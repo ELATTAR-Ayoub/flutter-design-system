@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/drawer.dart",
+      "source": "lib/src/components/ui/drawer.dart",
       "target": "@ui/drawer.dart",
-      "sha256": "c266991937267ec1254e525a17c4afc0b59b5f110b7bfbffdda83a33949af422"
+      "sha256": "7da92a42f71ecaa29a1c9d5405c834f937490c1ad150f35d06cb7f79baaecd0c"
     }
   ],
   "registryDependencies": [
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/drawer",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/drawer.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/drawer.dart",
   "deprecated": false
 }

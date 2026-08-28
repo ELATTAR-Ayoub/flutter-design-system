@@ -31,8 +31,8 @@ Create schema v1, deterministic generation, dependency validation, and a source-
 - `registry/schema/**`
 - `registry/foundations/**`
 - `registry/components/**`
-- `registry/effects/**`
-- `registry/motion/**`
+- `registry/components/**`
+- `registry/components/**`
 - `registry/generated/**`
 - `tool/registry_builder/**`
 - `test/registry_builder_test.dart`

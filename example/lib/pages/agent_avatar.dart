@@ -7,7 +7,7 @@
 /// **Two hundred and thirty-one cubes are in motion before the reader touches
 /// anything**, on nineteen different periods. Supervisor ruling F2 applies as
 /// it does on the feedback page: all of them build and all of them run, and the
-/// only gate is `elAnimationDuration`.
+/// only gate is `effectiveMotionDuration`.
 ///
 /// ## What is page-local, and why
 ///
@@ -15,18 +15,18 @@
 /// the console family. It has exactly one consumer here, so it stays on this
 /// page on the B10 precedent: promotion to the package needs a second one.
 /// Its shimmer is `@utility anim-shimmer-text`, which is `pulls-shimmer` (the
-/// keyframes `ElSkeleton` already runs) at [ElDurations.shimmerText] over a
+/// keyframes `Skeleton` already runs) at [MotionDurations.shimmerText] over a
 /// **three-stop, 100deg, 220%-wide** gradient clipped to the glyphs: a
 /// different utility from both `anim-shimmer` and the `shimmer` one
-/// `ElShimmerText` carries, and the reason it is spelled out rather than
+/// `AttachmentStatusText` carries, and the reason it is spelled out rather than
 /// reused.
 ///
-/// [_Matrix] is `components/el/agent-demo.tsx`'s `AvatarMatrix` and
+/// [_Matrix] is `components/space/agent-demo.tsx`'s `AvatarMatrix` and
 /// [_Playground] its `AvatarPlayground`. Both are docs-side components in the
 /// reference too, and both are page-local grids rather than kit ones: the
 /// matrix is `grid-cols-2 sm:grid-cols-4 lg:grid-cols-5`, which is **none** of
 /// the kit's five column maps (`cols={5}` is `2 / 3 / 5`), so only the lattice
-/// frame is shared. That is what [ElStateGrid.columns] is for.
+/// frame is shared. That is what [StateGrid.columns] is for.
 ///
 /// ## Probes
 ///
@@ -41,7 +41,7 @@
 ///
 ///  1. **`--agent-cube-error-right` is one 8-bit step apart.**
 ///     `hsl(0 60% 75%)` puts the red channel on 0.9 × 255 = **229.5 exactly**;
-///     Chrome rounds it up to 230 and `elHsl` down to 229. One channel of one
+///     Chrome rounds it up to 230 and `hslColor` down to 229. One channel of one
 ///     token, in the foundation's hsl conversion rather than in this family.
 ///     Nothing else in the twelve-token block differs at all.
 ///  2. **`scenes.ts`'s durations are rounded before the browser ever sees
@@ -106,7 +106,19 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -118,12 +130,12 @@ class AgentAvatarPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('agent', 'avatar');
+    final CategoryHit here = findCategory('agent', 'avatar');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // DRIFT 1: the group is already called "Agent".
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
@@ -134,8 +146,8 @@ class AgentAvatarPage extends StatelessWidget {
         // `className="mb-12"`, 48px, and the only Note on this page outside a
         // section, so the only one at the full 1080.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: const ElNote(
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: const Note(
             title: 'The agent acts, so the agent is blue',
             child: _BlueBody(),
           ),
@@ -147,7 +159,7 @@ class AgentAvatarPage extends StatelessWidget {
         const _OrbSection(),
         const _RendererSection(),
         const _ReducedMotionSection(),
-        const ElPageFootNav(groupId: 'agent', slug: 'avatar'),
+        const PageFootNav(groupId: 'agent', slug: 'avatar'),
       ],
     );
   }
@@ -158,7 +170,7 @@ class _BlueBody extends StatelessWidget {
   const _BlueBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -166,15 +178,15 @@ class _BlueBody extends StatelessWidget {
               'Rule 2 of the seven: blue acts, lime values. An agent '
               'doing work is an action, so every scene below is lit from ',
         ),
-        ElCode.span('--agent-cube-accent'),
+        Code.span('--agent-cube-accent'),
         const TextSpan(
           text:
               ', which points at the blue ramp. The accent’s top and '
               'right faces are mixed from that one value in ',
         ),
-        ElCode.span('oklab'),
+        Code.span('oklab'),
         const TextSpan(text: ', so re-pointing a single line in '),
-        ElCode.span('globals.css'),
+        Code.span('globals.css'),
         // DRIFT 5: nineteen scenes and one 3D cube.
         const TextSpan(
           text:
@@ -183,7 +195,7 @@ class _BlueBody extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -193,7 +205,7 @@ class _StatesSection extends StatelessWidget {
   const _StatesSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'states',
     title: 'Twenty states',
     description:
@@ -222,30 +234,30 @@ class _Matrix extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElStateGrid.columns(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return StateGrid.columns(
       base: 2,
       sm: 4,
       lg: 5,
       children: <Widget>[
-        for (final ElAgentState state in ElAgentState.values)
-          ElStateCell.bare(
+        for (final AgentState state in AgentState.values)
+          StateCell.bare(
             // `p-5`, not the bare cell's own `p-4`.
-            padding: EdgeInsets.all(el(5)),
+            padding: EdgeInsets.all(space(5)),
             child: Column(
               // `flex flex-col items-center gap-3`.
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElCubeAvatar(
+                AgentAvatar(
                   state: state,
-                  size: ElAgentAvatarSize.lg,
+                  size: AgentAvatarSize.lg,
                   accent: accent,
                 ),
-                SizedBox(height: el(3)),
-                ElText(
+                SizedBox(height: space(3)),
+                StyledText(
                   state.label,
-                  ElType.micro,
+                  TextStyles.eyebrowSmall,
                   color: theme.mutedForeground,
                   align: TextAlign.center,
                 ),
@@ -263,7 +275,7 @@ class _PlaygroundSection extends StatelessWidget {
   const _PlaygroundSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'playground',
     title: 'Face and status line',
     description:
@@ -285,11 +297,11 @@ class _Playground extends StatefulWidget {
 }
 
 class _PlaygroundState extends State<_Playground> {
-  ElAgentState _state = ElAgentState.thinking;
+  AgentState _state = AgentState.thinking;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       // `flex flex-col gap-6`.
@@ -298,35 +310,38 @@ class _PlaygroundState extends State<_Playground> {
         // `flex items-center gap-5 rounded-lg border border-border
         //  bg-background p-6`.
         Container(
-          padding: EdgeInsets.all(el(6)),
+          padding: EdgeInsets.all(space(6)),
           decoration: BoxDecoration(
             color: theme.background,
-            borderRadius: BorderRadius.circular(ElRadii.lg),
-            border: Border.all(color: theme.border, width: ElWidths.hairline),
+            borderRadius: BorderRadius.circular(Radii.lg),
+            border: Border.all(
+              color: theme.border,
+              width: BorderWidths.hairline,
+            ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              ElCubeAvatar(state: _state, size: ElAgentAvatarSize.xl),
-              SizedBox(width: el(5)),
+              AgentAvatar(state: _state, size: AgentAvatarSize.xl),
+              SizedBox(width: space(5)),
               // `min-w-0` on the status line, so the label truncates rather
               // than pushing the row wider than the panel.
               Expanded(child: _StatusLine(state: _state)),
             ],
           ),
         ),
-        SizedBox(height: el(6)),
+        SizedBox(height: space(6)),
         // `flex flex-wrap gap-2`.
         Wrap(
-          spacing: el(2),
-          runSpacing: el(2),
+          spacing: space(2),
+          runSpacing: space(2),
           children: <Widget>[
-            for (final ElAgentState s in ElAgentState.values)
-              ElButton(
-                size: ElButtonSize.sm,
+            for (final AgentState s in AgentState.values)
+              Button(
+                size: ButtonSize.sm,
                 variant: s == _state
-                    ? ElButtonVariant.primary
-                    : ElButtonVariant.outline,
+                    ? ButtonVariant.primary
+                    : ButtonVariant.outline,
                 onPressed: () => setState(() => _state = s),
                 // DRIFT 3: the wire id, not the label.
                 child: Text(s.wire),
@@ -359,13 +374,13 @@ class _PlaygroundState extends State<_Playground> {
 /// * `background-clip: text` with `color: transparent` is a [ShaderMask] in
 ///   [BlendMode.srcIn] over the painted glyphs: the gradient shows *through*
 ///   the letters and nowhere else.
-/// * `pulls-shimmer` is [ElShimmer]'s own table, `200% 0 → −200% 0`, and a
+/// * `pulls-shimmer` is [LoadingShimmerMotion]'s own table, `200% 0 → −200% 0`, and a
 ///   `background-position` percentage resolves against `container − image`. At
 ///   **220%** that is `−1.2W` per unit rather than `−W`, so the band travels
-///   `±2.4W` and not `±2W`; [ElShimmer.offsetAt] assumes the 200% tile, so the
+///   `±2.4W` and not `±2W`; [LoadingShimmerMotion.offsetAt] assumes the 200% tile, so the
 ///   offset is computed here from the same two stops.
 /// * `background-repeat` defaults to `repeat`, so the box is never empty at the
-///   extremes: the same fact [ElSkeleton]'s own note records.
+///   extremes: the same fact [Skeleton]'s own note records.
 ///
 /// The gradient's `100deg` leans the band ten degrees off vertical. Over a
 /// 13.8px line box that is 2.4px of vertical run against ~130px of horizontal,
@@ -374,7 +389,7 @@ class _PlaygroundState extends State<_Playground> {
 class _StatusLine extends StatefulWidget {
   const _StatusLine({required this.state});
 
-  final ElAgentState state;
+  final AgentState state;
 
   /// `background-size: 220% 100%`.
   static const double tileFactor = 2.2;
@@ -393,7 +408,7 @@ class _StatusLineState extends State<_StatusLine>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: ElDurations.shimmerText,
+    duration: MotionDurations.shimmerText,
   );
 
   @override
@@ -401,7 +416,7 @@ class _StatusLineState extends State<_StatusLine>
     super.didChangeDependencies();
     // `animation: none` under reduced motion, with no fill mode: so the band
     // reverts to stop 0 rather than holding wherever it was.
-    if (elAnimationDuration(context, ElDurations.shimmerText) ==
+    if (effectiveMotionDuration(context, MotionDurations.shimmerText) ==
         Duration.zero) {
       _c.stop();
       _c.value = 0;
@@ -418,10 +433,10 @@ class _StatusLineState extends State<_StatusLine>
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final Widget label = ElText(
+    final ThemeTokens theme = ThemeScope.of(context);
+    final Widget label = StyledText(
       widget.state.label,
-      ElType.chip,
+      TextStyles.chip,
       color: theme.mutedForeground,
       // `truncate`, `overflow:hidden white-space:nowrap text-overflow:ellipsis`.
       maxLines: 1,
@@ -440,12 +455,14 @@ class _StatusLineState extends State<_StatusLine>
         shaderCallback: (Rect bounds) {
           final double tile = bounds.width * _StatusLine.tileFactor;
           // `background-position: X%` puts the image's X% point on the box's
-          // X% point: `offset = (W − tileW) · X`. ElShimmer states the two
+          // X% point: `offset = (W − tileW) · X`. LoadingShimmerMotion states the two
           // ends; only the tile factor differs.
-          final double eased = ElShimmer.curve.transform(_c.value);
+          final double eased = LoadingShimmerMotion.curve.transform(_c.value);
           final double percent =
-              ElShimmer.fromPercent +
-              (ElShimmer.toPercent - ElShimmer.fromPercent) * eased;
+              LoadingShimmerMotion.fromPercent +
+              (LoadingShimmerMotion.toPercent -
+                      LoadingShimmerMotion.fromPercent) *
+                  eased;
           final double offset = (bounds.width - tile) * percent;
           final double radians = _StatusLine.angleDegrees * math.pi / 180;
           // CSS gradient angles run clockwise from "to top", so the axis is
@@ -455,7 +472,11 @@ class _StatusLineState extends State<_StatusLine>
           return ui.Gradient.linear(
             centre - axis * (tile / 2),
             centre + axis * (tile / 2),
-            <Color>[theme.mutedForeground, theme.agent, theme.mutedForeground],
+            <Color>[
+              theme.mutedForeground,
+              theme.agentAccent,
+              theme.mutedForeground,
+            ],
             _StatusLine.stops,
             TileMode.repeated,
           );
@@ -473,44 +494,44 @@ class _SizesSection extends StatelessWidget {
   const _SizesSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'sizes',
     title: 'Sizes',
     description:
         'Four scales. The scene sizes itself within the box rather than '
         'being transform-scaled, so strokes stay one pixel at every size.',
-    child: ElStateGrid(
+    child: StateGrid(
       children: <Widget>[
-        ElStateCell(
+        StateCell(
           label: 'sm',
           note: '32px · inline, beside a chip',
-          child: ElCubeAvatar(
-            state: ElAgentState.thinking,
-            size: ElAgentAvatarSize.sm,
+          child: AgentAvatar(
+            state: AgentState.thinking,
+            size: AgentAvatarSize.sm,
           ),
         ),
-        ElStateCell(
+        StateCell(
           label: 'md',
           note: '48px · launcher, console header',
-          child: ElCubeAvatar(
-            state: ElAgentState.thinking,
-            size: ElAgentAvatarSize.md,
+          child: AgentAvatar(
+            state: AgentState.thinking,
+            size: AgentAvatarSize.md,
           ),
         ),
-        ElStateCell(
+        StateCell(
           label: 'lg',
           note: '80px · welcome card',
-          child: ElCubeAvatar(
-            state: ElAgentState.thinking,
-            size: ElAgentAvatarSize.lg,
+          child: AgentAvatar(
+            state: AgentState.thinking,
+            size: AgentAvatarSize.lg,
           ),
         ),
-        ElStateCell(
+        StateCell(
           label: 'xl',
           note: '128px · empty state, hero',
-          child: ElCubeAvatar(
-            state: ElAgentState.thinking,
-            size: ElAgentAvatarSize.xl,
+          child: AgentAvatar(
+            state: AgentState.thinking,
+            size: AgentAvatarSize.xl,
           ),
         ),
       ],
@@ -525,48 +546,48 @@ class _AccentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'accent',
       title: 'One knob',
       description:
           'The accent is a prop, so one avatar set serves several products. '
           'Any CSS colour works — a token, a hex, a color-mix. This is the '
           'seam that makes the face rebrandable without touching a scene.',
-      child: ElStateGrid(
+      child: StateGrid(
         children: <Widget>[
-          const ElStateCell(
+          const StateCell(
             label: 'var(--agent)',
             note: 'the default',
-            child: ElCubeAvatar(
-              state: ElAgentState.callingTools,
-              size: ElAgentAvatarSize.lg,
+            child: AgentAvatar(
+              state: AgentState.callingTools,
+              size: AgentAvatarSize.lg,
             ),
           ),
-          ElStateCell(
+          StateCell(
             label: 'var(--color-value)',
             note: 'values, not actions',
-            child: ElCubeAvatar(
-              state: ElAgentState.callingTools,
-              size: ElAgentAvatarSize.lg,
-              accent: ElPalette.value,
+            child: AgentAvatar(
+              state: AgentState.callingTools,
+              size: AgentAvatarSize.lg,
+              accent: Palette.value,
             ),
           ),
-          ElStateCell(
+          StateCell(
             label: 'var(--color-success)',
             note: 'a different product',
-            child: ElCubeAvatar(
-              state: ElAgentState.callingTools,
-              size: ElAgentAvatarSize.lg,
-              accent: ElPalette.success,
+            child: AgentAvatar(
+              state: AgentState.callingTools,
+              size: AgentAvatarSize.lg,
+              accent: Palette.success,
             ),
           ),
-          ElStateCell(
+          StateCell(
             label: 'var(--color-info)',
             note: 'a different product',
-            child: ElCubeAvatar(
-              state: ElAgentState.callingTools,
-              size: ElAgentAvatarSize.lg,
-              accent: ElPalette.info,
+            child: AgentAvatar(
+              state: AgentState.callingTools,
+              size: AgentAvatarSize.lg,
+              accent: Palette.info,
             ),
           ),
         ],
@@ -582,7 +603,7 @@ class _OrbSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'orb',
       title: 'Voice orb',
       description:
@@ -592,14 +613,14 @@ class _OrbSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const ElPanel(
+          const Panel(
             label: 'Orb',
             // DRIFT 8: the one caption in the system naming a renderer.
             note: 'three.js · reads --orb-from and --orb-to',
             child: _OrbWell(),
           ),
           // `className="type-small mt-6"`.
-          SizedBox(height: el(6)),
+          SizedBox(height: space(6)),
           const _OrbNote(),
         ],
       ),
@@ -614,8 +635,10 @@ class _OrbWell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.symmetric(vertical: el(8)),
-    child: const Center(child: ElVoiceOrb(state: ElOrbState.idle, size: 160)),
+    padding: EdgeInsets.symmetric(vertical: space(8)),
+    child: const Center(
+      child: VoiceIndicator(state: VoiceIndicatorState.idle, size: 160),
+    ),
   );
 }
 
@@ -623,7 +646,7 @@ class _OrbNote extends StatelessWidget {
   const _OrbNote();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -631,17 +654,17 @@ class _OrbNote extends StatelessWidget {
               'A shader cannot resolve a CSS variable, so the wrapper '
               'reads ',
         ),
-        ElCode.span('--orb-from'),
+        Code.span('--orb-from'),
         const TextSpan(text: ' and '),
-        ElCode.span('--orb-to'),
+        Code.span('--orb-to'),
         const TextSpan(text: ' through '),
-        ElCode.span('getComputedStyle'),
+        Code.span('getComputedStyle'),
         const TextSpan(
           text:
               ' — which returns a real colour — and hands that to THREE. '
               'They are separate tokens from ',
         ),
-        ElCode.span('--agent'),
+        Code.span('--agent'),
         const TextSpan(
           text:
               ' so the orb can be tuned without moving the accent every '
@@ -649,7 +672,7 @@ class _OrbNote extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -659,7 +682,7 @@ class _RendererSection extends StatelessWidget {
   const _RendererSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'renderer',
     title: 'The renderer contract',
     description:
@@ -669,8 +692,8 @@ class _RendererSection extends StatelessWidget {
         'is one module satisfying this type, and nothing in the state '
         'machine, the transcript or the transport moves.',
     // DRIFT 4: four rows for a five-member type.
-    child: ElMeta(
-      items: <ElMetaItem>[
+    child: Meta(
+      items: <MetaItem>[
         (
           k: 'state',
           v: TextSpan(
@@ -712,12 +735,12 @@ class _ReducedMotionSection extends StatelessWidget {
   const _ReducedMotionSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'reduced-motion',
     title: 'Reduced motion is handled explicitly',
     description: 'Not inherited, and this is the trap worth knowing about.',
-    child: ElNote(
-      tone: ElNoteTone.value,
+    child: Note(
+      tone: NoteTone.value,
       title: 'Why the blanket rule is not enough',
       child: _ReducedMotionBody(),
     ),
@@ -731,7 +754,7 @@ class _ReducedMotionBody extends StatelessWidget {
   const _ReducedMotionBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -740,9 +763,9 @@ class _ReducedMotionBody extends StatelessWidget {
               'to 0.01ms and one iteration, which for most things is a '
               'freeze at the final keyframe. But ',
         ),
-        ElCode.span('appear'),
+        Code.span('appear'),
         const TextSpan(text: ' and '),
-        ElCode.span('drop'),
+        Code.span('drop'),
         const TextSpan(text: ' deliberately '),
         const TextSpan(text: 'end', style: _em),
         const TextSpan(
@@ -753,7 +776,7 @@ class _ReducedMotionBody extends StatelessWidget {
               'instruction is to fall back to the static cube layout, so '
               'that is stated in ',
         ),
-        ElCode.span('globals.css'),
+        Code.span('globals.css'),
         const TextSpan(
           text:
               ' rather than inherited: no animation, everything visible, '
@@ -761,6 +784,6 @@ class _ReducedMotionBody extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }

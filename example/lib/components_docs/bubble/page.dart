@@ -1,11 +1,11 @@
 /// Public documentation page for the `bubble` component.
 ///
-/// `bubble` is not one widget but a small family: [ElBubble] owns the box —
+/// `bubble` is not one widget but a small family: [Bubble] owns the box —
 /// `w-fit max-w-[80%]`, the alignment, the reactions rail's anchor point —
-/// and paints nothing itself; [ElBubbleContent] is the surface that knows a
+/// and paints nothing itself; [BubbleContent] is the surface that knows a
 /// variant's fill, border and ink, and can become a real control by passing
-/// [ElBubbleContent.onPressed]; [ElBubbleReactions] is the pill rail that
-/// hangs off any corner; [ElBubbleGroup] stacks a run of bubbles with the
+/// [BubbleContent.onPressed]; [BubbleReactions] is the pill rail that
+/// hangs off any corner; [BubbleGroup] stacks a run of bubbles with the
 /// reference's own 8px gap.
 ///
 /// This page is new — `bubble` had no page before this pass — built from
@@ -14,13 +14,25 @@
 /// here rather than invented fresh, per the rollout's own brief.
 ///
 /// **Section order**, matching the house shape: Preview, Installation,
-/// Usage, then one showcase per variant the `ElBubbleVariant` enum actually
+/// Usage, then one showcase per variant the `BubbleVariant` enum actually
 /// has (seven), then Alignment, As Child, Reactions and Reactions with
 /// Counts, then the eight disclosures.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -37,7 +49,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'All seven ElBubbleVariant values, side by side, each carrying '
+          'All seven BubbleVariant values, side by side, each carrying '
           'the same one-line copy so the fill is the only thing that '
           'changes.',
       specimen: _PreviewSpecimen(),
@@ -50,7 +62,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       description:
           'bubble has a real registry manifest, `elattar add bubble` '
           'installs lib/src/components/bubble.dart and resolves '
-          'press-motion and source-foundation automatically. The Manual '
+          'press and source-foundation automatically. The Manual '
           'tab is for a project not using the CLI.',
       command: bubbleDoc.command,
       manualFiles: <DocsCodeFile>[
@@ -69,7 +81,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElBubble and its five companion '
+              'Add the export line so Bubble and its five companion '
               'classes and four enums are reachable the same way the CLI '
               'path already makes them.',
           code: "export 'bubble.dart';",
@@ -88,8 +100,8 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'default',
       title: 'Default',
       description:
-          "ElBubbleVariant.normal — the constructor's own default, named "
-          '`default` in the cva source but ElBubbleVariant.normal here '
+          "BubbleVariant.normal — the constructor's own default, named "
+          '`default` in the cva source but BubbleVariant.normal here '
           'because default is a Dart keyword. theme.primary fill under '
           'theme.primaryForeground text: the sender\'s own turn.',
       specimen: _DefaultSpecimen(),
@@ -100,7 +112,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'secondary',
       title: 'Secondary',
       description:
-          'ElBubbleVariant.secondary: theme.secondary fill under '
+          'BubbleVariant.secondary: theme.secondary fill under '
           'theme.secondaryForeground text — the other party in the '
           'exchange.',
       specimen: _SecondarySpecimen(),
@@ -111,7 +123,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'muted',
       title: 'Muted',
       description:
-          'ElBubbleVariant.muted: theme.muted fill under theme.foreground '
+          'BubbleVariant.muted: theme.muted fill under theme.foreground '
           'text — a quieter turn, often shown on a card surface.',
       specimen: _MutedSpecimen(),
       code: _mutedCode,
@@ -121,7 +133,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'tinted',
       title: 'Tinted',
       description:
-          'ElBubbleVariant.tinted: theme.bubbleTinted, a brand wash token '
+          'BubbleVariant.tinted: theme.messageAccent, a brand wash token '
           'derived from theme.primary rather than an inline dark: twin — '
           'lightness 0.93 in light, 0.30 in dark.',
       specimen: _TintedSpecimen(),
@@ -132,7 +144,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'outline',
       title: 'Outline',
       description:
-          'ElBubbleVariant.outline: theme.background fill, theme.border '
+          'BubbleVariant.outline: theme.background fill, theme.border '
           'border — the one variant whose border is not transparent at '
           'rest.',
       specimen: _OutlineSpecimen(),
@@ -143,7 +155,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'ghost',
       title: 'Ghost',
       description:
-          'ElBubbleVariant.ghost: no fill, no padding, no radius, and the '
+          'BubbleVariant.ghost: no fill, no padding, no radius, and the '
           'only variant exempt from the 80% width cap — reach for it to '
           'set a long answer flush in the column rather than boxed in a '
           'bubble.',
@@ -155,8 +167,8 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'destructive',
       title: 'Destructive',
       description:
-          'ElBubbleVariant.destructive: theme.destructive at 10% alpha '
-          '(20% in dark) under theme.destructiveInk — not '
+          'BubbleVariant.destructive: theme.destructive at 10% alpha '
+          '(20% in dark) under theme.destructiveText — not '
           'theme.destructive text, which the source flags as a fill-end '
           'colour that does not carry text on its own.',
       specimen: _DestructiveSpecimen(),
@@ -179,8 +191,8 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'as-child',
       title: 'As Child',
       description:
-          'Pass ElBubbleContent.onPressed and the whole surface becomes '
-          'the control: hover, a 250ms colour sweep on ElCurves.out, and a '
+          'Pass BubbleContent.onPressed and the whole surface becomes '
+          'the control: hover, a 250ms colour sweep on MotionCurves.enter, and a '
           'focus ring all activate — none of which paint on the inert div '
           'form above. Hover this specimen to see the fill move.',
       specimen: _AsChildSpecimen(),
@@ -191,20 +203,20 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'reactions',
       title: 'Reactions',
       description:
-          "The bare rail — pass ElBubbleReactions.children instead of "
+          "The bare rail — pass BubbleReactions.children instead of "
           'reactions — at all four side x align corners. The rail rings '
           'in theme.card, so it needs a card surface under it or the ring '
           'reads as a halo; this specimen supplies one.',
       specimen: _ReactionsSpecimen(),
       code: _reactionsCode,
       label: 'Reactions specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     ShowcaseSection(
       id: 'reactions-counts',
       title: 'Reactions with Counts',
       description:
-          'Pass ElBubbleReactions.reactions instead, and each pill grows a '
+          'Pass BubbleReactions.reactions instead, and each pill grows a '
           'count. showCount.hover collapses it until hover or focus; '
           'showCount.always keeps it open — the accessible name carries '
           'the count either way, so no information ever lives in the '
@@ -213,31 +225,25 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       specimen: _ReactionCountsSpecimen(),
       code: _reactionCountsCode,
       label: 'Reactions with Counts specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     DisclosureSection(
       id: 'api',
       title: 'API Reference',
       description:
           'Every constructor parameter each exported class declares, '
-          'every field ElBubbleReaction carries, and every value of the '
+          'every field BubbleReaction carries, and every value of the '
           'four enums bubble.dart exports: one table per class or enum.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElBubble', anchor: 'api-elbubble'),
-        DocsTocEntry(title: 'ElBubbleContent', anchor: 'api-elbubblecontent'),
-        DocsTocEntry(title: 'ElBubbleGroup', anchor: 'api-elbubblegroup'),
-        DocsTocEntry(
-          title: 'ElBubbleReactions',
-          anchor: 'api-elbubblereactions',
-        ),
-        DocsTocEntry(
-          title: 'ElBubbleReaction',
-          anchor: 'api-elbubblereaction',
-        ),
-        DocsTocEntry(title: 'ElBubbleVariant', anchor: 'api-elbubblevariant'),
-        DocsTocEntry(title: 'ElBubbleAlign', anchor: 'api-elbubblealign'),
-        DocsTocEntry(title: 'ElBubbleSide', anchor: 'api-elbubbleside'),
-        DocsTocEntry(title: 'ElShowCount', anchor: 'api-elshowcount'),
+        DocsTocEntry(title: 'Bubble', anchor: 'api-elbubble'),
+        DocsTocEntry(title: 'BubbleContent', anchor: 'api-elbubblecontent'),
+        DocsTocEntry(title: 'BubbleGroup', anchor: 'api-elbubblegroup'),
+        DocsTocEntry(title: 'BubbleReactions', anchor: 'api-elbubblereactions'),
+        DocsTocEntry(title: 'BubbleReaction', anchor: 'api-elbubblereaction'),
+        DocsTocEntry(title: 'BubbleVariant', anchor: 'api-elbubblevariant'),
+        DocsTocEntry(title: 'BubbleAlign', anchor: 'api-elbubblealign'),
+        DocsTocEntry(title: 'BubbleSide', anchor: 'api-elbubbleside'),
+        DocsTocEntry(title: 'ShowCount', anchor: 'api-elshowcount'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -245,7 +251,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off _ElBubbleContentState._fill / _ink and '
+          'Read off _BubbleContentState._fill / _ink and '
           '_ReactionPillState.build, not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -291,7 +297,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/chat_test.dart',
             description:
-                'ElBubble, ElBubbleContent and ElBubbleReactions are '
+                'Bubble, BubbleContent and BubbleReactions are '
                 'covered inside the shared chat-family suite alongside '
                 'message and message-scroller: there is no dedicated '
                 'bubble_test.dart in the package yet.',
@@ -328,9 +334,9 @@ class BubbleDocPage extends StatelessWidget {
       title: bubbleDocSpec.title,
       description: bubbleDocSpec.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Bubble'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Bubble'),
     ],
     toc: bubbleDocSpec.toc,
     previous: const DocsPageLink(title: 'Card', route: '/components/card'),
@@ -345,14 +351,14 @@ class BubbleDocPage extends StatelessWidget {
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-const List<(ElBubbleVariant, String)> _variants = <(ElBubbleVariant, String)>[
-  (ElBubbleVariant.normal, "the sender's own turn"),
-  (ElBubbleVariant.secondary, 'the other party'),
-  (ElBubbleVariant.muted, 'quieter, on a card'),
-  (ElBubbleVariant.tinted, 'brand wash, per theme'),
-  (ElBubbleVariant.outline, 'hairline, no fill'),
-  (ElBubbleVariant.ghost, 'no bubble at all'),
-  (ElBubbleVariant.destructive, 'failed to send'),
+const List<(BubbleVariant, String)> _variants = <(BubbleVariant, String)>[
+  (BubbleVariant.normal, "the sender's own turn"),
+  (BubbleVariant.secondary, 'the other party'),
+  (BubbleVariant.muted, 'quieter, on a card'),
+  (BubbleVariant.tinted, 'brand wash, per theme'),
+  (BubbleVariant.outline, 'hairline, no fill'),
+  (BubbleVariant.ghost, 'no bubble at all'),
+  (BubbleVariant.destructive, 'failed to send'),
 ];
 
 class _PreviewSpecimen extends StatelessWidget {
@@ -362,26 +368,26 @@ class _PreviewSpecimen extends StatelessWidget {
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
     child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(2)),
+      padding: EdgeInsets.symmetric(horizontal: space(2)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          for (final (ElBubbleVariant variant, String note) in _variants) ...[
+          for (final (BubbleVariant variant, String note) in _variants) ...[
             KeyedSubtree(
               key: ValueKey<String>('bubble-preview:${variant.name}'),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  ElBubble(
+                  Bubble(
                     variant: variant,
-                    child: ElBubbleContent(child: Text(variant.label)),
+                    child: BubbleContent(child: Text(variant.label)),
                   ),
-                  SizedBox(height: el(2)),
-                  ElText(note, ElType.small, align: TextAlign.center),
+                  SizedBox(height: space(2)),
+                  StyledText(note, TextStyles.small, align: TextAlign.center),
                 ],
               ),
             ),
-            SizedBox(width: el(4)),
+            SizedBox(width: space(4)),
           ],
         ],
       ),
@@ -393,30 +399,30 @@ const String _previewCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
     'Row(\n'
     '  children: [\n'
-    '    ElBubble(child: ElBubbleContent(child: Text(\'default\'))),\n'
-    '    ElBubble(\n'
-    '      variant: ElBubbleVariant.secondary,\n'
-    "      child: ElBubbleContent(child: Text('secondary')),\n"
+    '    Bubble(child: BubbleContent(child: Text(\'default\'))),\n'
+    '    Bubble(\n'
+    '      variant: BubbleVariant.secondary,\n'
+    "      child: BubbleContent(child: Text('secondary')),\n"
     '    ),\n'
-    '    ElBubble(\n'
-    '      variant: ElBubbleVariant.muted,\n'
-    "      child: ElBubbleContent(child: Text('muted')),\n"
+    '    Bubble(\n'
+    '      variant: BubbleVariant.muted,\n'
+    "      child: BubbleContent(child: Text('muted')),\n"
     '    ),\n'
-    '    ElBubble(\n'
-    '      variant: ElBubbleVariant.tinted,\n'
-    "      child: ElBubbleContent(child: Text('tinted')),\n"
+    '    Bubble(\n'
+    '      variant: BubbleVariant.tinted,\n'
+    "      child: BubbleContent(child: Text('tinted')),\n"
     '    ),\n'
-    '    ElBubble(\n'
-    '      variant: ElBubbleVariant.outline,\n'
-    "      child: ElBubbleContent(child: Text('outline')),\n"
+    '    Bubble(\n'
+    '      variant: BubbleVariant.outline,\n'
+    "      child: BubbleContent(child: Text('outline')),\n"
     '    ),\n'
-    '    ElBubble(\n'
-    '      variant: ElBubbleVariant.ghost,\n'
-    "      child: ElBubbleContent(child: Text('ghost')),\n"
+    '    Bubble(\n'
+    '      variant: BubbleVariant.ghost,\n'
+    "      child: BubbleContent(child: Text('ghost')),\n"
     '    ),\n'
-    '    ElBubble(\n'
-    '      variant: ElBubbleVariant.destructive,\n'
-    "      child: ElBubbleContent(child: Text('destructive')),\n"
+    '    Bubble(\n'
+    '      variant: BubbleVariant.destructive,\n'
+    "      child: BubbleContent(child: Text('destructive')),\n"
     '    ),\n'
     '  ],\n'
     ')';
@@ -424,8 +430,8 @@ const String _previewCode =
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElBubble(
-  child: ElBubbleContent(
+Bubble(
+  child: BubbleContent(
     child: Text('Up 14% overnight'),
   ),
 )''';
@@ -436,17 +442,15 @@ class _DefaultSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('bubble-example:default'),
-    child: const ElBubble(
-      child: ElBubbleContent(
-        child: Text('Eclipse Vault is up 14% overnight.'),
-      ),
+    child: const Bubble(
+      child: BubbleContent(child: Text('Eclipse Vault is up 14% overnight.')),
     ),
   );
 }
 
 const String _defaultCode = '''
-ElBubble(
-  child: ElBubbleContent(
+Bubble(
+  child: BubbleContent(
     child: Text('Eclipse Vault is up 14% overnight.'),
   ),
 )''';
@@ -457,17 +461,17 @@ class _SecondarySpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('bubble-example:secondary'),
-    child: const ElBubble(
-      variant: ElBubbleVariant.secondary,
-      child: ElBubbleContent(child: Text('Which three?')),
+    child: const Bubble(
+      variant: BubbleVariant.secondary,
+      child: BubbleContent(child: Text('Which three?')),
     ),
   );
 }
 
 const String _secondaryCode = '''
-ElBubble(
-  variant: ElBubbleVariant.secondary,
-  child: ElBubbleContent(child: Text('Which three?')),
+Bubble(
+  variant: BubbleVariant.secondary,
+  child: BubbleContent(child: Text('Which three?')),
 )''';
 
 class _MutedSpecimen extends StatelessWidget {
@@ -476,17 +480,17 @@ class _MutedSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('bubble-example:muted'),
-    child: const ElBubble(
-      variant: ElBubbleVariant.muted,
-      child: ElBubbleContent(child: Text('Nice pull')),
+    child: const Bubble(
+      variant: BubbleVariant.muted,
+      child: BubbleContent(child: Text('Nice pull')),
     ),
   );
 }
 
 const String _mutedCode = '''
-ElBubble(
-  variant: ElBubbleVariant.muted,
-  child: ElBubbleContent(child: Text('Nice pull')),
+Bubble(
+  variant: BubbleVariant.muted,
+  child: BubbleContent(child: Text('Nice pull')),
 )''';
 
 class _TintedSpecimen extends StatelessWidget {
@@ -495,17 +499,17 @@ class _TintedSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('bubble-example:tinted'),
-    child: const ElBubble(
-      variant: ElBubbleVariant.tinted,
-      child: ElBubbleContent(child: Text('Set. I will watch it.')),
+    child: const Bubble(
+      variant: BubbleVariant.tinted,
+      child: BubbleContent(child: Text('Set. I will watch it.')),
     ),
   );
 }
 
 const String _tintedCode = '''
-ElBubble(
-  variant: ElBubbleVariant.tinted,
-  child: ElBubbleContent(child: Text('Set. I will watch it.')),
+Bubble(
+  variant: BubbleVariant.tinted,
+  child: BubbleContent(child: Text('Set. I will watch it.')),
 )''';
 
 class _OutlineSpecimen extends StatelessWidget {
@@ -514,19 +518,17 @@ class _OutlineSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('bubble-example:outline'),
-    child: const ElBubble(
-      variant: ElBubbleVariant.outline,
-      child: ElBubbleContent(
-        child: Text('Six cards, two of them graded.'),
-      ),
+    child: const Bubble(
+      variant: BubbleVariant.outline,
+      child: BubbleContent(child: Text('Six cards, two of them graded.')),
     ),
   );
 }
 
 const String _outlineCode = '''
-ElBubble(
-  variant: ElBubbleVariant.outline,
-  child: ElBubbleContent(child: Text('Six cards, two of them graded.')),
+Bubble(
+  variant: BubbleVariant.outline,
+  child: BubbleContent(child: Text('Six cards, two of them graded.')),
 )''';
 
 class _GhostSpecimen extends StatelessWidget {
@@ -535,9 +537,9 @@ class _GhostSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('bubble-example:ghost'),
-    child: const ElBubble(
-      variant: ElBubbleVariant.ghost,
-      child: ElBubbleContent(
+    child: const Bubble(
+      variant: BubbleVariant.ghost,
+      child: BubbleContent(
         child: Text(
           'It is concentrated: four accounts account for most of the '
           'volume, and all four bought within the same eleven minutes.',
@@ -548,9 +550,9 @@ class _GhostSpecimen extends StatelessWidget {
 }
 
 const String _ghostCode = '''
-ElBubble(
-  variant: ElBubbleVariant.ghost,
-  child: ElBubbleContent(
+Bubble(
+  variant: BubbleVariant.ghost,
+  child: BubbleContent(
     child: Text('It is concentrated: four accounts account for most of it.'),
   ),
 )''';
@@ -561,17 +563,17 @@ class _DestructiveSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('bubble-example:destructive'),
-    child: const ElBubble(
-      variant: ElBubbleVariant.destructive,
-      child: ElBubbleContent(child: Text('Failed to send. Tap to retry.')),
+    child: const Bubble(
+      variant: BubbleVariant.destructive,
+      child: BubbleContent(child: Text('Failed to send. Tap to retry.')),
     ),
   );
 }
 
 const String _destructiveCode = '''
-ElBubble(
-  variant: ElBubbleVariant.destructive,
-  child: ElBubbleContent(child: Text('Failed to send. Tap to retry.')),
+Bubble(
+  variant: BubbleVariant.destructive,
+  child: BubbleContent(child: Text('Failed to send. Tap to retry.')),
 )''';
 
 class _AlignmentSpecimen extends StatelessWidget {
@@ -580,15 +582,15 @@ class _AlignmentSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('bubble-example:alignment'),
-    child: ElBubbleGroup(
+    child: BubbleGroup(
       children: const <Widget>[
-        ElBubble(
-          variant: ElBubbleVariant.secondary,
-          child: ElBubbleContent(child: Text('Which three?')),
+        Bubble(
+          variant: BubbleVariant.secondary,
+          child: BubbleContent(child: Text('Which three?')),
         ),
-        ElBubble(
-          align: ElBubbleAlign.end,
-          child: ElBubbleContent(
+        Bubble(
+          align: BubbleAlign.end,
+          child: BubbleContent(
             child: Text('Eclipse, Origin Pulse and Nightfall.'),
           ),
         ),
@@ -598,15 +600,15 @@ class _AlignmentSpecimen extends StatelessWidget {
 }
 
 const String _alignmentCode = '''
-ElBubbleGroup(
+BubbleGroup(
   children: [
-    ElBubble(
-      variant: ElBubbleVariant.secondary,
-      child: ElBubbleContent(child: Text('Which three?')),
+    Bubble(
+      variant: BubbleVariant.secondary,
+      child: BubbleContent(child: Text('Which three?')),
     ),
-    ElBubble(
-      align: ElBubbleAlign.end,
-      child: ElBubbleContent(
+    Bubble(
+      align: BubbleAlign.end,
+      child: BubbleContent(
         child: Text('Eclipse, Origin Pulse and Nightfall.'),
       ),
     ),
@@ -619,18 +621,15 @@ class _AsChildSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('bubble-example:as-child'),
-    child: ElBubble(
-      child: ElBubbleContent(
-        onPressed: () {},
-        child: const Text('Open the set'),
-      ),
+    child: Bubble(
+      child: BubbleContent(onPressed: () {}, child: const Text('Open the set')),
     ),
   );
 }
 
 const String _asChildCode = '''
-ElBubble(
-  child: ElBubbleContent(
+Bubble(
+  child: BubbleContent(
     onPressed: () {},
     child: const Text('Open the set'),
   ),
@@ -639,47 +638,44 @@ ElBubble(
 class _ReactionsSpecimen extends StatelessWidget {
   const _ReactionsSpecimen();
 
-  static const List<(ElBubbleSide, ElBubbleAlign)> _corners =
-      <(ElBubbleSide, ElBubbleAlign)>[
-        (ElBubbleSide.bottom, ElBubbleAlign.end),
-        (ElBubbleSide.bottom, ElBubbleAlign.start),
-        (ElBubbleSide.top, ElBubbleAlign.end),
-        (ElBubbleSide.top, ElBubbleAlign.start),
+  static const List<(BubbleSide, BubbleAlign)> _corners =
+      <(BubbleSide, BubbleAlign)>[
+        (BubbleSide.bottom, BubbleAlign.end),
+        (BubbleSide.bottom, BubbleAlign.start),
+        (BubbleSide.top, BubbleAlign.end),
+        (BubbleSide.top, BubbleAlign.start),
       ];
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return KeyedSubtree(
       key: const ValueKey<String>('bubble-example:reactions'),
       child: ColoredBox(
         color: theme.card,
         child: Padding(
-          padding: EdgeInsets.all(el(6)),
+          padding: EdgeInsets.all(space(6)),
           child: Wrap(
-            spacing: el(8),
-            runSpacing: el(8),
+            spacing: space(8),
+            runSpacing: space(8),
             children: <Widget>[
-              for (final (ElBubbleSide side, ElBubbleAlign align) in _corners)
+              for (final (BubbleSide side, BubbleAlign align) in _corners)
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    ElBubble(
-                      variant: ElBubbleVariant.muted,
-                      reactions: ElBubbleReactions(
+                    Bubble(
+                      variant: BubbleVariant.muted,
+                      reactions: BubbleReactions(
                         side: side,
                         align: align,
-                        children: const <Widget>[
-                          Text('🔥'),
-                          Text('❤️'),
-                        ],
+                        children: const <Widget>[Text('🔥'), Text('❤️')],
                       ),
-                      child: const ElBubbleContent(child: Text('Nice pull')),
+                      child: const BubbleContent(child: Text('Nice pull')),
                     ),
-                    SizedBox(height: el(6)),
-                    ElText(
+                    SizedBox(height: space(6)),
+                    StyledText(
                       '${side.name} · ${align.name}',
-                      ElType.small,
+                      TextStyles.small,
                       align: TextAlign.center,
                     ),
                   ],
@@ -693,52 +689,50 @@ class _ReactionsSpecimen extends StatelessWidget {
 }
 
 const String _reactionsCode = '''
-ElBubble(
-  variant: ElBubbleVariant.muted,
-  reactions: ElBubbleReactions(
-    side: ElBubbleSide.bottom,
-    align: ElBubbleAlign.end,
+Bubble(
+  variant: BubbleVariant.muted,
+  reactions: BubbleReactions(
+    side: BubbleSide.bottom,
+    align: BubbleAlign.end,
     children: [Text('🔥'), Text('❤️')],
   ),
-  child: const ElBubbleContent(child: Text('Nice pull')),
+  child: const BubbleContent(child: Text('Nice pull')),
 )''';
 
 class _ReactionCountsSpecimen extends StatelessWidget {
   const _ReactionCountsSpecimen();
 
-  static const List<ElBubbleReaction> _reactions = <ElBubbleReaction>[
-    ElBubbleReaction(emoji: '🔥', count: 12, label: 'fire', mine: true),
-    ElBubbleReaction(emoji: '❤️', count: 8, label: 'a heart'),
-    ElBubbleReaction(emoji: '👏', count: 3, label: 'applause'),
+  static const List<BubbleReaction> _reactions = <BubbleReaction>[
+    BubbleReaction(emoji: '🔥', count: 12, label: 'fire', mine: true),
+    BubbleReaction(emoji: '❤️', count: 8, label: 'a heart'),
+    BubbleReaction(emoji: '👏', count: 3, label: 'applause'),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return KeyedSubtree(
       key: const ValueKey<String>('bubble-example:reactions-counts'),
       child: ColoredBox(
         color: theme.card,
         child: Padding(
-          padding: EdgeInsets.all(el(6)),
+          padding: EdgeInsets.all(space(6)),
           child: Wrap(
-            spacing: el(10),
-            runSpacing: el(8),
+            spacing: space(10),
+            runSpacing: space(8),
             children: <Widget>[
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  ElBubble(
-                    variant: ElBubbleVariant.muted,
-                    reactions: const ElBubbleReactions(
-                      reactions: _reactions,
-                    ),
-                    child: const ElBubbleContent(child: Text('Nice pull')),
+                  Bubble(
+                    variant: BubbleVariant.muted,
+                    reactions: const BubbleReactions(reactions: _reactions),
+                    child: const BubbleContent(child: Text('Nice pull')),
                   ),
-                  SizedBox(height: el(6)),
-                  ElText(
+                  SizedBox(height: space(6)),
+                  StyledText(
                     'showCount: hover (default)',
-                    ElType.small,
+                    TextStyles.small,
                     align: TextAlign.center,
                   ),
                 ],
@@ -746,18 +740,18 @@ class _ReactionCountsSpecimen extends StatelessWidget {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  ElBubble(
-                    variant: ElBubbleVariant.muted,
-                    reactions: const ElBubbleReactions(
+                  Bubble(
+                    variant: BubbleVariant.muted,
+                    reactions: const BubbleReactions(
                       reactions: _reactions,
-                      showCount: ElShowCount.always,
+                      showCount: ShowCount.always,
                     ),
-                    child: const ElBubbleContent(child: Text('Nice pull')),
+                    child: const BubbleContent(child: Text('Nice pull')),
                   ),
-                  SizedBox(height: el(6)),
-                  ElText(
+                  SizedBox(height: space(6)),
+                  StyledText(
                     'showCount: always',
-                    ElType.small,
+                    TextStyles.small,
                     align: TextAlign.center,
                   ),
                 ],
@@ -772,15 +766,15 @@ class _ReactionCountsSpecimen extends StatelessWidget {
 
 const String _reactionCountsCode = '''
 const reactions = [
-  ElBubbleReaction(emoji: '🔥', count: 12, label: 'fire', mine: true),
-  ElBubbleReaction(emoji: '❤️', count: 8, label: 'a heart'),
-  ElBubbleReaction(emoji: '👏', count: 3, label: 'applause'),
+  BubbleReaction(emoji: '🔥', count: 12, label: 'fire', mine: true),
+  BubbleReaction(emoji: '❤️', count: 8, label: 'a heart'),
+  BubbleReaction(emoji: '👏', count: 3, label: 'applause'),
 ];
 
-ElBubble(
-  variant: ElBubbleVariant.muted,
-  reactions: ElBubbleReactions(reactions: reactions),
-  child: const ElBubbleContent(child: Text('Nice pull')),
+Bubble(
+  variant: BubbleVariant.muted,
+  reactions: BubbleReactions(reactions: reactions),
+  child: const BubbleContent(child: Text('Nice pull')),
 )''';
 
 /* ── API Reference ──────────────────────────────────────────────────────── */
@@ -794,71 +788,65 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       DocsAnchor(
         id: 'api-elbubble',
-        child: const DocsApiTable(title: 'ElBubble', facts: _bubbleFacts),
+        child: const DocsApiTable(title: 'Bubble', facts: _bubbleFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elbubblecontent',
         child: const DocsApiTable(
-          title: 'ElBubbleContent',
+          title: 'BubbleContent',
           facts: _bubbleContentFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elbubblegroup',
         child: const DocsApiTable(
-          title: 'ElBubbleGroup',
+          title: 'BubbleGroup',
           facts: _bubbleGroupFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elbubblereactions',
         child: const DocsApiTable(
-          title: 'ElBubbleReactions',
+          title: 'BubbleReactions',
           facts: _bubbleReactionsFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elbubblereaction',
         child: const DocsApiTable(
-          title: 'ElBubbleReaction',
+          title: 'BubbleReaction',
           facts: _bubbleReactionFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elbubblevariant',
         child: const DocsApiTable(
-          title: 'ElBubbleVariant',
+          title: 'BubbleVariant',
           facts: _bubbleVariantFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elbubblealign',
         child: const DocsApiTable(
-          title: 'ElBubbleAlign',
+          title: 'BubbleAlign',
           facts: _bubbleAlignFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elbubbleside',
-        child: const DocsApiTable(
-          title: 'ElBubbleSide',
-          facts: _bubbleSideFacts,
-        ),
+        child: const DocsApiTable(title: 'BubbleSide', facts: _bubbleSideFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elshowcount',
-        child: const DocsApiTable(
-          title: 'ElShowCount',
-          facts: _showCountFacts,
-        ),
+        child: const DocsApiTable(title: 'ShowCount', facts: _showCountFacts),
       ),
     ],
   );
@@ -869,26 +857,26 @@ const List<DocsApiFact> _bubbleFacts = <DocsApiFact>[
     name: 'child',
     type: 'Widget',
     description:
-        'Required. Usually an ElBubbleContent, or whatever the call site '
+        'Required. Usually an BubbleContent, or whatever the call site '
         'stacks in the column.',
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElBubbleVariant',
+    type: 'BubbleVariant',
     description:
-        'Optional. Defaults to ElBubbleVariant.normal. Forwarded to the '
-        'child ElBubbleContent through an inherited scope.',
+        'Optional. Defaults to BubbleVariant.normal. Forwarded to the '
+        'child BubbleContent through an inherited scope.',
   ),
   DocsApiFact(
     name: 'align',
-    type: 'ElBubbleAlign',
+    type: 'BubbleAlign',
     description:
-        'Optional. Defaults to ElBubbleAlign.start. Inside a Message the '
+        'Optional. Defaults to BubbleAlign.start. Inside a Message the '
         "message's own align wins when this is left at its default.",
   ),
   DocsApiFact(
     name: 'reactions',
-    type: 'ElBubbleReactions?',
+    type: 'BubbleReactions?',
     description:
         'Optional. Defaults to null. Absolutely positioned against this '
         "bubble and pulled three quarters outside it — needs vertical "
@@ -924,7 +912,7 @@ const List<DocsApiFact> _bubbleGroupFacts = <DocsApiFact>[
     name: 'children',
     type: 'List<Widget>',
     description:
-        'Required. A run of ElBubble in a column, 8px apart — one per '
+        'Required. A run of Bubble in a column, 8px apart — one per '
         'conversation, or one per run of turns from the same sender.',
   ),
 ];
@@ -932,25 +920,25 @@ const List<DocsApiFact> _bubbleGroupFacts = <DocsApiFact>[
 const List<DocsApiFact> _bubbleReactionsFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'side',
-    type: 'ElBubbleSide',
-    description: 'Optional. Defaults to ElBubbleSide.bottom.',
+    type: 'BubbleSide',
+    description: 'Optional. Defaults to BubbleSide.bottom.',
   ),
   DocsApiFact(
     name: 'align',
-    type: 'ElBubbleAlign',
-    description: 'Optional. Defaults to ElBubbleAlign.end.',
+    type: 'BubbleAlign',
+    description: 'Optional. Defaults to BubbleAlign.end.',
   ),
   DocsApiFact(
     name: 'reactions',
-    type: 'List<ElBubbleReaction>?',
+    type: 'List<BubbleReaction>?',
     description:
         'Optional. Defaults to null. Draws data pills with counts; '
         'exclusive with children.',
   ),
   DocsApiFact(
     name: 'showCount',
-    type: 'ElShowCount',
-    description: 'Optional. Defaults to ElShowCount.hover.',
+    type: 'ShowCount',
+    description: 'Optional. Defaults to ShowCount.hover.',
   ),
   DocsApiFact(
     name: 'onReact',
@@ -1016,7 +1004,7 @@ const List<DocsApiFact> _bubbleVariantFacts = <DocsApiFact>[
     name: 'tinted',
     type: 'enum value',
     description:
-        'theme.bubbleTinted fill, theme.foreground text: a token derived '
+        'theme.messageAccent fill, theme.foreground text: a token derived '
         'from theme.primary, not an inline dark: twin.',
   ),
   DocsApiFact(
@@ -1036,7 +1024,7 @@ const List<DocsApiFact> _bubbleVariantFacts = <DocsApiFact>[
     name: 'destructive',
     type: 'enum value',
     description:
-        'theme.destructive at 10%/20% alpha fill, theme.destructiveInk '
+        'theme.destructive at 10%/20% alpha fill, theme.destructiveText '
         'text.',
   ),
 ];
@@ -1096,7 +1084,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Hover (asChild only)',
     treatment:
         'Pointer-only, and only when onPressed is set. Fill and ink '
-        'sweep over 250ms on ElCurves.out.',
+        'sweep over 250ms on MotionCurves.enter.',
     userSignal: 'A lit surface under the pointer — never on a bare div.',
   ),
   DocsStateFact(
@@ -1110,22 +1098,22 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reaction hover/focus',
     treatment:
         "A pill's count reveals from 0 to 16px width over 250ms on "
-        'ElCurves.out — unless showCount is always, which never '
+        'MotionCurves.enter — unless showCount is always, which never '
         'transitions.',
     userSignal: 'The number widens out of nothing under the pointer.',
   ),
   DocsStateFact(
     state: 'Reaction pressed',
     treatment:
-        'ElPress: 40ms down to 0.94 scale, 250ms spring back — the same '
+        'Press: 40ms down to 0.94 scale, 250ms spring back — the same '
         'press primitive Button uses.',
     userSignal: 'A physical squish on tap.',
   ),
   DocsStateFact(
     state: 'Reaction mine',
     treatment:
-        'ElBubbleReaction.mine: true tints the pill border and fill at '
-        'ElPalette.action and sets aria-pressed.',
+        'BubbleReaction.mine: true tints the pill border and fill at '
+        'Palette.action and sets aria-pressed.',
     userSignal:
         'A reacted-to pill reads differently at rest, not only on '
         'hover.',
@@ -1139,9 +1127,9 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Semantic role: the inert div form mounts no Semantics node of its '
-            'own. The asChild form (ElBubbleContent.onPressed set) wraps '
+            'own. The asChild form (BubbleContent.onPressed set) wraps '
             'itself in Semantics(button: true), with semanticsLabel as an '
             'override when the child is not a plain string.',
         'Reaction pills always carry Semantics(button: true, toggled: '
@@ -1167,7 +1155,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The div form takes no focus and answers no key: bubble.dart wires '
             'no Focus or key handler on it at all.',
         'The asChild form (onPressed set) wraps a Focus that tracks '
@@ -1177,7 +1165,7 @@ class _KeyboardContent extends StatelessWidget {
             'GestureDetector/Focus stack in the surrounding app already '
             'provides, not a bubble.dart-specific onKey.',
         'A reaction pill wraps its own Focus for the ring and its own '
-            'ElPress for the tap, the same pattern.',
+            'Press for the tap, the same pattern.',
         'No custom traversal order: nothing here declares a '
             'FocusTraversalPolicy.',
       ]);
@@ -1188,15 +1176,15 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in bubble.dart: BuildContext '
             'width is never read for a layout decision.',
         'Every bubble caps itself at 80% of the column it is in — a '
             '_MaxWidthFraction render object, not a LayoutBuilder, so '
-            'intrinsic queries (ElGrid measuring a cell) still pass '
+            'intrinsic queries (Grid measuring a cell) still pass '
             'through. ghost is exempt at 100%.',
         'Every measurement (padding, gap, focus ring, rail inset) is a '
-            'fixed 4px-grid value from el(), never keyed to viewport.',
+            'fixed 4px-grid value from space(), never keyed to viewport.',
       ]);
 }
 
@@ -1207,26 +1195,26 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/bubble.dart — one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/rendering.dart '
             '(RenderProxyBox/RenderStack, the width-cap and reactions-'
             'overflow render objects), package:flutter/widgets.dart.',
-        'Foundation imports: foundation/colors.dart (ElOklab, '
-            'elTransparent), foundation/motion.dart (elAnimationDuration), '
+        'Foundation imports: foundation/colors.dart (OklabColor, '
+            'transparent), foundation/motion.dart (effectiveMotionDuration), '
             'foundation/shadows.dart (the focus ring), '
-            'foundation/spacing.dart (el()), foundation/theme.dart, '
+            'foundation/spacing.dart (space()), foundation/theme.dart, '
             'foundation/typography.dart, theme_scope.dart.',
-        'Motion import: motion/press.dart (ElPress — the reaction pill\'s '
+        'Motion import: motion/press.dart (Press — the reaction pill\'s '
             'own press feedback).',
         'registryDependencies, resolved automatically by `elattar add '
-            'bubble`: press-motion, source-foundation — copied verbatim '
+            'bubble`: press, source-foundation — copied verbatim '
             'from registry/components/bubble.json.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: DocsLinkRow(
           links: <DocsLink>[
             DocsLink(label: 'Message', route: '/components/message'),
@@ -1234,10 +1222,7 @@ class _DependenciesContent extends StatelessWidget {
               label: 'Message Scroller',
               route: '/components/message-scroller',
             ),
-            DocsLink(
-              label: 'Press Motion',
-              route: '/components/press_motion',
-            ),
+            DocsLink(label: 'Press Motion', route: '/components/press'),
           ],
         ),
       ),
@@ -1250,38 +1235,42 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Every colour is read live off ElTheme.of(context) at build time: '
+      _bullets(ThemeScope.of(context), <String>[
+        'Every colour is read live off ThemeScope.of(context) at build time: '
             'theme.primary/primaryForeground (normal), theme.secondary/'
             'secondaryForeground (secondary), theme.muted/foreground '
-            '(muted), theme.bubbleTinted/bubbleTintedHover/foreground '
+            '(muted), theme.messageAccent/messageAccentHover/foreground '
             '(tinted), theme.background/border/foreground (outline), '
             'theme.muted/foreground (ghost hover), theme.destructive/'
-            'destructiveInk (destructive), theme.ring (the focus ring on '
+            'destructiveText (destructive), theme.ring (the focus ring on '
             'every variant, no destructive-only special case here unlike '
             'Button).',
-        'tinted is a token, not an inline dark: twin: theme.bubbleTinted is '
+        'tinted is a token, not an inline dark: twin: theme.messageAccent is '
             'declared once per theme block and derived from theme.primary, '
             'so it follows a rebrand automatically.',
-        'Shape: rounded-xl (ElRadii.xl) on every variant but ghost, which '
+        'Shape: rounded-xl (Radii.xl) on every variant but ghost, which '
             'drops to rounded-none — bubble.dart exposes no radius '
             'override at all.',
         'The reactions rail rings in theme.card at a fixed 3px spread — '
             'not a theme-aware default with an override field the way '
-            'ElCard exposes ringColor. A caller wanting a different ring '
+            'Card exposes ringColor. A caller wanting a different ring '
             'colour has no escape hatch here.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

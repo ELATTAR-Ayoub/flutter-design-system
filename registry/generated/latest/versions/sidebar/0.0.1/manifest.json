@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/sidebar.dart",
+      "source": "lib/src/components/ui/sidebar.dart",
       "target": "@ui/sidebar.dart",
-      "sha256": "b463e8d8fdd2a68fa67f5ea0a572a3e274c4b5330fa0c6308c505e241dc606fd"
+      "sha256": "5f84346cd6720358cb017fa35b1dfefd7c6f33b37620088fc6176f9cb611c173"
     }
   ],
   "registryDependencies": [
@@ -20,7 +20,7 @@
     "icon-swap",
     "input",
     "keyframes",
-    "machine-surface",
+    "surface",
     "sheet",
     "skeleton",
     "source-foundation",
@@ -34,7 +34,7 @@
     "icon-swap",
     "input",
     "keyframes",
-    "machine-surface",
+    "surface",
     "sheet",
     "skeleton",
     "tooltip"
@@ -45,6 +45,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/sidebar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/sidebar.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/sidebar.dart",
   "deprecated": false
 }

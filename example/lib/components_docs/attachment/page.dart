@@ -11,7 +11,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -28,7 +40,7 @@ final ComponentDocSpec attachmentDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'All five ElAttachmentState values, on the same file. Each '
+          'All five AttachmentState values, on the same file. Each '
           'card owns its own glyph: a spinner while uploading or '
           'processing, an alert glyph on error, a document glyph '
           'otherwise.',
@@ -61,7 +73,7 @@ final ComponentDocSpec attachmentDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElAttachment and every part it '
+              'Add the export line so Attachment and every part it '
               'composes are reachable the same way the CLI path already '
               'makes them.',
           code: "export 'attachment.dart';",
@@ -91,7 +103,7 @@ final ComponentDocSpec attachmentDocSpec = ComponentDocSpec(
       id: 'media',
       title: 'Media',
       description:
-          "ElAttachmentMediaVariant.icon (the default) centres a glyph "
+          "AttachmentMediaVariant.icon (the default) centres a glyph "
           'in a coloured well; .image fills the well and dims to 60% '
           'opacity until the state is done or idle — "which is what '
           'makes an upload look like it is still arriving."',
@@ -116,14 +128,14 @@ final ComponentDocSpec attachmentDocSpec = ComponentDocSpec(
       id: 'group',
       title: 'Group',
       description:
-          'ElAttachmentGroup scrolls sideways, snaps each card\'s '
+          'AttachmentGroup scrolls sideways, snaps each card\'s '
           'measured left edge to a 4px inset, and fades both edges up '
           'to 40px — drag the tray to see the snap and the fade move '
           'together.',
       specimen: _GroupSpecimen(),
       code: _groupCode,
       label: 'Group specimen view',
-      minHeight: el(48),
+      minHeight: space(48),
     ),
     DisclosureSection(
       id: 'api',
@@ -134,24 +146,18 @@ final ComponentDocSpec attachmentDocSpec = ComponentDocSpec(
           'actually reach for: one table per class or small family of '
           'classes.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElAttachment', anchor: 'api-elattachment'),
+        DocsTocEntry(title: 'Attachment', anchor: 'api-elattachment'),
         DocsTocEntry(
-          title: 'ElAttachment statics',
+          title: 'Attachment statics',
           anchor: 'api-elattachment-static',
         ),
-        DocsTocEntry(
-          title: 'ElAttachmentState',
-          anchor: 'api-elattachmentstate',
-        ),
+        DocsTocEntry(title: 'AttachmentState', anchor: 'api-elattachmentstate'),
         DocsTocEntry(
           title: 'Size · Orientation · Media variant',
           anchor: 'api-elattachment-enums',
         ),
-        DocsTocEntry(
-          title: 'ElAttachmentScope',
-          anchor: 'api-elattachmentscope',
-        ),
-        DocsTocEntry(title: 'ElAttachmentMedia', anchor: 'api-elattachmentmedia'),
+        DocsTocEntry(title: 'AttachmentScope', anchor: 'api-elattachmentscope'),
+        DocsTocEntry(title: 'AttachmentMedia', anchor: 'api-elattachmentmedia'),
         DocsTocEntry(
           title: 'Content · Title · Description · Shimmer',
           anchor: 'api-elattachment-content',
@@ -167,8 +173,8 @@ final ComponentDocSpec attachmentDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off _ElAttachmentState.build, _DashedBorderBox and '
-          '_ElAttachmentActionState directly, not inferred.',
+          'Read off _AttachmentState.build, _DashedBorderBox and '
+          '_AttachmentActionState directly, not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
     DisclosureSection(
@@ -181,7 +187,7 @@ final ComponentDocSpec attachmentDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'attachment.dart wires no key handling of its own anywhere in '
-          'the file — every fact here is either inherited from ElButton '
+          'the file — every fact here is either inherited from Button '
           'or about what does not happen.',
       child: _KeyboardContent(),
     ),
@@ -217,7 +223,7 @@ final ComponentDocSpec attachmentDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/chat_test.dart',
             description:
-                'Covers ElAttachment live, composed inside the chat '
+                'Covers Attachment live, composed inside the chat '
                 'page\'s own attachment section (19 references) — there '
                 'is no dedicated attachment_test.dart in the package yet.',
           ),
@@ -252,9 +258,9 @@ class AttachmentDocPage extends StatelessWidget {
       title: attachmentDoc.title,
       description: attachmentDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Attachment'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Attachment'),
     ],
     toc: attachmentDocSpec.toc,
     previous: null,
@@ -270,13 +276,13 @@ class AttachmentDocPage extends StatelessWidget {
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
 /// `ATTACHMENT_STATES`, `chat.dart`'s own list, reproduced.
-const List<(ElAttachmentState, String, String)> _attachmentStates =
-    <(ElAttachmentState, String, String)>[
-      (ElAttachmentState.idle, 'idle', 'dashed: nothing chosen yet'),
-      (ElAttachmentState.uploading, 'uploading', 'spinner + shimmer'),
-      (ElAttachmentState.processing, 'processing', 'sent, being read'),
-      (ElAttachmentState.error, 'error', 'border and media turn'),
-      (ElAttachmentState.done, 'done', 'the resting state'),
+const List<(AttachmentState, String, String)> _attachmentStates =
+    <(AttachmentState, String, String)>[
+      (AttachmentState.idle, 'idle', 'dashed: nothing chosen yet'),
+      (AttachmentState.uploading, 'uploading', 'spinner + shimmer'),
+      (AttachmentState.processing, 'processing', 'sent, being read'),
+      (AttachmentState.error, 'error', 'border and media turn'),
+      (AttachmentState.done, 'done', 'the resting state'),
     ];
 
 class _PreviewSpecimen extends StatelessWidget {
@@ -284,11 +290,11 @@ class _PreviewSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(4),
-    runSpacing: el(4),
+    spacing: space(4),
+    runSpacing: space(4),
     crossAxisAlignment: WrapCrossAlignment.start,
     children: <Widget>[
-      for (final (ElAttachmentState state, String label, String note)
+      for (final (AttachmentState state, String label, String note)
           in _attachmentStates)
         Column(
           mainAxisSize: MainAxisSize.min,
@@ -296,36 +302,34 @@ class _PreviewSpecimen extends StatelessWidget {
           children: <Widget>[
             KeyedSubtree(
               key: ValueKey<String>('attachment-preview:$label'),
-              child: ElAttachment(
+              child: Attachment(
                 state: state,
-                size: ElAttachmentSize.sm,
-                orientation: ElAttachmentOrientation.vertical,
-                media: ElAttachmentMedia(
+                size: AttachmentSize.sm,
+                orientation: AttachmentOrientation.vertical,
+                media: AttachmentMedia(
                   child: switch (state) {
-                    ElAttachmentState.uploading ||
-                    ElAttachmentState.processing => const ElSpinner(),
-                    ElAttachmentState.error => const ElIcon.lucide(
-                      ElLucide.circleAlert,
+                    AttachmentState.uploading ||
+                    AttachmentState.processing => const Spinner(),
+                    AttachmentState.error => const Icon.lucide(
+                      Lucide.circleAlert,
                       sizePx: 24,
                     ),
-                    _ => const ElIcon.lucide(ElLucide.sheet, sizePx: 24),
+                    _ => const Icon.lucide(Lucide.sheet, sizePx: 24),
                   },
                 ),
-                content: ElAttachmentContent(
-                  title: const ElAttachmentTitle('rarity-table.csv'),
-                  description: ElAttachmentDescription(
-                    state == ElAttachmentState.error
-                        ? 'Upload failed'
-                        : '18 KB',
+                content: AttachmentContent(
+                  title: const AttachmentTitle('rarity-table.csv'),
+                  description: AttachmentDescription(
+                    state == AttachmentState.error ? 'Upload failed' : '18 KB',
                   ),
                 ),
               ),
             ),
-            SizedBox(height: el(2)),
-            ElText(
+            SizedBox(height: space(2)),
+            StyledText(
               '$label · $note',
-              ElType.small,
-              color: ElTheme.of(context).mutedForeground,
+              TextStyles.small,
+              color: ThemeScope.of(context).mutedForeground,
             ),
           ],
         ),
@@ -335,27 +339,27 @@ class _PreviewSpecimen extends StatelessWidget {
 
 const String _previewCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-    'ElAttachment(\n'
-    '  state: ElAttachmentState.uploading,\n'
-    '  size: ElAttachmentSize.sm,\n'
-    '  orientation: ElAttachmentOrientation.vertical,\n'
-    '  media: const ElAttachmentMedia(child: ElSpinner()),\n'
-    '  content: ElAttachmentContent(\n'
-    "    title: const ElAttachmentTitle('rarity-table.csv'),\n"
-    "    description: ElAttachmentDescription('18 KB'),\n"
+    'Attachment(\n'
+    '  state: AttachmentState.uploading,\n'
+    '  size: AttachmentSize.sm,\n'
+    '  orientation: AttachmentOrientation.vertical,\n'
+    '  media: const AttachmentMedia(child: Spinner()),\n'
+    '  content: AttachmentContent(\n'
+    "    title: const AttachmentTitle('rarity-table.csv'),\n"
+    "    description: AttachmentDescription('18 KB'),\n"
     '  ),\n'
     ')';
 
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElAttachment(
-  media: ElAttachmentMedia(
-    child: ElIcon.lucide(ElLucide.fileText, sizePx: 16),
+Attachment(
+  media: AttachmentMedia(
+    child: Icon.lucide(Lucide.fileText, sizePx: 16),
   ),
-  content: const ElAttachmentContent(
-    title: ElAttachmentTitle('report.pdf'),
-    description: ElAttachmentDescription('2.6 MB'),
+  content: const AttachmentContent(
+    title: AttachmentTitle('report.pdf'),
+    description: AttachmentDescription('2.6 MB'),
   ),
 )''';
 
@@ -367,35 +371,35 @@ class _OrientationSizeSpecimen extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       Wrap(
-        spacing: el(3),
-        runSpacing: el(3),
+        spacing: space(3),
+        runSpacing: space(3),
         children: <Widget>[
-          for (final ElAttachmentSize size in ElAttachmentSize.values)
+          for (final AttachmentSize size in AttachmentSize.values)
             KeyedSubtree(
               key: ValueKey<String>('attachment-example:size-${size.name}'),
-              child: ElAttachment(
+              child: Attachment(
                 size: size,
-                media: ElAttachmentMedia(
-                  child: ElIcon.lucide(
-                    ElLucide.fileText,
-                    sizePx: ElAttachmentMedia.glyphFor(
+                media: AttachmentMedia(
+                  child: Icon.lucide(
+                    Lucide.fileText,
+                    sizePx: AttachmentMedia.glyphFor(
                       size,
-                      ElAttachmentOrientation.horizontal,
+                      AttachmentOrientation.horizontal,
                     ),
                   ),
                 ),
-                content: ElAttachmentContent(
-                  title: const ElAttachmentTitle('eclipse-vault-notes.pdf'),
-                  description: ElAttachmentDescription('size=${size.label}'),
+                content: AttachmentContent(
+                  title: const AttachmentTitle('eclipse-vault-notes.pdf'),
+                  description: AttachmentDescription('size=${size.label}'),
                 ),
-                actions: ElAttachmentActions(
+                actions: AttachmentActions(
                   children: <Widget>[
-                    ElAttachmentAction(
+                    AttachmentAction(
                       label: 'Remove eclipse-vault-notes.pdf',
                       onPressed: () {},
-                      child: ElIcon.lucide(
-                        ElLucide.x,
-                        sizePx: ElButton.iconPxFor(ElButtonSize.iconXs),
+                      child: Icon.lucide(
+                        Lucide.x,
+                        sizePx: Button.iconPxFor(ButtonSize.iconXs),
                       ),
                     ),
                   ],
@@ -404,29 +408,29 @@ class _OrientationSizeSpecimen extends StatelessWidget {
             ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       Wrap(
-        spacing: el(3),
-        runSpacing: el(3),
+        spacing: space(3),
+        runSpacing: space(3),
         children: <Widget>[
           KeyedSubtree(
             key: const ValueKey<String>('attachment-example:vertical-empty'),
-            child: ElAttachment(
-              orientation: ElAttachmentOrientation.vertical,
-              media: const ElAttachmentMedia(
-                child: ElIcon.lucide(ElLucide.image, sizePx: 24),
+            child: Attachment(
+              orientation: AttachmentOrientation.vertical,
+              media: const AttachmentMedia(
+                child: Icon.lucide(Lucide.image, sizePx: 24),
               ),
             ),
           ),
           KeyedSubtree(
             key: const ValueKey<String>('attachment-example:vertical-titled'),
-            child: ElAttachment(
-              orientation: ElAttachmentOrientation.vertical,
-              media: const ElAttachmentMedia(
-                child: ElIcon.lucide(ElLucide.image, sizePx: 24),
+            child: Attachment(
+              orientation: AttachmentOrientation.vertical,
+              media: const AttachmentMedia(
+                child: Icon.lucide(Lucide.image, sizePx: 24),
               ),
-              content: const ElAttachmentContent(
-                title: ElAttachmentTitle('slab-front.heic'),
+              content: const AttachmentContent(
+                title: AttachmentTitle('slab-front.heic'),
               ),
             ),
           ),
@@ -437,22 +441,22 @@ class _OrientationSizeSpecimen extends StatelessWidget {
 }
 
 const String _orientationSizeCode =
-    'for (final size in ElAttachmentSize.values)\n'
-    '  ElAttachment(\n'
+    'for (final size in AttachmentSize.values)\n'
+    '  Attachment(\n'
     '    size: size,\n'
-    '    media: ElAttachmentMedia(\n'
-    '      child: ElIcon.lucide(ElLucide.fileText,\n'
-    '        sizePx: ElAttachmentMedia.glyphFor(size, ElAttachmentOrientation.horizontal)),\n'
+    '    media: AttachmentMedia(\n'
+    '      child: Icon.lucide(Lucide.fileText,\n'
+    '        sizePx: AttachmentMedia.glyphFor(size, AttachmentOrientation.horizontal)),\n'
     '    ),\n'
-    '    content: ElAttachmentContent(\n'
-    "      title: const ElAttachmentTitle('eclipse-vault-notes.pdf'),\n"
-    "      description: ElAttachmentDescription('size=\${size.label}'),\n"
+    '    content: AttachmentContent(\n'
+    "      title: const AttachmentTitle('eclipse-vault-notes.pdf'),\n"
+    "      description: AttachmentDescription('size=\${size.label}'),\n"
     '    ),\n'
     '  )\n\n'
     '// w-24, widening to w-30 once content is given.\n'
-    'const ElAttachment(\n'
-    '  orientation: ElAttachmentOrientation.vertical,\n'
-    '  media: ElAttachmentMedia(child: Icon(...)),\n'
+    'const Attachment(\n'
+    '  orientation: AttachmentOrientation.vertical,\n'
+    '  media: AttachmentMedia(child: Icon(...)),\n'
     ')';
 
 class _MediaSpecimen extends StatelessWidget {
@@ -460,50 +464,50 @@ class _MediaSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Wrap(
-      spacing: el(3),
-      runSpacing: el(3),
+      spacing: space(3),
+      runSpacing: space(3),
       children: <Widget>[
         KeyedSubtree(
           key: const ValueKey<String>('attachment-example:media-image'),
-          child: ElAttachment(
-            orientation: ElAttachmentOrientation.vertical,
-            media: ElAttachmentMedia(
-              variant: ElAttachmentMediaVariant.image,
+          child: Attachment(
+            orientation: AttachmentOrientation.vertical,
+            media: AttachmentMedia(
+              variant: AttachmentMediaVariant.image,
               child: ColoredBox(color: theme.primary),
             ),
-            content: const ElAttachmentContent(
-              title: ElAttachmentTitle('sample-card.png'),
-              description: ElAttachmentDescription('412 KB'),
+            content: const AttachmentContent(
+              title: AttachmentTitle('sample-card.png'),
+              description: AttachmentDescription('412 KB'),
             ),
           ),
         ),
         KeyedSubtree(
           key: const ValueKey<String>('attachment-example:media-icon'),
-          child: ElAttachment(
-            orientation: ElAttachmentOrientation.vertical,
-            media: const ElAttachmentMedia(
-              child: ElIcon.lucide(ElLucide.image, sizePx: 24),
+          child: Attachment(
+            orientation: AttachmentOrientation.vertical,
+            media: const AttachmentMedia(
+              child: Icon.lucide(Lucide.image, sizePx: 24),
             ),
-            content: const ElAttachmentContent(
-              title: ElAttachmentTitle('slab-front.heic'),
-              description: ElAttachmentDescription('No preview'),
+            content: const AttachmentContent(
+              title: AttachmentTitle('slab-front.heic'),
+              description: AttachmentDescription('No preview'),
             ),
           ),
         ),
         KeyedSubtree(
           key: const ValueKey<String>('attachment-example:media-uploading'),
-          child: ElAttachment(
-            state: ElAttachmentState.uploading,
-            orientation: ElAttachmentOrientation.vertical,
-            media: ElAttachmentMedia(
-              variant: ElAttachmentMediaVariant.image,
+          child: Attachment(
+            state: AttachmentState.uploading,
+            orientation: AttachmentOrientation.vertical,
+            media: AttachmentMedia(
+              variant: AttachmentMediaVariant.image,
               child: ColoredBox(color: theme.primary),
             ),
-            content: const ElAttachmentContent(
-              title: ElAttachmentTitle('sample-card.png'),
-              description: ElAttachmentDescription('Uploading…'),
+            content: const AttachmentContent(
+              title: AttachmentTitle('sample-card.png'),
+              description: AttachmentDescription('Uploading…'),
             ),
           ),
         ),
@@ -515,15 +519,15 @@ class _MediaSpecimen extends StatelessWidget {
 const String _mediaCode =
     '// variant: image fills the well and dims to 60% opacity until\n'
     '// the state is done or idle.\n'
-    'ElAttachment(\n'
-    '  orientation: ElAttachmentOrientation.vertical,\n'
-    '  media: ElAttachmentMedia(\n'
-    '    variant: ElAttachmentMediaVariant.image,\n'
+    'Attachment(\n'
+    '  orientation: AttachmentOrientation.vertical,\n'
+    '  media: AttachmentMedia(\n'
+    '    variant: AttachmentMediaVariant.image,\n'
     '    child: Image(...),\n'
     '  ),\n'
-    '  content: const ElAttachmentContent(\n'
-    "    title: ElAttachmentTitle('sample-card.png'),\n"
-    "    description: ElAttachmentDescription('412 KB'),\n"
+    '  content: const AttachmentContent(\n'
+    "    title: AttachmentTitle('sample-card.png'),\n"
+    "    description: AttachmentDescription('412 KB'),\n"
     '  ),\n'
     ')';
 
@@ -532,42 +536,42 @@ class _PreviewDownloadSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Wrap(
-      spacing: el(3),
-      runSpacing: el(3),
+      spacing: space(3),
+      runSpacing: space(3),
       crossAxisAlignment: WrapCrossAlignment.start,
       children: <Widget>[
         KeyedSubtree(
           key: const ValueKey<String>('attachment-example:preview'),
-          child: ElAttachment(
-            orientation: ElAttachmentOrientation.vertical,
-            media: ElAttachmentMedia(
-              variant: ElAttachmentMediaVariant.image,
+          child: Attachment(
+            orientation: AttachmentOrientation.vertical,
+            media: AttachmentMedia(
+              variant: AttachmentMediaVariant.image,
               previewName: 'sample-card.png',
               previewDescription: '412 KB',
               preview: ColoredBox(color: theme.primary),
               child: ColoredBox(color: theme.primary),
             ),
-            content: const ElAttachmentContent(
-              title: ElAttachmentTitle('sample-card.png'),
-              description: ElAttachmentDescription('412 KB · press to expand'),
+            content: const AttachmentContent(
+              title: AttachmentTitle('sample-card.png'),
+              description: AttachmentDescription('412 KB · press to expand'),
             ),
           ),
         ),
         KeyedSubtree(
           key: const ValueKey<String>('attachment-example:download'),
-          child: ElAttachment(
-            media: const ElAttachmentMedia(
-              child: ElIcon.lucide(ElLucide.fileText, sizePx: 16),
+          child: Attachment(
+            media: const AttachmentMedia(
+              child: Icon.lucide(Lucide.fileText, sizePx: 16),
             ),
-            content: const ElAttachmentContent(
-              title: ElAttachmentTitle('grading-report.pdf'),
-              description: ElAttachmentDescription('2.6 MB'),
+            content: const AttachmentContent(
+              title: AttachmentTitle('grading-report.pdf'),
+              description: AttachmentDescription('2.6 MB'),
             ),
-            actions: ElAttachmentActions(
+            actions: AttachmentActions(
               children: <Widget>[
-                ElAttachmentAction(
+                AttachmentAction(
                   downloadName: 'grading-report.pdf',
                   onDownload: (String name) {},
                 ),
@@ -583,7 +587,7 @@ class _PreviewDownloadSpecimen extends StatelessWidget {
 const String _previewDownloadCode =
     '// preview makes the well expandable — pressing it opens the\n'
     '// media over the dimmed page.\n'
-    'ElAttachmentMedia(\n'
+    'AttachmentMedia(\n'
     "  previewName: 'sample-card.png',\n"
     "  previewDescription: '412 KB',\n"
     '  preview: Image(...), // the full-size media\n'
@@ -592,7 +596,7 @@ const String _previewDownloadCode =
     '// downloadName turns an action into the save control: the glyph\n'
     '// rolls to a check for 1600ms, and onDownload fires "Saving",\n'
     '// never "Saved" — a plain download anchor gives no completion event.\n'
-    'ElAttachmentAction(\n'
+    'AttachmentAction(\n'
     "  downloadName: 'grading-report.pdf',\n"
     '  onDownload: (name) => showToast(\'Saving \$name\'),\n'
     ')';
@@ -612,23 +616,23 @@ class _GroupSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('attachment-example:group'),
-    child: ElAttachmentGroup(
+    child: AttachmentGroup(
       children: <Widget>[
         for (final String name in _names)
-          ElAttachment(
-            size: ElAttachmentSize.sm,
-            media: ElAttachmentMedia(
-              child: ElIcon.lucide(
-                ElLucide.fileText,
-                sizePx: ElAttachmentMedia.glyphFor(
-                  ElAttachmentSize.sm,
-                  ElAttachmentOrientation.horizontal,
+          Attachment(
+            size: AttachmentSize.sm,
+            media: AttachmentMedia(
+              child: Icon.lucide(
+                Lucide.fileText,
+                sizePx: AttachmentMedia.glyphFor(
+                  AttachmentSize.sm,
+                  AttachmentOrientation.horizontal,
                 ),
               ),
             ),
-            content: ElAttachmentContent(
-              title: ElAttachmentTitle(name),
-              description: const ElAttachmentDescription('Ready'),
+            content: AttachmentContent(
+              title: AttachmentTitle(name),
+              description: const AttachmentDescription('Ready'),
             ),
           ),
       ],
@@ -637,15 +641,15 @@ class _GroupSpecimen extends StatelessWidget {
 }
 
 const String _groupCode =
-    'ElAttachmentGroup(\n'
+    'AttachmentGroup(\n'
     '  children: [\n'
     '    for (final name in names)\n'
-    '      ElAttachment(\n'
-    '        size: ElAttachmentSize.sm,\n'
-    '        media: ElAttachmentMedia(child: ElIcon.lucide(ElLucide.fileText, sizePx: 14)),\n'
-    '        content: ElAttachmentContent(\n'
-    '          title: ElAttachmentTitle(name),\n'
-    "          description: const ElAttachmentDescription('Ready'),\n"
+    '      Attachment(\n'
+    '        size: AttachmentSize.sm,\n'
+    '        media: AttachmentMedia(child: Icon.lucide(Lucide.fileText, sizePx: 14)),\n'
+    '        content: AttachmentContent(\n'
+    '          title: AttachmentTitle(name),\n'
+    "          description: const AttachmentDescription('Ready'),\n"
     '        ),\n'
     '      ),\n'
     '  ],\n'
@@ -662,25 +666,25 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elattachment',
-        child: DocsApiTable(title: 'ElAttachment', facts: _attachmentFacts),
+        child: DocsApiTable(title: 'Attachment', facts: _attachmentFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elattachment-static',
         child: DocsApiTable(
-          title: 'ElAttachment statics',
+          title: 'Attachment statics',
           facts: _attachmentStaticFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elattachmentstate',
         child: DocsApiTable(
-          title: 'ElAttachmentState',
+          title: 'AttachmentState',
           facts: _attachmentStateFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elattachment-enums',
         child: DocsApiTable(
@@ -688,23 +692,17 @@ class _ApiReferenceContent extends StatelessWidget {
           facts: _smallEnumFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elattachmentscope',
-        child: DocsApiTable(
-          title: 'ElAttachmentScope',
-          facts: _scopeFacts,
-        ),
+        child: DocsApiTable(title: 'AttachmentScope', facts: _scopeFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elattachmentmedia',
-        child: DocsApiTable(
-          title: 'ElAttachmentMedia',
-          facts: _mediaFacts,
-        ),
+        child: DocsApiTable(title: 'AttachmentMedia', facts: _mediaFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elattachment-content',
         child: DocsApiTable(
@@ -712,7 +710,7 @@ class _ApiReferenceContent extends StatelessWidget {
           facts: _contentFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elattachment-actions',
         child: DocsApiTable(
@@ -728,7 +726,7 @@ const List<DocsApiFact> _attachmentFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'media',
     type: 'Widget (required)',
-    description: 'The thumbnail well — an ElAttachmentMedia in practice.',
+    description: 'The thumbnail well — an AttachmentMedia in practice.',
   ),
   DocsApiFact(
     name: 'content',
@@ -748,23 +746,23 @@ const List<DocsApiFact> _attachmentFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'state',
-    type: 'ElAttachmentState',
+    type: 'AttachmentState',
     description:
-        'Optional. Defaults to ElAttachmentState.done. See the table '
+        'Optional. Defaults to AttachmentState.done. See the table '
         'below.',
   ),
   DocsApiFact(
     name: 'size',
-    type: 'ElAttachmentSize',
+    type: 'AttachmentSize',
     description:
-        'Optional. Defaults to ElAttachmentSize.md. Drives padding, '
+        'Optional. Defaults to AttachmentSize.md. Drives padding, '
         'gap and radius — see the enums table below.',
   ),
   DocsApiFact(
     name: 'orientation',
-    type: 'ElAttachmentOrientation',
+    type: 'AttachmentOrientation',
     description:
-        'Optional. Defaults to ElAttachmentOrientation.horizontal '
+        'Optional. Defaults to AttachmentOrientation.horizontal '
         '(min-w-40, a row). vertical is a w-24 tile that widens to '
         'w-30 once content is given.',
   ),
@@ -772,42 +770,42 @@ const List<DocsApiFact> _attachmentFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _attachmentStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElAttachment.paddingFor(size)',
+    name: 'Attachment.paddingFor(size)',
     type: 'static double',
     description: '8 / 6 / 4 — the rule that wins over four dead class lists.',
   ),
   DocsApiFact(
-    name: 'ElAttachment.gapFor(size)',
+    name: 'Attachment.gapFor(size)',
     type: 'static double',
     description: '8 / 10 / 6 — sm is the widest gap of the three.',
   ),
   DocsApiFact(
-    name: 'ElAttachment.radiusFor(size)',
+    name: 'Attachment.radiusFor(size)',
     type: 'static double',
-    description: 'ElRadii.xl, ElRadii.lg on xs.',
+    description: 'Radii.xl, Radii.lg on xs.',
   ),
   DocsApiFact(
-    name: 'ElAttachment.horizontalMinWidth',
+    name: 'Attachment.horizontalMinWidth',
     type: 'static double',
     description: '160 — the horizontal card\'s floor width.',
   ),
   DocsApiFact(
-    name: 'ElAttachment.verticalWidth',
+    name: 'Attachment.verticalWidth',
     type: 'static double',
     description: '96 — a vertical card with no content.',
   ),
   DocsApiFact(
-    name: 'ElAttachment.verticalWidthWithContent',
+    name: 'Attachment.verticalWidthWithContent',
     type: 'static double',
     description: '120 — a vertical card once it carries a title.',
   ),
   DocsApiFact(
-    name: 'ElAttachment.focusRingAlpha',
+    name: 'Attachment.focusRingAlpha',
     type: 'static const double',
     description: '0.50 — the focus-within ring alpha.',
   ),
   DocsApiFact(
-    name: 'ElAttachment.errorBorderAlpha',
+    name: 'Attachment.errorBorderAlpha',
     type: 'static const double',
     description: '0.30 — the error-state border alpha.',
   ),
@@ -845,38 +843,39 @@ const List<DocsApiFact> _attachmentStateFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _smallEnumFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElAttachmentSize.md',
+    name: 'AttachmentSize.md',
     type: 'enum value',
-    description: '13px text, 40px well. Named md because default is a '
+    description:
+        '13px text, 40px well. Named md because default is a '
         'Dart keyword.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentSize.sm',
+    name: 'AttachmentSize.sm',
     type: 'enum value',
     description: '12px, 32px.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentSize.xs',
+    name: 'AttachmentSize.xs',
     type: 'enum value',
     description: '12px, 28px, and a tighter radius.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentOrientation.horizontal',
+    name: 'AttachmentOrientation.horizontal',
     type: 'enum value',
     description: 'The default: a row with a 160px floor.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentOrientation.vertical',
+    name: 'AttachmentOrientation.vertical',
     type: 'enum value',
     description: 'A 96px tile that widens to 120 once titled.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMediaVariant.icon',
+    name: 'AttachmentMediaVariant.icon',
     type: 'enum value',
     description: 'The default: centres child in a coloured well.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMediaVariant.image',
+    name: 'AttachmentMediaVariant.image',
     type: 'enum value',
     description:
         'Expects a real image child and dims it to 60% until the '
@@ -886,25 +885,25 @@ const List<DocsApiFact> _smallEnumFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _scopeFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElAttachmentScope.of(context)',
-    type: 'static ElAttachmentScope',
+    name: 'AttachmentScope.of(context)',
+    type: 'static AttachmentScope',
     description:
-        'What every slot inside an ElAttachment reads to find its own '
+        'What every slot inside an Attachment reads to find its own '
         'state, size and orientation — asserts if nothing is above it.',
   ),
   DocsApiFact(
     name: 'state',
-    type: 'ElAttachmentState',
-    description: 'The enclosing ElAttachment\'s own state, republished.',
+    type: 'AttachmentState',
+    description: 'The enclosing Attachment\'s own state, republished.',
   ),
   DocsApiFact(
     name: 'size',
-    type: 'ElAttachmentSize',
+    type: 'AttachmentSize',
     description: 'Republished for a slot to read.',
   ),
   DocsApiFact(
     name: 'orientation',
-    type: 'ElAttachmentOrientation',
+    type: 'AttachmentOrientation',
     description: 'Republished for a slot to read.',
   ),
 ];
@@ -917,7 +916,7 @@ const List<DocsApiFact> _mediaFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElAttachmentMediaVariant',
+    type: 'AttachmentMediaVariant',
     description: 'Optional. Defaults to .icon.',
   ),
   DocsApiFact(
@@ -938,52 +937,53 @@ const List<DocsApiFact> _mediaFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'previewDescription',
     type: 'String?',
-    description: 'Optional. Defaults to null. A second, screen-reader-only line.',
+    description:
+        'Optional. Defaults to null. A second, screen-reader-only line.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMedia.wellFor(size)',
+    name: 'AttachmentMedia.wellFor(size)',
     type: 'static double?',
     description: '40 / 32 / 28 — null on a vertical md, which fills instead.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMedia.radiusFor(size)',
+    name: 'AttachmentMedia.radiusFor(size)',
     type: 'static double',
-    description: 'ElRadii.lg, ElRadii.md on xs.',
+    description: 'Radii.lg, Radii.md on xs.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMedia.glyphFor(size, orientation)',
+    name: 'AttachmentMedia.glyphFor(size, orientation)',
     type: 'static double',
     description:
         '14 on xs (wins even in a vertical card); 24 vertical, 16 '
         'horizontal otherwise.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMedia.imageDimmed',
+    name: 'AttachmentMedia.imageDimmed',
     type: 'static const double',
     description: '0.60 — the image variant\'s dimmed opacity.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMedia.errorWellAlpha',
+    name: 'AttachmentMedia.errorWellAlpha',
     type: 'static const double',
     description: '0.10 — the well fill alpha in the error state.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMedia.previewMaxWidth',
+    name: 'AttachmentMedia.previewMaxWidth',
     type: 'static double',
     description: '768 — the preview panel\'s own max-w-3xl.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMedia.previewMaxHeightFraction',
+    name: 'AttachmentMedia.previewMaxHeightFraction',
     type: 'static const double',
     description: '0.70 — max-h-[70vh] on the previewed media.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMedia.previewRingAlpha',
+    name: 'AttachmentMedia.previewRingAlpha',
     type: 'static const double',
     description: '0.10 — the preview panel\'s whole box-shadow.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentMedia.previewCloseInset',
+    name: 'AttachmentMedia.previewCloseInset',
     type: 'static double',
     description: '12 — top-3 right-3 on the close control.',
   ),
@@ -991,67 +991,67 @@ const List<DocsApiFact> _mediaFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _contentFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElAttachmentContent.title',
+    name: 'AttachmentContent.title',
     type: 'Widget (required)',
-    description: 'An ElAttachmentTitle in practice.',
+    description: 'An AttachmentTitle in practice.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentContent.description',
+    name: 'AttachmentContent.description',
     type: 'Widget?',
     description: 'Optional. Defaults to null.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentContent.verticalInset',
+    name: 'AttachmentContent.verticalInset',
     type: 'static double',
     description: '4 — the horizontal px content gets in a vertical card.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentTitle(text)',
+    name: 'AttachmentTitle(text)',
     type: 'String (positional, required)',
     description:
         'Truncates to one line; shimmers while the state is uploading '
-        'or processing (ElShimmerText).',
+        'or processing (AttachmentStatusText).',
   ),
   DocsApiFact(
-    name: 'ElAttachmentDescription(text)',
+    name: 'AttachmentDescription(text)',
     type: 'String (positional, required)',
     description:
-        'Truncates to one line; theme.destructiveInk in the error '
+        'Truncates to one line; theme.destructiveText in the error '
         'state (no opacity — measured to clear AA where the reference\'s '
         'own 80%-alpha ink fails it).',
   ),
   DocsApiFact(
-    name: 'ElAttachmentDescription.topGap',
+    name: 'AttachmentDescription.topGap',
     type: 'static double',
     description: '2 — mt-0.5 above the description line.',
   ),
   DocsApiFact(
-    name: 'ElShimmerText.child',
+    name: 'AttachmentStatusText.child',
     type: 'Widget (required)',
     description: 'What the highlight band sweeps across — a Text in practice.',
   ),
   DocsApiFact(
-    name: 'ElShimmerText.period',
+    name: 'AttachmentStatusText.period',
     type: 'static const Duration',
     description: '2 seconds — one full sweep, looping.',
   ),
   DocsApiFact(
-    name: 'ElShimmerText.spreadChars',
+    name: 'AttachmentStatusText.spreadChars',
     type: 'static const double',
     description: '3 — the ch half of the band\'s width, font-relative.',
   ),
   DocsApiFact(
-    name: 'ElShimmerText.spreadPx',
+    name: 'AttachmentStatusText.spreadPx',
     type: 'static double',
     description: '40 — the fixed px half of the band\'s width.',
   ),
   DocsApiFact(
-    name: 'ElShimmerText.angleDegrees',
+    name: 'AttachmentStatusText.angleDegrees',
     type: 'static const double',
     description: '20 — added to the gradient axis\'s own 90°.',
   ),
   DocsApiFact(
-    name: 'ElShimmerText.lightHighlightAlpha',
+    name: 'AttachmentStatusText.lightHighlightAlpha',
     type: 'static const double',
     description: '0.20 — the light theme\'s highlight alpha over the ink.',
   ),
@@ -1059,41 +1059,41 @@ const List<DocsApiFact> _contentFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _actionsFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElAttachmentActions.children',
+    name: 'AttachmentActions.children',
     type: 'List<Widget> (required)',
-    description: 'The cluster on the right, usually ElAttachmentAction rows.',
+    description: 'The cluster on the right, usually AttachmentAction rows.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentActions.verticalGap',
+    name: 'AttachmentActions.verticalGap',
     type: 'static double',
     description: '4 — gap-1 between actions, vertical cards only.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentAction.child',
+    name: 'AttachmentAction.child',
     type: 'Widget?',
     description:
         'Optional. Defaults to null. The glyph — null on the download '
         'form, which supplies its own icon swap.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentAction.onPressed',
+    name: 'AttachmentAction.onPressed',
     type: 'VoidCallback?',
     description: 'Optional. Defaults to null.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentAction.label',
+    name: 'AttachmentAction.label',
     type: 'String?',
     description: 'Optional. Defaults to null. The accessible name.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentAction.downloadName',
+    name: 'AttachmentAction.downloadName',
     type: 'String?',
     description:
         'Optional. Defaults to null. Non-null turns this into the '
         'save control.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentAction.onDownload',
+    name: 'AttachmentAction.onDownload',
     type: 'void Function(String name)?',
     description:
         'Optional. Defaults to null. Fired with downloadName when the '
@@ -1101,44 +1101,44 @@ const List<DocsApiFact> _actionsFacts = <DocsApiFact>[
         '<name>" toast, never "Saved."',
   ),
   DocsApiFact(
-    name: 'ElAttachmentAction.savingWindow',
+    name: 'AttachmentAction.savingWindow',
     type: 'static const Duration',
     description: '1600ms — how long the check glyph holds before rolling back.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentTrigger.onPressed',
+    name: 'AttachmentTrigger.onPressed',
     type: 'VoidCallback (required)',
     description:
         'The overlay control that makes a whole attachment pressable '
         'without nesting a button inside a button.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentTrigger.cursor',
+    name: 'AttachmentTrigger.cursor',
     type: 'MouseCursor',
     description: 'Optional. Defaults to SystemMouseCursors.click.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentTrigger.label',
+    name: 'AttachmentTrigger.label',
     type: 'String?',
     description: 'Optional. Defaults to null. The accessible name.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentGroup.children',
+    name: 'AttachmentGroup.children',
     type: 'List<Widget> (required)',
     description: 'The row of cards, each keeping its own measured width.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentGroup.gap',
+    name: 'AttachmentGroup.gap',
     type: 'static double',
     description: '12 — gap-3 between cards.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentGroup.paddingY',
+    name: 'AttachmentGroup.paddingY',
     type: 'static double',
     description: '4 — py-1 above and below the row.',
   ),
   DocsApiFact(
-    name: 'ElAttachmentGroup.scrollPadding',
+    name: 'AttachmentGroup.scrollPadding',
     type: 'static double',
     description: '4 — the inset a snapped card\'s leading edge lands at.',
   ),
@@ -1154,14 +1154,14 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'uploading / processing',
     treatment:
         'A spinner (or caller-supplied glyph) in the well; the title '
-        'wraps in ElShimmerText, sweeping a highlight band every 2s.',
+        'wraps in AttachmentStatusText, sweeping a highlight band every 2s.',
     userSignal: 'A moving highlight across the file name.',
   ),
   DocsStateFact(
     state: 'error',
     treatment:
         'border-destructive at 30% alpha; the well fills '
-        'destructive at 10% and its ink turns destructiveInk; the '
+        'destructive at 10% and its ink turns destructiveText; the '
         'description switches to the caller\'s error text.',
     userSignal: 'A red-rimmed card with a red-tinted well.',
   ),
@@ -1181,17 +1181,17 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Saving (an action with downloadName)',
     treatment:
-        'The download glyph rolls to a check through ElIconSwap for '
-        '1600ms (ElAttachmentAction.savingWindow), then rolls back.',
+        'The download glyph rolls to a check through IconSwap for '
+        '1600ms (AttachmentAction.savingWindow), then rolls back.',
     userSignal: 'A brief checkmark where the download glyph was.',
   ),
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        'ElShimmerText stills at its first frame (the band entirely '
+        'AttachmentStatusText stills at its first frame (the band entirely '
         'off the left edge) under MediaQuery.disableAnimations; the '
         'group\'s snap-scroll animateTo also collapses through '
-        'elAnimationDuration.',
+        'effectiveMotionDuration.',
     userSignal: 'No sweep on an uploading title; a snap lands instantly.',
   ),
 ];
@@ -1201,12 +1201,12 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElAttachmentTrigger (the expandable-preview overlay) is a '
+      _bullets(ThemeScope.of(context), <String>[
+        'AttachmentTrigger (the expandable-preview overlay) is a '
             'Semantics(button: true, label: label) over an otherwise '
             'invisible hit area — the accessible name is "Open <name> '
             'full size".',
-        'ElAttachmentAction composes ElButton, so it inherits '
+        'AttachmentAction composes Button, so it inherits '
             'Semantics(button: true) and whatever label the caller '
             'passes, or "Download <downloadName>" on the save form when '
             'none is given.',
@@ -1217,9 +1217,9 @@ class _AccessibilityContent extends StatelessWidget {
         'Known gap: neither the shimmer sweep nor the saving check-mark '
             'swap is announced to a screen reader — both are purely '
             'visual state changes with no accompanying Semantics update.',
-        'Known gap: ElAttachmentTitle and ElAttachmentDescription carry '
+        'Known gap: AttachmentTitle and AttachmentDescription carry '
             'no Semantics of their own beyond the plain text a screen '
-            'reader already gets from ElText — there is no live region '
+            'reader already gets from StyledText — there is no live region '
             'announcing a state change from uploading to error, for '
             'instance.',
       ]);
@@ -1230,15 +1230,15 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'attachment.dart wires no Focus.onKeyEvent anywhere: the card '
-            'itself (_ElAttachmentState) only listens for '
+            'itself (_AttachmentState) only listens for '
             'onFocusChange, to paint the focus-within ring.',
-        'Every interactive part is an ElButton underneath — '
-            'ElAttachmentAction directly, ElAttachmentTrigger through a '
+        'Every interactive part is an Button underneath — '
+            'AttachmentAction directly, AttachmentTrigger through a '
             'plain GestureDetector rather than a button — so Enter, '
             'NumpadEnter and Space activate a focused action the same '
-            'way they activate any ElButton; the trigger overlay '
+            'way they activate any Button; the trigger overlay '
             'answers only to a tap, not a key.',
         'No custom FocusTraversalPolicy: Tab and Shift+Tab walk '
             'whatever order the surrounding page declares.',
@@ -1250,13 +1250,13 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No MediaQuery.sizeOf breakpoint branch anywhere in '
             'attachment.dart: every measurement (paddingFor, gapFor, '
             'radiusFor, wellFor, glyphFor) is keyed only to '
-            'ElAttachmentSize and ElAttachmentOrientation, never to '
+            'AttachmentSize and AttachmentOrientation, never to '
             'viewport.',
-        'ElAttachmentGroup answers to its own available width through '
+        'AttachmentGroup answers to its own available width through '
             'ordinary scrolling, not a breakpoint: the fade fraction '
             '(min(12%, 40px)) is computed from the container\'s own '
             'measured width inside a LayoutBuilder.',
@@ -1274,27 +1274,27 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/attachment.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
         'Flutter imports: dart:math, dart:ui, package:flutter/'
             'gestures.dart (PointerDeviceKind), package:flutter/'
             'widgets.dart.',
-        'Foundation imports: foundation/motion.dart (elAnimationDuration), '
-            'foundation/shadows.dart, foundation/spacing.dart (el()), '
+        'Foundation imports: foundation/motion.dart (effectiveMotionDuration), '
+            'foundation/shadows.dart, foundation/spacing.dart (space()), '
             'foundation/theme.dart, foundation/typography.dart, '
             'theme_scope.dart.',
-        'Component imports: button.dart (ElButton, the actions), '
-            'dialog.dart (ElModalPortal, ElJellyTransition — the preview '
+        'Component imports: button.dart (Button, the actions), '
+            'dialog.dart (OverlayPortal, OpenTransition — the preview '
             'panel), icon.dart, icon_paths.g.dart, icon_swap.dart '
-            '(ElIconSwap — the download/saved glyph roll).',
+            '(IconSwap — the download/saved glyph roll).',
         'registryDependencies, resolved automatically by `elattar add '
             'attachment`: button, dialog, icon, icon-swap, '
             'source-foundation — copied verbatim from '
             'registry/components/attachment.json.',
       ]),
-      SizedBox(height: el(3)),
+      SizedBox(height: space(3)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
@@ -1312,33 +1312,37 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Every colour is read live off ElTheme.of(context) at build '
+      _bullets(ThemeScope.of(context), <String>[
+        'Every colour is read live off ThemeScope.of(context) at build '
             'time: theme.card (the fill), theme.border / theme.destructive '
-            '(the rim), theme.muted (the icon well), theme.destructiveInk '
+            '(the rim), theme.muted (the icon well), theme.destructiveText '
             '(the error description) and theme.ring (the focus-within '
             'ring).',
         'The shimmer highlight is theme-aware in a different way: dark '
             'resolves to a measured near-white, light to theme.foreground '
             'at 20% alpha — a relative-colour rule, not a token lookup.',
         'The preview panel\'s ring (foreground/10) and its close '
-            'button (a secondary ElButton, chosen specifically because '
+            'button (a secondary Button, chosen specifically because '
             'a ghost control would disappear into the photograph under '
             'it) both read theme live as well.',
-        'Flipping ElThemeController re-resolves every one of these on '
+        'Flipping ThemeController re-resolves every one of these on '
             'the next frame: nothing here is cached.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

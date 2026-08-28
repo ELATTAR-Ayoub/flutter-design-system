@@ -1,6 +1,6 @@
 /// Public documentation page for the `switch` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels, following the shadcn parity frame; it now declares a
 /// `ComponentDocSpec` (`example/lib/docs/component_doc_page.dart`) and hands
 /// it to `ComponentDocPage`, the same shape `button` established. Every
@@ -14,9 +14,9 @@
 /// rail entry), Installation, Usage, then one section per shadcn example
 /// (Description, Choice card, Disabled, Invalid, Size: no `Examples` wrapper
 /// heading), then the eight disclosures. The Size section's own geometry
-/// table moved into API Reference as a second `ElSwitchSize` table,
-/// alongside `ElSwitch` itself, matching how `button` documents
-/// `ElButtonSize`. `RTL` is still skipped, unchanged from the original
+/// table moved into API Reference as a second `SwitchSize` table,
+/// alongside `Switch` itself, matching how `button` documents
+/// `ButtonSize`. `RTL` is still skipped, unchanged from the original
 /// ruling: `_Thumb` positions the thumb with `Positioned.left`, which is not
 /// direction-aware, recorded as its own bullet in Responsive rather than a
 /// whole section this control cannot back up.
@@ -26,12 +26,24 @@
 /// gone now that `elattar add switch` actually resolves. New: a Keyboard
 /// disclosure, between Accessibility and Responsive, read directly off
 /// `lib/src/components/selection_control.dart`'s shared `_onKey`
-/// (switch.dart composes `ElSelectionControl`, it does not wire its own key
+/// (switch.dart composes `SelectionControl`, it does not wire its own key
 /// handler).
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -47,7 +59,7 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'A single interactive switch, wired to a real ElField label. Tap '
+          'A single interactive switch, wired to a real Field label. Tap '
           'the pill or the words beside it: both flip the same value.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
@@ -70,14 +82,14 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
               'selection_control.dart for the shared socket, focus ring and '
               'hit area: this is the class signature, not the full source.',
           code:
-              "import 'package:flutter/widgets.dart';\n\n"
-              'enum ElSwitchSize { sm, md }\n\n'
-              'class ElSwitch extends StatelessWidget {\n'
-              '  const ElSwitch({\n'
+              "import 'package:flutter/widgets.dart' hide AspectRatio, Form, FormField, Icon, OverlayPortal, RadioGroup, RichText, SafeArea, ScrollPosition, Table, TableColumnWidth;\n\n"
+              'enum SwitchSize { sm, md }\n\n'
+              'class Switch extends StatelessWidget {\n'
+              '  const Switch({\n'
               '    super.key,\n'
               '    required this.value,\n'
               '    this.onChanged,\n'
-              '    this.size = ElSwitchSize.md,\n'
+              '    this.size = SwitchSize.md,\n'
               '    this.enabled = true,\n'
               '    this.invalid = false,\n'
               '    this.focusNode,\n'
@@ -86,7 +98,7 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
               '  });\n\n'
               '  final bool value;\n'
               '  final ValueChanged<bool>? onChanged;\n'
-              '  final ElSwitchSize size;\n'
+              '  final SwitchSize size;\n'
               '  final bool enabled;\n'
               '  final bool invalid;\n'
               '  final FocusNode? focusNode;\n'
@@ -110,7 +122,7 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
       title: 'Description',
       description:
           'A label and a line of helper text under it, both published '
-          'through ElFieldScope so the switch adopts them as its accessible '
+          'through FieldScope so the switch adopts them as its accessible '
           'name and hint without repeating either string.',
       specimen: _DescriptionSpecimen(),
       code: _descriptionCode,
@@ -120,8 +132,8 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
       id: 'choice-card',
       title: 'Choice card',
       description:
-          'A composed settings list: one ElFieldGroup, several horizontal '
-          "ElField rows, one ElSwitch each: shadcn's own \"several toggles "
+          'A composed settings list: one FieldGroup, several horizontal '
+          "Field rows, one Switch each: shadcn's own \"several toggles "
           'grouped in a card" pattern.',
       specimen: _ChoiceCardSpecimen(),
       code: _choiceCardCode,
@@ -153,7 +165,7 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
       id: 'size',
       title: 'Size',
       description:
-          'The two rungs of ElSwitchSize, side by side. sm is a 36 × 20 '
+          'The two rungs of SwitchSize, side by side. sm is a 36 × 20 '
           'track with 16px of thumb travel; md (the default: named md '
           'because default is a Dart keyword; .label still reports '
           '"default", the attribute value the reference writes) is a '
@@ -167,8 +179,8 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElSwitch declares, and both '
-          'ElSwitchSize rungs.',
+          'Every constructor parameter Switch declares, and both '
+          'SwitchSize rungs.',
       child: _ApiReferenceContent(),
     ),
     DisclosureSection(
@@ -191,7 +203,7 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           "Read off lib/src/components/selection_control.dart's shared "
-          '_onKey: switch.dart composes ElSelectionControl rather than '
+          '_onKey: switch.dart composes SelectionControl rather than '
           'wiring its own key handler.',
       child: _KeyboardContent(),
     ),
@@ -230,7 +242,7 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
             value: 'test/selection_feedback_test.dart',
             description:
                 'Covers geometry, motion curves, colors, the hit area and '
-                'ElField wiring for the whole selection-control family.',
+                'Field wiring for the whole selection-control family.',
           ),
           const DocsInstallFact(
             label: 'Docs test',
@@ -261,9 +273,9 @@ class SwitchDocPage extends StatelessWidget {
       title: switchDoc.title,
       description: switchDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Switch'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Switch'),
     ],
     toc: switchDocSpec.toc,
     previous: const DocsPageLink(title: 'Select', route: '/components/select'),
@@ -280,8 +292,8 @@ class SwitchDocPage extends StatelessWidget {
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-/// The one specimen the tests tap: a real, stateful [ElSwitch] behind a
-/// [ElField] label, so both the control's own semantics and the label's
+/// The one specimen the tests tap: a real, stateful [Switch] behind a
+/// [Field] label, so both the control's own semantics and the label's
 /// activation wiring are exercised together.
 class _PreviewSpecimen extends StatefulWidget {
   const _PreviewSpecimen();
@@ -295,26 +307,26 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: ElContainers.xs),
+      constraints: const BoxConstraints(maxWidth: Containers.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElField(
+          Field(
             label: 'Email notifications',
             description: 'Applies immediately: there is no Save button.',
-            orientation: ElFieldOrientation.horizontal,
-            child: ElSwitch(
+            orientation: FieldOrientation.horizontal,
+            child: Switch(
               key: const ValueKey<String>('switch-doc-live-specimen'),
               value: _on,
               onChanged: (bool next) => setState(() => _on = next),
             ),
           ),
-          SizedBox(height: el(3)),
-          ElText(
+          SizedBox(height: space(3)),
+          StyledText(
             _on ? 'Currently on.' : 'Currently off.',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ],
@@ -323,11 +335,11 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   }
 }
 
-const String _previewCode = '''ElField(
+const String _previewCode = '''Field(
   label: 'Email notifications',
   description: 'Applies immediately: there is no Save button.',
-  orientation: ElFieldOrientation.horizontal,
-  child: ElSwitch(
+  orientation: FieldOrientation.horizontal,
+  child: Switch(
     value: notificationsOn,
     onChanged: (bool next) => setState(() => notificationsOn = next),
   ),
@@ -335,7 +347,7 @@ const String _previewCode = '''ElField(
 
 const String _usageCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-    'ElSwitch(\n'
+    'Switch(\n'
     '  value: notificationsOn,\n'
     '  onChanged: (bool next) => setState(() => notificationsOn = next),\n'
     ')';
@@ -352,12 +364,12 @@ class _DescriptionSpecimenState extends State<_DescriptionSpecimen> {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElContainers.xs),
-    child: ElField(
+    constraints: const BoxConstraints(maxWidth: Containers.xs),
+    child: Field(
       label: 'Marketing emails',
       description: 'Product announcements and offers, at most once a week.',
-      orientation: ElFieldOrientation.horizontal,
-      child: ElSwitch(
+      orientation: FieldOrientation.horizontal,
+      child: Switch(
         value: _on,
         onChanged: (bool next) => setState(() => _on = next),
       ),
@@ -365,11 +377,11 @@ class _DescriptionSpecimenState extends State<_DescriptionSpecimen> {
   );
 }
 
-const String _descriptionCode = '''ElField(
+const String _descriptionCode = '''Field(
   label: 'Marketing emails',
   description: 'Product announcements and offers, at most once a week.',
-  orientation: ElFieldOrientation.horizontal,
-  child: ElSwitch(
+  orientation: FieldOrientation.horizontal,
+  child: Switch(
     value: marketingOn,
     onChanged: (bool next) => setState(() => marketingOn = next),
   ),
@@ -392,14 +404,14 @@ class _ChoiceCardSpecimenState extends State<_ChoiceCardSpecimen> {
   ];
 
   @override
-  Widget build(BuildContext context) => ElFieldGroup(
+  Widget build(BuildContext context) => FieldGroup(
     children: <Widget>[
       for (int i = 0; i < _rows.length; i++)
-        ElField(
+        Field(
           label: _rows[i].$1,
           description: _rows[i].$2,
-          orientation: ElFieldOrientation.horizontal,
-          child: ElSwitch(
+          orientation: FieldOrientation.horizontal,
+          child: Switch(
             value: _values[i],
             label: _rows[i].$1,
             onChanged: (bool next) => setState(() => _values[i] = next),
@@ -409,14 +421,14 @@ class _ChoiceCardSpecimenState extends State<_ChoiceCardSpecimen> {
   );
 }
 
-const String _choiceCardCode = '''ElFieldGroup(
+const String _choiceCardCode = '''FieldGroup(
   children: [
     for (final row in rows)
-      ElField(
+      Field(
         label: row.label,
         description: row.description,
-        orientation: ElFieldOrientation.horizontal,
-        child: ElSwitch(
+        orientation: FieldOrientation.horizontal,
+        child: Switch(
           value: values[row],
           label: row.label,
           onChanged: (bool next) => setState(() => values[row] = next),
@@ -430,18 +442,18 @@ class _DisabledSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(6),
+    spacing: space(6),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: const <Widget>[
-      ElSwitch(value: false, enabled: false),
-      ElSwitch(value: true, enabled: false),
+      Switch(value: false, enabled: false),
+      Switch(value: true, enabled: false),
     ],
   );
 }
 
 const String _disabledCode =
-    'ElSwitch(value: false, enabled: false)\n\n'
-    'ElSwitch(value: true, enabled: false)';
+    'Switch(value: false, enabled: false)\n\n'
+    'Switch(value: true, enabled: false)';
 
 void _noop(bool _) {}
 
@@ -450,11 +462,11 @@ class _InvalidSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      ElSwitch(value: false, invalid: true, onChanged: _noop);
+      Switch(value: false, invalid: true, onChanged: _noop);
 }
 
 const String _invalidCode =
-    'ElSwitch(value: false, invalid: true, onChanged: (bool next) {})';
+    'Switch(value: false, invalid: true, onChanged: (bool next) {})';
 
 class _SizeSpecimen extends StatefulWidget {
   const _SizeSpecimen();
@@ -469,17 +481,17 @@ class _SizeSpecimenState extends State<_SizeSpecimen> {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(8),
-    runSpacing: el(4),
+    spacing: space(8),
+    runSpacing: space(4),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: <Widget>[
-      ElSwitch(
-        size: ElSwitchSize.sm,
+      Switch(
+        size: SwitchSize.sm,
         value: _sm,
         label: 'Small',
         onChanged: (bool next) => setState(() => _sm = next),
       ),
-      ElSwitch(
+      Switch(
         value: _md,
         label: 'Default',
         onChanged: (bool next) => setState(() => _md = next),
@@ -493,13 +505,13 @@ const String _sizeCode = '''Wrap(
   runSpacing: 16,
   crossAxisAlignment: WrapCrossAlignment.center,
   children: [
-    ElSwitch(
-      size: ElSwitchSize.sm,
+    Switch(
+      size: SwitchSize.sm,
       value: sm,
       label: 'Small',
       onChanged: (bool next) => setState(() => sm = next),
     ),
-    ElSwitch(
+    Switch(
       value: md,
       label: 'Default',
       onChanged: (bool next) => setState(() => md = next),
@@ -516,9 +528,9 @@ class _ApiReferenceContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const DocsApiTable(title: 'ElSwitch', facts: _switchApiFacts),
-      SizedBox(height: el(6)),
-      const DocsApiTable(title: 'ElSwitchSize', facts: _sizeFacts),
+      const DocsApiTable(title: 'Switch', facts: _switchApiFacts),
+      SizedBox(height: space(6)),
+      const DocsApiTable(title: 'SwitchSize', facts: _sizeFacts),
     ],
   );
 }
@@ -540,8 +552,8 @@ const List<DocsApiFact> _switchApiFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'size',
-    type: 'ElSwitchSize',
-    description: 'Defaults to ElSwitchSize.md. See the table below.',
+    type: 'SwitchSize',
+    description: 'Defaults to SwitchSize.md. See the table below.',
   ),
   DocsApiFact(
     name: 'enabled',
@@ -556,44 +568,44 @@ const List<DocsApiFact> _switchApiFacts = <DocsApiFact>[
     type: 'bool',
     description:
         "Defaults to false. Paints the destructive border/ring. ORed with "
-        "the enclosing ElFieldScope's own invalid flag.",
+        "the enclosing FieldScope's own invalid flag.",
   ),
   DocsApiFact(
     name: 'focusNode',
     type: 'FocusNode?',
     description:
-        "Optional. Falls back to a ElFieldScope's node when null, so "
-        'ElForm.focusFirstError can land on the switch itself.',
+        "Optional. Falls back to a FieldScope's node when null, so "
+        'Form.focusFirstError can land on the switch itself.',
   ),
   DocsApiFact(
     name: 'label',
     type: 'String?',
     description:
         'Optional accessible name for a switch whose visible label is a '
-        "sibling. Falls back to the enclosing ElFieldScope's label: "
-        'typically supplied by ElField.',
+        "sibling. Falls back to the enclosing FieldScope's label: "
+        'typically supplied by Field.',
   ),
   DocsApiFact(
     name: 'hint',
     type: 'String?',
     description:
         "Optional description/error text, resolved into the control's "
-        "semantics hint. Falls back to the enclosing ElFieldScope's "
+        "semantics hint. Falls back to the enclosing FieldScope's "
         'describedBy.',
   ),
 ];
 
 const List<DocsApiFact> _sizeFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSwitchSize.sm',
+    name: 'SwitchSize.sm',
     type: '36 × 20 track, 16px thumb',
     description: '16px of travel. data-size="sm" on the reference.',
   ),
   DocsApiFact(
-    name: 'ElSwitchSize.md',
+    name: 'SwitchSize.md',
     type: '44 × 24 track, 20px thumb',
     description:
-        '20px of travel. The default value of ElSwitch.size: named md '
+        '20px of travel. The default value of Switch.size: named md '
         'rather than default because default is a Dart keyword; .label '
         'still reports "default", the attribute value the reference '
         'writes.',
@@ -608,18 +620,18 @@ class _StatesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsStateMatrix(facts: _stateFacts),
-      SizedBox(height: el(3)),
+      SizedBox(height: space(3)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText(
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
           'Pressed is not a row: the reference\'s Switch class list carries '
           'no active-state transform of its own, so there is no distinct '
           'pressed visual beyond the value change itself. Loading, Empty '
           'and Success are not rows either: a boolean control has no '
           'asynchronous operation, so inventing them would describe '
           'behavior the source does not have.',
-          ElType.small,
-          color: ElTheme.of(context).mutedForeground,
+          TextStyles.small,
+          color: ThemeScope.of(context).mutedForeground,
         ),
       ),
     ],
@@ -631,7 +643,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Off (rest)',
     treatment:
         'value: false. Fill theme.muted, border theme.input, '
-        'ElShadows.pressed: a socket recessed below the surrounding '
+        'Shadows.inset: a socket recessed below the surrounding '
         'surface.',
     userSignal:
         "The thumb rests at the track's left edge; the darker, recessed "
@@ -640,7 +652,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'On (selected)',
     treatment:
-        'value: true. Fill/border theme.primary, ElShadows.btnPrimary: the '
+        'value: true. Fill/border theme.primary, Shadows.controlPrimary: the '
         'socket lights and casts a glow beneath the thumb.',
     userSignal:
         'The thumb travels to the right edge AND the socket brightens: '
@@ -689,7 +701,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         'MediaQuery.disableAnimations true collapses every tween to '
-        'Duration.zero via elAnimationDuration.',
+        'Duration.zero via effectiveMotionDuration.',
     userSignal:
         'The thumb still lands at the correct on/off position, instantly, '
         'with no travel and no spring overshoot.',
@@ -701,28 +713,28 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Semantic role: a Semantics(toggled: value) node inside the hit '
             'area, so assistive technology announces it as a switch/toggle '
             'and reads its state as on or off, not merely checked.',
-        'Accessible name: required. Pass ElSwitch.label directly, or wrap '
-            'the control in a ElField(label: …); the field publishes the '
-            'same string through ElFieldScope and the control adopts it '
+        'Accessible name: required. Pass Switch.label directly, or wrap '
+            'the control in a Field(label: …); the field publishes the '
+            'same string through FieldScope and the control adopts it '
             'automatically when its own label is left null.',
-        'Label activation: inside a horizontal ElField, tapping the label '
-            'text flips the switch too: ElField registers a '
-            'ElFieldActivator and ElSwitch fills it with its own toggle '
+        'Label activation: inside a horizontal Field, tapping the label '
+            'text flips the switch too: Field registers a '
+            'FieldActivator and Switch fills it with its own toggle '
             'callback.',
         'Keyboard: Tab moves focus onto an enabled switch; Enter or Space '
             'activates it, wired by hand onto a Focus widget the same way '
             'a native <button> would answer both keys: see Keyboard below '
             'for the exact contract.',
-        'Focus routing: an explicit ElSwitch.focusNode wins over one '
-            'supplied by an enclosing ElFieldScope, which in turn wins '
-            'over none, so ElForm.focusFirstError can land on the switch '
+        'Focus routing: an explicit Switch.focusNode wins over one '
+            'supplied by an enclosing FieldScope, which in turn wins '
+            'over none, so Form.focusFirstError can land on the switch '
             'itself.',
         'Touch target: the painted pill is 44 × 24 (or 36 × 20 at '
-            'ElSwitchSize.sm), but ElHitArea invisibly grows the tappable '
+            'SwitchSize.sm), but HitArea invisibly grows the tappable '
             'region by 12px on each side and 8px above/below the padding '
             'box: 66 × 38 at the default size, 58 × 34 at sm.',
         'Non-color signal: on and off are never distinguished by hue '
@@ -730,21 +742,21 @@ class _AccessibilityContent extends StatelessWidget {
             'socket\'s depth (recessed vs. lit) both change with the '
             'value, so the state reads correctly even without color '
             'vision.',
-        'Error wiring: ElSwitch(invalid: true) paints the destructive '
+        'Error wiring: Switch(invalid: true) paints the destructive '
             'ring but sets no semantics validation result of its own; '
             'that announcement comes from the enclosing '
-            'ElField/ElFieldScope, whose own Semantics node carries it '
+            'Field/FieldScope, whose own Semantics node carries it '
             'for every control inside, whether or not that control reads '
             'the scope at all.',
         'Known gap, spelling: the switch spells its disabled state '
             '`data-disabled:` while Checkbox, RadioGroupItem and Select '
             'spell it `disabled:` on the reference (forms-map drift 14). '
-            'Same intent, two selector families, one ElSwitch.enabled.',
+            'Same intent, two selector families, one Switch.enabled.',
       ]);
 }
 
 /// Read directly off `lib/src/components/selection_control.dart`'s shared
-/// `_onKey`: `switch.dart` composes `ElSelectionControl` rather than wiring
+/// `_onKey`: `switch.dart` composes `SelectionControl` rather than wiring
 /// its own key handler, so every fact here is that file's, not invented for
 /// this page.
 class _KeyboardContent extends StatelessWidget {
@@ -752,24 +764,24 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Activation: Enter, NumpadEnter, and Space toggle a focused, '
             'enabled switch. The shared _onKey only inspects KeyDownEvent, '
             'a matching KeyUpEvent is ignored, and any other key returns '
             'KeyEventResult.ignored so it keeps propagating.',
         'Tab order: canRequestFocus is wired to enabled && onTap != null '
-            '(switch.dart never sets ElSelectionControl.inert, so that '
+            '(switch.dart never sets SelectionControl.inert, so that '
             'half of the shared predicate is always false here): a '
             'disabled switch, or one with a null onChanged, is removed '
             'from keyboard traversal entirely, not just dimmed in place.',
         'No custom ordering: neither switch.dart nor '
             'selection_control.dart wires a FocusTraversalPolicy of its '
             'own. Tab and Shift+Tab walk whatever order the surrounding '
-            'page (or ElFieldGroup) already declares.',
+            'page (or FieldGroup) already declares.',
         'Pointer vs keyboard: a bare pointer tap never requests focus on '
             'the node in this family; only keyboard traversal, or an '
             'explicit focusNode.requestFocus() from outside, does — the '
-            "same asymmetry ElButton's own Keyboard section documents, "
+            "same asymmetry Button's own Keyboard section documents, "
             'shared machinery.',
       ]);
 }
@@ -779,12 +791,12 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in switch.dart: BuildContext '
             'width is never read for a layout decision; the same widget '
             'renders identically at 390px and 1440px.',
         'Every measurement (trackWidth, trackHeight, thumbSize, travel) '
-            'is a fixed value keyed only to ElSwitchSize, never to '
+            'is a fixed value keyed only to SwitchSize, never to '
             'viewport.',
         'Platform parity: Android, iOS, Web, macOS, Windows and Linux all '
             'render the same widget tree: switch.dart imports no dart:io '
@@ -836,26 +848,25 @@ class _DependenciesContent extends StatelessWidget {
             value: 'field.dart, selection_control.dart',
             description:
                 'switch.dart imports these directly: field.dart for '
-                'ElFieldScope wiring, and selection_control.dart for '
-                'ElSelectionControl, the shared track/focus-ring/hit-area '
+                'FieldScope wiring, and selection_control.dart for '
+                'SelectionControl, the shared track/focus-ring/hit-area '
                 'primitive Checkbox and RadioGroupItem also build on. '
                 'Neither is copyable in isolation.',
           ),
           const DocsInstallFact(
             label: 'Foundation dependencies',
             value:
-                'effects/machine_surface.dart, foundation/motion.dart, '
+                'effects/surface.dart, foundation/motion.dart, '
                 'foundation/shadows.dart, foundation/spacing.dart, '
                 'foundation/theme.dart, theme_scope.dart',
             description:
-                'ElMachineSurface for the raised thumb, and the usual '
+                'Surface for the raised thumb, and the usual '
                 'duration/curve, shadow, spacing and theme tokens.',
           ),
           DocsInstallFact(
             label: 'Exports',
             value: switchDoc.exports.join(', '),
-            description:
-                'The public symbols this component makes available.',
+            description: 'The public symbols this component makes available.',
           ),
           const DocsInstallFact(
             label: 'Assets',
@@ -865,7 +876,7 @@ class _DependenciesContent extends StatelessWidget {
           const DocsInstallFact(
             label: 'Fonts',
             value: 'none',
-            description: 'No text is rendered by ElSwitch itself.',
+            description: 'No text is rendered by Switch itself.',
           ),
           const DocsInstallFact(
             label: 'Shaders',
@@ -874,7 +885,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
@@ -882,10 +893,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Selection control',
             route: '/components/selection_control',
           ),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',
@@ -903,16 +911,16 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Every color routes through ElTheme.of(context) (primary, muted, '
+      _bullets(ThemeScope.of(context), <String>[
+        'Every color routes through ThemeScope.of(context) (primary, muted, '
             'input, border, foreground), so light and dark resolve '
             'automatically; nothing on this page is a literal Color.',
         'bg-muted is the one resting fill in this control family that is '
             'not --card: a socket you can see into needs to be darker '
             'than the surface it is cut out of.',
-        'Motion runs on ElDurations.transitionDefault (250ms): the '
-            "track's fill, border and ring tween on ElCurves.out, while "
-            "the thumb's own transform tweens on ElCurves.spring and "
+        'Motion runs on MotionDurations.normal (250ms): the '
+            "track's fill, border and ring tween on MotionCurves.enter, while "
+            "the thumb's own transform tweens on MotionCurves.emphasized and "
             "briefly overshoots the track's edge before settling: the "
             'one place in the control where the two halves of the same '
             'surface run different curves.',
@@ -921,15 +929,19 @@ class _ThemingContent extends StatelessWidget {
 
 /// Bulleted prose at reading width, matching `button/page.dart`'s own
 /// private `_bullets` helper: one bullet per bound fact, not a table.
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

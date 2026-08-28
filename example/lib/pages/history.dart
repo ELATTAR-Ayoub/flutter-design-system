@@ -15,7 +15,7 @@
 /// Every timestamp on this page is relative, *"14 minutes ago"*, *"yesterday"*,
 /// *"last week"*: so the rendered strings are a function of when the store was
 /// seeded. `useMockConversations` pins "now" to mount through `useState`'s
-/// initialiser; the port pins it to [ElClock.nowOf], which is the `?clock=`
+/// initialiser; the port pins it to [Clock.nowOf], which is the `?clock=`
 /// seam the parity rig freezes both renderers on.
 ///
 /// ## Drift register: recorded, shipped as written
@@ -56,7 +56,7 @@
 ///  9. **The AlertDialog's description interpolates the title into a
 ///     `text-foreground` span**, `<span>{title}</span> and everything in it
 ///     will be removed.`: which the port renders as one string, because
-///     [ElAlertDialogDescription] takes text. Recorded; the words are the same.
+///     [AlertDialogDescription] takes text. Recorded; the words are the same.
 /// 10. **§6's Note calls `shouldFilter` off "which is also why"**, attributing
 ///     the flag to the preview matching. The flag is off because cmdk would
 ///     re-score by the row's rendered text; the preview matching is what would
@@ -67,7 +67,19 @@ library;
 import 'dart:ui' as ui;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../agent/mock_transport.dart';
 import '../kit.dart';
@@ -82,12 +94,12 @@ class HistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('agent', 'history');
+    final CategoryHit here = findCategory('agent', 'history');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // DRIFT 1.
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
@@ -96,14 +108,14 @@ class HistoryPage extends StatelessWidget {
         ),
         // `className="mb-12"`, 48px.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: ElNote(
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: Note(
             title: 'Every card below is live',
-            child: ElText(
+            child: StyledText(
               'Rename them, pin them, delete them. Nothing resets between '
               'sections because each specimen owns its own state: which also '
               'means you can break one and see what that looks like.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ),
@@ -114,7 +126,7 @@ class HistoryPage extends StatelessWidget {
         const _CapabilitiesSection(),
         const _SearchSection(),
         const _SwitchSection(),
-        const ElPageFootNav(groupId: 'agent', slug: 'history'),
+        const PageFootNav(groupId: 'agent', slug: 'history'),
       ],
     );
   }
@@ -128,7 +140,7 @@ class _ListSection extends StatelessWidget {
   const _ListSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'list',
     title: 'The list',
     description:
@@ -142,13 +154,13 @@ class _ListSection extends StatelessWidget {
       children: <Widget>[
         // DRIFT 5: the label names `ChatHistory`; the specimen is the
         // flat list, without the drawer's own two headings.
-        const ElPanel(
+        const Panel(
           label: 'ChatHistory',
           note: 'live · pin, rename, delete, switch',
           child: HistoryListDemo(),
         ),
-        SizedBox(height: el(6)),
-        ElRichText(
+        SizedBox(height: space(6)),
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(
@@ -158,11 +170,11 @@ class _ListSection extends StatelessWidget {
                     'does not cut, it blurs out, swaps, and blurs back '
                     'in. See ',
               ),
-              ElCode.span('useBlurSwitch'),
+              Code.span('useBlurSwitch'),
               const TextSpan(text: ' below.'),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     ),
@@ -177,7 +189,7 @@ class HistoryListDemo extends StatefulWidget {
   final bool capabilities;
 
   /// `flex flex-col gap-3`: the strip over the group.
-  static double get gap => el(3);
+  static double get gap => space(3);
 
   @override
   State<HistoryListDemo> createState() => _HistoryListDemoState();
@@ -185,16 +197,16 @@ class HistoryListDemo extends StatefulWidget {
 
 class _HistoryListDemoState extends State<HistoryListDemo> {
   MockConversationStore? _store;
-  late final ElBlurSwitchController _switch = ElBlurSwitchController(
+  late final BlurSwitchController _switch = BlurSwitchController(
     open: (String id) => _store!.open(id),
   );
-  final ElFlipController _flip = ElFlipController();
+  final FlipController _flip = FlipController();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _store ??= MockConversationStore(
-      now: ElClock.nowOf(context),
+      now: Clock.nowOf(context),
       capabilities: widget.capabilities,
     );
   }
@@ -218,7 +230,7 @@ class _HistoryListDemoState extends State<HistoryListDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return ListenableBuilder(
       listenable: Listenable.merge(<Listenable>[_store!, _switch]),
       builder: (BuildContext context, Widget? _) {
@@ -227,54 +239,54 @@ class _HistoryListDemoState extends State<HistoryListDemo> {
         /* Same two-key order the drawer uses: pinned first, then newest.
            Without it this specimen would show a pin that changes an icon and
            nothing else, which is not what pinning does. */
-        final List<ElConversationSummary> ordered =
-            List<ElConversationSummary>.of(store.conversations)
-              ..sort((ElConversationSummary a, ElConversationSummary b) {
+        final List<ConversationSummary> ordered =
+            List<ConversationSummary>.of(store.conversations)
+              ..sort((ConversationSummary a, ConversationSummary b) {
                 if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
                 return b.updatedAt.compareTo(a.updatedAt);
               });
         _flip.reconcile(<String>[
-          for (final ElConversationSummary c in ordered) c.id,
+          for (final ConversationSummary c in ordered) c.id,
         ]);
 
         final String? activeTitle = store.activeId == null
             ? null
             : ordered
-                  .where((ElConversationSummary c) => c.id == store.activeId)
-                  .map((ElConversationSummary c) => c.title)
+                  .where((ConversationSummary c) => c.id == store.activeId)
+                  .map((ConversationSummary c) => c.title)
                   .followedBy(const <String>['—'])
                   .first;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            ElBlurSwitch(
+            BlurSwitch(
               phase: _switch.phase,
               child: Container(
-                padding: EdgeInsets.all(el(3)),
+                padding: EdgeInsets.all(space(3)),
                 decoration: BoxDecoration(
                   color: theme.background,
-                  borderRadius: BorderRadius.circular(ElRadii.lg),
+                  borderRadius: BorderRadius.circular(Radii.lg),
                   border: Border.all(
                     color: theme.border,
-                    width: ElWidths.hairline,
+                    width: BorderWidths.hairline,
                   ),
                 ),
-                child: ElText(
+                child: StyledText(
                   activeTitle == null
                       ? 'New conversation'
                       : 'Open: $activeTitle',
-                  ElType.caption,
+                  TextStyles.caption,
                   color: theme.mutedForeground,
                 ),
               ),
             ),
             SizedBox(height: HistoryListDemo.gap),
-            ElItemGroup(
-              gapOverride: el(1),
+            ItemGroup(
+              gapOverride: space(1),
               children: <Widget>[
-                for (final ElConversationSummary c in ordered)
-                  ElHistoryCard(
+                for (final ConversationSummary c in ordered)
+                  HistoryCard(
                     key: _flip.keyFor(c.id),
                     conversation: c,
                     active: c.id == store.activeId,
@@ -302,7 +314,7 @@ class _RenameSection extends StatelessWidget {
   const _RenameSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'rename',
     title: 'Renaming moves nothing',
     description:
@@ -312,27 +324,27 @@ class _RenameSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElGrid(
+        const Grid(
           base: 1,
           md: 2,
           children: <Widget>[
-            ElPanel(
+            Panel(
               label: 'rename=inline',
               note: 'the default',
-              child: HistoryCardSpecimen(rename: ElHistoryRename.inline),
+              child: HistoryCardSpecimen(rename: HistoryRename.inline),
             ),
-            ElPanel(
+            Panel(
               label: 'rename=dialog',
               note: 'menu → Rename',
-              child: HistoryCardSpecimen(rename: ElHistoryRename.dialog),
+              child: HistoryCardSpecimen(rename: HistoryRename.dialog),
             ),
           ],
         ),
-        SizedBox(height: el(6)),
-        ElNote(
-          tone: ElNoteTone.value,
+        SizedBox(height: space(6)),
+        Note(
+          tone: NoteTone.value,
           title: 'Why two',
-          child: ElText(
+          child: StyledText(
             'Inline is faster and keeps the list you are renaming inside '
             'of on screen, Enter commits, Escape abandons, blur commits, '
             'which is what every inline rename already does and therefore '
@@ -341,7 +353,7 @@ class _RenameSection extends StatelessWidget {
             'when renaming is rare enough that being able to find it beats '
             'being able to do it quickly. Both ship; pick per surface '
             'rather than inheriting one.',
-            ElType.small,
+            TextStyles.small,
           ),
         ),
       ],
@@ -354,14 +366,14 @@ class _RenameSection extends StatelessWidget {
 class HistoryCardSpecimen extends StatefulWidget {
   const HistoryCardSpecimen({
     super.key,
-    this.confirm = ElHistoryConfirm.inline,
-    this.rename = ElHistoryRename.inline,
+    this.confirm = HistoryConfirm.inline,
+    this.rename = HistoryRename.inline,
     this.pinned = false,
     this.active = false,
   });
 
-  final ElHistoryConfirm confirm;
-  final ElHistoryRename rename;
+  final HistoryConfirm confirm;
+  final HistoryRename rename;
   final bool pinned;
   final bool active;
 
@@ -385,21 +397,21 @@ class _HistoryCardSpecimenState extends State<HistoryCardSpecimen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _updatedAt ??= ElClock.nowOf(context).subtract(HistoryCardSpecimen.age);
+    _updatedAt ??= Clock.nowOf(context).subtract(HistoryCardSpecimen.age);
   }
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     if (_gone) {
       return Container(
-        padding: EdgeInsets.all(el(3)),
+        padding: EdgeInsets.all(space(3)),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(ElRadii.lg),
+          borderRadius: BorderRadius.circular(Radii.lg),
           border: Border.all(
             color: theme.border,
-            width: ElWidths.hairline,
+            width: BorderWidths.hairline,
             strokeAlign: BorderSide.strokeAlignInside,
           ),
         ),
@@ -407,16 +419,16 @@ class _HistoryCardSpecimenState extends State<HistoryCardSpecimen> {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: ElText(
+              child: StyledText(
                 'Deleted.',
-                ElType.caption,
+                TextStyles.caption,
                 color: theme.mutedForeground,
               ),
             ),
-            SizedBox(width: el(3)),
-            ElButton(
-              size: ElButtonSize.sm,
-              variant: ElButtonVariant.outline,
+            SizedBox(width: space(3)),
+            Button(
+              size: ButtonSize.sm,
+              variant: ButtonVariant.outline,
               onPressed: () => setState(() => _gone = false),
               child: const Text('Put it back'),
             ),
@@ -425,8 +437,8 @@ class _HistoryCardSpecimenState extends State<HistoryCardSpecimen> {
       );
     }
 
-    return ElHistoryCard(
-      conversation: ElConversationSummary(
+    return HistoryCard(
+      conversation: ConversationSummary(
         id: 'spec-card',
         title: _title,
         updatedAt: _updatedAt!,
@@ -472,13 +484,13 @@ class _DashedRingPainter extends BoxPainter {
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
     final Size size = configuration.size ?? Size.zero;
     final RRect rect = RRect.fromRectAndRadius(
-      (offset & size).deflate(ElWidths.hairline / 2),
-      const Radius.circular(ElRadii.lg),
+      (offset & size).deflate(BorderWidths.hairline / 2),
+      const Radius.circular(Radii.lg),
     );
     final Path path = Path()..addRRect(rect);
     final Paint paint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = ElWidths.hairline
+      ..strokeWidth = BorderWidths.hairline
       ..color = color;
     for (final ui.PathMetric metric in path.computeMetrics()) {
       double at = 0;
@@ -498,7 +510,7 @@ class _DeleteSection extends StatelessWidget {
   const _DeleteSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'delete',
     title: 'Two ways to ask before deleting',
     description:
@@ -507,26 +519,26 @@ class _DeleteSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElGrid(
+        const Grid(
           base: 1,
           md: 2,
           children: <Widget>[
-            ElPanel(
+            Panel(
               label: 'confirm=inline',
               note: 'slides in from the trailing edge',
-              child: HistoryCardSpecimen(confirm: ElHistoryConfirm.inline),
+              child: HistoryCardSpecimen(confirm: HistoryConfirm.inline),
             ),
-            ElPanel(
+            Panel(
               label: 'confirm=dialog',
               note: 'the system AlertDialog',
-              child: HistoryCardSpecimen(confirm: ElHistoryConfirm.dialog),
+              child: HistoryCardSpecimen(confirm: HistoryConfirm.dialog),
             ),
           ],
         ),
-        SizedBox(height: el(6)),
-        ElNote(
+        SizedBox(height: space(6)),
+        Note(
           title: 'The inline confirm lands on top, not beside',
-          child: ElRichText(
+          child: RichText(
             TextSpan(
               children: <InlineSpan>[
                 const TextSpan(
@@ -539,7 +551,7 @@ class _DeleteSection extends StatelessWidget {
                       'delete button physically out of reach and makes the '
                       'question unavoidable. It arrives on ',
                 ),
-                ElCode.span('anim-confirm-in'),
+                Code.span('anim-confirm-in'),
                 const TextSpan(
                   text:
                       ' and leaves on a plain fade, because retracing '
@@ -548,11 +560,11 @@ class _DeleteSection extends StatelessWidget {
                 ),
               ],
             ),
-            ElType.small,
+            TextStyles.small,
           ),
         ),
-        SizedBox(height: el(6)),
-        const ElDoDont(
+        SizedBox(height: space(6)),
+        const DoDont(
           dos: <String>[
             'Collapse the row as it leaves, so the rows below rise into '
                 'the gap in one movement.',
@@ -583,23 +595,23 @@ class _PinSection extends StatelessWidget {
   const _PinSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'pin',
     title: 'Pinning',
     description:
         'A pinned card holds its pin visible; an unpinned one reveals it '
         'on hover, so a long list is not a wall of grey icons. Pinned '
         'conversations lift to their own section above the rest.',
-    child: ElGrid(
+    child: Grid(
       base: 1,
       md: 2,
       children: <Widget>[
-        ElPanel(
+        Panel(
           label: 'pinned',
           note: 'pin stays lit',
           child: HistoryCardSpecimen(pinned: true),
         ),
-        ElPanel(
+        Panel(
           label: 'unpinned · active',
           note: 'pin appears on hover',
           child: HistoryCardSpecimen(active: true),
@@ -617,7 +629,7 @@ class _CapabilitiesSection extends StatelessWidget {
   const _CapabilitiesSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'capabilities',
     title: 'Capabilities come from the store',
     description:
@@ -627,19 +639,19 @@ class _CapabilitiesSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(
+        const Panel(
           label: 'a store with no pin and no share',
           note: 'the same list, degraded',
           child: HistoryListDemo(capabilities: false),
         ),
-        SizedBox(height: el(6)),
-        ElText(
+        SizedBox(height: space(6)),
+        StyledText(
           'Nothing about the list special-cases this. The affordances are '
           'absent because the functions are, which means a store backed by '
           'something that cannot persist a pin never has to pretend it '
           'can: and nobody has to keep a second list of feature flags in '
           'sync with the first.',
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     ),
@@ -654,7 +666,7 @@ class _SearchSection extends StatelessWidget {
   const _SearchSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'search',
     title: 'Search',
     description:
@@ -664,16 +676,16 @@ class _SearchSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(
+        const Panel(
           label: 'HistorySearch',
           note: 'recent chats by default',
           child: HistorySearchDemo(),
         ),
-        SizedBox(height: el(6)),
-        ElNote(
-          tone: ElNoteTone.value,
+        SizedBox(height: space(6)),
+        Note(
+          tone: NoteTone.value,
           title: 'Recent chats are the empty state',
-          child: ElRichText(
+          child: RichText(
             TextSpan(
               children: <InlineSpan>[
                 const TextSpan(
@@ -695,7 +707,7 @@ class _SearchSection extends StatelessWidget {
                       'conversation is usually what they asked, not what '
                       'it got named afterwards: which is also why ',
                 ),
-                ElCode.span('shouldFilter'),
+                Code.span('shouldFilter'),
                 const TextSpan(
                   text:
                       ' is off, or cmdk would re-filter by title and '
@@ -703,7 +715,7 @@ class _SearchSection extends StatelessWidget {
                 ),
               ],
             ),
-            ElType.small,
+            TextStyles.small,
           ),
         ),
       ],
@@ -727,7 +739,7 @@ class _HistorySearchDemoState extends State<HistorySearchDemo> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _store ??= MockConversationStore(now: ElClock.nowOf(context));
+    _store ??= MockConversationStore(now: Clock.nowOf(context));
   }
 
   @override
@@ -738,27 +750,27 @@ class _HistorySearchDemoState extends State<HistorySearchDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             onPressed: () => setState(() => _open = true),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const ElIcon.lucide(ElLucide.search, size: ElIconSize.sm),
-                SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
+                const Icon.lucide(Lucide.search, size: IconSize.sm),
+                SizedBox(width: Button.gapFor(ButtonSize.md)),
                 const Text('Search conversations'),
               ],
             ),
           ),
-          SizedBox(height: el(3)),
-          ElRichText(
+          SizedBox(height: space(3)),
+          RichText(
             const TextSpan(
               children: <InlineSpan>[
                 TextSpan(text: 'Opens on recent chats. Try '),
@@ -781,10 +793,10 @@ class _HistorySearchDemoState extends State<HistorySearchDemo> {
                 ),
               ],
             ),
-            ElType.caption,
+            TextStyles.caption,
             color: theme.mutedForeground,
           ),
-          ElHistorySearch(
+          HistorySearch(
             conversations: _store!.conversations,
             open: _open,
             onOpenChange: (bool v) => setState(() => _open = v),
@@ -806,7 +818,7 @@ class _SwitchSection extends StatelessWidget {
   const _SwitchSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'switch',
     title: 'Switching conversations',
     description:
@@ -817,11 +829,11 @@ class _SwitchSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(flush: true, child: ConsoleWithHistory()),
-        SizedBox(height: el(6)),
-        ElNote(
+        const Panel(flush: true, child: ConsoleWithHistory()),
+        SizedBox(height: space(6)),
+        Note(
           title: 'Why this needs a hook and not an effect',
-          child: ElRichText(
+          child: RichText(
             TextSpan(
               children: <InlineSpan>[
                 const TextSpan(
@@ -840,7 +852,7 @@ class _SwitchSection extends StatelessWidget {
                       ' conversation out and then back in: a flicker '
                       'with extra steps. ',
                 ),
-                ElCode.span('useBlurSwitch'),
+                Code.span('useBlurSwitch'),
                 const TextSpan(
                   text:
                       ' inverts the order. It owns the transition and '
@@ -852,12 +864,12 @@ class _SwitchSection extends StatelessWidget {
                 ),
               ],
             ),
-            ElType.small,
+            TextStyles.small,
           ),
         ),
-        SizedBox(height: el(6)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(6)),
+        Meta(
+          items: <MetaItem>[
             (
               k: 'useBlurSwitch(open)',
               v: const TextSpan(
@@ -891,13 +903,13 @@ class _SwitchSection extends StatelessWidget {
 /// `ConsoleWithHistory`: the console with history wired into its header slot.
 ///
 /// **The one narrow surface this page has on `agent_console.dart`.** Every
-/// reference to [ElAgentConsole] on this page is inside this widget, so a
+/// reference to [AgentConsole] on this page is inside this widget, so a
 /// signature drift in the console family costs one edit.
 ///
 /// KNOWN GAP, `switchPhase`. The reference passes `switchPhase={phase}` and
 /// the console wears `blurClass(switchPhase)` on its transcript;
-/// [ElAgentConsole] does not take one yet. The controller is built and driven
-/// here, and the drawer already calls [ElBlurSwitchController.switchTo], so the
+/// [AgentConsole] does not take one yet. The controller is built and driven
+/// here, and the drawer already calls [BlurSwitchController.switchTo], so the
 /// only missing wire is the prop. Until it lands the transcript swaps without
 /// blurring: named as a residual rather than faked by blurring the whole
 /// console, which would take the header and the composer with it.
@@ -906,7 +918,7 @@ class ConsoleWithHistory extends StatefulWidget {
 
   /// `className="h-152"`, 608px *(measured: the console 1078 × 608 inside a
   /// 1080 × 610 flush Panel)*.
-  static double get height => el(152);
+  static double get height => space(152);
 
   @override
   State<ConsoleWithHistory> createState() => _ConsoleWithHistoryState();
@@ -916,17 +928,17 @@ class _ConsoleWithHistoryState extends State<ConsoleWithHistory> {
   /// The box the drawer is laid over: the console's own root, which is
   /// `relative` on the reference for exactly this reason.
   final GlobalKey _surface = GlobalKey();
-  final ElMockTransport _transport = ElMockTransport();
+  final MockTransport _transport = MockTransport();
 
   MockConversationStore? _store;
-  late final ElBlurSwitchController _switch = ElBlurSwitchController(
+  late final BlurSwitchController _switch = BlurSwitchController(
     open: (String id) => _store!.open(id),
   );
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _store ??= MockConversationStore(now: ElClock.nowOf(context));
+    _store ??= MockConversationStore(now: Clock.nowOf(context));
   }
 
   @override
@@ -941,7 +953,7 @@ class _ConsoleWithHistoryState extends State<ConsoleWithHistory> {
   Widget build(BuildContext context) => SizedBox(
     key: _surface,
     height: ConsoleWithHistory.height,
-    child: ElAgentConsole(
+    child: AgentConsole(
       transport: _transport,
       persona: agentPersona,
       toolStates: agentToolStates,
@@ -951,7 +963,7 @@ class _ConsoleWithHistoryState extends State<ConsoleWithHistory> {
       height: ConsoleWithHistory.height,
       headerSlot: ListenableBuilder(
         listenable: _switch,
-        builder: (BuildContext context, Widget? _) => ElChatHistory(
+        builder: (BuildContext context, Widget? _) => ChatHistory(
           store: _store!,
           surfaceKey: _surface,
           // `{ ...store, open: switchTo }`: the drawer opens through the
@@ -968,7 +980,7 @@ class _ConsoleWithHistoryState extends State<ConsoleWithHistory> {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /// `PERSONA`.
-const ElAgentPersona agentPersona = ElAgentPersona(
+const AgentPersona agentPersona = AgentPersona(
   name: 'Vault',
   blurb: 'Ask about packs, pulls, prices and your wallet.',
   suggestions: <String>[
@@ -983,49 +995,49 @@ const ElAgentPersona agentPersona = ElAgentPersona(
 /// `TOOL_STATES`, *"only the caller knows whether `export_activity` is
 /// reading, writing or running, and a status line that guesses is a status line
 /// that lies."*
-const ElToolStateMap agentToolStates = <String, ElAgentState>{
-  'search_inventory': ElAgentState.searching,
-  'read_wallet': ElAgentState.retrieving,
-  'export_activity': ElAgentState.writing,
-  'fetch_market_price': ElAgentState.retrieving,
+const ToolStateMap agentToolStates = <String, AgentState>{
+  'search_inventory': AgentState.searching,
+  'read_wallet': AgentState.retrieving,
+  'export_activity': AgentState.writing,
+  'fetch_market_price': AgentState.retrieving,
 };
 
 /// `COMMANDS`.
-const List<ElAgentCommand> agentCommands = <ElAgentCommand>[
-  ElAgentCommand(
+const List<AgentCommand> agentCommands = <AgentCommand>[
+  AgentCommand(
     id: 'inventory',
     label: 'inventory',
     hint: 'What is in stock',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.search,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.search,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'wallet',
     label: 'wallet',
     hint: 'Balance and recent movement',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.wallet,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.wallet,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'export',
     label: 'export',
     hint: 'Download activity as CSV',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.download,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.download,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'guide',
     label: 'guide',
     hint: 'How pack odds work',
-    group: ElAgentCommandGroup.command,
-    icon: ElLucide.bookOpen,
+    group: AgentCommandGroup.command,
+    icon: Lucide.bookOpen,
   ),
 ];
 
 /// `MODELS`.
-const List<ElAgentModel> agentModels = <ElAgentModel>[
-  ElAgentModel(id: 'fast', label: 'Fast', hint: 'Answers in a second'),
-  ElAgentModel(id: 'deep', label: 'Deep', hint: 'Slower, checks its work'),
+const List<AgentModel> agentModels = <AgentModel>[
+  AgentModel(id: 'fast', label: 'Fast', hint: 'Answers in a second'),
+  AgentModel(id: 'deep', label: 'Deep', hint: 'Slower, checks its work'),
 ];
 
 /// `describeApproval`: turns a held action into a sentence a human can decide
@@ -1046,7 +1058,7 @@ String describeAgentApproval(String action, Map<String, Object?> params) {
 /// `lib/agent/mock-conversations.ts`: a conversation store with nothing behind
 /// it.
 ///
-/// It implements the whole [ElConversationStore] interface **including the two
+/// It implements the whole [ConversationStore] interface **including the two
 /// optional capabilities**, which is what lets the page show the list both with
 /// and without them. A store that omits `pin` gets no pin button and no pinned
 /// section, and that is not a special case in the list, it is the absence of a
@@ -1055,9 +1067,9 @@ String describeAgentApproval(String action, Map<String, Object?> params) {
 /// Timestamps are the one thing that cannot be a literal: `relativeTime`
 /// renders "3 hours ago" against the clock, so fixed ISO strings would drift
 /// into "8 months ago" and the page would quietly rot. They are offsets from
-/// [now] instead: and [now] comes from [ElClock], so the parity rig can freeze
+/// [now] instead: and [now] comes from [Clock], so the parity rig can freeze
 /// both renderers on the same instant.
-class MockConversationStore extends ElConversationStore {
+class MockConversationStore extends ConversationStore {
   MockConversationStore({required DateTime now, this.capabilities = true})
     : _conversations = _seed(now);
 
@@ -1069,60 +1081,59 @@ class MockConversationStore extends ElConversationStore {
       from.subtract(Duration(minutes: minutes));
 
   /// The seed, verbatim.
-  static List<ElConversationSummary> _seed(DateTime now) =>
-      <ElConversationSummary>[
-        ElConversationSummary(
-          id: 'c-vault',
-          title: 'Sealed inventory check',
-          updatedAt: _ago(14, now),
-          preview: 'What sealed boxes are left, and what is the best one?',
-          pinned: true,
-        ),
-        ElConversationSummary(
-          id: 'c-export',
-          title: 'Thirty-day activity export',
-          updatedAt: _ago(95, now),
-          preview: 'Export my last 30 days as a CSV',
-          pinned: true,
-        ),
-        ElConversationSummary(
-          id: 'c-pricing',
-          title: 'Pricing service outage',
-          updatedAt: _ago(260, now),
-          preview: 'What is Eclipse Vault worth right now?',
-        ),
-        ElConversationSummary(
-          id: 'c-hold',
-          title: 'Putting a pack on hold',
-          updatedAt: _ago(1500, now),
-          preview: 'Buy me an Eclipse Vault pack',
-        ),
-        ElConversationSummary(
-          id: 'c-odds',
-          title: 'How pack odds actually work',
-          updatedAt: _ago(4300, now),
-          preview: 'Explain the odds on a sealed box',
-        ),
-        ElConversationSummary(
-          id: 'c-balance',
-          title: 'Balance and recent movement',
-          updatedAt: _ago(11000, now),
-          preview: 'How much do I have available?',
-        ),
-        ElConversationSummary(
-          id: 'c-grading',
-          title: 'Grading a first edition',
-          updatedAt: _ago(26000, now),
-          preview: 'Is it worth grading a 1st edition?',
-        ),
-      ];
+  static List<ConversationSummary> _seed(DateTime now) => <ConversationSummary>[
+    ConversationSummary(
+      id: 'c-vault',
+      title: 'Sealed inventory check',
+      updatedAt: _ago(14, now),
+      preview: 'What sealed boxes are left, and what is the best one?',
+      pinned: true,
+    ),
+    ConversationSummary(
+      id: 'c-export',
+      title: 'Thirty-day activity export',
+      updatedAt: _ago(95, now),
+      preview: 'Export my last 30 days as a CSV',
+      pinned: true,
+    ),
+    ConversationSummary(
+      id: 'c-pricing',
+      title: 'Pricing service outage',
+      updatedAt: _ago(260, now),
+      preview: 'What is Eclipse Vault worth right now?',
+    ),
+    ConversationSummary(
+      id: 'c-hold',
+      title: 'Putting a pack on hold',
+      updatedAt: _ago(1500, now),
+      preview: 'Buy me an Eclipse Vault pack',
+    ),
+    ConversationSummary(
+      id: 'c-odds',
+      title: 'How pack odds actually work',
+      updatedAt: _ago(4300, now),
+      preview: 'Explain the odds on a sealed box',
+    ),
+    ConversationSummary(
+      id: 'c-balance',
+      title: 'Balance and recent movement',
+      updatedAt: _ago(11000, now),
+      preview: 'How much do I have available?',
+    ),
+    ConversationSummary(
+      id: 'c-grading',
+      title: 'Grading a first edition',
+      updatedAt: _ago(26000, now),
+      preview: 'Is it worth grading a 1st edition?',
+    ),
+  ];
 
-  List<ElConversationSummary> _conversations;
+  List<ConversationSummary> _conversations;
   String? _activeId = 'c-vault';
 
   @override
-  List<ElConversationSummary> get conversations =>
-      List<ElConversationSummary>.unmodifiable(_conversations);
+  List<ConversationSummary> get conversations =>
+      List<ConversationSummary>.unmodifiable(_conversations);
 
   @override
   String? get activeId => _activeId;
@@ -1148,8 +1159,8 @@ class MockConversationStore extends ElConversationStore {
 
   @override
   void rename(String id, String title) {
-    _conversations = <ElConversationSummary>[
-      for (final ElConversationSummary c in _conversations)
+    _conversations = <ConversationSummary>[
+      for (final ConversationSummary c in _conversations)
         if (c.id == id) c.copyWith(title: title) else c,
     ];
     notifyListeners();
@@ -1158,7 +1169,7 @@ class MockConversationStore extends ElConversationStore {
   @override
   void remove(String id) {
     _conversations = _conversations
-        .where((ElConversationSummary c) => c.id != id)
+        .where((ConversationSummary c) => c.id != id)
         .toList();
     if (_activeId == id) _activeId = null;
     notifyListeners();
@@ -1171,8 +1182,8 @@ class MockConversationStore extends ElConversationStore {
   void Function(String id, bool pinned)? get pin => capabilities ? _pin : null;
 
   void _pin(String id, bool pinned) {
-    _conversations = <ElConversationSummary>[
-      for (final ElConversationSummary c in _conversations)
+    _conversations = <ConversationSummary>[
+      for (final ConversationSummary c in _conversations)
         if (c.id == id) c.copyWith(pinned: pinned) else c,
     ];
     notifyListeners();

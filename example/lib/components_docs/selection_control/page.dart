@@ -1,15 +1,15 @@
 /// Public documentation page for the `selection_control` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` established. Every specimen
 /// widget and every code string below is the same one the hand-composed page
 /// carried; only where it lives changed.
 ///
-/// **selection_control** documents [ElSelectionControl], [ElHitArea], and
-/// [ElJellyReplay]: the shared socket, focus ring, hit-area expander and
-/// jelly squash that [ElCheckbox], [ElRadioGroup], and [ElSwitch] each wear.
+/// **selection_control** documents [SelectionControl], [HitArea], and
+/// [StateChangeFeedback]: the shared socket, focus ring, hit-area expander and
+/// jelly squash that [Checkbox], [RadioGroup], and [Switch] each wear.
 /// It has no shadcn/Base UI counterpart page of any kind: it is an invented
 /// internal primitive, so its content is "ours only" throughout.
 ///
@@ -25,7 +25,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -42,7 +54,7 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'ElSelectionControl in rest and checked states (focus-visible is '
+          'SelectionControl in rest and checked states (focus-visible is '
           'painted separately: see Focus ring below).',
       specimen: _SelectionControlPreview(),
       code: _previewCode,
@@ -73,8 +85,8 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElSelectionControl, ElHitArea and '
-              'ElJellyReplay are reachable the same way the CLI path '
+              'Add the export line so SelectionControl, HitArea and '
+              'StateChangeFeedback are reachable the same way the CLI path '
               'already makes them.',
           code: "export 'selection_control.dart';",
         ),
@@ -84,8 +96,8 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'ElSelectionControl is rarely constructed at a call site — '
-          'ElCheckbox, ElRadioGroup, and ElSwitch each wrap it with their '
+          'SelectionControl is rarely constructed at a call site — '
+          'Checkbox, RadioGroup, and Switch each wrap it with their '
           'own skin — but it is a public, directly usable widget.',
       code: _usageCode,
     ),
@@ -94,7 +106,7 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
       title: 'Hit area',
       description:
           'The painted control (width x height) is smaller than the area '
-          'that answers a tap: ElHitArea grows the pointer target past the '
+          'that answers a tap: HitArea grows the pointer target past the '
           'padding box by 12px each side horizontally and 8px each side '
           "vertically (a checkbox's 20x20 box answers a 42x34 tap), "
           'without moving any neighbouring widget — the margin is a '
@@ -134,7 +146,7 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
       id: 'jelly-replay',
       title: 'Jelly replay',
       description:
-          'jellyState is handed to ElJellyReplay: a squash animation '
+          'jellyState is handed to StateChangeFeedback: a squash animation '
           'replays every time it changes to a genuinely new value, and '
           'never on first mount — a MutationObserver-style guard, because '
           'the naive "animate on every data-state" approach would fire the '
@@ -148,15 +160,15 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElSelectionControl, ElHitArea, and '
-          'ElJellyReplay each declare.',
+          'Every constructor parameter SelectionControl, HitArea, and '
+          'StateChangeFeedback each declare.',
       children: const <DocsTocEntry>[
         DocsTocEntry(
-          title: 'ElSelectionControl',
+          title: 'SelectionControl',
           anchor: 'api-elselectioncontrol',
         ),
-        DocsTocEntry(title: 'ElHitArea', anchor: 'api-elhitarea'),
-        DocsTocEntry(title: 'ElJellyReplay', anchor: 'api-eljellyreplay'),
+        DocsTocEntry(title: 'HitArea', anchor: 'api-elhitarea'),
+        DocsTocEntry(title: 'StateChangeFeedback', anchor: 'api-eljellyreplay'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -164,9 +176,9 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElSelectionControl is configured by its caller (fill, border, '
+          'SelectionControl is configured by its caller (fill, border, '
           'shadow per state) rather than owning a fixed palette of its own '
-          '— ElCheckbox, ElRadioGroup, and ElSwitch each paint their own '
+          '— Checkbox, RadioGroup, and Switch each paint their own '
           'states using this socket.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -180,8 +192,8 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           "Read off lib/src/components/selection_control.dart's own "
-          '_onKey directly: the shared handler every ElCheckbox, '
-          'ElRadioGroup and ElSwitch answers keyboard input through.',
+          '_onKey directly: the shared handler every Checkbox, '
+          'RadioGroup and Switch answers keyboard input through.',
       child: _KeyboardContent(),
     ),
     DisclosureSection(
@@ -218,8 +230,7 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value:
-                'example/test/components_docs/selection_control_test.dart',
+            value: 'example/test/components_docs/selection_control_test.dart',
             description:
                 "This page's own live preview, API-completeness check, "
                 'and theme coverage.',
@@ -251,9 +262,9 @@ class SelectionControlDocPage extends StatelessWidget {
       title: selectionControlDoc.title,
       description: selectionControlDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Selection Control'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Selection Control'),
     ],
     toc: selectionControlDocSpec.toc,
     onNavigate: onNavigate,
@@ -266,25 +277,25 @@ class SelectionControlDocPage extends StatelessWidget {
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-/// Builds one square ElSelectionControl for the previews below: a bare
+/// Builds one square SelectionControl for the previews below: a bare
 /// checkbox-shaped socket with no indicator painted inside it, since this
 /// page documents the socket rather than any one skin.
 Widget _socket(
-  ElThemeData theme, {
+  ThemeTokens theme, {
   required bool on,
   bool forceFocusRing = false,
   bool inert = false,
   bool enabled = true,
   Key? key,
-}) => ElSelectionControl(
+}) => SelectionControl(
   key: key,
-  width: el(20),
-  height: el(20),
-  radius: BorderRadius.circular(ElRadii.sm),
+  width: space(20),
+  height: space(20),
+  radius: BorderRadius.circular(Radii.sm),
   fill: on ? theme.primary : theme.background,
   border: on ? theme.primary : theme.input,
-  shadow: on ? ElShadows.btnPrimary : ElShadows.pressed,
-  duration: ElDurations.transitionDefault,
+  shadow: on ? Shadows.controlPrimary : Shadows.inset,
+  duration: MotionDurations.normal,
   jellyState: on,
   forceFocusRing: forceFocusRing,
   inert: inert,
@@ -306,27 +317,27 @@ class _SelectionControlPreviewState extends State<_SelectionControlPreview> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElButton(
-          variant: ElButtonVariant.outline,
-          size: ElButtonSize.sm,
+        Button(
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
           onPressed: () => setState(() => _forceFocusRing = !_forceFocusRing),
-          child: ElText(
+          child: StyledText(
             _forceFocusRing ? 'Hide focus ring' : 'Show focus ring',
-            ElComponentType.buttonLabel,
+            TextStyles.buttonLabel,
           ),
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         Wrap(
-          spacing: el(5),
-          runSpacing: el(5),
+          spacing: space(5),
+          runSpacing: space(5),
           children: <Widget>[
             SizedBox(
-              width: el(32),
-              height: el(32),
+              width: space(32),
+              height: space(32),
               child: _socket(
                 theme,
                 on: false,
@@ -335,8 +346,8 @@ class _SelectionControlPreviewState extends State<_SelectionControlPreview> {
               ),
             ),
             SizedBox(
-              width: el(32),
-              height: el(32),
+              width: space(32),
+              height: space(32),
               child: _socket(
                 theme,
                 on: true,
@@ -355,26 +366,26 @@ const String _previewCode = '''Wrap(
   spacing: 20,
   runSpacing: 20,
   children: [
-    ElSelectionControl(
-      width: el(20),
-      height: el(20),
-      radius: BorderRadius.circular(ElRadii.sm),
+    SelectionControl(
+      width: space(20),
+      height: space(20),
+      radius: BorderRadius.circular(Radii.sm),
       fill: theme.background,
       border: theme.input,
-      shadow: ElShadows.pressed,
-      duration: ElDurations.transitionDefault,
+      shadow: Shadows.inset,
+      duration: MotionDurations.normal,
       jellyState: false,
       onTap: () {},
       child: const SizedBox(),
     ),
-    ElSelectionControl(
-      width: el(20),
-      height: el(20),
-      radius: BorderRadius.circular(ElRadii.sm),
+    SelectionControl(
+      width: space(20),
+      height: space(20),
+      radius: BorderRadius.circular(Radii.sm),
       fill: theme.primary,
       border: theme.primary,
-      shadow: ElShadows.btnPrimary,
-      duration: ElDurations.transitionDefault,
+      shadow: Shadows.controlPrimary,
+      duration: MotionDurations.normal,
       jellyState: true,
       onTap: () {},
       child: const SizedBox(),
@@ -382,17 +393,17 @@ const String _previewCode = '''Wrap(
   ],
 )''';
 
-const String _usageCode = '''ElSelectionControl(
-  width: el(20),
-  height: el(20),
-  radius: BorderRadius.circular(ElRadii.sm),
+const String _usageCode = '''SelectionControl(
+  width: space(20),
+  height: space(20),
+  radius: BorderRadius.circular(Radii.sm),
   fill: checked ? theme.primary : theme.background,
   border: checked ? theme.primary : theme.input,
-  shadow: checked ? ElShadows.btnPrimary : ElShadows.pressed,
-  duration: ElDurations.transitionDefault,
+  shadow: checked ? Shadows.controlPrimary : Shadows.inset,
+  duration: MotionDurations.normal,
   jellyState: checked,
   onTap: () => setState(() => checked = !checked),
-  child: checked ? const ElIcon(ElIconGlyph.check, size: ElIconSize.xs) : const SizedBox(),
+  child: checked ? const Icon(IconGlyph.check, size: IconSize.xs) : const SizedBox(),
 )''';
 
 class _HitAreaPreview extends StatelessWidget {
@@ -400,7 +411,7 @@ class _HitAreaPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -410,27 +421,27 @@ class _HitAreaPreview extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(
               color: theme.mutedForeground,
-              width: ElWidths.hairline,
+              width: BorderWidths.hairline,
             ),
-            borderRadius: BorderRadius.circular(ElRadii.sm),
+            borderRadius: BorderRadius.circular(Radii.sm),
           ),
           child: SizedBox(
             key: const ValueKey<String>('selection-control-hit-area'),
-            width: el(10.5),
-            height: el(8.5),
+            width: space(10.5),
+            height: space(8.5),
             child: Center(child: _socket(theme, on: false)),
           ),
         ),
-        SizedBox(width: el(4)),
+        SizedBox(width: space(4)),
         // Expanded, not a bare ConstrainedBox: at a narrow viewport the
-        // panel this preview sits inside is far short of ElContainers.xs
+        // panel this preview sits inside is far short of Containers.xs
         // (320px), and a fixed-width child in an unconstrained Row
         // overflows instead of wrapping.
         Expanded(
-          child: ElText(
+          child: StyledText(
             'The 20x20 box paints in the middle; the muted border marks the '
             '42x34 rect a tap anywhere inside still answers.',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ),
@@ -440,12 +451,12 @@ class _HitAreaPreview extends StatelessWidget {
 }
 
 const String _hitAreaCode =
-    '''// ElSelectionControl wraps itself in ElHitArea internally: a 20x20
+    '''// SelectionControl wraps itself in HitArea internally: a 20x20
 // checkbox-shaped control answers a pointer anywhere inside a 42x34 rect,
 // without moving any neighbouring widget.
-ElSelectionControl(
-  width: el(20),
-  height: el(20),
+SelectionControl(
+  width: space(20),
+  height: space(20),
   // ...
 )''';
 
@@ -461,46 +472,46 @@ class _FocusRingPreviewState extends State<_FocusRingPreview> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Wrap(
-          spacing: el(2),
+          spacing: space(2),
           children: <Widget>[
-            ElButton(
+            Button(
               key: const ValueKey<String>('selection-control-focus-ring-null'),
               variant: _forced == null
-                  ? ElButtonVariant.secondary
-                  : ElButtonVariant.outline,
-              size: ElButtonSize.sm,
+                  ? ButtonVariant.secondary
+                  : ButtonVariant.outline,
+              size: ButtonSize.sm,
               onPressed: () => setState(() => _forced = null),
-              child: ElText('null (follow focus)', ElComponentType.buttonLabel),
+              child: StyledText('null (follow focus)', TextStyles.buttonLabel),
             ),
-            ElButton(
+            Button(
               key: const ValueKey<String>('selection-control-focus-ring-true'),
               variant: _forced == true
-                  ? ElButtonVariant.secondary
-                  : ElButtonVariant.outline,
-              size: ElButtonSize.sm,
+                  ? ButtonVariant.secondary
+                  : ButtonVariant.outline,
+              size: ButtonSize.sm,
               onPressed: () => setState(() => _forced = true),
-              child: ElText('true (forced on)', ElComponentType.buttonLabel),
+              child: StyledText('true (forced on)', TextStyles.buttonLabel),
             ),
-            ElButton(
+            Button(
               key: const ValueKey<String>('selection-control-focus-ring-false'),
               variant: _forced == false
-                  ? ElButtonVariant.secondary
-                  : ElButtonVariant.outline,
-              size: ElButtonSize.sm,
+                  ? ButtonVariant.secondary
+                  : ButtonVariant.outline,
+              size: ButtonSize.sm,
               onPressed: () => setState(() => _forced = false),
-              child: ElText('false (withheld)', ElComponentType.buttonLabel),
+              child: StyledText('false (withheld)', TextStyles.buttonLabel),
             ),
           ],
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         SizedBox(
-          width: el(32),
-          height: el(32),
+          width: space(32),
+          height: space(32),
           child: _socket(
             theme,
             on: false,
@@ -513,7 +524,7 @@ class _FocusRingPreviewState extends State<_FocusRingPreview> {
   }
 }
 
-const String _focusRingCode = '''ElSelectionControl(
+const String _focusRingCode = '''SelectionControl(
   // ...
   forceFocusRing: true, // pins the ring open for a static specimen
 )''';
@@ -523,10 +534,10 @@ class _InertVsDisabledPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Wrap(
-      spacing: el(6),
-      runSpacing: el(4),
+      spacing: space(6),
+      runSpacing: space(4),
       children: <Widget>[
         _labelled(
           theme,
@@ -561,25 +572,25 @@ class _InertVsDisabledPreview extends StatelessWidget {
     );
   }
 
-  Widget _labelled(ElThemeData theme, String label, Widget child) => Column(
+  Widget _labelled(ThemeTokens theme, String label, Widget child) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElText(label, ElType.section, color: theme.mutedForeground),
-      SizedBox(height: el(2)),
-      SizedBox(width: el(32), height: el(32), child: child),
+      StyledText(label, TextStyles.section, color: theme.mutedForeground),
+      SizedBox(height: space(2)),
+      SizedBox(width: space(32), height: space(32), child: child),
     ],
   );
 }
 
 const String _inertVsDisabledCode =
     '''// Operable: paints normally, answers taps and Enter/Space.
-ElSelectionControl(onTap: () {}, /* ... */)
+SelectionControl(onTap: () {}, /* ... */)
 
 // Inert: full strength, in the tab order, deaf to input.
-ElSelectionControl(inert: true, onTap: null, /* ... */)
+SelectionControl(inert: true, onTap: null, /* ... */)
 
 // Disabled: 50% opacity, out of the tab order.
-ElSelectionControl(enabled: false, onTap: () {}, /* ... */)''';
+SelectionControl(enabled: false, onTap: () {}, /* ... */)''';
 
 class _JellyReplayPreview extends StatefulWidget {
   const _JellyReplayPreview();
@@ -593,21 +604,21 @@ class _JellyReplayPreviewState extends State<_JellyReplayPreview> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElButton(
+        Button(
           key: const ValueKey<String>('selection-control-jelly-toggle'),
-          variant: ElButtonVariant.outline,
-          size: ElButtonSize.sm,
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
           onPressed: () => setState(() => _on = !_on),
-          child: ElText('Toggle', ElComponentType.buttonLabel),
+          child: StyledText('Toggle', TextStyles.buttonLabel),
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         SizedBox(
-          width: el(32),
-          height: el(32),
+          width: space(32),
+          height: space(32),
           child: _socket(
             theme,
             on: _on,
@@ -620,9 +631,9 @@ class _JellyReplayPreviewState extends State<_JellyReplayPreview> {
 }
 
 const String _jellyReplayCode =
-    '''// ElSelectionControl threads jellyState into ElJellyReplay internally:
+    '''// SelectionControl threads jellyState into StateChangeFeedback internally:
 // the squash replays every time this value actually changes.
-ElSelectionControl(
+SelectionControl(
   jellyState: checked,
   onTap: () => setState(() => checked = !checked),
   // ...
@@ -640,19 +651,22 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-elselectioncontrol',
         child: DocsApiTable(
-          title: 'ElSelectionControl',
+          title: 'SelectionControl',
           facts: _selectionControlFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elhitarea',
-        child: DocsApiTable(title: 'ElHitArea', facts: _hitAreaFacts),
+        child: DocsApiTable(title: 'HitArea', facts: _hitAreaFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eljellyreplay',
-        child: DocsApiTable(title: 'ElJellyReplay', facts: _jellyReplayFacts),
+        child: DocsApiTable(
+          title: 'StateChangeFeedback',
+          facts: _jellyReplayFacts,
+        ),
       ),
     ],
   );
@@ -662,8 +676,7 @@ const List<DocsApiFact> _selectionControlFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'width',
     type: 'double',
-    description:
-        'Required. Painted size; the hit area expands beyond this.',
+    description: 'Required. Painted size; the hit area expands beyond this.',
   ),
   DocsApiFact(
     name: 'height',
@@ -678,8 +691,7 @@ const List<DocsApiFact> _selectionControlFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'fill',
     type: 'Color',
-    description:
-        "Required. Background at rest for the state the caller is in.",
+    description: "Required. Background at rest for the state the caller is in.",
   ),
   DocsApiFact(
     name: 'border',
@@ -689,7 +701,7 @@ const List<DocsApiFact> _selectionControlFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'shadow',
-    type: 'ElShadowSpec',
+    type: 'ShadowStyle',
     description:
         'Required. The token for the state: shadow-pressed at rest, '
         'shadow-btn-primary when checked/on.',
@@ -699,13 +711,13 @@ const List<DocsApiFact> _selectionControlFacts = <DocsApiFact>[
     type: 'Duration',
     description:
         'Required. The colour-transition length: all three callers pass '
-        'ElDurations.transitionDefault.',
+        'MotionDurations.normal.',
   ),
   DocsApiFact(
     name: 'jellyState',
     type: 'Object?',
     description:
-        'Required (nullable). Handed to ElJellyReplay; a change replays '
+        'Required (nullable). Handed to StateChangeFeedback; a change replays '
         'the squash animation.',
   ),
   DocsApiFact(
@@ -793,16 +805,12 @@ const List<DocsApiFact> _hitAreaFacts = <DocsApiFact>[
     type: 'double?',
     description:
         'Optional. Defaults to null, which falls back to '
-        'ElWidths.hairline: the border insets is measured inside. Pass 0 '
+        'BorderWidths.hairline: the border insets is measured inside. Pass 0 '
         'for a wrapper that paints no border of its own.',
   ),
+  DocsApiFact(name: 'child', type: 'Widget', description: 'Required.'),
   DocsApiFact(
-    name: 'child',
-    type: 'Widget',
-    description: 'Required.',
-  ),
-  DocsApiFact(
-    name: 'ElHitArea.debugExpanded(box)',
+    name: 'HitArea.debugExpanded(box)',
     type: 'static Rect',
     description:
         '@visibleForTesting. The expanded rect a render object answers, '
@@ -829,7 +837,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         "fill, border, and shadow come straight from the caller's own "
         'arguments: this widget applies no per-state colour of its own.',
     userSignal:
-        'Whatever the wrapping ElCheckbox/ElRadioGroup/ElSwitch decided '
+        'Whatever the wrapping Checkbox/RadioGroup/Switch decided '
         'to hand it for the current state.',
   ),
   DocsStateFact(
@@ -866,8 +874,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        'Colour transitions route through elAnimationDuration, which is '
-        'Duration.zero under MediaQuery.disableAnimations. ElJellyReplay '
+        'Colour transitions route through effectiveMotionDuration, which is '
+        'Duration.zero under MediaQuery.disableAnimations. StateChangeFeedback '
         "still plays: the reference's own jelly plays in reduced motion "
         'mode too (measured).',
     userSignal:
@@ -881,23 +889,23 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Semantic role: entirely caller-supplied. semantics wraps the '
-            'hit-area expander in whatever Semantics node ElCheckbox, '
-            'ElRadioGroup or ElSwitch build for their own state '
+            'hit-area expander in whatever Semantics node Checkbox, '
+            'RadioGroup or Switch build for their own state '
             '(checked/mixed, toggled, or a radio\'s own selected flag): '
-            'ElSelectionControl itself declares no role of its own.',
+            'SelectionControl itself declares no role of its own.',
         'Hit area: the visible control is 20x20 (checkbox/radio) or '
             '44x24 (switch), but the hit area expands to 42x34, 66x38, '
             'and 34x34 respectively. Margin expansion, not padding: '
             'neighbours stay in place, and a tap anywhere inside the '
-            'margin still reaches semantics because ElHitArea applies '
+            'margin still reaches semantics because HitArea applies '
             'the caller\'s semantics wrapper INSIDE the expander.',
         'Focus behavior: focus-visible:border-ring plus a ring, beaten '
             'by aria-invalid:border-destructive at equal specificity: a '
             'focused, invalid control renders identically to an '
             'unfocused invalid one. See States above.',
-        'Non-colour signal: ElSelectionControl paints none of its own; '
+        'Non-colour signal: SelectionControl paints none of its own; '
             'the shape-based signal (a drawn tick or bar, a thumb\'s '
             'left/right position) belongs entirely to whichever skin '
             'wraps this socket, documented on that component\'s own '
@@ -906,14 +914,14 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// Read directly off `lib/src/components/selection_control.dart`'s own
-/// `_onKey`: the shared handler every `ElCheckbox`, `ElRadioGroup` and
-/// `ElSwitch` answers keyboard input through.
+/// `_onKey`: the shared handler every `Checkbox`, `RadioGroup` and
+/// `Switch` answers keyboard input through.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Activation: Enter and Space activate an operable control — it '
             'is a button. onKey is consulted FIRST, before Enter/Space: '
             'a radio group supplies one for its own arrow-key '
@@ -936,7 +944,7 @@ class _KeyboardContent extends StatelessWidget {
         'Pointer vs keyboard: a bare pointer tap never requests focus '
             'on the node; only keyboard traversal, or an explicit '
             'focusNode.requestFocus() from outside, does — the same '
-            "asymmetry ElButton's own Keyboard section documents.",
+            "asymmetry Button's own Keyboard section documents.",
       ]);
 }
 
@@ -945,7 +953,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Sized entirely by its caller (width, height): no responsive '
             'breakpoints of its own.',
         'No BuildContext width is ever read for a layout decision; the '
@@ -982,9 +990,9 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Dependencies',
             value: selectionControlDoc.dependencies.join(', '),
             description:
-                'ElMachineSurface paints the socket; ElKeyframePlayer '
+                'Surface paints the socket; KeyframePlayer '
                 '(motion/keyframes.dart) drives the jelly squash; '
-                'button.dart supplies ElButton.withFocusRing, the shared '
+                'button.dart supplies Button.withFocusRing, the shared '
                 'ring-compositing helper.',
           ),
           const DocsInstallFact(
@@ -1002,14 +1010,11 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
           DocsLink(
             label: 'Source Foundation',
@@ -1026,28 +1031,32 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElSelectionControl reads no theme colours for its own resting '
+      _bullets(ThemeScope.of(context), <String>[
+        'SelectionControl reads no theme colours for its own resting '
             'paint: fill, border, and shadow all come from the '
             "caller's own arguments.",
         'Only the focus ring (theme.ring) and the invalid ring/border '
             '(theme.destructive) are resolved here, straight off '
-            'ElTheme.of(context) at build time: the two states this '
+            'ThemeScope.of(context) at build time: the two states this '
             'widget owns outright rather than delegating to its caller.',
       ]);
 }
 
 /// Bulleted prose at reading width, matching `button/page.dart`'s own
 /// private `_bullets` helper.
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

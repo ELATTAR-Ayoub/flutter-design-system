@@ -7,59 +7,59 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/foundation/colors.dart",
+      "source": "lib/src/design_system/foundation/colors.dart",
       "target": "@foundation/colors.dart",
-      "sha256": "ca52446e2c72a81be0be6bc5ad2974daa76541c6f1db0e5e68705dc1c0113dd3"
+      "sha256": "f839130c2a3f6443a10448eb1b7c461245fded3d4ab33a250cf29257618f9dea"
     },
     {
-      "source": "lib/src/foundation/date_format.dart",
+      "source": "lib/src/design_system/foundation/date_format.dart",
       "target": "@foundation/date_format.dart",
-      "sha256": "9bda1199073f6b4d4fda3384df10846b88aa4636ca6b3d287feee9de921e7ddf"
+      "sha256": "96b4446b795cdfd3f778b5e26c91ea649b9dfc3b0a61dcb2e149e1f2da896acc"
     },
     {
-      "source": "lib/src/foundation/media.dart",
+      "source": "lib/src/design_system/foundation/media.dart",
       "target": "@foundation/media.dart",
-      "sha256": "5967c6f54a324d55b7735e46c2eeaad1fedfc85906d54f9b4c33fd32000af0e7"
+      "sha256": "864e18ce30c82f872f94af2b0bb59332da386a287a7dd8b77a7b102419b54394"
     },
     {
-      "source": "lib/src/foundation/motion.dart",
+      "source": "lib/src/design_system/foundation/motion.dart",
       "target": "@foundation/motion.dart",
-      "sha256": "f442b009ef7acc0e0013085be027d4d6bfc05fe947b5d775ea60adcc3aab2b6b"
+      "sha256": "a486acd88b5e572e30ff9a3d85a9241e0395fb62d3c50c92b9b201cd5de4ad90"
     },
     {
-      "source": "lib/src/foundation/shadows.dart",
+      "source": "lib/src/design_system/foundation/shadows.dart",
       "target": "@foundation/shadows.dart",
-      "sha256": "e841a3a33506a8fbb5a04f9c2ae04ef6f2b4dd62e557306e664451a725fb0cae"
+      "sha256": "827140aac2137d94195592d57670b44b10c5cbeedfe78d843fc9408ef9000f15"
     },
     {
-      "source": "lib/src/foundation/spacing.dart",
+      "source": "lib/src/design_system/foundation/spacing.dart",
       "target": "@foundation/spacing.dart",
-      "sha256": "448689633efa7a1a4c8f3acef14a11421563261227f58d4895f36ec80f7b8b58"
+      "sha256": "d7a40f9bf8a937af7e517a6f6d13dd02a91bba392953a3f92fbd7bdc6cffe43e"
     },
     {
-      "source": "lib/src/foundation/surfaces.dart",
+      "source": "lib/src/design_system/foundation/surfaces.dart",
       "target": "@foundation/surfaces.dart",
-      "sha256": "88a24e7c3d25007870fd16c65b7ff4e5914f71f5ff0261aebeeb0436d51dac71"
+      "sha256": "3a3c5e3c89c524acefd7b25ebdcb7d7db52bce6d770fcca9e2be57999a4e7748"
     },
     {
-      "source": "lib/src/foundation/theme.dart",
+      "source": "lib/src/design_system/foundation/theme.dart",
       "target": "@foundation/theme.dart",
-      "sha256": "9628e3cbc767cd4cb8c794b5ddd1f39cf4e02ec2a8b06f2786c245be7eeed6d3"
+      "sha256": "61610dad0355cde857227d6fe826729411bc28035d42e14aee392c37c5579ca3"
     },
     {
-      "source": "lib/src/foundation/typography.dart",
+      "source": "lib/src/design_system/foundation/typography.dart",
       "target": "@foundation/typography.dart",
-      "sha256": "86aad1cd7231263874792a649292db7f0d4190cf62b465ca8a0632fbeb9e9c29"
+      "sha256": "8830a6acbfeae71d3fb75a32149fd6ba52110f68076284289400b7720927e656"
     },
     {
-      "source": "lib/src/text_layout.dart",
+      "source": "lib/src/design_system/foundation/text_layout.dart",
       "target": "@foundation/text_layout.dart",
-      "sha256": "31ac69ec85116c8b70876af76e9bd9a46ceecc76d9064bc3607b0630185787c6"
+      "sha256": "0855e2409ede8244f83558c3e2f910b57a43efa3b64507e6417a0cf5c649d3dc"
     },
     {
-      "source": "lib/src/theme_scope.dart",
+      "source": "lib/src/design_system/foundation/theme_scope.dart",
       "target": "@foundation/theme_scope.dart",
-      "sha256": "8bc1d236701adda50d9c13009a760b93e167c7fdc0bc66b965758529b29f80b4"
+      "sha256": "e5a8a18f379467759203ce22f74e6b225ea99b5e98cb761fe9984ec07b0ed124"
     }
   ],
   "registryDependencies": [],

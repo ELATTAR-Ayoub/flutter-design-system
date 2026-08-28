@@ -7,22 +7,22 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/alert_dialog.dart",
+      "source": "lib/src/components/ui/alert_dialog.dart",
       "target": "@ui/alert_dialog.dart",
-      "sha256": "daf1be69fd9681a80fccdd79e987043e8028961f0243b11b0a269385782fadea"
+      "sha256": "4d365714548644ae368da62e5c0827754974ad874a7d7591926f2094ab07c334"
     }
   ],
   "registryDependencies": [
     "button",
     "dialog",
-    "machine-surface",
+    "surface",
     "source-foundation",
     "tooltip"
   ],
   "semanticDependencies": [
     "button",
     "dialog",
-    "machine-surface",
+    "surface",
     "tooltip"
   ],
   "pubDependencies": {},
@@ -31,6 +31,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/alert-dialog",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/alert_dialog.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/alert_dialog.dart",
   "deprecated": false
 }

@@ -41,8 +41,8 @@ existing specimen widget and code string moves across unchanged.
 
 ## Repository traps that are NOT in the plan
 
-- **`pumpAndSettle` hangs on any page containing `ElAlert`.** It renders
-  `ElBloomCosmic`, whose controllers `repeat(reverse: true)` forever. Use
+- **`pumpAndSettle` hangs on any page containing `Alert`.** It renders
+  `BloomCosmic`, whose controllers `repeat(reverse: true)` forever. Use
   `tester.pump()`. The symptom is a timeout, not a failure.
 - **`Directory.current` is process-wide** and `dart test` runs test files in
   separate isolates of one process. Never mutate it.
@@ -62,7 +62,7 @@ existing specimen widget and code string moves across unchanged.
   the files exist, `os.listdir` lists them, `os.path.exists` is False, and the
   static server 404s them.
 - **`capture.js` needs `--nav domcontentloaded`** for any page rendering
-  `ElAlert` — such a page never goes network-idle and the capture dies on its
+  `Alert` — such a page never goes network-idle and the capture dies on its
   navigation timeout. Narrow widths use `shot.js`, not `capture.js`; the
   stitcher's content clip is the wide shell's own geometry.
 

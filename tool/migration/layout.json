@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "baseline": "f6f51eb",
+  "moves": [
+    {
+      "from": "lib/src/components/accordion.dart",
+      "to": "lib/src/components/ui/accordion.dart",
+      "gitBlob": "22939f670865b7d31ab4985db1024ac0c8bdcd96"
+    },
+    {
+      "from": "lib/src/components/agent_attach_menu.dart",
+      "to": "lib/src/components/ui/agent_attach_menu.dart",
+      "gitBlob": "6f7638aabe86d69019ea35781a35cd4e5403d9d5"
+    },
+    {
+      "from": "lib/src/components/agent_attachments.dart",
+      "to": "lib/src/components/ui/agent_attachments.dart",
+      "gitBlob": "55faed8f6dfcf6428ec75dceb69bb1aa32d507b5"
+    },
+    {
+      "from": "lib/src/components/agent_avatar.dart",
+      "to": "lib/src/components/ui/agent_avatar.dart",
+      "gitBlob": "41a2f75dff567d28325b2a589df0f8a8e9f1f1cb"
+    },
+    {
+      "from": "lib/src/components/agent_composer.dart",
+      "to": "lib/src/components/ui/agent_composer.dart",
+      "gitBlob": "a3621c0584755d3cb8e89a87d84623000b41eabd"
+    },
+    {
+      "from": "lib/src/components/agent_console.dart",
+      "to": "lib/src/blocks/agent_console/agent_console.dart",
+      "gitBlob": "d5f6d9022260dc2ab2f73ff0794e5f61411a9145"
+    },
+    {
+      "from": "lib/src/components/agent_core.dart",
+      "to": "lib/src/components/ui/agent_core.dart",
+      "gitBlob": "999c3dc93d9d143e010cda261857bf00859af748"
+    },
+    {
+      "from": "lib/src/components/agent_face.dart",
+      "to": "lib/src/components/ui/agent_face.dart",
+      "gitBlob": "36364d9dada06be437f07ed009bd60ad9758d0a6"
+    },
+    {
+      "from": "lib/src/components/agent_history.dart",
+      "to": "lib/src/components/ui/agent_history.dart",
+      "gitBlob": "b7a481984ff5bd6c18e3fdfe2efd235bd4867d94"
+    },
+    {
+      "from": "lib/src/components/agent_launcher.dart",
+      "to": "lib/src/components/ui/agent_launcher.dart",
+      "gitBlob": "7947e770aecdc351aa5989cc23c41c704b14bf5b"
+    },
+    {
+      "from": "lib/src/components/agent_markdown.dart",
+      "to": "lib/src/components/ui/agent_markdown.dart",
+      "gitBlob": "864e5ee30ed62bdcf3a6273cfa6647894f352701"
+    },
+    {
+      "from": "lib/src/components/agent_slash_palette.dart",
+      "to": "lib/src/components/ui/agent_slash_palette.dart",
+      "gitBlob": "aa92d8c5a4b7e6fe8035afdd9706a6e5fd2b62dd"
+    },
+    {
+      "from": "lib/src/components/agent_transcript.dart",
+      "to": "lib/src/components/ui/agent_transcript.dart",
+      "gitBlob": "23e4ffa5defd810479b67653f48a920523339b97"
+    },
+    {
+      "from": "lib/src/components/alert.dart",
+      "to": "lib/src/components/ui/alert.dart",
+      "gitBlob": "2027de163539f1f1cca0afcb1dcf2c50d6525de4"
+    },
+    {
+      "from": "lib/src/components/alert_dialog.dart",
+      "to": "lib/src/components/ui/alert_dialog.dart",
+      "gitBlob": "097aa6ef1faa4d0150baa496e5f7ee80d27fd858"
+    },
+    {
+      "from": "lib/src/components/aspect_ratio.dart",
+      "to": "lib/src/components/ui/aspect_ratio.dart",
+      "gitBlob": "5bcc7fc3743ad77d5ee7bcbf2f71b6aa19228e00"
+    },
+    {
+      "from": "lib/src/components/attachment.dart",
+      "to": "lib/src/components/ui/attachment.dart",
+      "gitBlob": "aa47842b07099fc97922eee65a2e88053f3f08eb"
+    },
+    {
+      "from": "lib/src/components/avatar.dart",
+      "to": "lib/src/components/ui/avatar.dart",
+      "gitBlob": "230106b908ca6345e0a591d1c303f6de75d9bc20"
+    },
+    {
+      "from": "lib/src/components/badge.dart",
+      "to": "lib/src/components/ui/badge.dart",
+      "gitBlob": "8328dd02de6ca6bfca59d17c5076a8d790c152e8"
+    },
+    {
+      "from": "lib/src/components/breadcrumb.dart",
+      "to": "lib/src/components/ui/breadcrumb.dart",
+      "gitBlob": "8c21d1a00acd08be7fbaaeda2638777562561ef6"
+    },
+    {
+      "from": "lib/src/components/bubble.dart",
+      "to": "lib/src/components/ui/bubble.dart",
+      "gitBlob": "12e0514734872659c2a921b83bf1570207fe9b6c"
+    },
+    {
+      "from": "lib/src/components/button.dart",
+      "to": "lib/src/components/ui/button.dart",
+      "gitBlob": "a3fedc4ed210a65085357462ca0e2ed283ebde5d"
+    },
+    {
+      "from": "lib/src/components/button_group.dart",
+      "to": "lib/src/components/ui/button_group.dart",
+      "gitBlob": "98f832673c8ef566bafb149094b8ae1336ce2145"
+    },
+    {
+      "from": "lib/src/components/calendar.dart",
+      "to": "lib/src/components/ui/calendar.dart",
+      "gitBlob": "a4d630aad923a32ef465a46eb64c13451000f2ee"
+    },
+    {
+      "from": "lib/src/components/card.dart",
+      "to": "lib/src/components/ui/card.dart",
+      "gitBlob": "c353b1fd5b594b76441149466113e77be5b21cc2"
+    },
+    {
+      "from": "lib/src/components/carousel.dart",
+      "to": "lib/src/components/ui/carousel.dart",
+      "gitBlob": "712012fab8b4938b605891dd982f28bc896241c7"
+    },
+    {
+      "from": "lib/src/components/chart.dart",
+      "to": "lib/src/components/ui/chart.dart",
+      "gitBlob": "38e31661a2c92dcd242157e5d77714529300a91b"
+    },
+    {
+      "from": "lib/src/components/chart_cartesian.dart",
+      "to": "lib/src/components/ui/chart_cartesian.dart",
+      "gitBlob": "fc753c4e9b53f94c189e390340ea6316b1c178ba"
+    },
+    {
+      "from": "lib/src/components/chart_geometry.dart",
+      "to": "lib/src/components/ui/chart_geometry.dart",
+      "gitBlob": "19083764bc817737343bb341440c069940136d05"
+    },
+    {
+      "from": "lib/src/components/chart_polar.dart",
+      "to": "lib/src/components/ui/chart_polar.dart",
+      "gitBlob": "0303e212dad14f8b993cdc961b67d038b8705057"
+    },
+    {
+      "from": "lib/src/components/checkbox.dart",
+      "to": "lib/src/components/ui/checkbox.dart",
+      "gitBlob": "01859960f850411e5bbdf83a1886cfdcfb01fab7"
+    },
+    {
+      "from": "lib/src/components/collapsible.dart",
+      "to": "lib/src/components/ui/collapsible.dart",
+      "gitBlob": "908660dd710b291d6cefe6276cfa45f4caa88aac"
+    },
+    {
+      "from": "lib/src/components/combobox.dart",
+      "to": "lib/src/components/ui/combobox.dart",
+      "gitBlob": "54f37732ea23df6cf8303d7b03ba99ccf4e3d5af"
+    },
+    {
+      "from": "lib/src/components/command.dart",
+      "to": "lib/src/components/ui/command.dart",
+      "gitBlob": "92f08f1735ceb65ce38f77da69f98c08582e3f5b"
+    },
+    {
+      "from": "lib/src/components/context_menu.dart",
+      "to": "lib/src/components/ui/context_menu.dart",
+      "gitBlob": "7483c26c78ce7708bb474dfe9c4fb61fd267dd65"
+    },
+    {
+      "from": "lib/src/components/dialog.dart",
+      "to": "lib/src/components/ui/dialog.dart",
+      "gitBlob": "bdbac0294ccd40e9cad4d0d4d3469efea43f18d8"
+    },
+    {
+      "from": "lib/src/components/drawer.dart",
+      "to": "lib/src/components/ui/drawer.dart",
+      "gitBlob": "fa00a42aa0692d61f3ae859a952ce4f70b60279c"
+    },
+    {
+      "from": "lib/src/components/dropdown_menu.dart",
+      "to": "lib/src/components/ui/dropdown_menu.dart",
+      "gitBlob": "7f4e69420b3afc54e0cdc14710b8c570b100ffd1"
+    },
+    {
+      "from": "lib/src/components/empty.dart",
+      "to": "lib/src/components/ui/empty.dart",
+      "gitBlob": "a7abfded6295ddd358e815a7155f7ce364fd2cc9"
+    },
+    {
+      "from": "lib/src/components/field.dart",
+      "to": "lib/src/components/ui/field.dart",
+      "gitBlob": "25f88f04dc57a2d264cfa5995d52205da100f12e"
+    },
+    {
+      "from": "lib/src/components/form.dart",
+      "to": "lib/src/components/ui/form.dart",
+      "gitBlob": "b7aaa4f8270f1d15224ae56f4b41a9244d959b14"
+    },
+    {
+      "from": "lib/src/components/hover_card.dart",
+      "to": "lib/src/components/ui/hover_card.dart",
+      "gitBlob": "ae15e9ce0d86006f4451b62d0bc11061da095bde"
+    },
+    {
+      "from": "lib/src/components/icon.dart",
+      "to": "lib/src/components/ui/icon.dart",
+      "gitBlob": "083e6c86408ddaabf5c1e68c910255c2209364d8"
+    },
+    {
+      "from": "lib/src/components/icon_paths.dart",
+      "to": "lib/src/components/ui/icon_paths.dart",
+      "gitBlob": "5b90e41e5830279b17943a94166debf84db5eba5"
+    },
+    {
+      "from": "lib/src/components/icon_paths.g.dart",
+      "to": "lib/src/components/ui/icon_paths.g.dart",
+      "gitBlob": "02a966253a3469839d0dce7ef9784895cf0a7043"
+    },
+    {
+      "from": "lib/src/components/icon_paths.g.index.dart",
+      "to": "lib/src/components/ui/icon_paths.g.index.dart",
+      "gitBlob": "7213014946ee9868ce86be3d5edca212c49467c5"
+    },
+    {
+      "from": "lib/src/components/icon_swap.dart",
+      "to": "lib/src/components/ui/icon_swap.dart",
+      "gitBlob": "2abe537a7fef976a3a1f88a56e09414aed40f461"
+    },
+    {
+      "from": "lib/src/components/input.dart",
+      "to": "lib/src/components/ui/input.dart",
+      "gitBlob": "1cbfd40f6af8cb78bf8aca519fa24a2d04bb9086"
+    },
+    {
+      "from": "lib/src/components/input_group.dart",
+      "to": "lib/src/components/ui/input_group.dart",
+      "gitBlob": "4f438ad94a3cd136b96a97302be08cf83d8e6390"
+    },
+    {
+      "from": "lib/src/components/input_otp.dart",
+      "to": "lib/src/components/ui/input_otp.dart",
+      "gitBlob": "9916ccea3ecdebdb8ba33f27efd74195b122bdab"
+    },
+    {
+      "from": "lib/src/components/item.dart",
+      "to": "lib/src/components/ui/item.dart",
+      "gitBlob": "a8d1beca9324d28f68ebd96d6affa27c02046f39"
+    },
+    {
+      "from": "lib/src/components/kbd.dart",
+      "to": "lib/src/components/ui/kbd.dart",
+      "gitBlob": "12be1514dc36fab1438cb77b25b2b87942b7eef7"
+    },
+    {
+      "from": "lib/src/components/marker.dart",
+      "to": "lib/src/components/ui/marker.dart",
+      "gitBlob": "4b300632c7ab4b172124912c0dd8c407f06c77b1"
+    },
+    {
+      "from": "lib/src/components/menu.dart",
+      "to": "lib/src/components/ui/menu.dart",
+      "gitBlob": "ece5096646ff9cffa7fc442d0f8371fd98df3535"
+    },
+    {
+      "from": "lib/src/components/menubar.dart",
+      "to": "lib/src/components/ui/menubar.dart",
+      "gitBlob": "495b4fa23a1a0ba54ddc492334b1e4b6dc238e9b"
+    },
+    {
+      "from": "lib/src/components/message.dart",
+      "to": "lib/src/components/ui/message.dart",
+      "gitBlob": "bf6db59b64b827f5a05c80ee64f340acf39b799f"
+    },
+    {
+      "from": "lib/src/components/message_scroller.dart",
+      "to": "lib/src/components/ui/message_scroller.dart",
+      "gitBlob": "860c790eeaf0ce0c68458242b0a48b1e9c4e3889"
+    },
+    {
+      "from": "lib/src/components/native_select.dart",
+      "to": "lib/src/components/ui/native_select.dart",
+      "gitBlob": "fa235b89765d73159b2fcae96992fb25b2aab91d"
+    },
+    {
+      "from": "lib/src/components/ui/user_menu.dart",
+      "to": "lib/src/components/ui/user_menu.dart",
+      "gitBlob": "188298f7ae9cfd4a7a16ea36b5e75766d939f3b4"
+    },
+    {
+      "from": "lib/src/components/navigation_menu.dart",
+      "to": "lib/src/components/ui/navigation_menu.dart",
+      "gitBlob": "b7de31dfa0d027550b9d5aed2cf16fc324ba2c0b"
+    },
+    {
+      "from": "lib/src/components/pagination.dart",
+      "to": "lib/src/components/ui/pagination.dart",
+      "gitBlob": "bec9047725301a2a43d1777f9697a2bd7815b3e6"
+    },
+    {
+      "from": "lib/src/components/popover.dart",
+      "to": "lib/src/components/ui/popover.dart",
+      "gitBlob": "24db262a67d35cd43620b33c2993c95728c07b10"
+    },
+    {
+      "from": "lib/src/components/progress.dart",
+      "to": "lib/src/components/ui/progress.dart",
+      "gitBlob": "a36ab11a6425244387c9ec033e8025292836992f"
+    },
+    {
+      "from": "lib/src/components/questionnaire.dart",
+      "to": "lib/src/components/ui/questionnaire.dart",
+      "gitBlob": "683e062b9a92dfd2afec6cd89badda190928cd1e"
+    },
+    {
+      "from": "lib/src/components/radio.dart",
+      "to": "lib/src/components/ui/radio.dart",
+      "gitBlob": "25bf89e533e977f014e8b41850ddf7721ff94749"
+    },
+    {
+      "from": "lib/src/components/resizable.dart",
+      "to": "lib/src/components/ui/resizable.dart",
+      "gitBlob": "fb633f1a80b28f9c23ffe1f2232534841b30234d"
+    },
+    {
+      "from": "lib/src/components/validation_rule.dart",
+      "to": "lib/src/components/ui/validation_rule.dart",
+      "gitBlob": "ddad519def516918f359f7f0d3292fbf6996ca2a"
+    },
+    {
+      "from": "lib/src/components/safe_area.dart",
+      "to": "lib/src/components/ui/safe_area.dart",
+      "gitBlob": "121f77b317fdceaaef067575e026d8bd85e547b7"
+    },
+    {
+      "from": "lib/src/components/scroll_area.dart",
+      "to": "lib/src/components/ui/scroll_area.dart",
+      "gitBlob": "8b9655d2b844dd051d480f4f83c0add6fedadb99"
+    },
+    {
+      "from": "lib/src/components/select.dart",
+      "to": "lib/src/components/ui/select.dart",
+      "gitBlob": "5a7747946b89f186be6f2f7ee3a1e6a844f34e2c"
+    },
+    {
+      "from": "lib/src/components/selection_control.dart",
+      "to": "lib/src/components/ui/selection_control.dart",
+      "gitBlob": "bd87a5bce74b75ba361567eef7b28110cdb29a70"
+    },
+    {
+      "from": "lib/src/components/separator.dart",
+      "to": "lib/src/components/ui/separator.dart",
+      "gitBlob": "89fb79ab788164da3f35c3f861cda620c33ded5b"
+    },
+    {
+      "from": "lib/src/components/sheet.dart",
+      "to": "lib/src/components/ui/sheet.dart",
+      "gitBlob": "22453be331a781f52ddc48ad0a13e06c47d22031"
+    },
+    {
+      "from": "lib/src/components/sidebar.dart",
+      "to": "lib/src/components/ui/sidebar.dart",
+      "gitBlob": "80b29d6d3ca79a4a7e3dbe85456f7fe285ac1bce"
+    },
+    {
+      "from": "lib/src/components/skeleton.dart",
+      "to": "lib/src/components/ui/skeleton.dart",
+      "gitBlob": "5662f7beeff85735eafef5476ac64ccbd1f42fe1"
+    },
+    {
+      "from": "lib/src/components/slider.dart",
+      "to": "lib/src/components/ui/slider.dart",
+      "gitBlob": "54c6846b61a11f5478186260fa0e8a64ccfebbc6"
+    },
+    {
+      "from": "lib/src/components/spinner.dart",
+      "to": "lib/src/components/ui/spinner.dart",
+      "gitBlob": "3abacbdf76fdd8d8c8ec90ef229d8271c6e485c3"
+    },
+    {
+      "from": "lib/src/components/stat.dart",
+      "to": "lib/src/components/ui/stat.dart",
+      "gitBlob": "4851c5682d1756b4e353a1cbd6db5c33cb18fdfe"
+    },
+    {
+      "from": "lib/src/components/switch.dart",
+      "to": "lib/src/components/ui/switch.dart",
+      "gitBlob": "baf7062fea355274384703ccf38b8d9e5653823d"
+    },
+    {
+      "from": "lib/src/components/table.dart",
+      "to": "lib/src/components/ui/table.dart",
+      "gitBlob": "39ac5834383dfd7b20baeab4ff0091f01f508330"
+    },
+    {
+      "from": "lib/src/components/tabs.dart",
+      "to": "lib/src/components/ui/tabs.dart",
+      "gitBlob": "d88d40b78bba4731f60cc8c186276d156c8abd98"
+    },
+    {
+      "from": "lib/src/components/textarea.dart",
+      "to": "lib/src/components/ui/textarea.dart",
+      "gitBlob": "49968aa197ded187870b982deb07964cde99b216"
+    },
+    {
+      "from": "lib/src/components/toaster.dart",
+      "to": "lib/src/components/ui/toaster.dart",
+      "gitBlob": "7cd1e19164fa70a0774fa8fe29fd47dc1bad99ba"
+    },
+    {
+      "from": "lib/src/components/toggle.dart",
+      "to": "lib/src/components/ui/toggle.dart",
+      "gitBlob": "cfad35affc1e38f55cbe8e04305b5d6de0b4cb9f"
+    },
+    {
+      "from": "lib/src/components/toggle_group.dart",
+      "to": "lib/src/components/ui/toggle_group.dart",
+      "gitBlob": "9b334f985bb9c65498a9d51b7bb9e53fdae661fc"
+    },
+    {
+      "from": "lib/src/components/tooltip.dart",
+      "to": "lib/src/components/ui/tooltip.dart",
+      "gitBlob": "e919cde42f146cf190bed544d52c2799ef8b1416"
+    },
+    {
+      "from": "lib/src/components/voice.dart",
+      "to": "lib/src/components/ui/voice.dart",
+      "gitBlob": "0a33217a3578b63b53db938c9a23c865782f318e"
+    },
+    {
+      "from": "lib/src/components/ui/feedback_surface.dart",
+      "to": "lib/src/components/ui/feedback_surface.dart",
+      "gitBlob": "0a06d2587f07ebb86f6c21a1ab8e5ae2557c80d5"
+    },
+    {
+      "from": "lib/src/components/ui/premium_surface.dart",
+      "to": "lib/src/components/ui/premium_surface.dart",
+      "gitBlob": "85e3010ec0a00de610375a537d5c987633baf2da"
+    },
+    {
+      "from": "lib/src/components/ui/glass.dart",
+      "to": "lib/src/components/ui/glass.dart",
+      "gitBlob": "f7474bf5586a493cfad8050cf437c5b2e9b3aaa9"
+    },
+    {
+      "from": "lib/src/components/ui/surface.dart",
+      "to": "lib/src/components/ui/surface.dart",
+      "gitBlob": "a4ad81ce50da9d6e5811e0a21c5042b52ea62799"
+    },
+    {
+      "from": "lib/src/components/ui/media_scrim.dart",
+      "to": "lib/src/components/ui/media_scrim.dart",
+      "gitBlob": "610d00f9b6ae9467dfdaeef6dd43ba923f407428"
+    },
+    {
+      "from": "lib/src/components/ui/background_effect.dart",
+      "to": "lib/src/components/ui/background_effect.dart",
+      "gitBlob": "3e81d5c96e195ee72b3585e4e75abc30872750cb"
+    },
+    {
+      "from": "lib/src/components/ui/action_feedback.dart",
+      "to": "lib/src/components/ui/action_feedback.dart",
+      "gitBlob": "58ce1a11092b28bdb9e9ab99816adee0cb20c967"
+    },
+    {
+      "from": "lib/src/components/ui/starfield.dart",
+      "to": "lib/src/components/ui/ambient_pattern.dart",
+      "gitBlob": "a00f4eae7da71057be081b9aa3326e021db52302"
+    },
+    {
+      "from": "lib/src/components/ui/voice_indicator.dart",
+      "to": "lib/src/components/ui/voice_indicator.dart",
+      "gitBlob": "c1fe0cdf9ecb43a731572b807232cac7bdb58215"
+    },
+    {
+      "from": "lib/src/foundation/colors.dart",
+      "to": "lib/src/design_system/foundation/colors.dart",
+      "gitBlob": "36bf9eb8285a153b1c24f0af46ac7e2c05950c23"
+    },
+    {
+      "from": "lib/src/foundation/date_format.dart",
+      "to": "lib/src/design_system/foundation/date_format.dart",
+      "gitBlob": "22f0b8bf3a1c615920e75843d1f59870f31c7dd9"
+    },
+    {
+      "from": "lib/src/foundation/media.dart",
+      "to": "lib/src/design_system/foundation/media.dart",
+      "gitBlob": "40c27caf76150f67e1c05203c4f78574338b715e"
+    },
+    {
+      "from": "lib/src/foundation/motion.dart",
+      "to": "lib/src/design_system/foundation/motion.dart",
+      "gitBlob": "b283311ef2e0a5df6f166e2ba395b52fd0fc7b50"
+    },
+    {
+      "from": "lib/src/foundation/shadows.dart",
+      "to": "lib/src/design_system/foundation/shadows.dart",
+      "gitBlob": "21aa7c3ea6c80e462bcbed7c1c9e59c50ffdad3f"
+    },
+    {
+      "from": "lib/src/foundation/spacing.dart",
+      "to": "lib/src/design_system/foundation/spacing.dart",
+      "gitBlob": "058f7ecbf9754ffd10574d4e94c0afb42840a3e0"
+    },
+    {
+      "from": "lib/src/foundation/surfaces.dart",
+      "to": "lib/src/design_system/foundation/surfaces.dart",
+      "gitBlob": "4e27915f7871bb101b8e4fee60af12bcd19d77bf"
+    },
+    {
+      "from": "lib/src/foundation/theme.dart",
+      "to": "lib/src/design_system/foundation/theme.dart",
+      "gitBlob": "cf5795736311ea5bb5f97947f5bff073d8abe8e8"
+    },
+    {
+      "from": "lib/src/foundation/typography.dart",
+      "to": "lib/src/design_system/foundation/typography.dart",
+      "gitBlob": "fe3da025f15827e756c10f38333f5f8498d5e9a6"
+    },
+    {
+      "from": "lib/src/components/ui/keyframes.dart",
+      "to": "lib/src/components/ui/keyframes.dart",
+      "gitBlob": "acc70eba8fac6cbee11fd0710e49569278d79af8"
+    },
+    {
+      "from": "lib/src/components/ui/lift.dart",
+      "to": "lib/src/components/ui/hover_builder.dart",
+      "gitBlob": "faedbda1e45b5f5e51fd3adb7d1f396f37436375"
+    },
+    {
+      "from": "lib/src/components/ui/press.dart",
+      "to": "lib/src/components/ui/press.dart",
+      "gitBlob": "cfd23dd2a2f8ef8341a53644d2dad698e832c50f"
+    },
+    {
+      "from": "lib/src/components/ui/active_indicator.dart",
+      "to": "lib/src/components/ui/active_indicator.dart",
+      "gitBlob": "b627bce2b015bbc65759d97ba5eed5e77843ed6f"
+    },
+    {
+      "from": "lib/src/components/ui/content_change.dart",
+      "to": "lib/src/components/ui/content_change.dart",
+      "gitBlob": "e7062bfc2bfe78b3c9006f5fd279804ae8aa5ad6"
+    },
+    {
+      "from": "lib/src/text_layout.dart",
+      "to": "lib/src/design_system/foundation/text_layout.dart",
+      "gitBlob": "bdf458ba082c1db0fd82af0c5ab0972c87d887c8"
+    },
+    {
+      "from": "lib/src/theme_scope.dart",
+      "to": "lib/src/design_system/foundation/theme_scope.dart",
+      "gitBlob": "228c82a3452c244569755c79934b584c18b33a7d"
+    }
+  ]
+}

@@ -3,16 +3,16 @@
 /// `registry/components/agent-face.json` exists and is installable today:
 /// [dependencies] below is that manifest's own `registryDependencies`,
 /// copied verbatim — `agent-avatar`, `agent-core`, `keyframes`,
-/// `source-foundation`, `voice`, `voice-orb`.
+/// `source-foundation`, `voice`, `voice-indicator`.
 ///
 /// `lib/src/components/agent_face.dart` is `parts/agent-face.tsx` ported:
 /// which of two objects sits in the face's slot — the working avatar or the
 /// listening/speaking voice orb — plus the sentence beside it. [exports]
 /// lists every public name the file declares; the page documents
-/// [ElAgentFace] (the widget a caller constructs), [ElAgentVoice] (the
-/// value that decides which object wins), [ElAgentStatusLine] and
-/// [ElAgentShimmerText] (the sentence, and the effect it wears while
-/// busy), and [ElAgentAvatarRegistry] (the seam every one of those four
+/// [AgentFace] (the widget a caller constructs), [AgentVoice] (the
+/// value that decides which object wins), [AgentStatusLine] and
+/// [AgentStatusText] (the sentence, and the effect it wears while
+/// busy), and [AgentAvatarRegistry] (the seam every one of those four
 /// resolves its renderer through) in full.
 library;
 
@@ -31,17 +31,17 @@ const ComponentDocEntry agentFaceDoc = ComponentDocEntry(
     'keyframes',
     'source-foundation',
     'voice',
-    'voice-orb',
+    'voice-indicator',
   ],
   exports: <String>[
-    'ElAgentFace',
-    'ElAgentVoice',
-    'ElAgentStatusLine',
-    'ElAgentShimmerText',
-    'ElAgentAvatarRegistry',
-    'ElAgentAvatarBuilder',
-    'ElAgentOrbBuilder',
-    'ElAgentVisualiserBuilder',
+    'AgentFace',
+    'AgentVoice',
+    'AgentStatusLine',
+    'AgentStatusText',
+    'AgentAvatarRegistry',
+    'AgentAvatarBuilder',
+    'AgentOrbBuilder',
+    'AgentVisualiserBuilder',
   ],
   sourcePath: 'lib/src/components/agent_face.dart',
 );

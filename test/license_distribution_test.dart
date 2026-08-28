@@ -41,8 +41,8 @@ const Map<String, String> _redistributed = <String, String>{
   'assets/fonts/InterVariable.ttf': 'third_party/fonts/inter/OFL.txt',
   'assets/fonts/GeistMono-Variable.ttf': 'third_party/fonts/geist-mono/OFL.txt',
   'assets/fonts/Redaction35-Italic.ttf': 'third_party/fonts/redaction/OFL.txt',
-  'lib/src/components/icon_paths.g.dart': 'third_party/lucide/LICENSE',
-  'lib/src/components/icon_paths.g.index.dart': 'third_party/lucide/LICENSE',
+  'lib/src/components/ui/icon_paths.g.dart': 'third_party/lucide/LICENSE',
+  'lib/src/components/ui/icon_paths.g.index.dart': 'third_party/lucide/LICENSE',
   'shaders/orb.frag': 'third_party/elevenlabs-ui/LICENSE',
 };
 
@@ -193,7 +193,7 @@ void main() {
 
   group('vendored files carry their notice inline', () {
     test('the generated lucide geometry embeds lucide\'s whole LICENSE', () {
-      final String generated = _read('lib/src/components/icon_paths.g.dart');
+      final String generated = _read('lib/src/components/ui/icon_paths.g.dart');
       final String upstream = _read('third_party/lucide/LICENSE');
       for (final String line in upstream.split('\n')) {
         final String trimmed = line.trimRight();
@@ -307,9 +307,9 @@ void main() {
       );
     });
 
-    test('voice-orb ships the shader notice', () {
+    test('voice-indicator ships the shader notice', () {
       expect(
-        licenseTargets(manifest('registry/effects/voice-orb.json')),
+        licenseTargets(manifest('registry/components/voice-indicator.json')),
         contains('@license/ElevenLabs-UI-MIT.txt'),
       );
     });
@@ -352,7 +352,7 @@ void main() {
             'third_party/fonts/redaction/OFL.txt',
         'registry/generated/latest/versions/icon/0.0.1/logical/license/Lucide-ISC.txt':
             'third_party/lucide/LICENSE',
-        'registry/generated/latest/versions/voice-orb/0.0.1/logical/license/ElevenLabs-UI-MIT.txt':
+        'registry/generated/latest/versions/voice-indicator/0.0.1/logical/license/ElevenLabs-UI-MIT.txt':
             'third_party/elevenlabs-ui/LICENSE',
       };
       payloads.forEach((String staged, String origin) {

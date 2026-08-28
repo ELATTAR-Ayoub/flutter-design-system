@@ -3,7 +3,7 @@
 /// `chart-cartesian` HAS a real `registry/components/chart-cartesian.json`
 /// manifest: [dependencies] below is that manifest's own `registryDependencies`
 /// list, copied verbatim: `chart`, `chart-geometry`, `source-foundation`. One
-/// widget, [ElCartesianChart], stands in for `AreaChart`, `BarChart` and
+/// widget, [CartesianChart], stands in for `AreaChart`, `BarChart` and
 /// `LineChart` — recharts makes the three one widget with a different
 /// `chartName` too — because the only thing that actually differs between
 /// them is which scale the category axis resolves to.
@@ -22,21 +22,21 @@ const ComponentDocEntry chartCartesianDoc = ComponentDocEntry(
   // verbatim.
   dependencies: <String>['chart', 'chart-geometry', 'source-foundation'],
   exports: <String>[
-    'ElChartMargin',
-    'ElChartLayout',
-    'ElChartAxisType',
-    'ElChartAxis',
-    'ElChartGrid',
-    'ElChartSeriesKind',
-    'ElChartDot',
-    'ElChartLabelList',
-    'ElChartLabelPosition',
-    'ElChartSeriesSpec',
-    'ElChartTooltipSpec',
-    'ElChartLegendSpec',
-    'ElCartesianChart',
-    'ElBarRect',
-    'ElBarSeriesPainter',
+    'ChartMargin',
+    'ChartLayout',
+    'ChartAxisType',
+    'ChartAxis',
+    'ChartGrid',
+    'ChartSeriesKind',
+    'ChartDot',
+    'ChartLabelList',
+    'ChartLabelPosition',
+    'ChartSeriesSpec',
+    'ChartTooltipSpec',
+    'ChartLegendSpec',
+    'CartesianChart',
+    'BarRect',
+    'BarSeriesPainter',
   ],
   sourcePath: 'lib/src/components/chart_cartesian.dart',
 );

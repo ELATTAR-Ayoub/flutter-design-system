@@ -4,15 +4,15 @@
 /// reads `DocsSection.id` (the kit's own section widget), and the
 /// API-table / state-matrix / accessibility / keyboard / dependencies
 /// assertions each open the relevant `DocsDisclosure` first — closed by
-/// default in the new kit, unlike the old page's always-visible `ElSection`.
+/// default in the new kit, unlike the old page's always-visible `Section`.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery`. Theme
-/// coverage flips a single live [ElThemeController] in place rather than
+/// coverage flips a single live [ThemeController] in place rather than
 /// rebuilding with a second controller instance.
 ///
 /// **No `pumpAndSettle` anywhere in this file.** Every specimen on the page
-/// carries a live `ElBloomCosmic`, whose drift and starfield are forever
+/// carries a live `FeedbackSurface`, whose drift and starfield are forever
 /// loops (see `test/effects_test.dart`'s own note) -- `pumpAndSettle` would
 /// hang waiting for an animation that never finishes. `tester.pump()` is
 /// enough to render one frame and assert against it.
@@ -23,7 +23,33 @@ import 'package:example/components_docs/alert/meta.dart';
 import 'package:example/components_docs/alert/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The full section list, in the order the re-housed page must render them.
@@ -50,8 +76,8 @@ const List<String> _sectionOrder = <String>[
   'source',
 ];
 
-Widget _harness(Widget child, {required ElThemeController controller}) =>
-    ElTheme(
+Widget _harness(Widget child, {required ThemeController controller}) =>
+    ThemeScope(
       controller: controller,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -77,7 +103,7 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 void main() {
@@ -85,12 +111,9 @@ void main() {
     expect(alertDoc.name, 'alert');
     expect(alertDoc.title, 'Alert');
     expect(alertDoc.sourcePath, 'lib/src/components/alert.dart');
-    expect(
-      alertDoc.exports,
-      containsAll(<String>['ElAlert', 'ElAlertVariant']),
-    );
+    expect(alertDoc.exports, containsAll(<String>['Alert', 'AlertVariant']));
     expect(alertDoc.dependencies, <String>[
-      'bloom-cosmic',
+      'feedback-surface',
       'source-foundation',
     ]);
     expect(alertDoc.command, 'elattar add alert');
@@ -103,9 +126,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
-    );
+    final ThemeController controller = ThemeController(mode: ColorMode.dark);
     addTearDown(controller.dispose);
     String? destination;
 
@@ -135,9 +156,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       addTearDown(controller.dispose);
 
       await tester.pumpWidget(
@@ -145,12 +164,12 @@ void main() {
       );
       await tester.pump();
 
-      // The Preview grid alone already mounts one ElAlert per variant; the
+      // The Preview grid alone already mounts one Alert per variant; the
       // per-variant sections below each mount at least one more, and RTL
       // and Stacked alerts each mount two.
-      expect(find.byType(ElAlert), findsAtLeastNWidgets(12));
+      expect(find.byType(Alert), findsAtLeastNWidgets(12));
 
-      // Basic carries ElAlertVariant.normal's own specimen.
+      // Basic carries AlertVariant.normal's own specimen.
       final Finder basic = find.byKey(
         const ValueKey<String>('alert-example:basic'),
       );
@@ -196,7 +215,7 @@ void main() {
         const ValueKey<String>('alert-example:stacked'),
       );
       expect(
-        find.descendant(of: stacked, matching: find.byType(ElAlert)),
+        find.descendant(of: stacked, matching: find.byType(Alert)),
         findsNWidgets(2),
       );
 
@@ -205,11 +224,14 @@ void main() {
         const ValueKey<String>('alert-example:rtl'),
       );
       expect(
-        find.descendant(of: rtl, matching: find.byType(ElAlert)),
+        find.descendant(of: rtl, matching: find.byType(Alert)),
         findsNWidgets(2),
       );
       // `rtl`'s own key sits on the Directionality wrapper itself.
-      expect(tester.widget<Directionality>(rtl).textDirection, TextDirection.rtl);
+      expect(
+        tester.widget<Directionality>(rtl).textDirection,
+        TextDirection.rtl,
+      );
 
       // Composition documents the anatomy as Dart, not a live render.
       final Finder compositionSection = find.byWidgetPredicate(
@@ -247,9 +269,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
-    );
+    final ThemeController controller = ThemeController(mode: ColorMode.dark);
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
@@ -285,16 +305,13 @@ void main() {
       expect(
         find.descendant(of: apiSection, matching: find.text(variant)),
         findsOneWidget,
-        reason: 'ElAlertVariant.$variant should be documented',
+        reason: 'AlertVariant.$variant should be documented',
       );
     }
-    // Custom Colors has no ElAlert equivalent -- recorded as skipped rather
+    // Custom Colors has no Alert equivalent -- recorded as skipped rather
     // than faked with another variant swatch.
     expect(
-      find.descendant(
-        of: apiSection,
-        matching: find.textContaining('SKIPPED'),
-      ),
+      find.descendant(of: apiSection, matching: find.textContaining('SKIPPED')),
       findsWidgets,
     );
     expect(tester.takeException(), isNull);
@@ -307,9 +324,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       addTearDown(controller.dispose);
 
       await tester.pumpWidget(
@@ -353,9 +368,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
-    );
+    final ThemeController controller = ThemeController(mode: ColorMode.dark);
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
@@ -385,9 +398,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.light,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.light);
       addTearDown(controller.dispose);
 
       await tester.pumpWidget(
@@ -403,11 +414,11 @@ void main() {
         find.byKey(const ValueKey<String>('docs-layout-sidebar')),
         findsNothing,
       );
-      expect(find.byType(ElAlert), findsAtLeastNWidgets(12));
+      expect(find.byType(Alert), findsAtLeastNWidgets(12));
       expect(tester.takeException(), isNull);
 
       // The controller is flipped in place: no new app, no new element tree.
-      controller.setMode(ElThemeMode.dark);
+      controller.setMode(ColorMode.dark);
       await tester.pump();
       expect(tester.takeException(), isNull);
     },
@@ -425,9 +436,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
-    );
+    final ThemeController controller = ThemeController(mode: ColorMode.dark);
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
@@ -439,7 +448,7 @@ void main() {
       find.byKey(const ValueKey<String>('docs-layout-sidebar')),
       findsOneWidget,
     );
-    expect(find.byType(ElAlert), findsAtLeastNWidgets(12));
+    expect(find.byType(Alert), findsAtLeastNWidgets(12));
     expect(tester.takeException(), isNull);
   });
 }

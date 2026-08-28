@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/combobox.dart",
+      "source": "lib/src/components/ui/combobox.dart",
       "target": "@ui/combobox.dart",
-      "sha256": "5475be0bbfcac54382deeee2c42562d72aad97217d94e59b2ca3d68c6a0024ac"
+      "sha256": "a21b7331e6bdd63cdf6ab8fc647a0261058efba51ed85b531cf202393f592370"
     }
   ],
   "registryDependencies": [
@@ -32,5 +32,9 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/combobox",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/combobox.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/combobox.dart",
+  "exports": [
+    "Combobox",
+    "ComboboxItem"
+  ]
 }

@@ -11,15 +11,10 @@ import 'dart:io';
 /// where.
 const String uiDirectory = 'lib/components/ui';
 const String foundationDirectory = 'lib/design_system/foundation';
-const String effectsDirectory = 'lib/design_system/effects';
-const String motionDirectory = 'lib/design_system/motion';
-const String assetsDirectory = 'assets';
-const String shadersDirectory = 'shaders';
+const String blocksDirectory = 'lib/blocks';
+const String assetsDirectory = 'assets/ui';
+const String shadersDirectory = 'shaders/ui';
 const String fontsDirectory = 'assets/elattar/fonts';
-
-/// Application compositions (shots) land in the consumer's own `lib/`, not
-/// under the design-system folders: `@app/shots/x/y.dart` -> `lib/shots/x/y.dart`.
-const String appDirectory = 'lib';
 
 /// Third-party license notices, at the consumer's project root.
 ///
@@ -54,20 +49,14 @@ class LogicalTargetMapper {
         '$foundationDirectory/${relative.substring(12)}',
       );
     }
-    if (relative.startsWith('@effects/')) {
-      return _join(projectRoot, '$effectsDirectory/${relative.substring(9)}');
-    }
-    if (relative.startsWith('@motion/')) {
-      return _join(projectRoot, '$motionDirectory/${relative.substring(8)}');
+    if (relative.startsWith('@block/')) {
+      return _join(projectRoot, '$blocksDirectory/${relative.substring(7)}');
     }
     if (relative.startsWith('@assets/')) {
       return _join(projectRoot, '$assetsDirectory/${relative.substring(8)}');
     }
     if (relative.startsWith('@shaders/')) {
       return _join(projectRoot, '$shadersDirectory/${relative.substring(9)}');
-    }
-    if (relative.startsWith('@app/')) {
-      return _join(projectRoot, '$appDirectory/${relative.substring(5)}');
     }
     if (relative.startsWith('@license/')) {
       return _join(projectRoot, '$licensesDirectory/${relative.substring(9)}');

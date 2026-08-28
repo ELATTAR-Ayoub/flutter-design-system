@@ -256,7 +256,7 @@ Map<String, Object?> _foundationItem({List<String>? registryDependencies}) {
     'minFlutter': '>=3.44.8',
     'files': <Map<String, Object?>>[
       <String, Object?>{
-        'source': 'lib/src/foundation/colors.dart',
+        'source': 'lib/src/design_system/foundation/colors.dart',
         'target': '@foundation/colors.dart',
         'sha256': '',
       },
@@ -283,7 +283,7 @@ Map<String, Object?> _iconItem() {
     'minFlutter': '>=3.44.8',
     'files': <Map<String, Object?>>[
       <String, Object?>{
-        'source': 'lib/src/components/icon.dart',
+        'source': 'lib/src/components/ui/icon.dart',
         'target': '@ui/icon.dart',
         'sha256': '',
       },
@@ -310,7 +310,7 @@ Map<String, Object?> _cardItem() {
     'minFlutter': '>=3.44.8',
     'files': <Map<String, Object?>>[
       <String, Object?>{
-        'source': 'lib/src/components/card.dart',
+        'source': 'lib/src/components/ui/card.dart',
         'target': '@ui/card.dart',
         'sha256': '',
       },
@@ -337,7 +337,7 @@ Map<String, Object?> _buttonItem({List<String>? registryDependencies}) {
     'minFlutter': '>=3.44.8',
     'files': <Map<String, Object?>>[
       <String, Object?>{
-        'source': 'lib/src/components/button.dart',
+        'source': 'lib/src/components/ui/button.dart',
         'target': '@ui/button.dart',
         'sha256': '',
       },
@@ -359,8 +359,8 @@ String _payloadPath(String target) {
   for (final String prefix in <String>[
     '@ui/',
     '@foundation/',
-    '@effects/',
-    '@motion/',
+    '@ui/',
+    '@ui/',
     '@assets/',
     '@shaders/',
   ]) {

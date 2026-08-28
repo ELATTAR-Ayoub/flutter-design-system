@@ -1,6 +1,6 @@
 /// Public documentation page for the `spinner` component, alone.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels shaped to mirror
 /// https://ui.shadcn.com/docs/components/base/spinner's own section list; it
 /// now declares a [ComponentDocSpec] (`example/lib/docs/
@@ -13,12 +13,12 @@
 ///
 /// **Skipped, honestly: Customization only.** The reference's Customization
 /// section edits `spinner.tsx` itself to swap its inline `<LoaderIcon>` for a
-/// different lucide icon; [ElSpinner]'s constructor is `ElSpinner({size,
+/// different lucide icon; [Spinner]'s constructor is `Spinner({size,
 /// strokeOverride})`, no `icon` or `glyph` parameter at all, and `build()`
-/// hardcodes `ElIcon(ElIconGlyph.loaderCircle, ...)`, so there is no
+/// hardcodes `Icon(IconGlyph.loaderCircle, ...)`, so there is no
 /// equivalent surface to demonstrate without forking `spinner.dart`. Button,
 /// Badge, Input Group, Empty and RTL are all real compositions of components
-/// this package has ([ElButton], [ElBadge], [ElInputGroup], [ElEmpty], and a
+/// this package has ([Button], [Badge], [InputGroup], [Empty], and a
 /// plain [Directionality] wrapper), and are kept, in the reference's own
 /// order.
 ///
@@ -28,7 +28,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -43,7 +55,7 @@ final ComponentDocSpec spinnerDocSpec = ComponentDocSpec(
     ShowcaseSection(
       id: 'preview',
       title: 'Preview',
-      description: 'The default 16px ElSpinner, rotating forever.',
+      description: 'The default 16px Spinner, rotating forever.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
@@ -71,7 +83,7 @@ final ComponentDocSpec spinnerDocSpec = ComponentDocSpec(
         const DocsCodeFile(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
-          description: 'Add the export line so ElSpinner is reachable.',
+          description: 'Add the export line so Spinner is reachable.',
           code: "export 'spinner.dart';",
         ),
       ],
@@ -80,7 +92,7 @@ final ComponentDocSpec spinnerDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'ElSpinner is a 16px rotating loader-circle icon that spins '
+          'Spinner is a 16px rotating loader-circle icon that spins '
           'once every 900ms, forever, using a linear easing curve, no '
           'ease-in or ease-out. It is mute: no aria-label, no '
           'role="status", because the reference drops both in its own '
@@ -104,8 +116,8 @@ final ComponentDocSpec spinnerDocSpec = ComponentDocSpec(
       description:
           'The reference composes a Spinner child by hand and tags it '
           'data-icon="inline-start" or "inline-end" for spacing on '
-          'either side of the label. ElButton\'s loading flag does the '
-          'inline-start case natively: it prepends a ElSpinner and '
+          'either side of the label. Button\'s loading flag does the '
+          'inline-start case natively: it prepends a Spinner and '
           'disables the button. The inline-end case has no dedicated '
           'flag, so it is a caller-built row instead.',
       specimen: _ButtonSpecimen(),
@@ -116,8 +128,8 @@ final ComponentDocSpec spinnerDocSpec = ComponentDocSpec(
       id: 'badge',
       title: 'Badge',
       description:
-          'ElBadge\'s glyph slot takes any widget, not only a '
-          'ElIconGlyph: a ElSpinner passed there is squeezed into the '
+          'Badge\'s glyph slot takes any widget, not only a '
+          'IconGlyph: a Spinner passed there is squeezed into the '
           'same 12px square an icon fills, with the usual 4px gap '
           'before the label.',
       specimen: _BadgeSpecimen(),
@@ -128,7 +140,7 @@ final ComponentDocSpec spinnerDocSpec = ComponentDocSpec(
       id: 'input-group',
       title: 'Input Group',
       description:
-          'An addon takes any widget too: a ElSpinner sized to the '
+          'An addon takes any widget too: a Spinner sized to the '
           'group\'s own 16px icon rung signals validation in progress '
           'without a status message of its own.',
       specimen: _InputGroupSpecimen(),
@@ -139,21 +151,21 @@ final ComponentDocSpec spinnerDocSpec = ComponentDocSpec(
       id: 'empty',
       title: 'Empty',
       description:
-          'ElEmptyMedia only takes a ElIconGlyph, so a spinner cannot '
-          'fill its tile. ElEmptyHeader\'s children list takes any '
+          'EmptyMedia only takes a IconGlyph, so a spinner cannot '
+          'fill its tile. EmptyHeader\'s children list takes any '
           'widget, so the spinner sits there directly instead, ahead of '
           'the title and description, the way the reference\'s '
           'EmptyMedia would.',
       specimen: _EmptySpecimen(),
       code: _emptyCode,
       label: 'Empty specimen view',
-      minHeight: el(120),
+      minHeight: space(120),
     ),
     ShowcaseSection(
       id: 'rtl',
       title: 'RTL',
       description:
-          'ElSpinner paints identically under either text direction: a '
+          'Spinner paints identically under either text direction: a '
           'rotating circle has no logical edges to mirror. What does '
           'mirror is the composition around it, under the same '
           'Directionality.rtl that Toggle, Progress and Pagination each '
@@ -187,7 +199,7 @@ final ComponentDocSpec spinnerDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          'ElSpinner is never in the tab order and answers no key '
+          'Spinner is never in the tab order and answers no key '
           'press: it is a decorative glyph, not an interactive control.',
       child: _KeyboardContent(),
     ),
@@ -221,7 +233,7 @@ final ComponentDocSpec spinnerDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/components_test.dart',
             description:
-                'ElSpinner is covered inside the shared base-components '
+                'Spinner is covered inside the shared base-components '
                 'suite.',
           ),
           const DocsInstallFact(
@@ -255,9 +267,9 @@ class SpinnerDocPage extends StatelessWidget {
       title: spinnerDoc.title,
       description: spinnerDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Spinner'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Spinner'),
     ],
     toc: spinnerDocSpec.toc,
     onNavigate: onNavigate,
@@ -276,19 +288,19 @@ class _PreviewSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const KeyedSubtree(
     key: ValueKey<String>('spinner-example:preview'),
-    child: ElSpinner(),
+    child: Spinner(),
   );
 }
 
 const String _previewCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-    'const ElSpinner loading = ElSpinner();';
+    'const Spinner loading = Spinner();';
 
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
 // Default: 16px, loops forever.
-const ElSpinner loading = ElSpinner();''';
+const Spinner loading = Spinner();''';
 
 class _SizeSpecimen extends StatelessWidget {
   const _SizeSpecimen();
@@ -298,18 +310,18 @@ class _SizeSpecimen extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElText('Default (16px, 900ms cycle)', ElType.section),
-      SizedBox(height: el(3)),
+      StyledText('Default (16px, 900ms cycle)', TextStyles.section),
+      SizedBox(height: space(3)),
       const KeyedSubtree(
         key: ValueKey<String>('spinner-example:size-default'),
-        child: ElSpinner(),
+        child: Spinner(),
       ),
-      SizedBox(height: el(5)),
-      ElText('Larger size (24px)', ElType.section),
-      SizedBox(height: el(3)),
+      SizedBox(height: space(5)),
+      StyledText('Larger size (24px)', TextStyles.section),
+      SizedBox(height: space(3)),
       const KeyedSubtree(
         key: ValueKey<String>('spinner-example:size-large'),
-        child: ElSpinner(size: 24),
+        child: Spinner(size: 24),
       ),
     ],
   );
@@ -318,20 +330,20 @@ class _SizeSpecimen extends StatelessWidget {
 const String _sizeCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
     '// Larger size, same stroke as the default.\n'
-    'const ElSpinner large = ElSpinner(size: 24);';
+    'const Spinner large = Spinner(size: 24);';
 
 class _ButtonSpecimen extends StatelessWidget {
   const _ButtonSpecimen();
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(4),
-    runSpacing: el(4),
+    spacing: space(4),
+    runSpacing: space(4),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: <Widget>[
       KeyedSubtree(
         key: const ValueKey<String>('spinner-example:button-loading'),
-        child: ElButton(
+        child: Button(
           loading: true,
           onPressed: () {},
           child: const Text('Loading...'),
@@ -339,15 +351,15 @@ class _ButtonSpecimen extends StatelessWidget {
       ),
       KeyedSubtree(
         key: const ValueKey<String>('spinner-example:button-inline-end'),
-        child: ElButton(
-          variant: ElButtonVariant.secondary,
+        child: Button(
+          variant: ButtonVariant.secondary,
           onPressed: () {},
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const Text('Processing'),
-              SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
-              const ElSpinner(),
+              SizedBox(width: Button.gapFor(ButtonSize.md)),
+              const Spinner(),
             ],
           ),
         ),
@@ -358,7 +370,7 @@ class _ButtonSpecimen extends StatelessWidget {
 
 const String _buttonCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-    'ElButton(\n'
+    'Button(\n'
     '  loading: true,\n'
     '  onPressed: () {},\n'
     "  child: const Text('Loading...'),\n"
@@ -369,24 +381,24 @@ class _BadgeSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(3),
-    runSpacing: el(3),
+    spacing: space(3),
+    runSpacing: space(3),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: <Widget>[
       KeyedSubtree(
         key: const ValueKey<String>('spinner-example:badge-secondary'),
-        child: ElBadge(
+        child: Badge(
           label: 'Syncing',
-          variant: ElBadgeVariant.secondary,
-          glyph: ElSpinner(size: ElBadge.glyphSize),
+          variant: BadgeVariant.secondary,
+          glyph: Spinner(size: Badge.glyphSize),
         ),
       ),
       KeyedSubtree(
         key: const ValueKey<String>('spinner-example:badge-action'),
-        child: ElBadge(
+        child: Badge(
           label: 'Updating',
-          variant: ElBadgeVariant.action,
-          glyph: ElSpinner(size: ElBadge.glyphSize),
+          variant: BadgeVariant.action,
+          glyph: Spinner(size: Badge.glyphSize),
         ),
       ),
     ],
@@ -394,10 +406,10 @@ class _BadgeSpecimen extends StatelessWidget {
 }
 
 const String _badgeCode =
-    "ElBadge(\n"
+    "Badge(\n"
     "  label: 'Syncing',\n"
-    '  variant: ElBadgeVariant.secondary,\n'
-    '  glyph: ElSpinner(size: ElBadge.glyphSize),\n'
+    '  variant: BadgeVariant.secondary,\n'
+    '  glyph: Spinner(size: Badge.glyphSize),\n'
     ')';
 
 class _InputGroupSpecimen extends StatelessWidget {
@@ -406,25 +418,25 @@ class _InputGroupSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('spinner-example:input-group'),
-    child: ElInputGroup(
-      endAddon: ElInputGroupAddon(
-        align: ElInputGroupAlign.end,
-        child: ElSpinner(size: ElIcon.pxFor(ElIconSize.sm)),
+    child: InputGroup(
+      endAddon: InputGroupAddon(
+        align: InputGroupAlign.end,
+        child: Spinner(size: Icon.pxFor(IconSize.sm)),
       ),
       enabled: false,
-      child: const ElInputGroupInput(placeholder: 'Validating...'),
+      child: const InputGroupInput(placeholder: 'Validating...'),
     ),
   );
 }
 
 const String _inputGroupCode =
-    'ElInputGroup(\n'
-    '  endAddon: ElInputGroupAddon(\n'
-    '    align: ElInputGroupAlign.end,\n'
-    '    child: ElSpinner(size: ElIcon.pxFor(ElIconSize.sm)),\n'
+    'InputGroup(\n'
+    '  endAddon: InputGroupAddon(\n'
+    '    align: InputGroupAlign.end,\n'
+    '    child: Spinner(size: Icon.pxFor(IconSize.sm)),\n'
     '  ),\n'
     '  enabled: false,\n'
-    "  child: ElInputGroupInput(placeholder: 'Validating...'),\n"
+    "  child: InputGroupInput(placeholder: 'Validating...'),\n"
     ')';
 
 class _EmptySpecimen extends StatelessWidget {
@@ -433,21 +445,21 @@ class _EmptySpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('spinner-example:empty'),
-    child: ElEmpty(
+    child: Empty(
       children: <Widget>[
-        ElEmptyHeader(
+        EmptyHeader(
           children: <Widget>[
-            const ElSpinner(size: 24),
-            const ElEmptyTitle('Processing your request'),
-            const ElEmptyDescription(
+            const Spinner(size: 24),
+            const EmptyTitle('Processing your request'),
+            const EmptyDescription(
               'This can take a few moments. Please keep this window open.',
             ),
           ],
         ),
-        ElEmptyContent(
+        EmptyContent(
           children: <Widget>[
-            ElButton(
-              variant: ElButtonVariant.outline,
+            Button(
+              variant: ButtonVariant.outline,
               onPressed: () {},
               child: const Text('Cancel'),
             ),
@@ -459,12 +471,12 @@ class _EmptySpecimen extends StatelessWidget {
 }
 
 const String _emptyCode =
-    'ElEmpty(\n'
+    'Empty(\n'
     '  children: <Widget>[\n'
-    '    ElEmptyHeader(\n'
+    '    EmptyHeader(\n'
     '      children: <Widget>[\n'
-    '        ElSpinner(size: 24),\n'
-    "        ElEmptyTitle('Processing your request'),\n"
+    '        Spinner(size: 24),\n'
+    "        EmptyTitle('Processing your request'),\n"
     '      ],\n'
     '    ),\n'
     '  ],\n'
@@ -480,9 +492,9 @@ class _RtlSpecimen extends StatelessWidget {
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const ElSpinner(),
-        SizedBox(width: el(2)),
-        ElText('جارٍ التحميل', ElType.body),
+        const Spinner(),
+        SizedBox(width: space(2)),
+        StyledText('جارٍ التحميل', TextStyles.body),
       ],
     ),
   );
@@ -494,8 +506,8 @@ const String _rtlCode =
     '  child: Row(\n'
     '    mainAxisSize: MainAxisSize.min,\n'
     '    children: <Widget>[\n'
-    '      const ElSpinner(),\n'
-    "      ElText('جارٍ التحميل', ElType.body),\n"
+    '      const Spinner(),\n'
+    "      StyledText('جارٍ التحميل', TextStyles.body),\n"
     '    ],\n'
     '  ),\n'
     ')';
@@ -510,13 +522,13 @@ class _ApiReferenceContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsApiTable(
-        title: 'ElSpinner properties',
+        title: 'Spinner properties',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'size',
             type: 'double',
             description:
-                'Defaults to ElSpinner.px (16.0). The rendered square '
+                'Defaults to Spinner.px (16.0). The rendered square '
                 'size. The stroke stays 2.4 regardless: see '
                 'strokeOverride.',
           ),
@@ -525,7 +537,7 @@ class _ApiReferenceContent extends StatelessWidget {
             type: 'double?',
             description:
                 'The stroke width in lucide\'s 24-unit space. Null '
-                'means 2.4 always (ElIcon.strokeFor(16)\'s result), '
+                'means 2.4 always (Icon.strokeFor(16)\'s result), '
                 'matching the reference\'s off-ladder behaviour: the '
                 'reference computes strokeWidth from the size **prop** '
                 '(always "md"), never from the className that changes '
@@ -534,18 +546,18 @@ class _ApiReferenceContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsApiTable(
-        title: 'ElSpinner static constant',
+        title: 'Spinner static constant',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElSpinner.px',
+            name: 'Spinner.px',
             type: 'static const double',
             description:
                 'The default size, 16.0, named because it matches the '
                 '`size-4` Tailwind class the reference uses, and '
-                'because ElButton reasons about it directly: a loading '
-                'button grows by ElSpinner.px + gapFor(size) the '
+                'because Button reasons about it directly: a loading '
+                'button grows by Spinner.px + gapFor(size) the '
                 'instant loading starts.',
           ),
         ],
@@ -559,12 +571,12 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Animating',
     treatment:
         'RotationTransition repeats forever at '
-        'elAnimationDuration(context, ElDurations.spin), 900ms by '
+        'effectiveMotionDuration(context, MotionDurations.spin), 900ms by '
         'default, linear curve: the one animation in the system that '
         'takes no --ease-* curve.',
     userSignal:
         'Continuous rotation signals work in progress. Paired with a '
-        'busy control such as a loading ElButton; never announced on '
+        'busy control such as a loading Button; never announced on '
         'its own.',
   ),
   DocsStateFact(
@@ -586,22 +598,22 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
     child: Builder(
       builder: (BuildContext context) {
-        final ElThemeData theme = ElTheme.of(context);
-        return ElText(
+        final ThemeTokens theme = ThemeScope.of(context);
+        return StyledText(
           'The reference hands its inner Icon a role="status" and an '
           'aria-label="Loading", but the reference\'s own Icon '
           'component destructures only {icon, size, tone, label, '
           'className} and spreads nothing, so both attributes are '
           'dropped on the floor there too. With no label reaching it, '
-          'the glyph renders aria-hidden. ElSpinner reproduces that '
+          'the glyph renders aria-hidden. Spinner reproduces that '
           'rendered behaviour: the glyph is wrapped in ExcludeSemantics, '
-          'and ElButton carries the busy state alone, so a screen '
+          'and Button carries the busy state alone, so a screen '
           'reader\'s only signal from a loading button is its '
           'aria-busy.',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         );
       },
@@ -610,7 +622,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// New: split out of Accessibility, matching `button`, `field`, `popover`,
-/// `alert` and `toaster`'s own dedicated Keyboard disclosure. ElSpinner is
+/// `alert` and `toaster`'s own dedicated Keyboard disclosure. Spinner is
 /// wrapped in [ExcludeSemantics] and has no [Focus] or `onKeyEvent` of its
 /// own anywhere in `spinner.dart` -- read directly off the source, not
 /// inferred.
@@ -619,21 +631,21 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
     child: Builder(
       builder: (BuildContext context) {
-        final ElThemeData theme = ElTheme.of(context);
-        return ElText(
+        final ThemeTokens theme = ThemeScope.of(context);
+        return StyledText(
           'No key handling of any kind: spinner.dart declares no Focus, '
           'FocusNode, or onKeyEvent anywhere, and the glyph itself is '
-          'wrapped in ExcludeSemantics. ElSpinner is never in the tab '
+          'wrapped in ExcludeSemantics. Spinner is never in the tab '
           'order and answers no key press -- it is a decorative glyph, '
           'always mounted inside whatever interactive control uses it '
-          '(a loading ElButton, an in-progress ElBadge, a validating '
-          'ElInputGroup addon), and that control\'s own tab stop and '
+          '(a loading Button, an in-progress Badge, a validating '
+          'InputGroup addon), and that control\'s own tab stop and '
           'key bindings are entirely unaffected by the spinner riding '
           'inside it.',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         );
       },
@@ -646,17 +658,17 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
     child: Builder(
       builder: (BuildContext context) {
-        final ElThemeData theme = ElTheme.of(context);
-        return ElText(
+        final ThemeTokens theme = ThemeScope.of(context);
+        return StyledText(
           'No platform-conditional code anywhere in spinner.dart: '
           'Android, iOS, Web, macOS, Windows, and Linux all render the '
-          'same widget tree. ElSpinner does not read MediaQuery for '
+          'same widget tree. Spinner does not read MediaQuery for '
           'layout, only for disableAnimations: it is a fixed-size '
           'widget that a responsive parent positions.',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         );
       },
@@ -671,18 +683,18 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/spinner.dart, one file, no '
             'companions.',
-        'Imports icon.dart directly: ElSpinner wraps a '
-            'ElIcon(ElIconGlyph.loaderCircle, ...) in a '
+        'Imports icon.dart directly: Spinner wraps a '
+            'Icon(IconGlyph.loaderCircle, ...) in a '
             'RotationTransition.',
         'registryDependencies, resolved automatically by `elattar add '
             'spinner`: icon, source-foundation.',
         'Used by many other components as a loading affordance: '
             'button, badge, input group, empty.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Icon', route: '/components/icon'),
@@ -705,19 +717,19 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
     child: Builder(
       builder: (BuildContext context) {
-        final ElThemeData theme = ElTheme.of(context);
-        return ElText(
+        final ThemeTokens theme = ThemeScope.of(context);
+        return StyledText(
           'Carries no tone parameter of its own; it always passes '
-          'ElIconTone.inherit to the ElIcon it wraps, so it takes the '
+          'IconTone.inherit to the Icon it wraps, so it takes the '
           'surrounding text colour in both light and dark themes. Its '
           'motion, not its colour, is the themed surface: the spin '
-          'duration is resolved through elAnimationDuration(context, '
-          'ElDurations.spin) on every build, the same lookup ElPress '
-          'and ElKeyframePlayer use.',
-          ElType.small,
+          'duration is resolved through effectiveMotionDuration(context, '
+          'MotionDurations.spin) on every build, the same lookup Press '
+          'and KeyframePlayer use.',
+          TextStyles.small,
           color: theme.mutedForeground,
         );
       },
@@ -725,15 +737,19 @@ class _ThemingContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

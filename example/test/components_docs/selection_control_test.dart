@@ -3,18 +3,18 @@
 ///
 /// Re-housed onto the kit alongside the page: the section-order test now
 /// reads `DocsSection.id` (the kit's own section widget) instead of
-/// `ElSection`'s title, and the API-table / state-matrix tests open the
+/// `Section`'s title, and the API-table / state-matrix tests open the
 /// relevant `DocsDisclosure` first — closed by default in the new kit.
 ///
-/// This page documents [ElSelectionControl], [ElHitArea], and
-/// [ElJellyReplay] — the shared socket primitive ElCheckbox, ElRadioGroup,
-/// and ElSwitch each build their own skin on top of. It has no shadcn/Base
+/// This page documents [SelectionControl], [HitArea], and
+/// [StateChangeFeedback] — the shared socket primitive Checkbox, RadioGroup,
+/// and Switch each build their own skin on top of. It has no shadcn/Base
 /// UI counterpart page of any kind, so its own sections are named for the
 /// reader problems `selection_control.dart`'s source actually solves.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage rather than
+/// `ThemeController` is flipped in place for theme coverage rather than
 /// re-pumped under a new controller.
 library;
 
@@ -25,7 +25,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -50,11 +76,11 @@ const List<String> _expectedSectionIds = <String>[
   'source',
 ];
 
-/// Every `ElApiTable` this page must render, by title, and every public
+/// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of each documented class found by
 /// reading `lib/src/components/selection_control.dart` directly.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElSelectionControl': <String>[
+  'SelectionControl': <String>[
     'width',
     'height',
     'radius',
@@ -74,13 +100,13 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'onKey',
     'semantics',
   ],
-  'ElHitArea': <String>[
+  'HitArea': <String>[
     'insets',
     'border',
     'child',
-    'ElHitArea.debugExpanded(box)',
+    'HitArea.debugExpanded(box)',
   ],
-  'ElJellyReplay': <String>['state', 'child'],
+  'StateChangeFeedback': <String>['state', 'child'],
 };
 
 /// The single `DocsDisclosure` whose title is [title], matching
@@ -92,21 +118,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -187,7 +213,7 @@ void main() {
   );
 
   testWidgets(
-    'each ElApiTable covers every public constructor parameter and static '
+    'each ApiTable covers every public constructor parameter and static '
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -196,7 +222,7 @@ void main() {
       await tester.ensureVisible(apiTrigger);
       await tester.tap(apiTrigger);
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -216,7 +242,7 @@ void main() {
         expect(
           documented,
           isNotNull,
-          reason: 'no ElApiTable titled "${expected.key}" was rendered',
+          reason: 'no ApiTable titled "${expected.key}" was rendered',
         );
         for (final String param in expected.value) {
           expect(
@@ -281,7 +307,7 @@ void main() {
     await tester.ensureVisible(statesTrigger);
     await tester.tap(statesTrigger);
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),
@@ -309,13 +335,10 @@ void main() {
   testWidgets(
     'both themes render the article with no exceptions when flipped in place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(selectionControlDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(selectionControlDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

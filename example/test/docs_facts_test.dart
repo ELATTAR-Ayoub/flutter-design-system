@@ -1,10 +1,36 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_facts.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness(Widget child) => ElTheme(
-  controller: ElThemeController(mode: ElThemeMode.dark),
+Widget _harness(Widget child) => ThemeScope(
+  controller: ThemeController(mode: ColorMode.dark),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     home: SingleChildScrollView(child: child),

@@ -5,7 +5,7 @@
 /// invisible against the block it sits on, and this is the only affordance
 /// the block has.
 ///
-/// The glyph rolls through [ElIconSwap] (`lib/src/components/icon_swap.dart`)
+/// The glyph rolls through [IconSwap] (`lib/src/components/icon_swap.dart`)
 /// rather than swapping instantly. That component's own docstring states the
 /// system's rule plainly: *"every control that alternates between icons swaps
 /// them through this... No crossfades, no instant swaps — a control that
@@ -15,7 +15,19 @@ library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import 'docs_toast_scope.dart';
 
@@ -87,29 +99,29 @@ class _DocsCopyButtonState extends State<DocsCopyButton> {
 
   @override
   Widget build(BuildContext context) {
-    // The glyph's own box — `ElButtonSize.iconSm`'s rung is 14px
-    // (`ElButton.iconPxFor`), matching `ElIconSize.sm`. The clip window is
-    // 4px wider than the glyph in every ElIconSwap demo in the package
+    // The glyph's own box — `ButtonSize.iconSm`'s rung is 14px
+    // (`Button.iconPxFor`), matching `IconSize.sm`. The clip window is
+    // 4px wider than the glyph in every IconSwap demo in the package
     // (`example/lib/pages/buttons.dart`), so the window is derived from the
     // cell rather than stated as a second number of its own.
-    final double cell = ElButton.iconPxFor(ElButtonSize.iconSm);
-    final double window = cell + el(1);
+    final double cell = Button.iconPxFor(ButtonSize.iconSm);
+    final double window = cell + space(1);
 
-    return ElButton(
-      variant: ElButtonVariant.secondary,
-      size: ElButtonSize.iconSm,
+    return Button(
+      variant: ButtonVariant.secondary,
+      size: ButtonSize.iconSm,
       label: _state == DocsCopyButton.copiedIndex
           ? widget.copiedLabel
           : widget.copyLabel,
       onPressed: _state == DocsCopyButton.pendingIndex ? null : _copy,
-      child: ElIconSwap(
+      child: IconSwap(
         activeIndex: _state,
         window: window,
         cell: cell,
         icons: <Widget>[
-          ElIcon.lucide(ElLucide.copy, size: ElIconSize.sm),
-          ElIcon.lucide(ElLucide.loaderCircle, size: ElIconSize.sm),
-          ElIcon.lucide(ElLucide.check, size: ElIconSize.sm),
+          Icon.lucide(Lucide.copy, size: IconSize.sm),
+          Icon.lucide(Lucide.loaderCircle, size: IconSize.sm),
+          Icon.lucide(Lucide.check, size: IconSize.sm),
         ],
       ),
     );

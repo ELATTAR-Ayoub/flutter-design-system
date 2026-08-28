@@ -2,14 +2,14 @@
 
 **Files that produce the render** (all under `D:\DESIGN\Design-System-2026-8\design-system\`):
 - `app\design-system\motion\page.tsx` — the page. **`"use client"`** — the only foundation page with local state (`const [run, setRun] = useState(0)`). Module-level data: two arrays (`durations` ×6, `easings` ×4) and one local component (`CurveGraph`).
-- `components\el\kit.tsx` — `ElPageHeader`, `ElSection`, `Panel`, `Meta`, `Code`, `Note`, `DoDont`, `PageFootNav` (all eight used).
+- `components\el\kit.tsx` — `PageHeader`, `Section`, `Panel`, `Meta`, `Code`, `Note`, `DoDont`, `PageFootNav` (all eight used).
 - `components\ui\button.tsx` — `Button variant="outline" size="sm"` ×3 (the three replay buttons).
 - `components\ui\icon.tsx` — `Icon` with lucide `RotateCcw` (×3) and `Sparkles` (×1), plus `Check`/`X`/`ArrowLeft`/`ArrowRight` inside kit.
 - `lib\el\nav.ts` — `findCategory("foundations","motion")` supplies header copy; `siblings()` supplies foot nav.
 - `app\design-system\layout.tsx` — shell (identical to the other foundation pages; see `shared-map.md` §1).
 - `app\globals.css` — **every keyframe, utility, duration and easing token below**. Line numbers cited throughout.
 
-**This map assumes you also hold `shared-map.md`.** Kit anatomy (Panel/Note/Meta/DoDont/PageFootNav/ElSection/ElPageHeader), the shell, the type scale and the shadow ladder are documented there and are not repeated except where this page uses them in a way the other pages do not.
+**This map assumes you also hold `shared-map.md`.** Kit anatomy (Panel/Note/Meta/DoDont/PageFootNav/Section/PageHeader), the shell, the type scale and the shadow ladder are documented there and are not repeated except where this page uses them in a way the other pages do not.
 
 ---
 
@@ -31,11 +31,11 @@ Panels are `border` (1px) + body `p-6` (24px), `box-sizing: border-box` → **bo
 
 Duration bar track: row grid `sm:grid-cols-[13rem_4rem_1fr]` + `gap-4` inside 1030 → 208 | 64 | **726** with two 16px gaps. Track is 726 × 32px (`h-8`).
 
-Section rhythm: `ElSection` = `mb-20` (80px), heading block `mb-6`, `<h2 class="type-h3">`, description `type-small mt-2 max-w-2xl` (672px cap).
+Section rhythm: `Section` = `mb-20` (80px), heading block `mb-6`, `<h2 class="type-h3">`, description `type-small mt-2 max-w-2xl` (672px cap).
 
 ---
 
-## 1 · Page header (`ElPageHeader`)
+## 1 · Page header (`PageHeader`)
 
 From `lib\el\nav.ts` foundations→motion (nav.ts:99–112), verbatim:
 1. Eyebrow `type-label text-action-ink` → **"Foundations"**
@@ -105,7 +105,7 @@ Rows render in **array order**, which is *not* ascending: 80, 150, 250, 400, **3
 | `from` | `0` |
 | `to` | `100%` |
 
-Fill `both`, curve `--ease-out` `cubic-bezier(0.22,1,0.36,1)`. On the 726px track the bar grows 0 → 726px. Flutter: animate a `SizedBox`/`FractionallySizedBox` factor 0→1 over `ElCurves.out`; the parent clips (`overflow-hidden`), so a plain `ClipRRect(BorderRadius.circular(ElRadii.sm))` is enough. The *bar* also carries `rounded-sm`, so at small widths it is a 6px-radius pill, not a square sliver.
+Fill `both`, curve `--ease-out` `cubic-bezier(0.22,1,0.36,1)`. On the 726px track the bar grows 0 → 726px. Flutter: animate a `SizedBox`/`FractionallySizedBox` factor 0→1 over `Curves.out`; the parent clips (`overflow-hidden`), so a plain `ClipRRect(BorderRadius.circular(Radii.sm))` is enough. The *bar* also carries `rounded-sm`, so at small widths it is a 6px-radius pill, not a square sliver.
 
 ---
 
@@ -169,7 +169,7 @@ Spring overshoot derivation (for a parity probe): with P0=(0,100), P1=(34,−56)
 
 ⚠ **The dashed line is invisible.** `<line y=0 … 0..100>` lies exactly on the `<rect>`'s own top edge, same colour, same 1-unit width. The rect's solid stroke paints over the dashes. Draw both (order: rect, then line, then path) and expect no visible dash. It is dead ink, not a missing feature.
 
-**Painter recipe.** `Path()..moveTo(0,100)..cubicTo(x1*100, 100-y1*100, x2*100, 100-y2*100, 100, 0)`, then a canvas transform implementing `meet`: `canvas.translate(dx, 0); canvas.scale(s); canvas.translate(8, 58);`. Stroke widths must be authored in **user units and scaled by the same transform** (a `Paint.strokeWidth` set post-scale will not match). `stroke` colours: rect/line `--border`, path `--color-action`. Default SVG caps are `butt` and joins `miter` — Flutter defaults to `StrokeCap.butt`/`StrokeJoin.miter`, so no override needed (note this differs from `ElIcon`'s `_GlyphPainter`, which sets round caps for lucide).
+**Painter recipe.** `Path()..moveTo(0,100)..cubicTo(x1*100, 100-y1*100, x2*100, 100-y2*100, 100, 0)`, then a canvas transform implementing `meet`: `canvas.translate(dx, 0); canvas.scale(s); canvas.translate(8, 58);`. Stroke widths must be authored in **user units and scaled by the same transform** (a `Paint.strokeWidth` set post-scale will not match). `stroke` colours: rect/line `--border`, path `--color-action`. Default SVG caps are `butt` and joins `miter` — Flutter defaults to `StrokeCap.butt`/`StrokeJoin.miter`, so no override needed (note this differs from `Icon`'s `_GlyphPainter`, which sets round caps for lucide).
 
 Accessibility label verbatim: `` `Easing curve ${pts.join(", ")}` `` → e.g. **"Easing curve 0.34, 1.56, 0.64, 1"** (JS `join` prints `1`, not `1.0`).
 
@@ -253,16 +253,16 @@ The *section description* and `RULES.md`:461 both assert the blanket 40/250. The
 
 Shadow values these depend on (globals.css:354–377, ink themed):
 - `--shadow-key: 0 4px 0 var(--wall), 0 7px 12px var(--ink-3)`
-- `--shadow-key-down: 0 1px 0 var(--wall), inset 0 2px 5px var(--ink-3)` — **has an inset layer** → `ElMachineSurface`
+- `--shadow-key-down: 0 1px 0 var(--wall), inset 0 2px 5px var(--ink-3)` — **has an inset layer** → `MachineSurface`
 - `--shadow-btn: inset 0 1px 0 var(--rim), inset 0 -2px 4px var(--ink-2), 0 1px 2px var(--ink-2), 0 3px 8px -2px var(--ink-2)`
 - `--shadow-btn-primary: inset 0 1px 0 var(--rim-strong), inset 0 -2px 5px var(--ink-2), 0 1px 2px var(--ink-2), 0 4px 10px -2px color-mix(in oklab, var(--color-action) 55%, transparent)`
 - `--shadow-e3: 0 2px 4px var(--ink-2), 0 14px 28px -8px var(--ink-3)`
 - `--wall`: dark `hsl(240 6% 8%)`, light `hsl(240 6% 82%)`; `--rim`: dark `rgb(255 255 255/.14)`, light `hsl(0 0% 100%/.85)`; `--rim-strong`: dark `rgb(255 255 255/.28)`, light `hsl(0 0% 100%/.4)`
 - `--ink-1..4`: dark `rgb(0 0 0 /.35/.5/.6/.75)`, light `hsl(240 20% 20% /.04/.07/.11/.16)`
 
-Remember the recorded port rule: **CSS blur = 2σ; Flutter derives σ = r·0.57735 + 0.5** — `ElShadowLayer.blurRadius` stores the inverted value. Never pass CSS blur numbers into `BoxShadow` directly.
+Remember the recorded port rule: **CSS blur = 2σ; Flutter derives σ = r·0.57735 + 0.5** — `ShadowLayer.blurRadius` stores the inverted value. Never pass CSS blur numbers into `BoxShadow` directly.
 
-**Hover has no equivalent on touch.** `.lift` is hover-only in CSS. `ElLiftCard` already models it via `MouseRegion`; on a touch platform the demo is simply static, matching the web.
+**Hover has no equivalent on touch.** `.lift` is hover-only in CSS. `LiftCard` already models it via `MouseRegion`; on a touch platform the demo is simply static, matching the web.
 
 ---
 
@@ -333,7 +333,7 @@ Copy: **"The only animation allowed to run forever, and only on the live indicat
 
 ### 6.3 · Keyframes — every stop, verbatim (globals.css:2424–2531)
 
-CSS applies the animation's timing function **between each adjacent pair of stops**, not once across the whole run. The Flutter house pattern (`sliding_pill.dart:217–245`) is `TweenSequence` with one `TweenSequenceItem` per gap, each wrapped in its own `CurveTween(curve: ElCurves.X)`, weights = the percentage gaps. Reuse it.
+CSS applies the animation's timing function **between each adjacent pair of stops**, not once across the whole run. The Flutter house pattern (`active_indicator.dart:217–245`) is `TweenSequence` with one `TweenSequenceItem` per gap, each wrapped in its own `CurveTween(curve: Curves.X)`, weights = the percentage gaps. Reuse it.
 
 **`yuki-pop-in`** (2424–2430) — `.anim-pop-in`, 550ms, `--ease-out`, `both`. Weights 55 / 25 / 12 / 8.
 
@@ -347,7 +347,7 @@ CSS applies the animation's timing function **between each adjacent pair of stop
 
 Opacity is declared only at 0% and 55%; from 55% onward it stays 1.
 
-**`yuki-jelly`** (2431–2438) — `.anim-jelly`, 600ms, `--ease-out`, `both`. Weights 30 / 15 / 15 / 18 / 22. **Already implemented** as the private `_jellyScale` in `lib\src\motion\sliding_pill.dart` — lift it into a shared player.
+**`yuki-jelly`** (2431–2438) — `.anim-jelly`, 600ms, `--ease-out`, `both`. Weights 30 / 15 / 15 / 18 / 22. **Already implemented** as the private `_jellyScale` in `lib\src\components\ui\active_indicator.dart` — lift it into a shared player.
 
 | stop | transform |
 |---|---|
@@ -387,7 +387,7 @@ Source comment (2372–2375): the keyframes drive `transform` only, never `trans
 | *(implicit 0%)* | element's own — none |
 | `to` | `rotate(360deg)` |
 
-`steps(8)` defaults to `steps(8, jump-end)` → **eight held positions of 45°**, each **175ms**: 0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°. `360°` is never displayed; the cycle wraps to 0°. Flutter: no stock `Curve` does this — build `class ElSteps extends Curve { transform(t) => (t * n).floorToDouble() / n; }` (the `jump-end` variant) and note that `Curve` is asked for `t ∈ [0,1]`; guard `t == 1.0` to return `(n-1)/n` only if you want the visual to match CSS on the wrap frame, which for an infinite loop is unobservable.
+`steps(8)` defaults to `steps(8, jump-end)` → **eight held positions of 45°**, each **175ms**: 0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°. `360°` is never displayed; the cycle wraps to 0°. Flutter: no stock `Curve` does this — build `class Steps extends Curve { transform(t) => (t * n).floorToDouble() / n; }` (the `jump-end` variant) and note that `Curve` is asked for `t ∈ [0,1]`; guard `t == 1.0` to return `(n-1)/n` only if you want the visual to match CSS on the wrap frame, which for an infinite loop is unobservable.
 
 **`yuki-sign-on`** (2474–2481) — `.anim-sign-on`, 900ms, `steps(1, end)`, `both`. `steps(1, jump-end)` applied *between every pair* means **no interpolation at all** — each stop's value is held until the next stop's time, then snaps.
 
@@ -444,7 +444,7 @@ Flutter: a `LinearGradient` with stops `[0, 0.5, 1]` painted into a rect of widt
 | 0%, 100% | 1 | `0 0 0 0 rgba(61, 220, 151, 0.5)` |
 | 50% | 0.75 | `0 0 0 5px rgba(61, 220, 151, 0)` |
 
-Offset 0, blur 0, **spread 0 → 5px**, alpha 0.5 → 0. A hard-edged ring expanding 5px outward from the 8px dot while fading. Flutter has no `spread` on `BoxShadow` in the CSS sense for a *hard* ring — paint it as a stroked/filled circle of radius `4 + 5t` behind the dot with alpha `0.5(1−t)`, and the dot itself at `opacity` `1 → 0.75 → 1`. Interpolate both halves of the cycle with `ElCurves.inOut`.
+Offset 0, blur 0, **spread 0 → 5px**, alpha 0.5 → 0. A hard-edged ring expanding 5px outward from the 8px dot while fading. Flutter has no `spread` on `BoxShadow` in the CSS sense for a *hard* ring — paint it as a stroked/filled circle of radius `4 + 5t` behind the dot with alpha `0.5(1−t)`, and the dot itself at `opacity` `1 → 0.75 → 1`. Interpolate both halves of the cycle with `Curves.inOut`.
 
 ⚠ **Colour drift.** `rgba(61, 220, 151, …)` = **#3DDC97**, a hard-coded green from an earlier palette. The dot's own fill is `bg-success` = `--color-success` **#10b981**. The ring and the dot are different greens, in both themes. Port both values as written.
 
@@ -517,7 +517,7 @@ Note what it does **not** do: `animation-delay` survives, and `animation-fill-mo
 
 ### 8.2 · Per-demo behaviour under reduced motion — the authoritative table
 
-Flutter equivalent: `MediaQuery.maybeDisableAnimationsOf(context)`; the port routes durations through `elAnimationDuration(context, d)` (`lib\src\theme_scope.dart:327–335`), which returns `Duration.zero`. For *display* of the flag (this section describes it but does not read it), use the MediaQuery directly.
+Flutter equivalent: `MediaQuery.maybeDisableAnimationsOf(context)`; the port routes durations through `elAnimationDuration(context, d)` (`lib\src\design_system\foundation\theme_scope.dart:327–335`), which returns `Duration.zero`. For *display* of the flag (this section describes it but does not read it), use the MediaQuery directly.
 
 | demo | rule that applies | resulting frozen state |
 |---|---|---|
@@ -533,7 +533,7 @@ Flutter equivalent: `MediaQuery.maybeDisableAnimationsOf(context)`; the port rou
 | `.anim-shimmer` | blanket; **no fill** | Runs once in 0.01ms, then `background-position` reverts to the element default `0% 0`. The utility's own `background` + `background-size: 200% 100%` are **not** in the keyframes, so they persist → a **static left-anchored gradient**, dark at the left edge, `--accent` band at the box's right edge. |
 | `.anim-pulse-live` | blanket; **no fill** | One 0.01ms cycle, then reverts → **plain 8px `--color-success` dot, no ring, opacity 1**. |
 | `press` / `click-spring` / `press-spring` / `press-key` / `lift` / `btn-spring` | blanket `transition-duration: 0.01ms` | State changes still happen, instantly and without easing. The buttons **still squish** on press (scale 0.9 / 0.92, 3px key travel) and `.lift` still jumps −3px on hover — they just teleport. Do not disable them. |
-| anchor scroll | `scroll-behavior: auto !important` | Jump, no smooth travel. (`ElSection.scrollTo` already routes through `elAnimationDuration`.) |
+| anchor scroll | `scroll-behavior: auto !important` | Jump, no smooth travel. (`Section.scrollTo` already routes through `elAnimationDuration`.) |
 | **replay buttons** | — | Still functional. Re-keying still remounts; each demo just re-freezes to its table row above. |
 
 ---
@@ -671,23 +671,23 @@ The page documents **6 of 10** durations (tick, fast, base, slow, overlay, rewar
 
 Verified against `D:\DESIGN\Design-System-2026-8\flutter-design-system` at HEAD `b6ad6a3`.
 
-**Verified: there was never a `ElAnims` / `ElAnimate` keyframe player in this repository.** `git log --all --diff-filter=D --name-only` returns empty (no file has ever been deleted); a content scan of every commit in every ref for `ElAnims|ElAnimate|ElKeyframe` under `lib/` returns zero hits. `lib/src/motion` has exactly three commits, all additive. Plan for building from scratch, not for restoring.
+**Verified: there was never a `Anims` / `Animate` keyframe player in this repository.** `git log --all --diff-filter=D --name-only` returns empty (no file has ever been deleted); a content scan of every commit in every ref for `Anims|Animate|Keyframe` under `lib/` returns zero hits. `lib/src/motion` has exactly three commits, all additive. Plan for building from scratch, not for restoring.
 
 ### 14.1 · Exists — reuse as-is
 
 | Thing | Location | Notes |
 |---|---|---|
-| `ElDurations` | `lib\src\foundation\motion.dart` | `tick` 80, `fast` 150, `base` 250, `slow` 400, `overlay` 320, `jelly` 420, `reward` 550, `bloom` 1000, `sway` 44s, `swayAlt` 33s, `pressDown` 40ms, `animJelly` 600ms |
-| `ElTransforms` | same | `pressScale` 0.94, `clickSpringScale` 0.9, `pressSpringScale` 0.92, `buttonScale` 0.95, `liftY` −3, `keyDownY` 3 |
-| `ElCurves` | same | `spring`, `out`, `curveIn` (renamed from `--ease-in`), `inOut`, `settle`, `standard`, `outFlex`, plus `ElCurves.all` (7 items — ready-made for the easing gallery, but its order is `[spring, out, curveIn, inOut, outFlex, settle, standard]`, **not** the page's four-item order) |
-| `elAnimationDuration(context, d)` | `lib\src\theme_scope.dart:327–335` | the `prefers-reduced-motion` port; returns `Duration.zero` under `MediaQuery.disableAnimations` |
-| `ElPress` | `lib\src\motion\press.dart` | asymmetric: `duration: pressDown` / `reverseDuration: base`, `ElCurves.spring` + `.flipped`; unclamped `Transform.scale` so overshoot carries; both durations re-read per build through `elAnimationDuration` |
-| `ElLift`, `ElLiftCard` | `lib\src\motion\lift.dart` | 250ms; `ElCurves.out` for rise+shadow, `ElCurves.standard` for border tint — matches `lift` exactly; `translateY(-3)`; shadow lerps from a transparent zero-size layer |
-| `ElSlidingPillGroup` + private `_jellyScale` | `lib\src\motion\sliding_pill.dart:217–245` | **the only keyframe implementation in the tree** — `TweenSequence<Offset>` with per-segment `CurveTween(ElCurves.out)` and weights 30/15/15/18/22 = `yuki-jelly`. This is the pattern to generalise. |
-| Docs kit | `example\lib\kit.dart` | `ElPageHeader`(48) · `ElSection`(142) · `ElPanel`(236) · `ElMeta`(384, `typedef ElMetaItem = ({String k, InlineSpan v})`) · `ElCode`(442, + `ElCode.span`) · `ElDoDont`(641) · `ElNote`(740, `enum ElNoteTone{action,value,error}`) · `ElDividedList`(1196) · `ElPageFootNav`(1062) |
-| `ElButton` | `lib\src\components\button.dart` | `variant: ElButtonVariant.outline` ✅, `size: ElButtonSize.sm` ✅ (h 32, `paddingXFor` el(3.5), `gapFor` el(1.5)); press = `ElPress(scale: buttonScale, downDuration: tick, upDuration: base)` |
-| `ElIcon` + path layer | `lib\src\components\icon.dart`, `icon_paths.dart` | sizes xs 12 … xl3 40, `strokeFor(px)` 2.4/2/1.6, tones incl. `inherit` and `action`; full SVG `d` parser (`ElIconPathElement`, arcs → cubics) |
-| `ElMachineSurface` | `lib\src\effects\machine_surface.dart` | required for every inset shadow (`shadow-key-down`, `shadow-btn*`) |
+| `Durations` | `lib\src\design_system\foundation\motion.dart` | `tick` 80, `fast` 150, `base` 250, `slow` 400, `overlay` 320, `jelly` 420, `reward` 550, `bloom` 1000, `sway` 44s, `swayAlt` 33s, `pressDown` 40ms, `animJelly` 600ms |
+| `Transforms` | same | `pressScale` 0.94, `clickSpringScale` 0.9, `pressSpringScale` 0.92, `buttonScale` 0.95, `liftY` −3, `keyDownY` 3 |
+| `Curves` | same | `spring`, `out`, `curveIn` (renamed from `--ease-in`), `inOut`, `settle`, `standard`, `outFlex`, plus `Curves.all` (7 items — ready-made for the easing gallery, but its order is `[spring, out, curveIn, inOut, outFlex, settle, standard]`, **not** the page's four-item order) |
+| `elAnimationDuration(context, d)` | `lib\src\design_system\foundation\theme_scope.dart:327–335` | the `prefers-reduced-motion` port; returns `Duration.zero` under `MediaQuery.disableAnimations` |
+| `Press` | `lib\src\components\ui\press.dart` | asymmetric: `duration: pressDown` / `reverseDuration: base`, `Curves.spring` + `.flipped`; unclamped `Transform.scale` so overshoot carries; both durations re-read per build through `elAnimationDuration` |
+| `Lift`, `LiftCard` | `lib\src\components\ui\hover_builder.dart` | 250ms; `Curves.out` for rise+shadow, `Curves.standard` for border tint — matches `lift` exactly; `translateY(-3)`; shadow lerps from a transparent zero-size layer |
+| `SlidingPillGroup` + private `_jellyScale` | `lib\src\components\ui\active_indicator.dart:217–245` | **the only keyframe implementation in the tree** — `TweenSequence<Offset>` with per-segment `CurveTween(Curves.out)` and weights 30/15/15/18/22 = `yuki-jelly`. This is the pattern to generalise. |
+| Docs kit | `example\lib\kit.dart` | `PageHeader`(48) · `Section`(142) · `Panel`(236) · `Meta`(384, `typedef MetaItem = ({String k, InlineSpan v})`) · `Code`(442, + `Code.span`) · `DoDont`(641) · `Note`(740, `enum NoteTone{action,value,error}`) · `DividedList`(1196) · `PageFootNav`(1062) |
+| `Button` | `lib\src\components\ui\button.dart` | `variant: ButtonVariant.outline` ✅, `size: ButtonSize.sm` ✅ (h 32, `paddingXFor` el(3.5), `gapFor` el(1.5)); press = `Press(scale: buttonScale, downDuration: tick, upDuration: base)` |
+| `Icon` + path layer | `lib\src\components\ui\icon.dart`, `icon_paths.dart` | sizes xs 12 … xl3 40, `strokeFor(px)` 2.4/2/1.6, tones incl. `inherit` and `action`; full SVG `d` parser (`IconPathElement`, arcs → cubics) |
+| `MachineSurface` | `lib\src\components\ui\surface.dart` | required for every inset shadow (`shadow-key-down`, `shadow-btn*`) |
 | `Path.cubicTo` precedent | `icon_paths.dart:427–441, 489–491, 641` + `test\icon_paths_test.dart` | cubic drawing is already proven |
 | Nav registration | `example\lib\nav.dart:160–173` | motion category **already registered** with the correct slug, title, blurb and six `contents` strings; route resolves to `/design-system/motion` |
 
@@ -695,36 +695,36 @@ Verified against `D:\DESIGN\Design-System-2026-8\flutter-design-system` at HEAD 
 
 | Thing | Why / where |
 |---|---|
-| **A shared keyframe player** | Nothing public exists. Generalise `_jellyScale`'s pattern into e.g. `ElKeyframes` (foundation) + a `ElKeyframePlayer` widget: `TweenSequence` over `(stop%, value)` pairs, per-segment `CurveTween`, `fillMode` semantics (`both` vs none — the reduced-motion table in §8.2 hinges on it). |
+| **A shared keyframe player** | Nothing public exists. Generalise `_jellyScale`'s pattern into e.g. `Keyframes` (foundation) + a `KeyframePlayer` widget: `TweenSequence` over `(stop%, value)` pairs, per-segment `CurveTween`, `fillMode` semantics (`both` vs none — the reduced-motion table in §8.2 hinges on it). |
 | **Eight of the nine named animations** | Only `yuki-jelly` exists (and only privately). Needed: `yuki-pop-in`, `yuki-spring-up`, `yuki-jelly-in`, `yuki-ratchet`, `yuki-sign-on`, `pulls-reveal`, `pulls-shimmer`, `pulls-pulse-live` — plus the page's own `el-sweep` and `el-travel`. |
 | **A `steps()` `Curve`** | For `yuki-ratchet` `steps(8)` and `yuki-sign-on` `steps(1, end)`. `docs\superpowers\research\globals-map.md:324` already flags this. Note: `steps(1,end)` between *every* keyframe pair = a stepwise timeline, which may be simpler to model as a discrete `ValueListenable<int>` than as a `Curve`. |
 | **Duration tokens for the literals** | `motion.dart` has no constant for 0.55s, 0.8s, 0.9s, 1.4s, 2s, or the ratchet's 175ms step. The guard-as-test forbids literals outside `lib/src/foundation/`, so add them there (`popIn`, `springUp`, `signOn`, `ratchet`, `shimmer`, `pulseLive`) rather than annotating call sites. |
-| **`RotateCcw` and `Sparkles` glyphs** | `enum ElIconGlyph` has exactly 8 members (`menu, x, sun, monitor, moon, arrowLeft, arrowRight, check`). Neither exists. Precedent for adding a glyph **without touching the package enum**: `example\lib\logo.dart:19–24, 114–166` declares a file-local `const ElIconPathElement` and strokes it in its own `CustomPainter`. |
-| **Leading-icon composition on `ElButton`** | `ElButton` takes one `child`, no icon parameter. Compose `Row(children: [glyph, SizedBox(width: ElButton.gapFor(size)), Text(...)])` — the public statics `heightFor`/`paddingXFor`/`gapFor`/`isSquare` exist for exactly this. |
+| **`RotateCcw` and `Sparkles` glyphs** | `enum IconGlyph` has exactly 8 members (`menu, x, sun, monitor, moon, arrowLeft, arrowRight, check`). Neither exists. Precedent for adding a glyph **without touching the package enum**: `example\lib\logo.dart:19–24, 114–166` declares a file-local `const IconPathElement` and strokes it in its own `CustomPainter`. |
+| **Leading-icon composition on `Button`** | `Button` takes one `child`, no icon parameter. Compose `Row(children: [glyph, SizedBox(width: Button.gapFor(size)), Text(...)])` — the public statics `heightFor`/`paddingXFor`/`gapFor`/`isSquare` exist for exactly this. |
 | **`CurveGraph` painter** | New `CustomPainter` implementing the `xMidYMid meet` letterbox of §4.1. Do not fill the box. |
-| **`.click-spring` / `.press-spring` / `.press-key` demo widgets** | `ElPress` covers click-spring (0.9 / 40ms / 250ms) and press-spring (0.92 / 40ms — but **220ms** release, which `ElPress` cannot express from `ElDurations` alone; a 220ms token or an explicit `upDuration` is needed). `press-key` is **not** covered at all: linear 80ms, `translateY(+3)`, and a `shadow-key` → `shadow-key-down` swap that needs `ElMachineSurface`. |
+| **`.click-spring` / `.press-spring` / `.press-key` demo widgets** | `Press` covers click-spring (0.9 / 40ms / 250ms) and press-spring (0.92 / 40ms — but **220ms** release, which `Press` cannot express from `Durations` alone; a 220ms token or an explicit `upDuration` is needed). `press-key` is **not** covered at all: linear 80ms, `translateY(+3)`, and a `shadow-key` → `shadow-key-down` swap that needs `MachineSurface`. |
 | **`example\lib\pages\motion.dart`** | Does not exist. `/design-system/motion` currently renders `PlaceholderPage(eyebrow: 'Foundations', title: 'Motion')` with the literal string `'Not ported yet'` (`example\lib\pages\placeholder.dart`, 45 lines). |
 | **Route entry** | `example\lib\main.dart:100–108` `pageFor(String route)` switch — add `'$elRoot/motion' => const MotionPage(),` + import. |
 
 ### 14.3 · Constraints the implementer must respect
 
-- **Token guard** (`test\token_guard_test.dart`) scans `lib\` and `example\lib\` (exempting only `lib/src/foundation/`) and fails on `Color(0x`, `fontSize: <digit>`, `letterSpacing: <digit>`, `FontWeight.w<digit>`, **`\bCurves.`** (stock Flutter curves banned — use `ElCurves`), `Duration(milliseconds:/microseconds: <digit>`, `BorderRadius.circular(<digit>`, **`BoxShadow(`**. Comments are scanned too. Escape hatch: trailing `// allow-hardcoded: <reason>` — see `sliding_pill.dart:236–245` for how keyframe geometry is annotated.
+- **Token guard** (`test\token_guard_test.dart`) scans `lib\` and `example\lib\` (exempting only `lib/src/foundation/`) and fails on `Color(0x`, `fontSize: <digit>`, `letterSpacing: <digit>`, `FontWeight.w<digit>`, **`\bCurves.`** (stock Flutter curves banned — use `Curves`), `Duration(milliseconds:/microseconds: <digit>`, `BorderRadius.circular(<digit>`, **`BoxShadow(`**. Comments are scanned too. Escape hatch: trailing `// allow-hardcoded: <reason>` — see `active_indicator.dart:236–245` for how keyframe geometry is annotated.
 - **Nav `contents` is a contract** (`nav.dart` docstring): the six strings promise six sections exist. The page ships **seven** sections (`#rules` has no chip) — matching the web. Do not add a seventh chip.
 - **Zero third-party dependencies** (`pubspec.yaml`: only `flutter`, `flutter_test`, `flutter_lints`, `yaml`). No animation package, no SVG package.
-- **Existing bug, fix while in there:** `lib\src\motion\sliding_pill.dart:71–74` — the `_jelly` `AnimationController`'s duration is set once at field init to `ElDurations.animJelly` and never routed through `elAnimationDuration`, so the arrival squash ignores reduced motion while the travel and fade honour it.
+- **Existing bug, fix while in there:** `lib\src\components\ui\active_indicator.dart:71–74` — the `_jelly` `AnimationController`'s duration is set once at field init to `Durations.animJelly` and never routed through `elAnimationDuration`, so the arrival squash ignores reduced motion while the travel and fade honour it.
 
 ---
 
 ## 15 · Open questions
 
 1. **`el-travel` = 0px (D1) — confirm in the browser before shipping the no-op.** Derived from the CSS transform spec (percentages resolve against the element's own border box), not observed. One-line check on the running reference: `getComputedStyle(document.querySelector('.size-6.bg-value')).transform` mid-animation, or `document.querySelector('.size-6.bg-value').getBoundingClientRect().left` at t=0 vs t=900ms. If it *does* move, the reference behaves differently from spec and this map's §4.2 must be rewritten.
-2. **`press-spring`'s 220ms.** It is a raw `0.22s` outside the duration scale. Add a `ElDurations.pressSpringUp = 220ms` token, or express it as an explicit `upDuration` at the call site with an `allow-hardcoded:` note? The guard makes the first cleaner; the second keeps the drift visible in the demo, which the fidelity bar may prefer.
+2. **`press-spring`'s 220ms.** It is a raw `0.22s` outside the duration scale. Add a `Durations.pressSpringUp = 220ms` token, or express it as an explicit `upDuration` at the call site with an `allow-hardcoded:` note? The guard makes the first cleaner; the second keeps the drift visible in the demo, which the fidelity bar may prefer.
 3. **`brightness()` under a theme swap.** The pre-computed colours in §6.3 are clamped per theme. Should the port apply a live `ColorFilter.matrix` (exactly reproduces CSS, including clamping) or precomputed `Color`s (cheaper, simpler probes)? Recommend the matrix, with the table as the probe oracle.
 4. **`pulls-reveal` perspective.** Confirmed no `perspective` on the element or any ancestor → orthographic Y-squash. Worth one visual A/B against the reference, because an orthographic 3-D rotate is unusual enough that it may read as a bug in review.
 5. **Base font size on the three press buttons.** They carry no `.type-*` class, so they inherit. `html` sets only `font-sans`; `body` sets no size. Confirm the computed value is the browser default 16px (not 15px from `.type-body`) before hardcoding — measure with the existing probe rig.
 6. **`.anim-shimmer`'s frozen gradient under reduced motion** (§8.2) depends on `background-position`'s initial value being `0% 0`. Worth one screenshot in reduced-motion mode; it is the least obvious row in that table.
 7. **Ratchet wrap frame.** `steps(8, jump-end)` never shows 360°. For an infinite loop this is unobservable, but if the port ever plays it finitely (reduced motion runs it once), decide whether the single 0.01ms run lands on 0° (matches CSS + no fill) or 315°.
-8. **Should `ElCurves.all` be reordered?** Its docstring claims globals.css declaration order but lists `outFlex` 5th where the field order puts it 7th. Unrelated to this page (which needs only four curves, in its own order), but it will mislead whoever builds a full easing gallery later.
+8. **Should `Curves.all` be reordered?** Its docstring claims globals.css declaration order but lists `outFlex` 5th where the field order puts it 7th. Unrelated to this page (which needs only four curves, in its own order), but it will mislead whoever builds a full easing gallery later.
 
 
 ---
@@ -757,9 +757,9 @@ globals.css:392-394 points the framework default at `--duration-base` to stop a
 `duration-*` class beating it - a precaution against a class that cannot be
 generated. The two values agree today; they are two declarations, not one.
 
-**Port impact.** `lib\src\foundation\motion.dart` gained
-`ElDurations.transitionDefault` (250ms) for exactly this, documented and cited to
-the probe. Spell `ElDurations.base` **only** where the reference reads
+**Port impact.** `lib\src\design_system\foundation\motion.dart` gained
+`Durations.transitionDefault` (250ms) for exactly this, documented and cited to
+the probe. Spell `Durations.base` **only** where the reference reads
 `var(--duration-base)` directly; every `transition-*` **utility** maps to
 `transitionDefault`. Nine call sites moved on 2026-08-15 - two of them
 (`checkbox.dart`, `radio.dart`) were rendering at 150ms and are now correct; the

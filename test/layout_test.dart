@@ -9,7 +9,33 @@ library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -24,11 +50,11 @@ Future<void> _pump(
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: ElThemeMode.light);
+  final ThemeController theme = ThemeController(mode: ColorMode.light);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -64,9 +90,9 @@ Future<TestGesture> _hover(WidgetTester tester, Offset at) async {
 }
 
 void main() {
-  /* ── ElAspectRatio ─────────────────────────────────────────────────────── */
+  /* ── AspectRatio ─────────────────────────────────────────────────────── */
 
-  group('ElAspectRatio', () {
+  group('AspectRatio', () {
     testWidgets(
       'height is width ÷ ratio, for all three of the page\'s ratios',
       (WidgetTester tester) async {
@@ -79,11 +105,11 @@ void main() {
             tester,
             SizedBox(
               width: 327.33,
-              child: ElAspectRatio(ratio: pair.$1, child: const SizedBox()),
+              child: AspectRatio(ratio: pair.$1, child: const SizedBox()),
             ),
           );
           final RenderBox box = tester.renderObject<RenderBox>(
-            find.byType(ElAspectRatio),
+            find.byType(AspectRatio),
           );
           expect(box.size.width, closeTo(327.33, 0.01));
           expect(
@@ -101,9 +127,9 @@ void main() {
         tester,
         SizedBox(
           width: 298.66,
-          child: ElAspectRatio(
+          child: AspectRatio(
             ratio: 3 / 4,
-            margin: EdgeInsets.only(bottom: el(4)),
+            margin: EdgeInsets.only(bottom: space(4)),
             child: const ColoredBox(
               key: ValueKey<String>('ratio-box'),
               color: Color(0xFF000000),
@@ -112,7 +138,7 @@ void main() {
         ),
       );
       final RenderBox slot = tester.renderObject<RenderBox>(
-        find.byType(ElAspectRatio),
+        find.byType(AspectRatio),
       );
       final RenderBox inner = tester.renderObject<RenderBox>(
         find.byKey(const ValueKey<String>('ratio-box')),
@@ -123,9 +149,9 @@ void main() {
     });
   });
 
-  /* ── ElScrollArea ──────────────────────────────────────────────────────── */
+  /* ── ScrollArea ──────────────────────────────────────────────────────── */
 
-  group('ElScrollArea', () {
+  group('ScrollArea', () {
     Widget rows(int n) => Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -138,15 +164,15 @@ void main() {
         '600ms after the pointer leaves', (WidgetTester tester) async {
       await _pump(
         tester,
-        SizedBox(width: 480, height: 254, child: ElScrollArea(child: rows(14))),
+        SizedBox(width: 480, height: 254, child: ScrollArea(child: rows(14))),
       );
       Finder thumb() => find.descendant(
-        of: find.byType(ElScrollArea),
+        of: find.byType(ScrollArea),
         matching: find.byWidgetPredicate(
           (Widget w) =>
               w is DecoratedBox &&
               (w.decoration as BoxDecoration).borderRadius ==
-                  BorderRadius.circular(ElRadii.pill),
+                  BorderRadius.circular(Radii.full),
         ),
       );
 
@@ -154,7 +180,7 @@ void main() {
 
       final TestGesture gesture = await _hover(
         tester,
-        tester.getCenter(find.byType(ElScrollArea)),
+        tester.getCenter(find.byType(ScrollArea)),
       );
       expect(thumb(), findsOneWidget);
 
@@ -174,25 +200,25 @@ void main() {
     ) async {
       await _pump(
         tester,
-        SizedBox(width: 480, height: 254, child: ElScrollArea(child: rows(14))),
+        SizedBox(width: 480, height: 254, child: ScrollArea(child: rows(14))),
       );
       Finder thumb() => find.descendant(
-        of: find.byType(ElScrollArea),
+        of: find.byType(ScrollArea),
         matching: find.byWidgetPredicate(
           (Widget w) =>
               w is DecoratedBox &&
               (w.decoration as BoxDecoration).borderRadius ==
-                  BorderRadius.circular(ElRadii.pill),
+                  BorderRadius.circular(Radii.full),
         ),
       );
 
       final TestGesture gesture = await _hover(
         tester,
-        tester.getCenter(find.byType(ElScrollArea)),
+        tester.getCenter(find.byType(ScrollArea)),
       );
       await gesture.moveTo(const Offset(700, 500));
       await tester.pump(const Duration(milliseconds: 300));
-      await gesture.moveTo(tester.getCenter(find.byType(ElScrollArea)));
+      await gesture.moveTo(tester.getCenter(find.byType(ScrollArea)));
       await tester.pump(const Duration(milliseconds: 400));
       expect(thumb(), findsOneWidget, reason: 'the first timer is stale');
     });
@@ -204,35 +230,35 @@ void main() {
         SizedBox(
           width: 480,
           height: 254,
-          child: ElScrollArea(child: SizedBox(height: 622, child: rows(1))),
+          child: ScrollArea(child: SizedBox(height: 622, child: rows(1))),
         ),
       );
-      await _hover(tester, tester.getCenter(find.byType(ElScrollArea)));
+      await _hover(tester, tester.getCenter(find.byType(ScrollArea)));
 
       final RenderBox area = tester.renderObject<RenderBox>(
-        find.byType(ElScrollArea),
+        find.byType(ScrollArea),
       );
       final RenderBox thumbBox = tester.renderObject<RenderBox>(
         find.descendant(
-          of: find.byType(ElScrollArea),
+          of: find.byType(ScrollArea),
           matching: find.byWidgetPredicate(
             (Widget w) =>
                 w is DecoratedBox &&
                 (w.decoration as BoxDecoration).borderRadius ==
-                    BorderRadius.circular(ElRadii.pill),
+                    BorderRadius.circular(Radii.full),
           ),
         ),
       );
 
       // `w-2.5` less `border-l` and `p-px` on both edges.
-      expect(thumbBox.size.width, closeTo(el(2.5) - el(0.75), 0.01));
+      expect(thumbBox.size.width, closeTo(space(2.5) - space(0.75), 0.01));
       // 254 ÷ 622 × 252 — the reference's own 102.90675.
       expect(thumbBox.size.height, closeTo(102.90675, 0.05));
       // Flush to the lane's right edge, 1px of `p-px` in.
       final double right = thumbBox
           .localToGlobal(Offset(thumbBox.size.width, 0), ancestor: area)
           .dx;
-      expect(right, closeTo(area.size.width - ElWidths.hairline, 0.01));
+      expect(right, closeTo(area.size.width - BorderWidths.hairline, 0.01));
     });
 
     testWidgets('overflow-x is hidden unless a horizontal bar is asked for', (
@@ -241,7 +267,7 @@ void main() {
       Widget wide({required bool bar}) => SizedBox(
         width: 480,
         height: 144,
-        child: ElScrollArea(
+        child: ScrollArea(
           horizontalBar: bar,
           child: const SizedBox(width: 764, height: 144),
         ),
@@ -250,7 +276,7 @@ void main() {
       await _pump(tester, wide(bar: false));
       expect(
         find.descendant(
-          of: find.byType(ElScrollArea),
+          of: find.byType(ScrollArea),
           matching: find.byType(Scrollable),
         ),
         findsOneWidget,
@@ -260,7 +286,7 @@ void main() {
       await _pump(tester, wide(bar: true));
       expect(
         find.descendant(
-          of: find.byType(ElScrollArea),
+          of: find.byType(ScrollArea),
           matching: find.byType(Scrollable),
         ),
         findsNWidgets(2),
@@ -275,7 +301,7 @@ void main() {
           SizedBox(
             width: 480,
             height: 254,
-            child: ElScrollArea(
+            child: ScrollArea(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: const <Widget>[
@@ -291,17 +317,17 @@ void main() {
     );
   });
 
-  /* ── ElCarouselController ──────────────────────────────────────────────── */
+  /* ── CarouselController ──────────────────────────────────────────────── */
 
-  group('ElCarouselController', () {
-    ElCarouselController page() => ElCarouselController()
+  group('CarouselController', () {
+    CarouselController page() => CarouselController()
       ..setMetrics(
         viewSize: 1046,
         slideSizes: List<double>.filled(6, 1046 / 3),
       );
 
     test('trimSnaps collapses the page\'s six slides into four stops', () {
-      final ElCarouselController c = page();
+      final CarouselController c = page();
       expect(c.snaps.length, 4);
       expect(c.snaps[0], 0);
       expect(c.snaps[1], closeTo(-348.667, 0.01));
@@ -312,7 +338,7 @@ void main() {
     });
 
     test('canScrollNext goes false on the third advance', () {
-      final ElCarouselController c = page();
+      final CarouselController c = page();
       c.scrollNext();
       c.scrollNext();
       expect(c.canScrollNext, isTrue);
@@ -325,14 +351,14 @@ void main() {
     test(
       'with no ticker the engine lands on the target — the reduced path',
       () {
-        final ElCarouselController c = page();
+        final CarouselController c = page();
         c.scrollTo(2);
         expect(c.location, closeTo(c.snaps[2], 0.0001));
       },
     );
 
     test('a release snaps to the nearest stop, both directions', () {
-      final ElCarouselController c = page();
+      final CarouselController c = page();
       // −100 of drag: the reference returned to 0.
       c.dragStart(0);
       c.dragUpdate(-100);
@@ -367,24 +393,24 @@ void main() {
     expect(frames[2], closeTo(-44.75, 0.3));
   });
 
-  /* ── ElResizablePanelGroup ─────────────────────────────────────────────── */
+  /* ── ResizablePanelGroup ─────────────────────────────────────────────── */
 
-  group('ElResizablePanelGroup', () {
+  group('ResizablePanelGroup', () {
     int seed = 0;
     // A fresh key per mount: `pumpWidget` with the same tree reuses the State,
     // and the split is state.
     Widget group({double minLeft = 25}) => SizedBox(
       width: 1028,
-      child: ElResizablePanelGroup(
+      child: ResizablePanelGroup(
         key: ValueKey<int>(seed++),
         minHeight: 222,
-        panels: <ElResizablePanel>[
-          ElResizablePanel(
+        panels: <ResizablePanel>[
+          ResizablePanel(
             defaultSize: 40,
             minSize: minLeft,
             child: const ColoredBox(color: Color(0xFF111111)),
           ),
-          const ElResizablePanel(
+          const ResizablePanel(
             defaultSize: 60,
             child: ColoredBox(color: Color(0xFF222222)),
           ),
@@ -395,11 +421,11 @@ void main() {
     List<RenderBox> panes(WidgetTester tester) => tester
         .renderObjectList<RenderBox>(
           find.descendant(
-            of: find.byType(ElResizablePanelGroup),
+            of: find.byType(ResizablePanelGroup),
             matching: find.byType(ColoredBox),
           ),
         )
-        .where((RenderBox box) => box.size.width != ElWidths.hairline)
+        .where((RenderBox box) => box.size.width != BorderWidths.hairline)
         .toList();
 
     testWidgets(
@@ -416,7 +442,7 @@ void main() {
     ) async {
       await _pump(tester, group(), size: const Size(1200, 400));
       final RenderBox box = tester.renderObject<RenderBox>(
-        find.byType(ElResizablePanelGroup),
+        find.byType(ResizablePanelGroup),
       );
       final Offset seam = box.localToGlobal(Offset(410.8, box.size.height / 2));
       await tester.dragFrom(seam, const Offset(150, 0));
@@ -429,7 +455,7 @@ void main() {
     ) async {
       await _pump(tester, group(), size: const Size(1200, 400));
       final RenderBox box = tester.renderObject<RenderBox>(
-        find.byType(ElResizablePanelGroup),
+        find.byType(ResizablePanelGroup),
       );
       final Offset seam = box.localToGlobal(Offset(410.8, box.size.height / 2));
 
@@ -454,7 +480,7 @@ void main() {
       Future<double> grabAt(double dx) async {
         await _pump(tester, group(), size: const Size(1200, 400));
         final RenderBox box = tester.renderObject<RenderBox>(
-          find.byType(ElResizablePanelGroup),
+          find.byType(ResizablePanelGroup),
         );
         await tester.dragFrom(
           box.localToGlobal(Offset(dx, box.size.height / 2)),
@@ -490,7 +516,7 @@ void main() {
       await _pump(tester, group(), size: const Size(1200, 400));
       final FocusNode node = tester.binding.focusManager.rootScope.descendants
           .firstWhere(
-            (FocusNode n) => n.debugLabel == elResizableHandleFocusLabel,
+            (FocusNode n) => n.debugLabel == resizableHandleFocusLabel,
           );
       node.requestFocus();
       await tester.pump();

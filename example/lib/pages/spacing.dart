@@ -9,16 +9,28 @@
 /// (spacing-map §11: copy is the page, tokens are the system):
 /// * the Meta copy calls `--width-page` **1320px**: twice, in `#grid` and in
 ///   the `2xl` breakpoint row: while the token declares 1200
-///   ([ElWidths.page], which carries the same drift note);
+///   ([LayoutWidths.page], which carries the same drift note);
 /// * `#radius` is labelled "Seven steps" and calls `3xl` the largest allowed,
-///   while [ElRadii] carries nine (`xs` 2px and `4xl` 32px are undocumented
+///   while [Radii] carries nine (`xs` 2px and `4xl` 32px are undocumented
 ///   here);
 /// * `#scale` rules that a gap off the ten-step list is wrong, while the docs
 ///   chrome it is printed on uses 6/10/20/28/56px steps of its own.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -36,10 +48,10 @@ const double _glowBorderAlpha = 0.40;
 const double _leadingSnug = 1.375;
 
 /// `w-36`: the column one radius specimen occupies.
-final double _radiusCellWidth = el(36);
+final double _radiusCellWidth = space(36);
 
 /// `h-24`: the height every specimen box on this page shares.
-final double _specimenHeight = el(24);
+final double _specimenHeight = space(24);
 
 /* ── Page data (the reference's three module-level arrays) ───────────────── */
 
@@ -47,7 +59,7 @@ final double _specimenHeight = el(24);
 ///
 /// [n] is the Tailwind class number, which *is* the pixel value divided by
 /// four: the page's whole argument: so the bar's width, the printed px and
-/// the class name all derive from it through [el] rather than being restated.
+/// the class name all derive from it through [space] rather than being restated.
 typedef _Step = ({int n, String use});
 
 const List<_Step> _scale = <_Step>[
@@ -68,63 +80,54 @@ const List<_Step> _scale = <_Step>[
 typedef _Radius = ({String name, double px, String use});
 
 final List<_Radius> _radii = <_Radius>[
-  (name: 'sm', px: ElRadii.sm, use: 'Badges, pips, small chips, inline code.'),
+  (name: 'sm', px: Radii.sm, use: 'Badges, pips, small chips, inline code.'),
   (
     name: 'md',
-    px: ElRadii.md,
+    px: Radii.md,
     use: 'Buttons, inputs, rows, dropdown items. The default.',
   ),
   (
     name: 'lg',
-    px: ElRadii.lg,
+    px: Radii.lg,
     use: 'Cards, pack cards, collectible tiles, panels.',
   ),
-  (name: 'xl', px: ElRadii.xl, use: 'Large cards, dialogs, feature panels.'),
-  (name: '2xl', px: ElRadii.xl2, use: 'Promotional panels, pack stage.'),
-  (
-    name: '3xl',
-    px: ElRadii.xl3,
-    use: 'The landing hero panel. Largest allowed.',
-  ),
+  (name: 'xl', px: Radii.xl, use: 'Large cards, dialogs, feature panels.'),
+  (name: '2xl', px: Radii.xl2, use: 'Promotional panels, pack stage.'),
+  (name: '3xl', px: Radii.xl3, use: 'The landing hero panel. Largest allowed.'),
   (
     name: 'pill',
-    px: ElRadii.pill,
+    px: Radii.full,
     use: 'Pills, filter chips, avatars, live indicator.',
   ),
 ];
 
 /// One neutral depth step: the class the box wears, the token it prints, and
 /// the spec that paints it.
-typedef _Elevation = ({
-  String token,
-  String cls,
-  ElShadowSpec spec,
-  String use,
-});
+typedef _Elevation = ({String token, String cls, ShadowStyle spec, String use});
 
 final List<_Elevation> _elevation = <_Elevation>[
   (
     token: '--shadow-e1',
     cls: 'shadow-e1',
-    spec: ElShadows.e1,
+    spec: Shadows.sm,
     use: 'Resting rows, chips, table headers. Barely there.',
   ),
   (
     token: '--shadow-e2',
     cls: 'shadow-e2',
-    spec: ElShadows.e2,
+    spec: Shadows.md,
     use: 'Cards and pack cards at rest.',
   ),
   (
     token: '--shadow-e3',
     cls: 'shadow-e3',
-    spec: ElShadows.e3,
+    spec: Shadows.lg,
     use: 'Hovered cards, popovers, dropdowns, sticky bars.',
   ),
   (
     token: '--shadow-e4',
     cls: 'shadow-e4',
-    spec: ElShadows.e4,
+    spec: Shadows.xl,
     use: 'Dialogs, drawers, the pack-opening stage.',
   ),
 ];
@@ -138,12 +141,12 @@ class SpacingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // The header reads its own copy out of the nav registry, exactly as
     // `findCategory("foundations", "spacing")` does in the reference.
-    final ElCategoryHit here = findCategory('foundations', 'spacing');
+    final CategoryHit here = findCategory('foundations', 'spacing');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           eyebrow: here.group.title,
           title: here.category.title,
           blurb: here.category.blurb,
@@ -154,10 +157,10 @@ class SpacingPage extends StatelessWidget {
         const _ElevationSection(),
         const _GridSection(),
         const _BreakpointsSection(),
-        const ElSection(
+        const Section(
           id: 'rules',
           title: 'Rules',
-          child: ElDoDont(
+          child: DoDont(
             dos: <String>[
               'Pick gaps from the scale — 4, 8, 12, 16, 24, 32, 40, 48, 64, 80.',
               'Let radius follow surface size: badges 6, buttons 10, cards 12, '
@@ -178,7 +181,7 @@ class SpacingPage extends StatelessWidget {
             ],
           ),
         ),
-        const ElPageFootNav(groupId: 'foundations', slug: 'spacing'),
+        const PageFootNav(groupId: 'foundations', slug: 'spacing'),
       ],
     );
   }
@@ -191,7 +194,7 @@ class _ScaleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'scale',
       title: 'Spacing scale',
       description:
@@ -203,20 +206,20 @@ class _ScaleSection extends StatelessWidget {
         children: <Widget>[
           // `overflow-hidden rounded-xl border border-border bg-card` with a
           // hairline between rows and none at the card's edges.
-          ElDividedList(
-            radius: ElRadii.xl,
+          DividedList(
+            radius: Radii.xl,
             children: <Widget>[
               for (final _Step step in _scale) _ScaleRow(step: step),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElNote(
-            tone: ElNoteTone.error,
+          SizedBox(height: space(4)),
+          Note(
+            tone: NoteTone.error,
             title: 'The only spacing rule',
-            child: ElText(
+            child: StyledText(
               'If a gap is not on this scale, it is wrong. There is no 18px, '
               'no 30px and no 50px anywhere in the product.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ],
@@ -234,19 +237,19 @@ class _ScaleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final bool wide = MediaQuery.sizeOf(context).width >= ElBreakpoints.sm;
-    final double px = el(step.n);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final bool wide = MediaQuery.sizeOf(context).width >= Breakpoints.sm;
+    final double px = space(step.n);
 
-    final Widget size = ElText(
+    final Widget size = StyledText(
       '${px.toInt()}px',
-      ElType.numBase,
+      TextStyles.numberBase,
       color: theme.foreground,
     );
-    final Widget className = ElText(
+    final Widget className = StyledText(
       'gap-${step.n}',
-      ElType.numSm,
-      color: theme.actionInk,
+      TextStyles.numberSm,
+      color: theme.actionText,
     );
     // `flex items-center gap-4`: the bar, then what the step is for.
     final Widget demo = Row(
@@ -255,29 +258,29 @@ class _ScaleRow extends StatelessWidget {
           // `style={{ width: s.px }}`: the specimen is the measure, so this
           // is the one width on the page that is stated in pixels.
           width: px,
-          height: el(3),
+          height: space(3),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: ElPalette.action,
-              borderRadius: BorderRadius.circular(ElRadii.sm),
+              color: Palette.action,
+              borderRadius: BorderRadius.circular(Radii.sm),
             ),
           ),
         ),
-        SizedBox(width: el(4)),
-        Expanded(child: ElText(step.use, ElType.small)),
+        SizedBox(width: space(4)),
+        Expanded(child: StyledText(step.use, TextStyles.small)),
       ],
     );
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(6), vertical: el(4)),
+      padding: EdgeInsets.symmetric(horizontal: space(6), vertical: space(4)),
       child: wide
           ? Row(
               children: <Widget>[
                 // `4rem` / `5rem`, then the rest of the row.
-                SizedBox(width: el(16), child: size),
-                SizedBox(width: el(6)),
-                SizedBox(width: el(20), child: className),
-                SizedBox(width: el(6)),
+                SizedBox(width: space(16), child: size),
+                SizedBox(width: space(6)),
+                SizedBox(width: space(20), child: className),
+                SizedBox(width: space(6)),
                 Expanded(child: demo),
               ],
             )
@@ -285,9 +288,9 @@ class _ScaleRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 size,
-                SizedBox(height: el(4)),
+                SizedBox(height: space(4)),
                 className,
-                SizedBox(height: el(4)),
+                SizedBox(height: space(4)),
                 demo,
               ],
             ),
@@ -302,7 +305,7 @@ class _RadiusSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'radius',
       title: 'Radius ladder',
       description:
@@ -311,11 +314,11 @@ class _RadiusSection extends StatelessWidget {
           'explicit values.',
       // "Seven steps" of nine: `--radius-xs` and `--radius-4xl` exist and are
       // not shown here. The label is the reference's, kept.
-      child: ElPanel(
+      child: Panel(
         label: 'Seven steps',
         child: Wrap(
-          spacing: el(5),
-          runSpacing: el(5),
+          spacing: space(5),
+          runSpacing: space(5),
           children: <Widget>[
             for (final _Radius radius in _radii) _RadiusCell(radius: radius),
           ],
@@ -328,7 +331,7 @@ class _RadiusSection extends StatelessWidget {
 /// `999` for the pill, `6px`… for every other rung: the reference's own
 /// special case, printed off the token either way.
 String _radiusLabel(double px) =>
-    px == ElRadii.pill ? '${px.toInt()}' : '${px.toInt()}px';
+    px == Radii.full ? '${px.toInt()}' : '${px.toInt()}px';
 
 class _RadiusCell extends StatelessWidget {
   const _RadiusCell({required this.radius});
@@ -337,7 +340,7 @@ class _RadiusCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       width: _radiusCellWidth,
@@ -352,21 +355,24 @@ class _RadiusCell extends StatelessWidget {
               color: theme.muted,
               // `style={{ borderRadius: r.px }}`: the specimen is the value.
               borderRadius: BorderRadius.circular(radius.px),
-              border: Border.all(color: theme.input, width: ElWidths.hairline),
+              border: Border.all(
+                color: theme.input,
+                width: BorderWidths.hairline,
+              ),
             ),
-            child: ElText(
+            child: StyledText(
               _radiusLabel(radius.px),
-              ElType.numSm,
+              TextStyles.numberSm,
               color: theme.mutedForeground,
             ),
           ),
-          SizedBox(height: el(3)),
-          ElText(
+          SizedBox(height: space(3)),
+          StyledText(
             'rounded-${radius.name}',
-            ElType.numSm,
-            color: theme.actionInk,
+            TextStyles.numberSm,
+            color: theme.actionText,
           ),
-          SizedBox(height: el(1)),
+          SizedBox(height: space(1)),
           _UseCopy(radius.use),
         ],
       ),
@@ -381,7 +387,7 @@ class _ElevationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'elevation',
       title: 'Elevation',
       description:
@@ -392,25 +398,25 @@ class _ElevationSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'Neutral depth',
-            child: ElGrid(
+            child: Grid(
               sm: 2,
               lg: 4,
-              gap: el(6),
+              gap: space(6),
               children: <Widget>[
                 for (final _Elevation step in _elevation)
                   _ElevationCell(step: step),
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Rationed glow',
             note: 'Selected · rare · premium only',
-            child: ElGrid(
+            child: Grid(
               sm: 2,
-              gap: el(6),
+              gap: space(6),
               children: const <Widget>[_ActionGlowCell(), _ValueGlowCell()],
             ),
           ),
@@ -427,7 +433,7 @@ class _ElevationCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,16 +443,23 @@ class _ElevationCell extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: theme.card,
-            borderRadius: BorderRadius.circular(ElRadii.lg),
-            border: Border.all(color: theme.border, width: ElWidths.hairline),
+            borderRadius: BorderRadius.circular(Radii.lg),
+            border: Border.all(
+              color: theme.border,
+              width: BorderWidths.hairline,
+            ),
             // `e1`–`e4` are outer-only, so a plain decoration paints them all.
             boxShadow: step.spec.outerShadows(theme),
           ),
-          child: ElText(step.cls, ElType.numSm, color: theme.mutedForeground),
+          child: StyledText(
+            step.cls,
+            TextStyles.numberSm,
+            color: theme.mutedForeground,
+          ),
         ),
-        SizedBox(height: el(3)),
-        ElText(step.token, ElType.numSm, color: theme.actionInk),
-        SizedBox(height: el(1)),
+        SizedBox(height: space(3)),
+        StyledText(step.token, TextStyles.numberSm, color: theme.actionText),
+        SizedBox(height: space(1)),
         _UseCopy(step.use),
       ],
     );
@@ -460,10 +473,10 @@ class _ActionGlowCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _GlowCell(
-      spec: ElShadows.glowAction,
-      rim: ElPalette.action,
+      spec: Shadows.glowAction,
+      rim: Palette.action,
       label: 'glow-action',
-      ink: ElTheme.of(context).actionInk,
+      ink: ThemeScope.of(context).actionText,
       lead:
           'Selected pack, focused primary CTA, active opening stage. '
           'Signals ',
@@ -479,10 +492,10 @@ class _ValueGlowCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _GlowCell(
-      spec: ElShadows.glowValue,
-      rim: ElPalette.value,
+      spec: Shadows.glowValue,
+      rim: Palette.value,
       label: 'glow-value',
-      ink: ElTheme.of(context).valueInk,
+      ink: ThemeScope.of(context).premiumText,
       lead:
           'Legendary or mythic reveal, reward unlock, premium action. '
           'Signals ',
@@ -501,7 +514,7 @@ class _GlowCell extends StatelessWidget {
     required this.emphasis,
   });
 
-  final ElShadowSpec spec;
+  final ShadowStyle spec;
 
   /// The ramp the `border-<ramp>/40` rim is cut from.
   final Color rim;
@@ -517,7 +530,7 @@ class _GlowCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -527,17 +540,17 @@ class _GlowCell extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: theme.card,
-            borderRadius: BorderRadius.circular(ElRadii.lg),
+            borderRadius: BorderRadius.circular(Radii.lg),
             border: Border.all(
               color: rim.withValues(alpha: _glowBorderAlpha),
-              width: ElWidths.hairline,
+              width: BorderWidths.hairline,
             ),
             boxShadow: spec.outerShadows(theme),
           ),
-          child: ElText(label, ElType.numSm, color: ink),
+          child: StyledText(label, TextStyles.numberSm, color: ink),
         ),
-        SizedBox(height: el(3)),
-        ElRichText(
+        SizedBox(height: space(3)),
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               TextSpan(text: lead),
@@ -548,7 +561,7 @@ class _GlowCell extends StatelessWidget {
               const TextSpan(text: '.'),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     );
@@ -562,7 +575,7 @@ class _GridSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'grid',
       title: 'Grid and content width',
       description:
@@ -574,8 +587,8 @@ class _GridSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const ElMeta(
-            items: <ElMetaItem>[
+          const Meta(
+            items: <MetaItem>[
               (
                 k: 'Design frame',
                 v: TextSpan(
@@ -642,14 +655,14 @@ class _GridSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: '12 columns · 24px gutters',
             // `grid-cols-12` with no responsive step: twelve columns at every
             // width, which is the claim being demonstrated.
-            child: ElGrid(
+            child: Grid(
               base: 12,
-              gap: el(6),
+              gap: space(6),
               children: <Widget>[
                 for (int i = 1; i <= 12; i++) _GridCell(column: i),
               ],
@@ -668,15 +681,19 @@ class _GridCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
-      height: el(20),
+      height: space(20),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: ElPalette.action.withValues(alpha: _gridCellAlpha),
-        borderRadius: BorderRadius.circular(ElRadii.sm),
+        color: Palette.action.withValues(alpha: _gridCellAlpha),
+        borderRadius: BorderRadius.circular(Radii.sm),
       ),
-      child: ElText('$column', ElType.numSm, color: theme.actionInk),
+      child: StyledText(
+        '$column',
+        TextStyles.numberSm,
+        color: theme.actionText,
+      ),
     );
   }
 }
@@ -688,7 +705,7 @@ class _BreakpointsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'breakpoints',
       title: 'Breakpoints',
       description:
@@ -700,8 +717,8 @@ class _BreakpointsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const ElMeta(
-            items: <ElMetaItem>[
+          const Meta(
+            items: <MetaItem>[
               (
                 k: 'sm — 640px',
                 v: TextSpan(
@@ -746,16 +763,16 @@ class _BreakpointsSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElNote(
+          SizedBox(height: space(4)),
+          Note(
             title: 'Why the scale was not overridden',
-            child: ElRichText(
+            child: RichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(
                     text: 'The obvious fix for a 1200px intent is a ',
                   ),
-                  ElCode.span('--breakpoint-xl'),
+                  Code.span('--breakpoint-xl'),
                   const TextSpan(
                     text:
                         ' override. It was rejected: every one of the '
@@ -764,13 +781,13 @@ class _BreakpointsSection extends StatelessWidget {
                         'them silently and nothing in the build reports it. '
                         'The prose was wrong, not the scale. Use ',
                   ),
-                  ElCode.span('xl:'),
+                  Code.span('xl:'),
                   const TextSpan(text: ' for the desktop switch and '),
-                  ElCode.span('md:'),
+                  Code.span('md:'),
                   const TextSpan(text: ' for the mobile boundary.'),
                 ],
               ),
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ],
@@ -793,13 +810,13 @@ class _UseCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle style = ElText.styleOf(
+    final TextStyle style = StyledText.styleOf(
       context,
-      ElType.small,
+      TextStyles.small,
     ).copyWith(height: _leadingSnug);
-    // Not a `.type-*` class, so it cannot go through [ElText]: but the line
+    // Not a `.type-*` class, so it cannot go through [StyledText]: but the line
     // box still has to be the one CSS lays out.
-    return ElLineBox(
+    return LineBox(
       style: style,
       child: Text(text, style: style),
     );

@@ -6,7 +6,33 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 
 import 'docs_table.dart' show DocsTable, DocsTableColumn;
 
@@ -51,7 +77,7 @@ class DocsInstallFact {
 ///
 /// The panel is what 64 existing component pages call this for — some
 /// passing [title] — so it stays; only the rows underneath moved onto
-/// `ElTable` (see `docs_table.dart`).
+/// `Table` (see `docs_table.dart`).
 class DocsApiTable extends StatelessWidget {
   const DocsApiTable({super.key, required this.facts, this.title = 'API'});
 
@@ -89,7 +115,7 @@ class DocsStateMatrix extends StatelessWidget {
   Widget build(BuildContext context) => _DocsFactPanel(
     title: title,
     child: _FactScroll(
-      minWidth: el(132),
+      minWidth: space(132),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -124,7 +150,7 @@ class DocsInstallFacts extends StatelessWidget {
       children: <Widget>[
         for (final DocsInstallFact fact in facts)
           Padding(
-            padding: EdgeInsets.only(bottom: el(4)),
+            padding: EdgeInsets.only(bottom: space(4)),
             child: _InstallRow(fact: fact),
           ),
       ],
@@ -140,23 +166,23 @@ class _DocsFactPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Semantics(
       container: true,
       label: title,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: theme.card,
-          borderRadius: BorderRadius.circular(ElRadii.xl),
-          border: Border.all(color: theme.border, width: ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.xl),
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
         child: Padding(
-          padding: EdgeInsets.all(el(5)),
+          padding: EdgeInsets.all(space(5)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              ElText(title, ElType.h4, color: theme.foreground),
-              SizedBox(height: el(4)),
+              StyledText(title, TextStyles.h4, color: theme.foreground),
+              SizedBox(height: space(4)),
               child,
             ],
           ),
@@ -189,20 +215,24 @@ class _TableHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
-      padding: EdgeInsets.only(bottom: el(2)),
+      padding: EdgeInsets.only(bottom: space(2)),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
+          bottom: BorderSide(color: theme.border, width: BorderWidths.hairline),
         ),
       ),
       child: Row(
         children: <Widget>[
           for (final String cell in cells)
             SizedBox(
-              width: el(44),
-              child: ElText(cell, ElType.section, color: theme.mutedForeground),
+              width: space(44),
+              child: StyledText(
+                cell,
+                TextStyles.section,
+                color: theme.mutedForeground,
+              ),
             ),
         ],
       ),
@@ -217,15 +247,18 @@ class _FactRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Semantics(
       container: true,
       label: cells.join(', '),
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: el(3)),
+        padding: EdgeInsets.symmetric(vertical: space(3)),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
+            bottom: BorderSide(
+              color: theme.border,
+              width: BorderWidths.hairline,
+            ),
           ),
         ),
         child: Row(
@@ -233,12 +266,12 @@ class _FactRow extends StatelessWidget {
           children: <Widget>[
             for (int index = 0; index < cells.length; index++)
               SizedBox(
-                width: el(44),
+                width: space(44),
                 child: Padding(
-                  padding: EdgeInsets.only(right: el(3)),
+                  padding: EdgeInsets.only(right: space(3)),
                   child: _SelectableFactText(
                     text: cells[index],
-                    spec: index == 0 ? ElType.body : ElType.small,
+                    spec: index == 0 ? TextStyles.body : TextStyles.small,
                     color: index == 0
                         ? theme.foreground
                         : theme.mutedForeground,
@@ -259,22 +292,22 @@ class _InstallRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Semantics(
       container: true,
       label: '${fact.label}: ${fact.value}. ${fact.description}',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElText(fact.label, ElType.section, color: theme.actionInk),
-          SizedBox(height: el(1)),
+          StyledText(fact.label, TextStyles.section, color: theme.actionText),
+          SizedBox(height: space(1)),
           _SelectableFactText(
             text: fact.value,
-            spec: ElType.code,
+            spec: TextStyles.code,
             color: theme.foreground,
           ),
-          SizedBox(height: el(1)),
-          ElText(fact.description, ElType.small),
+          SizedBox(height: space(1)),
+          StyledText(fact.description, TextStyles.small),
         ],
       ),
     );
@@ -289,10 +322,12 @@ class _SelectableFactText extends StatelessWidget {
   });
 
   final String text;
-  final ElTypeSpec spec;
+  final TextStyleToken spec;
   final Color color;
 
   @override
-  Widget build(BuildContext context) =>
-      SelectableText(text, style: ElText.styleOf(context, spec, color: color));
+  Widget build(BuildContext context) => SelectableText(
+    text,
+    style: StyledText.styleOf(context, spec, color: color),
+  );
 }

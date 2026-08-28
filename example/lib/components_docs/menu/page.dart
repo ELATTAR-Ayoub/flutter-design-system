@@ -15,18 +15,18 @@
 ///
 /// **Section order**, matching the house shape: Preview (the shared surface
 /// configured exactly as each of the three consumers configures it, side by
-/// side), Installation, Usage (the smallest correct `ElMenuContent`), Row
-/// kinds (one of every `ElMenuChild` case), Surface kinds (the three
-/// elevation recipes `ElMenuSurfaceKind` declares), Indicator side (the
+/// side), Installation, Usage (the smallest correct `MenuContent`), Row
+/// kinds (one of every `MenuChild` case), Surface kinds (the three
+/// elevation recipes `MenuSurfaceVariant` declares), Indicator side (the
 /// documented drift between a check row's tick on the end and on the
 /// start), then the eight disclosures. Keyboard sits between Accessibility
-/// and Responsive, read directly off `_ElMenuContentState._onKey`.
+/// and Responsive, read directly off `_MenuContentState._onKey`.
 ///
 /// **Do not invent behaviour.** Every fact below is read off
 /// `lib/src/components/menu.dart` itself — including the two DOCUMENTED
 /// DRIFTs the source already names (menus drift 4: the three elevation
 /// recipes; menus drift 5: the indicator side) and the submenu-kind gap
-/// (`_buildRow`'s `ElMenuSub` case maps every `content`-kind parent to
+/// (`_buildRow`'s `MenuSub` case maps every `content`-kind parent to
 /// `subBordered`, regardless of which of the three consumers is asking, so
 /// `menu.dart`'s own DRIFT-4 comment table promising `subRinged` for a
 /// dropdown's or a menubar's own submenu is not what the code does for any
@@ -34,7 +34,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -51,7 +63,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'The same ElMenuContent, configured exactly as each of the '
+          'The same MenuContent, configured exactly as each of the '
           'three consumers configures it: a dropdown menu (minWidth 160, '
           'indicatorSide.end), a context menu (minWidth 144, a submenu '
           'row), and a menubar (minWidth 144, indicatorSide.start — the '
@@ -60,7 +72,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     InstallSection(
       id: 'install',
@@ -90,7 +102,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElMenuContent and the rest of the '
+              'Add the export line so MenuContent and the rest of the '
               'row model are reachable the same way the CLI path already '
               'makes them.',
           code: "export 'menu.dart';",
@@ -101,7 +113,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'ElMenuContent is never placed on its own: a trigger root — a '
+          'MenuContent is never placed on its own: a trigger root — a '
           'popover anchored to a button, a pointer position, or a menubar '
           'strip — decides where it opens and hands it onClose. This is '
           'the smallest correct content list; dropdown_menu, context_menu '
@@ -112,7 +124,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
       id: 'row-kinds',
       title: 'Row kinds',
       description:
-          'Every case ElMenuChild is sealed over, in one content: a '
+          'Every case MenuChild is sealed over, in one content: a '
           'label, a group of plain items (one with an icon and a '
           'shortcut), a checkbox item, a radio group, a separator, a '
           'submenu (hover it, or focus and press ArrowRight), and a '
@@ -120,14 +132,14 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
       specimen: _RowKindsSpecimen(),
       code: _rowKindsCode,
       label: 'Row kinds specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     ShowcaseSection(
       id: 'surface-kinds',
       title: 'Surface kinds',
       description:
           'DOCUMENTED DRIFT (menus drift 4): the three elevation recipes '
-          'ElMenuSurfaceKind declares are not one recipe reused three '
+          'MenuSurfaceVariant declares are not one recipe reused three '
           'ways. content is shadow-md; subRinged and subBordered are '
           'both shadow-lg, but only subBordered adds a real 1px border '
           'and drops the ring — 2px taller than either of the other two '
@@ -143,8 +155,8 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
       description:
           'DOCUMENTED DRIFT (menus drift 5): a checked row\'s tick sits '
           'on the right in a dropdown and a context menu '
-          '(ElMenuIndicatorSide.end, the ElMenuContent default) and on '
-          'the left in a menubar alone (ElMenuIndicatorSide.start) — one '
+          '(MenuIndicatorSide.end, the MenuContent default) and on '
+          'the left in a menubar alone (MenuIndicatorSide.start) — one '
           'role, two mirror images, three files.',
       specimen: _IndicatorSideSpecimen(),
       code: _indicatorSideCode,
@@ -159,46 +171,31 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
           'surface, then the open content and the two shared primitives '
           'every trigger root reaches for.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElMenuItem', anchor: 'api-elmenuitem'),
+        DocsTocEntry(title: 'MenuItem', anchor: 'api-elmenuitem'),
+        DocsTocEntry(title: 'MenuItemVariant', anchor: 'api-elmenuitemvariant'),
         DocsTocEntry(
-          title: 'ElMenuItemVariant',
-          anchor: 'api-elmenuitemvariant',
-        ),
-        DocsTocEntry(
-          title: 'ElMenuCheckboxItem',
+          title: 'MenuCheckboxItem',
           anchor: 'api-elmenucheckboxitem',
         ),
+        DocsTocEntry(title: 'MenuRadioItem', anchor: 'api-elmenuradioitem'),
+        DocsTocEntry(title: 'MenuRadioGroup', anchor: 'api-elmenuradiogroup'),
+        DocsTocEntry(title: 'MenuLabel', anchor: 'api-elmenulabel'),
+        DocsTocEntry(title: 'MenuSeparator', anchor: 'api-elmenuseparator'),
+        DocsTocEntry(title: 'MenuGroup', anchor: 'api-elmenugroup'),
+        DocsTocEntry(title: 'MenuSub', anchor: 'api-elmenusub'),
         DocsTocEntry(
-          title: 'ElMenuRadioItem',
-          anchor: 'api-elmenuradioitem',
-        ),
-        DocsTocEntry(
-          title: 'ElMenuRadioGroup',
-          anchor: 'api-elmenuradiogroup',
-        ),
-        DocsTocEntry(title: 'ElMenuLabel', anchor: 'api-elmenulabel'),
-        DocsTocEntry(
-          title: 'ElMenuSeparator',
-          anchor: 'api-elmenuseparator',
-        ),
-        DocsTocEntry(title: 'ElMenuGroup', anchor: 'api-elmenugroup'),
-        DocsTocEntry(title: 'ElMenuSub', anchor: 'api-elmenusub'),
-        DocsTocEntry(
-          title: 'ElMenuIndicatorSide',
+          title: 'MenuIndicatorSide',
           anchor: 'api-elmenuindicatorside',
         ),
         DocsTocEntry(
-          title: 'ElMenuSurfaceKind',
+          title: 'MenuSurfaceVariant',
           anchor: 'api-elmenusurfacekind',
         ),
-        DocsTocEntry(title: 'ElMenu', anchor: 'api-elmenu'),
-        DocsTocEntry(title: 'ElMenuSurface', anchor: 'api-elmenusurface'),
-        DocsTocEntry(title: 'ElMenuContent', anchor: 'api-elmenucontent'),
-        DocsTocEntry(
-          title: 'ElMenuPointerDown',
-          anchor: 'api-elmenupointerdown',
-        ),
-        DocsTocEntry(title: 'ElMenuMotion', anchor: 'api-elmenumotion'),
+        DocsTocEntry(title: 'Menu', anchor: 'api-elmenu'),
+        DocsTocEntry(title: 'MenuSurface', anchor: 'api-elmenusurface'),
+        DocsTocEntry(title: 'MenuContent', anchor: 'api-elmenucontent'),
+        DocsTocEntry(title: 'MenuPointerDown', anchor: 'api-elmenupointerdown'),
+        DocsTocEntry(title: 'MenuMotion', anchor: 'api-elmenumotion'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -206,7 +203,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off _MenuRow.build and _ElMenuContentState, not '
+          'Read off _MenuRow.build and _MenuContentState, not '
           'inferred: a row does not transition at all, it snaps.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -219,7 +216,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          'Read directly off _ElMenuContentState._onKey: every key it '
+          'Read directly off _MenuContentState._onKey: every key it '
           'switches on, and what falls through to the default (default '
           'left ignored, so a menubar strip and a submenu\'s own parent '
           'can claim it instead).',
@@ -256,7 +253,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
           const DocsInstallFact(
             label: 'Package tests',
             value: 'test/menu_test.dart',
-            description: 'ElMenuContent and the row model are covered there.',
+            description: 'MenuContent and the row model are covered there.',
           ),
           const DocsInstallFact(
             label: 'Docs test',
@@ -290,19 +287,13 @@ class MenuDocPage extends StatelessWidget {
       title: menuDoc.title,
       description: menuDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Menu'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Menu'),
     ],
     toc: menuDocSpec.toc,
-    previous: const DocsPageLink(
-      title: 'Marker',
-      route: '/components/marker',
-    ),
-    next: const DocsPageLink(
-      title: 'Menubar',
-      route: '/components/menubar',
-    ),
+    previous: const DocsPageLink(title: 'Marker', route: '/components/marker'),
+    next: const DocsPageLink(title: 'Menubar', route: '/components/menubar'),
     onNavigate: onNavigate,
     child: KeyedSubtree(
       key: const ValueKey<String>('menu-doc-article'),
@@ -328,7 +319,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -343,73 +334,72 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
                 'As a dropdown menu',
                 KeyedSubtree(
                   key: const ValueKey<String>('menu-preview:dropdown'),
-                  child: ElMenuContent(
-                    minWidth: ElMenu.minWidthDropdown,
-                    children: <ElMenuChild>[
-                      const ElMenuLabel('My Account'),
-                      const ElMenuSeparator(),
-                      ElMenuGroup(
-                        children: <ElMenuChild>[
-                          ElMenuItem(
+                  child: MenuContent(
+                    minWidth: Menu.minWidthDropdown,
+                    children: <MenuChild>[
+                      const MenuLabel('My Account'),
+                      const MenuSeparator(),
+                      MenuGroup(
+                        children: <MenuChild>[
+                          MenuItem(
                             label: 'Profile',
-                            icon: ElIconGlyph.user,
+                            icon: IconGlyph.user,
                             shortcut: '⇧⌘P',
                             onSelect: () =>
                                 setState(() => _lastAction = 'Profile'),
                           ),
-                          ElMenuItem(
+                          MenuItem(
                             label: 'Settings',
-                            icon: ElIconGlyph.settings,
+                            icon: IconGlyph.settings,
                             onSelect: () =>
                                 setState(() => _lastAction = 'Settings'),
                           ),
                         ],
                       ),
-                      const ElMenuSeparator(),
-                      ElMenuCheckboxItem(
+                      const MenuSeparator(),
+                      MenuCheckboxItem(
                         label: 'Show sidebar',
                         checked: _dropdownChecked,
                         onSelect: (bool next) =>
                             setState(() => _dropdownChecked = next),
                       ),
-                      const ElMenuSeparator(),
-                      ElMenuItem(
+                      const MenuSeparator(),
+                      MenuItem(
                         label: 'Log out',
-                        variant: ElMenuItemVariant.destructive,
-                        onSelect: () =>
-                            setState(() => _lastAction = 'Log out'),
+                        variant: MenuItemVariant.destructive,
+                        onSelect: () => setState(() => _lastAction = 'Log out'),
                       ),
                     ],
                     onClose: () {},
                   ),
                 ),
               ),
-              SizedBox(width: el(5)),
+              SizedBox(width: space(5)),
               _labelled(
                 theme,
                 'As a context menu',
                 KeyedSubtree(
                   key: const ValueKey<String>('menu-preview:context'),
-                  child: ElMenuContent(
-                    minWidth: ElMenu.minWidthMenu,
-                    children: <ElMenuChild>[
-                      ElMenuItem(
+                  child: MenuContent(
+                    minWidth: Menu.minWidthMenu,
+                    children: <MenuChild>[
+                      MenuItem(
                         label: 'Back',
                         shortcut: '⌘[',
                         onSelect: () => setState(() => _lastAction = 'Back'),
                       ),
-                      const ElMenuItem(label: 'Forward', enabled: false),
-                      const ElMenuSeparator(),
-                      ElMenuSub(
+                      const MenuItem(label: 'Forward', enabled: false),
+                      const MenuSeparator(),
+                      MenuSub(
                         label: 'Share',
-                        icon: ElIconGlyph.share2,
-                        children: <ElMenuChild>[
-                          ElMenuItem(
+                        icon: IconGlyph.share2,
+                        children: <MenuChild>[
+                          MenuItem(
                             label: 'Copy link',
                             onSelect: () =>
                                 setState(() => _lastAction = 'Copy link'),
                           ),
-                          ElMenuItem(
+                          MenuItem(
                             label: 'Email',
                             onSelect: () =>
                                 setState(() => _lastAction = 'Email'),
@@ -421,30 +411,30 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
                   ),
                 ),
               ),
-              SizedBox(width: el(5)),
+              SizedBox(width: space(5)),
               _labelled(
                 theme,
                 'As a menubar (indicatorSide.start)',
                 KeyedSubtree(
                   key: const ValueKey<String>('menu-preview:menubar'),
-                  child: ElMenuContent(
-                    minWidth: ElMenu.minWidthMenu,
-                    indicatorSide: ElMenuIndicatorSide.start,
-                    children: <ElMenuChild>[
-                      ElMenuCheckboxItem(
+                  child: MenuContent(
+                    minWidth: Menu.minWidthMenu,
+                    indicatorSide: MenuIndicatorSide.start,
+                    children: <MenuChild>[
+                      MenuCheckboxItem(
                         label: 'Always show bookmarks',
                         checked: _menubarChecked,
                         onSelect: (bool next) =>
                             setState(() => _menubarChecked = next),
                       ),
-                      const ElMenuSeparator(),
-                      ElMenuRadioGroup(
+                      const MenuSeparator(),
+                      MenuRadioGroup(
                         value: _menubarRadio,
                         onChanged: (String next) =>
                             setState(() => _menubarRadio = next),
-                        children: const <ElMenuRadioItem>[
-                          ElMenuRadioItem(value: 'grid', label: 'Grid view'),
-                          ElMenuRadioItem(value: 'list', label: 'List view'),
+                        children: const <MenuRadioItem>[
+                          MenuRadioItem(value: 'grid', label: 'Grid view'),
+                          MenuRadioItem(value: 'list', label: 'List view'),
                         ],
                       ),
                     ],
@@ -455,67 +445,68 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
             ],
           ),
         ),
-        SizedBox(height: el(4)),
-        ElText(
+        SizedBox(height: space(4)),
+        StyledText(
           'Last action: $_lastAction',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
       ],
     );
   }
 
-  Widget _labelled(ElThemeData theme, String caption, Widget child) => Column(
+  Widget _labelled(ThemeTokens theme, String caption, Widget child) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElText(caption, ElType.section, color: theme.mutedForeground),
-      SizedBox(height: el(2)),
+      StyledText(caption, TextStyles.section, color: theme.mutedForeground),
+      SizedBox(height: space(2)),
       child,
     ],
   );
 }
 
-const String _previewCode = '''// As a dropdown: minWidth 160, the ElMenuContent default indicatorSide.end.
-ElMenuContent(
-  minWidth: ElMenu.minWidthDropdown,
+const String _previewCode =
+    '''// As a dropdown: minWidth 160, the MenuContent default indicatorSide.end.
+MenuContent(
+  minWidth: Menu.minWidthDropdown,
   children: [
-    ElMenuLabel('My Account'),
-    ElMenuSeparator(),
-    ElMenuGroup(children: [
-      ElMenuItem(label: 'Profile', icon: ElIconGlyph.user, shortcut: '⇧⌘P'),
-      ElMenuItem(label: 'Settings', icon: ElIconGlyph.settings),
+    MenuLabel('My Account'),
+    MenuSeparator(),
+    MenuGroup(children: [
+      MenuItem(label: 'Profile', icon: IconGlyph.user, shortcut: '⇧⌘P'),
+      MenuItem(label: 'Settings', icon: IconGlyph.settings),
     ]),
-    ElMenuSeparator(),
-    ElMenuCheckboxItem(label: 'Show sidebar', checked: showSidebar,
+    MenuSeparator(),
+    MenuCheckboxItem(label: 'Show sidebar', checked: showSidebar,
         onSelect: (next) => setState(() => showSidebar = next)),
-    ElMenuSeparator(),
-    ElMenuItem(label: 'Log out', variant: ElMenuItemVariant.destructive),
+    MenuSeparator(),
+    MenuItem(label: 'Log out', variant: MenuItemVariant.destructive),
   ],
   onClose: close,
 )
 
 // As a menubar: minWidth 144, indicatorSide.start — the drift.
-ElMenuContent(
-  minWidth: ElMenu.minWidthMenu,
-  indicatorSide: ElMenuIndicatorSide.start,
+MenuContent(
+  minWidth: Menu.minWidthMenu,
+  indicatorSide: MenuIndicatorSide.start,
   children: [
-    ElMenuCheckboxItem(label: 'Always show bookmarks', checked: shown,
+    MenuCheckboxItem(label: 'Always show bookmarks', checked: shown,
         onSelect: (next) => setState(() => shown = next)),
-    ElMenuSeparator(),
-    ElMenuRadioGroup(value: view, onChanged: onViewChanged, children: [
-      ElMenuRadioItem(value: 'grid', label: 'Grid view'),
-      ElMenuRadioItem(value: 'list', label: 'List view'),
+    MenuSeparator(),
+    MenuRadioGroup(value: view, onChanged: onViewChanged, children: [
+      MenuRadioItem(value: 'grid', label: 'Grid view'),
+      MenuRadioItem(value: 'list', label: 'List view'),
     ]),
   ],
   onClose: close,
 )''';
 
-const String _usageCode = '''ElMenuContent(
-  children: const <ElMenuChild>[
-    ElMenuItem(label: 'Settings', shortcut: '⌘,'),
-    ElMenuSeparator(),
-    ElMenuItem(label: 'Log out', variant: ElMenuItemVariant.destructive),
+const String _usageCode = '''MenuContent(
+  children: const <MenuChild>[
+    MenuItem(label: 'Settings', shortcut: '⌘,'),
+    MenuSeparator(),
+    MenuItem(label: 'Log out', variant: MenuItemVariant.destructive),
   ],
   onClose: close,
 )''';
@@ -534,45 +525,45 @@ class _RowKindsSpecimenState extends State<_RowKindsSpecimen> {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('menu-example:row-kinds'),
-    child: ElMenuContent(
-      children: <ElMenuChild>[
-        const ElMenuLabel('Row kinds'),
-        const ElMenuSeparator(),
-        ElMenuGroup(
-          children: <ElMenuChild>[
-            const ElMenuItem(label: 'A plain item'),
-            ElMenuItem(
+    child: MenuContent(
+      children: <MenuChild>[
+        const MenuLabel('Row kinds'),
+        const MenuSeparator(),
+        MenuGroup(
+          children: <MenuChild>[
+            const MenuItem(label: 'A plain item'),
+            MenuItem(
               label: 'With icon and shortcut',
-              icon: ElIconGlyph.star,
+              icon: IconGlyph.star,
               shortcut: '⌘K',
             ),
           ],
         ),
-        ElMenuCheckboxItem(
+        MenuCheckboxItem(
           label: 'A checkbox item',
           checked: _checked,
           onSelect: (bool next) => setState(() => _checked = next),
         ),
-        ElMenuRadioGroup(
+        MenuRadioGroup(
           value: _radio,
           onChanged: (String next) => setState(() => _radio = next),
-          children: const <ElMenuRadioItem>[
-            ElMenuRadioItem(value: 'a', label: 'Radio A'),
-            ElMenuRadioItem(value: 'b', label: 'Radio B'),
+          children: const <MenuRadioItem>[
+            MenuRadioItem(value: 'a', label: 'Radio A'),
+            MenuRadioItem(value: 'b', label: 'Radio B'),
           ],
         ),
-        const ElMenuSeparator(),
-        const ElMenuSub(
+        const MenuSeparator(),
+        const MenuSub(
           label: 'A submenu',
-          children: <ElMenuChild>[
-            ElMenuItem(label: 'One level deep'),
-            ElMenuItem(label: 'Anything deeper belongs in a dialog'),
+          children: <MenuChild>[
+            MenuItem(label: 'One level deep'),
+            MenuItem(label: 'Anything deeper belongs in a dialog'),
           ],
         ),
-        const ElMenuSeparator(),
-        const ElMenuItem(
+        const MenuSeparator(),
+        const MenuItem(
           label: 'A destructive item',
-          variant: ElMenuItemVariant.destructive,
+          variant: MenuItemVariant.destructive,
         ),
       ],
       onClose: () {},
@@ -580,25 +571,25 @@ class _RowKindsSpecimenState extends State<_RowKindsSpecimen> {
   );
 }
 
-const String _rowKindsCode = '''ElMenuContent(
-  children: const <ElMenuChild>[
-    ElMenuLabel('Row kinds'),
-    ElMenuSeparator(),
-    ElMenuGroup(children: [
-      ElMenuItem(label: 'A plain item'),
-      ElMenuItem(label: 'With icon and shortcut', icon: ElIconGlyph.star, shortcut: '⌘K'),
+const String _rowKindsCode = '''MenuContent(
+  children: const <MenuChild>[
+    MenuLabel('Row kinds'),
+    MenuSeparator(),
+    MenuGroup(children: [
+      MenuItem(label: 'A plain item'),
+      MenuItem(label: 'With icon and shortcut', icon: IconGlyph.star, shortcut: '⌘K'),
     ]),
-    ElMenuCheckboxItem(label: 'A checkbox item', checked: checked, onSelect: onCheck),
-    ElMenuRadioGroup(value: radio, onChanged: onRadio, children: [
-      ElMenuRadioItem(value: 'a', label: 'Radio A'),
-      ElMenuRadioItem(value: 'b', label: 'Radio B'),
+    MenuCheckboxItem(label: 'A checkbox item', checked: checked, onSelect: onCheck),
+    MenuRadioGroup(value: radio, onChanged: onRadio, children: [
+      MenuRadioItem(value: 'a', label: 'Radio A'),
+      MenuRadioItem(value: 'b', label: 'Radio B'),
     ]),
-    ElMenuSeparator(),
-    ElMenuSub(label: 'A submenu', children: [
-      ElMenuItem(label: 'One level deep'),
+    MenuSeparator(),
+    MenuSub(label: 'A submenu', children: [
+      MenuItem(label: 'One level deep'),
     ]),
-    ElMenuSeparator(),
-    ElMenuItem(label: 'A destructive item', variant: ElMenuItemVariant.destructive),
+    MenuSeparator(),
+    MenuItem(label: 'A destructive item', variant: MenuItemVariant.destructive),
   ],
   onClose: close,
 )''';
@@ -608,44 +599,47 @@ class _SurfaceKindsSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    Widget sample(String caption, ElMenuSurfaceKind kind) => Column(
+    final ThemeTokens theme = ThemeScope.of(context);
+    Widget sample(String caption, MenuSurfaceVariant kind) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText(caption, ElType.section, color: theme.mutedForeground),
-        SizedBox(height: el(2)),
-        ElMenuSurface(
+        StyledText(caption, TextStyles.section, color: theme.mutedForeground),
+        SizedBox(height: space(2)),
+        MenuSurface(
           kind: kind,
           child: Padding(
-            padding: EdgeInsets.all(el(4)),
-            child: ElText('Sample content', ElComponentType.sheetBody),
+            padding: EdgeInsets.all(space(4)),
+            child: StyledText('Sample content', TextStyles.bodyCompact),
           ),
         ),
       ],
     );
     return Wrap(
-      spacing: el(5),
-      runSpacing: el(5),
+      spacing: space(5),
+      runSpacing: space(5),
       children: <Widget>[
-        sample('content — shadow-md, ring', ElMenuSurfaceKind.content),
-        sample('subRinged — shadow-lg, ring', ElMenuSurfaceKind.subRinged),
-        sample('subBordered — shadow-lg, border', ElMenuSurfaceKind.subBordered),
+        sample('content — shadow-md, ring', MenuSurfaceVariant.content),
+        sample('subRinged — shadow-lg, ring', MenuSurfaceVariant.subRinged),
+        sample(
+          'subBordered — shadow-lg, border',
+          MenuSurfaceVariant.subBordered,
+        ),
       ],
     );
   }
 }
 
-const String _surfaceKindsCode = '''ElMenuSurface(kind: ElMenuSurfaceKind.content, child: content)
-ElMenuSurface(kind: ElMenuSurfaceKind.subRinged, child: content)
-ElMenuSurface(kind: ElMenuSurfaceKind.subBordered, child: content)''';
+const String _surfaceKindsCode =
+    '''MenuSurface(kind: MenuSurfaceVariant.content, child: content)
+MenuSurface(kind: MenuSurfaceVariant.subRinged, child: content)
+MenuSurface(kind: MenuSurfaceVariant.subBordered, child: content)''';
 
 class _IndicatorSideSpecimen extends StatefulWidget {
   const _IndicatorSideSpecimen();
 
   @override
-  State<_IndicatorSideSpecimen> createState() =>
-      _IndicatorSideSpecimenState();
+  State<_IndicatorSideSpecimen> createState() => _IndicatorSideSpecimenState();
 }
 
 class _IndicatorSideSpecimenState extends State<_IndicatorSideSpecimen> {
@@ -654,26 +648,26 @@ class _IndicatorSideSpecimenState extends State<_IndicatorSideSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Wrap(
-      spacing: el(5),
-      runSpacing: el(5),
+      spacing: space(5),
+      runSpacing: space(5),
       crossAxisAlignment: WrapCrossAlignment.start,
       children: <Widget>[
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ElText(
+            StyledText(
               'end — dropdown & context menu',
-              ElType.section,
+              TextStyles.section,
               color: theme.mutedForeground,
             ),
-            SizedBox(height: el(2)),
-            ElMenuContent(
-              minWidth: ElMenu.minWidthMenu,
-              children: <ElMenuChild>[
-                ElMenuCheckboxItem(
+            SizedBox(height: space(2)),
+            MenuContent(
+              minWidth: Menu.minWidthMenu,
+              children: <MenuChild>[
+                MenuCheckboxItem(
                   label: 'Word wrap',
                   checked: _endChecked,
                   onSelect: (bool next) => setState(() => _endChecked = next),
@@ -687,21 +681,20 @@ class _IndicatorSideSpecimenState extends State<_IndicatorSideSpecimen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ElText(
+            StyledText(
               'start — menubar, alone',
-              ElType.section,
+              TextStyles.section,
               color: theme.mutedForeground,
             ),
-            SizedBox(height: el(2)),
-            ElMenuContent(
-              minWidth: ElMenu.minWidthMenu,
-              indicatorSide: ElMenuIndicatorSide.start,
-              children: <ElMenuChild>[
-                ElMenuCheckboxItem(
+            SizedBox(height: space(2)),
+            MenuContent(
+              minWidth: Menu.minWidthMenu,
+              indicatorSide: MenuIndicatorSide.start,
+              children: <MenuChild>[
+                MenuCheckboxItem(
                   label: 'Word wrap',
                   checked: _startChecked,
-                  onSelect: (bool next) =>
-                      setState(() => _startChecked = next),
+                  onSelect: (bool next) => setState(() => _startChecked = next),
                 ),
               ],
               onClose: () {},
@@ -713,14 +706,14 @@ class _IndicatorSideSpecimenState extends State<_IndicatorSideSpecimen> {
   }
 }
 
-const String _indicatorSideCode = '''ElMenuContent(
-  children: [ElMenuCheckboxItem(label: 'Word wrap', checked: wrap, onSelect: onWrap)],
+const String _indicatorSideCode = '''MenuContent(
+  children: [MenuCheckboxItem(label: 'Word wrap', checked: wrap, onSelect: onWrap)],
   onClose: close,
-) // indicatorSide.end, the ElMenuContent default — tick on the right.
+) // indicatorSide.end, the MenuContent default — tick on the right.
 
-ElMenuContent(
-  indicatorSide: ElMenuIndicatorSide.start, // the menubar's own drift.
-  children: [ElMenuCheckboxItem(label: 'Word wrap', checked: wrap, onSelect: onWrap)],
+MenuContent(
+  indicatorSide: MenuIndicatorSide.start, // the menubar's own drift.
+  children: [MenuCheckboxItem(label: 'Word wrap', checked: wrap, onSelect: onWrap)],
   onClose: close,
 ) // tick on the left.''';
 
@@ -735,123 +728,121 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elmenuitem',
-        child: DocsApiTable(title: 'ElMenuItem', facts: _menuItemFacts),
+        child: DocsApiTable(title: 'MenuItem', facts: _menuItemFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenuitemvariant',
         child: DocsApiTable(
-          title: 'ElMenuItemVariant',
+          title: 'MenuItemVariant',
           facts: _menuItemVariantFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenucheckboxitem',
         child: DocsApiTable(
-          title: 'ElMenuCheckboxItem',
+          title: 'MenuCheckboxItem',
           facts: _menuCheckboxItemFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenuradioitem',
-        child: DocsApiTable(
-          title: 'ElMenuRadioItem',
-          facts: _menuRadioItemFacts,
-        ),
+        child: DocsApiTable(title: 'MenuRadioItem', facts: _menuRadioItemFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenuradiogroup',
         child: DocsApiTable(
-          title: 'ElMenuRadioGroup',
+          title: 'MenuRadioGroup',
           facts: _menuRadioGroupFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenulabel',
-        child: DocsApiTable(title: 'ElMenuLabel', facts: _menuLabelFacts),
+        child: DocsApiTable(title: 'MenuLabel', facts: _menuLabelFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenuseparator',
-        child: DocsApiTable(
-          title: 'ElMenuSeparator',
-          facts: _menuSeparatorFacts,
-        ),
+        child: DocsApiTable(title: 'MenuSeparator', facts: _menuSeparatorFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenugroup',
-        child: DocsApiTable(title: 'ElMenuGroup', facts: _menuGroupFacts),
+        child: DocsApiTable(title: 'MenuGroup', facts: _menuGroupFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenusub',
-        child: DocsApiTable(title: 'ElMenuSub', facts: _menuSubFacts),
+        child: DocsApiTable(title: 'MenuSub', facts: _menuSubFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenuindicatorside',
         child: DocsApiTable(
-          title: 'ElMenuIndicatorSide',
+          title: 'MenuIndicatorSide',
           facts: _menuIndicatorSideFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenusurfacekind',
         child: DocsApiTable(
-          title: 'ElMenuSurfaceKind',
+          title: 'MenuSurfaceVariant',
           facts: _menuSurfaceKindFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenu',
-        child: DocsApiTable(title: 'ElMenu: static geometry', facts: _menuFacts),
+        child: DocsApiTable(title: 'Menu: static geometry', facts: _menuFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenusurface',
-        child: DocsApiTable(title: 'ElMenuSurface', facts: _menuSurfaceFacts),
+        child: DocsApiTable(title: 'MenuSurface', facts: _menuSurfaceFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenucontent',
-        child: DocsApiTable(title: 'ElMenuContent', facts: _menuContentFacts),
+        child: DocsApiTable(title: 'MenuContent', facts: _menuContentFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenupointerdown',
         child: DocsApiTable(
-          title: 'ElMenuPointerDown',
+          title: 'MenuPointerDown',
           facts: _menuPointerDownFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmenumotion',
-        child: DocsApiTable(title: 'ElMenuMotion', facts: _menuMotionFacts),
+        child: DocsApiTable(title: 'MenuMotion', facts: _menuMotionFacts),
       ),
     ],
   );
 }
 
 const List<DocsApiFact> _menuItemFacts = <DocsApiFact>[
-  DocsApiFact(name: 'label', type: 'String', description: "Required. The row's text."),
+  DocsApiFact(
+    name: 'label',
+    type: 'String',
+    description: "Required. The row's text.",
+  ),
   DocsApiFact(
     name: 'icon',
-    type: 'ElIconGlyph?',
+    type: 'IconGlyph?',
     description:
-        'Optional. The leading glyph, forced into ElMenu.iconSize '
+        'Optional. The leading glyph, forced into Menu.iconSize '
         '(16px) regardless of the icon\'s own default size.',
   ),
   DocsApiFact(
     name: 'lucideIcon',
-    type: 'ElLucideGlyph?',
+    type: 'LucideGlyph?',
     description:
         'Optional. The same leading slot over the generated lucide '
         'registry, for a glyph icon.dart does not carry. Ignored when '
@@ -862,8 +853,8 @@ const List<DocsApiFact> _menuItemFacts = <DocsApiFact>[
     type: 'String?',
     description:
         'Optional. A second line under label, gap-1 flex-col '
-        'items-start: makes the row ElMenu.twoLineItemHeight tall '
-        'instead of ElMenu.itemHeight.',
+        'items-start: makes the row Menu.twoLineItemHeight tall '
+        'instead of Menu.itemHeight.',
   ),
   DocsApiFact(
     name: 'shortcut',
@@ -874,8 +865,8 @@ const List<DocsApiFact> _menuItemFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElMenuItemVariant',
-    description: 'Optional. Defaults to ElMenuItemVariant.normal.',
+    type: 'MenuItemVariant',
+    description: 'Optional. Defaults to MenuItemVariant.normal.',
   ),
   DocsApiFact(
     name: 'enabled',
@@ -905,13 +896,14 @@ const List<DocsApiFact> _menuItemVariantFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'normal',
     type: 'enum value',
-    description: 'The default. accent fill on highlight, popoverForeground ink.',
+    description:
+        'The default. accent fill on highlight, popoverForeground ink.',
   ),
   DocsApiFact(
     name: 'destructive',
     type: 'enum value',
     description:
-        'destructiveInk on the label, icon and shortcut in every '
+        'destructiveText on the label, icon and shortcut in every '
         'state; a highlighted row tints with destructive at 10% '
         '(light) / 20% (dark) instead of accent.',
   ),
@@ -926,8 +918,16 @@ const List<DocsApiFact> _menuCheckboxItemFacts = <DocsApiFact>[
         "Required. The tick's own indicator mounts only while this "
         'is true: an unchecked row holds no indicator element at all.',
   ),
-  DocsApiFact(name: 'enabled', type: 'bool', description: 'Optional. Defaults to true.'),
-  DocsApiFact(name: 'inset', type: 'bool', description: 'Optional. Defaults to false.'),
+  DocsApiFact(
+    name: 'enabled',
+    type: 'bool',
+    description: 'Optional. Defaults to true.',
+  ),
+  DocsApiFact(
+    name: 'inset',
+    type: 'bool',
+    description: 'Optional. Defaults to false.',
+  ),
   DocsApiFact(
     name: 'onSelect',
     type: 'ValueChanged<bool>?',
@@ -942,21 +942,27 @@ const List<DocsApiFact> _menuRadioItemFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'value',
     type: 'String',
-    description: "Required. What the enclosing group's onChanged is called with.",
+    description:
+        "Required. What the enclosing group's onChanged is called with.",
   ),
   DocsApiFact(name: 'label', type: 'String', description: 'Required.'),
-  DocsApiFact(name: 'enabled', type: 'bool', description: 'Optional. Defaults to true.'),
+  DocsApiFact(
+    name: 'enabled',
+    type: 'bool',
+    description: 'Optional. Defaults to true.',
+  ),
 ];
 
 const List<DocsApiFact> _menuRadioGroupFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'value',
     type: 'String?',
-    description: 'Required. Which child\'s value wears the tick; null shows none checked.',
+    description:
+        'Required. Which child\'s value wears the tick; null shows none checked.',
   ),
   DocsApiFact(
     name: 'children',
-    type: 'List<ElMenuRadioItem>',
+    type: 'List<MenuRadioItem>',
     description: 'Required. The rows this group holds.',
   ),
   DocsApiFact(
@@ -964,7 +970,7 @@ const List<DocsApiFact> _menuRadioGroupFacts = <DocsApiFact>[
     type: 'ValueChanged<String>?',
     description:
         'Optional. Called on commit with the tapped row\'s value: the '
-        'same controlled-no-handler shape as ElMenuCheckboxItem.onSelect '
+        'same controlled-no-handler shape as MenuCheckboxItem.onSelect '
         'when left null.',
   ),
 ];
@@ -982,7 +988,11 @@ const List<DocsApiFact> _menuLabelFacts = <DocsApiFact>[
         "Optional. The label's own children, for a multi-line block: "
         "still sits inside the label's own px-3 py-2.",
   ),
-  DocsApiFact(name: 'inset', type: 'bool', description: 'Optional. Defaults to false.'),
+  DocsApiFact(
+    name: 'inset',
+    type: 'bool',
+    description: 'Optional. Defaults to false.',
+  ),
 ];
 
 const List<DocsApiFact> _menuSeparatorFacts = <DocsApiFact>[
@@ -990,8 +1000,8 @@ const List<DocsApiFact> _menuSeparatorFacts = <DocsApiFact>[
     name: '(no parameters)',
     type: '—',
     description:
-        'const ElMenuSeparator() is the whole of it: a 1px rule at '
-        'ElMenu.separatorHeight (17), running the full content width by '
+        'const MenuSeparator() is the whole of it: a 1px rule at '
+        'Menu.separatorHeight (17), running the full content width by '
         "cancelling the content's own 8px padding with a negative margin.",
   ),
 ];
@@ -999,7 +1009,7 @@ const List<DocsApiFact> _menuSeparatorFacts = <DocsApiFact>[
 const List<DocsApiFact> _menuGroupFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'children',
-    type: 'List<ElMenuChild>',
+    type: 'List<MenuChild>',
     description:
         'Required. A role="group" wrapper that paints nothing: its rows '
         'sit flush with the rows outside it, with no gap of its own.',
@@ -1007,15 +1017,31 @@ const List<DocsApiFact> _menuGroupFacts = <DocsApiFact>[
 ];
 
 const List<DocsApiFact> _menuSubFacts = <DocsApiFact>[
-  DocsApiFact(name: 'label', type: 'String', description: "Required. The sub-trigger row's text."),
+  DocsApiFact(
+    name: 'label',
+    type: 'String',
+    description: "Required. The sub-trigger row's text.",
+  ),
   DocsApiFact(
     name: 'children',
-    type: 'List<ElMenuChild>',
+    type: 'List<MenuChild>',
     description: "Required. The submenu's own rows.",
   ),
-  DocsApiFact(name: 'icon', type: 'ElIconGlyph?', description: "Optional. The sub-trigger's own leading glyph."),
-  DocsApiFact(name: 'enabled', type: 'bool', description: 'Optional. Defaults to true.'),
-  DocsApiFact(name: 'inset', type: 'bool', description: 'Optional. Defaults to false.'),
+  DocsApiFact(
+    name: 'icon',
+    type: 'IconGlyph?',
+    description: "Optional. The sub-trigger's own leading glyph.",
+  ),
+  DocsApiFact(
+    name: 'enabled',
+    type: 'bool',
+    description: 'Optional. Defaults to true.',
+  ),
+  DocsApiFact(
+    name: 'inset',
+    type: 'bool',
+    description: 'Optional. Defaults to false.',
+  ),
 ];
 
 const List<DocsApiFact> _menuIndicatorSideFacts = <DocsApiFact>[
@@ -1023,7 +1049,7 @@ const List<DocsApiFact> _menuIndicatorSideFacts = <DocsApiFact>[
     name: 'end',
     type: 'enum value',
     description:
-        'py-2 pr-9 pl-3, tick at right-3. ElMenuContent\'s own default; '
+        'py-2 pr-9 pl-3, tick at right-3. MenuContent\'s own default; '
         'what a dropdown and a context menu both render.',
   ),
   DocsApiFact(
@@ -1041,14 +1067,14 @@ const List<DocsApiFact> _menuSurfaceKindFacts = <DocsApiFact>[
     type: 'enum value',
     description:
         'shadow-md ring-1 ring-foreground/10: every top-level '
-        'ElMenuContent across all three consumers.',
+        'MenuContent across all three consumers.',
   ),
   DocsApiFact(
     name: 'subRinged',
     type: 'enum value',
     description:
         'shadow-lg ring-1 ring-foreground/10. Declared and reachable if '
-        'a caller builds ElMenuContent directly and passes it, but '
+        'a caller builds MenuContent directly and passes it, but '
         'nothing in dropdown_menu.dart, context_menu.dart or menubar.dart '
         'ever does — see the submenu gap under subBordered.',
   ),
@@ -1059,7 +1085,7 @@ const List<DocsApiFact> _menuSurfaceKindFacts = <DocsApiFact>[
         'shadow-lg border, no ring — 2px taller than subRinged for the '
         'same content, a border adding to the box where a ring does not. '
         'GAP: what every submenu across all three consumers actually '
-        'renders with, because _buildRow\'s ElMenuSub case maps any '
+        'renders with, because _buildRow\'s MenuSub case maps any '
         'content-kind parent to subBordered regardless of caller — '
         'menu.dart\'s own DRIFT-4 comment table promising subRinged for '
         "a dropdown's or a menubar's own submenu is not what the code "
@@ -1068,70 +1094,132 @@ const List<DocsApiFact> _menuSurfaceKindFacts = <DocsApiFact>[
 ];
 
 const List<DocsApiFact> _menuFacts = <DocsApiFact>[
-  DocsApiFact(name: 'itemHeight', type: 'static double (get)', description: 'py-2 around one text-sm line box, 34.5714.'),
+  DocsApiFact(
+    name: 'itemHeight',
+    type: 'static double (get)',
+    description: 'py-2 around one text-sm line box, 34.5714.',
+  ),
   DocsApiFact(
     name: 'twoLineItemHeight',
     type: 'static double (get)',
-    description: 'A row carrying subtitle: itemHeight + a gap-1 + a caption line box, 52.7464.',
+    description:
+        'A row carrying subtitle: itemHeight + a gap-1 + a caption line box, 52.7464.',
   ),
-  DocsApiFact(name: 'labelHeight', type: 'static double (get)', description: "ElMenuLabel's own row, 32."),
-  DocsApiFact(name: 'separatorHeight', type: 'static double (get)', description: 'my-2 h-px, 17.'),
-  DocsApiFact(name: 'contentPadding', type: 'static double (get)', description: 'p-2 on the content box, 8.'),
-  DocsApiFact(name: 'minWidthDropdown', type: 'static double (get)', description: 'min-w-40, 160.'),
-  DocsApiFact(name: 'minWidthMenu', type: 'static double (get)', description: "min-w-36, 144 — a context menu's and a menubar's floor."),
-  DocsApiFact(name: 'minWidthSub', type: 'static double (get)', description: "min-w-40, 160 — a context menu's and a menubar's own submenu floor."),
+  DocsApiFact(
+    name: 'labelHeight',
+    type: 'static double (get)',
+    description: "MenuLabel's own row, 32.",
+  ),
+  DocsApiFact(
+    name: 'separatorHeight',
+    type: 'static double (get)',
+    description: 'my-2 h-px, 17.',
+  ),
+  DocsApiFact(
+    name: 'contentPadding',
+    type: 'static double (get)',
+    description: 'p-2 on the content box, 8.',
+  ),
+  DocsApiFact(
+    name: 'minWidthDropdown',
+    type: 'static double (get)',
+    description: 'min-w-40, 160.',
+  ),
+  DocsApiFact(
+    name: 'minWidthMenu',
+    type: 'static double (get)',
+    description: "min-w-36, 144 — a context menu's and a menubar's floor.",
+  ),
+  DocsApiFact(
+    name: 'minWidthSub',
+    type: 'static double (get)',
+    description:
+        "min-w-40, 160 — a context menu's and a menubar's own submenu floor.",
+  ),
   DocsApiFact(
     name: 'minWidthSubDropdown',
     type: 'static double (get)',
-    description: "min-w-24, 96 — a dropdown's own submenu floor, the only one of the three that is not 144 or 160.",
+    description:
+        "min-w-24, 96 — a dropdown's own submenu floor, the only one of the three that is not 144 or 160.",
   ),
-  DocsApiFact(name: 'insetPadding', type: 'static double (get)', description: 'data-inset:pl-9, 36.'),
-  DocsApiFact(name: 'iconSize', type: 'static double (get)', description: 'Every row icon is forced into this box, 16.'),
+  DocsApiFact(
+    name: 'insetPadding',
+    type: 'static double (get)',
+    description: 'data-inset:pl-9, 36.',
+  ),
+  DocsApiFact(
+    name: 'iconSize',
+    type: 'static double (get)',
+    description: 'Every row icon is forced into this box, 16.',
+  ),
   DocsApiFact(
     name: 'iconStroke',
     type: 'static double (get)',
-    description: 'The stroke width the asked-for size="sm" icon derives, kept while iconSize overrules the box itself.',
+    description:
+        'The stroke width the asked-for size="sm" icon derives, kept while iconSize overrules the box itself.',
   ),
 ];
 
 const List<DocsApiFact> _menuSurfaceFacts = <DocsApiFact>[
   DocsApiFact(name: 'child', type: 'Widget', description: 'Required.'),
-  DocsApiFact(name: 'kind', type: 'ElMenuSurfaceKind', description: 'Optional. Defaults to ElMenuSurfaceKind.content.'),
+  DocsApiFact(
+    name: 'kind',
+    type: 'MenuSurfaceVariant',
+    description: 'Optional. Defaults to MenuSurfaceVariant.content.',
+  ),
 ];
 
 const List<DocsApiFact> _menuContentFacts = <DocsApiFact>[
-  DocsApiFact(name: 'children', type: 'List<ElMenuChild>', description: "Required. The content's own rows, in order."),
+  DocsApiFact(
+    name: 'children',
+    type: 'List<MenuChild>',
+    description: "Required. The content's own rows, in order.",
+  ),
   DocsApiFact(
     name: 'onClose',
     type: 'VoidCallback',
-    description: 'Required. Dismisses the whole menu: a committed row, Tab, Escape at the top level, or a pointer outside.',
+    description:
+        'Required. Dismisses the whole menu: a committed row, Tab, Escape at the top level, or a pointer outside.',
   ),
-  DocsApiFact(name: 'width', type: 'double?', description: 'Optional. An explicit w-* on this content.'),
+  DocsApiFact(
+    name: 'width',
+    type: 'double?',
+    description: 'Optional. An explicit w-* on this content.',
+  ),
   DocsApiFact(
     name: 'minWidth',
     type: 'double?',
-    description: 'Optional. Null takes ElMenu.minWidthMenu (144); each consumer passes its own floor explicitly.',
+    description:
+        'Optional. Null takes Menu.minWidthMenu (144); each consumer passes its own floor explicitly.',
   ),
-  DocsApiFact(name: 'kind', type: 'ElMenuSurfaceKind', description: 'Optional. Defaults to ElMenuSurfaceKind.content.'),
+  DocsApiFact(
+    name: 'kind',
+    type: 'MenuSurfaceVariant',
+    description: 'Optional. Defaults to MenuSurfaceVariant.content.',
+  ),
   DocsApiFact(
     name: 'indicatorSide',
-    type: 'ElMenuIndicatorSide',
-    description: 'Optional. Defaults to ElMenuIndicatorSide.end; only menubar.dart overrides it to start.',
+    type: 'MenuIndicatorSide',
+    description:
+        'Optional. Defaults to MenuIndicatorSide.end; only menubar.dart overrides it to start.',
   ),
   DocsApiFact(
     name: 'autofocus',
     type: 'bool',
-    description: "Optional. Defaults to true. false for a submenu opened by hover: the keyboard stays on the parent's trigger until ArrowRight or Enter promotes it.",
+    description:
+        "Optional. Defaults to true. false for a submenu opened by hover: the keyboard stays on the parent's trigger until ArrowRight or Enter promotes it.",
   ),
   DocsApiFact(
     name: 'initialHighlight',
     type: 'int',
-    description: 'Optional. Defaults to -1, Radix\'s own "nothing focused yet". 0 is what a keyboard-opened trigger asks for.',
+    description:
+        'Optional. Defaults to -1, Radix\'s own "nothing focused yet". 0 is what a keyboard-opened trigger asks for.',
   ),
   DocsApiFact(
     name: 'onEscape',
     type: 'VoidCallback?',
-    description: 'Optional. Escape while this content has focus. Null routes to onClose; a submenu passes its own so Escape closes exactly one level.',
+    description:
+        'Optional. Escape while this content has focus. Null routes to onClose; a submenu passes its own so Escape closes exactly one level.',
   ),
 ];
 
@@ -1140,24 +1228,35 @@ const List<DocsApiFact> _menuPointerDownFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'onPointerDown',
     type: 'VoidCallback',
-    description: 'Required. Fired on a raw PointerDownEvent, never on a tap, a click, or a keyboard activation.',
+    description:
+        'Required. Fired on a raw PointerDownEvent, never on a tap, a click, or a keyboard activation.',
   ),
-  DocsApiFact(name: 'enabled', type: 'bool', description: 'Optional. Defaults to true. false renders child untouched.'),
+  DocsApiFact(
+    name: 'enabled',
+    type: 'bool',
+    description: 'Optional. Defaults to true. false renders child untouched.',
+  ),
 ];
 
 const List<DocsApiFact> _menuMotionFacts = <DocsApiFact>[
-  DocsApiFact(name: 'duration', type: 'static Duration (get)', description: 'ElDurations.overlay, 320ms.'),
+  DocsApiFact(
+    name: 'duration',
+    type: 'static Duration (get)',
+    description: 'MotionDurations.overlayEnter, 320ms.',
+  ),
   DocsApiFact(
     name: 'slideSides',
-    type: 'static Set<ElPopoverSide> (get)',
-    description: 'All four ElPopoverSide values: the overlay slides in from whichever side it actually lands on, on every one of the family.',
+    type: 'static Set<PopoverSide> (get)',
+    description:
+        'All four PopoverSide values: the overlay slides in from whichever side it actually lands on, on every one of the family.',
   ),
 ];
 
 const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest',
-    treatment: 'popoverForeground ink (destructiveInk on a destructive row); no fill.',
+    treatment:
+        'popoverForeground ink (destructiveText on a destructive row); no fill.',
     userSignal: "A row that reads as part of the menu's own surface.",
   ),
   DocsStateFact(
@@ -1179,7 +1278,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   ),
   DocsStateFact(
     state: 'Disabled',
-    treatment: 'Opacity drops to 50%; the row leaves the roving-focus and typeahead set entirely.',
+    treatment:
+        'Opacity drops to 50%; the row leaves the roving-focus and typeahead set entirely.',
     userSignal: 'Faded and unreachable by keyboard or pointer alike.',
   ),
   DocsStateFact(
@@ -1196,7 +1296,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'menu.dart itself paints no animation of its own — every row is '
         'a snap. The 320ms overlay entrance/exit belongs to whichever '
-        'ElPopover each consumer opens the content inside, not to this '
+        'Popover each consumer opens the content inside, not to this '
         'file.',
     userSignal: 'Rows never animate either way; only the overlay itself might.',
   ),
@@ -1207,7 +1307,7 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The open content itself carries no Semantics container, role '
             'or label of its own: no equivalent of role="menu" and no '
             'aria-activedescendant relationship. Only individual rows '
@@ -1219,17 +1319,17 @@ class _AccessibilityContent extends StatelessWidget {
         'A trigger\'s accessible name is entirely the caller\'s own '
             'responsibility: menu.dart supplies nothing automatically, '
             'because it never renders a trigger.',
-        'Focus behavior: ElMenuContent takes focus itself the frame '
+        'Focus behavior: MenuContent takes focus itself the frame '
             'after it mounts (autofocus: true by default — false only '
             'for a submenu opened by hover, until ArrowRight or Enter '
             'promotes it). Nothing in this file returns focus to a '
             'trigger when the menu closes.',
-        'Touch target: ElMenu.itemHeight is roughly 34.57px, below the '
+        'Touch target: Menu.itemHeight is roughly 34.57px, below the '
             '44 / 48px baseline most touch-target guidance names, and '
             'is not configurable per row or per instance.',
         'Non-colour signal: a checked row pairs its tick with the '
             'row\'s own label text, never colour alone. A destructive '
-            'row pairs its tint with destructiveInk text and the '
+            'row pairs its tint with destructiveText text and the '
             'word itself, not a colour shift alone.',
         'Error wiring: none. No row participates in form validation or '
             'an error state.',
@@ -1244,12 +1344,12 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'ArrowDown / ArrowUp move the roving highlight by one row. NO '
             'WRAP: past the last row ArrowDown stays there, and past the '
             'first ArrowUp stays there too — Radix\'s RovingFocusGroup is '
             'mounted with loop at its false default, the opposite of '
-            "ElSelect's own menu.",
+            "Select's own menu.",
         'Home / End jump straight to the first / last focusable row.',
         'ArrowRight opens a highlighted submenu and focuses its first '
             'row. On any other row it is not handled here at all: it '
@@ -1282,7 +1382,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in menu.dart: it reads no '
             'MediaQuery and renders the same widget tree at 390px and '
             '1440px.',
@@ -1294,7 +1394,7 @@ class _ResponsiveContent extends StatelessWidget {
             'never scaled by density or text-scale settings.',
         'Placement — how close to a viewport edge the content can open '
             'before it has to flip or shift — belongs entirely to '
-            'whichever ElPopover the consumer opens it inside; menu.dart '
+            'whichever Popover the consumer opens it inside; menu.dart '
             'repeats none of that logic itself.',
       ]);
 }
@@ -1327,7 +1427,7 @@ class _DependenciesContent extends StatelessWidget {
                 "The manifest's own registryDependencies, resolved "
                 'automatically: icon.dart (plus the generated icon_paths '
                 'files) for every row glyph, and popover.dart for '
-                'ElPopoverSurface, which ElMenuSurface paints through.',
+                'PopoverSurface, which MenuSurface paints through.',
           ),
           const DocsInstallFact(
             label: 'Consumers',
@@ -1340,7 +1440,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Dropdown Menu', route: '/components/dropdown-menu'),
@@ -1364,7 +1464,7 @@ class _ThemingContent extends StatelessWidget {
       DocsInstallFact(
         label: 'theme.popover / theme.popoverForeground',
         value: 'Content fill and rest ink',
-        description: 'Painted through ElPopoverSurface, which ElMenuSurface wraps.',
+        description: 'Painted through PopoverSurface, which MenuSurface wraps.',
       ),
       DocsInstallFact(
         label: 'theme.accent / theme.accentForeground',
@@ -1372,33 +1472,40 @@ class _ThemingContent extends StatelessWidget {
         description: 'Snaps in and out with no transition — see States.',
       ),
       DocsInstallFact(
-        label: 'theme.destructive / theme.destructiveInk',
+        label: 'theme.destructive / theme.destructiveText',
         value: 'Destructive row tint and ink',
-        description: 'Tint alpha is 10% in light, 20% in dark; the ink itself does not change with the theme.',
+        description:
+            'Tint alpha is 10% in light, 20% in dark; the ink itself does not change with the theme.',
       ),
       DocsInstallFact(
         label: 'theme.mutedForeground',
         value: 'Rest-state leading icon and shortcut ink',
-        description: 'Recolours to accentForeground / destructiveInk once the row is highlighted.',
+        description:
+            'Recolours to accentForeground / destructiveText once the row is highlighted.',
       ),
       DocsInstallFact(
         label: 'theme.foreground',
         value: 'Content ring, 10% alpha',
-        description: "The elevation ElMenuSurfaceKind.content and .subRinged both carry; .subBordered swaps it for a real theme.border line instead.",
+        description:
+            "The elevation MenuSurfaceVariant.content and .subRinged both carry; .subBordered swaps it for a real theme.border line instead.",
       ),
     ],
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

@@ -240,7 +240,7 @@ void _writeChunk(BytesBuilder out, String type, List<int> data) {
 /// Encodes [pixels] as an 8-bit RGBA PNG, grey replicated across RGB.
 ///
 /// RGBA rather than greyscale because that is what the replaced file was
-/// (colour type 6), and `voice_orb.dart` decodes it through Flutter's own
+/// (colour type 6), and `voice_indicator.dart` decodes it through Flutter's own
 /// image pipeline, which hands the shader an RGBA sampler either way. Keeping
 /// the colour type identical means the replacement is a drop-in.
 Uint8List encodePng(Uint8List pixels, {int size = textureSize}) {

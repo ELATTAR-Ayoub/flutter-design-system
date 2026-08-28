@@ -50,23 +50,23 @@ infrastructure and standing one up is a phase of its own.
 
 Reuse the existing rig: real test-view sizing (`tester.view.physicalSize`, not
 synthetic `MediaQuery` — this was a Phase F review correction), a live
-`ElThemeController` flipped in place, `MediaQueryData.disableAnimations` as the
-motion freeze, and `ElClock` for any shot rendering a date.
+`ThemeController` flipped in place, `MediaQueryData.disableAnimations` as the
+motion freeze, and `Clock` for any shot rendering a date.
 
 ## The seventeen-item ceiling
 
 A shot may only depend on registry items that exist. The registry holds exactly
-seventeen: `source-foundation`, `press-motion`, `machine-surface`, `foil-value`,
-`sheen-action`, `icon`, `spinner`, `rule`, `field`, `popover`, `tooltip`,
+seventeen: `source-foundation`, `press`, `surface`, `premium-surface`,
+`action-feedback`, `icon`, `spinner`, `rule`, `field`, `popover`, `tooltip`,
 `button`, `card`, `dialog`, `alert-dialog`, `input`, `select`.
 
-Consequence: **`ElGrid`, `ElPageHeader` and `ElSection` are off-limits** — they
+Consequence: **`Grid`, `PageHeader` and `Section` are off-limits** — they
 live in the example app's own kit, not the package and not the registry. So are
-`ElBadge`, `ElSeparator`, `ElTable`, `ElAvatar`, `ElTabs`, `ElTextarea`: real
+`Badge`, `Separator`, `Table`, `Avatar`, `Tabs`, `Textarea`: real
 components, but not registry items. Responsive layout is hand-rolled from
-`MediaQuery.sizeOf(context).width` against `ElBreakpoints`.
+`MediaQuery.sizeOf(context).width` against `Breakpoints`.
 
-`foil-value` is deliberately excluded from the first three shots — it runs two
+`premium-surface` is deliberately excluded from the first three shots — it runs two
 infinite animations that the deterministic-preview gate would have to freeze.
 
 ## Waves

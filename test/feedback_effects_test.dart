@@ -4,13 +4,25 @@ import 'dart:ui' as ui show Image, ImageByteFormat;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/rendering.dart' hide ScrollDirection;
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
-/// Wave A3 — the feedback page's effects layer: `bloom-cosmic`'s two drifts and
-/// its hover swell, `.starfield`, `AlertAction`, `ElProgress`, `ElSkeleton` and
-/// the `ElEmpty` family.
+/// Wave A3 — the feedback page's effects layer: `feedback-surface`'s two drifts and
+/// its hover swell, `.starfield`, `AlertAction`, `Progress`, `Skeleton` and
+/// the `Empty` family.
 ///
 /// **The painter rule is in force here.** Four of these six paint, and what a
 /// widget tree *says* and what lands on the canvas are two different claims —
@@ -27,7 +39,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 Widget host(
   Widget child, {
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   bool reducedMotion = false,
   Size viewport = const Size(1440, 900),
   EdgeInsets padding = EdgeInsets.zero,
@@ -42,8 +54,8 @@ Widget host(
     ),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Center(child: child),
       ),
     ),
@@ -52,8 +64,8 @@ Widget host(
 
 /// One rasterised frame of [child], as a row-major grid of colours.
 ///
-/// The whole reason this file rasterises: `ElBloomCosmic`, `ElStarfield`,
-/// `ElProgress` and `ElSkeleton` all paint through a [CustomPainter], and a
+/// The whole reason this file rasterises: `FeedbackSurface`, `AmbientPattern`,
+/// `Progress` and `Skeleton` all paint through a [CustomPainter], and a
 /// widget-tree assertion can only see the arguments that went in. This reads
 /// what came out.
 class Raster {
@@ -116,7 +128,7 @@ class Raster {
 Future<Raster> rasterise(
   WidgetTester t,
   Widget child, {
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   bool reducedMotion = false,
   Duration settle = Duration.zero,
 }) async {
@@ -135,7 +147,7 @@ Future<Raster> rasterise(
 /// The `Key('raster')` boundary's pixels, for a host this file pumped by hand.
 ///
 /// [rasterise] mounts its subject and reads it in one call, which a live
-/// [ElToaster] cannot use: it has to be mounted first and fired into
+/// [Toaster] cannot use: it has to be mounted first and fired into
 /// afterwards, so the read is the half that has to stand on its own.
 Future<Raster> readRaster(WidgetTester t) async {
   final RenderRepaintBoundary box = t.renderObject(
@@ -159,9 +171,10 @@ Widget bloomBox(Size size, {bool starfield = true}) => SizedBox(
   width: size.width,
   height: size.height,
   child: Builder(
-    builder: (BuildContext context) => ElBloomCosmic.action(
-      radius: BorderRadius.circular(ElRadii.lg),
-      fill: ElTheme.of(context).card,
+    builder: (BuildContext context) => FeedbackSurface(
+      variant: FeedbackVariant.neutral,
+      radius: BorderRadius.circular(Radii.lg),
+      fill: ThemeScope.of(context).card,
       starfield: starfield,
       child: const SizedBox.expand(),
     ),
@@ -170,63 +183,63 @@ Widget bloomBox(Size size, {bool starfield = true}) => SizedBox(
 
 void main() {
   // ───────────────────────────────────────────────────────────────────────────
-  // bloom-cosmic — the two drifts, the swell, and the caps that make both work
+  // feedback-surface — the two drifts, the swell, and the caps that make both work
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElBloomDrift — the keyframe tables', () {
+  group('BloomDrift — the keyframe tables', () {
     test('the periods are the two the utility writes', () {
-      expect(ElBloomDrift.deep.duration, ElDurations.cosmicDriftDeep);
-      expect(ElBloomDrift.near.duration, ElDurations.cosmicDriftNear);
-      expect(ElDurations.cosmicDriftDeep, const Duration(seconds: 18));
-      expect(ElDurations.cosmicDriftNear, const Duration(seconds: 11));
+      expect(BloomDrift.deep.duration, MotionDurations.cosmicDriftDeep);
+      expect(BloomDrift.near.duration, MotionDurations.cosmicDriftNear);
+      expect(MotionDurations.cosmicDriftDeep, const Duration(seconds: 18));
+      expect(MotionDurations.cosmicDriftNear, const Duration(seconds: 11));
       // 11s collides numerically with `foilDrift` and must stay its own name:
       // a metal sheen and a corner light are unrelated animations.
-      expect(ElDurations.cosmicDriftNear, ElDurations.foilDrift);
+      expect(MotionDurations.cosmicDriftNear, MotionDurations.foilDrift);
       expect(
-        ElDurations.cosmicDriftNear.hashCode,
-        ElDurations.foilDrift.hashCode,
+        MotionDurations.cosmicDriftNear.hashCode,
+        MotionDurations.foilDrift.hashCode,
       );
     });
 
     test('cosmic-drift-deep is three stops, cosmic-drift-near four', () {
-      expect(ElBloomDrift.deep.stops, hasLength(3));
-      expect(ElBloomDrift.near.stops, hasLength(4));
+      expect(BloomDrift.deep.stops, hasLength(3));
+      expect(BloomDrift.near.stops, hasLength(4));
       expect(
-        ElBloomDrift.deep.stops.map((ElBloomDriftStop s) => s.percent),
+        BloomDrift.deep.stops.map((BloomDriftStop s) => s.percent),
         <double>[0, 50, 100],
       );
       expect(
-        ElBloomDrift.near.stops.map((ElBloomDriftStop s) => s.percent),
+        BloomDrift.near.stops.map((BloomDriftStop s) => s.percent),
         <double>[0, 35, 70, 100],
       );
     });
 
     test('the tracks land on the declared values at every stop', () {
       // `50% { translate3d(-11%, 8%, 0) rotate(7deg) scale(1.2) }`
-      expect(ElBloomDrift.deep.translateX.transform(0.5), closeTo(-0.11, 1e-9));
-      expect(ElBloomDrift.deep.translateY.transform(0.5), closeTo(0.08, 1e-9));
-      expect(ElBloomDrift.deep.scale.transform(0.5), closeTo(1.2, 1e-9));
+      expect(BloomDrift.deep.translateX.transform(0.5), closeTo(-0.11, 1e-9));
+      expect(BloomDrift.deep.translateY.transform(0.5), closeTo(0.08, 1e-9));
+      expect(BloomDrift.deep.scale.transform(0.5), closeTo(1.2, 1e-9));
       // `100% { translate3d(6%, -9%, 0) rotate(-5deg) scale(1.08) }`
-      expect(ElBloomDrift.deep.translateX.transform(1), closeTo(0.06, 1e-9));
-      expect(ElBloomDrift.deep.scale.transform(1), closeTo(1.08, 1e-9));
+      expect(BloomDrift.deep.translateX.transform(1), closeTo(0.06, 1e-9));
+      expect(BloomDrift.deep.scale.transform(1), closeTo(1.08, 1e-9));
       // The near field's `0%` is scale(1.04) — NOT 1. See the resting-frame
       // test below, which is where that 4% matters.
-      expect(ElBloomDrift.near.scale.transform(0), closeTo(1.04, 1e-9));
-      expect(ElBloomDrift.near.scale.transform(0.35), closeTo(1.18, 1e-9));
-      expect(ElBloomDrift.near.scale.transform(0.70), closeTo(1, 1e-9));
-      expect(ElBloomDrift.near.scale.transform(1), closeTo(1.14, 1e-9));
+      expect(BloomDrift.near.scale.transform(0), closeTo(1.04, 1e-9));
+      expect(BloomDrift.near.scale.transform(0.35), closeTo(1.18, 1e-9));
+      expect(BloomDrift.near.scale.transform(0.70), closeTo(1, 1e-9));
+      expect(BloomDrift.near.scale.transform(1), closeTo(1.14, 1e-9));
     });
 
     test('the hover swell is 2.2 on the deep layer and 2.5 on the near', () {
-      expect(ElBloomDrift.deep.hoverScale, 2.2);
-      expect(ElBloomDrift.near.hoverScale, 2.5);
+      expect(BloomDrift.deep.hoverScale, 2.2);
+      expect(BloomDrift.near.hoverScale, 2.5);
     });
 
     test('transform-origin is 88%/82% deep and 90%/86% near', () {
-      expect(ElBloomDrift.deep.originX, 0.88);
-      expect(ElBloomDrift.deep.originY, 0.82);
-      expect(ElBloomDrift.near.originX, 0.90);
-      expect(ElBloomDrift.near.originY, 0.86);
+      expect(BloomDrift.deep.originX, 0.88);
+      expect(BloomDrift.deep.originY, 0.82);
+      expect(BloomDrift.near.originX, 0.90);
+      expect(BloomDrift.near.originY, 0.86);
     });
 
     test('the resting frame is transform:none, not stop 0', () {
@@ -238,15 +251,15 @@ void main() {
       // near field 4% too big — the failure mode this pin names.
       const Rect layer = Rect.fromLTWH(0, 0, 416, 200);
       expect(
-        ElBloomDrift.deep.restingMatrixFor(layer, hoverT: 0),
+        BloomDrift.deep.restingMatrixFor(layer, hoverT: 0),
         Matrix4.identity(),
       );
       expect(
-        ElBloomDrift.near.restingMatrixFor(layer, hoverT: 0),
+        BloomDrift.near.restingMatrixFor(layer, hoverT: 0),
         Matrix4.identity(),
       );
       expect(
-        ElBloomDrift.near.driftMatrix(layer, 0),
+        BloomDrift.near.driftMatrix(layer, 0),
         isNot(Matrix4.identity()),
         reason: 'stop 0 of the near table is scale(1.04)',
       );
@@ -254,7 +267,7 @@ void main() {
 
     test('the swell multiplies onto the drift about the layer origin', () {
       const Rect layer = Rect.fromLTWH(0, 0, 400, 200);
-      final Matrix4 hovered = ElBloomDrift.deep.matrixFor(
+      final Matrix4 hovered = BloomDrift.deep.matrixFor(
         layer,
         driftT: 0,
         hoverT: 1,
@@ -281,8 +294,8 @@ void main() {
     test('both caps bite on the feedback page\'s Alert', () {
       // `w-full` inside a 1030px panel body, less the 1px border on each side.
       const Rect alert = Rect.fromLTWH(0, 0, 1028, 69.125);
-      expect(ElBloomCosmic.layerRectFor(alert, deep: true).width, 416);
-      expect(ElBloomCosmic.layerRectFor(alert, deep: false).width, 336);
+      expect(FeedbackSurface.layerRectFor(alert, deep: true).width, 416);
+      expect(FeedbackSurface.layerRectFor(alert, deep: false).width, 336);
       // The anti-assertion: an uncapped port would paint these instead, and
       // 976px of light on a 1028px card is a flood, not a corner.
       expect(1028 * 0.95, closeTo(976.6, 0.05));
@@ -293,28 +306,28 @@ void main() {
       // 356px less its 1px border on each side.
       const Rect toast = Rect.fromLTWH(0, 0, 354, 51.5);
       expect(
-        ElBloomCosmic.layerRectFor(toast, deep: true).width,
+        FeedbackSurface.layerRectFor(toast, deep: true).width,
         closeTo(336.3, 0.05),
       );
       expect(
-        ElBloomCosmic.layerRectFor(toast, deep: false).width,
+        FeedbackSurface.layerRectFor(toast, deep: false).width,
         closeTo(304.44, 0.05),
       );
       // Both are under their caps, which is the point: the same declaration
       // resolves to a percentage here and to a constant on the Alert.
       expect(
-        ElBloomCosmic.layerRectFor(toast, deep: true).width,
+        FeedbackSurface.layerRectFor(toast, deep: true).width,
         lessThan(416),
       );
       expect(
-        ElBloomCosmic.layerRectFor(toast, deep: false).width,
+        FeedbackSurface.layerRectFor(toast, deep: false).width,
         lessThan(336),
       );
     });
 
     test('the layer hangs off the right edge and overshoots top and bottom', () {
       const Rect alert = Rect.fromLTWH(0, 0, 1028, 69.125);
-      final Rect deep = ElBloomCosmic.layerRectFor(alert, deep: true);
+      final Rect deep = FeedbackSurface.layerRectFor(alert, deep: true);
       // `inset: -95% -4.5rem -95% auto` — 72px past the right edge, and 95% of
       // the host's height clear of both the top and the bottom.
       expect(deep.right, closeTo(1028 + 72, 0.001));
@@ -333,7 +346,7 @@ void main() {
       WidgetTester t,
     ) async {
       final Raster frame = await rasterise(t, bloomBox(box, starfield: false));
-      final Color card = ElThemeData.dark.card;
+      final Color card = ThemeTokens.dark.card;
       final double cardLuma =
           card.r * 0.2126 + card.g * 0.7152 + card.b * 0.0722;
 
@@ -414,7 +427,7 @@ void main() {
 
       // Stilled is not blank: the resting frame is the light the forms page
       // already ships.
-      final Color card = ElThemeData.dark.card;
+      final Color card = ThemeTokens.dark.card;
       final double cardLuma =
           card.r * 0.2126 + card.g * 0.7152 + card.b * 0.0722;
       expect(
@@ -462,13 +475,13 @@ void main() {
       }
 
       final Raster resting = await shot();
-      await mouse.moveTo(t.getCenter(find.byType(ElBloomCosmic)));
+      await mouse.moveTo(t.getCenter(find.byType(FeedbackSurface)));
       // Two pumps, not one: the swell's controller starts during the event
       // dispatch, and its ticker takes the first frame after that as t0. A
       // single `pump(1050ms)` would land on t0 and read a swell of zero — the
       // test would fail while the widget was right.
       await t.pump();
-      await t.pump(ElDurations.bloom + const Duration(milliseconds: 50));
+      await t.pump(MotionDurations.bloom + const Duration(milliseconds: 50));
       final Raster hovered = await shot();
 
       // The swell is 2.2×/2.5× about a corner origin, so the light reaches
@@ -493,19 +506,19 @@ void main() {
   // .starfield
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElStarfield — the two clusters', () {
+  group('AmbientPattern — the two clusters', () {
     test('eight sparkles bottom-right, five top-right, thirteen in all', () {
-      expect(elStarfieldDense.sparkles, hasLength(8));
-      expect(elStarfieldThin.sparkles, hasLength(5));
-      expect(ElStarfield.clusters, <ElStarfieldCluster>[
-        elStarfieldDense,
-        elStarfieldThin,
+      expect(starfieldDense.sparkles, hasLength(8));
+      expect(starfieldThin.sparkles, hasLength(5));
+      expect(AmbientPattern.clusters, <StarfieldCluster>[
+        starfieldDense,
+        starfieldThin,
       ]);
     });
 
     test('the tiles are the two viewBoxes', () {
-      expect(elStarfieldDense.tile, const Size(260, 96));
-      expect(elStarfieldThin.tile, const Size(200, 64));
+      expect(starfieldDense.tile, const Size(260, 96));
+      expect(starfieldThin.tile, const Size(200, 64));
     });
 
     test('every instance is its measured opacity/translate/scale triple', () {
@@ -526,13 +539,13 @@ void main() {
         <double>[0.42, 96, 14, 0.13],
         <double>[0.38, 150, 60, 0.12],
       ];
-      for (final (List<List<double>> table, ElStarfieldCluster cluster)
-          in <(List<List<double>>, ElStarfieldCluster)>[
-            (dense, elStarfieldDense),
-            (thin, elStarfieldThin),
+      for (final (List<List<double>> table, StarfieldCluster cluster)
+          in <(List<List<double>>, StarfieldCluster)>[
+            (dense, starfieldDense),
+            (thin, starfieldThin),
           ]) {
         for (int i = 0; i < table.length; i++) {
-          final ElSparkle s = cluster.sparkles[i];
+          final Sparkle s = cluster.sparkles[i];
           expect(s.opacity, table[i][0], reason: 'sparkle ${i + 1} opacity');
           expect(s.x, table[i][1], reason: 'sparkle ${i + 1} x');
           expect(s.y, table[i][2], reason: 'sparkle ${i + 1} y');
@@ -541,25 +554,25 @@ void main() {
           expect(s.box.width, closeTo(24 * table[i][3], 1e-9));
         }
       }
-      expect(elStarfieldDense.sparkles.first.box.width, closeTo(11.04, 1e-9));
-      expect(elStarfieldThin.sparkles.last.box.width, closeTo(2.88, 1e-9));
+      expect(starfieldDense.sparkles.first.box.width, closeTo(11.04, 1e-9));
+      expect(starfieldThin.sparkles.last.box.width, closeTo(2.88, 1e-9));
     });
 
     test('the sways are 44s ±6° and 33s ∓5°', () {
-      expect(elStarfieldDense.sway, ElDurations.sway);
-      expect(elStarfieldThin.sway, ElDurations.swayAlt);
-      expect(ElDurations.sway, const Duration(seconds: 44));
-      expect(ElDurations.swayAlt, const Duration(seconds: 33));
+      expect(starfieldDense.sway, MotionDurations.sway);
+      expect(starfieldThin.sway, MotionDurations.swayAlt);
+      expect(MotionDurations.sway, const Duration(seconds: 44));
+      expect(MotionDurations.swayAlt, const Duration(seconds: 33));
 
-      expect(elStarfieldDense.swayDegreesAt(0), closeTo(-6, 1e-9));
-      expect(elStarfieldDense.swayDegreesAt(1), closeTo(6, 1e-9));
+      expect(starfieldDense.swayDegreesAt(0), closeTo(-6, 1e-9));
+      expect(starfieldDense.swayDegreesAt(1), closeTo(6, 1e-9));
       // The alt runs the other way: `from { rotate: 5deg } to { rotate: -5deg }`.
-      expect(elStarfieldThin.swayDegreesAt(0), closeTo(5, 1e-9));
-      expect(elStarfieldThin.swayDegreesAt(1), closeTo(-5, 1e-9));
+      expect(starfieldThin.swayDegreesAt(0), closeTo(5, 1e-9));
+      expect(starfieldThin.swayDegreesAt(1), closeTo(-5, 1e-9));
       // An oscillation, never a revolution — a full turn would swing the
       // cluster clear of the box for half its cycle.
       for (double t = 0; t <= 1; t += 0.05) {
-        expect(elStarfieldDense.swayDegreesAt(t).abs(), lessThanOrEqualTo(6));
+        expect(starfieldDense.swayDegreesAt(t).abs(), lessThanOrEqualTo(6));
       }
     });
 
@@ -569,70 +582,70 @@ void main() {
       // cycle. Written as one `transform` the hover would arrive somewhere
       // different at every rotation — which is the failure mode.
       const Size box = Size(354, 96);
-      final Offset origin = elStarfieldDense.originIn(box);
+      final Offset origin = starfieldDense.originIn(box);
       Offset mappedOrigin(double swayT) => MatrixUtils.transformPoint(
-        elStarfieldDense.matrixFor(box, swayT: swayT, hoverT: 1),
+        starfieldDense.matrixFor(box, swayT: swayT, hoverT: 1),
         origin,
       );
 
       // The origin is the pivot of both the rotation and the scale, so only the
       // translate can move it — and it moves it by the same amount either way.
-      expect(mappedOrigin(0) - origin, elStarfieldDense.hoverTranslate);
-      expect(mappedOrigin(1) - origin, elStarfieldDense.hoverTranslate);
-      expect(elStarfieldDense.hoverTranslate, const Offset(-5, 3));
-      expect(elStarfieldDense.hoverScale, 1.06);
-      expect(elStarfieldThin.hoverTranslate, const Offset(-3, -2));
-      expect(elStarfieldThin.hoverScale, 1.04);
+      expect(mappedOrigin(0) - origin, starfieldDense.hoverTranslate);
+      expect(mappedOrigin(1) - origin, starfieldDense.hoverTranslate);
+      expect(starfieldDense.hoverTranslate, const Offset(-5, 3));
+      expect(starfieldDense.hoverScale, 1.06);
+      expect(starfieldThin.hoverTranslate, const Offset(-3, -2));
+      expect(starfieldThin.hoverScale, 1.04);
     });
 
     test('each cluster pivots about the corner it is anchored to', () {
       const Size box = Size(1028, 69.125);
-      expect(elStarfieldDense.originIn(box), const Offset(1028, 69.125));
-      expect(elStarfieldThin.originIn(box), const Offset(1028, 0));
+      expect(starfieldDense.originIn(box), const Offset(1028, 69.125));
+      expect(starfieldThin.originIn(box), const Offset(1028, 0));
       // `background-position: right bottom` / `right top`, no-repeat.
       expect(
-        elStarfieldDense.tileOriginIn(box),
+        starfieldDense.tileOriginIn(box),
         const Offset(1028 - 260, 69.125 - 96),
       );
-      expect(elStarfieldThin.tileOriginIn(box), const Offset(1028 - 200, 0));
+      expect(starfieldThin.tileOriginIn(box), const Offset(1028 - 200, 0));
     });
 
     test('the clipping decides which sparkles exist — Alert', () {
       // Anchored, not tiled: on a 69.125px Alert the 96px tile's top 26.875px
       // is outside the box. Sparkle 5 (tile-y 16…20.32) goes entirely.
       const Size alert = Size(1028, 69.125);
-      final List<ElSparkle> visible = ElStarfield.visibleIn(
-        elStarfieldDense,
+      final List<Sparkle> visible = AmbientPattern.visibleIn(
+        starfieldDense,
         alert,
       );
       expect(visible, hasLength(7));
       expect(
-        visible.contains(elStarfieldDense.sparkles[4]),
+        visible.contains(starfieldDense.sparkles[4]),
         isFalse,
         reason: 'sparkle 5 is above the box and must not render',
       );
       // Sparkle 2 (tile-y 24…30.24) survives as a 3.365px sliver.
-      final ElSparkle two = elStarfieldDense.sparkles[1];
+      final Sparkle two = starfieldDense.sparkles[1];
       expect(visible.contains(two), isTrue);
-      final double origin = elStarfieldDense.tileOriginIn(alert).dy;
+      final double origin = starfieldDense.tileOriginIn(alert).dy;
       expect(two.box.shift(Offset(0, origin)).bottom, closeTo(3.365, 0.005));
       // Cluster B is never clipped vertically.
-      expect(ElStarfield.visibleIn(elStarfieldThin, alert), hasLength(5));
+      expect(AmbientPattern.visibleIn(starfieldThin, alert), hasLength(5));
     });
 
     test('the clipping decides which sparkles exist — toast', () {
       // A single-line toast is 51.5px tall, so the tile origin is −44.5 and
       // BOTH 2 and 5 go; 6 keeps 0.78px; 1 · 3 · 4 · 7 · 8 survive.
       const Size toast = Size(354, 51.5);
-      final List<ElSparkle> visible = ElStarfield.visibleIn(
-        elStarfieldDense,
+      final List<Sparkle> visible = AmbientPattern.visibleIn(
+        starfieldDense,
         toast,
       );
       expect(visible, hasLength(6));
-      expect(visible.contains(elStarfieldDense.sparkles[1]), isFalse);
-      expect(visible.contains(elStarfieldDense.sparkles[4]), isFalse);
-      final ElSparkle six = elStarfieldDense.sparkles[5];
-      final double origin = elStarfieldDense.tileOriginIn(toast).dy;
+      expect(visible.contains(starfieldDense.sparkles[1]), isFalse);
+      expect(visible.contains(starfieldDense.sparkles[4]), isFalse);
+      final Sparkle six = starfieldDense.sparkles[5];
+      final double origin = starfieldDense.tileOriginIn(toast).dy;
       expect(six.box.shift(Offset(0, origin)).bottom, closeTo(0.78, 0.005));
 
       // THE FAILURE MODE, named: a port that rescaled the tile to fit instead
@@ -640,32 +653,35 @@ void main() {
       // different density on every host.
       expect(
         visible.length,
-        isNot(elStarfieldDense.sparkles.length),
+        isNot(starfieldDense.sparkles.length),
         reason: 'the tile was rescaled to fit rather than clipped',
       );
     });
 
     test('the glow splits per theme, and only the light one is per-host', () {
       // Dark: `rgb(255 255 255 / 0.5)` — the sparkle's own white, halved.
-      final Color dark = ElStarfield.glowFor(
-        ElThemeData.dark,
-        ElPalette.warning,
+      final Color dark = AmbientPattern.glowFor(
+        ThemeTokens.dark,
+        Palette.warning,
       );
       expect(dark.a, closeTo(0.5, 1e-9));
       expect(dark.r, 1);
       expect(dark.g, 1);
       expect(dark.b, 1);
       // …and it does NOT move with the host's hue.
-      expect(ElStarfield.glowFor(ElThemeData.dark, ElPalette.info), dark);
+      expect(AmbientPattern.glowFor(ThemeTokens.dark, Palette.info), dark);
 
       // Light: `color-mix(in oklab, var(--bloom-2) 85%, transparent)` — the
       // host's own hue at 0.85, so an info alert and a warning toast glow in
       // two different colours on paper.
-      final Color warm = ElStarfield.glowFor(
-        ElThemeData.light,
-        ElPalette.warning,
+      final Color warm = AmbientPattern.glowFor(
+        ThemeTokens.light,
+        Palette.warning,
       );
-      final Color cool = ElStarfield.glowFor(ElThemeData.light, ElPalette.info);
+      final Color cool = AmbientPattern.glowFor(
+        ThemeTokens.light,
+        Palette.info,
+      );
       expect(warm.a, closeTo(0.85, 1e-9));
       expect(warm, isNot(cool));
     });
@@ -674,17 +690,17 @@ void main() {
       // The asymmetry worth pinning: `blur(16px)` IS a sigma, `drop-shadow(0 0
       // 2px)` is a radius and therefore σ = 1. Reading the second as a sigma
       // would double every glow on the page.
-      final ({double tight, double wide}) dark = ElStarfield.sigmasFor(
-        ElThemeData.dark,
+      final ({double tight, double wide}) dark = AmbientPattern.sigmasFor(
+        ThemeTokens.dark,
       );
-      expect(ElThemeData.dark.starGlowSize, 2);
+      expect(ThemeTokens.dark.starGlowSize, 2);
       expect(dark.tight, closeTo(1, 1e-9));
       expect(dark.wide, closeTo(3, 1e-9));
 
-      final ({double tight, double wide}) light = ElStarfield.sigmasFor(
-        ElThemeData.light,
+      final ({double tight, double wide}) light = AmbientPattern.sigmasFor(
+        ThemeTokens.light,
       );
-      expect(ElThemeData.light.starGlowSize, 3);
+      expect(ThemeTokens.light.starGlowSize, 3);
       expect(light.tight, closeTo(1.5, 1e-9));
       expect(light.wide, closeTo(4.5, 1e-9));
     });
@@ -778,7 +794,7 @@ void main() {
   // AlertAction and the reserved lane
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElAlert.action — F10\'s unconditional lane', () {
+  group('Alert.action — F10\'s unconditional lane', () {
     testWidgets(
       'the action sits 8px from the top and right of the border box',
       (WidgetTester t) async {
@@ -786,14 +802,14 @@ void main() {
           host(
             SizedBox(
               width: 1030,
-              child: ElAlert(
-                variant: ElAlertVariant.warning,
-                icon: const ElIcon(ElIconGlyph.hourglass),
+              child: Alert(
+                variant: AlertVariant.warning,
+                icon: const Icon(IconGlyph.hourglass),
                 title: 'Withdrawal under review',
                 description: 'Withdrawals over \$1,000 are reviewed manually.',
-                action: ElButton(
-                  variant: ElButtonVariant.secondary,
-                  size: ElButtonSize.sm,
+                action: Button(
+                  variant: ButtonVariant.secondary,
+                  size: ButtonSize.sm,
                   onPressed: () {},
                   child: const Text('Details'),
                 ),
@@ -801,8 +817,8 @@ void main() {
             ),
           ),
         );
-        final Rect alert = t.getRect(find.byType(ElAlert));
-        final Rect button = t.getRect(find.byType(ElButton));
+        final Rect alert = t.getRect(find.byType(Alert));
+        final Rect button = t.getRect(find.byType(Button));
         expect(alert.top - button.top, closeTo(-8, 0.001));
         expect(alert.right - button.right, closeTo(8, 0.001));
         // `Button variant="secondary" size="sm"` is 32px tall.
@@ -816,8 +832,8 @@ void main() {
       // Supervisor ruling F10. `has-data-[slot=alert-action]:pr-20` widens the
       // right padding unconditionally, which is what makes the two action
       // Alerts wrap differently from the other three.
-      expect(ElAlert.actionLane, 80);
-      expect(ElAlert.actionInset, 8);
+      expect(Alert.actionLane, 80);
+      expect(Alert.actionInset, 8);
 
       // A title long enough to fill its line, so its longest line reports the
       // measure it was given.
@@ -833,13 +849,13 @@ void main() {
           host(
             SizedBox(
               width: 1030,
-              child: ElAlert(
-                icon: const ElIcon(ElIconGlyph.info),
+              child: Alert(
+                icon: const Icon(IconGlyph.info),
                 title: long,
                 action: withAction
-                    ? ElButton(
-                        variant: ElButtonVariant.secondary,
-                        size: ElButtonSize.sm,
+                    ? Button(
+                        variant: ButtonVariant.secondary,
+                        size: ButtonSize.sm,
                         onPressed: () {},
                         child: const Text('Retry'),
                       )
@@ -853,7 +869,7 @@ void main() {
         final EdgeInsets pad = t
             .widgetList<Padding>(
               find.descendant(
-                of: find.byType(ElAlert),
+                of: find.byType(Alert),
                 matching: find.byType(Padding),
               ),
             )
@@ -883,51 +899,49 @@ void main() {
 
     testWidgets('no action means no lane and no Stack', (WidgetTester t) async {
       await t.pumpWidget(
-        host(
-          const SizedBox(width: 448, child: ElAlert(title: 'Provably fair')),
-        ),
+        host(const SizedBox(width: 448, child: Alert(title: 'Provably fair'))),
       );
-      expect(find.byType(ElButton), findsNothing);
+      expect(find.byType(Button), findsNothing);
     });
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // ElProgress
+  // Progress
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElProgress', () {
+  group('Progress', () {
     test('five tones, each an -ink fill on its own shadow', () {
-      expect(ElProgressTone.values, hasLength(5));
-      expect(ElProgressTone.normal.label, 'default');
-      expect(ElProgressTone.value.label, 'value');
+      expect(ProgressTone.values, hasLength(5));
+      expect(ProgressTone.normal.label, 'default');
+      expect(ProgressTone.value.label, 'value');
 
-      final ElThemeData theme = ElThemeData.dark;
-      expect(ElProgressTone.normal.inkOf(theme), theme.actionInk);
-      expect(ElProgressTone.value.inkOf(theme), theme.valueInk);
-      expect(ElProgressTone.success.inkOf(theme), theme.successInk);
-      expect(ElProgressTone.warning.inkOf(theme), theme.warningInk);
-      expect(ElProgressTone.destructive.inkOf(theme), theme.destructiveInk);
+      final ThemeTokens theme = ThemeTokens.dark;
+      expect(ProgressTone.normal.inkOf(theme), theme.actionText);
+      expect(ProgressTone.value.inkOf(theme), theme.premiumText);
+      expect(ProgressTone.success.inkOf(theme), theme.successText);
+      expect(ProgressTone.warning.inkOf(theme), theme.warningText);
+      expect(ProgressTone.destructive.inkOf(theme), theme.destructiveText);
 
       // The two lit tones carry their ramp's own glow; the other three do not.
-      expect(ElProgressTone.normal.shadow, ElShadows.btnPrimary);
-      expect(ElProgressTone.value.shadow, ElShadows.btnValue);
-      expect(ElProgressTone.success.shadow, ElShadows.btn);
-      expect(ElProgressTone.warning.shadow, ElShadows.btn);
-      expect(ElProgressTone.destructive.shadow, ElShadows.btn);
+      expect(ProgressTone.normal.shadow, Shadows.controlPrimary);
+      expect(ProgressTone.value.shadow, Shadows.controlPremium);
+      expect(ProgressTone.success.shadow, Shadows.control);
+      expect(ProgressTone.warning.shadow, Shadows.control);
+      expect(ProgressTone.destructive.shadow, Shadows.control);
     });
 
     test('the fill is a translation of a full-width bar', () {
-      expect(const ElProgress(value: 100).translation, 0);
-      expect(const ElProgress(value: 0).translation, -1);
-      expect(const ElProgress(value: 20.6).translation, closeTo(-0.794, 1e-9));
-      expect(const ElProgress(value: 69.6).translation, closeTo(-0.304, 1e-9));
+      expect(const Progress(value: 100).translation, 0);
+      expect(const Progress(value: 0).translation, -1);
+      expect(const Progress(value: 20.6).translation, closeTo(-0.794, 1e-9));
+      expect(const Progress(value: 69.6).translation, closeTo(-0.304, 1e-9));
     });
 
     test('the transition is the default, not the token that matches it', () {
       // `duration-base` is a `duration-<word>` utility and emits nothing, so
       // the transition lands on `--default-transition-duration`.
-      expect(ElProgress.transition, ElDurations.transitionDefault);
-      expect(ElProgress.height, 10);
+      expect(Progress.transition, MotionDurations.normal);
+      expect(Progress.height, 10);
     });
 
     testWidgets('10px channel, r999, 1px --input over --muted, in a socket', (
@@ -937,27 +951,27 @@ void main() {
         host(
           const SizedBox(
             width: 448,
-            child: ElProgress(value: 69.6, tone: ElProgressTone.value),
+            child: Progress(value: 69.6, tone: ProgressTone.value),
           ),
         ),
       );
-      final ElThemeData theme = ElTheme.of(t.element(find.byType(ElProgress)));
-      final Rect bar = t.getRect(find.byType(ElProgress));
+      final ThemeTokens theme = ThemeScope.of(t.element(find.byType(Progress)));
+      final Rect bar = t.getRect(find.byType(Progress));
       expect(bar.height, 10);
       expect(bar.width, 448);
 
-      final ElMachineSurface root = t.widget<ElMachineSurface>(
+      final Surface root = t.widget<Surface>(
         find
             .descendant(
-              of: find.byType(ElProgress),
-              matching: find.byType(ElMachineSurface),
+              of: find.byType(Progress),
+              matching: find.byType(Surface),
             )
             .first,
       );
-      expect(root.spec.layers, ElShadows.pressed.layers);
+      expect(root.spec.layers, Shadows.inset.layers);
       expect(root.fill, theme.muted);
       expect((root.border! as Border).top.color, theme.input);
-      expect(root.radius, BorderRadius.circular(ElRadii.pill));
+      expect(root.radius, BorderRadius.circular(Radii.full));
     });
 
     testWidgets('the first bar can have no accessible name — drift 6', (
@@ -965,13 +979,13 @@ void main() {
     ) async {
       final SemanticsHandle handle = t.ensureSemantics();
       await t.pumpWidget(
-        host(const SizedBox(width: 448, child: ElProgress(value: 20.6))),
+        host(const SizedBox(width: 448, child: Progress(value: 20.6))),
       );
       // `page.tsx:339` is a bare `<Progress value={20.6} />`; every other bar
       // on the page passes an aria-label. The port must be able to reproduce
       // the omission rather than quietly fixing it.
-      expect(t.getSemantics(find.byType(ElProgress)).label, '');
-      expect(t.getSemantics(find.byType(ElProgress)).value, '21%');
+      expect(t.getSemantics(find.byType(Progress)).label, '');
+      expect(t.getSemantics(find.byType(Progress)).value, '21%');
       handle.dispose();
     });
 
@@ -982,12 +996,12 @@ void main() {
         t,
         const SizedBox(
           width: width,
-          child: ElProgress(value: 60, tone: ElProgressTone.success),
+          child: Progress(value: 60, tone: ProgressTone.success),
         ),
         // Past the fill transition, which starts from 0 on the first frame.
         settle: const Duration(milliseconds: 400),
       );
-      final ElThemeData theme = ElThemeData.dark;
+      final ThemeTokens theme = ThemeTokens.dark;
 
       // The content box is the channel less its 1px border on each side, and
       // 60% of it is filled.
@@ -1002,7 +1016,7 @@ void main() {
       final Color filled = frame.at(boundary - 12, mid);
       expect(filled.g, greaterThan(filled.r * 3));
       expect(filled.g, greaterThan(filled.b));
-      expect(filled.g, closeTo(theme.successInk.g, 0.15));
+      expect(filled.g, closeTo(theme.successText.g, 0.15));
 
       // Right of it: the sunken `--muted` track, which is far darker.
       expect(
@@ -1027,47 +1041,47 @@ void main() {
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // ElSkeleton
+  // Skeleton
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElSkeleton', () {
+  group('Skeleton', () {
     test('it states no motion of its own', () {
-      expect(ElSkeleton.defaultRadius, ElRadii.md);
-      expect(ElShimmer.duration, ElDurations.shimmer);
-      expect(ElShimmer.fill, ElKeyframeFill.none);
-      expect(ElShimmer.loops, isTrue);
+      expect(Skeleton.defaultRadius, Radii.md);
+      expect(LoadingShimmerMotion.duration, MotionDurations.shimmer);
+      expect(LoadingShimmerMotion.fill, KeyframeFill.none);
+      expect(LoadingShimmerMotion.loops, isTrue);
     });
 
     testWidgets('the box is the caller\'s and the corner is rounded-md', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(const ElSkeleton(width: 160, height: 16)));
-      final Rect box = t.getRect(find.byType(ElSkeleton));
+      await t.pumpWidget(host(const Skeleton(width: 160, height: 16)));
+      final Rect box = t.getRect(find.byType(Skeleton));
       expect(box.width, 160);
       expect(box.height, 16);
       final ClipRRect clip = t.widget<ClipRRect>(
         find.descendant(
-          of: find.byType(ElSkeleton),
+          of: find.byType(Skeleton),
           matching: find.byType(ClipRRect),
         ),
       );
-      expect(clip.borderRadius, BorderRadius.circular(ElRadii.md));
+      expect(clip.borderRadius, BorderRadius.circular(Radii.md));
     });
 
     test('the span form is an inline box aligned to the middle', () {
       // `as="span"` → `inline-block`, and the page's one instance adds
       // `align-middle`.
-      final InlineSpan span = ElSkeleton.span(width: 112, height: 14);
+      final InlineSpan span = Skeleton.span(width: 112, height: 14);
       expect(span, isA<WidgetSpan>());
       expect((span as WidgetSpan).alignment, PlaceholderAlignment.middle);
-      expect(span.child, isA<ElSkeleton>());
+      expect(span.child, isA<Skeleton>());
     });
 
     testWidgets('rasterised: the band crosses, and reduced motion holds it', (
       WidgetTester t,
     ) async {
       const Size box = Size(160, 24);
-      const Widget skeleton = ElSkeleton(width: 160, height: 24);
+      const Widget skeleton = Skeleton(width: 160, height: 24);
       final Rect all = Offset.zero & box;
 
       final Raster first = await rasterise(t, skeleton);
@@ -1085,7 +1099,7 @@ void main() {
 
       // Every pixel is somewhere on the popover→accent ramp, in both frames:
       // the tile repeats, so the box is never empty at the extremes.
-      final ElThemeData theme = ElThemeData.dark;
+      final ThemeTokens theme = ThemeTokens.dark;
       final double floor =
           theme.popover.r * 0.2126 +
           theme.popover.g * 0.7152 +
@@ -1124,10 +1138,10 @@ void main() {
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // ElEmpty
+  // Empty
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElEmpty — six parts, two drifts', () {
+  group('Empty — six parts, two drifts', () {
     testWidgets('the dashed border never paints — drift 8', (
       WidgetTester t,
     ) async {
@@ -1135,16 +1149,16 @@ void main() {
         host(
           SizedBox(
             width: 482,
-            child: ElEmpty(
+            child: Empty(
               children: <Widget>[
-                ElEmptyHeader(
+                EmptyHeader(
                   children: <Widget>[
-                    const ElEmptyMedia(
-                      glyph: ElIconGlyph.packageOpen,
-                      tone: ElIconTone.action,
+                    const EmptyMedia(
+                      glyph: IconGlyph.packageOpen,
+                      tone: IconTone.action,
                     ),
-                    const ElEmptyTitle('Your Stash is empty'),
-                    const ElEmptyDescription('Cards land here.'),
+                    const EmptyTitle('Your Stash is empty'),
+                    const EmptyDescription('Cards land here.'),
                   ],
                 ),
               ],
@@ -1160,7 +1174,7 @@ void main() {
       final Iterable<DecoratedBox> decorated = t
           .widgetList<DecoratedBox>(
             find.descendant(
-              of: find.byType(ElEmpty),
+              of: find.byType(Empty),
               matching: find.byType(DecoratedBox),
             ),
           )
@@ -1172,21 +1186,16 @@ void main() {
         isEmpty,
         reason: 'a border painted where the reference has none',
       );
-      expect(ElEmpty.radius, ElRadii.xl);
-      expect(ElEmpty.padding, 24);
-      expect(ElEmpty.gap, 16);
+      expect(Empty.radius, Radii.xl);
+      expect(Empty.padding, 24);
+      expect(Empty.gap, 16);
     });
 
     testWidgets('EmptyMedia defeats Icon size="xl" — drift 9', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(
-        host(
-          const ElEmptyMedia(
-            glyph: ElIconGlyph.search,
-            tone: ElIconTone.subtle,
-          ),
-        ),
+        host(const EmptyMedia(glyph: IconGlyph.search, tone: IconTone.subtle)),
       );
       // The tile is 32 × 32 on a 12px corner.
       final Rect tile = t.getRect(find.byType(Container));
@@ -1197,35 +1206,35 @@ void main() {
       // 24: `[&_svg:not([class*='size-'])]:size-4` wins the box and the
       // `size="xl"` attribute loses, but `icon.tsx` computes strokeWidth from
       // the PROP. So it is visibly thinner than every other 16px glyph.
-      final ElIcon icon = t.widget<ElIcon>(find.byType(ElIcon));
+      final Icon icon = t.widget<Icon>(find.byType(Icon));
       expect(icon.sizePx, 16);
       expect(icon.strokeOverride, 2);
       expect(
-        ElIcon.strokeFor(16),
+        Icon.strokeFor(16),
         2.4,
         reason: 'the whole point of the drift is that these differ',
       );
-      expect(t.getRect(find.byType(ElIcon)).width, 16);
+      expect(t.getRect(find.byType(Icon)).width, 16);
     });
 
     testWidgets('both measures are max-w-sm, and the gaps are 8 / 10 / 16', (
       WidgetTester t,
     ) async {
-      expect(ElEmptyHeader.maxWidth, ElContainers.sm);
-      expect(ElEmptyContent.maxWidth, ElContainers.sm);
-      expect(ElContainers.sm, 384);
-      expect(ElEmptyHeader.gap, 8);
-      expect(ElEmptyContent.gap, 10);
-      expect(ElEmpty.gap, 16);
-      expect(ElEmptyMedia.marginBottom, 8);
+      expect(EmptyHeader.maxWidth, Containers.sm);
+      expect(EmptyContent.maxWidth, Containers.sm);
+      expect(Containers.sm, 384);
+      expect(EmptyHeader.gap, 8);
+      expect(EmptyContent.gap, 10);
+      expect(Empty.gap, 16);
+      expect(EmptyMedia.marginBottom, 8);
 
       await t.pumpWidget(
         host(
           SizedBox(
             width: 482,
-            child: ElEmptyHeader(
+            child: EmptyHeader(
               children: <Widget>[
-                const ElEmptyTitle('No packs match those filters'),
+                const EmptyTitle('No packs match those filters'),
               ],
             ),
           ),
@@ -1233,8 +1242,8 @@ void main() {
       );
       // 482px of panel, but the header caps itself at 384.
       expect(
-        t.getRect(find.byType(ElEmptyTitle)).width,
-        lessThanOrEqualTo(ElContainers.sm),
+        t.getRect(find.byType(EmptyTitle)).width,
+        lessThanOrEqualTo(Containers.sm),
       );
     });
 
@@ -1243,10 +1252,7 @@ void main() {
     ) async {
       await t.pumpWidget(
         host(
-          const SizedBox(
-            width: 384,
-            child: ElEmptyTitle('Your Stash is empty'),
-          ),
+          const SizedBox(width: 384, child: EmptyTitle('Your Stash is empty')),
         ),
       );
       final TextStyle title = t.widget<Text>(find.byType(Text)).style!;
@@ -1256,11 +1262,11 @@ void main() {
       expect(title.letterSpacing, closeTo(-0.26, 1e-9));
       // `font-heading` and `font-sans` are two tokens for one face, so the
       // class changes which is read and not which renders.
-      expect(title.fontFamily, contains(ElFonts.heading));
-      expect(ElFonts.heading, ElFonts.sans);
+      expect(title.fontFamily, contains(Fonts.heading));
+      expect(Fonts.heading, Fonts.sans);
 
-      expect(ElEmptyDescription.spec.size, 13);
-      expect(ElEmptyDescription.spec.height, closeTo(1.625, 1e-9));
+      expect(EmptyDescription.spec.size, 13);
+      expect(EmptyDescription.spec.height, closeTo(1.625, 1e-9));
     });
   });
 
@@ -1277,27 +1283,26 @@ void main() {
   // the tree. That distinction is the whole point: three nested transforms
   // could each be right and compose wrong.
   //
-  // No `pumpAndSettle` here either: a toast carries a `ElBloomCosmic`, which
+  // No `pumpAndSettle` here either: a toast carries a `FeedbackSurface`, which
   // runs two forever loops, so a settle would never return.
   // ────────────────────────────────────────────────────────────────────────
   group('sonner choreography — the stack', () {
-    Widget toaster(ElToastController c) => host(
-      SizedBox(width: 1440, height: 900, child: ElToaster(controller: c)),
-    );
+    Widget toaster(ToastController c) =>
+        host(SizedBox(width: 1440, height: 900, child: Toaster(controller: c)));
 
     Finder toastWith(String title) =>
-        find.ancestor(of: find.text(title), matching: find.byType(ElToast));
+        find.ancestor(of: find.text(title), matching: find.byType(Toast));
 
     /// The edge every toast is anchored to — `bottom: 24px` inside the host.
     double anchor(WidgetTester t) =>
-        t.getRect(find.byType(ElToaster)).bottom - ElToaster.viewportOffset;
+        t.getRect(find.byType(Toaster)).bottom - Toaster.viewportOffset;
 
     /// How far a toast's own bottom edge sits above that anchor.
     double raise(WidgetTester t, String title) =>
         anchor(t) - t.getRect(toastWith(title)).bottom;
 
     double scaleOf(WidgetTester t, String title) =>
-        t.getRect(toastWith(title)).width / ElToaster.width;
+        t.getRect(toastWith(title)).width / Toaster.width;
 
     /// The measured natural height the host pinned the stack to — read back
     /// off the widget rather than assumed, because it is a font metric.
@@ -1313,13 +1318,13 @@ void main() {
         .opacity;
 
     double contentOpacityOf(WidgetTester t, String title) =>
-        t.widget<ElToast>(toastWith(title)).contentOpacity;
+        t.widget<Toast>(toastWith(title)).contentOpacity;
 
     /// The mount frame, the measure-then-lay-out round trip, and the entrance.
     Future<void> arrive(WidgetTester t) async {
       await t.pump();
       await t.pump();
-      await t.pump(ElToaster.transition);
+      await t.pump(Toaster.transition);
       await t.pump();
     }
 
@@ -1338,7 +1343,7 @@ void main() {
       'enters from translateY(100%) at opacity 0, over the slow window on '
       'CSS ease',
       (WidgetTester t) async {
-        final ElToastController c = ElToastController();
+        final ToastController c = ToastController();
         addTearDown(c.dispose);
         await t.pumpWidget(toaster(c));
         c.success(
@@ -1361,21 +1366,21 @@ void main() {
 
         // `data-mounted="true"` — one frame later, and it travels.
         await t.pump();
-        await t.pump(ElToaster.transition ~/ 2);
-        final double half = ElCurves.cssEase.transform(0.5);
+        await t.pump(Toaster.transition ~/ 2);
+        final double half = MotionCurves.cssEase.transform(0.5);
         expect(
           raise(t, 'Sold 3 cards for \$2,481.00'),
           closeTo(-height * (1 - half), 0.6),
           reason:
               'measured 0.645 of the travel at 38.3% of the window — this '
-              'curve, and not ElCurves.standard or ElCurves.out',
+              'curve, and not MotionCurves.standard or MotionCurves.enter',
         );
         expect(
           opacityOf(t, 'Sold 3 cards for \$2,481.00'),
           closeTo(half, 0.02),
         );
 
-        await t.pump(ElToaster.transition);
+        await t.pump(Toaster.transition);
         expect(raise(t, 'Sold 3 cards for \$2,481.00'), closeTo(0, 0.01));
         expect(opacityOf(t, 'Sold 3 cards for \$2,481.00'), 1);
         c.clear();
@@ -1387,7 +1392,7 @@ void main() {
       'a collapsed stack blanks, scales 1 − 0.05n and pins every back toast '
       "to the FRONT toast's measured height",
       (WidgetTester t) async {
-        final ElToastController c = ElToastController();
+        final ToastController c = ToastController();
         addTearDown(c.dispose);
         await t.pumpWidget(toaster(c));
         const String front = 'Could not reach the vault';
@@ -1396,7 +1401,7 @@ void main() {
 
         // Each toast's own height, read while it is still the front one — the
         // only moment it wears it.
-        c.show(const ElToastMessage(title: back2));
+        c.show(const ToastMessage(title: back2));
         await arrive(t);
         final double natural2 = heightOf(t, back2);
         c.success(back1, description: 'Credited to your available balance.');
@@ -1428,7 +1433,7 @@ void main() {
           (1, back1),
           (2, back2),
         ]) {
-          final double scale = 1 - ElToaster.stackScaleStep * n;
+          final double scale = 1 - Toaster.stackScaleStep * n;
           expect(scaleOf(t, title), closeTo(scale, 1e-6), reason: 'toast $n');
           // `height: var(--front-toast-height)` — drift 17's measure-then-lay-out
           // pass, and the assertion this whole render object exists for.
@@ -1440,7 +1445,7 @@ void main() {
           // The box is translated by the gap and then scaled about its centre.
           expect(
             raise(t, title),
-            closeTo(ElToaster.gap * n + frontHeight * (1 - scale) / 2, 0.02),
+            closeTo(Toaster.gap * n + frontHeight * (1 - scale) / 2, 0.02),
             reason:
                 'toast $n sits translateY(-14n) up, scaled about its centre',
           );
@@ -1449,13 +1454,13 @@ void main() {
           // …and the starfield goes with them, because it hangs off
           // `[data-content]`. Measured on the live stack: contentOpacity 0 with
           // both bloom layers still at 0.75 and still drifting.
-          expect(t.widget<ElToast>(toastWith(title)).starfield, isFalse);
+          expect(t.widget<Toast>(toastWith(title)).starfield, isFalse);
           // The bloom is NOT blanked: its two pseudo-elements are on the toast
           // itself, so a collapsed sliver still glows.
           expect(
             find.descendant(
               of: toastWith(title),
-              matching: find.byType(ElBloomCosmic),
+              matching: find.byType(FeedbackSurface),
             ),
             findsOneWidget,
           );
@@ -1492,13 +1497,13 @@ void main() {
       'the toast a front exit promotes fades its content back in, at full '
       'opacity throughout — it does not blink out and re-enter',
       (WidgetTester t) async {
-        final ElToastController c = ElToastController();
+        final ToastController c = ToastController();
         addTearDown(c.dispose);
         await t.pumpWidget(toaster(c));
         const String front = 'Could not reach the vault';
         const String back1 = 'Sold 3 cards for \$2,481.00';
         const String back2 = 'Added to favourites';
-        c.show(const ElToastMessage(title: back2));
+        c.show(const ToastMessage(title: back2));
         await arrive(t);
         c.success(back1, description: 'Credited to your available balance.');
         await arrive(t);
@@ -1519,7 +1524,7 @@ void main() {
         // it from `heights` and the survivors close the gap, but `--opacity` is
         // the toast's own and the back toast is not the one leaving.
         for (int i = 0; i < 4; i++) {
-          await t.pump(ElToaster.unmountDelay ~/ 4);
+          await t.pump(Toaster.unmountDelay ~/ 4);
           expect(
             opacityOf(t, back1),
             1,
@@ -1553,17 +1558,17 @@ void main() {
         // Where the promotion starts from: still the blanked slot, one gap up
         // and scaled about its own centre.
         final double from = raise(t, back1);
-        expect(from, greaterThan(ElToaster.gap));
+        expect(from, greaterThan(Toaster.gap));
 
         // Mid-fade: content, scale and offset all part-way, on the one 400ms
         // window they share.
-        await t.pump(ElToaster.transition ~/ 2);
-        final double half = ElCurves.cssEase.transform(0.5);
+        await t.pump(Toaster.transition ~/ 2);
+        final double half = MotionCurves.cssEase.transform(0.5);
         expect(contentOpacityOf(t, back1), closeTo(half, 0.02));
         expect(opacityOf(t, back1), 1);
         expect(
           scaleOf(t, back1),
-          closeTo(1 - ElToaster.stackScaleStep * (1 - half), 0.01),
+          closeTo(1 - Toaster.stackScaleStep * (1 - half), 0.01),
           reason: 'travelling 0.95 → 1, not restarting at 1',
         );
         expect(raise(t, back1), closeTo(from * (1 - half), 0.6));
@@ -1576,7 +1581,7 @@ void main() {
         );
 
         // Landed: the front toast, legible, exactly where the front toast sits.
-        await t.pump(ElToaster.transition);
+        await t.pump(Toaster.transition);
         expect(contentOpacityOf(t, back1), 1);
         expect(opacityOf(t, back1), 1);
         expect(scaleOf(t, back1), closeTo(1, 1e-6));
@@ -1607,7 +1612,7 @@ void main() {
         // plate, pinned to the front toast's height, 14px off it, with its own
         // children at `opacity: 0`. Every assertion in this group still passes:
         // the tree is right and only the canvas is wrong.
-        final ElToastController c = ElToastController();
+        final ToastController c = ToastController();
         addTearDown(c.dispose);
         await t.pumpWidget(
           host(
@@ -1620,7 +1625,7 @@ void main() {
               child: SizedBox(
                 width: 700,
                 height: 400,
-                child: ElToaster(controller: c),
+                child: Toaster(controller: c),
               ),
             ),
           ),
@@ -1629,7 +1634,7 @@ void main() {
         // The control: one toast, nothing over it. Its title is `--foreground`
         // on `--popover`, so it is the brightest thing in its own band.
         const String back = 'Added to favourites';
-        c.show(const ElToastMessage(title: back));
+        c.show(const ToastMessage(title: back));
         await arrive(t);
         final Rect boundary = t.getRect(find.byKey(const Key('raster')));
         final Rect backTitle = t.getRect(find.text(back));
@@ -1683,11 +1688,11 @@ void main() {
       'an arrival lets the toast already on screen FADE into the stack, '
       'rather than restarting its entrance',
       (WidgetTester t) async {
-        final ElToastController c = ElToastController();
+        final ToastController c = ToastController();
         addTearDown(c.dispose);
         await t.pumpWidget(toaster(c));
         const String first = 'Added to favourites';
-        c.show(const ElToastMessage(title: first));
+        c.show(const ToastMessage(title: first));
         await arrive(t);
         final Element element = t.element(toastWith(first));
         expect(contentOpacityOf(t, first), 1);
@@ -1713,8 +1718,8 @@ void main() {
           reason: 'only the NEW toast enters; this one is already here',
         );
 
-        await t.pump(ElToaster.transition ~/ 2);
-        final double half = ElCurves.cssEase.transform(0.5);
+        await t.pump(Toaster.transition ~/ 2);
+        final double half = MotionCurves.cssEase.transform(0.5);
         expect(contentOpacityOf(t, first), closeTo(1 - half, 0.06));
         expect(
           contentOpacityOf(t, first),
@@ -1727,10 +1732,10 @@ void main() {
         final double mid = raise(t, first);
         expect(mid, greaterThan(0), reason: 'it has left the front slot');
 
-        await t.pump(ElToaster.transition);
+        await t.pump(Toaster.transition);
         expect(contentOpacityOf(t, first), 0);
         expect(opacityOf(t, first), 1);
-        expect(scaleOf(t, first), closeTo(1 - ElToaster.stackScaleStep, 1e-6));
+        expect(scaleOf(t, first), closeTo(1 - Toaster.stackScaleStep, 1e-6));
         // Where it was headed, measured rather than assumed — the pin is the
         // newcomer's height and this file renders on the test fallback face, so
         // how either title wraps is not a fact about anything.
@@ -1757,10 +1762,10 @@ void main() {
     testWidgets(
       'hovering expands to translateY(-offset) at each toast\'s own height',
       (WidgetTester t) async {
-        final ElToastController c = ElToastController();
+        final ToastController c = ToastController();
         addTearDown(c.dispose);
         await t.pumpWidget(toaster(c));
-        c.show(const ElToastMessage(title: 'Added to favourites'));
+        c.show(const ToastMessage(title: 'Added to favourites'));
         await arrive(t);
         c.success(
           'Sold 3 cards for \$2,481.00',
@@ -1777,16 +1782,16 @@ void main() {
         const String back1 = 'Sold 3 cards for \$2,481.00';
         const String back2 = 'Added to favourites';
         final double h0 = heightOf(t, front);
-        final double h1 = t.widget<ElToast>(toastWith(back1)).pinnedHeight!;
+        final double h1 = t.widget<Toast>(toastWith(back1)).pinnedHeight!;
 
         await hover(t, t.getCenter(toastWith(front)));
-        await t.pump(ElToaster.transition);
+        await t.pump(Toaster.transition);
         await t.pump();
 
         // `--offset: heightIndex * gap + Σ(heights before)`. Measured on the
         // live stack: 107.875px for the second of three, at its own 75.6875px.
         final double h1Natural = heightOf(t, back1);
-        expect(raise(t, back1), closeTo(ElToaster.gap + h0, 0.02));
+        expect(raise(t, back1), closeTo(Toaster.gap + h0, 0.02));
         expect(scaleOf(t, back1), closeTo(1, 1e-6));
         expect(contentOpacityOf(t, back1), 1);
         expect(
@@ -1799,7 +1804,7 @@ void main() {
 
         expect(
           raise(t, back2),
-          closeTo(2 * ElToaster.gap + h0 + h1Natural, 0.05),
+          closeTo(2 * Toaster.gap + h0 + h1Natural, 0.05),
         );
         expect(scaleOf(t, back2), closeTo(1, 1e-6));
         expect(contentOpacityOf(t, back2), 1);
@@ -1814,16 +1819,16 @@ void main() {
 
     testWidgets('the host grows to cover the expanded stack, so crossing the '
         'gap does not collapse it', (WidgetTester t) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
-      c.show(const ElToastMessage(title: 'Added to favourites'));
+      c.show(const ToastMessage(title: 'Added to favourites'));
       await arrive(t);
       c.success('Sold 3 cards for \$2,481.00');
       await arrive(t);
 
       final Finder stack = find.descendant(
-        of: find.byType(ElToaster),
+        of: find.byType(Toaster),
         matching: find.byType(Stack),
       );
       final double collapsed = t.getRect(stack.first).height;
@@ -1832,7 +1837,7 @@ void main() {
         t,
         t.getCenter(toastWith('Sold 3 cards for \$2,481.00')),
       );
-      await t.pump(ElToaster.transition);
+      await t.pump(Toaster.transition);
       await t.pump();
       final double expanded = t.getRect(stack.first).height;
       expect(
@@ -1846,9 +1851,9 @@ void main() {
       // The 14px gap between two expanded toasts is inside the host, so the
       // pointer never leaves it.
       final Rect top = t.getRect(toastWith('Added to favourites'));
-      await g.moveTo(Offset(top.center.dx, top.bottom + ElToaster.gap / 2));
+      await g.moveTo(Offset(top.center.dx, top.bottom + Toaster.gap / 2));
       await t.pump();
-      await t.pump(ElToaster.transition);
+      await t.pump(Toaster.transition);
       expect(
         contentOpacityOf(t, 'Added to favourites'),
         1,
@@ -1861,7 +1866,7 @@ void main() {
 
     testWidgets('a blanked toast lays its content out and clips it, rather '
         'than squashing it', (WidgetTester t) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       // A two-line toast first, then a one-line one on top of it: the back
@@ -1873,7 +1878,7 @@ void main() {
       );
       await arrive(t);
       final double tall = heightOf(t, 'Sold 3 cards for \$2,481.00');
-      c.show(const ElToastMessage(title: 'Added to favourites'));
+      c.show(const ToastMessage(title: 'Added to favourites'));
       await arrive(t);
 
       final double short = heightOf(t, 'Added to favourites');
@@ -1892,21 +1897,20 @@ void main() {
   });
 
   group('sonner choreography — the three exits and the swipe', () {
-    Widget toaster(ElToastController c) => host(
-      SizedBox(width: 1440, height: 900, child: ElToaster(controller: c)),
-    );
+    Widget toaster(ToastController c) =>
+        host(SizedBox(width: 1440, height: 900, child: Toaster(controller: c)));
 
     Finder toastWith(String title) =>
-        find.ancestor(of: find.text(title), matching: find.byType(ElToast));
+        find.ancestor(of: find.text(title), matching: find.byType(Toast));
 
     double anchor(WidgetTester t) =>
-        t.getRect(find.byType(ElToaster)).bottom - ElToaster.viewportOffset;
+        t.getRect(find.byType(Toaster)).bottom - Toaster.viewportOffset;
 
     double raise(WidgetTester t, String title) =>
         anchor(t) - t.getRect(toastWith(title)).bottom;
 
     double scaleOf(WidgetTester t, String title) =>
-        t.getRect(toastWith(title)).width / ElToaster.width;
+        t.getRect(toastWith(title)).width / Toaster.width;
 
     double heightOf(WidgetTester t, String title) =>
         t.getRect(toastWith(title)).height / scaleOf(t, title);
@@ -1922,13 +1926,13 @@ void main() {
     Future<void> arrive(WidgetTester t) async {
       await t.pump();
       await t.pump();
-      await t.pump(ElToaster.transition);
+      await t.pump(Toaster.transition);
       await t.pump();
     }
 
     testWidgets('the front leaves the way it came in, and is torn out '
         'mid-flight', (WidgetTester t) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       final int id = c.success('Preferences saved');
@@ -1937,12 +1941,12 @@ void main() {
 
       c.dismiss(id);
       await t.pump();
-      await t.pump(ElToaster.unmountDelay ~/ 2);
+      await t.pump(Toaster.unmountDelay ~/ 2);
       // `--y: translateY(--lift * -100%)` — the entrance, run backwards.
-      final double t100 = ElCurves.cssEase.transform(
-        ElToaster.unmountDelay.inMicroseconds /
+      final double t100 = MotionCurves.cssEase.transform(
+        Toaster.unmountDelay.inMicroseconds /
             2 /
-            ElToaster.transition.inMicroseconds,
+            Toaster.transition.inMicroseconds,
       );
       expect(raise(t, 'Preferences saved'), closeTo(-height * t100, 1.2));
       expect(opacityOf(t, 'Preferences saved'), closeTo(1 - t100, 0.03));
@@ -1951,19 +1955,19 @@ void main() {
       // is torn out with the exit half-run. Measured on the live front exit:
       // the last frame before unmount read opacity 0.35.
       expect(opacityOf(t, 'Preferences saved'), greaterThan(0.2));
-      await t.pump(ElToaster.unmountDelay ~/ 2);
+      await t.pump(Toaster.unmountDelay ~/ 2);
       await t.pump();
-      expect(find.byType(ElToast), findsNothing);
+      expect(find.byType(Toast), findsNothing);
       expect(c.length, 0);
     });
 
     testWidgets('a back toast in a COLLAPSED stack falls 40% instead, on a '
         'longer transform window than its fade', (WidgetTester t) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       final int oldest = c.show(
-        const ElToastMessage(title: 'Added to favourites'),
+        const ToastMessage(title: 'Added to favourites'),
       );
       await arrive(t);
       c.success(
@@ -1973,33 +1977,33 @@ void main() {
       await arrive(t);
 
       const String back = 'Added to favourites';
-      expect(scaleOf(t, back), closeTo(1 - ElToaster.stackScaleStep, 1e-6));
+      expect(scaleOf(t, back), closeTo(1 - Toaster.stackScaleStep, 1e-6));
 
       c.dismiss(oldest);
       await t.pump();
-      await t.pump(ElToaster.unmountDelay ~/ 2);
+      await t.pump(Toaster.unmountDelay ~/ 2);
 
       // `--y: translateY(40%)` with NO `scale()` in it — so the scale is
       // released back to 1 on the way out. Measured: 0.9 → 0.9019 → 0.9152 →
       // 0.9295 over the frames before the unmount.
-      final double moved = ElCurves.cssEase.transform(
-        ElToaster.unmountDelay.inMicroseconds /
+      final double moved = MotionCurves.cssEase.transform(
+        Toaster.unmountDelay.inMicroseconds /
             2 /
-            ElToaster.collapsedExitTransform.inMicroseconds,
+            Toaster.collapsedExitTransform.inMicroseconds,
       );
       expect(
         scaleOf(t, back),
-        closeTo(1 - ElToaster.stackScaleStep * (1 - moved), 0.01),
+        closeTo(1 - Toaster.stackScaleStep * (1 - moved), 0.01),
       );
       expect(
         raise(t, back),
-        lessThan(ElToaster.gap),
+        lessThan(Toaster.gap),
         reason: 'it is falling, not lifting',
       );
 
       // `transition: transform 500ms, opacity 200ms` — the fade is more than
       // twice as far along as the fall.
-      final double faded = ElCurves.cssEase.transform(0.5);
+      final double faded = MotionCurves.cssEase.transform(0.5);
       expect(opacityOf(t, back), closeTo(1 - faded, 0.06));
       expect(
         1 - opacityOf(t, back),
@@ -2007,7 +2011,7 @@ void main() {
         reason: 'it is gone well before it has finished falling',
       );
 
-      await t.pump(ElToaster.unmountDelay ~/ 2);
+      await t.pump(Toaster.unmountDelay ~/ 2);
       await t.pump();
       expect(find.text(back), findsNothing);
       c.clear();
@@ -2017,11 +2021,11 @@ void main() {
     testWidgets(
       'a back toast in an EXPANDED stack leaves through its own slot',
       (WidgetTester t) async {
-        final ElToastController c = ElToastController();
+        final ToastController c = ToastController();
         addTearDown(c.dispose);
         await t.pumpWidget(toaster(c));
         final int oldest = c.show(
-          const ElToastMessage(title: 'Added to favourites'),
+          const ToastMessage(title: 'Added to favourites'),
         );
         await arrive(t);
         c.success('Sold 3 cards for \$2,481.00');
@@ -2034,29 +2038,29 @@ void main() {
         addTearDown(g.removePointer);
         await g.moveTo(t.getCenter(toastWith('Sold 3 cards for \$2,481.00')));
         await t.pump();
-        await t.pump(ElToaster.transition);
+        await t.pump(Toaster.transition);
         await t.pump();
 
         const String back = 'Added to favourites';
         final double offset = raise(t, back);
         final double height = heightOf(t, back);
-        expect(offset, greaterThan(ElToaster.gap));
+        expect(offset, greaterThan(Toaster.gap));
 
         c.dismiss(oldest);
         await t.pump();
-        await t.pump(ElToaster.unmountDelay ~/ 2);
+        await t.pump(Toaster.unmountDelay ~/ 2);
 
         // `--y: translateY(--lift * --offset + --lift * -100%)` — it keeps the
         // slot the expansion gave it and travels a whole box further down it.
-        final double moved = ElCurves.cssEase.transform(
-          ElToaster.unmountDelay.inMicroseconds /
+        final double moved = MotionCurves.cssEase.transform(
+          Toaster.unmountDelay.inMicroseconds /
               2 /
-              ElToaster.transition.inMicroseconds,
+              Toaster.transition.inMicroseconds,
         );
         expect(raise(t, back), closeTo(offset - height * moved, 1.2));
         expect(scaleOf(t, back), closeTo(1, 1e-6));
 
-        await t.pump(ElToaster.unmountDelay);
+        await t.pump(Toaster.unmountDelay);
         await t.pump();
         expect(find.text(back), findsNothing);
         c.clear();
@@ -2066,7 +2070,7 @@ void main() {
 
     testWidgets('a swipe past the threshold throws it out; short of it the '
         'toast snaps home and survives', (WidgetTester t) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       c.warning('Only 12 packs left in this print run');
@@ -2079,11 +2083,11 @@ void main() {
       // transition at all. Measured: the toast did not travel and survived.
       await t.drag(
         toastWith(title),
-        Offset(ElToaster.swipeThreshold - 15, 0),
+        Offset(Toaster.swipeThreshold - 15, 0),
         touchSlopX: 0,
       );
       await t.pump();
-      expect(find.byType(ElToast), findsOneWidget);
+      expect(find.byType(Toast), findsOneWidget);
       expect(
         t.getRect(toastWith(title)).left,
         closeTo(home, 0.01),
@@ -2093,21 +2097,21 @@ void main() {
       // Past it: `data-swipe-out` beats all three removal rules.
       await t.drag(
         toastWith(title),
-        Offset(ElToaster.swipeThreshold + 15, 0),
+        Offset(Toaster.swipeThreshold + 15, 0),
         touchSlopX: 0,
       );
       await t.pump();
-      await t.pump(ElToaster.swipeOutDuration ~/ 2);
+      await t.pump(Toaster.swipeOutDuration ~/ 2);
       expect(
         t.getRect(toastWith(title)).left,
-        greaterThan(home + ElToaster.swipeThreshold + 15),
+        greaterThan(home + Toaster.swipeThreshold + 15),
         reason:
             'it keeps going in the direction it was thrown, a whole box '
             'further on',
       );
-      await t.pump(ElToaster.unmountDelay);
+      await t.pump(Toaster.unmountDelay);
       await t.pump();
-      expect(find.byType(ElToast), findsNothing);
+      expect(find.byType(Toast), findsNothing);
       expect(c.length, 0);
     });
 
@@ -2116,11 +2120,11 @@ void main() {
     ) async {
       // `getDampening` — `1 / (1.5 + |delta| / 20)`. Only the corner's own two
       // directions travel one-for-one.
-      expect(ElToaster.dampen(20), closeTo(20 / 2.5, 1e-9));
-      expect(ElToaster.dampen(-20), closeTo(-20 / 2.5, 1e-9));
-      expect(ElToaster.dampen(100), closeTo(100 / 6.5, 1e-9));
+      expect(Toaster.dampen(20), closeTo(20 / 2.5, 1e-9));
+      expect(Toaster.dampen(-20), closeTo(-20 / 2.5, 1e-9));
+      expect(Toaster.dampen(100), closeTo(100 / 6.5, 1e-9));
 
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       c.warning('Only 12 packs left in this print run');
@@ -2132,10 +2136,10 @@ void main() {
       await t.drag(toastWith(title), const Offset(-60, 0), touchSlopX: 0);
       await t.pump();
       expect(
-        find.byType(ElToast),
+        find.byType(Toast),
         findsOneWidget,
         reason:
-            '60px dampened to ${ElToaster.dampen(-60)} never reaches the '
+            '60px dampened to ${Toaster.dampen(-60)} never reaches the '
             'threshold',
       );
       expect(t.getRect(toastWith(title)).left, closeTo(home, 0.01));
@@ -2146,13 +2150,13 @@ void main() {
     testWidgets('a fling under the threshold still dismisses, on velocity', (
       WidgetTester t,
     ) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       c.warning('Only 12 packs left in this print run');
       await arrive(t);
       expect(
-        ElToaster.swipeVelocity,
+        Toaster.swipeVelocity,
         110,
         reason: "sonner's 0.11 px/ms, in the units DragEndDetails speaks",
       );
@@ -2163,32 +2167,32 @@ void main() {
         900,
       );
       await t.pump();
-      await t.pump(ElToaster.unmountDelay);
+      await t.pump(Toaster.unmountDelay);
       await t.pump();
-      expect(find.byType(ElToast), findsNothing);
+      expect(find.byType(Toast), findsNothing);
     });
   });
 
   group('sonner choreography — clocks, promise and reduced motion', () {
-    Widget toaster(ElToastController c, {bool reducedMotion = false}) => host(
-      SizedBox(width: 1440, height: 900, child: ElToaster(controller: c)),
+    Widget toaster(ToastController c, {bool reducedMotion = false}) => host(
+      SizedBox(width: 1440, height: 900, child: Toaster(controller: c)),
       reducedMotion: reducedMotion,
     );
 
     Finder toastWith(String title) =>
-        find.ancestor(of: find.text(title), matching: find.byType(ElToast));
+        find.ancestor(of: find.text(title), matching: find.byType(Toast));
 
     Future<void> arrive(WidgetTester t) async {
       await t.pump();
       await t.pump();
-      await t.pump(ElToaster.transition);
+      await t.pump(Toaster.transition);
       await t.pump();
     }
 
     testWidgets('hover-pause resumes from the stored remainder, not from zero', (
       WidgetTester t,
     ) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       c.info('Saved as @ayoub');
@@ -2196,7 +2200,7 @@ void main() {
       await t.pump();
 
       // A quarter of the way through the lifetime, park a pointer on it.
-      await t.pump(ElToaster.lifetime ~/ 4);
+      await t.pump(Toaster.lifetime ~/ 4);
       final TestGesture g = await t.createGesture(
         kind: PointerDeviceKind.mouse,
       );
@@ -2207,41 +2211,41 @@ void main() {
 
       // Held for four whole lifetimes. A toast whose clock had not stopped
       // would be long gone.
-      await t.pump(ElToaster.lifetime * 4);
-      expect(find.byType(ElToast), findsOneWidget);
+      await t.pump(Toaster.lifetime * 4);
+      expect(find.byType(Toast), findsOneWidget);
 
       await g.moveTo(const Offset(4, 4));
       await t.pump();
       // Three quarters were left, and three quarters are what is left. Measured
       // on the live page: hovered at +1062ms, released at +3844ms, gone at
       // +6798ms — a restart would have been +7700ms.
-      await t.pump(ElToaster.lifetime ~/ 2);
+      await t.pump(Toaster.lifetime ~/ 2);
       expect(
-        find.byType(ElToast),
+        find.byType(Toast),
         findsOneWidget,
         reason:
             'a restart would still be running here too — the next step '
             'is what tells them apart',
       );
-      await t.pump(ElToaster.lifetime ~/ 4);
-      await t.pump(ElToaster.unmountDelay);
+      await t.pump(Toaster.lifetime ~/ 4);
+      await t.pump(Toaster.unmountDelay);
       await t.pump();
       expect(
-        find.byType(ElToast),
+        find.byType(Toast),
         findsNothing,
         reason: 'a restart would have had a full quarter still to run',
       );
     });
 
     testWidgets('a loading toast has no clock at all', (WidgetTester t) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       c.loading('Requesting withdrawal…');
       await arrive(t);
-      await t.pump(ElToaster.lifetime * 3);
+      await t.pump(Toaster.lifetime * 3);
       expect(
-        find.byType(ElToast),
+        find.byType(Toast),
         findsOneWidget,
         reason:
             "index.mjs returns before startTimer whenever the type is "
@@ -2254,7 +2258,7 @@ void main() {
     testWidgets(
       'toast.promise swaps in place — same toast, no second entrance',
       (WidgetTester t) async {
-        final ElToastController c = ElToastController();
+        final ToastController c = ToastController();
         addTearDown(c.dispose);
         await t.pumpWidget(toaster(c));
         final Completer<void> settled = Completer<void>();
@@ -2266,14 +2270,14 @@ void main() {
         );
         await arrive(t);
 
-        expect(c.messageOf(id)!.type, ElToastType.loading);
+        expect(c.messageOf(id)!.type, ToastType.loading);
         expect(c.messageOf(id)!.promise, isTrue);
         expect(
           t
-              .widget<ElToast>(toastWith('Requesting withdrawal…'))
+              .widget<Toast>(toastWith('Requesting withdrawal…'))
               .message
               .resolvedGlyph,
-          ElIconGlyph.loaderCircle,
+          IconGlyph.loaderCircle,
         );
         final Rect before = t.getRect(toastWith('Requesting withdrawal…'));
 
@@ -2284,7 +2288,7 @@ void main() {
         await t.pump();
 
         expect(c.length, 1, reason: 'the same toast, not a second one');
-        expect(c.messageOf(id)!.type, ElToastType.success);
+        expect(c.messageOf(id)!.type, ToastType.success);
         expect(find.text('Requesting withdrawal…'), findsNothing);
         expect(find.text('Withdrawal requested'), findsOneWidget);
         expect(
@@ -2295,11 +2299,9 @@ void main() {
 
         // The settled glyph crosses in over the loader rather than cutting.
         await t.pump(const Duration(milliseconds: 100));
-        final ElToast mid = t.widget<ElToast>(
-          toastWith('Withdrawal requested'),
-        );
-        expect(mid.swapFrom, ElIconGlyph.loaderCircle);
-        expect(mid.message.resolvedGlyph, ElIconGlyph.circleCheck);
+        final Toast mid = t.widget<Toast>(toastWith('Withdrawal requested'));
+        expect(mid.swapFrom, IconGlyph.loaderCircle);
+        expect(mid.message.resolvedGlyph, IconGlyph.circleCheck);
         expect(mid.swapIn, greaterThan(0));
         expect(mid.swapIn, lessThan(1));
         expect(
@@ -2313,20 +2315,20 @@ void main() {
         // …and only now does the 4000ms clock start.
         await t.pump(const Duration(milliseconds: 300));
         expect(
-          t.widget<ElToast>(toastWith('Withdrawal requested')).swapFrom,
+          t.widget<Toast>(toastWith('Withdrawal requested')).swapFrom,
           isNull,
         );
-        await t.pump(ElToaster.lifetime);
-        await t.pump(ElToaster.unmountDelay);
+        await t.pump(Toaster.lifetime);
+        await t.pump(Toaster.unmountDelay);
         await t.pump();
-        expect(find.byType(ElToast), findsNothing);
+        expect(find.byType(Toast), findsNothing);
       },
     );
 
     testWidgets('a rejected promise settles to the error toast', (
       WidgetTester t,
     ) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       final Completer<void> settled = Completer<void>();
@@ -2340,7 +2342,7 @@ void main() {
       settled.completeError(StateError('vault unreachable'));
       await t.pump();
       await t.pump();
-      expect(c.messageOf(id)!.type, ElToastType.error);
+      expect(c.messageOf(id)!.type, ToastType.error);
       expect(find.text('Request failed'), findsOneWidget);
       c.clear();
       await t.pump();
@@ -2349,19 +2351,19 @@ void main() {
     testWidgets('the four missing controller methods fire their own types', (
       WidgetTester t,
     ) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       // The page fires neutral, success, error, warning and promise; `info`
       // and `loading` complete the set sonner exposes.
-      expect(c.messageOf(c.info('i'))!.type, ElToastType.info);
-      expect(c.messageOf(c.warning('w'))!.type, ElToastType.warning);
-      expect(c.messageOf(c.loading('l'))!.type, ElToastType.loading);
-      expect(c.messageOf(c.success('s'))!.type, ElToastType.success);
-      expect(c.messageOf(c.error('e'))!.type, ElToastType.error);
+      expect(c.messageOf(c.info('i'))!.type, ToastType.info);
+      expect(c.messageOf(c.warning('w'))!.type, ToastType.warning);
+      expect(c.messageOf(c.loading('l'))!.type, ToastType.loading);
+      expect(c.messageOf(c.success('s'))!.type, ToastType.success);
+      expect(c.messageOf(c.error('e'))!.type, ToastType.error);
       expect(
-        c.messageOf(c.show(const ElToastMessage(title: 'n')))!.type,
-        ElToastType.normal,
+        c.messageOf(c.show(const ToastMessage(title: 'n')))!.type,
+        ToastType.normal,
       );
       c.clear();
       await t.pump();
@@ -2369,7 +2371,7 @@ void main() {
 
     testWidgets('reduced motion lands every leg on its final frame, and the '
         'clocks still run', (WidgetTester t) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c, reducedMotion: true));
       c.success('Sold 3 cards for \$2,481.00');
@@ -2383,7 +2385,7 @@ void main() {
       // sonner's reading. Measured under `prefers-reduced-motion: reduce`: the
       // toast appears already at matrix(1,0,0,1,0,0) / opacity 1.
       final double anchor =
-          t.getRect(find.byType(ElToaster)).bottom - ElToaster.viewportOffset;
+          t.getRect(find.byType(Toaster)).bottom - Toaster.viewportOffset;
       expect(
         anchor - t.getRect(toastWith('Sold 3 cards for \$2,481.00')).bottom,
         closeTo(0, 0.01),
@@ -2403,48 +2405,48 @@ void main() {
         1,
       );
 
-      // The lifetime is NOT gated on elAnimationDuration: sonner's block
+      // The lifetime is NOT gated on effectiveMotionDuration: sonner's block
       // removes transitions, not timers, and the live page confirms it.
-      await t.pump(ElToaster.lifetime);
-      await t.pump(ElToaster.unmountDelay);
+      await t.pump(Toaster.lifetime);
+      await t.pump(Toaster.unmountDelay);
       await t.pump();
-      expect(find.byType(ElToast), findsNothing);
+      expect(find.byType(Toast), findsNothing);
     });
 
     testWidgets('the title inherits .cn-toast\'s 1.5 and the description keeps '
         'sonner\'s own 1.4', (WidgetTester t) async {
       // `[data-title]` declares weight and colour and no leading, so it takes
-      // `.cn-toast { line-height: 1.5 }` → 19.5px. `ElComponentType.buttonLabel`
+      // `.cn-toast { line-height: 1.5 }` → 19.5px. `TextStyles.buttonLabel`
       // is the same 13/500 on text-sm's surviving Tailwind ratio and is 0.93px
       // a line short of it.
-      expect(ElToast.titleSpec.size, 13);
-      expect(ElToast.titleSpec.height, ElType.small.height);
-      expect(ElToast.titleSpec.weight, ElComponentType.buttonLabel.weight);
+      expect(Toast.titleSpec.size, 13);
+      expect(Toast.titleSpec.height, TextStyles.small.height);
+      expect(Toast.titleSpec.weight, TextStyles.buttonLabel.weight);
       expect(
-        ElToast.titleSpec.height! * ElToast.titleSpec.size!,
+        Toast.titleSpec.height! * Toast.titleSpec.size!,
         closeTo(19.5, 1e-9),
       );
       expect(
-        ElToast.titleSpec.height,
-        isNot(closeTo(ElComponentType.buttonLabel.height!, 1e-6)),
+        Toast.titleSpec.height,
+        isNot(closeTo(TextStyles.buttonLabel.height!, 1e-6)),
         reason: 'the whole reason this spec exists',
       );
 
       // `[data-description]`: `.cn-toast` sets its size and colour and never
       // its leading, so sonner's own 1.4 survives — drift 4, live numbers.
-      expect(ElToast.descriptionSpec.size, 13);
+      expect(Toast.descriptionSpec.size, 13);
       expect(
-        ElToast.descriptionSpec.height! * ElToast.descriptionSpec.size!,
+        Toast.descriptionSpec.height! * Toast.descriptionSpec.size!,
         closeTo(18.2, 1e-9),
       );
-      expect(ElToast.descriptionSpec.weight, ElType.small.weight);
+      expect(Toast.descriptionSpec.weight, TextStyles.small.weight);
 
       // And the box they add up to. Measured on the live toaster: 53.5px for a
       // title-only toast — 32 of padding and 2 of border around one 19.5 line.
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
-      c.show(const ElToastMessage(title: 'Added to favourites'));
+      c.show(const ToastMessage(title: 'Added to favourites'));
       await arrive(t);
       expect(
         t.getRect(toastWith('Added to favourites')).height,
@@ -2457,14 +2459,14 @@ void main() {
     testWidgets('the toast carries an action pill, and pressing it dismisses', (
       WidgetTester t,
     ) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       bool retried = false;
       c.error(
         'Could not reach the vault',
         description: 'Nothing was charged. Try again in a moment.',
-        action: ElToastAction(label: 'Retry', onPressed: () => retried = true),
+        action: ToastAction(label: 'Retry', onPressed: () => retried = true),
       );
       await arrive(t);
 
@@ -2489,7 +2491,7 @@ void main() {
         reason: 'flex-start, not centred against a one-line title',
       );
 
-      final ElThemeData theme = ElTheme.of(t.element(find.byType(ElToast)));
+      final ThemeTokens theme = ThemeScope.of(t.element(find.byType(Toast)));
       expect(
         t.widget<AnimatedContainer>(pill).decoration,
         isA<BoxDecoration>().having(
@@ -2503,21 +2505,21 @@ void main() {
       await t.tap(find.text('Retry'));
       await t.pump();
       expect(retried, isTrue);
-      await t.pump(ElToaster.unmountDelay);
+      await t.pump(Toaster.unmountDelay);
       await t.pump();
-      expect(find.byType(ElToast), findsNothing);
+      expect(find.byType(Toast), findsNothing);
     });
 
     testWidgets(
       'the card shows the click cursor only while a tap would dismiss it',
       (WidgetTester t) async {
         // The tap-to-dismiss is the port's own affordance, not sonner's (see
-        // [ElToast.onDismiss]), so the cursor that marks it is the port's own
+        // [Toast.onDismiss]), so the cursor that marks it is the port's own
         // choice too: click while a tap does something, basic while it does not.
         await t.pumpWidget(
           host(
-            ElToast(
-              message: const ElToastMessage(title: 'Saved'),
+            Toast(
+              message: const ToastMessage(title: 'Saved'),
               onDismiss: () {},
             ),
           ),
@@ -2535,7 +2537,7 @@ void main() {
 
         // No handler: the static-preview case the class doc names.
         await t.pumpWidget(
-          host(const ElToast(message: ElToastMessage(title: 'Saved'))),
+          host(const Toast(message: ToastMessage(title: 'Saved'))),
         );
         await t.pump();
         final MouseRegion disabled = t.widget<MouseRegion>(
@@ -2562,29 +2564,27 @@ void main() {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const ElSpinner(),
-              ElSpinner(size: el(5)),
-              ElSpinner(size: el(6)),
+              const Spinner(),
+              Spinner(size: space(5)),
+              Spinner(size: space(6)),
             ],
           ),
         ),
       );
-      final List<ElIcon> icons = t
-          .widgetList<ElIcon>(find.byType(ElIcon))
-          .toList();
+      final List<Icon> icons = t.widgetList<Icon>(find.byType(Icon)).toList();
       expect(icons, hasLength(3));
-      for (final ElIcon icon in icons) {
+      for (final Icon icon in icons) {
         expect(icon.strokeOverride, closeTo(2.4, 1e-9));
       }
       // The ladder's own answer for the two larger boxes, which the reference
       // never reaches.
-      expect(ElIcon.strokeFor(el(5)), 2);
-      expect(ElIcon.strokeFor(el(6)), 2);
-      expect(ElIcon.strokeFor(ElSpinner.px), closeTo(2.4, 1e-9));
+      expect(Icon.strokeFor(space(5)), 2);
+      expect(Icon.strokeFor(space(6)), 2);
+      expect(Icon.strokeFor(Spinner.px), closeTo(2.4, 1e-9));
 
       // …and a caller may still say otherwise.
-      await t.pumpWidget(host(ElSpinner(size: el(6), strokeOverride: 2)));
-      expect(t.widget<ElIcon>(find.byType(ElIcon)).strokeOverride, 2);
+      await t.pumpWidget(host(Spinner(size: space(6), strokeOverride: 2)));
+      expect(t.widget<Icon>(find.byType(Icon)).strokeOverride, 2);
     });
 
     testWidgets('sonner\'s two easings are CSS\'s, not the system\'s — F5', (
@@ -2592,28 +2592,28 @@ void main() {
     ) async {
       // Both are foreign defaults, and both are visibly not the tokens whose
       // names they share. Measured against the live traces.
-      expect(ElCurves.cssEase, const Cubic(0.25, 0.1, 0.25, 1));
-      expect(ElCurves.cssEaseOut, const Cubic(0, 0, 0.58, 1));
+      expect(MotionCurves.cssEase, const Cubic(0.25, 0.1, 0.25, 1));
+      expect(MotionCurves.cssEaseOut, const Cubic(0, 0, 0.58, 1));
       expect(
-        ElCurves.all,
-        isNot(contains(ElCurves.cssEase)),
+        MotionCurves.all,
+        isNot(contains(MotionCurves.cssEase)),
         reason:
             'the transcript of --ease-* has seven entries and neither of '
             'these is one of them',
       );
-      expect(ElCurves.all, isNot(contains(ElCurves.cssEaseOut)));
+      expect(MotionCurves.all, isNot(contains(MotionCurves.cssEaseOut)));
       // The retiming that snapping either to a system token would have caused.
       expect(
-        ElCurves.cssEase.transform(0.2),
-        isNot(closeTo(ElCurves.standard.transform(0.2), 0.05)),
+        MotionCurves.cssEase.transform(0.2),
+        isNot(closeTo(MotionCurves.standard.transform(0.2), 0.05)),
       );
       expect(
-        ElCurves.cssEaseOut.transform(0.775),
-        isNot(closeTo(ElCurves.out.transform(0.775), 0.02)),
+        MotionCurves.cssEaseOut.transform(0.775),
+        isNot(closeTo(MotionCurves.enter.transform(0.775), 0.02)),
       );
       // The two numbers the live traces actually produced.
-      expect(ElCurves.cssEase.transform(0.383), closeTo(0.645, 0.02));
-      expect(ElCurves.cssEaseOut.transform(0.775), closeTo(0.923, 0.02));
+      expect(MotionCurves.cssEase.transform(0.383), closeTo(0.645, 0.02));
+      expect(MotionCurves.cssEaseOut.transform(0.775), closeTo(0.923, 0.02));
     });
   });
 
@@ -2644,15 +2644,15 @@ void main() {
     const Size phone = Size(375, 812);
 
     Widget toaster(
-      ElToastController c, {
+      ToastController c, {
       Size viewport = const Size(1440, 900),
-      ElToastPosition position = ElToastPosition.bottomRight,
+      ToastPosition position = ToastPosition.bottomRight,
       EdgeInsets bars = EdgeInsets.zero,
     }) => host(
       SizedBox(
         width: viewport.width,
         height: viewport.height,
-        child: ElToaster(controller: c, position: position),
+        child: Toaster(controller: c, position: position),
       ),
       viewport: viewport,
       padding: bars,
@@ -2671,11 +2671,11 @@ void main() {
     }
 
     Finder toastWith(String title) =>
-        find.ancestor(of: find.text(title), matching: find.byType(ElToast));
+        find.ancestor(of: find.text(title), matching: find.byType(Toast));
 
     /// The edge a compact stack hangs from — `top: 16px` inside the host.
     double topAnchor(WidgetTester t) =>
-        t.getRect(find.byType(ElToaster)).top + ElToaster.mobileViewportOffset;
+        t.getRect(find.byType(Toaster)).top + Toaster.mobileViewportOffset;
 
     /// How far a toast's own top edge sits BELOW that anchor. The mirror of
     /// the wide contract's `raise`, and positive in the direction the stack
@@ -2684,7 +2684,7 @@ void main() {
         t.getRect(toastWith(title)).top - topAnchor(t);
 
     double scaleOf(WidgetTester t, String title) =>
-        t.getRect(toastWith(title)).width / ElToaster.widthFor(phone.width);
+        t.getRect(toastWith(title)).width / Toaster.widthFor(phone.width);
 
     double heightOf(WidgetTester t, String title) =>
         t.getRect(toastWith(title)).height / scaleOf(t, title);
@@ -2700,38 +2700,38 @@ void main() {
     Future<void> arrive(WidgetTester t) async {
       await t.pump();
       await t.pump();
-      await t.pump(ElToaster.transition);
+      await t.pump(Toaster.transition);
       await t.pump();
     }
 
     test('the breakpoint and the offsets are sonner\'s own', () {
       // `@media (max-width: 600px)` — a max-width query is inclusive, so 600
       // itself is compact and 601 is not.
-      expect(ElToaster.mobileBreakpoint, 600);
-      expect(ElToaster.isCompact(600), isTrue);
-      expect(ElToaster.isCompact(601), isFalse);
-      expect(ElToaster.isCompact(375), isTrue);
-      expect(ElToaster.isCompact(1440), isFalse);
+      expect(Toaster.mobileBreakpoint, 600);
+      expect(Toaster.isCompact(600), isTrue);
+      expect(Toaster.isCompact(601), isFalse);
+      expect(Toaster.isCompact(375), isTrue);
+      expect(Toaster.isCompact(1440), isFalse);
 
       // MOBILE_VIEWPORT_OFFSET against VIEWPORT_OFFSET.
-      expect(ElToaster.mobileViewportOffset, 16);
-      expect(ElToaster.viewportOffset, 24);
-      expect(ElToaster.offsetFor(375), ElToaster.mobileViewportOffset);
-      expect(ElToaster.offsetFor(1440), ElToaster.viewportOffset);
+      expect(Toaster.mobileViewportOffset, 16);
+      expect(Toaster.viewportOffset, 24);
+      expect(Toaster.offsetFor(375), Toaster.mobileViewportOffset);
+      expect(Toaster.offsetFor(1440), Toaster.viewportOffset);
 
       // `width: calc(100% - var(--mobile-offset-left) * 2)` against the
       // 356px box.
-      expect(ElToaster.widthFor(375), 375 - 16 * 2);
-      expect(ElToaster.widthFor(1440), ElToaster.width);
-      expect(ElToaster.width, 356);
+      expect(Toaster.widthFor(375), 375 - 16 * 2);
+      expect(Toaster.widthFor(1440), Toaster.width);
+      expect(Toaster.width, 356);
       // It tracks the viewport rather than swapping one constant for another:
       // narrower than the 356px box on a 375 phone, wider than it at the
       // breakpoint itself.
-      expect(ElToaster.widthFor(375), lessThan(ElToaster.width));
-      expect(ElToaster.widthFor(600), greaterThan(ElToaster.width));
+      expect(Toaster.widthFor(375), lessThan(Toaster.width));
+      expect(Toaster.widthFor(600), greaterThan(Toaster.width));
       // A viewport narrower than its own two insets squeezes rather than
       // going negative, which would be an assertion in `Positioned`.
-      expect(ElToaster.widthFor(20), 0);
+      expect(Toaster.widthFor(20), 0);
 
       // The ordered departure, stated as an assertion so a later "fix" back to
       // the reference fails loudly. sonner's mobile block moves the x-position
@@ -2739,27 +2739,27 @@ void main() {
       // the reference therefore keeps its bottom stack on a phone. This port
       // does not.
       expect(
-        ElToaster.positionFor(ElToastPosition.bottomRight, 375),
-        ElToastPosition.topRight,
+        Toaster.positionFor(ToastPosition.bottomRight, 375),
+        ToastPosition.topRight,
         reason:
             'user-ordered top placement on small screens — the one place '
             'this file leaves the reference',
       );
       expect(
-        ElToaster.positionFor(ElToastPosition.bottomLeft, 375),
-        ElToastPosition.topLeft,
+        Toaster.positionFor(ToastPosition.bottomLeft, 375),
+        ToastPosition.topLeft,
         reason: 'the side survives the anchor swap; only the edge moves',
       );
       expect(
-        ElToaster.positionFor(ElToastPosition.bottomRight, 1440),
-        ElToastPosition.bottomRight,
+        Toaster.positionFor(ToastPosition.bottomRight, 1440),
+        ToastPosition.bottomRight,
         reason: 'the wide contract is untouched',
       );
 
       // `--lift` is the whole of the swap: every offset in the choreography is
       // a multiple of it, which is why there is one set of rules and not two.
-      expect(ElToastPosition.bottomRight.lift, -1);
-      expect(ElToastPosition.bottomRight.topAnchored.lift, 1);
+      expect(ToastPosition.bottomRight.lift, -1);
+      expect(ToastPosition.bottomRight.topAnchored.lift, 1);
     });
 
     // ──────────────────────────────────────────────────────────────────────
@@ -2767,28 +2767,28 @@ void main() {
     // stylesheet never spells `env(safe-area-inset-*)` because a desktop
     // browser has no bar to clear; the compact anchor above is what creates the
     // problem, since 16px from `y = 0` on a phone is 16px INTO the status bar.
-    // The ruling is `ElSafeArea`'s, corpus-wide: the anchored edge pays
+    // The ruling is `SafeArea`'s, corpus-wide: the anchored edge pays
     // `MediaQuery.padding` over sonner's own inset, and nothing else moves.
     // ──────────────────────────────────────────────────────────────────────
     test('the anchored edge pays the system bars over sonner\'s inset', () {
       // Compact is top-anchored, so the status bar is the one that is paid.
-      final EdgeInsets compact = ElToaster.paddingFor(
+      final EdgeInsets compact = Toaster.paddingFor(
         375,
         systemBars,
-        ElToastPosition.topRight,
+        ToastPosition.topRight,
       );
-      expect(compact.top, 47 + ElToaster.mobileViewportOffset);
+      expect(compact.top, 47 + Toaster.mobileViewportOffset);
       expect(
         compact.bottom,
-        ElToaster.mobileViewportOffset,
+        Toaster.mobileViewportOffset,
         reason:
             'the stack does not reach the far edge; spending an inset '
             'there would only cap how far it could expand',
       );
-      expect(compact.left, ElToaster.mobileViewportOffset);
+      expect(compact.left, Toaster.mobileViewportOffset);
       expect(
         compact.right,
-        ElToaster.mobileViewportOffset,
+        Toaster.mobileViewportOffset,
         reason:
             "the sides stay sonner's, because widthFor is 100% - 2 * 16 "
             'and the toast box is that same arithmetic',
@@ -2800,48 +2800,44 @@ void main() {
       // would otherwise make silently, and in the direction that reproduces
       // the bug.
       expect(
-        ElToaster.paddingFor(375, systemBars, ElToastPosition.bottomRight),
-        ElToaster.paddingFor(375, systemBars, ElToastPosition.topRight),
+        Toaster.paddingFor(375, systemBars, ToastPosition.bottomRight),
+        Toaster.paddingFor(375, systemBars, ToastPosition.topRight),
       );
       expect(
-        ElToaster.paddingFor(375, systemBars, ElToastPosition.bottomRight).top,
-        47 + ElToaster.mobileViewportOffset,
+        Toaster.paddingFor(375, systemBars, ToastPosition.bottomRight).top,
+        47 + Toaster.mobileViewportOffset,
       );
 
       // The wide contract is bottom-anchored, so it is the gesture bar's turn.
-      final EdgeInsets wide = ElToaster.paddingFor(
+      final EdgeInsets wide = Toaster.paddingFor(
         1440,
         systemBars,
-        ElToastPosition.bottomRight,
+        ToastPosition.bottomRight,
       );
-      expect(wide.bottom, 34 + ElToaster.viewportOffset);
-      expect(wide.top, ElToaster.viewportOffset);
-      expect(wide.right, ElToaster.viewportOffset);
+      expect(wide.bottom, 34 + Toaster.viewportOffset);
+      expect(wide.top, Toaster.viewportOffset);
+      expect(wide.right, Toaster.viewportOffset);
 
       // Every desktop, every browser, every test that does not set
       // `view.padding`: sonner's number, unchanged, and no second code path.
       expect(
-        ElToaster.paddingFor(
-          1440,
-          EdgeInsets.zero,
-          ElToastPosition.bottomRight,
-        ),
-        EdgeInsets.all(ElToaster.viewportOffset),
+        Toaster.paddingFor(1440, EdgeInsets.zero, ToastPosition.bottomRight),
+        EdgeInsets.all(Toaster.viewportOffset),
       );
       expect(
-        ElToaster.paddingFor(375, EdgeInsets.zero, ElToastPosition.topRight),
-        EdgeInsets.all(ElToaster.mobileViewportOffset),
+        Toaster.paddingFor(375, EdgeInsets.zero, ToastPosition.topRight),
+        EdgeInsets.all(Toaster.mobileViewportOffset),
       );
 
       // `Padding` asserts on a negative inset, so a nonsense bar squeezes
       // rather than crashing — `widthFor`'s own argument.
       expect(
-        ElToaster.paddingFor(
+        Toaster.paddingFor(
           375,
           const EdgeInsets.only(top: -100),
-          ElToastPosition.topRight,
+          ToastPosition.topRight,
         ),
-        EdgeInsets.all(ElToaster.mobileViewportOffset),
+        EdgeInsets.all(Toaster.mobileViewportOffset),
       );
     });
 
@@ -2849,7 +2845,7 @@ void main() {
       WidgetTester t,
     ) async {
       useSurface(t, phone);
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c, viewport: phone, bars: systemBars));
       c.success(
@@ -2860,13 +2856,13 @@ void main() {
 
       const String title = 'Sold 3 cards for \$2,481.00';
       final Rect toast = t.getRect(toastWith(title));
-      final Rect screen = t.getRect(find.byType(ElToaster));
+      final Rect screen = t.getRect(find.byType(Toaster));
 
       // `MediaQuery.padding.top` + MOBILE_VIEWPORT_OFFSET. The whole ordered
       // change, in one number.
       expect(
         toast.top - screen.top,
-        closeTo(systemBars.top + ElToaster.mobileViewportOffset, 0.01),
+        closeTo(systemBars.top + Toaster.mobileViewportOffset, 0.01),
       );
       expect(
         toast.top - screen.top,
@@ -2886,13 +2882,13 @@ void main() {
       // still sonner's own arithmetic.
       expect(
         toast.left - screen.left,
-        closeTo(ElToaster.mobileViewportOffset, 0.01),
+        closeTo(Toaster.mobileViewportOffset, 0.01),
       );
       expect(
         screen.right - toast.right,
-        closeTo(ElToaster.mobileViewportOffset, 0.01),
+        closeTo(Toaster.mobileViewportOffset, 0.01),
       );
-      expect(toast.width, closeTo(ElToaster.widthFor(phone.width), 0.01));
+      expect(toast.width, closeTo(Toaster.widthFor(phone.width), 0.01));
 
       c.clear();
       await t.pump();
@@ -2901,7 +2897,7 @@ void main() {
     testWidgets('a wide bottom stack clears the gesture bar the same way', (
       WidgetTester t,
     ) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c, bars: systemBars));
       c.success('Sold 3 cards for \$2,481.00');
@@ -2909,20 +2905,17 @@ void main() {
 
       const String title = 'Sold 3 cards for \$2,481.00';
       final Rect toast = t.getRect(toastWith(title));
-      final Rect screen = t.getRect(find.byType(ElToaster));
+      final Rect screen = t.getRect(find.byType(Toaster));
 
       // The bottom anchor pays `padding.bottom`; the sides keep VIEWPORT_OFFSET
       // and the box keeps its 356px.
       expect(
         screen.bottom - toast.bottom,
-        closeTo(systemBars.bottom + ElToaster.viewportOffset, 0.01),
+        closeTo(systemBars.bottom + Toaster.viewportOffset, 0.01),
       );
       expect(screen.bottom - toast.bottom, isNot(closeTo(24, 1)));
-      expect(
-        screen.right - toast.right,
-        closeTo(ElToaster.viewportOffset, 0.01),
-      );
-      expect(toast.width, closeTo(ElToaster.width, 0.01));
+      expect(screen.right - toast.right, closeTo(Toaster.viewportOffset, 0.01));
+      expect(toast.width, closeTo(Toaster.width, 0.01));
 
       c.clear();
       await t.pump();
@@ -2931,7 +2924,7 @@ void main() {
     testWidgets('a phone anchors the stack to the TOP, 16px down, full bleed '
         'between the two insets', (WidgetTester t) async {
       useSurface(t, phone);
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c, viewport: phone));
       c.success(
@@ -2942,13 +2935,13 @@ void main() {
 
       const String title = 'Sold 3 cards for \$2,481.00';
       final Rect toast = t.getRect(toastWith(title));
-      final Rect screen = t.getRect(find.byType(ElToaster));
+      final Rect screen = t.getRect(find.byType(Toaster));
 
       // Anchored to the top edge, at the mobile offset.
       expect(drop(t, title), closeTo(0, 0.01));
       expect(
         toast.top - screen.top,
-        closeTo(ElToaster.mobileViewportOffset, 0.01),
+        closeTo(Toaster.mobileViewportOffset, 0.01),
       );
       // And nowhere near the bottom, which is what it would be on the wide
       // contract and what the reference itself still does.
@@ -2963,19 +2956,19 @@ void main() {
       // `width: calc(100% - var(--mobile-offset-left) * 2)`, and the insets it
       // leaves on each side.
       expect(toast.width, closeTo(phone.width - 16 * 2, 0.01));
-      expect(toast.width, closeTo(ElToaster.widthFor(phone.width), 0.01));
+      expect(toast.width, closeTo(Toaster.widthFor(phone.width), 0.01));
       expect(
         toast.left - screen.left,
-        closeTo(ElToaster.mobileViewportOffset, 0.01),
+        closeTo(Toaster.mobileViewportOffset, 0.01),
       );
       expect(
         screen.right - toast.right,
-        closeTo(ElToaster.mobileViewportOffset, 0.01),
+        closeTo(Toaster.mobileViewportOffset, 0.01),
       );
       // Full bleed is the viewport minus its insets, not a second fixed box —
       // narrower than 356 on a 375 phone and wider than it at the 600px
       // breakpoint, which a constant could not be both of.
-      expect(toast.width, isNot(closeTo(ElToaster.width, 1)));
+      expect(toast.width, isNot(closeTo(Toaster.width, 1)));
       expect(toast.width, closeTo(343, 0.01));
 
       c.clear();
@@ -2986,7 +2979,7 @@ void main() {
       WidgetTester t,
     ) async {
       useSurface(t, phone);
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c, viewport: phone));
       c.success('Sold 3 cards for \$2,481.00');
@@ -3008,8 +3001,8 @@ void main() {
       // `data-mounted="true"` — and it travels DOWNWARD into place, on the
       // same slow window and the same CSS ease as the wide contract.
       await t.pump();
-      await t.pump(ElToaster.transition ~/ 2);
-      final double half = ElCurves.cssEase.transform(0.5);
+      await t.pump(Toaster.transition ~/ 2);
+      final double half = MotionCurves.cssEase.transform(0.5);
       expect(drop(t, title), closeTo(-height * (1 - half), 0.6));
       expect(
         drop(t, title),
@@ -3018,7 +3011,7 @@ void main() {
       );
       expect(opacityOf(t, title), closeTo(half, 0.02));
 
-      await t.pump(ElToaster.transition);
+      await t.pump(Toaster.transition);
       expect(drop(t, title), closeTo(0, 0.01));
       expect(opacityOf(t, title), 1);
       c.clear();
@@ -3029,7 +3022,7 @@ void main() {
       WidgetTester t,
     ) async {
       useSurface(t, phone);
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c, viewport: phone));
       c.success('Sold 3 cards for \$2,481.00');
@@ -3049,11 +3042,11 @@ void main() {
         (1, 'Saved as @ayoub'),
         (2, 'Sold 3 cards for \$2,481.00'),
       ]) {
-        final double scale = 1 - ElToaster.stackScaleStep * n;
+        final double scale = 1 - Toaster.stackScaleStep * n;
         expect(scaleOf(t, title), closeTo(scale, 0.01));
         expect(
           drop(t, title),
-          closeTo(ElToaster.gap * n + frontHeight * (1 - scale) / 2, 0.05),
+          closeTo(Toaster.gap * n + frontHeight * (1 - scale) / 2, 0.05),
           reason: 'positive is downward here — the stack hangs from the top',
         );
         expect(drop(t, title), greaterThan(0));
@@ -3069,20 +3062,20 @@ void main() {
       addTearDown(g.removePointer);
       await g.moveTo(t.getCenter(toastWith(front)));
       await t.pump();
-      await t.pump(ElToaster.transition);
+      await t.pump(Toaster.transition);
       await t.pump();
 
       final double h0 = heightOf(t, front);
       expect(scaleOf(t, 'Saved as @ayoub'), closeTo(1, 0.01));
       expect(
         drop(t, 'Saved as @ayoub'),
-        closeTo(ElToaster.gap + h0, 0.05),
+        closeTo(Toaster.gap + h0, 0.05),
         reason: 'expanded offset = n * gap + Σ heights before, downward',
       );
       final double h1 = heightOf(t, 'Saved as @ayoub');
       expect(
         drop(t, 'Sold 3 cards for \$2,481.00'),
-        closeTo(2 * ElToaster.gap + h0 + h1, 0.1),
+        closeTo(2 * Toaster.gap + h0 + h1, 0.1),
       );
 
       c.clear();
@@ -3093,7 +3086,7 @@ void main() {
       'the swipe follows the anchor — up dismisses, down is dampened',
       (WidgetTester t) async {
         useSurface(t, phone);
-        final ElToastController c = ElToastController();
+        final ToastController c = ToastController();
         addTearDown(c.dispose);
         await t.pumpWidget(toaster(c, viewport: phone));
         c.warning('Only 12 packs left in this print run');
@@ -3105,10 +3098,10 @@ void main() {
         // `1 / (1.5 + |delta| / 20)` and 60px lands at 13.3 — nowhere near the
         // 45px threshold. On the wide bottom-right contract this same drag is
         // the one that dismisses.
-        expect(ElToaster.dampen(60), lessThan(ElToaster.swipeThreshold));
+        expect(Toaster.dampen(60), lessThan(Toaster.swipeThreshold));
         await t.drag(toastWith(title), const Offset(0, 60), touchSlopY: 0);
         await t.pump();
-        expect(find.byType(ElToast), findsOneWidget);
+        expect(find.byType(Toast), findsOneWidget);
         expect(
           t.getRect(toastWith(title)).top,
           closeTo(home, 0.01),
@@ -3118,22 +3111,22 @@ void main() {
         // UP travels 1:1 and clears the threshold.
         await t.drag(toastWith(title), const Offset(0, -60), touchSlopY: 0);
         await t.pump();
-        await t.pump(ElToaster.swipeOutDuration ~/ 2);
+        await t.pump(Toaster.swipeOutDuration ~/ 2);
         expect(
           t.getRect(toastWith(title)).top,
           lessThan(home - 60),
           reason: 'the swipe-out keyframe carries it a further 100% upward',
         );
-        await t.pump(ElToaster.unmountDelay);
+        await t.pump(Toaster.unmountDelay);
         await t.pump();
-        expect(find.byType(ElToast), findsNothing);
+        expect(find.byType(Toast), findsNothing);
       },
     );
 
     testWidgets('the hover-pause, the collapse reset and the exits all still '
         'run compact', (WidgetTester t) async {
       useSurface(t, phone);
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c, viewport: phone));
       c.info('Saved as @ayoub');
@@ -3141,7 +3134,7 @@ void main() {
       await t.pump();
 
       // The clock is the clock whatever edge the toast hangs from.
-      await t.pump(ElToaster.lifetime ~/ 4);
+      await t.pump(Toaster.lifetime ~/ 4);
       final TestGesture g = await t.createGesture(
         kind: PointerDeviceKind.mouse,
       );
@@ -3149,37 +3142,37 @@ void main() {
       addTearDown(g.removePointer);
       await g.moveTo(t.getCenter(toastWith('Saved as @ayoub')));
       await t.pump();
-      await t.pump(ElToaster.lifetime * 4);
+      await t.pump(Toaster.lifetime * 4);
       expect(
-        find.byType(ElToast),
+        find.byType(Toast),
         findsOneWidget,
         reason: 'pauseTimer holds the remainder, compact or not',
       );
 
       await g.moveTo(const Offset(4, 4));
       await t.pump();
-      await t.pump(ElToaster.lifetime ~/ 2);
-      expect(find.byType(ElToast), findsOneWidget);
-      await t.pump(ElToaster.lifetime ~/ 4);
+      await t.pump(Toaster.lifetime ~/ 2);
+      expect(find.byType(Toast), findsOneWidget);
+      await t.pump(Toaster.lifetime ~/ 4);
 
       // The front exit leaves the way it came in — upward, out of the top.
       const String title = 'Saved as @ayoub';
       final double home = t.getRect(toastWith(title)).top;
-      await t.pump(ElToaster.unmountDelay ~/ 2);
+      await t.pump(Toaster.unmountDelay ~/ 2);
       expect(
         t.getRect(toastWith(title)).top,
         lessThan(home),
         reason: '--y: translateY(--lift * -100%) with --lift = +1 is upward',
       );
-      await t.pump(ElToaster.unmountDelay);
+      await t.pump(Toaster.unmountDelay);
       await t.pump();
-      expect(find.byType(ElToast), findsNothing);
+      expect(find.byType(Toast), findsNothing);
     });
 
     testWidgets('at 1440 the bottom-right contract is untouched', (
       WidgetTester t,
     ) async {
-      final ElToastController c = ElToastController();
+      final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
       c.success('Sold 3 cards for \$2,481.00');
@@ -3187,20 +3180,17 @@ void main() {
 
       const String title = 'Sold 3 cards for \$2,481.00';
       final Rect toast = t.getRect(toastWith(title));
-      final Rect screen = t.getRect(find.byType(ElToaster));
+      final Rect screen = t.getRect(find.byType(Toaster));
 
       // 24px from the bottom and 24px from the right, at 356px wide — every
       // pin the wide contract already carries, restated here so a regression
       // in the responsive branch cannot pass by only breaking the phone.
       expect(
         screen.bottom - toast.bottom,
-        closeTo(ElToaster.viewportOffset, 0.01),
+        closeTo(Toaster.viewportOffset, 0.01),
       );
-      expect(
-        screen.right - toast.right,
-        closeTo(ElToaster.viewportOffset, 0.01),
-      );
-      expect(toast.width, closeTo(ElToaster.width, 0.01));
+      expect(screen.right - toast.right, closeTo(Toaster.viewportOffset, 0.01));
+      expect(toast.width, closeTo(Toaster.width, 0.01));
       expect(
         toast.top - screen.top,
         greaterThan(screen.height / 2),
@@ -3215,7 +3205,7 @@ void main() {
       final Rect entering = t.getRect(toastWith('Saved as @ayoub'));
       expect(
         entering.bottom,
-        greaterThan(screen.bottom - ElToaster.viewportOffset),
+        greaterThan(screen.bottom - Toaster.viewportOffset),
         reason: 'translateY(+100%) — below its slot, not above it',
       );
       c.clear();

@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/agent_markdown.dart",
+      "source": "lib/src/components/ui/agent_markdown.dart",
       "target": "@ui/agent_markdown.dart",
-      "sha256": "2584998206d2184e1937f7509a0e8559d24dbd97901d7a9cbe5e4ebae9c74c68"
+      "sha256": "9ec44c3188d80fe2ed99f2a2d60486e52824c3d1c6864d7a940d6f3cb5865b22"
     }
   ],
   "registryDependencies": [
@@ -22,6 +22,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/agent-markdown",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/agent_markdown.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_markdown.dart",
   "deprecated": false
 }

@@ -7,21 +7,21 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/selection_control.dart",
+      "source": "lib/src/components/ui/selection_control.dart",
       "target": "@ui/selection_control.dart",
-      "sha256": "4ecb167aefd51e8706b8a6fe0f6945afd9823067e657543cd30e6a1cf36f4ed4"
+      "sha256": "510d72919f6ca20f8afcf9bb656d5f011796aa83b0fd029fee872ce85c78bfcc"
     }
   ],
   "registryDependencies": [
     "button",
     "keyframes",
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "semanticDependencies": [
     "button",
     "keyframes",
-    "machine-surface"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/selection-control",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/selection_control.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/selection_control.dart",
   "deprecated": false
 }

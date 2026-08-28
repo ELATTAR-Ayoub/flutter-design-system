@@ -74,7 +74,7 @@ import 'menubar/page.dart' as menubar;
 import 'message/page.dart' as message;
 import 'message_scroller/page.dart' as message_scroller;
 import 'native_select/page.dart' as native_select;
-import 'nav_user/page.dart' as nav_user;
+import 'user_menu/page.dart' as user_menu;
 import 'navigation_menu/page.dart' as navigation_menu;
 import 'pagination/page.dart' as pagination;
 import 'popover/page.dart' as popover;
@@ -82,7 +82,7 @@ import 'progress/page.dart' as progress;
 import 'questionnaire/page.dart' as questionnaire;
 import 'radio/page.dart' as radio;
 import 'resizable/page.dart' as resizable;
-import 'rule/page.dart' as rule;
+import 'validation_rule/page.dart' as rule;
 import 'scroll_area/page.dart' as scroll_area;
 import 'select/page.dart' as select;
 import 'selection_control/page.dart' as selection_control;
@@ -102,20 +102,20 @@ import 'toggle/page.dart' as toggle;
 import 'toggle_group/page.dart' as toggle_group;
 import 'tooltip/page.dart' as tooltip;
 import 'voice/page.dart' as voice;
-import 'voice_orb/page.dart' as voice_orb;
+import 'voice_indicator/page.dart' as voice_indicator;
 import 'icon_swap/page.dart' as icon_swap;
-import 'lift/page.dart' as lift;
-import 'sliding_pill/page.dart' as sliding_pill;
-import 'swap_in/page.dart' as swap_in;
-import 'foil_value/page.dart' as foil_value;
+import 'hover_builder/page.dart' as lift;
+import 'active_indicator/page.dart' as active_indicator;
+import 'content_change/page.dart' as content_change;
+import 'premium_surface/page.dart' as premium_surface;
 import 'glass/page.dart' as glass;
-import 'machine_surface/page.dart' as machine_surface;
+import 'surface/page.dart' as surface;
 import 'media_scrim/page.dart' as media_scrim;
-import 'bloom_cosmic/page.dart' as bloom_cosmic;
-import 'page_glow/page.dart' as page_glow;
-import 'sheen_action/page.dart' as sheen_action;
-import 'starfield/page.dart' as starfield;
-import 'press_motion/page.dart' as press_motion;
+import 'feedback_surface/page.dart' as feedback_surface;
+import 'background_effect/page.dart' as background_effect;
+import 'action_feedback/page.dart' as action_feedback;
+import 'ambient_pattern/page.dart' as starfield;
+import 'press/page.dart' as press;
 import 'keyframes/page.dart' as keyframes;
 import 'safe_area/page.dart' as safe_area;
 import 'source_foundation/page.dart' as source_foundation;
@@ -171,7 +171,7 @@ final Map<String, ComponentDocSpec> componentDocSpecs =
         calendar.calendarDocSpec,
         avatar.avatarDocSpec,
         hover_card.hoverCardDocSpec,
-        nav_user.navUserDocSpec,
+        user_menu.navUserDocSpec,
         tooltip.tooltipDocSpec,
         kbd.kbdDocSpec,
         carousel.carouselDocSpec,
@@ -207,20 +207,20 @@ final Map<String, ComponentDocSpec> componentDocSpecs =
         attachment.attachmentDocSpec,
         questionnaire.questionnaireDocSpec,
         voice.voiceDocSpec,
-        voice_orb.voiceOrbDocSpec,
+        voice_indicator.voiceOrbDocSpec,
         icon_swap.iconSwapDocSpec,
         lift.liftDocSpec,
-        sliding_pill.slidingPillDocSpec,
-        swap_in.swapInDocSpec,
-        foil_value.foilValueDocSpec,
+        active_indicator.slidingPillDocSpec,
+        content_change.swapInDocSpec,
+        premium_surface.foilValueDocSpec,
         glass.glassDocSpec,
-        machine_surface.machineSurfaceDocSpec,
+        surface.machineSurfaceDocSpec,
         media_scrim.mediaScrimDocSpec,
-        bloom_cosmic.bloomCosmicDocSpec,
-        page_glow.pageGlowDocSpec,
-        sheen_action.sheenActionDocSpec,
+        feedback_surface.bloomCosmicDocSpec,
+        background_effect.pageGlowDocSpec,
+        action_feedback.sheenActionDocSpec,
         starfield.starfieldDocSpec,
-        press_motion.pressMotionDocSpec,
+        press.pressMotionDocSpec,
         keyframes.keyframesDocSpec,
         safe_area.safeAreaDocSpec,
         source_foundation.sourceFoundationDocSpec,

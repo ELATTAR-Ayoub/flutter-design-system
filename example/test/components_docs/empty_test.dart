@@ -3,7 +3,7 @@
 /// Re-housed onto the kit alongside the page: the section-order test now
 /// reads `DocsSection.id`/`.title`, and the API-table reads open the
 /// `DocsDisclosure` first — closed by default, unlike the old page's
-/// always-visible `ElSection`.
+/// always-visible `Section`.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -12,16 +12,40 @@ import 'package:example/components_docs/empty/page.dart';
 import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title].
 Finder _disclosureTrigger(String title) => find.descendant(
@@ -77,7 +101,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: EmptyDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -95,7 +119,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in <String>[
           'children',
@@ -106,23 +130,23 @@ void main() {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
 
-        expect(find.byType(ElEmpty), findsWidgets);
-        expect(find.byType(ElEmptyHeader), findsWidgets);
-        expect(find.byType(ElEmptyMedia), findsWidgets);
-        expect(find.byType(ElEmptyTitle), findsWidgets);
-        expect(find.byType(ElEmptyDescription), findsWidgets);
-        expect(find.byType(ElEmptyContent), findsWidgets);
+        expect(find.byType(Empty), findsWidgets);
+        expect(find.byType(EmptyHeader), findsWidgets);
+        expect(find.byType(EmptyMedia), findsWidgets);
+        expect(find.byType(EmptyTitle), findsWidgets);
+        expect(find.byType(EmptyDescription), findsWidgets);
+        expect(find.byType(EmptyContent), findsWidgets);
 
         expect(emptyDoc.name, 'empty');
         expect(
           emptyDoc.exports,
           containsAll(<String>[
-            'ElEmpty',
-            'ElEmptyHeader',
-            'ElEmptyMedia',
-            'ElEmptyTitle',
-            'ElEmptyDescription',
-            'ElEmptyContent',
+            'Empty',
+            'EmptyHeader',
+            'EmptyMedia',
+            'EmptyTitle',
+            'EmptyDescription',
+            'EmptyContent',
           ]),
         );
         expect(emptyDoc.command, 'elattar add empty');
@@ -146,7 +170,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const EmptyDocPage(),
           ),
         );
@@ -177,7 +201,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const EmptyDocPage(),
           ),
         );
@@ -214,15 +238,15 @@ void main() {
           const Size(390, 844),
           const Size(1440, 900),
         ]) {
-          for (final ElThemeMode mode in <ElThemeMode>[
-            ElThemeMode.light,
-            ElThemeMode.dark,
+          for (final ColorMode mode in <ColorMode>[
+            ColorMode.light,
+            ColorMode.dark,
           ]) {
             tester.view.physicalSize = size;
             tester.view.devicePixelRatio = 1;
             addTearDown(tester.view.reset);
 
-            final ElThemeController controller = ElThemeController(mode: mode);
+            final ThemeController controller = ThemeController(mode: mode);
             await tester.pumpWidget(
               _harness(controller: controller, child: const EmptyDocPage()),
             );
@@ -233,7 +257,7 @@ void main() {
               findsOneWidget,
               reason: 'at $size in $mode',
             );
-            expect(find.byType(ElEmpty), findsWidgets);
+            expect(find.byType(Empty), findsWidgets);
           }
         }
       },

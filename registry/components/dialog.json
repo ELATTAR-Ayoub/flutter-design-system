@@ -7,40 +7,40 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/dialog.dart",
+      "source": "lib/src/components/ui/dialog.dart",
       "target": "@ui/dialog.dart",
-      "sha256": "f215f4027c18c914ca68329c2af8ab23b23bb7c376d308670dc721d7f1647c98"
+      "sha256": "cf2b0e979875691211269786e164bbfd166b687ec6967d39334d7e10b419a31c"
     }
   ],
   "registryDependencies": [
     "button",
     "icon",
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "pubDependencies": {},
   "semanticDependencies": [
     "button",
     "icon",
-    "machine-surface"
+    "surface"
   ],
   "assets": [],
   "fonts": [],
   "shaders": [],
   "exports": [
-    "ElModalPortal",
-    "ElDialogOverlay",
-    "ElJellyTransition",
-    "ElDialog",
-    "ElDialogVariant",
-    "ElDialogContent",
-    "ElDialogContentGroup",
-    "ElDialogHeader",
-    "ElDialogFooter",
-    "ElDialogTitle",
-    "ElDialogDescription",
-    "ElDialogMedia"
+    "OverlayPortal",
+    "DialogOverlay",
+    "OpenTransition",
+    "Dialog",
+    "DialogVariant",
+    "DialogContent",
+    "DialogContentGroup",
+    "DialogHeader",
+    "DialogFooter",
+    "DialogTitle",
+    "DialogDescription",
+    "DialogMedia"
   ],
   "documentationRoute": "/components/dialog",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/dialog.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/dialog.dart"
 }

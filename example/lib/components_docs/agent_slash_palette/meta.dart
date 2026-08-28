@@ -21,11 +21,11 @@ const ComponentDocEntry agentSlashPaletteDoc = ComponentDocEntry(
   // verbatim.
   dependencies: <String>['icon', 'source-foundation'],
   exports: <String>[
-    'ElAgentSlashPalette',
-    'ElAgentCommand',
-    'ElAgentCommandGroup',
-    'elSlashQuery',
-    'elFilterCommands',
+    'AgentSlashPalette',
+    'AgentCommand',
+    'AgentCommandGroup',
+    'slashQuery',
+    'filterCommands',
   ],
   sourcePath: 'lib/src/components/agent_slash_palette.dart',
 );

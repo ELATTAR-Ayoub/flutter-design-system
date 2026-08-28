@@ -16,6 +16,6 @@ const ComponentDocEntry textareaDoc = ComponentDocEntry(
   description: 'A multi-line text field that grows with what is typed into it.',
   // Registry dependencies resolved by `elattar add textarea`.
   dependencies: <String>['field', 'input', 'source-foundation'],
-  exports: <String>['ElTextarea'],
+  exports: <String>['Textarea'],
   sourcePath: 'lib/src/components/textarea.dart',
 );

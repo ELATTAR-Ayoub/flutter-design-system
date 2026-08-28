@@ -1,19 +1,19 @@
 /// Public documentation page for the `combobox` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` established. Every specimen
 /// widget and every code string the old page carried moves across
 /// unchanged; Filtering carried a bulleted explanation with no quoted
-/// source before, and now shows `elCollatorContains`'s own body verbatim,
+/// source before, and now shows `collatorContains`'s own body verbatim,
 /// since a `ShowcaseSection`/`SnippetSection` is a specimen AND its source.
 ///
-/// **Split from a combined page.** `ElCombobox<T>` used to be documented on
-/// `../command/page.dart`, sharing one entry with `ElCommand` on the
+/// **Split from a combined page.** `Combobox<T>` used to be documented on
+/// `../command/page.dart`, sharing one entry with `Command` on the
 /// argument that two "filter as you type" surfaces read as one idea. They
 /// are two separately barrel-exported public components with two source
-/// files, so each now owns a page: everything about `ElCombobox` moved here
+/// files, so each now owns a page: everything about `Combobox` moved here
 /// and is gone from the command page, not duplicated.
 ///
 /// **Section order**, matching `button`'s own house shape: Preview (the old
@@ -30,11 +30,11 @@
 /// matcher is a folded substring test rather than the fuzzy score its
 /// sibling uses, and confusing the two is how a caller reaches for the
 /// wrong component. Nine of the reference's sections describe a capability
-/// `ElCombobox` genuinely does not have; rather than fake one, each is
+/// `Combobox` genuinely does not have; rather than fake one, each is
 /// named in the Composition section's own quoted "skipped" notes.
 ///
-/// **This one is an overlay.** `ElCombobox` mounts its list through
-/// [ElPopover], which is an [OverlayPortal], so every live specimen here
+/// **This one is an overlay.** `Combobox` mounts its list through
+/// [Popover], which is an [OverlayPortal], so every live specimen here
 /// needs a real [Overlay] above it or the popup silently never opens: a
 /// `MaterialApp` ancestor is enough, and `combobox_test.dart` supplies one.
 /// A test that forgot it would pass while exercising nothing.
@@ -46,7 +46,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -95,8 +107,8 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElCombobox, ElComboboxItem and '
-              'elCollatorContains are reachable the same way the CLI path '
+              'Add the export line so Combobox, ComboboxItem and '
+              'collatorContains are reachable the same way the CLI path '
               'already makes them.',
           code: "export 'combobox.dart';",
         ),
@@ -131,7 +143,7 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
           "Not in shadcn's own section list, and the thing most worth "
           'knowing before choosing this component over its sibling: '
           'nothing is ranked, and nothing ever moves up the list. '
-          'elCollatorContains(label, query) is a folded substring match: '
+          'collatorContains(label, query) is a folded substring match: '
           'both sides are case-folded, Latin-diacritic-stripped and '
           'punctuation-skipped before the test runs, so typing "rift" '
           'finds Golden Rift even though the query starts mid-word, and '
@@ -156,7 +168,7 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
       description:
           'The same control wearing the error ring, for a failed field '
           'validation. The message itself belongs to the surrounding '
-          'ElField, the way ElInput and ElSelect already work: invalid on '
+          'Field, the way Input and Select already work: invalid on '
           'the control paints the ring and says nothing. An enclosing '
           "field's own invalid state reaches the control too, so either "
           'end can raise it.',
@@ -171,7 +183,7 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
           'Non-interactive: the popup never opens and the trigger button '
           'takes no press. Three separate things reach this state, and '
           'any one of them is enough: enabled: false, a null onChanged, '
-          'or a disabled ElField around it. A null onChanged is the most '
+          'or a disabled Field around it. A null onChanged is the most '
           'common real cause, because it usually falls out of a form '
           'with nothing to submit to yet.',
       specimen: _ComboboxDisabledSpecimen(),
@@ -186,14 +198,14 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
           'function lib/src/components/combobox.dart declares: one table '
           'each, read off the real constructors.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElCombobox', anchor: 'api-elcombobox'),
+        DocsTocEntry(title: 'Combobox', anchor: 'api-elcombobox'),
         DocsTocEntry(
-          title: 'ElCombobox static helpers',
+          title: 'Combobox static helpers',
           anchor: 'api-elcombobox-static',
         ),
-        DocsTocEntry(title: 'ElComboboxItem', anchor: 'api-elcomboboxitem'),
+        DocsTocEntry(title: 'ComboboxItem', anchor: 'api-elcomboboxitem'),
         DocsTocEntry(
-          title: 'elCollatorContains',
+          title: 'collatorContains',
           anchor: 'api-elcollatorcontains',
         ),
       ],
@@ -248,15 +260,15 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
             label: 'Source',
             value: comboboxDoc.sourcePath,
             description:
-                'Authoritative implementation: ElCombobox, ElComboboxItem '
-                'and elCollatorContains. The truth this page was written '
+                'Authoritative implementation: Combobox, ComboboxItem '
+                'and collatorContains. The truth this page was written '
                 'from.',
           ),
           const DocsInstallFact(
             label: 'Sibling component',
             value: 'lib/src/components/command.dart',
             description:
-                'ElCommand, the inline action launcher that used to '
+                'Command, the inline action launcher that used to '
                 'share this page. It has its own page now, at '
                 '/components/command: reach for it when the reader '
                 'knows what they want to do but not what it is named, '
@@ -267,15 +279,15 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
             label: 'Row type',
             value: 'lib/src/components/select.dart',
             description:
-                'ElComboboxItem is a typedef for ElSelectOption, so a '
-                'list written for ElSelect drops in unchanged and the '
+                'ComboboxItem is a typedef for SelectOption, so a '
+                'list written for Select drops in unchanged and the '
                 'two stay in step by construction.',
           ),
           const DocsInstallFact(
             label: 'Package tests',
             value: 'test/selects_test.dart',
             description:
-                "The ElCombobox group, including elCollatorContains' "
+                "The Combobox group, including collatorContains' "
                 'folding and substring behaviour.',
           ),
           const DocsInstallFact(
@@ -311,9 +323,9 @@ class ComboboxDocPage extends StatelessWidget {
       title: comboboxDoc.title,
       description: comboboxDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Combobox'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Combobox'),
     ],
     toc: comboboxDocSpec.toc,
     previous: const DocsPageLink(
@@ -333,49 +345,50 @@ class ComboboxDocPage extends StatelessWidget {
 const String _usageComboboxCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElCombobox<String>(
+Combobox<String>(
   value: selectedSet,
   onChanged: (String next) => setState(() => selectedSet = next),
   placeholder: 'Search sets...',
   emptyLabel: 'No set by that name.',
-  items: const <ElComboboxItem<String>>[
-    ElComboboxItem<String>(value: 'golden', label: 'Golden Rift'),
-    ElComboboxItem<String>(value: 'mystic', label: 'Mystic Surge'),
+  items: const <ComboboxItem<String>>[
+    ComboboxItem<String>(value: 'golden', label: 'Golden Rift'),
+    ComboboxItem<String>(value: 'mystic', label: 'Mystic Surge'),
   ],
 )''';
 
 const String _compositionComboboxCode =
-    '''ElCombobox<T>                   // one widget, not four
-├─ items: List<ElComboboxItem<T>>
-│  └─ ElComboboxItem<T>             one option (a ElSelectOption<T>)
+    '''Combobox<T>                   // one widget, not four
+├─ items: List<ComboboxItem<T>>
+│  └─ ComboboxItem<T>             one option (a SelectOption<T>)
 │     ├─ value: T                   what onChanged carries back
 │     ├─ label: String              what is shown, and what is matched
 │     └─ enabled: bool              a row that renders but cannot be picked
 ├─ value: T?                        the committed selection
-└─ (built for you) the input, the chevron trigger, the ElPopover,
+└─ (built for you) the input, the chevron trigger, the Popover,
                    and the filtered list inside it
 
 // Skipped, honestly — capabilities this port genuinely does not have:
 // Custom Items: rows are data, not children. There is no item builder.
 // Multiple Selection / Multiple: single-select by construction, one T?.
 // Clear Button: no showClear flag and no clear affordance at all.
-// Groups: the list is flat; ElComboboxItem carries no group heading.
+// Groups: the list is flat; ComboboxItem carries no group heading.
 // Auto Highlight: nothing is highlighted until an arrow key moves.
 // Popup: one shape only, an input with a chevron addon.
 // Input Group: the field IS an input group internally, but not exposed.
 // RTL: no Directionality/TextDirection branch in combobox.dart.''';
 
-const String _filterCode = '''bool elCollatorContains(String label, String query) {
+const String _filterCode =
+    '''bool collatorContains(String label, String query) {
   final String needle = _fold(query.trim());
   return needle.isEmpty || _fold(label).contains(needle);
 }''';
 
 const String _invalidComboboxCode = '''
-ElField(
+Field(
   label: 'Card set',
   description: 'Start typing to narrow the list.',
   errors: const <String>['Pick a card set to continue.'],
-  child: ElCombobox<String>(
+  child: Combobox<String>(
     items: cardSets,
     value: selectedSet,
     invalid: submitted && selectedSet == null,
@@ -384,7 +397,7 @@ ElField(
 )''';
 
 const String _disabledComboboxCode = '''
-ElCombobox<String>(
+Combobox<String>(
   items: cardSets,
   value: selectedSet,
   onChanged: null,          // enabled: false reaches the same state
@@ -393,8 +406,8 @@ ElCombobox<String>(
 
 /// The live combobox.
 ///
-/// The card sets are the package suite's own list. `ElCombobox` mounts its
-/// popup through a [ElPopover], so this specimen needs a real [Overlay]
+/// The card sets are the package suite's own list. `Combobox` mounts its
+/// popup through a [Popover], so this specimen needs a real [Overlay]
 /// above it: the docs shell has one in the app, and `combobox_test.dart`
 /// supplies a `MaterialApp`. Without one the popup silently never opens.
 class _ComboboxSpecimen extends StatefulWidget {
@@ -405,18 +418,18 @@ class _ComboboxSpecimen extends StatefulWidget {
 }
 
 /// The six sets every specimen on this page draws from.
-const List<ElComboboxItem<String>> _cardSets = <ElComboboxItem<String>>[
-  ElComboboxItem<String>(value: 'golden', label: 'Golden Rift'),
-  ElComboboxItem<String>(value: 'mystic', label: 'Mystic Surge'),
-  ElComboboxItem<String>(value: 'shadow', label: 'Shadow Core'),
-  ElComboboxItem<String>(value: 'celestial', label: 'Celestial Strike'),
-  ElComboboxItem<String>(value: 'origin', label: 'Origin Pulse'),
-  ElComboboxItem<String>(value: 'eclipse', label: 'Eclipse Vault'),
+const List<ComboboxItem<String>> _cardSets = <ComboboxItem<String>>[
+  ComboboxItem<String>(value: 'golden', label: 'Golden Rift'),
+  ComboboxItem<String>(value: 'mystic', label: 'Mystic Surge'),
+  ComboboxItem<String>(value: 'shadow', label: 'Shadow Core'),
+  ComboboxItem<String>(value: 'celestial', label: 'Celestial Strike'),
+  ComboboxItem<String>(value: 'origin', label: 'Origin Pulse'),
+  ComboboxItem<String>(value: 'eclipse', label: 'Eclipse Vault'),
 ];
 
 String? _labelFor(String? value) {
   if (value == null) return null;
-  for (final ElComboboxItem<String> item in _cardSets) {
+  for (final ComboboxItem<String> item in _cardSets) {
     if (item.value == value) return item.label;
   }
   return null;
@@ -427,14 +440,14 @@ class _ComboboxSpecimenState extends State<_ComboboxSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final String? label = _labelFor(_selected);
     return KeyedSubtree(
       key: const ValueKey<String>('combobox-doc-combobox-specimen'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElCombobox<String>(
+          Combobox<String>(
             items: _cardSets,
             value: _selected,
             onChanged: (String next) => setState(() => _selected = next),
@@ -442,10 +455,10 @@ class _ComboboxSpecimenState extends State<_ComboboxSpecimen> {
             emptyLabel: 'No set by that name.',
             label: 'Card set',
           ),
-          SizedBox(height: el(3)),
-          ElText(
+          SizedBox(height: space(3)),
+          StyledText(
             label == null ? 'Nothing selected yet' : 'Selected: $label',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ],
@@ -470,11 +483,11 @@ class _ComboboxInvalidSpecimenState extends State<_ComboboxInvalidSpecimen> {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('combobox-example:invalid'),
-    child: ElField(
+    child: Field(
       label: 'Card set',
       description: 'Start typing to narrow the list.',
       errors: const <String>['Pick a card set to continue.'],
-      child: ElCombobox<String>(
+      child: Combobox<String>(
         items: _cardSets,
         value: _selected,
         invalid: true,
@@ -493,7 +506,7 @@ class _ComboboxDisabledSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const KeyedSubtree(
     key: ValueKey<String>('combobox-example:disabled'),
-    child: ElCombobox<String>(
+    child: Combobox<String>(
       items: _cardSets,
       value: null,
       onChanged: null,
@@ -514,29 +527,29 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elcombobox',
-        child: DocsApiTable(title: 'ElCombobox<T>', facts: _comboboxFacts),
+        child: DocsApiTable(title: 'Combobox<T>', facts: _comboboxFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elcombobox-static',
         child: DocsApiTable(
-          title: 'ElCombobox static helpers',
+          title: 'Combobox static helpers',
           facts: _comboboxStaticFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elcomboboxitem',
         child: DocsApiTable(
-          title: 'ElComboboxItem<T> (= ElSelectOption<T>)',
+          title: 'ComboboxItem<T> (= SelectOption<T>)',
           facts: _comboboxItemFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elcollatorcontains',
         child: DocsApiTable(
-          title: 'elCollatorContains(label, query) → bool',
+          title: 'collatorContains(label, query) → bool',
           facts: _collatorFacts,
         ),
       ),
@@ -547,7 +560,7 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _comboboxFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'items',
-    type: 'List<ElComboboxItem<T>>',
+    type: 'List<ComboboxItem<T>>',
     description:
         'Required. The unfiltered list, in source order, which is also '
         "the order survivors keep. There is no cap: the reference's own "
@@ -586,7 +599,7 @@ const List<DocsApiFact> _comboboxFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to true. Composes with an enclosing '
-        'ElFieldScope the way ElInput and ElSelect do: either end can '
+        'FieldScope the way Input and Select do: either end can '
         'disable the control.',
   ),
   DocsApiFact(
@@ -594,7 +607,7 @@ const List<DocsApiFact> _comboboxFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to false. Paints the error ring; the '
-        'message itself belongs to the surrounding ElField. An '
+        'message itself belongs to the surrounding Field. An '
         "enclosing field's own invalid state raises this too.",
   ),
   DocsApiFact(
@@ -609,7 +622,7 @@ const List<DocsApiFact> _comboboxFacts = <DocsApiFact>[
     type: 'String?',
     description:
         "Optional. Defaults to null, falling back to an enclosing "
-        "ElField's label. The accessible name: it names the control's "
+        "Field's label. The accessible name: it names the control's "
         'semantics node and is passed to the inner input. It renders no '
         'visible label of its own.',
   ),
@@ -618,15 +631,15 @@ const List<DocsApiFact> _comboboxFacts = <DocsApiFact>[
     type: 'String?',
     description:
         "Optional. Defaults to null, falling back to an enclosing "
-        "ElField's description. The accessible DESCRIPTION only: it is "
-        "never painted. Visible helper text is the surrounding ElField's "
+        "Field's description. The accessible DESCRIPTION only: it is "
+        "never painted. Visible helper text is the surrounding Field's "
         'job.',
   ),
   DocsApiFact(
     name: 'filter',
     type: 'bool Function(String label, String query)?',
     description:
-        'Optional. Defaults to null, which uses elCollatorContains. '
+        'Optional. Defaults to null, which uses collatorContains. '
         "Return true to keep the row. It receives the row's label and "
         'the trimmed query.',
   ),
@@ -634,14 +647,14 @@ const List<DocsApiFact> _comboboxFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _comboboxStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElCombobox.popupOffset',
+    name: 'Combobox.popupOffset',
     type: 'static double',
     description:
         'The gap between the field and its popup, passed straight to '
         'the popover as its side offset.',
   ),
   DocsApiFact(
-    name: 'ElCombobox.popupOvershoot',
+    name: 'Combobox.popupOvershoot',
     type: 'static double',
     description:
         'How much wider than the measured anchor the popup renders. '
@@ -649,14 +662,14 @@ const List<DocsApiFact> _comboboxStaticFacts = <DocsApiFact>[
         'why the popup is wider than one and narrower than the other.',
   ),
   DocsApiFact(
-    name: 'ElCombobox.listMaxHeight',
+    name: 'Combobox.listMaxHeight',
     type: 'static double',
     description:
         "The list's own cap, 252px, before the room the positioner "
         'reports is consulted. The smaller of the two wins.',
   ),
   DocsApiFact(
-    name: 'ElCombobox.itemHeight',
+    name: 'Combobox.itemHeight',
     type: 'static double',
     description:
         'One row, derived from the sheet-body type spec plus its '
@@ -664,7 +677,7 @@ const List<DocsApiFact> _comboboxStaticFacts = <DocsApiFact>[
         'highlight into view by this measure.',
   ),
   DocsApiFact(
-    name: 'ElCombobox.emptyHeight',
+    name: 'Combobox.emptyHeight',
     type: 'static double',
     description:
         'The empty row, which is a row in every dimension but its '
@@ -697,12 +710,12 @@ const List<DocsApiFact> _comboboxItemFacts = <DocsApiFact>[
         'nor committed: the arrows step over it.',
   ),
   DocsApiFact(
-    name: 'ElComboboxItem<T>',
-    type: 'typedef = ElSelectOption<T>',
+    name: 'ComboboxItem<T>',
+    type: 'typedef = SelectOption<T>',
     description:
         'Not a class of its own: the row DATA is the same record '
-        'ElSelect carries, so it is the same type, and only the row '
-        'PAINT lives in combobox.dart. A list written for ElSelect '
+        'Select carries, so it is the same type, and only the row '
+        'PAINT lives in combobox.dart. A list written for Select '
         'drops in unchanged.',
   ),
 ];
@@ -790,7 +803,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Invalid',
     treatment:
-        'invalid on the control, or an invalid ElField around it, '
+        'invalid on the control, or an invalid Field around it, '
         'paints the error ring on the field. Nothing about the popup '
         'or the filter changes.',
     userSignal: 'A red ring; the message comes from the field.',
@@ -798,7 +811,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        'enabled: false, a null onChanged, or a disabled ElField. The '
+        'enabled: false, a null onChanged, or a disabled Field. The '
         'popup cannot open, the trigger takes no press, and the '
         'pointer listener is not installed.',
     userSignal: 'A faded, inert field.',
@@ -828,10 +841,10 @@ class _AccessibilityContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The control reports itself as a text field carrying its '
             'expanded state, named by label or by an enclosing '
-            "ElField's label, and described by hint or that field's own "
+            "Field's label, and described by hint or that field's own "
             'description. Each row reports as a button carrying its '
             'selected and enabled state.',
         'The trigger button carries its own name, which flips between '
@@ -839,14 +852,14 @@ class _AccessibilityContent extends StatelessWidget {
             'field takes the focus and the arrows drive the popup '
             'instead.',
       ]),
-      SizedBox(height: el(3)),
-      ElText(
+      SizedBox(height: space(3)),
+      StyledText(
         'Known gaps, reported not idealised',
-        ElType.section,
-        color: ElTheme.of(context).actionInk,
+        TextStyles.section,
+        color: ThemeScope.of(context).actionText,
       ),
-      SizedBox(height: el(2)),
-      _bullets(ElTheme.of(context), <String>[
+      SizedBox(height: space(2)),
+      _bullets(ThemeScope.of(context), <String>[
         'Known gap: no live region. Nothing announces how many rows '
             'survived the filter. A sighted reader sees the list '
             'collapse from six rows to one; a screen-reader user is '
@@ -879,7 +892,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The caret never leaves the field. Arrow keys move a highlight '
             'rather than focus, so typing keeps working throughout: the '
             'key handler is a Focus(canRequestFocus: false, '
@@ -904,7 +917,7 @@ class _KeyboardContent extends StatelessWidget {
             'that is not one of the four above.',
         'Tab order: canRequestFocus: false on the key-capturing Focus '
             'means it is never itself a tab stop; the real tab stop is '
-            'the underlying ElInputGroupInput, one focus node for the '
+            'the underlying InputGroupInput, one focus node for the '
             'whole control, not one per row.',
       ]);
 }
@@ -914,7 +927,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in combobox.dart: '
             'BuildContext width is never read for a layout decision, '
             'and the same widget tree renders at 390px and 1440px.',
@@ -943,31 +956,31 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/combobox.dart. One file, no '
             'companions, and a shipped registry manifest.',
         'Flutter imports: dart:math (clamping the popup height), '
             'package:flutter/services.dart (LogicalKeyboardKey, '
             'KeyEvent), package:flutter/widgets.dart.',
         'Foundation imports: foundation/motion.dart, '
-            'foundation/spacing.dart (el()), foundation/theme.dart, '
-            'foundation/typography.dart, theme_scope.dart (ElText, '
-            'ElTheme).',
-        'Component imports: field.dart (ElFieldScope, so an enclosing '
+            'foundation/spacing.dart (space()), foundation/theme.dart, '
+            'foundation/typography.dart, theme_scope.dart (StyledText, '
+            'ThemeScope).',
+        'Component imports: field.dart (FieldScope, so an enclosing '
             'field can supply the label, the focus node, and the '
             'enabled and invalid states), icon.dart and icon_paths.dart '
-            '(the chevron and the tick), input_group.dart (ElInputGroup, '
-            'ElInputGroupInput, ElInputGroupAddon, ElInputGroupButton: '
-            'the whole chassis), popover.dart (ElPopover and '
-            'ElPopoverSurface: the overlay), select.dart '
-            '(ElSelectOption, which ElComboboxItem is a typedef for).',
+            '(the chevron and the tick), input_group.dart (InputGroup, '
+            'InputGroupInput, InputGroupAddon, InputGroupButton: '
+            'the whole chassis), popover.dart (Popover and '
+            'PopoverSurface: the overlay), select.dart '
+            '(SelectOption, which ComboboxItem is a typedef for).',
         'Notably NOT imported: input.dart. The text field here is '
-            'ElInputGroupInput, not ElInput, which is the one '
+            'InputGroupInput, not Input, which is the one '
             'dependency this component does not share with the command '
             'palette.',
         'Assets: none. Shaders: none.',
       ]),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
@@ -986,15 +999,15 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Every colour resolves from ElTheme.of(context) at build time: '
+      _bullets(ThemeScope.of(context), <String>[
+        'Every colour resolves from ThemeScope.of(context) at build time: '
             'the field from the input-group recipe, the popup surface '
             'from popover, a row\'s ink from popoverForeground, the '
             'highlighted row from accent with accentForeground ink, and '
             'the empty row from mutedForeground. Flipping '
-            'ElThemeController re-resolves all of them on the next '
+            'ThemeController re-resolves all of them on the next '
             'frame.',
-        'The popup is a ElPopoverSurface, so its fill, radius, shadow '
+        'The popup is a PopoverSurface, so its fill, radius, shadow '
             'and ring are the shared overlay recipe rather than '
             'anything this component owns: a change there moves every '
             'popup in the system together.',
@@ -1016,15 +1029,19 @@ class _ThemingContent extends StatelessWidget {
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

@@ -4,9 +4,9 @@
 /// reads `DocsSection.id` (the kit's own section widget), and the
 /// API-table / accessibility / keyboard / dependencies assertions each open
 /// the relevant `DocsDisclosure` first — closed by default in the new kit,
-/// unlike the old page's always-visible `ElSection`.
+/// unlike the old page's always-visible `Section`.
 ///
-/// **No `pumpAndSettle` anywhere in this file.** `ElSpinner`'s
+/// **No `pumpAndSettle` anywhere in this file.** `Spinner`'s
 /// `AnimationController.repeat()` never settles, so `pumpAndSettle()` would
 /// hang forever; every wait below is a bounded `tester.pump()` /
 /// `tester.pump(Duration(...))`.
@@ -17,15 +17,41 @@ import 'package:example/components_docs/spinner/meta.dart';
 import 'package:example/components_docs/spinner/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// This page's own section order: see
 /// `example/lib/components_docs/spinner/page.dart`'s own library doc. Only
 /// Customization is skipped from the reference's own section list:
-/// [ElSpinner] exposes no `icon`/`glyph` constructor parameter, so there is
+/// [Spinner] exposes no `icon`/`glyph` constructor parameter, so there is
 /// nothing to swap. Button, Badge, Input Group, Empty and RTL are all real
-/// compositions with [ElButton], [ElBadge], [ElInputGroup], [ElEmpty] and a
+/// compositions with [Button], [Badge], [InputGroup], [Empty] and a
 /// [Directionality] wrapper. API Reference is first among the disclosures,
 /// ahead of the corpus's fixed closing seven.
 const List<String> _spinnerSectionOrder = <String>[
@@ -48,13 +74,11 @@ const List<String> _spinnerSectionOrder = <String>[
   'source',
 ];
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
 /// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
@@ -74,7 +98,7 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 void main() {
@@ -89,13 +113,13 @@ void main() {
       String? destination;
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: SpinnerDocPage(
             onNavigate: (String route) => destination = route,
           ),
         ),
       );
-      // One bounded pump only: ElSpinner's AnimationController.repeat()
+      // One bounded pump only: Spinner's AnimationController.repeat()
       // never settles, so pumpAndSettle() would hang forever.
       await tester.pump();
 
@@ -106,16 +130,16 @@ void main() {
 
       // At least one spinner mounts per composed example (preview, size x2,
       // button x2, badge x2, input group, empty, rtl).
-      expect(find.byType(ElSpinner), findsWidgets);
+      expect(find.byType(Spinner), findsWidgets);
       final int spinnerCount = tester
-          .widgetList<ElSpinner>(find.byType(ElSpinner))
+          .widgetList<Spinner>(find.byType(Spinner))
           .length;
       expect(spinnerCount, greaterThanOrEqualTo(9));
 
       // Metadata reads correctly.
       expect(spinnerDoc.name, 'spinner');
       expect(spinnerDoc.dependencies, <String>['icon', 'source-foundation']);
-      expect(spinnerDoc.exports, <String>['ElSpinner']);
+      expect(spinnerDoc.exports, <String>['Spinner']);
       expect(spinnerDoc.command, 'elattar add spinner');
 
       expect(destination, isNull);
@@ -165,7 +189,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const SpinnerDocPage(),
           ),
         );
@@ -186,40 +210,39 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the API Reference disclosure documents every public member',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the API Reference disclosure documents every public member', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const SpinnerDocPage(),
-          ),
-        );
-        await tester.pump();
-        await _open(tester, 'API Reference');
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const SpinnerDocPage(),
+        ),
+      );
+      await tester.pump();
+      await _open(tester, 'API Reference');
 
-        final Finder apiSection = find.byWidgetPredicate(
-          (Widget widget) => widget is DocsSection && widget.id == 'api',
+      final Finder apiSection = find.byWidgetPredicate(
+        (Widget widget) => widget is DocsSection && widget.id == 'api',
+      );
+      expect(apiSection, findsOneWidget);
+      for (final String member in <String>[
+        'size',
+        'strokeOverride',
+        'Spinner.px',
+      ]) {
+        expect(
+          find.descendant(of: apiSection, matching: find.text(member)),
+          findsOneWidget,
+          reason: 'API member "$member" should be documented',
         );
-        expect(apiSection, findsOneWidget);
-        for (final String member in <String>[
-          'size',
-          'strokeOverride',
-          'ElSpinner.px',
-        ]) {
-          expect(
-            find.descendant(of: apiSection, matching: find.text(member)),
-            findsOneWidget,
-            reason: 'API member "$member" should be documented',
-          );
-        }
-        expect(tester.takeException(), isNull);
-      },
-    );
+      }
+      expect(tester.takeException(), isNull);
+    });
 
     testWidgets(
       'the Keyboard disclosure states the spinner is never in the tab order',
@@ -230,7 +253,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const SpinnerDocPage(),
           ),
         );
@@ -261,7 +284,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const SpinnerDocPage(),
           ),
         );
@@ -297,8 +320,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
 
         // Normal motion: rotation progresses across two bounded pumps.
@@ -335,15 +358,15 @@ void main() {
     ) async {
       // `MediaQuery(disableAnimations: true)` sits BELOW `MaterialApp`, the
       // same discipline `collapsible_test.dart` and `buttons_page_test.dart`
-      // use, so it reaches every descendant `ElSpinner` through the real
-      // `elAnimationDuration` reduced-motion path.
+      // use, so it reaches every descendant `Spinner` through the real
+      // `effectiveMotionDuration` reduced-motion path.
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(
-        ElTheme(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+        ThemeScope(
+          controller: ThemeController(mode: ColorMode.dark),
           child: MaterialApp(
             home: Builder(
               builder: (BuildContext context) => MediaQuery(

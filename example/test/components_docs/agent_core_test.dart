@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title] — see
 /// `button_test.dart`'s own copy of this helper for why the lookup narrows
@@ -32,13 +56,13 @@ Finder _disclosureTrigger(String title) => find.descendant(
 /// cannot silently drift from what the page actually renders.
 const List<String> _agentCoreApiFactNames = <String>[
   '.wire / .label / .isBusy / .isNarrating / .glyph',
-  'ElAgentDelivery.content()',
-  'ElAgentDelivery.produced()',
-  'ElAgentDelivery.reference(reason)',
-  'ElBlurSwitchController({required open})',
-  'ElBlurSwitchController.inDuration',
-  'ElBlurSwitchController.outDuration',
-  'ElToolStateMap',
+  'AgentDelivery.content()',
+  'AgentDelivery.produced()',
+  'AgentDelivery.reference(reason)',
+  'BlurSwitchController({required open})',
+  'BlurSwitchController.inDuration',
+  'BlurSwitchController.outDuration',
+  'ToolStateMap',
   'abort()',
   'action',
   'activeId',
@@ -67,17 +91,17 @@ const List<String> _agentCoreApiFactNames = <String>[
   'delivery',
   'document',
   'done',
-  'elAttachmentKind(mime, name)',
-  'elFormatBytes(bytes)',
-  'elFormatMs(ms)',
-  'elHumaniseToolName(name)',
-  'elIsTextual(attachment)',
-  'elRelativeTime(then, {now})',
-  'elRelativeTimeOf(context, then)',
-  'elResolveAgentState({turns, signals, toolStates})',
-  'elSerialiseAttachments(text, attachments)',
-  'elStateForTool(name, map)',
-  'elStripProtocol(text)',
+  'attachmentKind(mime, name)',
+  'formatBytes(bytes)',
+  'formatMs(ms)',
+  'humaniseToolName(name)',
+  'isTextual(attachment)',
+  'relativeTime(then, {now})',
+  'relativeTimeOf(context, then)',
+  'resolveAgentState({turns, signals, toolStates})',
+  'serialiseAttachments(text, attachments)',
+  'stateForTool(name, map)',
+  'stripProtocol(text)',
   'error',
   'fatal',
   'id',
@@ -159,7 +183,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: AgentCoreDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -179,32 +203,32 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String name in _agentCoreApiFactNames) {
           expect(find.text(name), findsWidgets, reason: 'missing $name');
         }
 
-        // Every ElAgentState.values member is named in the ElAgentState
+        // Every AgentState.values member is named in the AgentState
         // table (via its enum value name) AND rendered live in Preview
         // above (via its chip key).
-        for (final ElAgentState state in ElAgentState.values) {
+        for (final AgentState state in AgentState.values) {
           expect(
             find.text(state.name),
             findsWidgets,
-            reason: 'ElAgentState.${state.name} missing from API table',
+            reason: 'AgentState.${state.name} missing from API table',
           );
           expect(
             find.byKey(ValueKey<String>('agent-core-preview:${state.name}')),
             findsOneWidget,
-            reason: 'ElAgentState.${state.name} missing a Preview chip',
+            reason: 'AgentState.${state.name} missing a Preview chip',
           );
         }
 
         // Resolve agent state: every scenario mounts, and a spot check of
         // the precedence ladder's own real outputs.
         final Map<String, String> resolved = <String, String>{
-          for (final ElAgentState state in ElAgentState.values)
+          for (final AgentState state in AgentState.values)
             state.label: state.name,
         };
         expect(resolved, isNotEmpty);
@@ -223,12 +247,10 @@ void main() {
         expect(find.text('Done'), findsWidgets);
 
         // Tool state mapping: exact match, prefix, longest-prefix-wins,
-        // and the unmapped fallback — all real elStateForTool calls.
+        // and the unmapped fallback — all real stateForTool calls.
         expect(
           find.byKey(
-            const ValueKey<String>(
-              'agent-core-tool-mapping:search_inventory',
-            ),
+            const ValueKey<String>('agent-core-tool-mapping:search_inventory'),
           ),
           findsOneWidget,
         );
@@ -240,8 +262,8 @@ void main() {
           findsOneWidget,
         );
 
-        // Formatting helpers: real elFormatBytes/elFormatMs/
-        // elHumaniseToolName/elRelativeTime outputs.
+        // Formatting helpers: real formatBytes/formatMs/
+        // humaniseToolName/relativeTime outputs.
         expect(find.text('512 B'), findsOneWidget);
         expect(find.text('2 KB'), findsOneWidget);
         expect(find.text('2.5 MB'), findsOneWidget);
@@ -252,7 +274,7 @@ void main() {
         expect(find.text('yesterday'), findsOneWidget);
         expect(find.text('in 3 hours'), findsOneWidget);
 
-        // Serialise attachments: the real elSerialiseAttachments output —
+        // Serialise attachments: the real serialiseAttachments output —
         // a textual file inlined, an unreadable image referenced instead.
         // Scoped to the specimen's own output container: several of these
         // substrings (the file names, the fence name) also appear in the
@@ -273,10 +295,10 @@ void main() {
         expect(
           agentCoreDoc.exports,
           containsAll(<String>[
-            'ElAgentState',
-            'ElAgentTurn',
-            'ElAgentTransport',
-            'ElAgentDelivery',
+            'AgentState',
+            'AgentTurn',
+            'AgentTransport',
+            'AgentDelivery',
           ]),
         );
         expect(agentCoreDoc.command, 'elattar add agent-core');
@@ -284,30 +306,29 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 6000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentCoreDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentCoreDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Five specimen stages: Preview, Resolve agent state, Tool state
-        // mapping, Formatting helpers, Serialise attachments.
-        expect(find.byType(DocsShowcase), findsNWidgets(5));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Five specimen stages: Preview, Resolve agent state, Tool state
+      // mapping, Formatting helpers, Serialise attachments.
+      expect(find.byType(DocsShowcase), findsNWidgets(5));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -340,45 +361,44 @@ void main() {
       );
     });
 
-    testWidgets(
-      'sections render in declaration order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentCoreDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentCoreDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, <String>[
-          'Preview',
-          'Installation',
-          'Usage',
-          'Resolve agent state',
-          'Tool state mapping',
-          'Formatting helpers',
-          'Serialise attachments',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Keyboard',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
-      },
-    );
+      expect(titles, <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'Resolve agent state',
+        'Tool state mapping',
+        'Formatting helpers',
+        'Serialise attachments',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -389,7 +409,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const AgentCoreDocPage(),
           ),
         );
@@ -418,24 +438,24 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const AgentCoreDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-core-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-core-doc-article')),
           ),
@@ -445,7 +465,7 @@ void main() {
         expect(lightTheme.foreground, isNot(darkTheme.foreground));
 
         expect(find.byType(DocsShowcase), findsNWidgets(5));
-        for (final ElAgentState state in ElAgentState.values) {
+        for (final AgentState state in AgentState.values) {
           expect(
             find.byKey(ValueKey<String>('agent-core-preview:${state.name}')),
             findsOneWidget,

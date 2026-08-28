@@ -1,7 +1,33 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_layout.dart';
 import 'package:example/kit.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _harness({
@@ -11,8 +37,8 @@ Widget _harness({
 }) {
   return MediaQuery(
     data: MediaQueryData(size: size),
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: ThemeScope(
+      controller: ThemeController(mode: ColorMode.dark),
       child: MaterialApp(
         home: SingleChildScrollView(controller: controller, child: child),
       ),
@@ -28,9 +54,9 @@ DocsLayout _layout({required Widget child}) => DocsLayout(
     description:
         'A long description that should remain readable at every supported width.',
   ),
-  breadcrumbs: const <ElBreadcrumbEntry>[
-    ElBreadcrumbEntry.link('Docs'),
-    ElBreadcrumbEntry.page('Foundations'),
+  breadcrumbs: const <BreadcrumbEntry>[
+    BreadcrumbEntry.link('Docs'),
+    BreadcrumbEntry.page('Foundations'),
   ],
   sidebar: const <DocsSidebarEntry>[
     DocsSidebarEntry(title: 'Introduction', route: '/docs', selected: true),
@@ -53,7 +79,7 @@ Widget _tallArticle({Key? usageKey}) => Column(
     const SizedBox(height: 900),
     KeyedSubtree(
       key: usageKey ?? docsAnchorKey('usage'),
-      child: ElText('The usage section body', ElType.body),
+      child: StyledText('The usage section body', TextStyles.body),
     ),
     const SizedBox(height: 2400),
   ],
@@ -172,7 +198,7 @@ void main() {
     await tester.pumpWidget(
       _harness(
         size: const Size(1440, 900),
-        child: _layout(child: ElText('Article body', ElType.body)),
+        child: _layout(child: StyledText('Article body', TextStyles.body)),
       ),
     );
 
@@ -204,7 +230,7 @@ void main() {
     await tester.pumpWidget(
       _harness(
         size: const Size(390, 844),
-        child: _layout(child: ElText('Article body', ElType.body)),
+        child: _layout(child: StyledText('Article body', TextStyles.body)),
       ),
     );
 
@@ -230,14 +256,14 @@ void main() {
           size: Size(390, 844),
           textScaler: TextScaler.linear(2),
         ),
-        child: ElTheme(
-          controller: ElThemeController(mode: ElThemeMode.light),
+        child: ThemeScope(
+          controller: ThemeController(mode: ColorMode.light),
           child: MaterialApp(
             home: SingleChildScrollView(
               child: _layout(
-                child: ElText(
+                child: StyledText(
                   'Article body with enough text to exercise wrapping.',
-                  ElType.body,
+                  TextStyles.body,
                 ),
               ),
             ),
@@ -283,7 +309,7 @@ void main() {
           ],
           next: const DocsPageLink(title: 'Next', route: '/next'),
           onNavigate: routes.add,
-          child: ElText('Body', ElType.body),
+          child: StyledText('Body', TextStyles.body),
         ),
       ),
     );
@@ -403,10 +429,10 @@ void main() {
     });
 
     // The dialog, input and select guides mark no anchors of their own: they
-    // are built out of `kit.dart`'s `ElSection`s whose ids already *are* their
+    // are built out of `kit.dart`'s `Section`s whose ids already *are* their
     // TOC anchors. This is the arm that resolves those, and it is why
     // `kit.dart` needed no change.
-    testWidgets('a kit ElSection id resolves without any extra marking', (
+    testWidgets('a kit Section id resolves without any extra marking', (
       WidgetTester tester,
     ) async {
       // Matches the real test surface to the `MediaQuery` size below: see
@@ -437,10 +463,10 @@ void main() {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 900),
-                ElSection(
+                Section(
                   id: 'states',
                   title: 'States',
-                  child: ElText('State matrix', ElType.body),
+                  child: StyledText('State matrix', TextStyles.body),
                 ),
                 const SizedBox(height: 2400),
               ],

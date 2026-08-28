@@ -3,10 +3,14 @@
   "publicBarrel": "lib/elattar_design_system.dart",
   "installableOwners": [
     "accordion",
+    "action-feedback",
+    "active-indicator",
     "alert",
     "alert-dialog",
+    "ambient-pattern",
     "aspect-ratio",
     "avatar",
+    "background-effect",
     "badge",
     "breadcrumb",
     "button",
@@ -17,29 +21,35 @@
     "collapsible",
     "combobox",
     "command",
+    "content-change",
     "context-menu",
     "drawer",
     "dropdown-menu",
     "empty",
+    "feedback-surface",
     "field",
     "form",
+    "glass",
+    "hover-builder",
     "hover-card",
     "icon",
     "input-group",
     "input-otp",
     "item",
     "kbd",
+    "keyframes",
     "marker",
+    "media-scrim",
     "menubar",
     "native-select",
-    "nav-user",
     "navigation-menu",
     "pagination",
     "popover",
+    "premium-surface",
+    "press",
     "progress",
     "radio",
     "resizable",
-    "rule",
     "scroll-area",
     "selection-control",
     "separator",
@@ -49,6 +59,7 @@
     "slider",
     "spinner",
     "stat",
+    "surface",
     "switch",
     "table",
     "tabs",
@@ -56,438 +67,506 @@
     "toaster",
     "toggle",
     "toggle-group",
-    "tooltip"
+    "tooltip",
+    "user-menu",
+    "validation-rule",
+    "voice-indicator"
   ],
   "components": [
     {
-      "source": "lib/src/components/accordion.dart",
+      "source": "lib/src/components/ui/accordion.dart",
       "owner": "accordion",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/agent_attach_menu.dart",
+      "source": "lib/src/components/ui/action_feedback.dart",
+      "owner": "action-feedback",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/active_indicator.dart",
+      "owner": "active-indicator",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/agent_attach_menu.dart",
       "owner": "agent-attach-menu",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/agent_attachments.dart",
+      "source": "lib/src/components/ui/agent_attachments.dart",
       "owner": "agent-attachments",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/agent_avatar.dart",
+      "source": "lib/src/components/ui/agent_avatar.dart",
       "owner": "agent-avatar",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/agent_composer.dart",
+      "source": "lib/src/components/ui/agent_composer.dart",
       "owner": "agent-composer",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/agent_console.dart",
-      "owner": "agent-console",
-      "classification": "dependency"
-    },
-    {
-      "source": "lib/src/components/agent_core.dart",
+      "source": "lib/src/components/ui/agent_core.dart",
       "owner": "agent-core",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/agent_face.dart",
+      "source": "lib/src/components/ui/agent_face.dart",
       "owner": "agent-face",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/agent_history.dart",
+      "source": "lib/src/components/ui/agent_history.dart",
       "owner": "agent-history",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/agent_launcher.dart",
+      "source": "lib/src/components/ui/agent_launcher.dart",
       "owner": "agent-launcher",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/agent_markdown.dart",
+      "source": "lib/src/components/ui/agent_markdown.dart",
       "owner": "agent-markdown",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/agent_slash_palette.dart",
+      "source": "lib/src/components/ui/agent_slash_palette.dart",
       "owner": "agent-slash-palette",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/agent_transcript.dart",
+      "source": "lib/src/components/ui/agent_transcript.dart",
       "owner": "agent-transcript",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/alert_dialog.dart",
-      "owner": "alert-dialog",
-      "classification": "installable"
-    },
-    {
-      "source": "lib/src/components/alert.dart",
+      "source": "lib/src/components/ui/alert.dart",
       "owner": "alert",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/aspect_ratio.dart",
+      "source": "lib/src/components/ui/alert_dialog.dart",
+      "owner": "alert-dialog",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/ambient_pattern.dart",
+      "owner": "ambient-pattern",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/aspect_ratio.dart",
       "owner": "aspect-ratio",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/attachment.dart",
+      "source": "lib/src/components/ui/attachment.dart",
       "owner": "attachment",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/avatar.dart",
+      "source": "lib/src/components/ui/avatar.dart",
       "owner": "avatar",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/badge.dart",
+      "source": "lib/src/components/ui/background_effect.dart",
+      "owner": "background-effect",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/badge.dart",
       "owner": "badge",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/breadcrumb.dart",
+      "source": "lib/src/components/ui/breadcrumb.dart",
       "owner": "breadcrumb",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/bubble.dart",
+      "source": "lib/src/components/ui/bubble.dart",
       "owner": "bubble",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/button_group.dart",
-      "owner": "button-group",
-      "classification": "installable"
-    },
-    {
-      "source": "lib/src/components/button.dart",
+      "source": "lib/src/components/ui/button.dart",
       "owner": "button",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/calendar.dart",
+      "source": "lib/src/components/ui/button_group.dart",
+      "owner": "button-group",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/calendar.dart",
       "owner": "calendar",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/card.dart",
+      "source": "lib/src/components/ui/card.dart",
       "owner": "card",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/carousel.dart",
+      "source": "lib/src/components/ui/carousel.dart",
       "owner": "carousel",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/chart_cartesian.dart",
-      "owner": "chart-cartesian",
-      "classification": "dependency"
-    },
-    {
-      "source": "lib/src/components/chart_geometry.dart",
-      "owner": "chart-geometry",
-      "classification": "dependency"
-    },
-    {
-      "source": "lib/src/components/chart_polar.dart",
-      "owner": "chart-polar",
-      "classification": "dependency"
-    },
-    {
-      "source": "lib/src/components/chart.dart",
+      "source": "lib/src/components/ui/chart.dart",
       "owner": "chart",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/checkbox.dart",
+      "source": "lib/src/components/ui/chart_cartesian.dart",
+      "owner": "chart-cartesian",
+      "classification": "dependency"
+    },
+    {
+      "source": "lib/src/components/ui/chart_geometry.dart",
+      "owner": "chart-geometry",
+      "classification": "dependency"
+    },
+    {
+      "source": "lib/src/components/ui/chart_polar.dart",
+      "owner": "chart-polar",
+      "classification": "dependency"
+    },
+    {
+      "source": "lib/src/components/ui/checkbox.dart",
       "owner": "checkbox",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/collapsible.dart",
+      "source": "lib/src/components/ui/collapsible.dart",
       "owner": "collapsible",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/combobox.dart",
+      "source": "lib/src/components/ui/combobox.dart",
       "owner": "combobox",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/command.dart",
+      "source": "lib/src/components/ui/command.dart",
       "owner": "command",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/context_menu.dart",
+      "source": "lib/src/components/ui/content_change.dart",
+      "owner": "content-change",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/context_menu.dart",
       "owner": "context-menu",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/dialog.dart",
+      "source": "lib/src/components/ui/dialog.dart",
       "owner": "dialog",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/drawer.dart",
+      "source": "lib/src/components/ui/drawer.dart",
       "owner": "drawer",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/dropdown_menu.dart",
+      "source": "lib/src/components/ui/dropdown_menu.dart",
       "owner": "dropdown-menu",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/empty.dart",
+      "source": "lib/src/components/ui/empty.dart",
       "owner": "empty",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/field.dart",
+      "source": "lib/src/components/ui/feedback_surface.dart",
+      "owner": "feedback-surface",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/field.dart",
       "owner": "field",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/form.dart",
+      "source": "lib/src/components/ui/form.dart",
       "owner": "form",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/hover_card.dart",
+      "source": "lib/src/components/ui/glass.dart",
+      "owner": "glass",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/hover_builder.dart",
+      "owner": "hover-builder",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/hover_card.dart",
       "owner": "hover-card",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/icon_paths.dart",
+      "source": "lib/src/components/ui/icon.dart",
+      "owner": "icon",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/icon_paths.dart",
       "owner": "icon",
       "classification": "bundled"
     },
     {
-      "source": "lib/src/components/icon_paths.g.dart",
+      "source": "lib/src/components/ui/icon_paths.g.dart",
       "owner": "icon",
       "classification": "bundled"
     },
     {
-      "source": "lib/src/components/icon_swap.dart",
+      "source": "lib/src/components/ui/icon_swap.dart",
       "owner": "icon-swap",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/icon.dart",
-      "owner": "icon",
-      "classification": "installable"
-    },
-    {
-      "source": "lib/src/components/input_group.dart",
-      "owner": "input-group",
-      "classification": "installable"
-    },
-    {
-      "source": "lib/src/components/input_otp.dart",
-      "owner": "input-otp",
-      "classification": "installable"
-    },
-    {
-      "source": "lib/src/components/input.dart",
+      "source": "lib/src/components/ui/input.dart",
       "owner": "input",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/item.dart",
+      "source": "lib/src/components/ui/input_group.dart",
+      "owner": "input-group",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/input_otp.dart",
+      "owner": "input-otp",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/item.dart",
       "owner": "item",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/kbd.dart",
+      "source": "lib/src/components/ui/kbd.dart",
       "owner": "kbd",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/marker.dart",
+      "source": "lib/src/components/ui/keyframes.dart",
+      "owner": "keyframes",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/marker.dart",
       "owner": "marker",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/menu.dart",
+      "source": "lib/src/components/ui/media_scrim.dart",
+      "owner": "media-scrim",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/menu.dart",
       "owner": "menu",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/menubar.dart",
+      "source": "lib/src/components/ui/menubar.dart",
       "owner": "menubar",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/message_scroller.dart",
-      "owner": "message-scroller",
-      "classification": "dependency"
-    },
-    {
-      "source": "lib/src/components/message.dart",
+      "source": "lib/src/components/ui/message.dart",
       "owner": "message",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/native_select.dart",
+      "source": "lib/src/components/ui/message_scroller.dart",
+      "owner": "message-scroller",
+      "classification": "dependency"
+    },
+    {
+      "source": "lib/src/components/ui/native_select.dart",
       "owner": "native-select",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/nav_user.dart",
-      "owner": "nav-user",
-      "classification": "installable"
-    },
-    {
-      "source": "lib/src/components/navigation_menu.dart",
+      "source": "lib/src/components/ui/navigation_menu.dart",
       "owner": "navigation-menu",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/pagination.dart",
+      "source": "lib/src/components/ui/pagination.dart",
       "owner": "pagination",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/popover.dart",
+      "source": "lib/src/components/ui/popover.dart",
       "owner": "popover",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/progress.dart",
+      "source": "lib/src/components/ui/premium_surface.dart",
+      "owner": "premium-surface",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/press.dart",
+      "owner": "press",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/progress.dart",
       "owner": "progress",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/questionnaire.dart",
+      "source": "lib/src/components/ui/questionnaire.dart",
       "owner": "questionnaire",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/radio.dart",
+      "source": "lib/src/components/ui/radio.dart",
       "owner": "radio",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/resizable.dart",
+      "source": "lib/src/components/ui/resizable.dart",
       "owner": "resizable",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/rule.dart",
-      "owner": "rule",
-      "classification": "installable"
-    },
-    {
-      "source": "lib/src/components/safe_area.dart",
+      "source": "lib/src/components/ui/safe_area.dart",
       "owner": "safe-area",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/scroll_area.dart",
+      "source": "lib/src/components/ui/scroll_area.dart",
       "owner": "scroll-area",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/select.dart",
+      "source": "lib/src/components/ui/select.dart",
       "owner": "select",
       "classification": "dependency"
     },
     {
-      "source": "lib/src/components/selection_control.dart",
+      "source": "lib/src/components/ui/selection_control.dart",
       "owner": "selection-control",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/separator.dart",
+      "source": "lib/src/components/ui/separator.dart",
       "owner": "separator",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/sheet.dart",
+      "source": "lib/src/components/ui/sheet.dart",
       "owner": "sheet",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/sidebar.dart",
+      "source": "lib/src/components/ui/sidebar.dart",
       "owner": "sidebar",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/skeleton.dart",
+      "source": "lib/src/components/ui/skeleton.dart",
       "owner": "skeleton",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/slider.dart",
+      "source": "lib/src/components/ui/slider.dart",
       "owner": "slider",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/spinner.dart",
+      "source": "lib/src/components/ui/spinner.dart",
       "owner": "spinner",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/stat.dart",
+      "source": "lib/src/components/ui/stat.dart",
       "owner": "stat",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/switch.dart",
+      "source": "lib/src/components/ui/surface.dart",
+      "owner": "surface",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/switch.dart",
       "owner": "switch",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/table.dart",
+      "source": "lib/src/components/ui/table.dart",
       "owner": "table",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/tabs.dart",
+      "source": "lib/src/components/ui/tabs.dart",
       "owner": "tabs",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/textarea.dart",
+      "source": "lib/src/components/ui/textarea.dart",
       "owner": "textarea",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/toaster.dart",
+      "source": "lib/src/components/ui/toaster.dart",
       "owner": "toaster",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/toggle_group.dart",
-      "owner": "toggle-group",
-      "classification": "installable"
-    },
-    {
-      "source": "lib/src/components/toggle.dart",
+      "source": "lib/src/components/ui/toggle.dart",
       "owner": "toggle",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/tooltip.dart",
+      "source": "lib/src/components/ui/toggle_group.dart",
+      "owner": "toggle-group",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/tooltip.dart",
       "owner": "tooltip",
       "classification": "installable"
     },
     {
-      "source": "lib/src/components/voice.dart",
+      "source": "lib/src/components/ui/user_menu.dart",
+      "owner": "user-menu",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/validation_rule.dart",
+      "owner": "validation-rule",
+      "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/voice.dart",
       "owner": "voice",
       "classification": "dependency"
+    },
+    {
+      "source": "lib/src/components/ui/voice_indicator.dart",
+      "owner": "voice-indicator",
+      "classification": "installable"
     }
   ]
 }

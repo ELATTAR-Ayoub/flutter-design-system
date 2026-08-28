@@ -7,24 +7,24 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/icon.dart",
+      "source": "lib/src/components/ui/icon.dart",
       "target": "@ui/icon.dart",
-      "sha256": "c2d08c1e3dbdc299d21f2316db6c8e76543d5b68973178e41f493b11af59c541"
+      "sha256": "771a5bd8d8889e18c7ecea4abcd0f34f5786d9dfb29a490e1481832dabf65818"
     },
     {
-      "source": "lib/src/components/icon_paths.dart",
+      "source": "lib/src/components/ui/icon_paths.dart",
       "target": "@ui/icon_paths.dart",
-      "sha256": "efb17140bdc3ad2148ba4676a755298d8154e285a6f94bbb8f849bcd6b8827c8"
+      "sha256": "fddac99d96cca546e2865f0c9c99c72ff36088c198a1f7e6cc803a72bed7be7d"
     },
     {
-      "source": "lib/src/components/icon_paths.g.dart",
+      "source": "lib/src/components/ui/icon_paths.g.dart",
       "target": "@ui/icon_paths.g.dart",
-      "sha256": "609fd4ceab67fce3ff39b4a687c08af737cb8161306d3b3aae1c8dc59527ff0f"
+      "sha256": "4993c5d70266cb88b2f4a1d3b2a5520ab462a5bb6e618bdf08ec95e950e65c29"
     },
     {
-      "source": "lib/src/components/icon_paths.g.index.dart",
+      "source": "lib/src/components/ui/icon_paths.g.index.dart",
       "target": "@ui/icon_paths.g.index.dart",
-      "sha256": "2b4d37b8131ec204ed359484ee030175e6bfede8ca2e72d6bc20bc9d9d2f5215"
+      "sha256": "58234d428593568c86e7f4485aa8c59908e185fdcce8b84cec811bde41dca5de"
     }
   ],
   "registryDependencies": [
@@ -43,6 +43,6 @@
     }
   ],
   "documentationRoute": "/components/icon",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/icon.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/icon.dart",
   "deprecated": false
 }

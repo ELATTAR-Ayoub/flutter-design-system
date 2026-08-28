@@ -1,18 +1,18 @@
 /// Public documentation page for the `agent-attach-menu` component.
 ///
-/// `agent_attach_menu.dart` declares one widget, [ElAgentAttachMenu]. API
+/// `agent_attach_menu.dart` declares one widget, [AgentAttachMenu]. API
 /// Reference gives it one table for its constructor parameters and a second
 /// for its own public statics.
 ///
 /// **Not built on the arrow-key-navigable menu.** The source's own library
 /// doc says why: the reference overrides `DropdownMenuItem` with a two-line
-/// child the stock [ElMenuItem] has no slot for, so this file composes
-/// [ElMenuSurface] and [ElMenuPointerDown] over [ElPopover] directly rather
-/// than [ElDropdownMenu]. That choice has a real consequence this page does
-/// not skip: [ElMenuContent] — the class that actually implements
+/// child the stock [MenuItem] has no slot for, so this file composes
+/// [MenuSurface] and [MenuPointerDown] over [Popover] directly rather
+/// than [DropdownMenu]. That choice has a real consequence this page does
+/// not skip: [MenuContent] — the class that actually implements
 /// ArrowDown/ArrowUp/Home/End/Enter navigation in `menu.dart` — is never
 /// used here, and neither `_AttachMenuState` nor `_MenuRow` binds a
-/// [FocusNode] or a [Focus.onKeyEvent] of its own. [ElPopover] does supply
+/// [FocusNode] or a [Focus.onKeyEvent] of its own. [Popover] does supply
 /// Escape, but only "when focus is already inside the popup" (its own class
 /// doc) — and nothing in this menu ever puts focus there. The Keyboard
 /// disclosure below documents exactly that reachable state, rather than the
@@ -20,7 +20,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -33,8 +45,8 @@ final ComponentDocSpec agentAttachMenuDocSpec = ComponentDocSpec(
   title: 'Agent Attach Menu',
   description:
       'The plus beside the composer: one control for picking a file or '
-      'running a skill, built on ElMenuSurface and ElMenuPointerDown over '
-      'ElPopover rather than the arrow-key-navigable ElDropdownMenu.',
+      'running a skill, built on MenuSurface and MenuPointerDown over '
+      'Popover rather than the arrow-key-navigable DropdownMenu.',
   sections: <DocsPageSection>[
     ShowcaseSection(
       id: 'preview',
@@ -42,13 +54,13 @@ final ComponentDocSpec agentAttachMenuDocSpec = ComponentDocSpec(
       description:
           'Both rows the composer can offer: a Photos & files row (when '
           'onPickFiles is given) and the skill-group commands from '
-          'commands, separated by one hairline. Only ElAgentCommand values '
+          'commands, separated by one hairline. Only AgentCommand values '
           'whose group is skill ever reach this menu — see Skills only '
           'below.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(64),
+      minHeight: space(64),
     ),
     InstallSection(
       id: 'install',
@@ -76,7 +88,7 @@ final ComponentDocSpec agentAttachMenuDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElAgentAttachMenu is reachable the '
+              'Add the export line so AgentAttachMenu is reachable the '
               'same way the CLI path already makes it.',
           code: "export 'agent_attach_menu.dart';",
         ),
@@ -102,16 +114,16 @@ final ComponentDocSpec agentAttachMenuDocSpec = ComponentDocSpec(
       specimen: _SkillsOnlySpecimen(),
       code: _skillsOnlyCode,
       label: 'Skills only specimen view',
-      minHeight: el(64),
+      minHeight: space(64),
     ),
     ShowcaseSection(
       id: 'disabled',
       title: 'Disabled',
       description:
-          'disabled: true does two things at once: ElMenuPointerDown stops '
+          'disabled: true does two things at once: MenuPointerDown stops '
           'calling onPointerDown at all (enabled: !disabled), and the '
-          'trigger ElButton itself receives onPressed: null, which is '
-          "ElButton's own disabled switch — 45% opacity, no pointer "
+          'trigger Button itself receives onPressed: null, which is '
+          "Button's own disabled switch — 45% opacity, no pointer "
           'events, on the same clock every disabled button uses.',
       specimen: _DisabledSpecimen(),
       code: _disabledCode,
@@ -121,18 +133,15 @@ final ComponentDocSpec agentAttachMenuDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElAgentAttachMenu declares, plus its '
-          'own public statics. ElAgentCommand and ElAgentCommandGroup — the '
+          'Every constructor parameter AgentAttachMenu declares, plus its '
+          'own public statics. AgentCommand and AgentCommandGroup — the '
           'type commands is built from — are documented on the Agent Slash '
           'Palette page instead, since this file imports them rather than '
           'declaring them.',
       children: const <DocsTocEntry>[
+        DocsTocEntry(title: 'AgentAttachMenu', anchor: 'api-elagentattachmenu'),
         DocsTocEntry(
-          title: 'ElAgentAttachMenu',
-          anchor: 'api-elagentattachmenu',
-        ),
-        DocsTocEntry(
-          title: 'ElAgentAttachMenu static values',
+          title: 'AgentAttachMenu static values',
           anchor: 'api-elagentattachmenu-static',
         ),
       ],
@@ -142,7 +151,7 @@ final ComponentDocSpec agentAttachMenuDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off ElAgentAttachMenu.build and _AttachMenuState, not '
+          'Read off AgentAttachMenu.build and _AttachMenuState, not '
           'inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -215,9 +224,9 @@ class AgentAttachMenuDocPage extends StatelessWidget {
       title: agentAttachMenuDoc.title,
       description: agentAttachMenuDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Agent Attach Menu'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Agent Attach Menu'),
     ],
     toc: agentAttachMenuDocSpec.toc,
     previous: null,
@@ -232,27 +241,27 @@ class AgentAttachMenuDocPage extends StatelessWidget {
 
 /* ── Sample data ─────────────────────────────────────────────────────────── */
 
-const List<ElAgentCommand> _menuCommands = <ElAgentCommand>[
-  ElAgentCommand(
+const List<AgentCommand> _menuCommands = <AgentCommand>[
+  AgentCommand(
     id: 'find-comps',
     label: 'Find comps',
     hint: 'Find comparable sold listings for this card',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.search,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.search,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'summarize',
     label: 'Summarize',
     hint: 'Summarize this conversation',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.sparkles,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.sparkles,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'clear',
     label: 'Clear',
     hint: 'Clear this conversation — never reaches this menu',
-    group: ElAgentCommandGroup.command,
-    icon: ElLucide.trash2,
+    group: AgentCommandGroup.command,
+    icon: Lucide.trash2,
   ),
 ];
 
@@ -270,23 +279,23 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElAgentAttachMenu(
+        AgentAttachMenu(
           key: const ValueKey<String>('agent-attach-menu-preview:trigger'),
           onPickFiles: () =>
               setState(() => _status = 'Opened the file picker.'),
           commands: _menuCommands,
-          onRunCommand: (ElAgentCommand command) =>
+          onRunCommand: (AgentCommand command) =>
               setState(() => _status = 'Ran: ${command.label}'),
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           _status,
-          ElType.small,
+          TextStyles.small,
           key: const ValueKey<String>('agent-attach-menu-preview:status'),
           color: theme.mutedForeground,
         ),
@@ -296,7 +305,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 }
 
 const String _previewCode = '''
-ElAgentAttachMenu(
+AgentAttachMenu(
   onPickFiles: () => openFilePicker(),
   commands: commands, // only group == skill renders
   onRunCommand: (command) => runCommand(command),
@@ -306,15 +315,15 @@ class _SkillsOnlySpecimen extends StatelessWidget {
   const _SkillsOnlySpecimen();
 
   @override
-  Widget build(BuildContext context) => ElAgentAttachMenu(
+  Widget build(BuildContext context) => AgentAttachMenu(
     key: const ValueKey<String>('agent-attach-menu-example:skills-only'),
     commands: _menuCommands,
-    onRunCommand: (ElAgentCommand _) {},
+    onRunCommand: (AgentCommand _) {},
   );
 }
 
 const String _skillsOnlyCode = '''
-ElAgentAttachMenu(
+AgentAttachMenu(
   // onPickFiles omitted — no Photos & files row, no separator.
   commands: commands,
   onRunCommand: (command) => runCommand(command),
@@ -324,17 +333,17 @@ class _DisabledSpecimen extends StatelessWidget {
   const _DisabledSpecimen();
 
   @override
-  Widget build(BuildContext context) => ElAgentAttachMenu(
+  Widget build(BuildContext context) => AgentAttachMenu(
     key: const ValueKey<String>('agent-attach-menu-example:disabled'),
     onPickFiles: () {},
     commands: _menuCommands,
-    onRunCommand: (ElAgentCommand _) {},
+    onRunCommand: (AgentCommand _) {},
     disabled: true,
   );
 }
 
 const String _disabledCode = '''
-ElAgentAttachMenu(
+AgentAttachMenu(
   onPickFiles: () => openFilePicker(),
   commands: commands,
   onRunCommand: (command) => runCommand(command),
@@ -346,7 +355,7 @@ ElAgentAttachMenu(
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElAgentAttachMenu(
+AgentAttachMenu(
   onPickFiles: () => openFilePicker(),
   commands: commands,
   onRunCommand: (command) => runCommand(command),
@@ -361,16 +370,13 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elagentattachmenu',
-        child: DocsApiTable(
-          title: 'ElAgentAttachMenu',
-          facts: _attachMenuFacts,
-        ),
+        child: DocsApiTable(title: 'AgentAttachMenu', facts: _attachMenuFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentattachmenu-static',
         child: DocsApiTable(
-          title: 'ElAgentAttachMenu static values',
+          title: 'AgentAttachMenu static values',
           facts: _attachMenuStaticFacts,
         ),
       ),
@@ -388,7 +394,7 @@ const List<DocsApiFact> _attachMenuFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'commands',
-    type: 'List<ElAgentCommand>?',
+    type: 'List<AgentCommand>?',
     description:
         "Optional. The full list the composer holds — this widget's own "
         '_skills getter filters it down to group == skill and ignores '
@@ -396,8 +402,9 @@ const List<DocsApiFact> _attachMenuFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'onRunCommand',
-    type: 'ValueChanged<ElAgentCommand>',
-    description: 'Required. Fires with the selected skill after the menu '
+    type: 'ValueChanged<AgentCommand>',
+    description:
+        'Required. Fires with the selected skill after the menu '
         'closes.',
   ),
   DocsApiFact(
@@ -405,43 +412,46 @@ const List<DocsApiFact> _attachMenuFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to false. Stops the trigger from opening and '
-        'renders the underlying ElButton in its own disabled paint.',
+        'renders the underlying Button in its own disabled paint.',
   ),
 ];
 
 const List<DocsApiFact> _attachMenuStaticFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'triggerSize',
-    type: 'ElButtonSize',
-    description:
-        'ElButtonSize.iconSm — the trigger is a plain icon-only ElButton.',
+    type: 'ButtonSize',
+    description: 'ButtonSize.iconSm — the trigger is a plain icon-only Button.',
   ),
   DocsApiFact(
     name: 'width',
     type: 'double',
-    description: 'el(80) — 320. Fixed content width, unrelated to the '
+    description:
+        'space(80) — 320. Fixed content width, unrelated to the '
         'viewport.',
   ),
   DocsApiFact(
     name: 'maxHeight',
     type: 'double',
-    description: 'el(96) — 384. The scrolling content never grows past '
+    description:
+        'space(96) — 384. The scrolling content never grows past '
         'this.',
   ),
   DocsApiFact(
     name: 'rowInsets',
     type: 'EdgeInsets',
-    description: 'symmetric(horizontal: el(3), vertical: el(2)) on a row.',
+    description:
+        'symmetric(horizontal: space(3), vertical: space(2)) on a row.',
   ),
   DocsApiFact(
     name: 'rowGap',
     type: 'double',
-    description: "el(3) — 12. Between a row's glyph and its text.",
+    description: "space(3) — 12. Between a row's glyph and its text.",
   ),
   DocsApiFact(
     name: 'rowRadius',
     type: 'double',
-    description: 'ElRadii.md — 10. The highlighted-row fill\'s corner '
+    description:
+        'Radii.md — 10. The highlighted-row fill\'s corner '
         'radius.',
   ),
   DocsApiFact(
@@ -454,11 +464,7 @@ const List<DocsApiFact> _attachMenuStaticFacts = <DocsApiFact>[
         'the slash palette\'s equivalent, which does have the flex and '
         'does show the gap.',
   ),
-  DocsApiFact(
-    name: 'glyphSize',
-    type: 'double',
-    description: 'el(4) — 16.',
-  ),
+  DocsApiFact(name: 'glyphSize', type: 'double', description: 'space(4) — 16.'),
 ];
 
 class _AccessibilityContent extends StatelessWidget {
@@ -466,13 +472,13 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Trigger: a plain ElButton with label: "Add files or use a '
+      _bullets(ThemeScope.of(context), <String>[
+        'Trigger: a plain Button with label: "Add files or use a '
             'skill", which is its accessible name (the plus icon carries '
             'no name of its own).',
-        'Trigger also wraps ElMenuTriggerScope(open: _isOpen), the same '
-            "scope ElDropdownMenu's own trigger reads — a caller building "
-            'a custom trigger can read ElMenuTriggerScope.openOf to '
+        'Trigger also wraps MenuTriggerScope(open: _isOpen), the same '
+            "scope DropdownMenu's own trigger reads — a caller building "
+            'a custom trigger can read MenuTriggerScope.openOf to '
             'reflect aria-expanded, and suppressPressScale: true cancels '
             'the press-scale animation the way a real aria-haspopup '
             'trigger does.',
@@ -495,8 +501,8 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'The trigger is a real ElButton, so it takes the same keyboard as '
+      _bullets(ThemeScope.of(context), <String>[
+        'The trigger is a real Button, so it takes the same keyboard as '
             'every other button on this system: Tab reaches it, Enter / '
             'NumpadEnter / Space activate it — see the Button page\'s own '
             'Keyboard disclosure.',
@@ -505,18 +511,18 @@ class _KeyboardContent extends StatelessWidget {
             'or an onKeyEvent: a row answers MouseRegion and a bare '
             'GestureDetector only.',
         'DRIFT, and worth stating plainly: this menu is not built on '
-            '[ElMenuContent] (menu.dart\'s own ArrowDown/ArrowUp/Home/End/'
-            'Enter handler) the way ElDropdownMenu is — the source\'s own '
+            '[MenuContent] (menu.dart\'s own ArrowDown/ArrowUp/Home/End/'
+            'Enter handler) the way DropdownMenu is — the source\'s own '
             'library note explains why (the two-line row the stock '
-            '[ElMenuItem] has no slot for) — so none of that navigation '
+            '[MenuItem] has no slot for) — so none of that navigation '
             'exists here.',
-        'Escape is not wired either, in practice. ElPopover does supply '
+        'Escape is not wired either, in practice. Popover does supply '
             'an Escape handler, but its own class doc is explicit: "the '
             'Escape key when focus is already inside the popup" — and '
             'because no row and no trigger substitute ever moves focus '
             'into the popup content, that Focus node (canRequestFocus: '
             'false) never receives a key event to answer. The menu still '
-            'closes on a tap anywhere outside it, through ElPopover\'s own '
+            'closes on a tap anywhere outside it, through Popover\'s own '
             'modal barrier — that dismissal is a pointer path, not a '
             'keyboard one.',
       ]);
@@ -527,12 +533,12 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in agent_attach_menu.dart: '
             'BuildContext width is never read for a layout decision.',
-        'width (320) and maxHeight (384) are fixed el() values: the '
+        'width (320) and maxHeight (384) are fixed space() values: the '
             "content's own box does not grow or shrink with the "
-            'viewport, though ElPopover\'s own collision flip repositions '
+            'viewport, though Popover\'s own collision flip repositions '
             'it — never resizes it — to stay on screen.',
         'side: top, align: start is fixed at the call site: this menu '
             'always opens upward and left-aligned to its trigger, on '
@@ -548,22 +554,22 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/agent_attach_menu.dart. No companion '
             'parts.',
         'Flutter imports: package:flutter/gestures.dart '
             '(PointerEnterEvent, PointerExitEvent), '
             'package:flutter/widgets.dart.',
-        'Foundation imports: colors.dart, spacing.dart (el()), '
+        'Foundation imports: colors.dart, spacing.dart (space()), '
             'theme.dart, typography.dart, theme_scope.dart.',
-        'Component imports: agent_slash_palette.dart (ElAgentCommand, '
-            'ElAgentCommandGroup — the type this file consumes, never '
-            'declares), button.dart (ElButton), dropdown_menu.dart '
-            '(ElDropdownMenu.sideOffset only — not the widget itself), '
-            'icon.dart, icon_paths.g.dart, menu.dart (ElMenuSurface, '
-            'ElMenuPointerDown, ElMenuTriggerScope, ElMenuMotion, '
-            'ElMenu.contentPadding — never ElMenuContent), popover.dart '
-            '(ElPopover and friends).',
+        'Component imports: agent_slash_palette.dart (AgentCommand, '
+            'AgentCommandGroup — the type this file consumes, never '
+            'declares), button.dart (Button), dropdown_menu.dart '
+            '(DropdownMenu.sideOffset only — not the widget itself), '
+            'icon.dart, icon_paths.g.dart, menu.dart (MenuSurface, '
+            'MenuPointerDown, MenuTriggerScope, MenuMotion, '
+            'Menu.contentPadding — never MenuContent), popover.dart '
+            '(Popover and friends).',
         'registryDependencies, resolved automatically by `elattar add '
             'agent-attach-menu`: agent-slash-palette, button, '
             'dropdown-menu, icon, menu, popover, source-foundation — '
@@ -573,9 +579,9 @@ class _DependenciesContent extends StatelessWidget {
             'agent-slash-palette, button, dropdown-menu, icon, menu, '
             'popover.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: DocsLinkRow(
           links: <DocsLink>[
             DocsLink(
@@ -602,14 +608,14 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Every colour is read live off ElTheme.of(context) at build time: '
+      _bullets(ThemeScope.of(context), <String>[
+        'Every colour is read live off ThemeScope.of(context) at build time: '
             'theme.border (the separator rule), theme.accent (a '
             'highlighted row\'s fill), theme.foreground (a row\'s title), '
             'theme.mutedForeground (the "Skills" heading and a row\'s '
-            'hint), theme.agent (every glyph). Flipping '
-            'ElThemeController re-resolves every one on the next frame.',
-        'The surface itself (ElMenuSurface, the popup\'s fill/border/'
+            'hint), theme.agentAccent (every glyph). Flipping '
+            'ThemeController re-resolves every one on the next frame.',
+        'The surface itself (MenuSurface, the popup\'s fill/border/'
             'shadow) and the popover\'s own animation are both borrowed '
             'wholesale from menu.dart / popover.dart — nothing here paints '
             'its own box.',
@@ -619,15 +625,19 @@ class _ThemingContent extends StatelessWidget {
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -635,26 +645,30 @@ Widget _bullets(ElThemeData theme, List<String> lines) => Column(
 const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Nothing to offer',
-    treatment: 'onPickFiles == null && skills.isEmpty short-circuits to '
-        'SizedBox.shrink() before ElPopover is even built.',
-    userSignal: 'No plus renders at all — a caller closes off attachments '
+    treatment:
+        'onPickFiles == null && skills.isEmpty short-circuits to '
+        'SizedBox.shrink() before Popover is even built.',
+    userSignal:
+        'No plus renders at all — a caller closes off attachments '
         'entirely by handing this widget nothing to do.',
   ),
   DocsStateFact(
     state: 'Closed',
-    treatment: '_open is false: only the trigger ElButton renders.',
+    treatment: '_open is false: only the trigger Button renders.',
     userSignal: 'The default resting state.',
   ),
   DocsStateFact(
     state: 'Open',
-    treatment: '_open is true (and disabled is false): ElPopover mounts '
-        'ElMenuSurface\'s content, animated in on ElPopover\'s own '
+    treatment:
+        '_open is true (and disabled is false): Popover mounts '
+        'MenuSurface\'s content, animated in on Popover\'s own '
         'enter transition.',
     userSignal: 'The menu shown in Preview above.',
   ),
   DocsStateFact(
     state: 'Row highlighted',
-    treatment: '_MenuRowState._highlighted, from MouseRegion.onEnter / '
+    treatment:
+        '_MenuRowState._highlighted, from MouseRegion.onEnter / '
         'onExit alone: theme.accent behind the row, no transition on it '
         'at all — measured, and reproduced as an instant fill rather than '
         'an animated one.',
@@ -662,8 +676,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   ),
   DocsStateFact(
     state: 'Disabled',
-    treatment: 'ElMenuPointerDown.enabled is !disabled (the menu cannot '
-        'be toggled open) and the trigger ElButton itself gets onPressed: '
+    treatment:
+        'MenuPointerDown.enabled is !disabled (the menu cannot '
+        'be toggled open) and the trigger Button itself gets onPressed: '
         'null, so it also paints 45% opacity and ignores pointer events.',
     userSignal: 'See Disabled above.',
   ),

@@ -1,8 +1,8 @@
 /// Public documentation page for the `resizable` component —
-/// `lib/src/components/resizable.dart`'s [ElResizablePanelGroup] and
-/// [ElResizablePanel].
+/// `lib/src/components/resizable.dart`'s [ResizablePanelGroup] and
+/// [ResizablePanel].
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels (plus a manual `_sidebar` list standing in for the shared
 /// `aspect_ratio` / `resizable` / `scroll_area` group, split out of that
 /// route — see the original library note, preserved in git history); it
@@ -27,7 +27,7 @@
 /// package itself (its version, its own release notes) rather than a UI
 /// affordance a Flutter port can show; there is nothing to mirror in
 /// either. `Vertical` is skipped for a real reason, not an oversight:
-/// [ElResizablePanelGroup] takes no orientation parameter at all, its
+/// [ResizablePanelGroup] takes no orientation parameter at all, its
 /// `build` method always lays panels into a horizontal `Row`
 /// (`resizable.dart`'s own `Row(crossAxisAlignment: ..., children: row)`),
 /// so there is no vertical mode to demonstrate.
@@ -50,7 +50,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -101,7 +113,7 @@ final ComponentDocSpec resizableDocSpec = ComponentDocSpec(
     SnippetSection(
       id: 'usage',
       title: 'Usage',
-      description: 'ElResizablePanelGroup with two panels.',
+      description: 'ResizablePanelGroup with two panels.',
       code: _usageCode,
     ),
     SnippetSection(
@@ -131,7 +143,7 @@ final ComponentDocSpec resizableDocSpec = ComponentDocSpec(
       title: 'RTL',
       description:
           'The same two-panel group read right-to-left under a '
-          'Directionality. Nothing in ElResizablePanelGroup mirrors by '
+          'Directionality. Nothing in ResizablePanelGroup mirrors by '
           'hand: the Row it lays panels into reverses child order '
           'automatically, so the first panel declared renders on the '
           'reading-start (here, physical right) side.',
@@ -148,7 +160,7 @@ final ComponentDocSpec resizableDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElResizablePanelGroup handles drag and keyboard on its '
+          'ResizablePanelGroup handles drag and keyboard on its '
           'separator.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -197,7 +209,8 @@ final ComponentDocSpec resizableDocSpec = ComponentDocSpec(
           const DocsInstallFact(
             label: 'Package tests',
             value: 'none yet',
-            description: 'No dedicated unit tests in the package test '
+            description:
+                'No dedicated unit tests in the package test '
                 'suite.',
           ),
           const DocsInstallFact(
@@ -231,9 +244,9 @@ class ResizableDocPage extends StatelessWidget {
       title: resizableDoc.title,
       description: resizableDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Resizable'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Resizable'),
     ],
     toc: resizableDocSpec.toc,
     previous: const DocsPageLink(
@@ -262,11 +275,11 @@ class _ApiReferenceContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: const <Widget>[
       DocsApiTable(
-        title: 'ElResizablePanelGroup',
+        title: 'ResizablePanelGroup',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'panels',
-            type: 'List<ElResizablePanel>',
+            type: 'List<ResizablePanel>',
             description: 'Required. The panels to arrange.',
           ),
           DocsApiFact(
@@ -285,7 +298,7 @@ class _ApiReferenceContent extends StatelessWidget {
       ),
       SizedBox(height: 24),
       DocsApiTable(
-        title: 'ElResizablePanel',
+        title: 'ResizablePanel',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'child',
@@ -317,7 +330,7 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Semantic role: Semantics(container: true, label: \'Resize\') on '
             'the grab strip; the group and its panels add no Semantics '
             'node of their own, content inside each panel announces '
@@ -346,10 +359,10 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Focus: the grab strip carries tabIndex={0}\'s equivalent (a '
             'Focus widget with its own FocusNode, debugLabel '
-            'elResizableHandleFocusLabel), so Tab and Shift+Tab reach it '
+            'resizableHandleFocusLabel), so Tab and Shift+Tab reach it '
             'in the surrounding page\'s own order.',
         'ArrowLeft / ArrowRight: move the separator by keyboardStep, five '
             'percentage points of the panel space, toward or away from '
@@ -369,7 +382,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Renders the same separator at 390px and 1440px: the separator '
             'is always 1px. Panel widths and the minSize constraint are '
             'in pixels and need explicit design on narrow screens.',
@@ -399,20 +412,23 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Foundation imports',
-            value: 'foundation/spacing.dart (el(), ElWidths, ElRadii), '
-                'foundation/theme.dart (ElThemeData)',
+            value:
+                'foundation/spacing.dart (space(), LayoutWidths, Radii), '
+                'foundation/theme.dart (ThemeTokens)',
             description: 'Colour and geometry tokens only.',
           ),
           const DocsInstallFact(
             label: 'Flutter imports',
-            value: 'package:flutter/gestures.dart (DragStartBehavior), '
+            value:
+                'package:flutter/gestures.dart (DragStartBehavior), '
                 'package:flutter/services.dart (LogicalKeyboardKey)',
-            description: 'For the drag start behavior and the '
+            description:
+                'For the drag start behavior and the '
                 'arrow/Home/End key handling.',
           ),
           const DocsInstallFact(
             label: 'Scope import',
-            value: 'theme_scope.dart (ElTheme)',
+            value: 'theme_scope.dart (ThemeScope)',
             description: 'No other component or effect file is imported.',
           ),
           const DocsInstallFact(
@@ -439,7 +455,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       DocsLinkRow(
         links: <DocsLink>[
           DocsLink(
@@ -457,24 +473,28 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The separator is theme.border, 1px. No state colours: hover '
             'adds a cursor, not a visual change. The grip is theme.border '
             'too, 4px wide and 24px tall.',
-        'Reads from the live theme: flipping ElThemeController updates '
+        'Reads from the live theme: flipping ThemeController updates '
             'the separator colour immediately.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -502,9 +522,11 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   ),
   DocsStateFact(
     state: 'Focus',
-    treatment: 'The separator accepts focus (tabIndex={0}\'s equivalent). '
+    treatment:
+        'The separator accepts focus (tabIndex={0}\'s equivalent). '
         'No visible focus ring.',
-    userSignal: 'See Keyboard below for what a focused separator '
+    userSignal:
+        'See Keyboard below for what a focused separator '
         'responds to.',
   ),
   DocsStateFact(
@@ -518,7 +540,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         'N/A: no animations. The drag is live and unanimated by design, '
-        'not gated by elAnimationDuration.',
+        'not gated by effectiveMotionDuration.',
     userSignal: 'No motion to still.',
   ),
 ];
@@ -530,12 +552,12 @@ class _PreviewSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
-      height: el(40),
-      child: ElResizablePanelGroup(
-        panels: <ElResizablePanel>[
-          ElResizablePanel(
+      height: space(40),
+      child: ResizablePanelGroup(
+        panels: <ResizablePanel>[
+          ResizablePanel(
             defaultSize: 50,
             minSize: 32,
             child: DecoratedBox(
@@ -544,12 +566,15 @@ class _PreviewSpecimen extends StatelessWidget {
                 color: theme.muted.withAlpha(32),
               ),
               child: Padding(
-                padding: EdgeInsets.all(el(3)),
-                child: ElText('Left panel: drag to resize', ElType.body),
+                padding: EdgeInsets.all(space(3)),
+                child: StyledText(
+                  'Left panel: drag to resize',
+                  TextStyles.body,
+                ),
               ),
             ),
           ),
-          ElResizablePanel(
+          ResizablePanel(
             defaultSize: 50,
             minSize: 32,
             child: DecoratedBox(
@@ -558,8 +583,8 @@ class _PreviewSpecimen extends StatelessWidget {
                 color: theme.background,
               ),
               child: Padding(
-                padding: EdgeInsets.all(el(3)),
-                child: ElText('Right panel', ElType.body),
+                padding: EdgeInsets.all(space(3)),
+                child: StyledText('Right panel', TextStyles.body),
               ),
             ),
           ),
@@ -572,14 +597,14 @@ class _PreviewSpecimen extends StatelessWidget {
 const String _previewCode = '''
 SizedBox(
   height: 160,
-  child: ElResizablePanelGroup(
+  child: ResizablePanelGroup(
     panels: [
-      ElResizablePanel(
+      ResizablePanel(
         defaultSize: 50,
         minSize: 32,
         child: Container(child: const Text('Left panel: drag to resize')),
       ),
-      ElResizablePanel(
+      ResizablePanel(
         defaultSize: 50,
         minSize: 32,
         child: Container(child: const Text('Right panel')),
@@ -588,15 +613,15 @@ SizedBox(
   ),
 )''';
 
-const String _usageCode = '''ElResizablePanelGroup(
+const String _usageCode = '''ResizablePanelGroup(
   withHandle: true,
-  panels: <ElResizablePanel>[
-    ElResizablePanel(
+  panels: <ResizablePanel>[
+    ResizablePanel(
       defaultSize: 40,
       minSize: 32,
       child: Container(child: Text('Left')),
     ),
-    ElResizablePanel(
+    ResizablePanel(
       defaultSize: 60,
       minSize: 48,
       child: Container(child: Text('Right')),
@@ -618,30 +643,30 @@ class _HandleSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     Widget group({required bool withHandle}) => SizedBox(
-      height: el(20),
-      child: ElResizablePanelGroup(
+      height: space(20),
+      child: ResizablePanelGroup(
         withHandle: withHandle,
-        panels: <ElResizablePanel>[
-          ElResizablePanel(
+        panels: <ResizablePanel>[
+          ResizablePanel(
             defaultSize: 50,
             minSize: 32,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.all(color: theme.border),
               ),
-              child: Center(child: ElText('Left', ElType.small)),
+              child: Center(child: StyledText('Left', TextStyles.small)),
             ),
           ),
-          ElResizablePanel(
+          ResizablePanel(
             defaultSize: 50,
             minSize: 32,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.all(color: theme.border),
               ),
-              child: Center(child: ElText('Right', ElType.small)),
+              child: Center(child: StyledText('Right', TextStyles.small)),
             ),
           ),
         ],
@@ -652,23 +677,23 @@ class _HandleSpecimen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText('withHandle: true (default)', ElType.section),
-        SizedBox(height: el(2)),
+        StyledText('withHandle: true (default)', TextStyles.section),
+        SizedBox(height: space(2)),
         group(withHandle: true),
-        SizedBox(height: el(6)),
-        ElText('withHandle: false', ElType.section),
-        SizedBox(height: el(2)),
+        SizedBox(height: space(6)),
+        StyledText('withHandle: false', TextStyles.section),
+        SizedBox(height: space(2)),
         group(withHandle: false),
       ],
     );
   }
 }
 
-const String _handleCode = '''ElResizablePanelGroup(
+const String _handleCode = '''ResizablePanelGroup(
   withHandle: false, // no visible grip, still draggable
-  panels: <ElResizablePanel>[
-    ElResizablePanel(defaultSize: 50, minSize: 32, child: left),
-    ElResizablePanel(defaultSize: 50, minSize: 32, child: right),
+  panels: <ResizablePanel>[
+    ResizablePanel(defaultSize: 50, minSize: 32, child: left),
+    ResizablePanel(defaultSize: 50, minSize: 32, child: right),
   ],
 )''';
 
@@ -677,31 +702,31 @@ class _RtlSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: SizedBox(
-        height: el(20),
-        child: ElResizablePanelGroup(
-          panels: <ElResizablePanel>[
-            ElResizablePanel(
+        height: space(20),
+        child: ResizablePanelGroup(
+          panels: <ResizablePanel>[
+            ResizablePanel(
               defaultSize: 50,
               minSize: 32,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   border: Border.all(color: theme.border),
                 ),
-                child: Center(child: ElText('أول', ElType.small)),
+                child: Center(child: StyledText('أول', TextStyles.small)),
               ),
             ),
-            ElResizablePanel(
+            ResizablePanel(
               defaultSize: 50,
               minSize: 32,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   border: Border.all(color: theme.border),
                 ),
-                child: Center(child: ElText('ثاني', ElType.small)),
+                child: Center(child: StyledText('ثاني', TextStyles.small)),
               ),
             ),
           ],
@@ -713,10 +738,10 @@ class _RtlSpecimen extends StatelessWidget {
 
 const String _rtlResizableCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElResizablePanelGroup(
-    panels: <ElResizablePanel>[
-      ElResizablePanel(defaultSize: 50, minSize: 32, child: first),
-      ElResizablePanel(defaultSize: 50, minSize: 32, child: second),
+  child: ResizablePanelGroup(
+    panels: <ResizablePanel>[
+      ResizablePanel(defaultSize: 50, minSize: 32, child: first),
+      ResizablePanel(defaultSize: 50, minSize: 32, child: second),
     ],
   ),
 )''';

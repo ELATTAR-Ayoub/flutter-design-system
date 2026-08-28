@@ -13,9 +13,9 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery`. Theme
-/// coverage flips a single live `ElThemeController` in place.
+/// coverage flips a single live `ThemeController` in place.
 ///
-/// `ElDrawer` mounts its content through an `OverlayPortal`, so the live
+/// `Drawer` mounts its content through an `OverlayPortal`, so the live
 /// specimen needs a real `Overlay`: the harness wraps the page in a
 /// `MaterialApp`. No `pumpAndSettle` is used anywhere on this page: an exact
 /// single-jump `pump(duration)` proved to undershoot the exit animation on
@@ -29,7 +29,33 @@ import 'package:example/components_docs/drawer/meta.dart';
 import 'package:example/components_docs/drawer/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -53,13 +79,13 @@ const List<String> _sectionOrder = <String>[
 ];
 
 /// Every constructor parameter name declared on the public classes of
-/// `lib/src/components/drawer.dart`. [ElDrawerHandle] takes no constructor
+/// `lib/src/components/drawer.dart`. [DrawerHandle] takes no constructor
 /// parameters of its own.
 const List<String> _drawerParamNames = <String>[
-  'trigger', // ElDrawer
-  'content', // ElDrawer
-  'children', // ElDrawerContent / ElDrawerHeader / ElDrawerFooter
-  'text', // ElDrawerTitle / ElDrawerDescription
+  'trigger', // Drawer
+  'content', // Drawer
+  'children', // DrawerContent / DrawerHeader / DrawerFooter
+  'text', // DrawerTitle / DrawerDescription
 ];
 
 Finder _disclosureTrigger(String title) => find.descendant(
@@ -79,21 +105,21 @@ Future<void> _settle(WidgetTester tester, {int steps = 12}) async {
   }
 }
 
-Future<ElThemeController> _pumpDrawerDoc(
+Future<ThemeController> _pumpDrawerDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -120,25 +146,23 @@ void main() {
       expect(
         drawerDoc.exports,
         containsAll(<String>[
-          'ElDrawer',
-          'ElDrawerContent',
-          'ElDrawerHandle',
-          'ElDrawerHeader',
-          'ElDrawerFooter',
-          'ElDrawerTitle',
-          'ElDrawerDescription',
+          'Drawer',
+          'DrawerContent',
+          'DrawerHandle',
+          'DrawerHeader',
+          'DrawerFooter',
+          'DrawerTitle',
+          'DrawerDescription',
         ]),
       );
       // No sheet symbols on this page's export list.
-      expect(drawerDoc.exports, isNot(contains('ElSheetOverlay')));
+      expect(drawerDoc.exports, isNot(contains('SheetOverlay')));
       expect(drawerDoc.dependencies, <String>['dialog', 'source-foundation']);
     });
   });
 
   group('DrawerDocPage house shape', () {
-    testWidgets('renders every section, in order', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders every section, in order', (WidgetTester tester) async {
       await _pumpDrawerDoc(tester, size: const Size(1440, 3600));
 
       final List<String> titles = tester
@@ -177,7 +201,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _drawerParamNames) {
           expect(
@@ -219,7 +243,7 @@ void main() {
     testWidgets(
       'drops the sidebar and shows the anchor strip at mobile width',
       (WidgetTester tester) async {
-        await _pumpDrawerDoc(tester, size: _narrow, mode: ElThemeMode.light);
+        await _pumpDrawerDoc(tester, size: _narrow, mode: ColorMode.light);
 
         expect(
           find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -233,40 +257,37 @@ void main() {
       },
     );
 
-    testWidgets(
-      'a live ElDrawer opens full-bleed at the bottom, drags past the '
-      'close threshold, and dismisses',
-      (WidgetTester tester) async {
-        await _pumpDrawerDoc(tester);
+    testWidgets('a live Drawer opens full-bleed at the bottom, drags past the '
+        'close threshold, and dismisses', (WidgetTester tester) async {
+      await _pumpDrawerDoc(tester);
 
-        final Finder trigger = find.byKey(
-          const ValueKey<String>('drawer-preview-trigger'),
-        );
-        await tester.ensureVisible(trigger);
-        await tester.tap(trigger);
-        await _settle(tester);
+      final Finder trigger = find.byKey(
+        const ValueKey<String>('drawer-preview-trigger'),
+      );
+      await tester.ensureVisible(trigger);
+      await tester.tap(trigger);
+      await _settle(tester);
 
-        expect(find.byType(ElDrawerContent), findsOneWidget);
-        expect(find.text('Card actions'), findsOneWidget);
-        final Rect panel = tester.getRect(find.byType(ElDrawerContent));
-        expect(panel.width, 1440);
-        expect(panel.bottom, closeTo(900, 1));
-        // The grip handle is part of the anatomy, unconditionally.
-        expect(find.byType(ElDrawerHandle), findsOneWidget);
+      expect(find.byType(DrawerContent), findsOneWidget);
+      expect(find.text('Card actions'), findsOneWidget);
+      final Rect panel = tester.getRect(find.byType(DrawerContent));
+      expect(panel.width, 1440);
+      expect(panel.bottom, closeTo(900, 1));
+      // The grip handle is part of the anatomy, unconditionally.
+      expect(find.byType(DrawerHandle), findsOneWidget);
 
-        // Past vaul's own 0.25-of-height close threshold, the drawer
-        // unmounts.
-        final TestGesture drag = await tester.startGesture(
-          panel.topCenter + const Offset(0, 8),
-        );
-        await tester.pump();
-        await drag.moveBy(Offset(0, panel.height * 0.6));
-        await tester.pump();
-        await drag.up();
-        await _settle(tester);
-        expect(find.byType(ElDrawerContent), findsNothing);
-      },
-    );
+      // Past vaul's own 0.25-of-height close threshold, the drawer
+      // unmounts.
+      final TestGesture drag = await tester.startGesture(
+        panel.topCenter + const Offset(0, 8),
+      );
+      await tester.pump();
+      await drag.moveBy(Offset(0, panel.height * 0.6));
+      await tester.pump();
+      await drag.up();
+      await _settle(tester);
+      expect(find.byType(DrawerContent), findsNothing);
+    });
 
     testWidgets('a drag short of the threshold releases the drawer back open', (
       WidgetTester tester,
@@ -280,7 +301,7 @@ void main() {
       await tester.tap(trigger);
       await _settle(tester);
 
-      final Rect panel = tester.getRect(find.byType(ElDrawerContent));
+      final Rect panel = tester.getRect(find.byType(DrawerContent));
       final TestGesture drag = await tester.startGesture(
         panel.topCenter + const Offset(0, 8),
       );
@@ -289,7 +310,7 @@ void main() {
       await tester.pump();
       await drag.up();
       await _settle(tester);
-      expect(find.byType(ElDrawerContent), findsOneWidget);
+      expect(find.byType(DrawerContent), findsOneWidget);
     });
 
     testWidgets('Escape dismisses an open drawer', (WidgetTester tester) async {
@@ -301,20 +322,20 @@ void main() {
       await tester.ensureVisible(trigger);
       await tester.tap(trigger);
       await _settle(tester);
-      expect(find.byType(ElDrawerContent), findsOneWidget);
+      expect(find.byType(DrawerContent), findsOneWidget);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await _settle(tester);
-      expect(find.byType(ElDrawerContent), findsNothing);
+      expect(find.byType(DrawerContent), findsNothing);
     });
 
     testWidgets('flips between light and dark with one live controller', (
       WidgetTester tester,
     ) async {
-      final ElThemeController controller = await _pumpDrawerDoc(tester);
+      final ThemeController controller = await _pumpDrawerDoc(tester);
       expect(tester.takeException(), isNull);
 
-      controller.setMode(ElThemeMode.light);
+      controller.setMode(ColorMode.light);
       await tester.pump();
       expect(tester.takeException(), isNull);
       expect(find.byType(DrawerDocPage), findsOneWidget);

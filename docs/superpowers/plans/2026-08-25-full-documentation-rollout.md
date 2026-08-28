@@ -17,10 +17,10 @@ Every task's requirements implicitly include this section.
 - **Repository mode.** `lib/elattar_design_system.dart` exists, no `elattar.yaml`. All paths are repository-mode names.
 - **Import the system through the public barrel only:** `package:elattar_design_system/elattar_design_system.dart`. Never reach into `lib/src/`.
 - **Nothing under `lib/src/` may be modified**, and no foundation token may be added or edited. Every gap is closed in `example/lib/docs/`.
-- **No visual literals in `example/lib/`.** Geometry from `el(...)`, `ElWidths`, `ElContainers`, `ElBreakpoints`; colour from `ElTheme.of(context)`; type from `ElText`/`ElType`; timing from `ElDurations`/`ElCurves`. A bare `0` or `0.0` is legal. `test/token_guard_test.dart` enforces this from the repository root.
-- **No uppercase type roles** anywhere under `example/lib/docs/` or `example/lib/components_docs/`: `ElType.label`, `ElType.micro`, `ElType.tag`, `ElType.badge`, `ElType.serial`, `ElType.inputSerial`, `ElType.buttonLabelCaps`. Never call `String.toUpperCase()`. `example/test/docs/docs_no_uppercase_test.dart` enforces it.
-- **`ElType.textSm` does not exist.** `textSm` belongs to `ElComponentType` (`lib/src/foundation/typography.dart:750`); `class ElType` starts at line 980 and has no such member. The de-uppercased eyebrow role is **`ElType.section`** — 13px/1.4/600/muted, documented at `typography.dart:1121` as "the label's quiet twin: a group heading in sentence case".
-- **`pumpAndSettle` is forbidden** in any test that pumps a documentation page. Several components (`ElAlert` via `ElBloomCosmic`, the premium button's foil shimmer, the starfield) run controllers that `repeat(reverse: true)` forever, so settling times out rather than failing. Use `tester.pump()`.
+- **No visual literals in `example/lib/`.** Geometry from `el(...)`, `Widths`, `Containers`, `Breakpoints`; colour from `Theme.of(context)`; type from `Text`/`Type`; timing from `Durations`/`Curves`. A bare `0` or `0.0` is legal. `test/token_guard_test.dart` enforces this from the repository root.
+- **No uppercase type roles** anywhere under `example/lib/docs/` or `example/lib/components_docs/`: `Type.label`, `Type.micro`, `Type.tag`, `Type.badge`, `Type.serial`, `Type.inputSerial`, `Type.buttonLabelCaps`. Never call `String.toUpperCase()`. `example/test/docs/docs_no_uppercase_test.dart` enforces it.
+- **`Type.textSm` does not exist.** `textSm` belongs to `ComponentType` (`lib/src/design_system/foundation/typography.dart:750`); `class Type` starts at line 980 and has no such member. The de-uppercased eyebrow role is **`Type.section`** — 13px/1.4/600/muted, documented at `typography.dart:1121` as "the label's quiet twin: a group heading in sentence case".
+- **`pumpAndSettle` is forbidden** in any test that pumps a documentation page. Several components (`Alert` via `BloomCosmic`, the premium button's foil shimmer, the starfield) run controllers that `repeat(reverse: true)` forever, so settling times out rather than failing. Use `tester.pump()`.
 - **Test view sizing** uses `tester.view.physicalSize` + `tester.view.devicePixelRatio` with `addTearDown(tester.view.reset)`, never a synthetic `MediaQuery` for sizing.
 - **A width assertion under a bare `SizedBox(width: N)` reports the root constraint**, not N, because `pumpWidget`'s RenderView hands down tight constraints. Wrap the subject in a `Center` inside the test host. Five tasks in the previous plan hit this independently.
 - **Any test that taps a `DocsCopyButton` must drain its confirmation timer** (`await tester.pump(DocsCopyButton.confirmation)`) or Flutter's teardown fails on a pending timer.
@@ -136,7 +136,7 @@ Preview, Installation, Usage, then one `ShowcaseSection` per variant or state th
 
 The 44 with no page:
 
-`agent-attach-menu`, `agent-attachments`, `agent-avatar`, `agent-composer`, `agent-console`, `agent-core`, `agent-face`, `agent-history`, `agent-launcher`, `agent-markdown`, `agent-slash-palette`, `agent-transcript`, `attachment`, `bloom-cosmic`, `bubble`, `card`, `chart`, `chart-cartesian`, `chart-geometry`, `chart-polar`, `dialog`, `foil-value`, `glass`, `icon-swap`, `input`, `keyframes`, `lift`, `machine-surface`, `media-scrim`, `menu`, `message`, `message-scroller`, `page-glow`, `press-motion`, `questionnaire`, `safe-area`, `select`, `sheen-action`, `sliding-pill`, `source-foundation`, `starfield`, `swap-in`, `voice`, `voice-orb`.
+`agent-attach-menu`, `agent-attachments`, `agent-avatar`, `agent-composer`, `agent-console`, `agent-core`, `agent-face`, `agent-history`, `agent-launcher`, `agent-markdown`, `agent-slash-palette`, `agent-transcript`, `attachment`, `feedback-surface`, `bubble`, `card`, `chart`, `chart-cartesian`, `chart-geometry`, `chart-polar`, `dialog`, `premium-surface`, `glass`, `icon-swap`, `input`, `keyframes`, `lift`, `surface`, `media-scrim`, `menu`, `message`, `message-scroller`, `background-effect`, `press`, `questionnaire`, `safe-area`, `select`, `action-feedback`, `active-indicator`, `source-foundation`, `starfield`, `content-change`, `voice`, `voice-indicator`.
 
 ## File structure
 
@@ -297,8 +297,8 @@ Add to `example/test/docs/component_doc_page_test.dart`:
           title: 'API Reference',
           child: Text('tables'),
           children: <DocsTocEntry>[
-            DocsTocEntry(title: 'ElX', anchor: 'api-elx'),
-            DocsTocEntry(title: 'ElXSize', anchor: 'api-elx-size'),
+            DocsTocEntry(title: 'X', anchor: 'api-elx'),
+            DocsTocEntry(title: 'XSize', anchor: 'api-elx-size'),
           ],
         ),
       ],
@@ -356,7 +356,7 @@ git commit -m "feat(docs): let a disclosure carry its own toc children"
 
 ### Task 3: An EffectSection for the fourteen non-component items
 
-Nine effects, five motion items and one foundation item are in the registry and need pages, but they are not components: `starfield`, `page-glow`, `press-motion`, `keyframes`, `safe-area`, `source-foundation` have no variants, often no visible widget of their own, and are applied to something else. Forcing them into `ShowcaseSection` produces an empty stage and a lie.
+Nine effects, five motion items and one foundation item are in the registry and need pages, but they are not components: `starfield`, `background-effect`, `press`, `keyframes`, `safe-area`, `source-foundation` have no variants, often no visible widget of their own, and are applied to something else. Forcing them into `ShowcaseSection` produces an empty stage and a lie.
 
 The sealed model has four cases and no escape hatch by design. This is the fifth case, added deliberately and reviewed as one — not a generic `WidgetSection` or a `builder` callback.
 
@@ -392,7 +392,7 @@ Add to `example/test/docs/component_doc_page_test.dart`:
                 id: 'applied',
                 title: 'Applied',
                 host: SizedBox(height: 120, width: 200),
-                code: 'ElGlass(child: ...)',
+                code: 'Glass(child: ...)',
               ),
             ],
           ),
@@ -623,9 +623,9 @@ class <Name>DocPage extends StatelessWidget {
           title: <name>Doc.title,
           description: <name>Doc.description,
         ),
-        breadcrumbs: const <ElBreadcrumbEntry>[
-          ElBreadcrumbEntry.link('Components'),
-          ElBreadcrumbEntry.page('<Name>'),
+        breadcrumbs: const <BreadcrumbEntry>[
+          BreadcrumbEntry.link('Components'),
+          BreadcrumbEntry.page('<Name>'),
         ],
         toc: <name>DocSpec.toc,
         onNavigate: onNavigate,
@@ -674,7 +674,7 @@ class <Name>DocPage extends StatelessWidget {
 | 16 | Data display | `table`, `stat`, `calendar`, `carousel` |
 | 17 | Media | `avatar`, `aspect_ratio`, `scroll_area`, `sidebar` |
 | 18 | Chrome | `hover_card`, `kbd`, `item`, `icon` |
-| 19 | Remainder | `nav_user`, `tooltip` |
+| 19 | Remainder | `user_menu`, `tooltip` |
 
 Two naming traps in this list:
 
@@ -707,11 +707,11 @@ These have no page at all. Each needs a `meta.dart`, a `page.dart`, a test, a ca
 | 24 | Charts | `chart`, `chart-cartesian`, `chart-polar`, `chart-geometry` | Showcase |
 | 25 | Core controls | `input`, `select`, `menu`, `dialog` | Showcase |
 | 26 | Containers | `card`, `bubble`, `message`, `message-scroller` | Showcase |
-| 27 | Misc components | `attachment`, `questionnaire`, `voice`, `voice-orb` | Showcase |
-| 28 | Interaction | `icon-swap`, `sliding-pill`, `swap-in`, `lift` | Effect |
-| 29 | Surfaces | `glass`, `machine-surface`, `media-scrim`, `foil-value` | Effect |
-| 30 | Atmosphere | `starfield`, `page-glow`, `bloom-cosmic`, `sheen-action` | Effect |
-| 31 | Motion + foundation | `press-motion`, `keyframes`, `safe-area`, `source-foundation` | Effect |
+| 27 | Misc components | `attachment`, `questionnaire`, `voice`, `voice-indicator` | Showcase |
+| 28 | Interaction | `icon-swap`, `active-indicator`, `content-change`, `lift` | Effect |
+| 29 | Surfaces | `glass`, `surface`, `media-scrim`, `premium-surface` | Effect |
+| 30 | Atmosphere | `starfield`, `background-effect`, `feedback-surface`, `action-feedback` | Effect |
+| 31 | Motion + foundation | `press`, `keyframes`, `safe-area`, `source-foundation` | Effect |
 
 **Per-task steps:**
 
@@ -765,7 +765,7 @@ Expected: PASS with all 99 documented. This test is the whole point of Phase C.
 
 - [ ] **Step 1:** For each, replace every hand-rolled code block with `DocsSnippet`, every hand-rolled table with `DocsTable`, and every collapsible with `DocsDisclosure`.
 - [ ] **Step 2:** `cli` documents commands — every command shown must be one the CLI actually accepts. Verify each against `packages/elattar_cli/` and report any that are not.
-- [ ] **Step 3:** `typeset` renders type specimens — it may legitimately reference uppercase roles as *subject matter*. The uppercase guard skips comment lines only, so if a specimen must name `ElType.label`, keep it in a string or a comment and say so in the report; do not weaken the guard.
+- [ ] **Step 3:** `typeset` renders type specimens — it may legitimately reference uppercase roles as *subject matter*. The uppercase guard skips comment lines only, so if a specimen must name `Type.label`, keep it in a string or a comment and say so in the report; do not weaken the guard.
 - [ ] **Step 4:** Run `test/docs`, the guards, the analyzer, and each page's own test.
 - [ ] **Step 5:** Commit.
 
@@ -797,7 +797,7 @@ cp -r build/web /c/elx/a/flutter-design-system
 cd /c/elx/a && python -m http.server 8331
 ```
 
-Capture a sample of ten pages across the families at 1440 dark, 1440 light and 390 dark, using `tool/verify/capture.js` and `tool/verify/shot.js`. `capture.js` needs `--nav domcontentloaded` for any page rendering `ElAlert`.
+Capture a sample of ten pages across the families at 1440 dark, 1440 light and 390 dark, using `tool/verify/capture.js` and `tool/verify/shot.js`. `capture.js` needs `--nav domcontentloaded` for any page rendering `Alert`.
 
 - [ ] **Step 3:** Write `docs/superpowers/reports/docs-kit/full-rollout-review.md` recording the commit, the commands actually run with exit codes, the measured page count, the captures, and every limitation. Commit it with `git add -f` — a bare `reports/` pattern in `.gitignore` over-matches that directory, and 20 sibling reports are already tracked there.
 

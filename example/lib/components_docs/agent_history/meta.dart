@@ -4,16 +4,16 @@
 /// today: [dependencies] below is that manifest's own
 /// `registryDependencies`, copied verbatim — `agent-core`, `alert`,
 /// `alert-dialog`, `button`, `command`, `dialog`, `dropdown-menu`, `empty`,
-/// `field`, `icon`, `input`, `item`, `machine-surface`, `menu`, `popover`,
+/// `field`, `icon`, `input`, `item`, `surface`, `menu`, `popover`,
 /// `source-foundation`, `spinner`.
 ///
 /// `lib/src/components/agent_history.dart` ports three reference files —
 /// `history-card.tsx`, `chat-history.tsx`, `history-search.tsx` — plus one
 /// motion helper the three of them share. [exports] lists every public
-/// name the file declares; the page documents [ElHistoryCard],
-/// [ElHistorySearch], and [ElChatHistory] (the three real widgets), the
+/// name the file declares; the page documents [HistoryCard],
+/// [HistorySearch], and [ChatHistory] (the three real widgets), the
 /// two enums that shape a card's destructive and rename affordances, and
-/// [ElRowMotion], [ElBlurSwitch], and [ElFlipController] (the shared
+/// [RowMotion], [BlurSwitch], and [FlipController] (the shared
 /// motion machinery) in full.
 library;
 
@@ -39,21 +39,21 @@ const ComponentDocEntry agentHistoryDoc = ComponentDocEntry(
     'icon',
     'input',
     'item',
-    'machine-surface',
+    'surface',
     'menu',
     'popover',
     'source-foundation',
     'spinner',
   ],
   exports: <String>[
-    'ElHistoryCard',
-    'ElHistorySearch',
-    'ElChatHistory',
-    'ElHistoryConfirm',
-    'ElHistoryRename',
-    'ElRowMotion',
-    'ElBlurSwitch',
-    'ElFlipController',
+    'HistoryCard',
+    'HistorySearch',
+    'ChatHistory',
+    'HistoryConfirm',
+    'HistoryRename',
+    'RowMotion',
+    'BlurSwitch',
+    'FlipController',
   ],
   sourcePath: 'lib/src/components/agent_history.dart',
 );

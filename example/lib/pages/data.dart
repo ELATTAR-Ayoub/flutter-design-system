@@ -16,7 +16,7 @@
 ///     small; it compiles to `:has(*[data-size="sm"])`, and each row ends in a
 ///     `<Button size="sm">Manage</Button>` that matches it. *(Measured: `gap:
 ///     10px`, with every item reporting `data-size="default"`.)* Reproduced —
-///     see [ElItemGroup.gap].
+///     see [ItemGroup.gap].
 ///  3. **`duration-fast` is a no-op, twice on this page.** `item.tsx` line 45
 ///     and
 ///     the navigating stat's `Card` both write `transition-colors
@@ -36,13 +36,13 @@
 ///     `border-collapse: collapse` splits the rule between its two rows, and
 ///     `[&_tr:last-child]:border-0` removes only the *bottom* half.
 ///     *(Measured on all three multi-row tables: 37 / 37 / 37 / 37 / **36.5**.)*
-///     See [ElTable] for the whole model.
+///     See [Table] for the whole model.
 ///  7. **`Stat`'s API list is one row longer than the component.** §API names
 ///     *"Badge variant: default · blue · premium …"*, `blue` is not one of the
 ///     cva's ten, and `link` is. The copy ships as written.
 ///  8. **The empty state's dashed border never paints.** `Empty` carries
 ///     `border-dashed` with no `border-*` width, so the filtered-to-nothing
-///     panel is a bordered rectangle in prose only: the `ElEmpty` family's
+///     panel is a bordered rectangle in prose only: the `Empty` family's
 ///     own recorded gap, reached here for the first time by a call site.
 ///  9. **The reload button's `disabled` is the only thing that stops a second
 ///     click.** `RELOAD_MS` is 1100 and the comment beside it says it is *"a
@@ -51,7 +51,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../data_table_demo.dart';
 import '../kit.dart';
@@ -73,16 +85,16 @@ const Duration _reloadWait = Duration(
 // wait, not a motion value; the source says so beside it.
 
 /// `mt-5`: the caption under a specimen.
-double get _captionGap => el(5);
+double get _captionGap => space(5);
 
 /// `mt-6`: the wider caption gap, and the gap over a trailing Note.
-double get _wideGap => el(6);
+double get _wideGap => space(6);
 
 /// `mt-4`: between two panels.
-double get _panelGap => el(4);
+double get _panelGap => space(4);
 
 /// `space-y-6` in the marker panel, and `gap-8` in the stat grids.
-double get _markerGap => el(6);
+double get _markerGap => space(6);
 
 /// `filter: grayscale(1)`, in Flutter's vocabulary.
 ///
@@ -163,35 +175,35 @@ class _DataPageState extends State<DataPage> {
   /// *"The whole grid reloads together, ONE reveal rather than a stagger.
   /// Both are legal (§4); mixing them without deciding is what looks
   /// accidental."*
-  ElStatState _live = ElStatState.ready;
+  StatState _live = StatState.ready;
 
   void _reload() {
-    setState(() => _live = ElStatState.loading);
+    setState(() => _live = StatState.loading);
     Future<void>.delayed(_reloadWait, () {
-      if (mounted) setState(() => _live = ElStatState.ready);
+      if (mounted) setState(() => _live = StatState.ready);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('base', 'data');
+    final CategoryHit here = findCategory('base', 'data');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // DRIFT 1.
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
           blurb: here.category.blurb,
           contents: here.category.contents,
         ),
-        const ElNote(
+        const Note(
           title: 'Charts are not on this page',
           child: _ChartsNoteBody(),
         ),
         // `className="mb-12"`.
-        SizedBox(height: el(12)),
+        SizedBox(height: space(12)),
         const _TableSection(),
         const _DataTableSection(),
         const _BadgeSection(),
@@ -203,7 +215,7 @@ class _DataPageState extends State<DataPage> {
         const _SeparatorSection(),
         const _ApiSection(),
         const _RulesSection(),
-        const ElPageFootNav(groupId: 'base', slug: 'data'),
+        const PageFootNav(groupId: 'base', slug: 'data'),
       ],
     );
   }
@@ -218,7 +230,7 @@ class _Caption extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: EdgeInsets.only(top: _captionGap),
-    child: ElText(text, ElType.small),
+    child: StyledText(text, TextStyles.small),
   );
 }
 
@@ -232,7 +244,7 @@ class _RichCaption extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: EdgeInsets.only(top: gap ?? _captionGap),
-    child: ElRichText(span, ElType.small),
+    child: RichText(span, TextStyles.small),
   );
 }
 
@@ -246,14 +258,14 @@ class _ChartsNoteBody extends StatelessWidget {
   const _ChartsNoteBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
-        ElCode.span('components/ui/chart.tsx'),
+        Code.span('components/ui/chart.tsx'),
         const TextSpan(text: ' and the five '),
-        ElCode.span('--chart-*'),
+        Code.span('--chart-*'),
         const TextSpan(text: ' tokens have a page to themselves: '),
-        ElCode.span('/design-system/components/base/charts'),
+        Code.span('/design-system/components/base/charts'),
         const TextSpan(
           text:
               '. Every family is there: area, bar, line, pie, radar, '
@@ -263,7 +275,7 @@ class _ChartsNoteBody extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -274,9 +286,9 @@ class _TableSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'table',
       title: 'Table',
       description:
@@ -286,18 +298,18 @@ class _TableSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'Transaction history',
             flush: true,
-            child: ElTable(
+            child: Table(
               caption: 'Showing the 5 most recent transactions of 248.',
-              header: const <ElTableCellSpec>[
-                ElTableCellSpec(child: Text('Type')),
-                ElTableCellSpec(child: Text('Detail')),
-                ElTableCellSpec(child: Text('Amount'), align: ElTableAlign.end),
-                ElTableCellSpec(child: Text('Status'), align: ElTableAlign.end),
+              header: const <TableCellSpec>[
+                TableCellSpec(child: Text('Type')),
+                TableCellSpec(child: Text('Detail')),
+                TableCellSpec(child: Text('Amount'), align: TableAlign.end),
+                TableCellSpec(child: Text('Status'), align: TableAlign.end),
               ],
-              rows: <ElTableRowSpec>[
+              rows: <TableRowSpec>[
                 for (final ({
                       String type,
                       String detail,
@@ -307,54 +319,54 @@ class _TableSection extends StatelessWidget {
                     })
                     row
                     in _tx)
-                  ElTableRowSpec(
-                    cells: <ElTableCellSpec>[
-                      ElTableCellSpec(
+                  TableRowSpec(
+                    cells: <TableCellSpec>[
+                      TableCellSpec(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            ElIcon.lucide(
+                            Icon.lucide(
                               row.incoming
-                                  ? ElLucide.arrowDownLeft
-                                  : ElLucide.arrowUpRight,
-                              size: ElIconSize.sm,
+                                  ? Lucide.arrowDownLeft
+                                  : Lucide.arrowUpRight,
+                              size: IconSize.sm,
                               tone: row.incoming
-                                  ? ElIconTone.success
-                                  : ElIconTone.subtle,
+                                  ? IconTone.success
+                                  : IconTone.subtle,
                             ),
-                            SizedBox(width: el(2)),
-                            ElText(
+                            SizedBox(width: space(2)),
+                            StyledText(
                               row.type,
-                              ElComponentType.textSm,
+                              TextStyles.bodySmall,
                               color: theme.foreground,
                             ),
                           ],
                         ),
                       ),
-                      ElTableCellSpec(
-                        child: ElText(
+                      TableCellSpec(
+                        child: StyledText(
                           row.detail,
-                          ElComponentType.textSm,
+                          TextStyles.bodySmall,
                           color: theme.mutedForeground,
                         ),
                       ),
-                      ElTableCellSpec(
-                        align: ElTableAlign.end,
-                        child: ElText(
+                      TableCellSpec(
+                        align: TableAlign.end,
+                        child: StyledText(
                           row.amount,
-                          ElType.numBase,
+                          TextStyles.numberBase,
                           color: row.incoming
-                              ? theme.valueInk
+                              ? theme.premiumText
                               : theme.foreground,
                         ),
                       ),
-                      ElTableCellSpec(
-                        align: ElTableAlign.end,
-                        child: ElBadge(
+                      TableCellSpec(
+                        align: TableAlign.end,
+                        child: Badge(
                           label: row.status,
                           variant: row.status == 'Pending'
-                              ? ElBadgeVariant.warning
-                              : ElBadgeVariant.success,
+                              ? BadgeVariant.warning
+                              : BadgeVariant.success,
                         ),
                       ),
                     ],
@@ -364,7 +376,7 @@ class _TableSection extends StatelessWidget {
           ),
           // `className="mt-4"`.
           SizedBox(height: _panelGap),
-          const ElNote(
+          const Note(
             title: 'Money in versus money out',
             child: _MoneyNoteBody(),
           ),
@@ -378,7 +390,7 @@ class _MoneyNoteBody extends StatelessWidget {
   const _MoneyNoteBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -393,7 +405,7 @@ class _MoneyNoteBody extends StatelessWidget {
               'means: and outgoing is plain text. Never red for outgoing, '
               'because a purchase is not an error. Not ',
         ),
-        ElCode.span('success'),
+        Code.span('success'),
         const TextSpan(
           text:
               ' either: §1.5 keeps a completed sale from looking like a '
@@ -401,7 +413,7 @@ class _MoneyNoteBody extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -411,7 +423,7 @@ class _DataTableSection extends StatelessWidget {
   const _DataTableSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'data-table',
     title: 'Data Table',
     description:
@@ -422,30 +434,30 @@ class _DataTableSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(
+        const Panel(
           label: 'Sort a column, filter, select rows, page through',
           child: DataTableDemo(),
         ),
         SizedBox(height: _wideGap),
-        const ElPanel(
+        const Panel(
           label: 'Loading: skeleton rows on the real footprint',
           child: DataTableDemo(loading: true),
         ),
         SizedBox(height: _wideGap),
-        const ElNote(
-          tone: ElNoteTone.value,
+        const Note(
+          tone: NoteTone.value,
           title: 'TanStack Table is pinned to v8, on purpose',
           child: _PinnedNoteBody(),
         ),
         SizedBox(height: _wideGap),
-        const ElNote(
-          tone: ElNoteTone.value,
+        const Note(
+          tone: NoteTone.value,
           title: 'The two states a table demo always skips',
           child: _SkippedNoteBody(),
         ),
         SizedBox(height: _wideGap),
-        ElMeta(
-          items: <ElMetaItem>[
+        Meta(
+          items: <MetaItem>[
             (
               k: 'useReactTable',
               v: const TextSpan(
@@ -501,7 +513,7 @@ class _PinnedNoteBody extends StatelessWidget {
   const _PinnedNoteBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -509,7 +521,7 @@ class _PinnedNoteBody extends StatelessWidget {
               'Data Table is the one shadcn entry that is not a file you '
               'own: it is a recipe driving ',
         ),
-        ElCode.span('@tanstack/react-table'),
+        Code.span('@tanstack/react-table'),
         const TextSpan(
           text:
               ', a separate library on its own release schedule. That '
@@ -521,7 +533,7 @@ class _PinnedNoteBody extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -529,7 +541,7 @@ class _SkippedNoteBody extends StatelessWidget {
   const _SkippedNoteBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -537,7 +549,7 @@ class _SkippedNoteBody extends StatelessWidget {
               'Filter this table down to nothing and you '
               'get an ',
         ),
-        ElCode.span('Empty'),
+        Code.span('Empty'),
         const TextSpan(
           text:
               ' with a way back out, not a blank rectangle. The second '
@@ -549,7 +561,7 @@ class _SkippedNoteBody extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -559,7 +571,7 @@ class _BadgeSection extends StatelessWidget {
   const _BadgeSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'badge',
     title: 'Badge',
     description:
@@ -569,74 +581,74 @@ class _BadgeSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(
+        const Panel(
           label: 'Variants',
-          child: ElRow(
+          child: SpecimenRow(
             children: <Widget>[
-              ElBadge(label: 'Default'),
-              ElBadge(label: 'Selected', variant: ElBadgeVariant.action),
-              ElBadge(label: 'Featured', variant: ElBadgeVariant.premium),
-              ElBadge(label: '6 Cards', variant: ElBadgeVariant.secondary),
-              ElBadge(label: 'Limited', variant: ElBadgeVariant.outline),
-              ElBadge(label: 'Available', variant: ElBadgeVariant.success),
-              ElBadge(label: 'Low supply', variant: ElBadgeVariant.warning),
-              ElBadge(label: 'New set', variant: ElBadgeVariant.info),
-              ElBadge(label: 'Sold out', variant: ElBadgeVariant.destructive),
-              ElBadge(label: 'Draft', variant: ElBadgeVariant.ghost),
+              Badge(label: 'Default'),
+              Badge(label: 'Selected', variant: BadgeVariant.action),
+              Badge(label: 'Featured', variant: BadgeVariant.premium),
+              Badge(label: '6 Cards', variant: BadgeVariant.secondary),
+              Badge(label: 'Limited', variant: BadgeVariant.outline),
+              Badge(label: 'Available', variant: BadgeVariant.success),
+              Badge(label: 'Low supply', variant: BadgeVariant.warning),
+              Badge(label: 'New set', variant: BadgeVariant.info),
+              Badge(label: 'Sold out', variant: BadgeVariant.destructive),
+              Badge(label: 'Draft', variant: BadgeVariant.ghost),
             ],
           ),
         ),
         SizedBox(height: _panelGap),
-        ElPanel(
+        Panel(
           label: 'With glyphs',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const ElRow(
+              const SpecimenRow(
                 children: <Widget>[
-                  ElBadge(
+                  Badge(
                     label: 'Featured',
-                    variant: ElBadgeVariant.premium,
-                    glyph: ElIcon.lucide(
-                      ElLucide.star,
-                      size: ElIconSize.xs,
-                      tone: ElIconTone.inherit,
+                    variant: BadgeVariant.premium,
+                    glyph: Icon.lucide(
+                      Lucide.star,
+                      size: IconSize.xs,
+                      tone: IconTone.inherit,
                     ),
                   ),
-                  ElBadge(
+                  Badge(
                     label: 'Hot',
-                    variant: ElBadgeVariant.destructive,
-                    glyph: ElIcon.lucide(
-                      ElLucide.flame,
-                      size: ElIconSize.xs,
-                      tone: ElIconTone.inherit,
+                    variant: BadgeVariant.destructive,
+                    glyph: Icon.lucide(
+                      Lucide.flame,
+                      size: IconSize.xs,
+                      tone: IconTone.inherit,
                     ),
                   ),
-                  ElBadge(
+                  Badge(
                     label: 'New',
-                    variant: ElBadgeVariant.action,
-                    glyph: ElIcon.lucide(
-                      ElLucide.zap,
-                      size: ElIconSize.xs,
-                      tone: ElIconTone.inherit,
+                    variant: BadgeVariant.action,
+                    glyph: Icon.lucide(
+                      Lucide.zap,
+                      size: IconSize.xs,
+                      tone: IconTone.inherit,
                     ),
                   ),
-                  ElBadge(
+                  Badge(
                     label: 'Legendary hit',
-                    variant: ElBadgeVariant.premium,
-                    glyph: ElIcon.lucide(
-                      ElLucide.crown,
-                      size: ElIconSize.xs,
-                      tone: ElIconTone.inherit,
+                    variant: BadgeVariant.premium,
+                    glyph: Icon.lucide(
+                      Lucide.crown,
+                      size: IconSize.xs,
+                      tone: IconTone.inherit,
                     ),
                   ),
-                  ElBadge(
+                  Badge(
                     label: 'Verified',
-                    variant: ElBadgeVariant.success,
-                    glyph: ElIcon.lucide(
-                      ElLucide.shieldCheck,
-                      size: ElIconSize.xs,
-                      tone: ElIconTone.inherit,
+                    variant: BadgeVariant.success,
+                    glyph: Icon.lucide(
+                      Lucide.shieldCheck,
+                      size: IconSize.xs,
+                      tone: IconTone.inherit,
                     ),
                   ),
                 ],
@@ -671,9 +683,9 @@ class _AvatarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'avatar',
       title: 'Avatar',
       description:
@@ -683,42 +695,40 @@ class _AvatarSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'Sizes and states',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ElRow(
-                  align: ElRowAlign.center,
+                SpecimenRow(
+                  align: SpecimenRowAlign.center,
                   children: <Widget>[
                     // `className="size-6"` with `.type-caption` on the
                     // fallback: the class beats the class, twice.
-                    ElAvatar(
+                    Avatar(
                       fallback: 'VW',
-                      sizePx: el(6),
-                      fallbackSpec: ElComponentType.avatarInitials,
+                      sizePx: space(6),
+                      fallbackSpec: TextStyles.avatarInitials,
                     ),
-                    ElAvatar(
+                    Avatar(
                       fallback: 'VW',
-                      sizePx: el(8),
-                      fallbackSpec: ElComponentType.avatarFallback,
+                      sizePx: space(8),
+                      fallbackSpec: TextStyles.avatarFallback,
                     ),
-                    ElAvatar(fallback: 'VW', sizePx: el(10)),
-                    ElAvatar(fallback: 'VW', sizePx: el(12)),
-                    ElAvatar(
+                    Avatar(fallback: 'VW', sizePx: space(10)),
+                    Avatar(fallback: 'VW', sizePx: space(12)),
+                    Avatar(
                       fallback: 'VW',
-                      sizePx: el(10),
-                      badge: ElAvatarBadge(fill: ElPalette.value),
+                      sizePx: space(10),
+                      badge: AvatarBadge(fill: Palette.value),
                     ),
-                    ElAvatar(
+                    Avatar(
                       fallback: '#1',
-                      sizePx: el(10),
+                      sizePx: space(10),
                       // `ring-2 ring-value`, *"one of lime's permitted jobs."*
-                      ring: (color: ElPalette.value, width: elAvatarRingWidth),
-                      fallbackFill: ElPalette.value.withValues(
-                        alpha: _valueTint,
-                      ),
-                      fallbackInk: theme.valueInk,
+                      ring: (color: Palette.value, width: avatarRingWidth),
+                      fallbackFill: Palette.value.withValues(alpha: _valueTint),
+                      fallbackInk: theme.premiumText,
                     ),
                   ],
                 ),
@@ -730,10 +740,10 @@ class _AvatarSection extends StatelessWidget {
             ),
           ),
           SizedBox(height: _panelGap),
-          ElPanel(
+          Panel(
             label: 'Avatar group: who opened this pack',
             child: Builder(
-              builder: (BuildContext context) => ElAvatarGroup(
+              builder: (BuildContext context) => AvatarGroup(
                 children: <Widget>[
                   for (final String initials in <String>[
                     'VW',
@@ -741,13 +751,13 @@ class _AvatarSection extends StatelessWidget {
                     'TC',
                     'SW',
                   ])
-                    ElAvatar(
+                    Avatar(
                       fallback: initials,
-                      sizePx: el(8),
-                      fallbackSpec: ElComponentType.avatarFallback,
-                      ring: ElAvatarGroup.ringOf(context),
+                      sizePx: space(8),
+                      fallbackSpec: TextStyles.avatarFallback,
+                      ring: AvatarGroup.ringOf(context),
                     ),
-                  const ElAvatarGroupCount('+248'),
+                  const AvatarGroupCount('+248'),
                 ],
               ),
             ),
@@ -768,9 +778,9 @@ class _CardSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'card',
       title: 'Card',
       description:
@@ -778,42 +788,39 @@ class _CardSection extends StatelessWidget {
           'cards on top of this one rather than forking it, so a token change '
           'still reaches them.',
       // `<div className="grid gap-4 md:grid-cols-2">`.
-      child: ElGrid(
+      child: Grid(
         md: 2,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'Card with action',
-            child: ElCard(
+            child: Card(
               children: <Widget>[
-                const ElCardHeader(
-                  title: ElCardTitle('Weekly competition'),
-                  description: ElCardDescription(
+                const CardHeader(
+                  title: CardTitle('Weekly competition'),
+                  description: CardDescription(
                     'Ends in 2 days, 14 hours. Top 100 collectors share the '
                     'pool.',
                   ),
-                  action: ElBadge(
-                    label: 'Live',
-                    variant: ElBadgeVariant.premium,
-                  ),
+                  action: Badge(label: 'Live', variant: BadgeVariant.premium),
                 ),
-                ElCardContent(
+                CardContent(
                   // `flex items-baseline justify-between`.
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      ElText('Prize pool', ElType.label),
-                      ElText(
+                      StyledText('Prize pool', TextStyles.eyebrow),
+                      StyledText(
                         r'$24,000.00',
-                        ElType.numMd,
-                        color: theme.valueInk,
+                        TextStyles.numberMd,
+                        color: theme.premiumText,
                       ),
                     ],
                   ),
                 ),
-                ElCardFooter(
-                  child: ElButton(
+                CardFooter(
+                  child: Button(
                     expanded: true,
                     onPressed: () {},
                     child: const Text('View Leaderboard'),
@@ -822,19 +829,19 @@ class _CardSection extends StatelessWidget {
               ],
             ),
           ),
-          ElPanel(
+          Panel(
             label: 'Card with figures',
-            child: ElCard(
+            child: Card(
               children: <Widget>[
-                const ElCardHeader(
-                  title: ElCardTitle('Your collection'),
-                  description: ElCardDescription('Across 8 card sets.'),
+                const CardHeader(
+                  title: CardTitle('Your collection'),
+                  description: CardDescription('Across 8 card sets.'),
                 ),
-                ElCardContent(
+                CardContent(
                   // `grid grid-cols-2 gap-5`.
-                  child: ElGrid(
+                  child: Grid(
                     base: 2,
-                    gap: el(5),
+                    gap: space(5),
                     children: <Widget>[
                       for (final ({String k, String v}) figure
                           in const <({String k, String v})>[
@@ -847,12 +854,12 @@ class _CardSection extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            ElText(figure.k, ElType.label),
+                            StyledText(figure.k, TextStyles.eyebrow),
                             // `mt-1.5`.
-                            SizedBox(height: el(1.5)),
-                            ElText(
+                            SizedBox(height: space(1.5)),
+                            StyledText(
                               figure.v,
-                              ElType.numMd,
+                              TextStyles.numberMd,
                               color: theme.foreground,
                             ),
                           ],
@@ -872,32 +879,32 @@ class _CardSection extends StatelessWidget {
 /* ── §6 · stat ───────────────────────────────────────────────────────────── */
 
 /// The three figures the Anatomy and colour-blindness panels repeat.
-const ElStatDelta _up = (value: '8.2%', direction: ElStatDirection.up);
-const ElStatDelta _refund = (value: '0.3%', direction: ElStatDirection.up);
-const ElStatDelta _flat = (value: '0.0%', direction: ElStatDirection.flat);
-const ElStatDelta _down = (value: '4.1%', direction: ElStatDirection.down);
+const StatDelta _up = (value: '8.2%', direction: StatDirection.up);
+const StatDelta _refund = (value: '0.3%', direction: StatDirection.up);
+const StatDelta _flat = (value: '0.0%', direction: StatDirection.flat);
+const StatDelta _down = (value: '4.1%', direction: StatDirection.down);
 
 class _StatSection extends StatelessWidget {
   const _StatSection({required this.live, required this.onReload});
 
-  final ElStatState live;
+  final StatState live;
   final VoidCallback onReload;
 
-  static const ElStat _revenue = ElStat(
+  static const Stat _revenue = Stat(
     label: 'Revenue',
     value: r'$12,480',
     delta: _up,
     hint: 'vs last month',
   );
 
-  static const ElStat _withdrawals = ElStat(
+  static const Stat _withdrawals = Stat(
     label: 'Withdrawals',
     value: r'$3,120',
     delta: _down,
     hint: 'vs last month',
   );
 
-  static const ElStat _packs = ElStat(
+  static const Stat _packs = Stat(
     label: 'Packs opened',
     value: '412',
     delta: _flat,
@@ -905,7 +912,7 @@ class _StatSection extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'stat',
     title: 'Stat',
     description:
@@ -916,21 +923,21 @@ class _StatSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPanel(
+        Panel(
           label: 'Anatomy',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              ElGrid(
+              Grid(
                 sm: 3,
-                gap: el(8),
+                gap: space(8),
                 children: const <Widget>[
                   _revenue,
-                  ElStat(
+                  Stat(
                     label: 'Refund rate',
                     value: '1.4%',
                     delta: _refund,
-                    betterWhen: ElStatDirection.down,
+                    betterWhen: StatDirection.down,
                     hint: 'vs last month',
                   ),
                   _packs,
@@ -946,7 +953,7 @@ class _StatSection extends StatelessWidget {
                           ' good news. Refund rate, churn and latency all '
                           'improve by falling, so ',
                     ),
-                    ElCode.span('betterWhen="down"'),
+                    Code.span('betterWhen="down"'),
                     const TextSpan(
                       text:
                           ' flips which direction earns the green. '
@@ -961,30 +968,30 @@ class _StatSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: _panelGap),
-        ElPanel(
+        Panel(
           label: 'Direction survives colour blindness',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               // `space-y-6`.
-              ElGrid(
+              Grid(
                 sm: 3,
-                gap: el(8),
+                gap: space(8),
                 children: const <Widget>[_revenue, _withdrawals, _packs],
               ),
               SizedBox(height: _markerGap),
-              const ElSeparator(),
+              const Separator(),
               SizedBox(height: _markerGap),
               ColorFiltered(
                 colorFilter: _grayscale,
-                child: ElGrid(
+                child: Grid(
                   sm: 3,
-                  gap: el(8),
+                  gap: space(8),
                   children: const <Widget>[_revenue, _withdrawals, _packs],
                 ),
               ),
               SizedBox(height: _wideGap),
-              const ElNote(
+              const Note(
                 title: 'A coloured arrow is one signal',
                 child: _OneSignalBody(),
               ),
@@ -992,7 +999,7 @@ class _StatSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: _panelGap),
-        ElPanel(
+        Panel(
           label:
               'The delta on its own, for a cell that already has a '
               'header',
@@ -1008,15 +1015,15 @@ class _StatSection extends StatelessWidget {
                           'A table gives its columns '
                           'headers, so a whole ',
                     ),
-                    ElCode.span('Stat'),
+                    Code.span('Stat'),
                     const TextSpan(
                       text:
                           ' in a revenue cell would print “Revenue” once '
                           'per row under a heading that already says it. ',
                     ),
-                    ElCode.span('StatDeltaMark'),
+                    Code.span('StatDeltaMark'),
                     const TextSpan(text: ' is the same mark '),
-                    ElCode.span('Stat'),
+                    Code.span('Stat'),
                     const TextSpan(
                       text:
                           ' draws, exported so the cell composes it '
@@ -1029,13 +1036,13 @@ class _StatSection extends StatelessWidget {
                     const TextSpan(
                       text: ' direction and only one of them is good news; ',
                     ),
-                    ElCode.span('betterWhen'),
+                    Code.span('betterWhen'),
                     const TextSpan(
                       text:
                           ' is required rather than defaulted on the bare '
                           'mark, because a caller reaching past ',
                     ),
-                    ElCode.span('Stat'),
+                    Code.span('Stat'),
                     const TextSpan(
                       text: ' for it is already thinking about direction.',
                     ),
@@ -1047,51 +1054,51 @@ class _StatSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: _panelGap),
-        const ElStateGrid(
+        const StateGrid(
           cols: 5,
           children: <Widget>[
-            ElStateCell(
+            StateCell(
               label: 'rest',
               note: 'the figure has landed',
               child: _revenue,
             ),
-            ElStateCell(
+            StateCell(
               label: 'loading',
               note: 'skeleton, same footprint',
-              child: ElStat(
+              child: Stat(
                 label: 'Revenue',
                 value: r'$12,480',
                 delta: _up,
                 hint: 'vs last month',
-                state: ElStatState.loading,
+                state: StatState.loading,
               ),
             ),
-            ElStateCell(
+            StateCell(
               label: 'error',
               note: 'what failed',
-              child: ElStat(
+              child: Stat(
                 label: 'Revenue',
                 value: r'$12,480',
                 delta: _up,
-                state: ElStatState.error,
+                state: StatState.error,
                 message: 'Could not load',
               ),
             ),
-            ElStateCell(
+            StateCell(
               label: 'empty',
               note: 'why there is nothing',
-              child: ElStat(
+              child: Stat(
                 label: 'Revenue',
                 value: r'$12,480',
                 delta: _up,
-                state: ElStatState.empty,
+                state: StatState.empty,
                 message: 'No sales this period',
               ),
             ),
-            ElStateCell(
+            StateCell(
               label: 'disabled',
               note: 'opacity-45, aria-disabled',
-              child: ElStat(
+              child: Stat(
                 label: 'Revenue',
                 value: r'$12,480',
                 delta: _up,
@@ -1102,38 +1109,38 @@ class _StatSection extends StatelessWidget {
           ],
         ),
         SizedBox(height: _panelGap),
-        ElPanel(
+        Panel(
           label: 'Loading, live',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              ElGrid(
+              Grid(
                 sm: 4,
-                gap: el(8),
+                gap: space(8),
                 children: <Widget>[
-                  ElStat(
+                  Stat(
                     label: 'Revenue',
                     value: r'$12,480',
                     delta: _up,
                     hint: 'vs last month',
                     state: live,
                   ),
-                  ElStat(
+                  Stat(
                     label: 'Refund rate',
                     value: '1.4%',
                     delta: _refund,
-                    betterWhen: ElStatDirection.down,
+                    betterWhen: StatDirection.down,
                     hint: 'vs last month',
                     state: live,
                   ),
-                  ElStat(
+                  Stat(
                     label: 'Packs opened',
                     value: '412',
                     delta: _flat,
                     hint: 'vs last month',
                     state: live,
                   ),
-                  ElStat(
+                  Stat(
                     label: 'Card sets',
                     value: '8',
                     hint: 'no comparison',
@@ -1142,19 +1149,19 @@ class _StatSection extends StatelessWidget {
                 ],
               ),
               // `<Row className="mt-8">`.
-              SizedBox(height: el(8)),
-              ElRow(
+              SizedBox(height: space(8)),
+              SpecimenRow(
                 children: <Widget>[
-                  ElButton(
-                    variant: ElButtonVariant.secondary,
-                    onPressed: live == ElStatState.loading ? null : onReload,
+                  Button(
+                    variant: ButtonVariant.secondary,
+                    onPressed: live == StatState.loading ? null : onReload,
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        ElIcon.lucide(
-                          ElLucide.rotateCcw,
-                          size: ElIconSize.md,
-                          tone: ElIconTone.inherit,
+                        Icon.lucide(
+                          Lucide.rotateCcw,
+                          size: IconSize.md,
+                          tone: IconTone.inherit,
                         ),
                         _ButtonGap(),
                         Text('Reload Figures'),
@@ -1179,7 +1186,7 @@ class _StatSection extends StatelessWidget {
                     ),
                     _em('one'),
                     const TextSpan(text: ' event: '),
-                    ElCode.span('anim-swap-in'),
+                    Code.span('anim-content-change'),
                     const TextSpan(
                       text:
                           ' on the arriving figure, never a fade out '
@@ -1192,12 +1199,12 @@ class _StatSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: _panelGap),
-        ElPanel(
+        Panel(
           label: 'When a stat navigates',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const ElGrid(sm: 2, lg: 3, children: <Widget>[_NavigatingStat()]),
+              const Grid(sm: 2, lg: 3, children: <Widget>[_NavigatingStat()]),
               _RichCaption(
                 TextSpan(
                   children: <InlineSpan>[
@@ -1214,17 +1221,17 @@ class _StatSection extends StatelessWidget {
                           ' is the control: it takes the surface change '
                           'on hover, the global focus ring, and ',
                     ),
-                    ElCode.span('press-spring'),
+                    Code.span('press-spring'),
                     const TextSpan(
                       text:
                           ' for the press. One transform '
                           'utility, not two, ',
                     ),
-                    ElCode.span('lift'),
+                    Code.span('lift'),
                     const TextSpan(text: ' and '),
-                    ElCode.span('press-spring'),
+                    Code.span('press-spring'),
                     const TextSpan(text: ' both write the whole '),
-                    ElCode.span('transition'),
+                    Code.span('transition'),
                     const TextSpan(
                       text:
                           ' shorthand, and §4 is explicit that which one '
@@ -1246,14 +1253,14 @@ class _ButtonGap extends StatelessWidget {
   const _ButtonGap();
 
   @override
-  Widget build(BuildContext context) => SizedBox(width: el(2));
+  Widget build(BuildContext context) => SizedBox(width: space(2));
 }
 
 class _OneSignalBody extends StatelessWidget {
   const _OneSignalBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     const TextSpan(
       text:
           'The lower row is the same markup with every hue removed, and '
@@ -1264,7 +1271,7 @@ class _OneSignalBody extends StatelessWidget {
           'direction is plain text, exactly as money leaving a wallet is '
           '(§1.4). Red means error, and a dip is not an error.',
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -1274,41 +1281,40 @@ class _DeltaCellTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    Widget cell(String figure, ElStatDelta delta, ElStatDirection better) =>
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ElText(figure, ElType.numSm, color: theme.foreground),
-            // `gap-0.5`.
-            SizedBox(height: el(0.5)),
-            ElStatDeltaMark(delta: delta, betterWhen: better),
-          ],
-        );
-
-    return ElTable(
-      header: const <ElTableCellSpec>[
-        ElTableCellSpec(child: Text('Campaign')),
-        ElTableCellSpec(child: Text('Revenue')),
-        ElTableCellSpec(child: Text('Refund rate')),
+    Widget cell(String figure, StatDelta delta, StatDirection better) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        StyledText(figure, TextStyles.numberSm, color: theme.foreground),
+        // `gap-0.5`.
+        SizedBox(height: space(0.5)),
+        StatDeltaMark(delta: delta, betterWhen: better),
       ],
-      rows: <ElTableRowSpec>[
-        ElTableRowSpec(
-          cells: <ElTableCellSpec>[
-            const ElTableCellSpec(child: Text('Stir in strength')),
-            ElTableCellSpec(
+    );
+
+    return Table(
+      header: const <TableCellSpec>[
+        TableCellSpec(child: Text('Campaign')),
+        TableCellSpec(child: Text('Revenue')),
+        TableCellSpec(child: Text('Refund rate')),
+      ],
+      rows: <TableRowSpec>[
+        TableRowSpec(
+          cells: <TableCellSpec>[
+            const TableCellSpec(child: Text('Stir in strength')),
+            TableCellSpec(
               child: cell(r'$12,180', (
                 value: '16%',
-                direction: ElStatDirection.up,
-              ), ElStatDirection.up),
+                direction: StatDirection.up,
+              ), StatDirection.up),
             ),
-            ElTableCellSpec(
+            TableCellSpec(
               child: cell('1.4%', (
                 value: '0.3%',
-                direction: ElStatDirection.up,
-              ), ElStatDirection.down),
+                direction: StatDirection.up,
+              ), StatDirection.down),
             ),
           ],
         ),
@@ -1336,31 +1342,31 @@ class _NavigatingStatState extends State<_NavigatingStat> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: ElPress(
-        scale: ElTransforms.pressSpringScale,
-        upDuration: ElDurations.pressSpringUp,
+      child: Press(
+        scale: MotionTransforms.pressSpringScale,
+        upDuration: MotionDurations.pressSpringUp,
         onTap: () {},
         child: TweenAnimationBuilder<Color?>(
           // `transition-colors duration-fast`, DRIFT 3.
-          duration: elAnimationDuration(context, ElDurations.transitionDefault),
-          curve: ElCurves.out,
+          duration: effectiveMotionDuration(context, MotionDurations.normal),
+          curve: MotionCurves.enter,
           tween: ColorTween(end: _hovered ? theme.accent : theme.card),
-          builder: (BuildContext context, Color? fill, Widget? child) => ElCard(
+          builder: (BuildContext context, Color? fill, Widget? child) => Card(
             fill: fill,
             // DRIFT 4: `box-shadow` is not in `transition-colors`' property
             // list, so the ring is a hard cut.
             ringColor: _hovered
-                ? ElPalette.action.withValues(alpha: _hoverRingAlpha)
-                : ElCard.ringOf(theme),
+                ? Palette.action.withValues(alpha: _hoverRingAlpha)
+                : Card.ringOf(theme),
             children: <Widget>[child!],
           ),
-          child: const ElCardContent(
-            child: ElStat(
+          child: const CardContent(
+            child: Stat(
               label: 'Revenue',
               value: r'$12,480',
               delta: _up,
@@ -1390,43 +1396,40 @@ class _ItemSection extends StatelessWidget {
       ];
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'item',
     title: 'Item',
     description:
         'A structured list row: media, content, actions. Used for '
         'payment methods, shipment lines and settings rows.',
-    child: ElPanel(
+    child: Panel(
       label: 'Payment methods',
       flush: true,
-      child: ElItemGroup(
+      child: ItemGroup(
         children: <Widget>[
           for (final ({String title, String desc, String badge}) method
               in _methods)
-            ElItem(
-              media: const ElItemMedia(
-                child: ElIcon.lucide(
-                  ElLucide.arrowUpRight,
-                  size: ElIconSize.md,
-                  tone: ElIconTone.subtle,
+            Item(
+              media: const ItemMedia(
+                child: Icon.lucide(
+                  Lucide.arrowUpRight,
+                  size: IconSize.md,
+                  tone: IconTone.subtle,
                 ),
               ),
-              content: ElItemContent(
+              content: ItemContent(
                 children: <Widget>[
-                  ElItemTitle(method.title),
-                  ElItemDescription(method.desc),
+                  ItemTitle(method.title),
+                  ItemDescription(method.desc),
                 ],
               ),
-              actions: ElItemActions(
+              actions: ItemActions(
                 children: <Widget>[
                   if (method.badge.isNotEmpty)
-                    ElBadge(
-                      label: method.badge,
-                      variant: ElBadgeVariant.action,
-                    ),
-                  ElButton(
-                    variant: ElButtonVariant.ghost,
-                    size: ElButtonSize.sm,
+                    Badge(label: method.badge, variant: BadgeVariant.action),
+                  Button(
+                    variant: ButtonVariant.ghost,
+                    size: ButtonSize.sm,
                     onPressed: () {},
                     child: const Text('Manage'),
                   ),
@@ -1445,7 +1448,7 @@ class _MarkerSection extends StatelessWidget {
   const _MarkerSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'marker',
     title: 'Marker',
     description:
@@ -1456,54 +1459,54 @@ class _MarkerSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPanel(
+        Panel(
           label: 'Three variants',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const ElMarker(
-                icon: ElIcon.lucide(
-                  ElLucide.info,
-                  size: ElIconSize.sm,
-                  tone: ElIconTone.muted,
+              const Marker(
+                icon: Icon.lucide(
+                  Lucide.info,
+                  size: IconSize.sm,
+                  tone: IconTone.muted,
                 ),
                 label:
                     'default: bare row, for a container that already '
                     'frames it',
               ),
               SizedBox(height: _markerGap),
-              const ElMarker(
-                variant: ElMarkerVariant.separator,
+              const Marker(
+                variant: MarkerVariant.separator,
                 label: 'separator: divides before from after',
               ),
               SizedBox(height: _markerGap),
-              const ElMarker(
-                variant: ElMarkerVariant.border,
+              const Marker(
+                variant: MarkerVariant.border,
                 label: 'border: heads what follows',
               ),
             ],
           ),
         ),
         SizedBox(height: _panelGap),
-        ElPanel(
+        Panel(
           label: 'In use: the agent console, where a stream was stopped',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              ElText(
+              StyledText(
                 'The assistant was mid-sentence and the user pressed stop. '
                 'Without the marker this reads as a finished answer that '
                 'trails off.',
-                ElType.small,
+                TextStyles.small,
               ),
               // `space-y-4`.
               SizedBox(height: _panelGap),
-              const ElMarker(
-                variant: ElMarkerVariant.separator,
-                icon: ElIcon.lucide(
-                  ElLucide.square,
-                  size: ElIconSize.sm,
-                  tone: ElIconTone.muted,
+              const Marker(
+                variant: MarkerVariant.separator,
+                icon: Icon.lucide(
+                  Lucide.square,
+                  size: IconSize.sm,
+                  tone: IconTone.muted,
                 ),
                 label: 'Stopped by you',
               ),
@@ -1511,8 +1514,8 @@ class _MarkerSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: _panelGap),
-        const ElNote(
-          tone: ElNoteTone.error,
+        const Note(
+          tone: NoteTone.error,
           title: 'Not an Alert',
           child: _NotAnAlertBody(),
         ),
@@ -1525,7 +1528,7 @@ class _NotAnAlertBody extends StatelessWidget {
   const _NotAnAlertBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -1535,7 +1538,7 @@ class _NotAnAlertBody extends StatelessWidget {
         ),
         _em('problem'),
         const TextSpan(text: ', that is an '),
-        ElCode.span('Alert'),
+        Code.span('Alert'),
         const TextSpan(
           text:
               ', §5’s table is explicit that a persistent condition '
@@ -1543,7 +1546,7 @@ class _NotAnAlertBody extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -1554,18 +1557,23 @@ class _SeparatorSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    Widget figure(String text) =>
-        Center(child: ElText(text, ElType.numSm, color: theme.mutedForeground));
+    Widget figure(String text) => Center(
+      child: StyledText(
+        text,
+        TextStyles.numberSm,
+        color: theme.mutedForeground,
+      ),
+    );
 
-    return ElSection(
+    return Section(
       id: 'separator',
       title: 'Separator',
       description:
           'A hairline. It uses the border token, so it holds up on '
           'every surface in the ladder without being restyled.',
-      child: ElPanel(
+      child: Panel(
         label: 'Horizontal and vertical',
         child: Align(
           alignment: AlignmentDirectional.centerStart,
@@ -1576,28 +1584,28 @@ class _SeparatorSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElText('Available balance', ElType.small),
+                StyledText('Available balance', TextStyles.small),
                 // `className="my-4"`.
                 SizedBox(height: _panelGap),
-                const ElSeparator(),
+                const Separator(),
                 SizedBox(height: _panelGap),
-                ElText('Bonus balance', ElType.small),
+                StyledText('Bonus balance', TextStyles.small),
                 SizedBox(height: _panelGap),
-                const ElSeparator(),
+                const Separator(),
                 SizedBox(height: _panelGap),
                 SizedBox(
                   // `flex h-6 items-center gap-4`.
-                  height: el(6),
+                  height: space(6),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       figure('412 packs'),
                       SizedBox(width: _panelGap),
-                      const ElSeparator.vertical(),
+                      const Separator.vertical(),
                       SizedBox(width: _panelGap),
                       figure('1,284 cards'),
                       SizedBox(width: _panelGap),
-                      const ElSeparator.vertical(),
+                      const Separator.vertical(),
                       SizedBox(width: _panelGap),
                       figure('8 sets'),
                     ],
@@ -1618,11 +1626,11 @@ class _ApiSection extends StatelessWidget {
   const _ApiSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'api',
     title: 'API',
-    child: ElMeta(
-      items: <ElMetaItem>[
+    child: Meta(
+      items: <MetaItem>[
         (
           // DRIFT 7: `blue` is not a variant and `link` is.
           k: 'Badge variant',
@@ -1710,10 +1718,10 @@ class _RulesSection extends StatelessWidget {
   const _RulesSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'rules',
     title: 'Rules',
-    child: ElDoDont(
+    child: DoDont(
       dos: <String>[
         'Right-align numeric table columns and use the shared tabular '
             'type-num foundation.',

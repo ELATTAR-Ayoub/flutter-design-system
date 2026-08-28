@@ -40,7 +40,7 @@ to a public HTTP endpoint simultaneously. Nothing gates it on the licensing deci
   redistribution only if each copy carries the notice. Non-compliant today, independent
   of what license the owner picks for their own code. The CLI copies these into user
   projects and writes no license file.
-- **F3** `lib/src/components/icon_paths.g.dart` — 714 KB of verbatim Lucide geometry
+- **F3** `lib/src/components/ui/icon_paths.g.dart` — 714 KB of verbatim Lucide geometry
   (ISC), 1756 glyphs. Header names the license but reproduces neither copyright nor
   permission notice. `icon` is a dependency of `button`, so effectively every install
   carries it.

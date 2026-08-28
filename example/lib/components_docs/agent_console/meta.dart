@@ -36,10 +36,10 @@ const ComponentDocEntry agentConsoleDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>[
-    'ElAgentConsole',
-    'ElAgentFeatures',
-    'ElAgentPersona',
-    'ElAgentModel',
+    'AgentConsole',
+    'AgentFeatures',
+    'AgentPersona',
+    'AgentModel',
   ],
   sourcePath: 'lib/src/components/agent_console.dart',
 );

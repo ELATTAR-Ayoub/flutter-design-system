@@ -1,11 +1,23 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind, kSecondaryButton;
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The menu family: `dropdown-menu.tsx`, `context-menu.tsx`, `menubar.tsx` and
-/// the five knobs they added to `ElPopover`.
+/// the five knobs they added to `Popover`.
 ///
 /// Numbers marked *(measured)* / *(probed)* were read off the live reference at
 /// `localhost:3000/design-system/components/base/menus` on 2026-08-16 by
@@ -18,7 +30,7 @@ Widget _hosted = const SizedBox.shrink();
 
 Widget overlayHost(
   Widget child, {
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   Size size = const Size(1440, 900),
   Alignment align = Alignment.center,
 }) {
@@ -27,8 +39,8 @@ Widget overlayHost(
     data: MediaQueryData(size: size),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Overlay(
           initialEntries: <OverlayEntry>[
             OverlayEntry(
@@ -60,12 +72,12 @@ Future<void> settleOverlay(WidgetTester tester) async {
 
 /// Runs an overlay's 320ms exit out and lets the portal unmount behind it.
 ///
-/// Four frames, not three: `ElPopover` starts its reverse from a **post-frame**
+/// Four frames, not three: `Popover` starts its reverse from a **post-frame**
 /// callback, so the controller's first tick is one frame after `open` flipped
 /// and the run ends one frame after that.
 Future<void> runOverlay(WidgetTester tester) async {
   for (int i = 0; i < 4; i++) {
-    await tester.pump(ElDurations.overlay);
+    await tester.pump(MotionDurations.overlayEnter);
   }
   await tester.pump();
 }
@@ -90,46 +102,42 @@ Future<TestGesture> hover(WidgetTester tester, Finder finder) async {
 }
 
 /// The account menu, verbatim from the page.
-List<ElMenuChild> accountMenu({VoidCallback? onSignOut}) => <ElMenuChild>[
-  const ElMenuLabel('voidwing'),
-  const ElMenuSeparator(),
-  const ElMenuGroup(
-    children: <ElMenuChild>[
-      ElMenuItem(
-        label: 'Wallet',
-        icon: ElIconGlyph.wallet,
-        shortcut: r'$1,204.80',
-      ),
-      ElMenuItem(label: 'Favourites', icon: ElIconGlyph.heart),
-      ElMenuItem(label: 'Preferences', icon: ElIconGlyph.settings),
+List<MenuChild> accountMenu({VoidCallback? onSignOut}) => <MenuChild>[
+  const MenuLabel('voidwing'),
+  const MenuSeparator(),
+  const MenuGroup(
+    children: <MenuChild>[
+      MenuItem(label: 'Wallet', icon: IconGlyph.wallet, shortcut: r'$1,204.80'),
+      MenuItem(label: 'Favourites', icon: IconGlyph.heart),
+      MenuItem(label: 'Preferences', icon: IconGlyph.settings),
     ],
   ),
-  const ElMenuSeparator(),
-  ElMenuItem(
+  const MenuSeparator(),
+  MenuItem(
     label: 'Sign out',
-    icon: ElIconGlyph.logOut,
-    variant: ElMenuItemVariant.destructive,
+    icon: IconGlyph.logOut,
+    variant: MenuItemVariant.destructive,
     onSelect: onSignOut,
   ),
 ];
 
 /// The context menu, verbatim from the page.
-const List<ElMenuChild> stashMenu = <ElMenuChild>[
-  ElMenuItem(label: 'Favourite', icon: ElIconGlyph.heart, shortcut: 'F'),
-  ElMenuItem(label: 'Share pull', icon: ElIconGlyph.share2),
-  ElMenuSub(
+const List<MenuChild> stashMenu = <MenuChild>[
+  MenuItem(label: 'Favourite', icon: IconGlyph.heart, shortcut: 'F'),
+  MenuItem(label: 'Share pull', icon: IconGlyph.share2),
+  MenuSub(
     label: 'Shipping',
-    icon: ElIconGlyph.truck,
-    children: <ElMenuChild>[
-      ElMenuItem(label: 'Add to shipment'),
-      ElMenuItem(label: 'Ship immediately'),
+    icon: IconGlyph.truck,
+    children: <MenuChild>[
+      MenuItem(label: 'Add to shipment'),
+      MenuItem(label: 'Ship immediately'),
     ],
   ),
-  ElMenuSeparator(),
-  ElMenuItem(
+  MenuSeparator(),
+  MenuItem(
     label: r'Sell for $1,240.00',
-    icon: ElIconGlyph.trash2,
-    variant: ElMenuItemVariant.destructive,
+    icon: IconGlyph.trash2,
+    variant: MenuItemVariant.destructive,
   ),
 ];
 
@@ -145,13 +153,13 @@ Color? fillOf(WidgetTester tester, String label) {
 void main() {
   /* ── Geometry ──────────────────────────────────────────────────────────── */
 
-  group('ElMenu geometry', () {
+  group('Menu geometry', () {
     test('a row is `py-2` around one `text-sm` line box', () {
       // *(Measured: every `*MenuItem` on the page is 34.5625 tall — Chrome's
       // quantisation of the 18.5714px line box.)*
-      expect(ElMenu.itemHeight, closeTo(34.571, 0.001));
+      expect(Menu.itemHeight, closeTo(34.571, 0.001));
       // The select's rows are the same rung, and must stay the same number.
-      expect(ElMenu.itemHeight, ElSelect.itemHeight);
+      expect(Menu.itemHeight, Select.itemHeight);
     });
 
     test('a two-line row is that plus `gap-1` and a caption line box', () {
@@ -159,90 +167,88 @@ void main() {
       // `ModelPicker` writes, and the only two-line row in the corpus:
       // 16 (`py-2`) + 18.5714 (`text-sm`) + 4 (`gap-1`) + 14.175
       // (`.type-caption`).
-      expect(ElMenu.twoLineItemHeight, closeTo(52.746, 0.001));
+      expect(Menu.twoLineItemHeight, closeTo(52.746, 0.001));
       expect(
-        ElMenu.twoLineItemHeight - ElMenu.itemHeight,
+        Menu.twoLineItemHeight - Menu.itemHeight,
         closeTo(4 + 14.175, 0.001),
       );
       // The command palette's two-line row is the same two line boxes in the
       // same padding and **48.7**, because a command row writes no gap between
       // them. Two components, two numbers, one reference — so this is the
       // assertion that catches the first one being copied onto the second.
-      expect(ElMenu.twoLineItemHeight - 48.7, closeTo(4, 0.05));
+      expect(Menu.twoLineItemHeight - 48.7, closeTo(4, 0.05));
     });
 
     test('a subtitle is what makes a row two lines, and nothing else does', () {
-      const List<ElMenuChild> oneLine = <ElMenuChild>[
-        ElMenuItem(label: 'Fast', shortcut: 'Answers in a second'),
+      const List<MenuChild> oneLine = <MenuChild>[
+        MenuItem(label: 'Fast', shortcut: 'Answers in a second'),
       ];
-      const List<ElMenuChild> twoLine = <ElMenuChild>[
-        ElMenuItem(label: 'Fast', subtitle: 'Answers in a second'),
+      const List<MenuChild> twoLine = <MenuChild>[
+        MenuItem(label: 'Fast', subtitle: 'Answers in a second'),
       ];
       // The same string in the two slots: beside the label it costs nothing,
       // under it costs a line box and the gap. That difference is the whole of
       // the console's divergence 2, in one number.
       expect(
-        ElMenuContent.heightOf(oneLine),
-        closeTo(ElMenu.contentPadding * 2 + ElMenu.itemHeight, 0.001),
+        MenuContent.heightOf(oneLine),
+        closeTo(Menu.contentPadding * 2 + Menu.itemHeight, 0.001),
       );
       expect(
-        ElMenuContent.heightOf(twoLine),
-        closeTo(ElMenu.contentPadding * 2 + ElMenu.twoLineItemHeight, 0.001),
+        MenuContent.heightOf(twoLine),
+        closeTo(Menu.contentPadding * 2 + Menu.twoLineItemHeight, 0.001),
       );
     });
 
     test('a label is 12px/500 in a 16px line box, `py-2` — 32', () {
       // *(Measured: "Visible columns" occupies exactly 32.)*
-      expect(ElMenu.labelHeight, 32);
+      expect(Menu.labelHeight, 32);
       // `font-medium` — `menuHeading`, not `menuLabel`. `SelectLabel` writes
       // no `font-*` class and this one does; the sizes match, the weights do
       // not.
-      expect(ElMenu.labelHeight, ElSelect.labelHeight);
-      expect(ElComponentType.menuHeading.weight, FontWeight.w500);
-      expect(ElComponentType.menuLabel.weight, FontWeight.w400);
+      expect(Menu.labelHeight, Select.labelHeight);
+      expect(TextStyles.menuHeading.weight, FontWeight.w500);
+      expect(TextStyles.menuLabel.weight, FontWeight.w400);
     });
 
     test('a separator occupies 17', () {
-      expect(ElMenu.separatorHeight, 17);
+      expect(Menu.separatorHeight, 17);
     });
 
     test('the account menu adds up to the 236.25 the reference renders', () {
       // 8 + 32 + 17 + 3×34.5625 + 17 + 34.5625 + 8. The page's own label is a
       // two-line block (48 rather than 32), which is the 16px difference
       // between this sum and the measured 236.25.
-      expect(ElMenuContent.heightOf(accountMenu()), closeTo(236.25 - 16, 0.05));
+      expect(MenuContent.heightOf(accountMenu()), closeTo(236.25 - 16, 0.05));
     });
 
     test('the context menu adds up to the 171.25 the reference renders', () {
-      // 8 + 3×34.5625 + 17 + 34.5625 + 8 = 171.25. A `ElMenuSub` row is one
+      // 8 + 3×34.5625 + 17 + 34.5625 + 8 = 171.25. A `MenuSub` row is one
       // item tall, and the separator is 17.
-      expect(ElMenuContent.heightOf(stashMenu), closeTo(171.25, 0.05));
+      expect(MenuContent.heightOf(stashMenu), closeTo(171.25, 0.05));
     });
 
     test('the min-widths are the three the family writes', () {
-      expect(ElMenu.minWidthDropdown, 160); // `min-w-40`
-      expect(ElMenu.minWidthMenu, 144); // `min-w-36`
-      expect(ElMenu.minWidthSub, 160); // `min-w-40`
-      expect(ElMenu.minWidthSubDropdown, 96); // `min-w-24`
+      expect(Menu.minWidthDropdown, 160); // `min-w-40`
+      expect(Menu.minWidthMenu, 144); // `min-w-36`
+      expect(Menu.minWidthSub, 160); // `min-w-40`
+      expect(Menu.minWidthSubDropdown, 96); // `min-w-24`
     });
 
     test('a `*MenuGroup` paints nothing and adds nothing', () {
       // *(Measured: the account menu's group is exactly 3 × 34.5625 with no
       // gap above, below or between.)*
-      const List<ElMenuChild> flat = <ElMenuChild>[
-        ElMenuItem(label: 'a'),
-        ElMenuItem(label: 'b'),
+      const List<MenuChild> flat = <MenuChild>[
+        MenuItem(label: 'a'),
+        MenuItem(label: 'b'),
       ];
-      const List<ElMenuChild> grouped = <ElMenuChild>[
-        ElMenuGroup(children: flat),
-      ];
-      expect(ElMenuContent.heightOf(grouped), ElMenuContent.heightOf(flat));
+      const List<MenuChild> grouped = <MenuChild>[MenuGroup(children: flat)];
+      expect(MenuContent.heightOf(grouped), MenuContent.heightOf(flat));
     });
   });
 
   /* ── The dropdown ──────────────────────────────────────────────────────── */
 
-  group('ElDropdownMenu', () {
+  group('DropdownMenu', () {
     testWidgets('opens on pointer-DOWN, not on the tap', (
       WidgetTester t,
     ) async {
@@ -251,7 +257,7 @@ void main() {
       // t=146.7, 93ms before the `pointerup` at t=240.1.)*
       await t.pumpWidget(
         overlayHost(
-          ElDropdownMenu(
+          DropdownMenu(
             trigger: const _Trigger(width: 111),
             children: accountMenu(),
           ),
@@ -259,7 +265,7 @@ void main() {
       );
 
       final TestGesture gesture = await t.startGesture(
-        t.getCenter(find.byType(ElDropdownMenu)),
+        t.getCenter(find.byType(DropdownMenu)),
       );
       await settleOverlay(t);
       expect(
@@ -280,7 +286,7 @@ void main() {
       // and `align="start"`.)*
       await t.pumpWidget(
         overlayHost(
-          ElDropdownMenu(
+          DropdownMenu(
             width: 240,
             trigger: const _Trigger(width: 111.40625),
             children: accountMenu(),
@@ -288,12 +294,12 @@ void main() {
           align: Alignment.topLeft,
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
       final Rect trigger = t.getRect(find.byType(_Trigger));
-      final Rect content = t.getRect(find.byType(ElMenuContent));
+      final Rect content = t.getRect(find.byType(MenuContent));
       expect(content.top - trigger.bottom, closeTo(4, 0.01));
       expect(content.left, closeTo(trigger.left, 0.01));
       expect(content.width, 240, reason: '`w-60` beats the trigger width');
@@ -303,21 +309,21 @@ void main() {
         'grows for it', (WidgetTester t) async {
       useFrame(t);
       // The agent console's `ModelPicker`, in miniature. Its hint rode the
-      // `shortcut` slot for as long as [ElMenuItem] had no second line, which
+      // `shortcut` slot for as long as [MenuItem] had no second line, which
       // put it *beside* the label — recorded as the console's divergence 2 and
       // closed by this slot.
-      const List<ElMenuChild> models = <ElMenuChild>[
-        ElMenuItem(label: 'Fast', subtitle: 'Answers in a second'),
-        ElMenuItem(label: 'Deep', subtitle: 'Slower, checks its work'),
+      const List<MenuChild> models = <MenuChild>[
+        MenuItem(label: 'Fast', subtitle: 'Answers in a second'),
+        MenuItem(label: 'Deep', subtitle: 'Slower, checks its work'),
       ];
       await t.pumpWidget(
         overlayHost(
-          const ElDropdownMenu(trigger: _Trigger(width: 111), children: models),
+          const DropdownMenu(trigger: _Trigger(width: 111), children: models),
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
       final Rect label = t.getRect(find.text('Fast'));
       final Rect hint = t.getRect(find.text('Answers in a second'));
@@ -332,17 +338,17 @@ void main() {
       // comes off the label's bottom edge rather than out of the gap — which
       // is why the row's own height below is the number to hold, and this one
       // is only here to say the gap exists at all.
-      expect(hint.top - label.bottom, closeTo(el(1), 0.2));
+      expect(hint.top - label.bottom, closeTo(space(1), 0.2));
 
       // …and the popup really is two tall rows and its own `p-2`, rather than
       // two short rows with an overflowing child.
       expect(
-        t.getSize(find.byType(ElMenuContent)).height,
-        closeTo(ElMenuContent.heightOf(models), 0.05),
+        t.getSize(find.byType(MenuContent)).height,
+        closeTo(MenuContent.heightOf(models), 0.05),
       );
       expect(
-        t.getSize(find.byType(ElMenuContent)).height,
-        closeTo(ElMenu.contentPadding * 2 + ElMenu.twoLineItemHeight * 2, 0.05),
+        t.getSize(find.byType(MenuContent)).height,
+        closeTo(Menu.contentPadding * 2 + Menu.twoLineItemHeight * 2, 0.05),
       );
       expect(t.takeException(), isNull);
     });
@@ -356,18 +362,18 @@ void main() {
       // compute `--accent-foreground`.)*
       await t.pumpWidget(
         overlayHost(
-          ElDropdownMenu(
+          DropdownMenu(
             trigger: const _Trigger(width: 111),
             children: accountMenu(),
           ),
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
-      final ElThemeData theme = ElTheme.of(
-        t.element(find.byType(ElMenuContent)),
+      final ThemeTokens theme = ThemeScope.of(
+        t.element(find.byType(MenuContent)),
       );
       expect(fillOf(t, 'Wallet'), isNull);
 
@@ -375,13 +381,13 @@ void main() {
       // One frame. No tween, no curve.
       expect(fillOf(t, 'Wallet'), theme.accent);
 
-      final ElText shortcut = t.widget<ElText>(
+      final StyledText shortcut = t.widget<StyledText>(
         find.byWidgetPredicate(
-          (Widget w) => w is ElText && w.text == r'$1,204.80',
+          (Widget w) => w is StyledText && w.text == r'$1,204.80',
         ),
       );
       expect(shortcut.color, theme.accentForeground);
-      expect(shortcut.spec, ElComponentType.menuShortcut);
+      expect(shortcut.spec, TextStyles.menuShortcut);
     });
 
     // *(Measured: `--destructive` at 20% on dark, 10% on light, with
@@ -390,35 +396,35 @@ void main() {
     // `MouseTracker` asserts on the second add.
     Future<void> destructiveTint(
       WidgetTester t,
-      ElThemeMode mode,
+      ColorMode mode,
       double alpha,
     ) async {
       useFrame(t);
       await t.pumpWidget(
         overlayHost(
-          ElDropdownMenu(
+          DropdownMenu(
             trigger: const _Trigger(width: 111),
             children: accountMenu(),
           ),
           mode: mode,
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
-      final ElThemeData theme = ElTheme.of(
-        t.element(find.byType(ElMenuContent)),
+      final ThemeTokens theme = ThemeScope.of(
+        t.element(find.byType(MenuContent)),
       );
       expect(
         t
-            .widget<ElText>(
+            .widget<StyledText>(
               find.byWidgetPredicate(
-                (Widget w) => w is ElText && w.text == 'Sign out',
+                (Widget w) => w is StyledText && w.text == 'Sign out',
               ),
             )
             .color,
-        theme.destructiveInk,
+        theme.destructiveText,
       );
 
       await hover(t, find.text('Sign out'));
@@ -426,26 +432,26 @@ void main() {
       // Still destructive ink, not accent-foreground.
       expect(
         t
-            .widget<ElText>(
+            .widget<StyledText>(
               find.byWidgetPredicate(
-                (Widget w) => w is ElText && w.text == 'Sign out',
+                (Widget w) => w is StyledText && w.text == 'Sign out',
               ),
             )
             .color,
-        theme.destructiveInk,
+        theme.destructiveText,
       );
     }
 
     testWidgets('a destructive row tints at 20% on dark', (
       WidgetTester t,
     ) async {
-      await destructiveTint(t, ElThemeMode.dark, 0.20);
+      await destructiveTint(t, ColorMode.dark, 0.20);
     });
 
     testWidgets('a destructive row tints at 10% on light', (
       WidgetTester t,
     ) async {
-      await destructiveTint(t, ElThemeMode.light, 0.10);
+      await destructiveTint(t, ColorMode.light, 0.10);
     });
 
     testWidgets('a committed row closes the menu', (WidgetTester t) async {
@@ -453,15 +459,15 @@ void main() {
       int signOuts = 0;
       await t.pumpWidget(
         overlayHost(
-          ElDropdownMenu(
+          DropdownMenu(
             trigger: const _Trigger(width: 111),
             children: accountMenu(onSignOut: () => signOuts++),
           ),
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
       await t.tap(find.text('Sign out'));
       await runOverlay(t);
@@ -472,20 +478,20 @@ void main() {
     testWidgets('the arrows do NOT wrap', (WidgetTester t) async {
       useFrame(t);
       // *(Probed: `End` then `ArrowDown` stays on "Sign out"; `Home` then
-      // `ArrowUp` stays on "Wallet".)* The opposite of `ElSelect`'s menu.
+      // `ArrowUp` stays on "Wallet".)* The opposite of `Select`'s menu.
       await t.pumpWidget(
         overlayHost(
-          ElDropdownMenu(
+          DropdownMenu(
             trigger: const _Trigger(width: 111),
             children: accountMenu(),
           ),
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
-      final ElThemeData theme = ElTheme.of(
-        t.element(find.byType(ElMenuContent)),
+      await t.pump(MotionDurations.overlayEnter);
+      final ThemeTokens theme = ThemeScope.of(
+        t.element(find.byType(MenuContent)),
       );
 
       await t.sendKeyEvent(LogicalKeyboardKey.end);
@@ -515,20 +521,20 @@ void main() {
       // "Preferences".)*
       await t.pumpWidget(
         overlayHost(
-          ElDropdownMenu(
+          DropdownMenu(
             trigger: const _Trigger(width: 111),
             children: accountMenu(),
           ),
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
       await t.sendKeyEvent(LogicalKeyboardKey.keyP);
       await t.pump();
-      final ElThemeData theme = ElTheme.of(
-        t.element(find.byType(ElMenuContent)),
+      final ThemeTokens theme = ThemeScope.of(
+        t.element(find.byType(MenuContent)),
       );
       expect(fillOf(t, 'Preferences'), theme.accent);
     });
@@ -537,15 +543,15 @@ void main() {
       useFrame(t);
       await t.pumpWidget(
         overlayHost(
-          ElDropdownMenu(
+          DropdownMenu(
             trigger: const _Trigger(width: 111),
             children: accountMenu(),
           ),
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       await t.sendKeyEvent(LogicalKeyboardKey.escape);
       await runOverlay(t);
       expect(find.text('Wallet'), findsNothing);
@@ -559,28 +565,28 @@ void main() {
       // all — `ItemIndicator` is conditional.)*
       await t.pumpWidget(
         overlayHost(
-          const ElDropdownMenu(
+          const DropdownMenu(
             width: 208,
             trigger: _Trigger(width: 88),
-            children: <ElMenuChild>[
-              ElMenuLabel('Visible columns'),
-              ElMenuSeparator(),
-              ElMenuCheckboxItem(label: 'Rarity', checked: true),
-              ElMenuCheckboxItem(label: 'Condition', checked: false),
+            children: <MenuChild>[
+              MenuLabel('Visible columns'),
+              MenuSeparator(),
+              MenuCheckboxItem(label: 'Rarity', checked: true),
+              MenuCheckboxItem(label: 'Condition', checked: false),
             ],
           ),
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
       Finder tickIn(String label) => find.descendant(
         of: find
             .ancestor(of: find.text(label), matching: find.byType(Stack))
             .first,
         matching: find.byWidgetPredicate(
-          (Widget w) => w is ElIcon && w.glyph == ElIconGlyph.check,
+          (Widget w) => w is Icon && w.glyph == IconGlyph.check,
         ),
       );
       expect(tickIn('Rarity'), findsOneWidget);
@@ -595,30 +601,30 @@ void main() {
       // after reopening)*. `onSelect: null` is the page's own state.
       await t.pumpWidget(
         overlayHost(
-          const ElDropdownMenu(
+          const DropdownMenu(
             width: 208,
             trigger: _Trigger(width: 88),
-            children: <ElMenuChild>[
-              ElMenuCheckboxItem(label: 'Condition', checked: false),
+            children: <MenuChild>[
+              MenuCheckboxItem(label: 'Condition', checked: false),
             ],
           ),
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       await t.tap(find.text('Condition'));
       await runOverlay(t);
       expect(find.text('Condition'), findsNothing);
 
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       expect(
         find.descendant(
-          of: find.byType(ElMenuContent),
+          of: find.byType(MenuContent),
           matching: find.byWidgetPredicate(
-            (Widget w) => w is ElIcon && w.glyph == ElIconGlyph.check,
+            (Widget w) => w is Icon && w.glyph == IconGlyph.check,
           ),
         ),
         findsNothing,
@@ -630,30 +636,30 @@ void main() {
       useFrame(t);
       await t.pumpWidget(
         overlayHost(
-          const ElDropdownMenu(
+          const DropdownMenu(
             width: 208,
             trigger: _Trigger(width: 60),
-            children: <ElMenuChild>[
-              ElMenuRadioGroup(
+            children: <MenuChild>[
+              MenuRadioGroup(
                 value: 'value',
-                children: <ElMenuRadioItem>[
-                  ElMenuRadioItem(value: 'value', label: 'Highest value'),
-                  ElMenuRadioItem(value: 'rarity', label: 'Rarity'),
-                  ElMenuRadioItem(value: 'recent', label: 'Recently acquired'),
+                children: <MenuRadioItem>[
+                  MenuRadioItem(value: 'value', label: 'Highest value'),
+                  MenuRadioItem(value: 'rarity', label: 'Rarity'),
+                  MenuRadioItem(value: 'recent', label: 'Recently acquired'),
                 ],
               ),
             ],
           ),
         ),
       );
-      await t.tap(find.byType(ElDropdownMenu));
+      await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       expect(
         find.descendant(
-          of: find.byType(ElMenuContent),
+          of: find.byType(MenuContent),
           matching: find.byWidgetPredicate(
-            (Widget w) => w is ElIcon && w.glyph == ElIconGlyph.check,
+            (Widget w) => w is Icon && w.glyph == IconGlyph.check,
           ),
         ),
         findsOneWidget,
@@ -663,10 +669,10 @@ void main() {
     test('GAP CLOSED 1 is recorded, not silently assumed', () {
       // The reference's menu triggers do not squish (`aria-haspopup="menu"`
       // cancels `active:not-aria-[haspopup]:scale-95`), and neither do the
-      // port's: `ElButton.suppressPressScale` is that attribute.
-      expect(ElDropdownMenu.pressScaleSuppressed, isTrue);
+      // port's: `Button.suppressPressScale` is that attribute.
+      expect(DropdownMenu.pressScaleSuppressed, isTrue);
       // Its counterpart on the selects page — the same drift, one file over.
-      expect(ElDatePicker.pressScaleSuppressed, isTrue);
+      expect(DatePicker.pressScaleSuppressed, isTrue);
     });
 
     testWidgets('GAP CLOSED 1, with teeth: a trigger holds unity while held', (
@@ -675,7 +681,7 @@ void main() {
       useFrame(t);
       await t.pumpWidget(
         overlayHost(
-          ElDropdownMenu(
+          DropdownMenu(
             width: 240,
             trigger: const _GhostTrigger(),
             children: accountMenu(),
@@ -687,7 +693,7 @@ void main() {
           .widget<Transform>(
             find
                 .descendant(
-                  of: find.byType(ElButton),
+                  of: find.byType(Button),
                   matching: find.byType(Transform),
                 )
                 .first,
@@ -697,11 +703,11 @@ void main() {
 
       expect(scaleOf(), 1.0);
       final TestGesture press = await t.startGesture(
-        t.getCenter(find.byType(ElButton)),
+        t.getCenter(find.byType(Button)),
       );
       await settleOverlay(t);
       expect(
-        find.byType(ElMenuContent),
+        find.byType(MenuContent),
         findsOneWidget,
         reason: 'the menu opens on pointer-down, before this asserts',
       );
@@ -717,7 +723,7 @@ void main() {
       useFrame(t);
       await t.pumpWidget(
         overlayHost(
-          ElDropdownMenu(
+          DropdownMenu(
             width: 240,
             trigger: const _GhostTrigger(),
             children: accountMenu(),
@@ -725,24 +731,24 @@ void main() {
         ),
       );
 
-      ElMachineSurface surface() => t.widget<ElMachineSurface>(
+      Surface surface() => t.widget<Surface>(
         find.descendant(
-          of: find.byType(ElButton),
-          matching: find.byType(ElMachineSurface),
+          of: find.byType(Button),
+          matching: find.byType(Surface),
         ),
       );
 
-      final ElThemeData theme = ElThemeData.dark;
-      expect(surface().fill, elTransparent, reason: 'ghost at rest');
+      final ThemeTokens theme = ThemeTokens.dark;
+      expect(surface().fill, transparent, reason: 'ghost at rest');
 
       // Opened by a tap that leaves no pointer resting on the trigger — the
       // one case the port used to drop the fill in.
-      await t.tap(find.byType(ElButton));
+      await t.tap(find.byType(Button));
       await settleOverlay(t);
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
 
-      expect(find.byType(ElMenuContent), findsOneWidget);
+      expect(find.byType(MenuContent), findsOneWidget);
       // `aria-expanded:bg-secondary` — the hover fill, held by the open menu.
       expect(surface().fill, theme.secondary);
     });
@@ -750,14 +756,14 @@ void main() {
 
   /* ── The context menu ──────────────────────────────────────────────────── */
 
-  group('ElContextMenu', () {
+  group('ContextMenu', () {
     /// Right-clicks the card's own centre and hands the point back, so the
     /// placement can be asserted against the thing the pointer actually hit.
     Future<Offset> rightClick(WidgetTester t) async {
-      final Offset at = t.getCenter(find.byType(ElContextMenu));
+      final Offset at = t.getCenter(find.byType(ContextMenu));
       await t.tapAt(at, buttons: kSecondaryButton);
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       return at;
     }
 
@@ -767,14 +773,14 @@ void main() {
       // `[data-slot=context-menu-content]`.)*
       await t.pumpWidget(
         overlayHost(
-          const ElContextMenu(
+          const ContextMenu(
             width: 224,
             children: stashMenu,
             child: _Trigger(width: 320, height: 160),
           ),
         ),
       );
-      await t.tap(find.byType(ElContextMenu));
+      await t.tap(find.byType(ContextMenu));
       await settleOverlay(t);
       expect(find.text('Favourite'), findsNothing);
     });
@@ -787,7 +793,7 @@ void main() {
       // (487, 498) — `side="right" sideOffset={2} align="start"`.)*
       await t.pumpWidget(
         overlayHost(
-          const ElContextMenu(
+          const ContextMenu(
             width: 224,
             children: stashMenu,
             child: _Trigger(width: 320, height: 160),
@@ -796,7 +802,7 @@ void main() {
       );
       final Offset at = await rightClick(t);
 
-      final Rect content = t.getRect(find.byType(ElMenuContent).first);
+      final Rect content = t.getRect(find.byType(MenuContent).first);
       expect(content.left - at.dx, closeTo(2, 0.01));
       expect(content.top - at.dy, closeTo(0, 0.01));
       expect(content.width, 224);
@@ -811,7 +817,7 @@ void main() {
       // *(Measured: its left edge lands exactly on the trigger's right edge.)*
       await t.pumpWidget(
         overlayHost(
-          const ElContextMenu(
+          const ContextMenu(
             width: 224,
             children: stashMenu,
             child: _Trigger(width: 320, height: 160),
@@ -829,7 +835,7 @@ void main() {
       );
       await t.pump(const Duration(milliseconds: 20));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       expect(find.text('Add to shipment'), findsOneWidget);
 
       final Rect trigger = t.getRect(
@@ -840,13 +846,13 @@ void main() {
             )
             .first,
       );
-      final Rect sub = t.getRect(find.byType(ElMenuContent).last);
+      final Rect sub = t.getRect(find.byType(MenuContent).last);
       expect(sub.left, closeTo(trigger.right, 0.01));
       expect(sub.top, closeTo(trigger.top, 0.01));
       // 8 + 2×34.5625 + 8, plus the 1px border on each side — the one overlay
       // in the corpus that writes `border` rather than `ring-1`.
       expect(sub.height, closeTo(87.125, 0.05));
-      expect(sub.width, greaterThanOrEqualTo(ElMenu.minWidthSub));
+      expect(sub.width, greaterThanOrEqualTo(Menu.minWidthSub));
     });
 
     testWidgets('the submenu closes when the pointer reaches a sibling row', (
@@ -855,7 +861,7 @@ void main() {
       useFrame(t);
       await t.pumpWidget(
         overlayHost(
-          const ElContextMenu(
+          const ContextMenu(
             width: 224,
             children: stashMenu,
             child: _Trigger(width: 320, height: 160),
@@ -867,7 +873,7 @@ void main() {
       final TestGesture gesture = await hover(t, find.text('Shipping'));
       await t.pump(const Duration(milliseconds: 120));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       expect(find.text('Add to shipment'), findsOneWidget);
 
       await gesture.moveTo(t.getCenter(find.text('Favourite')));
@@ -885,7 +891,7 @@ void main() {
       // back on "Shipping".)*
       await t.pumpWidget(
         overlayHost(
-          const ElContextMenu(
+          const ContextMenu(
             width: 224,
             children: stashMenu,
             child: _Trigger(width: 320, height: 160),
@@ -898,14 +904,14 @@ void main() {
         await t.sendKeyEvent(LogicalKeyboardKey.arrowDown);
         await t.pump();
       }
-      final ElThemeData theme = ElTheme.of(
-        t.element(find.byType(ElMenuContent).first),
+      final ThemeTokens theme = ThemeScope.of(
+        t.element(find.byType(MenuContent).first),
       );
       expect(fillOf(t, 'Shipping'), theme.accent);
 
       await t.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       expect(find.text('Add to shipment'), findsOneWidget);
       expect(fillOf(t, 'Add to shipment'), theme.accent);
 
@@ -922,29 +928,29 @@ void main() {
 
   /* ── The menubar ───────────────────────────────────────────────────────── */
 
-  group('ElMenubar', () {
-    const List<ElMenubarMenu> admin = <ElMenubarMenu>[
-      ElMenubarMenu(
+  group('Menubar', () {
+    const List<MenubarMenu> admin = <MenubarMenu>[
+      MenubarMenu(
         label: 'Packs',
-        children: <ElMenuChild>[
-          ElMenuItem(label: 'New pack', shortcut: '⌘N'),
-          ElMenuItem(label: 'Import card set'),
-          ElMenuSeparator(),
-          ElMenuItem(label: 'Publish queue'),
+        children: <MenuChild>[
+          MenuItem(label: 'New pack', shortcut: '⌘N'),
+          MenuItem(label: 'Import card set'),
+          MenuSeparator(),
+          MenuItem(label: 'Publish queue'),
         ],
       ),
-      ElMenubarMenu(
+      MenubarMenu(
         label: 'Users',
-        children: <ElMenuChild>[
-          ElMenuItem(label: 'Search users'),
-          ElMenuItem(label: 'Verification queue'),
+        children: <MenuChild>[
+          MenuItem(label: 'Search users'),
+          MenuItem(label: 'Verification queue'),
         ],
       ),
-      ElMenubarMenu(
+      MenubarMenu(
         label: 'Wallet',
-        children: <ElMenuChild>[
-          ElMenuItem(label: 'Withdrawal approvals'),
-          ElMenuItem(label: 'Transaction audit'),
+        children: <MenuChild>[
+          MenuItem(label: 'Withdrawal approvals'),
+          MenuItem(label: 'Transaction audit'),
         ],
       ),
     ];
@@ -955,10 +961,10 @@ void main() {
       useFrame(t);
       // *(Measured: the root's box is y=1531.63 h=32 and the first trigger's
       // is y=1531.63 h=32 — the `p-1` is spent entirely on overflow.)*
-      await t.pumpWidget(overlayHost(const ElMenubar(menus: admin)));
+      await t.pumpWidget(overlayHost(const Menubar(menus: admin)));
       await t.pump();
 
-      final Rect bar = t.getRect(find.byType(ElMenubar));
+      final Rect bar = t.getRect(find.byType(Menubar));
       final Rect trigger = t.getRect(
         find
             .ancestor(
@@ -982,11 +988,11 @@ void main() {
       // *(Measured: dx = −4 (`alignOffset={-4}`), dy = 8.38
       // (`sideOffset={8}`), `min-w-36` → 144 wide, 136.688 tall.)*
       await t.pumpWidget(
-        overlayHost(const ElMenubar(menus: admin), align: Alignment.topLeft),
+        overlayHost(const Menubar(menus: admin), align: Alignment.topLeft),
       );
       await t.tap(find.text('Packs'));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
       final Rect trigger = t.getRect(
         find
@@ -996,7 +1002,7 @@ void main() {
             )
             .first,
       );
-      final Rect content = t.getRect(find.byType(ElMenuContent));
+      final Rect content = t.getRect(find.byType(MenuContent));
       expect(content.top - trigger.bottom, closeTo(8, 0.01));
       expect(content.left - trigger.left, closeTo(-4, 0.01));
       // The exact 144 is the `min-w-36` floor beating a 128.45 intrinsic, and
@@ -1012,10 +1018,10 @@ void main() {
       useFrame(t);
       // *(Measured: `pointerover` at t=167.3, both `data-state`s flipped by
       // t=168.5 — no intent delay.)*
-      await t.pumpWidget(overlayHost(const ElMenubar(menus: admin)));
+      await t.pumpWidget(overlayHost(const Menubar(menus: admin)));
       await t.tap(find.text('Packs'));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       expect(find.text('New pack'), findsOneWidget);
 
       await hover(t, find.text('Users'));
@@ -1031,10 +1037,10 @@ void main() {
       // Its class list stops at `data-open:zoom-in-95`; the `animate-out` trio
       // its three siblings carry is absent, so the popup is gone on the frame
       // the state flips rather than 320ms later.
-      await t.pumpWidget(overlayHost(const ElMenubar(menus: admin)));
+      await t.pumpWidget(overlayHost(const Menubar(menus: admin)));
       await t.tap(find.text('Packs'));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
       await t.sendKeyEvent(LogicalKeyboardKey.escape);
       await t.pump();
@@ -1049,19 +1055,19 @@ void main() {
     testWidgets('ArrowRight walks to the next menu', (WidgetTester t) async {
       useFrame(t);
       // *(Probed: from "Users" open, `ArrowRight` opened "Wallet".)*
-      await t.pumpWidget(overlayHost(const ElMenubar(menus: admin)));
+      await t.pumpWidget(overlayHost(const Menubar(menus: admin)));
       await t.tap(find.text('Packs'));
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
       await t.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       expect(find.text('Search users'), findsOneWidget);
 
       await t.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
       expect(find.text('New pack'), findsOneWidget);
     });
 
@@ -1069,9 +1075,9 @@ void main() {
       WidgetTester t,
     ) async {
       useFrame(t);
-      await t.pumpWidget(overlayHost(const ElMenubar(menus: admin)));
+      await t.pumpWidget(overlayHost(const Menubar(menus: admin)));
       await t.pump();
-      final ElThemeData theme = ElTheme.of(t.element(find.byType(ElMenubar)));
+      final ThemeTokens theme = ThemeScope.of(t.element(find.byType(Menubar)));
 
       Color? triggerFill(String label) {
         final Finder box = find
@@ -1086,9 +1092,9 @@ void main() {
     });
   });
 
-  /* ── The ElPopover extensions ──────────────────────────────────────────── */
+  /* ── The Popover extensions ──────────────────────────────────────────── */
 
-  group('ElPopover — what the menus added', () {
+  group('Popover — what the menus added', () {
     test('the corner origin is Radix\'s, the anchor origin is base-ui\'s', () {
       const Rect anchor = Rect.fromLTWH(325, 539.14, 111.40625, 40);
       const Size content = Size(240, 236.25);
@@ -1096,25 +1102,25 @@ void main() {
 
       // *(Measured: `--radix-dropdown-menu-content-transform-origin: 0% 0px`
       // — the content's own top-left, whatever the anchor's width.)*
-      final ElPopoverPlacement corner = elPopoverPlacement(
+      final PopoverPlacement corner = popoverPlacement(
         anchor: anchor,
         content: content,
         viewport: viewport,
-        side: ElPopoverSide.bottom,
-        align: ElPopoverAlign.start,
+        side: PopoverSide.bottom,
+        align: PopoverAlign.start,
         sideOffset: 4,
-        origin: ElPopoverOriginModel.corner,
+        origin: PopoverAnchorMode.corner,
       );
       expect(corner.origin, const Alignment(-1, -1));
 
       // base-ui's, unchanged: it points at the anchor's centre and pays for
       // the `sideOffset`. This is the default, so no shipped consumer moves.
-      final ElPopoverPlacement anchored = elPopoverPlacement(
+      final PopoverPlacement anchored = popoverPlacement(
         anchor: anchor,
         content: content,
         viewport: viewport,
-        side: ElPopoverSide.bottom,
-        align: ElPopoverAlign.start,
+        side: PopoverSide.bottom,
+        align: PopoverAlign.start,
         sideOffset: 4,
       );
       expect(anchored.origin.x, isNot(closeTo(-1, 0.01)));
@@ -1125,16 +1131,16 @@ void main() {
       // *(Measured: a `ContextMenuContent` at `side=right align=start`
       // computes `0px 0%`.)*
       const Rect point = Rect.fromLTWH(485, 498, 0, 0);
-      final ElPopoverPlacement right = elPopoverPlacement(
+      final PopoverPlacement right = popoverPlacement(
         anchor: point,
         content: const Size(224, 171.25),
         viewport: const Size(1440, 900),
-        side: ElPopoverSide.right,
-        align: ElPopoverAlign.start,
+        side: PopoverSide.right,
+        align: PopoverAlign.start,
         sideOffset: 2,
-        origin: ElPopoverOriginModel.corner,
+        origin: PopoverAnchorMode.corner,
       );
-      expect(right.side, ElPopoverSide.right);
+      expect(right.side, PopoverSide.right);
       expect(right.origin, const Alignment(-1, -1));
       expect(right.offset.dx, closeTo(487, 0.01));
       expect(right.offset.dy, closeTo(498, 0.01));
@@ -1147,7 +1153,7 @@ void main() {
       // the mechanism the "closes on sibling hover" test depends on.
       await t.pumpWidget(
         overlayHost(
-          const ElContextMenu(
+          const ContextMenu(
             width: 224,
             children: stashMenu,
             child: _Trigger(width: 320, height: 160),
@@ -1167,11 +1173,11 @@ void main() {
       );
       await gesture.up();
       await settleOverlay(t);
-      await t.pump(ElDurations.overlay);
+      await t.pump(MotionDurations.overlayEnter);
 
       final int barriersBefore = t
-          .widgetList<ElPopover>(find.byType(ElPopover))
-          .where((ElPopover p) => p.barrier != ElPopoverBarrier.none)
+          .widgetList<Popover>(find.byType(Popover))
+          .where((Popover p) => p.barrier != PopoverBarrier.none)
           .length;
       expect(
         barriersBefore,
@@ -1187,27 +1193,27 @@ void main() {
       // `popover.tsx` writes one `slide-in-from-*`; the menus write four. The
       // default is still the one, so the combobox and the date picker do not
       // move.
-      const ElPopover popover = ElPopover(
+      const Popover popover = Popover(
         open: false,
         anchor: SizedBox.shrink(),
         content: _noContent,
       );
-      expect(popover.slideSides, <ElPopoverSide>{ElPopoverSide.bottom});
-      expect(popover.origin, ElPopoverOriginModel.anchor);
+      expect(popover.slideSides, <PopoverSide>{PopoverSide.bottom});
+      expect(popover.origin, PopoverAnchorMode.anchor);
       expect(popover.animateOut, isTrue);
-      expect(popover.barrier, ElPopoverBarrier.modal);
-      expect(ElMenuMotion.slideSides.length, 4);
-      expect(ElMenuMotion.duration, ElDurations.overlay);
+      expect(popover.barrier, PopoverBarrier.modal);
+      expect(MenuMotion.slideSides.length, 4);
+      expect(MenuMotion.duration, MotionDurations.overlayEnter);
     });
   });
 }
 
-Widget _noContent(BuildContext context, ElPopoverAnchorMetrics metrics) =>
+Widget _noContent(BuildContext context, PopoverAnchorMetrics metrics) =>
     const SizedBox.shrink();
 
 /// A stand-in for the page's real trigger.
 ///
-/// It **paints**, because `ElMenuPointerDown` is `asChild`: it defers hit
+/// It **paints**, because `MenuPointerDown` is `asChild`: it defers hit
 /// testing to the control it wraps, the way Radix's `Trigger asChild` puts its
 /// handlers on a real `<button>` rather than on a wrapper of its own. A bare
 /// [SizedBox] is not hit-testable and would be a harness artefact, not a
@@ -1221,12 +1227,12 @@ class _GhostTrigger extends StatelessWidget {
   const _GhostTrigger();
 
   @override
-  Widget build(BuildContext context) => ElButton(
-    variant: ElButtonVariant.ghost,
+  Widget build(BuildContext context) => Button(
+    variant: ButtonVariant.ghost,
     suppressPressScale: true,
-    expanded: ElMenuTriggerScope.openOf(context),
+    expanded: MenuTriggerScope.openOf(context),
     onPressed: () {},
-    child: ElText('voidwing', ElType.small),
+    child: StyledText('voidwing', TextStyles.small),
   );
 }
 

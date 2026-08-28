@@ -7,16 +7,16 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/form.dart",
+      "source": "lib/src/components/ui/form.dart",
       "target": "@ui/form.dart",
-      "sha256": "53e03b41c81b4b90698e5bf30baa0d3cb7de92d2156e91c4ebc0ba78f6a25e13"
+      "sha256": "0ca8a89f2c9a90647a0319d0dd8957ba1603ae8f060ed4175a859274c57850cc"
     }
   ],
   "registryDependencies": [
-    "rule"
+    "validation-rule"
   ],
   "semanticDependencies": [
-    "rule"
+    "validation-rule"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -24,6 +24,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/form",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/form.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/form.dart",
   "deprecated": false
 }

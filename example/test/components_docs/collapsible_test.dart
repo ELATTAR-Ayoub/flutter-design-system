@@ -1,17 +1,17 @@
 /// Tests for `components_docs/collapsible/page.dart`'s [CollapsibleDocPage]
-/// — the public documentation page for `ElCollapsible` (and the [ElUnfold]
-/// animation it shares with `ElAccordion`).
+/// — the public documentation page for `Collapsible` (and the [Unfold]
+/// animation it shares with `Accordion`).
 ///
 /// Re-housed onto the kit alongside the page: the section-order test now
 /// reads `DocsSection.id`, and the API-table / state-matrix reads open the
 /// relevant `DocsDisclosure` first — closed by default, unlike the old
-/// page's always-visible `ElSection`.
+/// page's always-visible `Section`.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery` for
 /// layout. Motion is frozen through `MediaQuery(disableAnimations: true)`,
-/// mounted below `MaterialApp` so it reaches every descendant `ElUnfold`,
-/// rather than pumping `ElDurations.jelly` / `ElDurations.base` by hand. No
+/// mounted below `MaterialApp` so it reaches every descendant `Unfold`,
+/// rather than pumping `MotionDurations.open` / `MotionDurations.normal` by hand. No
 /// `pumpAndSettle` anywhere, per the rollout brief: `tester.pump()` (motion
 /// is already disabled, so a single frame settles any tween).
 library;
@@ -25,7 +25,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The house-shape section order this page must render, top to bottom.
@@ -56,21 +82,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pumpCollapsible(
+Future<ThemeController> _pumpCollapsible(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -99,7 +125,7 @@ void main() {
       expect(collapsibleDoc.sourcePath, 'lib/src/components/collapsible.dart');
       expect(
         collapsibleDoc.exports,
-        containsAll(<String>['ElCollapsible', 'ElUnfold']),
+        containsAll(<String>['Collapsible', 'Unfold']),
       );
       expect(collapsibleDoc.command, 'elattar add collapsible');
     });
@@ -129,7 +155,7 @@ void main() {
     testWidgets(
       'renders the article at 1440x900 and flips a live theme controller in place',
       (WidgetTester tester) async {
-        final ElThemeController theme = await _pumpCollapsible(
+        final ThemeController theme = await _pumpCollapsible(
           tester,
           size: _wide,
         );
@@ -143,12 +169,12 @@ void main() {
           find.byKey(const ValueKey<String>('docs-layout-sidebar')),
           findsOneWidget,
         );
-        expect(find.byType(ElCollapsible), findsWidgets);
+        expect(find.byType(Collapsible), findsWidgets);
         expect(tester.takeException(), isNull);
 
         // Same controller, flipped in place rather than rebuilt: dark then
         // light must both render the same tree without throwing.
-        theme.setMode(ElThemeMode.light);
+        theme.setMode(ColorMode.light);
         await tester.pump();
         expect(
           find.byKey(const ValueKey<String>('collapsible-doc-article')),
@@ -178,7 +204,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('the API tables document every ElCollapsible and ElUnfold '
+    testWidgets('the API tables document every Collapsible and Unfold '
         'constructor parameter', (WidgetTester tester) async {
       await _pumpCollapsible(tester);
 
@@ -186,14 +212,14 @@ void main() {
       await tester.ensureVisible(apiTrigger);
       await tester.tap(apiTrigger);
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
-      // `open` is shared by both ElCollapsible and ElUnfold.
+      // `open` is shared by both Collapsible and Unfold.
       expect(find.text('open'), findsNWidgets(2));
-      // ElCollapsible-only.
+      // Collapsible-only.
       expect(find.text('trigger'), findsOneWidget);
       expect(find.text('content'), findsOneWidget);
-      // ElUnfold-only.
+      // Unfold-only.
       expect(find.text('child'), findsOneWidget);
     });
 
@@ -212,7 +238,7 @@ void main() {
       (WidgetTester tester) async {
         await _pumpCollapsible(tester, size: const Size(900, 1400));
 
-        // Closed by default: ElUnfold renders nothing for its content.
+        // Closed by default: Unfold renders nothing for its content.
         expect(find.text('Volatility'), findsNothing);
         expect(find.text('Advanced filters'), findsOneWidget);
 

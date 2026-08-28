@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/dropdown_menu.dart",
+      "source": "lib/src/components/ui/dropdown_menu.dart",
       "target": "@ui/dropdown_menu.dart",
-      "sha256": "715b26ee5469a33357188750ce2bd1444d53d0e31ce19b3420081e70c2647dc8"
+      "sha256": "981c286ce69209c9770529a81c3787b7a9a02febf2de5861fbfb27bb5719dc51"
     }
   ],
   "registryDependencies": [
@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/dropdown-menu",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/dropdown_menu.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/dropdown_menu.dart",
   "deprecated": false
 }

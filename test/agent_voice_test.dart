@@ -1,5 +1,5 @@
-/// The voice family — `ElVoiceOrb`, `ElLiveWaveform`, `ElBarVisualizer`,
-/// `ElMicControl`.
+/// The voice family — `VoiceIndicator`, `LiveWaveform`, `BarVisualizer`,
+/// `MicControl`.
 ///
 /// The orb is a painter over a fragment programme, so it is held to the
 /// painter rule in full: **rendered pixels**, not recipe parameters. The
@@ -31,7 +31,19 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The size the reference's own orb specimens are drawn at.
@@ -42,20 +54,20 @@ const int _seed = 1234;
 
 Future<void> _pumpOrb(
   WidgetTester tester, {
-  ElOrbState state = ElOrbState.idle,
+  VoiceIndicatorState state = VoiceIndicatorState.idle,
   bool reduced = true,
   double size = _orbSize,
   ValueListenable<double>? level,
 }) async {
   await tester.pumpWidget(
-    ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.light),
+    ThemeScope(
+      controller: ThemeController(mode: ColorMode.light),
       child: MediaQuery(
         data: MediaQueryData(disableAnimations: reduced),
         child: Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: ElVoiceOrb(
+            child: VoiceIndicator(
               state: state,
               size: size,
               seed: _seed,
@@ -128,14 +140,14 @@ Future<String?> _shaderBlocked(WidgetTester tester) async {
 
 /// Swallow the orb's own load failure — and nothing else.
 ///
-/// [ElVoiceOrb] reports a programme it could not load through [FlutterError]
+/// [VoiceIndicator] reports a programme it could not load through [FlutterError]
 /// rather than swallowing it, which is right, and which means the failure lands
 /// in whichever test pumped first. Matching on the recorded error object keeps
 /// this from becoming a blanket catch: anything the orb did not raise rethrows.
 void _drainStageError(WidgetTester tester) {
   final Object? thrown = tester.takeException();
   if (thrown == null) return;
-  final Object? recorded = ElOrbProgram.lastError;
+  final Object? recorded = VoiceIndicatorProgram.lastError;
   if (recorded != null && thrown.toString() == recorded.toString()) return;
   throw thrown;
 }
@@ -215,7 +227,7 @@ void main() {
         1.6596637490740256,
         3.1458267627574354,
       ];
-      final List<double> actual = ElVoiceOrb.offsetsForSeed(_seed);
+      final List<double> actual = VoiceIndicator.offsetsForSeed(_seed);
       expect(actual, hasLength(7));
       for (int i = 0; i < 7; i++) {
         // Float32List storage is the only reason this is not exact: the
@@ -230,30 +242,33 @@ void main() {
 
     test('every draw lands inside one full turn', () {
       for (final int seed in <int>[0, 1, 0xFFFFFFFF, 987654321]) {
-        for (final double offset in ElVoiceOrb.offsetsForSeed(seed)) {
+        for (final double offset in VoiceIndicator.offsetsForSeed(seed)) {
           expect(offset, inInclusiveRange(0, 6.283185307179587));
         }
       }
     });
 
     test('a seed is a seed — the same one twice gives the same phases', () {
-      expect(ElVoiceOrb.offsetsForSeed(7), ElVoiceOrb.offsetsForSeed(7));
       expect(
-        ElVoiceOrb.offsetsForSeed(7),
-        isNot(equals(ElVoiceOrb.offsetsForSeed(8))),
+        VoiceIndicator.offsetsForSeed(7),
+        VoiceIndicator.offsetsForSeed(7),
+      );
+      expect(
+        VoiceIndicator.offsetsForSeed(7),
+        isNot(equals(VoiceIndicator.offsetsForSeed(8))),
       );
     });
   });
 
   /* ── The disc ──────────────────────────────────────────────────────────── */
 
-  group('ElVoiceOrb geometry', () {
+  group('VoiceIndicator geometry', () {
     test('the disc fraction is the measured one', () {
       // r3f's default camera: 75° fov at z = 5 gives a frustum
       // 2 · 5 · tan(37.5°) = 7.673270 tall, and the mesh is 7 across.
-      expect(ElVoiceOrb.discFraction, closeTo(7 / 7.673269879789604, 1e-9));
+      expect(VoiceIndicator.discFraction, closeTo(7 / 7.673269879789604, 1e-9));
       // And what the browser actually rendered: 102px of a 112px canvas.
-      expect((ElVoiceOrb.discFraction * 112).round(), 102);
+      expect((VoiceIndicator.discFraction * 112).round(), 102);
     });
 
     testWidgets('takes exactly the box it is given', (
@@ -263,7 +278,7 @@ void main() {
       _drainStageError(tester);
       // True whether or not the programme loaded: an orb that cannot draw is
       // still an orb-shaped hole, never a collapsed one.
-      expect(tester.getSize(find.byType(ElVoiceOrb)), const Size(112, 112));
+      expect(tester.getSize(find.byType(VoiceIndicator)), const Size(112, 112));
     });
 
     testWidgets('a null level leaves the orb at rest and still drawn', (
@@ -279,8 +294,8 @@ void main() {
 
   /* ── Rendered pixels ───────────────────────────────────────────────────── */
 
-  group('ElVoiceOrb rendered pixels', () {
-    setUp(ElOrbProgram.resetForTest);
+  group('VoiceIndicator rendered pixels', () {
+    setUp(VoiceIndicatorProgram.resetForTest);
 
     testWidgets('the shader asset is reachable and compiles', (
       WidgetTester tester,
@@ -289,9 +304,8 @@ void main() {
         markTestSkipped('no asset bundle — run without --no-test-assets');
         return;
       }
-      final ElOrbProgram? loaded = await tester.runAsync<ElOrbProgram?>(
-        () => ElOrbProgram.load(),
-      );
+      final VoiceIndicatorProgram? loaded = await tester
+          .runAsync<VoiceIndicatorProgram?>(() => VoiceIndicatorProgram.load());
       _drainStageError(tester);
       expect(
         loaded,
@@ -315,9 +329,8 @@ void main() {
       // Loaded before the pump so the widget picks the programme up in its
       // first build: an orb that is still waiting paints a bare box, and there
       // would be no boundary to rasterise.
-      final ElOrbProgram? ready = await tester.runAsync<ElOrbProgram?>(
-        () => ElOrbProgram.load(),
-      );
+      final VoiceIndicatorProgram? ready = await tester
+          .runAsync<VoiceIndicatorProgram?>(() => VoiceIndicatorProgram.load());
       _drainStageError(tester);
       expect(ready, isNotNull, reason: 'the bundle is present');
       await _pumpOrb(tester);
@@ -352,9 +365,8 @@ void main() {
       // Loaded before the pump so the widget picks the programme up in its
       // first build: an orb that is still waiting paints a bare box, and there
       // would be no boundary to rasterise.
-      final ElOrbProgram? ready = await tester.runAsync<ElOrbProgram?>(
-        () => ElOrbProgram.load(),
-      );
+      final VoiceIndicatorProgram? ready = await tester
+          .runAsync<VoiceIndicatorProgram?>(() => VoiceIndicatorProgram.load());
       _drainStageError(tester);
       expect(ready, isNotNull, reason: 'the bundle is present');
       await _pumpOrb(tester);
@@ -399,22 +411,21 @@ void main() {
       // Loaded before the pump so the widget picks the programme up in its
       // first build: an orb that is still waiting paints a bare box, and there
       // would be no boundary to rasterise.
-      final ElOrbProgram? ready = await tester.runAsync<ElOrbProgram?>(
-        () => ElOrbProgram.load(),
-      );
+      final VoiceIndicatorProgram? ready = await tester
+          .runAsync<VoiceIndicatorProgram?>(() => VoiceIndicatorProgram.load());
       _drainStageError(tester);
       expect(ready, isNotNull, reason: 'the bundle is present');
 
-      Future<_Raster> render(ElThemeMode mode) async {
+      Future<_Raster> render(ColorMode mode) async {
         await tester.pumpWidget(
-          ElTheme(
-            controller: ElThemeController(mode: mode),
+          ThemeScope(
+            controller: ThemeController(mode: mode),
             child: const MediaQuery(
               data: MediaQueryData(disableAnimations: true),
               child: Directionality(
                 textDirection: TextDirection.ltr,
                 child: Center(
-                  child: ElVoiceOrb(size: _orbSize, seed: _seed),
+                  child: VoiceIndicator(size: _orbSize, seed: _seed),
                 ),
               ),
             ),
@@ -424,8 +435,8 @@ void main() {
         return _raster(tester, find.byType(RepaintBoundary).last);
       }
 
-      final _Raster light = await render(ElThemeMode.light);
-      final _Raster dark = await render(ElThemeMode.dark);
+      final _Raster light = await render(ColorMode.light);
+      final _Raster dark = await render(ColorMode.dark);
       const int mid = _orbSize ~/ 2;
 
       // `luminance = mix(color.r, 1.0 - color.r, uInverted)` — the same field,
@@ -440,25 +451,25 @@ void main() {
 
   /* ── Waveform ──────────────────────────────────────────────────────────── */
 
-  group('ElLiveWaveform', () {
+  group('LiveWaveform', () {
     testWidgets('defaults are the component\'s own', (
       WidgetTester tester,
     ) async {
-      expect(ElLiveWaveform.defaultWidth, 120);
-      expect(ElLiveWaveform.defaultHeight, 28);
-      expect(ElLiveWaveform.strokeWidth, 1.5);
+      expect(LiveWaveform.defaultWidth, 120);
+      expect(LiveWaveform.defaultHeight, 28);
+      expect(LiveWaveform.strokeWidth, 1.5);
 
       await tester.pumpWidget(
-        _host(const ElLiveWaveform(width: 320, height: 48)),
+        _host(const LiveWaveform(width: 320, height: 48)),
       );
-      expect(tester.getSize(find.byType(ElLiveWaveform)), const Size(320, 48));
+      expect(tester.getSize(find.byType(LiveWaveform)), const Size(320, 48));
     });
 
     testWidgets(
       'no stream draws a flat line at the midpoint, and nothing else',
       (WidgetTester tester) async {
         await tester.pumpWidget(
-          _host(const ElLiveWaveform(width: 320, height: 48)),
+          _host(const LiveWaveform(width: 320, height: 48)),
         );
         final _Raster raster = await _raster(
           tester,
@@ -497,7 +508,7 @@ void main() {
       addTearDown(samples.dispose);
 
       await tester.pumpWidget(
-        _host(ElLiveWaveform(samples: samples, width: 320, height: 48)),
+        _host(LiveWaveform(samples: samples, width: 320, height: 48)),
       );
       final _Raster raster = await _raster(
         tester,
@@ -516,13 +527,13 @@ void main() {
 
   /* ── Bars ──────────────────────────────────────────────────────────────── */
 
-  group('ElBarVisualizer', () {
+  group('BarVisualizer', () {
     test('the reference constants', () {
-      expect(ElBarVisualizer.defaultBars, 12);
-      expect(ElBarVisualizer.defaultWidth, 96);
-      expect(ElBarVisualizer.defaultHeight, 24);
-      expect(ElBarVisualizer.gap, 2);
-      expect(ElBarVisualizer.floor, 0.06);
+      expect(BarVisualizer.defaultBars, 12);
+      expect(BarVisualizer.defaultWidth, 96);
+      expect(BarVisualizer.defaultHeight, 24);
+      expect(BarVisualizer.gap, 2);
+      expect(BarVisualizer.floor, 0.06);
       // `(w - gap · (bars - 1)) / bars` — the number every bar's radius is
       // derived from.
       const double barWidth = (96 - 2 * 11) / 12;
@@ -532,7 +543,7 @@ void main() {
     testWidgets('at rest, twelve bars sit at the floor', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_host(const ElBarVisualizer()));
+      await tester.pumpWidget(_host(const BarVisualizer()));
       final _Raster raster = await _raster(
         tester,
         find.byType(RepaintBoundary).last,
@@ -556,7 +567,7 @@ void main() {
     testWidgets('active oscillates without an analyser; idle does not', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_host(const ElBarVisualizer(active: true)));
+      await tester.pumpWidget(_host(const BarVisualizer(active: true)));
       await tester.pump(const Duration(milliseconds: 120));
       final _Raster moving = await _raster(
         tester,
@@ -573,7 +584,7 @@ void main() {
         reason: '`active` is the one path allowed to move without a signal',
       );
 
-      await tester.pumpWidget(_host(const ElBarVisualizer()));
+      await tester.pumpWidget(_host(const BarVisualizer()));
       final _Raster still = await _raster(
         tester,
         find.byType(RepaintBoundary).last,
@@ -594,7 +605,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _host(const ElBarVisualizer(active: true), reduced: true),
+        _host(const BarVisualizer(active: true), reduced: true),
       );
       final _Raster first = await _raster(
         tester,
@@ -611,33 +622,33 @@ void main() {
 
   /* ── Mic control ───────────────────────────────────────────────────────── */
 
-  group('ElMicControl', () {
+  group('MicControl', () {
     testWidgets('one pill, 34 x 34, with a single half', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _host(ElMicControl(listening: false, onToggle: () {})),
+        _host(MicControl(listening: false, onToggle: () {})),
       );
       // 1px border + a 32px button + 1px border, measured on the live
       // reference. The chevron half is `hasMenu`-gated and never renders there.
-      expect(tester.getSize(find.byType(ElMicControl)), const Size(34, 34));
-      expect(find.byType(ElButton), findsOneWidget);
-      expect(tester.getSize(find.byType(ElButton)), const Size(32, 32));
+      expect(tester.getSize(find.byType(MicControl)), const Size(34, 34));
+      expect(find.byType(Button), findsOneWidget);
+      expect(tester.getSize(find.byType(Button)), const Size(32, 32));
     });
 
     testWidgets('the accessible name is the verb, and it flips', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _host(ElMicControl(listening: false, onToggle: () {})),
+        _host(MicControl(listening: false, onToggle: () {})),
       );
-      expect(tester.widget<ElButton>(find.byType(ElButton)).label, 'Dictate');
+      expect(tester.widget<Button>(find.byType(Button)).label, 'Dictate');
 
       await tester.pumpWidget(
-        _host(ElMicControl(listening: true, onToggle: () {})),
+        _host(MicControl(listening: true, onToggle: () {})),
       );
       expect(
-        tester.widget<ElButton>(find.byType(ElButton)).label,
+        tester.widget<Button>(find.byType(Button)).label,
         'Stop dictation',
       );
     });
@@ -646,7 +657,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _host(ElMicControl(listening: false, onToggle: () {})),
+        _host(MicControl(listening: false, onToggle: () {})),
       );
       final _Raster rest = await _raster(
         tester,
@@ -654,7 +665,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        _host(ElMicControl(listening: true, onToggle: () {})),
+        _host(MicControl(listening: true, onToggle: () {})),
       );
       await tester.pump();
       final _Raster live = await _raster(
@@ -678,23 +689,23 @@ void main() {
     testWidgets('a null handler leaves the control inert', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_host(const ElMicControl(listening: false)));
-      expect(tester.widget<ElButton>(find.byType(ElButton)).onPressed, isNull);
+      await tester.pumpWidget(_host(const MicControl(listening: false)));
+      expect(tester.widget<Button>(find.byType(Button)).onPressed, isNull);
     });
 
     testWidgets('disabled beats a handler', (WidgetTester tester) async {
       await tester.pumpWidget(
-        _host(ElMicControl(listening: false, disabled: true, onToggle: () {})),
+        _host(MicControl(listening: false, disabled: true, onToggle: () {})),
       );
-      expect(tester.widget<ElButton>(find.byType(ElButton)).onPressed, isNull);
+      expect(tester.widget<Button>(find.byType(Button)).onPressed, isNull);
     });
   });
 }
 
 /* ── Harness ─────────────────────────────────────────────────────────────── */
 
-Widget _host(Widget child, {bool reduced = false}) => ElTheme(
-  controller: ElThemeController(mode: ElThemeMode.light),
+Widget _host(Widget child, {bool reduced = false}) => ThemeScope(
+  controller: ThemeController(mode: ColorMode.light),
   child: MediaQuery(
     data: MediaQueryData(disableAnimations: reduced),
     child: Directionality(

@@ -91,8 +91,8 @@ import 'package:flutter/material.dart';
 
 void main() {
   runApp(
-    ElTheme(
-      controller: ElThemeController(),
+    ThemeScope(
+      controller: ThemeController(),
       child: const MaterialApp(home: DemoPage()),
     ),
   );
@@ -103,14 +103,14 @@ class DemoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return ColoredBox(
       color: theme.background,
       child: Center(
-        child: ElButton(
+        child: Button(
           onPressed: () {},
-          child: const ElText('Continue', ElType.label),
+          child: const StyledText('Continue', TextStyles.label),
         ),
       ),
     );

@@ -7,26 +7,31 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/tabs.dart",
+      "source": "lib/src/components/ui/tabs.dart",
       "target": "@ui/tabs.dart",
-      "sha256": "4954aac6d03ff98ca27a511c31d47ddd787f6d8a326183fdef530000c5d1526f"
+      "sha256": "24d9b5c6127529235e80cdba5fc289666d856617264723a03e61fdf94e2ea203"
     }
   ],
   "registryDependencies": [
     "button",
-    "machine-surface",
-    "sliding-pill",
+    "surface",
+    "active-indicator",
     "source-foundation"
   ],
   "semanticDependencies": [
     "button",
-    "machine-surface",
-    "sliding-pill"
+    "surface",
+    "active-indicator"
   ],
   "pubDependencies": {},
   "assets": [],
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/tabs",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/tabs.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/tabs.dart",
+  "exports": [
+    "TabItem",
+    "Tabs",
+    "TabsVariant"
+  ]
 }

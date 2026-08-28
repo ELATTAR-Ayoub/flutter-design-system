@@ -271,9 +271,9 @@ void main() {
 
     test('contains every existing group and category without changing nav', () {
       final Set<String> expected = <String>{
-        for (final ElGroup group in elGroups) group.href,
-        for (final ElGroup group in elGroups)
-          for (final ElCategory category in group.categories)
+        for (final Group group in elGroups) group.href,
+        for (final Group group in elGroups)
+          for (final Category category in group.categories)
             categoryHref(group, category),
       };
       final Set<String> indexed = searchableRoutes

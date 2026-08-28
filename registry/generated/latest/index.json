@@ -9,6 +9,18 @@
       "documentationRoute": "/components/accordion"
     },
     {
+      "name": "action-feedback",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/action-feedback"
+    },
+    {
+      "name": "active-indicator",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/active-indicator"
+    },
+    {
       "name": "agent-attach-menu",
       "type": "component",
       "version": "0.0.1",
@@ -34,9 +46,9 @@
     },
     {
       "name": "agent-console",
-      "type": "component",
+      "type": "block",
       "version": "0.0.1",
-      "documentationRoute": "/components/agent-console"
+      "documentationRoute": "/blocks/agent-console"
     },
     {
       "name": "agent-core",
@@ -93,6 +105,12 @@
       "documentationRoute": "/components/alert-dialog"
     },
     {
+      "name": "ambient-pattern",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/ambient-pattern"
+    },
+    {
       "name": "aspect-ratio",
       "type": "component",
       "version": "0.0.1",
@@ -111,16 +129,16 @@
       "documentationRoute": "/components/avatar"
     },
     {
+      "name": "background-effect",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/background-effect"
+    },
+    {
       "name": "badge",
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/badge"
-    },
-    {
-      "name": "bloom-cosmic",
-      "type": "effect",
-      "version": "0.0.1",
-      "documentationRoute": "/docs/effects/bloom-cosmic"
     },
     {
       "name": "breadcrumb",
@@ -213,6 +231,12 @@
       "documentationRoute": "/components/command"
     },
     {
+      "name": "content-change",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/content-change"
+    },
+    {
       "name": "context-menu",
       "type": "component",
       "version": "0.0.1",
@@ -243,16 +267,16 @@
       "documentationRoute": "/components/empty"
     },
     {
+      "name": "feedback-surface",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/feedback-surface"
+    },
+    {
       "name": "field",
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/field"
-    },
-    {
-      "name": "foil-value",
-      "type": "effect",
-      "version": "0.0.1",
-      "documentationRoute": "/docs/effects/foil-value"
     },
     {
       "name": "form",
@@ -262,9 +286,15 @@
     },
     {
       "name": "glass",
-      "type": "effect",
+      "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/docs/effects/glass"
+      "documentationRoute": "/components/glass"
+    },
+    {
+      "name": "hover-builder",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/hover-builder"
     },
     {
       "name": "hover-card",
@@ -316,21 +346,9 @@
     },
     {
       "name": "keyframes",
-      "type": "motion",
+      "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/docs/motion/keyframes"
-    },
-    {
-      "name": "lift",
-      "type": "motion",
-      "version": "0.0.1",
-      "documentationRoute": "/docs/motion/lift"
-    },
-    {
-      "name": "machine-surface",
-      "type": "effect",
-      "version": "0.0.1",
-      "documentationRoute": "/docs/effects/machine-surface"
+      "documentationRoute": "/components/keyframes"
     },
     {
       "name": "marker",
@@ -340,9 +358,9 @@
     },
     {
       "name": "media-scrim",
-      "type": "effect",
+      "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/docs/effects/media-scrim"
+      "documentationRoute": "/components/media-scrim"
     },
     {
       "name": "menu",
@@ -375,22 +393,10 @@
       "documentationRoute": "/components/native-select"
     },
     {
-      "name": "nav-user",
-      "type": "component",
-      "version": "0.0.1",
-      "documentationRoute": "/components/nav-user"
-    },
-    {
       "name": "navigation-menu",
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/navigation-menu"
-    },
-    {
-      "name": "page-glow",
-      "type": "effect",
-      "version": "0.0.1",
-      "documentationRoute": "/docs/effects/page-glow"
     },
     {
       "name": "pagination",
@@ -405,10 +411,16 @@
       "documentationRoute": "/components/popover"
     },
     {
-      "name": "press-motion",
-      "type": "motion",
+      "name": "premium-surface",
+      "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/docs/motion/press"
+      "documentationRoute": "/components/premium-surface"
+    },
+    {
+      "name": "press",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/press"
     },
     {
       "name": "progress",
@@ -433,12 +445,6 @@
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/resizable"
-    },
-    {
-      "name": "rule",
-      "type": "component",
-      "version": "0.0.1",
-      "documentationRoute": "/docs/foundations/rules"
     },
     {
       "name": "safe-area",
@@ -471,12 +477,6 @@
       "documentationRoute": "/components/separator"
     },
     {
-      "name": "sheen-action",
-      "type": "effect",
-      "version": "0.0.1",
-      "documentationRoute": "/docs/effects/sheen-action"
-    },
-    {
       "name": "sheet",
       "type": "component",
       "version": "0.0.1",
@@ -501,12 +501,6 @@
       "documentationRoute": "/components/slider"
     },
     {
-      "name": "sliding-pill",
-      "type": "motion",
-      "version": "0.0.1",
-      "documentationRoute": "/docs/motion/sliding-pill"
-    },
-    {
       "name": "source-foundation",
       "type": "foundation",
       "version": "0.0.1",
@@ -519,22 +513,16 @@
       "documentationRoute": "/components/spinner"
     },
     {
-      "name": "starfield",
-      "type": "effect",
-      "version": "0.0.1",
-      "documentationRoute": "/docs/effects/starfield"
-    },
-    {
       "name": "stat",
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/stat"
     },
     {
-      "name": "swap-in",
-      "type": "motion",
+      "name": "surface",
+      "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/docs/motion/swap-in"
+      "documentationRoute": "/components/surface"
     },
     {
       "name": "switch",
@@ -585,16 +573,28 @@
       "documentationRoute": "/components/tooltip"
     },
     {
+      "name": "user-menu",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/components/user-menu"
+    },
+    {
+      "name": "validation-rule",
+      "type": "component",
+      "version": "0.0.1",
+      "documentationRoute": "/docs/foundations/rules"
+    },
+    {
       "name": "voice",
       "type": "component",
       "version": "0.0.1",
       "documentationRoute": "/components/voice"
     },
     {
-      "name": "voice-orb",
-      "type": "effect",
+      "name": "voice-indicator",
+      "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/docs/effects/voice-orb"
+      "documentationRoute": "/components/voice-indicator"
     }
   ]
 }

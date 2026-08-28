@@ -3,7 +3,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import 'docs_snippet.dart';
 
@@ -24,19 +36,19 @@ class DocsShowcaseFrame extends StatelessWidget {
   final double minHeight;
 
   /// The stage's inner padding, so a specimen never touches the border.
-  static double get padding => el(6);
+  static double get padding => space(6);
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
       constraints: BoxConstraints(minHeight: minHeight),
       width: double.infinity,
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: theme.background,
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
-        borderRadius: BorderRadius.circular(ElRadii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
       ),
       child: Align(alignment: alignment, child: child),
     );
@@ -87,16 +99,16 @@ class DocsShowcase extends StatefulWidget {
   /// measure, and a section that genuinely needs the height asks for it —
   /// [minHeight] — so one tall specimen costs one line instead of every
   /// short one costing 400px.
-  static double get tallMinHeight => el(96);
+  static double get tallMinHeight => space(96);
 
   /// Kept as its own name because [EffectSection] and the narrow branch both
   /// mean *this* measure specifically, not "whatever the default happens to
   /// be": if a later change raises [tallMinHeight] again, an effect's host
   /// and a phone's stage should not follow it up.
-  static double get shortMinHeight => el(96);
+  static double get shortMinHeight => space(96);
 
   static double minHeightFor(double viewportWidth) =>
-      viewportWidth < ElBreakpoints.sm ? shortMinHeight : tallMinHeight;
+      viewportWidth < Breakpoints.sm ? shortMinHeight : tallMinHeight;
 
   @override
   State<DocsShowcase> createState() => _DocsShowcaseState();
@@ -119,11 +131,11 @@ class _DocsShowcaseState extends State<DocsShowcase> {
       children: <Widget>[
         Align(
           alignment: Alignment.centerLeft,
-          child: ElToggleGroup(
+          child: ToggleGroup(
             label: widget.label ?? 'Specimen view',
-            items: const <ElToggleGroupItem>[
-              ElToggleGroupItem(label: 'Preview'),
-              ElToggleGroupItem(label: 'Code'),
+            items: const <ToggleGroupItem>[
+              ToggleGroupItem(label: 'Preview'),
+              ToggleGroupItem(label: 'Code'),
             ],
             selectedIndex: _selected,
             // Null means the tapped option was already selected. A view
@@ -132,7 +144,7 @@ class _DocsShowcaseState extends State<DocsShowcase> {
                 setState(() => _selected = index ?? _selected),
           ),
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         if (_selected == 0)
           DocsShowcaseFrame(
             alignment: widget.alignment,

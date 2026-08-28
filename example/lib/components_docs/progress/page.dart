@@ -1,6 +1,6 @@
 /// Public documentation page for the `progress` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels shaped to mirror
 /// https://ui.shadcn.com/docs/components/base/progress's own section list;
 /// it now declares a [ComponentDocSpec] (`example/lib/docs/
@@ -14,7 +14,7 @@
 /// matching every other re-housed page's shape.
 ///
 /// **Skipped, honestly.** `Composition` documents a `Progress.Root`/`Track`/
-/// `Indicator`/`Label`/`Value` compound-widget tree; [ElProgress] is one
+/// `Indicator`/`Label`/`Value` compound-widget tree; [Progress] is one
 /// `StatelessWidget` with a `value`/`tone`/`label` surface and exposes no
 /// such tree, so there is nothing to show. Its `With label and value`
 /// subsection and the sibling `Label` section both answer the same reader
@@ -29,14 +29,14 @@
 /// **Corrected, not carried over.** The old page's Installation section
 /// stated `registry/components/progress.json` does not exist and that
 /// "none of this is resolved automatically today" -- false: the manifest
-/// exists and `elattar add progress` resolves machine-surface and
+/// exists and `elattar add progress` resolves surface and
 /// source-foundation automatically, exactly as `progress/meta.dart`'s own
 /// [progressDoc.dependencies] already listed. The Installation section here
 /// says so honestly instead.
 ///
-/// **Motion.** `ElProgress`'s fill is a finite `ImplicitlyAnimatedWidget`
+/// **Motion.** `Progress`'s fill is a finite `ImplicitlyAnimatedWidget`
 /// transition (it tweens once per value change, then stops), gated through
-/// `elAnimationDuration` (`theme_scope.dart`) to `Duration.zero` under
+/// `effectiveMotionDuration` (`theme_scope.dart`) to `Duration.zero` under
 /// `MediaQuery.disableAnimations`: confirmed by reading
 /// `_AnimatedFractionalTranslation`'s duration parameter directly, and by
 /// this page's own reduced-motion test case, which never calls
@@ -44,14 +44,26 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import 'meta.dart';
 
-/// One static [ElProgress] specimen. Values and labels echo the reference's
+/// One static [Progress] specimen. Values and labels echo the reference's
 /// own examples where `progress.dart`'s class doc quotes them verbatim
 /// (`20.6`, `66.7`, and the drift-7 array's `{ tone: "default", label:
 /// "Steps today", value: 72 }`): see drift 6 and drift 7 in
@@ -60,22 +72,22 @@ import 'meta.dart';
 class _ProgressSpecimen {
   const _ProgressSpecimen(this.value, this.tone, this.label);
   final double value;
-  final ElProgressTone tone;
+  final ProgressTone tone;
   final String? label;
 }
 
 const List<_ProgressSpecimen> _progressSpecimens = <_ProgressSpecimen>[
   // No label: reproduces the reference's own drift 6 (page.tsx:339 is a
   // bare <Progress value={20.6} /> with no aria-label).
-  _ProgressSpecimen(20.6, ElProgressTone.normal, null),
-  _ProgressSpecimen(66.7, ElProgressTone.normal, 'Profile complete'),
-  _ProgressSpecimen(72, ElProgressTone.normal, 'Steps today'),
-  _ProgressSpecimen(45, ElProgressTone.value, 'Storage used'),
-  _ProgressSpecimen(88, ElProgressTone.success, 'Sync complete'),
-  _ProgressSpecimen(34, ElProgressTone.warning, 'Battery'),
+  _ProgressSpecimen(20.6, ProgressTone.normal, null),
+  _ProgressSpecimen(66.7, ProgressTone.normal, 'Profile complete'),
+  _ProgressSpecimen(72, ProgressTone.normal, 'Steps today'),
+  _ProgressSpecimen(45, ProgressTone.value, 'Storage used'),
+  _ProgressSpecimen(88, ProgressTone.success, 'Sync complete'),
+  _ProgressSpecimen(34, ProgressTone.warning, 'Battery'),
   // destructive is for a reading OUTSIDE its safe band, per the enum's own
   // doc comment: not merely a low number.
-  _ProgressSpecimen(92, ElProgressTone.destructive, 'CPU temperature'),
+  _ProgressSpecimen(92, ProgressTone.destructive, 'CPU temperature'),
 ];
 
 final ComponentDocSpec progressDocSpec = ComponentDocSpec(
@@ -86,7 +98,7 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
     ShowcaseSection(
       id: 'preview',
       title: 'Preview',
-      description: 'A determinate ElProgress reading.',
+      description: 'A determinate Progress reading.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
@@ -97,7 +109,7 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
       description:
           'progress has a real registry manifest, `elattar add progress` '
           'installs lib/src/components/progress.dart and resolves '
-          'machine-surface and source-foundation automatically. The '
+          'surface and source-foundation automatically. The '
           'Manual tab is for a project not using the CLI.',
       command: progressDoc.command,
       manualFiles: <DocsCodeFile>[
@@ -116,7 +128,7 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElProgress and ElProgressTone are '
+              'Add the export line so Progress and ProgressTone are '
               'reachable the same way the CLI path already makes them.',
           code: "export 'progress.dart';",
         ),
@@ -127,11 +139,11 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
       title: 'Usage',
       description:
           'The smallest correct call, then a realistic, tone-selected '
-          'one. Reach for ElProgress the moment you can compute a '
+          'one. Reach for Progress the moment you can compute a '
           'fraction: a file upload, a multi-step wizard, a sync job '
-          'reporting bytes done over bytes total. Reach for ElSpinner '
+          'reporting bytes done over bytes total. Reach for Spinner '
           'instead when you cannot compute a fraction and the wait is '
-          'short; reach for ElSkeleton when you already know the shape '
+          'short; reach for Skeleton when you already know the shape '
           'of what is arriving.',
       code: _usageCode,
     ),
@@ -139,7 +151,7 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
       id: 'label-value',
       title: 'Label and value',
       description:
-          'ElProgress has no separate ProgressLabel or ProgressValue '
+          'Progress has no separate ProgressLabel or ProgressValue '
           'widget: label is a single Semantics accessible-name '
           'parameter, and a visible percentage readout, like the '
           'reference\'s own "412 / 2,000" span, is presentation the '
@@ -151,15 +163,15 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
       specimen: _LabelValueSpecimen(),
       code: _labelValueCode,
       label: 'Label and value specimen view',
-      minHeight: el(110),
+      minHeight: space(110),
     ),
     ShowcaseSection(
       id: 'controlled',
       title: 'Controlled',
       description:
-          'A real, stateful ElProgress. Press "Advance" to see the fill '
-          'tween into its new position under ElProgress.transition '
-          '(250ms, ElCurves.out): this is the specimen the reduced '
+          'A real, stateful Progress. Press "Advance" to see the fill '
+          'tween into its new position under Progress.transition '
+          '(250ms, MotionCurves.enter): this is the specimen the reduced '
           'motion section below drives to a single-pump landing.',
       specimen: _ProgressLiveSpecimen(),
       code: _controlledCode,
@@ -169,7 +181,7 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
       id: 'rtl',
       title: 'RTL',
       description:
-          'ElProgress renders under an ambient RTL Directionality '
+          'Progress renders under an ambient RTL Directionality '
           'without error, and its Semantics label and value announce '
           'correctly in either direction. One real gap: the fill\'s '
           'FractionalTranslation offset carries a fixed sign rather '
@@ -186,7 +198,7 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
       id: 'download-list',
       title: 'Download list',
       description:
-          'Three ElProgress rows sharing a list, echoing the '
+          'Three Progress rows sharing a list, echoing the '
           'reference\'s own second PROGRESS_TONES panel: the composed '
           'shape a download manager or a sync status panel actually '
           'uses. Not part of the shadcn counterpart\'s own section '
@@ -220,7 +232,7 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          'None: ElProgress is never in the tab order. It is a '
+          'None: Progress is never in the tab order. It is a '
           'read-only status indicator, matching the native ARIA '
           'progressbar role\'s own behavior.',
       child: _KeyboardContent(),
@@ -257,7 +269,7 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/feedback_effects_test.dart',
             description:
-                'group(\'ElProgress\'): tones, the translation formula, '
+                'group(\'Progress\'): tones, the translation formula, '
                 'rasterised fill placement, and the drift-6 unlabelled '
                 'bar.',
           ),
@@ -293,9 +305,9 @@ class ProgressDocPage extends StatelessWidget {
       title: progressDoc.title,
       description: progressDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Progress'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Progress'),
     ],
     toc: progressDocSpec.toc,
     previous: const DocsPageLink(title: 'Kbd', route: '/components/kbd'),
@@ -316,28 +328,28 @@ class _PreviewSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const KeyedSubtree(
     key: ValueKey<String>('progress-example:preview'),
-    child: ElProgress(value: 66.7, label: 'Profile complete'),
+    child: Progress(value: 66.7, label: 'Profile complete'),
   );
 }
 
-const String _previewCode = '''ElProgress(
+const String _previewCode = '''Progress(
   value: 66.7,
   label: 'Profile complete',
 )''';
 
 const String _usageCode = '''
 // The smallest correct call: tone defaults to normal, label is optional.
-ElProgress(value: 62)
+Progress(value: 62)
 
 // A labelled, tone-selected bar for a real status.
-ElProgress(
+Progress(
   value: syncedBytes / totalBytes * 100,
-  tone: ElProgressTone.value,
+  tone: ProgressTone.value,
   label: 'Sync progress',
 )''';
 
-/// One [ElProgress] specimen with its value printed beside it: the docs
-/// page's own presentation, not part of ElProgress's API.
+/// One [Progress] specimen with its value printed beside it: the docs
+/// page's own presentation, not part of Progress's API.
 class _LabelledProgress extends StatelessWidget {
   const _LabelledProgress({required this.spec});
 
@@ -345,34 +357,34 @@ class _LabelledProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Row(
           children: <Widget>[
             Expanded(
-              child: ElText(
+              child: StyledText(
                 spec.label ?? '(no label: reproduces reference drift 6)',
-                ElType.small,
+                TextStyles.small,
                 color: spec.label == null
                     ? theme.mutedForeground
                     : theme.foreground,
               ),
             ),
-            ElText(
+            StyledText(
               '${spec.value.round()}%',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ],
         ),
-        SizedBox(height: el(2)),
+        SizedBox(height: space(2)),
         KeyedSubtree(
           key: ValueKey<String>(
             'progress-preview:${spec.tone.name}:${spec.value}',
           ),
-          child: ElProgress(
+          child: Progress(
             value: spec.value,
             tone: spec.tone,
             label: spec.label,
@@ -393,7 +405,7 @@ class _LabelValueSpecimen extends StatelessWidget {
     children: <Widget>[
       for (final _ProgressSpecimen spec in _progressSpecimens) ...<Widget>[
         _LabelledProgress(spec: spec),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
       ],
     ],
   );
@@ -401,16 +413,16 @@ class _LabelValueSpecimen extends StatelessWidget {
 
 const String _labelValueCode = '''
 // Reproduces the reference's own drift 6: the first bar has no label.
-ElProgress(value: 20.6)
+Progress(value: 20.6)
 
-ElProgress(value: 66.7, label: 'Profile complete')
-ElProgress(value: 72, label: 'Steps today')
-ElProgress(value: 45, tone: ElProgressTone.value, label: 'Storage used')
-ElProgress(value: 88, tone: ElProgressTone.success, label: 'Sync complete')
-ElProgress(value: 34, tone: ElProgressTone.warning, label: 'Battery')
-ElProgress(value: 92, tone: ElProgressTone.destructive, label: 'CPU temperature')''';
+Progress(value: 66.7, label: 'Profile complete')
+Progress(value: 72, label: 'Steps today')
+Progress(value: 45, tone: ProgressTone.value, label: 'Storage used')
+Progress(value: 88, tone: ProgressTone.success, label: 'Sync complete')
+Progress(value: 34, tone: ProgressTone.warning, label: 'Battery')
+Progress(value: 92, tone: ProgressTone.destructive, label: 'CPU temperature')''';
 
-/// The one specimen the docs test drives: a real, stateful [ElProgress] a
+/// The one specimen the docs test drives: a real, stateful [Progress] a
 /// reader (and the reduced-motion test) can advance step by step.
 class _ProgressLiveSpecimen extends StatefulWidget {
   const _ProgressLiveSpecimen();
@@ -430,38 +442,38 @@ class _ProgressLiveSpecimenState extends State<_ProgressLiveSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final bool atMax = _value >= 100;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElProgress(
+        Progress(
           key: const ValueKey<String>('progress-doc-live-specimen'),
           value: _value,
-          tone: ElProgressTone.value,
+          tone: ProgressTone.value,
           label: 'Uploading report.pdf',
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         Wrap(
           alignment: WrapAlignment.spaceBetween,
           crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: el(3),
-          runSpacing: el(2),
+          spacing: space(3),
+          runSpacing: space(2),
           children: <Widget>[
-            ElText(
+            StyledText(
               '${_value.round()}%, Uploading report.pdf',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
-            ElButton(
+            Button(
               key: const ValueKey<String>('progress-doc-simulate-button'),
-              variant: ElButtonVariant.secondary,
-              size: ElButtonSize.sm,
+              variant: ButtonVariant.secondary,
+              size: ButtonSize.sm,
               label: atMax ? 'Reset upload' : 'Advance upload 20%',
               onPressed: _advanceOrReset,
-              child: ElText(
+              child: StyledText(
                 atMax ? 'Reset' : 'Advance 20%',
-                ElComponentType.buttonLabel,
+                TextStyles.buttonLabel,
               ),
             ),
           ],
@@ -474,15 +486,15 @@ class _ProgressLiveSpecimenState extends State<_ProgressLiveSpecimen> {
 const String _controlledCode = '''
 double value = 20;
 
-ElProgress(
+Progress(
   value: value,
-  tone: ElProgressTone.value,
+  tone: ProgressTone.value,
   label: 'Uploading report.pdf',
 )
 
 // Press to advance: setState(() => value = (value + 20).clamp(0, 100));''';
 
-/// A single [ElProgress] rendered under an ambient RTL [Directionality]:
+/// A single [Progress] rendered under an ambient RTL [Directionality]:
 /// see `RTL`'s own description for what does, and does not, mirror.
 class _ProgressRtlDemo extends StatelessWidget {
   const _ProgressRtlDemo();
@@ -491,9 +503,9 @@ class _ProgressRtlDemo extends StatelessWidget {
   Widget build(BuildContext context) => const Directionality(
     key: ValueKey<String>('progress-example:rtl'),
     textDirection: TextDirection.rtl,
-    child: ElProgress(
+    child: Progress(
       value: 66.7,
-      tone: ElProgressTone.value,
+      tone: ProgressTone.value,
       label: 'اكتمال التحميل',
     ),
   );
@@ -501,53 +513,53 @@ class _ProgressRtlDemo extends StatelessWidget {
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElProgress(
+  child: Progress(
     value: 66.7,
-    tone: ElProgressTone.value,
+    tone: ProgressTone.value,
     label: 'اكتمال التحميل',
   ),
 )''';
 
-/// Three [ElProgress] rows sharing a list: the composed shape a download
+/// Three [Progress] rows sharing a list: the composed shape a download
 /// manager or a sync status panel actually uses, echoing the reference's own
 /// PROGRESS_TONES second panel.
 class _DownloadListComposition extends StatelessWidget {
   const _DownloadListComposition();
 
-  static const List<(String, double, ElProgressTone)> _rows =
-      <(String, double, ElProgressTone)>[
-        ('quarterly-report.pdf', 100, ElProgressTone.success),
-        ('design-assets.zip', 54, ElProgressTone.value),
-        ('backup.tar.gz', 8, ElProgressTone.normal),
+  static const List<(String, double, ProgressTone)> _rows =
+      <(String, double, ProgressTone)>[
+        ('quarterly-report.pdf', 100, ProgressTone.success),
+        ('design-assets.zip', 54, ProgressTone.value),
+        ('backup.tar.gz', 8, ProgressTone.normal),
       ];
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       key: const ValueKey<String>('progress-example:download-list'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         for (int i = 0; i < _rows.length; i++) ...<Widget>[
-          if (i > 0) SizedBox(height: el(4)),
+          if (i > 0) SizedBox(height: space(4)),
           Row(
             children: <Widget>[
               Expanded(
-                child: ElText(
+                child: StyledText(
                   _rows[i].$1,
-                  ElType.small,
+                  TextStyles.small,
                   color: theme.foreground,
                 ),
               ),
-              ElText(
+              StyledText(
                 _rows[i].$2 >= 100 ? 'Done' : '${_rows[i].$2.round()}%',
-                ElType.small,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
             ],
           ),
-          SizedBox(height: el(1.5)),
-          ElProgress(value: _rows[i].$2, tone: _rows[i].$3, label: _rows[i].$1),
+          SizedBox(height: space(1.5)),
+          Progress(value: _rows[i].$2, tone: _rows[i].$3, label: _rows[i].$1),
         ],
       ],
     );
@@ -556,9 +568,9 @@ class _DownloadListComposition extends StatelessWidget {
 
 const String _downloadListCode = '''Column(
   children: [
-    ElProgress(value: 100, tone: ElProgressTone.success, label: 'quarterly-report.pdf'),
-    ElProgress(value: 54, tone: ElProgressTone.value, label: 'design-assets.zip'),
-    ElProgress(value: 8, tone: ElProgressTone.normal, label: 'backup.tar.gz'),
+    Progress(value: 100, tone: ProgressTone.success, label: 'quarterly-report.pdf'),
+    Progress(value: 54, tone: ProgressTone.value, label: 'design-assets.zip'),
+    Progress(value: 8, tone: ProgressTone.normal, label: 'backup.tar.gz'),
   ],
 )''';
 
@@ -572,7 +584,7 @@ class _ApiReferenceContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsApiTable(
-        title: 'ElProgress properties',
+        title: 'Progress properties',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'value',
@@ -584,9 +596,9 @@ class _ApiReferenceContent extends StatelessWidget {
           ),
           DocsApiFact(
             name: 'tone',
-            type: 'ElProgressTone',
+            type: 'ProgressTone',
             description:
-                'Defaults to ElProgressTone.normal. Selects the fill '
+                'Defaults to ProgressTone.normal. Selects the fill '
                 'ink and shadow: see the tone table below.',
           ),
           DocsApiFact(
@@ -599,36 +611,36 @@ class _ApiReferenceContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsApiTable(
-        title: 'ElProgress static members',
+        title: 'Progress static members',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElProgress.height',
+            name: 'Progress.height',
             type: 'static double',
             description:
                 'The channel height, 10px (h-2.5). A fixed constant: '
                 'progress has a tone axis, not a size axis.',
           ),
           DocsApiFact(
-            name: 'ElProgress.transition',
+            name: 'Progress.transition',
             type: 'static Duration',
             description:
-                'ElDurations.transitionDefault (250ms): the fill\'s '
+                'MotionDurations.normal (250ms): the fill\'s '
                 'own transform transition, gated through '
-                'elAnimationDuration.',
+                'effectiveMotionDuration.',
           ),
         ],
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsApiTable(
-        title: 'ElProgressTone',
+        title: 'ProgressTone',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'normal',
             type: 'filled: the default',
             description:
-                'Fills with theme.actionInk under ElShadows.btnPrimary. '
+                'Fills with theme.actionText under Shadows.controlPrimary. '
                 'Spelled "normal" rather than "default" because '
                 'default is a Dart keyword; .label still reports '
                 '"default".',
@@ -637,25 +649,25 @@ class _ApiReferenceContent extends StatelessWidget {
             name: 'value',
             type: 'filled',
             description:
-                'Fills with theme.valueInk under ElShadows.btnValue, '
+                'Fills with theme.premiumText under Shadows.controlPremium, '
                 'the one tone that leaves the action ramp, because '
                 'progression toward a reward is a value signal.',
           ),
           DocsApiFact(
             name: 'success',
             type: 'filled',
-            description: 'Fills with theme.successInk under ElShadows.btn.',
+            description: 'Fills with theme.successText under Shadows.control.',
           ),
           DocsApiFact(
             name: 'warning',
             type: 'filled',
-            description: 'Fills with theme.warningInk under ElShadows.btn.',
+            description: 'Fills with theme.warningText under Shadows.control.',
           ),
           DocsApiFact(
             name: 'destructive',
             type: 'filled',
             description:
-                'Fills with theme.destructiveInk under ElShadows.btn. '
+                'Fills with theme.destructiveText under Shadows.control. '
                 'For a reading OUTSIDE its safe band: a temperature or '
                 'error rate too high: never merely for a number that '
                 'fell; a figure moving the wrong way is news, not a '
@@ -672,7 +684,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Value change',
     treatment:
         'The indicator translates from its old position to its new '
-        'one over ElProgress.transition (250ms, ElCurves.out): a '
+        'one over Progress.transition (250ms, MotionCurves.enter): a '
         'transform, not a width change.',
     userSignal:
         'The fill visibly slides to its new position rather than '
@@ -682,7 +694,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Error / Success',
     treatment:
         'Not a live transition on one bar: choose '
-        'ElProgressTone.destructive or .success at construction time '
+        'ProgressTone.destructive or .success at construction time '
         'instead. See the tone table in API Reference.',
     userSignal: 'A different progress instance, not a state change.',
   ),
@@ -690,7 +702,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         'MediaQuery.disableAnimations collapses the transition to '
-        'Duration.zero via elAnimationDuration: the fill lands on its '
+        'Duration.zero via effectiveMotionDuration: the fill lands on its '
         'target translation without a tween.',
     userSignal:
         'The progress bar jumps straight to its value: confirmed by '
@@ -715,7 +727,7 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Semantic role: a Semantics node wraps the whole widget with '
             "value: '\${value.round()}%': every progress bar announces "
             'its percentage regardless of whether label is set. This '
@@ -743,9 +755,9 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No key handling of its own: progress.dart wires no Focus, '
-            'FocusNode, or onKeyEvent anywhere. ElProgress is never in '
+            'FocusNode, or onKeyEvent anywhere. Progress is never in '
             'the tab order: it is a read-only status indicator, '
             'matching the native ARIA progressbar role\'s own '
             'behavior.',
@@ -761,11 +773,11 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint reads from BuildContext, and no platform '
             'branch: the same widget tree renders at 390px and 1440px '
             'and on every target platform.',
-        'ElProgress takes its width from its parent\'s constraints '
+        'Progress takes its width from its parent\'s constraints '
             '(there is no width parameter); only its 10px height is '
             'fixed. A caller that wants a narrower bar wraps it in a '
             'SizedBox or a ConstrainedBox: the component itself never '
@@ -810,9 +822,9 @@ class _DependenciesContent extends StatelessWidget {
             value:
                 'foundation/motion.dart, foundation/shadows.dart, '
                 'foundation/spacing.dart, foundation/theme.dart, '
-                'effects/machine_surface.dart, theme_scope.dart',
+                'effects/surface.dart, theme_scope.dart',
             description:
-                'ElMachineSurface paints the channel and the fill; the '
+                'Surface paints the channel and the fill; the '
                 'rest are the shared motion, shadow, spacing, theme '
                 'and theme-mode primitives every component reads.',
           ),
@@ -828,7 +840,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Assets, fonts, shaders',
             value: 'none',
             description:
-                'The fill and channel are ElMachineSurface layers: box '
+                'The fill and channel are Surface layers: box '
                 'shadows and solid fills, not a fragment shader.',
           ),
           const DocsInstallFact(
@@ -838,15 +850,12 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Spinner', route: '/components/spinner'),
           DocsLink(label: 'Skeleton', route: '/components/skeleton'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',
@@ -862,27 +871,31 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Every colour comes from the live theme: theme.muted/.input '
-            'for the channel, and ElProgressTone.inkOf(theme): one of '
-            'actionInk/valueInk/successInk/warningInk/destructiveInk, '
-            'for the fill. Flipping ElThemeController re-resolves both '
+            'for the channel, and ProgressTone.inkOf(theme): one of '
+            'actionText/premiumText/successText/warningText/destructiveText, '
+            'for the fill. Flipping ThemeController re-resolves both '
             'on every rebuild; nothing is cached.',
-        'ElProgress declares no colour-override parameter of its own, '
-            'every fill is tone-derived, the same rule ElBadge follows '
+        'Progress declares no colour-override parameter of its own, '
+            'every fill is tone-derived, the same rule Badge follows '
             'for its variants.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

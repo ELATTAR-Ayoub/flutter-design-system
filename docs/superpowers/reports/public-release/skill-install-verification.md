@@ -105,13 +105,13 @@ table column headers containing "consumer" (the mode-translation table).
 All six paths the exit gate names explicitly are still claimed as
 this-repository sources of truth and still exist:
 `lib/elattar_design_system.dart`, `lib/src/foundation/`,
-`lib/src/components/`, `lib/src/theme_scope.dart`,
+`lib/src/components/`, `lib/src/design_system/foundation/theme_scope.dart`,
 `test/token_guard_test.dart`, `tool/verify/README.md`. Every other
-this-repository path claim in the file (`lib/src/effects/`,
-`lib/src/motion/`, `example/lib/`, `test/`, `example/test/`, `registry/`,
+this-repository path claim in the file (`lib/src/components/ui/`,
+`lib/src/components/ui/`, `example/lib/`, `test/`, `example/test/`, `registry/`,
 `packages/elattar_cli/`) also resolves.
 
-Mutation-tested by hand: rewriting `lib/src/theme_scope.dart` to a
+Mutation-tested by hand: rewriting `lib/src/design_system/foundation/theme_scope.dart` to a
 nonexistent filename in the file caused both the named-path test and the
 general scan to fail, each naming the exact stale path and the source line.
 Consumer-only paths (`lib/components/ui/`, `lib/design_system/foundation/`,

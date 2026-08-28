@@ -12,20 +12,17 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// The roles whose spec carries `uppercase: true`.
 const List<String> _uppercaseRoles = <String>[
-  'ElType.label',
-  'ElType.micro',
-  'ElType.tag',
-  'ElType.badge',
-  'ElType.serial',
-  'ElType.inputSerial',
-  'ElType.buttonLabelCaps',
+  'TextStyles.eyebrow',
+  'TextStyles.eyebrowSmall',
+  'TextStyles.tag',
+  'TextStyles.badge',
+  'TextStyles.identifier',
+  'TextStyles.inputSerial',
+  'TextStyles.buttonLabelCaps',
 ];
 
 /// Directories the rule covers.
-const List<String> _roots = <String>[
-  'lib/docs',
-  'lib/components_docs',
-];
+const List<String> _roots = <String>['lib/docs', 'lib/components_docs'];
 
 void main() {
   test('no uppercase role, and no manual upper-casing', () {
@@ -34,8 +31,9 @@ void main() {
     for (final String root in _roots) {
       final Directory directory = Directory(root);
       if (!directory.existsSync()) continue;
-      for (final FileSystemEntity entity
-          in directory.listSync(recursive: true)) {
+      for (final FileSystemEntity entity in directory.listSync(
+        recursive: true,
+      )) {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
         final List<String> lines = entity.readAsLinesSync();
         for (int i = 0; i < lines.length; i++) {
@@ -43,7 +41,9 @@ void main() {
           // Comments explain the rule; they do not break it.
           if (line.trimLeft().startsWith('//')) continue;
           for (final String role in _uppercaseRoles) {
-            if (line.contains(role)) {
+            if (RegExp(
+              '${RegExp.escape(role)}(?![A-Za-z0-9_])',
+            ).hasMatch(line)) {
               offences.add('${entity.path}:${i + 1}  $role');
             }
           }
@@ -59,7 +59,7 @@ void main() {
       isEmpty,
       reason:
           'documentation pages must not render uppercase text. Use '
-          'ElType.caption, ElType.small or ElType.section instead:\n'
+          'TextStyles.caption, TextStyles.small or TextStyles.section instead:\n'
           '${offences.join('\n')}',
     );
   });

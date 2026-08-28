@@ -1,15 +1,15 @@
 /// The 27 public type roles, named.
 ///
-/// `ElTypeSpec` carries no name. It records what a `.type-*` class declares —
+/// `TextStyleToken` carries no name. It records what a `.type-*` class declares —
 /// family, size, leading, weight, tracking, casing, tabular figures, the
 /// colour the class sets on itself — and nothing about what the class is
 /// *called* or what it is *for*. Two roles with identical values would be
 /// indistinguishable to any code that tried to recover a name by matching on
-/// them, and `ElType.badge` and `ElType.label` are one tracking value apart.
+/// them, and `TextStyles.badge` and `TextStyles.eyebrow` are one tracking value apart.
 ///
 /// So the names live here, written down once, each bound to its spec by
 /// identity. `example/test/typeset_docs_test.dart` asserts this list covers
-/// `ElType.all` exactly once — no role missing, none listed twice, none
+/// `TextStyles.all` exactly once — no role missing, none listed twice, none
 /// invented — which is what makes a page built from this list a complete
 /// inventory rather than a selection somebody curated.
 ///
@@ -78,11 +78,11 @@ class TypesetRole {
     this.sizeRule,
   });
 
-  /// The `ElType` member, exactly as written at a call site: `ElType.$name`.
+  /// The `TextStyles` member, exactly as written at a call site: `TextStyles.$name`.
   final String name;
 
-  /// The spec itself. Compared by identity against `ElType.all`.
-  final ElTypeSpec spec;
+  /// The spec itself. Compared by identity against `TextStyles.all`.
+  final TextStyleToken spec;
 
   final TypesetGroup group;
 
@@ -104,12 +104,12 @@ class TypesetRole {
   final String? sizeRule;
 }
 
-/// Every role in `ElType.all`, in reading order.
+/// Every role in `TextStyles.all`, in reading order.
 final List<TypesetRole> typesetRoles = <TypesetRole>[
   // ── Words ────────────────────────────────────────────────────────────────
   TypesetRole(
     name: 'display',
-    spec: ElType.display,
+    spec: TextStyles.display,
     group: TypesetGroup.words,
     usage:
         'The largest thing on a page, and there should be one. Fluid: it '
@@ -117,21 +117,21 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
         'need a breakpoint to stay proportionate. Reach for h1 when the page '
         'has a title rather than a statement.',
     sample: 'Build the interface you mean.',
-    sizeRule: 'Fluid — ElFluid.display(context), clamped 44–64px',
+    sizeRule: 'Fluid — Fluid.display(context), clamped 44–64px',
   ),
   TypesetRole(
     name: 'h1',
-    spec: ElType.h1,
+    spec: TextStyles.h1,
     group: TypesetGroup.words,
     usage:
         'A page title. Also fluid, on a tighter clamp than display, so the '
         'two never collide at any width.',
     sample: 'Typeset',
-    sizeRule: 'Fluid — ElFluid.h1(context), clamped 32–40px',
+    sizeRule: 'Fluid — Fluid.h1(context), clamped 32–40px',
   ),
   TypesetRole(
     name: 'h2',
-    spec: ElType.h2,
+    spec: TextStyles.h2,
     group: TypesetGroup.words,
     usage:
         'A section heading. The only role whose weight sits between two named '
@@ -142,7 +142,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'h3',
-    spec: ElType.h3,
+    spec: TextStyles.h3,
     group: TypesetGroup.words,
     usage: 'A subsection heading inside a section.',
     sample: 'Choosing a role',
@@ -150,7 +150,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'h4',
-    spec: ElType.h4,
+    spec: TextStyles.h4,
     group: TypesetGroup.words,
     usage:
         'The smallest heading. Same size as lead and a different job: h4 '
@@ -160,7 +160,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'lead',
-    spec: ElType.lead,
+    spec: TextStyles.lead,
     group: TypesetGroup.words,
     usage:
         'The standfirst under a title: one paragraph, generously leaded, '
@@ -171,7 +171,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'body',
-    spec: ElType.body,
+    spec: TextStyles.body,
     group: TypesetGroup.words,
     usage:
         'Running prose. The default for anything a reader reads rather than '
@@ -183,7 +183,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'small',
-    spec: ElType.small,
+    spec: TextStyles.small,
     group: TypesetGroup.words,
     usage:
         'Secondary prose: a caveat, a footnote, a hint under a field. Muted '
@@ -194,7 +194,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'nav',
-    spec: ElType.nav,
+    spec: TextStyles.nav,
     group: TypesetGroup.words,
     usage:
         'A navigation destination. Tighter leading than body because a nav '
@@ -204,7 +204,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'navSm',
-    spec: ElType.navSm,
+    spec: TextStyles.navSm,
     group: TypesetGroup.words,
     usage:
         'The dense step of nav, for a secondary or nested list. Sentence '
@@ -215,8 +215,8 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
 
   // ── Labels and furniture ─────────────────────────────────────────────────
   TypesetRole(
-    name: 'label',
-    spec: ElType.label,
+    name: 'eyebrow',
+    spec: TextStyles.eyebrow,
     group: TypesetGroup.labels,
     usage:
         'The eyebrow above a section: uppercase, widely tracked, muted. The '
@@ -227,7 +227,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'section',
-    spec: ElType.section,
+    spec: TextStyles.section,
     group: TypesetGroup.labels,
     usage:
         'The label\'s quiet twin: a group heading in sentence case, for a '
@@ -237,7 +237,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'chip',
-    spec: ElType.chip,
+    spec: TextStyles.chip,
     group: TypesetGroup.labels,
     usage:
         'Text inside a small pill or filter chip. Sentence case, unlike tag '
@@ -247,7 +247,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'caption',
-    spec: ElType.caption,
+    spec: TextStyles.caption,
     group: TypesetGroup.labels,
     usage:
         'A caption under a figure or a specimen. The smallest sentence-case '
@@ -256,8 +256,8 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
     sizeRule: null,
   ),
   TypesetRole(
-    name: 'micro',
-    spec: ElType.micro,
+    name: 'eyebrowSmall',
+    spec: TextStyles.eyebrowSmall,
     group: TypesetGroup.labels,
     usage:
         'The most widely tracked role in the scale, and muted: metadata that '
@@ -267,7 +267,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'tag',
-    spec: ElType.tag,
+    spec: TextStyles.tag,
     group: TypesetGroup.labels,
     usage: 'The smallest step in the scale. A category marker, not a sentence.',
     sample: 'New',
@@ -275,7 +275,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'badge',
-    spec: ElType.badge,
+    spec: TextStyles.badge,
     group: TypesetGroup.labels,
     usage:
         'Text inside a badge. Same size as label, tracked slightly tighter, '
@@ -285,7 +285,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   ),
   TypesetRole(
     name: 'wordmark',
-    spec: ElType.wordmark,
+    spec: TextStyles.wordmark,
     group: TypesetGroup.labels,
     usage:
         'A product or brand name set in the word face: body size, bold, '
@@ -297,7 +297,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   // ── Code and serials ─────────────────────────────────────────────────────
   TypesetRole(
     name: 'code',
-    spec: ElType.code,
+    spec: TextStyles.code,
     group: TypesetGroup.code,
     usage:
         'Inline code and command text. Declares no weight, so it inherits '
@@ -307,8 +307,8 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
     sizeRule: null,
   ),
   TypesetRole(
-    name: 'serial',
-    spec: ElType.serial,
+    name: 'identifier',
+    spec: TextStyles.identifier,
     group: TypesetGroup.code,
     usage:
         'An identifier a person reads back: an order number, a hash, a key. '
@@ -320,24 +320,24 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
 
   // ── Numerics ─────────────────────────────────────────────────────────────
   TypesetRole(
-    name: 'numXs',
-    spec: ElType.numXs,
+    name: 'numberXs',
+    spec: TextStyles.numberXs,
     group: TypesetGroup.numerics,
     usage: 'A figure inside a dense control — a badge count, a table cell.',
     sample: '1,510',
     sizeRule: null,
   ),
   TypesetRole(
-    name: 'numSm',
-    spec: ElType.numSm,
+    name: 'numberSm',
+    spec: TextStyles.numberSm,
     group: TypesetGroup.numerics,
     usage: 'A figure beside a label in a list or a compact row.',
     sample: '99',
     sizeRule: null,
   ),
   TypesetRole(
-    name: 'numBase',
-    spec: ElType.numBase,
+    name: 'numberBase',
+    spec: TextStyles.numberBase,
     group: TypesetGroup.numerics,
     usage:
         'The default figure: body-sized, so a number set inline with prose '
@@ -346,24 +346,24 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
     sizeRule: null,
   ),
   TypesetRole(
-    name: 'numMd',
-    spec: ElType.numMd,
+    name: 'numberMd',
+    spec: TextStyles.numberMd,
     group: TypesetGroup.numerics,
     usage: 'A secondary metric on a dashboard — supporting, not headline.',
     sample: '47 KB',
     sizeRule: null,
   ),
   TypesetRole(
-    name: 'numLg',
-    spec: ElType.numLg,
+    name: 'numberLg',
+    spec: TextStyles.numberLg,
     group: TypesetGroup.numerics,
     usage: 'A stat tile\'s value: the number the tile exists to show.',
     sample: '1,510',
     sizeRule: null,
   ),
   TypesetRole(
-    name: 'numXl',
-    spec: ElType.numXl,
+    name: 'numberXl',
+    spec: TextStyles.numberXl,
     group: TypesetGroup.numerics,
     usage:
         'The headline figure on a page. The only numeric step that overrides '
@@ -376,7 +376,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
   // ── Accent ───────────────────────────────────────────────────────────────
   TypesetRole(
     name: 'accent',
-    spec: ElType.accent,
+    spec: TextStyles.accent,
     group: TypesetGroup.accent,
     usage:
         'One or two italic words inside a heading, for emphasis the word '
@@ -385,7 +385,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
         'it inherits its leading for the same reason. Use it once on a page '
         'or not at all.',
     sample: 'mean',
-    sizeRule: 'Relative — ElType.accentSize(inherited), 1.055x its context',
+    sizeRule: 'Relative — TextStyles.accentSize(inherited), 1.055x its context',
   ),
 ];
 

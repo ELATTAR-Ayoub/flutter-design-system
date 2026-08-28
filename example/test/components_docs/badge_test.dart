@@ -2,14 +2,40 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/badge/meta.dart';
 import 'package:example/components_docs/badge/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The house-shape section order (`components_docs/button/page.dart`'s own
 /// reference shape): Preview, Installation, Usage, then one section per
 /// variant/state, then the eight fixed disclosures in their required order.
 /// `Link` and `Custom Colors` are shadcn sections this component genuinely
-/// cannot do (ElBadge has no href/asChild and no colour-override parameter)
+/// cannot do (Badge has no href/asChild and no colour-override parameter)
 /// and are asserted absent.
 const List<String> _expectedSectionHeadings = <String>[
   'Preview',
@@ -41,49 +67,47 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// Reads the resolved ink colour off the labelled specimen for [variant].
 ///
 /// `page.dart` wraps each preview specimen in a `KeyedSubtree` keyed
 /// `badge-preview:<variant.name>` specifically so a test can locate one
-/// variant's rendered [ElText] without reaching into `ElBadge`'s private
+/// variant's rendered [StyledText] without reaching into `Badge`'s private
 /// `_ink`/`_fill` resolution.
-Color _inkOf(WidgetTester tester, ElBadgeVariant variant) {
+Color _inkOf(WidgetTester tester, BadgeVariant variant) {
   final Finder key = find.byKey(
     ValueKey<String>('badge-preview:${variant.name}'),
   );
-  final ElText text = tester.widget<ElText>(
-    find.descendant(of: key, matching: find.byType(ElText)).first,
+  final StyledText text = tester.widget<StyledText>(
+    find.descendant(of: key, matching: find.byType(StyledText)).first,
   );
   return text.color!;
 }
 
 /// Pairs whose ink is expected to coincide: asserted in the source itself
 /// (`badge.dart`'s `_ink`): outline/ghost both fall back to
-/// `mutedForeground`, and link/action both resolve to `actionInk`.
-const List<(ElBadgeVariant, ElBadgeVariant)> _sharedInkPairs =
-    <(ElBadgeVariant, ElBadgeVariant)>[
-      (ElBadgeVariant.outline, ElBadgeVariant.ghost),
-      (ElBadgeVariant.link, ElBadgeVariant.action),
+/// `mutedForeground`, and link/action both resolve to `actionText`.
+const List<(BadgeVariant, BadgeVariant)> _sharedInkPairs =
+    <(BadgeVariant, BadgeVariant)>[
+      (BadgeVariant.outline, BadgeVariant.ghost),
+      (BadgeVariant.link, BadgeVariant.action),
     ];
 
-bool _expectedShared(ElBadgeVariant a, ElBadgeVariant b) => _sharedInkPairs.any(
-  ((ElBadgeVariant, ElBadgeVariant) pair) =>
+bool _expectedShared(BadgeVariant a, BadgeVariant b) => _sharedInkPairs.any(
+  ((BadgeVariant, BadgeVariant) pair) =>
       (pair.$1 == a && pair.$2 == b) || (pair.$1 == b && pair.$2 == a),
 );
 
 /// Every variant not in [_sharedInkPairs] must remain visually distinguishable
 /// from every other variant within one theme.
-void _assertVariantsDistinguishable(Map<ElBadgeVariant, Color> inks) {
-  for (final ElBadgeVariant a in ElBadgeVariant.values) {
-    for (final ElBadgeVariant b in ElBadgeVariant.values) {
+void _assertVariantsDistinguishable(Map<BadgeVariant, Color> inks) {
+  for (final BadgeVariant a in BadgeVariant.values) {
+    for (final BadgeVariant b in BadgeVariant.values) {
       if (a == b) continue;
       if (_expectedShared(a, b)) {
         expect(
@@ -114,7 +138,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: BadgeDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -134,9 +158,9 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.base);
+        await tester.pump(MotionDurations.normal);
 
-        // The API table lists every ElBadge constructor parameter found in
+        // The API table lists every Badge constructor parameter found in
         // lib/src/components/badge.dart.
         for (final String param in <String>[
           'label',
@@ -149,18 +173,18 @@ void main() {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
 
-        // A live specimen of every ElBadgeVariant mounts somewhere on the
+        // A live specimen of every BadgeVariant mounts somewhere on the
         // page: not just the ones with distinct ink.
-        final Set<ElBadgeVariant> mounted = tester
-            .widgetList<ElBadge>(find.byType(ElBadge))
-            .map((ElBadge badge) => badge.variant)
+        final Set<BadgeVariant> mounted = tester
+            .widgetList<Badge>(find.byType(Badge))
+            .map((Badge badge) => badge.variant)
             .toSet();
-        expect(mounted, containsAll(ElBadgeVariant.values));
+        expect(mounted, containsAll(BadgeVariant.values));
 
         expect(badgeDoc.name, 'badge');
         expect(
           badgeDoc.exports,
-          containsAll(<String>['ElBadge', 'ElBadgeVariant']),
+          containsAll(<String>['Badge', 'BadgeVariant']),
         );
         expect(destination, isNull);
       },
@@ -175,7 +199,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const BadgeDocPage(),
           ),
         );
@@ -202,43 +226,43 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const BadgeDocPage()),
         );
 
-        final Map<ElBadgeVariant, Color> darkInks = <ElBadgeVariant, Color>{
-          for (final ElBadgeVariant v in ElBadgeVariant.values)
+        final Map<BadgeVariant, Color> darkInks = <BadgeVariant, Color>{
+          for (final BadgeVariant v in BadgeVariant.values)
             v: _inkOf(tester, v),
         };
         _assertVariantsDistinguishable(darkInks);
 
         // Flip the SAME controller in place: not a fresh widget tree, the
         // same object every real theme toggle mutates.
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final Map<ElBadgeVariant, Color> lightInks = <ElBadgeVariant, Color>{
-          for (final ElBadgeVariant v in ElBadgeVariant.values)
+        final Map<BadgeVariant, Color> lightInks = <BadgeVariant, Color>{
+          for (final BadgeVariant v in BadgeVariant.values)
             v: _inkOf(tester, v),
         };
         _assertVariantsDistinguishable(lightInks);
 
-        // The semantic inks are theme-resolved tokens (ElPalette.*Deep in
-        // light, ElPalette.* in dark): they must actually move when the
+        // The semantic inks are theme-resolved tokens (Palette.*Deep in
+        // light, Palette.* in dark): they must actually move when the
         // theme flips, not just stay internally distinguishable.
-        for (final ElBadgeVariant v in <ElBadgeVariant>[
-          ElBadgeVariant.destructive,
-          ElBadgeVariant.outline,
-          ElBadgeVariant.ghost,
-          ElBadgeVariant.link,
-          ElBadgeVariant.action,
-          ElBadgeVariant.premium,
-          ElBadgeVariant.success,
-          ElBadgeVariant.warning,
-          ElBadgeVariant.info,
+        for (final BadgeVariant v in <BadgeVariant>[
+          BadgeVariant.destructive,
+          BadgeVariant.outline,
+          BadgeVariant.ghost,
+          BadgeVariant.link,
+          BadgeVariant.action,
+          BadgeVariant.premium,
+          BadgeVariant.success,
+          BadgeVariant.warning,
+          BadgeVariant.info,
         ]) {
           expect(
             lightInks[v],
@@ -259,7 +283,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const BadgeDocPage(),
           ),
         );
@@ -274,9 +298,9 @@ void main() {
         // house shape.
         final List<String> headings = <String>[
           ...tester
-              .widgetList<ElText>(find.byType(ElText))
-              .where((ElText text) => text.spec == ElType.h3)
-              .map((ElText text) => text.text),
+              .widgetList<StyledText>(find.byType(StyledText))
+              .where((StyledText text) => text.spec == TextStyles.h3)
+              .map((StyledText text) => text.text),
           ...tester
               .widgetList<DocsDisclosure>(find.byType(DocsDisclosure))
               .map((DocsDisclosure disclosure) => disclosure.title),

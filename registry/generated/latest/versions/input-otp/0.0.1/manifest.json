@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/input_otp.dart",
+      "source": "lib/src/components/ui/input_otp.dart",
       "target": "@ui/input_otp.dart",
-      "sha256": "6a38632d9d747d3da37540c81dbdbe0ac235fd9e33dbc630feef3d56789d4608"
+      "sha256": "42d43608f40703cc702422fe08fa1cf38e4b528c191b4c5a9d5c8f04aa2a70dd"
     }
   ],
   "registryDependencies": [
@@ -18,7 +18,7 @@
     "icon",
     "input",
     "keyframes",
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "semanticDependencies": [
@@ -27,7 +27,7 @@
     "icon",
     "input",
     "keyframes",
-    "machine-surface"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -35,6 +35,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/input-otp",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/input_otp.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/input_otp.dart",
   "deprecated": false
 }

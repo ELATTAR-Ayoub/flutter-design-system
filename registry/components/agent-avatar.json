@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/agent_avatar.dart",
+      "source": "lib/src/components/ui/agent_avatar.dart",
       "target": "@ui/agent_avatar.dart",
-      "sha256": "c823941d165e84db19073e53eb6b66bdd18db6344b76daf50362d5fb646c4531"
+      "sha256": "94e13258a17542457b86203aa2e9a9d9b5e1430a1a2b37a8451e02ad29c2f802"
     }
   ],
   "registryDependencies": [
@@ -26,5 +26,17 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent-avatar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/agent_avatar.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_avatar.dart",
+  "exports": [
+    "AgentAvatar",
+    "AgentAvatarSize",
+    "AgentCube",
+    "AgentCubeFaces",
+    "AgentCubeKeyframe",
+    "AgentCubeKeyframes",
+    "AgentCubeMotion",
+    "AgentCubeScene",
+    "AgentCubeSpec",
+    "CubeScene"
+  ]
 }

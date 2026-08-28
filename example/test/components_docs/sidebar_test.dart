@@ -6,14 +6,14 @@
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery` for size.
 /// The one thing the harness *does* override on [MediaQuery] is
 /// `disableAnimations`, because the whole point of this page is a control
-/// that **animates** its width over 250ms: `elAnimationDuration` reads that
+/// that **animates** its width over 250ms: `effectiveMotionDuration` reads that
 /// flag and returns [Duration.zero], so the collapse lands whole on the next
 /// frame and no test here has to pump a made-up duration to catch it.
 ///
-/// Theme coverage flips a live [ElThemeController] in place rather than
+/// Theme coverage flips a live [ThemeController] in place rather than
 /// pumping two independent trees.
 ///
-/// The page mounts three real [ElSidebarProvider]s (icon, parts, offcanvas),
+/// The page mounts three real [SidebarProvider]s (icon, parts, offcanvas),
 /// one per `ShowcaseSection` (Preview, Composition, Offcanvas) — a
 /// `ShowcaseSection`'s specimen renders in its Preview pane immediately, no
 /// disclosure to open first. Each provider installs its own
@@ -34,7 +34,33 @@ import 'package:example/components_docs/sidebar/page.dart';
 import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -86,21 +112,21 @@ const List<String> _sidebarSectionOrder = <String>[
   'Source',
 ];
 
-Future<ElThemeController> _pumpSidebarDoc(
+Future<ThemeController> _pumpSidebarDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -127,7 +153,7 @@ Finder _within(Key specimen, Type type) =>
     find.descendant(of: find.byKey(specimen), matching: find.byType(type));
 
 double _panelWidth(WidgetTester tester, Key specimen) =>
-    tester.renderObject<RenderBox>(_within(specimen, ElSidebar)).size.width;
+    tester.renderObject<RenderBox>(_within(specimen, Sidebar)).size.width;
 
 /// Scrolls [finder] into the docs scroller and taps it.
 Future<void> _reveal(WidgetTester tester, Finder finder) async {
@@ -155,7 +181,7 @@ Future<void> _open(WidgetTester tester, String title) async {
   await _reveal(tester, trigger);
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 void main() {
@@ -168,47 +194,47 @@ void main() {
       expect(sidebarDoc.sourcePath, 'lib/src/components/sidebar.dart');
 
       // The whole family, not just the panel: provider, panel, rail, trigger,
-      // inset, regions, groups, menu, submenu, and the nav_user block that
+      // inset, regions, groups, menu, submenu, and the user_menu block that
       // ships in the same family.
       expect(
         sidebarDoc.exports,
         containsAll(<String>[
-          'ElSidebarProvider',
-          'ElSidebarScope',
-          'ElSidebarChrome',
-          'ElSidebar',
-          'ElSidebarSide',
-          'ElSidebarVariant',
-          'ElSidebarCollapsible',
-          'ElSidebarRail',
-          'ElSidebarTrigger',
-          'ElSidebarInset',
-          'ElSidebarHeader',
-          'ElSidebarFooter',
-          'ElSidebarContent',
-          'ElSidebarSeparator',
-          'ElSidebarGroup',
-          'ElSidebarGroupContent',
-          'ElSidebarGroupLabel',
-          'ElSidebarGroupAction',
-          'ElSidebarCollapsibleGroup',
-          'ElSidebarMenu',
-          'ElSidebarMenuItem',
-          'ElSidebarMenuButton',
-          'ElSidebarMenuButtonSize',
-          'ElSidebarMenuRow',
-          'ElSidebarMenuLabel',
-          'ElSidebarMenuAction',
-          'ElSidebarMenuBadge',
-          'ElSidebarMenuSkeleton',
-          'ElSidebarMenuSub',
-          'ElSidebarMenuSubItem',
-          'ElSidebarMenuSubButton',
-          'ElSidebarMenuSubButtonSize',
-          'ElSidebarInput',
-          'ElNavUser',
-          'ElNavUserAccount',
-          'ElNavUserItem',
+          'SidebarProvider',
+          'SidebarScope',
+          'SidebarChrome',
+          'Sidebar',
+          'SidebarSide',
+          'SidebarVariant',
+          'SidebarCollapsible',
+          'SidebarRail',
+          'SidebarTrigger',
+          'SidebarInset',
+          'SidebarHeader',
+          'SidebarFooter',
+          'SidebarContent',
+          'SidebarSeparator',
+          'SidebarGroup',
+          'SidebarGroupContent',
+          'SidebarGroupLabel',
+          'SidebarGroupAction',
+          'SidebarCollapsibleGroup',
+          'SidebarMenu',
+          'SidebarMenuItem',
+          'SidebarMenuButton',
+          'SidebarMenuButtonSize',
+          'SidebarMenuRow',
+          'SidebarMenuLabel',
+          'SidebarMenuAction',
+          'SidebarMenuBadge',
+          'SidebarMenuSkeleton',
+          'SidebarMenuSub',
+          'SidebarMenuSubItem',
+          'SidebarMenuSubButton',
+          'SidebarMenuSubButtonSize',
+          'SidebarInput',
+          'UserMenu',
+          'UserMenuAccount',
+          'UserMenuItem',
         ]),
       );
 
@@ -242,27 +268,26 @@ void main() {
       );
     });
 
-    testWidgets(
-      'sections render in the house order, section for section',
-      (WidgetTester tester) async {
-        await _pumpSidebarDoc(tester);
+    testWidgets('sections render in the house order, section for section', (
+      WidgetTester tester,
+    ) async {
+      await _pumpSidebarDoc(tester);
 
-        // Reading each mounted `DocsSection`'s own `title` field sidesteps
-        // the duplicate-string hazard `find.text` carries here (a section
-        // heading and its own TOC link render the same string).
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      // Reading each mounted `DocsSection`'s own `title` field sidesteps
+      // the duplicate-string hazard `find.text` carries here (a section
+      // heading and its own TOC link render the same string).
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, _sidebarSectionOrder);
+      expect(titles, _sidebarSectionOrder);
 
-        // Twenty-four collapsed disclosures: sixteen reference-table
-        // sections (Structure through SidebarRail, minus Sidebar's split-off
-        // Offcanvas showcase) plus the eight trailing ones.
-        expect(find.byType(DocsDisclosure), findsNWidgets(24));
-      },
-    );
+      // Twenty-four collapsed disclosures: sixteen reference-table
+      // sections (Structure through SidebarRail, minus Sidebar's split-off
+      // Offcanvas showcase) plus the eight trailing ones.
+      expect(find.byType(DocsDisclosure), findsNWidgets(24));
+    });
 
     testWidgets('the API tables cover the whole family', (
       WidgetTester tester,
@@ -272,13 +297,13 @@ void main() {
 
       // Every table title in the API section.
       for (final String klass in <String>[
-        'ElSidebarProvider',
-        'ElSidebar',
-        'ElSidebarMenuButton',
-        'ElSidebarMenuItem',
-        'ElSidebarCollapsibleGroup',
-        'ElSidebarScope',
-        'ElNavUser',
+        'SidebarProvider',
+        'Sidebar',
+        'SidebarMenuButton',
+        'SidebarMenuItem',
+        'SidebarCollapsibleGroup',
+        'SidebarScope',
+        'UserMenu',
       ]) {
         expect(
           find.textContaining(klass),
@@ -361,7 +386,7 @@ void main() {
       await _open(tester, 'Accessibility');
 
       // The finding: a row's own accessible name comes from
-      // ElButton(label: label ?? tooltip), not from the tooltip overlay,
+      // Button(label: label ?? tooltip), not from the tooltip overlay,
       // and a row given neither loses its name entirely once collapsed.
       expect(find.textContaining('accessible name'), findsWidgets);
       expect(find.textContaining('label ?? tooltip'), findsWidgets);
@@ -411,19 +436,19 @@ void main() {
     ) async {
       await _pumpSidebarDoc(tester);
 
-      expect(_panelWidth(tester, _shellKey), ElWidths.sidebar);
+      expect(_panelWidth(tester, _shellKey), LayoutWidths.sidebar);
 
-      final Finder trigger = _within(_shellKey, ElSidebarTrigger);
+      final Finder trigger = _within(_shellKey, SidebarTrigger);
       await _reveal(tester, trigger);
       await tester.tap(trigger);
       await tester.pump();
       await tester.pump();
-      expect(_panelWidth(tester, _shellKey), ElWidths.sidebarIcon);
+      expect(_panelWidth(tester, _shellKey), LayoutWidths.sidebarCollapsed);
 
       await tester.tap(trigger);
       await tester.pump();
       await tester.pump();
-      expect(_panelWidth(tester, _shellKey), ElWidths.sidebar);
+      expect(_panelWidth(tester, _shellKey), LayoutWidths.sidebar);
       expect(tester.takeException(), isNull);
     });
 
@@ -433,12 +458,12 @@ void main() {
       await _pumpSidebarDoc(tester);
 
       final int rowsExpanded = tester
-          .widgetList(_within(_shellKey, ElSidebarMenuButton))
+          .widgetList(_within(_shellKey, SidebarMenuButton))
           .length;
       expect(rowsExpanded, greaterThan(0));
-      expect(_within(_shellKey, ElSidebarMenuSubButton), findsWidgets);
+      expect(_within(_shellKey, SidebarMenuSubButton), findsWidgets);
 
-      final Finder trigger = _within(_shellKey, ElSidebarTrigger);
+      final Finder trigger = _within(_shellKey, SidebarTrigger);
       await _reveal(tester, trigger);
       await tester.tap(trigger);
       await tester.pump();
@@ -446,18 +471,18 @@ void main() {
 
       // The rows survive at 32px; the nested list does not survive at all.
       expect(
-        tester.widgetList(_within(_shellKey, ElSidebarMenuButton)).length,
+        tester.widgetList(_within(_shellKey, SidebarMenuButton)).length,
         rowsExpanded,
       );
-      expect(_within(_shellKey, ElSidebarMenuSubButton), findsNothing);
+      expect(_within(_shellKey, SidebarMenuSubButton), findsNothing);
       expect(
         tester
             .renderObject<RenderBox>(
-              _within(_shellKey, ElSidebarMenuButton).first,
+              _within(_shellKey, SidebarMenuButton).first,
             )
             .size
             .height,
-        ElSidebarMenuButton.iconSize,
+        SidebarMenuButton.iconSize,
       );
     });
 
@@ -466,9 +491,9 @@ void main() {
     ) async {
       await _pumpSidebarDoc(tester);
 
-      expect(_panelWidth(tester, _offcanvasKey), ElWidths.sidebar);
+      expect(_panelWidth(tester, _offcanvasKey), LayoutWidths.sidebar);
 
-      final Finder trigger = _within(_offcanvasKey, ElSidebarTrigger);
+      final Finder trigger = _within(_offcanvasKey, SidebarTrigger);
       await _reveal(tester, trigger);
       await tester.tap(trigger);
       await tester.pump();
@@ -477,9 +502,12 @@ void main() {
       expect(_panelWidth(tester, _offcanvasKey), 0);
       // The container keeps its width and leaves to the left.
       final Rect content = tester.getRect(
-        _within(_offcanvasKey, ElSidebarContent),
+        _within(_offcanvasKey, SidebarContent),
       );
-      expect(content.width, closeTo(ElWidths.sidebar - ElWidths.hairline, 0.5));
+      expect(
+        content.width,
+        closeTo(LayoutWidths.sidebar - BorderWidths.hairline, 0.5),
+      );
     });
 
     testWidgets('the parts stage is collapsible=none and never collapses', (
@@ -488,9 +516,9 @@ void main() {
       await _pumpSidebarDoc(tester);
 
       final double before = _panelWidth(tester, _partsKey);
-      expect(before, greaterThan(ElWidths.sidebar));
+      expect(before, greaterThan(LayoutWidths.sidebar));
 
-      final Finder trigger = _within(_shellKey, ElSidebarTrigger);
+      final Finder trigger = _within(_shellKey, SidebarTrigger);
       await _reveal(tester, trigger);
       await tester.tap(trigger);
       await tester.pump();
@@ -503,15 +531,15 @@ void main() {
       WidgetTester tester,
     ) async {
       await _pumpSidebarDoc(tester);
-      expect(_panelWidth(tester, _shellKey), ElWidths.sidebar);
+      expect(_panelWidth(tester, _shellKey), LayoutWidths.sidebar);
 
       await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-      await tester.sendKeyEvent(ElSidebarProvider.shortcut);
+      await tester.sendKeyEvent(SidebarProvider.shortcut);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
       await tester.pump();
       await tester.pump();
 
-      expect(_panelWidth(tester, _shellKey), ElWidths.sidebarIcon);
+      expect(_panelWidth(tester, _shellKey), LayoutWidths.sidebarCollapsed);
     });
   });
 
@@ -529,7 +557,7 @@ void main() {
         find.byKey(const ValueKey<String>('docs-layout-toc')),
         findsOneWidget,
       );
-      expect(_within(_shellKey, ElSidebarContent), findsOneWidget);
+      expect(_within(_shellKey, SidebarContent), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -548,23 +576,23 @@ void main() {
       );
       expect(find.byKey(_articleKey), findsOneWidget);
 
-      // Under ElBreakpoints.md the desktop gap/container pair is not built
+      // Under Breakpoints.md the desktop gap/container pair is not built
       // at all: the panel is a sheet that is closed until openMobile says
       // otherwise.
-      expect(ElSidebarProvider.isMobileWidth(_narrow.width), isTrue);
-      expect(_within(_shellKey, ElSidebarContent), findsNothing);
+      expect(SidebarProvider.isMobileWidth(_narrow.width), isTrue);
+      expect(_within(_shellKey, SidebarContent), findsNothing);
 
-      final Finder trigger = _within(_shellKey, ElSidebarTrigger);
+      final Finder trigger = _within(_shellKey, SidebarTrigger);
       await _reveal(tester, trigger);
       await tester.tap(trigger);
       await tester.pump();
       await tester.pump();
 
-      final Finder sheet = _within(_shellKey, ElSheetContent);
+      final Finder sheet = _within(_shellKey, SheetContent);
       expect(sheet, findsOneWidget);
       expect(
-        tester.widget<ElSheetContent>(sheet).width,
-        ElWidths.sidebarMobile,
+        tester.widget<SheetContent>(sheet).width,
+        LayoutWidths.sidebarMobile,
       );
       expect(tester.takeException(), isNull);
     });
@@ -572,31 +600,31 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpSidebarDoc(tester, mode: ElThemeMode.light);
-      expect(find.byType(ElSidebar), findsWidgets);
+      await _pumpSidebarDoc(tester, mode: ColorMode.light);
+      expect(find.byType(Sidebar), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpSidebarDoc(tester, mode: ElThemeMode.dark);
-      expect(find.byType(ElSidebar), findsWidgets);
+      await _pumpSidebarDoc(tester, mode: ColorMode.dark);
+      expect(find.byType(Sidebar), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpSidebarDoc(
+      final ThemeController theme = await _pumpSidebarDoc(
         tester,
-        mode: ElThemeMode.dark,
+        mode: ColorMode.dark,
       );
       expect(find.byKey(_shellKey), findsOneWidget);
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
       expect(find.byKey(_shellKey), findsOneWidget);
-      expect(_panelWidth(tester, _shellKey), ElWidths.sidebar);
+      expect(_panelWidth(tester, _shellKey), LayoutWidths.sidebar);
       expect(tester.takeException(), isNull);
     });
   });

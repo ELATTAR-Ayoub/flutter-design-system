@@ -1,8 +1,8 @@
 /// Public documentation page for the `glass` effect.
 ///
-/// **Not a component.** `lib/src/effects/glass.dart` exports four
-/// `StatelessWidget`s — `ElGlassPanel`, `ElGlassPanelClear`,
-/// `ElGlassPanelDeep`, `ElGlassControl` — none with a variant, a size, or an
+/// **Not a component.** `lib/src/components/ui/glass.dart` exports four
+/// `StatelessWidget`s — `GlassVariant.panel`, `GlassVariant.navigation`,
+/// `GlassVariant.prominent`, `GlassVariant.control` — none with a variant, a size, or an
 /// enum of their own. One material (a translucent fill, a backdrop blur, a
 /// hairline rim), split by scale: card-weight panels blur what is behind
 /// them, the pill-scale control does not.
@@ -14,8 +14,8 @@
 /// stages a real host beside the same host with the effect removed or one
 /// variable changed.
 ///
-/// **Honesty on real use.** `grep -rln "ElGlassPanel\|ElGlassControl\|
-/// ElGlassPanelDeep\|ElGlassPanelClear" lib/src/` at the time this page was
+/// **Honesty on real use.** `grep -rln "GlassVariant.panel\|GlassVariant.control\|
+/// GlassVariant.prominent\|GlassVariant.navigation" lib/src/` at the time this page was
 /// written returns only `glass.dart` itself: no component in the corpus
 /// composes any of these four yet. `example/lib/pages/shadows.dart`'s own
 /// `#glass` section is the one place in the app that mounts them, and it is
@@ -24,7 +24,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -41,7 +53,7 @@ final ComponentDocSpec glassDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'An opaque theme.card rectangle beside an ElGlassPanel over the '
+          'An opaque theme.card rectangle beside an GlassVariant.panel over the '
           'same colourful backdrop. The panel\'s fill is theme.card at '
           '74% (color-mix toward transparent), so the gradient behind it '
           'stays visible through the blur — the whole reason to reach for '
@@ -55,8 +67,8 @@ final ComponentDocSpec glassDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'glass has a real registry manifest, `elattar add glass` '
-          'installs lib/src/effects/glass.dart and resolves both '
-          'registryDependencies — machine-surface, source-foundation — '
+          'installs lib/src/components/ui/glass.dart and resolves both '
+          'registryDependencies — surface, source-foundation — '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
       command: glassDoc.command,
@@ -65,8 +77,8 @@ final ComponentDocSpec glassDocSpec = ComponentDocSpec(
           path: 'lib/effects/glass.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/effects/glass.dart's generated "
-              '@effects/glass.dart payload into effects.',
+              "Copy lib/src/components/ui/glass.dart's generated "
+              '@ui/glass.dart payload into effects.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated glass source here when using manual '
@@ -94,7 +106,7 @@ final ComponentDocSpec glassDocSpec = ComponentDocSpec(
       id: 'control',
       title: 'Control',
       description:
-          'ElGlassControl is the pill-scale utility: a theme.foreground '
+          'GlassVariant.control is the pill-scale utility: a theme.foreground '
           'wash at 7% and two inset layers only — no blur, no saturate, '
           'no ambient shadow. At 44px (rendered 48, a documented drift '
           'against the CSS comment and the section copy) there is '
@@ -108,7 +120,7 @@ final ComponentDocSpec glassDocSpec = ComponentDocSpec(
       id: 'deep',
       title: 'Deep',
       description:
-          'ElGlassPanel and ElGlassPanelDeep are byte-identical but for '
+          'GlassVariant.panel and GlassVariant.prominent are byte-identical but for '
           'their ambient layer: shadow-e2 against shadow-e4. e4 rather '
           'than a bespoke shadow, because elevation reads as a ratio of '
           'object to shadow — the depth that floats a 400px dialog leaves '
@@ -121,7 +133,7 @@ final ComponentDocSpec glassDocSpec = ComponentDocSpec(
       id: 'clear',
       title: 'Clear',
       description:
-          'ElGlassPanelClear shares every mechanic with ElGlassPanel — '
+          'GlassVariant.navigation shares every mechanic with GlassVariant.panel — '
           'geometry, backdrop blur and saturation, rim, highlight, e2 '
           'ambient — and lowers only the fill opacity, for floating '
           'navigation chrome where content moving beneath should stay '
@@ -135,29 +147,40 @@ final ComponentDocSpec glassDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every constructor parameter each of the four glass widgets '
-          'declares, read off lib/src/effects/glass.dart: one table per '
+          'declares, read off lib/src/components/ui/glass.dart: one table per '
           'class, since all four are exported from this one file.',
       child: const _ApiReferenceContent(),
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElGlassPanel', anchor: 'api-elglasspanel'),
+        DocsTocEntry(title: 'GlassVariant.panel', anchor: 'api-elglasspanel'),
         DocsTocEntry(
-          title: 'ElGlassPanelClear',
+          title: 'GlassVariant.navigation',
           anchor: 'api-elglasspanelclear',
         ),
         DocsTocEntry(
-          title: 'ElGlassPanelDeep',
+          title: 'GlassVariant.prominent',
           anchor: 'api-elglasspaneldeep',
         ),
-        DocsTocEntry(title: 'ElGlassControl', anchor: 'api-elglasscontrol'),
+        DocsTocEntry(
+          title: 'GlassVariant.control',
+          anchor: 'api-elglasscontrol',
+        ),
       ],
     ),
-    DisclosureSection(id: 'states', title: 'States', child: const _StatesContent()),
+    DisclosureSection(
+      id: 'states',
+      title: 'States',
+      child: const _StatesContent(),
+    ),
     DisclosureSection(
       id: 'accessibility',
       title: 'Accessibility',
       child: const _AccessibilityContent(),
     ),
-    DisclosureSection(id: 'keyboard', title: 'Keyboard', child: const _KeyboardContent()),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      child: const _KeyboardContent(),
+    ),
     DisclosureSection(
       id: 'responsive',
       title: 'Responsive',
@@ -168,7 +191,11 @@ final ComponentDocSpec glassDocSpec = ComponentDocSpec(
       title: 'Dependencies',
       child: const _DependenciesContent(),
     ),
-    DisclosureSection(id: 'theming', title: 'Theming', child: const _ThemingContent()),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: const _ThemingContent(),
+    ),
     DisclosureSection(
       id: 'source',
       title: 'Source',
@@ -188,7 +215,7 @@ final ComponentDocSpec glassDocSpec = ComponentDocSpec(
             description:
                 'The "glass composites" and "glass utilities" groups cover '
                 'the fill maths, the ambient clip, the inset ring, and '
-                'the elSaturate colour filter.',
+                'the saturate colour filter.',
           ),
           const DocsInstallFact(
             label: 'Docs test',
@@ -221,9 +248,9 @@ class GlassDocPage extends StatelessWidget {
       title: glassDoc.title,
       description: glassDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Glass'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Glass'),
     ],
     toc: glassDocSpec.toc,
     previous: null,
@@ -255,13 +282,13 @@ class _CaptionedPair extends StatelessWidget {
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
     child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(2)),
+      padding: EdgeInsets.symmetric(horizontal: space(2)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _Captioned(caption: leftCaption, child: left),
-          SizedBox(width: el(8)),
+          SizedBox(width: space(8)),
           _Captioned(caption: rightCaption, child: right),
         ],
       ),
@@ -277,21 +304,21 @@ class _Captioned extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         child,
-        SizedBox(height: el(2)),
-        ElText(caption, ElType.section, color: theme.mutedForeground),
+        SizedBox(height: space(2)),
+        StyledText(caption, TextStyles.section, color: theme.mutedForeground),
       ],
     );
   }
 }
 
 /// The gradient stage a card-scale panel is judged against: content moving
-/// underneath is the whole reason `ElGlassPanel`'s fill is translucent.
+/// underneath is the whole reason `GlassVariant.panel`'s fill is translucent.
 class _ColourfulStage extends StatelessWidget {
   const _ColourfulStage({required this.child});
 
@@ -299,14 +326,14 @@ class _ColourfulStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
-      width: el(56),
-      height: el(32),
-      padding: EdgeInsets.all(el(4)),
+      width: space(56),
+      height: space(32),
+      padding: EdgeInsets.all(space(4)),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(ElRadii.xl4),
+        borderRadius: BorderRadius.circular(Radii.xl4),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -326,16 +353,16 @@ class _OpaqueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
       key: keyValue == null ? null : ValueKey<String>(keyValue!),
-      padding: EdgeInsets.all(el(4)),
+      padding: EdgeInsets.all(space(4)),
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
-      child: ElText(label, ElType.small, color: theme.foreground),
+      child: StyledText(label, TextStyles.small, color: theme.foreground),
     );
   }
 }
@@ -347,7 +374,7 @@ class _PreviewHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return _CaptionedPair(
       leftCaption: 'Opaque theme.card',
       left: _ColourfulStage(
@@ -356,16 +383,21 @@ class _PreviewHost extends StatelessWidget {
           keyValue: 'glass-example:opaque',
         ),
       ),
-      rightCaption: 'ElGlassPanel',
+      rightCaption: 'GlassVariant.panel',
       right: _ColourfulStage(
         child: SizedBox(
           key: const ValueKey<String>('glass-example:preview'),
-          width: el(28),
-          height: el(16),
-          child: ElGlassPanel(
-            radius: BorderRadius.circular(ElRadii.xl4),
+          width: space(28),
+          height: space(16),
+          child: Glass(
+            variant: GlassVariant.panel,
+            radius: BorderRadius.circular(Radii.xl4),
             child: Center(
-              child: ElText('glass-panel', ElType.small, color: theme.foreground),
+              child: StyledText(
+                'glass-panel',
+                TextStyles.small,
+                color: theme.foreground,
+              ),
             ),
           ),
         ),
@@ -380,14 +412,14 @@ const String _previewCode =
     'DecoratedBox(\n'
     '  decoration: BoxDecoration(\n'
     '    color: theme.card,\n'
-    '    borderRadius: BorderRadius.circular(ElRadii.lg),\n'
+    '    borderRadius: BorderRadius.circular(Radii.lg),\n'
     '  ),\n'
     "  child: const Text('card'),\n"
     ')\n\n'
-    '// With: ElGlassPanel — translucent theme.card, a backdrop blur, a\n'
+    '// With: GlassVariant.panel — translucent theme.card, a backdrop blur, a\n'
     '// hairline rim — over the same backdrop.\n'
-    'ElGlassPanel(\n'
-    '  radius: BorderRadius.circular(ElRadii.xl4),\n'
+    'Glass(variant: GlassVariant.panel, \n'
+    '  radius: BorderRadius.circular(Radii.xl4),\n'
     "  child: const Text('glass-panel'),\n"
     ')';
 
@@ -396,14 +428,14 @@ class _ControlHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     Widget backdrop(Widget child) => Container(
-      width: el(40),
-      height: el(24),
+      width: space(40),
+      height: space(24),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(ElRadii.xl4),
+        borderRadius: BorderRadius.circular(Radii.xl4),
       ),
       child: child,
     );
@@ -412,29 +444,34 @@ class _ControlHost extends StatelessWidget {
       left: backdrop(
         Container(
           key: const ValueKey<String>('glass-example:control-flat'),
-          height: el(12),
-          padding: EdgeInsets.symmetric(horizontal: el(4)),
+          height: space(12),
+          padding: EdgeInsets.symmetric(horizontal: space(4)),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: ElOklab.mix(theme.foreground, elTransparent, 0.07),
-            borderRadius: BorderRadius.circular(ElRadii.pill),
+            color: OklabColor.mix(theme.foreground, transparent, 0.07),
+            borderRadius: BorderRadius.circular(Radii.full),
           ),
-          child: ElText('glass-control', ElType.small, color: theme.foreground),
+          child: StyledText(
+            'glass-control',
+            TextStyles.small,
+            color: theme.foreground,
+          ),
         ),
       ),
-      rightCaption: 'ElGlassControl',
+      rightCaption: 'GlassVariant.control',
       right: backdrop(
         SizedBox(
           key: const ValueKey<String>('glass-example:control'),
-          height: el(12),
-          child: ElGlassControl(
-            radius: BorderRadius.circular(ElRadii.pill),
-            padding: EdgeInsets.symmetric(horizontal: el(4)),
+          height: space(12),
+          child: Glass(
+            variant: GlassVariant.control,
+            radius: BorderRadius.circular(Radii.full),
+            padding: EdgeInsets.symmetric(horizontal: space(4)),
             child: Center(
               widthFactor: 1,
-              child: ElText(
+              child: StyledText(
                 'glass-control',
-                ElType.small,
+                TextStyles.small,
                 color: theme.foreground,
               ),
             ),
@@ -446,9 +483,9 @@ class _ControlHost extends StatelessWidget {
 }
 
 const String _controlCode =
-    'ElGlassControl(\n'
-    '  radius: BorderRadius.circular(ElRadii.pill),\n'
-    '  padding: EdgeInsets.symmetric(horizontal: el(4)),\n'
+    'Glass(variant: GlassVariant.control, \n'
+    '  radius: BorderRadius.circular(Radii.full),\n'
+    '  padding: EdgeInsets.symmetric(horizontal: space(4)),\n'
     "  child: const Text('glass-control'),\n"
     ')';
 
@@ -457,26 +494,28 @@ class _DeepHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _CaptionedPair(
-    leftCaption: 'ElGlassPanel (shadow-e2)',
+    leftCaption: 'GlassVariant.panel (shadow-e2)',
     left: _ColourfulStage(
       child: SizedBox(
         key: const ValueKey<String>('glass-example:deep-e2'),
-        width: el(24),
-        height: el(14),
-        child: ElGlassPanel(
-          radius: BorderRadius.circular(ElRadii.xl4),
+        width: space(24),
+        height: space(14),
+        child: Glass(
+          variant: GlassVariant.panel,
+          radius: BorderRadius.circular(Radii.xl4),
           child: const SizedBox.expand(),
         ),
       ),
     ),
-    rightCaption: 'ElGlassPanelDeep (shadow-e4)',
+    rightCaption: 'GlassVariant.prominent (shadow-e4)',
     right: _ColourfulStage(
       child: SizedBox(
         key: const ValueKey<String>('glass-example:deep-e4'),
-        width: el(24),
-        height: el(14),
-        child: ElGlassPanelDeep(
-          radius: BorderRadius.circular(ElRadii.xl4),
+        width: space(24),
+        height: space(14),
+        child: Glass(
+          variant: GlassVariant.prominent,
+          radius: BorderRadius.circular(Radii.xl4),
           child: const SizedBox.expand(),
         ),
       ),
@@ -486,35 +525,37 @@ class _DeepHost extends StatelessWidget {
 
 const String _deepCode =
     '// shadow-e2 ambient.\n'
-    'ElGlassPanel(radius: BorderRadius.circular(ElRadii.xl4), child: ...)\n\n'
+    'Glass(variant: GlassVariant.panel, radius: BorderRadius.circular(Radii.xl4), child: ...)\n\n'
     '// shadow-e4 ambient — same fill, same rim, same highlight.\n'
-    'ElGlassPanelDeep(radius: BorderRadius.circular(ElRadii.xl4), child: ...)';
+    'Glass(variant: GlassVariant.prominent, radius: BorderRadius.circular(Radii.xl4), child: ...)';
 
 class _ClearHost extends StatelessWidget {
   const _ClearHost();
 
   @override
   Widget build(BuildContext context) => _CaptionedPair(
-    leftCaption: 'ElGlassPanel',
+    leftCaption: 'GlassVariant.panel',
     left: _ColourfulStage(
       child: SizedBox(
         key: const ValueKey<String>('glass-example:clear-panel'),
-        width: el(24),
-        height: el(14),
-        child: ElGlassPanel(
-          radius: BorderRadius.circular(ElRadii.xl4),
+        width: space(24),
+        height: space(14),
+        child: Glass(
+          variant: GlassVariant.panel,
+          radius: BorderRadius.circular(Radii.xl4),
           child: const SizedBox.expand(),
         ),
       ),
     ),
-    rightCaption: 'ElGlassPanelClear',
+    rightCaption: 'GlassVariant.navigation',
     right: _ColourfulStage(
       child: SizedBox(
         key: const ValueKey<String>('glass-example:clear'),
-        width: el(24),
-        height: el(14),
-        child: ElGlassPanelClear(
-          radius: BorderRadius.circular(ElRadii.xl4),
+        width: space(24),
+        height: space(14),
+        child: Glass(
+          variant: GlassVariant.navigation,
+          radius: BorderRadius.circular(Radii.xl4),
           child: const SizedBox.expand(),
         ),
       ),
@@ -524,18 +565,18 @@ class _ClearHost extends StatelessWidget {
 
 const String _clearCode =
     '// Standard fill.\n'
-    'ElGlassPanel(radius: BorderRadius.circular(ElRadii.xl4), child: ...)\n\n'
+    'Glass(variant: GlassVariant.panel, radius: BorderRadius.circular(Radii.xl4), child: ...)\n\n'
     "// A lower, foundation-owned fill opacity: floating navigation chrome.\n"
-    'ElGlassPanelClear(radius: BorderRadius.circular(ElRadii.xl4), child: ...)';
+    'Glass(variant: GlassVariant.navigation, radius: BorderRadius.circular(Radii.xl4), child: ...)';
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
 
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElGlassPanel(
-  radius: BorderRadius.circular(ElRadii.xl4),
-  padding: EdgeInsets.all(el(6)),
+Glass(variant: GlassVariant.panel,
+  radius: BorderRadius.circular(Radii.xl4),
+  padding: EdgeInsets.all(space(6)),
   child: const Text('Card'),
 )''';
 
@@ -548,29 +589,29 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elglasspanel',
-        child: DocsApiTable(title: 'ElGlassPanel', facts: _panelFacts),
+        child: DocsApiTable(title: 'GlassVariant.panel', facts: _panelFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elglasspanelclear',
         child: const DocsApiTable(
-          title: 'ElGlassPanelClear',
+          title: 'GlassVariant.navigation',
           facts: _panelFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elglasspaneldeep',
         child: const DocsApiTable(
-          title: 'ElGlassPanelDeep',
+          title: 'GlassVariant.prominent',
           facts: _panelFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elglasscontrol',
         child: const DocsApiTable(
-          title: 'ElGlassControl',
+          title: 'GlassVariant.control',
           facts: _panelFacts,
         ),
       ),
@@ -608,7 +649,7 @@ class _StatesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'All four are StatelessWidgets: no hover, press, focus, or '
             'internal state of their own — no States matrix in the sense '
             'a control has one.',
@@ -628,10 +669,10 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'None of the four glass widgets renders a Semantics node of its '
             'own: each build() returns a Stack or a single '
-            'ElMachineSurface, neither of which declares accessibility '
+            'Surface, neither of which declares accessibility '
             'metadata. Whatever semantics child carries pass through '
             'untouched.',
         'No accessible name, no role: a caller composing interactive '
@@ -645,7 +686,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Takes no focus and handles no key: glass.dart declares no '
             'Focus, no FocusNode, no onKeyEvent on any of the four '
             'classes. Each is a paint-only surface; a caller that wants '
@@ -659,7 +700,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in glass.dart: BuildContext '
             'width is never read for a layout decision.',
         'radius, padding and child are all the caller\'s own choices. '
@@ -667,7 +708,7 @@ class _ResponsiveContent extends StatelessWidget {
             'both recompute from the RenderBox Size Flutter hands them '
             'at paint time, so the geometry scales with whatever box the '
             'caller gives it, at every viewport.',
-        'The backdrop blur (ImageFilter.blur, sigma from ElBlurs.xl) is '
+        'The backdrop blur (ImageFilter.blur, sigma from Blurs.xl) is '
             'a fixed radius, not a fraction of the box: a wider panel '
             'blurs its backdrop by the same amount a narrow one does.',
       ]);
@@ -680,34 +721,34 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
-        'File: lib/src/effects/glass.dart: one file, four classes, no '
+      _bullets(ThemeScope.of(context), <String>[
+        'File: lib/src/components/ui/glass.dart: one file, four classes, no '
             'companions.',
         'Flutter imports: dart:math, dart:ui, package:flutter/'
             'foundation.dart (listEquals), package:flutter/widgets.dart.',
-        'Foundation imports: foundation/colors.dart (ElOklab.mix), '
-            'foundation/shadows.dart, foundation/spacing.dart (el()), '
-            'foundation/surfaces.dart (ElSurfaceOpacity), foundation/'
+        'Foundation imports: foundation/colors.dart (OklabColor.mix), '
+            'foundation/shadows.dart, foundation/spacing.dart (space()), '
+            'foundation/surfaces.dart (SurfaceOpacity), foundation/'
             'theme.dart, theme_scope.dart.',
-        'Effect import: effects/machine_surface.dart (ElMachineSurface) — '
+        'Effect import: effects/surface.dart (Surface) — '
             'every inset layer in every glass spec is painted through it.',
         'registryDependencies, resolved automatically by `elattar add '
-            'glass`: machine-surface, source-foundation — copied '
-            'verbatim from registry/effects/glass.json. '
+            'glass`: surface, source-foundation — copied '
+            'verbatim from registry/components/glass.json. '
             'semanticDependencies (the manifest\'s narrower field): '
-            'machine-surface.',
+            'surface.',
         'Real use in this corpus, honestly: none yet. grep -rln '
-            '"ElGlassPanel\\|ElGlassControl\\|ElGlassPanelDeep\\|'
-            'ElGlassPanelClear" lib/src/ returns only glass.dart itself — '
+            '"GlassVariant.panel\\|GlassVariant.control\\|GlassVariant.prominent\\|'
+            'GlassVariant.navigation" lib/src/ returns only glass.dart itself — '
             'no component composes any of the four. '
             'example/lib/pages/shadows.dart\'s own #glass section is the '
             'one place in the app that mounts them, and what the Control, '
             'Deep and Clear specimens above are modelled on.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       DocsLinkRow(
         links: <DocsLink>[
-          DocsLink(label: 'Machine Surface', route: '/components/machine_surface'),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
         ],
       ),
     ],
@@ -718,49 +759,54 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        '"Neither needs a dark: variant" — glass.dart\'s own library '
-            'doc. Every fill and rim is ElOklab.mix(X, elTransparent, N) '
-            'over theme.card or theme.foreground, so a light edge on '
-            'dark and a dark edge on light fall out of the same '
-            'expression with no theme branch anywhere in the file.',
-        'ElGlassPanel / ElGlassPanelDeep fill: '
-            'ElOklab.mix(theme.card, elTransparent, ElSurfaceOpacity.'
-            'glassPanel) — theme.card at 74%.',
-        'ElGlassPanelClear fill: ElOklab.mix(theme.card, elTransparent, '
-            'ElSurfaceOpacity.navigationGlass) — the same mix at the '
-            'foundation-owned, lower navigation-glass opacity.',
-        'ElGlassControl fill: ElOklab.mix(theme.foreground, '
-            'elTransparent, 0.07) — theme.foreground at 7%.',
-        'Every rim: ElOklab.mix(theme.foreground, elTransparent, N) — '
-            '12% on the two panels, 16% on the control (heavier, because '
-            'a control has no ambient shadow to describe its edge; the '
-            'ring is the whole silhouette).',
-        'The top highlight on all four is theme.rimStrong — the same '
-            'token every other raised machine-surface carries, which is '
-            'what keeps a glass panel in the same visual world as a '
-            'button.',
-        'The two panels\' ambient is ElShadows.e2 (ElGlassPanel, '
-            'ElGlassPanelClear) or ElShadows.e4 (ElGlassPanelDeep): each '
-            'layer inside those specs is itself a Color Function'
-            '(ElThemeData), resolved live — see the Machine Surface '
-            'page\'s own Theming section for what that means.',
-        'The backdrop blur and saturation (blur(24px) saturate(1.5) on '
-            'the two panels; none on the control) are geometry, not '
-            'colour: they do not change between themes.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    '"Neither needs a dark: variant" — glass.dart\'s own library '
+        'doc. Every fill and rim is OklabColor.mix(X, transparent, N) '
+        'over theme.card or theme.foreground, so a light edge on '
+        'dark and a dark edge on light fall out of the same '
+        'expression with no theme branch anywhere in the file.',
+    'GlassVariant.panel / GlassVariant.prominent fill: '
+        'OklabColor.mix(theme.card, transparent, SurfaceOpacity.'
+        'glassPanel) — theme.card at 74%.',
+    'GlassVariant.navigation fill: OklabColor.mix(theme.card, transparent, '
+        'SurfaceOpacity.navigationGlass) — the same mix at the '
+        'foundation-owned, lower navigation-glass opacity.',
+    'GlassVariant.control fill: OklabColor.mix(theme.foreground, '
+        'transparent, 0.07) — theme.foreground at 7%.',
+    'Every rim: OklabColor.mix(theme.foreground, transparent, N) — '
+        '12% on the two panels, 16% on the control (heavier, because '
+        'a control has no ambient shadow to describe its edge; the '
+        'ring is the whole silhouette).',
+    'The top highlight on all four is theme.rimStrong — the same '
+        'token every other raised surface carries, which is '
+        'what keeps a glass panel in the same visual world as a '
+        'button.',
+    'The two panels\' ambient is Shadows.md (GlassVariant.panel, '
+        'GlassVariant.navigation) or Shadows.xl (GlassVariant.prominent): each '
+        'layer inside those specs is itself a Color Function'
+        '(ThemeTokens), resolved live — see the Machine Surface '
+        'page\'s own Theming section for what that means.',
+    'The backdrop blur and saturation (blur(24px) saturate(1.5) on '
+        'the two panels; none on the control) are geometry, not '
+        'colour: they do not change between themes.',
+  ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

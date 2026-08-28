@@ -2,20 +2,7 @@ library;
 
 import 'dart:convert';
 
-enum RegistryItemType {
-  foundation,
-  component,
-  effect,
-  motion,
-  asset,
-  block,
-  preset,
-
-  /// An installable product-neutral application composition. Shots are
-  /// application screens, not design-system parts: they install under `@app/`
-  /// and are never exported from the generated `ui`/`foundation` barrels.
-  shot,
-}
+enum RegistryItemType { foundation, component, asset, block, preset }
 
 RegistryItemType registryItemTypeFromJson(String value) {
   for (final RegistryItemType type in RegistryItemType.values) {

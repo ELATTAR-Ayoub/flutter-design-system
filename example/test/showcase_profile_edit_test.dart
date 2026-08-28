@@ -1,9 +1,35 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/showcase/showcase_profile.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Future<ElToastController> _pumpProfile(
+Future<ToastController> _pumpProfile(
   WidgetTester tester, {
   required Size size,
 }) async {
@@ -12,12 +38,12 @@ Future<ElToastController> _pumpProfile(
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
 
-  final ElThemeController theme = ElThemeController();
-  final ElToastController toasts = ElToastController();
+  final ThemeController theme = ThemeController();
+  final ToastController toasts = ToastController();
   addTearDown(theme.dispose);
   addTearDown(toasts.dispose);
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -35,7 +61,7 @@ Future<ElToastController> _pumpProfile(
 Future<void> _openEditor(WidgetTester tester) async {
   await tester.tap(find.byKey(const Key('profile-edit')));
   await tester.pump();
-  expect(find.byType(ElDialogContent), findsOneWidget);
+  expect(find.byType(DialogContent), findsOneWidget);
 }
 
 Future<void> _tapDialogAction(WidgetTester tester, Key key) async {
@@ -48,9 +74,9 @@ void main() {
   testWidgets('editor exposes complete profile fields and media actions', (
     WidgetTester tester,
   ) async {
-    final ElToastController toasts = await _pumpProfile(
+    final ToastController toasts = await _pumpProfile(
       tester,
-      size: const Size(ElBreakpoints.md, ElWidths.page),
+      size: const Size(Breakpoints.md, LayoutWidths.page),
     );
 
     await _openEditor(tester);
@@ -77,9 +103,9 @@ void main() {
   testWidgets('invalid save shows inline errors and focuses first field', (
     WidgetTester tester,
   ) async {
-    final ElToastController toasts = await _pumpProfile(
+    final ToastController toasts = await _pumpProfile(
       tester,
-      size: const Size(ElContainers.sm, ElBreakpoints.sm),
+      size: const Size(Containers.sm, Breakpoints.sm),
     );
     await _openEditor(tester);
 
@@ -103,7 +129,7 @@ void main() {
       find.text('Tell your audience a little more in at least 24 characters.'),
       findsOneWidget,
     );
-    final ElInput displayName = tester.widget<ElInput>(
+    final Input displayName = tester.widget<Input>(
       find.byKey(const Key('profile-display-name')),
     );
     expect(displayName.focusNode?.hasFocus, isTrue);
@@ -114,9 +140,9 @@ void main() {
   testWidgets('cancel discards edits without feedback', (
     WidgetTester tester,
   ) async {
-    final ElToastController toasts = await _pumpProfile(
+    final ToastController toasts = await _pumpProfile(
       tester,
-      size: const Size(ElContainers.sm, ElWidths.page),
+      size: const Size(Containers.sm, LayoutWidths.page),
     );
     await _openEditor(tester);
 
@@ -127,7 +153,7 @@ void main() {
     await _tapDialogAction(tester, const Key('profile-cancel'));
     await tester.pump();
 
-    expect(find.byType(ElDialogContent), findsNothing);
+    expect(find.byType(DialogContent), findsNothing);
     expect(find.text('Ari Rocha'), findsOneWidget);
     expect(find.text('Uncommitted name'), findsNothing);
     expect(toasts.length, 0);
@@ -136,9 +162,9 @@ void main() {
   testWidgets('save disables form, commits details, and emits one toast', (
     WidgetTester tester,
   ) async {
-    final ElToastController toasts = await _pumpProfile(
+    final ToastController toasts = await _pumpProfile(
       tester,
-      size: const Size(ElBreakpoints.md, ElWidths.page),
+      size: const Size(Breakpoints.md, LayoutWidths.page),
     );
     await _openEditor(tester);
 
@@ -157,10 +183,10 @@ void main() {
     await _tapDialogAction(tester, const Key('profile-save'));
     await tester.pump();
 
-    final ElButton save = tester.widget<ElButton>(
+    final Button save = tester.widget<Button>(
       find.byKey(const Key('profile-save')),
     );
-    final ElInput name = tester.widget<ElInput>(
+    final Input name = tester.widget<Input>(
       find.byKey(const Key('profile-display-name')),
     );
     expect(save.loading, isTrue);
@@ -168,10 +194,10 @@ void main() {
     expect(name.enabled, isFalse);
     expect(toasts.length, 0);
 
-    await tester.pump(ElDurations.base);
+    await tester.pump(MotionDurations.normal);
     await tester.pump();
 
-    expect(find.byType(ElDialogContent), findsNothing);
+    expect(find.byType(DialogContent), findsNothing);
     expect(find.text('Ari Moreno'), findsOneWidget);
     expect(find.text('@arirocha · Kaohsiung'), findsOneWidget);
     expect(
@@ -187,15 +213,15 @@ void main() {
   testWidgets('share profile opens the complete share dialog', (
     WidgetTester tester,
   ) async {
-    final ElToastController toasts = await _pumpProfile(
+    final ToastController toasts = await _pumpProfile(
       tester,
-      size: const Size(ElContainers.sm, ElWidths.page),
+      size: const Size(Containers.sm, LayoutWidths.page),
     );
 
     await tester.tap(find.byKey(const Key('profile-share')));
     await tester.pump();
 
-    expect(find.byType(ElDialogContent), findsOneWidget);
+    expect(find.byType(DialogContent), findsOneWidget);
     expect(find.text('Share profile'), findsWidgets);
     expect(find.text('https://signal.studio/arirocha'), findsOneWidget);
     expect(find.text('Copy link'), findsOneWidget);
@@ -217,16 +243,13 @@ void main() {
 
     await _tapDialogAction(tester, const Key('share-done'));
     await tester.pump();
-    expect(find.byType(ElDialogContent), findsNothing);
+    expect(find.byType(DialogContent), findsNothing);
   });
 
   testWidgets('profile and editor reflow at narrow and wide sizes', (
     WidgetTester tester,
   ) async {
-    await _pumpProfile(
-      tester,
-      size: const Size(ElContainers.sm, ElBreakpoints.sm),
-    );
+    await _pumpProfile(tester, size: const Size(Containers.sm, Breakpoints.sm));
     expect(find.text('About the creator'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await _openEditor(tester);
@@ -235,7 +258,7 @@ void main() {
 
     await _tapDialogAction(tester, const Key('profile-cancel'));
     await tester.pump();
-    tester.view.physicalSize = const Size(ElBreakpoints.lg, ElWidths.page);
+    tester.view.physicalSize = const Size(Breakpoints.lg, LayoutWidths.page);
     await tester.pump();
     expect(find.text('About the creator'), findsOneWidget);
     expect(tester.takeException(), isNull);

@@ -3,10 +3,10 @@
 /// `chart` HAS a real `registry/components/chart.json` manifest:
 /// [dependencies] below is that manifest's own `registryDependencies` list,
 /// copied verbatim: `source-foundation` only. This is `components/ui/chart.tsx`,
-/// the official shadcn wrapper, ported: the themed [ElChartConfig], the
-/// fixed-height [ElChartContainer] every plot mounts inside, the hover
-/// [ElChartTooltipContent] panel, the [ElChartLegendContent] row, and
-/// [elChartNumber], the one grouped-thousands formatter every chart figure on
+/// the official shadcn wrapper, ported: the themed [ChartConfig], the
+/// fixed-height [ChartContainer] every plot mounts inside, the hover
+/// [ChartTooltipContent] panel, the [ChartLegendContent] row, and
+/// [chartNumber], the one grouped-thousands formatter every chart figure on
 /// the page goes through. It draws nothing itself — `chart-cartesian` and
 /// `chart-polar` are the six widgets that actually paint a plot inside the
 /// container this file provides.
@@ -25,19 +25,19 @@ const ComponentDocEntry chartDoc = ComponentDocEntry(
   // registry/components/chart.json's own registryDependencies, verbatim.
   dependencies: <String>['source-foundation'],
   exports: <String>[
-    'ElChartText',
-    'ElChartSeries',
-    'ElChartConfig',
-    'ElChartScope',
-    'ElChartMotion',
-    'ElChartContainer',
-    'ElChartIndicator',
-    'ElChartTooltipItem',
-    'ElChartTooltipContent',
-    'ElChartLegendItem',
-    'ElChartLegendContent',
-    'ElChartLegendAlign',
-    'elChartNumber',
+    'ChartText',
+    'ChartSeries',
+    'ChartConfig',
+    'ChartScope',
+    'ChartMotion',
+    'ChartContainer',
+    'ChartIndicator',
+    'ChartTooltipItem',
+    'ChartTooltipContent',
+    'ChartLegendItem',
+    'ChartLegendContent',
+    'ChartLegendAlign',
+    'chartNumber',
   ],
   sourcePath: 'lib/src/components/chart.dart',
 );

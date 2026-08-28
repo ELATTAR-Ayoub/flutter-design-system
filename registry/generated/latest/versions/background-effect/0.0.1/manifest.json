@@ -1,0 +1,27 @@
+{
+  "name": "background-effect",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "The page atmosphere — `app/globals.css` L983–993.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/background_effect.dart",
+      "target": "@ui/background_effect.dart",
+      "sha256": "93e5b6031dcd76e189f5c753d040029768e8e0514461f4bbba533ab27f4aafb0"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/background-effect",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/background_effect.dart",
+  "deprecated": false
+}

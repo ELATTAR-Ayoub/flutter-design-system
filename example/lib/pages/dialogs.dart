@@ -1,10 +1,10 @@
 /// `/design-system/components/base/dialogs`: nine overlays, and every one of
 /// them opens.
 ///
-/// The page the modal family arrives on. `ElPopover` shipped with `selects` and
-/// `ElSheet`'s left-hand route with the shell; everything else is new here —
-/// `ElDialog`, `ElAlertDialog`, `ElDrawer`, `ElTooltip`, `ElHoverCard`,
-/// `ElBadge`, and the sheet's own four sides and three-zone banding.
+/// The page the modal family arrives on. `Popover` shipped with `selects` and
+/// `Sheet`'s left-hand route with the shell; everything else is new here —
+/// `Dialog`, `AlertDialog`, `Drawer`, `Tooltip`, `HoverCard`,
+/// `Badge`, and the sheet's own four sides and three-zone banding.
 ///
 /// **The fidelity bar is that they open.** A reader can press Open Pack and
 /// watch the jelly, drag the drawer down to dismiss it, hover an icon button
@@ -15,7 +15,7 @@
 ///
 /// ## What is page-local and why
 ///
-/// [_DangerZone] is `components/el/danger-zone-demo.tsx`, which the reference
+/// [_DangerZone] is `components/space/danger-zone-demo.tsx`, which the reference
 /// itself keeps out of `components/ui/`: *"It is a composition, not a new
 /// primitive… RULES §5 says a screen is composition before it is creation, and
 /// the pieces this needs all existed."* It stays here on the same reasoning and
@@ -59,7 +59,7 @@
 ///     the wide instance puts its button on the right and the three narrow ones
 ///     wrap it onto a second line at the *left*. Measured 99px and 155px rows
 ///     from the same markup.
-/// 10. **`ElGrid` stretches where CSS grid does not.** The four bad-day zones
+/// 10. **`Grid` stretches where CSS grid does not.** The four bad-day zones
 ///     sit in `lg:grid-cols-2`, and the reference's two rows are sized by their
 ///     tallest cell while each zone keeps its own height. The port's grid hands
 ///     each cell a tight height, so every cell is a plain [Column]: which
@@ -67,7 +67,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -76,10 +88,10 @@ import '../shell.dart';
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
 /// `max-w-2xl`: the settings column the first danger zone is centred in.
-final double _measure2xl = ElContainers.xl2;
+final double _measure2xl = Containers.xl2;
 
 /// `max-w-md`: the danger zone's description column.
-final double _measureMd = ElContainers.md;
+final double _measureMd = Containers.md;
 
 /// `<strong>` inside a `.type-small` sentence. The same helper `feedback.dart`
 /// carries, and for the same reason: a bare `FontWeight.bold` would drop the
@@ -112,8 +124,8 @@ class _Prose extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(top: top ?? el(5)),
-    child: ElText(text, ElType.small),
+    padding: EdgeInsets.only(top: top ?? space(5)),
+    child: StyledText(text, TextStyles.small),
   );
 }
 
@@ -124,12 +136,12 @@ class DialogsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('base', 'dialogs');
+    final CategoryHit here = findCategory('base', 'dialogs');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
           blurb: here.category.blurb,
@@ -138,8 +150,8 @@ class DialogsPage extends StatelessWidget {
         ),
         // `className="mb-12"`, 48px, the Note outside every section.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: const ElNote(
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: const Note(
             title: 'Picking the right overlay',
             child: _PickingBody(),
           ),
@@ -155,7 +167,7 @@ class DialogsPage extends StatelessWidget {
         const _TooltipSection(),
         const _ApiSection(),
         const _RulesSection(),
-        const ElPageFootNav(groupId: 'base', slug: 'dialogs'),
+        const PageFootNav(groupId: 'base', slug: 'dialogs'),
       ],
     );
   }
@@ -168,11 +180,11 @@ class _PickingBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final TextStyle base = ElText.styleOf(context, ElType.small);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final TextStyle base = StyledText.styleOf(context, TextStyles.small);
     final TextStyle strong = _strong(base).copyWith(color: theme.foreground);
 
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           TextSpan(text: 'Dialog', style: strong),
@@ -197,7 +209,7 @@ class _PickingBody extends StatelessWidget {
           const TextSpan(text: ' is a label, never content.'),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -208,27 +220,27 @@ class _DialogSection extends StatelessWidget {
   const _DialogSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'dialog',
     title: 'Dialog',
     description:
         "Modal, dismissible, for a decision that needs the "
         "user's full attention. Purchase confirmation is the canonical "
         'case.',
-    child: ElPanel(
+    child: Panel(
       label: 'Purchase confirmation',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElRow(
+          SpecimenRow(
             children: <Widget>[
-              ElDialog(
-                trigger: (BuildContext context, VoidCallback open) => ElButton(
+              Dialog(
+                trigger: (BuildContext context, VoidCallback open) => Button(
                   onPressed: open,
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      ElIcon(ElIconGlyph.packageOpen, size: ElIconSize.sm),
+                      Icon(IconGlyph.packageOpen, size: IconSize.sm),
                       _ButtonGap(),
                       Text('Open Pack'),
                     ],
@@ -237,9 +249,9 @@ class _DialogSection extends StatelessWidget {
                 content: (BuildContext context, VoidCallback close) =>
                     _PurchaseDialog(close: close),
               ),
-              ElDialog(
-                trigger: (BuildContext context, VoidCallback open) => ElButton(
-                  variant: ElButtonVariant.secondary,
+              Dialog(
+                trigger: (BuildContext context, VoidCallback open) => Button(
+                  variant: ButtonVariant.secondary,
                   onPressed: open,
                   child: const Text('Form dialog'),
                 ),
@@ -269,7 +281,7 @@ class _ButtonGap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      SizedBox(width: ElButton.gapFor(ElButtonSize.md));
+      SizedBox(width: Button.gapFor(ButtonSize.md));
 }
 
 class _PurchaseDialog extends StatelessWidget {
@@ -279,14 +291,14 @@ class _PurchaseDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElDialogContent(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return DialogContent(
       onClose: close,
       children: <Widget>[
-        const ElDialogHeader(
+        const DialogHeader(
           children: <Widget>[
-            ElDialogTitle('Confirm your purchase'),
-            ElDialogDescription(
+            DialogTitle('Confirm your purchase'),
+            DialogDescription(
               'You are about to open 3 packs of Eclipse Vault. This cannot be '
               'reversed once the cards are revealed.',
             ),
@@ -295,14 +307,17 @@ class _PurchaseDialog extends StatelessWidget {
         // `my-2`: the one child on the page that carries a margin of its own,
         // which is why the measured gap above and below it is 24 and not 16.
         Padding(
-          padding: EdgeInsets.symmetric(vertical: el(2)),
+          padding: EdgeInsets.symmetric(vertical: space(2)),
           // [Container], not [DecoratedBox]: the receipt's 138px is a BORDER
           // box, and only Container pays `decoration.padding` for a border.
           child: Container(
             decoration: BoxDecoration(
               color: theme.background,
-              borderRadius: BorderRadius.circular(ElRadii.lg),
-              border: Border.all(color: theme.border, width: ElWidths.hairline),
+              borderRadius: BorderRadius.circular(Radii.lg),
+              border: Border.all(
+                color: theme.border,
+                width: BorderWidths.hairline,
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -317,15 +332,15 @@ class _PurchaseDialog extends StatelessWidget {
             ),
           ),
         ),
-        ElDialogFooter(
+        DialogFooter(
           children: <Widget>[
-            ElButton(
-              variant: ElButtonVariant.ghost,
+            Button(
+              variant: ButtonVariant.ghost,
               onPressed: close,
               child: const Text('Cancel'),
             ),
-            ElButton(
-              variant: ElButtonVariant.premium,
+            Button(
+              variant: ButtonVariant.premium,
               onPressed: () {},
               child: const Text('Confirm & Open'),
             ),
@@ -340,11 +355,11 @@ class _PurchaseDialog extends StatelessWidget {
 class _Divider extends StatelessWidget {
   const _Divider({required this.theme});
 
-  final ElThemeData theme;
+  final ThemeTokens theme;
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: ElWidths.hairline,
+    height: BorderWidths.hairline,
     child: ColoredBox(color: theme.border),
   );
 }
@@ -362,21 +377,21 @@ class _LineItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
+      padding: EdgeInsets.symmetric(horizontal: space(4), vertical: space(3)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          ElText(
+          StyledText(
             k,
-            total ? ElType.label : ElType.small,
+            total ? TextStyles.eyebrow : TextStyles.small,
             color: theme.mutedForeground,
           ),
-          ElText(
+          StyledText(
             v,
-            total ? ElType.numMd : ElType.numBase,
-            color: total ? theme.valueInk : theme.foreground,
+            total ? TextStyles.numberMd : TextStyles.numberBase,
+            color: total ? theme.premiumText : theme.foreground,
           ),
         ],
       ),
@@ -390,43 +405,43 @@ class _ShipmentDialog extends StatelessWidget {
   final VoidCallback close;
 
   @override
-  Widget build(BuildContext context) => ElDialogContent(
+  Widget build(BuildContext context) => DialogContent(
     onClose: close,
     children: <Widget>[
-      const ElDialogHeader(
+      const DialogHeader(
         children: <Widget>[
-          ElDialogTitle('Request shipment'),
-          ElDialogDescription(
+          DialogTitle('Request shipment'),
+          DialogDescription(
             'Physical cards ship from our vault once a request is '
             'approved.',
           ),
         ],
       ),
-      const ElFieldGroup(
+      const FieldGroup(
         children: <Widget>[
-          ElField(
+          Field(
             label: 'Full name',
-            child: ElInput(placeholder: 'As it appears on ID'),
+            child: Input(placeholder: 'As it appears on ID'),
           ),
-          ElField(
+          Field(
             label: 'Address',
-            child: ElInput(placeholder: 'Street address'),
+            child: Input(placeholder: 'Street address'),
           ),
         ],
       ),
-      ElDialogFooter(
+      DialogFooter(
         children: <Widget>[
-          ElButton(
-            variant: ElButtonVariant.ghost,
+          Button(
+            variant: ButtonVariant.ghost,
             onPressed: close,
             child: const Text('Cancel'),
           ),
-          ElButton(
+          Button(
             onPressed: () {},
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElIcon(ElIconGlyph.truck, size: ElIconSize.sm),
+                Icon(IconGlyph.truck, size: IconSize.sm),
                 _ButtonGap(),
                 Text('Request Shipment'),
               ],
@@ -444,23 +459,23 @@ class _MediaDialogSection extends StatelessWidget {
   const _MediaDialogSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'media-dialog',
     title: 'Media dialog',
     description:
         'The existing Dialog with a full-bleed visual lead. Use '
         'it for announcements, product news, onboarding updates and '
         'promotions—not confirmations.',
-    child: ElPanel(
+    child: Panel(
       label: 'Announcement with image header',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElRow(
+          SpecimenRow(
             children: <Widget>[
-              ElDialog(
-                trigger: (BuildContext context, VoidCallback open) => ElButton(
-                  variant: ElButtonVariant.secondary,
+              Dialog(
+                trigger: (BuildContext context, VoidCallback open) => Button(
+                  variant: ButtonVariant.secondary,
                   onPressed: open,
                   child: const Text('Show announcement'),
                 ),
@@ -470,7 +485,7 @@ class _MediaDialogSection extends StatelessWidget {
             ],
           ),
           Padding(
-            padding: EdgeInsets.only(top: el(5)),
+            padding: EdgeInsets.only(top: space(5)),
             child: const _MediaProse(),
           ),
         ],
@@ -484,12 +499,12 @@ class _MediaProse extends StatelessWidget {
   const _MediaProse();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(text: 'This is '),
         // U+201C / U+201D: the reference writes `&quot;` inside the chip.
-        ElCode.span('DialogContent variant="media"'),
+        Code.span('DialogContent variant="media"'),
         const TextSpan(
           text:
               ', not a separate modal. It keeps the same focus trap, '
@@ -498,7 +513,7 @@ class _MediaProse extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -508,13 +523,13 @@ class _AnnouncementDialog extends StatelessWidget {
   final VoidCallback close;
 
   @override
-  Widget build(BuildContext context) => ElDialogContent(
-    variant: ElDialogVariant.media,
+  Widget build(BuildContext context) => DialogContent(
+    variant: DialogVariant.media,
     // DRIFT 5: no X, and both footer buttons close.
     showCloseButton: false,
     onClose: close,
     children: <Widget>[
-      const ElDialogMedia(
+      const DialogMedia(
         child: Image(
           image: AssetImage('assets/imgs/sample-pack.jpg'),
           fit: BoxFit.cover,
@@ -523,26 +538,26 @@ class _AnnouncementDialog extends StatelessWidget {
           semanticLabel: 'Silver Tempest pack artwork',
         ),
       ),
-      const ElDialogHeader(
+      const DialogHeader(
         children: <Widget>[
           // `w-fit`: the chip is as wide as its label.
-          ElBadge(label: 'New release', variant: ElBadgeVariant.action),
-          ElDialogTitle('Silver Tempest has arrived'),
-          ElDialogDescription(
+          Badge(label: 'New release', variant: BadgeVariant.action),
+          DialogTitle('Silver Tempest has arrived'),
+          DialogDescription(
             'A new set is live with fresh pulls, published odds and a '
             'limited first release. See what changed before opening a '
             'pack.',
           ),
         ],
       ),
-      ElDialogFooter(
+      DialogFooter(
         children: <Widget>[
-          ElButton(
-            variant: ElButtonVariant.ghost,
+          Button(
+            variant: ButtonVariant.ghost,
             onPressed: close,
             child: const Text('Not now'),
           ),
-          ElButton(
+          Button(
             onPressed: close,
             // U+2019, `See what&rsquo;s new`.
             child: const Text('See what’s new'),
@@ -559,74 +574,74 @@ class _AlertDialogSection extends StatelessWidget {
   const _AlertDialogSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'alert-dialog',
     title: 'Alert Dialog',
     description:
         'For actions that cannot be undone. Deliberately harder '
         'to dismiss: no overlay click, no escape-to-cancel by accident, '
         'and the confirming button states the consequence.',
-    child: ElPanel(
+    child: Panel(
       label: 'Destructive confirmations',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElRow(
+          SpecimenRow(
             children: <Widget>[
-              ElAlertDialog(
-                trigger: (BuildContext context, VoidCallback open) => ElButton(
-                  variant: ElButtonVariant.destructive,
+              AlertDialog(
+                trigger: (BuildContext context, VoidCallback open) => Button(
+                  variant: ButtonVariant.destructive,
                   onPressed: open,
                   child: const Text('Sell All Cards'),
                 ),
                 content: (BuildContext context, VoidCallback close) =>
-                    ElAlertDialogContent(
-                      header: const ElAlertDialogHeader(
-                        title: ElAlertDialogTitle(
+                    AlertDialogContent(
+                      header: const AlertDialogHeader(
+                        title: AlertDialogTitle(
                           r'Sell all 12 cards for $2,481.00?',
                         ),
-                        description: ElAlertDialogDescription(
+                        description: AlertDialogDescription(
                           'Every card in this pull will be sold back at its '
                           'current listed value and removed from your Stash. '
                           'This cannot be undone, and the cards cannot be '
                           'bought back.',
                         ),
                       ),
-                      footer: ElAlertDialogFooter(
-                        cancel: ElAlertDialogCancel(
+                      footer: AlertDialogFooter(
+                        cancel: AlertDialogCancel(
                           label: 'Keep my cards',
                           onPressed: close,
                         ),
-                        action: ElAlertDialogAction(
+                        action: AlertDialogAction(
                           label: r'Sell all for $2,481.00',
                           onPressed: close,
                         ),
                       ),
                     ),
               ),
-              ElAlertDialog(
-                trigger: (BuildContext context, VoidCallback open) => ElButton(
-                  variant: ElButtonVariant.outline,
+              AlertDialog(
+                trigger: (BuildContext context, VoidCallback open) => Button(
+                  variant: ButtonVariant.outline,
                   onPressed: open,
                   child: const Text('Close account'),
                 ),
                 content: (BuildContext context, VoidCallback close) =>
-                    ElAlertDialogContent(
-                      header: const ElAlertDialogHeader(
-                        title: ElAlertDialogTitle('Close your account?'),
-                        description: ElAlertDialogDescription(
+                    AlertDialogContent(
+                      header: const AlertDialogHeader(
+                        title: AlertDialogTitle('Close your account?'),
+                        description: AlertDialogDescription(
                           r'Your remaining balance of $1,204.80 will be '
                           'returned to your payment method. Pending shipments '
                           'will still be delivered. Your Stash and pull '
                           'history will be permanently deleted.',
                         ),
                       ),
-                      footer: ElAlertDialogFooter(
-                        cancel: ElAlertDialogCancel(
+                      footer: AlertDialogFooter(
+                        cancel: AlertDialogCancel(
                           label: 'Cancel',
                           onPressed: close,
                         ),
-                        action: ElAlertDialogAction(
+                        action: AlertDialogAction(
                           label: 'Close my account',
                           onPressed: close,
                         ),
@@ -636,16 +651,16 @@ class _AlertDialogSection extends StatelessWidget {
             ],
           ),
           Padding(
-            padding: EdgeInsets.only(top: el(6)),
-            child: const ElNote(
+            padding: EdgeInsets.only(top: space(6)),
+            child: const Note(
               title: 'Two zones here, not three',
               child: _TwoZonesBody(),
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: el(6)),
-            child: const ElNote(
-              tone: ElNoteTone.error,
+            padding: EdgeInsets.only(top: space(6)),
+            child: const Note(
+              tone: NoteTone.error,
               title: 'Write the consequence into the button',
               child: _ConsequenceBody(),
             ),
@@ -660,7 +675,7 @@ class _TwoZonesBody extends StatelessWidget {
   const _TwoZonesBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     const TextSpan(
       children: <InlineSpan>[
         TextSpan(text: 'The alert dialog is the one overlay that does '),
@@ -682,7 +697,7 @@ class _TwoZonesBody extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -690,13 +705,13 @@ class _ConsequenceBody extends StatelessWidget {
   const _ConsequenceBody();
 
   @override
-  Widget build(BuildContext context) => ElText(
+  Widget build(BuildContext context) => StyledText(
     // U+201C / U+201D throughout, `&ldquo;` / `&rdquo;`.
     '“Sell all for \$2,481.00” beats “Confirm”. The user should be able to '
     'read only the button and still know exactly what happens. The cancel '
     'option is also phrased as the safe choice, “Keep my cards”, not just '
     '“Cancel”.',
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -706,7 +721,7 @@ class _DangerZoneSection extends StatelessWidget {
   const _DangerZoneSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'danger-zone',
     title: 'Danger Zone',
     description:
@@ -717,7 +732,7 @@ class _DangerZoneSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPanel(
+        Panel(
           label: 'Settings · Account',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -730,14 +745,14 @@ class _DangerZoneSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       const _AccountHeading(),
-                      SizedBox(height: el(8)),
+                      SizedBox(height: space(8)),
                       const _DangerZone(),
                     ],
                   ),
                 ),
               ),
               _Prose(
-                top: el(6),
+                top: space(6),
                 'The region is bordered, not filled. A red block beside '
                 'three neutral settings blocks reads as an error that has '
                 'already happened; the hairline and the heading say '
@@ -750,15 +765,15 @@ class _DangerZoneSection extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: el(6)),
-        ElPanel(
+        SizedBox(height: space(6)),
+        Panel(
           label: 'The states that only exist on a bad day',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              ElGrid(
+              Grid(
                 lg: 2,
-                gap: el(6),
+                gap: space(6),
                 children: <Widget>[
                   _BadDayCell(
                     label: 'Failing · the request rejects',
@@ -782,9 +797,9 @@ class _DangerZoneSection extends StatelessWidget {
                 ],
               ),
               Padding(
-                padding: EdgeInsets.only(top: el(6)),
-                child: const ElNote(
-                  tone: ElNoteTone.error,
+                padding: EdgeInsets.only(top: space(6)),
+                child: const Note(
+                  tone: NoteTone.error,
                   title: 'The failure path is live, not drawn',
                   child: _FailurePathBody(),
                 ),
@@ -792,9 +807,9 @@ class _DangerZoneSection extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: el(6)),
-        const ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(6)),
+        const Meta(
+          items: <MetaItem>[
             (
               k: 'onDelete',
               v: TextSpan(
@@ -848,13 +863,17 @@ class _AccountHeading extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElText('Account', ElType.h4, color: ElTheme.of(context).foreground),
+      StyledText(
+        'Account',
+        TextStyles.h4,
+        color: ThemeScope.of(context).foreground,
+      ),
       Padding(
-        padding: EdgeInsets.only(top: el(1)),
-        child: ElText(
+        padding: EdgeInsets.only(top: space(1)),
+        child: StyledText(
           'Workspace name, members and billing. Changes here save as you '
           'type.',
-          ElType.small,
+          TextStyles.small,
         ),
       ),
     ],
@@ -875,8 +894,12 @@ class _BadDayCell extends StatelessWidget {
     // own height inside the grid's tight cell.
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      ElText(label, ElType.label, color: ElTheme.of(context).mutedForeground),
-      SizedBox(height: el(3)),
+      StyledText(
+        label,
+        TextStyles.eyebrow,
+        color: ThemeScope.of(context).mutedForeground,
+      ),
+      SizedBox(height: space(3)),
       zone,
     ],
   );
@@ -886,11 +909,11 @@ class _FailurePathBody extends StatelessWidget {
   const _FailurePathBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(text: 'The second zone above takes a rejecting '),
-        ElCode.span('onDelete'),
+        Code.span('onDelete'),
         TextSpan(
           text:
               '. That seam exists so the error state is reachable on the '
@@ -901,7 +924,7 @@ class _FailurePathBody extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -910,7 +933,7 @@ class _FailurePathBody extends StatelessWidget {
 /// `DeleteStatus`.
 enum _DeleteStatus { idle, deleting, deleted, failed }
 
-/// `components/el/danger-zone-demo.tsx`.
+/// `components/space/danger-zone-demo.tsx`.
 ///
 /// *"Why the region is bordered rather than tinted: RULES §5, Alert: one
 /// surface, five meanings. A filled red block beside three neutral settings
@@ -987,7 +1010,7 @@ class _DangerZoneState extends State<_DangerZone> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final Color hairline = theme.destructive.withValues(
       alpha: _DangerZone.borderAlpha,
     );
@@ -997,28 +1020,31 @@ class _DangerZoneState extends State<_DangerZone> {
     return Container(
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: hairline, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: hairline, width: BorderWidths.hairline),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(ElRadii.lg),
+        borderRadius: BorderRadius.circular(Radii.lg),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             _DangerHeading(hairline: hairline),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: el(5), vertical: el(4)),
+              padding: EdgeInsets.symmetric(
+                horizontal: space(5),
+                vertical: space(4),
+              ),
               child: _row(theme),
             ),
             if (_status == _DeleteStatus.failed && _failure != null)
               Padding(
-                padding: EdgeInsets.fromLTRB(el(5), 0, el(5), el(5)),
-                child: ElAlert(
-                  variant: ElAlertVariant.destructive,
-                  icon: const ElIcon(
-                    ElIconGlyph.alertTriangle,
-                    tone: ElIconTone.error,
+                padding: EdgeInsets.fromLTRB(space(5), 0, space(5), space(5)),
+                child: Alert(
+                  variant: AlertVariant.destructive,
+                  icon: const Icon(
+                    IconGlyph.alertTriangle,
+                    tone: IconTone.error,
                   ),
                   title: 'Account not deleted',
                   description:
@@ -1032,7 +1058,7 @@ class _DangerZoneState extends State<_DangerZone> {
     );
   }
 
-  Widget _row(ElThemeData theme) {
+  Widget _row(ThemeTokens theme) {
     if (widget.loading) return const _DangerZoneRowSkeleton();
     if (_status == _DeleteStatus.deleted) return const _DeletedRow();
     return Wrap(
@@ -1040,36 +1066,36 @@ class _DangerZoneState extends State<_DangerZone> {
       // line push apart, and a wrapped line starts at the left.
       alignment: WrapAlignment.spaceBetween,
       crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: el(4),
-      runSpacing: el(4),
+      spacing: space(4),
+      runSpacing: space(4),
       children: <Widget>[
         const _DeleteCopy(),
         if (widget.unavailableReason != null)
           _Unavailable(reason: widget.unavailableReason!)
         else
-          ElAlertDialog(
-            trigger: (BuildContext context, VoidCallback open) => ElButton(
-              variant: ElButtonVariant.destructive,
+          AlertDialog(
+            trigger: (BuildContext context, VoidCallback open) => Button(
+              variant: ButtonVariant.destructive,
               loading: _status == _DeleteStatus.deleting,
               onPressed: open,
               child: const Text('Delete account'),
             ),
             content: (BuildContext context, VoidCallback close) =>
-                ElAlertDialogContent(
-                  header: const ElAlertDialogHeader(
-                    title: ElAlertDialogTitle('Delete your account?'),
-                    description: ElAlertDialogDescription(
+                AlertDialogContent(
+                  header: const AlertDialogHeader(
+                    title: AlertDialogTitle('Delete your account?'),
+                    description: AlertDialogDescription(
                       'Your workspace, its 14 members and all 2,480 files are '
                       'removed immediately. Support cannot restore them, and the '
                       'workspace name becomes available to anyone.',
                     ),
                   ),
-                  footer: ElAlertDialogFooter(
-                    cancel: ElAlertDialogCancel(
+                  footer: AlertDialogFooter(
+                    cancel: AlertDialogCancel(
                       label: 'Keep my account',
                       onPressed: close,
                     ),
-                    action: ElAlertDialogAction(
+                    action: AlertDialogAction(
                       label: 'Delete my account and all files',
                       onPressed: () {
                         close();
@@ -1092,25 +1118,29 @@ class _DangerHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
       decoration: BoxDecoration(
         color: theme.destructive.withValues(alpha: _DangerZone.bandAlpha),
         border: Border(
-          bottom: BorderSide(color: hairline, width: ElWidths.hairline),
+          bottom: BorderSide(color: hairline, width: BorderWidths.hairline),
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: el(5), vertical: el(3)),
+        padding: EdgeInsets.symmetric(horizontal: space(5), vertical: space(3)),
         child: Row(
           children: <Widget>[
-            const ElIcon(
-              ElIconGlyph.shieldAlert,
-              size: ElIconSize.sm,
-              tone: ElIconTone.error,
+            const Icon(
+              IconGlyph.shieldAlert,
+              size: IconSize.sm,
+              tone: IconTone.error,
             ),
-            SizedBox(width: el(2)),
-            ElText('Danger zone', ElType.label, color: theme.destructiveInk),
+            SizedBox(width: space(2)),
+            StyledText(
+              'Danger zone',
+              TextStyles.eyebrow,
+              color: theme.destructiveText,
+            ),
           ],
         ),
       ),
@@ -1129,17 +1159,17 @@ class _DeleteCopy extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText(
+        StyledText(
           'Delete account',
-          ElType.body,
-          color: ElTheme.of(context).foreground,
+          TextStyles.body,
+          color: ThemeScope.of(context).foreground,
         ),
         Padding(
-          padding: EdgeInsets.only(top: el(1)),
-          child: ElText(
+          padding: EdgeInsets.only(top: space(1)),
+          child: StyledText(
             'Your workspace, its members and every file in it are removed '
             'immediately. This cannot be undone.',
-            ElType.small,
+            TextStyles.small,
           ),
         ),
       ],
@@ -1159,19 +1189,19 @@ class _Unavailable extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.end,
     children: <Widget>[
-      const ElButton(
-        variant: ElButtonVariant.destructive,
+      const Button(
+        variant: ButtonVariant.destructive,
         // No handler: `disabled`.
         child: Text('Delete account'),
       ),
-      SizedBox(height: el(1.5)),
+      SizedBox(height: space(1.5)),
       // *"Active text beside a disabled control. The control is exempt from
       // contrast (trap 9); this sentence is not."*
-      ElText(
+      StyledText(
         reason,
-        ElType.caption,
+        TextStyles.caption,
         align: TextAlign.right,
-        color: ElTheme.of(context).mutedForeground,
+        color: ThemeScope.of(context).mutedForeground,
       ),
     ],
   );
@@ -1188,17 +1218,17 @@ class _DeletedRow extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText(
+        StyledText(
           'Account deleted',
-          ElType.body,
-          color: ElTheme.of(context).foreground,
+          TextStyles.body,
+          color: ThemeScope.of(context).foreground,
         ),
         Padding(
-          padding: EdgeInsets.only(top: el(1)),
-          child: ElText(
+          padding: EdgeInsets.only(top: space(1)),
+          child: StyledText(
             'Deleted a moment ago. You will be signed out of every device '
             'shortly.',
-            ElType.small,
+            TextStyles.small,
           ),
         ),
       ],
@@ -1216,8 +1246,8 @@ class _DangerZoneRowSkeleton extends StatelessWidget {
   Widget build(BuildContext context) => Wrap(
     alignment: WrapAlignment.spaceBetween,
     crossAxisAlignment: WrapCrossAlignment.center,
-    spacing: el(4),
-    runSpacing: el(4),
+    spacing: space(4),
+    runSpacing: space(4),
     children: <Widget>[
       Column(
         mainAxisSize: MainAxisSize.min,
@@ -1226,19 +1256,23 @@ class _DangerZoneRowSkeleton extends StatelessWidget {
           // `<p className="type-body"><Skeleton as="span" className="h-4
           // w-36 align-middle" /></p>`: an inline placeholder in a real
           // line box, so the row keeps the resting row's 24px line.
-          _SkeletonLine(spec: ElType.body, width: el(36), height: el(4)),
+          _SkeletonLine(
+            spec: TextStyles.body,
+            width: space(36),
+            height: space(4),
+          ),
           Padding(
-            padding: EdgeInsets.only(top: el(1)),
+            padding: EdgeInsets.only(top: space(1)),
             child: _SkeletonLine(
-              spec: ElType.small,
-              width: el(72),
-              height: el(3.5),
+              spec: TextStyles.small,
+              width: space(72),
+              height: space(3.5),
             ),
           ),
         ],
       ),
       // `h-10 w-36 rounded-pill`.
-      ElSkeleton(width: el(36), height: el(10), radius: ElRadii.pill),
+      Skeleton(width: space(36), height: space(10), radius: Radii.full),
     ],
   );
 }
@@ -1252,17 +1286,17 @@ class _SkeletonLine extends StatelessWidget {
     required this.height,
   });
 
-  final ElTypeSpec spec;
+  final TextStyleToken spec;
   final double width;
   final double height;
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         WidgetSpan(
           alignment: PlaceholderAlignment.middle,
-          child: ElSkeleton(width: width, height: height),
+          child: Skeleton(width: width, height: height),
         ),
       ],
     ),
@@ -1276,33 +1310,30 @@ class _SheetSection extends StatelessWidget {
   const _SheetSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'sheet',
     title: 'Sheet',
     description:
         'Slides in from an edge. The filter panel on the '
         'marketplace becomes a sheet below 1200px, and the account panel '
         'uses it on every size.',
-    child: ElPanel(
+    child: Panel(
       label: 'Filter sheet',
-      child: ElRow(
+      child: SpecimenRow(
         children: <Widget>[
-          for (final ElSheetSide side in <ElSheetSide>[
-            ElSheetSide.left,
-            ElSheetSide.right,
+          for (final SheetSide side in <SheetSide>[
+            SheetSide.left,
+            SheetSide.right,
           ])
-            ElSheetOverlay(
+            SheetOverlay(
               side: side,
-              trigger: (BuildContext context, VoidCallback open) => ElButton(
-                variant: ElButtonVariant.outline,
+              trigger: (BuildContext context, VoidCallback open) => Button(
+                variant: ButtonVariant.outline,
                 onPressed: open,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    const ElIcon(
-                      ElIconGlyph.slidersHorizontal,
-                      size: ElIconSize.sm,
-                    ),
+                    const Icon(IconGlyph.slidersHorizontal, size: IconSize.sm),
                     const _ButtonGap(),
                     Text('Filters (${side.name})'),
                   ],
@@ -1320,7 +1351,7 @@ class _SheetSection extends StatelessWidget {
 class _FilterSheet extends StatefulWidget {
   const _FilterSheet({required this.side, required this.close});
 
-  final ElSheetSide side;
+  final SheetSide side;
   final VoidCallback close;
 
   @override
@@ -1342,19 +1373,19 @@ class _FilterSheetState extends State<_FilterSheet> {
   ];
 
   @override
-  Widget build(BuildContext context) => ElSheetContent(
+  Widget build(BuildContext context) => SheetContent(
     side: widget.side,
     onClose: widget.close,
     children: <Widget>[
-      const ElSheetHeader(
+      const SheetHeader(
         children: <Widget>[
-          ElSheetTitle('Filter packs'),
-          ElSheetDescription('184 packs match your current filters.'),
+          SheetTitle('Filter packs'),
+          SheetDescription('184 packs match your current filters.'),
         ],
       ),
       // `space-y-8 px-4`.
       Padding(
-        padding: EdgeInsets.symmetric(horizontal: el(4)),
+        padding: EdgeInsets.symmetric(horizontal: space(4)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
@@ -1363,9 +1394,9 @@ class _FilterSheetState extends State<_FilterSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElText('Price range', ElType.label),
-                SizedBox(height: el(4)),
-                ElSlider(
+                StyledText('Price range', TextStyles.eyebrow),
+                SizedBox(height: space(4)),
+                Slider(
                   values: _price,
                   max: 500,
                   step: 5,
@@ -1373,15 +1404,15 @@ class _FilterSheetState extends State<_FilterSheet> {
                 ),
               ],
             ),
-            SizedBox(height: el(8)),
+            SizedBox(height: space(8)),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElText('Rarity floor', ElType.label),
-                SizedBox(height: el(4)),
+                StyledText('Rarity floor', TextStyles.eyebrow),
+                SizedBox(height: space(4)),
                 for (int i = 0; i < _floor.length; i++) ...<Widget>[
-                  if (i > 0) SizedBox(height: el(3)),
+                  if (i > 0) SizedBox(height: space(3)),
                   _RarityRow(
                     label: _floor[i],
                     checked: _rarities.contains(_floor[i]),
@@ -1399,11 +1430,11 @@ class _FilterSheetState extends State<_FilterSheet> {
           ],
         ),
       ),
-      ElSheetFooter(
+      SheetFooter(
         children: <Widget>[
-          ElButton(onPressed: () {}, child: const Text('Apply filters')),
-          ElButton(
-            variant: ElButtonVariant.ghost,
+          Button(onPressed: () {}, child: const Text('Apply filters')),
+          Button(
+            variant: ButtonVariant.ghost,
             onPressed: () {},
             child: const Text('Reset'),
           ),
@@ -1438,13 +1469,12 @@ class _RarityRow extends StatelessWidget {
     onTap: () => onChanged(!checked),
     child: Row(
       children: <Widget>[
-        ElCheckbox(
-          state: checked ? ElCheckboxState.checked : ElCheckboxState.unchecked,
-          onChanged: (ElCheckboxState s) =>
-              onChanged(s == ElCheckboxState.checked),
+        Checkbox(
+          state: checked ? CheckboxState.checked : CheckboxState.unchecked,
+          onChanged: (CheckboxState s) => onChanged(s == CheckboxState.checked),
         ),
-        SizedBox(width: el(3)),
-        ElText(label, ElType.small),
+        SizedBox(width: space(3)),
+        StyledText(label, TextStyles.small),
       ],
     ),
   );
@@ -1456,23 +1486,23 @@ class _DrawerSection extends StatelessWidget {
   const _DrawerSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'drawer',
     title: 'Drawer',
     description:
         'The mobile bottom sheet. Draggable, and the correct '
         'container for card actions on a phone where a dialog would feel '
         'oversized.',
-    child: ElPanel(
+    child: Panel(
       label: 'Bottom drawer',
       child: Align(
         // The reference puts the trigger straight in the panel, with no
         // `Row` around it, so it keeps its own width and starts at the
         // content edge.
         alignment: AlignmentDirectional.centerStart,
-        child: ElDrawer(
-          trigger: (BuildContext context, VoidCallback open) => ElButton(
-            variant: ElButtonVariant.secondary,
+        child: Drawer(
+          trigger: (BuildContext context, VoidCallback open) => Button(
+            variant: ButtonVariant.secondary,
             onPressed: open,
             child: const Text('Card actions'),
           ),
@@ -1490,47 +1520,47 @@ class _CardActionsDrawer extends StatelessWidget {
   final VoidCallback close;
 
   @override
-  Widget build(BuildContext context) => ElDrawerContent(
+  Widget build(BuildContext context) => DrawerContent(
     children: <Widget>[
-      const ElDrawerHeader(
+      const DrawerHeader(
         children: <Widget>[
-          ElDrawerTitle('Voidwing Ascendant'),
-          ElDrawerDescription(
+          DrawerTitle('Voidwing Ascendant'),
+          DrawerDescription(
             r'Eclipse Vault · #044 · Legendary · Estimated $1,240.00',
           ),
         ],
       ),
       // `grid gap-2 px-4`.
       Padding(
-        padding: EdgeInsets.symmetric(horizontal: el(4)),
+        padding: EdgeInsets.symmetric(horizontal: space(4)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ElButton(
-              variant: ElButtonVariant.premium,
+            Button(
+              variant: ButtonVariant.premium,
               onPressed: () {},
               child: const Text(r'Sell for $1,240.00'),
             ),
-            SizedBox(height: el(2)),
-            ElButton(
-              variant: ElButtonVariant.secondary,
+            SizedBox(height: space(2)),
+            Button(
+              variant: ButtonVariant.secondary,
               onPressed: () {},
               child: const Text('Add to Shipment'),
             ),
-            SizedBox(height: el(2)),
-            ElButton(
-              variant: ElButtonVariant.outline,
+            SizedBox(height: space(2)),
+            Button(
+              variant: ButtonVariant.outline,
               onPressed: () {},
               child: const Text('Inspect Card'),
             ),
           ],
         ),
       ),
-      ElDrawerFooter(
+      DrawerFooter(
         children: <Widget>[
-          ElButton(
-            variant: ElButtonVariant.ghost,
+          Button(
+            variant: ButtonVariant.ghost,
             onPressed: close,
             child: const Text('Close'),
           ),
@@ -1555,11 +1585,11 @@ class _PopoverSectionState extends State<_PopoverSection> {
 
   /// `w-80` and `w-56`: the two `className` widths, which beat
   /// `PopoverContent`'s own `w-72`.
-  static double get _oddsWidth => el(80);
-  static double get _sortWidth => el(56);
+  static double get _oddsWidth => space(80);
+  static double get _sortWidth => space(56);
 
   /// `sideOffset={4}`.
-  static double get _sideOffset => el(1);
+  static double get _sideOffset => space(1);
 
   static const List<(String, String)> _odds5 = <(String, String)>[
     ('Common', '68.00%'),
@@ -1577,107 +1607,98 @@ class _PopoverSectionState extends State<_PopoverSection> {
   ];
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'popover',
     title: 'Popover',
     description:
         'Non-modal, anchored to a control. Used for the odds '
         'explainer, quick filters and the notification panel. The page '
         'underneath stays usable.',
-    child: ElPanel(
+    child: Panel(
       label: 'Odds explainer',
-      child: ElRow(
+      child: SpecimenRow(
         children: <Widget>[
-          ElPopover(
+          Popover(
             open: _odds,
             sideOffset: _sideOffset,
             onDismiss: () => setState(() => _odds = false),
-            anchor: ElButton(
-              variant: ElButtonVariant.outline,
-              size: ElButtonSize.sm,
+            anchor: Button(
+              variant: ButtonVariant.outline,
+              size: ButtonSize.sm,
               onPressed: () => setState(() => _odds = !_odds),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  ElIcon(ElIconGlyph.info, size: ElIconSize.sm),
+                  Icon(IconGlyph.info, size: IconSize.sm),
                   SizedBox(width: 6), // allow-hardcoded: `gap-1.5` on `sm`.
                   Text('How odds work'),
                 ],
               ),
             ),
-            content: (BuildContext context, ElPopoverAnchorMetrics _) =>
-                SizedBox(
-                  width: _oddsWidth,
-                  child: _PopoverPanel(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const _PopoverHeader(
-                          title: 'Per-card odds',
-                          description:
-                              'Every card in a pack is rolled independently.',
-                        ),
-                        // `mt-4 space-y-2`.
-                        Padding(
-                          padding: EdgeInsets.only(top: el(4)),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              for (
-                                int i = 0;
-                                i < _odds5.length;
-                                i++
-                              ) ...<Widget>[
-                                if (i > 0) SizedBox(height: el(2)),
-                                _OddsRow(
-                                  name: _odds5[i].$1,
-                                  value: _odds5[i].$2,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
+            content: (BuildContext context, PopoverAnchorMetrics _) => SizedBox(
+              width: _oddsWidth,
+              child: _PopoverPanel(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    const _PopoverHeader(
+                      title: 'Per-card odds',
+                      description:
+                          'Every card in a pack is rolled independently.',
                     ),
-                  ),
+                    // `mt-4 space-y-2`.
+                    Padding(
+                      padding: EdgeInsets.only(top: space(4)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          for (int i = 0; i < _odds5.length; i++) ...<Widget>[
+                            if (i > 0) SizedBox(height: space(2)),
+                            _OddsRow(name: _odds5[i].$1, value: _odds5[i].$2),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+            ),
           ),
-          ElPopover(
+          Popover(
             open: _sort,
             sideOffset: _sideOffset,
             onDismiss: () => setState(() => _sort = false),
-            anchor: ElButton(
-              variant: ElButtonVariant.ghost,
-              size: ElButtonSize.sm,
+            anchor: Button(
+              variant: ButtonVariant.ghost,
+              size: ButtonSize.sm,
               onPressed: () => setState(() => _sort = !_sort),
               child: const Text('Quick sort'),
             ),
-            content: (BuildContext context, ElPopoverAnchorMetrics _) =>
-                SizedBox(
-                  width: _sortWidth,
-                  child: _PopoverPanel(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        for (int i = 0; i < _sorts.length; i++) ...<Widget>[
-                          if (i > 0) SizedBox(height: el(1)),
-                          ElButton(
-                            variant: ElButtonVariant.ghost,
-                            size: ElButtonSize.sm,
-                            onPressed: () {},
-                            child: Align(
-                              // `justify-start`.
-                              alignment: AlignmentDirectional.centerStart,
-                              child: Text(_sorts[i]),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
+            content: (BuildContext context, PopoverAnchorMetrics _) => SizedBox(
+              width: _sortWidth,
+              child: _PopoverPanel(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    for (int i = 0; i < _sorts.length; i++) ...<Widget>[
+                      if (i > 0) SizedBox(height: space(1)),
+                      Button(
+                        variant: ButtonVariant.ghost,
+                        size: ButtonSize.sm,
+                        onPressed: () {},
+                        child: Align(
+                          // `justify-start`.
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(_sorts[i]),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
+              ),
+            ),
           ),
         ],
       ),
@@ -1692,8 +1713,8 @@ class _PopoverPanel extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => ElPopoverSurface(
-    child: Padding(padding: EdgeInsets.all(el(2.5)), child: child),
+  Widget build(BuildContext context) => PopoverSurface(
+    child: Padding(padding: EdgeInsets.all(space(2.5)), child: child),
   );
 }
 
@@ -1706,21 +1727,21 @@ class _PopoverHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText(
+        StyledText(
           title,
-          ElComponentType.popoverTitle,
+          TextStyles.popoverTitle,
           color: theme.popoverForeground,
         ),
         // `gap-0.5`.
-        SizedBox(height: el(0.5)),
-        ElText(
+        SizedBox(height: space(0.5)),
+        StyledText(
           description,
-          ElComponentType.sheetBody,
+          TextStyles.bodyCompact,
           color: theme.mutedForeground,
         ),
       ],
@@ -1736,12 +1757,12 @@ class _OddsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        ElText(name, ElType.small, color: theme.mutedForeground),
-        ElText(value, ElType.numSm, color: theme.foreground),
+        StyledText(name, TextStyles.small, color: theme.mutedForeground),
+        StyledText(value, TextStyles.numberSm, color: theme.foreground),
       ],
     );
   }
@@ -1753,26 +1774,26 @@ class _HoverCardSection extends StatelessWidget {
   const _HoverCardSection();
 
   /// `h-32` on the preview swatch.
-  static double get _swatchHeight => el(32);
+  static double get _swatchHeight => space(32);
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'hover-card',
     title: 'Hover Card',
     description:
         'A richer preview on hover, for pointer users only. Used '
         'to preview a card from a live-pull row without leaving the feed. '
         'Never put an action inside one.',
-    child: ElPanel(
+    child: Panel(
       label: 'Card preview',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Align(
             alignment: AlignmentDirectional.centerStart,
-            child: ElHoverCard(
-              trigger: ElButton(
-                variant: ElButtonVariant.link,
+            child: HoverCard(
+              trigger: Button(
+                variant: ButtonVariant.link,
                 onPressed: () {},
                 child: const Text('Voidwing Ascendant'),
               ),
@@ -1801,7 +1822,7 @@ class _CardPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
@@ -1809,29 +1830,36 @@ class _CardPreview extends StatelessWidget {
         // `mb-3 h-32 rounded-md border border-value/30 bg-value/12`.
         Container(
           height: swatchHeight,
-          margin: EdgeInsets.only(bottom: el(3)),
+          margin: EdgeInsets.only(bottom: space(3)),
           decoration: BoxDecoration(
-            color: ElPalette.value.withValues(alpha: _swatchFillAlpha),
-            borderRadius: BorderRadius.circular(ElRadii.md),
+            color: Palette.value.withValues(alpha: _swatchFillAlpha),
+            borderRadius: BorderRadius.circular(Radii.md),
             border: Border.all(
-              color: ElPalette.value.withValues(alpha: _swatchBorderAlpha),
-              width: ElWidths.hairline,
+              color: Palette.value.withValues(alpha: _swatchBorderAlpha),
+              width: BorderWidths.hairline,
             ),
           ),
         ),
-        ElText('Voidwing Ascendant', ElType.h4, color: theme.foreground),
+        StyledText(
+          'Voidwing Ascendant',
+          TextStyles.h4,
+          color: theme.foreground,
+        ),
         Padding(
-          padding: EdgeInsets.only(top: el(1)),
-          child: ElText('Eclipse Vault · #044 of 250', ElType.small),
+          padding: EdgeInsets.only(top: space(1)),
+          child: StyledText('Eclipse Vault · #044 of 250', TextStyles.small),
         ),
         // `mt-3 flex items-baseline justify-between border-t border-border
         // pt-3`.
         Container(
-          margin: EdgeInsets.only(top: el(3)),
-          padding: EdgeInsets.only(top: el(3)),
+          margin: EdgeInsets.only(top: space(3)),
+          padding: EdgeInsets.only(top: space(3)),
           decoration: BoxDecoration(
             border: Border(
-              top: BorderSide(color: theme.border, width: ElWidths.hairline),
+              top: BorderSide(
+                color: theme.border,
+                width: BorderWidths.hairline,
+              ),
             ),
           ),
           child: Row(
@@ -1839,8 +1867,16 @@ class _CardPreview extends StatelessWidget {
             textBaseline: TextBaseline.alphabetic,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              ElText('Legendary', ElType.label, color: theme.valueInk),
-              ElText(r'$1,240.00', ElType.numMd, color: theme.valueInk),
+              StyledText(
+                'Legendary',
+                TextStyles.eyebrow,
+                color: theme.premiumText,
+              ),
+              StyledText(
+                r'$1,240.00',
+                TextStyles.numberMd,
+                color: theme.premiumText,
+              ),
             ],
           ),
         ),
@@ -1855,47 +1891,44 @@ class _TooltipSection extends StatelessWidget {
   const _TooltipSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'tooltip',
     title: 'Tooltip',
     description:
         'A short label for a control whose purpose is not '
         'obvious. It is not a place for content, and it is never the only '
         'way to learn something.',
-    child: ElPanel(
+    child: Panel(
       label: 'Icon-button labels',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElRow(
+          SpecimenRow(
             children: <Widget>[
-              ElTooltip(
+              Tooltip(
                 label: 'Open this pack',
-                child: ElButton(
-                  variant: ElButtonVariant.ghost,
-                  size: ElButtonSize.icon,
+                child: Button(
+                  variant: ButtonVariant.ghost,
+                  size: ButtonSize.icon,
                   label: 'Add to favourites',
                   onPressed: () {},
-                  child: const ElIcon(
-                    ElIconGlyph.packageOpen,
-                    size: ElIconSize.md,
-                  ),
+                  child: const Icon(IconGlyph.packageOpen, size: IconSize.md),
                 ),
               ),
-              ElTooltip(
+              Tooltip(
                 label: 'Filter and sort',
-                child: ElButton(
-                  variant: ElButtonVariant.ghost,
-                  size: ElButtonSize.icon,
+                child: Button(
+                  variant: ButtonVariant.ghost,
+                  size: ButtonSize.icon,
                   label: 'Filters',
                   onPressed: () {},
-                  child: const ElIcon(
-                    ElIconGlyph.slidersHorizontal,
-                    size: ElIconSize.md,
+                  child: const Icon(
+                    IconGlyph.slidersHorizontal,
+                    size: IconSize.md,
                   ),
                 ),
               ),
-              const ElTooltip(
+              const Tooltip(
                 label: '412 packs remaining of a 2,000 print run',
                 child: _DashedCount(),
               ),
@@ -1925,14 +1958,18 @@ class _DashedCount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: theme.input, width: ElWidths.hairline),
+          bottom: BorderSide(color: theme.input, width: BorderWidths.hairline),
         ),
       ),
-      child: ElText('412 / 2,000', ElType.numSm, color: theme.mutedForeground),
+      child: StyledText(
+        '412 / 2,000',
+        TextStyles.numberSm,
+        color: theme.mutedForeground,
+      ),
     );
   }
 }
@@ -1943,11 +1980,11 @@ class _ApiSection extends StatelessWidget {
   const _ApiSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'api',
     title: 'API',
-    child: ElMeta(
-      items: <ElMetaItem>[
+    child: Meta(
+      items: <MetaItem>[
         (
           k: 'Dialog',
           v: TextSpan(
@@ -2003,13 +2040,13 @@ class _RulesSection extends StatelessWidget {
   const _RulesSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'rules',
     title: 'Rules',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElDoDont(
+        const DoDont(
           dos: <String>[
             'Use Alert Dialog for anything irreversible: selling, '
                 'deleting, closing an account.',
@@ -2047,8 +2084,8 @@ class _RulesSection extends StatelessWidget {
           ],
         ),
         Padding(
-          padding: EdgeInsets.only(top: el(4)),
-          child: const ElNote(child: _MotionNoteBody()),
+          padding: EdgeInsets.only(top: space(4)),
+          child: const Note(child: _MotionNoteBody()),
         ),
       ],
     ),
@@ -2060,31 +2097,31 @@ class _MotionNoteBody extends StatelessWidget {
   const _MotionNoteBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
           text: 'Modal overlays, Dialog, Alert Dialog: arrive on ',
         ),
-        ElCode.span('anim-jelly-in'),
+        Code.span('anim-jelly-in'),
         TextSpan(text: ' ('),
-        ElCode.span('--duration-jelly'),
+        Code.span('--duration-jelly'),
         TextSpan(text: ', 420ms on '),
-        ElCode.span('--ease-spring'),
+        Code.span('--ease-spring'),
         TextSpan(text: ') and leave on '),
-        ElCode.span('anim-jelly-out'),
+        Code.span('anim-jelly-out'),
         TextSpan(text: ' at '),
-        ElCode.span('--duration-base'),
+        Code.span('--duration-base'),
         TextSpan(
           text:
               '. Leaving is deliberately faster than arriving. Anchored '
               'and edge overlays, Popover, Tooltip, Sheet, Drawer: keep '
               'their own fade or slide on ',
         ),
-        ElCode.span('--duration-overlay'),
+        Code.span('--duration-overlay'),
         TextSpan(text: ' (320ms). Never override either per-instance.'),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }

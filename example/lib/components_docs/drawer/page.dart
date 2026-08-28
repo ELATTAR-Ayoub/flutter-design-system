@@ -7,7 +7,7 @@
 /// `lib/src/components/sheet.dart` has its own page and its own directory,
 /// `../sheet/page.dart`, not this one.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels shaped to mirror shadcn's own drawer page section for section; it
 /// now declares a [ComponentDocSpec]
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
@@ -27,7 +27,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -78,10 +90,10 @@ final ComponentDocSpec drawerDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'Uncontrolled, like ElDialog: the open/close boolean lives '
-          'inside ElModalPortal and the trigger only ever gets a '
-          'callback. ElDrawer exposes no onOpenChange callback the way '
-          "ElDialog does: a real gap against the dialog's own API, not "
+          'Uncontrolled, like Dialog: the open/close boolean lives '
+          'inside OverlayPortal and the trigger only ever gets a '
+          'callback. Drawer exposes no onOpenChange callback the way '
+          "Dialog does: a real gap against the dialog's own API, not "
           'an omission from this page.',
       code: _drawerUsageCode,
     ),
@@ -90,8 +102,8 @@ final ComponentDocSpec drawerDocSpec = ComponentDocSpec(
       title: 'Composition',
       description:
           'Read directly off drawer.dart rather than carried from a '
-          'live specimen: ElDrawerHandle mounts itself automatically '
-          'ahead of ElDrawerContent.children and never appears in '
+          'live specimen: DrawerHandle mounts itself automatically '
+          'ahead of DrawerContent.children and never appears in '
           'caller code.',
       code: _drawerCompositionCode,
     ),
@@ -99,13 +111,13 @@ final ComponentDocSpec drawerDocSpec = ComponentDocSpec(
       id: 'sizing',
       title: 'Sizing',
       description:
-          'ElDrawerContent takes no width or height parameter of its '
-          'own: max-height is always ElDrawerContent.maxHeightFraction '
-          '(80% of the viewport) below a fixed ElDrawerContent.topGutter '
+          'DrawerContent takes no width or height parameter of its '
+          'own: max-height is always DrawerContent.maxHeightFraction '
+          '(80% of the viewport) below a fixed DrawerContent.topGutter '
           '(96px) strip of page it may never cover. Where the reference '
           'lets a caller override height per instance with a Tailwind '
-          'class, ElDrawer exposes no matching parameter: every drawer '
-          'in the app is sized identically. See ElDrawerContent below in '
+          'class, Drawer exposes no matching parameter: every drawer '
+          'in the app is sized identically. See DrawerContent below in '
           'API Reference for the fixed layout tokens.',
       code: _sizingSkippedCode,
     ),
@@ -116,18 +128,18 @@ final ComponentDocSpec drawerDocSpec = ComponentDocSpec(
           'Every public constructor parameter declared on every public '
           'class in lib/src/components/drawer.dart: one table each.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElDrawer', anchor: 'api-eldrawer'),
-        DocsTocEntry(title: 'ElDrawerContent', anchor: 'api-eldrawercontent'),
+        DocsTocEntry(title: 'Drawer', anchor: 'api-eldrawer'),
+        DocsTocEntry(title: 'DrawerContent', anchor: 'api-eldrawercontent'),
         DocsTocEntry(
-          title: 'ElDrawerContent static helpers',
+          title: 'DrawerContent static helpers',
           anchor: 'api-eldrawercontent-static',
         ),
-        DocsTocEntry(title: 'ElDrawerHandle', anchor: 'api-eldrawerhandle'),
-        DocsTocEntry(title: 'ElDrawerHeader', anchor: 'api-eldrawerheader'),
-        DocsTocEntry(title: 'ElDrawerFooter', anchor: 'api-eldrawerfooter'),
-        DocsTocEntry(title: 'ElDrawerTitle', anchor: 'api-eldrawertitle'),
+        DocsTocEntry(title: 'DrawerHandle', anchor: 'api-eldrawerhandle'),
+        DocsTocEntry(title: 'DrawerHeader', anchor: 'api-eldrawerheader'),
+        DocsTocEntry(title: 'DrawerFooter', anchor: 'api-eldrawerfooter'),
+        DocsTocEntry(title: 'DrawerTitle', anchor: 'api-eldrawertitle'),
         DocsTocEntry(
-          title: 'ElDrawerDescription',
+          title: 'DrawerDescription',
           anchor: 'api-eldrawerdescription',
         ),
       ],
@@ -137,8 +149,8 @@ final ComponentDocSpec drawerDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read straight off ElDrawer, ElDrawerContent, and the shared '
-          'ElModalPortal it rides.',
+          'Read straight off Drawer, DrawerContent, and the shared '
+          'OverlayPortal it rides.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
     DisclosureSection(
@@ -151,7 +163,7 @@ final ComponentDocSpec drawerDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'drawer.dart wires no key handling of its own: every fact '
-          'here belongs to the shared ElModalPortal it rides '
+          'here belongs to the shared OverlayPortal it rides '
           '(lib/src/components/dialog.dart).',
       child: _KeyboardContent(),
     ),
@@ -187,7 +199,7 @@ final ComponentDocSpec drawerDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/dialogs_test.dart',
             description:
-                'ElDrawer is covered inside this suite; there is no '
+                'Drawer is covered inside this suite; there is no '
                 'dedicated drawer_test.dart in the package itself.',
           ),
           const DocsInstallFact(
@@ -196,7 +208,7 @@ final ComponentDocSpec drawerDocSpec = ComponentDocSpec(
             description:
                 'Covers this page: the article mounts, every documented '
                 'constructor parameter appears in an API table, the '
-                'section order matches this file, and a live ElDrawer '
+                'section order matches this file, and a live Drawer '
                 'actually opens, drags past the close threshold, and '
                 'dismisses.',
           ),
@@ -224,9 +236,9 @@ class DrawerDocPage extends StatelessWidget {
       title: drawerDoc.title,
       description: drawerDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Drawer'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Drawer'),
     ],
     toc: drawerDocSpec.toc,
     previous: const DocsPageLink(title: 'Dialog', route: '/components/dialog'),
@@ -244,40 +256,40 @@ class DrawerDocPage extends StatelessWidget {
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-const String _drawerUsageCode = '''ElDrawer(
-  trigger: (context, open) => ElButton(
+const String _drawerUsageCode = '''Drawer(
+  trigger: (context, open) => Button(
     onPressed: open,
     child: const Text('Card actions'),
   ),
-  content: (context, close) => ElDrawerContent(
+  content: (context, close) => DrawerContent(
     children: <Widget>[
-      ElDrawerHeader(children: <Widget>[
-        ElDrawerTitle('Voidwing Ascendant'),
-        ElDrawerDescription('Eclipse Vault · #044 · Legendary'),
+      DrawerHeader(children: <Widget>[
+        DrawerTitle('Voidwing Ascendant'),
+        DrawerDescription('Eclipse Vault · #044 · Legendary'),
       ]),
-      ElDrawerFooter(children: <Widget>[
-        ElButton(onPressed: close, child: const Text('Sell for \$1,240.00')),
+      DrawerFooter(children: <Widget>[
+        Button(onPressed: close, child: const Text('Sell for \$1,240.00')),
       ]),
     ],
   ),
 )''';
 
 /// Drawer's anatomy, read directly off drawer.dart rather than carried from
-/// a live specimen: ElDrawerHandle mounts itself automatically ahead of
-/// [ElDrawerContent.children] and never appears in caller code.
-const String _drawerCompositionCode = '''ElDrawer(
+/// a live specimen: DrawerHandle mounts itself automatically ahead of
+/// [DrawerContent.children] and never appears in caller code.
+const String _drawerCompositionCode = '''Drawer(
   trigger: (context, open) => ..., // builds the opener
-  content: (context, close) => ElDrawerContent(
+  content: (context, close) => DrawerContent(
     children: <Widget>[
-      // ElDrawerHandle is NOT listed here: ElDrawerContent prepends it
+      // DrawerHandle is NOT listed here: DrawerContent prepends it
       // to the column itself, unconditionally, ahead of these children.
-      ElDrawerHeader(children: <Widget>[
-        ElDrawerTitle('...'),
-        ElDrawerDescription('...'),
+      DrawerHeader(children: <Widget>[
+        DrawerTitle('...'),
+        DrawerDescription('...'),
       ]),
       ..., // the body: any widget, not independently scrollable
-      ElDrawerFooter(children: <Widget>[
-        ElButton(onPressed: close, child: const Text('...')),
+      DrawerFooter(children: <Widget>[
+        Button(onPressed: close, child: const Text('...')),
       ]),
     ],
   ),
@@ -291,24 +303,24 @@ const String _sizingSkippedCode =
 // snap points, responsive, migrating from vaul.
 
 // Styling: the reference's data-[state], data-[vaul-drawer-direction],
-// and CSS custom-property hooks have no Flutter analogue; ElDrawer
+// and CSS custom-property hooks have no Flutter analogue; Drawer
 // exposes no styling surface beyond the fixed fill/border/radius
-// documented under ElDrawerContent in API Reference.
+// documented under DrawerContent in API Reference.
 
-// Position: ElDrawer opens from the bottom only. drawer.dart's own doc
+// Position: Drawer opens from the bottom only. drawer.dart's own doc
 // comment records left, right, and top as "not ported": there is no
 // swipeDirection-equivalent parameter.
 
-// Swipe handle: ElDrawerHandle always mounts, unconditionally,
-// prepended by ElDrawerContent itself. There is no showSwipeHandle-style
+// Swipe handle: DrawerHandle always mounts, unconditionally,
+// prepended by DrawerContent itself. There is no showSwipeHandle-style
 // toggle to turn it off.
 
-// Nested: opening a second ElDrawer from within an open one is not
-// demonstrated anywhere in the corpus. ElModalPortal's own stack could
+// Nested: opening a second Drawer from within an open one is not
+// demonstrated anywhere in the corpus. OverlayPortal's own stack could
 // plausibly support it, but no specimen exists to verify the
 // reference's parent-stays-mounted behavior against.
 
-// Non modal: ElDrawer always mounts a dismissing scrim; there is no
+// Non modal: Drawer always mounts a dismissing scrim; there is no
 // modal: false to let the page keep receiving input while it is open.
 
 // Snap points: also recorded as "not ported" in drawer.dart's own doc
@@ -325,7 +337,7 @@ const String _sizingSkippedCode =
 // existing Vaul integration. Nothing to migrate on a from-scratch
 // Flutter port.''';
 
-/// The primary live specimen: one real [ElDrawer], keyed by [keyPrefix] so
+/// The primary live specimen: one real [Drawer], keyed by [keyPrefix] so
 /// the same specimen shape can be reused at more than one call site on this
 /// page without a duplicate-key collision.
 class _DrawerPreview extends StatelessWidget {
@@ -334,35 +346,35 @@ class _DrawerPreview extends StatelessWidget {
   final String keyPrefix;
 
   @override
-  Widget build(BuildContext context) => ElDrawer(
-    trigger: (BuildContext context, VoidCallback open) => ElButton(
+  Widget build(BuildContext context) => Drawer(
+    trigger: (BuildContext context, VoidCallback open) => Button(
       key: ValueKey<String>('$keyPrefix-trigger'),
-      variant: ElButtonVariant.secondary,
+      variant: ButtonVariant.secondary,
       onPressed: open,
       child: const Text('Open drawer'),
     ),
-    content: (BuildContext context, VoidCallback close) => ElDrawerContent(
+    content: (BuildContext context, VoidCallback close) => DrawerContent(
       children: <Widget>[
-        const ElDrawerHeader(
+        const DrawerHeader(
           children: <Widget>[
-            ElDrawerTitle('Card actions'),
-            ElDrawerDescription(
+            DrawerTitle('Card actions'),
+            DrawerDescription(
               'Drag down to dismiss, or use the buttons below.',
             ),
           ],
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: el(4)),
-          child: ElButton(
+          padding: EdgeInsets.symmetric(horizontal: space(4)),
+          child: Button(
             expanded: true,
             onPressed: close,
             child: const Text('Close'),
           ),
         ),
-        ElDrawerFooter(
+        DrawerFooter(
           children: <Widget>[
-            ElButton(
-              variant: ElButtonVariant.outline,
+            Button(
+              variant: ButtonVariant.outline,
               onPressed: close,
               child: const Text('Cancel'),
             ),
@@ -384,46 +396,46 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-eldrawer',
-        child: DocsApiTable(title: 'ElDrawer', facts: _drawerFacts),
+        child: DocsApiTable(title: 'Drawer', facts: _drawerFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eldrawercontent',
-        child: DocsApiTable(title: 'ElDrawerContent', facts: _contentFacts),
+        child: DocsApiTable(title: 'DrawerContent', facts: _contentFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eldrawercontent-static',
         child: DocsApiTable(
-          title: 'ElDrawerContent static helpers',
+          title: 'DrawerContent static helpers',
           facts: _contentStaticFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eldrawerhandle',
-        child: DocsApiTable(title: 'ElDrawerHandle', facts: _handleFacts),
+        child: DocsApiTable(title: 'DrawerHandle', facts: _handleFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eldrawerheader',
-        child: DocsApiTable(title: 'ElDrawerHeader', facts: _headerFacts),
+        child: DocsApiTable(title: 'DrawerHeader', facts: _headerFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eldrawerfooter',
-        child: DocsApiTable(title: 'ElDrawerFooter', facts: _footerFacts),
+        child: DocsApiTable(title: 'DrawerFooter', facts: _footerFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eldrawertitle',
-        child: DocsApiTable(title: 'ElDrawerTitle', facts: _titleFacts),
+        child: DocsApiTable(title: 'DrawerTitle', facts: _titleFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eldrawerdescription',
         child: DocsApiTable(
-          title: 'ElDrawerDescription',
+          title: 'DrawerDescription',
           facts: _descriptionFacts,
         ),
       ),
@@ -434,15 +446,15 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _drawerFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'trigger',
-    type: 'ElModalTriggerBuilder',
+    type: 'ModalTriggerBuilder',
     description: 'Required. Builds the control that opens the portal.',
   ),
   DocsApiFact(
     name: 'content',
-    type: 'ElModalContentBuilder',
+    type: 'ModalContentBuilder',
     description:
         'Required. Builds the panel and receives its close callback. '
-        'ElDrawer wraps the built content in its own vertical drag '
+        'Drawer wraps the built content in its own vertical drag '
         'gesture detector before mounting it.',
   ),
 ];
@@ -452,7 +464,7 @@ const List<DocsApiFact> _contentFacts = <DocsApiFact>[
     name: 'children',
     type: 'List<Widget>',
     description:
-        'Required. The column\'s contents. A ElDrawerHandle is '
+        'Required. The column\'s contents. A DrawerHandle is '
         'prepended automatically ahead of these; it is not one of '
         'these children and cannot be turned off.',
   ),
@@ -460,42 +472,42 @@ const List<DocsApiFact> _contentFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _contentStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElDrawerContent.topGutter',
+    name: 'DrawerContent.topGutter',
     type: 'static double',
     description:
-        '96px (el(24)): the strip of page the drawer may never cover, '
+        '96px (space(24)): the strip of page the drawer may never cover, '
         'even at its tallest.',
   ),
   DocsApiFact(
-    name: 'ElDrawerContent.maxHeightFraction',
+    name: 'DrawerContent.maxHeightFraction',
     type: 'static const double',
     description: '0.8: the panel never exceeds 80% of the viewport height.',
   ),
   DocsApiFact(
-    name: 'ElDrawerContent.radius',
+    name: 'DrawerContent.radius',
     type: 'static double',
-    description: 'ElRadii.xl (16px): the top corners only.',
+    description: 'Radii.xl (16px): the top corners only.',
   ),
 ];
 
 const List<DocsApiFact> _handleFacts = <DocsApiFact>[
   DocsApiFact(
     name: '(none)',
-    type: 'const ElDrawerHandle({super.key})',
+    type: 'const DrawerHandle({super.key})',
     description:
         'Takes no constructor parameters of its own beyond key. It is '
         'the grip: width and height are fixed statics below, not '
         'per-instance options.',
   ),
   DocsApiFact(
-    name: 'ElDrawerHandle.width',
+    name: 'DrawerHandle.width',
     type: 'static double',
-    description: '96px (el(24)) grip width.',
+    description: '96px (space(24)) grip width.',
   ),
   DocsApiFact(
-    name: 'ElDrawerHandle.height',
+    name: 'DrawerHandle.height',
     type: 'static double',
-    description: '4px (el(1)) grip height.',
+    description: '4px (space(1)) grip height.',
   ),
 ];
 
@@ -551,8 +563,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Open',
     treatment:
         'Scrim and panel both animate over 500ms on vaul\'s own '
-        'cubic-bezier(0.32, 0.72, 0, 1) (ElDurations.drawer / '
-        'ElCurves.vaul): a different clock and curve from every other '
+        'cubic-bezier(0.32, 0.72, 0, 1) (MotionDurations.drawerOpen / '
+        'MotionCurves.vaul): a different clock and curve from every other '
         'overlay in the system.',
     userSignal:
         'The grip handle signals the drawer is draggable before the '
@@ -572,7 +584,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Escape / back',
     treatment:
-        'Dismisses on Escape (ElModalPortal\'s FocusScope) and on '
+        'Dismisses on Escape (OverlayPortal\'s FocusScope) and on '
         'Android back / predictive back (the shared PopScope stack).',
     userSignal: 'The page remains in place.',
   ),
@@ -580,13 +592,13 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Scrim tap',
     treatment:
         'Dismisses on a tap outside the panel: dismissOnOverlayTap is '
-        'not set to false, so ElModalPortal\'s true default applies.',
+        'not set to false, so OverlayPortal\'s true default applies.',
     userSignal: 'Any tap outside the panel closes it.',
   ),
   DocsStateFact(
     state: 'Long content',
     treatment:
-        'ElDrawerContent clips to its own 80vh cap and does not wrap '
+        'DrawerContent clips to its own 80vh cap and does not wrap '
         'its body in a Flexible + SingleChildScrollView. The body is '
         'deliberately NOT independently scrollable: a nested '
         'Scrollable would win the gesture arena against the '
@@ -600,7 +612,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Disabled, N/A',
     treatment: 'Exposes no enabled/disabled parameter of its own.',
     userSignal:
-        'A caller wanting a disabled trigger gates ElButton\'s own '
+        'A caller wanting a disabled trigger gates Button\'s own '
         'onPressed outside this widget.',
   ),
   DocsStateFact(
@@ -611,8 +623,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        'Rides ElModalPortal, whose durations resolve through '
-        'elAnimationDuration(context, ...): collapsing to zero under '
+        'Rides OverlayPortal, whose durations resolve through '
+        'effectiveMotionDuration(context, ...): collapsing to zero under '
         'the platform\'s disable-animations flag.',
     userSignal: 'The transition still happens, instantly.',
   ),
@@ -623,13 +635,13 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Focus moves INTO the panel on open: ElModalPortal wraps the '
+      _bullets(ThemeScope.of(context), <String>[
+        'Focus moves INTO the panel on open: OverlayPortal wraps the '
             'content in FocusScope(autofocus: true), so the '
             'FocusScopeNode itself (not a leaf widget) claims primary '
             'focus the moment the overlay mounts.',
         'Closing DOES return focus to the trigger that opened the '
-            'overlay, even though ElModalPortal contains no explicit '
+            'overlay, even though OverlayPortal contains no explicit '
             '"restore focus" code of its own: Flutter\'s FocusManager '
             'falls back to the enclosing scope\'s previously-focused '
             'child once the overlay\'s own FocusScope is removed from '
@@ -638,38 +650,38 @@ class _AccessibilityContent extends StatelessWidget {
         'No built-in close button at all: unlike Sheet, drawer.dart '
             'imports neither button.dart nor icon.dart. A caller must '
             'compose one and give it its own accessible label.',
-        'ElDrawerContent does NOT use ElSafeArea anywhere: a real gap. '
+        'DrawerContent does NOT use SafeArea anywhere: a real gap. '
             'On a device with a bottom home indicator, drawer content '
             'is not inset from it.',
-        'Touch target: the grip handle ElDrawerHandle renders is 96 x '
+        'Touch target: the grip handle DrawerHandle renders is 96 x '
             '4 logical pixels, far under any reasonable touch-target '
             'guidance on its own. The full-width lane it sits in (the '
             'whole top strip of the panel) is what actually receives '
             'the drag gesture, not the visible bar.',
-        'ElDrawerTitle and ElDrawerDescription are plain, centred '
-            'ElText, not wired to the panel as a Semantics('
+        'DrawerTitle and DrawerDescription are plain, centred '
+            'StyledText, not wired to the panel as a Semantics('
             'scopesRoute: true) accessible name/description pair.',
       ]);
 }
 
 /// `drawer.dart` wires no key handling of its own — every fact here belongs
-/// to the shared `ElModalPortal` it rides (`lib/src/components/dialog.dart`).
+/// to the shared `OverlayPortal` it rides (`lib/src/components/dialog.dart`).
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Focus is trapped while open in the sense that matters for Tab '
             'traversal: once Tab moves focus to a real control inside '
             'the panel, further presses cycle inside the panel rather '
             'than reaching page content behind the scrim.',
         'Escape closes the topmost open overlay '
-            '(ElModalPortalState\'s static stack), matching dialog\'s '
+            '(OverlayPortalState\'s static stack), matching dialog\'s '
             'own Escape contract.',
         'Android back / predictive back dismisses the topmost overlay '
             'unconditionally, the same USER-ORDERED MOBILE ADAPTATION '
-            'dialog.dart documents, shared by every ElModalPortal '
+            'dialog.dart documents, shared by every OverlayPortal '
             'consumer.',
         'No custom ordering: drawer.dart declares no '
             'FocusTraversalPolicy of its own. Tab and Shift+Tab walk '
@@ -687,15 +699,15 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Opts OUT of ElModalPortal\'s compact viewport clamp '
+      _bullets(ThemeScope.of(context), <String>[
+        'Opts OUT of OverlayPortal\'s compact viewport clamp '
             '(clampToViewport: false): the drawer already IS the phone '
             'container, inset-x-0 is a full-bleed width a 90vw cap '
             'would break.',
         'Clamps its own height instead: max-height is always 80% of '
-            'the viewport (ElDrawerContent.maxHeightFraction), on '
+            'the viewport (DrawerContent.maxHeightFraction), on '
             'every screen size, with a fixed 96px top gutter '
-            '(ElDrawerContent.topGutter) it may never cover.',
+            '(DrawerContent.topGutter) it may never cover.',
         'The body is deliberately NOT independently scrollable: a '
             'nested Scrollable would win the gesture arena against the '
             'drag-to-dismiss recognizer wrapped around the whole '
@@ -719,7 +731,7 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/drawer.dart: one file, no '
             'companions.',
         'Flutter imports: package:flutter/gestures.dart '
@@ -729,21 +741,21 @@ class _DependenciesContent extends StatelessWidget {
             'package:flutter/widgets.dart.',
         'Foundation imports: foundation/motion.dart, '
             'foundation/spacing.dart, foundation/theme.dart, '
-            'foundation/typography.dart, theme_scope.dart (ElText, '
-            'ElTheme).',
-        'Component imports: dialog.dart only (ElModalPortal, '
-            'ElModalTriggerBuilder, ElModalContentBuilder). No '
+            'foundation/typography.dart, theme_scope.dart (StyledText, '
+            'ThemeScope).',
+        'Component imports: dialog.dart only (OverlayPortal, '
+            'ModalTriggerBuilder, ModalContentBuilder). No '
             'button.dart, no icon.dart: matching the lack of a '
             'built-in close button.',
         'registryDependencies, read directly from the shipped '
             'manifest: ${drawerDoc.dependencies.join(', ')}.',
         'Assets, fonts, shaders: none, though its motion is worth '
-            'flagging even without an asset: driven by ElCurves.vaul '
-            'and ElDurations.drawer rather than the shared '
-            'ElDurations.overlay / ElCurves.out tokens every other '
-            'ElModalPortal consumer uses.',
+            'flagging even without an asset: driven by MotionCurves.vaul '
+            'and MotionDurations.drawerOpen rather than the shared '
+            'MotionDurations.overlayEnter / MotionCurves.enter tokens every other '
+            'OverlayPortal consumer uses.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Dialog', route: '/components/dialog'),
@@ -758,37 +770,41 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'theme.popover always fills the panel; there is no fill '
             'override parameter, a real gap against Sheet\'s own fill '
             'parameter.',
         'theme.border paints the single hairline seam on the panel\'s '
             'top edge.',
-        'theme.muted paints ElDrawerHandle\'s grip pill. drawer.dart '
-            'never reads ElShadows: the panel carries no '
+        'theme.muted paints DrawerHandle\'s grip pill. drawer.dart '
+            'never reads Shadows: the panel carries no '
             'elevation/shadow spec at all, unlike Sheet\'s '
-            'ElShadows.tailwindLg.',
-        'ElRadii.xl (16px) rounds the top corners only (rounded-t-xl); '
+            'Shadows.tailwindLg.',
+        'Radii.xl (16px) rounds the top corners only (rounded-t-xl); '
             'the bottom stays square, flush with the viewport edge.',
-        'ElDrawerHeader and ElDrawerFooter carry NO muted band or rule '
+        'DrawerHeader and DrawerFooter carry NO muted band or rule '
             'of their own: plain padded columns, a real anatomy '
             'difference from Sheet\'s own header/footer, which do band '
             'and rule.',
-        'Every colour is read live off ElTheme.of(context) at build '
-            'time. Flipping ElThemeController re-resolves every one '
+        'Every colour is read live off ThemeScope.of(context) at build '
+            'time. Flipping ThemeController re-resolves every one '
             'on the next frame: nothing is cached.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

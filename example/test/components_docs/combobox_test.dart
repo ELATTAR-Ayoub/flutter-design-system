@@ -1,25 +1,25 @@
 /// Tests for `components_docs/combobox/meta.dart` and
 /// `components_docs/combobox/page.dart`: the public documentation page for
-/// [ElCombobox] alone.
+/// [Combobox] alone.
 ///
 /// Re-housed onto the kit alongside the page: the section-order test now
 /// reads `DocsSection.id` (the kit's own section widget) instead of
-/// `ElSection`'s title, and the API-table / state-matrix tests open the
+/// `Section`'s title, and the API-table / state-matrix tests open the
 /// relevant `DocsDisclosure` first — closed by default in the new kit.
 ///
-/// [ElCombobox] mounts its list through a [ElPopover], which is an
+/// [Combobox] mounts its list through a [Popover], which is an
 /// [OverlayPortal], so every specimen on this page needs a real [Overlay]
 /// above it: the [MaterialApp] in the harness below is what supplies one.
 /// Without it the popup silently never opens and every "it filters"
 /// assertion would pass against an untested path.
 ///
 /// The popup's entrance is a real animation, so an open is pumped by
-/// [ElDurations.overlay] rather than settled: `pumpAndSettle` is never used
+/// [MotionDurations.overlayEnter] rather than settled: `pumpAndSettle` is never used
 /// here.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
-/// coverage uses one live [ElThemeController] flipped in place.
+/// coverage uses one live [ThemeController] flipped in place.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -27,7 +27,33 @@ import 'package:example/components_docs/combobox/meta.dart';
 import 'package:example/components_docs/combobox/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -59,7 +85,7 @@ const List<String> _expectedSectionIds = <String>[
   'source',
 ];
 
-/// Every named constructor parameter `ElCombobox` declares, excluding `key`.
+/// Every named constructor parameter `Combobox` declares, excluding `key`.
 const List<String> _comboboxParams = <String>[
   'items',
   'value',
@@ -74,13 +100,13 @@ const List<String> _comboboxParams = <String>[
   'filter',
 ];
 
-/// Every public static `ElCombobox` exposes.
+/// Every public static `Combobox` exposes.
 const List<String> _comboboxStatics = <String>[
-  'ElCombobox.popupOffset',
-  'ElCombobox.popupOvershoot',
-  'ElCombobox.listMaxHeight',
-  'ElCombobox.itemHeight',
-  'ElCombobox.emptyHeight',
+  'Combobox.popupOffset',
+  'Combobox.popupOvershoot',
+  'Combobox.listMaxHeight',
+  'Combobox.itemHeight',
+  'Combobox.emptyHeight',
 ];
 
 /// The single `DocsDisclosure` whose title is [title], matching
@@ -92,23 +118,23 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pumpComboboxDoc(
+Future<ThemeController> _pumpComboboxDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
-      // MaterialApp, not a bare ElTheme: the popup is an OverlayPortal and
+      // MaterialApp, not a bare ThemeScope: the popup is an OverlayPortal and
       // needs a real Overlay ancestor or it never mounts.
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -127,7 +153,7 @@ Future<ElThemeController> _pumpComboboxDoc(
 /// The text field inside the live combobox specimen at the top of the page.
 Finder _comboboxInput() => find.descendant(
   of: find.byKey(_comboboxSpecimenKey),
-  matching: find.byType(ElInputGroupInput),
+  matching: find.byType(InputGroupInput),
 );
 
 /// Opens the live specimen's popup and lets its entrance run.
@@ -138,26 +164,26 @@ Future<void> _openPopup(WidgetTester tester) async {
   await tester.pump();
   // Never pumpAndSettle: the popup entrance is a real animation and this is
   // the duration it runs for.
-  await tester.pump(ElDurations.overlay);
+  await tester.pump(MotionDurations.overlayEnter);
   await tester.pump();
 }
 
 void main() {
   group('meta', () {
-    test('comboboxDoc names the real public API surface of ElCombobox', () {
+    test('comboboxDoc names the real public API surface of Combobox', () {
       expect(comboboxDoc.name, 'combobox');
       expect(comboboxDoc.title, 'Combobox');
       expect(comboboxDoc.route, '/components/combobox');
       expect(comboboxDoc.command, 'elattar add combobox');
       expect(comboboxDoc.sourcePath, 'lib/src/components/combobox.dart');
       expect(comboboxDoc.exports, <String>[
-        'ElCombobox',
-        'ElComboboxItem',
-        'elCollatorContains',
+        'Combobox',
+        'ComboboxItem',
+        'collatorContains',
       ]);
       // The split: nothing command-shaped is claimed by this entry.
-      expect(comboboxDoc.exports, isNot(contains('ElCommand')));
-      expect(comboboxDoc.exports, isNot(contains('elCommandScore')));
+      expect(comboboxDoc.exports, isNot(contains('Command')));
+      expect(comboboxDoc.exports, isNot(contains('commandScore')));
       // Short description: one sentence, no trailing ellipsis.
       expect(comboboxDoc.description, isNot(contains('..')));
       expect(comboboxDoc.description.trim(), comboboxDoc.description);
@@ -173,7 +199,7 @@ void main() {
         'source-foundation',
       ]);
       // command.dart imports input.dart for its search field; this file
-      // reaches for ElInputGroupInput instead.
+      // reaches for InputGroupInput instead.
       expect(comboboxDoc.dependencies, isNot(contains('input')));
     });
   });
@@ -191,7 +217,7 @@ void main() {
       expect(find.byKey(_comboboxSpecimenKey), findsOneWidget);
       expect(find.byKey(_invalidSpecimenKey), findsOneWidget);
       expect(find.byKey(_disabledSpecimenKey), findsOneWidget);
-      expect(find.byType(ElCombobox<String>), findsNWidgets(3));
+      expect(find.byType(Combobox<String>), findsNWidgets(3));
       expect(tester.takeException(), isNull);
     });
 
@@ -213,11 +239,10 @@ void main() {
     ) async {
       await _pumpComboboxDoc(tester);
 
-      expect(find.byType(ElCommand), findsNothing);
-      expect(find.text('ElCommand'), findsNothing);
-      expect(find.text('ElCommandItem'), findsNothing);
+      expect(find.byType(Command), findsNothing);
+      expect(find.text('CommandItem'), findsNothing);
       expect(
-        find.text('elCommandScore(string, abbreviation, [aliases]) → double'),
+        find.text('commandScore(string, abbreviation, [aliases]) → double'),
         findsNothing,
       );
       final List<String> ids = tester
@@ -239,15 +264,15 @@ void main() {
         await tester.ensureVisible(apiTrigger);
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String name in <String>[
           ..._comboboxParams,
           ..._comboboxStatics,
-          // ElComboboxItem<T> = ElSelectOption<T>: value, label, enabled are
+          // ComboboxItem<T> = SelectOption<T>: value, label, enabled are
           // already in _comboboxParams; the typedef row names itself.
-          'ElComboboxItem<T>',
-          // elCollatorContains(label, query)
+          'ComboboxItem<T>',
+          // collatorContains(label, query)
           'query',
           'returns',
         ]) {
@@ -262,10 +287,10 @@ void main() {
         // findsOneWidget: each of these is also a nested TOC entry at this
         // width, so a bare find.text matches twice.
         for (final String title in <String>[
-          'ElCombobox<T>',
-          'ElCombobox static helpers',
-          'ElComboboxItem<T> (= ElSelectOption<T>)',
-          'elCollatorContains(label, query) → bool',
+          'Combobox<T>',
+          'Combobox static helpers',
+          'ComboboxItem<T> (= SelectOption<T>)',
+          'collatorContains(label, query) → bool',
         ]) {
           expect(
             find.text(title),
@@ -286,15 +311,15 @@ void main() {
         await tester.ensureVisible(apiTrigger);
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
-        expect(find.text('List<ElComboboxItem<T>>'), findsAtLeastNWidgets(1));
+        expect(find.text('List<ComboboxItem<T>>'), findsAtLeastNWidgets(1));
         expect(find.text('ValueChanged<T>?'), findsAtLeastNWidgets(1));
         expect(
           find.text('bool Function(String label, String query)?'),
           findsAtLeastNWidgets(1),
         );
-        expect(find.text('typedef = ElSelectOption<T>'), findsOneWidget);
+        expect(find.text('typedef = SelectOption<T>'), findsOneWidget);
         // The old merged table called hint "helper text under the field". It
         // is an accessible description only and is never painted.
         expect(find.textContaining('never painted'), findsAtLeastNWidgets(1));
@@ -314,7 +339,7 @@ void main() {
       (WidgetTester tester) async {
         await _pumpComboboxDoc(tester);
 
-        expect(find.textContaining('elCollatorContains'), findsWidgets);
+        expect(find.textContaining('collatorContains'), findsWidgets);
         expect(find.textContaining('substring'), findsWidgets);
         expect(find.textContaining('DIVERGENCE'), findsWidgets);
       },
@@ -330,7 +355,7 @@ void main() {
         await tester.ensureVisible(a11yTrigger);
         await tester.tap(a11yTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         expect(find.textContaining('live region'), findsWidgets);
         expect(find.textContaining('Known gap'), findsWidgets);
@@ -398,7 +423,7 @@ void main() {
       ]) {
         expect(
           find.descendant(
-            of: find.byType(ElPopoverSurface),
+            of: find.byType(PopoverSurface),
             matching: find.text(gone),
           ),
           findsNothing,
@@ -419,7 +444,7 @@ void main() {
       expect(find.text('No set by that name.'), findsOneWidget);
       expect(
         find.descendant(
-          of: find.byType(ElPopoverSurface),
+          of: find.byType(PopoverSurface),
           matching: find.text('Golden Rift'),
         ),
         findsNothing,
@@ -434,7 +459,7 @@ void main() {
 
       await tester.tap(find.text('Golden Rift'));
       await tester.pump();
-      await tester.pump(ElDurations.overlay);
+      await tester.pump(MotionDurations.overlayEnter);
       await tester.pump();
 
       expect(find.textContaining('Selected: Golden Rift'), findsOneWidget);
@@ -452,7 +477,7 @@ void main() {
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pump();
-      await tester.pump(ElDurations.overlay);
+      await tester.pump(MotionDurations.overlayEnter);
       await tester.pump();
 
       expect(find.text('Mystic Surge'), findsNothing);
@@ -467,10 +492,10 @@ void main() {
     ) async {
       await _pumpComboboxDoc(tester);
 
-      final ElCombobox<String> invalid = tester.widget<ElCombobox<String>>(
+      final Combobox<String> invalid = tester.widget<Combobox<String>>(
         find.descendant(
           of: find.byKey(_invalidSpecimenKey),
-          matching: find.byType(ElCombobox<String>),
+          matching: find.byType(Combobox<String>),
         ),
       );
       expect(invalid.invalid, isTrue);
@@ -486,26 +511,26 @@ void main() {
         await _pumpComboboxDoc(tester);
 
         final Finder specimen = find.byKey(_disabledSpecimenKey);
-        final ElCombobox<String> disabled = tester.widget<ElCombobox<String>>(
+        final Combobox<String> disabled = tester.widget<Combobox<String>>(
           find.descendant(
             of: specimen,
-            matching: find.byType(ElCombobox<String>),
+            matching: find.byType(Combobox<String>),
           ),
         );
         expect(disabled.onChanged, isNull);
 
         final Finder input = find.descendant(
           of: specimen,
-          matching: find.byType(ElInputGroupInput),
+          matching: find.byType(InputGroupInput),
         );
         await tester.ensureVisible(input);
         await tester.tap(input, warnIfMissed: false);
         await tester.pump();
-        await tester.pump(ElDurations.overlay);
+        await tester.pump(MotionDurations.overlayEnter);
         await tester.pump();
 
         // No popup mounted anywhere on the page.
-        expect(find.byType(ElPopoverSurface), findsNothing);
+        expect(find.byType(PopoverSurface), findsNothing);
         expect(tester.takeException(), isNull);
       },
     );
@@ -547,13 +572,13 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpComboboxDoc(tester, mode: ElThemeMode.light);
+      await _pumpComboboxDoc(tester, mode: ColorMode.light);
       expect(find.byKey(_comboboxSpecimenKey), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpComboboxDoc(tester, mode: ElThemeMode.dark);
+      await _pumpComboboxDoc(tester, mode: ColorMode.dark);
       expect(find.byKey(_comboboxSpecimenKey), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
@@ -561,20 +586,20 @@ void main() {
     testWidgets('flipping the theme in place keeps every specimen', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpComboboxDoc(
+      final ThemeController theme = await _pumpComboboxDoc(
         tester,
-        mode: ElThemeMode.dark,
+        mode: ColorMode.dark,
       );
-      final ElThemeData dark = ElTheme.of(
+      final ThemeTokens dark = ThemeScope.of(
         tester.element(
           find.byKey(const ValueKey<String>('combobox-doc-article')),
         ),
       );
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
-      final ElThemeData light = ElTheme.of(
+      final ThemeTokens light = ThemeScope.of(
         tester.element(
           find.byKey(const ValueKey<String>('combobox-doc-article')),
         ),

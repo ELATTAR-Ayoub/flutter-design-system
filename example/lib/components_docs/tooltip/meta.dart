@@ -24,6 +24,6 @@ const ComponentDocEntry tooltipDoc = ComponentDocEntry(
   // a worker that invented a name here is exactly the failure mode the
   // Phase J supervisor notes warn about, and this one does not need to.
   dependencies: <String>['source-foundation'],
-  exports: <String>['ElTooltip', 'ElTooltipSide', 'ElTooltipContent'],
+  exports: <String>['Tooltip', 'TooltipSide', 'TooltipContent'],
   sourcePath: 'lib/src/components/tooltip.dart',
 );

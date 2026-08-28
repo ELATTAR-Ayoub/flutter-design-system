@@ -2,12 +2,12 @@
 /// The tokeniser behind [DocsSnippet].
 ///
 /// DEVIATION from the task-2 brief, ruled by the repository owner: the brief
-/// had `DocsSnippet` render through `ElAgentCodeBlock`. `ElAgentCodeBlock`
-/// looks its language up in `elLanguageAliases`
+/// had `DocsSnippet` render through `AgentCodeBlock`. `AgentCodeBlock`
+/// looks its language up in `languageAliases`
 /// (`lib/src/components/agent_markdown.dart`), which registers bash, css,
 /// js/javascript, json, jsx, md/markdown, py/python, sh/shell, sql, ts/tsx/
 /// typescript — and no `dart`. Since `dart` is the default language and
-/// nearly all documentation code, routing through `ElAgentCodeBlock` would
+/// nearly all documentation code, routing through `AgentCodeBlock` would
 /// render every Dart snippet flat and unhighlighted.
 ///
 /// [docsTokenise] is the fix: for `dart` it runs a Dart tokenizer that lives
@@ -16,11 +16,11 @@
 /// `_dsIdentStart` / `_dsIdentPart` / `_dsDigit` / `_tokeniseDartLine`
 /// grammar, kept exactly — see that file for what it does and does not
 /// recognise). Only the colours change: instead of `docs_code.dart`'s own
-/// `_dsCodeTokenColor` (this system's semantic tokens, `ElPalette.action`
-/// etc.), every kind here paints through `ElPrismPalette` — the same VS Code
-/// Dark Plus palette `ElAgentCodeBlock` uses — so the site still carries
+/// `_dsCodeTokenColor` (this system's semantic tokens, `Palette.action`
+/// etc.), every kind here paints through `PrismPalette` — the same VS Code
+/// Dark Plus palette `AgentCodeBlock` uses — so the site still carries
 /// exactly one syntax theme, not two. For every other language this falls
-/// through to `ElAgentCodeBlock.normalise` + `elTokenise`, the package's own
+/// through to `AgentCodeBlock.normalise` + `tokenise`, the package's own
 /// tokeniser; an unrecognised language renders as plain, uncoloured text
 /// rather than failing.
 ///
@@ -34,24 +34,24 @@ import 'package:flutter/widgets.dart' show Color;
 /// Tokenises [code] as [language] for [DocsSnippet]'s highlighted body.
 ///
 /// `language == 'dart'` runs the tokenizer below. Otherwise, when
-/// `ElAgentCodeBlock.normalise(language)` recognises the fence, this defers
-/// to the package's own `elTokenise`. Anything else — an unrecognised
-/// language — comes back as one plain, uncoloured [ElCodeToken] per line.
-List<List<ElCodeToken>> docsTokenise(String code, String language) {
+/// `AgentCodeBlock.normalise(language)` recognises the fence, this defers
+/// to the package's own `tokenise`. Anything else — an unrecognised
+/// language — comes back as one plain, uncoloured [CodeToken] per line.
+List<List<CodeToken>> docsTokenise(String code, String language) {
   if (language == 'dart') {
-    return <List<ElCodeToken>>[
+    return <List<CodeToken>>[
       for (final String line in code.split('\n')) _tokeniseDartLine(line),
     ];
   }
 
-  final String? normalised = ElAgentCodeBlock.normalise(language);
+  final String? normalised = AgentCodeBlock.normalise(language);
   if (normalised != null) {
-    return elTokenise(code, normalised);
+    return tokenise(code, normalised);
   }
 
-  return <List<ElCodeToken>>[
+  return <List<CodeToken>>[
     for (final String line in code.split('\n'))
-      <ElCodeToken>[ElCodeToken(line, ElPrismPalette.plain)],
+      <CodeToken>[CodeToken(line, PrismPalette.plain)],
   ];
 }
 
@@ -84,19 +84,19 @@ class _DsCodeToken {
   final _DsCodeTokenKind kind;
 }
 
-/// The VS Code Dark Plus palette [ElAgentCodeBlock] paints from — not this
+/// The VS Code Dark Plus palette [AgentCodeBlock] paints from — not this
 /// system's own semantic tokens, so the site keeps exactly one syntax theme.
-/// Annotations map to [ElPrismPalette.function]: Prism's own Dart grammar has
+/// Annotations map to [PrismPalette.function]: Prism's own Dart grammar has
 /// no dedicated annotation class, and `function` is the closest existing hue
 /// for a `@override`-style marker that is neither a keyword nor a type.
 Color _dsCodeTokenColor(_DsCodeTokenKind kind) => switch (kind) {
-  _DsCodeTokenKind.keyword => ElPrismPalette.keyword,
-  _DsCodeTokenKind.string => ElPrismPalette.string,
-  _DsCodeTokenKind.number => ElPrismPalette.number,
-  _DsCodeTokenKind.type => ElPrismPalette.type,
-  _DsCodeTokenKind.annotation => ElPrismPalette.function,
-  _DsCodeTokenKind.comment => ElPrismPalette.comment,
-  _DsCodeTokenKind.plain => ElPrismPalette.plain,
+  _DsCodeTokenKind.keyword => PrismPalette.keyword,
+  _DsCodeTokenKind.string => PrismPalette.string,
+  _DsCodeTokenKind.number => PrismPalette.number,
+  _DsCodeTokenKind.type => PrismPalette.type,
+  _DsCodeTokenKind.annotation => PrismPalette.function,
+  _DsCodeTokenKind.comment => PrismPalette.comment,
+  _DsCodeTokenKind.plain => PrismPalette.plain,
 };
 
 /// Dart's reserved and built-in-identifier words — the only vocabulary this
@@ -184,11 +184,11 @@ final RegExp _dsDigit = RegExp(r'[0-9]');
 // same set.
 final RegExp _upperStart = RegExp(r'^[A-Z]');
 
-/// Tokenises one line of Dart-ish source into [ElCodeToken]s, coloured
-/// through [ElPrismPalette].
+/// Tokenises one line of Dart-ish source into [CodeToken]s, coloured
+/// through [PrismPalette].
 ///
 /// See the file-level doc comment for exactly what this scanner covers.
-List<ElCodeToken> _tokeniseDartLine(String line) {
+List<CodeToken> _tokeniseDartLine(String line) {
   final List<_DsCodeToken> out = <_DsCodeToken>[];
   final StringBuffer plain = StringBuffer();
 
@@ -206,9 +206,9 @@ List<ElCodeToken> _tokeniseDartLine(String line) {
     if (c == '/' && i + 1 < line.length && line[i + 1] == '/') {
       flush();
       out.add(_DsCodeToken(line.substring(i), _DsCodeTokenKind.comment));
-      return <ElCodeToken>[
+      return <CodeToken>[
         for (final _DsCodeToken t in out)
-          ElCodeToken(t.text, _dsCodeTokenColor(t.kind)),
+          CodeToken(t.text, _dsCodeTokenColor(t.kind)),
       ];
     }
 
@@ -284,7 +284,8 @@ List<ElCodeToken> _tokeniseDartLine(String line) {
   }
 
   flush();
-  return <ElCodeToken>[
-    for (final _DsCodeToken t in out) ElCodeToken(t.text, _dsCodeTokenColor(t.kind)),
+  return <CodeToken>[
+    for (final _DsCodeToken t in out)
+      CodeToken(t.text, _dsCodeTokenColor(t.kind)),
   ];
 }

@@ -1,7 +1,7 @@
 /// Documentation metadata for the `marker` component.
 ///
-/// Split out of `components_docs/carousel/` on 2026-08-24: `ElMarker` and
-/// `ElMarkerVariant` are their own barrel export
+/// Split out of `components_docs/carousel/` on 2026-08-24: `Marker` and
+/// `MarkerVariant` are their own barrel export
 /// (`export 'src/components/marker.dart';`) and now own their own page.
 ///
 /// Not wired into `catalog.dart`'s `componentDocs` list: that file is
@@ -21,6 +21,6 @@ const ComponentDocEntry markerDoc = ComponentDocEntry(
       '"Today", "Context cleared", "3 messages hidden". Not a highlight, and '
       'it draws no background.',
   dependencies: <String>['source-foundation'],
-  exports: <String>['ElMarker', 'ElMarkerVariant'],
+  exports: <String>['Marker', 'MarkerVariant'],
   sourcePath: 'lib/src/components/marker.dart',
 );

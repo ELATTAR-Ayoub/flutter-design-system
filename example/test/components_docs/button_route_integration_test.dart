@@ -24,7 +24,33 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/catalog.dart';
 import 'package:example/main.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// Real test-view sizing only, matching every other suite in this package.
@@ -35,8 +61,8 @@ void _setViewSize(WidgetTester tester, Size size) {
 }
 
 Widget _harness({required Widget child, ScrollController? scrollController}) =>
-    ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    ThemeScope(
+      controller: ThemeController(mode: ColorMode.dark),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: SingleChildScrollView(controller: scrollController, child: child),
@@ -80,7 +106,7 @@ void main() {
       await tester.pump();
 
       // Both keys belong to Examples subsections only the reference page
-      // builds (a per-ElButtonSize breakdown and the "Emphasis (caps)"
+      // builds (a per-ButtonSize breakdown and the "Emphasis (caps)"
       // specimen); the retired `button_card_pages.dart` ButtonDocPage has
       // neither.
       expect(

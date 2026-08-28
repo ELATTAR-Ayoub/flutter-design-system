@@ -16,16 +16,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -39,15 +63,15 @@ Finder _disclosureTrigger(String title) => find.descendant(
 /// seven `DocsApiTable`s claim to cover. Names shared by more than one
 /// class (`align`, `ghost`, `child`, `children`, `text`) appear once.
 const List<String> _messageApiParams = <String>[
-  // ElMessageGroup / ElMessageContent
+  // MessageGroup / MessageContent
   'children',
-  // ElMessage
+  // Message
   'content', 'avatar', 'align', 'ghost',
-  // ElMessageScope / ElMessageAvatar
+  // MessageScope / MessageAvatar
   'child', 'size', 'lifted',
-  // ElMessageContent
+  // MessageContent
   'header', 'footer',
-  // ElMessageHeader / ElMessageFooter
+  // MessageHeader / MessageFooter
   'text',
 ];
 
@@ -73,7 +97,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: MessageDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -91,7 +115,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _messageApiParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
@@ -105,39 +129,39 @@ void main() {
           );
         }
 
-        // At least one ElMessage on the page actually carries align: end
+        // At least one Message on the page actually carries align: end
         // (Align, Group) and at least one carries the default start
         // (Preview, Avatar, Header and Footer) — both real, not just
         // labelled.
-        final List<ElMessage> messages = tester
-            .widgetList<ElMessage>(find.byType(ElMessage))
+        final List<Message> messages = tester
+            .widgetList<Message>(find.byType(Message))
             .toList();
         expect(
-          messages.any((ElMessage m) => m.align == ElBubbleAlign.end),
+          messages.any((Message m) => m.align == BubbleAlign.end),
           isTrue,
-          reason: 'no ElMessage on the page carries align: end',
+          reason: 'no Message on the page carries align: end',
         );
         expect(
-          messages.any((ElMessage m) => m.align == ElBubbleAlign.start),
+          messages.any((Message m) => m.align == BubbleAlign.start),
           isTrue,
-          reason: 'no ElMessage on the page carries the default align',
+          reason: 'no Message on the page carries the default align',
         );
 
         // The Ghost example actually carries ghost: true.
-        final ElMessage ghostMessage = tester.widget<ElMessage>(
+        final Message ghostMessage = tester.widget<Message>(
           find.descendant(
             of: find.byKey(const ValueKey<String>('message-example:ghost')),
-            matching: find.byType(ElMessage),
+            matching: find.byType(Message),
           ),
         );
         expect(ghostMessage.ghost, isTrue);
 
-        // The Group example mounts an ElMessageGroup with more than one
-        // ElMessage inside it.
-        final ElMessageGroup group = tester.widget<ElMessageGroup>(
+        // The Group example mounts an MessageGroup with more than one
+        // Message inside it.
+        final MessageGroup group = tester.widget<MessageGroup>(
           find.descendant(
             of: find.byKey(const ValueKey<String>('message-example:group')),
-            matching: find.byType(ElMessageGroup),
+            matching: find.byType(MessageGroup),
           ),
         );
         expect(group.children.length, greaterThan(1));
@@ -146,43 +170,45 @@ void main() {
         expect(
           messageDoc.exports,
           containsAll(<String>[
-            'ElMessageGroup',
-            'ElMessage',
-            'ElMessageScope',
-            'ElMessageAvatar',
-            'ElMessageContent',
-            'ElMessageHeader',
-            'ElMessageFooter',
+            'MessageGroup',
+            'Message',
+            'MessageScope',
+            'MessageAvatar',
+            'MessageContent',
+            'MessageHeader',
+            'MessageFooter',
           ]),
         );
         expect(messageDoc.command, 'elattar add message');
-        expect(messageDoc.dependencies, <String>['bubble', 'source-foundation']);
+        expect(messageDoc.dependencies, <String>[
+          'bubble',
+          'source-foundation',
+        ]);
         expect(destination, isNull);
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const MessageDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const MessageDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Six specimen stages: Preview, Avatar, Header and Footer, Align,
-        // Ghost, Group.
-        expect(find.byType(DocsShowcase), findsNWidgets(6));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Six specimen stages: Preview, Avatar, Header and Footer, Align,
+      // Ghost, Group.
+      expect(find.byType(DocsShowcase), findsNWidgets(6));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -209,43 +235,39 @@ void main() {
       final DocsTocEntry api = messageDocSpec.toc.firstWhere(
         (DocsTocEntry e) => e.anchor == 'api',
       );
-      expect(
-        api.children.map((DocsTocEntry e) => e.anchor).toList(),
-        <String>[
-          'api-elmessagegroup',
-          'api-elmessage',
-          'api-elmessagescope',
-          'api-elmessageavatar',
-          'api-elmessagecontent',
-          'api-elmessageheader',
-          'api-elmessagefooter',
-        ],
-      );
+      expect(api.children.map((DocsTocEntry e) => e.anchor).toList(), <String>[
+        'api-elmessagegroup',
+        'api-elmessage',
+        'api-elmessagescope',
+        'api-elmessageavatar',
+        'api-elmessagecontent',
+        'api-elmessageheader',
+        'api-elmessagefooter',
+      ]);
     });
 
-    testWidgets(
-      'sections render in declaration order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const MessageDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const MessageDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, messageDocSpec.toc.map((e) => e.title).toList());
-      },
-    );
+      expect(titles, messageDocSpec.toc.map((e) => e.title).toList());
+    });
 
     testWidgets('renders at narrow width with the anchor strip', (
       WidgetTester tester,
@@ -256,7 +278,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const MessageDocPage(),
         ),
       );
@@ -280,16 +302,14 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       await tester.pumpWidget(
         _harness(controller: controller, child: const MessageDocPage()),
       );
       await tester.pump();
       expect(tester.takeException(), isNull);
 
-      controller.setMode(ElThemeMode.light);
+      controller.setMode(ColorMode.light);
       await tester.pump();
       expect(tester.takeException(), isNull);
 

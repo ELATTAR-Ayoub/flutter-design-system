@@ -9,7 +9,19 @@ import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart';
 import 'package:example/docs/docs_showcase.dart';
 import 'package:example/docs/docs_snippet.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 const ComponentDocSpec _spec = ComponentDocSpec(
@@ -26,26 +38,22 @@ const ComponentDocSpec _spec = ComponentDocSpec(
     SnippetSection(
       id: 'usage',
       title: 'Usage',
-      code: 'ElButton(onPressed: () {}, child: const Text("Go"))',
+      code: 'Button(onPressed: () {}, child: const Text("Go"))',
     ),
     ShowcaseSection(
       id: 'ghost',
       title: 'Ghost',
       specimen: SizedBox(height: 40, width: 100),
-      code: 'ElButton(variant: ElButtonVariant.ghost)',
+      code: 'Button(variant: ButtonVariant.ghost)',
     ),
-    DisclosureSection(
-      id: 'theming',
-      title: 'Theming',
-      child: Text('Tokens.'),
-    ),
+    DisclosureSection(id: 'theming', title: 'Theming', child: Text('Tokens.')),
   ],
 );
 
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
-  child: ElTheme(
-    controller: ElThemeController(mode: ElThemeMode.dark),
+  child: ThemeScope(
+    controller: ThemeController(mode: ColorMode.dark),
     child: SingleChildScrollView(child: child),
   ),
 );
@@ -108,7 +116,9 @@ void main() {
     await tester.pumpWidget(_host(const ComponentDocPage(spec: _spec)));
     await tester.pump();
 
-    for (final ElText text in tester.widgetList<ElText>(find.byType(ElText))) {
+    for (final StyledText text in tester.widgetList<StyledText>(
+      find.byType(StyledText),
+    )) {
       expect(text.spec.uppercase, isFalse, reason: text.text);
     }
   });
@@ -135,7 +145,7 @@ void main() {
                 id: 'applied',
                 title: 'Applied',
                 host: SizedBox(height: 120, width: 200),
-                code: 'ElGlass(child: ...)',
+                code: 'Glass(child: ...)',
               ),
             ],
           ),
@@ -171,8 +181,8 @@ void main() {
                 id: 'applied',
                 title: 'Applied',
                 host: const SizedBox(height: 120, width: 200),
-                code: 'ElStarfield()',
-                minHeight: el(160),
+                code: 'AmbientPattern()',
+                minHeight: space(160),
               ),
             ],
           ),
@@ -181,7 +191,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, el(160));
+    expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, space(160));
   });
 
   testWidgets('a showcase section can shorten its own stage', (
@@ -204,7 +214,7 @@ void main() {
                 title: 'Ghost',
                 specimen: const SizedBox(height: 40, width: 100),
                 code: 'x',
-                minHeight: el(48),
+                minHeight: space(48),
               ),
             ],
           ),
@@ -213,7 +223,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, el(48));
+    expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, space(48));
   });
 
   testWidgets('a disclosure prints its title once, not twice', (

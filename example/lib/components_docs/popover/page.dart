@@ -1,6 +1,6 @@
 /// Public documentation page for the `popover` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels; it now declares a [ComponentDocSpec]
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// [ComponentDocPage], the same shape `button` and `field` established.
@@ -11,19 +11,31 @@
 /// with no rendered popover at all), and a dedicated Keyboard disclosure
 /// split out of the old combined Accessibility section.
 ///
-/// `ElPopover` is the one primitive in this wave that is a positioning
-/// engine as much as a component: [ElSelect] and `HoverCard` both reuse its
-/// placement math ([elPopoverPlacement]) and its paint ([ElPopoverSurface])
+/// `Popover` is the one primitive in this wave that is a positioning
+/// engine as much as a component: [Select] and `HoverCard` both reuse its
+/// placement math ([popoverPlacement]) and its paint ([PopoverSurface])
 /// without mounting the widget itself, and nine other components —
 /// `DropdownMenu`, `ContextMenu`, `Menubar`, `Menu`, the agent attach menu,
 /// `Combobox`, `NativeSelect`, `Calendar`'s date picker, and
-/// `NavigationMenu`: mount their popups through [ElPopover] directly. Both
+/// `NavigationMenu`: mount their popups through [Popover] directly. Both
 /// facts are cited from the real source comments and are reflected in the
 /// Composition and Dependencies sections below, not invented.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -68,25 +80,24 @@ final ComponentDocSpec popoverDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'ElPopover reads open the way Radix reads its own open prop: '
+          'Popover reads open the way Radix reads its own open prop: '
           'the caller owns the boolean and reports it back on '
           'onDismiss. There is no controller with its own lifecycle to '
           'create or dispose. The three shapes below are the real ones '
           'this component ships for: a minimal share popover, a '
           'virtual-anchor context menu, and a non-modal barrier handoff.',
-      code:
-          '$_usageBasicCode\n\n$_usageAnchorPointCode\n\n$_usageNonModalCode',
+      code: '$_usageBasicCode\n\n$_usageAnchorPointCode\n\n$_usageNonModalCode',
     ),
     SnippetSection(
       id: 'composition',
       title: 'Composition',
       description:
           'shadcn splits Popover into Popover, PopoverTrigger, and '
-          'PopoverContent. ElPopover is one widget instead: anchor is '
+          'PopoverContent. Popover is one widget instead: anchor is '
           'the trigger, rendered verbatim, and content is a builder that '
-          'returns the popup, almost always wrapped in ElPopoverSurface '
+          'returns the popup, almost always wrapped in PopoverSurface '
           'for the shared fill, ring, and radius. The shape below is '
-          "ElCombobox's own popup wiring, a real excerpt, not an "
+          "Combobox's own popup wiring, a real excerpt, not an "
           'invented one.',
       code: _compositionCode,
     ),
@@ -96,7 +107,7 @@ final ComponentDocSpec popoverDocSpec = ComponentDocSpec(
       description:
           "shadcn's own live demo for this section is a Start / Center / "
           'End tab switcher. Below are three independent popovers instead, '
-          'one per ElPopoverAlign value, each with its own open state: how '
+          'one per PopoverAlign value, each with its own open state: how '
           'the popup lines up on the cross axis against its trigger.',
       specimen: _AlignSpecimen(),
       code: _alignCode,
@@ -106,11 +117,11 @@ final ComponentDocSpec popoverDocSpec = ComponentDocSpec(
       id: 'variants',
       title: 'Variants',
       description:
-          'The reference has no section for this: ElPopover carries real '
+          'The reference has no section for this: Popover carries real '
           'behavioral forks beyond align, each measured off the reference '
           'this system ports rather than invented for symmetry. Below, one '
-          'trigger per ElPopoverSide value. ElPopoverOriginModel (which '
-          'corner the zoom grows from) and ElPopoverBarrier (what the '
+          'trigger per PopoverSide value. PopoverAnchorMode (which '
+          'corner the zoom grows from) and PopoverBarrier (what the '
           'popup lays under itself) are documented in API Reference below '
           'instead of demonstrated live: both are subtler behavioral '
           'differences — a hit-testing rule and a transform-origin corner '
@@ -126,35 +137,29 @@ final ComponentDocSpec popoverDocSpec = ComponentDocSpec(
           'Every public class, enum, top-level function, and constructor '
           'parameter the source declares.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElPopover', anchor: 'api-elpopover'),
-        DocsTocEntry(title: 'ElPopoverAlign', anchor: 'api-elpopoveralign'),
-        DocsTocEntry(title: 'ElPopoverSide', anchor: 'api-elpopoverside'),
+        DocsTocEntry(title: 'Popover', anchor: 'api-elpopover'),
+        DocsTocEntry(title: 'PopoverAlign', anchor: 'api-elpopoveralign'),
+        DocsTocEntry(title: 'PopoverSide', anchor: 'api-elpopoverside'),
         DocsTocEntry(
-          title: 'ElPopoverOriginModel',
+          title: 'PopoverAnchorMode',
           anchor: 'api-elpopoveroriginmodel',
         ),
+        DocsTocEntry(title: 'PopoverBarrier', anchor: 'api-elpopoverbarrier'),
+        DocsTocEntry(title: 'PopoverSurface', anchor: 'api-elpopoversurface'),
         DocsTocEntry(
-          title: 'ElPopoverBarrier',
-          anchor: 'api-elpopoverbarrier',
-        ),
-        DocsTocEntry(
-          title: 'ElPopoverSurface',
-          anchor: 'api-elpopoversurface',
-        ),
-        DocsTocEntry(
-          title: 'elPopoverPlacement()',
+          title: 'popoverPlacement()',
           anchor: 'api-elpopoverplacement-fn',
         ),
         DocsTocEntry(
-          title: 'ElPopoverPlacement',
+          title: 'PopoverPlacement',
           anchor: 'api-elpopoverplacement',
         ),
         DocsTocEntry(
-          title: 'ElPopoverAnchorMetrics',
+          title: 'PopoverAnchorMetrics',
           anchor: 'api-elpopoveranchormetrics',
         ),
         DocsTocEntry(
-          title: 'ElPopoverContentBuilder',
+          title: 'PopoverContentBuilder',
           anchor: 'api-elpopovercontentbuilder',
         ),
       ],
@@ -164,7 +169,7 @@ final ComponentDocSpec popoverDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElPopover opens and closes on a caller-owned boolean, not on a '
+          'Popover opens and closes on a caller-owned boolean, not on a '
           "pointer gesture of its own. Rows describing an internal "
           'trigger interaction are marked N/A for that reason rather than '
           'invented.',
@@ -179,7 +184,7 @@ final ComponentDocSpec popoverDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          "Read straight off ElPopover's own Focus wrapper and _onKey "
+          "Read straight off Popover's own Focus wrapper and _onKey "
           '(lib/src/components/popover.dart), not inferred.',
       child: _KeyboardContent(),
     ),
@@ -227,8 +232,8 @@ final ComponentDocSpec popoverDocSpec = ComponentDocSpec(
           const DocsInstallFact(
             label: 'Tests',
             value:
-                "test/selects_test.dart (ElPopover) and "
-                "test/menus_test.dart (ElPopover: what the menus added)",
+                "test/selects_test.dart (Popover) and "
+                "test/menus_test.dart (Popover: what the menus added)",
             description:
                 'Package-level behavioral coverage: placement, the '
                 'collision flip, the barrier, and the four knobs the '
@@ -260,15 +265,12 @@ class PopoverDocPage extends StatelessWidget {
       title: popoverDoc.title,
       description: popoverDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Popover'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Popover'),
     ],
     toc: popoverDocSpec.toc,
-    previous: const DocsPageLink(
-      title: 'Select',
-      route: '/components/select',
-    ),
+    previous: const DocsPageLink(title: 'Select', route: '/components/select'),
     // No next page is wired: no other overlay/navigation component had
     // landed a route when this page was written, and a guessed one would
     // risk pointing at a page that does not exist.
@@ -282,42 +284,41 @@ class PopoverDocPage extends StatelessWidget {
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-const String _previewCode =
-    '''ElPopover(
+const String _previewCode = '''Popover(
   open: _open,
-  side: ElPopoverSide.bottom,
-  align: ElPopoverAlign.start,
-  sideOffset: el(2),
-  collisionPadding: el(2),
+  side: PopoverSide.bottom,
+  align: PopoverAlign.start,
+  sideOffset: space(2),
+  collisionPadding: space(2),
   onDismiss: () => setState(() => _open = false),
-  anchor: ElButton(
-    variant: ElButtonVariant.outline,
+  anchor: Button(
+    variant: ButtonVariant.outline,
     label: 'Open popover',
     onPressed: () => setState(() => _open = !_open),
     child: const Text('Open popover'),
   ),
-  content: (context, metrics) => ElPopoverSurface(
+  content: (context, metrics) => PopoverSurface(
     child: Container(
-      width: math.max(metrics.anchorWidth, el(70)),
-      padding: EdgeInsets.all(el(4)),
+      width: math.max(metrics.anchorWidth, space(70)),
+      padding: EdgeInsets.all(space(4)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText('Update dimensions', ElType.section),
-          SizedBox(height: el(1)),
-          ElText(
+          StyledText('Update dimensions', TextStyles.section),
+          SizedBox(height: space(1)),
+          StyledText(
             'Set the exact width and height for the selection.',
-            ElType.small,
+            TextStyles.small,
           ),
-          SizedBox(height: el(4)),
-          const ElInput(label: 'Width', initialValue: '100%'),
-          SizedBox(height: el(3)),
-          const ElInput(label: 'Height', initialValue: '25px'),
-          SizedBox(height: el(4)),
-          ElButton(
-            variant: ElButtonVariant.secondary,
-            size: ElButtonSize.sm,
+          SizedBox(height: space(4)),
+          const Input(label: 'Width', initialValue: '100%'),
+          SizedBox(height: space(3)),
+          const Input(label: 'Height', initialValue: '25px'),
+          SizedBox(height: space(4)),
+          Button(
+            variant: ButtonVariant.secondary,
+            size: ButtonSize.sm,
             expanded: true,
             label: 'Done',
             onPressed: () => setState(() => _open = false),
@@ -340,20 +341,20 @@ class _ShareButtonState extends State<_ShareButton> {
 
   @override
   Widget build(BuildContext context) {
-    return ElPopover(
+    return Popover(
       open: _open,
       onDismiss: () => setState(() => _open = false),
-      anchor: ElButton(
-        variant: ElButtonVariant.outline,
+      anchor: Button(
+        variant: ButtonVariant.outline,
         label: 'Share',
         onPressed: () => setState(() => _open = !_open),
-        child: const ElText('Share', ElComponentType.buttonLabel),
+        child: const StyledText('Share', TextStyles.buttonLabel),
       ),
-      content: (BuildContext context, ElPopoverAnchorMetrics metrics) =>
-          ElPopoverSurface(
+      content: (BuildContext context, PopoverAnchorMetrics metrics) =>
+          PopoverSurface(
         child: Padding(
-          padding: EdgeInsets.all(el(4)),
-          child: const ElText('Share link content goes here.', ElType.small),
+          padding: EdgeInsets.all(space(4)),
+          child: const StyledText('Share link content goes here.', TextStyles.small),
         ),
       ),
     );
@@ -363,12 +364,12 @@ class _ShareButtonState extends State<_ShareButton> {
 const String _usageAnchorPointCode =
     '''// A context menu has no trigger box to anchor to, Radix anchors it to a
 // virtual element at the pointer instead, which is what anchorPoint is for.
-ElPopover(
+Popover(
   open: _at != null,
   anchorPoint: _at,
-  side: ElPopoverSide.right,
-  align: ElPopoverAlign.start,
-  origin: ElPopoverOriginModel.corner,
+  side: PopoverSide.right,
+  align: PopoverAlign.start,
+  origin: PopoverAnchorMode.corner,
   onDismiss: _close,
   anchor: Listener(
     onPointerDown: (PointerDownEvent event) {
@@ -378,93 +379,94 @@ ElPopover(
     },
     child: content,
   ),
-  content: (BuildContext context, ElPopoverAnchorMetrics metrics) =>
-      ElPopoverSurface(child: menuRows),
+  content: (BuildContext context, PopoverAnchorMetrics metrics) =>
+      PopoverSurface(child: menuRows),
 )''';
 
 const String _usageNonModalCode =
     '''// A menubar's own menus hand over to a sibling trigger on hover: a modal
 // barrier would swallow that hover before it ever reached the next trigger.
-ElPopover(
+Popover(
   open: _openIndex == index,
-  barrier: ElPopoverBarrier.nonModal,
+  barrier: PopoverBarrier.nonModal,
   onDismiss: () => setState(() => _openIndex = null),
   anchor: menuTrigger,
-  content: (BuildContext context, ElPopoverAnchorMetrics metrics) =>
-      ElPopoverSurface(child: menuRows),
+  content: (BuildContext context, PopoverAnchorMetrics metrics) =>
+      PopoverSurface(child: menuRows),
 )''';
 
-const String _compositionCode = '''input = ElPopover(
+const String _compositionCode = '''input = Popover(
   open: _open && _enabled,
-  side: ElPopoverSide.bottom,
-  align: ElPopoverAlign.start,
-  sideOffset: ElCombobox.popupOffset,
-  collisionPadding: el(2),
+  side: PopoverSide.bottom,
+  align: PopoverAlign.start,
+  sideOffset: Combobox.popupOffset,
+  collisionPadding: space(2),
   onDismiss: () => _closePopup(),
   anchor: input,
-  content: (BuildContext context, ElPopoverAnchorMetrics metrics) =>
+  content: (BuildContext context, PopoverAnchorMetrics metrics) =>
       _ComboboxPopup<T>(
-    width: metrics.anchorWidth + ElCombobox.popupOvershoot,
+    width: metrics.anchorWidth + Combobox.popupOvershoot,
     maxHeight: math.min(
-      ElCombobox.listMaxHeight,
-      metrics.availableHeight - el(9),
+      Combobox.listMaxHeight,
+      metrics.availableHeight - space(9),
     ),
     items: visible,
     // ...
   ),
 );''';
 
-const String _alignCode = '''for (final ElPopoverAlign align in ElPopoverAlign.values)
-  ElPopover(
+const String _alignCode =
+    '''for (final PopoverAlign align in PopoverAlign.values)
+  Popover(
     open: openAlign == align,
     align: align,
     onDismiss: () => setState(() => openAlign = null),
-    anchor: ElButton(
+    anchor: Button(
       label: align.name,
       onPressed: () => setState(() => openAlign = align),
       child: Text(align.name),
     ),
-    content: (context, metrics) => ElPopoverSurface(
+    content: (context, metrics) => PopoverSurface(
       child: Padding(
-        padding: EdgeInsets.all(el(4)),
+        padding: EdgeInsets.all(space(4)),
         child: Text('align: \${align.name}'),
       ),
     ),
   )''';
 
-const String _sideCode = '''for (final ElPopoverSide side in ElPopoverSide.values)
-  ElPopover(
+const String _sideCode = '''for (final PopoverSide side in PopoverSide.values)
+  Popover(
     open: openSide == side,
     side: side,
     onDismiss: () => setState(() => openSide = null),
-    anchor: ElButton(
+    anchor: Button(
       label: side.name,
       onPressed: () => setState(() => openSide = side),
       child: Text(side.name),
     ),
-    content: (context, metrics) => ElPopoverSurface(
+    content: (context, metrics) => PopoverSurface(
       child: Padding(
-        padding: EdgeInsets.all(el(4)),
+        padding: EdgeInsets.all(space(4)),
         child: Text('side: \${side.name}'),
       ),
     ),
   )''';
 
-/// One [ElPopover] trigger, whose own open state is independent of every
+/// One [Popover] trigger, whose own open state is independent of every
 /// sibling instance: what lets [_AlignSpecimen] and [_SideSpecimen] mount
 /// several without one closing another.
 class _PopoverDemoTrigger extends StatefulWidget {
   const _PopoverDemoTrigger({
     required this.keyPrefix,
     required this.label,
-    this.side = ElPopoverSide.bottom,
-    this.align = ElPopoverAlign.center,
+    this.side = PopoverSide.bottom,
+    this.align = PopoverAlign.center,
   });
 
   final String keyPrefix;
   final String label;
-  final ElPopoverSide side;
-  final ElPopoverAlign align;
+  final PopoverSide side;
+  final PopoverAlign align;
 
   @override
   State<_PopoverDemoTrigger> createState() => _PopoverDemoTriggerState();
@@ -474,26 +476,26 @@ class _PopoverDemoTriggerState extends State<_PopoverDemoTrigger> {
   bool _open = false;
 
   @override
-  Widget build(BuildContext context) => ElPopover(
+  Widget build(BuildContext context) => Popover(
     open: _open,
     side: widget.side,
     align: widget.align,
-    sideOffset: el(2),
+    sideOffset: space(2),
     onDismiss: () => setState(() => _open = false),
-    anchor: ElButton(
+    anchor: Button(
       key: ValueKey<String>('${widget.keyPrefix}-trigger'),
-      variant: ElButtonVariant.outline,
-      size: ElButtonSize.sm,
+      variant: ButtonVariant.outline,
+      size: ButtonSize.sm,
       label: widget.label,
       onPressed: () => setState(() => _open = !_open),
       child: Text(widget.label),
     ),
-    content: (BuildContext context, ElPopoverAnchorMetrics metrics) =>
-        ElPopoverSurface(
+    content: (BuildContext context, PopoverAnchorMetrics metrics) =>
+        PopoverSurface(
           child: Padding(
             key: ValueKey<String>('${widget.keyPrefix}-content'),
-            padding: EdgeInsets.all(el(4)),
-            child: ElText(widget.label, ElType.small),
+            padding: EdgeInsets.all(space(4)),
+            child: StyledText(widget.label, TextStyles.small),
           ),
         ),
   );
@@ -504,10 +506,10 @@ class _AlignSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(3),
-    runSpacing: el(3),
+    spacing: space(3),
+    runSpacing: space(3),
     children: <Widget>[
-      for (final ElPopoverAlign align in ElPopoverAlign.values)
+      for (final PopoverAlign align in PopoverAlign.values)
         _PopoverDemoTrigger(
           keyPrefix: 'popover-example:align-${align.name}',
           label: align.name,
@@ -522,10 +524,10 @@ class _SideSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(3),
-    runSpacing: el(3),
+    spacing: space(3),
+    runSpacing: space(3),
     children: <Widget>[
-      for (final ElPopoverSide side in ElPopoverSide.values)
+      for (final PopoverSide side in PopoverSide.values)
         _PopoverDemoTrigger(
           keyPrefix: 'popover-example:side-${side.name}',
           label: side.name,
@@ -537,7 +539,7 @@ class _SideSpecimen extends StatelessWidget {
 
 /// The live specimen: a trigger that owns its own `open` state, and a
 /// popup with real interactive content anchored to it: a genuine
-/// [ElPopover] mounted through a real [Overlay], not a static illustration.
+/// [Popover] mounted through a real [Overlay], not a static illustration.
 class _PopoverPreview extends StatefulWidget {
   const _PopoverPreview();
 
@@ -550,74 +552,74 @@ class _PopoverPreviewState extends State<_PopoverPreview> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText('Bottom side, start aligned', ElType.section),
-        SizedBox(height: el(3)),
-        ElPopover(
+        StyledText('Bottom side, start aligned', TextStyles.section),
+        SizedBox(height: space(3)),
+        Popover(
           open: _open,
-          side: ElPopoverSide.bottom,
-          align: ElPopoverAlign.start,
-          sideOffset: el(2),
-          collisionPadding: el(2),
+          side: PopoverSide.bottom,
+          align: PopoverAlign.start,
+          sideOffset: space(2),
+          collisionPadding: space(2),
           onDismiss: () => setState(() => _open = false),
-          anchor: ElButton(
+          anchor: Button(
             key: const ValueKey<String>('popover-doc-specimen-trigger'),
-            variant: ElButtonVariant.outline,
-            size: ElButtonSize.md,
+            variant: ButtonVariant.outline,
+            size: ButtonSize.md,
             label: 'Open popover',
             onPressed: () => setState(() => _open = !_open),
-            child: ElText('Open popover', ElComponentType.buttonLabel),
+            child: StyledText('Open popover', TextStyles.buttonLabel),
           ),
-          content: (BuildContext context, ElPopoverAnchorMetrics metrics) =>
-              ElPopoverSurface(
+          content: (BuildContext context, PopoverAnchorMetrics metrics) =>
+              PopoverSurface(
                 child: Container(
                   key: const ValueKey<String>('popover-doc-specimen-content'),
-                  width: metrics.anchorWidth < el(70)
-                      ? el(70)
+                  width: metrics.anchorWidth < space(70)
+                      ? space(70)
                       : metrics.anchorWidth,
-                  padding: EdgeInsets.all(el(4)),
+                  padding: EdgeInsets.all(space(4)),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      ElText(
+                      StyledText(
                         'Update dimensions',
-                        ElType.section,
+                        TextStyles.section,
                         color: theme.popoverForeground,
                       ),
-                      SizedBox(height: el(1)),
-                      ElText(
+                      SizedBox(height: space(1)),
+                      StyledText(
                         'Set the exact width and height for the selection.',
-                        ElType.small,
+                        TextStyles.small,
                         color: theme.mutedForeground,
                       ),
-                      SizedBox(height: el(4)),
-                      const ElInput(label: 'Width', initialValue: '100%'),
-                      SizedBox(height: el(3)),
-                      const ElInput(label: 'Height', initialValue: '25px'),
-                      SizedBox(height: el(4)),
-                      ElButton(
-                        variant: ElButtonVariant.secondary,
-                        size: ElButtonSize.sm,
+                      SizedBox(height: space(4)),
+                      const Input(label: 'Width', initialValue: '100%'),
+                      SizedBox(height: space(3)),
+                      const Input(label: 'Height', initialValue: '25px'),
+                      SizedBox(height: space(4)),
+                      Button(
+                        variant: ButtonVariant.secondary,
+                        size: ButtonSize.sm,
                         expanded: true,
                         label: 'Done',
                         onPressed: () => setState(() => _open = false),
-                        child: ElText('Done', ElComponentType.buttonLabel),
+                        child: StyledText('Done', TextStyles.buttonLabel),
                       ),
                     ],
                   ),
                 ),
               ),
         ),
-        SizedBox(height: el(6)),
-        ElText(
+        SizedBox(height: space(6)),
+        StyledText(
           'Tap the trigger to open it; tap anywhere outside the popup, or '
           'press Escape once focus is inside it, to dismiss it.',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
       ],
@@ -636,68 +638,62 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elpopover',
-        child: DocsApiTable(title: 'ElPopover', facts: _elPopoverFacts),
+        child: DocsApiTable(title: 'Popover', facts: _elPopoverFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpopoveralign',
-        child: DocsApiTable(title: 'ElPopoverAlign', facts: _alignFacts),
+        child: DocsApiTable(title: 'PopoverAlign', facts: _alignFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpopoverside',
-        child: DocsApiTable(title: 'ElPopoverSide', facts: _sideFacts),
+        child: DocsApiTable(title: 'PopoverSide', facts: _sideFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpopoveroriginmodel',
-        child: DocsApiTable(
-          title: 'ElPopoverOriginModel',
-          facts: _originFacts,
-        ),
+        child: DocsApiTable(title: 'PopoverAnchorMode', facts: _originFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpopoverbarrier',
-        child: DocsApiTable(title: 'ElPopoverBarrier', facts: _barrierFacts),
+        child: DocsApiTable(title: 'PopoverBarrier', facts: _barrierFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpopoversurface',
-        child: DocsApiTable(
-          title: 'ElPopoverSurface',
-          facts: _surfaceFacts,
-        ),
+        child: DocsApiTable(title: 'PopoverSurface', facts: _surfaceFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpopoverplacement-fn',
         child: DocsApiTable(
-          title: 'elPopoverPlacement(): the positioner',
+          title: 'popoverPlacement(): the positioner',
           facts: _placementFnFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpopoverplacement',
         child: DocsApiTable(
-          title: 'ElPopoverPlacement (return value)',
+          title: 'PopoverPlacement (return value)',
           facts: _placementFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpopoveranchormetrics',
         child: DocsApiTable(
-          title: 'ElPopoverAnchorMetrics',
+          title: 'PopoverAnchorMetrics',
           facts: _anchorMetricsFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpopovercontentbuilder',
         child: DocsApiTable(
-          title: 'ElPopoverContentBuilder (typedef)',
+          title: 'PopoverContentBuilder (typedef)',
           facts: _contentBuilderFacts,
         ),
       ),
@@ -710,7 +706,7 @@ const List<DocsApiFact> _elPopoverFacts = <DocsApiFact>[
     name: 'open',
     type: 'bool',
     description:
-        'Required. Caller-owned, ElPopover mounts on the frame after '
+        'Required. Caller-owned, Popover mounts on the frame after '
         'this turns true and unmounts after it turns false and any exit '
         'animation finishes.',
   ),
@@ -724,23 +720,23 @@ const List<DocsApiFact> _elPopoverFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'content',
-    type: 'ElPopoverContentBuilder',
+    type: 'PopoverContentBuilder',
     description:
         'Required. Builds the popup from the metrics the positioner '
         "knows about the trigger before the popup itself is measured.",
   ),
   DocsApiFact(
     name: 'side',
-    type: 'ElPopoverSide',
+    type: 'PopoverSide',
     description:
-        'Default ElPopoverSide.bottom. Which edge of the anchor the '
+        'Default PopoverSide.bottom. Which edge of the anchor the '
         'popup opens against.',
   ),
   DocsApiFact(
     name: 'align',
-    type: 'ElPopoverAlign',
+    type: 'PopoverAlign',
     description:
-        'Default ElPopoverAlign.center. How the popup lines up on the '
+        'Default PopoverAlign.center. How the popup lines up on the '
         'cross axis.',
   ),
   DocsApiFact(
@@ -763,7 +759,7 @@ const List<DocsApiFact> _elPopoverFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Default true. Whether the fade/zoom/slide transition runs at '
-        'all. False is what ElNativeSelect mounts its menu under: the '
+        'all. False is what NativeSelect mounts its menu under: the '
         'popup appears whole, in one frame, the way an operating-system '
         'picker does not zoom.',
   ),
@@ -778,16 +774,16 @@ const List<DocsApiFact> _elPopoverFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'origin',
-    type: 'ElPopoverOriginModel',
+    type: 'PopoverAnchorMode',
     description:
-        "Default ElPopoverOriginModel.anchor. Whose transform-origin "
+        "Default PopoverAnchorMode.anchor. Whose transform-origin "
         'model the zoom grows from.',
   ),
   DocsApiFact(
     name: 'slideSides',
-    type: 'Set<ElPopoverSide>',
+    type: 'Set<PopoverSide>',
     description:
-        'Default {ElPopoverSide.bottom}. The resolved sides whose '
+        'Default {PopoverSide.bottom}. The resolved sides whose '
         "entrance carries a slide, travelling toward the trigger's "
         'side.',
   ),
@@ -803,9 +799,9 @@ const List<DocsApiFact> _elPopoverFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'barrier',
-    type: 'ElPopoverBarrier',
+    type: 'PopoverBarrier',
     description:
-        'Default ElPopoverBarrier.modal. What the popup lays under '
+        'Default PopoverBarrier.modal. What the popup lays under '
         'itself to catch a pointer aimed elsewhere.',
   ),
   DocsApiFact(
@@ -821,19 +817,19 @@ const List<DocsApiFact> _elPopoverFacts = <DocsApiFact>[
 const List<DocsApiFact> _alignFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'start',
-    type: 'ElPopoverAlign',
+    type: 'PopoverAlign',
     description:
         "Leading edges flush: what the combobox's own popover "
         'positioner uses.',
   ),
   DocsApiFact(
     name: 'center',
-    type: 'ElPopoverAlign',
+    type: 'PopoverAlign',
     description: 'Centred on the trigger. The default.',
   ),
   DocsApiFact(
     name: 'end',
-    type: 'ElPopoverAlign',
+    type: 'PopoverAlign',
     description: 'Trailing edges flush.',
   ),
 ];
@@ -841,25 +837,24 @@ const List<DocsApiFact> _alignFacts = <DocsApiFact>[
 const List<DocsApiFact> _sideFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'top',
-    type: 'ElPopoverSide',
+    type: 'PopoverSide',
     description: 'Above the trigger. opposite resolves to bottom.',
   ),
   DocsApiFact(
     name: 'bottom',
-    type: 'ElPopoverSide',
+    type: 'PopoverSide',
     description:
         "The default: both consumers on the selects page use it. "
         'opposite resolves to top.',
   ),
   DocsApiFact(
     name: 'left',
-    type: 'ElPopoverSide',
-    description:
-        'To the left of the trigger. opposite resolves to right.',
+    type: 'PopoverSide',
+    description: 'To the left of the trigger. opposite resolves to right.',
   ),
   DocsApiFact(
     name: 'right',
-    type: 'ElPopoverSide',
+    type: 'PopoverSide',
     description:
         'To the right: a context-menu submenu opens here. opposite '
         'resolves to left.',
@@ -869,7 +864,7 @@ const List<DocsApiFact> _sideFacts = <DocsApiFact>[
 const List<DocsApiFact> _originFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'anchor',
-    type: 'ElPopoverOriginModel',
+    type: 'PopoverAnchorMode',
     description:
         "The default. The zoom grows from a point on the trigger's own "
         "centre line, measured from base-ui's popups (the combobox, "
@@ -877,7 +872,7 @@ const List<DocsApiFact> _originFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'corner',
-    type: 'ElPopoverOriginModel',
+    type: 'PopoverAnchorMode',
     description:
         "The zoom grows from the popup's own nearest corner to the "
         "trigger: what every menu family's Radix positioner measures "
@@ -885,7 +880,7 @@ const List<DocsApiFact> _originFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'selfCenter',
-    type: 'ElPopoverOriginModel',
+    type: 'PopoverAnchorMode',
     description:
         "The popup's own middle, CSS's initial transform-origin value, "
         'reached on the reference by an unmatched Tailwind class rather '
@@ -897,7 +892,7 @@ const List<DocsApiFact> _originFacts = <DocsApiFact>[
 const List<DocsApiFact> _barrierFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'modal',
-    type: 'ElPopoverBarrier',
+    type: 'PopoverBarrier',
     description:
         'The default. An opaque layer under the popup, nothing outside '
         'it can be hovered or clicked while it is open, and a pointer '
@@ -906,7 +901,7 @@ const List<DocsApiFact> _barrierFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'nonModal',
-    type: 'ElPopoverBarrier',
+    type: 'PopoverBarrier',
     description:
         'A translucent layer: an outside pointer both dismisses and '
         'still reaches whatever it landed on. What lets a menubar hand '
@@ -914,7 +909,7 @@ const List<DocsApiFact> _barrierFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'none',
-    type: 'ElPopoverBarrier',
+    type: 'PopoverBarrier',
     description:
         "No layer at all: a submenu. A layer here would sit over the "
         "parent's own rows and a pointer moving from the submenu back "
@@ -933,13 +928,13 @@ const List<DocsApiFact> _surfaceFacts = <DocsApiFact>[
     type: 'BorderRadius?',
     description:
         'Default null, which resolves to BorderRadius.circular('
-        'ElRadii.lg), 12px.',
+        'Radii.lg), 12px.',
   ),
   DocsApiFact(
     name: 'shadow',
-    type: 'ElShadowSpec?',
+    type: 'ShadowStyle?',
     description:
-        'Default null, which resolves to ElShadows.tailwindMd. Every '
+        'Default null, which resolves to Shadows.tailwindMd. Every '
         '*SubContent in the menu family passes shadow-lg here instead.',
   ),
   DocsApiFact(
@@ -960,12 +955,12 @@ const List<DocsApiFact> _surfaceFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'spec(theme)',
-    type: 'static ElShadowSpec',
+    type: 'static ShadowStyle',
     description: "The family's shared shadow-plus-ring recipe at its defaults.",
   ),
   DocsApiFact(
     name: 'specOf({shadow, ring})',
-    type: 'static ElShadowSpec',
+    type: 'static ShadowStyle',
     description:
         'The same recipe with either half swapped out: what radius and '
         'shadow above are built from.',
@@ -992,19 +987,15 @@ const List<DocsApiFact> _placementFnFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'side',
-    type: 'ElPopoverSide',
-    description: 'Default ElPopoverSide.bottom.',
+    type: 'PopoverSide',
+    description: 'Default PopoverSide.bottom.',
   ),
   DocsApiFact(
     name: 'align',
-    type: 'ElPopoverAlign',
-    description: 'Default ElPopoverAlign.center.',
+    type: 'PopoverAlign',
+    description: 'Default PopoverAlign.center.',
   ),
-  DocsApiFact(
-    name: 'sideOffset',
-    type: 'double',
-    description: 'Default 0.',
-  ),
+  DocsApiFact(name: 'sideOffset', type: 'double', description: 'Default 0.'),
   DocsApiFact(
     name: 'collisionPadding',
     type: 'double',
@@ -1012,8 +1003,8 @@ const List<DocsApiFact> _placementFnFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'origin',
-    type: 'ElPopoverOriginModel',
-    description: 'Default ElPopoverOriginModel.anchor.',
+    type: 'PopoverAnchorMode',
+    description: 'Default PopoverAnchorMode.anchor.',
   ),
 ];
 
@@ -1027,7 +1018,7 @@ const List<DocsApiFact> _placementFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'side',
-    type: 'ElPopoverSide',
+    type: 'PopoverSide',
     description:
         'The side it actually landed on: the requested side, or its '
         'opposite when the flip fired.',
@@ -1077,7 +1068,7 @@ const List<DocsApiFact> _anchorMetricsFacts = <DocsApiFact>[
 const List<DocsApiFact> _contentBuilderFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'content',
-    type: 'Widget Function(BuildContext, ElPopoverAnchorMetrics)',
+    type: 'Widget Function(BuildContext, PopoverAnchorMetrics)',
     description:
         "The content parameter's own signature: the popup is built "
         "from the caller's own build scope, so a list that narrows on "
@@ -1098,7 +1089,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Hover',
     treatment:
         'N/A: anchor is rendered verbatim with no MouseRegion or '
-        "gesture of ElPopover's own added to it; a hover effect on the "
+        "gesture of Popover's own added to it; a hover effect on the "
         "trigger is entirely the caller's own widget.",
     userSignal: 'N/A',
   ),
@@ -1113,9 +1104,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Pressed',
     treatment:
-        "N/A, ElPopover applies no press paint of its own to anchor; "
+        "N/A, Popover applies no press paint of its own to anchor; "
         "open is a prop the caller flips from whatever gesture its own "
-        'trigger widget already wires (a ElButton onPressed, in every '
+        'trigger widget already wires (a Button onPressed, in every '
         'shipped consumer).',
     userSignal: 'N/A',
   ),
@@ -1153,7 +1144,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        'N/A, ElPopover has no enabled or disabled parameter; a caller '
+        'N/A, Popover has no enabled or disabled parameter; a caller '
         'wanting a disabled trigger disables its own anchor widget and '
         'never sets open to true.',
     userSignal: 'N/A',
@@ -1162,7 +1153,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         'The fade/zoom/slide transition runs through '
-        'elAnimationDuration, so its ElDurations.overlay duration '
+        'effectiveMotionDuration, so its MotionDurations.overlayEnter duration '
         'collapses to zero under reduced motion: the same collapse '
         'animate and animateOut already model at false.',
     userSignal:
@@ -1180,7 +1171,7 @@ class _AccessibilityContent extends StatelessWidget {
     children: const <Widget>[
       _A11yRow(
         'Semantic role',
-        'ElPopover renders no Semantics node of its own: no dialog or '
+        'Popover renders no Semantics node of its own: no dialog or '
             'popup role, and no aria-expanded-style relationship wired '
             'between anchor and its popup.',
       ),
@@ -1212,11 +1203,11 @@ class _AccessibilityContent extends StatelessWidget {
             'keeps focus in its own input; the date picker autofocuses '
             'its calendar), but that handling is each '
             'consumer’s own responsibility, not something '
-            'ElPopover verifies or falls back to.',
+            'Popover verifies or falls back to.',
       ),
       _A11yRow(
         'Touch target',
-        'ElPopover adds no padding of its own around anchor; the tap '
+        'Popover adds no padding of its own around anchor; the tap '
             "target is whatever the wrapped trigger already provides.",
       ),
       _A11yRow(
@@ -1226,7 +1217,7 @@ class _AccessibilityContent extends StatelessWidget {
       ),
       _A11yRow(
         'Error wiring',
-        'None, ElPopover never participates in form validation or an '
+        'None, Popover never participates in form validation or an '
             'error state of its own.',
       ),
       _A11yRow(
@@ -1238,7 +1229,7 @@ class _AccessibilityContent extends StatelessWidget {
       _A11yRow(
         'Known platform differences',
         'None observed in the paint or gesture logic: the barrier and '
-            'layout code route on geometry and ElPopoverBarrier, never '
+            'layout code route on geometry and PopoverBarrier, never '
             'on platform.',
         last: true,
       ),
@@ -1246,15 +1237,15 @@ class _AccessibilityContent extends StatelessWidget {
   );
 }
 
-/// Read straight off `ElPopover`'s own `Focus` wrapper and `_onKey`
+/// Read straight off `Popover`'s own `Focus` wrapper and `_onKey`
 /// (`lib/src/components/popover.dart`), not inferred.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElPopover requests no focus for itself: the Focus wrapper '
+      _bullets(ThemeScope.of(context), <String>[
+        'Popover requests no focus for itself: the Focus wrapper '
             'around content is built with canRequestFocus: false, '
             'skipTraversal: true, so Tab never lands on it and it is '
             'never the thing holding focus.',
@@ -1263,12 +1254,12 @@ class _KeyboardContent extends StatelessWidget {
             'LogicalKeyboardKey.escape and calls onDismiss?.call(); any '
             'other key, or an Escape press before content holds focus, '
             'returns KeyEventResult.ignored and keeps propagating.',
-        'No Tab trap: ElPopover imposes no FocusScope of its own '
-            'around content, unlike ElModalPortal. Tab order inside '
+        'No Tab trap: Popover imposes no FocusScope of its own '
+            'around content, unlike OverlayPortal. Tab order inside '
             'the popup, and whether Tab can leave it, is entirely up '
             'to whatever content builds.',
         'anchor keeps whatever tab order and key bindings its own '
-            'widget already had: ElPopover adds no key handling to the '
+            'widget already had: Popover adds no key handling to the '
             'trigger.',
       ]);
 }
@@ -1280,8 +1271,8 @@ class _ResponsiveContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
-        "Main axis: the flip: elPopoverPlacement measures the room "
+      _bullets(ThemeScope.of(context), <String>[
+        "Main axis: the flip: popoverPlacement measures the room "
             'side leaves against the anchor and the collision boundary. '
             "If the requested side has enough room for the content's "
             'size, it is used as-is. If not, the opposite side is '
@@ -1295,7 +1286,7 @@ class _ResponsiveContent extends StatelessWidget {
             'collisionPadding on both ends. A popup sliding along its '
             'trigger keeps it attached; the cross axis is never '
             'flipped, only shifted.',
-        'The result is reported back out as ElPopoverPlacement once '
+        'The result is reported back out as PopoverPlacement once '
             'layout knows it, on the next frame: a popup whose side '
             'flips therefore zooms from the requested corner for one '
             'frame and the resolved one for the rest of the '
@@ -1305,7 +1296,7 @@ class _ResponsiveContent extends StatelessWidget {
             'geometry runs whether the app is a phone, a tablet, or a '
             'desktop window, and content builders that want to respond '
             'to the room available read it themselves off '
-            'ElPopoverAnchorMetrics.availableWidth / availableHeight, '
+            'PopoverAnchorMetrics.availableWidth / availableHeight, '
             'the way the combobox popup caps its own maxHeight against '
             'it.',
       ]),
@@ -1368,8 +1359,8 @@ class _DependenciesContent extends StatelessWidget {
           const DocsInstallFact(
             label: 'Verified',
             value:
-                "test/selects_test.dart's ElPopover group, "
-                "test/menus_test.dart's ElPopover: what the menus "
+                "test/selects_test.dart's Popover group, "
+                "test/menus_test.dart's Popover: what the menus "
                 'added group, plus this docs specimen',
             description:
                 'Package-level behavioral coverage: placement, the '
@@ -1379,7 +1370,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Dropdown Menu', route: '/components/dropdown-menu'),
@@ -1393,10 +1384,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Native Select', route: '/components/native_select'),
           DocsLink(label: 'Calendar', route: '/components/calendar'),
           DocsLink(label: 'Hover Card', route: '/components/hover-card'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',
@@ -1411,23 +1399,24 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(BuildContext context) => _bullets(ElTheme.of(context), <String>[
-    "ElPopoverSurface fills with theme.popover and inks its text with "
-        "theme.popoverForeground through a DefaultTextStyle: content "
-        'built inside content picks this up automatically unless it '
-        'overrides its own color.',
-    'The ring is a flat 10% of theme.foreground over the shadow layer, '
-        'on every instance that leaves ring at its true default: the '
-        'corner radius (ElRadii.lg, 12px) and the elevation '
-        '(ElShadows.tailwindMd) are each overridable per instance '
-        'through radius and shadow, unlike the fixed pill ElTooltip '
-        'renders.',
-    'The open/close transition: an 8px slide on whichever sides '
-        'slideSides names, a 95%→100% zoom, and a fade: runs over '
-        'ElDurations.overlay through elAnimationDuration on '
-        'ElCurves.out, so it resolves instantly under reduced motion '
-        'rather than being skipped as a special case.',
-  ]);
+  Widget build(BuildContext context) =>
+      _bullets(ThemeScope.of(context), <String>[
+        "PopoverSurface fills with theme.popover and inks its text with "
+            "theme.popoverForeground through a DefaultTextStyle: content "
+            'built inside content picks this up automatically unless it '
+            'overrides its own color.',
+        'The ring is a flat 10% of theme.foreground over the shadow layer, '
+            'on every instance that leaves ring at its true default: the '
+            'corner radius (Radii.lg, 12px) and the elevation '
+            '(Shadows.tailwindMd) are each overridable per instance '
+            'through radius and shadow, unlike the fixed pill Tooltip '
+            'renders.',
+        'The open/close transition: an 8px slide on whichever sides '
+            'slideSides names, a 95%→100% zoom, and a fade: runs over '
+            'MotionDurations.overlayEnter through effectiveMotionDuration on '
+            'MotionCurves.enter, so it resolves instantly under reduced motion '
+            'rather than being skipped as a special case.',
+      ]);
 }
 
 class _A11yRow extends StatelessWidget {
@@ -1439,30 +1428,34 @@ class _A11yRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : el(3)),
+      padding: EdgeInsets.only(bottom: last ? 0 : space(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.section, color: theme.actionInk),
-          SizedBox(height: el(1)),
-          ElText(body, ElType.small),
+          StyledText(label, TextStyles.section, color: theme.actionText),
+          SizedBox(height: space(1)),
+          StyledText(body, TextStyles.small),
         ],
       ),
     );
   }
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

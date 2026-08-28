@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/scroll_area.dart",
+      "source": "lib/src/components/ui/scroll_area.dart",
       "target": "@ui/scroll_area.dart",
-      "sha256": "90ce66b9c08b86e5d566172ac64b27107aa72b97c9d4fe43ebcabc437dbaa6d5"
+      "sha256": "58632353f3f043009e259fa02cdc2e70870ed80b8478af8576c49ebcf74be92b"
     }
   ],
   "registryDependencies": [
@@ -21,5 +21,9 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/scroll-area",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/scroll_area.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/scroll_area.dart",
+  "exports": [
+    "ScrollArea",
+    "ScrollAreaBehavior"
+  ]
 }

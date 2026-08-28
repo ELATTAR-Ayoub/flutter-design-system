@@ -27,6 +27,6 @@ const ComponentDocEntry separatorDoc = ComponentDocEntry(
       'horizontal fills the parent width, vertical stretches to the '
       'parent height.',
   dependencies: <String>['source-foundation'],
-  exports: <String>['ElSeparator', 'ElSeparatorOrientation'],
+  exports: <String>['Separator', 'SeparatorOrientation'],
   sourcePath: 'lib/src/components/separator.dart',
 );

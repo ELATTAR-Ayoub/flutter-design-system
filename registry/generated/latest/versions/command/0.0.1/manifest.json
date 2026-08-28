@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/command.dart",
+      "source": "lib/src/components/ui/command.dart",
       "target": "@ui/command.dart",
-      "sha256": "e72f380c1b52880ff4dbc181fef5e40eb3ea59c2cef46cfb15b652905b50515b"
+      "sha256": "95a2c09298096218e4ee6c3ddff69fdf9fdbe3c1a6d8a7545afe5b3d2733218a"
     }
   ],
   "registryDependencies": [
@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/command",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/command.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/command.dart",
   "deprecated": false
 }

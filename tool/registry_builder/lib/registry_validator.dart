@@ -6,13 +6,9 @@ import 'registry_schema.dart';
 const Set<String> logicalTargetPrefixes = <String>{
   '@ui/',
   '@foundation/',
-  '@effects/',
-  '@motion/',
+  '@block/',
   '@assets/',
   '@shaders/',
-  // Application-level compositions (shots). These land in the consumer's own
-  // `lib/`, never inside the design-system folders.
-  '@app/',
   // Third-party license notices. These land in the consumer's root
   // `LICENSES/` directory, outside `lib/` and outside the asset bundle:
   // a notice has to be findable by a human reading the repository, not

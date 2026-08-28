@@ -12,10 +12,10 @@
 /// for a non-widget item" guidance for this family — `agent-core` is a
 /// registry `component`, not an effect — so every section below is a
 /// `ShowcaseSection` whose specimen stages the vocabulary itself: the real
-/// `ElAgentState.values` as chips, `elResolveAgentState` walked against ten
-/// real turn lists, `elStateForTool`'s longest-prefix rule against a real
-/// `ElToolStateMap`, the formatting helpers against real inputs, and
-/// `elSerialiseAttachments`'s real wire output. Nothing here is invented:
+/// `AgentState.values` as chips, `resolveAgentState` walked against ten
+/// real turn lists, `stateForTool`'s longest-prefix rule against a real
+/// `ToolStateMap`, the formatting helpers against real inputs, and
+/// `serialiseAttachments`'s real wire output. Nothing here is invented:
 /// every scenario is a real call into the real function, computed at build
 /// time, not a hard-coded string standing in for one.
 ///
@@ -29,7 +29,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -46,7 +58,7 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'All twenty ElAgentState.values, in states.ts\'s own order, each '
+          'All twenty AgentState.values, in states.ts\'s own order, each '
           'showing its real .glyph icon and its real .label sentence — '
           'transcribed from the source, not paraphrased, including the '
           'documented drift that not one of them actually carries the '
@@ -54,7 +66,7 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(64),
+      minHeight: space(64),
     ),
     InstallSection(
       id: 'install',
@@ -99,25 +111,25 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
       id: 'resolve-state',
       title: 'Resolve agent state',
       description:
-          'elResolveAgentState\'s own nine-branch precedence ladder, walked '
+          'resolveAgentState\'s own nine-branch precedence ladder, walked '
           'against ten real turn lists — the same function a live console '
           'calls every time it rebuilds. Each row below is a real call, not '
           'a claim about one.',
       specimen: _ResolveStateSpecimen(),
       code: _resolveStateCode,
       label: 'Resolve agent state specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     ShowcaseSection(
       id: 'tool-mapping',
       title: 'Tool state mapping',
       description:
-          'elStateForTool: an exact match first, then the longest "."- or '
+          'stateForTool: an exact match first, then the longest "."- or '
           '"_"-terminated prefix that matches — so a name that fits both a '
           'blanket finance. mapping and a more specific finance.forecast. '
           'one resolves through the longer, regardless of which was '
           'declared first. An unmapped name resolves to null, and the '
-          'chip falls back to elHumaniseToolName instead.',
+          'chip falls back to humaniseToolName instead.',
       specimen: _ToolMappingSpecimen(),
       code: _toolMappingCode,
       label: 'Tool state mapping specimen view',
@@ -126,22 +138,22 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
       id: 'formatting',
       title: 'Formatting helpers',
       description:
-          'elFormatBytes, elFormatMs, elHumaniseToolName and elRelativeTime '
+          'formatBytes, formatMs, humaniseToolName and relativeTime '
           '— the small, pure functions that turn a raw byte count, a '
           'duration, a snake_case tool name, or a DateTime into the '
-          'sentence a reader actually sees. elRelativeTime below is passed '
+          'sentence a reader actually sees. relativeTime below is passed '
           'a fixed now: so the result is deterministic rather than a moving '
           'target.',
       specimen: _FormattingSpecimen(),
       code: _formattingCode,
       label: 'Formatting helpers specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     ShowcaseSection(
       id: 'serialise-attachments',
       title: 'Serialise attachments',
       description:
-          'elSerialiseAttachments folds attachments into the string that '
+          'serialiseAttachments folds attachments into the string that '
           'actually goes on the wire: a textual file inlines under a '
           '<file> fence, an image with a vision reading inlines under an '
           '<image> fence, and anything else — here, an image with no '
@@ -150,7 +162,7 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
       specimen: _SerialiseSpecimen(),
       code: _serialiseCode,
       label: 'Serialise attachments specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     DisclosureSection(
       id: 'api',
@@ -158,7 +170,7 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
       description:
           'Every exported class and enum this library declares, one table '
           'each, plus a twenty-sixth table for the top-level functions. '
-          'Alias typedefs (ElAgentAttachmentDelivery, ElAgentUserTurn, and '
+          'Alias typedefs (AgentAttachmentDelivery, AgentUserTurn, and '
           'the rest of the "console spelling" family the library doc '
           'names) are noted beside their canonical type rather than given a '
           'second table: they add no field of their own.',
@@ -174,9 +186,9 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
           'State / Treatment / User signal columns describe a control\'s '
           'interaction states, and there is no control here to describe. '
           'What this file DOES have is a twenty-value state machine, which '
-          'is a different thing: see the ElAgentState table in API '
+          'is a different thing: see the AgentState table in API '
           'Reference for every value, and Resolve agent state above for how '
-          'elResolveAgentState picks one.',
+          'resolveAgentState picks one.',
       child: _StatesContent(),
     ),
     DisclosureSection(
@@ -186,7 +198,7 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
           'agent_core.dart paints nothing and sets no Semantics node of its '
           'own — every accessible name and live region in this family '
           'belongs to the widget that renders a turn (agent-transcript\'s '
-          'ElToolChip, agent-console\'s status line), documented on those '
+          'ToolChip, agent-console\'s status line), documented on those '
           'pages. What this file contributes is the vocabulary those '
           'widgets read.',
       child: _AccessibilityContent(),
@@ -221,7 +233,7 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
       title: 'Theming',
       description:
           'agent_core.dart imports no theme_scope.dart and calls '
-          'ElTheme.of(context) nowhere in the file.',
+          'ThemeScope.of(context) nowhere in the file.',
       child: _ThemingContent(),
     ),
     DisclosureSection(
@@ -276,9 +288,9 @@ class AgentCoreDocPage extends StatelessWidget {
       title: agentCoreDoc.title,
       description: agentCoreDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Agent Core'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Agent Core'),
     ],
     toc: agentCoreDocSpec.toc,
     previous: null,
@@ -301,33 +313,40 @@ class _PreviewSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Wrap(
-      spacing: el(2),
-      runSpacing: el(2),
+      spacing: space(2),
+      runSpacing: space(2),
       children: <Widget>[
-        for (final ElAgentState state in ElAgentState.values)
+        for (final AgentState state in AgentState.values)
           Container(
             key: ValueKey<String>('agent-core-preview:${state.name}'),
             padding: EdgeInsets.symmetric(
-              horizontal: el(3),
-              vertical: el(1.5),
+              horizontal: space(3),
+              vertical: space(1.5),
             ),
             decoration: BoxDecoration(
               color: theme.card,
-              borderRadius: BorderRadius.circular(ElRadii.pill),
-              border: Border.all(color: theme.border, width: ElWidths.hairline),
+              borderRadius: BorderRadius.circular(Radii.full),
+              border: Border.all(
+                color: theme.border,
+                width: BorderWidths.hairline,
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElIcon.lucide(
+                Icon.lucide(
                   state.glyph,
-                  sizePx: el(3.5),
-                  tone: ElIconTone.muted,
+                  sizePx: space(3.5),
+                  tone: IconTone.muted,
                 ),
-                SizedBox(width: el(1.5)),
-                ElText(state.label, ElType.chip, color: theme.mutedForeground),
+                SizedBox(width: space(1.5)),
+                StyledText(
+                  state.label,
+                  TextStyles.chip,
+                  color: theme.mutedForeground,
+                ),
               ],
             ),
           ),
@@ -336,133 +355,131 @@ class _PreviewSpecimen extends StatelessWidget {
   }
 }
 
-const String _previewCode = '''for (final ElAgentState state in ElAgentState.values)
+const String _previewCode = '''for (final AgentState state in AgentState.values)
   Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      ElIcon.lucide(state.glyph, sizePx: 14, tone: ElIconTone.muted),
+      Icon.lucide(state.glyph, sizePx: 14, tone: IconTone.muted),
       const SizedBox(width: 6),
-      ElText(state.label, ElType.chip),
+      StyledText(state.label, TextStyles.chip),
     ],
   )''';
 
 const String _usageCode =
     '''import 'package:elattar_design_system/elattar_design_system.dart';
 
-final ElAgentState state = elResolveAgentState(
-  turns: const <ElAgentTurn>[],
-  signals: const ElAgentSignals(isLoading: true),
+final AgentState state = resolveAgentState(
+  turns: const <AgentTurn>[],
+  signals: const AgentSignals(isLoading: true),
 );
-// state == ElAgentState.thinking''';
+// state == AgentState.thinking''';
 
 class _ResolveScenario {
   const _ResolveScenario({
     required this.label,
     required this.turns,
-    this.signals = const ElAgentSignals(),
+    this.signals = const AgentSignals(),
     this.toolStates,
   });
 
   final String label;
-  final List<ElAgentTurn> turns;
-  final ElAgentSignals signals;
-  final ElToolStateMap? toolStates;
+  final List<AgentTurn> turns;
+  final AgentSignals signals;
+  final ToolStateMap? toolStates;
 }
 
 const List<_ResolveScenario> _resolveScenarios = <_ResolveScenario>[
-  _ResolveScenario(label: '0. Empty conversation', turns: <ElAgentTurn>[]),
+  _ResolveScenario(label: '0. Empty conversation', turns: <AgentTurn>[]),
   _ResolveScenario(
     label: '6. Sent, nothing back yet',
-    turns: <ElAgentTurn>[ElUserTurn(id: 'u1', text: 'Hi')],
-    signals: ElAgentSignals(awaitingFirstEvent: true),
+    turns: <AgentTurn>[UserTurn(id: 'u1', text: 'Hi')],
+    signals: AgentSignals(awaitingFirstEvent: true),
   ),
   _ResolveScenario(
     label: '7. Loading, no other signal',
-    turns: <ElAgentTurn>[],
-    signals: ElAgentSignals(isLoading: true),
+    turns: <AgentTurn>[],
+    signals: AgentSignals(isLoading: true),
   ),
   _ResolveScenario(
     label: '3. A tool in flight (unmapped)',
-    turns: <ElAgentTurn>[
-      ElToolTurn(
+    turns: <AgentTurn>[
+      ToolTurn(
         id: 't1',
         name: 'search_inventory',
         params: <String, Object?>{},
-        status: ElAgentTurnStatus.running,
+        status: AgentTurnStatus.running,
         attempt: 1,
       ),
     ],
   ),
   _ResolveScenario(
     label: '3. The same tool, retried after a failure',
-    turns: <ElAgentTurn>[
-      ElToolTurn(
+    turns: <AgentTurn>[
+      ToolTurn(
         id: 't1',
         name: 'search_inventory',
         params: <String, Object?>{},
-        status: ElAgentTurnStatus.running,
+        status: AgentTurnStatus.running,
         attempt: 2,
       ),
     ],
   ),
   _ResolveScenario(
     label: '3. A tool in flight, mapped via toolStates',
-    turns: <ElAgentTurn>[
-      ElToolTurn(
+    turns: <AgentTurn>[
+      ToolTurn(
         id: 't1',
         name: 'search_inventory',
         params: <String, Object?>{},
-        status: ElAgentTurnStatus.running,
+        status: AgentTurnStatus.running,
         attempt: 1,
       ),
     ],
-    toolStates: <String, ElAgentState>{
-      'search_inventory': ElAgentState.searching,
-    },
+    toolStates: <String, AgentState>{'search_inventory': AgentState.searching},
   ),
   _ResolveScenario(
     label: '2. An action held for approval',
-    turns: <ElAgentTurn>[
-      ElActionTurn(
+    turns: <AgentTurn>[
+      ActionTurn(
         id: 'a1',
         action: 'purchase_pack',
         params: <String, Object?>{},
-        status: ElAgentTurnStatus.running,
-        approval: ElApprovalOutcome.pending,
+        status: AgentTurnStatus.running,
+        approval: ApprovalOutcome.pending,
       ),
     ],
   ),
   _ResolveScenario(
     label: '5. Prose streaming right after a tool call',
-    turns: <ElAgentTurn>[
-      ElUserTurn(id: 'u1', text: 'Find the file'),
-      ElToolTurn(
+    turns: <AgentTurn>[
+      UserTurn(id: 'u1', text: 'Find the file'),
+      ToolTurn(
         id: 't1',
         name: 'search_files',
         params: <String, Object?>{},
-        status: ElAgentTurnStatus.ok,
+        status: AgentTurnStatus.ok,
         attempt: 1,
       ),
-      ElTextTurn(id: 'a1', text: 'Found it.', streaming: true),
+      TextTurn(id: 'a1', text: 'Found it.', streaming: true),
     ],
   ),
   _ResolveScenario(
     label: '5. Prose streaming with no prior work',
-    turns: <ElAgentTurn>[
-      ElTextTurn(id: 'a1', text: 'Thinking out loud.', streaming: true),
+    turns: <AgentTurn>[
+      TextTurn(id: 'a1', text: 'Thinking out loud.', streaming: true),
     ],
   ),
   _ResolveScenario(
     label: '1. A fatal error',
-    turns: <ElAgentTurn>[
-      ElErrorTurn(id: 'e1', message: 'The upstream timed out.', fatal: true),
+    turns: <AgentTurn>[
+      ErrorTurn(id: 'e1', message: 'The upstream timed out.', fatal: true),
     ],
   ),
   _ResolveScenario(
     label: '8. A turn finished, nothing else happening',
-    turns: <ElAgentTurn>[
-      ElUserTurn(id: 'u1', text: 'Thanks'),
-      ElTextTurn(id: 'a1', text: 'You are welcome.', streaming: false),
+    turns: <AgentTurn>[
+      UserTurn(id: 'u1', text: 'Thanks'),
+      TextTurn(id: 'a1', text: 'You are welcome.', streaming: false),
     ],
   ),
 ];
@@ -472,7 +489,7 @@ class _ResolveStateSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
@@ -480,11 +497,11 @@ class _ResolveStateSpecimen extends StatelessWidget {
         for (final _ResolveScenario scenario in _resolveScenarios)
           Padding(
             key: ValueKey<String>('agent-core-resolve:${scenario.label}'),
-            padding: EdgeInsets.only(bottom: el(3)),
+            padding: EdgeInsets.only(bottom: space(3)),
             child: _StatRow(
               theme: theme,
               label: scenario.label,
-              value: elResolveAgentState(
+              value: resolveAgentState(
                 turns: scenario.turns,
                 signals: scenario.signals,
                 toolStates: scenario.toolStates,
@@ -496,32 +513,33 @@ class _ResolveStateSpecimen extends StatelessWidget {
   }
 }
 
-const String _resolveStateCode = '''// Branch numbers are elResolveAgentState's own precedence order.
-elResolveAgentState(
-  turns: const [ElUserTurn(id: 'u1', text: 'Hi')],
-  signals: const ElAgentSignals(awaitingFirstEvent: true),
+const String _resolveStateCode =
+    '''// Branch numbers are resolveAgentState's own precedence order.
+resolveAgentState(
+  turns: const [UserTurn(id: 'u1', text: 'Hi')],
+  signals: const AgentSignals(awaitingFirstEvent: true),
 ).label; // 'Queued'
 
-elResolveAgentState(
+resolveAgentState(
   turns: [
-    ElToolTurn(
+    ToolTurn(
       id: 't1',
       name: 'search_inventory',
       params: const {},
-      status: ElAgentTurnStatus.running,
+      status: AgentTurnStatus.running,
       attempt: 2, // a retry
     ),
   ],
-  signals: const ElAgentSignals(),
+  signals: const AgentSignals(),
 ).label; // 'Retrying' ''';
 
 class _ToolMappingSpecimen extends StatelessWidget {
   const _ToolMappingSpecimen();
 
-  static const ElToolStateMap _toolStates = <String, ElAgentState>{
-    'search_inventory': ElAgentState.searching,
-    'finance.': ElAgentState.retrieving,
-    'finance.forecast.': ElAgentState.processing,
+  static const ToolStateMap _toolStates = <String, AgentState>{
+    'search_inventory': AgentState.searching,
+    'finance.': AgentState.retrieving,
+    'finance.forecast.': AgentState.processing,
   };
 
   static const List<String> _names = <String>[
@@ -533,7 +551,7 @@ class _ToolMappingSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
@@ -541,14 +559,14 @@ class _ToolMappingSpecimen extends StatelessWidget {
         for (final String name in _names)
           Padding(
             key: ValueKey<String>('agent-core-tool-mapping:$name'),
-            padding: EdgeInsets.only(bottom: el(3)),
+            padding: EdgeInsets.only(bottom: space(3)),
             child: _StatRow(
               theme: theme,
               label: name,
               value:
-                  elStateForTool(name, _toolStates)?.label ??
+                  stateForTool(name, _toolStates)?.label ??
                   '(unmapped — falls back to '
-                      '"${elHumaniseToolName(name)}")',
+                      '"${humaniseToolName(name)}")',
             ),
           ),
       ],
@@ -556,45 +574,45 @@ class _ToolMappingSpecimen extends StatelessWidget {
   }
 }
 
-const String _toolMappingCode = '''const ElToolStateMap toolStates = {
-  'search_inventory': ElAgentState.searching,
-  'finance.': ElAgentState.retrieving,
-  'finance.forecast.': ElAgentState.processing, // the longer prefix
+const String _toolMappingCode = '''const ToolStateMap toolStates = {
+  'search_inventory': AgentState.searching,
+  'finance.': AgentState.retrieving,
+  'finance.forecast.': AgentState.processing, // the longer prefix
 };
 
-elStateForTool('search_inventory', toolStates);    // exact: searching
-elStateForTool('finance.report', toolStates);      // prefix: retrieving
-elStateForTool('finance.forecast.q3', toolStates); // longest prefix wins: processing
-elStateForTool('export_activity', toolStates);     // null: unmapped''';
+stateForTool('search_inventory', toolStates);    // exact: searching
+stateForTool('finance.report', toolStates);      // prefix: retrieving
+stateForTool('finance.forecast.q3', toolStates); // longest prefix wins: processing
+stateForTool('export_activity', toolStates);     // null: unmapped''';
 
 class _FormattingSpecimen extends StatelessWidget {
   const _FormattingSpecimen();
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final DateTime now = DateTime(2026, 8, 26, 12);
     final List<(String, String)> rows = <(String, String)>[
-      ('elFormatBytes(512)', elFormatBytes(512)),
-      ('elFormatBytes(2048)', elFormatBytes(2048)),
-      ('elFormatBytes(2621440)', elFormatBytes(2621440)),
-      ('elFormatMs(320)', elFormatMs(320)),
-      ('elFormatMs(8000)', elFormatMs(8000)),
+      ('formatBytes(512)', formatBytes(512)),
+      ('formatBytes(2048)', formatBytes(2048)),
+      ('formatBytes(2621440)', formatBytes(2621440)),
+      ('formatMs(320)', formatMs(320)),
+      ('formatMs(8000)', formatMs(8000)),
       (
-        "elHumaniseToolName('search_inventory')",
-        elHumaniseToolName('search_inventory'),
+        "humaniseToolName('search_inventory')",
+        humaniseToolName('search_inventory'),
       ),
       (
-        "elHumaniseToolName('exportActivityReport')",
-        elHumaniseToolName('exportActivityReport'),
+        "humaniseToolName('exportActivityReport')",
+        humaniseToolName('exportActivityReport'),
       ),
       (
-        'elRelativeTime(now − 1 day, now: now)',
-        elRelativeTime(now.subtract(const Duration(days: 1)), now: now),
+        'relativeTime(now − 1 day, now: now)',
+        relativeTime(now.subtract(const Duration(days: 1)), now: now),
       ),
       (
-        'elRelativeTime(now + 3 hours, now: now)',
-        elRelativeTime(now.add(const Duration(hours: 3)), now: now),
+        'relativeTime(now + 3 hours, now: now)',
+        relativeTime(now.add(const Duration(hours: 3)), now: now),
       ),
     ];
     return Column(
@@ -604,7 +622,7 @@ class _FormattingSpecimen extends StatelessWidget {
         for (final (String call, String result) in rows)
           Padding(
             key: ValueKey<String>('agent-core-formatting:$call'),
-            padding: EdgeInsets.only(bottom: el(3)),
+            padding: EdgeInsets.only(bottom: space(3)),
             child: _StatRow(theme: theme, label: call, value: result),
           ),
       ],
@@ -616,9 +634,13 @@ class _FormattingSpecimen extends StatelessWidget {
 /// neither ever overflows a narrow stage — every showcase specimen on this
 /// page that pairs a real call with its real output uses this.
 class _StatRow extends StatelessWidget {
-  const _StatRow({required this.theme, required this.label, required this.value});
+  const _StatRow({
+    required this.theme,
+    required this.label,
+    required this.value,
+  });
 
-  final ElThemeData theme;
+  final ThemeTokens theme;
   final String label;
   final String value;
 
@@ -627,36 +649,36 @@ class _StatRow extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElText(label, ElType.code, color: theme.foreground),
-      SizedBox(height: el(1)),
-      ElText(value, ElType.small, color: theme.mutedForeground),
+      StyledText(label, TextStyles.code, color: theme.foreground),
+      SizedBox(height: space(1)),
+      StyledText(value, TextStyles.small, color: theme.mutedForeground),
     ],
   );
 }
 
-const String _formattingCode = '''elFormatBytes(512);      // '512 B'
-elFormatBytes(2048);     // '2 KB'
-elFormatBytes(2621440);  // '2.5 MB'
-elFormatMs(320);         // '320ms'
-elFormatMs(8000);        // '8.0s'
-elHumaniseToolName('search_inventory');     // 'Search inventory'
-elHumaniseToolName('exportActivityReport'); // 'Export activity report'
-elRelativeTime(then, now: now);             // 'yesterday', 'in 3 hours', …''';
+const String _formattingCode = '''formatBytes(512);      // '512 B'
+formatBytes(2048);     // '2 KB'
+formatBytes(2621440);  // '2.5 MB'
+formatMs(320);         // '320ms'
+formatMs(8000);        // '8.0s'
+humaniseToolName('search_inventory');     // 'Search inventory'
+humaniseToolName('exportActivityReport'); // 'Export activity report'
+relativeTime(then, now: now);             // 'yesterday', 'in 3 hours', …''';
 
-const List<ElAgentAttachment> _sampleAttachments = <ElAgentAttachment>[
-  ElAgentAttachment(
+const List<AgentAttachment> _sampleAttachments = <AgentAttachment>[
+  AgentAttachment(
     id: 'f1',
     name: 'notes.md',
     mime: 'text/markdown',
-    kind: ElAgentAttachmentKind.other,
+    kind: AgentAttachmentKind.other,
     size: 42,
     text: '# Notes\n- remember the demo',
   ),
-  ElAgentAttachment(
+  AgentAttachment(
     id: 'f2',
     name: 'diagram.png',
     mime: 'image/png',
-    kind: ElAgentAttachmentKind.image,
+    kind: AgentAttachmentKind.image,
     size: 20480,
   ),
 ];
@@ -666,25 +688,25 @@ class _SerialiseSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final ElSerialisedMessage message = elSerialiseAttachments(
+    final ThemeTokens theme = ThemeScope.of(context);
+    final SerialisedMessage message = serialiseAttachments(
       'Here is what I found.',
       _sampleAttachments,
     );
     return Container(
       key: const ValueKey<String>('agent-core-serialise-output'),
       width: double.infinity,
-      padding: EdgeInsets.all(el(3)),
+      padding: EdgeInsets.all(space(3)),
       decoration: BoxDecoration(
         color: theme.muted.withValues(alpha: 0.40),
-        borderRadius: BorderRadius.circular(ElRadii.md),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.md),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: ElText(
+        child: StyledText(
           message.text,
-          ElType.code,
+          TextStyles.code,
           color: theme.mutedForeground,
           softWrap: false,
         ),
@@ -694,18 +716,18 @@ class _SerialiseSpecimen extends StatelessWidget {
 }
 
 const String _serialiseCode = '''final attachments = [
-  ElAgentAttachment(
+  AgentAttachment(
     id: 'f1', name: 'notes.md', mime: 'text/markdown',
-    kind: ElAgentAttachmentKind.other, size: 42,
+    kind: AgentAttachmentKind.other, size: 42,
     text: '# Notes\\n- remember the demo',
   ),
-  ElAgentAttachment(
+  AgentAttachment(
     id: 'f2', name: 'diagram.png', mime: 'image/png',
-    kind: ElAgentAttachmentKind.image, size: 20480, // no vision reading
+    kind: AgentAttachmentKind.image, size: 20480, // no vision reading
   ),
 ];
 
-elSerialiseAttachments('Here is what I found.', attachments).text;
+serialiseAttachments('Here is what I found.', attachments).text;
 // 'Here is what I found.'
 //
 // <file name="notes.md" type="text/markdown">
@@ -723,40 +745,40 @@ elSerialiseAttachments('Here is what I found.', attachments).text;
 
 const List<DocsTocEntry> _apiChildren = <DocsTocEntry>[
   DocsTocEntry(
-    title: 'ElAgentAttachmentKind',
+    title: 'AgentAttachmentKind',
     anchor: 'api-elagentattachmentkind',
   ),
-  DocsTocEntry(title: 'ElAgentDeliverySent', anchor: 'api-elagentdeliverysent'),
-  DocsTocEntry(title: 'ElAgentDelivery', anchor: 'api-elagentdelivery'),
-  DocsTocEntry(title: 'ElAgentAttachment', anchor: 'api-elagentattachment'),
-  DocsTocEntry(title: 'ElSerialisedMessage', anchor: 'api-elserialisedmessage'),
-  DocsTocEntry(title: 'ElAgentTurnStatus', anchor: 'api-elagentturnstatus'),
-  DocsTocEntry(title: 'ElAgentTurn', anchor: 'api-elagentturn'),
-  DocsTocEntry(title: 'ElUserTurn', anchor: 'api-eluserturn'),
-  DocsTocEntry(title: 'ElTextTurn', anchor: 'api-eltextturn'),
-  DocsTocEntry(title: 'ElToolTurn', anchor: 'api-eltoolturn'),
-  DocsTocEntry(title: 'ElActionTurn', anchor: 'api-elactionturn'),
-  DocsTocEntry(title: 'ElApprovalOutcome', anchor: 'api-elapprovaloutcome'),
-  DocsTocEntry(title: 'ElErrorTurn', anchor: 'api-elerrorturn'),
-  DocsTocEntry(title: 'ElPendingApproval', anchor: 'api-elpendingapproval'),
-  DocsTocEntry(title: 'ElAgentState', anchor: 'api-elagentstate'),
-  DocsTocEntry(title: 'ElToolStateMap', anchor: 'api-eltoolstatemap'),
+  DocsTocEntry(title: 'AgentDeliverySent', anchor: 'api-elagentdeliverysent'),
+  DocsTocEntry(title: 'AgentDelivery', anchor: 'api-elagentdelivery'),
+  DocsTocEntry(title: 'AgentAttachment', anchor: 'api-elagentattachment'),
+  DocsTocEntry(title: 'SerialisedMessage', anchor: 'api-elserialisedmessage'),
+  DocsTocEntry(title: 'AgentTurnStatus', anchor: 'api-elagentturnstatus'),
+  DocsTocEntry(title: 'AgentTurn', anchor: 'api-elagentturn'),
+  DocsTocEntry(title: 'UserTurn', anchor: 'api-eluserturn'),
+  DocsTocEntry(title: 'TextTurn', anchor: 'api-eltextturn'),
+  DocsTocEntry(title: 'ToolTurn', anchor: 'api-eltoolturn'),
+  DocsTocEntry(title: 'ActionTurn', anchor: 'api-elactionturn'),
+  DocsTocEntry(title: 'ApprovalOutcome', anchor: 'api-elapprovaloutcome'),
+  DocsTocEntry(title: 'ErrorTurn', anchor: 'api-elerrorturn'),
+  DocsTocEntry(title: 'PendingApproval', anchor: 'api-elpendingapproval'),
+  DocsTocEntry(title: 'AgentState', anchor: 'api-elagentstate'),
+  DocsTocEntry(title: 'ToolStateMap', anchor: 'api-eltoolstatemap'),
   DocsTocEntry(
-    title: 'ElAgentAttachmentSupport',
+    title: 'AgentAttachmentSupport',
     anchor: 'api-elagentattachmentsupport',
   ),
-  DocsTocEntry(title: 'ElAgentCapabilities', anchor: 'api-elagentcapabilities'),
-  DocsTocEntry(title: 'ElAgentSendOptions', anchor: 'api-elagentsendoptions'),
-  DocsTocEntry(title: 'ElAgentTransport', anchor: 'api-elagenttransport'),
-  DocsTocEntry(title: 'ElAgentSignals', anchor: 'api-elagentsignals'),
+  DocsTocEntry(title: 'AgentCapabilities', anchor: 'api-elagentcapabilities'),
+  DocsTocEntry(title: 'AgentSendOptions', anchor: 'api-elagentsendoptions'),
+  DocsTocEntry(title: 'AgentTransport', anchor: 'api-elagenttransport'),
+  DocsTocEntry(title: 'AgentSignals', anchor: 'api-elagentsignals'),
   DocsTocEntry(
-    title: 'ElConversationSummary',
+    title: 'ConversationSummary',
     anchor: 'api-elconversationsummary',
   ),
-  DocsTocEntry(title: 'ElConversationStore', anchor: 'api-elconversationstore'),
-  DocsTocEntry(title: 'ElSwitchPhase', anchor: 'api-elswitchphase'),
+  DocsTocEntry(title: 'ConversationStore', anchor: 'api-elconversationstore'),
+  DocsTocEntry(title: 'SwitchPhase', anchor: 'api-elswitchphase'),
   DocsTocEntry(
-    title: 'ElBlurSwitchController',
+    title: 'BlurSwitchController',
     anchor: 'api-elblurswitchcontroller',
   ),
   DocsTocEntry(title: 'Top-level functions', anchor: 'api-functions'),
@@ -772,173 +794,161 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-elagentattachmentkind',
         child: DocsApiTable(
-          title: 'ElAgentAttachmentKind',
+          title: 'AgentAttachmentKind',
           facts: _attachmentKindFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentdeliverysent',
         child: DocsApiTable(
-          title: 'ElAgentDeliverySent',
+          title: 'AgentDeliverySent',
           facts: _deliverySentFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentdelivery',
-        child: DocsApiTable(title: 'ElAgentDelivery', facts: _deliveryFacts),
+        child: DocsApiTable(title: 'AgentDelivery', facts: _deliveryFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentattachment',
-        child: DocsApiTable(
-          title: 'ElAgentAttachment',
-          facts: _attachmentFacts,
-        ),
+        child: DocsApiTable(title: 'AgentAttachment', facts: _attachmentFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elserialisedmessage',
         child: DocsApiTable(
-          title: 'ElSerialisedMessage',
+          title: 'SerialisedMessage',
           facts: _serialisedMessageFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentturnstatus',
-        child: DocsApiTable(
-          title: 'ElAgentTurnStatus',
-          facts: _turnStatusFacts,
-        ),
+        child: DocsApiTable(title: 'AgentTurnStatus', facts: _turnStatusFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentturn',
-        child: DocsApiTable(title: 'ElAgentTurn', facts: _agentTurnFacts),
+        child: DocsApiTable(title: 'AgentTurn', facts: _agentTurnFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eluserturn',
-        child: DocsApiTable(title: 'ElUserTurn', facts: _userTurnFacts),
+        child: DocsApiTable(title: 'UserTurn', facts: _userTurnFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eltextturn',
-        child: DocsApiTable(title: 'ElTextTurn', facts: _textTurnFacts),
+        child: DocsApiTable(title: 'TextTurn', facts: _textTurnFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eltoolturn',
-        child: DocsApiTable(title: 'ElToolTurn', facts: _toolTurnFacts),
+        child: DocsApiTable(title: 'ToolTurn', facts: _toolTurnFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elactionturn',
-        child: DocsApiTable(title: 'ElActionTurn', facts: _actionTurnFacts),
+        child: DocsApiTable(title: 'ActionTurn', facts: _actionTurnFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elapprovaloutcome',
         child: DocsApiTable(
-          title: 'ElApprovalOutcome',
+          title: 'ApprovalOutcome',
           facts: _approvalOutcomeFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elerrorturn',
-        child: DocsApiTable(title: 'ElErrorTurn', facts: _errorTurnFacts),
+        child: DocsApiTable(title: 'ErrorTurn', facts: _errorTurnFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpendingapproval',
         child: DocsApiTable(
-          title: 'ElPendingApproval',
+          title: 'PendingApproval',
           facts: _pendingApprovalFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentstate',
-        child: DocsApiTable(title: 'ElAgentState', facts: _agentStateFacts),
+        child: DocsApiTable(title: 'AgentState', facts: _agentStateFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eltoolstatemap',
-        child: DocsApiTable(
-          title: 'ElToolStateMap',
-          facts: _toolStateMapFacts,
-        ),
+        child: DocsApiTable(title: 'ToolStateMap', facts: _toolStateMapFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentattachmentsupport',
         child: DocsApiTable(
-          title: 'ElAgentAttachmentSupport',
+          title: 'AgentAttachmentSupport',
           facts: _attachmentSupportFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentcapabilities',
         child: DocsApiTable(
-          title: 'ElAgentCapabilities',
+          title: 'AgentCapabilities',
           facts: _capabilitiesFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentsendoptions',
         child: DocsApiTable(
-          title: 'ElAgentSendOptions',
+          title: 'AgentSendOptions',
           facts: _sendOptionsFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagenttransport',
-        child: DocsApiTable(
-          title: 'ElAgentTransport',
-          facts: _transportFacts,
-        ),
+        child: DocsApiTable(title: 'AgentTransport', facts: _transportFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentsignals',
-        child: DocsApiTable(title: 'ElAgentSignals', facts: _signalsFacts),
+        child: DocsApiTable(title: 'AgentSignals', facts: _signalsFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elconversationsummary',
         child: DocsApiTable(
-          title: 'ElConversationSummary',
+          title: 'ConversationSummary',
           facts: _conversationSummaryFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elconversationstore',
         child: DocsApiTable(
-          title: 'ElConversationStore',
+          title: 'ConversationStore',
           facts: _conversationStoreFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elswitchphase',
-        child: DocsApiTable(title: 'ElSwitchPhase', facts: _switchPhaseFacts),
+        child: DocsApiTable(title: 'SwitchPhase', facts: _switchPhaseFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elblurswitchcontroller',
         child: DocsApiTable(
-          title: 'ElBlurSwitchController',
+          title: 'BlurSwitchController',
           facts: _blurSwitchFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-functions',
         child: DocsApiTable(
@@ -1009,39 +1019,36 @@ const List<DocsApiFact> _deliverySentFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _deliveryFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElAgentDelivery.content()',
+    name: 'AgentDelivery.content()',
     type: 'const constructor',
     description: 'sent: content, reason: null.',
   ),
   DocsApiFact(
-    name: 'ElAgentDelivery.reference(reason)',
+    name: 'AgentDelivery.reference(reason)',
     type: 'const constructor',
     description: 'Required positional String reason. sent: reference.',
   ),
   DocsApiFact(
-    name: 'ElAgentDelivery.produced()',
+    name: 'AgentDelivery.produced()',
     type: 'const constructor',
     description: 'sent: produced, reason: null.',
   ),
   DocsApiFact(
     name: 'sent',
-    type: 'ElAgentDeliverySent',
+    type: 'AgentDeliverySent',
     description: 'Which constructor built this instance.',
   ),
   DocsApiFact(
     name: 'reason',
     type: 'String?',
-    description: 'Only .reference() carries one; every other constructor '
+    description:
+        'Only .reference() carries one; every other constructor '
         'leaves it null.',
   ),
 ];
 
 const List<DocsApiFact> _attachmentFacts = <DocsApiFact>[
-  DocsApiFact(
-    name: 'id',
-    type: 'String',
-    description: 'Required.',
-  ),
+  DocsApiFact(name: 'id', type: 'String', description: 'Required.'),
   DocsApiFact(name: 'name', type: 'String', description: 'Required.'),
   DocsApiFact(
     name: 'mime',
@@ -1050,11 +1057,16 @@ const List<DocsApiFact> _attachmentFacts = <DocsApiFact>[
         'Required. As reported by the picker, or asserted by the '
         'producing tool.',
   ),
-  DocsApiFact(name: 'kind', type: 'ElAgentAttachmentKind', description: 'Required.'),
+  DocsApiFact(
+    name: 'kind',
+    type: 'AgentAttachmentKind',
+    description: 'Required.',
+  ),
   DocsApiFact(
     name: 'size',
     type: 'int',
-    description: 'Required. Bytes: shown to the user and what the size '
+    description:
+        'Required. Bytes: shown to the user and what the size '
         'cap is enforced against.',
   ),
   DocsApiFact(
@@ -1071,7 +1083,7 @@ const List<DocsApiFact> _attachmentFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'delivery',
-    type: 'ElAgentDelivery?',
+    type: 'AgentDelivery?',
     description:
         'Optional. Set by the transport once it knows whether the '
         'content actually travelled.',
@@ -1079,7 +1091,8 @@ const List<DocsApiFact> _attachmentFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'copyWith({delivery, text})',
     type: 'method',
-    description: 'Returns a new instance with delivery and/or text '
+    description:
+        'Returns a new instance with delivery and/or text '
         'replaced; every other field carries over unchanged.',
   ),
 ];
@@ -1092,16 +1105,25 @@ const List<DocsApiFact> _serialisedMessageFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'attachments',
-    type: 'List<ElAgentAttachment>',
-    description: 'Required. The same attachments, with delivery stamped '
+    type: 'List<AgentAttachment>',
+    description:
+        'Required. The same attachments, with delivery stamped '
         'on each.',
   ),
 ];
 
 const List<DocsApiFact> _turnStatusFacts = <DocsApiFact>[
   DocsApiFact(name: 'running', type: 'enum value', description: 'In flight.'),
-  DocsApiFact(name: 'ok', type: 'enum value', description: 'Settled, succeeded.'),
-  DocsApiFact(name: 'error', type: 'enum value', description: 'Settled, failed.'),
+  DocsApiFact(
+    name: 'ok',
+    type: 'enum value',
+    description: 'Settled, succeeded.',
+  ),
+  DocsApiFact(
+    name: 'error',
+    type: 'enum value',
+    description: 'Settled, failed.',
+  ),
 ];
 
 const List<DocsApiFact> _agentTurnFacts = <DocsApiFact>[
@@ -1115,21 +1137,29 @@ const List<DocsApiFact> _agentTurnFacts = <DocsApiFact>[
 ];
 
 const List<DocsApiFact> _userTurnFacts = <DocsApiFact>[
-  DocsApiFact(name: 'id', type: 'String', description: 'Required (from ElAgentTurn).'),
+  DocsApiFact(
+    name: 'id',
+    type: 'String',
+    description: 'Required (from AgentTurn).',
+  ),
   DocsApiFact(name: 'text', type: 'String', description: 'Required.'),
   DocsApiFact(
     name: 'attachments',
-    type: 'List<ElAgentAttachment>',
+    type: 'List<AgentAttachment>',
     description: 'Defaults to [].',
   ),
 ];
 
 const List<DocsApiFact> _textTurnFacts = <DocsApiFact>[
-  DocsApiFact(name: 'id', type: 'String', description: 'Required (from ElAgentTurn).'),
+  DocsApiFact(
+    name: 'id',
+    type: 'String',
+    description: 'Required (from AgentTurn).',
+  ),
   DocsApiFact(name: 'text', type: 'String', description: 'Required.'),
   DocsApiFact(
     name: 'attachments',
-    type: 'List<ElAgentAttachment>',
+    type: 'List<AgentAttachment>',
     description: 'Defaults to [].',
   ),
   DocsApiFact(
@@ -1152,14 +1182,26 @@ const List<DocsApiFact> _textTurnFacts = <DocsApiFact>[
 ];
 
 const List<DocsApiFact> _toolTurnFacts = <DocsApiFact>[
-  DocsApiFact(name: 'id', type: 'String', description: 'Required (from ElAgentTurn).'),
-  DocsApiFact(name: 'name', type: 'String', description: 'Required. The tool name.'),
+  DocsApiFact(
+    name: 'id',
+    type: 'String',
+    description: 'Required (from AgentTurn).',
+  ),
+  DocsApiFact(
+    name: 'name',
+    type: 'String',
+    description: 'Required. The tool name.',
+  ),
   DocsApiFact(
     name: 'params',
     type: 'Map<String, Object?>',
     description: 'Required. The call\'s arguments.',
   ),
-  DocsApiFact(name: 'status', type: 'ElAgentTurnStatus', description: 'Required.'),
+  DocsApiFact(
+    name: 'status',
+    type: 'AgentTurnStatus',
+    description: 'Required.',
+  ),
   DocsApiFact(
     name: 'attempt',
     type: 'int',
@@ -1184,7 +1226,7 @@ const List<DocsApiFact> _toolTurnFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'attachments',
-    type: 'List<ElAgentAttachment>',
+    type: 'List<AgentAttachment>',
     description: 'Defaults to []. Files the tool produced.',
   ),
   DocsApiFact(
@@ -1197,7 +1239,11 @@ const List<DocsApiFact> _toolTurnFacts = <DocsApiFact>[
 ];
 
 const List<DocsApiFact> _actionTurnFacts = <DocsApiFact>[
-  DocsApiFact(name: 'id', type: 'String', description: 'Required (from ElAgentTurn).'),
+  DocsApiFact(
+    name: 'id',
+    type: 'String',
+    description: 'Required (from AgentTurn).',
+  ),
   DocsApiFact(
     name: 'action',
     type: 'String',
@@ -1208,21 +1254,17 @@ const List<DocsApiFact> _actionTurnFacts = <DocsApiFact>[
     type: 'Map<String, Object?>',
     description: 'Required.',
   ),
-  DocsApiFact(name: 'status', type: 'ElAgentTurnStatus', description: 'Required.'),
   DocsApiFact(
-    name: 'startedAt',
-    type: 'int',
-    description: 'Defaults to 0.',
+    name: 'status',
+    type: 'AgentTurnStatus',
+    description: 'Required.',
   ),
-  DocsApiFact(
-    name: 'error',
-    type: 'String?',
-    description: 'Optional.',
-  ),
+  DocsApiFact(name: 'startedAt', type: 'int', description: 'Defaults to 0.'),
+  DocsApiFact(name: 'error', type: 'String?', description: 'Optional.'),
   DocsApiFact(name: 'ms', type: 'int?', description: 'Optional.'),
   DocsApiFact(
     name: 'approval',
-    type: 'ElApprovalOutcome?',
+    type: 'ApprovalOutcome?',
     description:
         'Optional. Set when this action is held at an approval card '
         'rather than run.',
@@ -1235,19 +1277,31 @@ const List<DocsApiFact> _approvalOutcomeFacts = <DocsApiFact>[
     type: 'enum value',
     description: 'Held, waiting on a human.',
   ),
-  DocsApiFact(name: 'approved', type: 'enum value', description: 'The user said yes.'),
-  DocsApiFact(name: 'rejected', type: 'enum value', description: 'The user said no.'),
+  DocsApiFact(
+    name: 'approved',
+    type: 'enum value',
+    description: 'The user said yes.',
+  ),
+  DocsApiFact(
+    name: 'rejected',
+    type: 'enum value',
+    description: 'The user said no.',
+  ),
 ];
 
 const List<DocsApiFact> _errorTurnFacts = <DocsApiFact>[
-  DocsApiFact(name: 'id', type: 'String', description: 'Required (from ElAgentTurn).'),
+  DocsApiFact(
+    name: 'id',
+    type: 'String',
+    description: 'Required (from AgentTurn).',
+  ),
   DocsApiFact(name: 'message', type: 'String', description: 'Required.'),
   DocsApiFact(
     name: 'fatal',
     type: 'bool',
     description:
         'Required. A fatal error outranks every other branch in '
-        'elResolveAgentState; a non-fatal one does not.',
+        'resolveAgentState; a non-fatal one does not.',
   ),
 ];
 
@@ -1255,7 +1309,7 @@ const List<DocsApiFact> _pendingApprovalFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'turnId',
     type: 'String',
-    description: 'Required. The ElActionTurn this belongs to.',
+    description: 'Required. The ActionTurn this belongs to.',
   ),
   DocsApiFact(name: 'action', type: 'String', description: 'Required.'),
   DocsApiFact(
@@ -1274,26 +1328,107 @@ const List<DocsApiFact> _pendingApprovalFacts = <DocsApiFact>[
 ];
 
 const List<DocsApiFact> _agentStateFacts = <DocsApiFact>[
-  DocsApiFact(name: 'idle', type: 'enum value', description: '"Ready" · not busy · ElLucide.circle.'),
-  DocsApiFact(name: 'queued', type: 'enum value', description: '"Queued" · busy · ElLucide.clock.'),
-  DocsApiFact(name: 'planning', type: 'enum value', description: '"Planning" · busy, narrating · ElLucide.listChecks.'),
-  DocsApiFact(name: 'retrieving', type: 'enum value', description: '"Retrieving knowledge" · busy · ElLucide.bookOpen.'),
-  DocsApiFact(name: 'ingesting', type: 'enum value', description: '"Ingesting data" · busy · ElLucide.database.'),
-  DocsApiFact(name: 'running', type: 'enum value', description: '"Running code" · busy · ElLucide.terminal.'),
-  DocsApiFact(name: 'delegating', type: 'enum value', description: '"Delegating to agent" · busy · ElLucide.arrowRightLeft.'),
-  DocsApiFact(name: 'awaitingApproval', type: 'enum value', description: '"Awaiting approval" · busy, wire awaiting_approval · ElLucide.shieldQuestionMark.'),
-  DocsApiFact(name: 'validating', type: 'enum value', description: '"Validating" · busy · ElLucide.checkCheck.'),
-  DocsApiFact(name: 'retrying', type: 'enum value', description: '"Retrying" · busy · ElLucide.rotateCw.'),
-  DocsApiFact(name: 'error', type: 'enum value', description: '"Something went wrong" · not busy · ElLucide.triangleAlert.'),
-  DocsApiFact(name: 'summarizing', type: 'enum value', description: '"Summarizing" · busy, narrating · ElLucide.scrollText.'),
-  DocsApiFact(name: 'thinking', type: 'enum value', description: '"Thinking" · busy · ElLucide.brain.'),
-  DocsApiFact(name: 'processing', type: 'enum value', description: '"Processing" · busy · ElLucide.chartColumn.'),
-  DocsApiFact(name: 'callingTools', type: 'enum value', description: '"Calling tools" · busy, wire calling_tools · ElLucide.wrench.'),
-  DocsApiFact(name: 'searching', type: 'enum value', description: '"Searching" · busy · ElLucide.search.'),
-  DocsApiFact(name: 'reading', type: 'enum value', description: '"Reading files" · busy · ElLucide.bookOpen.'),
-  DocsApiFact(name: 'recalling', type: 'enum value', description: '"Recalling context" · busy · ElLucide.rotateCcwClock.'),
-  DocsApiFact(name: 'writing', type: 'enum value', description: '"Writing" · busy, narrating · ElLucide.pencil.'),
-  DocsApiFact(name: 'done', type: 'enum value', description: '"Done" · not busy · ElLucide.check.'),
+  DocsApiFact(
+    name: 'idle',
+    type: 'enum value',
+    description: '"Ready" · not busy · Lucide.circle.',
+  ),
+  DocsApiFact(
+    name: 'queued',
+    type: 'enum value',
+    description: '"Queued" · busy · Lucide.clock.',
+  ),
+  DocsApiFact(
+    name: 'planning',
+    type: 'enum value',
+    description: '"Planning" · busy, narrating · Lucide.listChecks.',
+  ),
+  DocsApiFact(
+    name: 'retrieving',
+    type: 'enum value',
+    description: '"Retrieving knowledge" · busy · Lucide.bookOpen.',
+  ),
+  DocsApiFact(
+    name: 'ingesting',
+    type: 'enum value',
+    description: '"Ingesting data" · busy · Lucide.database.',
+  ),
+  DocsApiFact(
+    name: 'running',
+    type: 'enum value',
+    description: '"Running code" · busy · Lucide.terminal.',
+  ),
+  DocsApiFact(
+    name: 'delegating',
+    type: 'enum value',
+    description: '"Delegating to agent" · busy · Lucide.arrowRightLeft.',
+  ),
+  DocsApiFact(
+    name: 'awaitingApproval',
+    type: 'enum value',
+    description:
+        '"Awaiting approval" · busy, wire awaiting_approval · Lucide.shieldQuestionMark.',
+  ),
+  DocsApiFact(
+    name: 'validating',
+    type: 'enum value',
+    description: '"Validating" · busy · Lucide.checkCheck.',
+  ),
+  DocsApiFact(
+    name: 'retrying',
+    type: 'enum value',
+    description: '"Retrying" · busy · Lucide.rotateCw.',
+  ),
+  DocsApiFact(
+    name: 'error',
+    type: 'enum value',
+    description: '"Something went wrong" · not busy · Lucide.triangleAlert.',
+  ),
+  DocsApiFact(
+    name: 'summarizing',
+    type: 'enum value',
+    description: '"Summarizing" · busy, narrating · Lucide.scrollText.',
+  ),
+  DocsApiFact(
+    name: 'thinking',
+    type: 'enum value',
+    description: '"Thinking" · busy · Lucide.brain.',
+  ),
+  DocsApiFact(
+    name: 'processing',
+    type: 'enum value',
+    description: '"Processing" · busy · Lucide.chartColumn.',
+  ),
+  DocsApiFact(
+    name: 'callingTools',
+    type: 'enum value',
+    description: '"Calling tools" · busy, wire calling_tools · Lucide.wrench.',
+  ),
+  DocsApiFact(
+    name: 'searching',
+    type: 'enum value',
+    description: '"Searching" · busy · Lucide.search.',
+  ),
+  DocsApiFact(
+    name: 'reading',
+    type: 'enum value',
+    description: '"Reading files" · busy · Lucide.bookOpen.',
+  ),
+  DocsApiFact(
+    name: 'recalling',
+    type: 'enum value',
+    description: '"Recalling context" · busy · Lucide.rotateCcwClock.',
+  ),
+  DocsApiFact(
+    name: 'writing',
+    type: 'enum value',
+    description: '"Writing" · busy, narrating · Lucide.pencil.',
+  ),
+  DocsApiFact(
+    name: 'done',
+    type: 'enum value',
+    description: '"Done" · not busy · Lucide.check.',
+  ),
   DocsApiFact(
     name: '.wire / .label / .isBusy / .isNarrating / .glyph',
     type: 'getters',
@@ -1307,8 +1442,8 @@ const List<DocsApiFact> _agentStateFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _toolStateMapFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElToolStateMap',
-    type: 'typedef Map<String, ElAgentState>',
+    name: 'ToolStateMap',
+    type: 'typedef Map<String, AgentState>',
     description:
         'Supplied by the caller, never guessed: only the caller knows '
         'whether export_activity is reading, writing or running.',
@@ -1316,29 +1451,46 @@ const List<DocsApiFact> _toolStateMapFacts = <DocsApiFact>[
 ];
 
 const List<DocsApiFact> _attachmentSupportFacts = <DocsApiFact>[
-  DocsApiFact(name: 'content', type: 'enum value', description: 'Can carry attachment content.'),
-  DocsApiFact(name: 'reference', type: 'enum value', description: 'Filenames only.'),
-  DocsApiFact(name: 'none', type: 'enum value', description: 'No attachments at all.'),
+  DocsApiFact(
+    name: 'content',
+    type: 'enum value',
+    description: 'Can carry attachment content.',
+  ),
+  DocsApiFact(
+    name: 'reference',
+    type: 'enum value',
+    description: 'Filenames only.',
+  ),
+  DocsApiFact(
+    name: 'none',
+    type: 'enum value',
+    description: 'No attachments at all.',
+  ),
 ];
 
 const List<DocsApiFact> _capabilitiesFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'attachments',
-    type: 'ElAgentAttachmentSupport',
+    type: 'AgentAttachmentSupport',
     description: 'Defaults to content.',
   ),
-  DocsApiFact(name: 'models', type: 'bool', description: 'Defaults to true. Can the model be chosen per message.'),
+  DocsApiFact(
+    name: 'models',
+    type: 'bool',
+    description: 'Defaults to true. Can the model be chosen per message.',
+  ),
   DocsApiFact(
     name: 'approvals',
     type: 'bool',
-    description: 'Defaults to true. Can a tool call or action be held for the user to approve.',
+    description:
+        'Defaults to true. Can a tool call or action be held for the user to approve.',
   ),
 ];
 
 const List<DocsApiFact> _sendOptionsFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'attachments',
-    type: 'List<ElAgentAttachment>',
+    type: 'List<AgentAttachment>',
     description: 'Defaults to [].',
   ),
   DocsApiFact(
@@ -1361,8 +1513,9 @@ const List<DocsApiFact> _sendOptionsFacts = <DocsApiFact>[
 const List<DocsApiFact> _transportFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'turns',
-    type: 'List<ElAgentTurn> (get)',
-    description: 'The transcript, in order. Owned by the transport so it '
+    type: 'List<AgentTurn> (get)',
+    description:
+        'The transcript, in order. Owned by the transport so it '
         'can settle its own tool calls.',
   ),
   DocsApiFact(
@@ -1387,28 +1540,34 @@ const List<DocsApiFact> _transportFacts = <DocsApiFact>[
   DocsApiFact(name: 'error', type: 'Object? (get)', description: 'Required.'),
   DocsApiFact(
     name: 'pendingApprovals',
-    type: 'List<ElPendingApproval> (get)',
+    type: 'List<PendingApproval> (get)',
     description: 'Requests the transport is holding at an approval gate.',
   ),
   DocsApiFact(
     name: 'capabilities',
-    type: 'ElAgentCapabilities (get)',
+    type: 'AgentCapabilities (get)',
     description: 'Required.',
   ),
 ];
 
 const List<DocsApiFact> _signalsFacts = <DocsApiFact>[
-  DocsApiFact(name: 'isLoading', type: 'bool', description: 'Defaults to false.'),
+  DocsApiFact(
+    name: 'isLoading',
+    type: 'bool',
+    description: 'Defaults to false.',
+  ),
   DocsApiFact(
     name: 'awaitingFirstEvent',
     type: 'bool',
-    description: 'Defaults to false. True between hitting send and the '
+    description:
+        'Defaults to false. True between hitting send and the '
         'first event coming back.',
   ),
   DocsApiFact(
     name: 'declared',
-    type: 'ElAgentState?',
-    description: 'Optional. A state the agent asserted about itself; '
+    type: 'AgentState?',
+    description:
+        'Optional. A state the agent asserted about itself; '
         'wins over everything derived.',
   ),
 ];
@@ -1434,7 +1593,8 @@ const List<DocsApiFact> _conversationSummaryFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'copyWith({title, pinned})',
     type: 'method',
-    description: 'Returns a new instance with title and/or pinned '
+    description:
+        'Returns a new instance with title and/or pinned '
         'replaced.',
   ),
 ];
@@ -1442,26 +1602,48 @@ const List<DocsApiFact> _conversationSummaryFacts = <DocsApiFact>[
 const List<DocsApiFact> _conversationStoreFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'conversations',
-    type: 'List<ElConversationSummary> (get)',
+    type: 'List<ConversationSummary> (get)',
     description: 'Required.',
   ),
   DocsApiFact(
     name: 'activeId',
     type: 'String? (get)',
-    description: 'The conversation on screen, or null for an unsaved new '
+    description:
+        'The conversation on screen, or null for an unsaved new '
         'one.',
   ),
   DocsApiFact(name: 'isLoading', type: 'bool (get)', description: 'Required.'),
   DocsApiFact(name: 'error', type: 'String? (get)', description: 'Required.'),
-  DocsApiFact(name: 'open(id)', type: 'void Function', description: 'Required.'),
-  DocsApiFact(name: 'create()', type: 'void Function', description: 'Required.'),
-  DocsApiFact(name: 'rename(id, title)', type: 'void Function', description: 'Required.'),
-  DocsApiFact(name: 'remove(id)', type: 'void Function', description: 'Required.'),
-  DocsApiFact(name: 'refresh()', type: 'void Function', description: 'Required.'),
+  DocsApiFact(
+    name: 'open(id)',
+    type: 'void Function',
+    description: 'Required.',
+  ),
+  DocsApiFact(
+    name: 'create()',
+    type: 'void Function',
+    description: 'Required.',
+  ),
+  DocsApiFact(
+    name: 'rename(id, title)',
+    type: 'void Function',
+    description: 'Required.',
+  ),
+  DocsApiFact(
+    name: 'remove(id)',
+    type: 'void Function',
+    description: 'Required.',
+  ),
+  DocsApiFact(
+    name: 'refresh()',
+    type: 'void Function',
+    description: 'Required.',
+  ),
   DocsApiFact(
     name: 'pin',
     type: 'void Function(String, bool)?',
-    description: 'Null when the store cannot pin: the affordance goes '
+    description:
+        'Null when the store cannot pin: the affordance goes '
         'with it. Capabilities are absence, not flags.',
   ),
   DocsApiFact(
@@ -1472,8 +1654,16 @@ const List<DocsApiFact> _conversationStoreFacts = <DocsApiFact>[
 ];
 
 const List<DocsApiFact> _switchPhaseFacts = <DocsApiFact>[
-  DocsApiFact(name: 'idle', type: 'enum value', description: 'className: "" (no transition in flight).'),
-  DocsApiFact(name: 'out', type: 'enum value', description: "className: 'anim-blur-out'."),
+  DocsApiFact(
+    name: 'idle',
+    type: 'enum value',
+    description: 'className: "" (no transition in flight).',
+  ),
+  DocsApiFact(
+    name: 'out',
+    type: 'enum value',
+    description: "className: 'anim-blur-out'.",
+  ),
   DocsApiFact(
     name: 'blurIn',
     type: 'enum value',
@@ -1485,90 +1675,100 @@ const List<DocsApiFact> _switchPhaseFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _blurSwitchFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElBlurSwitchController({required open})',
+    name: 'BlurSwitchController({required open})',
     type: 'constructor',
     description:
         'open: void Function(String id) — the store call, made at the '
         'darkest point of the transition.',
   ),
   DocsApiFact(
-    name: 'ElBlurSwitchController.outDuration',
+    name: 'BlurSwitchController.outDuration',
     type: 'static Duration (get)',
-    description: 'ElDurations.fast — anim-blur-out.',
+    description: 'MotionDurations.fast — anim-blur-out.',
   ),
   DocsApiFact(
-    name: 'ElBlurSwitchController.inDuration',
+    name: 'BlurSwitchController.inDuration',
     type: 'static Duration (get)',
-    description: 'ElDurations.base — anim-blur-in.',
+    description: 'MotionDurations.normal — anim-blur-in.',
   ),
-  DocsApiFact(name: 'phase', type: 'ElSwitchPhase (get)', description: 'Required.'),
+  DocsApiFact(
+    name: 'phase',
+    type: 'SwitchPhase (get)',
+    description: 'Required.',
+  ),
   DocsApiFact(
     name: 'switchTo(id)',
     type: 'void Function',
-    description: 'What a history row calls instead of store.open — runs '
+    description:
+        'What a history row calls instead of store.open — runs '
         'the blur-out, swap, blur-in sequence.',
   ),
 ];
 
 const List<DocsApiFact> _functionFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'elAttachmentKind(mime, name)',
-    type: 'ElAgentAttachmentKind Function',
+    name: 'attachmentKind(mime, name)',
+    type: 'AgentAttachmentKind Function',
     description: 'Classify by MIME first, extension second.',
   ),
   DocsApiFact(
-    name: 'elFormatBytes(bytes)',
+    name: 'formatBytes(bytes)',
     type: 'String Function',
     description: '1023 B, 18 KB, 2.6 MB.',
   ),
   DocsApiFact(
-    name: 'elIsTextual(attachment)',
+    name: 'isTextual(attachment)',
     type: 'bool Function',
     description: 'Whether this file\'s bytes are meaningfully text.',
   ),
   DocsApiFact(
-    name: 'elSerialiseAttachments(text, attachments)',
-    type: 'ElSerialisedMessage Function',
+    name: 'serialiseAttachments(text, attachments)',
+    type: 'SerialisedMessage Function',
     description: 'Fold attachments into the message the agent receives.',
   ),
   DocsApiFact(
-    name: 'elStripProtocol(text)',
+    name: 'stripProtocol(text)',
     type: 'String Function',
-    description: 'Strip the streaming protocol\'s own <complete> tags and '
+    description:
+        'Strip the streaming protocol\'s own <complete> tags and '
         'a dangling half-written tag at the end of the buffer.',
   ),
   DocsApiFact(
-    name: 'elStateForTool(name, map)',
-    type: 'ElAgentState? Function',
-    description: 'Exact match first, then longest "."- or "_"-terminated '
+    name: 'stateForTool(name, map)',
+    type: 'AgentState? Function',
+    description:
+        'Exact match first, then longest "."- or "_"-terminated '
         'prefix.',
   ),
   DocsApiFact(
-    name: 'elHumaniseToolName(name)',
+    name: 'humaniseToolName(name)',
     type: 'String Function',
     description: 'search_inventory → Search inventory.',
   ),
   DocsApiFact(
-    name: 'elFormatMs(ms)',
+    name: 'formatMs(ms)',
     type: 'String Function',
     description: '912ms under a second, 8.0s above it.',
   ),
   DocsApiFact(
-    name: 'elResolveAgentState({turns, signals, toolStates})',
-    type: 'ElAgentState Function',
-    description: 'Which of the twenty states is true right now — the '
+    name: 'resolveAgentState({turns, signals, toolStates})',
+    type: 'AgentState Function',
+    description:
+        'Which of the twenty states is true right now — the '
         'nine-branch precedence ladder.',
   ),
   DocsApiFact(
-    name: 'elRelativeTime(then, {now})',
+    name: 'relativeTime(then, {now})',
     type: 'String Function',
-    description: 'The largest unit that still reads as a whole number: '
+    description:
+        'The largest unit that still reads as a whole number: '
         '"just now", "yesterday", "3 hours ago".',
   ),
   DocsApiFact(
-    name: 'elRelativeTimeOf(context, then)',
+    name: 'relativeTimeOf(context, then)',
     type: 'String Function',
-    description: 'elRelativeTime against the nearest ElClock — the '
+    description:
+        'relativeTime against the nearest Clock — the '
         '?clock= seam.',
   ),
 ];
@@ -1578,16 +1778,16 @@ class _StatesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No hover, press, focus, disabled, or loading state: '
             'agent_core.dart declares no widget and paints nothing, so '
             'there is no control here for DocsStateMatrix to describe.',
-        'What it has instead is the twenty-value ElAgentState machine — '
-            'see the ElAgentState table in API Reference for every value, '
+        'What it has instead is the twenty-value AgentState machine — '
+            'see the AgentState table in API Reference for every value, '
             'label, and glyph, and Resolve agent state above for the real '
-            'elResolveAgentState precedence ladder that picks one.',
-        'ElSwitchPhase is a second, much smaller state: idle / out / '
-            'blurIn, the three frames ElBlurSwitchController drives a '
+            'resolveAgentState precedence ladder that picks one.',
+        'SwitchPhase is a second, much smaller state: idle / out / '
+            'blurIn, the three frames BlurSwitchController drives a '
             'conversation switch through. Also documented in API '
             'Reference, not demonstrated live here: it needs an animated '
             'consumer (agent-history\'s own transcript) to be shown '
@@ -1600,18 +1800,18 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No Semantics node: agent_core.dart imports package:flutter/'
             'widgets.dart only for @immutable, VoidCallback, '
             'ChangeNotifier, Listenable, and BuildContext — never for a '
             'RenderObject or a Semantics call of its own.',
         'What it supplies instead is the vocabulary a consuming widget '
-            'announces: ElAgentState.label is the exact sentence a status '
-            'line reads aloud, and elHumaniseToolName is the fallback '
+            'announces: AgentState.label is the exact sentence a status '
+            'line reads aloud, and humaniseToolName is the fallback '
             'name a tool chip announces when no product-specific label '
             'was mapped for it — so an unmapped tool is still announced '
             'as words a person can read, never a raw snake_case slug.',
-        'elSerialiseAttachments\'s <attached-but-not-readable> block is '
+        'serialiseAttachments\'s <attached-but-not-readable> block is '
             'itself an accessibility-adjacent honesty device, aimed at '
             'the model rather than a screen reader: it tells the agent, '
             'in words, exactly which files it cannot see, rather than '
@@ -1624,7 +1824,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'agent_core.dart declares no widget: it takes no focus and '
             'handles no key event. Every keyboard interaction in this '
             'family — arrow keys in the slash palette, Enter to send — '
@@ -1638,11 +1838,11 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching: nothing in agent_core.dart reads '
             'MediaQuery, because it draws no layout to break.',
         'BuildContext appears in exactly one function, '
-            'elRelativeTimeOf, and only to read the ambient ElClock — a '
+            'relativeTimeOf, and only to read the ambient Clock — a '
             'testing seam for freezing "now" — never the viewport.',
         'Platform parity: every type and function in this file is pure '
             'Dart with no dart:io Platform branch and no platform '
@@ -1676,21 +1876,22 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Foundation imports',
-            value: 'foundation/date_format.dart, foundation/motion.dart, '
+            value:
+                'foundation/date_format.dart, foundation/motion.dart, '
                 'icon_paths.g.dart',
             description:
-                'date_format.dart supplies ElClock (the ?clock= seam '
-                'elRelativeTimeOf reads); motion.dart supplies '
-                'ElDurations.fast/base for ElBlurSwitchController; '
-                'icon_paths.g.dart supplies ElLucideGlyph, the type '
-                'ElAgentState.glyph returns.',
+                'date_format.dart supplies Clock (the ?clock= seam '
+                'relativeTimeOf reads); motion.dart supplies '
+                'MotionDurations.fast/base for BlurSwitchController; '
+                'icon_paths.g.dart supplies LucideGlyph, the type '
+                'AgentState.glyph returns.',
           ),
           DocsInstallFact(
             label: 'registryDependencies',
             value: agentCoreDoc.dependencies.join(', '),
             description:
                 "The manifest's own list, resolved automatically by "
-                'elattar add agent-core. icon is what ElLucideGlyph and '
+                'elattar add agent-core. icon is what LucideGlyph and '
                 'the icon path table it indexes into ultimately come '
                 'from.',
           ),
@@ -1708,7 +1909,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Icon', route: '/components/icon'),
@@ -1721,7 +1922,10 @@ class _DependenciesContent extends StatelessWidget {
             route: '/components/agent_attachments',
           ),
           DocsLink(label: 'Agent Avatar', route: '/components/agent_avatar'),
-          DocsLink(label: 'Agent Composer', route: '/components/agent-composer'),
+          DocsLink(
+            label: 'Agent Composer',
+            route: '/components/agent-composer',
+          ),
           DocsLink(label: 'Agent Console', route: '/components/agent-console'),
           DocsLink(label: 'Agent Face', route: '/components/agent_face'),
           DocsLink(label: 'Agent History', route: '/components/agent_history'),
@@ -1756,30 +1960,34 @@ class _ThemingContent extends StatelessWidget {
     facts: const <DocsInstallFact>[
       DocsInstallFact(
         label: 'Nothing',
-        value: 'agent_core.dart reads no ElTheme',
+        value: 'agent_core.dart reads no ThemeScope',
         description:
             'The file imports no theme_scope.dart and calls '
-            'ElTheme.of(context) nowhere. Every colour this page shows — '
+            'ThemeScope.of(context) nowhere. Every colour this page shows — '
             'the Preview chips\' theme.card and theme.border, the code '
             'blocks\' theme.muted — belongs to THIS PAGE\'s own specimen '
             'widgets, not to agent_core.dart itself. A consuming widget '
             '(agent-console\'s error banner reads theme.destructive, its '
-            'ElAgentFace reads theme.agent) is where the family\'s real '
+            'AgentFace reads theme.agentAccent) is where the family\'s real '
             'theming lives.',
       ),
     ],
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

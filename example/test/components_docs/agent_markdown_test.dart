@@ -1,9 +1,9 @@
 /// Tests for `components_docs/agent_markdown/page.dart`'s
 /// [AgentMarkdownDocPage]: the agent-markdown component documentation page.
 ///
-/// `agent_markdown.dart` declares three widgets ([ElAgentMarkdown],
-/// [ElAgentCodeBlock], [ElPreformattedCode]) and two supporting classes
-/// ([ElPrismPalette], [ElCodeToken]) this page documents — read directly
+/// `agent_markdown.dart` declares three widgets ([AgentMarkdown],
+/// [AgentCodeBlock], [PreformattedCode]) and two supporting classes
+/// ([PrismPalette], [CodeToken]) this page documents — read directly
 /// from `lib/src/components/agent_markdown.dart`. The parser's own block
 /// model and top-level parse/render/tokenise functions are deliberately out
 /// of scope for the API table, per the page's own library doc; this file
@@ -20,7 +20,34 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
+import 'package:flutter/widgets.dart' as flutter show RichText, Table;
 import 'package:flutter_test/flutter_test.dart';
 
 const List<String> _expectedSectionOrder = <String>[
@@ -42,7 +69,7 @@ const List<String> _expectedSectionOrder = <String>[
 ];
 
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElAgentMarkdown': <String>[
+  'AgentMarkdown': <String>[
     'text',
     'textAlign',
     'blockGap',
@@ -55,7 +82,7 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'cellPadY',
     'headingTop',
   ],
-  'ElAgentCodeBlock': <String>[
+  'AgentCodeBlock': <String>[
     'code',
     'language',
     'plainPadding',
@@ -63,8 +90,8 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'stripPadY',
     'normalise(language)',
   ],
-  'ElPreformattedCode': <String>['code', 'color'],
-  'ElPrismPalette': <String>[
+  'PreformattedCode': <String>['code', 'color'],
+  'PrismPalette': <String>[
     'ground',
     'plain',
     'keyword',
@@ -77,8 +104,8 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'margin',
     'lineHeight',
   ],
-  'ElCodeToken': <String>['text', 'color'],
-  'Top-level functions': <String>['elSafeHref(raw)', 'elLanguageAliases'],
+  'CodeToken': <String>['text', 'color'],
+  'Top-level functions': <String>['safeHref(raw)', 'languageAliases'],
 };
 
 const Size _wide = Size(1440, 900);
@@ -91,21 +118,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -155,23 +182,24 @@ void main() {
       },
     );
 
-    testWidgets(
-      'renders the house-shape section order, section for section',
-      (WidgetTester tester) async {
-        await _pump(tester);
+    testWidgets('renders the house-shape section order, section for section', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester);
 
-        final List<String> ids = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.id)
-            .toList();
+      final List<String> ids = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
+          .toList();
 
-        expect(ids, _expectedSectionOrder);
-      },
-    );
+      expect(ids, _expectedSectionOrder);
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
-        agentMarkdownDocSpec.toc.map((DocsTocEntry entry) => entry.anchor).toList(),
+        agentMarkdownDocSpec.toc
+            .map((DocsTocEntry entry) => entry.anchor)
+            .toList(),
         _expectedSectionOrder,
       );
     });
@@ -186,7 +214,7 @@ void main() {
         await tester.ensureVisible(apiTrigger);
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         final List<DocsApiTable> tables = tester
             .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -300,7 +328,7 @@ void main() {
         await tester.ensureVisible(body);
 
         expect(
-          find.descendant(of: body, matching: find.byType(Table)),
+          find.descendant(of: body, matching: find.byType(flutter.Table)),
           findsOneWidget,
         );
         for (final String cell in <String>[
@@ -332,12 +360,12 @@ void main() {
         await tester.ensureVisible(body);
 
         expect(
-          find.descendant(of: body, matching: find.byType(ElAgentCodeBlock)),
+          find.descendant(of: body, matching: find.byType(AgentCodeBlock)),
           findsNWidgets(2),
         );
         // Only the recognised fence prints a normalised language label —
-        // ElType.micro renders it visually uppercase (text-transform is
-        // applied to the string ElText paints, not to the source), so the
+        // TextStyles.eyebrowSmall renders it visually uppercase (text-transform is
+        // applied to the string StyledText paints, not to the source), so the
         // label reads "TYPESCRIPT" rather than "typescript".
         expect(
           find.descendant(of: body, matching: find.text('TYPESCRIPT')),
@@ -357,74 +385,71 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the Links specimen renders every label as text, including the '
-      'refused javascript: one, and none of them expose a tap recognizer',
-      (WidgetTester tester) async {
-        await _pump(tester);
+    testWidgets('the Links specimen renders every label as text, including the '
+        'refused javascript: one, and none of them expose a tap recognizer', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester);
 
-        final Finder body = find.byKey(
-          const ValueKey<String>('agent-markdown-example:links'),
-        );
-        await tester.ensureVisible(body);
+      final Finder body = find.byKey(
+        const ValueKey<String>('agent-markdown-example:links'),
+      );
+      await tester.ensureVisible(body);
 
-        expect(
-          find.descendant(of: body, matching: find.text('View the comps')),
-          findsOneWidget,
-        );
-        expect(
-          find.descendant(
-            of: body,
-            matching: find.text('https://example.com/bare-url'),
-          ),
-          findsOneWidget,
-        );
-        expect(
-          find.descendant(of: body, matching: find.text('Click me')),
-          findsOneWidget,
-        );
-        // The refused markdown syntax itself never leaks as literal text:
-        // it was parsed as a link, just an unsafe one.
-        expect(
-          find.descendant(
-            of: body,
-            matching: find.textContaining('[Click me]'),
-          ),
-          findsNothing,
-        );
+      expect(
+        find.descendant(of: body, matching: find.text('View the comps')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: body,
+          matching: find.text('https://example.com/bare-url'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: body, matching: find.text('Click me')),
+        findsOneWidget,
+      );
+      // The refused markdown syntax itself never leaks as literal text:
+      // it was parsed as a link, just an unsafe one.
+      expect(
+        find.descendant(of: body, matching: find.textContaining('[Click me]')),
+        findsNothing,
+      );
 
-        // No inline span anywhere on this page carries a tap recognizer —
-        // this renderer draws links, it does not wire them.
-        final Iterable<RichText> richTexts = tester.widgetList<RichText>(
-          find.descendant(of: body, matching: find.byType(RichText)),
-        );
-        bool hasRecognizer(InlineSpan span) {
-          bool found = false;
-          span.visitChildren((InlineSpan child) {
-            if (child is TextSpan && child.recognizer != null) found = true;
-            if (found) return false;
-            return true;
-          });
-          return found;
-        }
+      // No inline span anywhere on this page carries a tap recognizer —
+      // this renderer draws links, it does not wire them.
+      final Iterable<flutter.RichText> richTexts = tester
+          .widgetList<flutter.RichText>(
+            find.descendant(of: body, matching: find.byType(flutter.RichText)),
+          );
+      bool hasRecognizer(InlineSpan span) {
+        bool found = false;
+        span.visitChildren((InlineSpan child) {
+          if (child is TextSpan && child.recognizer != null) found = true;
+          if (found) return false;
+          return true;
+        });
+        return found;
+      }
 
-        for (final RichText rich in richTexts) {
-          expect(hasRecognizer(rich.text), isFalse);
-        }
-      },
-    );
+      for (final flutter.RichText rich in richTexts) {
+        expect(hasRecognizer(rich.text), isFalse);
+      }
+    });
 
     testWidgets(
       'both themes render the article with no exceptions when flipped in '
       'place',
       (WidgetTester tester) async {
-        final ElThemeController theme = await _pump(
+        final ThemeController theme = await _pump(
           tester,
-          mode: ElThemeMode.light,
+          mode: ColorMode.light,
         );
         expect(find.text(agentMarkdownDoc.title), findsWidgets);
 
-        theme.setMode(ElThemeMode.dark);
+        theme.setMode(ColorMode.dark);
         await tester.pump();
         expect(find.text(agentMarkdownDoc.title), findsWidgets);
         expect(tester.takeException(), isNull);
@@ -436,10 +461,7 @@ void main() {
       (WidgetTester tester) async {
         await _pump(tester);
 
-        expect(
-          find.textContaining('elattar add agent-markdown'),
-          findsWidgets,
-        );
+        expect(find.textContaining('elattar add agent-markdown'), findsWidgets);
         expect(agentMarkdownDoc.command, 'elattar add agent-markdown');
         expect(agentMarkdownDoc.route, '/components/agent_markdown');
       },
@@ -451,13 +473,13 @@ void main() {
       expect(
         agentMarkdownDoc.exports,
         containsAll(<String>[
-          'ElAgentMarkdown',
-          'ElAgentCodeBlock',
-          'ElPreformattedCode',
-          'ElPrismPalette',
-          'ElCodeToken',
-          'elSafeHref',
-          'elLanguageAliases',
+          'AgentMarkdown',
+          'AgentCodeBlock',
+          'PreformattedCode',
+          'PrismPalette',
+          'CodeToken',
+          'safeHref',
+          'languageAliases',
         ]),
       );
     });

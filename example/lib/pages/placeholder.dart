@@ -7,7 +7,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// Eyebrow, title, and an honest sentence.
 class PlaceholderPage extends StatelessWidget {
@@ -16,29 +28,29 @@ class PlaceholderPage extends StatelessWidget {
   /// The page's own name: the nav category, or the group for an index route.
   final String title;
 
-  /// The group above it, rendered the way `ElPageHeader` renders one.
+  /// The group above it, rendered the way `PageHeader` renders one.
   final String? eyebrow;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         if (eyebrow != null) ...<Widget>[
-          ElText(eyebrow!, ElType.label, color: theme.actionInk),
+          StyledText(eyebrow!, TextStyles.eyebrow, color: theme.actionText),
           // `mt-4`.
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
         ],
-        ElText(
+        StyledText(
           title,
-          ElType.h1,
-          fontSize: ElFluid.h1(context),
+          TextStyles.h1,
+          fontSize: Fluid.h1(context),
           color: theme.foreground,
         ),
-        SizedBox(height: el(4)),
-        ElText('Not ported yet', ElType.small),
+        SizedBox(height: space(4)),
+        StyledText('Not ported yet', TextStyles.small),
       ],
     );
   }

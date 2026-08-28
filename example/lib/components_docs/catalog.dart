@@ -41,7 +41,7 @@ import 'native_select/meta.dart' as native_select;
 import 'navigation_menu/meta.dart' as navigation_menu;
 import 'pagination/meta.dart' as pagination;
 import 'popover/meta.dart' as popover;
-import 'press_motion/meta.dart' as press_motion;
+import 'press/meta.dart' as press;
 import 'progress/meta.dart' as progress;
 import 'questionnaire/meta.dart' as questionnaire;
 import 'radio/meta.dart' as radio;
@@ -66,10 +66,10 @@ import 'button_group/meta.dart' as button_group;
 import 'combobox/meta.dart' as combobox;
 import 'context_menu/meta.dart' as context_menu;
 import 'drawer/meta.dart' as drawer;
-import 'rule/meta.dart' as rule;
+import 'validation_rule/meta.dart' as rule;
 import 'safe_area/meta.dart' as safe_area;
 import 'empty/meta.dart' as empty;
-import 'foil_value/meta.dart' as foil_value;
+import 'premium_surface/meta.dart' as premium_surface;
 import 'form/meta.dart' as form;
 import 'glass/meta.dart' as glass;
 import 'hover_card/meta.dart' as hover_card;
@@ -77,29 +77,29 @@ import 'input_otp/meta.dart' as input_otp;
 import 'item/meta.dart' as item;
 import 'kbd/meta.dart' as kbd;
 import 'keyframes/meta.dart' as keyframes;
-import 'machine_surface/meta.dart' as machine_surface;
+import 'surface/meta.dart' as surface;
 import 'marker/meta.dart' as marker;
 import 'media_scrim/meta.dart' as media_scrim;
 import 'menu/meta.dart' as menu;
 import 'menubar/meta.dart' as menubar;
 import 'message/meta.dart' as message;
 import 'message_scroller/meta.dart' as message_scroller;
-import 'nav_user/meta.dart' as nav_user;
+import 'user_menu/meta.dart' as user_menu;
 import 'resizable/meta.dart' as resizable;
 import 'selection_control/meta.dart' as selection_control;
 import 'skeleton/meta.dart' as skeleton;
 import 'spinner/meta.dart' as spinner;
 import 'toggle_group/meta.dart' as toggle_group;
 import 'voice/meta.dart' as voice;
-import 'voice_orb/meta.dart' as voice_orb;
+import 'voice_indicator/meta.dart' as voice_indicator;
 import 'icon_swap/meta.dart' as icon_swap;
-import 'lift/meta.dart' as lift;
-import 'sliding_pill/meta.dart' as sliding_pill;
-import 'swap_in/meta.dart' as swap_in;
-import 'bloom_cosmic/meta.dart' as bloom_cosmic;
-import 'page_glow/meta.dart' as page_glow;
-import 'sheen_action/meta.dart' as sheen_action;
-import 'starfield/meta.dart' as starfield;
+import 'hover_builder/meta.dart' as lift;
+import 'active_indicator/meta.dart' as active_indicator;
+import 'content_change/meta.dart' as content_change;
+import 'feedback_surface/meta.dart' as feedback_surface;
+import 'background_effect/meta.dart' as background_effect;
+import 'action_feedback/meta.dart' as action_feedback;
+import 'ambient_pattern/meta.dart' as starfield;
 
 class ComponentDocEntry {
   const ComponentDocEntry({
@@ -179,7 +179,7 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
   navigation_menu.navigationMenuDoc,
   pagination.paginationDoc,
   popover.popoverDoc,
-  press_motion.pressMotionDoc,
+  press.pressDoc,
   progress.progressDoc,
   questionnaire.questionnaireDoc,
   radio.radioDoc,
@@ -203,10 +203,10 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
   combobox.comboboxDoc,
   context_menu.contextMenuDoc,
   drawer.drawerDoc,
-  rule.elRuleDoc,
+  rule.validationRuleDoc,
   safe_area.safeAreaDoc,
   empty.emptyDoc,
-  foil_value.foilValueDoc,
+  premium_surface.premiumSurfaceDoc,
   form.formDoc,
   glass.glassDoc,
   hover_card.hoverCardDoc,
@@ -214,29 +214,29 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
   item.itemDoc,
   kbd.kbdDoc,
   keyframes.keyframesDoc,
-  machine_surface.machineSurfaceDoc,
+  surface.surfaceDoc,
   marker.markerDoc,
   media_scrim.mediaScrimDoc,
   menu.menuDoc,
   menubar.menubarDoc,
   message.messageDoc,
   message_scroller.messageScrollerDoc,
-  nav_user.navUserDoc,
+  user_menu.userMenuDoc,
   resizable.resizableDoc,
   selection_control.selectionControlDoc,
   skeleton.skeletonDoc,
   spinner.spinnerDoc,
   toggle_group.toggleGroupDoc,
   voice.voiceDoc,
-  voice_orb.voiceOrbDoc,
+  voice_indicator.voiceIndicatorDoc,
   icon_swap.iconSwapDoc,
-  lift.liftDoc,
-  sliding_pill.slidingPillDoc,
-  swap_in.swapInDoc,
-  bloom_cosmic.bloomCosmicDoc,
-  page_glow.pageGlowDoc,
-  sheen_action.sheenActionDoc,
-  starfield.starfieldDoc,
+  lift.hoverBuilderDoc,
+  active_indicator.activeIndicatorDoc,
+  content_change.contentChangeDoc,
+  feedback_surface.feedbackSurfaceDoc,
+  background_effect.backgroundEffectDoc,
+  action_feedback.actionFeedbackDoc,
+  starfield.ambientPatternDoc,
 ];
 
 ComponentDocEntry? componentDocForRoute(String route) {

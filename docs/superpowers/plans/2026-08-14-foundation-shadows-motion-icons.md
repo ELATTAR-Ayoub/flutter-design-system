@@ -20,7 +20,7 @@ keyframes) on the way.
   is the closest cousin for specimen grids).
 
 **Architecture:** unchanged — literals only in `lib/src/foundation/`;
-`ElMachineSurface` for anything inset; `ElOklab.mix` derivations over frozen
+`MachineSurface` for anything inset; `Oklab.mix` derivations over frozen
 hexes so a rebrand carries; every animation duration routed through
 `elAnimationDuration` (reduced-motion gate); source-line doc comments in the
 house style (`utility name — globals.css Lnnn`).
@@ -50,23 +50,23 @@ house style (`utility name — globals.css Lnnn`).
 |---|---|---|
 | S1/S10 | Reference heights for parity probes | Supervisor measures with the capture rig at integration; implementers land probes with a `skip: 'measured at integration'` marker the supervisor removes. |
 | S2 | Infinite foil vs tests | Constraint 3 above; every effect controller routes through `elAnimationDuration`, so `disableAnimations` freezes them to frame 0. |
-| S3 + M-ledger | Off-scale timing literals (2.6s, 620ms, 11s, 5.5s, 2.4s, 220ms, 550ms, 800ms, 900ms, 1.4s, 2s, 175ms step) | New named constants in `ElDurations` with source-line comments — the `pressDown`/`animJelly` precedent: the constraint is that literals live in the foundation layer, not that the reference happened to name them. Names: `beatHover`, `beatPress`, `foilDrift`, `glint`, `glintHover`, `pressSpringUp`, `popIn`, `springUp`, `signOn`, `ratchet`, `shimmer`, `pulseLive`. |
+| S3 + M-ledger | Off-scale timing literals (2.6s, 620ms, 11s, 5.5s, 2.4s, 220ms, 550ms, 800ms, 900ms, 1.4s, 2s, 175ms step) | New named constants in `Durations` with source-line comments — the `pressDown`/`animJelly` precedent: the constraint is that literals live in the foundation layer, not that the reference happened to name them. Names: `beatHover`, `beatPress`, `foilDrift`, `glint`, `glintHover`, `pressSpringUp`, `popIn`, `springUp`, `signOn`, `ratchet`, `shimmer`, `pulseLive`. |
 | S4 | Reduced motion on foil/beat | Gate them. Not a divergence: the reference's blanket `prefers-reduced-motion` rule collapses ALL animations to 0.01ms, foil included — `elAnimationDuration` IS that blanket rule. |
 | S5 | Button variant scope | All five missing variants now: `primary` (default), `premium`, `secondary`, `destructive`, `link` — the icons page needs `destructive` regardless, and the enum completes once. |
 | S6 | Input | Genuinely editable (`EditableText`-backed), keyboard-focusable, real caret — "everything is a live component". |
 | S7 | `glass-panel-deep` | Build with its sibling; it is an e4-for-e2 swap and the CSS pairs them. |
 | S8 | 44px copy vs 48px specimen | Render 48, print 44. Fidelity bar. |
 | M1 | `el-travel` zero px | **Verified live by the supervisor** (all four chips hold `matrix(1,0,0,1,0,0)` on a 482px track after the run). Ship the no-op; doc-comment carries the mechanism and the one-line change that would mirror an upstream fix. |
-| M2 | press-spring 220ms | `ElDurations.pressSpringUp` token (S3). Drift stays visible in the demo's note copy, which prints the real numbers. |
+| M2 | press-spring 220ms | `Durations.pressSpringUp` token (S3). Drift stays visible in the demo's note copy, which prints the real numbers. |
 | M3 | `brightness()` | Live `ColorFilter.matrix` per theme; the map's precomputed table is the probe oracle, not the source. |
 | M4 | Orthographic reveal | Ship orthographic (no perspective on the reference, verified in the map); supervisor does one visual A/B on the rig captures at integration. |
 | M5 | Press-button base font | Implementer uses 16px with an `// integration-verify` marker; supervisor confirms via computed-style probe before removing the marker. |
 | M7 | Ratchet under reduced motion | Lands on 0° (CSS: no fill mode, one collapsed iteration → initial state). |
-| M8 | `ElCurves.all` docstring order lie | Fix the docstring in Task A (do not reorder the list — call sites may index it). |
-| M-bug | `sliding_pill.dart:71–74` jelly bypasses `elAnimationDuration` | Fix in Task A. |
+| M8 | `Curves.all` docstring order lie | Fix the docstring in Task A (do not reorder the list — call sites may index it). |
+| M-bug | `active_indicator.dart:71–74` jelly bypasses `elAnimationDuration` | Fix in Task A. |
 | I-Q1 | Usage code block TSX vs Dart | **Dart, exactly the map's proposed text** — a code sample's job is to be executable by its reader, and the user's stated purpose is customers building Flutter apps from these docs. The one deliberate translation on the page; recorded in the page doc comment and surfaced to the user for override. |
 | I-Q2 | Alias glyph names | Curated names on the enum (`filter`, `helpCircle`, `alertTriangle`); lucide module named in each transcript comment. |
-| I-Q3 | 14→16px button icon override | Write `ElIconSize.md` + comment the reference's overridden `size="sm"`. |
+| I-Q3 | 14→16px button icon override | Write `IconSize.md` + comment the reference's overridden `size="sm"`. |
 | I-Q4 | Six chips, six sections | Keep the six real sections; record the chip/anchor drift. |
 | I-Q5 | Sheen scope for icons page | Superseded: Task A ships the full sheen for the shadows page; the icons page consumes the finished effect. |
 | I-Q6 | muted/subtle twin swatches | Comment in the page, mirroring `icon.dart`'s own rationale. |
@@ -78,30 +78,30 @@ house style (`utility name — globals.css Lnnn`).
 ### Task A — Package: effects, buttons, input, timing tokens, keyframes
 
 **Model:** opus. **Map:** shadows-map (primary) + motion-map §keyframes/§utilities.
-**Owns (exclusive):** `lib/src/foundation/motion.dart`, `lib/src/effects/sheen_action.dart` (new), `lib/src/effects/foil_value.dart` (new), `lib/src/effects/glass.dart` (new), `lib/src/components/button.dart`, `lib/src/components/input.dart` (new), `lib/src/motion/` (all, incl. new `keyframes.dart`), `test/effects_test.dart` (new), `test/components_test.dart`, `test/motion_test.dart`, barrel exports in `lib/elattar_design_system.dart`.
+**Owns (exclusive):** `lib/src/design_system/foundation/motion.dart`, `lib/src/components/ui/action_feedback.dart` (new), `lib/src/components/ui/premium_surface.dart` (new), `lib/src/components/ui/glass.dart` (new), `lib/src/components/ui/button.dart`, `lib/src/components/ui/input.dart` (new), `lib/src/components/ui/` (all, incl. new `keyframes.dart`), `test/effects_test.dart` (new), `test/components_test.dart`, `test/motion_test.dart`, barrel exports in `lib/elattar_design_system.dart`.
 
-- [ ] `ElDurations` additions per ruling S3, each with its globals.css / page source line.
-- [ ] `lib/src/motion/keyframes.dart`: the eleven keyframe tables from motion-map §keyframes as const data (stop, transform components, opacity, filter terms), a `TweenSequence`-based player builder, and a `ElSteps(n, {jumpEnd})` curve. `sign-on`'s stepwise timeline modelled per the map (stepped evaluation, not interpolation). Reduced motion: player resolves through `elAnimationDuration`; `both`-fill anims freeze at the final stop, no-fill loopers at stop 0.
-- [ ] `glass.dart`: `ElGlassPanel` / `ElGlassPanelDeep` / `ElGlassControl` per shadows-map §7 — `card@74%` over σ24 blur + the §13.5 saturate matrix, `rim-strong` top inset, `foreground@12%/16%` ring via `ElInsetShadowPainter`-equivalent (the port's machine-surface inset path), e2/e4 outer.
-- [ ] `sheen_action.dart` + `foil_value.dart` per shadows-map §5 — every gradient stop derived with `ElOklab.mix` from `ElPalette` (the map's resolved hexes are test oracles, not source); blend modes per theme (`luminous` split); beat/glint/drift on the new tokens; controllers through `elAnimationDuration`; `RepaintBoundary` around infinite layers.
+- [ ] `Durations` additions per ruling S3, each with its globals.css / page source line.
+- [ ] `lib/src/components/ui/keyframes.dart`: the eleven keyframe tables from motion-map §keyframes as const data (stop, transform components, opacity, filter terms), a `TweenSequence`-based player builder, and a `Steps(n, {jumpEnd})` curve. `sign-on`'s stepwise timeline modelled per the map (stepped evaluation, not interpolation). Reduced motion: player resolves through `elAnimationDuration`; `both`-fill anims freeze at the final stop, no-fill loopers at stop 0.
+- [ ] `glass.dart`: `GlassVariant.panel` / `GlassVariant.prominent` / `GlassVariant.control` per shadows-map §7 — `card@74%` over σ24 blur + the §13.5 saturate matrix, `rim-strong` top inset, `foreground@12%/16%` ring via `InsetShadowPainter`-equivalent (the port's surface inset path), e2/e4 outer.
+- [ ] `action_feedback.dart` + `premium_surface.dart` per shadows-map §5 — every gradient stop derived with `Oklab.mix` from `Palette` (the map's resolved hexes are test oracles, not source); blend modes per theme (`luminous` split); beat/glint/drift on the new tokens; controllers through `elAnimationDuration`; `RepaintBoundary` around infinite layers.
 - [ ] `button.dart`: five new variants with the map's exact state matrices (22 states); premium hover swaps `btnValue`→`glowValue` wholesale; active outranks hover; focus ring = 3px `ring@35%/50%` per map, composited in front of the surface shadow; shared focus-ring helper.
 - [ ] `input.dart`: 40px pill, `--input` border, `--card` fill, `pressed` socket, placeholder at muted, focus border `primary@50%` + 3px ring `ring@35%`, 250ms `--ease-out`, genuinely editable (ruling S6).
-- [ ] Fix `sliding_pill.dart:71–74` (route jelly duration through `elAnimationDuration`); fix `ElCurves.all` docstring (M8).
+- [ ] Fix `active_indicator.dart:71–74` (route jelly duration through `elAnimationDuration`); fix `Curves.all` docstring (M8).
 - [ ] Tests: effect gradient stops vs the map's hex oracles; button state matrix per variant; input focus states; keyframe evaluation at the map's sampled stops; steps curve; reduced-motion freeze frames. `flutter analyze` + `flutter test` green.
 
 ### Task B — Package: icon capabilities + 59 glyphs
 
 **Model:** opus. **Map:** icons-map §12.
-**Owns (exclusive):** `lib/src/components/icon_paths.dart`, `lib/src/components/icon.dart`, `test/icon_paths_test.dart`.
+**Owns (exclusive):** `lib/src/components/ui/icon_paths.dart`, `lib/src/components/ui/icon.dart`, `test/icon_paths_test.dart`.
 
-- [ ] Capability pass FIRST (icons-map build-order constraint): `ElIconPolylineElement`; fill support (two-pass paint, `filled` flag on the element model — keep the stroke pass's single-`Path` contract by collecting fills separately); `rect` `ry` honoured; then the four-glyph arc spike (`star`, `zap`, `sparkles`, `crown`) and a bounds-assertion run before mass transcription.
+- [ ] Capability pass FIRST (icons-map build-order constraint): `IconPolylineElement`; fill support (two-pass paint, `filled` flag on the element model — keep the stroke pass's single-`Path` contract by collecting fills separately); `rect` `ry` honoured; then the four-glyph arc spike (`star`, `zap`, `sparkles`, `crown`) and a bounds-assertion run before mass transcription.
 - [ ] Transcribe the remaining 55 curated glyphs from lucide-react 1.28.0 modules (the map tables every module path; three deprecated-alias traps resolved per ruling I-Q2), plus `rotateCcw` and `sparkles` needed by the motion page's replay buttons and reveal demo.
 - [ ] Per-glyph transcript assertions in the existing style; all-glyph bounds test; `flutter analyze` + `flutter test` green.
 
 ### Task C — Page: shadows (after A)
 
 **Model:** opus. **Map:** shadows-map. **Owns:** `example/lib/pages/shadows.dart` (new), `example/test/shadows_page_test.dart` (new).
-- [ ] The seven blocks in order (page Note, six sections), copy verbatim, all specimens through `ElShadows.*` specs and `ElMachineSurface`; live buttons (five variants) and the editable input; glass on the real widgets; drifts 1–10 recorded in the doc comment.
+- [ ] The seven blocks in order (page Note, six sections), copy verbatim, all specimens through `Shadows.*` specs and `MachineSurface`; live buttons (five variants) and the editable input; glass on the real widgets; drifts 1–10 recorded in the doc comment.
 - [ ] Page test modelled on `spacing_page_test.dart` (structure, copy spot-checks, both themes) with `pump(Duration)` only.
 
 ### Task D — Page: motion (after A and B)
@@ -114,7 +114,7 @@ house style (`utility name — globals.css Lnnn`).
 
 **Model:** opus. **Map:** icons-map. **Owns:** `example/lib/pages/icons.dart` (new), `example/lib/kit.dart` (the `<pre>` code-block widget ONLY — single-writer rule), `example/test/icons_page_test.dart` (new).
 - [ ] The six sections verbatim; the Dart usage block per ruling I-Q1; size/tone label tables (`default`/`2xl`/`3xl` spellings); the five button pairings on Task-A variants; all 63 curated tiles from the registry; foot-nav prev-only with spacer.
-- [ ] `ElCodeBlock` in kit: `ElType.code` at 1.625 leading, muted ink, background fill, 12px radius, 20px padding, `ElThinScrollbar` horizontal.
+- [ ] `CodeBlock` in kit: `Type.code` at 1.625 leading, muted ink, background fill, 12px radius, 20px padding, `ThinScrollbar` horizontal.
 - [ ] Page test per the house pattern.
 
 ### Task F — Integration (supervisor, inline)

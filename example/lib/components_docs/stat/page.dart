@@ -1,23 +1,23 @@
 /// Public documentation page for the `stat` component alone.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` and `field` established.
 /// Every specimen widget and every code string below is the one the
 /// hand-composed page carried; only where it lives changed, plus a new
-/// Keyboard disclosure — `ElStat` is never focusable, and the disclosure
+/// Keyboard disclosure — `Stat` is never focusable, and the disclosure
 /// says so plainly rather than being skipped.
 ///
 /// **Split from a merged page**, unchanged from before: `stat/page.dart`
 /// used to document `stat`, `item`, `empty`, and `kbd` together. `item`,
 /// `empty`, and `kbd` now have real pages of their own
 /// (`lib/components_docs/item/`, `empty/`, `kbd/`); this file keeps only
-/// what belongs to `ElStat`.
+/// what belongs to `Stat`.
 ///
 /// **`stat` ships a real registry manifest.** `registry/components/
 /// stat.json` exists (`registryDependencies: [icon, skeleton,
-/// source-foundation, swap-in]`), so `elattar add stat` installs today.
+/// source-foundation, content-change]`), so `elattar add stat` installs today.
 /// The previous version of this page said the opposite — "stat has no
 /// registry/components/stat.json yet" — which was wrong; every
 /// install-facing fact below reads off the shipped manifest instead.
@@ -37,7 +37,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -54,7 +66,7 @@ final ComponentDocSpec statDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'ElStat renders a labelled metric figure with an optional delta '
+          'Stat renders a labelled metric figure with an optional delta '
           'and trailing hint. The metric sits in a fixed-height slot, the '
           'delta row is optional and wraps if it overflows, and the '
           'footprint is identical across every state (ready, loading, '
@@ -72,7 +84,7 @@ final ComponentDocSpec statDocSpec = ComponentDocSpec(
       description:
           'stat ships a real registry manifest: `elattar add stat` '
           'installs lib/src/components/stat.dart and resolves icon, '
-          'skeleton, source-foundation, and swap-in automatically. The '
+          'skeleton, source-foundation, and content-change automatically. The '
           'Manual tab is for a project not using the CLI.',
       command: statDoc.command,
       manualFiles: <DocsCodeFile>[
@@ -91,7 +103,7 @@ final ComponentDocSpec statDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElStat and its companion types are '
+              'Add the export line so Stat and its companion types are '
               'reachable the same way the CLI path already makes them.',
           code: "export 'stat.dart';",
         ),
@@ -107,9 +119,9 @@ final ComponentDocSpec statDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          'ElStat is a single leaf: it takes data (label, value, delta, '
+          'Stat is a single leaf: it takes data (label, value, delta, '
           'hint), not children, so there is no part-widget tree to '
-          'assemble the way Item or Empty have. ElStatDeltaMark is the one '
+          'assemble the way Item or Empty have. StatDeltaMark is the one '
           'piece exported separately, for a caller that already has its '
           'own label and wants to reuse just the direction mark (see API '
           'Reference). Below: one real composed use, a card header.',
@@ -147,7 +159,7 @@ final ComponentDocSpec statDocSpec = ComponentDocSpec(
       id: 'rtl',
       title: 'RTL',
       description:
-          'ElStat paints no direction-specific layout of its own: it '
+          'Stat paints no direction-specific layout of its own: it '
           'sizes to its content and reads right-to-left under a plain '
           'Directionality, the same composition either way.',
       specimen: const _RtlSpecimen(),
@@ -158,16 +170,10 @@ final ComponentDocSpec statDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElStat', anchor: 'api-elstat'),
-        DocsTocEntry(
-          title: 'ElStat static tokens',
-          anchor: 'api-elstat-static',
-        ),
-        DocsTocEntry(title: 'ElStatState', anchor: 'api-elstatstate'),
-        DocsTocEntry(
-          title: 'ElStatDeltaMark',
-          anchor: 'api-elstatdeltamark',
-        ),
+        DocsTocEntry(title: 'Stat', anchor: 'api-elstat'),
+        DocsTocEntry(title: 'Stat static tokens', anchor: 'api-elstat-static'),
+        DocsTocEntry(title: 'StatState', anchor: 'api-elstatstate'),
+        DocsTocEntry(title: 'StatDeltaMark', anchor: 'api-elstatdeltamark'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -175,7 +181,7 @@ final ComponentDocSpec statDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElStat is the only one of the four former sibling components '
+          'Stat is the only one of the four former sibling components '
           'with a real state machine: these rows read straight off the '
           'source.',
       child: DocsStateMatrix(facts: _stateFacts),
@@ -189,7 +195,7 @@ final ComponentDocSpec statDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          'ElStat is read, never touched: it owns no GestureDetector, '
+          'Stat is read, never touched: it owns no GestureDetector, '
           'FocusNode, or onPressed/enabled parameter of its own, so every '
           'fact here is about what does NOT happen.',
       child: _KeyboardContent(),
@@ -260,9 +266,9 @@ class StatDocPage extends StatelessWidget {
       title: statDocSpec.title,
       description: statDocSpec.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Stat'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Stat'),
     ],
     toc: statDocSpec.toc,
     onNavigate: onNavigate,
@@ -281,19 +287,19 @@ class _PreviewSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const KeyedSubtree(
     key: ValueKey<String>('stat-preview'),
-    child: ElStat(
+    child: Stat(
       label: 'Revenue',
       value: '\$12,480',
-      delta: (value: '8.2%', direction: ElStatDirection.up),
+      delta: (value: '8.2%', direction: StatDirection.up),
       hint: 'vs last month',
     ),
   );
 }
 
-const String _previewCode = '''ElStat(
+const String _previewCode = '''Stat(
   label: 'Revenue',
   value: '\\\$12,480',
-  delta: (value: '8.2%', direction: ElStatDirection.up),
+  delta: (value: '8.2%', direction: StatDirection.up),
   hint: 'vs last month',
 )''';
 
@@ -301,17 +307,17 @@ const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
 // The smallest correct call.
-ElStat(
+Stat(
   label: 'Revenue',
   value: '\\\$12,480',
 )
 
 // A full metric with delta and hint.
-ElStat(
+Stat(
   label: 'Revenue',
   value: '\\\$12,480',
-  delta: (value: '8.2%', direction: ElStatDirection.up),
-  betterWhen: ElStatDirection.up,
+  delta: (value: '8.2%', direction: StatDirection.up),
+  betterWhen: StatDirection.up,
   hint: 'vs last month',
 )''';
 
@@ -319,23 +325,23 @@ class _CompositionSpecimen extends StatelessWidget {
   const _CompositionSpecimen();
 
   @override
-  Widget build(BuildContext context) => ElCard(
+  Widget build(BuildContext context) => Card(
     children: <Widget>[
-      ElCardContent(
+      CardContent(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const ElStat(
+            const Stat(
               label: 'Monthly revenue',
               value: '\$52,840',
-              delta: (value: '12.5%', direction: ElStatDirection.up),
+              delta: (value: '12.5%', direction: StatDirection.up),
               hint: 'vs last month',
             ),
-            SizedBox(height: el(4)),
-            const ElSeparator(),
-            SizedBox(height: el(4)),
-            ElText('In the last 30 days', ElType.small),
+            SizedBox(height: space(4)),
+            const Separator(),
+            SizedBox(height: space(4)),
+            StyledText('In the last 30 days', TextStyles.small),
           ],
         ),
       ),
@@ -343,23 +349,23 @@ class _CompositionSpecimen extends StatelessWidget {
   );
 }
 
-const String _compositionCode = '''ElCard(
+const String _compositionCode = '''Card(
   children: <Widget>[
-    ElCardContent(
+    CardContent(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const ElStat(
+          const Stat(
             label: 'Monthly revenue',
             value: '\\\$52,840',
-            delta: (value: '12.5%', direction: ElStatDirection.up),
+            delta: (value: '12.5%', direction: StatDirection.up),
             hint: 'vs last month',
           ),
-          SizedBox(height: el(4)),
-          const ElSeparator(),
-          SizedBox(height: el(4)),
-          ElText('In the last 30 days', ElType.small),
+          SizedBox(height: space(4)),
+          const Separator(),
+          SizedBox(height: space(4)),
+          StyledText('In the last 30 days', TextStyles.small),
         ],
       ),
     ),
@@ -371,34 +377,34 @@ class _DeltaSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(10),
-    runSpacing: el(6),
+    spacing: space(10),
+    runSpacing: space(6),
     children: <Widget>[
       const KeyedSubtree(
         key: ValueKey<String>('stat-example:up'),
-        child: ElStat(
+        child: Stat(
           label: 'Revenue',
           value: '\$12,480',
-          delta: (value: '8.2%', direction: ElStatDirection.up),
+          delta: (value: '8.2%', direction: StatDirection.up),
           hint: 'vs last month',
         ),
       ),
       const KeyedSubtree(
         key: ValueKey<String>('stat-example:down'),
-        child: ElStat(
+        child: Stat(
           label: 'Refunds',
           value: '\$1,204',
-          delta: (value: '3.1%', direction: ElStatDirection.down),
-          betterWhen: ElStatDirection.down,
+          delta: (value: '3.1%', direction: StatDirection.down),
+          betterWhen: StatDirection.down,
           hint: 'vs last month',
         ),
       ),
       const KeyedSubtree(
         key: ValueKey<String>('stat-example:flat'),
-        child: ElStat(
+        child: Stat(
           label: 'Signups',
           value: '482',
-          delta: (value: '0.0%', direction: ElStatDirection.flat),
+          delta: (value: '0.0%', direction: StatDirection.flat),
           hint: 'vs last month',
         ),
       ),
@@ -406,25 +412,25 @@ class _DeltaSpecimen extends StatelessWidget {
   );
 }
 
-const String _deltaCode = '''ElStat(
+const String _deltaCode = '''Stat(
   label: 'Revenue',
   value: '\\\$12,480',
-  delta: (value: '8.2%', direction: ElStatDirection.up),
+  delta: (value: '8.2%', direction: StatDirection.up),
   hint: 'vs last month',
 )
 
-ElStat(
+Stat(
   label: 'Refunds',
   value: '\\\$1,204',
-  delta: (value: '3.1%', direction: ElStatDirection.down),
-  betterWhen: ElStatDirection.down, // down is favourable here
+  delta: (value: '3.1%', direction: StatDirection.down),
+  betterWhen: StatDirection.down, // down is favourable here
   hint: 'vs last month',
 )
 
-ElStat(
+Stat(
   label: 'Signups',
   value: '482',
-  delta: (value: '0.0%', direction: ElStatDirection.flat),
+  delta: (value: '0.0%', direction: StatDirection.flat),
   hint: 'vs last month',
 )''';
 
@@ -433,43 +439,43 @@ class _StatesDemoSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(10),
-    runSpacing: el(6),
+    spacing: space(10),
+    runSpacing: space(6),
     children: <Widget>[
       const KeyedSubtree(
         key: ValueKey<String>('stat-example:loading'),
-        child: ElStat(
+        child: Stat(
           label: 'Revenue',
           value: '\$12,480',
-          delta: (value: '8.2%', direction: ElStatDirection.up),
-          state: ElStatState.loading,
+          delta: (value: '8.2%', direction: StatDirection.up),
+          state: StatState.loading,
         ),
       ),
       const KeyedSubtree(
         key: ValueKey<String>('stat-example:error'),
-        child: ElStat(
+        child: Stat(
           label: 'Uptime',
           value: 'N/A',
-          state: ElStatState.error,
+          state: StatState.error,
           message: 'Failed to load',
         ),
       ),
       const KeyedSubtree(
         key: ValueKey<String>('stat-example:empty'),
-        child: ElStat(
+        child: Stat(
           label: 'Uptime',
           value: 'N/A',
-          state: ElStatState.empty,
+          state: StatState.empty,
           message: 'No data yet',
         ),
       ),
       const KeyedSubtree(
         key: ValueKey<String>('stat-example:disabled'),
-        child: ElStat(
+        child: Stat(
           label: 'Churn',
           value: '4.1%',
-          delta: (value: '0.4%', direction: ElStatDirection.down),
-          betterWhen: ElStatDirection.down,
+          delta: (value: '0.4%', direction: StatDirection.down),
+          betterWhen: StatDirection.down,
           hint: 'vs last month',
           disabled: true,
         ),
@@ -478,32 +484,32 @@ class _StatesDemoSpecimen extends StatelessWidget {
   );
 }
 
-const String _statesDemoCode = '''ElStat(
+const String _statesDemoCode = '''Stat(
   label: 'Revenue',
   value: '\\\$12,480',
-  delta: (value: '8.2%', direction: ElStatDirection.up),
-  state: ElStatState.loading,
+  delta: (value: '8.2%', direction: StatDirection.up),
+  state: StatState.loading,
 )
 
-ElStat(
+Stat(
   label: 'Uptime',
   value: 'N/A',
-  state: ElStatState.error,
+  state: StatState.error,
   message: 'Failed to load',
 )
 
-ElStat(
+Stat(
   label: 'Uptime',
   value: 'N/A',
-  state: ElStatState.empty,
+  state: StatState.empty,
   message: 'No data yet',
 )
 
-ElStat(
+Stat(
   label: 'Churn',
   value: '4.1%',
-  delta: (value: '0.4%', direction: ElStatDirection.down),
-  betterWhen: ElStatDirection.down,
+  delta: (value: '0.4%', direction: StatDirection.down),
+  betterWhen: StatDirection.down,
   hint: 'vs last month',
   disabled: true,
 )''';
@@ -516,10 +522,10 @@ class _RtlSpecimen extends StatelessWidget {
     textDirection: TextDirection.rtl,
     child: const KeyedSubtree(
       key: ValueKey<String>('rtl-example:stat'),
-      child: ElStat(
+      child: Stat(
         label: 'الإيرادات',
         value: '\$12,480',
-        delta: (value: '8.2%', direction: ElStatDirection.up),
+        delta: (value: '8.2%', direction: StatDirection.up),
         hint: 'مقارنة بالشهر الماضي',
       ),
     ),
@@ -528,10 +534,10 @@ class _RtlSpecimen extends StatelessWidget {
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElStat(
+  child: Stat(
     label: 'الإيرادات',
     value: '\\\$12,480',
-    delta: (value: '8.2%', direction: ElStatDirection.up),
+    delta: (value: '8.2%', direction: StatDirection.up),
     hint: 'مقارنة بالشهر الماضي',
   ),
 )''';
@@ -548,7 +554,7 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-elstat',
         child: DocsApiTable(
-          title: 'ElStat',
+          title: 'Stat',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'label',
@@ -564,17 +570,17 @@ class _ApiReferenceContent extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'delta',
-              type: 'ElStatDelta?',
+              type: 'StatDelta?',
               description:
                   'Optional. Defaults to null. A record, (value: "8.2%", '
-                  'direction: ElStatDirection.up). Presence reserves the '
+                  'direction: StatDirection.up). Presence reserves the '
                   'delta row even while loading.',
             ),
             DocsApiFact(
               name: 'betterWhen',
-              type: 'ElStatDirection',
+              type: 'StatDirection',
               description:
-                  'Optional. Defaults to ElStatDirection.up. Which '
+                  'Optional. Defaults to StatDirection.up. Which '
                   'direction gets the success ink; the other gets plain '
                   'foreground. Flat is always muted.',
             ),
@@ -587,9 +593,9 @@ class _ApiReferenceContent extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'state',
-              type: 'ElStatState',
+              type: 'StatState',
               description:
-                  'Optional. Defaults to ElStatState.ready. Controls what '
+                  'Optional. Defaults to StatState.ready. Controls what '
                   'the figure and delta render as.',
             ),
             DocsApiFact(
@@ -610,41 +616,41 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elstat-static',
         child: DocsApiTable(
-          title: 'ElStat static tokens',
+          title: 'Stat static tokens',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'ElStat.rowGap',
+              name: 'Stat.rowGap',
               type: 'static double',
               description: '8px: under the label, and under the figure slot.',
             ),
             DocsApiFact(
-              name: 'ElStat.deltaGap',
+              name: 'Stat.deltaGap',
               type: 'static double',
               description: '8px gap on the delta row (flex-wrap).',
             ),
             DocsApiFact(
-              name: 'ElStat.messageGap',
+              name: 'Stat.messageGap',
               type: 'static double',
               description:
                   '6px gap between the error triangle-alert icon and its '
                   'message.',
             ),
             DocsApiFact(
-              name: 'ElStat.figureSkeleton',
+              name: 'Stat.figureSkeleton',
               type: 'static Size',
               description: '112px × 20px: the loading figure placeholder.',
             ),
             DocsApiFact(
-              name: 'ElStat.deltaSkeleton',
+              name: 'Stat.deltaSkeleton',
               type: 'static Size',
               description: '56px × 10px: the loading delta placeholder.',
             ),
             DocsApiFact(
-              name: 'ElStat.figureHeight',
+              name: 'Stat.figureHeight',
               type: 'static double',
               description:
                   'The fixed line-box height the figure slot maintains in '
@@ -653,11 +659,11 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elstatstate',
         child: DocsApiTable(
-          title: 'ElStatState',
+          title: 'StatState',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'ready',
@@ -687,28 +693,27 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elstatdeltamark',
         child: DocsApiTable(
-          title: 'ElStatDeltaMark',
+          title: 'StatDeltaMark',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'delta',
-              type: 'ElStatDelta',
-              description:
-                  'Required. The same record type ElStat.delta takes.',
+              type: 'StatDelta',
+              description: 'Required. The same record type Stat.delta takes.',
             ),
             DocsApiFact(
               name: 'betterWhen',
-              type: 'ElStatDirection',
+              type: 'StatDirection',
               description:
                   'Required, not defaulted: a caller reaching for the '
                   'mark alone is already thinking about direction and '
                   'must say which one it means.',
             ),
             DocsApiFact(
-              name: 'ElStatDeltaMark.gap',
+              name: 'StatDeltaMark.gap',
               type: 'static double',
               description: '4px between the glyph and the sign+value text.',
             ),
@@ -731,7 +736,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Loading',
     treatment:
         'Renders skeleton placeholders for the value and delta, keeping '
-        'the same figureHeight so the layout does not reflow. A ElSwapIn '
+        'the same figureHeight so the layout does not reflow. A ContentChange '
         'replay fires on the loading → ready transition (a key change, '
         'not an AnimationController).',
     userSignal: 'A shimmer where the figure and delta will be.',
@@ -752,14 +757,14 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Hover / Focus-visible / Pressed / Selected',
     treatment:
-        'N/A: ElStat owns no GestureDetector, FocusNode, or '
+        'N/A: Stat owns no GestureDetector, FocusNode, or '
         'onPressed/enabled parameter. It is read, never touched.',
     userSignal: 'Nothing responds to a pointer or keyboard here.',
   ),
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        'N/A: no AnimationController exists. ElSwapIn is a key-change '
+        'N/A: no AnimationController exists. ContentChange is a key-change '
         'replay, not a running animation to still.',
     userSignal: 'Nothing to still.',
   ),
@@ -770,12 +775,12 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Semantic role: none of its own, ElStat and ElStatDeltaMark '
-            'render plain Column/Row widgets and static text via ElText, '
+      _bullets(ThemeScope.of(context), <String>[
+        'Semantic role: none of its own, Stat and StatDeltaMark '
+            'render plain Column/Row widgets and static text via StyledText, '
             'with no custom Semantics wrapper.',
         'Delta direction is conveyed three ways, not colour alone. '
-            'ElStatDeltaMark wraps the mark in '
+            'StatDeltaMark wraps the mark in '
             'Semantics(label: direction.word), where the word is "Up", '
             '"Down", or "No change": read before the number by assistive '
             'tech. The glyph shape (arrow up, arrow down, minus) and the '
@@ -783,7 +788,7 @@ class _AccessibilityContent extends StatelessWidget {
             'so the direction reads even if colour is removed. This is '
             'Trap 11: a mark whose only difference is hue is one signal, '
             'not two.',
-        'Blank states: ElStat.build renders Semantics(label: "No value") '
+        'Blank states: Stat.build renders Semantics(label: "No value") '
             'around the em dash when state is error or empty, so the '
             'absence announces itself.',
         'Disabled: opacity 45% plus Semantics(enabled: false) makes '
@@ -797,14 +802,14 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Never focusable: no Focus widget or FocusNode exists anywhere '
-            'in stat.dart. ElStat cannot receive keyboard focus and has '
+            'in stat.dart. Stat cannot receive keyboard focus and has '
             'no key binding.',
         'Not in the tab order: a keyboard user tabs straight past a '
-            'ElStat, whether it stands alone or sits inside a card '
+            'Stat, whether it stands alone or sits inside a card '
             'header, because there is nothing here to land on.',
-        'No activation: ElStat takes no onPressed and no onTap of any '
+        'No activation: Stat takes no onPressed and no onTap of any '
             'kind. It is a figure to read, not a control to operate.',
       ]);
 }
@@ -814,10 +819,10 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No responsive branching: renders identically at 390px and '
             '1440px. The slot heights are fixed, the figure width is '
-            'intrinsic to the string (subject to ElType.numLg\'s own '
+            'intrinsic to the string (subject to TextStyles.numberLg\'s own '
             'line breaking), and the label row and delta row wrap if '
             'needed.',
         'Platform parity: Android, iOS, Web, macOS, Windows, and Linux '
@@ -851,10 +856,10 @@ class _DependenciesContent extends StatelessWidget {
             value: statDoc.dependencies.join(', '),
             description:
                 "The manifest's registryDependencies, resolved "
-                'automatically by the registry client: ElIcon for the '
-                'delta glyphs, ElSkeleton for the loading placeholders, '
+                'automatically by the registry client: Icon for the '
+                'delta glyphs, Skeleton for the loading placeholders, '
                 'source-foundation for spacing/theme/typography, and the '
-                'swap-in motion effect for the loading-to-ready replay.',
+                'content-change motion effect for the loading-to-ready replay.',
           ),
           const DocsInstallFact(
             label: 'Assets',
@@ -882,7 +887,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Icon', route: '/components/icon'),
@@ -891,7 +896,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Source Foundation',
             route: '/components/source_foundation',
           ),
-          DocsLink(label: 'Swap In', route: '/components/swap_in'),
+          DocsLink(label: 'Swap In', route: '/components/content_change'),
         ],
       ),
     ],
@@ -906,13 +911,12 @@ class _ThemingContent extends StatelessWidget {
     title: 'What actually varies with the theme',
     facts: const <DocsInstallFact>[
       DocsInstallFact(
-        label: 'ElStatDeltaMark ink',
-        value:
-            'theme.successInk / theme.foreground / theme.mutedForeground',
+        label: 'StatDeltaMark ink',
+        value: 'theme.successText / theme.foreground / theme.mutedForeground',
         description:
-            'theme.successInk when the move is favourable, '
+            'theme.successText when the move is favourable, '
             'theme.foreground when it is not, and theme.mutedForeground '
-            'when flat. Flipping ElThemeController between light and '
+            'when flat. Flipping ThemeController between light and '
             'dark re-resolves all three.',
       ),
       DocsInstallFact(
@@ -920,21 +924,25 @@ class _ThemingContent extends StatelessWidget {
         value: 'none',
         description:
             'Every colour is theme- or direction-derived, never a bare '
-            'Color argument on ElStat itself.',
+            'Color argument on Stat itself.',
       ),
     ],
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

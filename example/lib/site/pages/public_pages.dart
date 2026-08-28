@@ -6,7 +6,33 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 
 import '../../kit.dart';
 import '../../nav.dart';
@@ -50,50 +76,50 @@ class PublicHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return _PublicPage(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
           Center(child: _HeroPill(onNavigate: onNavigate)),
-          SizedBox(height: el(6)),
+          SizedBox(height: space(6)),
           Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: ElContainers.xl2),
-              child: ElText(
+              constraints: const BoxConstraints(maxWidth: Containers.xl2),
+              child: StyledText(
                 'Build the interface\nyou mean.',
-                ElType.display,
-                fontSize: ElFluid.display(context),
+                TextStyles.display,
+                fontSize: Fluid.display(context),
                 align: TextAlign.center,
                 color: theme.foreground,
               ),
             ),
           ),
-          SizedBox(height: el(5)),
+          SizedBox(height: space(5)),
           Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: ElContainers.md),
-              child: ElText(
+              constraints: const BoxConstraints(maxWidth: Containers.md),
+              child: StyledText(
                 'A copy-first design system for Flutter. Start with the '
                 'foundation, add only the pieces you need, and keep every '
                 'decision visible in your own codebase.',
-                ElType.lead,
+                TextStyles.lead,
                 align: TextAlign.center,
               ),
             ),
           ),
-          SizedBox(height: el(7)),
+          SizedBox(height: space(7)),
           Center(
-            child: ElButton(
-              size: ElButtonSize.lg,
+            child: Button(
+              size: ButtonSize.lg,
               onPressed: onNavigate == null
                   ? null
                   : () => onNavigate!(publicDocsRoute),
               child: const Text('Start building'),
             ),
           ),
-          SizedBox(height: el(16)),
+          SizedBox(height: space(16)),
           HomeMasonryGrid(sm: 2, lg: 3, children: homeShowcaseCards()),
         ],
       ),
@@ -103,8 +129,8 @@ class PublicHomePage extends StatelessWidget {
 
 /// The pill at the top of the hero: a small, tappable, pill-shaped link, the
 /// way https://ui.shadcn.com/ leads with "Introducing…" above its own
-/// headline. [ElButton] is already pill-radius by default (see
-/// `ElButton.build`'s `widget.radius ?? BorderRadius.circular(ElRadii.pill)`),
+/// headline. [Button] is already pill-radius by default (see
+/// `Button.build`'s `widget.radius ?? BorderRadius.circular(Radii.full)`),
 /// so this is a plain outline button sized down, not a bespoke shape.
 class _HeroPill extends StatelessWidget {
   const _HeroPill({this.onNavigate});
@@ -112,9 +138,9 @@ class _HeroPill extends StatelessWidget {
   final PublicNavigate? onNavigate;
 
   @override
-  Widget build(BuildContext context) => ElButton(
-    size: ElButtonSize.sm,
-    variant: ElButtonVariant.outline,
+  Widget build(BuildContext context) => Button(
+    size: ButtonSize.sm,
+    variant: ButtonVariant.outline,
     onPressed: onNavigate == null
         ? null
         : () => onNavigate!(publicComponentsRoute),
@@ -122,11 +148,11 @@ class _HeroPill extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         const Text('Browse components'),
-        SizedBox(width: el(1.5)),
-        const ElIcon(
-          ElIconGlyph.arrowRight,
-          size: ElIconSize.xs,
-          tone: ElIconTone.muted,
+        SizedBox(width: space(1.5)),
+        const Icon(
+          IconGlyph.arrowRight,
+          size: IconSize.xs,
+          tone: IconTone.muted,
         ),
       ],
     ),
@@ -171,7 +197,7 @@ class PublicDocsPage extends StatelessWidget {
 /// Two link sections mirror the two catalogs this site actually has:
 /// [componentDocs] (34 individually documented components, alphabetical, one
 /// route each, the direct counterpart of the reference's "All Components")
-/// under "Ready to install", then one section per non-Foundations [ElGroup]
+/// under "Ready to install", then one section per non-Foundations [Group]
 /// listing its categories, since those are the site's only other
 /// individually routable pages. Foundations is excluded, as it was before
 /// this page was reshaped: it is not a component family.
@@ -184,7 +210,7 @@ class PublicComponentsPage extends StatelessWidget {
   /// under `/components/<name>`.
   ///
   /// The `elGroups` categories that used to follow are gone: every one of them
-  /// linked into the legacy `/el/...` tree, which no longer exists. A page a
+  /// linked into the legacy `/space/...` tree, which no longer exists. A page a
   /// reader cannot open does not belong in an index.
   @override
   Widget build(BuildContext context) {
@@ -238,16 +264,16 @@ class _ComponentLinkSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElText(title, ElType.h3, color: theme.foreground),
-        SizedBox(height: el(4)),
-        ElGrid(
+        StyledText(title, TextStyles.h3, color: theme.foreground),
+        SizedBox(height: space(4)),
+        Grid(
           sm: 2,
           lg: 3,
-          gap: el(2),
+          gap: space(2),
           children: <Widget>[
             for (final _ComponentLinkEntry entry in entries)
               _ComponentLinkRow(
@@ -295,10 +321,10 @@ class _ComponentLinkRowState extends State<_ComponentLinkRow> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final Duration duration = elAnimationDuration(
+    final ThemeTokens theme = ThemeScope.of(context);
+    final Duration duration = effectiveMotionDuration(
       context,
-      ElDurations.transitionDefault,
+      MotionDurations.normal,
     );
     return Semantics(
       link: true,
@@ -310,15 +336,15 @@ class _ComponentLinkRowState extends State<_ComponentLinkRow> {
           onTap: widget.onPressed,
           behavior: HitTestBehavior.opaque,
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: el(1.5)),
+            padding: EdgeInsets.symmetric(vertical: space(1.5)),
             child: TweenAnimationBuilder<Color?>(
               tween: ColorTween(
-                end: _hovered ? theme.actionInk : theme.mutedForeground,
+                end: _hovered ? theme.actionText : theme.mutedForeground,
               ),
               duration: duration,
-              curve: ElCurves.out,
+              curve: MotionCurves.enter,
               builder: (BuildContext context, Color? ink, Widget? _) =>
-                  ElText(widget.entry.title, ElType.small, color: ink),
+                  StyledText(widget.entry.title, TextStyles.small, color: ink),
             ),
           ),
         ),
@@ -351,14 +377,14 @@ class _PublicPage extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => ElSafeArea(
+  Widget build(BuildContext context) => SafeArea(
     top: false,
     bottom: true,
     child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(8)),
+      padding: EdgeInsets.symmetric(horizontal: space(4), vertical: space(8)),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElBreakpoints.xl),
+          constraints: const BoxConstraints(maxWidth: Breakpoints.xl),
           child: child,
         ),
       ),
@@ -381,17 +407,21 @@ class _PublicLinkCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElCard(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Card(
       children: <Widget>[
-        ElCardHeader(
-          title: ElText(title, ElType.h4, color: theme.foreground),
-          description: ElText(label, ElType.label, color: theme.actionInk),
+        CardHeader(
+          title: StyledText(title, TextStyles.h4, color: theme.foreground),
+          description: StyledText(
+            label,
+            TextStyles.eyebrow,
+            color: theme.actionText,
+          ),
         ),
-        ElCardContent(child: ElText(body, ElType.small)),
-        ElCardFooter(
-          child: ElButton(
-            variant: ElButtonVariant.ghost,
+        CardContent(child: StyledText(body, TextStyles.small)),
+        CardFooter(
+          child: Button(
+            variant: ButtonVariant.ghost,
             onPressed: onPressed,
             child: const Text('Open reference'),
           ),
@@ -469,7 +499,7 @@ class _DocsList extends StatelessWidget {
     children: <Widget>[
       for (final ({String title, String body, String route}) entry in _entries)
         Padding(
-          padding: EdgeInsets.only(bottom: el(3)),
+          padding: EdgeInsets.only(bottom: space(3)),
           child: _PublicLinkCard(
             title: entry.title,
             body: entry.body,

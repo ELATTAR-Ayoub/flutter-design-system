@@ -3,7 +3,19 @@ library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/material.dart' show Navigator, SelectionArea;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../logo.dart';
 import '../shell.dart';
@@ -12,7 +24,7 @@ import 'site_navigation.dart';
 import 'site_routes.dart';
 
 /// Shell-scoped toasts for public-site actions.
-final ElToastController siteToasts = ElToastController();
+final ToastController siteToasts = ToastController();
 
 /// Header, search, mobile navigation, reading column, and footer for the
 /// public website.
@@ -60,6 +72,7 @@ class _SiteShellState extends State<SiteShell> {
       _main.jumpTo(_main.position.minScrollExtent);
     }
   }
+
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode(debugLabel: 'SiteSearch');
 
@@ -93,9 +106,9 @@ class _SiteShellState extends State<SiteShell> {
   }
 
   void _openMobileNavigation() {
-    ElSheet.showLeft(
+    Sheet.showLeft(
       context,
-      width: ElWidths.sidebarMobile,
+      width: LayoutWidths.sidebarMobile,
       builder: (BuildContext sheetContext) => _SiteMobileNavigation(
         currentRoute: widget.route,
         onNavigate: (String href) {
@@ -108,36 +121,40 @@ class _SiteShellState extends State<SiteShell> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final double viewport = MediaQuery.sizeOf(context).width;
-    final bool desktop = viewport >= ElBreakpoints.lg;
-    final double header = ElSafeArea.topBarHeightOf(
+    final bool desktop = viewport >= Breakpoints.lg;
+    final double header = SafeArea.topBarHeightOf(
       context,
-      ElWidths.siteHeader,
+      LayoutHeights.siteHeader,
     );
 
     return DefaultTextStyle(
       // `<body class="… text-foreground">`, exactly as `shell.dart:165` states
       // it for the documentation shell and `showcase/showcase_app.dart:151`
       // states it for Signal Studio. Without it this subtree has no
-      // [DefaultTextStyle] of its own, so every [ElText] inherits
+      // [DefaultTextStyle] of its own, so every [StyledText] inherits
       // [WidgetsApp]'s fallback, 0xD0FF0000 ink under a double yellow
-      // underline, the "you forgot a Material" style: because [ElText] builds
+      // underline, the "you forgot a Material" style: because [StyledText] builds
       // with `inherit: true` and never declares a `decoration`, and because its
-      // [ElTypeColor.none] classes resolve their ink from
+      // [TextColorRole.none] classes resolve their ink from
       // `DefaultTextStyle.of(context).style.color`. Both leaked onto every
       // public route until this landed.
-      style: ElText.styleOf(context, ElType.body, color: theme.foreground),
+      style: StyledText.styleOf(
+        context,
+        TextStyles.body,
+        color: theme.foreground,
+      ),
       child: Stack(
         children: <Widget>[
-          const Positioned.fill(child: ElPageGlow()),
+          const Positioned.fill(child: BackgroundEffect()),
           Positioned.fill(
-            child: ElSafeArea(
+            child: SafeArea(
               top: false,
               bottom: false,
               child: Center(
                 child: SizedBox(
-                  width: ElWidths.shell,
+                  width: LayoutWidths.shell,
                   child: _SiteBody(
                     controller: _main,
                     header: header,
@@ -176,7 +193,7 @@ class _SiteShellState extends State<SiteShell> {
                 onNavigate: _navigate,
               ),
             ),
-          Positioned.fill(child: ElToaster(controller: siteToasts)),
+          Positioned.fill(child: Toaster(controller: siteToasts)),
         ],
       ),
     );
@@ -202,14 +219,14 @@ class _SiteBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       controller: controller,
-      padding: ElSafeArea.scrollPaddingOf(
+      padding: SafeArea.scrollPaddingOf(
         context,
         base: EdgeInsets.only(top: header),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: desktop ? el(12) : el(6),
-          vertical: el(12),
+          horizontal: desktop ? space(12) : space(6),
+          vertical: space(12),
         ),
         child: Align(
           alignment: Alignment.topCenter,
@@ -220,16 +237,16 @@ class _SiteBody extends StatelessWidget {
             // used to reach past this box to place the outer two, which broke
             // hit-testing on every row in the overhang. It no longer reaches;
             // it needs the room instead. Pages that want the narrower column
-            // still cap themselves (`_PublicPage` at `ElBreakpoints.xl`, and
-            // `DocsLayout`'s own article at `ElWidths.article`), so this
+            // still cap themselves (`_PublicPage` at `Breakpoints.xl`, and
+            // `DocsLayout`'s own article at `LayoutWidths.article`), so this
             // widens only what was relying on this box to do the capping.
-            constraints: const BoxConstraints(maxWidth: ElWidths.shell),
+            constraints: const BoxConstraints(maxWidth: LayoutWidths.shell),
             child: SelectionArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   child,
-                  SizedBox(height: el(12)),
+                  SizedBox(height: space(12)),
                   footer,
                 ],
               ),
@@ -260,37 +277,37 @@ class _SiteHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final bool compact = viewport < ElBreakpoints.sm;
-    final double horizontalPadding = compact ? el(4) : el(6);
-    final double compactGap = compact ? el(2) : el(3);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final bool compact = viewport < Breakpoints.sm;
+    final double horizontalPadding = compact ? space(4) : space(6);
+    final double compactGap = compact ? space(2) : space(3);
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.background,
         border: Border(
-          bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
+          bottom: BorderSide(color: theme.border, width: BorderWidths.hairline),
         ),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: ElSafeArea(
+        child: SafeArea(
           bottom: false,
           child: Row(
             children: <Widget>[
               if (!desktop) ...<Widget>[
-                ElButton(
-                  variant: ElButtonVariant.outline,
-                  size: ElButtonSize.icon,
+                Button(
+                  variant: ButtonVariant.outline,
+                  size: ButtonSize.icon,
                   label: 'Open site navigation',
                   onPressed: onOpenMobileNavigation,
-                  child: const ElIcon(ElIconGlyph.menu),
+                  child: const Icon(IconGlyph.menu),
                 ),
                 SizedBox(width: compactGap),
               ],
               MouseRegion(
                 cursor: SystemMouseCursors.click,
-                child: ElPress(
+                child: Press(
                   onTap: () => onNavigate(homeRoute),
                   child: SelectionContainer.disabled(
                     child: Logo(showMark: !compact),
@@ -298,18 +315,18 @@ class _SiteHeader extends StatelessWidget {
                 ),
               ),
               if (desktop) ...<Widget>[
-                SizedBox(width: el(6)),
+                SizedBox(width: space(6)),
                 Expanded(
                   child: Wrap(
-                    spacing: el(2),
-                    runSpacing: el(2),
+                    spacing: space(2),
+                    runSpacing: space(2),
                     children: <Widget>[
                       for (final SiteNavEntry entry in primarySiteNavigation)
-                        ElButton(
+                        Button(
                           variant: route == entry.path
-                              ? ElButtonVariant.secondary
-                              : ElButtonVariant.ghost,
-                          size: ElButtonSize.sm,
+                              ? ButtonVariant.secondary
+                              : ButtonVariant.ghost,
+                          size: ButtonSize.sm,
                           label: entry.title,
                           onPressed: () => onNavigate(entry.path),
                           child: Text(entry.title),
@@ -320,19 +337,19 @@ class _SiteHeader extends StatelessWidget {
               ] else
                 const Spacer(),
               SizedBox(width: compactGap),
-              ElButton(
-                variant: ElButtonVariant.outline,
-                size: compact ? ElButtonSize.icon : ElButtonSize.sm,
+              Button(
+                variant: ButtonVariant.outline,
+                size: compact ? ButtonSize.icon : ButtonSize.sm,
                 label: 'Search documentation',
                 onPressed: onOpenSearch,
                 child: compact
-                    ? const ElIcon(ElIconGlyph.search)
+                    ? const Icon(IconGlyph.search)
                     : Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          ElIcon.lucide(ElLucide.search, size: ElIconSize.sm),
-                          SizedBox(width: ElButton.gapFor(ElButtonSize.sm)),
-                          ElText('Search', ElComponentType.buttonLabel),
+                          Icon.lucide(Lucide.search, size: IconSize.sm),
+                          SizedBox(width: Button.gapFor(ButtonSize.sm)),
+                          StyledText('Search', TextStyles.buttonLabel),
                         ],
                       ),
               ),
@@ -388,24 +405,27 @@ class _SearchOverlayState extends State<_SearchOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final List<SiteSearchGroup> groups = siteSearchGroups(_query);
     final bool empty = _query.trim().isNotEmpty && groups.isEmpty;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(el(6), el(4), el(6), 0),
+      padding: EdgeInsets.fromLTRB(space(6), space(4), space(6), 0),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElWidths.page),
+          constraints: const BoxConstraints(maxWidth: LayoutWidths.page),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: theme.card,
-              borderRadius: BorderRadius.circular(ElRadii.xl),
-              border: Border.all(color: theme.border, width: ElWidths.hairline),
-              boxShadow: ElShadows.tailwindLg.outerShadows(theme),
+              borderRadius: BorderRadius.circular(Radii.xl),
+              border: Border.all(
+                color: theme.border,
+                width: BorderWidths.hairline,
+              ),
+              boxShadow: Shadows.tailwindLg.outerShadows(theme),
             ),
             child: Padding(
-              padding: EdgeInsets.all(el(4)),
+              padding: EdgeInsets.all(space(4)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
@@ -413,46 +433,46 @@ class _SearchOverlayState extends State<_SearchOverlay> {
                   Row(
                     children: <Widget>[
                       Expanded(
-                        child: ElText(
+                        child: StyledText(
                           'Search the public site',
-                          ElType.h4,
+                          TextStyles.h4,
                           color: theme.foreground,
                         ),
                       ),
-                      ElButton(
-                        variant: ElButtonVariant.ghost,
-                        size: ElButtonSize.iconSm,
+                      Button(
+                        variant: ButtonVariant.ghost,
+                        size: ButtonSize.iconSm,
                         label: 'Close search',
                         onPressed: widget.onClose,
-                        child: const ElIcon(ElIconGlyph.x),
+                        child: const Icon(IconGlyph.x),
                       ),
                     ],
                   ),
-                  SizedBox(height: el(3)),
+                  SizedBox(height: space(3)),
                   if (empty)
                     _SearchEmptyState(onNavigate: widget.onNavigate)
                   else
-                    ElCommand(
+                    Command(
                       label: 'Public site search',
                       controller: widget.controller,
                       focusNode: widget.focusNode,
                       placeholder: 'Search pages, docs, and components…',
                       shouldFilter: false,
                       emptyLabel: null,
-                      groups: <ElCommandGroup>[
+                      groups: <CommandGroup>[
                         for (int i = 0; i < groups.length; i++)
-                          ElCommandGroup(
+                          CommandGroup(
                             heading: groups[i].title,
                             separatorBefore: i > 0 && _query.trim().isEmpty,
-                            items: <ElCommandItem>[
+                            items: <CommandItem>[
                               for (final SearchRoute route in groups[i].routes)
-                                ElCommandItem(
+                                CommandItem(
                                   label: route.title,
                                   subtitle: route.description,
                                   meta: route.path,
                                   icon: route.isDesignSystemRoute
-                                      ? ElIconGlyph.layers
-                                      : ElIconGlyph.sparkles,
+                                      ? IconGlyph.layers
+                                      : IconGlyph.sparkles,
                                   keywords: route.keywords,
                                   onSelect: () => widget.onNavigate(route.path),
                                 ),
@@ -477,21 +497,21 @@ class _SearchEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElEmpty(
+    return Empty(
       children: <Widget>[
-        const ElEmptyHeader(
+        const EmptyHeader(
           children: <Widget>[
-            ElEmptyMedia(glyph: ElIconGlyph.search),
-            ElEmptyTitle('Nothing matched that search'),
-            ElEmptyDescription(
+            EmptyMedia(glyph: IconGlyph.search),
+            EmptyTitle('Nothing matched that search'),
+            EmptyDescription(
               'Try a broader term, or jump straight into the documentation index.',
             ),
           ],
         ),
-        ElEmptyContent(
+        EmptyContent(
           children: <Widget>[
-            ElButton(
-              variant: ElButtonVariant.secondary,
+            Button(
+              variant: ButtonVariant.secondary,
               onPressed: () => onNavigate(docsRoute),
               child: const Text('Open documentation'),
             ),
@@ -514,29 +534,33 @@ class _SiteMobileNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: el(6)),
+      padding: EdgeInsets.symmetric(horizontal: space(6)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(top: el(4), bottom: el(4), right: el(12)),
+            padding: EdgeInsets.only(
+              top: space(4),
+              bottom: space(4),
+              right: space(12),
+            ),
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
-              child: ElPress(
+              child: Press(
                 onTap: () => onNavigate(homeRoute),
                 child: SelectionContainer.disabled(child: const Logo()),
               ),
             ),
           ),
           for (final SiteNavGroup group in footerSiteNavigation) ...<Widget>[
-            ElText(group.title, ElType.label),
-            SizedBox(height: el(3)),
+            StyledText(group.title, TextStyles.eyebrow),
+            SizedBox(height: space(3)),
             for (final SiteNavEntry entry in group.entries) ...<Widget>[
-              ElButton(
+              Button(
                 variant: currentRoute == entry.path
-                    ? ElButtonVariant.secondary
-                    : ElButtonVariant.ghost,
-                size: ElButtonSize.md,
+                    ? ButtonVariant.secondary
+                    : ButtonVariant.ghost,
+                size: ButtonSize.md,
                 label: entry.title,
                 onPressed: () => onNavigate(entry.path),
                 contentAlignment: Alignment.centerLeft,
@@ -545,9 +569,9 @@ class _SiteMobileNavigation extends StatelessWidget {
                   child: Text(entry.title),
                 ),
               ),
-              SizedBox(height: el(1)),
+              SizedBox(height: space(1)),
             ],
-            SizedBox(height: el(5)),
+            SizedBox(height: space(5)),
           ],
         ],
       ),
@@ -562,45 +586,49 @@ class _SiteFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(ElRadii.xl),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.xl),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: Padding(
-        padding: EdgeInsets.all(el(6)),
+        padding: EdgeInsets.all(space(6)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            ElText('Build with Elattar', ElType.h4, color: theme.foreground),
-            SizedBox(height: el(2)),
-            ElText(
-              'Start from the foundation, copy the components you need, and keep the design system transparent for every team that adopts it.',
-              ElType.small,
+            StyledText(
+              'Build with Elattar',
+              TextStyles.h4,
+              color: theme.foreground,
             ),
-            SizedBox(height: el(6)),
+            SizedBox(height: space(2)),
+            StyledText(
+              'Start from the foundation, copy the components you need, and keep the design system transparent for every team that adopts it.',
+              TextStyles.small,
+            ),
+            SizedBox(height: space(6)),
             Wrap(
-              spacing: el(6),
-              runSpacing: el(6),
+              spacing: space(6),
+              runSpacing: space(6),
               children: <Widget>[
                 for (final SiteNavGroup group in footerSiteNavigation)
                   _FooterColumn(group: group, onNavigate: onNavigate),
               ],
             ),
-            SizedBox(height: el(6)),
+            SizedBox(height: space(6)),
             Wrap(
-              spacing: el(3),
-              runSpacing: el(3),
+              spacing: space(3),
+              runSpacing: space(3),
               children: <Widget>[
-                ElButton(
-                  variant: ElButtonVariant.primary,
+                Button(
+                  variant: ButtonVariant.primary,
                   onPressed: () => onNavigate(docsRoute),
                   child: const Text('Read the docs'),
                 ),
-                ElButton(
-                  variant: ElButtonVariant.secondary,
+                Button(
+                  variant: ButtonVariant.secondary,
                   onPressed: () => onNavigate(componentsRoute),
                   child: const Text('Browse components'),
                 ),
@@ -621,28 +649,28 @@ class _FooterColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
-      width: ElWidths.rail,
+      width: LayoutWidths.rail,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(group.title, ElType.label, color: theme.foreground),
-          SizedBox(height: el(3)),
+          StyledText(group.title, TextStyles.eyebrow, color: theme.foreground),
+          SizedBox(height: space(3)),
           for (final SiteNavEntry entry in group.entries) ...<Widget>[
             MouseRegion(
               cursor: SystemMouseCursors.click,
-              child: ElPress(
+              child: Press(
                 onTap: () => onNavigate(entry.path),
                 child: SelectionContainer.disabled(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: el(1)),
-                    child: ElText(entry.title, ElType.small),
+                    padding: EdgeInsets.symmetric(vertical: space(1)),
+                    child: StyledText(entry.title, TextStyles.small),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: el(1)),
+            SizedBox(height: space(1)),
           ],
         ],
       ),

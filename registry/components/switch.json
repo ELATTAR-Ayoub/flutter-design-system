@@ -7,20 +7,20 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/switch.dart",
+      "source": "lib/src/components/ui/switch.dart",
       "target": "@ui/switch.dart",
-      "sha256": "d27914ff06d3345638832d9f055de02a769fe94ec314da3088fcefc80e407901"
+      "sha256": "e4c528929fda14a9f5c03f01d93571d9846714b3d713ab975ebba40df2b7a1c0"
     }
   ],
   "registryDependencies": [
     "field",
-    "machine-surface",
+    "surface",
     "selection-control",
     "source-foundation"
   ],
   "semanticDependencies": [
     "field",
-    "machine-surface",
+    "surface",
     "selection-control"
   ],
   "pubDependencies": {},
@@ -28,5 +28,9 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/switch",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/switch.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/switch.dart",
+  "exports": [
+    "Switch",
+    "SwitchSize"
+  ]
 }

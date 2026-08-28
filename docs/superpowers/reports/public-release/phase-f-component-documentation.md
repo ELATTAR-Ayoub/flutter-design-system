@@ -34,13 +34,13 @@ Each guide is composed from the Phase C documentation primitives and the real pu
 - `dart format` completed for the route, catalog, page, and test changes.
 - `flutter analyze` passed for the example application.
 - Focused tests passed for all five documentation pages, public-page catalog integration, and route/search integration.
-- The focused widget tests exercise live `ElButton`, `ElInput`, `ElCard`, `ElDialog`, and `ElSelect` specimens and narrow/wide layout behavior.
+- The focused widget tests exercise live `Button`, `Input`, `Card`, `Dialog`, and `Select` specimens and narrow/wide layout behavior.
 
 The final full-suite and release-web-build wrapper was attempted after the focused gate. On this Windows runner the Flutter launcher stopped emitting output and left no Dart driver process; the stalled wrappers were terminated. This is recorded as an environment verification follow-up, not as a passing gate or a product failure. The previous Phase E full suite and release build remain the latest completed global gates.
 
 ## Revisions made during review
 
-- Corrected breadcrumb construction to the public `ElBreadcrumbEntry.link` and `.page` factories.
+- Corrected breadcrumb construction to the public `BreadcrumbEntry.link` and `.page` factories.
 - Replaced test-only synthetic `MediaQuery` widths with real test-view sizing so responsive assertions exercise the actual layout surface.
 - Replaced brittle copy-text assertions with live-widget and documentation-block assertions.
 - Kept the stable component routes separate from the legacy grouped documentation routes.

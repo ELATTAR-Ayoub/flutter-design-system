@@ -38,7 +38,7 @@
 ///  5. **`text-nav` is not `.type-nav`.** The navigation-menu triggers wear the
 ///     utility (13.5px / **1.5** = 20.25) and the top-nav buttons the component
 ///     class (13.5px / **1.2** = 16.2). Both measured on this page, three
-///     sections apart. Carried by [ElComponentType.navMenuTrigger].
+///     sections apart. Carried by [TextStyles.navMenuTrigger].
 ///  6. **The top-nav press SNAPS** (sweep item X1, the two sites on this page).
 ///     `press` declares the whole `transition` shorthand and `transition-colors
 ///     duration-fast` is emitted after it at equal specificity, so
@@ -46,10 +46,10 @@
 ///     it. Probed with a real pointer: `none → matrix(0.94, …) → none`, each in
 ///     a single frame, with no intermediate matrix: where the navigation-menu
 ///     trigger beside it reported 0.937591 mid-flight. Reproduced with
-///     [ElPress] at zero on both legs, the `theme_toggle.dart` pattern.
+///     [Press] at zero on both legs, the `theme_toggle.dart` pattern.
 ///  7. **`duration-fast` / `duration-base` are inert system-wide**: closed by
 ///     the sweep. The two sites on this page (`tabs.tsx` L113 and
-///     `navigation-menu.tsx` L125) run [ElDurations.transitionDefault].
+///     `navigation-menu.tsx` L125) run [MotionDurations.normal].
 ///  8. **Nothing about a navigation-menu trigger's paint transitions.** `press`
 ///     supplies the only `transition-property` on the element and it is
 ///     `transform`, so `hover:bg-secondary`, `hover:text-foreground` and both
@@ -83,7 +83,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../logo.dart';
@@ -92,12 +104,12 @@ import '../nav.dart';
 /* ── Page data: the four const tables at the top of `page.tsx` ──────────── */
 
 /// `NAV`: the signed-in top bar.
-const List<({String label, ElIconGlyph icon, bool active})> _nav =
-    <({String label, ElIconGlyph icon, bool active})>[
-      (label: 'Packs', icon: ElIconGlyph.package, active: true),
-      (label: 'Live Pulls', icon: ElIconGlyph.radio, active: false),
-      (label: 'Stash', icon: ElIconGlyph.layers, active: false),
-      (label: 'Wallet', icon: ElIconGlyph.wallet, active: false),
+const List<({String label, IconGlyph icon, bool active})> _nav =
+    <({String label, IconGlyph icon, bool active})>[
+      (label: 'Packs', icon: IconGlyph.package, active: true),
+      (label: 'Live Pulls', icon: IconGlyph.radio, active: false),
+      (label: 'Stash', icon: IconGlyph.layers, active: false),
+      (label: 'Wallet', icon: IconGlyph.wallet, active: false),
     ];
 
 /// The signed-out bar's four words. Declared inline on the reference.
@@ -121,12 +133,12 @@ _packLinks = <({String title, String blurb})>[
 ];
 
 /// `MARKET_LINKS`: the one-column panel, and the page's only `active` link.
-const List<({String title, ElIconGlyph icon, bool active})> _marketLinks =
-    <({String title, ElIconGlyph icon, bool active})>[
-      (title: 'Browse all', icon: ElIconGlyph.layers, active: true),
-      (title: 'Trending', icon: ElIconGlyph.trendingUp, active: false),
-      (title: 'Ending soon', icon: ElIconGlyph.gavel, active: false),
-      (title: 'Hot right now', icon: ElIconGlyph.flame, active: false),
+const List<({String title, IconGlyph icon, bool active})> _marketLinks =
+    <({String title, IconGlyph icon, bool active})>[
+      (title: 'Browse all', icon: IconGlyph.layers, active: true),
+      (title: 'Trending', icon: IconGlyph.trendingUp, active: false),
+      (title: 'Ending soon', icon: IconGlyph.gavel, active: false),
+      (title: 'Hot right now', icon: IconGlyph.flame, active: false),
     ];
 
 /// `WALLET_LINKS`.
@@ -138,15 +150,15 @@ const List<String> _walletLinks = <String>[
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `w-140`: the Packs panel's grid. Tailwind's spacing scale, so `el` reaches
+/// `w-140`: the Packs panel's grid. Tailwind's spacing scale, so `space` reaches
 /// it, unlike the `max-w-*` container scale the other pages need literals for.
-final double _packsGridWidth = el(140);
+final double _packsGridWidth = space(140);
 
 /// `w-80`: the Marketplace panel's list.
-final double _marketGridWidth = el(80);
+final double _marketGridWidth = space(80);
 
 /// `w-72`: the two `viewport={false}` panels and the indicator panel.
-final double _narrowGridWidth = el(72);
+final double _narrowGridWidth = space(72);
 
 /// The specimen stage under a navigation menu: `flex min-h-N items-start
 /// justify-center px-5 pt-5 pb-M`.
@@ -161,7 +173,7 @@ Widget _menuStage({
 }) => ConstrainedBox(
   constraints: BoxConstraints(minHeight: minHeight),
   child: Padding(
-    padding: EdgeInsets.fromLTRB(el(5), el(5), el(5), bottomPadding),
+    padding: EdgeInsets.fromLTRB(space(5), space(5), space(5), bottomPadding),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,12 +189,12 @@ class NavigationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('base', 'navigation');
+    final CategoryHit here = findCategory('base', 'navigation');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // The drift every base page carries: the group is already called
           // "Base Components" and the page interpolates a second literal.
           eyebrow: '${here.group.title} · Base',
@@ -192,21 +204,21 @@ class NavigationPage extends StatelessWidget {
         ),
         // `className="mb-12"`, 48px.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: ElNote(
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: Note(
             title: 'The active indicator is a rule, not a glow',
-            // A [ElText], not a bare [Text]: [ElNote] hands its child the
-            // `.type-small` ambient style, but only [ElText] brings the
-            // [ElLineBox] that measures the paragraph as CSS measures it. The
+            // A [StyledText], not a bare [Text]: [Note] hands its child the
+            // `.type-small` ambient style, but only [StyledText] brings the
+            // [LineBox] that measures the paragraph as CSS measures it. The
             // difference here is one pixel on a two-line body, and it moves
             // every section on the page down with it.
-            child: ElText(
+            child: StyledText(
               'Every active navigation state in the product is a controlled '
               'blue mark — a 2px underline, a left border, or a tinted pill. '
               'Navigation items never glow. The brief is explicit about this, '
               'and it is what keeps the top bar from looking like a slot '
               'machine.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ),
@@ -219,7 +231,7 @@ class NavigationPage extends StatelessWidget {
         const _DisclosureSection(),
         const _ApiSection(),
         const _RulesSection(),
-        const ElPageFootNav(groupId: 'base', slug: 'navigation'),
+        const PageFootNav(groupId: 'base', slug: 'navigation'),
       ],
     );
   }
@@ -232,7 +244,7 @@ class _TopNavSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'topnav',
       title: 'Top navigation pattern',
       description:
@@ -242,13 +254,13 @@ class _TopNavSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const ElPanel(
+          const Panel(
             label: 'Signed in',
             flush: true,
             child: _TopNavRow(signedIn: true),
           ),
-          SizedBox(height: el(4)),
-          const ElPanel(
+          SizedBox(height: space(4)),
+          const Panel(
             label: 'Signed out',
             flush: true,
             child: _TopNavRow(signedIn: false),
@@ -266,11 +278,11 @@ class _TopNavRow extends StatelessWidget {
   final bool signedIn;
 
   /// `h-16`: the row's border box, `border-b` included.
-  static double get height => el(16);
+  static double get height => space(16);
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       height: height,
@@ -283,21 +295,20 @@ class _TopNavRow extends StatelessWidget {
             left: 0,
             right: 0,
             bottom: 0,
-            height: ElWidths.hairline,
+            height: BorderWidths.hairline,
             child: ColoredBox(color: theme.border),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: el(5)),
+            padding: EdgeInsets.symmetric(horizontal: space(5)),
             child: Row(
               children: <Widget>[
                 // `className="mr-6"`.
                 Padding(
-                  padding: EdgeInsets.only(right: el(6)),
+                  padding: EdgeInsets.only(right: space(6)),
                   child: const Logo(),
                 ),
                 if (signedIn)
-                  for (final ({String label, ElIconGlyph icon, bool active})
-                      item
+                  for (final ({String label, IconGlyph icon, bool active}) item
                       in _nav) ...<Widget>[
                     _TopNavButton(
                       label: item.label,
@@ -305,34 +316,34 @@ class _TopNavRow extends StatelessWidget {
                       active: item.active,
                     ),
                     // `gap-1`: the row's own, paid between every pair.
-                    SizedBox(width: el(1)),
+                    SizedBox(width: space(1)),
                   ]
                 else
                   for (final String label in _signedOut) ...<Widget>[
                     _TopNavButton(label: label),
-                    SizedBox(width: el(1)),
+                    SizedBox(width: space(1)),
                   ],
                 const Spacer(),
                 if (signedIn) ...<Widget>[
                   const _BalanceChip(),
                   // `ml-auto flex items-center gap-3`.
-                  SizedBox(width: el(3)),
-                  ElButton(
-                    size: ElButtonSize.sm,
+                  SizedBox(width: space(3)),
+                  Button(
+                    size: ButtonSize.sm,
                     onPressed: () {},
                     child: const Text('Open Pack'),
                   ),
                 ] else ...<Widget>[
-                  ElButton(
-                    variant: ElButtonVariant.ghost,
-                    size: ElButtonSize.sm,
+                  Button(
+                    variant: ButtonVariant.ghost,
+                    size: ButtonSize.sm,
                     onPressed: () {},
                     child: const Text('Log In'),
                   ),
                   // `ml-auto flex items-center gap-2`.
-                  SizedBox(width: el(2)),
-                  ElButton(
-                    size: ElButtonSize.sm,
+                  SizedBox(width: space(2)),
+                  Button(
+                    size: ButtonSize.sm,
                     onPressed: () {},
                     child: const Text('Create Account'),
                   ),
@@ -353,13 +364,13 @@ class _TopNavButton extends StatefulWidget {
   final String label;
 
   /// The signed-out bar carries no icons at all: and no `gap-2` either.
-  final ElIconGlyph? glyph;
+  final IconGlyph? glyph;
 
   final bool active;
 
   /// `absolute inset-x-2 bottom-0 h-0.5 rounded-t-sm bg-action`.
-  static double get underlineInset => el(2);
-  static double get underlineHeight => el(0.5);
+  static double get underlineInset => space(2);
+  static double get underlineHeight => space(0.5);
 
   @override
   State<_TopNavButton> createState() => _TopNavButtonState();
@@ -375,7 +386,7 @@ class _TopNavButtonState extends State<_TopNavButton> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     // `text-foreground` when active; `text-muted-foreground
     // hover:text-foreground` otherwise. This is the only thing
     // `transition-colors` has left to animate.
@@ -384,33 +395,31 @@ class _TopNavButtonState extends State<_TopNavButton> {
         : theme.mutedForeground;
 
     final Widget content = Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(4)),
+      padding: EdgeInsets.symmetric(horizontal: space(4)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           if (widget.glyph != null) ...<Widget>[
-            ElIcon(
+            Icon(
               widget.glyph!,
-              size: ElIconSize.sm,
+              size: IconSize.sm,
               // `tone={n.active ? "action" : "subtle"}`: the glyph keeps its
               // own tone and does **not** follow the label's hover.
-              tone: widget.active ? ElIconTone.action : ElIconTone.subtle,
+              tone: widget.active ? IconTone.action : IconTone.subtle,
             ),
-            SizedBox(width: el(2)),
+            SizedBox(width: space(2)),
           ],
           TweenAnimationBuilder<Color?>(
             tween: ColorTween(end: ink),
-            duration: elAnimationDuration(
-              context,
-              ElDurations.transitionDefault,
-            ),
-            curve: ElCurves.out,
-            builder: (BuildContext context, Color? value, Widget? _) => ElText(
-              widget.label,
-              ElType.nav,
-              color: value ?? ink,
-              softWrap: false,
-            ),
+            duration: effectiveMotionDuration(context, MotionDurations.normal),
+            curve: MotionCurves.enter,
+            builder: (BuildContext context, Color? value, Widget? _) =>
+                StyledText(
+                  widget.label,
+                  TextStyles.nav,
+                  color: value ?? ink,
+                  softWrap: false,
+                ),
           ),
         ],
       ),
@@ -426,7 +435,7 @@ class _TopNavButtonState extends State<_TopNavButton> {
         // says why: *"the blue underline alone is not announced."*
         selected: widget.active ? true : null,
         label: widget.label,
-        child: ElPress(
+        child: Press(
           // DRIFT 6 / sweep X1: the squish snaps here.
           downDuration: Duration.zero,
           upDuration: Duration.zero,
@@ -445,10 +454,10 @@ class _TopNavButtonState extends State<_TopNavButton> {
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         // `bg-action`: the palette ramp, not `--primary`.
-                        color: ElPalette.action,
+                        color: Palette.action,
                         // `rounded-t-sm`: the two top corners only.
                         borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(ElRadii.sm),
+                          top: Radius.circular(Radii.sm),
                         ),
                       ),
                     ),
@@ -469,7 +478,7 @@ class _BalanceChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     // The chip's own line box is the containing block's, not the small span's:
     // a blockified `<span>` inherits the row's 16px / 1.5 leading and the
     // 11.5px numeral sits inside it. 24px, measured.
@@ -477,17 +486,21 @@ class _BalanceChip extends StatelessWidget {
     final double lineBox = (ambient.fontSize ?? 0) * (ambient.height ?? 1);
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: el(3), vertical: el(2)),
+      padding: EdgeInsets.symmetric(horizontal: space(3), vertical: space(2)),
       decoration: BoxDecoration(
         color: theme.muted,
-        borderRadius: BorderRadius.circular(ElRadii.md),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.md),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: SizedBox(
         height: lineBox,
         child: Center(
           widthFactor: 1,
-          child: ElText(r'$1,204.80', ElType.numSm, color: theme.valueInk),
+          child: StyledText(
+            r'$1,204.80',
+            TextStyles.numberSm,
+            color: theme.premiumText,
+          ),
         ),
       ),
     );
@@ -501,14 +514,14 @@ class _DirectionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'direction',
       title: 'Direction provider',
       description:
           'Direction is context, not a second set of controls. The '
           'same Breadcrumb composition reads right-to-left when its provider '
           'changes.',
-      child: const ElPanel(
+      child: const Panel(
         label: 'RTL context',
         note: 'direction=rtl',
         child: Directionality(
@@ -516,10 +529,10 @@ class _DirectionSection extends StatelessWidget {
           // statement in Flutter, where Radix needs the context provider and
           // the DOM attribute separately.
           textDirection: TextDirection.rtl,
-          child: ElBreadcrumb(
-            items: <ElBreadcrumbEntry>[
-              ElBreadcrumbEntry.link('الحزم'),
-              ElBreadcrumbEntry.page('نبض الأصل'),
+          child: Breadcrumb(
+            items: <BreadcrumbEntry>[
+              BreadcrumbEntry.link('الحزم'),
+              BreadcrumbEntry.page('نبض الأصل'),
             ],
           ),
         ),
@@ -561,13 +574,13 @@ class _TabsSectionState extends State<_TabsSection> {
 
   /// `className="pt-6"` on every `TabsContent` on this page.
   Widget _content(String text) => Padding(
-    padding: EdgeInsets.only(top: el(6)),
-    child: ElText(text, ElType.small),
+    padding: EdgeInsets.only(top: space(6)),
+    child: StyledText(text, TextStyles.small),
   );
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'tabs',
       title: 'Tabs',
       description:
@@ -577,41 +590,41 @@ class _TabsSectionState extends State<_TabsSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'Live Pulls / Top Hits',
-            child: ElTabs(
+            child: Tabs(
               selectedIndex: _live,
               onChanged: (int i) => setState(() => _live = i),
-              items: <ElTabItem>[
-                ElTabItem(
+              items: <TabItem>[
+                TabItem(
                   label: 'Live Pulls',
                   content: _content(
                     'A live feed of every pull across the platform, updating '
                     'continuously.',
                   ),
                 ),
-                ElTabItem(
+                TabItem(
                   label: 'Top Hits',
                   content: _content(
                     'The highest-value cards pulled in the last 24 hours.',
                   ),
                 ),
-                ElTabItem(
+                TabItem(
                   label: 'My Pulls',
                   content: _content('Your own pull history.'),
                 ),
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Account tabs',
-            child: ElTabs(
+            child: Tabs(
               selectedIndex: _account,
               onChanged: (int i) => setState(() => _account = i),
-              items: <ElTabItem>[
+              items: <TabItem>[
                 for (int i = 0; i < _accountTabs.length; i++)
-                  ElTabItem(
+                  TabItem(
                     label: _accountTabs[i],
                     // Five triggers, one `TabsContent`: the other four values
                     // have no panel at all in the reference.
@@ -625,16 +638,16 @@ class _TabsSectionState extends State<_TabsSection> {
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Line variant',
-            child: ElTabs(
-              variant: ElTabsVariant.line,
+            child: Tabs(
+              variant: TabsVariant.line,
               selectedIndex: _line,
               onChanged: (int i) => setState(() => _line = i),
-              items: <ElTabItem>[
+              items: <TabItem>[
                 for (int i = 0; i < _lineTabs.length; i++)
-                  ElTabItem(
+                  TabItem(
                     label: _lineTabs[i],
                     content: i == 0
                         ? _content(
@@ -650,12 +663,12 @@ class _TabsSectionState extends State<_TabsSection> {
           ),
           // `className="type-small mt-5"`, outside every Panel.
           Padding(
-            padding: EdgeInsets.only(top: el(5)),
-            child: ElText(
+            padding: EdgeInsets.only(top: space(5)),
+            child: StyledText(
               '40px track, 4px inset, 32px triggers on 16px padding — the same '
               'ladder as every other control. Stock shadcn ships 32 / 3 / 25, '
               'none of which is on the 8-point scale.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ],
@@ -671,26 +684,26 @@ class _BreadcrumbSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'breadcrumb',
       title: 'Breadcrumb',
       description:
           'Used on pack detail pages, where the user arrived from a '
           'filtered marketplace and needs a way back to it.',
-      child: ElPanel(
+      child: Panel(
         label: 'Pack detail',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const ElBreadcrumb(
-              items: <ElBreadcrumbEntry>[
-                ElBreadcrumbEntry.link('Packs'),
-                ElBreadcrumbEntry.link('Eclipse Vault'),
-                ElBreadcrumbEntry.page('Origin Pulse — Series I'),
+            const Breadcrumb(
+              items: <BreadcrumbEntry>[
+                BreadcrumbEntry.link('Packs'),
+                BreadcrumbEntry.link('Eclipse Vault'),
+                BreadcrumbEntry.page('Origin Pulse — Series I'),
               ],
             ),
             Padding(
-              padding: EdgeInsets.only(top: el(5)),
+              padding: EdgeInsets.only(top: space(5)),
               child: const _BreadcrumbCaption(),
             ),
           ],
@@ -705,17 +718,17 @@ class _BreadcrumbCaption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'The current page is a '),
-          ElCode.span('BreadcrumbPage'),
+          Code.span('BreadcrumbPage'),
           const TextSpan(text: ', not a link — it carries '),
-          ElCode.span('aria-current'),
+          Code.span('aria-current'),
           const TextSpan(text: ' and is not clickable.'),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -727,7 +740,7 @@ class _PaginationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'pagination',
       title: 'Pagination',
       description:
@@ -737,49 +750,49 @@ class _PaginationSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'Pack grid pagination',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                const ElPagination(
+                const Pagination(
                   children: <Widget>[
-                    ElPaginationStep.previous(),
-                    ElPaginationLink(label: '1'),
-                    ElPaginationLink(label: '2', isActive: true),
-                    ElPaginationLink(label: '3'),
-                    ElPaginationEllipsis(),
-                    ElPaginationLink(label: '12'),
-                    ElPaginationStep.next(),
+                    PaginationStep.previous(),
+                    PaginationLink(label: '1'),
+                    PaginationLink(label: '2', isActive: true),
+                    PaginationLink(label: '3'),
+                    PaginationEllipsis(),
+                    PaginationLink(label: '12'),
+                    PaginationStep.next(),
                   ],
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: el(5)),
-                  child: ElText(
+                  padding: EdgeInsets.only(top: space(5)),
+                  child: StyledText(
                     'Showing 25–48 of 184 packs',
-                    ElType.small,
+                    TextStyles.small,
                     align: TextAlign.center,
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Load more — for feeds',
             child: Column(
               // `flex flex-col items-center gap-3`.
               children: <Widget>[
-                ElButton(
-                  variant: ElButtonVariant.outline,
+                Button(
+                  variant: ButtonVariant.outline,
                   onPressed: () {},
                   child: const Text('Load 25 more pulls'),
                 ),
-                SizedBox(height: el(3)),
-                ElText(
+                SizedBox(height: space(3)),
+                StyledText(
                   '48 of 12,480 shown',
-                  ElType.numSm,
-                  color: ElTheme.of(context).mutedForeground,
+                  TextStyles.numberSm,
+                  color: ThemeScope.of(context).mutedForeground,
                 ),
               ],
             ),
@@ -797,9 +810,9 @@ class _NavigationMenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'navigation-menu',
       title: 'Navigation Menu',
       description:
@@ -810,45 +823,45 @@ class _NavigationMenuSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'With a viewport — one shared panel that resizes',
             flush: true,
             child: _menuStage(
-              minHeight: el(64),
-              bottomPadding: el(40),
-              child: ElNavigationMenu(
-                items: <ElNavigationMenuItem>[
-                  ElNavigationMenuItem.trigger(
+              minHeight: space(64),
+              bottomPadding: space(40),
+              child: NavigationMenu(
+                items: <NavigationMenuItem>[
+                  NavigationMenuItem.trigger(
                     label: 'Packs',
                     content: SizedBox(
                       width: _packsGridWidth,
                       child: _PackGrid(theme: theme),
                     ),
                   ),
-                  ElNavigationMenuItem.trigger(
+                  NavigationMenuItem.trigger(
                     label: 'Marketplace',
                     content: SizedBox(
                       width: _marketGridWidth,
                       child: _IconLinkList(links: _marketLinks),
                     ),
                   ),
-                  const ElNavigationMenuItem.link(label: 'Leaderboard'),
+                  const NavigationMenuItem.link(label: 'Leaderboard'),
                 ],
               ),
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Without a viewport — each item owns its panel',
             note: 'viewport={false}',
             flush: true,
             child: _menuStage(
-              minHeight: el(56),
-              bottomPadding: el(32),
-              child: ElNavigationMenu(
+              minHeight: space(56),
+              bottomPadding: space(32),
+              child: NavigationMenu(
                 viewport: false,
-                items: <ElNavigationMenuItem>[
-                  ElNavigationMenuItem.trigger(
+                items: <NavigationMenuItem>[
+                  NavigationMenuItem.trigger(
                     label: 'Stash',
                     content: SizedBox(
                       width: _narrowGridWidth,
@@ -859,7 +872,7 @@ class _NavigationMenuSection extends StatelessWidget {
                       ),
                     ),
                   ),
-                  ElNavigationMenuItem.trigger(
+                  NavigationMenuItem.trigger(
                     label: 'Wallet',
                     content: SizedBox(
                       width: _narrowGridWidth,
@@ -870,18 +883,18 @@ class _NavigationMenuSection extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Indicator — the caret that names the open trigger',
             flush: true,
             child: _menuStage(
-              minHeight: el(56),
-              bottomPadding: el(32),
-              child: ElNavigationMenu(
+              minHeight: space(56),
+              bottomPadding: space(32),
+              child: NavigationMenu(
                 indicator: true,
-                items: <ElNavigationMenuItem>[
+                items: <NavigationMenuItem>[
                   for (final String label in <String>['Packs', 'Marketplace'])
-                    ElNavigationMenuItem.trigger(
+                    NavigationMenuItem.trigger(
                       label: label,
                       content: SizedBox(
                         width: _narrowGridWidth,
@@ -893,13 +906,13 @@ class _NavigationMenuSection extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: el(4)),
-            child: ElGrid(
+            padding: EdgeInsets.only(top: space(4)),
+            child: Grid(
               base: 1,
               lg: 2,
               children: const <Widget>[
-                ElNote(title: 'Keyboard', child: _KeyboardBody()),
-                ElNote(
+                Note(title: 'Keyboard', child: _KeyboardBody()),
+                Note(
                   title: 'Where the state variants come from',
                   child: _VariantsBody(),
                 ),
@@ -916,18 +929,18 @@ class _NavigationMenuSection extends StatelessWidget {
 class _PackGrid extends StatelessWidget {
   const _PackGrid({required this.theme});
 
-  final ElThemeData theme;
+  final ThemeTokens theme;
 
   @override
   Widget build(BuildContext context) {
-    return ElGrid(
+    return Grid(
       base: 1,
       md: 2,
       // `gap-1`, not the kit default's `gap-4`.
-      gap: el(1),
+      gap: space(1),
       children: <Widget>[
         for (final ({String title, String blurb}) link in _packLinks)
-          ElNavigationMenuLink(
+          NavigationMenuLink(
             onTap: () {},
             // `className="flex-col items-start"` on the anchor: the row's own
             // `flex items-center` inverted for the two-line shape.
@@ -935,9 +948,9 @@ class _PackGrid extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElText(link.title, ElType.nav, color: theme.foreground),
-                SizedBox(height: ElNavigationMenuLink.gap),
-                ElText(link.blurb, ElType.small),
+                StyledText(link.title, TextStyles.nav, color: theme.foreground),
+                SizedBox(height: NavigationMenuLink.gap),
+                StyledText(link.blurb, TextStyles.small),
               ],
             ),
           ),
@@ -950,7 +963,7 @@ class _PackGrid extends StatelessWidget {
 class _IconLinkList extends StatelessWidget {
   const _IconLinkList({required this.links, this.honourActive = true});
 
-  final List<({String title, ElIconGlyph icon, bool active})> links;
+  final List<({String title, IconGlyph icon, bool active})> links;
 
   /// The Stash panel takes the same three rows and shows them **unstyled** —
   /// `NavigationMenuLink` there is written without an `active` prop at all,
@@ -964,19 +977,15 @@ class _IconLinkList extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         for (int i = 0; i < links.length; i++) ...<Widget>[
-          if (i > 0) SizedBox(height: el(1)),
-          ElNavigationMenuLink(
+          if (i > 0) SizedBox(height: space(1)),
+          NavigationMenuLink(
             active: honourActive && links[i].active,
             onTap: () {},
             child: Row(
               children: <Widget>[
-                ElIcon(
-                  links[i].icon,
-                  size: ElIconSize.sm,
-                  tone: ElIconTone.subtle,
-                ),
-                SizedBox(width: ElNavigationMenuLink.gap),
-                ElText(links[i].title, ElComponentType.textSm),
+                Icon(links[i].icon, size: IconSize.sm, tone: IconTone.subtle),
+                SizedBox(width: NavigationMenuLink.gap),
+                StyledText(links[i].title, TextStyles.bodySmall),
               ],
             ),
           ),
@@ -999,10 +1008,10 @@ class _PlainLinkList extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         for (int i = 0; i < labels.length; i++) ...<Widget>[
-          if (i > 0) SizedBox(height: el(1)),
-          ElNavigationMenuLink(
+          if (i > 0) SizedBox(height: space(1)),
+          NavigationMenuLink(
             onTap: () {},
-            child: ElText(labels[i], ElComponentType.textSm),
+            child: StyledText(labels[i], TextStyles.bodySmall),
           ),
         ],
       ],
@@ -1019,31 +1028,31 @@ class _KeyboardBody extends StatelessWidget {
     final List<InlineSpan> rows = <InlineSpan>[
       TextSpan(
         children: <InlineSpan>[
-          ElCode.span('←'),
+          Code.span('←'),
           const TextSpan(text: ' '),
-          ElCode.span('→'),
+          Code.span('→'),
           const TextSpan(text: ' move between triggers.'),
         ],
       ),
       TextSpan(
         children: <InlineSpan>[
-          ElCode.span('Enter'),
+          Code.span('Enter'),
           const TextSpan(text: ' or '),
-          ElCode.span('Space'),
+          Code.span('Space'),
           const TextSpan(text: ' opens the panel; '),
-          ElCode.span('↓'),
+          Code.span('↓'),
           const TextSpan(text: ' opens it and enters it.'),
         ],
       ),
       TextSpan(
         children: <InlineSpan>[
-          ElCode.span('Tab'),
+          Code.span('Tab'),
           const TextSpan(text: ' walks the links inside an open panel.'),
         ],
       ),
       TextSpan(
         children: <InlineSpan>[
-          ElCode.span('Esc'),
+          Code.span('Esc'),
           const TextSpan(
             text: ' closes the panel and returns focus to its trigger.',
           ),
@@ -1057,8 +1066,8 @@ class _KeyboardBody extends StatelessWidget {
       children: <Widget>[
         for (int i = 0; i < rows.length; i++) ...<Widget>[
           // `space-y-1.5`: a margin between siblings, not a gap around them.
-          if (i > 0) SizedBox(height: el(1.5)),
-          ElRichText(rows[i], ElType.small),
+          if (i > 0) SizedBox(height: space(1.5)),
+          RichText(rows[i], TextStyles.small),
         ],
       ],
     );
@@ -1070,50 +1079,50 @@ class _VariantsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Radix emits '),
-          ElCode.span('data-state="open"'),
+          Code.span('data-state="open"'),
           const TextSpan(text: ' and '),
-          ElCode.span('data-active=""'),
+          Code.span('data-active=""'),
           const TextSpan(text: ' — never a bare '),
-          ElCode.span('data-open'),
+          Code.span('data-open'),
           const TextSpan(text: '. Tailwind alone would compile '),
-          ElCode.span('data-open:'),
+          Code.span('data-open:'),
           const TextSpan(text: ' to '),
-          ElCode.span('[data-open]'),
+          Code.span('[data-open]'),
           const TextSpan(text: ' and match nothing. It works here because '),
-          ElCode.span('app/globals.css'),
+          Code.span('app/globals.css'),
           const TextSpan(text: ' imports '),
-          ElCode.span('shadcn/tailwind.css'),
+          Code.span('shadcn/tailwind.css'),
           const TextSpan(text: ', which registers '),
-          ElCode.span('@custom-variant data-open'),
+          Code.span('@custom-variant data-open'),
           const TextSpan(text: ' covering '),
-          ElCode.span('[data-state="open"]'),
+          Code.span('[data-state="open"]'),
           const TextSpan(text: ' as well — likewise '),
-          ElCode.span('data-closed'),
+          Code.span('data-closed'),
           const TextSpan(text: ', '),
-          ElCode.span('data-checked'),
+          Code.span('data-checked'),
           const TextSpan(text: ', '),
-          ElCode.span('data-active'),
+          Code.span('data-active'),
           const TextSpan(text: ', '),
-          ElCode.span('data-horizontal'),
+          Code.span('data-horizontal'),
           const TextSpan(text: ' and '),
-          ElCode.span('data-vertical'),
+          Code.span('data-vertical'),
           const TextSpan(
             text:
                 '. Fifteen vendored components depend on that shim. Check it '
                 'before deciding one of them is broken: a compile test '
                 'importing only ',
           ),
-          ElCode.span('tailwindcss'),
+          Code.span('tailwindcss'),
           const TextSpan(
             text: ' reports every one of them dead, and is wrong.',
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -1143,88 +1152,88 @@ class _DisclosureSectionState extends State<_DisclosureSection> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'disclosure',
       title: 'Accordion & Collapsible',
       description:
           'Accordion for a set of related disclosures where only one '
           'should be open — the FAQ. Collapsible for a single independent '
           'section, like an advanced filter block.',
-      child: ElGrid(
+      child: Grid(
         base: 1,
         lg: 2,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'Accordion — FAQ',
-            child: ElAccordion(
+            child: Accordion(
               openIndex: _open,
               onChanged: (int? i) => setState(() => _open = i),
-              items: <ElAccordionItem>[
-                ElAccordionItem(
+              items: <AccordionItem>[
+                AccordionItem(
                   title: 'How are the odds decided?',
-                  // `text-sm` on the content div, through a [ElText] for the
+                  // `text-sm` on the content div, through a [StyledText] for the
                   // Note's reason: the paragraph's own height is what the
                   // unfold animates to.
-                  content: ElText(
+                  content: StyledText(
                     'Every card in a pack is rolled independently against the '
                     'published rarity table. The table is shown on each '
                     'pack’s detail page before you buy.',
-                    ElComponentType.textSm,
+                    TextStyles.bodySmall,
                   ),
                 ),
-                ElAccordionItem(
+                AccordionItem(
                   title: 'Can I sell a card back?',
-                  content: ElText(
+                  content: StyledText(
                     'Yes. Sell-back is offered at the card’s current listed '
                     'value, and the amount is credited to your available '
                     'balance immediately.',
-                    ElComponentType.textSm,
+                    TextStyles.bodySmall,
                   ),
                 ),
-                ElAccordionItem(
+                AccordionItem(
                   title: 'How does shipping work?',
-                  content: ElText(
+                  content: StyledText(
                     'Request a shipment from your Stash. Cards are pulled from '
                     'the vault, graded, and dispatched together.',
-                    ElComponentType.textSm,
+                    TextStyles.bodySmall,
                   ),
                 ),
               ],
             ),
           ),
-          ElPanel(
+          Panel(
             label: 'Collapsible — advanced filters',
-            child: ElCollapsible(
+            child: Collapsible(
               open: _filters,
-              trigger: ElButton(
-                variant: ElButtonVariant.outline,
+              trigger: Button(
+                variant: ButtonVariant.outline,
                 onPressed: () => setState(() => _filters = !_filters),
                 child: Row(
                   // `className="w-full justify-between"`.
                   children: <Widget>[
                     const Text('Advanced filters'),
                     const Spacer(),
-                    ElIcon(
-                      ElIconGlyph.chevronRight,
-                      size: ElIconSize.sm,
-                      tone: ElIconTone.subtle,
+                    Icon(
+                      IconGlyph.chevronRight,
+                      size: IconSize.sm,
+                      tone: IconTone.subtle,
                     ),
                   ],
                 ),
               ),
               content: Padding(
                 // `className="pt-4"` on the content.
-                padding: EdgeInsets.only(top: el(4)),
+                padding: EdgeInsets.only(top: space(4)),
                 child: Container(
-                  padding: EdgeInsets.all(el(4)),
+                  padding: EdgeInsets.all(space(4)),
                   decoration: BoxDecoration(
                     color: theme.card,
-                    borderRadius: BorderRadius.circular(ElRadii.lg),
+                    borderRadius: BorderRadius.circular(Radii.lg),
                     border: Border.all(
                       color: theme.border,
-                      width: ElWidths.hairline,
+                      width: BorderWidths.hairline,
                     ),
                   ),
                   child: Column(
@@ -1233,8 +1242,8 @@ class _DisclosureSectionState extends State<_DisclosureSection> {
                     children: <Widget>[
                       for (int i = 0; i < _filterRows.length; i++) ...<Widget>[
                         // `space-y-3`.
-                        if (i > 0) SizedBox(height: el(3)),
-                        ElText(_filterRows[i], ElType.small),
+                        if (i > 0) SizedBox(height: space(3)),
+                        StyledText(_filterRows[i], TextStyles.small),
                       ],
                     ],
                   ),
@@ -1255,11 +1264,11 @@ class _ApiSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'api',
       title: 'API',
-      child: ElMeta(
-        items: <ElMetaItem>[
+      child: Meta(
+        items: <MetaItem>[
           (
             k: 'Tabs',
             v: const TextSpan(
@@ -1347,10 +1356,10 @@ class _RulesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ElSection(
+    return const Section(
       id: 'rules',
       title: 'Rules',
-      child: ElDoDont(
+      child: DoDont(
         dos: <String>[
           'Mark the active nav item with aria-current as well as the blue '
               'indicator.',

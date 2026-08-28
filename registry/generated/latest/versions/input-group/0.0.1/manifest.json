@@ -7,25 +7,25 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/input_group.dart",
+      "source": "lib/src/components/ui/input_group.dart",
       "target": "@ui/input_group.dart",
-      "sha256": "adcc1c983aecfe1009d78588f2f7221b01bbc37a9c0d0741f9b671e0481ff5f0"
+      "sha256": "289e5627e66d54463bb02af597ef07b957fc13fecba77b0181374b846aaf4663"
     }
   ],
   "registryDependencies": [
     "button",
     "field",
     "input",
-    "machine-surface",
-    "press-motion",
+    "surface",
+    "press",
     "source-foundation"
   ],
   "semanticDependencies": [
     "button",
     "field",
     "input",
-    "machine-surface",
-    "press-motion"
+    "surface",
+    "press"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -33,6 +33,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/input-group",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/input_group.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/input_group.dart",
   "deprecated": false
 }

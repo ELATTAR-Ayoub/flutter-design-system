@@ -1,7 +1,7 @@
 /// Public documentation page for the `select` component.
 ///
 /// **Re-housed onto the kit.** This page used to be `SelectDocPage`,
-/// hand-composing `ElSection` panels inside
+/// hand-composing `Section` panels inside
 /// `example/lib/components_docs/input_select_pages.dart` and living outside
 /// `componentDocs`. It now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
@@ -17,12 +17,24 @@
 /// own sections below it, since `SnippetSection` carries no live
 /// specimen), Grouped menu, Size & width, then the eight disclosures. New:
 /// a Keyboard disclosure, between Accessibility and Responsive, read
-/// directly off `lib/src/components/select.dart`'s `_ElSelectState`
+/// directly off `lib/src/components/select.dart`'s `_SelectState`
 /// keyboard handling.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -46,7 +58,7 @@ final ComponentDocSpec selectDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     InstallSection(
       id: 'install',
@@ -54,7 +66,7 @@ final ComponentDocSpec selectDocSpec = ComponentDocSpec(
       description:
           'select has a real registry manifest: elattar add select '
           'installs lib/src/components/select.dart and resolves button, '
-          'field, icon, machine-surface, popover, and source-foundation '
+          'field, icon, surface, popover, and source-foundation '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
       command: selectDoc.command,
@@ -74,7 +86,7 @@ final ComponentDocSpec selectDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElSelect and its five companion '
+              'Add the export line so Select and its five companion '
               'classes are reachable the same way the CLI path already '
               'makes them.',
           code: "export 'select.dart';",
@@ -95,12 +107,12 @@ final ComponentDocSpec selectDocSpec = ComponentDocSpec(
       title: 'Grouped menu',
       description:
           'Group labels and separators are part of the public API, not '
-          'an implementation detail: ElSelectGroup and ElSelectSeparator '
-          'sit in the same options list as ElSelectOption.',
+          'an implementation detail: SelectGroup and SelectSeparator '
+          'sit in the same options list as SelectOption.',
       specimen: _GroupedSelectPreview(),
       code: _groupedSelectCode,
       label: 'Grouped menu specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     ShowcaseSection(
       id: 'size-width',
@@ -117,19 +129,16 @@ final ComponentDocSpec selectDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElSelect declares, ElSelectSize\'s '
+          'Every constructor parameter Select declares, SelectSize\'s '
           'two rungs, and the four companion classes: one table per '
           'exported class or enum.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElSelect', anchor: 'api-elselect'),
-        DocsTocEntry(title: 'ElSelectSize', anchor: 'api-elselectsize'),
-        DocsTocEntry(title: 'ElSelectOption', anchor: 'api-elselectoption'),
-        DocsTocEntry(title: 'ElSelectGroup', anchor: 'api-elselectgroup'),
-        DocsTocEntry(
-          title: 'ElSelectSeparator',
-          anchor: 'api-elselectseparator',
-        ),
-        DocsTocEntry(title: 'ElSelectMenu', anchor: 'api-elselectmenu'),
+        DocsTocEntry(title: 'Select', anchor: 'api-elselect'),
+        DocsTocEntry(title: 'SelectSize', anchor: 'api-elselectsize'),
+        DocsTocEntry(title: 'SelectOption', anchor: 'api-elselectoption'),
+        DocsTocEntry(title: 'SelectGroup', anchor: 'api-elselectgroup'),
+        DocsTocEntry(title: 'SelectSeparator', anchor: 'api-elselectseparator'),
+        DocsTocEntry(title: 'SelectMenu', anchor: 'api-elselectmenu'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -137,7 +146,7 @@ final ComponentDocSpec selectDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off _ElSelectState.build and ElSelect\'s own class doc, '
+          'Read off _SelectState.build and Select\'s own class doc, '
           'not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -187,14 +196,14 @@ final ComponentDocSpec selectDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/selects_test.dart',
             description:
-                'ElSelect is covered there (87 ElSelect references at the '
+                'Select is covered there (87 Select references at the '
                 'time this page was written).',
           ),
           const DocsInstallFact(
             label: 'Docs test',
             value: 'example/test/components_docs/select_test.dart',
             description:
-                'Covers this page: the article mounts, every ElSelect '
+                'Covers this page: the article mounts, every Select '
                 'constructor parameter this page claims to document, and '
                 'both themes at two viewport widths.',
           ),
@@ -222,9 +231,9 @@ class SelectDocPage extends StatelessWidget {
       title: selectDoc.title,
       description: selectDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Select'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Select'),
     ],
     toc: selectDocSpec.toc,
     previous: const DocsPageLink(
@@ -260,7 +269,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   String? _value;
   bool _invalid = false;
   bool _disabled = false;
-  ElSelectSize _size = ElSelectSize.md;
+  SelectSize _size = SelectSize.md;
 
   @override
   Widget build(BuildContext context) {
@@ -268,18 +277,18 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Wrap(
-          spacing: el(2),
-          runSpacing: el(2),
+          spacing: space(2),
+          runSpacing: space(2),
           children: <Widget>[
             _TogglePill(
-              selected: _size == ElSelectSize.md,
+              selected: _size == SelectSize.md,
               label: 'Size md',
-              onPressed: () => setState(() => _size = ElSelectSize.md),
+              onPressed: () => setState(() => _size = SelectSize.md),
             ),
             _TogglePill(
-              selected: _size == ElSelectSize.sm,
+              selected: _size == SelectSize.sm,
               label: 'Size sm',
-              onPressed: () => setState(() => _size = ElSelectSize.sm),
+              onPressed: () => setState(() => _size = SelectSize.sm),
             ),
             _TogglePill(
               selected: _invalid,
@@ -293,8 +302,8 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
             ),
           ],
         ),
-        SizedBox(height: el(5)),
-        ElField(
+        SizedBox(height: space(5)),
+        Field(
           label: 'Sort order',
           description:
               'Grouped options stay keyboard-friendly: the arrows skip '
@@ -302,7 +311,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           errors: _invalid
               ? const <String>['Choose a sort order before continuing.']
               : const <String>[],
-          child: ElSelect<String>(
+          child: Select<String>(
             options: _sortOptions,
             value: _value,
             onChanged: _disabled
@@ -318,22 +327,22 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
                 : 'Grouped menu with disabled rows.',
           ),
         ),
-        SizedBox(height: el(4)),
-        ElText(
+        SizedBox(height: space(4)),
+        StyledText(
           _value == null ? 'No value selected yet.' : 'Selected: $_value',
-          ElType.small,
-          color: ElTheme.of(context).mutedForeground,
+          TextStyles.small,
+          color: ThemeScope.of(context).mutedForeground,
         ),
       ],
     );
   }
 }
 
-const String _previewCode = '''ElField(
+const String _previewCode = '''Field(
   label: 'Sort order',
   description: 'Grouped options stay keyboard-friendly.',
   errors: invalid ? ['Choose a sort order before continuing.'] : [],
-  child: ElSelect<String>(
+  child: Select<String>(
     options: sortOptions,
     value: value,
     onChanged: (next) => setState(() => value = next),
@@ -345,21 +354,21 @@ const String _previewCode = '''ElField(
   ),
 )''';
 
-const String _usageCode = '''ElSelect<String>(
-  options: const <ElSelectChild<String>>[
-    ElSelectGroup(
+const String _usageCode = '''Select<String>(
+  options: const <SelectChild<String>>[
+    SelectGroup(
       label: 'Activity',
       children: [
-        ElSelectOption(value: 'popular', label: 'Most popular'),
-        ElSelectOption(value: 'newest', label: 'Newest'),
+        SelectOption(value: 'popular', label: 'Most popular'),
+        SelectOption(value: 'newest', label: 'Newest'),
       ],
     ),
-    ElSelectSeparator(),
-    ElSelectGroup(
+    SelectSeparator(),
+    SelectGroup(
       label: 'Price',
       children: [
-        ElSelectOption(value: 'low', label: 'Price: low to high'),
-        ElSelectOption(value: 'high', label: 'Price: high to low'),
+        SelectOption(value: 'low', label: 'Price: low to high'),
+        SelectOption(value: 'high', label: 'Price: high to low'),
       ],
     ),
   ],
@@ -381,10 +390,10 @@ class _GroupedSelectPreviewState extends State<_GroupedSelectPreview> {
 
   @override
   Widget build(BuildContext context) {
-    return ElField(
+    return Field(
       label: 'Category',
       description: 'A grouped menu with semantic sections.',
-      child: ElSelect<String>(
+      child: Select<String>(
         options: _profileOptions,
         value: _category,
         onChanged: (String next) => setState(() => _category = next),
@@ -395,21 +404,21 @@ class _GroupedSelectPreviewState extends State<_GroupedSelectPreview> {
   }
 }
 
-const String _groupedSelectCode = '''ElSelect<String>(
-  options: const <ElSelectChild<String>>[
-    ElSelectGroup(
+const String _groupedSelectCode = '''Select<String>(
+  options: const <SelectChild<String>>[
+    SelectGroup(
       label: 'Category',
       children: [
-        ElSelectOption(value: 'design', label: 'Design & culture'),
-        ElSelectOption(value: 'photo', label: 'Photography'),
+        SelectOption(value: 'design', label: 'Design & culture'),
+        SelectOption(value: 'photo', label: 'Photography'),
       ],
     ),
-    ElSelectSeparator(),
-    ElSelectGroup(
+    SelectSeparator(),
+    SelectGroup(
       label: 'Visibility',
       children: [
-        ElSelectOption(value: 'public', label: 'Public'),
-        ElSelectOption(value: 'private', label: 'Private'),
+        SelectOption(value: 'public', label: 'Public'),
+        SelectOption(value: 'private', label: 'Private'),
       ],
     ),
   ],
@@ -439,14 +448,14 @@ class _SelectSizeSpecimenState extends State<_SelectSizeSpecimen> {
           label: _expand ? 'Expand on' : 'Expand off',
           onPressed: () => setState(() => _expand = !_expand),
         ),
-        SizedBox(height: el(5)),
-        ElSelect<String>(
+        SizedBox(height: space(5)),
+        Select<String>(
           options: _rarityOptions,
           value: _rarity,
           onChanged: (String next) => setState(() => _rarity = next),
           placeholder: 'Any rarity',
-          size: ElSelectSize.sm,
-          width: _expand ? null : el(40),
+          size: SelectSize.sm,
+          width: _expand ? null : space(40),
           expand: _expand,
           label: 'Rarity',
         ),
@@ -455,12 +464,12 @@ class _SelectSizeSpecimenState extends State<_SelectSizeSpecimen> {
   }
 }
 
-const String _selectSizeCode = '''ElSelect<String>(
+const String _selectSizeCode = '''Select<String>(
   options: rarityOptions,
   value: rarity,
   onChanged: onChanged,
   placeholder: 'Any rarity',
-  size: ElSelectSize.sm,
+  size: SelectSize.sm,
   width: 160,
 )''';
 
@@ -477,31 +486,31 @@ class _TogglePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElButton(
-      variant: selected ? ElButtonVariant.primary : ElButtonVariant.secondary,
-      size: ElButtonSize.sm,
+    return Button(
+      variant: selected ? ButtonVariant.primary : ButtonVariant.secondary,
+      size: ButtonSize.sm,
       label: label,
       onPressed: onPressed,
-      child: ElText(label, ElComponentType.buttonLabel),
+      child: StyledText(label, TextStyles.buttonLabel),
     );
   }
 }
 
-const List<ElSelectChild<String>> _sortOptions = <ElSelectChild<String>>[
-  ElSelectGroup<String>(
+const List<SelectChild<String>> _sortOptions = <SelectChild<String>>[
+  SelectGroup<String>(
     label: 'Activity',
-    children: <ElSelectOption<String>>[
-      ElSelectOption<String>(value: 'popular', label: 'Most popular'),
-      ElSelectOption<String>(value: 'newest', label: 'Newest'),
-      ElSelectOption<String>(value: 'volatility', label: 'Volatility'),
+    children: <SelectOption<String>>[
+      SelectOption<String>(value: 'popular', label: 'Most popular'),
+      SelectOption<String>(value: 'newest', label: 'Newest'),
+      SelectOption<String>(value: 'volatility', label: 'Volatility'),
     ],
   ),
-  ElSelectSeparator(),
-  ElSelectGroup<String>(
+  SelectSeparator(),
+  SelectGroup<String>(
     label: 'Price',
-    children: <ElSelectOption<String>>[
-      ElSelectOption<String>(value: 'low', label: 'Price: low to high'),
-      ElSelectOption<String>(
+    children: <SelectOption<String>>[
+      SelectOption<String>(value: 'low', label: 'Price: low to high'),
+      SelectOption<String>(
         value: 'high',
         label: 'Price: high to low',
         enabled: false,
@@ -510,28 +519,28 @@ const List<ElSelectChild<String>> _sortOptions = <ElSelectChild<String>>[
   ),
 ];
 
-const List<ElSelectChild<String>> _profileOptions = <ElSelectChild<String>>[
-  ElSelectGroup<String>(
+const List<SelectChild<String>> _profileOptions = <SelectChild<String>>[
+  SelectGroup<String>(
     label: 'Category',
-    children: <ElSelectOption<String>>[
-      ElSelectOption<String>(value: 'design', label: 'Design & culture'),
-      ElSelectOption<String>(value: 'photo', label: 'Photography'),
+    children: <SelectOption<String>>[
+      SelectOption<String>(value: 'design', label: 'Design & culture'),
+      SelectOption<String>(value: 'photo', label: 'Photography'),
     ],
   ),
-  ElSelectSeparator(),
-  ElSelectGroup<String>(
+  SelectSeparator(),
+  SelectGroup<String>(
     label: 'Visibility',
-    children: <ElSelectOption<String>>[
-      ElSelectOption<String>(value: 'public', label: 'Public'),
-      ElSelectOption<String>(value: 'private', label: 'Private'),
+    children: <SelectOption<String>>[
+      SelectOption<String>(value: 'public', label: 'Public'),
+      SelectOption<String>(value: 'private', label: 'Private'),
     ],
   ),
 ];
 
-const List<ElSelectChild<String>> _rarityOptions = <ElSelectChild<String>>[
-  ElSelectOption<String>(value: 'common', label: 'Common'),
-  ElSelectOption<String>(value: 'rare', label: 'Rare'),
-  ElSelectOption<String>(value: 'mythic', label: 'Mythic'),
+const List<SelectChild<String>> _rarityOptions = <SelectChild<String>>[
+  SelectOption<String>(value: 'common', label: 'Common'),
+  SelectOption<String>(value: 'rare', label: 'Rare'),
+  SelectOption<String>(value: 'mythic', label: 'Mythic'),
 ];
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
@@ -545,38 +554,35 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elselect',
-        child: DocsApiTable(title: 'ElSelect', facts: _selectFacts),
+        child: DocsApiTable(title: 'Select', facts: _selectFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elselectsize',
-        child: DocsApiTable(title: 'ElSelectSize', facts: _selectSizeFacts),
+        child: DocsApiTable(title: 'SelectSize', facts: _selectSizeFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elselectoption',
-        child: DocsApiTable(
-          title: 'ElSelectOption',
-          facts: _selectOptionFacts,
-        ),
+        child: DocsApiTable(title: 'SelectOption', facts: _selectOptionFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elselectgroup',
-        child: DocsApiTable(title: 'ElSelectGroup', facts: _selectGroupFacts),
+        child: DocsApiTable(title: 'SelectGroup', facts: _selectGroupFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elselectseparator',
         child: DocsApiTable(
-          title: 'ElSelectSeparator',
+          title: 'SelectSeparator',
           facts: _selectSeparatorFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elselectmenu',
-        child: DocsApiTable(title: 'ElSelectMenu', facts: _selectMenuFacts),
+        child: DocsApiTable(title: 'SelectMenu', facts: _selectMenuFacts),
       ),
     ],
   );
@@ -585,7 +591,7 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _selectFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'options',
-    type: 'List<ElSelectChild<T>>',
+    type: 'List<SelectChild<T>>',
     description:
         "Required. SelectContent's children — items, groups, and "
         'separators, in menu order.',
@@ -609,9 +615,9 @@ const List<DocsApiFact> _selectFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'size',
-    type: 'ElSelectSize',
+    type: 'SelectSize',
     description:
-        'Optional. Defaults to ElSelectSize.md. See the ElSelectSize '
+        'Optional. Defaults to SelectSize.md. See the SelectSize '
         'table below.',
   ),
   DocsApiFact(
@@ -619,14 +625,14 @@ const List<DocsApiFact> _selectFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to true. ANDed with the enclosing '
-        'ElFieldScope\'s.',
+        'FieldScope\'s.',
   ),
   DocsApiFact(
     name: 'invalid',
     type: 'bool',
     description:
         'Optional. Defaults to false. ORed with the enclosing '
-        'ElFieldScope\'s. Destructive border and ring override the '
+        'FieldScope\'s. Destructive border and ring override the '
         'neutral trigger styling.',
   ),
   DocsApiFact(
@@ -634,7 +640,7 @@ const List<DocsApiFact> _selectFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to false. Fills the available form width '
-        'when true, the cascade a vertical ElField applies.',
+        'when true, the cascade a vertical Field applies.',
   ),
   DocsApiFact(
     name: 'width',
@@ -647,7 +653,7 @@ const List<DocsApiFact> _selectFacts = <DocsApiFact>[
     name: 'focusNode',
     type: 'FocusNode?',
     description:
-        'Optional. A ElFieldScope\'s node wins over the owned one and '
+        'Optional. A FieldScope\'s node wins over the owned one and '
         'loses to this.',
   ),
   DocsApiFact(
@@ -665,40 +671,36 @@ const List<DocsApiFact> _selectFacts = <DocsApiFact>[
         'message.',
   ),
   DocsApiFact(
-    name: 'ElSelect.itemHeight',
+    name: 'Select.itemHeight',
     type: 'static double',
     description:
         'One row\'s height — the step item-aligned placement counts in.',
   ),
   DocsApiFact(
-    name: 'ElSelect.labelHeight',
+    name: 'Select.labelHeight',
     type: 'static double',
-    description: 'A ElSelectGroup label row\'s height, 32.',
+    description: 'A SelectGroup label row\'s height, 32.',
   ),
   DocsApiFact(
-    name: 'ElSelect.separatorHeight',
+    name: 'Select.separatorHeight',
     type: 'static double',
-    description: 'A ElSelectSeparator row\'s height, 17.',
+    description: 'A SelectSeparator row\'s height, 17.',
   ),
   DocsApiFact(
-    name: 'ElSelect.scrollButtonHeight',
+    name: 'Select.scrollButtonHeight',
     type: 'static double',
     description: 'A scroll button\'s height, 32.',
   ),
 ];
 
 const List<DocsApiFact> _selectSizeFacts = <DocsApiFact>[
-  DocsApiFact(
-    name: 'sm',
-    type: 'enum value',
-    description: 'A 32px trigger.',
-  ),
+  DocsApiFact(name: 'sm', type: 'enum value', description: 'A 32px trigger.'),
   DocsApiFact(
     name: 'md',
     type: 'enum value',
     description:
         'The constructor default — a 40px trigger, level with a '
-        'default ElInput and ElButton.',
+        'default Input and Button.',
   ),
 ];
 
@@ -732,7 +734,7 @@ const List<DocsApiFact> _selectGroupFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'children',
-    type: 'List<ElSelectOption<T>>',
+    type: 'List<SelectOption<T>>',
     description: 'Required. The rows this group holds.',
   ),
 ];
@@ -742,7 +744,7 @@ const List<DocsApiFact> _selectSeparatorFacts = <DocsApiFact>[
     name: '(no parameters)',
     type: '—',
     description:
-        'A const ElSelectSeparator() is the whole of it: a 1px rule '
+        'A const SelectSeparator() is the whole of it: a 1px rule '
         'that runs the full content width, contributing 17px to the '
         'item-aligned placement.',
   ),
@@ -751,8 +753,8 @@ const List<DocsApiFact> _selectSeparatorFacts = <DocsApiFact>[
 const List<DocsApiFact> _selectMenuFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'children',
-    type: 'List<ElSelectChild<T>>',
-    description: "Required. The same options list ElSelect itself takes.",
+    type: 'List<SelectChild<T>>',
+    description: "Required. The same options list Select itself takes.",
   ),
   DocsApiFact(
     name: 'selected',
@@ -783,7 +785,7 @@ const List<DocsApiFact> _selectMenuFacts = <DocsApiFact>[
         'moving the box.',
   ),
   DocsApiFact(
-    name: 'ElSelectMenu.heightOf(children)',
+    name: 'SelectMenu.heightOf(children)',
     type: 'static double',
     description:
         'The height children renders at, p-2 included — what a caller '
@@ -832,7 +834,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Grouped menu',
     treatment:
         'Labels and separators structure the menu but are not '
-        'selection stops; ElSelectGroup contributes a scroll margin '
+        'selection stops; SelectGroup contributes a scroll margin '
         'when the keyboard walks into it.',
     userSignal: 'The menu stays easy to scan and navigate.',
   ),
@@ -843,14 +845,14 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Provide a visible ElField label in forms, or pass label for '
+      _bullets(ThemeScope.of(context), <String>[
+        'Provide a visible Field label in forms, or pass label for '
             'accessible naming when the trigger stands alone.',
         'placeholder is for the empty-selection state only; it is not '
             'a substitute for labelling the control.',
         'invalid publishes the destructive treatment and semantic '
             'invalid state on the trigger, ORed with the enclosing '
-            'ElFieldScope\'s.',
+            'FieldScope\'s.',
         'Keyboard navigation moves through selectable rows only and '
             'skips group labels, separators, and disabled options.',
       ]);
@@ -861,7 +863,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'ArrowDown / ArrowUp move the highlight one row; unlike '
             'menu.dart\'s own menu, this one wraps: past the last row '
             'the highlight returns to the first, and past the first it '
@@ -882,14 +884,14 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in select.dart: expand and '
             'width are both explicit switches a caller passes, never a '
             'value this file reads off MediaQuery.',
         'Every row height (itemHeight, labelHeight, separatorHeight, '
             'scrollButtonHeight) is a fixed 4px-grid value, read off the '
             'type spec rather than the viewport.',
-        'ElPopover\'s own collision handling keeps the popup on-screen '
+        'Popover\'s own collision handling keeps the popup on-screen '
             'near a viewport edge; select.dart repeats none of that '
             'logic itself.',
       ]);
@@ -926,17 +928,14 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Popover', route: '/components/popover'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',
@@ -975,7 +974,8 @@ class _ThemingContent extends StatelessWidget {
       DocsInstallFact(
         label: 'theme.popover',
         value: 'Menu content fill',
-        description: 'Painted through ElPopoverSurface, shared with every '
+        description:
+            'Painted through PopoverSurface, shared with every '
             'other popover-backed control.',
       ),
       DocsInstallFact(
@@ -987,15 +987,19 @@ class _ThemingContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

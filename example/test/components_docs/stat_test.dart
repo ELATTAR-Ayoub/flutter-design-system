@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title].
 Finder _disclosureTrigger(String title) => find.descendant(
@@ -31,13 +55,13 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 void main() {
   group('stat docs page', () {
     testWidgets(
-      'renders the article, the full API tables, and live specimens of ElStat',
+      'renders the article, the full API tables, and live specimens of Stat',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -46,7 +70,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: StatDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -59,11 +83,11 @@ void main() {
           findsOneWidget,
         );
 
-        expect(find.byType(ElStat), findsWidgets);
+        expect(find.byType(Stat), findsWidgets);
         // item/empty/kbd are their own pages now: no live specimens here.
-        expect(find.byType(ElItem), findsNothing);
-        expect(find.byType(ElEmpty), findsNothing);
-        expect(find.byType(ElKbd), findsNothing);
+        expect(find.byType(Item), findsNothing);
+        expect(find.byType(Empty), findsNothing);
+        expect(find.byType(Kbd), findsNothing);
 
         await _open(tester, 'API Reference');
         await _open(tester, 'Accessibility');
@@ -80,10 +104,10 @@ void main() {
         expect(
           statDoc.exports,
           containsAll(<String>[
-            'ElStat',
-            'ElStatDirection',
-            'ElStatState',
-            'ElStatDeltaMark',
+            'Stat',
+            'StatDirection',
+            'StatState',
+            'StatDeltaMark',
           ]),
         );
         expect(destination, isNull);
@@ -100,7 +124,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const StatDocPage(),
           ),
         );
@@ -128,25 +152,23 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.light,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.light);
       await tester.pumpWidget(
         _harness(controller: controller, child: const StatDocPage()),
       );
       await tester.pump();
 
-      final ElStat stat = tester.widget<ElStat>(find.byType(ElStat).first);
+      final Stat stat = tester.widget<Stat>(find.byType(Stat).first);
       expect(stat.delta, isNotNull, reason: 'expected a specimen with delta');
 
       expect(
-        find.byType(ElStatDeltaMark),
+        find.byType(StatDeltaMark),
         findsWidgets,
         reason: 'delta mark is rendered',
       );
     });
 
-    testWidgets('stat renders correctly in every ElStatState', (
+    testWidgets('stat renders correctly in every StatState', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(1440, 900);
@@ -155,15 +177,15 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const StatDocPage(),
         ),
       );
       await tester.pump();
 
-      for (final ElStatState state in ElStatState.values) {
+      for (final StatState state in StatState.values) {
         expect(
-          find.byWidgetPredicate((Widget w) => w is ElStat && w.state == state),
+          find.byWidgetPredicate((Widget w) => w is Stat && w.state == state),
           findsWidgets,
           reason: 'missing a $state specimen',
         );
@@ -177,15 +199,15 @@ void main() {
           const Size(390, 844),
           const Size(1440, 900),
         ]) {
-          for (final ElThemeMode mode in <ElThemeMode>[
-            ElThemeMode.light,
-            ElThemeMode.dark,
+          for (final ColorMode mode in <ColorMode>[
+            ColorMode.light,
+            ColorMode.dark,
           ]) {
             tester.view.physicalSize = size;
             tester.view.devicePixelRatio = 1;
             addTearDown(tester.view.reset);
 
-            final ElThemeController controller = ElThemeController(mode: mode);
+            final ThemeController controller = ThemeController(mode: mode);
             await tester.pumpWidget(
               _harness(controller: controller, child: const StatDocPage()),
             );
@@ -197,7 +219,7 @@ void main() {
               reason: 'at $size in $mode',
             );
 
-            expect(find.byType(ElStat), findsWidgets);
+            expect(find.byType(Stat), findsWidgets);
           }
         }
       },
@@ -236,7 +258,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const StatDocPage(),
           ),
         );

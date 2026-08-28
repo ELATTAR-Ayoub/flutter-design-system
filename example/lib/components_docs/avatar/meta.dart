@@ -11,7 +11,7 @@ library;
 
 import '../catalog.dart' show ComponentDocEntry;
 
-/// `avatar`: a round identity mark: [ElAvatar]'s own image if it loads,
+/// `avatar`: a round identity mark: [Avatar]'s own image if it loads,
 /// initials underneath if it does not.
 const ComponentDocEntry avatarDoc = ComponentDocEntry(
   name: 'avatar',
@@ -20,14 +20,14 @@ const ComponentDocEntry avatarDoc = ComponentDocEntry(
       'A round identity mark that shows a photo when it loads and initials underneath when it does not.',
   dependencies: <String>['source-foundation'],
   exports: <String>[
-    'ElAvatar',
-    'ElAvatarSize',
-    'ElAvatarRing',
-    'elAvatarRingWidth',
-    'ElAvatarBadge',
-    'ElAvatarGroup',
-    'ElAvatarGroupCount',
-    'ElAvatarRimPainter',
+    'Avatar',
+    'AvatarSize',
+    'AvatarRing',
+    'avatarRingWidth',
+    'AvatarBadge',
+    'AvatarGroup',
+    'AvatarGroupCount',
+    'AvatarRimPainter',
   ],
   sourcePath: 'lib/src/components/avatar.dart',
 );

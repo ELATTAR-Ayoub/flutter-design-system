@@ -21,13 +21,13 @@ const ComponentDocEntry agentMarkdownDoc = ComponentDocEntry(
   // verbatim.
   dependencies: <String>['source-foundation'],
   exports: <String>[
-    'ElAgentMarkdown',
-    'ElAgentCodeBlock',
-    'ElPreformattedCode',
-    'ElPrismPalette',
-    'ElCodeToken',
-    'elSafeHref',
-    'elLanguageAliases',
+    'AgentMarkdown',
+    'AgentCodeBlock',
+    'PreformattedCode',
+    'PrismPalette',
+    'CodeToken',
+    'safeHref',
+    'languageAliases',
   ],
   sourcePath: 'lib/src/components/agent_markdown.dart',
 );

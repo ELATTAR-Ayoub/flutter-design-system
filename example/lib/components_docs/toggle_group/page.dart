@@ -1,12 +1,12 @@
 /// Public documentation page for the `toggle-group` component.
 ///
 /// **Re-housed onto the documentation kit.** This page used to be a
-/// hand-composed `_ToggleGroupArticle` built from `kit.dart`'s `ElSection`
+/// hand-composed `_ToggleGroupArticle` built from `kit.dart`'s `Section`
 /// (see `example/lib/components_docs/button/page.dart`'s own library doc for
 /// the house shape every page is being moved onto). Every specimen and every
 /// code string below is the same one the old page rendered; what moved is
 /// only where the content lives: a `ComponentDocSpec` declaration plus a
-/// ten-line widget, `DocsSection`/`DocsDisclosure` instead of `ElSection`,
+/// ten-line widget, `DocsSection`/`DocsDisclosure` instead of `Section`,
 /// and the eight fixed disclosures in the house order (API Reference,
 /// States, Accessibility, Keyboard, Responsive, Dependencies, Theming,
 /// Source) instead of the old page's own six.
@@ -38,7 +38,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -78,16 +90,16 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
           title: 'Manual: source mode (not recommended yet)',
           description:
               'Copying toggle_group.dart alone will not compile: every '
-              'item is a ElToggle from toggle.dart, and the selection pill '
-              'is ElSlidingPillGroup from sliding_pill.dart. Those in turn '
+              'item is a Toggle from toggle.dart, and the selection pill '
+              'is ActiveIndicator from active_indicator.dart. Those in turn '
               'need siblings of their own (see Dependencies below), and no '
               'manifest exists yet to resolve them for you. Package mode — '
-              'depending on the package and using ElToggleGroup and '
-              'ElToggleGroupItem directly, exactly as this page does — is '
+              'depending on the package and using ToggleGroup and '
+              'ToggleGroupItem directly, exactly as this page does — is '
               'supported today.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// Package mode: depend on the package and use ElToggleGroup\n'
+              '// Package mode: depend on the package and use ToggleGroup\n'
               '// directly. Source mode has no manifest yet.',
         ),
       ],
@@ -101,7 +113,7 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
           'already-selected option calls it with null. selectedIndex has '
           'to accept both: the group never decides on its own whether '
           '"nothing selected" is a state your UI allows, it only reports '
-          'the tap. ElToggleGroup has no opinion on what null means to '
+          'the tap. ToggleGroup has no opinion on what null means to '
           'your screen beyond that: it only reports it — the two policies '
           'below are both valid.',
       specimen: _UsageSpecimen(),
@@ -112,8 +124,8 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          'ElToggleGroup has no ToggleGroupItem widget to assemble by '
-          'hand: items builds the whole row, and ElSlidingPillGroup\'s own '
+          'ToggleGroup has no ToggleGroupItem widget to assemble by '
+          'hand: items builds the whole row, and ActiveIndicator\'s own '
           'travelling pill is inserted underneath it. What follows is what '
           'that single call builds internally.',
       code: _compositionCode,
@@ -123,8 +135,8 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
       title: 'Outline',
       description:
           "variant is passed to every item, the same way the reference's "
-          'root context provider passes it. It is ElToggleVariant, '
-          "ElToggle's own enum: the group declares no variant type of its "
+          'root context provider passes it. It is ToggleVariant, '
+          "Toggle's own enum: the group declares no variant type of its "
           'own.',
       specimen: _OutlineSpecimen(),
       code: _outlineCode,
@@ -134,8 +146,8 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
       id: 'sizes',
       title: 'Sizes',
       description:
-          'size is passed to every item too, and is ElToggleSize, '
-          "ElToggle's own enum: sm and lg side by side. The travelling "
+          'size is passed to every item too, and is ToggleSize, '
+          "Toggle's own enum: sm and lg side by side. The travelling "
           'pill measures itself from whatever geometry the items end up '
           'with, so it needs no size of its own.',
       specimen: _SizesSpecimen(),
@@ -145,7 +157,7 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
     DisclosureSection(
       id: 'spacing',
       title: 'Spacing',
-      description: 'Not ported: ElToggleGroup declares no spacing parameter.',
+      description: 'Not ported: ToggleGroup declares no spacing parameter.',
       child: const DocsInstallFacts(
         title: 'What is missing, and what you get instead',
         facts: <DocsInstallFact>[
@@ -160,10 +172,10 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
           ),
           DocsInstallFact(
             label: 'What this port has',
-            value: 'ElToggleGroup.gap, a static getter: 8px, fixed',
+            value: 'ToggleGroup.gap, a static getter: 8px, fixed',
             description:
-                'The gap between items is ElToggleGroup.gap, read once '
-                'and handed to ElSlidingPillGroup. It is a static on the '
+                'The gap between items is ToggleGroup.gap, read once '
+                'and handed to ActiveIndicator. It is a static on the '
                 'class, not a constructor parameter: no call site can '
                 'change it, and there is no per-instance override anywhere '
                 'in toggle_group.dart.',
@@ -186,7 +198,7 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
       id: 'vertical',
       title: 'Vertical',
       description:
-          'Not ported: ElToggleGroup declares no orientation parameter, and '
+          'Not ported: ToggleGroup declares no orientation parameter, and '
           'always lays out horizontally.',
       child: const DocsInstallFacts(
         title: 'What is missing, and what you get instead',
@@ -203,7 +215,7 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
             label: 'What this port has',
             value: 'A horizontal row only',
             description:
-                'ElToggleGroup hands its items to ElSlidingPillGroup, '
+                'ToggleGroup hands its items to ActiveIndicator, '
                 "whose own layout is a Row and whose pill travels along "
                 'one axis. Neither takes an orientation, so there is no '
                 'parameter to set and no vertical branch to reach.',
@@ -212,7 +224,7 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
             label: 'Consequence',
             value: 'A vertical group is not expressible',
             description:
-                'Wrapping ElToggleGroup in a Column does nothing: the '
+                'Wrapping ToggleGroup in a Column does nothing: the '
                 'Column holds one group, and that group is still a row. A '
                 'stacked exclusive selection needs a different primitive, '
                 'not this one with a flag flipped. This section exists so '
@@ -225,9 +237,9 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
       id: 'disabled',
       title: 'Disabled',
       description:
-          'ElToggleGroupItem.enabled: false disables just that one option; '
-          'ElToggleGroup wires its onChanged to null for a disabled item, '
-          'the same as a standalone ElToggle. There is no group-wide '
+          'ToggleGroupItem.enabled: false disables just that one option; '
+          'ToggleGroup wires its onChanged to null for a disabled item, '
+          'the same as a standalone Toggle. There is no group-wide '
           'disabled flag: disable every item to disable the whole control.',
       specimen: _DisabledSpecimen(),
       code: _disabledCode,
@@ -237,7 +249,7 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
       id: 'custom',
       title: 'Custom',
       description:
-          'ElToggleGroupItem.child is per-item and optional: two options '
+          'ToggleGroupItem.child is per-item and optional: two options '
           'here supply an icon-and-label row, and the third omits child '
           'entirely and falls back to a bare Text(label). label is still '
           'required on all three: it is what the item announces to a '
@@ -250,7 +262,7 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
       id: 'rtl',
       title: 'RTL',
       description:
-          "ElSlidingPillGroup measures each child's own RenderBox and "
+          "ActiveIndicator measures each child's own RenderBox and "
           'positions the pill from those measurements, so it reads '
           'correctly under Directionality.rtl too: the items mirror, and '
           'the pill follows the item it is under.',
@@ -262,27 +274,24 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElToggleGroup and ElToggleGroupItem '
+          'Every constructor parameter ToggleGroup and ToggleGroupItem '
           'declare, and the group\'s one static: one table each, read off '
           'lib/src/components/toggle_group.dart.',
       child: _ApiReferenceContent(),
       children: <DocsTocEntry>[
-        DocsTocEntry(title: 'ElToggleGroup', anchor: 'api-eltogglegroup'),
+        DocsTocEntry(title: 'ToggleGroup', anchor: 'api-eltogglegroup'),
         DocsTocEntry(
-          title: 'ElToggleGroup static helpers',
+          title: 'ToggleGroup static helpers',
           anchor: 'api-eltogglegroup-static',
         ),
-        DocsTocEntry(
-          title: 'ElToggleGroupItem',
-          anchor: 'api-eltogglegroupitem',
-        ),
+        DocsTocEntry(title: 'ToggleGroupItem', anchor: 'api-eltogglegroupitem'),
       ],
     ),
     DisclosureSection(
       id: 'states',
       title: 'States',
       description:
-          'Read off toggle_group.dart and the ElToggle skin it configures. '
+          'Read off toggle_group.dart and the Toggle skin it configures. '
           'Pressed, Loading, Empty, Error and Success are omitted: reasons '
           'follow the table.',
       child: _StatesContent(),
@@ -321,14 +330,14 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
             label: 'Source',
             value: toggleGroupDoc.sourcePath,
             description:
-                'Authoritative implementation of ElToggleGroup and '
-                'ElToggleGroupItem: the truth this page was written from.',
+                'Authoritative implementation of ToggleGroup and '
+                'ToggleGroupItem: the truth this page was written from.',
           ),
           const DocsInstallFact(
             label: 'Item source',
             value: toggleItemSourcePath,
             description:
-                'ElToggle, ElToggleVariant and ElToggleSize: every item is '
+                'Toggle, ToggleVariant and ToggleSize: every item is '
                 'one of these, and both enums belong to it. Documented on '
                 'the toggle page.',
           ),
@@ -336,15 +345,15 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
             label: 'Shared machinery',
             value: slidingPillSourcePath,
             description:
-                'ElSlidingPillGroup: the travelling-pill engine, shared '
-                'with ElTabs, ElSidebar and IconSwap, and documented on '
+                'ActiveIndicator: the travelling-pill engine, shared '
+                'with Tabs, Sidebar and IconSwap, and documented on '
                 'their own component pages.',
           ),
           const DocsInstallFact(
             label: 'Package tests',
             value: 'test/components_test.dart',
             description:
-                'The ElToggleGroup group within that file covers '
+                'The ToggleGroup group within that file covers '
                 'selection, deselection and per-item disabling in the '
                 'package itself; there is no dedicated '
                 'toggle_group_test.dart in the package yet.',
@@ -383,9 +392,9 @@ class ToggleGroupDocPage extends StatelessWidget {
       title: toggleGroupDoc.title,
       description: toggleGroupDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Toggle group'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Toggle group'),
     ],
     toc: toggleGroupDocSpec.toc,
     previous: const DocsPageLink(title: 'Toggle', route: '/components/toggle'),
@@ -399,7 +408,7 @@ class ToggleGroupDocPage extends StatelessWidget {
 }
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
-// ElSlidingPillGroup's internal Row neither wraps nor scrolls, so every live
+// ActiveIndicator's internal Row neither wraps nor scrolls, so every live
 // group specimen below carries the same SingleChildScrollView(scrollDirection:
 // Axis.horizontal) mitigation the old page's own library doc named.
 
@@ -417,38 +426,38 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: ElToggleGroup(
+          child: ToggleGroup(
             key: const ValueKey<String>('toggle-group-live-specimen'),
-            items: const <ElToggleGroupItem>[
-              ElToggleGroupItem(label: 'Newest'),
-              ElToggleGroupItem(label: 'Price'),
-              ElToggleGroupItem(label: 'Popular'),
+            items: const <ToggleGroupItem>[
+              ToggleGroupItem(label: 'Newest'),
+              ToggleGroupItem(label: 'Price'),
+              ToggleGroupItem(label: 'Popular'),
             ],
             selectedIndex: _selectedIndex,
             onChanged: (int? next) => setState(() => _selectedIndex = next),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           _selectedIndex == null
               ? 'selectedIndex: null: tap any option to select it.'
               : 'selectedIndex: $_selectedIndex: tap '
                     '"${_labels[_selectedIndex!]}" again to deselect it.',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           'The pill is theme.primary; the fading of "nothing selected" is '
-          'what ElSlidingPillGroup renders whenever selectedIndex is null.',
-          ElType.small,
+          'what ActiveIndicator renders whenever selectedIndex is null.',
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
       ],
@@ -458,11 +467,11 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
 const String _previewCode = '''int? sortIndex = 0;
 
-ElToggleGroup(
-  items: const <ElToggleGroupItem>[
-    ElToggleGroupItem(label: 'Newest'),
-    ElToggleGroupItem(label: 'Price'),
-    ElToggleGroupItem(label: 'Popular'),
+ToggleGroup(
+  items: const <ToggleGroupItem>[
+    ToggleGroupItem(label: 'Newest'),
+    ToggleGroupItem(label: 'Price'),
+    ToggleGroupItem(label: 'Popular'),
   ],
   selectedIndex: sortIndex,
   // Receives the tapped index, or null when the tap re-selected the
@@ -487,30 +496,30 @@ class _UsageSpecimenState extends State<_UsageSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: ElToggleGroup(
+          child: ToggleGroup(
             key: const ValueKey<String>('toggle-group-usage-specimen'),
-            items: const <ElToggleGroupItem>[
-              ElToggleGroupItem(label: 'Newest'),
-              ElToggleGroupItem(label: 'Price'),
-              ElToggleGroupItem(label: 'Popular'),
+            items: const <ToggleGroupItem>[
+              ToggleGroupItem(label: 'Newest'),
+              ToggleGroupItem(label: 'Price'),
+              ToggleGroupItem(label: 'Popular'),
             ],
             selectedIndex: _sortIndex,
             onChanged: (int? next) => setState(() => _sortIndex = next),
           ),
         ),
-        SizedBox(height: el(2)),
-        ElText(
+        SizedBox(height: space(2)),
+        StyledText(
           _sortIndex == null
               ? 'Sorting by: none selected'
               : 'Sorting by: ${_labels[_sortIndex!]}',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
       ],
@@ -520,17 +529,17 @@ class _UsageSpecimenState extends State<_UsageSpecimen> {
 
 const String _usageCode = '''int? sortIndex = 0;
 
-ElToggleGroup(
-  items: const <ElToggleGroupItem>[
-    ElToggleGroupItem(label: 'Newest'),
-    ElToggleGroupItem(label: 'Price'),
-    ElToggleGroupItem(label: 'Popular'),
+ToggleGroup(
+  items: const <ToggleGroupItem>[
+    ToggleGroupItem(label: 'Newest'),
+    ToggleGroupItem(label: 'Price'),
+    ToggleGroupItem(label: 'Popular'),
   ],
   selectedIndex: sortIndex,
   onChanged: (int? next) => setState(() => sortIndex = next),
 )
 
-// ElToggleGroup has no opinion on what null means to your screen: it only
+// ToggleGroup has no opinion on what null means to your screen: it only
 // reports it. Two real policies, both valid:
 
 // 1. Keep the null: "nothing selected" is a real, distinct state.
@@ -541,17 +550,17 @@ onChanged: (int? next) => setState(() => sortIndex = next),
 onFamilyChanged: (int? index) => setState(() => familyIndex = index ?? 0),''';
 
 const String _compositionCode =
-    '''ElSlidingPillGroup(                    // owns the travelling selection pill
+    '''ActiveIndicator(                    // owns the travelling selection pill
   activeIndex: selectedIndex ?? -1,
-  gap: ElToggleGroup.gap,
-  pill: ElMachineSurface(...),          // theme.primary, ElRadii.pill, ElShadows.chip
+  gap: ToggleGroup.gap,
+  indicator: Surface(...),          // theme.primary, Radii.full, Shadows.compactControl
   children: <Widget>[
-    for (final ElToggleGroupItem item in items)
-      ElToggle(                          // one ElToggle per ElToggleGroupItem
+    for (final ToggleGroupItem item in items)
+      Toggle(                          // one Toggle per ToggleGroupItem
         pressed: item == selected,
         inExclusiveGroup: true,          // radio-shaped semantics, not an
                                           // independent on/off switch
-        pressedFill: elTransparent,      // gives up its own fill …
+        pressedFill: transparent,      // gives up its own fill …
         pressedInk: theme.primaryForeground, // … so the pill shows through
         child: item.child ?? Text(item.label),
       ),
@@ -571,13 +580,13 @@ class _OutlineSpecimenState extends State<_OutlineSpecimen> {
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
-    child: ElToggleGroup(
+    child: ToggleGroup(
       key: const ValueKey<String>('toggle-group-outline-specimen'),
-      variant: ElToggleVariant.outline,
-      items: const <ElToggleGroupItem>[
-        ElToggleGroupItem(label: 'Newest'),
-        ElToggleGroupItem(label: 'Price'),
-        ElToggleGroupItem(label: 'Popular'),
+      variant: ToggleVariant.outline,
+      items: const <ToggleGroupItem>[
+        ToggleGroupItem(label: 'Newest'),
+        ToggleGroupItem(label: 'Price'),
+        ToggleGroupItem(label: 'Popular'),
       ],
       selectedIndex: _index,
       onChanged: (int? next) => setState(() => _index = next),
@@ -585,12 +594,12 @@ class _OutlineSpecimenState extends State<_OutlineSpecimen> {
   );
 }
 
-const String _outlineCode = '''ElToggleGroup(
-  variant: ElToggleVariant.outline,
-  items: const <ElToggleGroupItem>[
-    ElToggleGroupItem(label: 'Newest'),
-    ElToggleGroupItem(label: 'Price'),
-    ElToggleGroupItem(label: 'Popular'),
+const String _outlineCode = '''ToggleGroup(
+  variant: ToggleVariant.outline,
+  items: const <ToggleGroupItem>[
+    ToggleGroupItem(label: 'Newest'),
+    ToggleGroupItem(label: 'Price'),
+    ToggleGroupItem(label: 'Popular'),
   ],
   selectedIndex: sortIndex,
   onChanged: (int? next) => setState(() => sortIndex = next),
@@ -609,19 +618,19 @@ class _SizesSpecimenState extends State<_SizesSpecimen> {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(6),
-    runSpacing: el(4),
+    spacing: space(6),
+    runSpacing: space(4),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: <Widget>[
       SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: ElToggleGroup(
+        child: ToggleGroup(
           key: const ValueKey<String>('toggle-group-sizes-sm-specimen'),
-          size: ElToggleSize.sm,
-          items: const <ElToggleGroupItem>[
-            ElToggleGroupItem(label: 'Newest'),
-            ElToggleGroupItem(label: 'Price'),
-            ElToggleGroupItem(label: 'Popular'),
+          size: ToggleSize.sm,
+          items: const <ToggleGroupItem>[
+            ToggleGroupItem(label: 'Newest'),
+            ToggleGroupItem(label: 'Price'),
+            ToggleGroupItem(label: 'Popular'),
           ],
           selectedIndex: _smIndex,
           onChanged: (int? next) => setState(() => _smIndex = next),
@@ -629,13 +638,13 @@ class _SizesSpecimenState extends State<_SizesSpecimen> {
       ),
       SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: ElToggleGroup(
+        child: ToggleGroup(
           key: const ValueKey<String>('toggle-group-sizes-lg-specimen'),
-          size: ElToggleSize.lg,
-          items: const <ElToggleGroupItem>[
-            ElToggleGroupItem(label: 'Newest'),
-            ElToggleGroupItem(label: 'Price'),
-            ElToggleGroupItem(label: 'Popular'),
+          size: ToggleSize.lg,
+          items: const <ToggleGroupItem>[
+            ToggleGroupItem(label: 'Newest'),
+            ToggleGroupItem(label: 'Price'),
+            ToggleGroupItem(label: 'Popular'),
           ],
           selectedIndex: _lgIndex,
           onChanged: (int? next) => setState(() => _lgIndex = next),
@@ -646,9 +655,9 @@ class _SizesSpecimenState extends State<_SizesSpecimen> {
 }
 
 const String _sizesCode =
-    '''ElToggleGroup(size: ElToggleSize.sm, items: items, selectedIndex: smIndex, onChanged: (int? next) => setState(() => smIndex = next))
+    '''ToggleGroup(size: ToggleSize.sm, items: items, selectedIndex: smIndex, onChanged: (int? next) => setState(() => smIndex = next))
 
-ElToggleGroup(size: ElToggleSize.lg, items: items, selectedIndex: lgIndex, onChanged: (int? next) => setState(() => lgIndex = next))''';
+ToggleGroup(size: ToggleSize.lg, items: items, selectedIndex: lgIndex, onChanged: (int? next) => setState(() => lgIndex = next))''';
 
 class _DisabledSpecimen extends StatefulWidget {
   const _DisabledSpecimen();
@@ -663,12 +672,12 @@ class _DisabledSpecimenState extends State<_DisabledSpecimen> {
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
-    child: ElToggleGroup(
+    child: ToggleGroup(
       key: const ValueKey<String>('toggle-group-disabled-specimen'),
-      items: const <ElToggleGroupItem>[
-        ElToggleGroupItem(label: 'Newest'),
-        ElToggleGroupItem(label: 'Price', enabled: false),
-        ElToggleGroupItem(label: 'Popular'),
+      items: const <ToggleGroupItem>[
+        ToggleGroupItem(label: 'Newest'),
+        ToggleGroupItem(label: 'Price', enabled: false),
+        ToggleGroupItem(label: 'Popular'),
       ],
       selectedIndex: _index,
       onChanged: (int? next) => setState(() => _index = next),
@@ -676,11 +685,11 @@ class _DisabledSpecimenState extends State<_DisabledSpecimen> {
   );
 }
 
-const String _disabledCode = '''ElToggleGroup(
-  items: const <ElToggleGroupItem>[
-    ElToggleGroupItem(label: 'Newest'),
-    ElToggleGroupItem(label: 'Price', enabled: false),
-    ElToggleGroupItem(label: 'Popular'),
+const String _disabledCode = '''ToggleGroup(
+  items: const <ToggleGroupItem>[
+    ToggleGroupItem(label: 'Newest'),
+    ToggleGroupItem(label: 'Price', enabled: false),
+    ToggleGroupItem(label: 'Popular'),
   ],
   selectedIndex: sortIndex,
   onChanged: (int? next) => setState(() => sortIndex = next),
@@ -699,38 +708,35 @@ class _CustomSpecimenState extends State<_CustomSpecimen> {
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
-    child: ElToggleGroup(
+    child: ToggleGroup(
       key: const ValueKey<String>('toggle-group-custom-specimen'),
-      items: <ElToggleGroupItem>[
-        ElToggleGroupItem(
+      items: <ToggleGroupItem>[
+        ToggleGroupItem(
           label: 'Grid',
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElIcon(
-                ElIconGlyph.layoutGrid,
-                size: ElToggle.iconSizeFor(ElToggleSize.md),
+              Icon(
+                IconGlyph.layoutGrid,
+                size: Toggle.iconSizeFor(ToggleSize.md),
               ),
-              SizedBox(width: ElToggle.gap),
+              SizedBox(width: Toggle.gap),
               const Text('Grid'),
             ],
           ),
         ),
-        ElToggleGroupItem(
+        ToggleGroupItem(
           label: 'List',
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElIcon(
-                ElIconGlyph.rows3,
-                size: ElToggle.iconSizeFor(ElToggleSize.md),
-              ),
-              SizedBox(width: ElToggle.gap),
+              Icon(IconGlyph.rows3, size: Toggle.iconSizeFor(ToggleSize.md)),
+              SizedBox(width: Toggle.gap),
               const Text('List'),
             ],
           ),
         ),
-        const ElToggleGroupItem(label: 'Table'),
+        const ToggleGroupItem(label: 'Table'),
       ],
       selectedIndex: _viewIndex,
       onChanged: (int? next) => setState(() => _viewIndex = next),
@@ -739,42 +745,42 @@ class _CustomSpecimenState extends State<_CustomSpecimen> {
 }
 
 const String _customCode =
-    '''// ElToggleGroupItem.child is optional per item: two options here supply
+    '''// ToggleGroupItem.child is optional per item: two options here supply
 // an icon-and-label row, and the third omits child and falls back to a
 // bare Text(label).
 int? viewIndex = 0;
 
-ElToggleGroup(
-  items: <ElToggleGroupItem>[
-    ElToggleGroupItem(
+ToggleGroup(
+  items: <ToggleGroupItem>[
+    ToggleGroupItem(
       label: 'Grid',
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElIcon(
-            ElIconGlyph.layoutGrid,
-            size: ElToggle.iconSizeFor(ElToggleSize.md),
+          Icon(
+            IconGlyph.layoutGrid,
+            size: Toggle.iconSizeFor(ToggleSize.md),
           ),
-          SizedBox(width: ElToggle.gap),
+          SizedBox(width: Toggle.gap),
           const Text('Grid'),
         ],
       ),
     ),
-    ElToggleGroupItem(
+    ToggleGroupItem(
       label: 'List',
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElIcon(
-            ElIconGlyph.rows3,
-            size: ElToggle.iconSizeFor(ElToggleSize.md),
+          Icon(
+            IconGlyph.rows3,
+            size: Toggle.iconSizeFor(ToggleSize.md),
           ),
-          SizedBox(width: ElToggle.gap),
+          SizedBox(width: Toggle.gap),
           const Text('List'),
         ],
       ),
     ),
-    const ElToggleGroupItem(label: 'Table'),
+    const ToggleGroupItem(label: 'Table'),
   ],
   selectedIndex: viewIndex,
   onChanged: (int? next) => setState(() => viewIndex = next),
@@ -795,12 +801,12 @@ class _RtlSpecimenState extends State<_RtlSpecimen> {
     textDirection: TextDirection.rtl,
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: ElToggleGroup(
+      child: ToggleGroup(
         key: const ValueKey<String>('toggle-group-rtl-specimen'),
-        items: const <ElToggleGroupItem>[
-          ElToggleGroupItem(label: 'الأحدث'),
-          ElToggleGroupItem(label: 'السعر'),
-          ElToggleGroupItem(label: 'الأكثر شيوعا'),
+        items: const <ToggleGroupItem>[
+          ToggleGroupItem(label: 'الأحدث'),
+          ToggleGroupItem(label: 'السعر'),
+          ToggleGroupItem(label: 'الأكثر شيوعا'),
         ],
         selectedIndex: _index,
         onChanged: (int? next) => setState(() => _index = next),
@@ -811,11 +817,11 @@ class _RtlSpecimenState extends State<_RtlSpecimen> {
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElToggleGroup(
-    items: const <ElToggleGroupItem>[
-      ElToggleGroupItem(label: 'الأحدث'),
-      ElToggleGroupItem(label: 'السعر'),
-      ElToggleGroupItem(label: 'الأكثر شيوعا'),
+  child: ToggleGroup(
+    items: const <ToggleGroupItem>[
+      ToggleGroupItem(label: 'الأحدث'),
+      ToggleGroupItem(label: 'السعر'),
+      ToggleGroupItem(label: 'الأكثر شيوعا'),
     ],
     selectedIndex: sortIndex,
     onChanged: (int? next) => setState(() => sortIndex = next),
@@ -833,20 +839,20 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-eltogglegroup',
-        child: DocsApiTable(title: 'ElToggleGroup', facts: _groupApiFacts),
+        child: DocsApiTable(title: 'ToggleGroup', facts: _groupApiFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eltogglegroup-static',
         child: DocsApiTable(
-          title: 'ElToggleGroup static helpers',
+          title: 'ToggleGroup static helpers',
           facts: _groupStaticFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eltogglegroupitem',
-        child: DocsApiTable(title: 'ElToggleGroupItem', facts: _itemApiFacts),
+        child: DocsApiTable(title: 'ToggleGroupItem', facts: _itemApiFacts),
       ),
     ],
   );
@@ -855,9 +861,9 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _groupApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'items',
-    type: 'List<ElToggleGroupItem>',
+    type: 'List<ToggleGroupItem>',
     description:
-        'Required. The options, in paint order. One ElToggle is built per '
+        'Required. The options, in paint order. One Toggle is built per '
         'entry, and the index a caller reads back is this list\'s index.',
   ),
   DocsApiFact(
@@ -867,7 +873,7 @@ const List<DocsApiFact> _groupApiFacts = <DocsApiFact>[
         'Required, and nullable: null is a legal value, not an omission. '
         'Which option is selected, or null for none, the state the '
         'travelling pill reads. Null or out-of-range is what '
-        'ElSlidingPillGroup treats as deselected: the pill fades out and '
+        'ActiveIndicator treats as deselected: the pill fades out and '
         'stays parked where it last was.',
   ),
   DocsApiFact(
@@ -881,18 +887,18 @@ const List<DocsApiFact> _groupApiFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElToggleVariant',
+    type: 'ToggleVariant',
     description:
-        'Optional. Defaults to ElToggleVariant.standard. Forwarded '
-        "unchanged to every item. ElToggle's own enum, documented on the "
+        'Optional. Defaults to ToggleVariant.standard. Forwarded '
+        "unchanged to every item. Toggle's own enum, documented on the "
         'toggle page.',
   ),
   DocsApiFact(
     name: 'size',
-    type: 'ElToggleSize',
+    type: 'ToggleSize',
     description:
-        'Optional. Defaults to ElToggleSize.md. Forwarded unchanged to '
-        "every item. ElToggle's own enum, documented on the toggle page.",
+        'Optional. Defaults to ToggleSize.md. Forwarded unchanged to '
+        "every item. Toggle's own enum, documented on the toggle page.",
   ),
   DocsApiFact(
     name: 'label',
@@ -907,12 +913,12 @@ const List<DocsApiFact> _groupApiFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _groupStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElToggleGroup.gap',
+    name: 'ToggleGroup.gap',
     type: 'static double',
     description:
         'A getter, not a per-size function and not a constructor '
         'parameter: 8px between items, on every size and every variant. '
-        "Handed straight to ElSlidingPillGroup, so it is also the gap the "
+        "Handed straight to ActiveIndicator, so it is also the gap the "
         "travelling pill's own geometry is measured against. See Spacing "
         'above for what this being fixed rules out.',
   ),
@@ -939,7 +945,7 @@ const List<DocsApiFact> _itemApiFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to true. false makes the group pass a null '
-        "onChanged to this item's ElToggle, which is the only disabled "
+        "onChanged to this item's Toggle, which is the only disabled "
         'switch a toggle has: 50% opacity, no hit-testing, no tab stop.',
   ),
 ];
@@ -949,27 +955,27 @@ class _StatesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const DocsStateMatrix(facts: _stateFacts),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-          child: ElText(
-            'Pressed is not a row: an item is a ElToggle, whose class '
-            'list carries no active-state rule and no press-motion '
+          constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+          child: StyledText(
+            'Pressed is not a row: an item is a Toggle, whose class '
+            'list carries no active-state rule and no press '
             'utility, so nothing happens between pointer-down and '
             'pointer-up. Loading and Empty are not rows: this is a '
             'synchronous primitive with no async operation, and an empty '
             'items list simply renders nothing rather than an empty '
             'state. Error is not a row: aria-invalid is never set on '
             'this control anywhere in the reference, and neither '
-            'ElToggleGroup nor ElToggleGroupItem exposes an invalid '
+            'ToggleGroup nor ToggleGroupItem exposes an invalid '
             'parameter. Success is not a row: the component defines no '
             'success semantics of its own.',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ),
@@ -982,7 +988,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest (unselected item)',
     treatment:
-        'Each item is a ElToggle with pressed: false. standard: no fill, '
+        'Each item is a Toggle with pressed: false. standard: no fill, '
         'no border. outline: a 1px theme.input border. Ink is '
         'theme.foreground.',
     userSignal:
@@ -1003,16 +1009,16 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'The group passes pressedFill: transparent and pressedInk: '
         "theme.primaryForeground, so the item gives up its own fill and "
-        "ElSlidingPillGroup's single theme.primary pill, already "
+        "ActiveIndicator's single theme.primary pill, already "
         'travelling underneath it, shows through.',
     userSignal:
-        'White-on-blue ink over the travelling pill: the one place '
+        'White-on-blue ink over the travelling indicator: the one place '
         'selection reads as the brand colour in this family.',
   ),
   DocsStateFact(
     state: 'Nothing selected',
     treatment:
-        'selectedIndex: null reaches ElSlidingPillGroup as activeIndex: '
+        'selectedIndex: null reaches ActiveIndicator as activeIndex: '
         '-1, its deselected sentinel. The pill fades out and stays '
         'parked where it last was rather than travelling off the end.',
     userSignal:
@@ -1031,7 +1037,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled (per item)',
     treatment:
-        'ElToggleGroupItem.enabled: false makes the group pass a null '
+        'ToggleGroupItem.enabled: false makes the group pass a null '
         'onChanged to that item: 50% opacity, and an IgnorePointer that '
         'removes it from hit-testing, hover tracking and the tab order '
         'together. The rest of the group stays live.',
@@ -1041,8 +1047,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         "The item's fill/ink/border/ring tween chain and "
-        "ElSlidingPillGroup's own travel and jelly squash all resolve "
-        'through elAnimationDuration, which reduced motion shortens '
+        "ActiveIndicator's own travel and jelly squash all resolve "
+        'through effectiveMotionDuration, which reduced motion shortens '
         'toward zero.',
     userSignal:
         'The pill appears at its new position instead of travelling to '
@@ -1068,19 +1074,18 @@ class _AccessibilityContent extends StatelessWidget {
       ),
       const DocsInstallFact(
         label: 'Semantic role (the group)',
-        value:
-            'Semantics(container: true, label: …), only when label is set',
+        value: 'Semantics(container: true, label: …), only when label is set',
         description:
-            'With label null, the default, ElToggleGroup emits no '
+            'With label null, the default, ToggleGroup emits no '
             'container node at all: the items are the only semantics '
             'present. Supply label when nothing else on the screen names '
             'the group.',
       ),
       const DocsInstallFact(
         label: 'Label association',
-        value: 'ElToggleGroupItem.label',
+        value: 'ToggleGroupItem.label',
         description:
-            "Passed straight through as the ElToggle's own label for "
+            "Passed straight through as the Toggle's own label for "
             "every item, which overrides rather than joins the child's "
             'content-derived name. That is why label is required on the '
             'item even when child renders its own text.',
@@ -1089,7 +1094,7 @@ class _AccessibilityContent extends StatelessWidget {
         label: 'Keyboard activation',
         value: 'Enter, numpad Enter, Space, per item',
         description:
-            'Inherited from ElToggle, hand-wired through '
+            'Inherited from Toggle, hand-wired through '
             'Focus.onKeyEvent. Activating the already-selected item '
             'clears the selection, exactly as tapping it does — see '
             'Keyboard below.',
@@ -1128,7 +1133,7 @@ class _AccessibilityContent extends StatelessWidget {
         label: 'Error wiring',
         value: 'N/A: no invalid parameter exists',
         description:
-            'Neither ElToggleGroup nor ElToggleGroupItem declares an '
+            'Neither ToggleGroup nor ToggleGroupItem declares an '
             'invalid/aria-invalid path; the source states aria-invalid '
             'is never set on this control anywhere in the reference. '
             'There is nothing to wire.',
@@ -1148,7 +1153,7 @@ class _AccessibilityContent extends StatelessWidget {
 /// New: the design calls for this page to carry its own Keyboard section.
 /// Every claim here is read off `lib/src/components/toggle_group.dart`
 /// directly: the file wires no `Focus.onKeyEvent` of its own — every item
-/// is a plain `ElToggle`, so activation and the disabled/traversal rule
+/// is a plain `Toggle`, so activation and the disabled/traversal rule
 /// come from that component's own `_onKey` and `Focus` wiring — plus the
 /// one real divergence toggle_group.dart's own library doc records: no
 /// `RovingFocusGroup`.
@@ -1157,10 +1162,10 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'toggle_group.dart wires no Focus.onKeyEvent, no '
             'FocusTraversalPolicy, and no RovingFocusGroup of its own: '
-            'every item is a plain ElToggle, and every key event it '
+            'every item is a plain Toggle, and every key event it '
             'receives is handled by that component\'s own _onKey.',
         'Activation: Enter, NumpadEnter, and Space activate a focused, '
             'enabled item, identical to the standalone toggle. Activating '
@@ -1172,8 +1177,8 @@ class _KeyboardContent extends StatelessWidget {
             'it); toggle_group.dart states this divergence rather than '
             'approximating half of it, so a three-item group costs three '
             'Tab presses to cross.',
-        'Disabled items: ElToggleGroupItem.enabled: false makes the group '
-            'pass a null onChanged to that item\'s ElToggle, which removes '
+        'Disabled items: ToggleGroupItem.enabled: false makes the group '
+            'pass a null onChanged to that item\'s Toggle, which removes '
             'it from keyboard traversal entirely (canRequestFocus: '
             '_enabled, one layer down) — not just dimmed in place.',
       ]);
@@ -1184,12 +1189,12 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-    child: ElText(
-      'ElToggleGroup has no breakpoints of its own: it is a Row of '
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+    child: StyledText(
+      'ToggleGroup has no breakpoints of its own: it is a Row of '
       'fixed-height items plus a travelling pill, sized to its own '
       'content, and nothing in toggle_group.dart reads a viewport width. '
-      "That is the thing to plan for, not a feature: ElSlidingPillGroup's "
+      "That is the thing to plan for, not a feature: ActiveIndicator's "
       'internal Row neither wraps nor scrolls, so a group whose items '
       'want more width than the column has WILL overflow rather than '
       'reflow. Three of the sort segments on this page already do it at '
@@ -1203,7 +1208,7 @@ class _ResponsiveContent extends StatelessWidget {
       'row. Keyboard activation and pointer activation behave identically '
       'on every Flutter target this package supports; there is no '
       'platform channel and nothing here is web-only or desktop-only.',
-      ElType.small,
+      TextStyles.small,
     ),
   );
 }
@@ -1222,28 +1227,28 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Source file',
             value: toggleGroupDoc.sourcePath,
             description:
-                'The authoritative implementation of ElToggleGroup and '
-                'ElToggleGroupItem: one file.',
+                'The authoritative implementation of ToggleGroup and '
+                'ToggleGroupItem: one file.',
           ),
           const DocsInstallFact(
             label: 'Flutter imports',
             value: 'package:flutter/widgets.dart',
             description:
                 'The only Flutter import: no services.dart here, because '
-                'the key handling lives in ElToggle, one layer down.',
+                'the key handling lives in Toggle, one layer down.',
           ),
           DocsInstallFact(
             label: 'Local file dependencies',
             value:
                 '$toggleItemSourcePath, $slidingPillSourcePath, '
-                'effects/machine_surface.dart',
+                'effects/surface.dart',
             description:
                 'toggle_group.dart imports toggle.dart directly: every '
-                'item IS a ElToggle underneath, configured with '
+                'item IS a Toggle underneath, configured with '
                 'pressedFill, pressedInk and inExclusiveGroup. It imports '
-                'motion/sliding_pill.dart for ElSlidingPillGroup, the '
-                'travelling-pill machinery it shares with ElTabs, '
-                'ElSidebar and IconSwap, and effects/machine_surface.dart '
+                'motion/active_indicator.dart for ActiveIndicator, the '
+                'travelling-pill machinery it shares with Tabs, '
+                'Sidebar and IconSwap, and effects/surface.dart '
                 'to paint the pill itself. None are copyable in '
                 'isolation: see Installation.',
           ),
@@ -1255,8 +1260,8 @@ class _DependenciesContent extends StatelessWidget {
                 'theme_scope.dart',
             description:
                 'Token sources: the transparent-colour constant the '
-                'selected item is filled with, ElShadows.chip for the '
-                'pill, the el() spacing scale and ElRadii.pill, and the '
+                'selected item is filled with, Shadows.compactControl for the '
+                'pill, the space() spacing scale and Radii.full, and the '
                 'live theme. Note what is absent next to toggle.dart\'s '
                 'own list: no typography.dart and no motion.dart, '
                 'because the item resolves its own text style and its '
@@ -1267,7 +1272,7 @@ class _DependenciesContent extends StatelessWidget {
             value: toggleGroupDoc.exports.join(', '),
             description:
                 'The public symbols this component makes available. '
-                'ElToggleVariant and ElToggleSize are toggle.dart\'s own '
+                'ToggleVariant and ToggleSize are toggle.dart\'s own '
                 'exports, documented on the toggle page.',
           ),
           const DocsInstallFact(
@@ -1276,7 +1281,7 @@ class _DependenciesContent extends StatelessWidget {
             description:
                 'The pill, the fills and the borders are plain box '
                 'decoration: no image and no icon-font glyph of its own. '
-                'An icon supplied through ElToggleGroupItem.child brings '
+                'An icon supplied through ToggleGroupItem.child brings '
                 'its own geometry from icon_paths.dart, not an asset '
                 'file.',
           ),
@@ -1286,7 +1291,7 @@ class _DependenciesContent extends StatelessWidget {
             description:
                 'The group renders no text of its own: an item falls '
                 'back to a bare Text, which inherits the '
-                'DefaultTextStyle ElToggle installs.',
+                'DefaultTextStyle Toggle installs.',
           ),
           const DocsInstallFact(
             label: 'Shaders',
@@ -1295,17 +1300,17 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: DocsLinkRow(
           links: <DocsLink>[
             DocsLink(label: 'Toggle', route: '/components/toggle'),
-            DocsLink(label: 'Sliding Pill', route: '/components/sliding_pill'),
             DocsLink(
-              label: 'Machine Surface',
-              route: '/components/machine_surface',
+              label: 'Sliding Pill',
+              route: '/components/active_indicator',
             ),
+            DocsLink(label: 'Machine Surface', route: '/components/surface'),
             DocsLink(
               label: 'Source Foundation',
               route: '/components/source_foundation',
@@ -1332,22 +1337,22 @@ class _ThemingContent extends StatelessWidget {
         value: 'theme.primary',
         description:
             'The one blue selection surface in this family. Read live off '
-            'ElTheme.of(context) at build time, so flipping the theme '
+            'ThemeScope.of(context) at build time, so flipping the theme '
             'controller re-resolves it on the next frame.',
       ),
       const DocsInstallFact(
         label: 'Pill shape and elevation',
-        value: 'ElRadii.pill, ElShadows.chip',
+        value: 'Radii.full, Shadows.compactControl',
         description:
             "A stadium over the item's own rounded rect, wearing the chip "
-            "spec's inner rim and inner shade. Always ElRadii.pill "
+            "spec's inner rim and inner shade. Always Radii.full "
             'regardless of item size: a documented drift in '
             "toggle_group.dart's own header, since the item underneath is "
-            'ElRadii.lg or ElRadii.md.',
+            'Radii.lg or Radii.md.',
       ),
       const DocsInstallFact(
         label: 'Selected item fill and ink',
-        value: 'elTransparent, theme.primaryForeground',
+        value: 'transparent, theme.primaryForeground',
         description:
             'Passed down as pressedFill and pressedInk. The item gives up '
             'the theme.muted fill it would paint on its own so the pill '
@@ -1356,7 +1361,7 @@ class _ThemingContent extends StatelessWidget {
       ),
       const DocsInstallFact(
         label: 'Unselected item colours',
-        value: 'Inherited from ElToggle, unchanged',
+        value: 'Inherited from Toggle, unchanged',
         description:
             'transparent at rest, theme.muted on hover, theme.input or '
             'theme.ring for an outline border, theme.foreground ink. The '
@@ -1364,33 +1369,34 @@ class _ThemingContent extends StatelessWidget {
       ),
       const DocsInstallFact(
         label: 'Gap',
-        value: 'ElToggleGroup.gap, 8px',
+        value: 'ToggleGroup.gap, 8px',
         description:
             'Fixed, and not themeable or overridable: see Spacing above.',
       ),
       const DocsInstallFact(
         label: 'Motion',
-        value: 'ElSlidingPillGroup: ElDurations.base, ElCurves.spring',
+        value:
+            'ActiveIndicator: MotionDurations.normal, MotionCurves.emphasized',
         description:
             "The pill's travel, plus a jelly squash on "
-            'ElDurations.animJelly, all resolved through '
-            'elAnimationDuration so reduced motion shortens or removes '
+            'MotionDurations.stateChange, all resolved through '
+            'effectiveMotionDuration so reduced motion shortens or removes '
             "them automatically. The item's own colour legs run on "
-            'ElDurations.transitionDefault and ElCurves.out instead, one '
+            'MotionDurations.normal and MotionCurves.enter instead, one '
             'layer down.',
       ),
     ],
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => ConstrainedBox(
-  constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+Widget _bullets(ThemeTokens theme, List<String> lines) => ConstrainedBox(
+  constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       for (final String line in lines) ...<Widget>[
-        ElText('•  $line', ElType.small, color: theme.mutedForeground),
-        SizedBox(height: el(2)),
+        StyledText('•  $line', TextStyles.small, color: theme.mutedForeground),
+        SizedBox(height: space(2)),
       ],
     ],
   ),

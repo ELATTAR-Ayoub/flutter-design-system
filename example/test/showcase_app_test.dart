@@ -1,13 +1,39 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/showcase/showcase_app.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _phone = Size(390, 844);
 const double _gestureBar = 34;
 
 Finder _navigationButton(String label) => find.byWidgetPredicate(
-  (Widget widget) => widget is ElButton && widget.label == label,
+  (Widget widget) => widget is Button && widget.label == label,
 );
 
 Semantics _selectionSemantics(WidgetTester tester, String label) => tester
@@ -53,7 +79,7 @@ void main() {
     await tester.pumpWidget(const SignalStudioApp());
     await tester.tap(_navigationButton('Dashboard'));
     await tester.pump();
-    await tester.pump(ElDurations.fast);
+    await tester.pump(MotionDurations.fast);
 
     expect(
       _selectionSemantics(tester, 'Dashboard').properties.selected,
@@ -85,7 +111,7 @@ void main() {
     );
     final Finder back = find.byWidgetPredicate(
       (Widget widget) =>
-          widget is ElButton && widget.label == 'Back to design system',
+          widget is Button && widget.label == 'Back to design system',
     );
     final Finder theme = find.bySemanticsLabel('Colour theme');
 
@@ -93,7 +119,7 @@ void main() {
     expect(name, findsOneWidget);
     expect(
       tester.getRect(name).left - tester.getRect(avatar).right,
-      closeTo(el(2), ElWidths.hairline),
+      closeTo(space(2), BorderWidths.hairline),
     );
     expect(
       tester.getRect(back).left,
@@ -101,12 +127,12 @@ void main() {
     );
     expect(
       tester.getRect(theme).left - tester.getRect(back).right,
-      closeTo(el(2), ElWidths.hairline),
+      closeTo(space(2), BorderWidths.hairline),
     );
-    expect(tester.getRect(identity).left, greaterThanOrEqualTo(el(4)));
+    expect(tester.getRect(identity).left, greaterThanOrEqualTo(space(4)));
     expect(
       tester.getRect(theme).right,
-      lessThanOrEqualTo(_phone.width - el(4)),
+      lessThanOrEqualTo(_phone.width - space(4)),
     );
     expect(tester.takeException(), isNull);
   });
@@ -124,30 +150,30 @@ void main() {
       final Finder dock = find.byKey(const Key('showcase-compact-dock'));
       final Finder group = find.descendant(
         of: dock,
-        matching: find.byType(ElSlidingPillGroup),
+        matching: find.byType(ActiveIndicator),
       );
       final Finder buttons = find.descendant(
         of: dock,
-        matching: find.byType(ElButton),
+        matching: find.byType(Button),
       );
 
       expect(group, findsOneWidget);
-      expect(tester.widget<ElSlidingPillGroup>(group).activeIndex, 0);
+      expect(tester.widget<ActiveIndicator>(group).activeIndex, 0);
       expect(buttons, findsNWidgets(3));
       expect(
         tester
-            .widgetList<ElButton>(buttons)
-            .map((ElButton button) => button.variant),
-        everyElement(ElButtonVariant.ghost),
+            .widgetList<Button>(buttons)
+            .map((Button button) => button.variant),
+        everyElement(ButtonVariant.ghost),
       );
       expect(_selectionSemantics(tester, 'Profile').properties.selected, true);
 
-      final ElMachineSurface pill = tester.widget<ElMachineSurface>(
+      final Surface pill = tester.widget<Surface>(
         find.byKey(const Key('showcase-destination-pill')),
       );
-      expect(pill.spec, same(ElShadows.chip));
-      expect(pill.radius, BorderRadius.circular(ElRadii.lg));
-      expect(pill.fill, ElTheme.of(tester.element(dock)).secondary);
+      expect(pill.spec, same(Shadows.compactControl));
+      expect(pill.radius, BorderRadius.circular(Radii.lg));
+      expect(pill.fill, ThemeScope.of(tester.element(dock)).secondary);
     },
   );
 
@@ -161,7 +187,7 @@ void main() {
     await tester.pumpWidget(const SignalStudioApp());
     await tester.pump();
     await tester.pump();
-    await tester.pump(ElDurations.animJelly);
+    await tester.pump(MotionDurations.stateChange);
 
     final Finder pill = find.byKey(const Key('showcase-destination-pill'));
     final double oldCenter = tester.getCenter(pill).dx;
@@ -171,14 +197,17 @@ void main() {
 
     await tester.tap(_navigationButton('Dashboard'));
     await tester.pump();
-    await tester.pump(ElDurations.tick);
+    await tester.pump(MotionDurations.tick);
 
     final double travellingCenter = tester.getCenter(pill).dx;
     expect(travellingCenter, greaterThan(oldCenter));
     expect(travellingCenter, lessThan(newCenter));
 
-    await tester.pump(ElDurations.base);
-    expect(tester.getCenter(pill).dx, closeTo(newCenter, ElWidths.hairline));
+    await tester.pump(MotionDurations.normal);
+    expect(
+      tester.getCenter(pill).dx,
+      closeTo(newCenter, BorderWidths.hairline),
+    );
   });
 
   testWidgets('compact destination pill snaps under reduced motion', (
@@ -201,7 +230,7 @@ void main() {
       tester.getCenter(pill).dx,
       closeTo(
         tester.getCenter(_navigationButton('Reels')).dx,
-        ElWidths.hairline,
+        BorderWidths.hairline,
       ),
     );
   });
@@ -213,7 +242,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     for (final double width in <double>[390, 800]) {
-      tester.view.physicalSize = Size(width, ElWidths.page);
+      tester.view.physicalSize = Size(width, LayoutWidths.page);
       await tester.pumpWidget(const SignalStudioApp());
       await tester.pump();
       await tester.tap(_navigationButton('Reels'));
@@ -227,7 +256,7 @@ void main() {
           .left;
       expect(
         avatarLeft,
-        closeTo(reelContentLeft, ElWidths.hairline),
+        closeTo(reelContentLeft, BorderWidths.hairline),
         reason: 'compact width $width should share the reel content measure',
       );
       expect(tester.takeException(), isNull);
@@ -253,7 +282,7 @@ void main() {
       findsOneWidget,
     );
     expect(_selectionSemantics(tester, 'Profile').properties.selected, isTrue);
-    expect(tester.getRect(dock).bottom, _phone.height - _gestureBar - el(3));
+    expect(tester.getRect(dock).bottom, _phone.height - _gestureBar - space(3));
     expect(
       tester.getRect(find.byType(IndexedStack)).bottom,
       greaterThan(tester.getRect(dock).top),
@@ -316,14 +345,14 @@ void main() {
   ) async {
     await tester.pumpWidget(const SignalStudioApp());
     await tester.tap(_navigationButton('Dashboard'));
-    await tester.pump(ElDurations.fast);
+    await tester.pump(MotionDurations.fast);
     await tester.pump();
 
-    await tester.tap(find.widgetWithText(ElButton, 'Refresh').first);
+    await tester.tap(find.widgetWithText(Button, 'Refresh').first);
     await tester.pump();
-    expect(find.byType(ElSkeleton), findsWidgets);
+    expect(find.byType(Skeleton), findsWidgets);
 
-    await tester.pump(ElDurations.fast);
+    await tester.pump(MotionDurations.fast);
     await tester.pump();
     expect(find.text('Studio data is current'), findsOneWidget);
   });
@@ -344,12 +373,12 @@ class _ProfileStateProbeState extends State<_ProfileStateProbe> {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText('Profile draft $_draft', ElType.body),
-        SizedBox(height: el(2)),
-        ElButton(
+        StyledText('Profile draft $_draft', TextStyles.body),
+        SizedBox(height: space(2)),
+        Button(
           label: 'Increase profile draft',
           onPressed: () => setState(() => _draft += 1),
-          child: ElText('Increase', ElComponentType.buttonLabel),
+          child: StyledText('Increase', TextStyles.buttonLabel),
         ),
       ],
     ),

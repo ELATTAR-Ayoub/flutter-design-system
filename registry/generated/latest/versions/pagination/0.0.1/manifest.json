@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/pagination.dart",
+      "source": "lib/src/components/ui/pagination.dart",
       "target": "@ui/pagination.dart",
-      "sha256": "fcf7ea4e3245641fcf5cde34ae807fbb612a72d73fd72d54d1b853419215d1c8"
+      "sha256": "b52413afbe1b1b0286cfe0f9fd4cd9e300b15e32536704161095a44dd39878b3"
     }
   ],
   "registryDependencies": [
@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/pagination",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/pagination.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/pagination.dart",
   "deprecated": false
 }

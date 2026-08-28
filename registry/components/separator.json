@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/separator.dart",
+      "source": "lib/src/components/ui/separator.dart",
       "target": "@ui/separator.dart",
-      "sha256": "9ed933c6b9cb791fc5bc686d2eae2d839d077c37f81d251c984dcf4a9aca6996"
+      "sha256": "d78c515a20e578c60dbc73d5bec99d50a0f3caa753a106ecd875318c997552ef"
     }
   ],
   "registryDependencies": [
@@ -21,5 +21,9 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/separator",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/separator.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/separator.dart",
+  "exports": [
+    "Separator",
+    "SeparatorOrientation"
+  ]
 }

@@ -5,7 +5,7 @@
 /// of it survives the port: *"a real `Sidebar` is `fixed inset-y-0 h-svh`, an
 /// app shell rather than a widget. That rules out a `Panel`, and it also rules
 /// out any route under `app/design-system/layout.tsx`: that layout supplies the
-/// docs chrome, including `ElSidebar` and a 1080px reading column, and a nested
+/// docs chrome, including `Sidebar` and a 1080px reading column, and a nested
 /// route in Next cannot opt out of a parent layout. Rendering there would drop a
 /// fixed sidebar on top of the documentation's own one."* Flutter has the same
 /// problem and the same shape of answer: [DocsShell] is a widget rather than a
@@ -36,11 +36,11 @@
 ///  2. **Six of the demo's glyphs are off the generated registry.**
 ///     `CircleGauge`, `Funnel`, `Users`, `Receipt`, `ChevronsUpDown` and
 ///     `BookOpen` are not on the icons page's curated whitelist, so they come
-///     through [ElIcon.lucide]: the same split the sidebar page's own `FOOT_NAV`
+///     through [Icon.lucide]: the same split the sidebar page's own `FOOT_NAV`
 ///     carries for `Receipt`.
 ///  3. **`group-data-[collapsible=icon]:hidden` on `SidebarInput` is a call-site
 ///     class**, not a component prop, so the port writes it at the call site too:
-///     the field is read off [ElSidebarChrome] and simply not built in icon mode.
+///     the field is read off [SidebarChrome] and simply not built in icon mode.
 ///
 /// ## No oracle
 ///
@@ -52,7 +52,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../nav.dart';
 import '../shell.dart';
@@ -64,21 +76,21 @@ import '../shell.dart';
 const String sidebarDemoRoute = '/sidebar-demo';
 
 /// `NAV`.
-const List<({String label, ElLucideGlyph icon, String? count})> _nav =
-    <({String label, ElLucideGlyph icon, String? count})>[
-      (label: 'Overview', icon: ElLucide.circleGauge, count: null),
-      (label: 'Funnels', icon: ElLucide.funnel, count: null),
-      (label: 'Retention', icon: ElLucide.sparkles, count: null),
-      (label: 'Revenue', icon: ElLucide.wallet, count: r'$24.8k'),
-      (label: 'Users', icon: ElLucide.users, count: null),
+const List<({String label, LucideGlyph icon, String? count})> _nav =
+    <({String label, LucideGlyph icon, String? count})>[
+      (label: 'Overview', icon: Lucide.circleGauge, count: null),
+      (label: 'Funnels', icon: Lucide.funnel, count: null),
+      (label: 'Retention', icon: Lucide.sparkles, count: null),
+      (label: 'Revenue', icon: Lucide.wallet, count: r'$24.8k'),
+      (label: 'Users', icon: Lucide.users, count: null),
     ];
 
 /// `EXPLORE`.
-const List<({String label, ElLucideGlyph icon, String? count})> _explore =
-    <({String label, ElLucideGlyph icon, String? count})>[
-      (label: 'Dashboard', icon: ElLucide.layers, count: null),
-      (label: 'Segments', icon: ElLucide.star, count: null),
-      (label: 'Reports', icon: ElLucide.receipt, count: '3'),
+const List<({String label, LucideGlyph icon, String? count})> _explore =
+    <({String label, LucideGlyph icon, String? count})>[
+      (label: 'Dashboard', icon: Lucide.layers, count: null),
+      (label: 'Segments', icon: Lucide.star, count: null),
+      (label: 'Reports', icon: Lucide.receipt, count: '3'),
     ];
 
 /// `SIDES`.
@@ -118,14 +130,14 @@ class SidebarDemoPage extends StatefulWidget {
 }
 
 class _SidebarDemoPageState extends State<SidebarDemoPage> {
-  ElSidebarSide _side = ElSidebarSide.left;
-  ElSidebarVariant _variant = ElSidebarVariant.sidebar;
-  ElSidebarCollapsible _collapsible = ElSidebarCollapsible.icon;
+  SidebarSide _side = SidebarSide.left;
+  SidebarVariant _variant = SidebarVariant.sidebar;
+  SidebarCollapsible _collapsible = SidebarCollapsible.icon;
   String _active = _nav.first.label;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return DefaultTextStyle(
       // `<body class="… bg-background text-foreground">`.
@@ -136,7 +148,11 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
       // own family, size and leading: but a class that declares no `color`
       // (`.type-caption`, `.type-body`) would otherwise take the framework's
       // debug ink instead of the token.
-      style: ElText.styleOf(context, ElType.body, color: theme.foreground),
+      style: StyledText.styleOf(
+        context,
+        TextStyles.body,
+        color: theme.foreground,
+      ),
       child: ColoredBox(
         color: theme.background,
         // USER-ORDERED MOBILE ADAPTATION (2026-08-16). This route is the one
@@ -144,17 +160,17 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
         // [DocsShell] follows has to be written here too, in the same shape:
         // the background above paints to every edge, and the shell inside it
         // clears the bars. Horizontal is spent once, here, for both columns;
-        // [ElSafeArea] removes it from the [MediaQuery] below, so the panel's
+        // [SafeArea] removes it from the [MediaQuery] below, so the panel's
         // header and footer pay only the two insets they actually touch.
         //
         // On a phone this whole page is under 768px, where the panel is a sheet
-        // rather than a column: and `ElSheetContent` insets nothing of its
+        // rather than a column: and `SheetContent` insets nothing of its
         // own, so the same two wrappers are what keep the sheet's rows off the
         // clock and the gesture bar.
-        child: ElSafeArea(
+        child: SafeArea(
           top: false,
           bottom: false,
-          child: ElSidebarProvider(
+          child: SidebarProvider(
             // `key={`${side}-${variant}-${collapsible}`}`, *"structural shell
             // settings remount the provider so state from one geometry cannot
             // leak into the next."*
@@ -166,7 +182,7 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
             // `className="min-h-svh"`.
             minHeight: MediaQuery.sizeOf(context).height,
             children: <Widget>[
-              ElSidebar(
+              Sidebar(
                 side: _side,
                 variant: _variant,
                 collapsible: _collapsible,
@@ -178,11 +194,11 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
                   ),
                   const _DemoFooter(),
                   // `{collapsible !== "none" && <SidebarRail />}`.
-                  if (_collapsible != ElSidebarCollapsible.none)
-                    const ElSidebarRail(),
+                  if (_collapsible != SidebarCollapsible.none)
+                    const SidebarRail(),
                 ],
               ),
-              ElSidebarInset(
+              SidebarInset(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
@@ -194,9 +210,9 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
                         // …and the scroller is therefore what owes the gesture
                         // bar: the readout's last line scrolls clear of it
                         // instead of resting under it.
-                        padding: ElSafeArea.scrollPaddingOf(
+                        padding: SafeArea.scrollPaddingOf(
                           context,
-                          base: EdgeInsets.all(el(6)),
+                          base: EdgeInsets.all(space(6)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,15 +222,14 @@ class _SidebarDemoPageState extends State<SidebarDemoPage> {
                               side: _side,
                               variant: _variant,
                               collapsible: _collapsible,
-                              onSide: (int i) => setState(
-                                () => _side = ElSidebarSide.values[i],
-                              ),
+                              onSide: (int i) =>
+                                  setState(() => _side = SidebarSide.values[i]),
                               onVariant: (int i) => setState(
-                                () => _variant = ElSidebarVariant.values[i],
+                                () => _variant = SidebarVariant.values[i],
                               ),
                               onCollapsible: (int i) => setState(
-                                () => _collapsible =
-                                    ElSidebarCollapsible.values[i],
+                                () =>
+                                    _collapsible = SidebarCollapsible.values[i],
                               ),
                             ),
                             const _Readout(),
@@ -241,42 +256,42 @@ class _DemoHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     // The panel runs the full height of the window, so its first row is what
-    // the status bar lands on. The panel's own fill is painted by [ElSidebar]
+    // the status bar lands on. The panel's own fill is painted by [Sidebar]
     // around this, and keeps reaching the top of the screen.
-    return ElSafeArea(
+    return SafeArea(
       bottom: false,
-      child: ElSidebarHeader(
+      child: SidebarHeader(
         children: <Widget>[
-          ElSidebarMenu(
+          SidebarMenu(
             children: <Widget>[
-              ElSidebarMenuItem(
-                button: ElSidebarMenuButton(
-                  size: ElSidebarMenuButtonSize.lg,
+              SidebarMenuItem(
+                button: SidebarMenuButton(
+                  size: SidebarMenuButtonSize.lg,
                   tooltip: 'Lumen workspace',
-                  child: ElSidebarMenuRow(
-                    size: ElSidebarMenuButtonSize.lg,
+                  child: SidebarMenuRow(
+                    size: SidebarMenuButtonSize.lg,
                     // `flex size-8 shrink-0 items-center justify-center
                     //  rounded-lg bg-secondary text-foreground shadow-chip`.
                     leading: SizedBox(
-                      width: el(8),
-                      height: el(8),
-                      child: ElMachineSurface(
-                        spec: ElShadows.chip,
-                        radius: BorderRadius.circular(ElRadii.lg),
+                      width: space(8),
+                      height: space(8),
+                      child: Surface(
+                        spec: Shadows.compactControl,
+                        radius: BorderRadius.circular(Radii.lg),
                         fill: theme.secondary,
                         child: Center(
-                          child: ElIcon(
-                            ElIconGlyph.sparkles,
-                            size: ElIconSize.sm,
-                            tone: ElIconTone.inherit,
+                          child: Icon(
+                            IconGlyph.sparkles,
+                            size: IconSize.sm,
+                            tone: IconTone.inherit,
                           ),
                         ),
                       ),
                     ),
                     label: const _WorkspaceLabel(),
-                    trailing: const ElIcon.lucide(ElLucide.chevronsUpDown),
+                    trailing: const Icon.lucide(Lucide.chevronsUpDown),
                   ),
                 ),
               ),
@@ -284,8 +299,8 @@ class _DemoHeader extends StatelessWidget {
           ),
           // DRIFT 3: `group-data-[collapsible=icon]:hidden`, written at the
           // call site here exactly as it is there.
-          if (!ElSidebarChrome.iconModeOf(context))
-            const ElSidebarInput(
+          if (!SidebarChrome.iconModeOf(context))
+            const SidebarInput(
               placeholder: 'Search cards',
               label: 'Search cards',
             ),
@@ -301,22 +316,22 @@ class _WorkspaceLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText(
+        StyledText(
           'Lumen',
-          ElType.nav,
+          TextStyles.nav,
           color: theme.foreground,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           softWrap: false,
         ),
-        ElText(
+        StyledText(
           '12 members',
-          ElType.caption,
+          TextStyles.caption,
           color: theme.mutedForeground,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -335,15 +350,15 @@ class _DemoContent extends StatelessWidget {
   final ValueChanged<String> onSelect;
 
   @override
-  Widget build(BuildContext context) => ElSidebarContent(
+  Widget build(BuildContext context) => SidebarContent(
     children: <Widget>[
-      ElSidebarCollapsibleGroup(
+      SidebarCollapsibleGroup(
         label: 'Essentials',
         toggleLabel: 'Toggle Essentials group',
         child: _DemoMenu(items: _nav, active: active, onSelect: onSelect),
       ),
-      const ElSidebarSeparator(),
-      ElSidebarCollapsibleGroup(
+      const SidebarSeparator(),
+      SidebarCollapsibleGroup(
         label: 'Explore',
         toggleLabel: 'Toggle Explore group',
         action: const _AddView(),
@@ -351,7 +366,7 @@ class _DemoContent extends StatelessWidget {
           items: _explore,
           active: active,
           onSelect: onSelect,
-          badgeVariant: ElBadgeVariant.destructive,
+          badgeVariant: BadgeVariant.destructive,
         ),
       ),
     ],
@@ -364,38 +379,38 @@ class _DemoMenu extends StatelessWidget {
     required this.items,
     required this.active,
     required this.onSelect,
-    this.badgeVariant = ElBadgeVariant.secondary,
+    this.badgeVariant = BadgeVariant.secondary,
   });
 
-  final List<({String label, ElLucideGlyph icon, String? count})> items;
+  final List<({String label, LucideGlyph icon, String? count})> items;
   final String active;
   final ValueChanged<String> onSelect;
 
   /// `SidebarMenuBadge`'s own default on the first group, `destructive` on the
   /// second.
-  final ElBadgeVariant badgeVariant;
+  final BadgeVariant badgeVariant;
 
   @override
   Widget build(BuildContext context) {
-    final double glyph = ElButton.iconPxFor(ElSidebarMenuButtonSize.md.button);
-    return ElSidebarMenu(
+    final double glyph = Button.iconPxFor(SidebarMenuButtonSize.md.button);
+    return SidebarMenu(
       children: <Widget>[
-        for (final ({String label, ElLucideGlyph icon, String? count}) item
+        for (final ({String label, LucideGlyph icon, String? count}) item
             in items)
-          ElSidebarMenuItem(
-            button: ElSidebarMenuButton(
+          SidebarMenuItem(
+            button: SidebarMenuButton(
               isActive: active == item.label,
               onPressed: () => onSelect(item.label),
               tooltip: item.label,
-              child: ElSidebarMenuRow(
+              child: SidebarMenuRow(
                 // DRIFT 2: off the generated registry.
-                leading: ElIcon.lucide(item.icon, sizePx: glyph),
-                label: ElSidebarMenuLabel(item.label),
+                leading: Icon.lucide(item.icon, sizePx: glyph),
+                label: SidebarMenuLabel(item.label),
               ),
             ),
             badge: item.count == null
                 ? null
-                : ElSidebarMenuBadge(item.count!, variant: badgeVariant),
+                : SidebarMenuBadge(item.count!, variant: badgeVariant),
           ),
       ],
     );
@@ -407,12 +422,9 @@ class _AddView extends StatelessWidget {
   const _AddView();
 
   @override
-  Widget build(BuildContext context) => ElSidebarGroupAction(
+  Widget build(BuildContext context) => SidebarGroupAction(
     label: 'Add view',
-    child: ElIcon(
-      ElIconGlyph.plus,
-      sizePx: ElButton.iconPxFor(ElButtonSize.iconXs),
-    ),
+    child: Icon(IconGlyph.plus, sizePx: Button.iconPxFor(ButtonSize.iconXs)),
   );
 }
 
@@ -422,22 +434,22 @@ class _DemoFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double glyph = ElButton.iconPxFor(ElSidebarMenuButtonSize.md.button);
+    final double glyph = Button.iconPxFor(SidebarMenuButtonSize.md.button);
     // The panel's floor, and so the row the gesture bar would sit on. `top` is
     // false: the status bar is the header's to pay, and paying it twice would
     // push the footer up by the height of the clock.
-    return ElSafeArea(
+    return SafeArea(
       top: false,
-      child: ElSidebarFooter(
+      child: SidebarFooter(
         children: <Widget>[
-          ElSidebarMenu(
+          SidebarMenu(
             children: <Widget>[
-              ElSidebarMenuItem(
-                button: ElSidebarMenuButton(
+              SidebarMenuItem(
+                button: SidebarMenuButton(
                   tooltip: "What's new",
-                  child: ElSidebarMenuRow(
-                    leading: ElIcon(ElIconGlyph.bell, sizePx: glyph),
-                    label: const ElSidebarMenuLabel("What's new"),
+                  child: SidebarMenuRow(
+                    leading: Icon(IconGlyph.bell, sizePx: glyph),
+                    label: const SidebarMenuLabel("What's new"),
                   ),
                 ),
                 // `<SidebarMenuBadge variant="ghost">2</SidebarMenuBadge>`.
@@ -449,17 +461,14 @@ class _DemoFooter extends StatelessWidget {
                 // `pr-16` lane fires either way: it is
                 // `group-has-data-[sidebar=menu-badge]/menu-item`, which reads
                 // the item's whole subtree. The port has one slot for it.
-                badge: const ElSidebarMenuBadge(
-                  '2',
-                  variant: ElBadgeVariant.ghost,
-                ),
+                badge: const SidebarMenuBadge('2', variant: BadgeVariant.ghost),
               ),
-              ElSidebarMenuItem(
-                button: ElSidebarMenuButton(
+              SidebarMenuItem(
+                button: SidebarMenuButton(
                   tooltip: 'Docs',
-                  child: ElSidebarMenuRow(
-                    leading: const ElIcon.lucide(ElLucide.bookOpen),
-                    label: const ElSidebarMenuLabel('Docs'),
+                  child: SidebarMenuRow(
+                    leading: const Icon.lucide(Lucide.bookOpen),
+                    label: const SidebarMenuLabel('Docs'),
                   ),
                 ),
               ),
@@ -482,9 +491,9 @@ class _InsetHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     // `hidden … sm:inline` on the hint.
-    final bool wide = MediaQuery.sizeOf(context).width >= ElBreakpoints.sm;
+    final bool wide = MediaQuery.sizeOf(context).width >= Breakpoints.sm;
 
     return Container(
       // The inset's own top bar, and on this route there is nothing above it —
@@ -495,35 +504,35 @@ class _InsetHeader extends StatelessWidget {
       // overpay is the variant's margin and is left alone rather than
       // subtracted, because a control below the bar is right and a control
       // under it is not.
-      height: ElSafeArea.topBarHeightOf(context, ElWidths.siteHeader),
-      padding: EdgeInsets.symmetric(horizontal: el(6)),
+      height: SafeArea.topBarHeightOf(context, LayoutHeights.siteHeader),
+      padding: EdgeInsets.symmetric(horizontal: space(6)),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: theme.border, width: ElWidths.hairline),
+          bottom: BorderSide(color: theme.border, width: BorderWidths.hairline),
         ),
       ),
-      child: ElSafeArea(
+      child: SafeArea(
         bottom: false,
         child: Row(
           children: <Widget>[
-            const ElSidebarTrigger(),
-            SizedBox(width: el(3)),
-            ElText(active, ElType.label),
+            const SidebarTrigger(),
+            SizedBox(width: space(3)),
+            StyledText(active, TextStyles.eyebrow),
             // `ml-auto flex items-center gap-2`.
             const Spacer(),
             if (wide) ...<Widget>[
               // `.type-caption` declares no colour, so `text-muted-foreground`
               // is doing real work at both caption sites on this page.
-              ElText(
+              StyledText(
                 'Toggle with',
-                ElType.caption,
+                TextStyles.caption,
                 color: theme.mutedForeground,
               ),
-              SizedBox(width: el(2)),
+              SizedBox(width: space(2)),
             ],
-            const ElKbd('⌘'),
-            SizedBox(width: el(2)),
-            const ElKbd('B'),
+            const Kbd('⌘'),
+            SizedBox(width: space(2)),
+            const Kbd('B'),
           ],
         ),
       ),
@@ -541,21 +550,21 @@ class _BackLink extends StatelessWidget {
     final AppRouter router = AppRouter.of(context);
     return Padding(
       // `mb-8` on the row that holds it.
-      padding: EdgeInsets.only(bottom: el(8)),
+      padding: EdgeInsets.only(bottom: space(8)),
       child: Align(
         alignment: AlignmentDirectional.centerStart,
-        child: ElButton(
-          variant: ElButtonVariant.outline,
-          size: ElButtonSize.sm,
+        child: Button(
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
           onPressed: () => router.navigate('$elRoot/components/base/sidebar'),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElIcon(
-                ElIconGlyph.arrowLeft,
-                sizePx: ElButton.iconPxFor(ElButtonSize.sm),
+              Icon(
+                IconGlyph.arrowLeft,
+                sizePx: Button.iconPxFor(ButtonSize.sm),
               ),
-              SizedBox(width: ElButton.gapFor(ElButtonSize.sm)),
+              SizedBox(width: Button.gapFor(ButtonSize.sm)),
               const Text('Back to Sidebar'),
             ],
           ),
@@ -577,37 +586,41 @@ class _ShellSettings extends StatelessWidget {
     required this.onCollapsible,
   });
 
-  final ElSidebarSide side;
-  final ElSidebarVariant variant;
-  final ElSidebarCollapsible collapsible;
+  final SidebarSide side;
+  final SidebarVariant variant;
+  final SidebarCollapsible collapsible;
   final ValueChanged<int> onSide;
   final ValueChanged<int> onVariant;
   final ValueChanged<int> onCollapsible;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: el(8)),
+      padding: EdgeInsets.only(bottom: space(8)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: theme.card,
-          borderRadius: BorderRadius.circular(ElRadii.xl),
-          border: Border.all(color: theme.border, width: ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.xl),
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
         child: Padding(
-          padding: EdgeInsets.all(el(4)),
+          padding: EdgeInsets.all(space(4)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElText('Shell settings', ElType.h4, color: theme.foreground),
+              StyledText(
+                'Shell settings',
+                TextStyles.h4,
+                color: theme.foreground,
+              ),
               // `mt-4`.
-              SizedBox(height: el(4)),
+              SizedBox(height: space(4)),
               // `flex flex-wrap gap-x-8 gap-y-5`.
               Wrap(
-                spacing: el(8),
-                runSpacing: el(5),
+                spacing: space(8),
+                runSpacing: space(5),
                 children: <Widget>[
                   _ShellSetting(
                     label: 'side',
@@ -658,19 +671,23 @@ class _ShellSetting extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       // `className="type-caption text-muted-foreground"`.
-      ElText(label, ElType.caption, color: ElTheme.of(context).mutedForeground),
+      StyledText(
+        label,
+        TextStyles.caption,
+        color: ThemeScope.of(context).mutedForeground,
+      ),
       // `gap-2` on the column.
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       Wrap(
-        spacing: el(2),
-        runSpacing: el(2),
+        spacing: space(2),
+        runSpacing: space(2),
         children: <Widget>[
           for (int i = 0; i < options.length; i++)
-            ElButton(
-              size: ElButtonSize.sm,
+            Button(
+              size: ButtonSize.sm,
               variant: i == selected
-                  ? ElButtonVariant.primary
-                  : ElButtonVariant.outline,
+                  ? ButtonVariant.primary
+                  : ButtonVariant.outline,
               onPressed: () => onChanged(i),
               child: Text(options[i]),
             ),
@@ -718,35 +735,39 @@ class _Readout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final TextStyle small = ElText.styleOf(context, ElType.small);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final TextStyle small = StyledText.styleOf(context, TextStyles.small);
 
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: ElContainers.xl2),
+      constraints: BoxConstraints(maxWidth: Containers.xl2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElText('The live sidebar', ElType.h2, color: theme.foreground),
+          StyledText(
+            'The live sidebar',
+            TextStyles.h2,
+            color: theme.foreground,
+          ),
           // `space-y-4`.
-          SizedBox(height: el(4)),
-          ElText(
+          SizedBox(height: space(4)),
+          StyledText(
             'Four things here need a viewport and cannot be shown in a boxed '
             'specimen.',
-            ElType.body,
+            TextStyles.body,
           ),
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
           // `<ul className="space-y-3">`.
           for (int i = 0; i < _items.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: el(3)),
+            if (i > 0) SizedBox(height: space(3)),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                ElBadge(label: '${i + 1}', variant: ElBadgeVariant.outline),
+                Badge(label: '${i + 1}', variant: BadgeVariant.outline),
                 // `gap-3`.
-                SizedBox(width: el(3)),
+                SizedBox(width: space(3)),
                 Expanded(
-                  child: ElRichText(
+                  child: RichText(
                     TextSpan(
                       children: <InlineSpan>[
                         TextSpan(
@@ -756,7 +777,7 @@ class _Readout extends StatelessWidget {
                         TextSpan(text: _items[i].rest),
                       ],
                     ),
-                    ElType.small,
+                    TextStyles.small,
                   ),
                 ),
               ],

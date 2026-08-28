@@ -6,14 +6,14 @@
 /// `test/agent_launcher_test.dart`.
 ///
 /// **The trigger is fixed to the whole page, not to this card.** The live
-/// specimen below sits inside an `ElAgentLauncher`, genuinely positioned
+/// specimen below sits inside an `AgentLauncher`, genuinely positioned
 /// by an `OverlayPortal` against the nearest `Overlay` — the app's own,
 /// not the showcase stage — the same fact `pages/console.dart`'s own
 /// launcher demo notes for its reader: *"it is sitting in the
 /// bottom-right corner of the page you are reading."*
 ///
 /// **One launcher, not two.** `avatar` is demonstrated by a toggle over a
-/// single live `ElAgentLauncher` rather than by mounting a second one:
+/// single live `AgentLauncher` rather than by mounting a second one:
 /// both pin to the exact same `right-6 bottom-6` corner, and the second
 /// instance sits exactly on top of the first, absorbing every tap meant
 /// for it — measured directly while writing this page's own test, not
@@ -27,7 +27,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -43,13 +55,13 @@ final ComponentDocSpec agentLauncherDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'A live ElAgentLauncher, pinned to the bottom-right corner of '
+          'A live AgentLauncher, pinned to the bottom-right corner of '
           'the whole page (fixed right-6 bottom-6, z-40) rather than to '
           'this card. Hover it to see the label ride out; click it to '
-          'open the dialog. The toggle swaps ElAgentLauncher.avatar '
-          'between the default (ElCubeAvatar, through '
-          'ElAgentAvatarRegistry.renderer) and a plain square, through '
-          'the same ElAgentAvatarBuilder seam ElAgentFace.avatar takes — '
+          'open the dialog. The toggle swaps AgentLauncher.avatar '
+          'between the default (AgentAvatar, through '
+          'AgentAvatarRegistry.renderer) and a plain square, through '
+          'the same AgentAvatarBuilder seam AgentFace.avatar takes — '
           'a second, independent launcher is not shown beside it, '
           'because two fixed-position launchers pin to the exact same '
           'corner and the second would sit on top of the first, '
@@ -57,7 +69,7 @@ final ComponentDocSpec agentLauncherDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(48),
+      minHeight: space(48),
     ),
     InstallSection(
       id: 'install',
@@ -85,7 +97,7 @@ final ComponentDocSpec agentLauncherDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElAgentLauncher is reachable the '
+              'Add the export line so AgentLauncher is reachable the '
               'same way the CLI path already makes it.',
           code: "export 'agent_launcher.dart';",
         ),
@@ -107,13 +119,13 @@ final ComponentDocSpec agentLauncherDocSpec = ComponentDocSpec(
           'The one public class the file declares, in full — every '
           'constructor parameter and every static measurement '
           'dialogSize\'s own clamp is built from.',
-      child: DocsApiTable(title: 'ElAgentLauncher', facts: _launcherFacts),
+      child: DocsApiTable(title: 'AgentLauncher', facts: _launcherFacts),
     ),
     DisclosureSection(
       id: 'states',
       title: 'States',
       description:
-          "The trigger is an ElButton(variant: outline) underneath: its "
+          "The trigger is an Button(variant: outline) underneath: its "
           'own hover / press / focus states are inherited unchanged — see '
           "Button's own States. What agent_launcher.dart adds is below.",
       child: DocsStateMatrix(facts: _stateFacts),
@@ -159,14 +171,14 @@ final ComponentDocSpec agentLauncherDocSpec = ComponentDocSpec(
           const DocsInstallFact(
             label: 'Package tests',
             value: 'test/agent_launcher_test.dart',
-            description: "The package's own coverage of ElAgentLauncher.",
+            description: "The package's own coverage of AgentLauncher.",
           ),
           const DocsInstallFact(
             label: 'Docs test',
             value: 'example/test/components_docs/agent_launcher_test.dart',
             description:
                 'Covers this page: the article mounts, every '
-                'ElAgentLauncher constructor parameter this page claims '
+                'AgentLauncher constructor parameter this page claims '
                 'to document, opening the dialog on tap, and both themes '
                 'at two viewport widths.',
           ),
@@ -194,9 +206,9 @@ class AgentLauncherDocPage extends StatelessWidget {
       title: agentLauncherDoc.title,
       description: agentLauncherDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Agent Launcher'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Agent Launcher'),
     ],
     toc: agentLauncherDocSpec.toc,
     previous: null,
@@ -219,39 +231,39 @@ class _PlaceholderChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
       key: ValueKey<String>(keyValue),
       width: double.infinity,
       height: double.infinity,
       alignment: Alignment.center,
       color: theme.popover,
-      child: ElText(
+      child: StyledText(
         'child slot — a console goes here',
-        ElType.body,
+        TextStyles.body,
         color: theme.mutedForeground,
       ),
     );
   }
 }
 
-/// `ElAgentAvatarBuilder`'s own shape: positional, so a call site can hand
+/// `AgentAvatarBuilder`'s own shape: positional, so a call site can hand
 /// over a closure without restating every label. Draws a plain square the
 /// same size the real face would occupy.
 Widget _squareRenderer(
   BuildContext context,
-  ElAgentState state,
-  ElAgentAvatarSize size,
+  AgentState state,
+  AgentAvatarSize size,
   Color? accent,
   double? speed,
 ) {
-  final ElThemeData theme = ElTheme.of(context);
+  final ThemeTokens theme = ThemeScope.of(context);
   return Container(
     width: size.box,
     height: size.box,
     decoration: BoxDecoration(
-      color: accent ?? theme.agent,
-      borderRadius: BorderRadius.circular(ElRadii.sm),
+      color: accent ?? theme.agentAccent,
+      borderRadius: BorderRadius.circular(Radii.sm),
     ),
   );
 }
@@ -278,35 +290,35 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Wrap(
-          spacing: el(2),
-          runSpacing: el(2),
+          spacing: space(2),
+          runSpacing: space(2),
           children: <Widget>[
-            ElButton(
+            Button(
               key: const ValueKey<String>(
                 'agent-launcher-preview-toggle-default',
               ),
-              size: ElButtonSize.sm,
+              size: ButtonSize.sm,
               variant: _customRenderer
-                  ? ElButtonVariant.outline
-                  : ElButtonVariant.secondary,
+                  ? ButtonVariant.outline
+                  : ButtonVariant.secondary,
               onPressed: () => setState(() => _customRenderer = false),
               child: const Text('Default'),
             ),
-            ElButton(
+            Button(
               key: const ValueKey<String>(
                 'agent-launcher-preview-toggle-custom',
               ),
-              size: ElButtonSize.sm,
+              size: ButtonSize.sm,
               variant: _customRenderer
-                  ? ElButtonVariant.secondary
-                  : ElButtonVariant.outline,
+                  ? ButtonVariant.secondary
+                  : ButtonVariant.outline,
               onPressed: () => setState(() => _customRenderer = true),
               child: const Text('avatar: squareRenderer'),
             ),
           ],
         ),
-        SizedBox(height: el(6)),
-        ElAgentLauncher(
+        SizedBox(height: space(6)),
+        AgentLauncher(
           key: const ValueKey<String>('agent-launcher-preview'),
           label: 'Ask the assistant',
           title: 'Vault',
@@ -321,35 +333,33 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   );
 }
 
-const String _previewCode =
-    '''
+const String _previewCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElAgentLauncher(
+AgentLauncher(
   label: 'Ask the assistant',
   title: 'Vault',
   description: 'Ask about packs, pulls, prices and your wallet.',
   child: MyConsole(),
 )
 
-// avatar swaps the trigger's own face for any ElAgentAvatarBuilder:
-ElAgentLauncher(
+// avatar swaps the trigger's own face for any AgentAvatarBuilder:
+AgentLauncher(
   label: 'Ask the assistant',
   title: 'Vault',
   description: 'Ask about packs, pulls, prices and your wallet.',
   avatar: (context, state, size, accent, speed) => Container(
     width: size.box,
     height: size.box,
-    color: accent ?? ElTheme.of(context).agent,
+    color: accent ?? ThemeScope.of(context).agentAccent,
   ),
   child: MyConsole(),
 )''';
 
-const String _usageCode =
-    '''
+const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElAgentLauncher(
+AgentLauncher(
   label: 'Ask the assistant',
   title: 'Assistant',
   description: 'Opens the console.',
@@ -363,8 +373,8 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'The trigger is ElButton(label: widget.label, child: ElAgentFace('
+      _bullets(ThemeScope.of(context), <String>[
+        'The trigger is Button(label: widget.label, child: AgentFace('
             '…)): passing label forces excludeSemantics: true on the '
             'button, so the accessible name is the launcher\'s own '
             'label ("Ask the assistant"), not the face\'s state sentence.',
@@ -385,12 +395,12 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'The trigger inherits ElButton\'s own keyboard handling '
+      _bullets(ThemeScope.of(context), <String>[
+        'The trigger inherits Button\'s own keyboard handling '
             'unchanged: Enter, NumpadEnter, and Space activate it when '
             'focused. agent_launcher.dart wires no Focus node or key '
             'handler of its own.',
-        'Escape closes the open dialog — inherited from ElModalPortal '
+        'Escape closes the open dialog — inherited from OverlayPortal '
             '(dialog.dart), unconditional there, not something '
             'agent_launcher.dart adds.',
       ]);
@@ -401,7 +411,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'dialogSize(viewport) is the one real breakpoint-shaped '
             'computation in the file: width is '
             'max(minFraction · vw, min(maxWidth, viewportFraction · vw)) '
@@ -411,7 +421,7 @@ class _ResponsiveContent extends StatelessWidget {
             '1280px one.',
         'height is min(heightFraction · vh, maxHeight) — a plain min, no '
             'floor.',
-        'ElModalCompact.clampSize takes the last word on a phone: at '
+        'CompactDialogLayout.clampSize takes the last word on a phone: at '
             '375x812 the formula above resolves to 292.5 x 714.6 (714.6 '
             'is 88% of the viewport, leaving nothing for the scrim), and '
             'the clamp brings it to 292.5 x 609. Above the breakpoint the '
@@ -429,7 +439,7 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/agent_launcher.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
@@ -437,15 +447,15 @@ class _DependenciesContent extends StatelessWidget {
             'agent-launcher`: agent-core, agent-face, button, dialog, '
             'source-foundation — copied verbatim from '
             'registry/components/agent-launcher.json. button supplies '
-            'ElButton and ElButtonSurface\'s hoverBorder field (added for '
-            'this call site); dialog supplies ElModalPortal, '
-            'ElJellyTransition, and ElModalCompact.clampSize; agent-face '
-            'supplies the trigger\'s own ElAgentFace and '
-            'ElAgentAvatarBuilder.',
+            'Button and ButtonStyleRecipe\'s hoverBorder field (added for '
+            'this call site); dialog supplies OverlayPortal, '
+            'OpenTransition, and CompactDialogLayout.clampSize; agent-face '
+            'supplies the trigger\'s own AgentFace and '
+            'AgentAvatarBuilder.',
         'semanticDependencies (the manifest\'s own, narrower field): the '
             'same five.',
       ]),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Agent Core', route: '/components/agent-core'),
@@ -463,31 +473,35 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The trigger\'s fill, border, and press feel are outline\'s own '
             '(theme.card, theme.input, shadow-btn/shadow-btn-down) — see '
             "Button's own Theming. The one override this file adds is "
-            'hover:border-agent/50: ElButtonSurface(hoverBorder: '
-            'theme.agent.withValues(alpha: 0.50)), painted on the same '
+            'hover:border-agent/50: ButtonStyleRecipe(hoverBorder: '
+            'theme.agentAccent.withValues(alpha: 0.50)), painted on the same '
             'spring clock the border already rides.',
         'The label chip is theme.card with a theme.border hairline and '
-            'ElShadows.e2 — the same panel chrome a tooltip or a popover '
+            'Shadows.md — the same panel chrome a tooltip or a popover '
             'uses.',
         'The dialog surface is theme.popover, ringed and shadowed by '
-            'ElDialogContent.ringSpec plus ElShadows.e4, both from '
+            'DialogContent.ringSpec plus Shadows.xl, both from '
             'dialog.dart: nothing here paints a bespoke shadow.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -521,38 +535,38 @@ const List<DocsApiFact> _launcherFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'avatar',
-    type: 'ElAgentAvatarBuilder?',
+    type: 'AgentAvatarBuilder?',
     description:
-        'Null takes ElAgentAvatarRegistry.renderer, the same default '
+        'Null takes AgentAvatarRegistry.renderer, the same default '
         "the console header uses.",
   ),
   DocsApiFact(
     name: 'size',
     type: 'static double get',
-    description: 'el(16) = 64px — the trigger\'s own square.',
+    description: 'space(16) = 64px — the trigger\'s own square.',
   ),
   DocsApiFact(
     name: 'inset',
     type: 'static double get',
-    description: 'el(6) = 24px — right and bottom, from the viewport edge.',
+    description: 'space(6) = 24px — right and bottom, from the viewport edge.',
   ),
   DocsApiFact(
     name: 'labelGap',
     type: 'static double get',
-    description: 'el(3) = 12px — between the label and the button.',
+    description: 'space(3) = 12px — between the label and the button.',
   ),
   DocsApiFact(
     name: 'labelRest',
     type: 'static double get',
     description:
-        'el(2) = 8px — the label\'s resting translateX; it SNAPS to 0 on '
+        'space(2) = 8px — the label\'s resting translateX; it SNAPS to 0 on '
         'the first hover frame rather than riding the opacity fade, per '
         "the file's own PROBE CORRECTION.",
   ),
   DocsApiFact(
     name: 'labelPadding',
     type: 'static EdgeInsets get',
-    description: 'Symmetric, el(3) horizontal, el(2) vertical.',
+    description: 'Symmetric, space(3) horizontal, space(2) vertical.',
   ),
   DocsApiFact(
     name: 'hoverRimAlpha',
@@ -572,7 +586,7 @@ const List<DocsApiFact> _launcherFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'dialogMaxWidth',
     type: 'static double get',
-    description: 'el(320) = 1280px — the CSS max-width cap, 80rem.',
+    description: 'space(320) = 1280px — the CSS max-width cap, 80rem.',
   ),
   DocsApiFact(
     name: 'dialogHeightFraction',
@@ -582,7 +596,7 @@ const List<DocsApiFact> _launcherFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'dialogMaxHeight',
     type: 'static double get',
-    description: 'el(208) = 832px — the height formula\'s 52rem cap.',
+    description: 'space(208) = 832px — the height formula\'s 52rem cap.',
   ),
   DocsApiFact(
     name: 'dialogSize',
@@ -590,7 +604,7 @@ const List<DocsApiFact> _launcherFacts = <DocsApiFact>[
     description:
         'The resolved dialog box for a given viewport, CSS\'s own '
         "max(min-width, min(max-width, width)) order, then "
-        'ElModalCompact.clampSize\'s mobile floor. See Responsive.',
+        'CompactDialogLayout.clampSize\'s mobile floor. See Responsive.',
   ),
 ];
 
@@ -603,7 +617,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'label, hover',
     treatment:
-        'opacity 1 over ElDurations.base on ElCurves.outFlex; translateX '
+        'opacity 1 over MotionDurations.normal on MotionCurves.outFlex; translateX '
         'SNAPS to 0 on the first hover frame, not animated',
     userSignal:
         'Fades in while already in position — the measured PROBE '
@@ -611,7 +625,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   ),
   DocsStateFact(
     state: 'dialog, open',
-    treatment: 'ElJellyTransition over the dialog content',
+    treatment: 'OpenTransition over the dialog content',
     userSignal: 'The console (or whatever child is) appears, jellied in.',
   ),
   DocsStateFact(
@@ -619,6 +633,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         "outline's own hover plus this file's own addition, "
         'hover:border-agent/50',
-    userSignal: 'The rim tints toward the agent accent on top of outline\'s own hover.',
+    userSignal:
+        'The rim tints toward the agent accent on top of outline\'s own hover.',
   ),
 ];

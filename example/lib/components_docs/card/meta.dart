@@ -23,12 +23,12 @@ const ComponentDocEntry cardDoc = ComponentDocEntry(
   // registry/components/card.json's own registryDependencies, verbatim.
   dependencies: <String>['source-foundation'],
   exports: <String>[
-    'ElCard',
-    'ElCardHeader',
-    'ElCardTitle',
-    'ElCardDescription',
-    'ElCardContent',
-    'ElCardFooter',
+    'Card',
+    'CardHeader',
+    'CardTitle',
+    'CardDescription',
+    'CardContent',
+    'CardFooter',
   ],
   sourcePath: 'lib/src/components/card.dart',
 );

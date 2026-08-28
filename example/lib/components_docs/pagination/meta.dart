@@ -20,14 +20,14 @@ const ComponentDocEntry paginationDoc = ComponentDocEntry(
   name: 'pagination',
   title: 'Pagination',
   description:
-      'A centred row of page links, built entirely out of ElButton: no '
+      'A centred row of page links, built entirely out of Button: no '
       'page-count model, no truncation logic of its own.',
   dependencies: <String>['button', 'icon', 'source-foundation'],
   exports: <String>[
-    'ElPagination',
-    'ElPaginationLink',
-    'ElPaginationStep',
-    'ElPaginationEllipsis',
+    'Pagination',
+    'PaginationLink',
+    'PaginationStep',
+    'PaginationEllipsis',
   ],
   sourcePath: 'lib/src/components/pagination.dart',
 );

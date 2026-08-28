@@ -4,7 +4,7 @@
 - `app\design-system\icons\page.tsx` — the page (252 lines, server component, no client code, no local components; two module-level `Record` maps `sizeUse` and `toneUse` supply the per-row copy)
 - `components\ui\icon.tsx` — `Icon`, `ICON_SIZES`, `ICON_TONES` — **the page's own subject**, and the thing every other page borrows
 - `lib\el\icons.ts` — `ICON_GROUPS` (four groups, 63 entries) and `ICON_COUNT` (a `reduce`, not a literal)
-- `components\el\kit.tsx` — `ElPageHeader`, `ElSection`, `Panel`, `Meta`, `Code`, `DoDont`, `Note`, `PageFootNav` (all eight used)
+- `components\el\kit.tsx` — `PageHeader`, `Section`, `Panel`, `Meta`, `Code`, `DoDont`, `Note`, `PageFootNav` (all eight used)
 - `components\ui\button.tsx` — `Button` (five instances; four variants plus `ghost`+`size="icon"`)
 - `lib\el\nav.ts` — `findCategory("foundations","icons")` supplies header copy; `siblings()` supplies foot-nav
 - `app\design-system\layout.tsx`, `app\layout.tsx` — shell
@@ -12,10 +12,10 @@
 - `node_modules\lucide-react\dist\esm\icons\*.mjs` — **lucide-react 1.28.0, ISC**; the geometry itself
 
 **Flutter target** (all under `D:\DESIGN\Design-System-2026-8\flutter-design-system\`):
-- `lib\src\components\icon.dart` — `ElIcon`, `ElIconSize`, `ElIconTone` — **already complete**
-- `lib\src\components\icon_paths.dart` — `ElIconGlyph` (8 members), `ElIconElement` (4 subclasses), `_SvgPathParser` — **the gap**
+- `lib\src\components\ui\icon.dart` — `Icon`, `IconSize`, `IconTone` — **already complete**
+- `lib\src\components\ui\icon_paths.dart` — `IconGlyph` (8 members), `IconElement` (4 subclasses), `_SvgPathParser` — **the gap**
 - `test\icon_paths_test.dart` — the transcript guard
-- `example\lib\kit.dart` — `ElPageHeader`/`ElSection`/`ElPanel`/`ElMeta`/`ElCode`/`ElDoDont`/`ElNote`/`ElPageFootNav`
+- `example\lib\kit.dart` — `PageHeader`/`Section`/`Panel`/`Meta`/`Code`/`DoDont`/`Note`/`PageFootNav`
 - `example\lib\nav.dart` — `icons` category already registered, last in `foundations`
 - `example\lib\main.dart` — `pageFor()`; `/design-system/icons` currently falls to `PlaceholderPage`
 
@@ -32,7 +32,7 @@ Identical to every other foundations page — see `spacing-map.md §0`. Restated
 
 ---
 
-## 1 · Page header (`ElPageHeader`)
+## 1 · Page header (`PageHeader`)
 
 `<header class="mb-14 border-b border-border pb-10">` — 56px below, 40px inner bottom. All four props come from `findCategory("foundations","icons")`; **the page overrides nothing** (unlike the colors page, which substitutes its own blurb and chips).
 
@@ -49,7 +49,7 @@ Identical to every other foundations page — see `spacing-map.md §0`. Restated
 
 ## 2 · Section `#component` — "The Icon component"
 
-`ElSection` shell (all sections): `<section id="…" class="mb-20">` (80px); heading block `mb-6`; `h2.type-h3.text-foreground` (21px/1.3, 600, −0.01em); description `p.type-small.mt-2.max-w-2xl` (13px/1.5, 400, muted).
+`Section` shell (all sections): `<section id="…" class="mb-20">` (80px); heading block `mb-6`; `h2.type-h3.text-foreground` (21px/1.3, 600, −0.01em); description `p.type-small.mt-2.max-w-2xl` (13px/1.5, 400, muted).
 
 Description (verbatim): **"Lucide is the source set, but it is never imported straight into a screen. Everything goes through one component, which forces a size, a tone and an accessibility decision on every instance."**
 
@@ -125,7 +125,7 @@ It is a **three-rung snap, not a clamp** — the middle branch is a literal `2`,
 | 2xl | 32 | 1.500 | middle (`1.5 < 1.5` is false) | **2.0** | 2.67 |
 | 3xl | 40 | 1.200 | `< 1.5` | **1.6** | 2.67 |
 
-So the optical claim in the copy is approximate rather than exact: rendered stroke still climbs 1.20 → 2.67 across the ladder. Port the ternary, not the claim. `ElIcon.strokeFor` already transcribes it and `test/components_test.dart:92–101` already pins all seven rungs with the reasoning in a comment.
+So the optical claim in the copy is approximate rather than exact: rendered stroke still climbs 1.20 → 2.67 across the ladder. Port the ternary, not the claim. `Icon.strokeFor` already transcribes it and `test/components_test.dart:92–101` already pins all seven rungs with the reasoning in a comment.
 
 ---
 
@@ -155,7 +155,7 @@ Description (verbatim): **"Seven steps. Icons pair with text, so each size exist
 
 Both the `·` and the `—` are literal U+00B7 / U+2014. The mono span is `--muted-foreground`, the sentence after it is `.type-small`'s own muted — same colour, different family and size, which is the whole point of the treatment.
 
-⚠ **Key-name mapping for the Dart port.** The page prints the *object key*. `ElIconSize` spells the last two rungs `xl2`/`xl3` because Dart identifiers cannot start with a digit. The port must render **`2xl`** and **`3xl`**, not `xl2`/`xl3` — a label table, not `.name`.
+⚠ **Key-name mapping for the Dart port.** The page prints the *object key*. `IconSize` spells the last two rungs `xl2`/`xl3` because Dart identifiers cannot start with a digit. The port must render **`2xl`** and **`3xl`**, not `xl2`/`xl3` — a label table, not `.name`.
 
 ---
 
@@ -187,7 +187,7 @@ Each cell `div.flex.items-center.gap-3` (12px):
 
 Two things a 1:1 port must reproduce rather than tidy: **cells 2 and 3 are visually identical** (`subtle` is a separate *intent*, not a separate colour — `icon.tsx` keeps the name so the two can diverge later without touching call sites), and **cell 10 renders as plain foreground** because nothing on this page sets a text colour on the panel body, so `inherit` shows the `default` colour. The tone map also carries a five-line comment in `icon.tsx:38–43` recording that `success`/`warning` once resolved to the brand ramp and `info` to plain muted, which made the three semantic state colours unreachable — worth keeping in the Dart doc comment (it already is).
 
-⚠ **Key-name mapping.** `ElIconTone.normal` must render as **`default`** (Dart reserves `default`). Same label-table requirement as §3.
+⚠ **Key-name mapping.** `IconTone.normal` must render as **`default`** (Dart reserves `default`). Same label-table requirement as §3.
 
 ---
 
@@ -205,13 +205,13 @@ Description (verbatim): **"Inside a button an icon should inherit the button's c
 
 ⚠⚠ **The size override — the single most important rendering fact in this section.** `Icon` emits `width`/`height` **attributes**, and its `className` is `cn("shrink-0", ICON_TONES[tone], className)` — never containing the substring `size-`. So `[&_svg:not([class*='size-'])]:size-4` matches, and a CSS rule beats an SVG presentation attribute. **The four labelled buttons ask for `size="sm"` (14px) and render 16×16.** The `strokeWidth` attribute is *not* CSS, so it stays at the value computed for 14px — which is 2.4, and `strokeFor(16)` is also 2.4, so the two coincide and no stroke drift is visible. `size="icon"` sets only `size-10` and adds no SVG override, so the ghost button's `size="md"` icon renders at its own 16px. Net: **all five glyphs paint at 16px with stroke 2.4.**
 
-(The same mechanism, in the opposite direction, is why `ElIcon.sizePx` exists — the overview page's `<Icon size="md" className="size-5">` comes out 20px carrying md's 2.4 stroke. See `icon.dart:107–119`.)
+(The same mechanism, in the opposite direction, is why `Icon.sizePx` exists — the overview page's `<Icon size="md" className="size-5">` comes out 20px carrying md's 2.4 stroke. See `icon.dart:107–119`.)
 
 Size `default` = `h-10 gap-2 px-4 text-sm` → **40px tall, 16px horizontal padding, 8px icon-to-label gap, 13px label** (`--text-sm` is aliased to `--text-small` = 0.8125rem — **13px, not 14px**).
 
 | # | markup | variant surface | icon |
 |---|---|---|---|
-| 1 | `<Button><Icon icon={PackageOpen} size="sm" tone="inherit" />Open Pack</Button>` | `sheen-action bg-primary text-primary-foreground shadow-btn-primary active:shadow-btn-down` — `--primary` = `--color-action` `hsl(217 91% 53%)` both themes, label `hsl(0 0% 100%)`, plus the `sheen-action` gradient + beat pseudo-elements | PackageOpen, 16px, stroke 2.4, `text-current` → white |
+| 1 | `<Button><Icon icon={PackageOpen} size="sm" tone="inherit" />Open Pack</Button>` | `action-feedback bg-primary text-primary-foreground shadow-btn-primary active:shadow-btn-down` — `--primary` = `--color-action` `hsl(217 91% 53%)` both themes, label `hsl(0 0% 100%)`, plus the `action-feedback` gradient + beat pseudo-elements | PackageOpen, 16px, stroke 2.4, `text-current` → white |
 | 2 | `<Button variant="secondary">…Favourite` | `bg-secondary text-secondary-foreground hover:bg-accent aria-expanded:bg-accent` — dark `hsl(240 3.7% 15.9%)`, light `hsl(240 4.8% 95.9%)`; **no shadow** | Heart, 16px, 2.4, inherit |
 | 3 | `<Button variant="outline">…Search` | `border-input bg-card text-foreground shadow-btn hover:bg-muted active:shadow-btn-down aria-expanded:bg-muted` | Search, 16px, 2.4, inherit |
 | 4 | `<Button variant="destructive">…Remove` | `border-destructive/25 bg-destructive/10 text-destructive-ink hover:border-destructive/40 hover:bg-destructive/20 focus-visible:border-destructive/50 focus-visible:ring-destructive/25` — **a tint, not a fill**; `--destructive` `hsl(0 72.2% 50.6%)` in both themes, ink flips `#f87171` / `hsl(0 72.2% 46%)`; **no shadow** | Trash2, 16px, 2.4, inherit → destructive-ink |
@@ -385,7 +385,7 @@ No entrance or keyframe animations on the page's own content. Everything that mo
 
 - **`press`** (foot-nav link, header logo): `transition: transform 250ms cubic-bezier(0.34,1.56,0.64,1)`; `:active { transform: scale(0.94); transition-duration: 40ms }` — 40ms in, springy 250ms out (globals.css:2277–2284).
 - **`btn-spring`** on all five buttons — §5.
-- **`sheen-action`** on button 1 only (globals.css:2090+): a 176° five-stop `linear-gradient` background, a `::before` radial "beat" ellipse (`mix-blend-mode` **multiply on light, screen on dark**, globals.css:3289–3295) that animates `action-beat` **2.6s `--ease-out` infinite on hover** and **620ms once on `:active`**, plus a static `::after` texture layer. **At rest, on a docs page nobody is hovering, only the linear gradient and the texture are visible.**
+- **`action-feedback`** on button 1 only (globals.css:2090+): a 176° five-stop `linear-gradient` background, a `::before` radial "beat" ellipse (`mix-blend-mode` **multiply on light, screen on dark**, globals.css:3289–3295) that animates `action-beat` **2.6s `--ease-out` infinite on hover** and **620ms once on `:active`**, plus a static `::after` texture layer. **At rest, on a docs page nobody is hovering, only the linear gradient and the texture are visible.**
 - **Foot-nav / button border+background hovers** ride their element's own transition (`press` covers `transform` only, so the foot-nav border change is instant; `btn-spring` covers `border-color`/`background-color`, so button hovers are 250ms).
 - Anchor travel: smooth scroll, 96px `scroll-padding-block-start`; `prefers-reduced-motion: reduce` forces `scroll-behavior: auto !important`.
 - The glyph tiles, the ladder and the 63-cell grids are **completely static** — no hover, no copy-to-clipboard, no click target anywhere in `#sizes`, `#tones` or `#set`.
@@ -444,25 +444,25 @@ Radii used: `rounded-pill` 999 (buttons, chips) · `rounded-xl` 16 (Panels) · `
 
 There is **no icon font and no SVG asset**. Geometry is embedded as Dart data and stroked on a `Canvas`.
 
-`lib\src\components\icon_paths.dart` (652 lines):
-- `enum ElIconGlyph` — **8 members**: `menu, x, sun, monitor, moon, arrowLeft, arrowRight, check`.
-- `sealed class ElIconElement` with **four** subclasses, one per lucide `__iconNode` node type:
-  - `ElIconPathElement(String d)` — the `d` attribute character-for-character; parsed on every `addTo`.
-  - `ElIconLineElement(x1, y1, x2, y2)` — `moveTo`/`lineTo`. (Constructor is point-then-point; lucide writes `x1, x2, y1, y2`, so the transcription reorders deliberately.)
-  - `ElIconCircleElement(cx, cy, r)` — `Path.addOval`.
-  - `ElIconRectElement(x, y, width, height, rx)` — `Path.addRRect`, uniform radius.
-- `ElIconPaths.viewBox = 24`; `ElIconPaths.elements` is a `const Map<ElIconGlyph, List<ElIconElement>>`, in lucide's own element order (paint order **and** diff order against the `.mjs`).
-- `ElIconPaths.pathFor(glyph)` returns a **fresh** `Path` per call — deliberate, because `Path` is mutable and a shared instance would let one painter corrupt every other icon.
+`lib\src\components\ui\icon_paths.dart` (652 lines):
+- `enum IconGlyph` — **8 members**: `menu, x, sun, monitor, moon, arrowLeft, arrowRight, check`.
+- `sealed class IconElement` with **four** subclasses, one per lucide `__iconNode` node type:
+  - `IconPathElement(String d)` — the `d` attribute character-for-character; parsed on every `addTo`.
+  - `IconLineElement(x1, y1, x2, y2)` — `moveTo`/`lineTo`. (Constructor is point-then-point; lucide writes `x1, x2, y1, y2`, so the transcription reorders deliberately.)
+  - `IconCircleElement(cx, cy, r)` — `Path.addOval`.
+  - `IconRectElement(x, y, width, height, rx)` — `Path.addRRect`, uniform radius.
+- `IconPaths.viewBox = 24`; `IconPaths.elements` is a `const Map<IconGlyph, List<IconElement>>`, in lucide's own element order (paint order **and** diff order against the `.mjs`).
+- `IconPaths.pathFor(glyph)` returns a **fresh** `Path` per call — deliberate, because `Path` is mutable and a shared instance would let one painter corrupt every other icon.
 - `_SvgPathParser` — a complete single-pass `d` reader implementing **`M m L l H h V v C c S s Q q T t A a Z z`**, with the two SVG rules that actually bite: optional separators (`1 1-9.473`, `.405-.022`) and sticky command letters with the implicit-lineto degradation (`M`→`L`, `m`→`l`). Arc flags are scanned **one character at a time** (`_flag()`), not as numbers, so packed `0 00-2.474` and `1 1-9.473` both parse. Elliptical arcs use endpoint→centre parameterisation per SVG 1.1 **F.6.5** with the out-of-range radii correction of **F.6.6**, split into ≤90° cubic segments with the `4/3·tan(θ/4)` construction, and the final segment lands on the caller's endpoint verbatim so float drift cannot open a hairline gap. Malformed data **throws** rather than recovering — the input is a const string in the repo, so a throw is a build-time transcription bug.
 
-`lib\src\components\icon.dart`:
+`lib\src\components\ui\icon.dart`:
 - `_GlyphPainter.paint` does `canvas.scale(size.width / 24, size.height / 24)` then **one** `canvas.drawPath` with a single `Paint`: `style = PaintingStyle.stroke`, `strokeCap = round`, `strokeJoin = round`, `strokeWidth` in **24-unit space** — exactly what an SVG `stroke-width` attribute is, and exactly what a browser does when it fits a `viewBox` into a smaller box.
 
 ### 12.2 Answer to the port question: **yes, the web's per-size stroke retune is fully portable — it already is ported**
 
 This is the decisive advantage of path-drawn glyphs over a font. With an icon font the outline is baked at design time and stroke weight is not a free parameter; here it is a `Paint` field. Because the path is authored in 24 units and the canvas is scaled by `px/24`, a `strokeWidth` of 2.4 renders `2.4 × px/24` device px — bit-for-bit the browser's behaviour.
 
-`ElIcon.strokeFor(double px)` (`icon.dart:157–162`) is a literal transcription of the ternary, including the three named constants `_heavyStroke 2.4 / _lightStroke 1.6 / _heavyAbove 2.6 / _lightBelow 1.5` and a doc comment explaining that the middle branch is a **literal 2**, not `48/px`. `test/components_test.dart:92–101` pins all seven rungs, and comments the `1.5 < 1.5 == false` edge at 2xl. `ElIcon.strokeOverride` exists for the theme toggle, which renders lucide's default stroke 2 at 14px rather than the formula's 2.4.
+`Icon.strokeFor(double px)` (`icon.dart:157–162`) is a literal transcription of the ternary, including the three named constants `_heavyStroke 2.4 / _lightStroke 1.6 / _heavyAbove 2.6 / _lightBelow 1.5` and a doc comment explaining that the middle branch is a **literal 2**, not `48/px`. `test/components_test.dart:92–101` pins all seven rungs, and comments the `1.5 < 1.5 == false` edge at 2xl. `Icon.strokeOverride` exists for the theme toggle, which renders lucide's default stroke 2 at 14px rather than the formula's 2.4.
 
 **Nothing in the stroke story needs work.** The gap is purely geometric.
 
@@ -553,10 +553,10 @@ node -e 'const s=require("fs").readFileSync("node_modules/lucide-react/dist/esm/
 
 These are decisions, not transcriptions — the only places the implementer must add code rather than copy data.
 
-1. **`polyline` is not implemented.** `Package` node 3 is `["polyline", { points: "3.29 7 12 12 20.71 7" }]`. `ElIconElement`'s own docstring already anticipates this ("lucide only ever emits `path`, `line`, `circle`, `rect`, `ellipse` and `polyline` nodes, and these four cover every glyph this package embeds. A new node type is a new subclass here, not a special case at the call site"). **Add `ElIconPolylineElement(List<Offset> points)`** → `moveTo` the first, `lineTo` the rest, **do not close** (that is `polygon`, which lucide does not emit). One glyph needs it; it is the file's own prescribed remedy.
+1. **`polyline` is not implemented.** `Package` node 3 is `["polyline", { points: "3.29 7 12 12 20.71 7" }]`. `IconElement`'s own docstring already anticipates this ("lucide only ever emits `path`, `line`, `circle`, `rect`, `ellipse` and `polyline` nodes, and these four cover every glyph this package embeds. A new node type is a new subclass here, not a special case at the call site"). **Add `IconPolylineElement(List<Offset> points)`** → `moveTo` the first, `lineTo` the rest, **do not close** (that is `polygon`, which lucide does not emit). One glyph needs it; it is the file's own prescribed remedy.
 2. **`fill` is not implemented, and one glyph needs it.** `Tag` node 2 is `["circle", { cx: "7.5", cy: "7.5", r: ".5", fill: "currentColor" }]` — a **filled** 0.5-unit dot. `_GlyphPainter` builds one `Path` and strokes it with one `Paint`. As written, Tag's dot would paint as a 1-unit-diameter ring stroked at 2 units — a blob roughly 5× its intended area, and visibly wrong at 20px. **This needs the element model to carry a fill flag and the painter to make two passes** (stroke the unfilled elements, fill the filled ones), which also means `pathFor` can no longer return a single `Path` for every glyph. This is the one genuine architectural change in the batch — scope it before starting, not after 58 transcriptions.
-3. **`ry` on `rect` — the doc comment is now false.** `ElIconRectElement`'s docstring says *"lucide never sets `ry`, so SVG's '`ry` defaults to `rx`' rule applies"*. `copy.mjs` and `lock.mjs` both ship `rx: "2", ry: "2"`. Numerically harmless (`ry == rx`, so the uniform `Radius.circular(rx)` is still correct), but the comment must be corrected to *"lucide sets `ry` only where it equals `rx`"* and the transcript test should assert that equality rather than assume it.
-4. **Closed subpaths arrive for the first time.** Twelve of the 59 carry `z`/`Z`: `Package, Layers, Trophy, PackageOpen, Filter, Sparkles, Crown, Zap, Star, Tag, Shield, ShieldCheck`. The parser handles `Z` correctly. But `test/icon_paths_test.dart:246–271` asserts *"`Z` closes the subpath — and nothing else does"* over a **named allowlist** of six glyphs, so it will not break — it just stops covering the new majority. More importantly, `icon_paths_test.dart:145–162` loops **every** `ElIconGlyph.values` and asserts `getBounds()` stays within `[−0.01, 24.01]`. `getBounds()` includes cubic **control** points, which bulge outside the drawn curve (moon already measures `left 2.9121` vs a sampled `2.9979`). Several arc-heavy glyphs reach the grid edge; **verify this assertion still passes before assuming it does**, and if it fails, widen it with the `_tightBounds` sampler the file already provides rather than by loosening the constant.
+3. **`ry` on `rect` — the doc comment is now false.** `IconRectElement`'s docstring says *"lucide never sets `ry`, so SVG's '`ry` defaults to `rx`' rule applies"*. `copy.mjs` and `lock.mjs` both ship `rx: "2", ry: "2"`. Numerically harmless (`ry == rx`, so the uniform `Radius.circular(rx)` is still correct), but the comment must be corrected to *"lucide sets `ry` only where it equals `rx`"* and the transcript test should assert that equality rather than assume it.
+4. **Closed subpaths arrive for the first time.** Twelve of the 59 carry `z`/`Z`: `Package, Layers, Trophy, PackageOpen, Filter, Sparkles, Crown, Zap, Star, Tag, Shield, ShieldCheck`. The parser handles `Z` correctly. But `test/icon_paths_test.dart:246–271` asserts *"`Z` closes the subpath — and nothing else does"* over a **named allowlist** of six glyphs, so it will not break — it just stops covering the new majority. More importantly, `icon_paths_test.dart:145–162` loops **every** `IconGlyph.values` and asserts `getBounds()` stays within `[−0.01, 24.01]`. `getBounds()` includes cubic **control** points, which bulge outside the drawn curve (moon already measures `left 2.9121` vs a sampled `2.9979`). Several arc-heavy glyphs reach the grid edge; **verify this assertion still passes before assuming it does**, and if it fails, widen it with the `_tightBounds` sampler the file already provides rather than by loosening the constant.
 
 ### 12.5 Parser coverage across the 59 (no parser work required)
 
@@ -582,38 +582,38 @@ Every command the curated set uses is already implemented **and** now exercised 
 
 | thing | where |
 |---|---|
-| `ElIcon`, the 7-rung ladder, `pxFor`, the tone map, `colorFor`, `label`→`Semantics`/`ExcludeSemantics` | `lib\src\components\icon.dart` |
+| `Icon`, the 7-rung ladder, `pxFor`, the tone map, `colorFor`, `label`→`Semantics`/`ExcludeSemantics` | `lib\src\components\ui\icon.dart` |
 | `strokeFor` — the exact three-rung snap, pinned at all 7 rungs | `icon.dart:157`, `test\components_test.dart:92` |
 | `sizePx` / `strokeOverride` escape hatches (needed for §5's 14→16 override if transcribed literally) | `icon.dart:107–128` |
 | SVG `d` parser with full grammar + F.6.5/F.6.6 arcs | `icon_paths.dart:268–652` |
-| All eight kit primitives: `ElPageHeader`, `ElSection`, `ElPanel` (with `label` **and** `note`), `ElMeta`, `ElCode`, `ElDoDont`, `ElNote`, `ElPageFootNav` | `example\lib\kit.dart` |
-| `ElGrid(base:1, sm:2, lg:3)` — exactly the tones and set grids | `example\lib\kit.dart:814` |
+| All eight kit primitives: `PageHeader`, `Section`, `Panel` (with `label` **and** `note`), `Meta`, `Code`, `DoDont`, `Note`, `PageFootNav` | `example\lib\kit.dart` |
+| `Grid(base:1, sm:2, lg:3)` — exactly the tones and set grids | `example\lib\kit.dart:814` |
 | `icons` nav category, last in `foundations`, with the six chips verbatim | `example\lib\nav.dart` |
 | `siblings('foundations','icons')` → `(prev: Motion, next: null)`, already asserted | `example\lib\nav.dart:731`, `example\test\nav_test.dart:121` |
-| `ElPageFootNav` empty-slot branch (`SizedBox.shrink()` inside `Expanded`) | `example\lib\kit.dart:1062` |
-| Theme fields for every colour in §10, incl. `primary`, `secondary`, `accent`, `destructive`, `successInk`/`warningInk`/`infoInk` | `lib\src\foundation\theme.dart` |
-| `ElShadows.btn`, `.btnPrimary`, `.btnDown` | `lib\src\foundation\shadows.dart:204–237` |
-| `ElPress` (250ms spring / 40ms in) and `ElThinScrollbar` | `lib\src\motion\press.dart`, `example\lib\shell.dart` |
+| `PageFootNav` empty-slot branch (`SizedBox.shrink()` inside `Expanded`) | `example\lib\kit.dart:1062` |
+| Theme fields for every colour in §10, incl. `primary`, `secondary`, `accent`, `destructive`, `successText`/`warningText`/`infoText` | `lib\src\design_system\foundation\theme.dart` |
+| `Shadows.control`, `.btnPrimary`, `.btnDown` | `lib\src\design_system\foundation\shadows.dart:204–237` |
+| `Press` (250ms spring / 40ms in) and `ThinScrollbar` | `lib\src\components\ui\press.dart`, `example\lib\shell.dart` |
 
 ### Missing — must be built
 
 | # | thing | why the icons page needs it | size |
 |---|---|---|---|
-| 1 | **59 glyphs in `ElIconGlyph` + `ElIconPaths.elements`**, with 59 transcript assertions | §6 renders all 63; §3 needs `PackageOpen`; §4 needs `Search`; §5 needs `PackageOpen`, `Heart`, `Search`, `Trash2` | large, mechanical |
-| 2 | **`ElIconPolylineElement`** | `Package` | tiny |
+| 1 | **59 glyphs in `IconGlyph` + `IconPaths.elements`**, with 59 transcript assertions | §6 renders all 63; §3 needs `PackageOpen`; §4 needs `Search`; §5 needs `PackageOpen`, `Heart`, `Search`, `Trash2` | large, mechanical |
+| 2 | **`IconPolylineElement`** | `Package` | tiny |
 | 3 | **Fill support in the element model + `_GlyphPainter`** (two-pass paint) | `Tag`'s `fill="currentColor"` dot | small but architectural — see §12.4.2 |
-| 4 | **`ElButtonVariant.primary` / `.secondary` / `.destructive`** | §5 buttons 1, 2, 4. `button.dart:28–36` currently has **only `outline` and `ghost`**, and its header says the other five "drop in later — they need `sheen-action` and `foil-value`" | medium |
-| 5 | **`sheen-action`** — 176° 5-stop linear gradient + radial beat `::before` (multiply on light / screen on dark) + static texture `::after` | button 1 only; at rest only the gradient and texture show, the beat is hover/active | medium; can ship the gradient first and the beat later |
-| 6 | **A multi-line code-block widget** (`<pre>`) | §2.1. `ElCode` is the **inline chip only** — there is no `pre` equivalent anywhere in `example\lib\kit.dart`. Needs: `ElType.code` at **1.625** leading (not `.type-code`'s 1.4), `--muted-foreground`, `--background` fill, 12px radius, 20px padding, horizontal scroll via the existing `ElThinScrollbar` | small |
+| 4 | **`ButtonVariant.primary` / `.secondary` / `.destructive`** | §5 buttons 1, 2, 4. `button.dart:28–36` currently has **only `outline` and `ghost`**, and its header says the other five "drop in later — they need `action-feedback` and `premium-surface`" | medium |
+| 5 | **`action-feedback`** — 176° 5-stop linear gradient + radial beat `::before` (multiply on light / screen on dark) + static texture `::after` | button 1 only; at rest only the gradient and texture show, the beat is hover/active | medium; can ship the gradient first and the beat later |
+| 6 | **A multi-line code-block widget** (`<pre>`) | §2.1. `Code` is the **inline chip only** — there is no `pre` equivalent anywhere in `example\lib\kit.dart`. Needs: `Type.code` at **1.625** leading (not `.type-code`'s 1.4), `--muted-foreground`, `--background` fill, 12px radius, 20px padding, horizontal scroll via the existing `ThinScrollbar` | small |
 | 7 | **`example\lib\pages\icons.dart`** + one `switch` arm in `main.dart` (`'$elRoot/icons' => const IconsPage()`) + the `import` | the page itself | medium |
-| 8 | **Label tables** `ElIconSize → "xs".."3xl"` and `ElIconTone → "default".."inherit"` | §3 and §4 print the *key*, and Dart spells two sizes and one tone differently | tiny |
+| 8 | **Label tables** `IconSize → "xs".."3xl"` and `IconTone → "default".."inherit"` | §3 and §4 print the *key*, and Dart spells two sizes and one tone differently | tiny |
 | 9 | **Test file `example\test\icons_page_test.dart`** + a route entry in `vertical_parity_probe_test.dart` and `wrap_parity_probe_test.dart` | every other ported page has one; the probes iterate a route map | medium |
 
-**Build-order constraint:** items 2–3 change `ElIconElement`'s shape and `pathFor`'s return contract. Do them **before** item 1, or 59 transcriptions get rewritten.
+**Build-order constraint:** items 2–3 change `IconElement`'s shape and `pathFor`'s return contract. Do them **before** item 1, or 59 transcriptions get rewritten.
 
 **`token_guard_test.dart` applies — but read what it actually forbids.** `test\token_guard_test.dart` scans `lib` **and** `example/lib` as raw text, comments included, exempting only `lib/src/foundation/`. It is **not** a blanket numeric-literal scan: it is **nine specific patterns** — `Color(0x`, `Color.from`, `fontSize:\s*\d`, `letterSpacing:\s*-?\d`, `FontWeight.w\d`, `\bCurves.`, `Duration((milli|micro)seconds:\s*\d`, `BorderRadius.circular(\d`, `BoxShadow(`. Bare `0`/`0.0` and `elTransparent` are always legal; the escape hatch is `// allow-hardcoded: <reason>` on the line.
 
-Consequence for this batch: **glyph coordinates are safe.** `ElIconCircleElement(12, 12, 4)` matches no rule, which is why `icon_paths.dart` carries **zero** `allow-hardcoded` markers today and why 162 new elements need none either. What *will* trip the guard in the new page is typography and chrome: use `ElType.*` rather than `fontSize:`/`letterSpacing:`/`FontWeight.w*`, `ElRadii.*` through the existing kit rather than `BorderRadius.circular(12)`, `ElShadows.*`/`ElMachineSurface` rather than `BoxShadow(`, `ElCurves.*` rather than `Curves.*`, and `ElDurations.*` rather than `Duration(milliseconds: 250)` — the last two matter for the `sheen-action` beat in item 5.
+Consequence for this batch: **glyph coordinates are safe.** `IconCircleElement(12, 12, 4)` matches no rule, which is why `icon_paths.dart` carries **zero** `allow-hardcoded` markers today and why 162 new elements need none either. What *will* trip the guard in the new page is typography and chrome: use `Type.*` rather than `fontSize:`/`letterSpacing:`/`FontWeight.w*`, `Radii.*` through the existing kit rather than `BorderRadius.circular(12)`, `Shadows.*`/`MachineSurface` rather than `BoxShadow(`, `Curves.*` rather than `Curves.*`, and `Durations.*` rather than `Duration(milliseconds: 250)` — the last two matter for the `action-feedback` beat in item 5.
 
 ---
 
@@ -630,23 +630,23 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 
 // Decorative — adjacent text already says "Open Pack",
 // so the glyph is hidden from screen readers.
-const ElIcon(ElIconGlyph.packageOpen, size: ElIconSize.md, tone: ElIconTone.inherit)
+const Icon(IconGlyph.packageOpen, size: IconSize.md, tone: IconTone.inherit)
 
 // Meaningful — icon-only control, so it must be named.
-const ElIcon(ElIconGlyph.heart, size: ElIconSize.lg, tone: ElIconTone.value, label: 'Add to favourites')
+const Icon(IconGlyph.heart, size: IconSize.lg, tone: IconTone.value, label: 'Add to favourites')
 ```
 
 Two consequences to accept deliberately: (a) the two-import head collapses to one (Dart has a barrel; there is no separate `lucide-react` package), so the block loses a line unless a filler is added — prefer losing the line to inventing an import; (b) `Heart` is imported implicitly, which quietly **fixes** the reference's missing-import bug (§11.5). Note the fix rather than reintroducing the bug.
 
 The alternative — ship the TSX verbatim — is defensible only if the map's purpose is archival. Flag this for a human decision; it is the one place on this page where "verbatim" and "1:1" genuinely point in different directions.
 
-**Q2 — Does the Flutter `ElIconGlyph` keep the curated *name* or the lucide *module* name for the three aliases?** `Filter`/`funnel`, `HelpCircle`/`circle-question-mark`, `AlertTriangle`/`triangle-alert`. **Recommendation: name the enum member for the curated name** (`filter`, `helpCircle`, `alertTriangle`) because §6 prints those strings and the whitelist is `icons.ts`; put the real module in the transcript comment so an audit finds the geometry. Same for `Rows3` → `rows3` (module `rows-3.mjs`) and `Share2`/`Trash2`.
+**Q2 — Does the Flutter `IconGlyph` keep the curated *name* or the lucide *module* name for the three aliases?** `Filter`/`funnel`, `HelpCircle`/`circle-question-mark`, `AlertTriangle`/`triangle-alert`. **Recommendation: name the enum member for the curated name** (`filter`, `helpCircle`, `alertTriangle`) because §6 prints those strings and the whitelist is `icons.ts`; put the real module in the transcript comment so an audit finds the geometry. Same for `Rows3` → `rows3` (module `rows-3.mjs`) and `Share2`/`Trash2`.
 
-**Q3 — Reproduce the 14px→16px button-icon override, or write 16px directly?** The reference *renders* 16px. **Recommendation: write `ElIconSize.md` (16px) and comment the reference's `size="sm"` + the CSS rule that overrode it.** `sizePx` is not needed here because the strokes coincide; reserve that hatch for the overview page's genuine 20px/2.4 mismatch.
+**Q3 — Reproduce the 14px→16px button-icon override, or write 16px directly?** The reference *renders* 16px. **Recommendation: write `IconSize.md` (16px) and comment the reference's `size="sm"` + the CSS rule that overrode it.** `sizePx` is not needed here because the strokes coincide; reserve that hatch for the overview page's genuine 20px/2.4 mismatch.
 
 **Q4 — Does `#set` need six anchors to satisfy the six nav chips?** The chips are static `<li>` in the reference and do not scroll (`colors-map.md §2`). The Flutter `nav.dart` comment insists `contents` is "a commitment, not a label". **Recommendation: render the chips as data, keep the six real sections (`component/sizes/tones/in-context/set/rules`), and record the mismatch in §11.1 as reference drift** — inventing three extra sections to satisfy a chip list would be a divergence, not a fidelity gain.
 
-**Q5 — How much of `sheen-action` ships in v1?** Button 1's resting appearance is the linear gradient + static texture; the radial beat is hover/active only. **Recommendation: ship the gradient and texture, defer the `action-beat` keyframe**, and note it — this page is not the buttons page, and the shadows/motion pages will need the full effect anyway.
+**Q5 — How much of `action-feedback` ships in v1?** Button 1's resting appearance is the linear gradient + static texture; the radial beat is hover/active only. **Recommendation: ship the gradient and texture, defer the `action-beat` keyframe**, and note it — this page is not the buttons page, and the shadows/motion pages will need the full effect anyway.
 
 **Q6 — Do the two visually identical tone swatches (`muted` / `subtle`) get a comment in the port?** **Recommendation: yes** — `icon.dart` already documents why the names differ; the docs page should not look like a bug to a reader diffing screenshots.
 

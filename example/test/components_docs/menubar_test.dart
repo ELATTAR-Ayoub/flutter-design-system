@@ -4,10 +4,10 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
-/// coverage uses a live `ElThemeController` flipped in place rather than two
+/// coverage uses a live `ThemeController` flipped in place rather than two
 /// independent pumps.
 ///
-/// ElMenubar mounts its open menu through [OverlayPortal] (via ElPopover),
+/// Menubar mounts its open menu through [OverlayPortal] (via Popover),
 /// so the live specimen needs a real [Overlay]: the harness wraps the page
 /// in a `MaterialApp`, the same fix Popover and Select needed.
 ///
@@ -21,7 +21,33 @@ import 'package:example/components_docs/menubar/meta.dart';
 import 'package:example/components_docs/menubar/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
@@ -44,27 +70,27 @@ Future<void> _openDisclosure(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-Future<ElThemeController> _pumpPage(
+Future<ThemeController> _pumpPage(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -94,7 +120,7 @@ void main() {
       expect(menubarDoc.sourcePath, 'lib/src/components/menubar.dart');
       expect(
         menubarDoc.exports,
-        containsAll(<String>['ElMenubar', 'ElMenubarMenu']),
+        containsAll(<String>['Menubar', 'MenubarMenu']),
       );
       // Short description: one sentence, no trailing ellipsis.
       expect(menubarDoc.description, isNot(contains('..')));
@@ -156,10 +182,10 @@ void main() {
         await _pumpPage(tester, size: const Size(1440, 4000));
         await _openDisclosure(tester, 'API Reference');
 
-        // ElMenubar.
+        // Menubar.
         expect(find.text('menus'), findsWidgets);
 
-        // ElMenubarMenu.
+        // MenubarMenu.
         expect(find.text('label'), findsWidgets);
         expect(find.text('children'), findsWidgets);
       },
@@ -173,13 +199,13 @@ void main() {
       expect(find.textContaining('elattar add menubar'), findsWidgets);
     });
 
-    testWidgets('documents that the component is built on ElPopover', (
+    testWidgets('documents that the component is built on Popover', (
       WidgetTester tester,
     ) async {
       await _pumpPage(tester, size: const Size(1440, 4000));
       await _openDisclosure(tester, 'Dependencies');
 
-      expect(find.textContaining('ElPopover'), findsWidgets);
+      expect(find.textContaining('Popover'), findsWidgets);
     });
   });
 
@@ -246,7 +272,7 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpPage(tester, mode: ElThemeMode.light);
+      await _pumpPage(tester, mode: ColorMode.light);
       expect(
         find.byKey(const ValueKey<String>('menubar-specimen')),
         findsOneWidget,
@@ -255,7 +281,7 @@ void main() {
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpPage(tester, mode: ElThemeMode.dark);
+      await _pumpPage(tester, mode: ColorMode.dark);
       expect(
         find.byKey(const ValueKey<String>('menubar-specimen')),
         findsOneWidget,
@@ -266,16 +292,16 @@ void main() {
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpPage(
+      final ThemeController theme = await _pumpPage(
         tester,
-        mode: ElThemeMode.dark,
+        mode: ColorMode.dark,
       );
       expect(
         find.byKey(const ValueKey<String>('menubar-specimen')),
         findsOneWidget,
       );
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
       expect(

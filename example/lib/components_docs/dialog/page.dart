@@ -1,7 +1,7 @@
 /// Public documentation page for the `dialog` component.
 ///
 /// **Re-housed onto the kit.** This page used to be `DialogDocPage`,
-/// hand-composing `ElSection` panels inside
+/// hand-composing `Section` panels inside
 /// `example/lib/components_docs/dialog_page.dart` and living outside
 /// `componentDocs`. It now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
@@ -9,7 +9,7 @@
 /// `select` already carry. The live preview — both the normal and media
 /// dialog, opened from the same `_DialogPreview` `Wrap` the old page used —
 /// moved unchanged into `_PreviewSpecimen` below; the house shape then
-/// wants a `ShowcaseSection` per variant `ElDialogVariant` actually has, so
+/// wants a `ShowcaseSection` per variant `DialogVariant` actually has, so
 /// Normal and Media below Preview are new, each isolating one of the two
 /// specimens the old page only ever showed side by side.
 ///
@@ -17,11 +17,23 @@
 /// Usage (the smallest correct construction, code-only), Normal, Media,
 /// then the eight disclosures. New: a Keyboard disclosure, between
 /// Accessibility and Responsive, read directly off
-/// `ElModalPortalState._onKey` and `_onPop`.
+/// `OverlayPortalState._onKey` and `_onPop`.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -40,11 +52,11 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
       description:
           'Open each specimen to inspect the overlay, close affordance, '
           'focus scope, and jelly transition. Normal and media share the '
-          'same ElModalPortal.',
+          'same OverlayPortal.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     InstallSection(
       id: 'install',
@@ -52,7 +64,7 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
       description:
           'dialog has a real registry manifest: elattar add dialog '
           'installs lib/src/components/dialog.dart and resolves button, '
-          'icon, machine-surface, and source-foundation automatically. '
+          'icon, surface, and source-foundation automatically. '
           'The Manual tab is for a project not using the CLI.',
       command: dialogDoc.command,
       manualFiles: <DocsCodeFile>[
@@ -71,7 +83,7 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElDialog and its eleven companion '
+              'Add the export line so Dialog and its eleven companion '
               'classes are reachable the same way the CLI path already '
               'makes them.',
           code: "export 'dialog.dart';",
@@ -91,7 +103,7 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
       id: 'normal',
       title: 'Normal',
       description:
-          'ElDialogVariant.normal, the constructor default: a banded '
+          'DialogVariant.normal, the constructor default: a banded '
           'header and footer around a lit body, sm:max-w-sm (384) wide.',
       specimen: _NormalDialogSpecimen(),
       code: _normalCode,
@@ -101,7 +113,7 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
       id: 'media',
       title: 'Media',
       description:
-          'ElDialogVariant.media: a full-bleed 16:9 ElDialogMedia slot '
+          'DialogVariant.media: a full-bleed 16:9 DialogMedia slot '
           'leads the panel, both bands lose their fill and rule, and the '
           'panel widens to sm:max-w-md (448).',
       specimen: _MediaDialogSpecimen(),
@@ -116,27 +128,24 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
           'exports declares: the dialog-specific composition first, then '
           'the shared portal machinery a sheet and a drawer ride too.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElDialog', anchor: 'api-eldialog'),
-        DocsTocEntry(title: 'ElDialogVariant', anchor: 'api-eldialogvariant'),
-        DocsTocEntry(title: 'ElDialogContent', anchor: 'api-eldialogcontent'),
+        DocsTocEntry(title: 'Dialog', anchor: 'api-eldialog'),
+        DocsTocEntry(title: 'DialogVariant', anchor: 'api-eldialogvariant'),
+        DocsTocEntry(title: 'DialogContent', anchor: 'api-eldialogcontent'),
         DocsTocEntry(
-          title: 'ElDialogContentGroup',
+          title: 'DialogContentGroup',
           anchor: 'api-eldialogcontentgroup',
         ),
-        DocsTocEntry(title: 'ElDialogHeader', anchor: 'api-eldialogheader'),
-        DocsTocEntry(title: 'ElDialogFooter', anchor: 'api-eldialogfooter'),
-        DocsTocEntry(title: 'ElDialogTitle', anchor: 'api-eldialogtitle'),
+        DocsTocEntry(title: 'DialogHeader', anchor: 'api-eldialogheader'),
+        DocsTocEntry(title: 'DialogFooter', anchor: 'api-eldialogfooter'),
+        DocsTocEntry(title: 'DialogTitle', anchor: 'api-eldialogtitle'),
         DocsTocEntry(
-          title: 'ElDialogDescription',
+          title: 'DialogDescription',
           anchor: 'api-eldialogdescription',
         ),
-        DocsTocEntry(title: 'ElDialogMedia', anchor: 'api-eldialogmedia'),
-        DocsTocEntry(title: 'ElModalPortal', anchor: 'api-elmodalportal'),
-        DocsTocEntry(title: 'ElDialogOverlay', anchor: 'api-eldialogoverlay'),
-        DocsTocEntry(
-          title: 'ElJellyTransition',
-          anchor: 'api-eljellytransition',
-        ),
+        DocsTocEntry(title: 'DialogMedia', anchor: 'api-eldialogmedia'),
+        DocsTocEntry(title: 'OverlayPortal', anchor: 'api-elmodalportal'),
+        DocsTocEntry(title: 'DialogOverlay', anchor: 'api-eldialogoverlay'),
+        DocsTocEntry(title: 'OpenTransition', anchor: 'api-eljellytransition'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -144,8 +153,8 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off ElModalPortalState.build/open/close and '
-          'ElDialogContent.build, not inferred.',
+          'Read off OverlayPortalState.build/open/close and '
+          'DialogContent.build, not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
     DisclosureSection(
@@ -157,7 +166,7 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          'Read directly off ElModalPortalState._onKey and _onPop: '
+          'Read directly off OverlayPortalState._onKey and _onPop: '
           'Escape and back are deliberately not the same contract, see '
           'dialog.dart\'s own library doc.',
       child: _KeyboardContent(),
@@ -194,15 +203,15 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/dialogs_test.dart',
             description:
-                'ElDialog is covered there (44 ElDialog references at '
+                'Dialog is covered there (44 Dialog references at '
                 'the time this page was written).',
           ),
           const DocsInstallFact(
             label: 'Docs test',
             value: 'example/test/components_docs/dialog_test.dart',
             description:
-                'Covers this page: the article mounts, every ElDialog '
-                'and ElDialogContent constructor parameter this page '
+                'Covers this page: the article mounts, every Dialog '
+                'and DialogContent constructor parameter this page '
                 'claims to document, and a live open/close cycle of '
                 'both variants.',
           ),
@@ -230,12 +239,15 @@ class DialogDocPage extends StatelessWidget {
       title: dialogDoc.title,
       description: dialogDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Dialog'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Dialog'),
     ],
     toc: dialogDocSpec.toc,
-    previous: const DocsPageLink(title: 'Command', route: '/components/command'),
+    previous: const DocsPageLink(
+      title: 'Command',
+      route: '/components/command',
+    ),
     next: const DocsPageLink(
       title: 'Dropdown Menu',
       route: '/components/dropdown-menu',
@@ -252,7 +264,7 @@ class DialogDocPage extends StatelessWidget {
 // `_PreviewSpecimen` is the old page's `_DialogPreview` carried unchanged.
 // `_NormalDialogSpecimen` and `_MediaDialogSpecimen` isolate its two
 // halves so each variant gets its own house-shape section, built from the
-// exact same ElDialog composition.
+// exact same Dialog composition.
 
 class _PreviewSpecimen extends StatefulWidget {
   const _PreviewSpecimen();
@@ -264,54 +276,54 @@ class _PreviewSpecimen extends StatefulWidget {
 class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(3),
-    runSpacing: el(3),
+    spacing: space(3),
+    runSpacing: space(3),
     children: <Widget>[
-      ElDialog(
+      Dialog(
         trigger: (BuildContext context, VoidCallback open) =>
-            ElButton(onPressed: open, child: const Text('Open normal')),
-        content: (BuildContext context, VoidCallback close) => ElDialogContent(
+            Button(onPressed: open, child: const Text('Open normal')),
+        content: (BuildContext context, VoidCallback close) => DialogContent(
           onClose: close,
           children: <Widget>[
-            const ElDialogHeader(
+            const DialogHeader(
               children: <Widget>[
-                ElDialogTitle('Confirm action'),
-                ElDialogDescription('This is a live modal preview.'),
+                DialogTitle('Confirm action'),
+                DialogDescription('This is a live modal preview.'),
               ],
             ),
-            ElDialogFooter(
+            DialogFooter(
               children: <Widget>[
-                ElButton(onPressed: close, child: Text('Cancel')),
+                Button(onPressed: close, child: Text('Cancel')),
               ],
             ),
           ],
         ),
       ),
-      ElDialog(
-        trigger: (BuildContext context, VoidCallback open) => ElButton(
-          variant: ElButtonVariant.outline,
+      Dialog(
+        trigger: (BuildContext context, VoidCallback open) => Button(
+          variant: ButtonVariant.outline,
           onPressed: open,
           child: const Text('Open media'),
         ),
-        content: (BuildContext context, VoidCallback close) => ElDialogContent(
-          variant: ElDialogVariant.media,
+        content: (BuildContext context, VoidCallback close) => DialogContent(
+          variant: DialogVariant.media,
           showCloseButton: false,
           children: <Widget>[
-            ElDialogMedia(
+            DialogMedia(
               child: ColoredBox(
-                color: ElPalette.action,
-                child: Center(child: ElIcon(ElIconGlyph.sparkles)),
+                color: Palette.action,
+                child: Center(child: Icon(IconGlyph.sparkles)),
               ),
             ),
-            const ElDialogHeader(
+            const DialogHeader(
               children: <Widget>[
-                ElDialogTitle('A visual lead'),
-                ElDialogDescription('Media dialogs use the same close flow.'),
+                DialogTitle('A visual lead'),
+                DialogDescription('Media dialogs use the same close flow.'),
               ],
             ),
-            ElDialogFooter(
+            DialogFooter(
               children: <Widget>[
-                ElButton(onPressed: close, child: Text('Continue')),
+                Button(onPressed: close, child: Text('Continue')),
               ],
             ),
           ],
@@ -321,37 +333,37 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   );
 }
 
-const String _previewCode = '''ElDialog(
+const String _previewCode = '''Dialog(
   trigger: (context, open) =>
-      ElButton(onPressed: open, child: const Text('Open normal')),
-  content: (context, close) => ElDialogContent(
+      Button(onPressed: open, child: const Text('Open normal')),
+  content: (context, close) => DialogContent(
     onClose: close,
     children: [
-      ElDialogHeader(children: [
-        ElDialogTitle('Confirm action'),
-        ElDialogDescription('This is a live modal preview.'),
+      DialogHeader(children: [
+        DialogTitle('Confirm action'),
+        DialogDescription('This is a live modal preview.'),
       ]),
-      ElDialogFooter(children: [
-        ElButton(onPressed: close, child: const Text('Cancel')),
+      DialogFooter(children: [
+        Button(onPressed: close, child: const Text('Cancel')),
       ]),
     ],
   ),
 )''';
 
-const String _usageCode = '''ElDialog(
-  trigger: (context, open) => ElButton(
+const String _usageCode = '''Dialog(
+  trigger: (context, open) => Button(
     onPressed: open,
     child: const Text('Open dialog'),
   ),
-  content: (context, close) => ElDialogContent(
+  content: (context, close) => DialogContent(
     onClose: close,
     children: <Widget>[
-      ElDialogHeader(children: <Widget>[
-        ElDialogTitle('Confirm action'),
-        ElDialogDescription('Review the change before continuing.'),
+      DialogHeader(children: <Widget>[
+        DialogTitle('Confirm action'),
+        DialogDescription('Review the change before continuing.'),
       ]),
-      ElDialogFooter(children: <Widget>[
-        ElButton(onPressed: close, child: const Text('Cancel')),
+      DialogFooter(children: <Widget>[
+        Button(onPressed: close, child: const Text('Cancel')),
       ]),
     ],
   ),
@@ -361,44 +373,42 @@ class _NormalDialogSpecimen extends StatelessWidget {
   const _NormalDialogSpecimen();
 
   @override
-  Widget build(BuildContext context) => ElDialog(
-    trigger: (BuildContext context, VoidCallback open) => ElButton(
+  Widget build(BuildContext context) => Dialog(
+    trigger: (BuildContext context, VoidCallback open) => Button(
       key: const ValueKey<String>('dialog-example:normal-trigger'),
       onPressed: open,
       child: const Text('Open normal'),
     ),
-    content: (BuildContext context, VoidCallback close) => ElDialogContent(
+    content: (BuildContext context, VoidCallback close) => DialogContent(
       key: const ValueKey<String>('dialog-example:normal-content'),
       onClose: close,
       children: <Widget>[
-        const ElDialogHeader(
+        const DialogHeader(
           children: <Widget>[
-            ElDialogTitle('Confirm action'),
-            ElDialogDescription('This is a live modal preview.'),
+            DialogTitle('Confirm action'),
+            DialogDescription('This is a live modal preview.'),
           ],
         ),
-        ElDialogFooter(
-          children: <Widget>[
-            ElButton(onPressed: close, child: Text('Cancel')),
-          ],
+        DialogFooter(
+          children: <Widget>[Button(onPressed: close, child: Text('Cancel'))],
         ),
       ],
     ),
   );
 }
 
-const String _normalCode = '''ElDialog(
+const String _normalCode = '''Dialog(
   trigger: (context, open) =>
-      ElButton(onPressed: open, child: const Text('Open normal')),
-  content: (context, close) => ElDialogContent(
+      Button(onPressed: open, child: const Text('Open normal')),
+  content: (context, close) => DialogContent(
     onClose: close,
     children: [
-      ElDialogHeader(children: [
-        ElDialogTitle('Confirm action'),
-        ElDialogDescription('This is a live modal preview.'),
+      DialogHeader(children: [
+        DialogTitle('Confirm action'),
+        DialogDescription('This is a live modal preview.'),
       ]),
-      ElDialogFooter(children: [
-        ElButton(onPressed: close, child: const Text('Cancel')),
+      DialogFooter(children: [
+        Button(onPressed: close, child: const Text('Cancel')),
       ]),
     ],
   ),
@@ -408,57 +418,55 @@ class _MediaDialogSpecimen extends StatelessWidget {
   const _MediaDialogSpecimen();
 
   @override
-  Widget build(BuildContext context) => ElDialog(
-    trigger: (BuildContext context, VoidCallback open) => ElButton(
+  Widget build(BuildContext context) => Dialog(
+    trigger: (BuildContext context, VoidCallback open) => Button(
       key: const ValueKey<String>('dialog-example:media-trigger'),
-      variant: ElButtonVariant.outline,
+      variant: ButtonVariant.outline,
       onPressed: open,
       child: const Text('Open media'),
     ),
-    content: (BuildContext context, VoidCallback close) => ElDialogContent(
+    content: (BuildContext context, VoidCallback close) => DialogContent(
       key: const ValueKey<String>('dialog-example:media-content'),
-      variant: ElDialogVariant.media,
+      variant: DialogVariant.media,
       showCloseButton: false,
       children: <Widget>[
-        ElDialogMedia(
+        DialogMedia(
           child: ColoredBox(
-            color: ElPalette.action,
-            child: Center(child: ElIcon(ElIconGlyph.sparkles)),
+            color: Palette.action,
+            child: Center(child: Icon(IconGlyph.sparkles)),
           ),
         ),
-        const ElDialogHeader(
+        const DialogHeader(
           children: <Widget>[
-            ElDialogTitle('A visual lead'),
-            ElDialogDescription('Media dialogs use the same close flow.'),
+            DialogTitle('A visual lead'),
+            DialogDescription('Media dialogs use the same close flow.'),
           ],
         ),
-        ElDialogFooter(
-          children: <Widget>[
-            ElButton(onPressed: close, child: Text('Continue')),
-          ],
+        DialogFooter(
+          children: <Widget>[Button(onPressed: close, child: Text('Continue'))],
         ),
       ],
     ),
   );
 }
 
-const String _mediaCode = '''ElDialog(
-  trigger: (context, open) => ElButton(
-    variant: ElButtonVariant.outline,
+const String _mediaCode = '''Dialog(
+  trigger: (context, open) => Button(
+    variant: ButtonVariant.outline,
     onPressed: open,
     child: const Text('Open media'),
   ),
-  content: (context, close) => ElDialogContent(
-    variant: ElDialogVariant.media,
+  content: (context, close) => DialogContent(
+    variant: DialogVariant.media,
     showCloseButton: false,
     children: [
-      ElDialogMedia(child: /* artwork */),
-      ElDialogHeader(children: [
-        ElDialogTitle('A visual lead'),
-        ElDialogDescription('Media dialogs use the same close flow.'),
+      DialogMedia(child: /* artwork */),
+      DialogHeader(children: [
+        DialogTitle('A visual lead'),
+        DialogDescription('Media dialogs use the same close flow.'),
       ]),
-      ElDialogFooter(children: [
-        ElButton(onPressed: close, child: const Text('Continue')),
+      DialogFooter(children: [
+        Button(onPressed: close, child: const Text('Continue')),
       ]),
     ],
   ),
@@ -475,87 +483,69 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-eldialog',
-        child: DocsApiTable(title: 'ElDialog', facts: _dialogFacts),
+        child: DocsApiTable(title: 'Dialog', facts: _dialogFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldialogvariant',
-        child: DocsApiTable(
-          title: 'ElDialogVariant',
-          facts: _dialogVariantFacts,
-        ),
+        child: DocsApiTable(title: 'DialogVariant', facts: _dialogVariantFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldialogcontent',
-        child: DocsApiTable(
-          title: 'ElDialogContent',
-          facts: _dialogContentFacts,
-        ),
+        child: DocsApiTable(title: 'DialogContent', facts: _dialogContentFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldialogcontentgroup',
         child: DocsApiTable(
-          title: 'ElDialogContentGroup',
+          title: 'DialogContentGroup',
           facts: _dialogContentGroupFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldialogheader',
-        child: DocsApiTable(
-          title: 'ElDialogHeader',
-          facts: _dialogHeaderFacts,
-        ),
+        child: DocsApiTable(title: 'DialogHeader', facts: _dialogHeaderFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldialogfooter',
-        child: DocsApiTable(
-          title: 'ElDialogFooter',
-          facts: _dialogFooterFacts,
-        ),
+        child: DocsApiTable(title: 'DialogFooter', facts: _dialogFooterFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldialogtitle',
-        child: DocsApiTable(title: 'ElDialogTitle', facts: _dialogTitleFacts),
+        child: DocsApiTable(title: 'DialogTitle', facts: _dialogTitleFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldialogdescription',
         child: DocsApiTable(
-          title: 'ElDialogDescription',
+          title: 'DialogDescription',
           facts: _dialogDescriptionFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldialogmedia',
-        child: DocsApiTable(title: 'ElDialogMedia', facts: _dialogMediaFacts),
+        child: DocsApiTable(title: 'DialogMedia', facts: _dialogMediaFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elmodalportal',
-        child: DocsApiTable(
-          title: 'ElModalPortal',
-          facts: _modalPortalFacts,
-        ),
+        child: DocsApiTable(title: 'OverlayPortal', facts: _modalPortalFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldialogoverlay',
-        child: DocsApiTable(
-          title: 'ElDialogOverlay',
-          facts: _dialogOverlayFacts,
-        ),
+        child: DocsApiTable(title: 'DialogOverlay', facts: _dialogOverlayFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eljellytransition',
         child: DocsApiTable(
-          title: 'ElJellyTransition',
+          title: 'OpenTransition',
           facts: _jellyTransitionFacts,
         ),
       ),
@@ -566,13 +556,14 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _dialogFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'trigger',
-    type: 'ElModalTriggerBuilder',
+    type: 'ModalTriggerBuilder',
     description: 'Required. Builds the control that opens the portal.',
   ),
   DocsApiFact(
     name: 'content',
-    type: 'ElModalContentBuilder',
-    description: "Required. Builds the panel and receives the portal's own "
+    type: 'ModalContentBuilder',
+    description:
+        "Required. Builds the panel and receives the portal's own "
         'close callback.',
   ),
   DocsApiFact(
@@ -604,14 +595,14 @@ const List<DocsApiFact> _dialogContentFacts = <DocsApiFact>[
     name: 'children',
     type: 'List<Widget>',
     description:
-        "Required. The grid's children, in order. A ElDialogHeader "
-        'first and a ElDialogFooter last is the anatomy, but nothing '
+        "Required. The grid's children, in order. A DialogHeader "
+        'first and a DialogFooter last is the anatomy, but nothing '
         'here enforces it.',
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElDialogVariant',
-    description: 'Optional. Defaults to ElDialogVariant.normal.',
+    type: 'DialogVariant',
+    description: 'Optional. Defaults to DialogVariant.normal.',
   ),
   DocsApiFact(
     name: 'showCloseButton',
@@ -623,32 +614,33 @@ const List<DocsApiFact> _dialogContentFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'onClose',
     type: 'VoidCallback?',
-    description: "Optional. Wired by ElDialog; the close button's own X "
+    description:
+        "Optional. Wired by Dialog; the close button's own X "
         'calls it.',
   ),
   DocsApiFact(
-    name: 'ElDialogContent.maxWidth',
+    name: 'DialogContent.maxWidth',
     type: 'static double',
     description: 'sm:max-w-sm — 384, the normal variant.',
   ),
   DocsApiFact(
-    name: 'ElDialogContent.mediaMaxWidth',
+    name: 'DialogContent.mediaMaxWidth',
     type: 'static double',
     description: 'sm:max-w-md — 448, the media variant.',
   ),
   DocsApiFact(
-    name: 'ElDialogContent.padding',
+    name: 'DialogContent.padding',
     type: 'static double',
     description: 'p-4 / gap-4 — zero on the media variant.',
   ),
   DocsApiFact(
-    name: 'ElDialogContent.radius',
+    name: 'DialogContent.radius',
     type: 'static double',
     description: 'rounded-xl.',
   ),
   DocsApiFact(
-    name: 'ElDialogContent.ringSpec',
-    type: 'static ElShadowSpec',
+    name: 'DialogContent.ringSpec',
+    type: 'static ShadowStyle',
     description:
         'ring-1 ring-foreground/10, and nothing under it — a dialog '
         'needs no elevation because the scrim already separates it.',
@@ -663,11 +655,7 @@ const List<DocsApiFact> _dialogContentGroupFacts = <DocsApiFact>[
         "Required. The group/dialog-content the bands read their "
         'group-data hooks off.',
   ),
-  DocsApiFact(
-    name: 'variant',
-    type: 'ElDialogVariant',
-    description: 'Required.',
-  ),
+  DocsApiFact(name: 'variant', type: 'DialogVariant', description: 'Required.'),
   DocsApiFact(
     name: 'child',
     type: 'Widget',
@@ -679,13 +667,15 @@ const List<DocsApiFact> _dialogHeaderFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'children',
     type: 'List<Widget>',
-    description: 'Required. flex flex-col gap-2 — typically a '
-        'ElDialogTitle and a ElDialogDescription.',
+    description:
+        'Required. flex flex-col gap-2 — typically a '
+        'DialogTitle and a DialogDescription.',
   ),
   DocsApiFact(
-    name: 'ElDialogHeader.closeButtonLane',
+    name: 'DialogHeader.closeButtonLane',
     type: 'static double',
-    description: 'pr-12 — the lane the absolutely-positioned close button '
+    description:
+        'pr-12 — the lane the absolutely-positioned close button '
         'lands in.',
   ),
 ];
@@ -704,8 +694,7 @@ const List<DocsApiFact> _dialogTitleFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'text (positional)',
     type: 'String',
-    description:
-        'Required. font-heading text-base leading-none font-medium.',
+    description: 'Required. font-heading text-base leading-none font-medium.',
   ),
 ];
 
@@ -726,7 +715,7 @@ const List<DocsApiFact> _dialogMediaFacts = <DocsApiFact>[
         'aspect-video overflow-hidden bg-muted.',
   ),
   DocsApiFact(
-    name: 'ElDialogMedia.aspect',
+    name: 'DialogMedia.aspect',
     type: 'static const double',
     description: '16 / 9.',
   ),
@@ -735,17 +724,17 @@ const List<DocsApiFact> _dialogMediaFacts = <DocsApiFact>[
 const List<DocsApiFact> _modalPortalFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'trigger',
-    type: 'ElModalTriggerBuilder',
+    type: 'ModalTriggerBuilder',
     description: 'Required. Builds the control that opens the portal.',
   ),
   DocsApiFact(
     name: 'content',
-    type: 'ElModalContentBuilder',
+    type: 'ModalContentBuilder',
     description: "Required. Builds the overlay's content.",
   ),
   DocsApiFact(
     name: 'transition',
-    type: 'ElModalTransitionBuilder',
+    type: 'ModalTransitionBuilder',
     description: 'Required. Wraps content in its enter/exit animation.',
   ),
   DocsApiFact(
@@ -759,24 +748,25 @@ const List<DocsApiFact> _modalPortalFacts = <DocsApiFact>[
     name: 'enterDuration',
     type: 'Duration',
     description:
-        'Optional. Defaults to ElDurations.jelly (420ms). Leaving should '
+        'Optional. Defaults to MotionDurations.open (420ms). Leaving should '
         'never take as long as arriving.',
   ),
   DocsApiFact(
     name: 'exitDuration',
     type: 'Duration',
-    description: 'Optional. Defaults to ElDurations.base (250ms).',
+    description: 'Optional. Defaults to MotionDurations.normal (250ms).',
   ),
   DocsApiFact(
     name: 'overlayDuration',
     type: 'Duration',
-    description: 'Optional. Defaults to ElDurations.overlay (320ms). The '
+    description:
+        'Optional. Defaults to MotionDurations.overlayEnter (320ms). The '
         "scrim's own clock, separate from the content's.",
   ),
   DocsApiFact(
     name: 'overlayCurve',
     type: 'Curve',
-    description: 'Optional. Defaults to ElCurves.out.',
+    description: 'Optional. Defaults to MotionCurves.enter.',
   ),
   DocsApiFact(
     name: 'dismissOnOverlayTap',
@@ -790,7 +780,7 @@ const List<DocsApiFact> _modalPortalFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to true. USER-ORDERED MOBILE ADAPTATION: '
-        "whether ElModalCompact's 90vw x 75vh box applies on a phone. "
+        "whether CompactDialogLayout's 90vw x 75vh box applies on a phone. "
         'Off for the sheet and the drawer, which clamp themselves.',
   ),
   DocsApiFact(
@@ -805,7 +795,7 @@ const List<DocsApiFact> _dialogOverlayFacts = <DocsApiFact>[
     name: '(no parameters)',
     type: '—',
     description:
-        'const ElDialogOverlay() is the whole of it: fixed inset-0 '
+        'const DialogOverlay() is the whole of it: fixed inset-0 '
         'bg-background/15 under a 4px backdrop blur, shared byte-for-byte '
         'with the alert dialog, sheet, and drawer.',
   ),
@@ -823,7 +813,7 @@ const List<DocsApiFact> _jellyTransitionFacts = <DocsApiFact>[
     description: 'Required. The panel this transition wraps.',
   ),
   DocsApiFact(
-    name: 'ElJellyTransition.sample(progress, {entering})',
+    name: 'OpenTransition.sample(progress, {entering})',
     type: 'static ({double scale, double shift, double opacity})',
     description:
         'The keyframe state at progress along whichever of the two '
@@ -834,7 +824,8 @@ const List<DocsApiFact> _jellyTransitionFacts = <DocsApiFact>[
 const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Closed',
-    treatment: 'The overlay is not mounted at all: OverlayPortal builds '
+    treatment:
+        'The overlay is not mounted at all: OverlayPortal builds '
         'nothing extra.',
     userSignal: 'Only the trigger is visible.',
   ),
@@ -858,13 +849,14 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'The body sits in a loosely-fit SingleChildScrollView; the '
         'header and footer bands stay pinned outside it.',
-    userSignal: 'Title and actions remain reachable while the body '
+    userSignal:
+        'Title and actions remain reachable while the body '
         'scrolls.',
   ),
   DocsStateFact(
     state: 'Compact (≤600px viewport)',
     treatment:
-        'USER-ORDERED MOBILE ADAPTATION: ElModalCompact clamps the '
+        'USER-ORDERED MOBILE ADAPTATION: CompactDialogLayout clamps the '
         'panel to 90vw x 75vh; above the breakpoint every measured '
         'desktop pin is untouched.',
     userSignal: 'The panel never reaches either edge of a phone screen.',
@@ -872,7 +864,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Media',
     treatment:
-        'Full-bleed ElDialogMedia slot, wider panel (448), the close '
+        'Full-bleed DialogMedia slot, wider panel (448), the close '
         'button rendered over the artwork with a blurred backdrop '
         'instead of on a band.',
     userSignal: 'Artwork leads the panel and is clipped to its corners.',
@@ -884,15 +876,15 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'A FocusScope wraps the panel and moves focus into it on open, '
             'autofocusing the first tabbable child.',
-        'The close button is labelled "Close" (Semantics via ElButton\'s '
+        'The close button is labelled "Close" (Semantics via Button\'s '
             'own label), not left to an icon alone.',
         'dismissOnOverlayTap gates whether tapping outside the panel '
             'dismisses it — off for the alert dialog, which must be '
             'answered rather than dismissed.',
-        'Every open ElModalPortal registers on one static stack so '
+        'Every open OverlayPortal registers on one static stack so '
             'Android\'s back button dismisses exactly the topmost one — '
             'see Keyboard below for what Escape does instead.',
       ]);
@@ -903,7 +895,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Escape closes whichever modal has focus, including the alert '
             'dialog — a documented drift from that variant\'s own copy, '
             'which promises no escape-to-cancel by accident.',
@@ -911,7 +903,7 @@ class _KeyboardContent extends StatelessWidget {
             'focus cannot land on anything behind the overlay.',
         'No arrow-key navigation of any kind: a dialog holds prose and '
             'buttons, not a list of rows.',
-        'Enter and Space activate whichever ElButton inside the panel '
+        'Enter and Space activate whichever Button inside the panel '
             'currently has focus — ordinary button semantics, not a '
             'dialog-specific binding.',
         'Back and Escape are deliberately NOT the same contract: Escape '
@@ -927,8 +919,8 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'USER-ORDERED MOBILE ADAPTATION 1 — ElModalCompact: at or below '
+      _bullets(ThemeScope.of(context), <String>[
+        'USER-ORDERED MOBILE ADAPTATION 1 — CompactDialogLayout: at or below '
             '600 logical pixels the panel is held inside a 90vw x 75vh '
             'box and its body scrolls inside it. Desktop geometry above '
             'the breakpoint is a no-op: every measured pin still holds.',
@@ -970,11 +962,11 @@ class _DependenciesContent extends StatelessWidget {
                 "The manifest's registryDependencies, resolved "
                 'automatically. button supplies every trigger and '
                 'footer CTA; icon supplies the close glyph; '
-                'machine-surface paints the panel.',
+                'surface paints the panel.',
           ),
           const DocsInstallFact(
             label: 'Shared machinery',
-            value: 'ElModalPortal, ElDialogOverlay, ElJellyTransition',
+            value: 'OverlayPortal, DialogOverlay, OpenTransition',
             description:
                 'The same portal a sheet and a drawer ride: neither of '
                 'those files repeats this one\'s focus-trap, back-button, '
@@ -982,15 +974,12 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Icon', route: '/components/icon'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(label: 'Alert dialog', route: '/components/alert-dialog'),
           DocsLink(label: 'Sheet', route: '/components/sheet'),
           DocsLink(label: 'Drawer', route: '/components/drawer'),
@@ -1010,24 +999,27 @@ class _ThemingContent extends StatelessWidget {
       DocsInstallFact(
         label: 'theme.popover',
         value: 'Panel fill',
-        description: 'Painted through ElMachineSurface.',
+        description: 'Painted through Surface.',
       ),
       DocsInstallFact(
         label: 'theme.foreground',
         value: 'Panel ring, 10% alpha',
-        description: 'The only elevation the panel carries: no shadow '
+        description:
+            'The only elevation the panel carries: no shadow '
             'under it.',
       ),
       DocsInstallFact(
         label: 'theme.muted',
         value: 'Header and footer band fill, 50% alpha',
-        description: 'Both bands are muted so the body reads as the only '
+        description:
+            'Both bands are muted so the body reads as the only '
             'lit surface.',
       ),
       DocsInstallFact(
         label: 'theme.border',
         value: 'Band rule',
-        description: 'The 1px line that closes each band, matching the '
+        description:
+            'The 1px line that closes each band, matching the '
             'header top / footer bottom.',
       ),
       DocsInstallFact(
@@ -1039,15 +1031,19 @@ class _ThemingContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

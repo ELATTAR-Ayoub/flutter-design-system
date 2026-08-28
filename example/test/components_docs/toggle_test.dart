@@ -1,25 +1,25 @@
 /// Tests for `components_docs/toggle/page.dart`'s [ToggleDocPage].
 ///
 /// **Re-housed onto the documentation kit.** This suite used to read the old
-/// page's `ElSection`s and its own hand-rolled `docsAnchorKey`/
-/// `ElSection.anchorKey` anchors directly; it now reads `DocsSection` (the
+/// page's `Section`s and its own hand-rolled `docsAnchorKey`/
+/// `Section.anchorKey` anchors directly; it now reads `DocsSection` (the
 /// kit's own section widget) and opens each `DocsDisclosure` before reading
 /// what is inside it — closed by default, it mounts no content at all —
 /// matching `button_test.dart`'s own pattern, the worked reference for this
 /// rollout. The pixel-position ordering assertion the old suite made off
-/// `docsAnchorKey`/`ElSection.anchorKey` cannot survive unchanged (those are
+/// `docsAnchorKey`/`Section.anchorKey` cannot survive unchanged (those are
 /// not how the kit marks an anchor); it is rewritten below to assert the
 /// identical fact — the sections render in this exact order — by reading
 /// each mounted `DocsSection`'s own `title`, the same substitution
 /// `button_test.dart` itself made for the same reason.
 ///
-/// **Trimmed for the split.** This suite still covers `ElToggle` alone; every
+/// **Trimmed for the split.** This suite still covers `Toggle` alone; every
 /// group assertion lives in `toggle_group_test.dart`, and the assertion that
-/// no `ElToggleGroup` mounts here at all is kept, unmoved.
+/// no `ToggleGroup` mounts here at all is kept, unmoved.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage rather than
+/// `ThemeController` is flipped in place for theme coverage rather than
 /// re-pumped under a new controller.
 library;
 
@@ -31,7 +31,33 @@ import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
 import 'package:flutter/foundation.dart' show listEquals;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -59,7 +85,7 @@ const List<String> _sectionTitles = <String>[
   'Source',
 ];
 
-/// Every named constructor parameter `ElToggle` declares, excluding `key`,
+/// Every named constructor parameter `Toggle` declares, excluding `key`,
 /// read directly from `lib/src/components/toggle.dart` (L166-L178).
 const List<String> _toggleParams = <String>[
   'child',
@@ -74,18 +100,18 @@ const List<String> _toggleParams = <String>[
   'inExclusiveGroup',
 ];
 
-/// `ElToggle`'s six static helpers, named exactly as the API table names
+/// `Toggle`'s six static helpers, named exactly as the API table names
 /// them (`toggle.dart` L243-L306).
 const List<String> _toggleStatics = <String>[
-  'ElToggle.heightFor(size)',
-  'ElToggle.minWidthFor(size)',
-  'ElToggle.paddingX',
-  'ElToggle.gap',
-  'ElToggle.radiusFor(size)',
-  'ElToggle.iconSizeFor(size)',
+  'Toggle.heightFor(size)',
+  'Toggle.minWidthFor(size)',
+  'Toggle.paddingX',
+  'Toggle.gap',
+  'Toggle.radiusFor(size)',
+  'Toggle.iconSizeFor(size)',
 ];
 
-/// Every live `ElToggle` specimen this page's own source keys.
+/// Every live `Toggle` specimen this page's own source keys.
 const List<String> _specimenKeys = <String>[
   'toggle-live-specimen',
   'toggle-outline-bold-specimen',
@@ -120,24 +146,24 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.base);
+  await tester.pump(MotionDurations.normal);
 }
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -208,35 +234,35 @@ void main() {
     });
 
     testWidgets(
-      'the group half of the old page is gone: every mounted ElToggleGroup '
+      'the group half of the old page is gone: every mounted ToggleGroup '
       'is the kit\'s own Preview/Code or CLI/Manual chrome, never a '
-      'documented ElToggleGroup specimen',
+      'documented ToggleGroup specimen',
       (WidgetTester tester) async {
         await _pump(tester);
 
-        // DocsShowcase and DocsInstall are both built out of ElToggleGroup
+        // DocsShowcase and DocsInstall are both built out of ToggleGroup
         // as their own Preview/Code and CLI/Manual view switchers — that is
         // kit chrome every re-housed page carries, not a component
         // specimen. What must stay true after the split is that no group
-        // *content* (a documented ElToggleGroup demonstrating the real
-        // component) mounts here: every ElToggleGroup's own items must be
+        // *content* (a documented ToggleGroup demonstrating the real
+        // component) mounts here: every ToggleGroup's own items must be
         // one of those two fixed kit-chrome label sets.
         const List<String> chromeA = <String>['Preview', 'Code'];
         const List<String> chromeB = <String>['CLI', 'Manual'];
-        for (final ElToggleGroup group in tester.widgetList<ElToggleGroup>(
-          find.byType(ElToggleGroup),
+        for (final ToggleGroup group in tester.widgetList<ToggleGroup>(
+          find.byType(ToggleGroup),
         )) {
           final List<String> labels = group.items
-              .map((ElToggleGroupItem item) => item.label)
+              .map((ToggleGroupItem item) => item.label)
               .toList();
-          final bool isKitChrome = listEquals(labels, chromeA) ||
-              listEquals(labels, chromeB);
+          final bool isKitChrome =
+              listEquals(labels, chromeA) || listEquals(labels, chromeB);
           expect(
             isKitChrome,
             isTrue,
             reason:
-                'unexpected ElToggleGroup content on the toggle page: '
-                '$labels — ElToggleGroup belongs to toggle_group/page.dart '
+                'unexpected ToggleGroup content on the toggle page: '
+                '$labels — ToggleGroup belongs to toggle_group/page.dart '
                 'after the split',
           );
         }
@@ -249,13 +275,13 @@ void main() {
           'items',
           'selectedIndex',
           'enabled',
-          'ElToggleGroup.gap',
+          'ToggleGroup.gap',
         ]) {
           expect(
             documented,
             isNot(contains(groupOnly)),
             reason:
-                '"$groupOnly" is a ElToggleGroup/ElToggleGroupItem member '
+                '"$groupOnly" is a ToggleGroup/ToggleGroupItem member '
                 'and belongs on the toggle-group page',
           );
         }
@@ -265,8 +291,8 @@ void main() {
     );
 
     testWidgets(
-      'the API tables cover every ElToggle constructor parameter, every '
-      'static helper, and every ElToggleVariant and ElToggleSize value',
+      'the API tables cover every Toggle constructor parameter, every '
+      'static helper, and every ToggleVariant and ToggleSize value',
       (WidgetTester tester) async {
         await _pump(tester);
         await _open(tester, 'API Reference');
@@ -277,10 +303,10 @@ void main() {
         // One table per class or enum, plus one for the statics: never a
         // merged table.
         expect(tables.map((DocsApiTable t) => t.title), <String>[
-          'ElToggle',
-          'ElToggle static helpers',
-          'ElToggleVariant',
-          'ElToggleSize',
+          'Toggle',
+          'Toggle static helpers',
+          'ToggleVariant',
+          'ToggleSize',
         ]);
 
         final Set<String> documented = _documentedNames(tester);
@@ -289,28 +315,28 @@ void main() {
           expect(
             documented,
             contains(param),
-            reason: 'ElToggle constructor parameter "$param" is undocumented',
+            reason: 'Toggle constructor parameter "$param" is undocumented',
           );
         }
         for (final String member in _toggleStatics) {
           expect(
             documented,
             contains(member),
-            reason: 'ElToggle static "$member" is undocumented',
+            reason: 'Toggle static "$member" is undocumented',
           );
         }
-        for (final ElToggleVariant variant in ElToggleVariant.values) {
+        for (final ToggleVariant variant in ToggleVariant.values) {
           expect(
             documented,
             contains(variant.name),
-            reason: 'ElToggleVariant.${variant.name} is undocumented',
+            reason: 'ToggleVariant.${variant.name} is undocumented',
           );
         }
-        for (final ElToggleSize size in ElToggleSize.values) {
+        for (final ToggleSize size in ToggleSize.values) {
           expect(
             documented,
             contains(size.name),
-            reason: 'ElToggleSize.${size.name} is undocumented',
+            reason: 'ToggleSize.${size.name} is undocumented',
           );
         }
       },
@@ -318,7 +344,7 @@ void main() {
 
     testWidgets(
       'every live specimen this page keys is mounted, and every variant and '
-      'size rung has a real ElToggle behind it',
+      'size rung has a real Toggle behind it',
       (WidgetTester tester) async {
         await _pump(tester);
 
@@ -330,16 +356,16 @@ void main() {
           );
         }
 
-        final List<ElToggle> mounted = tester
-            .widgetList<ElToggle>(find.byType(ElToggle))
+        final List<Toggle> mounted = tester
+            .widgetList<Toggle>(find.byType(Toggle))
             .toList();
         expect(
-          mounted.map((ElToggle t) => t.variant).toSet(),
-          containsAll(ElToggleVariant.values),
+          mounted.map((Toggle t) => t.variant).toSet(),
+          containsAll(ToggleVariant.values),
         );
         expect(
-          mounted.map((ElToggle t) => t.size).toSet(),
-          containsAll(ElToggleSize.values),
+          mounted.map((Toggle t) => t.size).toSet(),
+          containsAll(ToggleSize.values),
         );
 
         expect(tester.takeException(), isNull);
@@ -353,15 +379,15 @@ void main() {
 
       const Key key = ValueKey<String>('toggle-live-specimen');
       await tester.ensureVisible(find.byKey(key));
-      expect(tester.widget<ElToggle>(find.byKey(key)).pressed, isFalse);
+      expect(tester.widget<Toggle>(find.byKey(key)).pressed, isFalse);
 
       await tester.tap(find.byKey(key), warnIfMissed: false);
       await tester.pump();
-      expect(tester.widget<ElToggle>(find.byKey(key)).pressed, isTrue);
+      expect(tester.widget<Toggle>(find.byKey(key)).pressed, isTrue);
 
       await tester.tap(find.byKey(key), warnIfMissed: false);
       await tester.pump();
-      expect(tester.widget<ElToggle>(find.byKey(key)).pressed, isFalse);
+      expect(tester.widget<Toggle>(find.byKey(key)).pressed, isFalse);
 
       expect(tester.takeException(), isNull);
     });
@@ -373,25 +399,25 @@ void main() {
 
       const Key outlineKey = ValueKey<String>('toggle-outline-bold-specimen');
       await tester.ensureVisible(find.byKey(outlineKey));
-      final ElToggle outline = tester.widget<ElToggle>(find.byKey(outlineKey));
-      expect(outline.variant, ElToggleVariant.outline);
+      final Toggle outline = tester.widget<Toggle>(find.byKey(outlineKey));
+      expect(outline.variant, ToggleVariant.outline);
       expect(outline.pressed, isFalse);
       await tester.tap(find.byKey(outlineKey), warnIfMissed: false);
       await tester.pump();
-      expect(tester.widget<ElToggle>(find.byKey(outlineKey)).pressed, isTrue);
+      expect(tester.widget<Toggle>(find.byKey(outlineKey)).pressed, isTrue);
 
       const Key withTextKey = ValueKey<String>('toggle-with-text-specimen');
       await tester.ensureVisible(find.byKey(withTextKey));
-      expect(tester.widget<ElToggle>(find.byKey(withTextKey)).pressed, isFalse);
+      expect(tester.widget<Toggle>(find.byKey(withTextKey)).pressed, isFalse);
       await tester.tap(find.byKey(withTextKey), warnIfMissed: false);
       await tester.pump();
-      expect(tester.widget<ElToggle>(find.byKey(withTextKey)).pressed, isTrue);
+      expect(tester.widget<Toggle>(find.byKey(withTextKey)).pressed, isTrue);
 
       expect(tester.takeException(), isNull);
     });
 
     testWidgets(
-      'the Independent toggles specimen mounts two ElToggles that stay '
+      'the Independent toggles specimen mounts two Toggles that stay '
       'mutually independent',
       (WidgetTester tester) async {
         await _pump(tester);
@@ -403,14 +429,14 @@ void main() {
           const ValueKey<String>('toggle-independent-italic-specimen'),
         );
         await tester.ensureVisible(bold);
-        expect(tester.widget<ElToggle>(bold).pressed, isFalse);
-        expect(tester.widget<ElToggle>(italic).pressed, isFalse);
+        expect(tester.widget<Toggle>(bold).pressed, isFalse);
+        expect(tester.widget<Toggle>(italic).pressed, isFalse);
 
         await tester.tap(bold, warnIfMissed: false);
         await tester.pump();
-        expect(tester.widget<ElToggle>(bold).pressed, isTrue);
+        expect(tester.widget<Toggle>(bold).pressed, isTrue);
         expect(
-          tester.widget<ElToggle>(italic).pressed,
+          tester.widget<Toggle>(italic).pressed,
           isFalse,
           reason: 'Bold and Italic must not be mutually exclusive',
         );
@@ -428,18 +454,18 @@ void main() {
         const Key on = ValueKey<String>('toggle-disabled-on-specimen');
         await tester.ensureVisible(find.byKey(off));
 
-        final ElToggle offToggle = tester.widget<ElToggle>(find.byKey(off));
-        final ElToggle onToggle = tester.widget<ElToggle>(find.byKey(on));
+        final Toggle offToggle = tester.widget<Toggle>(find.byKey(off));
+        final Toggle onToggle = tester.widget<Toggle>(find.byKey(on));
         expect(offToggle.onChanged, isNull);
         expect(onToggle.onChanged, isNull);
         expect(offToggle.pressed, isFalse);
         expect(onToggle.pressed, isTrue);
 
-        // A null onChanged is the only disabled switch ElToggle has: tapping
+        // A null onChanged is the only disabled switch Toggle has: tapping
         // must change nothing at all.
         await tester.tap(find.byKey(off), warnIfMissed: false);
         await tester.pump();
-        expect(tester.widget<ElToggle>(find.byKey(off)).pressed, isFalse);
+        expect(tester.widget<Toggle>(find.byKey(off)).pressed, isFalse);
 
         expect(tester.takeException(), isNull);
       },
@@ -466,10 +492,10 @@ void main() {
           findsWidgets,
         );
 
-        expect(tester.widget<ElToggle>(rtl).pressed, isFalse);
+        expect(tester.widget<Toggle>(rtl).pressed, isFalse);
         await tester.tap(rtl, warnIfMissed: false);
         await tester.pump();
-        expect(tester.widget<ElToggle>(rtl).pressed, isTrue);
+        expect(tester.widget<Toggle>(rtl).pressed, isTrue);
 
         expect(tester.takeException(), isNull);
       },
@@ -515,22 +541,22 @@ void main() {
       'both themes render the article with no exceptions when flipped in '
       'place, losing no specimen',
       (WidgetTester tester) async {
-        final ElThemeController theme = await _pump(
+        final ThemeController theme = await _pump(
           tester,
-          mode: ElThemeMode.light,
+          mode: ColorMode.light,
         );
         expect(find.text(toggleDoc.title), findsWidgets);
 
-        final ElThemeData light = ElTheme.of(
+        final ThemeTokens light = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('toggle-doc-article')),
           ),
         );
 
-        theme.setMode(ElThemeMode.dark);
+        theme.setMode(ColorMode.dark);
         await tester.pump();
 
-        final ElThemeData dark = ElTheme.of(
+        final ThemeTokens dark = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('toggle-doc-article')),
           ),
@@ -556,7 +582,7 @@ void main() {
       expect(find.textContaining('elattar add toggle'), findsWidgets);
     });
 
-    testWidgets('the meta entry describes ElToggle alone', (
+    testWidgets('the meta entry describes Toggle alone', (
       WidgetTester tester,
     ) async {
       expect(toggleDoc.name, 'toggle');
@@ -564,13 +590,13 @@ void main() {
       expect(toggleDoc.command, 'elattar add toggle');
       expect(toggleDoc.sourcePath, 'lib/src/components/toggle.dart');
       expect(toggleDoc.exports, <String>[
-        'ElToggle',
-        'ElToggleVariant',
-        'ElToggleSize',
+        'Toggle',
+        'ToggleVariant',
+        'ToggleSize',
       ]);
       // The group's own exports moved to toggleGroupDoc.
-      expect(toggleDoc.exports, isNot(contains('ElToggleGroup')));
-      expect(toggleDoc.exports, isNot(contains('ElToggleGroupItem')));
+      expect(toggleDoc.exports, isNot(contains('ToggleGroup')));
+      expect(toggleDoc.exports, isNot(contains('ToggleGroupItem')));
     });
   });
 }

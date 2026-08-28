@@ -1,5 +1,17 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import 'showcase_share_dialog.dart';
 import 'showcase_shell_scope.dart';
@@ -11,7 +23,7 @@ import 'showcase_shell_scope.dart';
 class SignalStudioProfilePage extends StatefulWidget {
   const SignalStudioProfilePage({super.key, required this.toasts});
 
-  final ElToastController toasts;
+  final ToastController toasts;
 
   @override
   State<SignalStudioProfilePage> createState() =>
@@ -40,15 +52,15 @@ class _SignalStudioProfilePageState extends State<SignalStudioProfilePage> {
       'Refreshing profile',
       description: 'Syncing your studio activity.',
     );
-    await Future<void>.delayed(ElDurations.slow);
+    await Future<void>.delayed(MotionDurations.slow);
     if (!mounted) return;
     setState(() => _refreshing = false);
     widget.toasts.settle(
       toast,
-      const ElToastMessage(
+      const ToastMessage(
         title: 'Profile is current',
         description: 'Your creator signals are up to date.',
-        type: ElToastType.success,
+        type: ToastType.success,
         promise: true,
       ),
     );
@@ -59,31 +71,31 @@ class _SignalStudioProfilePageState extends State<SignalStudioProfilePage> {
     widget.toasts.success(
       'Profile updated',
       description: 'Your public creator details are now current.',
-      glyph: ElIconGlyph.circleCheck,
+      glyph: IconGlyph.circleCheck,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final bool wide = constraints.maxWidth >= ElBreakpoints.md;
+        final bool wide = constraints.maxWidth >= Breakpoints.md;
         final double bottomClearance =
             ShowcaseShellScope.bottomOverlayClearanceOf(context);
         return SingleChildScrollView(
-          padding: ElSafeArea.scrollPaddingOf(
+          padding: SafeArea.scrollPaddingOf(
             context,
             base: EdgeInsets.fromLTRB(
-              el(5),
-              el(5),
-              el(5),
-              el(5) + bottomClearance,
+              space(5),
+              space(5),
+              space(5),
+              space(5) + bottomClearance,
             ),
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: ElWidths.page),
+              constraints: const BoxConstraints(maxWidth: LayoutWidths.page),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -95,22 +107,22 @@ class _SignalStudioProfilePageState extends State<SignalStudioProfilePage> {
                     toasts: widget.toasts,
                     onRefresh: _refresh,
                   ),
-                  SizedBox(height: el(6)),
+                  SizedBox(height: space(6)),
                   _ProfileStats(wide: wide),
-                  SizedBox(height: el(6)),
+                  SizedBox(height: space(6)),
                   _ProfileDetails(profile: _profile, wide: wide),
-                  SizedBox(height: el(6)),
-                  ElTabs(
+                  SizedBox(height: space(6)),
+                  Tabs(
                     selectedIndex: _tabIndex,
                     onChanged: (int index) => setState(() => _tabIndex = index),
-                    variant: ElTabsVariant.line,
-                    items: <ElTabItem>[
-                      ElTabItem(
+                    variant: TabsVariant.line,
+                    items: <TabItem>[
+                      TabItem(
                         label: wide ? 'Highlights' : 'Work',
                         content: _Highlights(wide: wide),
                       ),
-                      const ElTabItem(label: 'Drafts', content: _DraftsEmpty()),
-                      ElTabItem(
+                      const TabItem(label: 'Drafts', content: _DraftsEmpty()),
+                      TabItem(
                         label: wide ? 'Collections' : 'Saved',
                         content: _CollectionsError(
                           onRetry: () => setState(() => _tabIndex = 0),
@@ -118,21 +130,21 @@ class _SignalStudioProfilePageState extends State<SignalStudioProfilePage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: el(8)),
-                  ElText(
+                  SizedBox(height: space(8)),
+                  StyledText(
                     'PROFILE SIGNAL',
-                    ElType.label,
+                    TextStyles.eyebrow,
                     color: theme.mutedForeground,
                   ),
-                  SizedBox(height: el(2)),
-                  ElAlert(
+                  SizedBox(height: space(2)),
+                  Alert(
                     title: 'Your next release has room to grow.',
                     description:
                         'A concise studio note keeps the strongest work visible without asking followers to hunt for it.',
-                    variant: ElAlertVariant.info,
-                    icon: const ElIcon(
-                      ElIconGlyph.sparkles,
-                      tone: ElIconTone.inherit,
+                    variant: AlertVariant.info,
+                    icon: const Icon(
+                      IconGlyph.sparkles,
+                      tone: IconTone.inherit,
                     ),
                   ),
                 ],
@@ -159,47 +171,47 @@ class _ProfileHero extends StatelessWidget {
   final bool wide;
   final bool refreshing;
   final Future<void> Function(_ProfileData profile) onSave;
-  final ElToastController toasts;
+  final ToastController toasts;
   final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final Widget identity = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElAvatar(
+        Avatar(
           fallback: _initials(profile.displayName),
           image: AssetImage(profile.avatarAsset),
-          size: ElAvatarSize.lg,
-          badge: ElAvatarBadge(fill: theme.successInk),
+          size: AvatarSize.lg,
+          badge: AvatarBadge(fill: theme.successText),
         ),
-        SizedBox(width: el(4)),
+        SizedBox(width: space(4)),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              ElText(profile.displayName, ElType.h2),
-              SizedBox(height: el(1)),
-              ElText(
+              StyledText(profile.displayName, TextStyles.h2),
+              SizedBox(height: space(1)),
+              StyledText(
                 '${profile.handle} · ${profile.location}',
-                ElType.small,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
-              SizedBox(height: el(3)),
+              SizedBox(height: space(3)),
               Wrap(
-                spacing: el(2),
-                runSpacing: el(2),
+                spacing: space(2),
+                runSpacing: space(2),
                 children: <Widget>[
-                  ElBadge(
+                  Badge(
                     label: profile.category.toUpperCase(),
-                    variant: ElBadgeVariant.action,
+                    variant: BadgeVariant.action,
                   ),
-                  ElBadge(
+                  Badge(
                     label: profile.status.toUpperCase(),
                     variant: profile.status == 'On air'
-                        ? ElBadgeVariant.success
-                        : ElBadgeVariant.secondary,
+                        ? BadgeVariant.success
+                        : BadgeVariant.secondary,
                   ),
                 ],
               ),
@@ -209,15 +221,15 @@ class _ProfileHero extends StatelessWidget {
       ],
     );
     final Widget actions = Wrap(
-      spacing: el(2),
-      runSpacing: el(2),
+      spacing: space(2),
+      runSpacing: space(2),
       children: <Widget>[
-        ElDialog(
-          trigger: (BuildContext context, VoidCallback open) => ElButton(
+        Dialog(
+          trigger: (BuildContext context, VoidCallback open) => Button(
             key: const Key('profile-edit'),
-            variant: ElButtonVariant.primary,
+            variant: ButtonVariant.primary,
             onPressed: open,
-            child: ElText('Edit profile', ElComponentType.buttonLabel),
+            child: StyledText('Edit profile', TextStyles.buttonLabel),
           ),
           content: (BuildContext context, VoidCallback close) =>
               _ProfileEditor(profile: profile, close: close, onSave: onSave),
@@ -229,41 +241,42 @@ class _ProfileHero extends StatelessWidget {
           subject: profile.displayName,
           link: 'https://signal.studio/${profile.handle.substring(1)}',
           toasts: toasts,
-          trigger: (BuildContext context, VoidCallback open) => ElButton(
+          trigger: (BuildContext context, VoidCallback open) => Button(
             key: const Key('profile-share'),
-            variant: ElButtonVariant.secondary,
+            variant: ButtonVariant.secondary,
             label: 'Share profile',
             onPressed: open,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const ElIcon(ElIconGlyph.share2, size: ElIconSize.sm),
+                const Icon(IconGlyph.share2, size: IconSize.sm),
                 const _ActionGap(),
-                ElText('Share profile', ElComponentType.buttonLabel),
+                StyledText('Share profile', TextStyles.buttonLabel),
               ],
             ),
           ),
         ),
-        ElButton(
-          variant: ElButtonVariant.outline,
+        Button(
+          variant: ButtonVariant.outline,
           loading: refreshing,
           onPressed: refreshing ? null : onRefresh,
-          child: ElText('Refresh', ElComponentType.buttonLabel),
+          child: StyledText('Refresh', TextStyles.buttonLabel),
         ),
       ],
     );
 
-    return ElGlassPanelDeep(
-      radius: BorderRadius.circular(ElRadii.xl2),
+    return Glass(
+      variant: GlassVariant.prominent,
+      radius: BorderRadius.circular(Radii.xl2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           ClipRRect(
             borderRadius: BorderRadius.vertical(
-              top: Radius.circular(ElRadii.xl2),
+              top: Radius.circular(Radii.xl2),
             ),
             child: SizedBox(
-              height: wide ? el(36) : el(28),
+              height: wide ? space(36) : space(28),
               child: Image(
                 image: AssetImage(profile.coverAsset),
                 fit: BoxFit.cover,
@@ -271,13 +284,13 @@ class _ProfileHero extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(el(5)),
+            padding: EdgeInsets.all(space(5)),
             child: wide
                 ? Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       Expanded(child: identity),
-                      SizedBox(width: el(5)),
+                      SizedBox(width: space(5)),
                       Flexible(child: actions),
                     ],
                   )
@@ -285,7 +298,7 @@ class _ProfileHero extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       identity,
-                      SizedBox(height: el(5)),
+                      SizedBox(height: space(5)),
                       actions,
                     ],
                   ),
@@ -300,7 +313,7 @@ class _ActionGap extends StatelessWidget {
   const _ActionGap();
 
   @override
-  Widget build(BuildContext context) => SizedBox(width: el(2));
+  Widget build(BuildContext context) => SizedBox(width: space(2));
 }
 
 class _ProfileEditor extends StatefulWidget {
@@ -319,32 +332,25 @@ class _ProfileEditor extends StatefulWidget {
 }
 
 class _ProfileEditorState extends State<_ProfileEditor> {
-  static const List<ElSelectOption<String>> _categories =
-      <ElSelectOption<String>>[
-        ElSelectOption<String>(
-          value: 'Design & culture',
-          label: 'Design & culture',
-        ),
-        ElSelectOption<String>(value: 'Photography', label: 'Photography'),
-        ElSelectOption<String>(
-          value: 'Creative technology',
-          label: 'Creative technology',
-        ),
+  static const List<SelectOption<String>> _categories = <SelectOption<String>>[
+    SelectOption<String>(value: 'Design & culture', label: 'Design & culture'),
+    SelectOption<String>(value: 'Photography', label: 'Photography'),
+    SelectOption<String>(
+      value: 'Creative technology',
+      label: 'Creative technology',
+    ),
+  ];
+  static const List<SelectOption<String>> _visibilityOptions =
+      <SelectOption<String>>[
+        SelectOption<String>(value: 'Public', label: 'Public'),
+        SelectOption<String>(value: 'Followers only', label: 'Followers only'),
+        SelectOption<String>(value: 'Private', label: 'Private'),
       ];
-  static const List<ElSelectOption<String>> _visibilityOptions =
-      <ElSelectOption<String>>[
-        ElSelectOption<String>(value: 'Public', label: 'Public'),
-        ElSelectOption<String>(
-          value: 'Followers only',
-          label: 'Followers only',
-        ),
-        ElSelectOption<String>(value: 'Private', label: 'Private'),
-      ];
-  static const List<ElSelectOption<String>> _statusOptions =
-      <ElSelectOption<String>>[
-        ElSelectOption<String>(value: 'On air', label: 'On air'),
-        ElSelectOption<String>(value: 'Planning', label: 'Planning'),
-        ElSelectOption<String>(value: 'Away', label: 'Away'),
+  static const List<SelectOption<String>> _statusOptions =
+      <SelectOption<String>>[
+        SelectOption<String>(value: 'On air', label: 'On air'),
+        SelectOption<String>(value: 'Planning', label: 'Planning'),
+        SelectOption<String>(value: 'Away', label: 'Away'),
       ];
 
   late final TextEditingController _displayName;
@@ -483,7 +489,7 @@ class _ProfileEditorState extends State<_ProfileEditor> {
   Future<void> _save() async {
     if (_saving || !_validate()) return;
     setState(() => _saving = true);
-    await Future<void>.delayed(ElDurations.base);
+    await Future<void>.delayed(MotionDurations.normal);
     if (!mounted) return;
     await widget.onSave(
       _ProfileData(
@@ -507,18 +513,18 @@ class _ProfileEditorState extends State<_ProfileEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return ElDialogContent(
+    return DialogContent(
       onClose: _saving ? null : widget.close,
       children: <Widget>[
-        const ElDialogHeader(
+        const DialogHeader(
           children: <Widget>[
-            ElDialogTitle('Edit creator profile'),
-            ElDialogDescription(
+            DialogTitle('Edit creator profile'),
+            DialogDescription(
               'Shape the identity and publishing signals your audience sees.',
             ),
           ],
         ),
-        ElFieldGroup(
+        FieldGroup(
           children: <Widget>[
             _ProfileMediaEditor(
               profile: widget.profile,
@@ -529,12 +535,12 @@ class _ProfileEditorState extends State<_ProfileEditor> {
               onAvatar: _selectAvatar,
               onCover: _selectCover,
             ),
-            ElField(
+            Field(
               label: 'Display name',
               errors: _errors(_displayNameError),
               focusNode: _displayNameFocus,
               enabled: !_saving,
-              child: ElInput(
+              child: Input(
                 key: const Key('profile-display-name'),
                 controller: _displayName,
                 focusNode: _displayNameFocus,
@@ -543,14 +549,14 @@ class _ProfileEditorState extends State<_ProfileEditor> {
                 onChanged: (_) => _clearError('displayName'),
               ),
             ),
-            ElField(
+            Field(
               label: 'Handle',
               description:
                   'Starts with @ and becomes part of your public link.',
               errors: _errors(_handleError),
               focusNode: _handleFocus,
               enabled: !_saving,
-              child: ElInput(
+              child: Input(
                 key: const Key('profile-handle'),
                 controller: _handle,
                 focusNode: _handleFocus,
@@ -558,12 +564,12 @@ class _ProfileEditorState extends State<_ProfileEditor> {
                 onChanged: (_) => _clearError('handle'),
               ),
             ),
-            ElField(
+            Field(
               label: 'Location',
               errors: _errors(_locationError),
               focusNode: _locationFocus,
               enabled: !_saving,
-              child: ElInput(
+              child: Input(
                 key: const Key('profile-location'),
                 controller: _location,
                 focusNode: _locationFocus,
@@ -572,13 +578,13 @@ class _ProfileEditorState extends State<_ProfileEditor> {
                 onChanged: (_) => _clearError('location'),
               ),
             ),
-            ElField(
+            Field(
               label: 'Bio',
               description: '24–160 characters. Keep it useful and specific.',
               errors: _errors(_bioError),
               focusNode: _bioFocus,
               enabled: !_saving,
-              child: ElTextarea(
+              child: Textarea(
                 key: const Key('profile-bio'),
                 controller: _bio,
                 focusNode: _bioFocus,
@@ -586,11 +592,11 @@ class _ProfileEditorState extends State<_ProfileEditor> {
                 onChanged: (_) => _clearError('bio'),
               ),
             ),
-            ElField(
+            Field(
               label: 'Category',
               focusNode: _categoryFocus,
               enabled: !_saving,
-              child: ElSelect<String>(
+              child: Select<String>(
                 key: const Key('profile-category'),
                 options: _categories,
                 value: _category,
@@ -602,12 +608,12 @@ class _ProfileEditorState extends State<_ProfileEditor> {
                 focusNode: _categoryFocus,
               ),
             ),
-            ElField(
+            Field(
               label: 'Profile visibility',
               description: 'Choose who can discover this creator profile.',
               focusNode: _visibilityFocus,
               enabled: !_saving,
-              child: ElSelect<String>(
+              child: Select<String>(
                 key: const Key('profile-visibility'),
                 options: _visibilityOptions,
                 value: _visibility,
@@ -619,12 +625,12 @@ class _ProfileEditorState extends State<_ProfileEditor> {
                 focusNode: _visibilityFocus,
               ),
             ),
-            ElField(
+            Field(
               label: 'Studio status',
               description: 'A short availability signal shown near your name.',
               focusNode: _statusFocus,
               enabled: !_saving,
-              child: ElSelect<String>(
+              child: Select<String>(
                 key: const Key('profile-status'),
                 options: _statusOptions,
                 value: _status,
@@ -638,19 +644,19 @@ class _ProfileEditorState extends State<_ProfileEditor> {
             ),
           ],
         ),
-        ElDialogFooter(
+        DialogFooter(
           children: <Widget>[
-            ElButton(
+            Button(
               key: const Key('profile-cancel'),
-              variant: ElButtonVariant.ghost,
+              variant: ButtonVariant.ghost,
               onPressed: _saving ? null : widget.close,
-              child: ElText('Cancel', ElComponentType.buttonLabel),
+              child: StyledText('Cancel', TextStyles.buttonLabel),
             ),
-            ElButton(
+            Button(
               key: const Key('profile-save'),
               loading: _saving,
               onPressed: _saving ? null : _save,
-              child: ElText('Save changes', ElComponentType.buttonLabel),
+              child: StyledText('Save changes', TextStyles.buttonLabel),
             ),
           ],
         ),
@@ -680,98 +686,89 @@ class _ProfileMediaEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElCard(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Profile media'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Profile media'),
+          description: CardDescription(
             'Preview a supplied studio image before committing it.',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               ClipRRect(
-                borderRadius: BorderRadius.circular(ElRadii.lg),
+                borderRadius: BorderRadius.circular(Radii.lg),
                 child: SizedBox(
-                  height: el(20),
+                  height: space(20),
                   child: Image(
                     image: AssetImage(coverAsset),
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
-              SizedBox(height: el(3)),
+              SizedBox(height: space(3)),
               Row(
                 children: <Widget>[
-                  ElAvatar(
+                  Avatar(
                     fallback: _initials(profile.displayName),
                     image: AssetImage(avatarAsset),
-                    size: ElAvatarSize.md,
+                    size: AvatarSize.md,
                   ),
-                  SizedBox(width: el(3)),
+                  SizedBox(width: space(3)),
                   Expanded(
-                    child: ElText(
+                    child: StyledText(
                       'Avatar and cover preview',
-                      ElType.small,
+                      TextStyles.small,
                       color: theme.mutedForeground,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: el(3)),
+              SizedBox(height: space(3)),
               Wrap(
-                spacing: el(2),
-                runSpacing: el(2),
+                spacing: space(2),
+                runSpacing: space(2),
                 children: <Widget>[
-                  ElButton(
+                  Button(
                     key: const Key('profile-change-avatar'),
-                    size: ElButtonSize.sm,
-                    variant: ElButtonVariant.outline,
+                    size: ButtonSize.sm,
+                    variant: ButtonVariant.outline,
                     onPressed: enabled ? onAvatar : null,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        const ElIcon.lucide(
-                          ElLucide.camera,
-                          size: ElIconSize.sm,
-                        ),
+                        const Icon.lucide(Lucide.camera, size: IconSize.sm),
                         const _ActionGap(),
-                        ElText('Change avatar', ElComponentType.buttonLabelSm),
+                        StyledText('Change avatar', TextStyles.buttonLabelSm),
                       ],
                     ),
                   ),
-                  ElButton(
+                  Button(
                     key: const Key('profile-change-cover'),
-                    size: ElButtonSize.sm,
-                    variant: ElButtonVariant.outline,
+                    size: ButtonSize.sm,
+                    variant: ButtonVariant.outline,
                     onPressed: enabled ? onCover : null,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        const ElIcon.lucide(
-                          ElLucide.image,
-                          size: ElIconSize.sm,
-                        ),
+                        const Icon.lucide(Lucide.image, size: IconSize.sm),
                         const _ActionGap(),
-                        ElText('Change cover', ElComponentType.buttonLabelSm),
+                        StyledText('Change cover', TextStyles.buttonLabelSm),
                       ],
                     ),
                   ),
                 ],
               ),
               if (note != null) ...<Widget>[
-                SizedBox(height: el(3)),
-                ElAlert(
+                SizedBox(height: space(3)),
+                Alert(
                   title: 'Media selection ready',
                   description: note!,
-                  variant: ElAlertVariant.info,
-                  icon: const ElIcon(
-                    ElIconGlyph.info,
-                    tone: ElIconTone.inherit,
-                  ),
+                  variant: AlertVariant.info,
+                  icon: const Icon(IconGlyph.info, tone: IconTone.inherit),
                 ),
               ],
             ],
@@ -792,22 +789,22 @@ class _ProfileDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Widget> facts = <Widget>[
       _ProfileFact(
-        glyph: ElLucide.mapPin,
+        glyph: Lucide.mapPin,
         label: 'Based in',
         value: profile.location,
       ),
       _ProfileFact(
-        glyph: ElLucide.palette,
+        glyph: Lucide.palette,
         label: 'Category',
         value: profile.category,
       ),
       _ProfileFact(
-        glyph: profile.visibility == 'Public' ? ElLucide.globe : ElLucide.lock,
+        glyph: profile.visibility == 'Public' ? Lucide.globe : Lucide.lock,
         label: 'Visibility',
         value: profile.visibility,
       ),
       _ProfileFact(
-        glyph: ElLucide.activity,
+        glyph: Lucide.activity,
         label: 'Studio status',
         value: profile.status,
       ),
@@ -819,16 +816,16 @@ class _ProfileDetails extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(child: facts[0]),
-                  SizedBox(width: el(3)),
+                  SizedBox(width: space(3)),
                   Expanded(child: facts[1]),
                 ],
               ),
-              SizedBox(height: el(3)),
+              SizedBox(height: space(3)),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(child: facts[2]),
-                  SizedBox(width: el(3)),
+                  SizedBox(width: space(3)),
                   Expanded(child: facts[3]),
                 ],
               ),
@@ -838,24 +835,24 @@ class _ProfileDetails extends StatelessWidget {
             children: <Widget>[
               for (int index = 0; index < facts.length; index++) ...<Widget>[
                 facts[index],
-                if (index < facts.length - 1) SizedBox(height: el(3)),
+                if (index < facts.length - 1) SizedBox(height: space(3)),
               ],
             ],
           );
-    return ElCard(
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('About the creator'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('About the creator'),
+          description: CardDescription(
             'The public context behind the work and its availability.',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              ElText(profile.bio, ElType.body),
-              SizedBox(height: el(4)),
+              StyledText(profile.bio, TextStyles.body),
+              SizedBox(height: space(4)),
               factGrid,
             ],
           ),
@@ -872,16 +869,16 @@ class _ProfileFact extends StatelessWidget {
     required this.value,
   });
 
-  final ElLucideGlyph glyph;
+  final LucideGlyph glyph;
   final String label;
   final String value;
 
   @override
-  Widget build(BuildContext context) => ElItem(
-    variant: ElItemVariant.outline,
-    media: ElItemMedia(child: ElIcon.lucide(glyph, tone: ElIconTone.muted)),
-    content: ElItemContent(
-      children: <Widget>[ElItemTitle(label), ElItemDescription(value)],
+  Widget build(BuildContext context) => Item(
+    variant: ItemVariant.outline,
+    media: ItemMedia(child: Icon.lucide(glyph, tone: IconTone.muted)),
+    content: ItemContent(
+      children: <Widget>[ItemTitle(label), ItemDescription(value)],
     ),
   );
 }
@@ -929,32 +926,32 @@ class _ProfileStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const List<ElStat> stats = <ElStat>[
-      ElStat(
+    const List<Stat> stats = <Stat>[
+      Stat(
         label: 'FOLLOWERS',
         value: '84.2K',
-        delta: (value: '12.8%', direction: ElStatDirection.up),
+        delta: (value: '12.8%', direction: StatDirection.up),
       ),
-      ElStat(
+      Stat(
         label: 'REACH',
         value: '1.8M',
-        delta: (value: '8.4%', direction: ElStatDirection.up),
+        delta: (value: '8.4%', direction: StatDirection.up),
       ),
-      ElStat(
+      Stat(
         label: 'SAVES',
         value: '14.6K',
-        delta: (value: '2.1%', direction: ElStatDirection.up),
+        delta: (value: '2.1%', direction: StatDirection.up),
       ),
     ];
-    return ElCard(
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Studio pulse'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Studio pulse'),
+          description: CardDescription(
             'A compact read on the audience you are building.',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: wide
               ? Row(
                   children: <Widget>[
@@ -964,7 +961,7 @@ class _ProfileStats extends StatelessWidget {
                       index++
                     ) ...<Widget>[
                       Expanded(child: stats[index]),
-                      if (index < stats.length - 1) SizedBox(width: el(5)),
+                      if (index < stats.length - 1) SizedBox(width: space(5)),
                     ],
                   ],
                 )
@@ -977,7 +974,7 @@ class _ProfileStats extends StatelessWidget {
                       index++
                     ) ...<Widget>[
                       stats[index],
-                      if (index < stats.length - 1) SizedBox(height: el(5)),
+                      if (index < stats.length - 1) SizedBox(height: space(5)),
                     ],
                   ],
                 ),
@@ -1013,7 +1010,7 @@ class _Highlights extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Expanded(child: cards[0]),
-              SizedBox(width: el(4)),
+              SizedBox(width: space(4)),
               Expanded(child: cards[1]),
             ],
           )
@@ -1021,7 +1018,7 @@ class _Highlights extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               cards[0],
-              SizedBox(height: el(4)),
+              SizedBox(height: space(4)),
               cards[1],
             ],
           );
@@ -1043,27 +1040,31 @@ class _HighlightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElCard(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Card(
       children: <Widget>[
-        ElCardContent(
+        CardContent(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(ElRadii.lg),
+            borderRadius: BorderRadius.circular(Radii.lg),
             child: SizedBox(
-              height: el(32),
+              height: space(32),
               child: Image(image: asset, fit: BoxFit.cover),
             ),
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              ElText(eyebrow, ElType.label, color: theme.mutedForeground),
-              SizedBox(height: el(2)),
-              ElText(title, ElType.h4),
-              SizedBox(height: el(2)),
-              ElText(meta, ElType.small, color: theme.mutedForeground),
+              StyledText(
+                eyebrow,
+                TextStyles.eyebrow,
+                color: theme.mutedForeground,
+              ),
+              SizedBox(height: space(2)),
+              StyledText(title, TextStyles.h4),
+              SizedBox(height: space(2)),
+              StyledText(meta, TextStyles.small, color: theme.mutedForeground),
             ],
           ),
         ),
@@ -1076,16 +1077,16 @@ class _DraftsEmpty extends StatelessWidget {
   const _DraftsEmpty();
 
   @override
-  Widget build(BuildContext context) => ElCard(
+  Widget build(BuildContext context) => Card(
     children: const <Widget>[
-      ElCardContent(
-        child: ElEmpty(
+      CardContent(
+        child: Empty(
           children: <Widget>[
-            ElEmptyHeader(
+            EmptyHeader(
               children: <Widget>[
-                ElEmptyMedia(glyph: ElIconGlyph.packageOpen),
-                ElEmptyTitle('No drafts are waiting.'),
-                ElEmptyDescription(
+                EmptyMedia(glyph: IconGlyph.packageOpen),
+                EmptyTitle('No drafts are waiting.'),
+                EmptyDescription(
                   'Your next idea can begin as a short note or a saved reel.',
                 ),
               ],
@@ -1103,17 +1104,17 @@ class _CollectionsError extends StatelessWidget {
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) => ElAlert(
+  Widget build(BuildContext context) => Alert(
     title: 'Collections could not load.',
     description:
         'Your saved work is safe. Try reconnecting to your studio feed.',
-    variant: ElAlertVariant.destructive,
-    icon: const ElIcon(ElIconGlyph.circleX, tone: ElIconTone.inherit),
-    action: ElButton(
-      size: ElButtonSize.sm,
-      variant: ElButtonVariant.secondary,
+    variant: AlertVariant.destructive,
+    icon: const Icon(IconGlyph.circleX, tone: IconTone.inherit),
+    action: Button(
+      size: ButtonSize.sm,
+      variant: ButtonVariant.secondary,
       onPressed: onRetry,
-      child: ElText('Retry', ElComponentType.buttonLabelSm),
+      child: StyledText('Retry', TextStyles.buttonLabelSm),
     ),
   );
 }

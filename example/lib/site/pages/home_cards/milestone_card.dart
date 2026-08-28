@@ -3,7 +3,33 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 
 /// A milestone-setting form, built the same way as the home grid's other live
 /// cards: real state, real validation, real components.
@@ -15,19 +41,21 @@ class MilestoneCard extends StatefulWidget {
 }
 
 class _MilestoneCardState extends State<MilestoneCard> {
-  static final List<ElRule<String>> _nameRules = <ElRule<String>>[
-    ElRule.minLength(2, 'Give the goal a name.'),
-  ];
+  static final List<ValidationRule<String>> _nameRules =
+      <ValidationRule<String>>[
+        ValidationRule.minLength(2, 'Give the goal a name.'),
+      ];
 
-  static final List<ElRule<String>> _amountRules = <ElRule<String>>[
-    ElRule<String>(_isDollarAmount, 'Enter an amount in dollars.'),
-  ];
+  static final List<ValidationRule<String>> _amountRules =
+      <ValidationRule<String>>[
+        ValidationRule<String>(_isDollarAmount, 'Enter an amount in dollars.'),
+      ];
 
-  static const List<ElSelectOption<String>> _dates = <ElSelectOption<String>>[
-    ElSelectOption<String>(value: 'dec-2025', label: 'Dec 2025'),
-    ElSelectOption<String>(value: 'mar-2026', label: 'Mar 2026'),
-    ElSelectOption<String>(value: 'jun-2026', label: 'Jun 2026'),
-    ElSelectOption<String>(value: 'dec-2026', label: 'Dec 2026'),
+  static const List<SelectOption<String>> _dates = <SelectOption<String>>[
+    SelectOption<String>(value: 'dec-2025', label: 'Dec 2025'),
+    SelectOption<String>(value: 'mar-2026', label: 'Mar 2026'),
+    SelectOption<String>(value: 'jun-2026', label: 'Jun 2026'),
+    SelectOption<String>(value: 'dec-2026', label: 'Dec 2026'),
   ];
 
   static bool _isDollarAmount(String value) {
@@ -60,20 +88,21 @@ class _MilestoneCardState extends State<MilestoneCard> {
     setState(() => _created = false);
   }
 
-  List<String> get _nameIssues => ElRules.check<String>(_name.text, _nameRules);
+  List<String> get _nameIssues =>
+      Validators.check<String>(_name.text, _nameRules);
   List<String> get _amountIssues =>
-      ElRules.check<String>(_amount.text, _amountRules);
+      Validators.check<String>(_amount.text, _amountRules);
   bool get _valid => _nameIssues.isEmpty && _amountIssues.isEmpty;
 
   String get _dateLabel => _dates
-      .firstWhere((ElSelectOption<String> option) => option.value == _date)
+      .firstWhere((SelectOption<String> option) => option.value == _date)
       .label;
 
   Future<void> _create() async {
     setState(() => _submitted = true);
     if (!_valid) return;
     setState(() => _loading = true);
-    await Future<void>.delayed(ElDurations.slow);
+    await Future<void>.delayed(MotionDurations.slow);
     if (!mounted) return;
     setState(() {
       _loading = false;
@@ -93,21 +122,21 @@ class _MilestoneCardState extends State<MilestoneCard> {
 
   Widget _fields(BuildContext context) {
     final bool show = _submitted;
-    final Widget amountField = ElField(
+    final Widget amountField = Field(
       label: 'Target amount',
       errors: show ? _amountIssues : const <String>[],
       enabled: !_loading,
-      child: ElInput(
+      child: Input(
         key: const ValueKey<String>('home-milestone-amount'),
         controller: _amount,
         placeholder: r'$15,000',
         keyboardType: TextInputType.number,
       ),
     );
-    final Widget dateField = ElField(
+    final Widget dateField = Field(
       label: 'Target date',
       enabled: !_loading,
-      child: ElSelect<String>(
+      child: Select<String>(
         key: const ValueKey<String>('home-milestone-date'),
         options: _dates,
         value: _date,
@@ -119,13 +148,13 @@ class _MilestoneCardState extends State<MilestoneCard> {
       ),
     );
 
-    return ElFieldSet(
+    return FieldSet(
       children: <Widget>[
-        ElField(
+        Field(
           label: 'Goal name',
           errors: show ? _nameIssues : const <String>[],
           enabled: !_loading,
-          child: ElInput(
+          child: Input(
             key: const ValueKey<String>('home-milestone-name'),
             controller: _name,
             placeholder: 'e.g. new car, home downpayment',
@@ -133,12 +162,12 @@ class _MilestoneCardState extends State<MilestoneCard> {
         ),
         LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            if (constraints.maxWidth >= el(70)) {
+            if (constraints.maxWidth >= space(70)) {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(child: amountField),
-                  SizedBox(width: ElFieldSet.gap),
+                  SizedBox(width: FieldSet.gap),
                   Expanded(child: dateField),
                 ],
               );
@@ -148,7 +177,7 @@ class _MilestoneCardState extends State<MilestoneCard> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 amountField,
-                SizedBox(height: ElFieldSet.gap),
+                SizedBox(height: FieldSet.gap),
                 dateField,
               ],
             );
@@ -160,42 +189,42 @@ class _MilestoneCardState extends State<MilestoneCard> {
 
   @override
   Widget build(BuildContext context) {
-    return ElCard(
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Set a new milestone'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Set a new milestone'),
+          description: CardDescription(
             'Define your financial target and we will help you pace your '
             'savings.',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               if (_created) ...<Widget>[
-                ElAlert(
+                Alert(
                   key: const ValueKey<String>('home-milestone-success'),
-                  variant: ElAlertVariant.success,
-                  icon: const ElIcon(ElIconGlyph.circleCheck),
+                  variant: AlertVariant.success,
+                  icon: const Icon(IconGlyph.circleCheck),
                   title: '${_name.text} is on track.',
                   description: 'We will pace it to $_dateLabel.',
                 ),
-                SizedBox(height: ElFieldSet.gap),
+                SizedBox(height: FieldSet.gap),
               ],
               _fields(context),
             ],
           ),
         ),
-        ElCardFooter(
+        CardFooter(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               SizedBox(
                 width: double.infinity,
-                child: ElButton(
+                child: Button(
                   key: const ValueKey<String>('home-milestone-create'),
                   loading: _loading,
                   contentAlignment: AlignmentDirectional.center,
@@ -203,12 +232,12 @@ class _MilestoneCardState extends State<MilestoneCard> {
                   child: const Text('Create goal'),
                 ),
               ),
-              SizedBox(height: el(2)),
+              SizedBox(height: space(2)),
               SizedBox(
                 width: double.infinity,
-                child: ElButton(
+                child: Button(
                   key: const ValueKey<String>('home-milestone-cancel'),
-                  variant: ElButtonVariant.outline,
+                  variant: ButtonVariant.outline,
                   contentAlignment: AlignmentDirectional.center,
                   onPressed: _loading ? null : _cancel,
                   child: const Text('Cancel'),

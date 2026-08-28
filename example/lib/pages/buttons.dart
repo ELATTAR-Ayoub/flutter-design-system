@@ -2,7 +2,7 @@
 /// in the port.
 ///
 /// Nine sections, and almost nothing on it is a picture of a control: the
-/// eight variant cells are live [ElButton]s, the ladder is five real rungs, the
+/// eight variant cells are live [Button]s, the ladder is five real rungs, the
 /// six live buttons press and take focus, the three toggles toggle, the segment
 /// group's pill travels, and all four IconSwap wheels roll. Two cells are
 /// deliberately **stills**: see the drift register, entries 13 and 14.
@@ -22,7 +22,7 @@
 ///   printed API row is copy, and the fidelity bar is the reference's own copy
 ///  : and the divergence is recorded here instead of an invented API.
 /// * **`aria-pressed` on the IconSwap demos.** Three of the four set it (the
-///   fourth does not; drift 23). `ElButton` exposes `label` and `enabled` and
+///   fourth does not; drift 23). `Button` exposes `label` and `enabled` and
 ///   the pinned SDK's `SemanticsProperties` has no pressed-button flag that is
 ///   not also a checkbox or a switch, so a toggling *button* cannot announce
 ///   its state without announcing the wrong role. Recorded, not faked: the
@@ -41,7 +41,7 @@
 /// 3. **"the width stays stable"**, said four times: the `#states` cell note,
 ///    the `#api` `loading` row, Do #4, and the prop's own JSDoc: against a
 ///    **prepended** spinner that adds its own width plus the rung's gap. All
-///    four ship. Stated once more in `ElButton.loading`.
+///    four ship. Stated once more in `Button.loading`.
 /// 4. **The spinner is silent.** `Spinner` hands `role="status"` and
 ///    `aria-label="Loading"` to `Icon`, which destructures neither; only
 ///    `aria-busy` survives, and Flutter has no `aria-busy` (ruling B9).
@@ -50,7 +50,7 @@
 ///    selection is real one panel further down and only there.
 /// 6. **`Icon size="sm"` renders 16px** inside a button: the base class list's
 ///    `size-4` beats the attribute, while `strokeWidth` keeps the 14px value.
-///    Seven glyphs on this page. Carried by `ElButton.iconPxFor`.
+///    Seven glyphs on this page. Carried by `Button.iconPxFor`.
 /// 7. **ButtonGroup end radii are asymmetric**: the trailing member is forced
 ///    to the container radius while the leading one keeps its own pill.
 /// 8. **`ButtonGroupText` sets no `data-slot`**, so the rule that rounds the
@@ -71,11 +71,11 @@
 ///    control: it reproduces the ring and the border, and not the transition a
 ///    real `:focus-visible` runs. See [_FocusStill].
 /// 15. **Five size rungs, three type sizes, and only three of six type classes
-///    carry a line-height at all.** Stated in full on `ElButtonSize`.
+///    carry a line-height at all.** Stated in full on `ButtonSize`.
 /// 16. **`ButtonGroupText className="type-num"` does not render as
 ///    `type-num`**: the utilities beat the component layer on size and
 ///    weight, and the mono family, the tabular figures and the tracking
-///    survive. Pre-resolved as `ElComponentType.buttonGroupNum`.
+///    survive. Pre-resolved as `TextStyles.buttonGroupNum`.
 /// 17. **`icon-xs` is documented and never rendered.** The cva declares it,
 ///    the `#api` table prints it, the page shows eight of the nine. Built
 ///    anyway (ruling B3), so the printed row stays true.
@@ -100,7 +100,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -124,7 +136,7 @@ const List<(String, String)> _sizeUse = <(String, String)>[
 ///
 /// The `size` row is the authority for the nine-rung ladder and it prints
 /// `icon-xs`, which the page never renders (drift 17); the `loading` row
-/// repeats the width claim `ElButton.loading` disproves (drift 3); and
+/// repeats the width claim `Button.loading` disproves (drift 3); and
 /// `asChild` describes a prop this port does not have (ruling B4). All three
 /// ship as written: a printed API row is copy.
 const List<(String, String)> _apiRows = <(String, String)>[
@@ -183,12 +195,12 @@ class ButtonsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('base', 'buttons');
+    final CategoryHit here = findCategory('base', 'buttons');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // DRIFT 1. The foundations pages pass `group.title` alone; this one
           // interpolates a second literal after it, and the group is already
           // called "Base Components": so the eyebrow reads "Base Components ·
@@ -213,7 +225,7 @@ class ButtonsPage extends StatelessWidget {
         // `buttons` is index 0 of `base`, so `prev` is null and the kit renders
         // the bare spacer in its place: the first one-sided foot nav that is
         // missing its *left* half.
-        const ElPageFootNav(groupId: 'base', slug: 'buttons'),
+        const PageFootNav(groupId: 'base', slug: 'buttons'),
       ],
     );
   }
@@ -226,7 +238,7 @@ class _VariantsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'variants',
       title: 'Variants',
       description:
@@ -237,97 +249,94 @@ class _VariantsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           // `cols={4}`, `grid-cols-2 sm:grid-cols-4`, so 4×2 at this frame.
-          ElStateGrid(
+          StateGrid(
             cols: 4,
             children: <Widget>[
-              ElStateCell(
+              StateCell(
                 label: 'default',
                 note: 'Primary action. Blue.',
-                child: ElButton(
-                  onPressed: () {},
-                  child: const Text('Open Pack'),
-                ),
+                child: Button(onPressed: () {}, child: const Text('Open Pack')),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'premium',
                 note: 'Money & reward. Lime.',
-                child: ElButton(
-                  variant: ElButtonVariant.premium,
+                child: Button(
+                  variant: ButtonVariant.premium,
                   onPressed: () {},
                   child: const Text('Deposit Funds'),
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'secondary',
                 note: 'Neutral, beside a primary.',
-                child: ElButton(
-                  variant: ElButtonVariant.secondary,
+                child: Button(
+                  variant: ButtonVariant.secondary,
                   onPressed: () {},
                   child: const Text('View Hits'),
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'outline',
                 note: 'Must not compete.',
-                child: ElButton(
-                  variant: ElButtonVariant.outline,
+                child: Button(
+                  variant: ButtonVariant.outline,
                   onPressed: () {},
                   child: const Text('Filters'),
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'ghost',
                 note: 'Toolbars, dismissals.',
-                child: ElButton(
-                  variant: ElButtonVariant.ghost,
+                child: Button(
+                  variant: ButtonVariant.ghost,
                   onPressed: () {},
                   child: const Text('Skip'),
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'destructive',
                 note: 'Sell back, delete.',
-                child: ElButton(
-                  variant: ElButtonVariant.destructive,
+                child: Button(
+                  variant: ButtonVariant.destructive,
                   onPressed: () {},
                   child: const Text('Sell All'),
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'link',
                 note: 'Inline text action.',
                 // Still a 40px pill with 16px of horizontal padding that
                 // scales on press and takes the blue ring: a "text button"
                 // only in what it paints.
-                child: ElButton(
-                  variant: ElButtonVariant.link,
+                child: Button(
+                  variant: ButtonVariant.link,
                   onPressed: () {},
                   child: const Text('Forgot password?'),
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'premium + caps',
                 note: 'Hero CTA treatment.',
                 // DRIFT 22: `caps` is an axis, not a rung: it beats the
                 // size's own class, so this label is *smaller* than the seven
                 // beside it, and uppercased.
-                child: ElButton(
-                  variant: ElButtonVariant.premium,
-                  emphasis: ElButtonEmphasis.caps,
+                child: Button(
+                  variant: ButtonVariant.premium,
+                  emphasis: ButtonEmphasis.caps,
                   onPressed: () {},
                   child: const Text('Claim Reward'),
                 ),
               ),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElNote(
-            tone: ElNoteTone.value,
+          SizedBox(height: space(4)),
+          Note(
+            tone: NoteTone.value,
             title: 'The lime button is rationed',
-            child: ElRichText(
+            child: RichText(
               TextSpan(
                 children: <InlineSpan>[
-                  ElCode.span('premium'),
+                  Code.span('premium'),
                   const TextSpan(
                     text:
                         ' is the only variant permitted to glow, and only on '
@@ -337,7 +346,7 @@ class _VariantsSection extends StatelessWidget {
                   ),
                 ],
               ),
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ],
@@ -352,20 +361,20 @@ class _SizesSection extends StatelessWidget {
   const _SizesSection();
 
   /// The five rungs the ladder shows, with the caption printed under each.
-  static const List<(ElButtonSize, String, String)> _ladder =
-      <(ElButtonSize, String, String)>[
-        (ElButtonSize.xs, 'Extra small', 'xs · 24px'),
-        (ElButtonSize.sm, 'Small', 'sm · 32px'),
-        (ElButtonSize.md, 'Medium', 'default · 40px'),
-        (ElButtonSize.lg, 'Large', 'lg · 48px'),
-        (ElButtonSize.xl, 'Hero', 'xl · 56px'),
+  static const List<(ButtonSize, String, String)> _ladder =
+      <(ButtonSize, String, String)>[
+        (ButtonSize.xs, 'Extra small', 'xs · 24px'),
+        (ButtonSize.sm, 'Small', 'sm · 32px'),
+        (ButtonSize.md, 'Medium', 'default · 40px'),
+        (ButtonSize.lg, 'Large', 'lg · 48px'),
+        (ButtonSize.xl, 'Hero', 'xl · 56px'),
       ];
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'sizes',
       title: 'Sizes',
       // The straight apostrophe in "product's" is the reference's.
@@ -373,7 +382,7 @@ class _SizesSection extends StatelessWidget {
           '32 / 40 / 48 / 56, plus a 24px step for dense internals. '
           'This ladder is intentionally taller than stock shadcn — a premium '
           "product's primary action cannot be 32px.",
-      child: ElPanel(
+      child: Panel(
         label: 'The ladder',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -381,10 +390,10 @@ class _SizesSection extends StatelessWidget {
             // `align="end"`. The caption block is the same height under all
             // five columns, so aligning the columns' bottoms aligns the
             // buttons' bottoms too: the ladder gets a shared baseline free.
-            ElRow(
-              align: ElRowAlign.end,
+            SpecimenRow(
+              align: SpecimenRowAlign.end,
               children: <Widget>[
-                for (final (ElButtonSize, String, String) rung in _ladder)
+                for (final (ButtonSize, String, String) rung in _ladder)
                   _LadderColumn(
                     size: rung.$1,
                     label: rung.$2,
@@ -396,13 +405,13 @@ class _SizesSection extends StatelessWidget {
               // `mt-6 … border-t border-border pt-5`: margin outside the
               // rule, padding inside it, which is the order a border box
               // stacks them in.
-              margin: EdgeInsets.only(top: el(6)),
-              padding: EdgeInsets.only(top: el(5)),
+              margin: EdgeInsets.only(top: space(6)),
+              padding: EdgeInsets.only(top: space(5)),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
                     color: theme.border,
-                    width: ElWidths.hairline,
+                    width: BorderWidths.hairline,
                   ),
                 ),
               ),
@@ -411,7 +420,7 @@ class _SizesSection extends StatelessWidget {
                 children: <Widget>[
                   // `space-y-2`.
                   for (int i = 0; i < _sizeUse.length; i++) ...<Widget>[
-                    if (i > 0) SizedBox(height: el(2)),
+                    if (i > 0) SizedBox(height: space(2)),
                     _SizeUseLine(entry: _sizeUse[i]),
                   ],
                 ],
@@ -432,7 +441,7 @@ class _LadderColumn extends StatelessWidget {
     required this.caption,
   });
 
-  final ElButtonSize size;
+  final ButtonSize size;
   final String label;
 
   /// `.type-micro`, so it is uppercased at paint time and the source stays
@@ -445,9 +454,9 @@ class _LadderColumn extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        ElButton(size: size, onPressed: () {}, child: Text(label)),
-        SizedBox(height: el(3)),
-        ElText(caption, ElType.micro, align: TextAlign.center),
+        Button(size: size, onPressed: () {}, child: Text(label)),
+        SizedBox(height: space(3)),
+        StyledText(caption, TextStyles.eyebrowSmall, align: TextAlign.center),
       ],
     );
   }
@@ -464,23 +473,23 @@ class _SizeUseLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           TextSpan(
             text: entry.$1,
-            style: ElText.styleOf(
+            style: StyledText.styleOf(
               context,
-              ElType.numSm,
+              TextStyles.numberSm,
               color: theme.mutedForeground,
             ),
           ),
           TextSpan(text: ': ${entry.$2}'),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -492,19 +501,18 @@ class _StatesSection extends StatelessWidget {
 
   /// The six live variants, in the order the panel renders them. `link` is
   /// absent: the one variant of the seven this row leaves out.
-  static const List<(ElButtonVariant, String)> _live =
-      <(ElButtonVariant, String)>[
-        (ElButtonVariant.primary, 'Primary'),
-        (ElButtonVariant.premium, 'Premium'),
-        (ElButtonVariant.secondary, 'Secondary'),
-        (ElButtonVariant.outline, 'Outline'),
-        (ElButtonVariant.ghost, 'Ghost'),
-        (ElButtonVariant.destructive, 'Destructive'),
-      ];
+  static const List<(ButtonVariant, String)> _live = <(ButtonVariant, String)>[
+    (ButtonVariant.primary, 'Primary'),
+    (ButtonVariant.premium, 'Premium'),
+    (ButtonVariant.secondary, 'Secondary'),
+    (ButtonVariant.outline, 'Outline'),
+    (ButtonVariant.ghost, 'Ghost'),
+    (ButtonVariant.destructive, 'Destructive'),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'states',
       title: 'States',
       description:
@@ -515,17 +523,14 @@ class _StatesSection extends StatelessWidget {
         children: <Widget>[
           // `cols={5}`, `grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`, so one
           // clean row at this frame and only at this frame.
-          ElStateGrid(
+          StateGrid(
             cols: 5,
             children: <Widget>[
-              ElStateCell(
+              StateCell(
                 label: 'Default',
-                child: ElButton(
-                  onPressed: () {},
-                  child: const Text('Open Pack'),
-                ),
+                child: Button(onPressed: () {}, child: const Text('Open Pack')),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'Hover',
                 note: 'Hover it',
                 // DRIFT 13. The reference adds `className="bg-action"` here,
@@ -535,12 +540,9 @@ class _StatesSection extends StatelessWidget {
                 // no-op it is (ruling B8); the note admits it is live rather
                 // than a still, and the real hover difference is the sheen
                 // beating, which only a true hover starts.
-                child: ElButton(
-                  onPressed: () {},
-                  child: const Text('Open Pack'),
-                ),
+                child: Button(onPressed: () {}, child: const Text('Open Pack')),
               ),
-              const ElStateCell(
+              const StateCell(
                 label: 'Focus',
                 note: 'Tab to it',
                 child: _FocusStill(),
@@ -548,41 +550,41 @@ class _StatesSection extends StatelessWidget {
               // No handler and `loading`: the reference passes neither an
               // `onClick` nor `disabled`, and `disabled = disabled || loading`
               // does the rest.
-              const ElStateCell(
+              const StateCell(
                 label: 'Loading',
                 note: 'Disabled, width held',
-                child: ElButton(loading: true, child: Text('Open Pack')),
+                child: Button(loading: true, child: Text('Open Pack')),
               ),
-              const ElStateCell(
+              const StateCell(
                 label: 'Disabled',
                 note: '45% opacity',
-                child: ElButton(child: Text('Open Pack')),
+                child: Button(child: Text('Open Pack')),
               ),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Live — press and hold, or tab through',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ElRow(
+                SpecimenRow(
                   children: <Widget>[
-                    for (final (ElButtonVariant, String) v in _live)
-                      ElButton(
+                    for (final (ButtonVariant, String) v in _live)
+                      Button(
                         variant: v.$1,
                         onPressed: () {},
                         child: Text(v.$2),
                       ),
                   ],
                 ),
-                SizedBox(height: el(5)),
+                SizedBox(height: space(5)),
                 // DRIFT 2: three numbers, none of which is the one that runs.
-                ElText(
+                StyledText(
                   'Press scales to 97% over 150ms. Focus draws a blue ring '
                   'that is never removed. Both behaviours are built into the '
                   'variant base class, so no component has to remember them.',
-                  ElType.small,
+                  TextStyles.small,
                 ),
               ],
             ),
@@ -605,7 +607,7 @@ class _StatesSection extends StatelessWidget {
 /// So this draws the still rather than requesting focus. Focus is exclusive
 /// and traversable: a genuinely focused specimen would steal the page's focus
 /// on load and lose the state on the first Tab, which is not what the
-/// reference renders. The overlay is a [ElMachineSurface] filling the button's
+/// reference renders. The overlay is a [Surface] filling the button's
 /// own box: same box, same pill, so the ring lands where the class puts it and
 /// the 1px border paints over the transparent one the base class list carries,
 /// with no effect on layout. Painting after the button is what "composited in
@@ -618,24 +620,27 @@ class _FocusStill extends StatelessWidget {
 
   /// The base the ring composites onto: the button paints its own
   /// `shadow-btn-primary` underneath, so this layer carries the ring alone.
-  static const ElShadowSpec _bare = ElShadowSpec(<ElShadowLayer>[]);
+  static const ShadowStyle _bare = ShadowStyle(<ShadowLayer>[]);
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Stack(
       children: <Widget>[
-        ElButton(onPressed: () {}, child: const Text('Open Pack')),
+        Button(onPressed: () {}, child: const Text('Open Pack')),
         Positioned.fill(
           child: IgnorePointer(
-            child: ElMachineSurface(
-              spec: ElButton.withFocusRing(
+            child: Surface(
+              spec: Button.withFocusRing(
                 _bare,
                 theme.ring.withValues(alpha: _ringAlpha),
               ),
-              radius: BorderRadius.circular(ElRadii.pill),
-              border: Border.all(color: theme.ring, width: ElWidths.hairline),
+              radius: BorderRadius.circular(Radii.full),
+              border: Border.all(
+                color: theme.ring,
+                width: BorderWidths.hairline,
+              ),
               child: const SizedBox.expand(),
             ),
           ),
@@ -651,17 +656,17 @@ class _IconsSection extends StatelessWidget {
   const _IconsSection();
 
   /// The four labelled buttons. Icon leads, label follows.
-  static const List<(ElButtonVariant, ElIconGlyph, String)> _labelled =
-      <(ElButtonVariant, ElIconGlyph, String)>[
-        (ElButtonVariant.primary, ElIconGlyph.packageOpen, 'Open Pack'),
-        (ElButtonVariant.premium, ElIconGlyph.wallet, 'Deposit Funds'),
-        (ElButtonVariant.secondary, ElIconGlyph.share2, 'Share Pull'),
-        (ElButtonVariant.destructive, ElIconGlyph.trash2, 'Sell Selected'),
+  static const List<(ButtonVariant, IconGlyph, String)> _labelled =
+      <(ButtonVariant, IconGlyph, String)>[
+        (ButtonVariant.primary, IconGlyph.packageOpen, 'Open Pack'),
+        (ButtonVariant.premium, IconGlyph.wallet, 'Deposit Funds'),
+        (ButtonVariant.secondary, IconGlyph.share2, 'Share Pull'),
+        (ButtonVariant.destructive, IconGlyph.trash2, 'Sell Selected'),
       ];
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'icons',
       title: 'Icons and icon-only buttons',
       // Straight apostrophe in "button's", as the reference has it.
@@ -672,77 +677,76 @@ class _IconsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'With a label',
-            child: ElRow(
+            child: SpecimenRow(
               children: <Widget>[
-                for (final (ElButtonVariant, ElIconGlyph, String) b
-                    in _labelled)
+                for (final (ButtonVariant, IconGlyph, String) b in _labelled)
                   _LabelledIconButton(variant: b.$1, glyph: b.$2, label: b.$3),
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Icon only',
             // The page's only use of the panel's `note` slot.
             note: 'aria-label required',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ElRow(
+                SpecimenRow(
                   children: <Widget>[
-                    ElButton(
-                      size: ElButtonSize.iconSm,
-                      variant: ElButtonVariant.ghost,
+                    Button(
+                      size: ButtonSize.iconSm,
+                      variant: ButtonVariant.ghost,
                       label: 'Search packs',
                       onPressed: () {},
-                      child: ElIcon(
-                        ElIconGlyph.search,
-                        sizePx: ElButton.iconPxFor(ElButtonSize.iconSm),
+                      child: Icon(
+                        IconGlyph.search,
+                        sizePx: Button.iconPxFor(ButtonSize.iconSm),
                       ),
                     ),
-                    ElButton(
-                      size: ElButtonSize.icon,
-                      variant: ElButtonVariant.outline,
+                    Button(
+                      size: ButtonSize.icon,
+                      variant: ButtonVariant.outline,
                       label: 'Add to favourites',
                       onPressed: () {},
-                      child: ElIcon(
-                        ElIconGlyph.heart,
-                        sizePx: ElButton.iconPxFor(ElButtonSize.icon),
+                      child: Icon(
+                        IconGlyph.heart,
+                        sizePx: Button.iconPxFor(ButtonSize.icon),
                       ),
                     ),
-                    ElButton(
-                      size: ElButtonSize.iconLg,
+                    Button(
+                      size: ButtonSize.iconLg,
                       label: 'Open pack',
                       onPressed: () {},
-                      child: ElIcon(
-                        ElIconGlyph.packageOpen,
-                        sizePx: ElButton.iconPxFor(ElButtonSize.iconLg),
+                      child: Icon(
+                        IconGlyph.packageOpen,
+                        sizePx: Button.iconPxFor(ButtonSize.iconLg),
                       ),
                     ),
                     // The one glyph on the page that does not inherit its
                     // button's ink.
-                    ElButton(
-                      size: ElButtonSize.icon,
-                      variant: ElButtonVariant.ghost,
+                    Button(
+                      size: ButtonSize.icon,
+                      variant: ButtonVariant.ghost,
                       label: 'Favourite this card',
                       onPressed: () {},
-                      child: ElIcon(
-                        ElIconGlyph.heart,
-                        sizePx: ElButton.iconPxFor(ElButtonSize.icon),
-                        tone: ElIconTone.value,
+                      child: Icon(
+                        IconGlyph.heart,
+                        sizePx: Button.iconPxFor(ButtonSize.icon),
+                        tone: IconTone.value,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: el(5)),
+                SizedBox(height: space(5)),
                 // `lime&rsquo;s`: a right single quotation mark.
-                ElText(
+                StyledText(
                   'The last button uses the lime tone deliberately — a '
                   'favourited card is a value signal, and that is one of '
                   'lime’s permitted jobs.',
-                  ElType.small,
+                  TextStyles.small,
                 ),
               ],
             ),
@@ -766,22 +770,22 @@ class _LabelledIconButton extends StatelessWidget {
     required this.label,
   });
 
-  final ElButtonVariant variant;
-  final ElIconGlyph glyph;
+  final ButtonVariant variant;
+  final IconGlyph glyph;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    const ElButtonSize size = ElButtonSize.md;
+    const ButtonSize size = ButtonSize.md;
 
-    return ElButton(
+    return Button(
       variant: variant,
       onPressed: () {},
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElIcon(glyph, sizePx: ElButton.iconPxFor(size)),
-          SizedBox(width: ElButton.gapFor(size)),
+          Icon(glyph, sizePx: Button.iconPxFor(size)),
+          SizedBox(width: Button.gapFor(size)),
           Text(label),
         ],
       ),
@@ -796,77 +800,77 @@ class _GroupsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'groups',
       title: 'Button Group',
       description:
           'Joins related actions into one control. Used for view '
           'switching, quantity steppers and split actions.',
-      child: ElPanel(
+      child: Panel(
         label: 'Segmented actions',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             // `w-fit`: a group shrinks to its members rather than filling the
             // panel, so the column starts them rather than stretching them.
-            ElButtonGroup(
+            ButtonGroup(
               children: <Widget>[
                 for (final String label in const <String>[
                   'Newest',
                   'Price',
                   'Popularity',
                 ])
-                  ElButton(
-                    variant: ElButtonVariant.outline,
+                  Button(
+                    variant: ButtonVariant.outline,
                     onPressed: () {},
                     child: Text(label),
                   ),
               ],
             ),
             // `space-y-6`.
-            SizedBox(height: el(6)),
-            ElButtonGroup(
+            SizedBox(height: space(6)),
+            ButtonGroup(
               children: <Widget>[
-                const ElButtonGroupText('Quantity'),
-                const ElButtonGroupSeparator(),
-                ElButton(
-                  variant: ElButtonVariant.outline,
-                  size: ElButtonSize.icon,
+                const ButtonGroupText('Quantity'),
+                const ButtonGroupSeparator(),
+                Button(
+                  variant: ButtonVariant.outline,
+                  size: ButtonSize.icon,
                   label: 'Decrease quantity',
                   onPressed: () {},
-                  child: ElIcon(
-                    ElIconGlyph.minus,
-                    sizePx: ElButton.iconPxFor(ElButtonSize.icon),
+                  child: Icon(
+                    IconGlyph.minus,
+                    sizePx: Button.iconPxFor(ButtonSize.icon),
                   ),
                 ),
                 // DRIFT 16: `className="type-num"` loses its size and its
                 // weight to the utilities already on the element, and keeps
                 // the mono family, the tabular figures and the tracking.
-                const ElButtonGroupText('3', numeric: true),
-                ElButton(
-                  variant: ElButtonVariant.outline,
-                  size: ElButtonSize.icon,
+                const ButtonGroupText('3', numeric: true),
+                Button(
+                  variant: ButtonVariant.outline,
+                  size: ButtonSize.icon,
                   label: 'Increase quantity',
                   onPressed: () {},
-                  child: ElIcon(
-                    ElIconGlyph.plus,
-                    sizePx: ElButton.iconPxFor(ElButtonSize.icon),
+                  child: Icon(
+                    IconGlyph.plus,
+                    sizePx: Button.iconPxFor(ButtonSize.icon),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: el(6)),
-            ElButtonGroup(
+            SizedBox(height: space(6)),
+            ButtonGroup(
               children: <Widget>[
-                ElButton(onPressed: () {}, child: const Text('Open Pack')),
-                const ElButtonGroupSeparator(),
-                ElButton(
-                  size: ElButtonSize.icon,
+                Button(onPressed: () {}, child: const Text('Open Pack')),
+                const ButtonGroupSeparator(),
+                Button(
+                  size: ButtonSize.icon,
                   label: 'More open options',
                   onPressed: () {},
-                  child: ElIcon(
-                    ElIconGlyph.chevronDown,
-                    sizePx: ElButton.iconPxFor(ElButtonSize.icon),
+                  child: Icon(
+                    IconGlyph.chevronDown,
+                    sizePx: Button.iconPxFor(ButtonSize.icon),
                   ),
                 ),
               ],
@@ -885,7 +889,7 @@ class _ToggleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'toggle',
       // A literal ampersand in the heading.
       title: 'Toggle & Toggle Group',
@@ -895,14 +899,14 @@ class _ToggleSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const ElPanel(label: 'Toggle', child: _TogglePanel()),
-          SizedBox(height: el(4)),
-          const ElPanel(
+          const Panel(label: 'Toggle', child: _TogglePanel()),
+          SizedBox(height: space(4)),
+          const Panel(
             label: 'Toggle Group — three or more options',
             child: _ToggleGroupPanel(),
           ),
-          SizedBox(height: el(4)),
-          const ElPanel(
+          SizedBox(height: space(4)),
+          const Panel(
             label: 'IconSwap — the two-state control',
             child: _IconSwapPanel(),
           ),
@@ -925,42 +929,42 @@ class _TogglePanelState extends State<_TogglePanel> {
   /// never moves, so it needs no slot.
   final List<bool> _pressed = <bool>[false, true];
 
-  Widget _heart() => const ElIcon(ElIconGlyph.heart, size: ElIconSize.md);
+  Widget _heart() => const Icon(IconGlyph.heart, size: IconSize.md);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElRow(
+        SpecimenRow(
           children: <Widget>[
-            ElToggle(
+            Toggle(
               pressed: _pressed[0],
               onChanged: (bool v) => setState(() => _pressed[0] = v),
               label: 'Favourite',
               child: _heart(),
             ),
-            ElToggle(
+            Toggle(
               pressed: _pressed[1],
               onChanged: (bool v) => setState(() => _pressed[1] = v),
               label: 'Favourite, on',
               child: _heart(),
             ),
             // A null handler is `disabled`: no pointer events, 50% opacity.
-            ElToggle(
+            Toggle(
               pressed: false,
               label: 'Favourite, unavailable',
               child: _heart(),
             ),
           ],
         ),
-        SizedBox(height: el(5)),
+        SizedBox(height: space(5)),
         // DRIFT 5: the pressed fill is `--muted`, which is grey. The blue
         // selection this promises is real one panel down, and only there.
-        ElText(
+        StyledText(
           'Off · On · Disabled. The pressed state fills with the blue tint — '
           'selection is always blue.',
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     );
@@ -985,11 +989,11 @@ class _ToggleGroupPanelState extends State<_ToggleGroupPanel> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         // `w-fit`, so the group is started rather than stretched.
-        ElToggleGroup(
-          items: const <ElToggleGroupItem>[
-            ElToggleGroupItem(label: 'Newest'),
-            ElToggleGroupItem(label: 'Price'),
-            ElToggleGroupItem(label: 'Popular'),
+        ToggleGroup(
+          items: const <ToggleGroupItem>[
+            ToggleGroupItem(label: 'Newest'),
+            ToggleGroupItem(label: 'Price'),
+            ToggleGroupItem(label: 'Popular'),
           ],
           selectedIndex: _selected,
           // Radix `type="single"` clears the selection when the active option
@@ -997,12 +1001,12 @@ class _ToggleGroupPanelState extends State<_ToggleGroupPanel> {
           // B7). Mirrored rather than locked to one-always-selected.
           onChanged: (int? i) => setState(() => _selected = i),
         ),
-        SizedBox(height: el(5)),
-        ElText(
+        SizedBox(height: space(5)),
+        StyledText(
           'A toggle group is for three or more mutually exclusive options. '
           'With exactly two, use IconSwap below — a segmented control for a '
           'binary choice wastes space and reads as weaker than it is.',
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     );
@@ -1021,20 +1025,20 @@ class _IconSwapPanel extends StatelessWidget {
         // DRIFT 20: "No crossfades": and the roll transitions opacity on the
         // same spring as the transform, which clamps to full about a third of
         // the way through.
-        ElText(
+        StyledText(
           'Every control that alternates between two icons swaps them through '
           'a vertical strip. Click each one: the icons are a physical wheel, '
           'so the old icon exits through the top and the next rises from '
           'below, landing with a jelly squash. No crossfades, no instant '
           'swaps — a control that changed meaning should show you that it '
           'changed.',
-          ElType.small,
+          TextStyles.small,
         ),
-        SizedBox(height: el(6)),
+        SizedBox(height: space(6)),
         // `flex flex-wrap items-start gap-10`.
         Wrap(
-          spacing: el(10),
-          runSpacing: el(10),
+          spacing: space(10),
+          runSpacing: space(10),
           crossAxisAlignment: WrapCrossAlignment.start,
           children: <Widget>[
             _ViewSwitchDemo(),
@@ -1043,24 +1047,24 @@ class _IconSwapPanel extends StatelessWidget {
             _MuteDemo(),
           ],
         ),
-        SizedBox(height: el(6)),
-        ElRichText(
+        SizedBox(height: space(6)),
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(text: 'Put '),
-              ElCode.span('IconSwap'),
+              Code.span('IconSwap'),
               const TextSpan(
                 text: ' inside a Button as its child, and give the button an ',
               ),
-              ElCode.span('aria-label'),
+              Code.span('aria-label'),
               const TextSpan(
                 text: ' that describes what pressing it will do — plus ',
               ),
-              ElCode.span('aria-pressed'),
+              Code.span('aria-pressed'),
               const TextSpan(text: ' when it is a toggle.'),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     );
@@ -1083,8 +1087,8 @@ class _SwapDemo extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.center,
     children: <Widget>[
       control,
-      SizedBox(height: el(3)),
-      ElText(caption, ElType.micro, align: TextAlign.center),
+      SizedBox(height: space(3)),
+      StyledText(caption, TextStyles.eyebrowSmall, align: TextAlign.center),
     ],
   );
 }
@@ -1102,25 +1106,25 @@ class _ViewSwitchDemoState extends State<_ViewSwitchDemo> {
 
   @override
   Widget build(BuildContext context) {
-    const ElButtonSize size = ElButtonSize.icon;
-    final double glyph = ElButton.iconPxFor(size);
+    const ButtonSize size = ButtonSize.icon;
+    final double glyph = Button.iconPxFor(size);
 
     return _SwapDemo(
       caption: 'View · ${_list ? 'list' : 'grid'}',
-      control: ElButton(
-        variant: ElButtonVariant.outline,
+      control: Button(
+        variant: ButtonVariant.outline,
         size: size,
         // `aria-pressed={view === "list"}` has no port: see the library note.
         label: _list ? 'Switch to grid view' : 'Switch to list view',
         onPressed: () => setState(() => _list = !_list),
-        child: ElIconSwap(
+        child: IconSwap(
           activeIndex: _list ? 1 : 0,
           // `className="size-5"`: the clip window, 4px wider than the glyph.
-          window: el(5),
+          window: space(5),
           cell: glyph,
           icons: <Widget>[
-            ElIcon(ElIconGlyph.layoutGrid, sizePx: glyph),
-            ElIcon(ElIconGlyph.rows3, sizePx: glyph),
+            Icon(IconGlyph.layoutGrid, sizePx: glyph),
+            Icon(IconGlyph.rows3, sizePx: glyph),
           ],
         ),
       ),
@@ -1142,23 +1146,23 @@ class _PlayPauseDemoState extends State<_PlayPauseDemo> {
 
   @override
   Widget build(BuildContext context) {
-    const ElButtonSize size = ElButtonSize.iconLg;
-    final double glyph = ElButton.iconPxFor(size);
+    const ButtonSize size = ButtonSize.iconLg;
+    final double glyph = Button.iconPxFor(size);
 
     return _SwapDemo(
       caption: _playing ? 'Playing' : 'Paused',
-      control: ElButton(
+      control: Button(
         size: size,
         label: _playing ? 'Pause' : 'Play',
         onPressed: () => setState(() => _playing = !_playing),
-        child: ElIconSwap(
+        child: IconSwap(
           activeIndex: _playing ? 1 : 0,
           // `className="size-6"`.
-          window: el(6),
+          window: space(6),
           cell: glyph,
           icons: <Widget>[
-            ElIcon(ElIconGlyph.play, sizePx: glyph),
-            ElIcon(ElIconGlyph.pause, sizePx: glyph),
+            Icon(IconGlyph.play, sizePx: glyph),
+            Icon(IconGlyph.pause, sizePx: glyph),
           ],
         ),
       ),
@@ -1180,26 +1184,26 @@ class _FavouriteDemoState extends State<_FavouriteDemo> {
 
   @override
   Widget build(BuildContext context) {
-    const ElButtonSize size = ElButtonSize.icon;
-    final double glyph = ElButton.iconPxFor(size);
+    const ButtonSize size = ButtonSize.icon;
+    final double glyph = Button.iconPxFor(size);
 
     return _SwapDemo(
       caption: _on ? 'Favourited' : 'Not favourited',
-      control: ElButton(
-        variant: ElButtonVariant.secondary,
+      control: Button(
+        variant: ButtonVariant.secondary,
         size: size,
         label: _on ? 'Remove from favourites' : 'Add to favourites',
         onPressed: () => setState(() => _on = !_on),
-        child: ElIconSwap(
+        child: IconSwap(
           activeIndex: _on ? 1 : 0,
-          window: el(5),
+          window: space(5),
           cell: glyph,
           icons: <Widget>[
-            ElIcon(ElIconGlyph.heart, sizePx: glyph, tone: ElIconTone.subtle),
+            Icon(IconGlyph.heart, sizePx: glyph, tone: IconTone.subtle),
             _FilledGlyph(
-              glyph: ElIconGlyph.heart,
+              glyph: IconGlyph.heart,
               px: glyph,
-              tone: ElIconTone.value,
+              tone: IconTone.value,
             ),
           ],
         ),
@@ -1221,23 +1225,23 @@ class _MuteDemoState extends State<_MuteDemo> {
 
   @override
   Widget build(BuildContext context) {
-    const ElButtonSize size = ElButtonSize.icon;
-    final double glyph = ElButton.iconPxFor(size);
+    const ButtonSize size = ButtonSize.icon;
+    final double glyph = Button.iconPxFor(size);
 
     return _SwapDemo(
       caption: _muted ? 'Muted' : 'Sound on',
-      control: ElButton(
-        variant: ElButtonVariant.ghost,
+      control: Button(
+        variant: ButtonVariant.ghost,
         size: size,
         label: _muted ? 'Unmute' : 'Mute',
         onPressed: () => setState(() => _muted = !_muted),
-        child: ElIconSwap(
+        child: IconSwap(
           activeIndex: _muted ? 1 : 0,
-          window: el(5),
+          window: space(5),
           cell: glyph,
           icons: <Widget>[
-            ElIcon(ElIconGlyph.volume2, sizePx: glyph),
-            ElIcon(ElIconGlyph.volumeX, sizePx: glyph),
+            Icon(IconGlyph.volume2, sizePx: glyph),
+            Icon(IconGlyph.volumeX, sizePx: glyph),
           ],
         ),
       ),
@@ -1249,7 +1253,7 @@ class _MuteDemoState extends State<_MuteDemo> {
 /// painted as well as stroked.
 ///
 /// `fill` is an SVG paint property, not a size or a tone: lucide's paths ship
-/// `fill="none"` and [ElIcon] has no parameter that would override it, because
+/// `fill="none"` and [Icon] has no parameter that would override it, because
 /// exactly one glyph in the curated set fills anything and it fills a dot.
 /// So the interior is painted here, under the real glyph, out of the **same**
 /// transcribed path: page-local painting rather than a component API, which
@@ -1263,12 +1267,12 @@ class _FilledGlyph extends StatelessWidget {
     required this.tone,
   });
 
-  final ElIconGlyph glyph;
+  final IconGlyph glyph;
   final double px;
 
   /// Resolved once and used for both passes, the way `currentColor` and
   /// `fill-value-ink` land on the same token here.
-  final ElIconTone tone;
+  final IconTone tone;
 
   @override
   Widget build(BuildContext context) {
@@ -1276,13 +1280,10 @@ class _FilledGlyph extends StatelessWidget {
       width: px,
       height: px,
       child: CustomPaint(
-        painter: _GlyphFill(
-          glyph: glyph,
-          color: ElIcon.colorFor(context, tone),
-        ),
+        painter: _GlyphFill(glyph: glyph, color: Icon.colorFor(context, tone)),
         // A [CustomPaint] painter draws behind its child, which is the
         // stacking order `fill` and `stroke` have inside one `<path>`.
-        child: ElIcon(glyph, sizePx: px, tone: tone),
+        child: Icon(glyph, sizePx: px, tone: tone),
       ),
     );
   }
@@ -1291,19 +1292,19 @@ class _FilledGlyph extends StatelessWidget {
 class _GlyphFill extends CustomPainter {
   const _GlyphFill({required this.glyph, required this.color});
 
-  final ElIconGlyph glyph;
+  final IconGlyph glyph;
   final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (size.isEmpty) return;
     canvas.save();
-    // The same fit [ElIcon] uses: lucide's 24-unit space into the rendered box.
+    // The same fit [Icon] uses: lucide's 24-unit space into the rendered box.
     canvas.scale(
-      size.width / ElIconPaths.viewBox,
-      size.height / ElIconPaths.viewBox,
+      size.width / IconPaths.viewBox,
+      size.height / IconPaths.viewBox,
     );
-    canvas.drawPath(ElIconPaths.pathFor(glyph), Paint()..color = color);
+    canvas.drawPath(IconPaths.pathFor(glyph), Paint()..color = color);
     canvas.restore();
   }
 
@@ -1319,38 +1320,38 @@ class _KbdSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'kbd',
       title: 'Kbd',
       description:
           'Keyboard hints. The product is fully keyboard navigable, '
           'so shortcuts are surfaced rather than hidden.',
-      child: ElPanel(
+      child: Panel(
         label: 'Shortcut hints',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            ElRow(
+            SpecimenRow(
               children: <Widget>[
                 // DRIFT 19: a `<kbd>` nesting two `<kbd>`s: the group renders
                 // the same element its members do while typed as a `div`.
-                ElKbdGroup(children: <Widget>[ElKbd('Ctrl'), ElKbd('K')]),
-                ElText('Open search', ElType.small),
+                KbdGroup(children: <Widget>[Kbd('Ctrl'), Kbd('K')]),
+                StyledText('Open search', TextStyles.small),
               ],
             ),
             // `space-y-4`.
-            SizedBox(height: el(4)),
-            ElRow(
+            SizedBox(height: space(4)),
+            SpecimenRow(
               children: <Widget>[
-                ElKbd('Space'),
-                ElText('Reveal next card', ElType.small),
+                Kbd('Space'),
+                StyledText('Reveal next card', TextStyles.small),
               ],
             ),
-            SizedBox(height: el(4)),
-            ElRow(
+            SizedBox(height: space(4)),
+            SpecimenRow(
               children: <Widget>[
-                ElKbd('Esc'),
-                ElText('Skip the opening sequence', ElType.small),
+                Kbd('Esc'),
+                StyledText('Skip the opening sequence', TextStyles.small),
               ],
             ),
           ],
@@ -1367,12 +1368,12 @@ class _ApiSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'api',
       title: 'API',
       // One of the two sections that pass no description.
-      child: ElMeta(
-        items: <ElMetaItem>[
+      child: Meta(
+        items: <MetaItem>[
           for (final (String, String) row in _apiRows)
             (k: row.$1, v: TextSpan(text: row.$2)),
         ],
@@ -1388,12 +1389,12 @@ class _RulesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ElSection(
+    return const Section(
       id: 'rules',
       title: 'Rules',
       // DRIFT 3, a fourth time: Do #4 restates the width claim the prepended
       // spinner disproves.
-      child: ElDoDont(dos: _dos, donts: _donts),
+      child: DoDont(dos: _dos, donts: _donts),
     );
   }
 }

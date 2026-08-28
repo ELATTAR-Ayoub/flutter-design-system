@@ -1,10 +1,10 @@
 /// Tests for `components_docs/resizable/page.dart`'s [ResizableDocPage]:
-/// [ElResizablePanelGroup] and [ElResizablePanel].
+/// [ResizablePanelGroup] and [ResizablePanel].
 ///
 /// Re-housed onto the kit alongside the page: the section-order test now
 /// reads `DocsSection.id`, and the API-table / state-matrix reads open the
 /// relevant `DocsDisclosure` first — closed by default, unlike the old
-/// page's always-visible `ElSection`.
+/// page's always-visible `Section`.
 ///
 /// Reads `lib/src/components/resizable.dart` directly; every public class
 /// and constructor parameter enumerated below is one this page's API
@@ -12,7 +12,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage.
+/// `ThemeController` is flipped in place for theme coverage.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -23,15 +23,41 @@ import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElResizablePanelGroup': <String>['panels', 'withHandle', 'minHeight'],
-  'ElResizablePanel': <String>['child', 'defaultSize', 'minSize'],
+  'ResizablePanelGroup': <String>['panels', 'withHandle', 'minHeight'],
+  'ResizablePanel': <String>['child', 'defaultSize', 'minSize'],
 };
 
 /// The single `DocsDisclosure` whose title is [title].
@@ -42,21 +68,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -130,17 +156,15 @@ void main() {
     },
   );
 
-  testWidgets('each ElApiTable covers every public constructor parameter of '
-      'ElResizablePanelGroup and ElResizablePanel', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('each ApiTable covers every public constructor parameter of '
+      'ResizablePanelGroup and ResizablePanel', (WidgetTester tester) async {
     await _pump(tester);
 
     final Finder apiTrigger = _disclosureTrigger('API Reference');
     await tester.ensureVisible(apiTrigger);
     await tester.tap(apiTrigger);
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     final List<DocsApiTable> tables = tester
         .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -160,7 +184,7 @@ void main() {
       expect(
         documented,
         isNotNull,
-        reason: 'no ElApiTable titled "${expected.key}" was rendered',
+        reason: 'no ApiTable titled "${expected.key}" was rendered',
       );
       for (final String param in expected.value) {
         expect(
@@ -172,14 +196,14 @@ void main() {
     }
   });
 
-  testWidgets('ElResizablePanelGroup renders resizable panels with a draggable '
+  testWidgets('ResizablePanelGroup renders resizable panels with a draggable '
       'separator, in the Preview demo and the Handle and RTL specimens', (
     WidgetTester tester,
   ) async {
     await _pump(tester);
 
     // Preview, Handle (two groups), RTL.
-    final Finder panelGroup = find.byType(ElResizablePanelGroup);
+    final Finder panelGroup = find.byType(ResizablePanelGroup);
     expect(panelGroup, findsAtLeastNWidgets(4));
     expect(tester.takeException(), isNull);
   });
@@ -188,13 +212,10 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(resizableDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(resizableDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);
@@ -218,7 +239,7 @@ void main() {
     await tester.ensureVisible(statesTrigger);
     await tester.tap(statesTrigger);
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),
@@ -245,7 +266,7 @@ void main() {
     await tester.ensureVisible(keyboardTrigger);
     await tester.tap(keyboardTrigger);
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     expect(find.textContaining('ArrowLeft'), findsOneWidget);
     expect(find.textContaining('ArrowRight'), findsOneWidget);
@@ -276,7 +297,7 @@ void main() {
     expect(resizableDoc.name, 'resizable');
     expect(
       resizableDoc.exports,
-      containsAll(<String>['ElResizablePanelGroup', 'ElResizablePanel']),
+      containsAll(<String>['ResizablePanelGroup', 'ResizablePanel']),
     );
     expect(resizableDoc.command, 'elattar add resizable');
     expect(tester.takeException(), isNull);

@@ -1,6 +1,6 @@
 /// Public component documentation for the sidebar **family**.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels reshaped to mirror `ui.shadcn.com/docs/components/base/sidebar`
 /// section for section; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
@@ -14,7 +14,7 @@
 ///  * `Composition` gained the code half it never had (a live `_PartsSpecimen`
 ///    with no toggle before), and a new `Offcanvas` section — split out of
 ///    the old `Sidebar` section, which mixed four reference tables with one
-///    live specimen — gives the third `ElSidebarCollapsible` mode its own
+///    live specimen — gives the third `SidebarCollapsible` mode its own
 ///    slot, matching `icon` (Preview) and `none` (Composition).
 ///  * Every section that is a reference table with no live widget to
 ///    demonstrate (Structure, SidebarProvider, useSidebar, and every named
@@ -33,9 +33,9 @@
 /// `registryDependencies` this page's [dependencies] already named, and its
 /// own `documentationRoute` already points at `/components/sidebar`.
 /// `elattar add sidebar` works. The one real gap the corrected text still
-/// names honestly: that manifest does **not** list `nav_user.dart` — the
+/// names honestly: that manifest does **not** list `user_menu.dart` — the
 /// footer account block ships as its own separate registry item,
-/// `nav-user` (`registry/components/nav-user.json`, which itself depends on
+/// `user-menu` (`registry/components/user-menu.json`, which itself depends on
 /// `sidebar`), with its own documentation page. See Installation and
 /// Dependencies below.
 ///
@@ -60,14 +60,26 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_code.dart' show DocsSelectableCodeBlock;
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
-import '../../kit.dart' show ElNote, ElNoteTone, ElPanel;
+import '../../kit.dart' show Note, NoteTone, Panel;
 import 'meta.dart';
 
 final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
@@ -86,7 +98,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
       specimen: _ShellSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     InstallSection(
       id: 'install',
@@ -95,8 +107,8 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           'sidebar has a real registry manifest, `elattar add sidebar` '
           'installs lib/src/components/sidebar.dart and resolves all '
           'twelve registryDependencies automatically. That manifest does '
-          'not list nav_user.dart: the footer account block ships as its '
-          'own registry item, `nav-user` (`elattar add nav-user`, which '
+          'not list user_menu.dart: the footer account block ships as its '
+          'own registry item, `user-menu` (`elattar add user-menu`, which '
           'itself depends on sidebar), with its own documentation page. '
           'The Manual tab below is for a project not using the CLI, or '
           'editing a local fork.',
@@ -112,11 +124,11 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           code: _installShellExcerpt,
         ),
         const DocsCodeFile(
-          path: 'lib/components/ui/nav_user.dart',
-          title: '2. Copy nav_user.dart (public surface excerpt)',
+          path: 'lib/components/ui/user_menu.dart',
+          title: '2. Copy user_menu.dart (public surface excerpt)',
           description:
-              "The nav-user registry item's own payload. It reads "
-              'ElSidebarScope for isMobile and composes ElSidebarMenu, so '
+              "The user-menu registry item's own payload. It reads "
+              'SidebarScope for isMobile and composes SidebarMenu, so '
               'it only works inside a provider.',
           code: _installNavUserExcerpt,
         ),
@@ -137,7 +149,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           'The smallest correct shell: a provider owning state and the '
           'keyboard shortcut, wrapped around one collapsing panel and one '
           'main column. The one rule the compiler cannot enforce: '
-          'ElSidebarProvider.variant and ElSidebar.variant must be given '
+          'SidebarProvider.variant and Sidebar.variant must be given '
           'the same value. On the web reference one is computed from the '
           'other through :has() and peer- selectors, which ask a parent '
           'about its descendants and a box about its sibling. Flutter can '
@@ -157,7 +169,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
       specimen: _PartsSpecimen(),
       code: _compositionCode,
       label: 'Composition specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     DisclosureSection(
       id: 'structure',
@@ -198,12 +210,12 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
       title: 'Offcanvas',
       description:
           'The third collapse mode, live: collapsible: offcanvas is '
-          "ElSidebar's own default. The gap closes to nothing and the "
+          "Sidebar's own default. The gap closes to nothing and the "
           'panel keeps its full 256 as it leaves.',
       specimen: _OffcanvasSpecimen(),
       code: _offcanvasCode,
       label: 'Offcanvas specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     DisclosureSection(
       id: 'use-sidebar',
@@ -211,9 +223,9 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
       description:
           'The reference publishes a hook; this port publishes an '
           'inherited scope with the same surface, read as '
-          'ElSidebarScope.of(context) wherever a descendant needs it.',
+          'SidebarScope.of(context) wherever a descendant needs it.',
       child: const DocsApiTable(
-        title: 'ElSidebarScope, read with .of(context)',
+        title: 'SidebarScope, read with .of(context)',
         facts: _useSidebarFacts,
       ),
     ),
@@ -224,10 +236,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           'A region above the scrolling content, most often holding a '
           'workspace switcher or a search field: see the live shell '
           'above for one in use.',
-      child: const DocsApiTable(
-        title: 'ElSidebarHeader',
-        facts: _headerFacts,
-      ),
+      child: const DocsApiTable(title: 'SidebarHeader', facts: _headerFacts),
     ),
     DisclosureSection(
       id: 'sidebar-footer',
@@ -244,7 +253,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           'The one scrolling region in the panel, and the flex child '
           'that pushes the footer to the floor.',
       child: const DocsApiTable(
-        title: 'ElSidebarContent and ElSidebarSeparator',
+        title: 'SidebarContent and SidebarSeparator',
         facts: _contentFacts,
       ),
     ),
@@ -263,7 +272,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           'The list itself: one travelling pill shared by every row in '
           'it, rather than each row painting its own selected fill.',
       child: const DocsApiTable(
-        title: 'ElSidebarMenu and ElSidebarMenuItem',
+        title: 'SidebarMenu and SidebarMenuItem',
         facts: _menuFacts,
       ),
     ),
@@ -282,7 +291,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           "A second control on a row, beside the item's own button: a "
           '24px ghost square pinned to the right edge.',
       child: const DocsApiTable(
-        title: 'ElSidebarMenuAction',
+        title: 'SidebarMenuAction',
         facts: _menuActionFacts,
       ),
     ),
@@ -293,7 +302,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           'A nested list hung off a border spine under a row, for the '
           'items one level down.',
       child: const DocsApiTable(
-        title: 'ElSidebarMenuSub, ElSidebarMenuSubItem, ElSidebarMenuSubButton',
+        title: 'SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton',
         facts: _menuSubFacts,
       ),
     ),
@@ -304,7 +313,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           "A count in a row's right lane, drawn over the row rather "
           'than inside its hit area.',
       child: const DocsApiTable(
-        title: 'ElSidebarMenuBadge',
+        title: 'SidebarMenuBadge',
         facts: _menuBadgeFacts,
       ),
     ),
@@ -316,7 +325,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           'its own data loads: see it live in Composition, two rows '
           'deep.',
       child: const DocsApiTable(
-        title: 'ElSidebarMenuSkeleton',
+        title: 'SidebarMenuSkeleton',
         facts: _menuSkeletonFacts,
       ),
     ),
@@ -326,10 +335,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
       description:
           'The button that toggles the panel, meant to live in the '
           'main column so it survives whatever the panel is doing.',
-      child: const DocsApiTable(
-        title: 'ElSidebarTrigger',
-        facts: _triggerFacts,
-      ),
+      child: const DocsApiTable(title: 'SidebarTrigger', facts: _triggerFacts),
     ),
     DisclosureSection(
       id: 'sidebar-rail',
@@ -337,7 +343,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
       description:
           'A thin strip straddling the panel edge: a pointer shortcut '
           'for the same toggle, never the only way to reach it.',
-      child: const DocsApiTable(title: 'ElSidebarRail', facts: _railFacts),
+      child: const DocsApiTable(title: 'SidebarRail', facts: _railFacts),
     ),
     SnippetSection(
       id: 'controlled-sidebar',
@@ -352,42 +358,33 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every public class in lib/src/components/sidebar.dart and '
-          'lib/src/components/nav_user.dart, with every constructor '
+          'lib/src/components/ui/user_menu.dart, with every constructor '
           'parameter and its default: fourteen tables, the largest '
           'single disclosure in the corpus.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(
-          title: 'ElSidebarProvider',
-          anchor: 'api-elsidebarprovider',
-        ),
-        DocsTocEntry(title: 'ElSidebar', anchor: 'api-elsidebar'),
+        DocsTocEntry(title: 'SidebarProvider', anchor: 'api-elsidebarprovider'),
+        DocsTocEntry(title: 'Sidebar', anchor: 'api-elsidebar'),
         DocsTocEntry(
           title: 'Rail, Trigger, Inset',
           anchor: 'api-rail-trigger-inset',
         ),
         DocsTocEntry(title: 'Regions', anchor: 'api-regions'),
         DocsTocEntry(
-          title: 'ElSidebarCollapsibleGroup',
+          title: 'SidebarCollapsibleGroup',
           anchor: 'api-collapsible-group',
         ),
-        DocsTocEntry(title: 'ElSidebarMenu', anchor: 'api-menu'),
-        DocsTocEntry(title: 'ElSidebarMenuItem', anchor: 'api-menu-item'),
-        DocsTocEntry(title: 'ElSidebarMenuButton', anchor: 'api-menu-button'),
+        DocsTocEntry(title: 'SidebarMenu', anchor: 'api-menu'),
+        DocsTocEntry(title: 'SidebarMenuItem', anchor: 'api-menu-item'),
+        DocsTocEntry(title: 'SidebarMenuButton', anchor: 'api-menu-button'),
         DocsTocEntry(title: 'Row content', anchor: 'api-row-content'),
         DocsTocEntry(
           title: 'Action and Badge',
           anchor: 'api-menu-action-badge',
         ),
-        DocsTocEntry(
-          title: 'ElSidebarMenuSkeleton',
-          anchor: 'api-menu-skeleton',
-        ),
-        DocsTocEntry(
-          title: 'Sub-menu and field',
-          anchor: 'api-sub-menu-field',
-        ),
+        DocsTocEntry(title: 'SidebarMenuSkeleton', anchor: 'api-menu-skeleton'),
+        DocsTocEntry(title: 'Sub-menu and field', anchor: 'api-sub-menu-field'),
         DocsTocEntry(title: 'Scopes', anchor: 'api-scopes'),
-        DocsTocEntry(title: 'ElNavUser', anchor: 'api-navuser'),
+        DocsTocEntry(title: 'UserMenu', anchor: 'api-navuser'),
       ],
       child: const _ApiReferenceContent(),
     ),
@@ -409,7 +406,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          'Read off ElSidebarProvider (the shortcut) and ElSidebarRail '
+          'Read off SidebarProvider (the shortcut) and SidebarRail '
           '(the deliberate exception): the "Keyboard interactions" fact '
           'this section used to fold into Accessibility lives here now, '
           'beside its own tabIndex fact.',
@@ -515,9 +512,9 @@ class SidebarDocPage extends StatelessWidget {
       title: sidebarDoc.title,
       description: sidebarDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Sidebar'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Sidebar'),
     ],
     sidebar: const <DocsSidebarEntry>[
       DocsSidebarEntry(title: 'Sheet', route: '/components/sheet'),
@@ -548,14 +545,11 @@ class _VariantsContent extends StatelessWidget {
   Widget build(BuildContext context) => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      DocsApiTable(
-        title: 'ElSidebarCollapsible',
-        facts: _collapsibleFacts,
-      ),
+      DocsApiTable(title: 'SidebarCollapsible', facts: _collapsibleFacts),
       SizedBox(height: 20),
-      DocsApiTable(title: 'ElSidebarVariant', facts: _sidebarVariantFacts),
+      DocsApiTable(title: 'SidebarVariant', facts: _sidebarVariantFacts),
       SizedBox(height: 20),
-      DocsApiTable(title: 'ElSidebarSide', facts: _sidebarSideFacts),
+      DocsApiTable(title: 'SidebarSide', facts: _sidebarSideFacts),
       SizedBox(height: 20),
       DocsApiTable(title: 'Row ladders', facts: _rowLaddersFacts),
     ],
@@ -572,7 +566,7 @@ class _FooterContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsApiTable(
-        title: 'ElSidebarFooter',
+        title: 'SidebarFooter',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'children',
@@ -580,12 +574,12 @@ class _FooterContent extends StatelessWidget {
             description:
                 "Required. The header's twin. There is no mt-auto to port: "
                 'the content region between them takes the slack. Most '
-                'often holds a ElNavUser, the account block below.',
+                'often holds a UserMenu, the account block below.',
           ),
         ],
       ),
-      SizedBox(height: el(5)),
-      const ElPanel(
+      SizedBox(height: space(5)),
+      const Panel(
         label: 'DART',
         note: 'FOOTER ACCOUNT BLOCK',
         child: DocsSelectableCodeBlock(code: _usageNavUserCode),
@@ -604,11 +598,11 @@ class _GroupContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsApiTable(
-        title: 'ElSidebarGroup, ElSidebarGroupLabel, ElSidebarGroupAction',
+        title: 'SidebarGroup, SidebarGroupLabel, SidebarGroupAction',
         facts: _groupFacts,
       ),
-      SizedBox(height: el(5)),
-      const ElPanel(
+      SizedBox(height: space(5)),
+      const Panel(
         label: 'DART',
         note: 'DISCLOSURE GROUP',
         child: DocsSelectableCodeBlock(code: _usageGroupCode),
@@ -626,12 +620,9 @@ class _MenuButtonContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const DocsApiTable(
-        title: 'ElSidebarMenuButton',
-        facts: _menuButtonFacts,
-      ),
-      SizedBox(height: el(5)),
-      const ElPanel(
+      const DocsApiTable(title: 'SidebarMenuButton', facts: _menuButtonFacts),
+      SizedBox(height: space(5)),
+      const Panel(
         label: 'DART',
         note: 'A COLLAPSING ROW',
         child: DocsSelectableCodeBlock(code: _usageRowCode),
@@ -651,83 +642,77 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elsidebarprovider',
-        child: DocsApiTable(
-          title: 'ElSidebarProvider',
-          facts: _apiProviderFacts,
-        ),
+        child: DocsApiTable(title: 'SidebarProvider', facts: _apiProviderFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elsidebar',
-        child: DocsApiTable(title: 'ElSidebar', facts: _apiSidebarFacts),
+        child: DocsApiTable(title: 'Sidebar', facts: _apiSidebarFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-rail-trigger-inset',
         child: DocsApiTable(
-          title: 'ElSidebarRail, ElSidebarTrigger, ElSidebarInset',
+          title: 'SidebarRail, SidebarTrigger, SidebarInset',
           facts: _apiRailTriggerInsetFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-regions',
         child: DocsApiTable(title: 'Regions', facts: _apiRegionsFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-collapsible-group',
         child: DocsApiTable(
-          title: 'ElSidebarCollapsibleGroup',
+          title: 'SidebarCollapsibleGroup',
           facts: _apiCollapsibleGroupFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-menu',
-        child: DocsApiTable(title: 'ElSidebarMenu', facts: _apiMenuFacts),
+        child: DocsApiTable(title: 'SidebarMenu', facts: _apiMenuFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-menu-item',
-        child: DocsApiTable(
-          title: 'ElSidebarMenuItem',
-          facts: _apiMenuItemFacts,
-        ),
+        child: DocsApiTable(title: 'SidebarMenuItem', facts: _apiMenuItemFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-menu-button',
         child: DocsApiTable(
-          title: 'ElSidebarMenuButton',
+          title: 'SidebarMenuButton',
           facts: _apiMenuButtonFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-row-content',
         child: DocsApiTable(
-          title: 'Row content: ElSidebarMenuRow, ElSidebarMenuLabel',
+          title: 'Row content: SidebarMenuRow, SidebarMenuLabel',
           facts: _apiRowContentFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-menu-action-badge',
         child: DocsApiTable(
-          title: 'ElSidebarMenuAction and ElSidebarMenuBadge',
+          title: 'SidebarMenuAction and SidebarMenuBadge',
           facts: _apiMenuActionBadgeFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-menu-skeleton',
         child: DocsApiTable(
-          title: 'ElSidebarMenuSkeleton',
+          title: 'SidebarMenuSkeleton',
           facts: _apiMenuSkeletonFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-sub-menu-field',
         child: DocsApiTable(
@@ -735,19 +720,19 @@ class _ApiReferenceContent extends StatelessWidget {
           facts: _apiSubMenuFieldFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-scopes',
         child: DocsApiTable(
-          title: 'Scopes: ElSidebarScope and ElSidebarChrome',
+          title: 'Scopes: SidebarScope and SidebarChrome',
           facts: _apiScopesFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-navuser',
         child: DocsApiTable(
-          title: 'ElNavUser (nav_user.dart)',
+          title: 'UserMenu (user_menu.dart)',
           facts: _apiNavUserFacts,
         ),
       ),
@@ -764,7 +749,7 @@ class _AccessibilityContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const ElPanel(
+      const Panel(
         label: 'What the semantics tree actually carries',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -775,18 +760,18 @@ class _AccessibilityContent extends StatelessWidget {
                   'trigger, the rail, each menu row, each sub-button, the '
                   'group and menu actions, and the disclosure line. The '
                   'panel itself is not a landmark and the groups are not '
-                  'headings, ElSidebarGroupLabel is plain text, so group '
+                  'headings, SidebarGroupLabel is plain text, so group '
                   'structure is visual only and a screen reader hears one '
                   'flat run of buttons.',
             ),
             _A11yRow(
               'Required labels',
-              'ElSidebarMenuButton resolves its accessible name as '
+              'SidebarMenuButton resolves its accessible name as '
                   'label ?? tooltip and hands it to the underlying button, '
-                  'which publishes it as a real name. ElSidebarTrigger and '
-                  'ElSidebarRail both hard-code "Toggle Sidebar". '
-                  'ElSidebarGroupAction and ElSidebarMenuAction each take a '
-                  'required label, which is their only name. ElSidebarInput '
+                  'which publishes it as a real name. SidebarTrigger and '
+                  'SidebarRail both hard-code "Toggle Sidebar". '
+                  'SidebarGroupAction and SidebarMenuAction each take a '
+                  'required label, which is their only name. SidebarInput '
                   'takes an optional label and has no other name if it is '
                   'omitted.',
             ),
@@ -842,40 +827,40 @@ class _AccessibilityContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
-      ElNote(
+      SizedBox(height: space(5)),
+      Note(
         title: 'Correcting a plausible assumption about the collapsed rail',
-        child: ElText(
+        child: StyledText(
           'The tooltip component wires no Semantics at all, which makes '
           '"an icon-only row whose only label is a tooltip" the obvious '
           'accessibility failure to expect here. Read against the source, '
-          'that is not what happens: ElSidebarMenuButton passes '
+          'that is not what happens: SidebarMenuButton passes '
           'label ?? tooltip down as the button accessible name, so a row '
           'given a tooltip is properly named in the semantics tree whether '
           'or not the tooltip overlay is ever shown, and whether or not the '
           'panel is collapsed. The tooltip string is doing double duty as '
           'an accessible name, which is exactly the wiring the tooltip '
           'component itself lacks.',
-          ElType.small,
+          TextStyles.small,
         ),
       ),
-      SizedBox(height: el(5)),
-      ElNote(
-        tone: ElNoteTone.error,
+      SizedBox(height: space(5)),
+      Note(
+        tone: NoteTone.error,
         title: 'Known gap: a collapsed row with neither label nor tooltip',
-        child: ElText(
+        child: StyledText(
           'The gap is narrower than the guess, and real. Both label and '
           'tooltip default to null, and nothing requires either. Expanded, '
           'such a row is still named, because its visible text supplies the '
-          'name. Collapsed, ElSidebarMenuRow drops the text and renders the '
+          'name. Collapsed, SidebarMenuRow drops the text and renders the '
           'glyph alone, and a glyph carries no text: so the row becomes an '
           'unnamed button, announced as "button" and nothing more, at '
           'exactly the moment its label disappeared from the screen. Always '
-          'give every ElSidebarMenuButton a tooltip, or an explicit label '
+          'give every SidebarMenuButton a tooltip, or an explicit label '
           'if the tooltip copy is wrong as a name. The same applies to '
-          'ElSidebarInput, whose label is optional and which has no other '
+          'SidebarInput, whose label is optional and which has no other '
           'accessible name.',
-          ElType.small,
+          TextStyles.small,
         ),
       ),
     ],
@@ -889,9 +874,9 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Ctrl-B / Cmd-B toggles the panel from anywhere: '
-            'ElSidebarProvider registers the shortcut on '
+            'SidebarProvider registers the shortcut on '
             'HardwareKeyboard.instance directly rather than on a Focus '
             'subtree, the port of a document-level listener. A page '
             'carrying several providers installs several handlers, and '
@@ -903,13 +888,13 @@ class _KeyboardContent extends StatelessWidget {
             'every menu row, every sub-button, the group and menu '
             'actions, and the disclosure line are all buttons '
             "underneath and answer Enter/Space once focused — inherited "
-            "from ElButton's own key handling, not wired again here.",
+            "from Button's own key handling, not wired again here.",
         'Tab order: sidebar.dart declares no FocusTraversalPolicy of its '
             "own; Tab and Shift+Tab walk whatever order the panel's own "
             'child list declares.',
         'The rail takes no focus at all, reproducing the reference '
             'tabIndex of -1: it is a 16px pointer shortcut a keyboard '
-            'user cannot reach. ElSidebarTrigger does the same job and '
+            'user cannot reach. SidebarTrigger does the same job and '
             'is always the reachable alternative.',
         'Two known gaps, not fixed here: in icon mode, sub-menus and '
             'sub-buttons are removed from the tree entirely, so focus '
@@ -933,10 +918,10 @@ class _ResponsiveContent extends StatelessWidget {
         title: 'The breakpoint, and what it switches',
         facts: _responsiveFacts,
       ),
-      SizedBox(height: el(5)),
-      ElNote(
+      SizedBox(height: space(5)),
+      Note(
         title: 'Two known divergences worth planning around',
-        child: ElText(
+        child: StyledText(
           'The rail paints as a 16px strip straddling the panel edge but '
           'only answers a click on its inner half: Flutter hit-tests '
           'nothing outside a box, and the outer half lies over the main '
@@ -947,7 +932,7 @@ class _ResponsiveContent extends StatelessWidget {
           'cookie and no store here, so open state does not survive a '
           'restart. If a project needs it, drive the panel with open and '
           'onOpenChange and persist it yourself.',
-          ElType.small,
+          TextStyles.small,
         ),
       ),
     ],
@@ -981,7 +966,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Family size',
-            value: '33 exports in sidebar.dart, 3 in nav_user.dart',
+            value: '33 exports in sidebar.dart, 3 in user_menu.dart',
             description:
                 'Provider, two inherited scopes, the panel, rail, '
                 'trigger, inset, six regions, four group parts, twelve '
@@ -991,9 +976,9 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Destination',
             value: 'lib/components/ui/sidebar.dart',
             description:
-                'Where the sidebar manifest installs to. nav_user.dart '
+                'Where the sidebar manifest installs to. user_menu.dart '
                 'installs to the same lib/components/ui/ target through '
-                'its own registry item, nav-user, not through this one.',
+                'its own registry item, user-menu, not through this one.',
           ),
           const DocsInstallFact(
             label: 'Foundation',
@@ -1008,7 +993,7 @@ class _DependenciesContent extends StatelessWidget {
             description:
                 "The sidebar manifest's own registryDependencies, "
                 'resolved automatically by `elattar add sidebar`. '
-                "nav-user's own manifest additionally depends on avatar, "
+                "user-menu's own manifest additionally depends on avatar, "
                 'dropdown-menu, menu, popover, and sidebar itself.',
           ),
           const DocsInstallFact(
@@ -1034,7 +1019,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Badge', route: '/components/badge'),
@@ -1044,10 +1029,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Icon Swap', route: '/components/icon_swap'),
           DocsLink(label: 'Input', route: '/components/input'),
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(label: 'Sheet', route: '/components/sheet'),
           DocsLink(label: 'Skeleton', route: '/components/skeleton'),
           DocsLink(
@@ -1055,7 +1037,7 @@ class _DependenciesContent extends StatelessWidget {
             route: '/components/source_foundation',
           ),
           DocsLink(label: 'Tooltip', route: '/components/tooltip'),
-          DocsLink(label: 'Nav User', route: '/components/nav_user'),
+          DocsLink(label: 'User Menu', route: '/components/user_menu'),
         ],
       ),
     ],
@@ -1071,12 +1053,12 @@ class _ThemingContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      ElPanel(
+      Panel(
         label: 'What actually varies with the theme',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            ElText(
+            StyledText(
               'The panel has its own colour pair, separate from the page: '
               'the sidebar fill and the sidebar foreground, which every '
               'region inherits as ambient ink. Borders inside the panel use '
@@ -1086,40 +1068,40 @@ class _ThemingContent extends StatelessWidget {
               'port of the reference --sidebar-* custom properties: fixed '
               'foundation tokens rather than CSS variables, but the same '
               'pair in both places.',
-              ElType.small,
+              TextStyles.small,
             ),
-            SizedBox(height: el(3)),
-            ElText(
+            SizedBox(height: space(3)),
+            StyledText(
               'The active row does not paint a fill. The pill does, from '
               'the secondary colour with the chip shadow spec, because a '
               'fill alone reads as a smudge and a fill with an edge reads '
               'as a surface. The active row changes only its ink, to the '
               'sidebar accent foreground.',
-              ElType.small,
+              TextStyles.small,
             ),
-            SizedBox(height: el(3)),
-            ElText(
+            SizedBox(height: space(3)),
+            StyledText(
               'The group label deliberately does not dim. Stock renders it '
               'at 70% strength, which it could afford because its token was '
               'a dark grey; here the token is already the lightest step '
               'that clears AA on both the background and the muted '
               'surfaces, and 70% of it measures 2.76:1 against the 4.5:1 it '
               'owes. At full strength it measures 4.83:1.',
-              ElType.small,
+              TextStyles.small,
             ),
-            SizedBox(height: el(3)),
-            ElText(
+            SizedBox(height: space(3)),
+            StyledText(
               'Two typed parts collide with their own utilities and lose, '
               'and both are reproduced rather than fixed: the menu badge '
               'keeps only its mono family, tabular figures and tracking, '
               'and the account avatar fallback keeps its weight but not its '
               'size.',
-              ElType.small,
+              TextStyles.small,
             ),
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsApiTable(
         title: 'Layout tokens the family exposes',
         facts: _themingFacts,
@@ -1130,15 +1112,19 @@ class _ThemingContent extends StatelessWidget {
 
 /* ── Small shared bits ───────────────────────────────────────────────────── */
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -1152,15 +1138,15 @@ class _A11yRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : el(3)),
+      padding: EdgeInsets.only(bottom: last ? 0 : space(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.section, color: theme.actionInk),
-          SizedBox(height: el(1)),
-          ElText(body, ElType.small),
+          StyledText(label, TextStyles.section, color: theme.actionText),
+          SizedBox(height: space(1)),
+          StyledText(body, TextStyles.small),
         ],
       ),
     );
@@ -1169,23 +1155,23 @@ class _A11yRow extends StatelessWidget {
 
 /* ── Live specimens ──────────────────────────────────────────────────────── */
 
-const ElNavUserAccount _account = ElNavUserAccount(
+const UserMenuAccount _account = UserMenuAccount(
   name: 'Ayoub Elattar',
   email: 'ayoub@elattar.dev',
 );
 
-const List<ElNavUserItem> _accountItems = <ElNavUserItem>[
-  ElNavUserItem(label: 'Account', icon: ElLucide.badgeCheck),
-  ElNavUserItem(label: 'Billing', icon: ElLucide.creditCard),
-  ElNavUserItem(label: 'Notifications', icon: ElLucide.bell),
-  ElNavUserItem(label: 'Sign out', icon: ElLucide.logOut, destructive: true),
+const List<UserMenuItem> _accountItems = <UserMenuItem>[
+  UserMenuItem(label: 'Account', icon: Lucide.badgeCheck),
+  UserMenuItem(label: 'Billing', icon: Lucide.creditCard),
+  UserMenuItem(label: 'Notifications', icon: Lucide.bell),
+  UserMenuItem(label: 'Sign out', icon: Lucide.logOut, destructive: true),
 ];
 
-const List<({String label, ElIconGlyph icon})> _shellRows =
-    <({String label, ElIconGlyph icon})>[
-      (label: 'Overview', icon: ElIconGlyph.layers),
-      (label: 'Segments', icon: ElIconGlyph.star),
-      (label: 'Revenue', icon: ElIconGlyph.wallet),
+const List<({String label, IconGlyph icon})> _shellRows =
+    <({String label, IconGlyph icon})>[
+      (label: 'Overview', icon: IconGlyph.layers),
+      (label: 'Segments', icon: IconGlyph.star),
+      (label: 'Revenue', icon: IconGlyph.wallet),
     ];
 
 /// The primary specimen: a real app shell that collapses to an icon rail.
@@ -1194,31 +1180,31 @@ class _ShellSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return ClipRect(
       child: SizedBox(
         key: const ValueKey<String>('sidebar-doc-specimen-shell'),
-        height: el(96),
-        child: ElSidebarProvider(
+        height: space(96),
+        child: SidebarProvider(
           children: <Widget>[
-            ElSidebar(
-              collapsible: ElSidebarCollapsible.icon,
+            Sidebar(
+              collapsible: SidebarCollapsible.icon,
               children: <Widget>[
-                ElSidebarHeader(
+                SidebarHeader(
                   children: <Widget>[
-                    ElSidebarMenu(
+                    SidebarMenu(
                       children: <Widget>[
-                        ElSidebarMenuItem(
-                          button: ElSidebarMenuButton(
-                            size: ElSidebarMenuButtonSize.lg,
+                        SidebarMenuItem(
+                          button: SidebarMenuButton(
+                            size: SidebarMenuButtonSize.lg,
                             tooltip: 'Elattar',
-                            child: ElSidebarMenuRow(
-                              size: ElSidebarMenuButtonSize.lg,
-                              leading: ElIcon(
-                                ElIconGlyph.sparkles,
-                                sizePx: ElButton.iconPxFor(ElButtonSize.lg),
+                            child: SidebarMenuRow(
+                              size: SidebarMenuButtonSize.lg,
+                              leading: Icon(
+                                IconGlyph.sparkles,
+                                sizePx: Button.iconPxFor(ButtonSize.lg),
                               ),
-                              label: const ElSidebarMenuLabel('Elattar'),
+                              label: const SidebarMenuLabel('Elattar'),
                             ),
                           ),
                         ),
@@ -1226,42 +1212,40 @@ class _ShellSpecimen extends StatelessWidget {
                     ),
                   ],
                 ),
-                ElSidebarContent(
+                SidebarContent(
                   children: <Widget>[
-                    ElSidebarGroup(
+                    SidebarGroup(
                       children: <Widget>[
-                        const ElSidebarGroupLabel('Platform'),
-                        ElSidebarGroupContent(
-                          child: ElSidebarMenu(
+                        const SidebarGroupLabel('Platform'),
+                        SidebarGroupContent(
+                          child: SidebarMenu(
                             children: <Widget>[
                               for (int i = 0; i < _shellRows.length; i++)
-                                ElSidebarMenuItem(
-                                  button: ElSidebarMenuButton(
+                                SidebarMenuItem(
+                                  button: SidebarMenuButton(
                                     isActive: i == 0,
                                     tooltip: _shellRows[i].label,
-                                    child: ElSidebarMenuRow(
-                                      leading: ElIcon(
+                                    child: SidebarMenuRow(
+                                      leading: Icon(
                                         _shellRows[i].icon,
-                                        sizePx: ElButton.iconPxFor(
-                                          ElButtonSize.sm,
-                                        ),
+                                        sizePx: Button.iconPxFor(ButtonSize.sm),
                                       ),
-                                      label: ElSidebarMenuLabel(
+                                      label: SidebarMenuLabel(
                                         _shellRows[i].label,
                                       ),
                                     ),
                                   ),
                                   submenu: i == 0
-                                      ? const ElSidebarMenuSub(
+                                      ? const SidebarMenuSub(
                                           children: <Widget>[
-                                            ElSidebarMenuSubItem(
-                                              child: ElSidebarMenuSubButton(
+                                            SidebarMenuSubItem(
+                                              child: SidebarMenuSubButton(
                                                 label: 'Live',
                                                 isActive: true,
                                               ),
                                             ),
-                                            ElSidebarMenuSubItem(
-                                              child: ElSidebarMenuSubButton(
+                                            SidebarMenuSubItem(
+                                              child: SidebarMenuSubButton(
                                                 label: 'Archived',
                                               ),
                                             ),
@@ -1276,26 +1260,26 @@ class _ShellSpecimen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const ElSidebarFooter(
+                const SidebarFooter(
                   children: <Widget>[
-                    ElNavUser(user: _account, items: _accountItems),
+                    UserMenu(user: _account, items: _accountItems),
                   ],
                 ),
-                const ElSidebarRail(),
+                const SidebarRail(),
               ],
             ),
-            ElSidebarInset(
+            SidebarInset(
               child: Padding(
-                padding: EdgeInsets.all(el(4)),
+                padding: EdgeInsets.all(space(4)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     // Horizontally scrolling, not `Expanded`: the
                     // mobile-sheet branch of this same specimen can squeeze
                     // the main column to a sliver a few pixels wide (the
-                    // sheet itself pays a fixed ElWidths.sidebarMobile out
+                    // sheet itself pays a fixed LayoutWidths.sidebarMobile out
                     // of the same narrow stage), narrower than
-                    // ElSidebarTrigger's own touch target — an unconstrained
+                    // SidebarTrigger's own touch target — an unconstrained
                     // Row here overflowed at exactly that width. Scrolling
                     // rather than clipping keeps the trigger reachable
                     // either way.
@@ -1303,23 +1287,23 @@ class _ShellSpecimen extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: <Widget>[
-                          const ElSidebarTrigger(),
-                          SizedBox(width: el(2)),
-                          ElText(
+                          const SidebarTrigger(),
+                          SizedBox(width: space(2)),
+                          StyledText(
                             'Overview',
-                            ElType.h4,
+                            TextStyles.h4,
                             color: theme.foreground,
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: el(3)),
-                    ElText(
+                    SizedBox(height: space(3)),
+                    StyledText(
                       'The panel travels 256 to 48 over 250ms. The labels, '
                       'the nested list and the group heading go; the rows '
                       'stay, as 32px squares that name themselves through '
                       'their tooltips.',
-                      ElType.small,
+                      TextStyles.small,
                       color: theme.mutedForeground,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
@@ -1341,36 +1325,34 @@ class _OffcanvasSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return ClipRect(
       child: SizedBox(
         key: const ValueKey<String>('sidebar-doc-specimen-offcanvas'),
-        height: el(64),
-        child: ElSidebarProvider(
+        height: space(64),
+        child: SidebarProvider(
           children: <Widget>[
-            ElSidebar(
+            Sidebar(
               children: <Widget>[
-                ElSidebarContent(
+                SidebarContent(
                   children: <Widget>[
-                    ElSidebarGroup(
+                    SidebarGroup(
                       children: <Widget>[
-                        const ElSidebarGroupLabel('Workspace'),
-                        ElSidebarGroupContent(
-                          child: ElSidebarMenu(
+                        const SidebarGroupLabel('Workspace'),
+                        SidebarGroupContent(
+                          child: SidebarMenu(
                             children: <Widget>[
                               for (int i = 0; i < _shellRows.length; i++)
-                                ElSidebarMenuItem(
-                                  button: ElSidebarMenuButton(
+                                SidebarMenuItem(
+                                  button: SidebarMenuButton(
                                     isActive: i == 1,
                                     tooltip: _shellRows[i].label,
-                                    child: ElSidebarMenuRow(
-                                      leading: ElIcon(
+                                    child: SidebarMenuRow(
+                                      leading: Icon(
                                         _shellRows[i].icon,
-                                        sizePx: ElButton.iconPxFor(
-                                          ElButtonSize.sm,
-                                        ),
+                                        sizePx: Button.iconPxFor(ButtonSize.sm),
                                       ),
-                                      label: ElSidebarMenuLabel(
+                                      label: SidebarMenuLabel(
                                         _shellRows[i].label,
                                       ),
                                     ),
@@ -1383,21 +1365,21 @@ class _OffcanvasSpecimen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const ElSidebarRail(),
+                const SidebarRail(),
               ],
             ),
-            ElSidebarInset(
+            SidebarInset(
               child: Padding(
-                padding: EdgeInsets.all(el(4)),
+                padding: EdgeInsets.all(space(4)),
                 child: Row(
                   children: <Widget>[
-                    const ElSidebarTrigger(),
-                    SizedBox(width: el(2)),
+                    const SidebarTrigger(),
+                    SizedBox(width: space(2)),
                     Expanded(
-                      child: ElText(
+                      child: StyledText(
                         'Offcanvas: the gap closes to nothing and the panel '
                         'keeps its 256 as it leaves.',
-                        ElType.small,
+                        TextStyles.small,
                         color: theme.mutedForeground,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -1421,55 +1403,55 @@ class _PartsSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     key: const ValueKey<String>('sidebar-doc-specimen-parts'),
-    height: el(120),
-    child: ElSidebarProvider(
+    height: space(120),
+    child: SidebarProvider(
       children: <Widget>[
         Expanded(
-          child: ElSidebar(
-            collapsible: ElSidebarCollapsible.none,
+          child: Sidebar(
+            collapsible: SidebarCollapsible.none,
             expand: true,
             children: <Widget>[
-              const ElSidebarHeader(
+              const SidebarHeader(
                 children: <Widget>[
-                  ElSidebarInput(placeholder: 'Search', label: 'Search'),
+                  SidebarInput(placeholder: 'Search', label: 'Search'),
                 ],
               ),
-              ElSidebarContent(
+              SidebarContent(
                 children: <Widget>[
-                  ElSidebarGroup(
+                  SidebarGroup(
                     children: <Widget>[
-                      const ElSidebarGroupLabel('Platform'),
-                      ElSidebarGroupContent(
-                        child: ElSidebarMenu(
+                      const SidebarGroupLabel('Platform'),
+                      SidebarGroupContent(
+                        child: SidebarMenu(
                           children: <Widget>[
-                            ElSidebarMenuItem(
-                              button: ElSidebarMenuButton(
+                            SidebarMenuItem(
+                              button: SidebarMenuButton(
                                 isActive: true,
                                 tooltip: 'Reports',
-                                child: ElSidebarMenuRow(
-                                  leading: ElIcon(
-                                    ElIconGlyph.layers,
-                                    sizePx: ElButton.iconPxFor(ElButtonSize.sm),
+                                child: SidebarMenuRow(
+                                  leading: Icon(
+                                    IconGlyph.layers,
+                                    sizePx: Button.iconPxFor(ButtonSize.sm),
                                   ),
-                                  label: const ElSidebarMenuLabel('Reports'),
+                                  label: const SidebarMenuLabel('Reports'),
                                 ),
                               ),
-                              badge: const ElSidebarMenuBadge('3'),
+                              badge: const SidebarMenuBadge('3'),
                             ),
-                            ElSidebarMenuItem(
-                              button: ElSidebarMenuButton(
+                            SidebarMenuItem(
+                              button: SidebarMenuButton(
                                 tooltip: 'Segments',
-                                child: ElSidebarMenuRow(
-                                  leading: ElIcon(
-                                    ElIconGlyph.star,
-                                    sizePx: ElButton.iconPxFor(ElButtonSize.sm),
+                                child: SidebarMenuRow(
+                                  leading: Icon(
+                                    IconGlyph.star,
+                                    sizePx: Button.iconPxFor(ButtonSize.sm),
                                   ),
-                                  label: const ElSidebarMenuLabel('Segments'),
+                                  label: const SidebarMenuLabel('Segments'),
                                 ),
                               ),
-                              action: const ElSidebarMenuAction(
+                              action: const SidebarMenuAction(
                                 label: 'Add segment',
-                                child: ElIcon(ElIconGlyph.plus),
+                                child: Icon(IconGlyph.plus),
                               ),
                             ),
                           ],
@@ -1477,37 +1459,37 @@ class _PartsSpecimen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const ElSidebarSeparator(),
-                  ElSidebarCollapsibleGroup(
+                  const SidebarSeparator(),
+                  SidebarCollapsibleGroup(
                     label: 'Collection',
                     toggleLabel: 'Toggle Collection group',
-                    action: const ElSidebarGroupAction(
+                    action: const SidebarGroupAction(
                       label: 'Add to collection',
-                      child: ElIcon(ElIconGlyph.plus),
+                      child: Icon(IconGlyph.plus),
                     ),
-                    child: ElSidebarMenu(
+                    child: SidebarMenu(
                       children: <Widget>[
-                        ElSidebarMenuItem(
-                          button: ElSidebarMenuButton(
+                        SidebarMenuItem(
+                          button: SidebarMenuButton(
                             tooltip: 'Wallet',
-                            child: ElSidebarMenuRow(
-                              leading: ElIcon(
-                                ElIconGlyph.wallet,
-                                sizePx: ElButton.iconPxFor(ElButtonSize.sm),
+                            child: SidebarMenuRow(
+                              leading: Icon(
+                                IconGlyph.wallet,
+                                sizePx: Button.iconPxFor(ButtonSize.sm),
                               ),
-                              label: const ElSidebarMenuLabel('Wallet'),
+                              label: const SidebarMenuLabel('Wallet'),
                             ),
                           ),
-                          submenu: const ElSidebarMenuSub(
+                          submenu: const SidebarMenuSub(
                             children: <Widget>[
-                              ElSidebarMenuSubItem(
-                                child: ElSidebarMenuSubButton(
+                              SidebarMenuSubItem(
+                                child: SidebarMenuSubButton(
                                   label: 'Open',
                                   isActive: true,
                                 ),
                               ),
-                              ElSidebarMenuSubItem(
-                                child: ElSidebarMenuSubButton(label: 'Settled'),
+                              SidebarMenuSubItem(
+                                child: SidebarMenuSubButton(label: 'Settled'),
                               ),
                             ],
                           ),
@@ -1515,22 +1497,16 @@ class _PartsSpecimen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const ElSidebarGroup(
+                  const SidebarGroup(
                     children: <Widget>[
-                      ElSidebarGroupLabel('Loading'),
-                      ElSidebarGroupContent(
+                      SidebarGroupLabel('Loading'),
+                      SidebarGroupContent(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            ElSidebarMenuSkeleton(
-                              showIcon: true,
-                              seed: 'row-1',
-                            ),
-                            ElSidebarMenuSkeleton(
-                              showIcon: true,
-                              seed: 'row-2',
-                            ),
+                            SidebarMenuSkeleton(showIcon: true, seed: 'row-1'),
+                            SidebarMenuSkeleton(showIcon: true, seed: 'row-2'),
                           ],
                         ),
                       ),
@@ -1548,24 +1524,24 @@ class _PartsSpecimen extends StatelessWidget {
 
 /* ── Code samples ────────────────────────────────────────────────────────── */
 
-const String _previewCode = '''ElSidebarProvider(
+const String _previewCode = '''SidebarProvider(
   children: [
-    ElSidebar(
-      collapsible: ElSidebarCollapsible.icon,
+    Sidebar(
+      collapsible: SidebarCollapsible.icon,
       children: [
-        ElSidebarHeader(
+        SidebarHeader(
           children: [
-            ElSidebarMenu(
+            SidebarMenu(
               children: [
-                ElSidebarMenuItem(
-                  button: ElSidebarMenuButton(
-                    size: ElSidebarMenuButtonSize.lg,
+                SidebarMenuItem(
+                  button: SidebarMenuButton(
+                    size: SidebarMenuButtonSize.lg,
                     tooltip: 'Elattar',
-                    child: ElSidebarMenuRow(
-                      size: ElSidebarMenuButtonSize.lg,
-                      leading: ElIcon(ElIconGlyph.sparkles,
-                          sizePx: ElButton.iconPxFor(ElButtonSize.lg)),
-                      label: const ElSidebarMenuLabel('Elattar'),
+                    child: SidebarMenuRow(
+                      size: SidebarMenuButtonSize.lg,
+                      leading: Icon(IconGlyph.sparkles,
+                          sizePx: Button.iconPxFor(ButtonSize.lg)),
+                      label: const SidebarMenuLabel('Elattar'),
                     ),
                   ),
                 ),
@@ -1573,34 +1549,34 @@ const String _previewCode = '''ElSidebarProvider(
             ),
           ],
         ),
-        ElSidebarContent(
+        SidebarContent(
           children: [
-            ElSidebarGroup(
+            SidebarGroup(
               children: [
-                const ElSidebarGroupLabel('Platform'),
-                ElSidebarGroupContent(
-                  child: ElSidebarMenu(
+                const SidebarGroupLabel('Platform'),
+                SidebarGroupContent(
+                  child: SidebarMenu(
                     children: [
                       // Every row is named by its own tooltip, so the name
                       // survives once the panel collapses to a rail.
-                      ElSidebarMenuItem(
-                        button: ElSidebarMenuButton(
+                      SidebarMenuItem(
+                        button: SidebarMenuButton(
                           isActive: true,
                           tooltip: 'Overview',
-                          child: ElSidebarMenuRow(
-                            leading: ElIcon(ElIconGlyph.layers,
-                                sizePx: ElButton.iconPxFor(ElButtonSize.sm)),
-                            label: const ElSidebarMenuLabel('Overview'),
+                          child: SidebarMenuRow(
+                            leading: Icon(IconGlyph.layers,
+                                sizePx: Button.iconPxFor(ButtonSize.sm)),
+                            label: const SidebarMenuLabel('Overview'),
                           ),
                         ),
-                        submenu: const ElSidebarMenuSub(
+                        submenu: const SidebarMenuSub(
                           children: [
-                            ElSidebarMenuSubItem(
-                              child: ElSidebarMenuSubButton(
+                            SidebarMenuSubItem(
+                              child: SidebarMenuSubButton(
                                   label: 'Live', isActive: true),
                             ),
-                            ElSidebarMenuSubItem(
-                              child: ElSidebarMenuSubButton(label: 'Archived'),
+                            SidebarMenuSubItem(
+                              child: SidebarMenuSubButton(label: 'Archived'),
                             ),
                           ],
                         ),
@@ -1613,19 +1589,19 @@ const String _previewCode = '''ElSidebarProvider(
             ),
           ],
         ),
-        const ElSidebarFooter(
-          children: [ElNavUser(user: account, items: accountItems)],
+        const SidebarFooter(
+          children: [UserMenu(user: account, items: accountItems)],
         ),
-        const ElSidebarRail(),
+        const SidebarRail(),
       ],
     ),
-    ElSidebarInset(
+    SidebarInset(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const ElSidebarTrigger(),
+              const SidebarTrigger(),
               const Text('Overview'),
             ],
           ),
@@ -1638,47 +1614,47 @@ const String _previewCode = '''ElSidebarProvider(
   ],
 )''';
 
-const String _compositionCode = '''ElSidebarProvider(
+const String _compositionCode = '''SidebarProvider(
   children: [
-    ElSidebar(
-      collapsible: ElSidebarCollapsible.none,
+    Sidebar(
+      collapsible: SidebarCollapsible.none,
       expand: true,
       children: [
-        const ElSidebarHeader(
-          children: [ElSidebarInput(placeholder: 'Search', label: 'Search')],
+        const SidebarHeader(
+          children: [SidebarInput(placeholder: 'Search', label: 'Search')],
         ),
-        ElSidebarContent(
+        SidebarContent(
           children: [
-            ElSidebarGroup(
+            SidebarGroup(
               children: [
-                const ElSidebarGroupLabel('Platform'),
-                ElSidebarGroupContent(
-                  child: ElSidebarMenu(
+                const SidebarGroupLabel('Platform'),
+                SidebarGroupContent(
+                  child: SidebarMenu(
                     children: [
-                      ElSidebarMenuItem(
-                        button: ElSidebarMenuButton(
+                      SidebarMenuItem(
+                        button: SidebarMenuButton(
                           isActive: true,
                           tooltip: 'Reports',
-                          child: ElSidebarMenuRow(
-                            leading: ElIcon(ElIconGlyph.layers,
-                                sizePx: ElButton.iconPxFor(ElButtonSize.sm)),
-                            label: const ElSidebarMenuLabel('Reports'),
+                          child: SidebarMenuRow(
+                            leading: Icon(IconGlyph.layers,
+                                sizePx: Button.iconPxFor(ButtonSize.sm)),
+                            label: const SidebarMenuLabel('Reports'),
                           ),
                         ),
-                        badge: const ElSidebarMenuBadge('3'),
+                        badge: const SidebarMenuBadge('3'),
                       ),
-                      ElSidebarMenuItem(
-                        button: ElSidebarMenuButton(
+                      SidebarMenuItem(
+                        button: SidebarMenuButton(
                           tooltip: 'Segments',
-                          child: ElSidebarMenuRow(
-                            leading: ElIcon(ElIconGlyph.star,
-                                sizePx: ElButton.iconPxFor(ElButtonSize.sm)),
-                            label: const ElSidebarMenuLabel('Segments'),
+                          child: SidebarMenuRow(
+                            leading: Icon(IconGlyph.star,
+                                sizePx: Button.iconPxFor(ButtonSize.sm)),
+                            label: const SidebarMenuLabel('Segments'),
                           ),
                         ),
-                        action: const ElSidebarMenuAction(
+                        action: const SidebarMenuAction(
                           label: 'Add segment',
-                          child: ElIcon(ElIconGlyph.plus),
+                          child: Icon(IconGlyph.plus),
                         ),
                       ),
                     ],
@@ -1686,36 +1662,36 @@ const String _compositionCode = '''ElSidebarProvider(
                 ),
               ],
             ),
-            const ElSidebarSeparator(),
+            const SidebarSeparator(),
             // The trigger is the disclosure line itself, not the title
             // and not the action: the action performs its verb, the
             // divider only changes disclosure state.
-            ElSidebarCollapsibleGroup(
+            SidebarCollapsibleGroup(
               label: 'Collection',
               toggleLabel: 'Toggle Collection group',
-              action: const ElSidebarGroupAction(
+              action: const SidebarGroupAction(
                 label: 'Add to collection',
-                child: ElIcon(ElIconGlyph.plus),
+                child: Icon(IconGlyph.plus),
               ),
-              child: ElSidebarMenu(
+              child: SidebarMenu(
                 children: [
-                  ElSidebarMenuItem(
-                    button: ElSidebarMenuButton(
+                  SidebarMenuItem(
+                    button: SidebarMenuButton(
                       tooltip: 'Wallet',
-                      child: ElSidebarMenuRow(
-                        leading: ElIcon(ElIconGlyph.wallet,
-                            sizePx: ElButton.iconPxFor(ElButtonSize.sm)),
-                        label: const ElSidebarMenuLabel('Wallet'),
+                      child: SidebarMenuRow(
+                        leading: Icon(IconGlyph.wallet,
+                            sizePx: Button.iconPxFor(ButtonSize.sm)),
+                        label: const SidebarMenuLabel('Wallet'),
                       ),
                     ),
-                    submenu: const ElSidebarMenuSub(
+                    submenu: const SidebarMenuSub(
                       children: [
-                        ElSidebarMenuSubItem(
-                          child: ElSidebarMenuSubButton(
+                        SidebarMenuSubItem(
+                          child: SidebarMenuSubButton(
                               label: 'Open', isActive: true),
                         ),
-                        ElSidebarMenuSubItem(
-                          child: ElSidebarMenuSubButton(label: 'Settled'),
+                        SidebarMenuSubItem(
+                          child: SidebarMenuSubButton(label: 'Settled'),
                         ),
                       ],
                     ),
@@ -1723,16 +1699,16 @@ const String _compositionCode = '''ElSidebarProvider(
                 ],
               ),
             ),
-            // A caller renders ElSidebarMenuSkeleton in place of real rows
+            // A caller renders SidebarMenuSkeleton in place of real rows
             // while its own data loads.
-            const ElSidebarGroup(
+            const SidebarGroup(
               children: [
-                ElSidebarGroupLabel('Loading'),
-                ElSidebarGroupContent(
+                SidebarGroupLabel('Loading'),
+                SidebarGroupContent(
                   child: Column(
                     children: [
-                      ElSidebarMenuSkeleton(showIcon: true, seed: 'row-1'),
-                      ElSidebarMenuSkeleton(showIcon: true, seed: 'row-2'),
+                      SidebarMenuSkeleton(showIcon: true, seed: 'row-1'),
+                      SidebarMenuSkeleton(showIcon: true, seed: 'row-2'),
                     ],
                   ),
                 ),
@@ -1745,29 +1721,29 @@ const String _compositionCode = '''ElSidebarProvider(
   ],
 )''';
 
-const String _offcanvasCode = '''ElSidebarProvider(
+const String _offcanvasCode = '''SidebarProvider(
   children: [
-    ElSidebar(
-      // collapsible: ElSidebarCollapsible.offcanvas is ElSidebar's own
+    Sidebar(
+      // collapsible: SidebarCollapsible.offcanvas is Sidebar's own
       // default: the gap closes to nothing and the panel keeps its full
       // 256 as it slides off the edge. Nothing unmounts.
       children: [
-        ElSidebarContent(
+        SidebarContent(
           children: [
-            ElSidebarGroup(
+            SidebarGroup(
               children: [
-                const ElSidebarGroupLabel('Workspace'),
-                ElSidebarGroupContent(
-                  child: ElSidebarMenu(
+                const SidebarGroupLabel('Workspace'),
+                SidebarGroupContent(
+                  child: SidebarMenu(
                     children: [
                       for (final row in rows)
-                        ElSidebarMenuItem(
-                          button: ElSidebarMenuButton(
+                        SidebarMenuItem(
+                          button: SidebarMenuButton(
                             isActive: row.isActive,
                             tooltip: row.label,
-                            child: ElSidebarMenuRow(
-                              leading: ElIcon(row.icon),
-                              label: ElSidebarMenuLabel(row.label),
+                            child: SidebarMenuRow(
+                              leading: Icon(row.icon),
+                              label: SidebarMenuLabel(row.label),
                             ),
                           ),
                         ),
@@ -1778,13 +1754,13 @@ const String _offcanvasCode = '''ElSidebarProvider(
             ),
           ],
         ),
-        const ElSidebarRail(),
+        const SidebarRail(),
       ],
     ),
-    ElSidebarInset(
+    SidebarInset(
       child: Row(
         children: [
-          const ElSidebarTrigger(),
+          const SidebarTrigger(),
           const Expanded(
             child: Text(
               'Offcanvas: the gap closes to nothing and the panel keeps '
@@ -1802,30 +1778,30 @@ const String _usageMinimalCode =
 
 // The provider owns the state and the Ctrl-B / Cmd-B shortcut; the panel
 // and the main column are its two flex children.
-ElSidebarProvider(
+SidebarProvider(
   children: <Widget>[
-    ElSidebar(
-      collapsible: ElSidebarCollapsible.icon,
+    Sidebar(
+      collapsible: SidebarCollapsible.icon,
       children: <Widget>[
-        ElSidebarContent(
+        SidebarContent(
           children: <Widget>[
-            ElSidebarGroup(
+            SidebarGroup(
               children: <Widget>[
-                const ElSidebarGroupLabel('Platform'),
-                ElSidebarGroupContent(
-                  child: ElSidebarMenu(
+                const SidebarGroupLabel('Platform'),
+                SidebarGroupContent(
+                  child: SidebarMenu(
                     children: <Widget>[
-                      ElSidebarMenuItem(
-                        button: ElSidebarMenuButton(
+                      SidebarMenuItem(
+                        button: SidebarMenuButton(
                           isActive: true,
                           tooltip: 'Overview',
                           onPressed: () {},
-                          child: ElSidebarMenuRow(
-                            leading: ElIcon(
-                              ElIconGlyph.layers,
-                              sizePx: ElButton.iconPxFor(ElButtonSize.sm),
+                          child: SidebarMenuRow(
+                            leading: Icon(
+                              IconGlyph.layers,
+                              sizePx: Button.iconPxFor(ButtonSize.sm),
                             ),
-                            label: const ElSidebarMenuLabel('Overview'),
+                            label: const SidebarMenuLabel('Overview'),
                           ),
                         ),
                       ),
@@ -1836,10 +1812,10 @@ ElSidebarProvider(
             ),
           ],
         ),
-        const ElSidebarRail(),
+        const SidebarRail(),
       ],
     ),
-    const ElSidebarInset(child: ElSidebarTrigger()),
+    const SidebarInset(child: SidebarTrigger()),
   ],
 )''';
 
@@ -1850,47 +1826,47 @@ const String _usageRowCode =
 // AND the accessible name handed to the button underneath. A row given
 // neither tooltip nor label becomes an unnamed button once collapsed,
 // because the visible text that was naming it is gone.
-ElSidebarMenuItem(
-  button: ElSidebarMenuButton(
+SidebarMenuItem(
+  button: SidebarMenuButton(
     isActive: selected == 'revenue',
     tooltip: 'Revenue',
     onPressed: () => select('revenue'),
-    child: ElSidebarMenuRow(
-      leading: ElIcon(
-        ElIconGlyph.wallet,
-        sizePx: ElButton.iconPxFor(ElButtonSize.sm),
+    child: SidebarMenuRow(
+      leading: Icon(
+        IconGlyph.wallet,
+        sizePx: Button.iconPxFor(ButtonSize.sm),
       ),
-      label: const ElSidebarMenuLabel('Revenue'),
+      label: const SidebarMenuLabel('Revenue'),
     ),
   ),
   // Both hide themselves in icon mode, and both widen the row's right
   // padding while they are visible.
-  badge: const ElSidebarMenuBadge('3'),
+  badge: const SidebarMenuBadge('3'),
 )''';
 
 const String _usageGroupCode =
     '''// The disclosure line is the trigger, not the title and not the action:
 // clicking the action performs its verb, and the divider only changes
 // disclosure state.
-ElSidebarCollapsibleGroup(
+SidebarCollapsibleGroup(
   label: 'Collection',
   toggleLabel: 'Toggle Collection group',
-  action: ElSidebarGroupAction(
+  action: SidebarGroupAction(
     label: 'Add to collection',
     onPressed: () {},
-    child: const ElIcon(ElIconGlyph.plus),
+    child: const Icon(IconGlyph.plus),
   ),
-  child: ElSidebarMenu(
+  child: SidebarMenu(
     children: [
-      ElSidebarMenuItem(
-        button: const ElSidebarMenuButton(
+      SidebarMenuItem(
+        button: const SidebarMenuButton(
           tooltip: 'Wallet',
-          child: ElSidebarMenuLabel('Wallet'),
+          child: SidebarMenuLabel('Wallet'),
         ),
-        submenu: ElSidebarMenuSub(
+        submenu: SidebarMenuSub(
           children: [
-            ElSidebarMenuSubItem(
-              child: ElSidebarMenuSubButton(
+            SidebarMenuSubItem(
+              child: SidebarMenuSubButton(
                 label: 'Open',
                 isActive: true,
                 onPressed: () {},
@@ -1908,43 +1884,43 @@ const String _usageControlledCode =
 // fully replaces the provider's own setState, so a provider that ignores it
 // never moves. This is also the only way to persist panel state: the
 // reference writes a seven-day cookie and this port has no store.
-ElSidebarProvider(
+SidebarProvider(
   open: _open,
   onOpenChange: (bool next) => setState(() => _open = next),
-  variant: ElSidebarVariant.inset,
+  variant: SidebarVariant.inset,
   minHeight: MediaQuery.sizeOf(context).height,
   children: [
-    ElSidebar(
+    Sidebar(
       // Must match the provider, Flutter has no :has() or peer- selector,
       // so the fact travels down twice.
-      variant: ElSidebarVariant.inset,
-      collapsible: ElSidebarCollapsible.icon,
+      variant: SidebarVariant.inset,
+      collapsible: SidebarCollapsible.icon,
       children: [/* regions */],
     ),
-    ElSidebarInset(child: page),
+    SidebarInset(child: page),
   ],
 )''';
 
 const String _usageNavUserCode =
-    '''// nav_user.dart: the account block a sidebar footer is incomplete
-// without. It reads ElSidebarScope for isMobile, so it only works inside a
-// provider, and it composes ElSidebarMenu itself: put it straight into the
+    '''// user_menu.dart: the account block a sidebar footer is incomplete
+// without. It reads SidebarScope for isMobile, so it only works inside a
+// provider, and it composes SidebarMenu itself: put it straight into the
 // footer, not inside another menu.
-ElSidebarFooter(
+SidebarFooter(
   children: [
-    ElNavUser(
-      user: const ElNavUserAccount(
+    UserMenu(
+      user: const UserMenuAccount(
         name: 'Ayoub Elattar',
         email: 'ayoub@elattar.dev',
       ),
       items: [
-        ElNavUserItem(label: 'Account', icon: ElLucide.badgeCheck),
-        ElNavUserItem(label: 'Billing', icon: ElLucide.creditCard),
+        UserMenuItem(label: 'Account', icon: Lucide.badgeCheck),
+        UserMenuItem(label: 'Billing', icon: Lucide.creditCard),
         // Destructive items are gathered below a separator, wherever they
         // sit in the list.
-        ElNavUserItem(
+        UserMenuItem(
           label: 'Sign out',
-          icon: ElLucide.logOut,
+          icon: Lucide.logOut,
           destructive: true,
           onSelect: signOut,
         ),
@@ -1953,44 +1929,44 @@ ElSidebarFooter(
   ],
 )''';
 
-const String _installShellExcerpt = '''enum ElSidebarSide { left, right }
+const String _installShellExcerpt = '''enum SidebarSide { left, right }
 
-enum ElSidebarVariant { sidebar, floating, inset }
+enum SidebarVariant { sidebar, floating, inset }
 
-enum ElSidebarCollapsible { offcanvas, icon, none }
+enum SidebarCollapsible { offcanvas, icon, none }
 
-class ElSidebarProvider extends StatefulWidget {
-  const ElSidebarProvider({
+class SidebarProvider extends StatefulWidget {
+  const SidebarProvider({
     super.key,
     required this.children,
     this.defaultOpen = true,
     this.open,
     this.onOpenChange,
-    this.variant = ElSidebarVariant.sidebar,
+    this.variant = SidebarVariant.sidebar,
     this.minHeight,
   });
 
   static const LogicalKeyboardKey shortcut = LogicalKeyboardKey.keyB;
-  static bool isMobileWidth(double width) => width < ElBreakpoints.md;
+  static bool isMobileWidth(double width) => width < Breakpoints.md;
 }
 
-class ElSidebar extends StatelessWidget {
-  const ElSidebar({
+class Sidebar extends StatelessWidget {
+  const Sidebar({
     super.key,
     required this.children,
-    this.side = ElSidebarSide.left,
-    this.variant = ElSidebarVariant.sidebar,
-    this.collapsible = ElSidebarCollapsible.offcanvas,
+    this.side = SidebarSide.left,
+    this.variant = SidebarVariant.sidebar,
+    this.collapsible = SidebarCollapsible.offcanvas,
     this.expand = false,
   });
 }
 
-// Plus: ElSidebarScope, ElSidebarChrome, ElSidebarRail, ElSidebarTrigger,
-// ElSidebarInset, and the region, group and menu parts: see the API
+// Plus: SidebarScope, SidebarChrome, SidebarRail, SidebarTrigger,
+// SidebarInset, and the region, group and menu parts: see the API
 // Reference section on this page for every one of them.''';
 
-const String _installNavUserExcerpt = '''class ElNavUserAccount {
-  const ElNavUserAccount({
+const String _installNavUserExcerpt = '''class UserMenuAccount {
+  const UserMenuAccount({
     required this.name,
     required this.email,
     this.avatar,
@@ -1999,8 +1975,8 @@ const String _installNavUserExcerpt = '''class ElNavUserAccount {
   String get initials;
 }
 
-class ElNavUserItem {
-  const ElNavUserItem({
+class UserMenuItem {
+  const UserMenuItem({
     required this.label,
     this.icon,
     this.onSelect,
@@ -2008,38 +1984,38 @@ class ElNavUserItem {
   });
 }
 
-class ElNavUser extends StatelessWidget {
-  const ElNavUser({super.key, required this.user, required this.items});
+class UserMenu extends StatelessWidget {
+  const UserMenu({super.key, required this.user, required this.items});
 
-  static double get menuMinWidth => el(56);
+  static double get menuMinWidth => space(56);
 }''';
 
 /* ── Facts ────────────────────────────────────────────────────────────────── */
 
 const List<DocsApiFact> _structureFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarProvider',
+    name: 'SidebarProvider',
     type: 'the state',
     description:
         'Owns open, openMobile and the Ctrl-B / Cmd-B shortcut. Wraps '
-        'one ElSidebar and one ElSidebarInset as its two flex children.',
+        'one Sidebar and one SidebarInset as its two flex children.',
   ),
   DocsApiFact(
-    name: 'ElSidebar',
+    name: 'Sidebar',
     type: 'the panel',
     description:
-        'Reads the provider through ElSidebarScope and lays out its '
+        'Reads the provider through SidebarScope and lays out its '
         'own regions: header, content, footer, and a rail on its edge.',
   ),
   DocsApiFact(
-    name: 'ElSidebarInset',
+    name: 'SidebarInset',
     type: 'the main column',
     description:
         "Beside the panel, wrapped in an Expanded that is free to be "
         "narrower than its content: the port's spelling of min-w-0.",
   ),
   DocsApiFact(
-    name: 'ElSidebarTrigger and ElSidebarRail',
+    name: 'SidebarTrigger and SidebarRail',
     type: 'the controls',
     description:
         'Two ways to flip the panel: a button in the main column, and '
@@ -2052,7 +2028,7 @@ const List<DocsApiFact> _providerFacts = <DocsApiFact>[
     name: 'expanded (any mode)',
     type: 'gap 256 / panel 256',
     description:
-        'ElWidths.sidebar. The gap is a real box in the row; the panel '
+        'LayoutWidths.sidebar. The gap is a real box in the row; the panel '
         'is an overflowing child of the gap, which is what a position: '
         'fixed container trapped by a transformed ancestor renders as.',
   ),
@@ -2060,16 +2036,16 @@ const List<DocsApiFact> _providerFacts = <DocsApiFact>[
     name: 'icon, variant: sidebar',
     type: 'gap 48 / panel 48',
     description:
-        'ElWidths.sidebarIcon. Both legs animate to the same 48, so the '
+        'LayoutWidths.sidebarCollapsed. Both legs animate to the same 48, so the '
         'panel and the space it occupies stay identical.',
   ),
   DocsApiFact(
     name: 'icon, variant: floating or inset',
     type: 'gap 64 / panel 66',
     description:
-        'ElSidebar.insetIconGap is 48 + el(4) = 64, because those two '
+        'Sidebar.insetIconGap is 48 + space(4) = 64, because those two '
         'variants pay their own 8px frame on both edges; '
-        'ElSidebar.insetIconWidth adds the two hairlines and is 66.',
+        'Sidebar.insetIconWidth adds the two hairlines and is 66.',
   ),
   DocsApiFact(
     name: 'offcanvas',
@@ -2091,18 +2067,18 @@ const List<DocsApiFact> _providerFacts = <DocsApiFact>[
     name: 'duration and curve',
     type: '250ms, linear',
     description:
-        'ElDurations.transitionDefault on ElCurves.linear for all '
+        'MotionDurations.normal on MotionCurves.linear for all '
         'three legs: gap width, panel width, and the offcanvas slide. '
         'Measured as genuinely linear on the reference: even steps, no '
         'front-loading, no overshoot. Everything routes through '
-        'elAnimationDuration, so reduced motion makes the whole '
+        'effectiveMotionDuration, so reduced motion makes the whole '
         'collapse instant.',
   ),
   DocsApiFact(
     name: 'the row, mid-collapse',
     type: 'snaps, does not tween',
     description:
-        'ElSidebarMenuButton.iconSize (32) lands whole on the first '
+        'SidebarMenuButton.iconSize (32) lands whole on the first '
         'frame while the panel is still wide. The panel slides; its '
         'contents cut.',
   ),
@@ -2118,7 +2094,7 @@ const List<DocsApiFact> _collapsibleFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'icon',
-    type: 'ElSidebarCollapsible',
+    type: 'SidebarCollapsible',
     description:
         'The panel narrows to the icon rail and keeps its glyphs. '
         'Labels, badges, actions and sub-menus go; rows and tooltips '
@@ -2126,7 +2102,7 @@ const List<DocsApiFact> _collapsibleFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'none',
-    type: 'ElSidebarCollapsible',
+    type: 'SidebarCollapsible',
     description:
         'It does not collapse. No gap, no container, no rail, and the '
         'trigger and keyboard shortcut still flip the provider flag: '
@@ -2144,14 +2120,14 @@ const List<DocsApiFact> _sidebarVariantFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'floating',
-    type: 'ElSidebarVariant',
+    type: 'SidebarVariant',
     description:
         'Inset by 8 on both edges, the panel itself a rounded card with '
         'a ring and a small shadow. No border, so it costs no layout.',
   ),
   DocsApiFact(
     name: 'inset',
-    type: 'ElSidebarVariant',
+    type: 'SidebarVariant',
     description:
         'Also inset by 8, but it is the main column that becomes the '
         'card: the provider paints the sidebar colour behind everything '
@@ -2169,7 +2145,7 @@ const List<DocsApiFact> _sidebarSideFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'right',
-    type: 'ElSidebarSide',
+    type: 'SidebarSide',
     description:
         'All four mirrored. The gap stays the first item in the row; it '
         'is the panel inside it that moves.',
@@ -2178,7 +2154,7 @@ const List<DocsApiFact> _sidebarSideFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _rowLaddersFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarMenuButtonSize.sm / md / lg',
+    name: 'SidebarMenuButtonSize.sm / md / lg',
     type: 'button xs / sm / lg',
     description:
         'md is the default and measures 37.5px; lg measures 50 with a '
@@ -2187,7 +2163,7 @@ const List<DocsApiFact> _rowLaddersFacts = <DocsApiFact>[
         'heights.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuSubButtonSize.sm / md',
+    name: 'SidebarMenuSubButtonSize.sm / md',
     type: 'button xs / sm',
     description: 'md is the default: a 32px nested link.',
   ),
@@ -2230,19 +2206,19 @@ const List<DocsApiFact> _headerFacts = <DocsApiFact>[
     name: 'children',
     type: 'List<Widget>',
     description:
-        'Required. A column with el(2) between children, inside the '
-        'region padding: el(3) expanded, el(2) in icon mode.',
+        'Required. A column with space(2) between children, inside the '
+        'region padding: space(3) expanded, space(2) in icon mode.',
   ),
   DocsApiFact(
     name: 'gap',
     type: 'static double (get)',
-    description: 'el(2) = 8. Shared by the footer.',
+    description: 'space(2) = 8. Shared by the footer.',
   ),
 ];
 
 const List<DocsApiFact> _contentFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarContent.children',
+    name: 'SidebarContent.children',
     type: 'List<Widget>',
     description:
         'Default const []. The one scrolling region in the panel, and '
@@ -2250,38 +2226,38 @@ const List<DocsApiFact> _contentFacts = <DocsApiFact>[
         'mode it stops scrolling and clips instead.',
   ),
   DocsApiFact(
-    name: 'ElSidebarSeparator()',
+    name: 'SidebarSeparator()',
     type: 'const, key only',
     description:
-        'A hairline in the sidebar border colour, inset el(3), el(2) '
+        'A hairline in the sidebar border colour, inset space(3), space(2) '
         'in icon mode.',
   ),
 ];
 
 const List<DocsApiFact> _groupFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarGroup.children',
+    name: 'SidebarGroup.children',
     type: 'List<Widget>',
     description: 'Required. A padded column, same region padding.',
   ),
   DocsApiFact(
-    name: 'ElSidebarGroupLabel(label)',
+    name: 'SidebarGroupLabel(label)',
     type: 'String, positional',
     description:
-        'Required. 32px tall, typed ElType.navSm at full strength: '
+        'Required. 32px tall, typed TextStyles.navSm at full strength: '
         'dimming it to 70% would measure 2.76:1 against the 4.5:1 it '
         'owes.',
   ),
   DocsApiFact(
-    name: 'ElSidebarGroupAction',
+    name: 'SidebarGroupAction',
     type: 'child, label, onPressed?',
     description:
         'child and label required. A 24px ghost square for the '
         "group's top-right corner, positioned by "
-        'ElSidebarCollapsibleGroup: nothing else holds one.',
+        'SidebarCollapsibleGroup: nothing else holds one.',
   ),
   DocsApiFact(
-    name: 'ElSidebarCollapsibleGroup',
+    name: 'SidebarCollapsibleGroup',
     type: 'label, toggleLabel, child',
     description:
         'label, toggleLabel and child required. The trigger is the '
@@ -2292,7 +2268,7 @@ const List<DocsApiFact> _groupFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _menuFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarMenu.children',
+    name: 'SidebarMenu.children',
     type: 'List<Widget>',
     description:
         'Required. The menu owns one travelling pill; the rows never '
@@ -2302,12 +2278,12 @@ const List<DocsApiFact> _menuFacts = <DocsApiFact>[
         'opens.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenu.gap',
+    name: 'SidebarMenu.gap',
     type: 'static double (get)',
-    description: 'el(1) = 4, between rows.',
+    description: 'space(1) = 4, between rows.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuItem.button / action / badge / submenu',
+    name: 'SidebarMenuItem.button / action / badge / submenu',
     type: 'Widget, Widget?, Widget?, Widget?',
     description:
         'button required. The other three are optional row furniture: '
@@ -2336,7 +2312,7 @@ const List<DocsApiFact> _menuButtonFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'variant / size',
-    type: 'ElButtonVariant, ElSidebarMenuButtonSize',
+    type: 'ButtonVariant, SidebarMenuButtonSize',
     description:
         'Default ghost and md (37.5px tall). ghost rather than the '
         'button default, because a column of rows each painting '
@@ -2357,21 +2333,21 @@ const List<DocsApiFact> _menuActionFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _menuSubFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarMenuSub.children',
+    name: 'SidebarMenuSub.children',
     type: 'List<Widget>',
     description:
         'Required. The nested list, hung off a border spine. Renders '
         'nothing at all in icon mode.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuSubButton.label',
+    name: 'SidebarMenuSubButton.label',
     type: 'String',
     description:
         'Required, and a String rather than a Widget: this part is '
         'always a link upstream, so it takes text.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuSubButton.isActive',
+    name: 'SidebarMenuSubButton.isActive',
     type: 'bool',
     description:
         'Default false. A colour and nothing else: a sub-button never '
@@ -2382,7 +2358,7 @@ const List<DocsApiFact> _menuSubFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _menuBadgeFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarMenuBadge(count)',
+    name: 'SidebarMenuBadge(count)',
     type: 'String, positional',
     description:
         'Required. The count in the right lane, pointer-events-none '
@@ -2391,9 +2367,9 @@ const List<DocsApiFact> _menuBadgeFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElBadgeVariant',
+    type: 'BadgeVariant',
     description:
-        "Default ElBadgeVariant.secondary: the sidebar's own default, "
+        "Default BadgeVariant.secondary: the sidebar's own default, "
         "not the badge's.",
   ),
 ];
@@ -2415,7 +2391,7 @@ const List<DocsApiFact> _menuSkeletonFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'height',
     type: 'static double (get)',
-    description: 'el(8) = 32, the same as a collapsed row.',
+    description: 'space(8) = 32, the same as a collapsed row.',
   ),
 ];
 
@@ -2431,17 +2407,17 @@ const List<DocsApiFact> _triggerFacts = <DocsApiFact>[
     name: 'accessible name',
     type: 'hard-coded',
     description:
-        'Both ElSidebarTrigger and ElSidebarRail publish "Toggle '
+        'Both SidebarTrigger and SidebarRail publish "Toggle '
         'Sidebar" as their name.',
   ),
 ];
 
 const List<DocsApiFact> _railFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarRail()',
+    name: 'SidebarRail()',
     type: 'const, key only',
     description:
-        'A marker. It renders SizedBox.shrink in the flow; ElSidebar '
+        'A marker. It renders SizedBox.shrink in the flow; Sidebar '
         'sees it in children and paints the strip in the slot it '
         'computed, because only the panel knows where its edge is.',
   ),
@@ -2449,9 +2425,9 @@ const List<DocsApiFact> _railFacts = <DocsApiFact>[
     name: 'hairline',
     type: 'static double (get)',
     description:
-        'el(0.5) = 2. The hover rule down the middle of the strip. The '
+        'space(0.5) = 2. The hover rule down the middle of the strip. The '
         'rail takes no focus, reproducing the reference tabIndex of '
-        '-1: it is a pointer shortcut, and ElSidebarTrigger is always '
+        '-1: it is a pointer shortcut, and SidebarTrigger is always '
         'the reachable alternative.',
   ),
 ];
@@ -2462,7 +2438,7 @@ const List<DocsApiFact> _apiProviderFacts = <DocsApiFact>[
     type: 'List<Widget>',
     description:
         "Required. The wrapper row's flex children: normally one "
-        'ElSidebar and one ElSidebarInset.',
+        'Sidebar and one SidebarInset.',
   ),
   DocsApiFact(
     name: 'defaultOpen',
@@ -2489,10 +2465,10 @@ const List<DocsApiFact> _apiProviderFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElSidebarVariant',
+    type: 'SidebarVariant',
     description:
-        'Default ElSidebarVariant.sidebar. Must match the variant '
-        'given to ElSidebar. Only inset changes what the provider '
+        'Default SidebarVariant.sidebar. Must match the variant '
+        'given to Sidebar. Only inset changes what the provider '
         'itself paints: it fills the whole row with the sidebar '
         'colour.',
   ),
@@ -2515,7 +2491,7 @@ const List<DocsApiFact> _apiProviderFacts = <DocsApiFact>[
     name: 'isMobileWidth',
     type: 'static bool Function(double)',
     description:
-        'width < ElBreakpoints.md, i.e. under 768. The port of '
+        'width < Breakpoints.md, i.e. under 768. The port of '
         'useIsMobile().',
   ),
 ];
@@ -2526,26 +2502,26 @@ const List<DocsApiFact> _apiSidebarFacts = <DocsApiFact>[
     type: 'List<Widget>',
     description:
         "Required. The panel's regions, top to bottom. A "
-        'ElSidebarRail among them is what puts a rail on the edge; '
+        'SidebarRail among them is what puts a rail on the edge; '
         'the widget itself contributes nothing to the column.',
   ),
   DocsApiFact(
     name: 'side',
-    type: 'ElSidebarSide',
-    description: 'Default ElSidebarSide.left.',
+    type: 'SidebarSide',
+    description: 'Default SidebarSide.left.',
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElSidebarVariant',
+    type: 'SidebarVariant',
     description:
-        'Default ElSidebarVariant.sidebar. Must match '
-        'ElSidebarProvider.variant.',
+        'Default SidebarVariant.sidebar. Must match '
+        'SidebarProvider.variant.',
   ),
   DocsApiFact(
     name: 'collapsible',
-    type: 'ElSidebarCollapsible',
+    type: 'SidebarCollapsible',
     description:
-        'Default ElSidebarCollapsible.offcanvas: note that this is not '
+        'Default SidebarCollapsible.offcanvas: note that this is not '
         'the icon rail most shells want.',
   ),
   DocsApiFact(
@@ -2560,7 +2536,7 @@ const List<DocsApiFact> _apiSidebarFacts = <DocsApiFact>[
     name: 'insetIconGap',
     type: 'static double (get)',
     description:
-        '64, ElWidths.sidebarIcon + el(4). The collapsed gap under '
+        '64, LayoutWidths.sidebarCollapsed + space(4). The collapsed gap under '
         'floating and inset.',
   ),
   DocsApiFact(
@@ -2571,39 +2547,38 @@ const List<DocsApiFact> _apiSidebarFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'framePadding',
     type: 'static double (get)',
-    description: 'el(2) = 8. The p-2 floating and inset pay.',
+    description: 'space(2) = 8. The p-2 floating and inset pay.',
   ),
   DocsApiFact(
     name: 'railWidth',
     type: 'static double (get)',
-    description: 'el(4) = 16. The strip straddling the panel edge.',
+    description: 'space(4) = 16. The strip straddling the panel edge.',
   ),
 ];
 
 const List<DocsApiFact> _apiRailTriggerInsetFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarRail()',
+    name: 'SidebarRail()',
     type: 'const, key only',
     description:
-        'A marker. It renders SizedBox.shrink in the flow; ElSidebar '
+        'A marker. It renders SizedBox.shrink in the flow; Sidebar '
         'sees it in children and paints the strip in the slot it '
         'computed, because only the panel knows where its edge is.',
   ),
   DocsApiFact(
-    name: 'ElSidebarRail.hairline',
+    name: 'SidebarRail.hairline',
     type: 'static double (get)',
-    description:
-        'el(0.5) = 2. The hover rule down the middle of the strip.',
+    description: 'space(0.5) = 2. The hover rule down the middle of the strip.',
   ),
   DocsApiFact(
-    name: 'ElSidebarTrigger.onPressed',
+    name: 'SidebarTrigger.onPressed',
     type: 'VoidCallback?',
     description:
         'Default null. Called before the toggle, in that order. The '
         'trigger toggles regardless.',
   ),
   DocsApiFact(
-    name: 'ElSidebarInset.child',
+    name: 'SidebarInset.child',
     type: 'Widget',
     description:
         'Required. The main column beside the panel, wrapped in an '
@@ -2611,36 +2586,36 @@ const List<DocsApiFact> _apiRailTriggerInsetFacts = <DocsApiFact>[
         "port's spelling of min-w-0.",
   ),
   DocsApiFact(
-    name: 'ElSidebarInset.margin',
+    name: 'SidebarInset.margin',
     type: 'static double (get)',
     description:
-        'el(2) = 8. The inset variant only: 8px on three sides while '
+        'space(2) = 8. The inset variant only: 8px on three sides while '
         'open, all four once collapsed.',
   ),
 ];
 
 const List<DocsApiFact> _apiRegionsFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarHeader.children',
+    name: 'SidebarHeader.children',
     type: 'List<Widget>',
     description:
-        'Required. A column with el(2) between children, inside the '
-        'region padding: el(3) expanded, el(2) in icon mode.',
+        'Required. A column with space(2) between children, inside the '
+        'region padding: space(3) expanded, space(2) in icon mode.',
   ),
   DocsApiFact(
-    name: 'ElSidebarHeader.gap',
+    name: 'SidebarHeader.gap',
     type: 'static double (get)',
-    description: 'el(2) = 8. Shared by the footer.',
+    description: 'space(2) = 8. Shared by the footer.',
   ),
   DocsApiFact(
-    name: 'ElSidebarFooter.children',
+    name: 'SidebarFooter.children',
     type: 'List<Widget>',
     description:
         "Required. The header's twin. There is no mt-auto to port: "
         'the content region between them takes the slack.',
   ),
   DocsApiFact(
-    name: 'ElSidebarContent.children',
+    name: 'SidebarContent.children',
     type: 'List<Widget>',
     description:
         'Default const []. The one scrolling region in the panel, and '
@@ -2648,56 +2623,56 @@ const List<DocsApiFact> _apiRegionsFacts = <DocsApiFact>[
         'mode it stops scrolling and clips instead.',
   ),
   DocsApiFact(
-    name: 'ElSidebarSeparator()',
+    name: 'SidebarSeparator()',
     type: 'const, key only',
     description:
-        'A hairline in the sidebar border colour, inset el(3), el(2) '
+        'A hairline in the sidebar border colour, inset space(3), space(2) '
         'in icon mode. Painted here rather than composed from the '
         'separator primitive, because both the colour and the inset '
         'are overridden.',
   ),
   DocsApiFact(
-    name: 'ElSidebarGroup.children',
+    name: 'SidebarGroup.children',
     type: 'List<Widget>',
     description: 'Required. A padded column, same region padding.',
   ),
   DocsApiFact(
-    name: 'ElSidebarGroupContent.child',
+    name: 'SidebarGroupContent.child',
     type: 'Widget',
     description:
         'Required. Renders its child verbatim: it has no type of its '
         'own and exists so a call site reads like the reference.',
   ),
   DocsApiFact(
-    name: 'ElSidebarGroupLabel(label)',
+    name: 'SidebarGroupLabel(label)',
     type: 'String, positional',
     description:
-        'Required. 32px tall, typed ElType.navSm at full strength: '
+        'Required. 32px tall, typed TextStyles.navSm at full strength: '
         'dimming it to 70% would measure 2.76:1 against the 4.5:1 it '
         'owes.',
   ),
   DocsApiFact(
-    name: 'ElSidebarGroupLabel.padding',
+    name: 'SidebarGroupLabel.padding',
     type: 'EdgeInsetsGeometry?',
     description:
-        'Default null, which resolves to left el(3) / right el(10). '
-        'ElSidebarCollapsibleGroup passes EdgeInsets.zero, so on a '
+        'Default null, which resolves to left space(3) / right space(10). '
+        'SidebarCollapsibleGroup passes EdgeInsets.zero, so on a '
         'real page the declared padding never renders.',
   ),
   DocsApiFact(
-    name: 'ElSidebarGroupLabel.height',
+    name: 'SidebarGroupLabel.height',
     type: 'static double (get)',
     description:
-        'el(8) = 32. In icon mode the box animates to zero height and '
+        'space(8) = 32. In icon mode the box animates to zero height and '
         'zero opacity, so the collapsed group loses the whole row.',
   ),
   DocsApiFact(
-    name: 'ElSidebarGroupAction',
+    name: 'SidebarGroupAction',
     type: 'child, label, onPressed?',
     description:
         'child and label required. A 24px ghost square for the '
         "group's top-right corner, positioned by "
-        'ElSidebarCollapsibleGroup: nothing else holds one. label is '
+        'SidebarCollapsibleGroup: nothing else holds one. label is '
         'its only accessible name.',
   ),
 ];
@@ -2726,7 +2701,7 @@ const List<DocsApiFact> _apiCollapsibleGroupFacts = <DocsApiFact>[
     name: 'action',
     type: 'Widget?',
     description:
-        'Default null. A ElSidebarGroupAction, anchored in the '
+        'Default null. A SidebarGroupAction, anchored in the '
         "group's top-right corner. Its presence also widens the "
         "trigger's right margin.",
   ),
@@ -2740,13 +2715,13 @@ const List<DocsApiFact> _apiCollapsibleGroupFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'triggerHeight',
     type: 'static double (get)',
-    description: 'el(6) = 24.',
+    description: 'space(6) = 24.',
   ),
   DocsApiFact(
     name: 'lineOpen / lineClosed',
     type: 'static double (get)',
     description:
-        '1 and el(1) = 4. The disclosure line thickens from a '
+        '1 and space(1) = 4. The disclosure line thickens from a '
         'hairline to 4px while closed, over 250ms.',
   ),
 ];
@@ -2765,7 +2740,7 @@ const List<DocsApiFact> _apiMenuFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'gap',
     type: 'static double (get)',
-    description: 'el(1) = 4, between rows.',
+    description: 'space(1) = 4, between rows.',
   ),
 ];
 
@@ -2774,28 +2749,28 @@ const List<DocsApiFact> _apiMenuItemFacts = <DocsApiFact>[
     name: 'button',
     type: 'Widget',
     description:
-        'Required. The row: a ElSidebarMenuButton, or a dropdown '
+        'Required. The row: a SidebarMenuButton, or a dropdown '
         'trigger wrapping one.',
   ),
   DocsApiFact(
     name: 'action',
     type: 'Widget?',
     description:
-        'Default null. A ElSidebarMenuAction, centred on the row and '
-        'pinned el(1) from its right edge. Hidden in icon mode.',
+        'Default null. A SidebarMenuAction, centred on the row and '
+        'pinned space(1) from its right edge. Hidden in icon mode.',
   ),
   DocsApiFact(
     name: 'badge',
     type: 'Widget?',
     description:
-        'Default null. A ElSidebarMenuBadge, pinned el(2) from the '
+        'Default null. A SidebarMenuBadge, pinned space(2) from the '
         'right edge. Hidden in icon mode.',
   ),
   DocsApiFact(
     name: 'submenu',
     type: 'Widget?',
     description:
-        'Default null. A ElSidebarMenuSub, in flow under the row, '
+        'Default null. A SidebarMenuSub, in flow under the row, '
         'which makes the item taller than its own button. This is the '
         'one relational question Flutter can answer, because the item '
         'is handed its children as a list.',
@@ -2806,7 +2781,7 @@ const List<DocsApiFact> _apiMenuButtonFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'child',
     type: 'Widget',
-    description: 'Required. Normally a ElSidebarMenuRow.',
+    description: 'Required. Normally a SidebarMenuRow.',
   ),
   DocsApiFact(
     name: 'isActive',
@@ -2818,18 +2793,18 @@ const List<DocsApiFact> _apiMenuButtonFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElButtonVariant',
+    type: 'ButtonVariant',
     description:
-        'Default ElButtonVariant.ghost: not the button default. A '
+        'Default ButtonVariant.ghost: not the button default. A '
         'column of rows each painting bg-primary would be a wall of '
         'blue with no hierarchy left to spend.',
   ),
   DocsApiFact(
     name: 'size',
-    type: 'ElSidebarMenuButtonSize',
+    type: 'SidebarMenuButtonSize',
     description:
-        'Default ElSidebarMenuButtonSize.md, which is 37.5px tall at '
-        'h-auto with el(2) padding.',
+        'Default SidebarMenuButtonSize.md, which is 37.5px tall at '
+        'h-auto with space(2) padding.',
   ),
   DocsApiFact(
     name: 'tooltip',
@@ -2872,47 +2847,47 @@ const List<DocsApiFact> _apiMenuButtonFacts = <DocsApiFact>[
     name: 'padding / actionLane / badgeLane',
     type: 'static double (get)',
     description:
-        'el(2) = 8, el(10) = 40, el(16) = 64. The right padding a row '
+        'space(2) = 8, space(10) = 40, space(16) = 64. The right padding a row '
         'reserves when its item carries an action or a badge.',
   ),
   DocsApiFact(
     name: 'iconSize',
     type: 'static double (get)',
     description:
-        'el(8) = 32. The collapsed row is a hard square and gets '
+        'space(8) = 32. The collapsed row is a hard square and gets '
         'there in one frame.',
   ),
 ];
 
 const List<DocsApiFact> _apiRowContentFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarMenuRow.label',
+    name: 'SidebarMenuRow.label',
     type: 'Widget',
     description: 'Required. The label span, expanded to fill the line.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuRow.leading',
+    name: 'SidebarMenuRow.leading',
     type: 'Widget?',
     description:
         'Default null. The glyph, already sized by the caller from '
-        "ElButton.iconPxFor. In icon mode the row renders this and "
+        "Button.iconPxFor. In icon mode the row renders this and "
         'nothing else: and if it is null, the text label survives the '
         'collapse instead, clipped to 32px.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuRow.trailing',
+    name: 'SidebarMenuRow.trailing',
     type: 'Widget?',
     description: 'Default null. Anything after the label.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuRow.size',
-    type: 'ElSidebarMenuButtonSize',
+    name: 'SidebarMenuRow.size',
+    type: 'SidebarMenuButtonSize',
     description:
         'Default md. Only picks the gap between glyph and label; pass '
         'the same value the button has.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuLabel(text)',
+    name: 'SidebarMenuLabel(text)',
     type: 'String, positional',
     description:
         'Required. One truncating line, laid out in a CSS line box so '
@@ -2925,30 +2900,30 @@ const List<DocsApiFact> _apiRowContentFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _apiMenuActionBadgeFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarMenuAction.child / label / onPressed',
+    name: 'SidebarMenuAction.child / label / onPressed',
     type: 'Widget, String, VoidCallback?',
     description:
         'child and label required. A 24px ghost square for the row\'s '
         "right lane. label is its only accessible name.",
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuBadge(count)',
+    name: 'SidebarMenuBadge(count)',
     type: 'String, positional',
     description:
         'Required. The count in the right lane, pointer-events-none '
         'so a click on it reaches the row underneath.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuBadge.variant',
-    type: 'ElBadgeVariant',
+    name: 'SidebarMenuBadge.variant',
+    type: 'BadgeVariant',
     description:
-        "Default ElBadgeVariant.secondary: the sidebar's own default, "
+        "Default BadgeVariant.secondary: the sidebar's own default, "
         "not the badge's.",
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuBadge.paddingX / minWidth',
+    name: 'SidebarMenuBadge.paddingX / minWidth',
     type: 'static double (get)',
-    description: 'el(1.5) = 6 and el(5) = 20.',
+    description: 'space(1.5) = 6 and space(5) = 20.',
   ),
 ];
 
@@ -2978,32 +2953,32 @@ const List<DocsApiFact> _apiMenuSkeletonFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'height',
     type: 'static double (get)',
-    description: 'el(8) = 32, the same as a collapsed row.',
+    description: 'space(8) = 32, the same as a collapsed row.',
   ),
 ];
 
 const List<DocsApiFact> _apiSubMenuFieldFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarMenuSub.children',
+    name: 'SidebarMenuSub.children',
     type: 'List<Widget>',
     description:
         'Required. The nested list, hung off a border spine. Renders '
         'nothing at all in icon mode.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuSubItem.child',
+    name: 'SidebarMenuSubItem.child',
     type: 'Widget',
     description: 'Required. Renders its child verbatim.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuSubButton.label',
+    name: 'SidebarMenuSubButton.label',
     type: 'String',
     description:
         'Required, and a String rather than a Widget: this part is '
         'always a link upstream, so it takes text.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuSubButton.isActive',
+    name: 'SidebarMenuSubButton.isActive',
     type: 'bool',
     description:
         'Default false. A colour and nothing else: a sub-button never '
@@ -3011,12 +2986,12 @@ const List<DocsApiFact> _apiSubMenuFieldFacts = <DocsApiFact>[
         'screen.',
   ),
   DocsApiFact(
-    name: 'ElSidebarMenuSubButton.variant / size / onPressed',
-    type: 'ElButtonVariant, ElSidebarMenuSubButtonSize, VoidCallback?',
+    name: 'SidebarMenuSubButton.variant / size / onPressed',
+    type: 'ButtonVariant, SidebarMenuSubButtonSize, VoidCallback?',
     description: 'Defaults ghost, md, and null.',
   ),
   DocsApiFact(
-    name: 'ElSidebarInput.placeholder / label / controller / padding',
+    name: 'SidebarInput.placeholder / label / controller / padding',
     type: 'String?, String?, TextEditingController?, EdgeInsetsGeometry?',
     description:
         'All default null. A 32px flat field filled with the '
@@ -3024,22 +2999,22 @@ const List<DocsApiFact> _apiSubMenuFieldFacts = <DocsApiFact>[
         'as a well cut into the panel. label is its accessible name.',
   ),
   DocsApiFact(
-    name: 'ElSidebarInput.height',
+    name: 'SidebarInput.height',
     type: 'static double (get)',
-    description: 'el(8) = 32.',
+    description: 'space(8) = 32.',
   ),
 ];
 
 const List<DocsApiFact> _apiScopesFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSidebarScope.open / collapsed',
+    name: 'SidebarScope.open / collapsed',
     type: 'bool / bool (get)',
     description:
         "The desktop panel's flag, and its negation. This is the whole "
         'of what the reference publishes as useSidebar().',
   ),
   DocsApiFact(
-    name: 'ElSidebarScope.openMobile',
+    name: 'SidebarScope.openMobile',
     type: 'bool',
     description:
         "The mobile sheet's own flag: a separate boolean, as it is "
@@ -3047,19 +3022,19 @@ const List<DocsApiFact> _apiScopesFacts = <DocsApiFact>[
         'closing the sheet does not collapse the panel.',
   ),
   DocsApiFact(
-    name: 'ElSidebarScope.isMobile',
+    name: 'SidebarScope.isMobile',
     type: 'bool',
     description: 'The viewport is under 768.',
   ),
   DocsApiFact(
-    name: 'ElSidebarScope.setOpen / setOpenMobile / toggleSidebar',
+    name: 'SidebarScope.setOpen / setOpenMobile / toggleSidebar',
     type: 'ValueChanged<bool>, ValueChanged<bool>, VoidCallback',
     description:
         'toggleSidebar routes to whichever of the two flags the '
         'current width says is live.',
   ),
   DocsApiFact(
-    name: 'ElSidebarScope.of / maybeOf',
+    name: 'SidebarScope.of / maybeOf',
     type: 'static',
     description:
         'of asserts inside a provider, as useSidebar() throws; maybeOf '
@@ -3067,15 +3042,15 @@ const List<DocsApiFact> _apiScopesFacts = <DocsApiFact>[
         'would have had no consumer.',
   ),
   DocsApiFact(
-    name: 'ElSidebarChrome.side / variant / collapsible',
-    type: 'ElSidebarSide, ElSidebarVariant, ElSidebarCollapsible?',
+    name: 'SidebarChrome.side / variant / collapsible',
+    type: 'SidebarSide, SidebarVariant, SidebarCollapsible?',
     description:
         'What the panel publishes to the regions inside it. '
         'collapsible is the collapse mode while collapsed and null '
         'while expanded, which is the reference conditional exactly.',
   ),
   DocsApiFact(
-    name: 'ElSidebarChrome.iconMode / iconModeOf',
+    name: 'SidebarChrome.iconMode / iconModeOf',
     type: 'bool (get) / static bool Function(BuildContext)',
     description:
         'The one predicate fifteen layout rules read. False outside a '
@@ -3086,36 +3061,36 @@ const List<DocsApiFact> _apiScopesFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _apiNavUserFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElNavUser.user',
-    type: 'ElNavUserAccount',
+    name: 'UserMenu.user',
+    type: 'UserMenuAccount',
     description:
         'Required. Composes one lg row holding an avatar, a two-line '
         'identity block and a chevron, opening a menu that repeats the '
         'identity at its head.',
   ),
   DocsApiFact(
-    name: 'ElNavUser.items',
-    type: 'List<ElNavUserItem>',
+    name: 'UserMenu.items',
+    type: 'List<UserMenuItem>',
     description:
         'Required, with no default on purpose: a default list would '
         'put invented product actions into a chassis meant to travel '
         'into the next project.',
   ),
   DocsApiFact(
-    name: 'ElNavUser.menuMinWidth',
+    name: 'UserMenu.menuMinWidth',
     type: 'static double (get)',
-    description: 'el(56) = 224, the floor under the trigger width.',
+    description: 'space(56) = 224, the floor under the trigger width.',
   ),
   DocsApiFact(
-    name: 'ElNavUserAccount.name / email / avatar',
+    name: 'UserMenuAccount.name / email / avatar',
     type: 'String, String, ImageProvider?',
     description:
         'name and email required. initials is derived: the first '
         'letter of each of the first two words, uppercased.',
   ),
   DocsApiFact(
-    name: 'ElNavUserItem.label / icon / onSelect / destructive',
-    type: 'String, ElLucideGlyph?, VoidCallback?, bool',
+    name: 'UserMenuItem.label / icon / onSelect / destructive',
+    type: 'String, LucideGlyph?, VoidCallback?, bool',
     description:
         'label required; destructive defaults false. Destructive '
         'items are gathered below a separator and rendered in the '
@@ -3165,19 +3140,18 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Selected',
     treatment:
-        'isActive moves the menu pill: 250ms of spring travel, a 150ms '
+        'isActive moves the menu indicator: 250ms of spring travel, a 150ms '
         'fade, and a 600ms jelly squash on arrival. The row itself '
         'changes only its ink to the sidebar accent colour: no weight '
         'change, so nothing reflows. When two rows claim it, the '
         'topmost wins, and a sub-button never claims it at all.',
-    userSignal:
-        'One filled, shadowed pill travels to the newly active row.',
+    userSignal: 'One filled, shadowed pill travels to the newly active row.',
   ),
   DocsStateFact(
     state: 'Loading',
     treatment:
         'N/A: nothing in the family is asynchronous. '
-        'ElSidebarMenuSkeleton is a shimmer row a caller renders '
+        'SidebarMenuSkeleton is a shimmer row a caller renders '
         'instead of real rows while its own data loads; the menu has '
         'no loading state of its own to enter.',
     userSignal: 'N/A',
@@ -3185,7 +3159,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Empty',
     treatment:
-        'Partly applicable. ElSidebarContent.children defaults to an '
+        'Partly applicable. SidebarContent.children defaults to an '
         'empty list and renders an empty scrolling column: there is no '
         'empty-state affordance, and none is invented here. A panel '
         'with nothing in it is a blank panel.',
@@ -3194,7 +3168,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Error',
     treatment:
-        'N/A: no validation anywhere. ElSidebarInput delegates to the '
+        'N/A: no validation anywhere. SidebarInput delegates to the '
         'input primitive but exposes no invalid flag, so a sidebar '
         'field cannot be put into an error state through this API.',
     userSignal: 'N/A',
@@ -3208,7 +3182,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Disabled',
     treatment:
         'N/A: there is no enabled or disabled parameter anywhere in '
-        'the family. ElSidebarMenuButton and ElSidebarMenuSubButton '
+        'the family. SidebarMenuButton and SidebarMenuSubButton '
         'substitute an empty callback when onPressed is null, so a row '
         'without a handler is an inert row rather than a disabled one, '
         'and it still reports itself as an enabled button.',
@@ -3220,7 +3194,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         'Every animation in the family runs through '
-        'elAnimationDuration: the three collapse legs, the group label '
+        'effectiveMotionDuration: the three collapse legs, the group label '
         'fold, the disclosure line, the rail hover, the pill travel '
         'and its fade, and the jelly squash. Under reduced motion the '
         'collapse is instant and the pill teleports.',
@@ -3233,8 +3207,8 @@ const List<DocsApiFact> _responsiveFacts = <DocsApiFact>[
     name: 'the threshold',
     type: 'width < 768',
     description:
-        'ElSidebarProvider.isMobileWidth compares the media query '
-        'width against ElBreakpoints.md. 767 is mobile, 768 is not. '
+        'SidebarProvider.isMobileWidth compares the media query '
+        'width against Breakpoints.md. 767 is mobile, 768 is not. '
         'This is the port of a max-width media query, read from '
         'MediaQuery rather than from the platform, so a resized '
         'desktop window crosses it exactly as a phone does.',
@@ -3244,7 +3218,7 @@ const List<DocsApiFact> _responsiveFacts = <DocsApiFact>[
     type: 'a sheet, 288 wide',
     description:
         'The gap-and-container pair is not built at all. The panel '
-        'becomes a sheet on the same side at ElWidths.sidebarMobile '
+        'becomes a sheet on the same side at LayoutWidths.sidebarMobile '
         '(288: deliberately wider than the 256 desktop panel, because '
         'a sheet has no main column beside it competing for the eye), '
         'with its close button hidden and a container label of '
@@ -3280,41 +3254,41 @@ const List<DocsApiFact> _responsiveFacts = <DocsApiFact>[
     name: 'the account menu',
     type: 'drops below on mobile',
     description:
-        'ElNavUser opens its menu to the right on desktop and below '
+        'UserMenu opens its menu to the right on desktop and below '
         'on mobile, because there is no room beside.',
   ),
 ];
 
 const List<DocsApiFact> _themingFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElWidths.sidebar',
+    name: 'LayoutWidths.sidebar',
     type: '256',
     description: 'The expanded panel and the offcanvas travel.',
   ),
   DocsApiFact(
-    name: 'ElWidths.sidebarIcon',
+    name: 'LayoutWidths.sidebarCollapsed',
     type: '48',
     description: 'The collapsed rail, and the hit-target floor.',
   ),
   DocsApiFact(
-    name: 'ElWidths.sidebarMobile',
+    name: 'LayoutWidths.sidebarMobile',
     type: '288',
     description: 'The sheet on a narrow viewport.',
   ),
   DocsApiFact(
-    name: 'ElBreakpoints.md',
+    name: 'Breakpoints.md',
     type: '768',
     description: 'The one threshold the family reads.',
   ),
   DocsApiFact(
-    name: 'ElDurations.transitionDefault',
+    name: 'MotionDurations.normal',
     type: '250ms',
     description:
         'The collapse, the group fold, the disclosure line and the '
         'rail all run on it.',
   ),
   DocsApiFact(
-    name: 'ElRadii.lg',
+    name: 'Radii.lg',
     type: 'the row corner',
     description:
         'Rows are rounded rather than pilled: a 240px pill is a '

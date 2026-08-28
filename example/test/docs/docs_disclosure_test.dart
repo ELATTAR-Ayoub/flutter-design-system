@@ -14,15 +14,27 @@ library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_disclosure.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: ThemeScope(
+      controller: ThemeController(mode: ColorMode.dark),
       child: Center(child: child),
     ),
   ),
@@ -78,7 +90,7 @@ void main() {
 
     await tester.tap(find.byKey(DocsDisclosure.triggerKey));
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
     expect(find.text('body'), findsOneWidget);
   });
 
@@ -99,10 +111,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(
-      tester.widget<ElIcon>(find.byType(ElIcon)).lucide,
-      ElLucide.chevronDown,
-    );
+    expect(tester.widget<Icon>(find.byType(Icon)).lucide, Lucide.chevronDown);
     final double closed = tester
         .widget<RotationTransition>(find.byType(RotationTransition))
         .turns
@@ -110,7 +119,7 @@ void main() {
 
     await tester.tap(find.byKey(DocsDisclosure.triggerKey));
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     expect(
       tester
@@ -132,7 +141,9 @@ void main() {
     );
     await tester.pump();
 
-    for (final ElText text in tester.widgetList<ElText>(find.byType(ElText))) {
+    for (final StyledText text in tester.widgetList<StyledText>(
+      find.byType(StyledText),
+    )) {
       expect(text.spec.uppercase, isFalse, reason: text.text);
     }
   });

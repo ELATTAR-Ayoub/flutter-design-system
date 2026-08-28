@@ -1,12 +1,12 @@
-/// [ElSafeArea] — the system-bar contract, driven.
+/// [SafeArea] — the system-bar contract, driven.
 ///
 /// A user-ordered mobile adaptation (2026-08-16), so there is no reference
 /// behaviour to compare against and no oracle to measure: what is pinned here
 /// is the ruling itself, in the three parts a caller can get wrong.
 ///
-///  1. **Content moves, paint does not.** The box around a [ElSafeArea] keeps
+///  1. **Content moves, paint does not.** The box around a [SafeArea] keeps
 ///     its size and position; only what is inside comes in.
-///  2. **Nothing is paid twice.** The insets a [ElSafeArea] spends are removed
+///  2. **Nothing is paid twice.** The insets a [SafeArea] spends are removed
 ///     from the [MediaQuery] it hands down, so a wrapper inside a wrapper — a
 ///     panel inside a sheet — adds nothing.
 ///  3. **Zero costs nothing.** With no bars, no widget joins the tree. This is
@@ -16,7 +16,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// A portrait phone: the status bar over a notch, the gesture pill below.
@@ -66,7 +78,7 @@ extension on WidgetTester {
   }
 }
 
-/// Reads [ElSafeArea]'s statics at the point in the tree it is mounted.
+/// Reads [SafeArea]'s statics at the point in the tree it is mounted.
 class _Probe extends StatelessWidget {
   const _Probe({this.onBuild});
 
@@ -84,7 +96,7 @@ void main() {
     testWidgets('reads MediaQueryData.padding', (WidgetTester tester) async {
       late EdgeInsets read;
       await tester.pumpBars(
-        _Probe(onBuild: (BuildContext c) => read = ElSafeArea.insetsOf(c)),
+        _Probe(onBuild: (BuildContext c) => read = SafeArea.insetsOf(c)),
       );
       expect(read, _phone);
     });
@@ -97,7 +109,7 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: _Probe(
-            onBuild: (BuildContext c) => read = ElSafeArea.insetsOf(c),
+            onBuild: (BuildContext c) => read = SafeArea.insetsOf(c),
           ),
         ),
       );
@@ -109,7 +121,7 @@ void main() {
     ) async {
       late EdgeInsets read;
       await tester.pumpBars(
-        _Probe(onBuild: (BuildContext c) => read = ElSafeArea.insetsOf(c)),
+        _Probe(onBuild: (BuildContext c) => read = SafeArea.insetsOf(c)),
         viewInsets: _keyboard,
       );
       // `viewInsets.bottom` is 336 and this is 34: the two are different
@@ -123,7 +135,7 @@ void main() {
     testWidgets('moves its child and leaves the box around it alone', (
       WidgetTester tester,
     ) async {
-      await tester.pumpBars(tester.boxed(const ElSafeArea(child: _Probe())));
+      await tester.pumpBars(tester.boxed(const SafeArea(child: _Probe())));
 
       expect(tester.spend, _phone);
       // The half of the ruling that says what *not* to inset: whatever paints
@@ -135,7 +147,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpBars(
-        tester.boxed(const ElSafeArea(top: false, child: _Probe())),
+        tester.boxed(const SafeArea(top: false, child: _Probe())),
       );
       expect(tester.spend, const EdgeInsets.only(bottom: 34));
     });
@@ -144,7 +156,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpBars(
-        tester.boxed(const ElSafeArea(bottom: false, child: _Probe())),
+        tester.boxed(const SafeArea(bottom: false, child: _Probe())),
         bars: _landscape,
       );
       expect(tester.spend, const EdgeInsets.only(left: 47, right: 34));
@@ -156,10 +168,10 @@ void main() {
       late EdgeInsets nested;
       await tester.pumpBars(
         tester.boxed(
-          ElSafeArea(
-            child: ElSafeArea(
+          SafeArea(
+            child: SafeArea(
               child: _Probe(
-                onBuild: (BuildContext c) => nested = ElSafeArea.insetsOf(c),
+                onBuild: (BuildContext c) => nested = SafeArea.insetsOf(c),
               ),
             ),
           ),
@@ -167,7 +179,7 @@ void main() {
       );
 
       // The inner one read zero, so it added nothing: the pair spent the bars
-      // exactly once. This is what makes a [ElSafeArea] safe to write on a
+      // exactly once. This is what makes a [SafeArea] safe to write on a
       // panel that may or may not be inside a sheet that already paid.
       expect(nested, EdgeInsets.zero);
       expect(tester.spend, _phone);
@@ -177,7 +189,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpBars(
-        tester.boxed(const ElSafeArea(child: _Probe())),
+        tester.boxed(const SafeArea(child: _Probe())),
         bars: EdgeInsets.zero,
       );
 
@@ -186,14 +198,14 @@ void main() {
       // measures the same tree it did before this component existed.
       expect(
         find.descendant(
-          of: find.byType(ElSafeArea),
+          of: find.byType(SafeArea),
           matching: find.byType(Padding),
         ),
         findsNothing,
       );
       expect(
         find.descendant(
-          of: find.byType(ElSafeArea),
+          of: find.byType(SafeArea),
           matching: find.byType(MediaQuery),
         ),
         findsNothing,
@@ -210,10 +222,10 @@ void main() {
       await tester.pumpBars(
         _Probe(
           onBuild: (BuildContext c) =>
-              height = ElSafeArea.topBarHeightOf(c, ElWidths.siteHeader),
+              height = SafeArea.topBarHeightOf(c, LayoutHeights.siteHeader),
         ),
       );
-      expect(height, ElWidths.siteHeader + 47);
+      expect(height, LayoutHeights.siteHeader + 47);
     });
 
     testWidgets('is the bar\'s own height on a desktop', (
@@ -223,11 +235,11 @@ void main() {
       await tester.pumpBars(
         _Probe(
           onBuild: (BuildContext c) =>
-              height = ElSafeArea.topBarHeightOf(c, ElWidths.siteHeader),
+              height = SafeArea.topBarHeightOf(c, LayoutHeights.siteHeader),
         ),
         bars: EdgeInsets.zero,
       );
-      expect(height, ElWidths.siteHeader);
+      expect(height, LayoutHeights.siteHeader);
     });
   });
 
@@ -238,9 +250,9 @@ void main() {
       late EdgeInsets padding;
       await tester.pumpBars(
         _Probe(
-          onBuild: (BuildContext c) => padding = ElSafeArea.scrollPaddingOf(
+          onBuild: (BuildContext c) => padding = SafeArea.scrollPaddingOf(
             c,
-            base: const EdgeInsets.only(top: ElWidths.siteHeader),
+            base: const EdgeInsets.only(top: LayoutHeights.siteHeader),
           ),
         ),
       );
@@ -248,7 +260,7 @@ void main() {
       // it scrolls *under* it, and 64 is the room it leaves for it.
       expect(
         padding,
-        const EdgeInsets.only(top: ElWidths.siteHeader, bottom: 34),
+        const EdgeInsets.only(top: LayoutHeights.siteHeader, bottom: 34),
       );
     });
 
@@ -258,7 +270,7 @@ void main() {
       late EdgeInsets padding;
       await tester.pumpBars(
         _Probe(
-          onBuild: (BuildContext c) => padding = ElSafeArea.scrollPaddingOf(
+          onBuild: (BuildContext c) => padding = SafeArea.scrollPaddingOf(
             c,
             base: const EdgeInsets.all(24),
           ),
@@ -271,12 +283,12 @@ void main() {
     testWidgets('hands the base straight back on a desktop', (
       WidgetTester tester,
     ) async {
-      const EdgeInsets base = EdgeInsets.only(top: ElWidths.siteHeader);
+      const EdgeInsets base = EdgeInsets.only(top: LayoutHeights.siteHeader);
       late EdgeInsets padding;
       await tester.pumpBars(
         _Probe(
           onBuild: (BuildContext c) =>
-              padding = ElSafeArea.scrollPaddingOf(c, base: base),
+              padding = SafeArea.scrollPaddingOf(c, base: base),
         ),
         bars: EdgeInsets.zero,
       );

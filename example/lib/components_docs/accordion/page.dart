@@ -1,6 +1,6 @@
 /// Public documentation page for the `accordion` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the shape `button` established. Every specimen
@@ -12,7 +12,7 @@
 /// **Section order**: Preview, Installation, Usage, Composition, Basic,
 /// Card, then the eight disclosures. New: a Keyboard disclosure, between
 /// Accessibility and Responsive — read directly off
-/// `_ElAccordionTriggerState.build` (`lib/src/components/accordion.dart`),
+/// `_AccordionTriggerState.build` (`lib/src/components/accordion.dart`),
 /// which wires a bare `GestureDetector.onTap` and a `Focus` widget for its
 /// ring, but no `onKeyEvent` of any kind: the fact that used to live as one
 /// bullet inside Accessibility now gets the section the house shape
@@ -20,7 +20,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -74,7 +86,7 @@ final ComponentDocSpec accordionDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'ElAccordion is always controlled: the caller owns openIndex and '
+          'Accordion is always controlled: the caller owns openIndex and '
           'threads it back through onChanged. There is no uncontrolled or '
           'auto-managed variant.',
       code: _usageCode,
@@ -83,8 +95,8 @@ final ComponentDocSpec accordionDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          'ElAccordion takes data, not children: items is a '
-          'List<ElAccordionItem>, each one a title and a content widget, '
+          'Accordion takes data, not children: items is a '
+          'List<AccordionItem>, each one a title and a content widget, '
           'rather than a tree of separate Accordion/AccordionItem/'
           'AccordionTrigger sub-widgets to assemble by hand. content still '
           'accepts any Widget, not just a string: this specimen nests '
@@ -107,20 +119,20 @@ final ComponentDocSpec accordionDocSpec = ComponentDocSpec(
       id: 'card',
       title: 'Card',
       description:
-          'ElAccordion has no surface of its own: wrap it in ElCard when '
+          'Accordion has no surface of its own: wrap it in Card when '
           'the FAQ needs a header and an edge, same as any other content.',
       specimen: _AccordionCardPreview(),
       code: _cardCode,
       label: 'Card specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     DisclosureSection(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every public constructor parameter on ElAccordion and '
-          'ElAccordionItem, plus the fixed layout constants that stand in '
-          'for a variant or size enum, since ElAccordion has neither.',
+          'Every public constructor parameter on Accordion and '
+          'AccordionItem, plus the fixed layout constants that stand in '
+          'for a variant or size enum, since Accordion has neither.',
       child: _ApiReferenceContent(),
     ),
     DisclosureSection(
@@ -137,7 +149,7 @@ final ComponentDocSpec accordionDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          '_ElAccordionTriggerState wires the same Focus-ring idiom '
+          '_AccordionTriggerState wires the same Focus-ring idiom '
           'button.dart uses, but none of button.dart\'s key handling: '
           'every fact here is read off that class directly, not inferred.',
       child: _KeyboardContent(),
@@ -209,18 +221,15 @@ class AccordionDocPage extends StatelessWidget {
       title: accordionDoc.title,
       description: accordionDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Accordion'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Accordion'),
     ],
     toc: accordionDocSpec.toc,
     // Forward references into the same wave: `select` already routes
     // (Phase F); `alert` lands alongside `accordion` once every worker's
     // page is wired in by the supervisor.
-    previous: const DocsPageLink(
-      title: 'Select',
-      route: '/components/select',
-    ),
+    previous: const DocsPageLink(title: 'Select', route: '/components/select'),
     next: const DocsPageLink(title: 'Alert', route: '/components/alert'),
     onNavigate: onNavigate,
     child: KeyedSubtree(
@@ -240,11 +249,11 @@ class _ApiReferenceContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: const <Widget>[
       DocsApiTable(
-        title: 'ElAccordion',
+        title: 'Accordion',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'items',
-            type: 'List<ElAccordionItem>',
+            type: 'List<AccordionItem>',
             description: 'The ordered set of trigger/content pairs.',
           ),
           DocsApiFact(
@@ -267,7 +276,7 @@ class _ApiReferenceContent extends StatelessWidget {
       ),
       SizedBox(height: 24),
       DocsApiTable(
-        title: 'ElAccordionItem',
+        title: 'AccordionItem',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'title',
@@ -287,26 +296,26 @@ class _ApiReferenceContent extends StatelessWidget {
       ),
       SizedBox(height: 24),
       DocsApiTable(
-        title: 'ElAccordion static layout tokens',
+        title: 'Accordion static layout tokens',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElAccordion.triggerPaddingY',
+            name: 'Accordion.triggerPaddingY',
             type: 'static double',
             description:
                 '10px of vertical padding on the trigger (py-2.5), '
                 'reusable if you need to match the rhythm elsewhere.',
           ),
           DocsApiFact(
-            name: 'ElAccordion.contentPaddingBottom',
+            name: 'Accordion.contentPaddingBottom',
             type: 'static double',
             description: '10px under the open panel\'s content (pb-2.5).',
           ),
           DocsApiFact(
-            name: 'ElAccordion.chevronPx',
+            name: 'Accordion.chevronPx',
             type: 'static double',
             description:
                 '16px chevron size: the icon widget\'s own default, not '
-                'an accordion-specific variant. ElAccordion exposes no '
+                'an accordion-specific variant. Accordion exposes no '
                 'variant or size enum: every accordion renders through '
                 'this same trigger and padding ladder.',
           ),
@@ -321,7 +330,7 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Each trigger publishes one merged Semantics node: button: true, '
             'expanded: <open state>, label: <title>.',
         'title is the only accessible name a trigger has: there is no '
@@ -342,7 +351,7 @@ class _AccessibilityContent extends StatelessWidget {
       ]);
 }
 
-/// Read directly off `_ElAccordionTriggerState.build`
+/// Read directly off `_AccordionTriggerState.build`
 /// (`lib/src/components/accordion.dart`): a bare `GestureDetector.onTap`
 /// and a `Focus` widget kept only for the ring's `onFocusChange`, with no
 /// `onKeyEvent` anywhere in the file.
@@ -351,13 +360,13 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Activation: none. accordion.dart wires no Focus.onKeyEvent and no '
             'onKey of any kind: Enter, NumpadEnter and Space do nothing to '
             'a focused trigger. Only a pointer or touch tap toggles a '
             'panel today.',
         'Tab order: every trigger stays in the default traversal order, '
-            'open or closed: ElAccordion sets no FocusTraversalPolicy and '
+            'open or closed: Accordion sets no FocusTraversalPolicy and '
             'removes nothing from Tab order the way a disabled control '
             'would.',
         'Pointer vs keyboard: a bare tap never calls requestFocus() on '
@@ -366,7 +375,7 @@ class _KeyboardContent extends StatelessWidget {
             ':focus-visible.',
         'Known gap, reported rather than fixed: button.dart, this '
             'component\'s closest kin (the same focus-ring '
-            'TweenAnimationBuilder/ElMachineSurface idiom), activates on '
+            'TweenAnimationBuilder/Surface idiom), activates on '
             'Enter and Space. accordion.dart does not.',
       ]);
 }
@@ -376,8 +385,8 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElAccordion is a stretched Column with no breakpoints of its own: '
+      _bullets(ThemeScope.of(context), <String>[
+        'Accordion is a stretched Column with no breakpoints of its own: '
             'it always fills the width its parent gives it.',
         'A trigger title has no maxLines or overflow set, so a long '
             'question wraps onto more than one line instead of '
@@ -407,16 +416,17 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Component dependencies',
-            value: 'button (focus-ring statics), collapsible (ElUnfold), '
+            value:
+                'button (focus-ring statics), collapsible (Unfold), '
                 'icon (chevron glyphs)',
             description: 'Sibling components imported directly.',
           ),
           const DocsInstallFact(
             label: 'Foundation dependencies',
-            value: 'source-foundation, machine-surface',
+            value: 'source-foundation, surface',
             description:
                 'Colors, motion, shadows, spacing, theme, typography, and '
-                'the ElMachineSurface effect used for the focus ring.',
+                'the Surface effect used for the focus ring.',
           ),
           const DocsInstallFact(
             label: 'Assets, fonts, shaders',
@@ -427,16 +437,13 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Collapsible', route: '/components/collapsible'),
           DocsLink(label: 'Icon', route: '/components/icon'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
         ],
       ),
     ],
@@ -448,7 +455,7 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'theme.border paints the 1px seam under every item but the last '
             '(not-last:border-b).',
         'theme.foreground paints both the trigger label and the chevron: '
@@ -458,20 +465,24 @@ class _ThemingContent extends StatelessWidget {
         'theme.ring, at the system\'s standard 0.50 alpha, is the only '
             'color the focus state adds; there is no separate hover or '
             'pressed fill.',
-        'ElShadows.none is the trigger\'s resting elevation: the focus '
+        'Shadows.none is the trigger\'s resting elevation: the focus '
             'ring is the only shadow layer it ever gains.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -498,7 +509,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   ),
   DocsStateFact(
     state: 'Pressed',
-    treatment: 'No dedicated pressed/scale treatment is wired for this '
+    treatment:
+        'No dedicated pressed/scale treatment is wired for this '
         'trigger.',
     userSignal:
         'A tap resolves directly into the open/close transition instead '
@@ -524,7 +536,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled, N/A',
     treatment:
-        'ElAccordion and ElAccordionItem expose no enabled or disabled '
+        'Accordion and AccordionItem expose no enabled or disabled '
         'parameter.',
     userSignal:
         'A caller wanting a disabled row has to gate it outside the '
@@ -544,7 +556,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         'Both the focus-ring transition and the panel\'s open/close '
-        'animation route through elAnimationDuration.',
+        'animation route through effectiveMotionDuration.',
     userSignal:
         'That duration collapses to zero when the platform\'s '
         'disable-animations flag is on: transitions still happen, '
@@ -566,39 +578,39 @@ class _AccordionPreview extends StatefulWidget {
 class _AccordionPreviewState extends State<_AccordionPreview> {
   int? _openIndex = 0;
 
-  static final List<ElAccordionItem> _items = <ElAccordionItem>[
-    ElAccordionItem(
+  static final List<AccordionItem> _items = <AccordionItem>[
+    AccordionItem(
       title: 'What does single and collapsible mean here?',
-      content: ElText(
+      content: StyledText(
         'Only one panel can stay open. Opening a second panel closes the '
         'first, and tapping an already-open trigger closes it, so the '
         'set can end with nothing expanded.',
-        ElType.body,
+        TextStyles.body,
       ),
     ),
-    ElAccordionItem(
+    AccordionItem(
       title: 'Does the chevron rotate?',
-      content: ElText(
+      content: StyledText(
         'No. The port renders two separate glyphs, chevron-down and '
         'chevron-up, and swaps which one is visible. Nothing on the '
         'icon animates a rotation.',
-        ElType.body,
+        TextStyles.body,
       ),
     ),
-    ElAccordionItem(
+    AccordionItem(
       title: 'What happens with a long question?',
-      content: ElText(
+      content: StyledText(
         'The label wraps onto more than one line if it needs to. The '
         'chevron stays aligned with the first line instead of '
         're-centering on the full block.',
-        ElType.body,
+        TextStyles.body,
       ),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return ElAccordion(
+    return Accordion(
       items: _items,
       openIndex: _openIndex,
       onChanged: (int? next) => setState(() => _openIndex = next),
@@ -619,13 +631,13 @@ class _FaqAccordionState extends State<FaqAccordion> {
 
   @override
   Widget build(BuildContext context) {
-    return ElAccordion(
-      items: const <ElAccordionItem>[
-        ElAccordionItem(
+    return Accordion(
+      items: const <AccordionItem>[
+        AccordionItem(
           title: 'What does single and collapsible mean here?',
           content: Text('Only one panel can stay open at a time.'),
         ),
-        ElAccordionItem(
+        AccordionItem(
           title: 'Does the chevron rotate?',
           content: Text('No: it swaps between two glyphs.'),
         ),
@@ -637,9 +649,9 @@ class _FaqAccordionState extends State<FaqAccordion> {
 }''';
 
 const String _usageCode = '''
-ElAccordion(
-  items: const <ElAccordionItem>[
-    ElAccordionItem(
+Accordion(
+  items: const <AccordionItem>[
+    AccordionItem(
       title: 'Shipping',
       content: Text('Orders ship within two business days.'),
     ),
@@ -662,23 +674,23 @@ class _AccordionCompositionPreviewState
     extends State<_AccordionCompositionPreview> {
   int? _openIndex = 0;
 
-  late final List<ElAccordionItem> _items = <ElAccordionItem>[
-    ElAccordionItem(
+  late final List<AccordionItem> _items = <AccordionItem>[
+    AccordionItem(
       title: 'Refund policy, in full',
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElText(
+          StyledText(
             'Refunds are issued to the original payment method within '
             'five business days of approval.',
-            ElType.body,
+            TextStyles.body,
           ),
           const SizedBox(height: 8),
-          ElText(
+          StyledText(
             'Store credit is available immediately as an alternative, and '
             'never expires.',
-            ElType.body,
+            TextStyles.body,
           ),
         ],
       ),
@@ -687,7 +699,7 @@ class _AccordionCompositionPreviewState
 
   @override
   Widget build(BuildContext context) {
-    return ElAccordion(
+    return Accordion(
       items: _items,
       openIndex: _openIndex,
       onChanged: (int? next) => setState(() => _openIndex = next),
@@ -696,9 +708,9 @@ class _AccordionCompositionPreviewState
 }
 
 const String _compositionCode = '''
-ElAccordion(
-  items: <ElAccordionItem>[
-    ElAccordionItem(
+Accordion(
+  items: <AccordionItem>[
+    AccordionItem(
       title: 'Refund policy, in full',
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -730,27 +742,27 @@ class _AccordionBasicPreview extends StatefulWidget {
 class _AccordionBasicPreviewState extends State<_AccordionBasicPreview> {
   int? _openIndex = 0;
 
-  static final List<ElAccordionItem> _items = <ElAccordionItem>[
-    ElAccordionItem(
+  static final List<AccordionItem> _items = <AccordionItem>[
+    AccordionItem(
       title: 'How long does shipping take?',
-      content: ElText(
+      content: StyledText(
         'Orders ship within two business days and arrive in five to seven.',
-        ElType.body,
+        TextStyles.body,
       ),
     ),
-    ElAccordionItem(
+    AccordionItem(
       title: 'Can I return an item?',
-      content: ElText(
+      content: StyledText(
         'Yes, within thirty days of delivery, unworn and in its original '
         'packaging.',
-        ElType.body,
+        TextStyles.body,
       ),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return ElAccordion(
+    return Accordion(
       items: _items,
       openIndex: _openIndex,
       onChanged: (int? next) => setState(() => _openIndex = next),
@@ -759,13 +771,13 @@ class _AccordionBasicPreviewState extends State<_AccordionBasicPreview> {
 }
 
 const String _basicCode = '''
-ElAccordion(
-  items: const <ElAccordionItem>[
-    ElAccordionItem(
+Accordion(
+  items: const <AccordionItem>[
+    AccordionItem(
       title: 'How long does shipping take?',
       content: Text('Orders ship within two business days.'),
     ),
-    ElAccordionItem(
+    AccordionItem(
       title: 'Can I return an item?',
       content: Text('Yes, within thirty days of delivery.'),
     ),
@@ -774,8 +786,8 @@ ElAccordion(
   onChanged: (int? next) => setState(() => openIndex = next),
 )''';
 
-/// `ElAccordion` has no surface of its own: this specimen wraps it in
-/// [ElCard] to show the FAQ with a header and an edge.
+/// `Accordion` has no surface of its own: this specimen wraps it in
+/// [Card] to show the FAQ with a header and an edge.
 class _AccordionCardPreview extends StatefulWidget {
   const _AccordionCardPreview();
 
@@ -786,37 +798,37 @@ class _AccordionCardPreview extends StatefulWidget {
 class _AccordionCardPreviewState extends State<_AccordionCardPreview> {
   int? _openIndex = 0;
 
-  static final List<ElAccordionItem> _items = <ElAccordionItem>[
-    ElAccordionItem(
+  static final List<AccordionItem> _items = <AccordionItem>[
+    AccordionItem(
       title: 'What plans are available?',
-      content: ElText(
+      content: StyledText(
         'Starter, Pro, and Enterprise. Every plan bills monthly and can be '
         'changed at any time.',
-        ElType.body,
+        TextStyles.body,
       ),
     ),
-    ElAccordionItem(
+    AccordionItem(
       title: 'Can I cancel anytime?',
-      content: ElText(
+      content: StyledText(
         'Yes. Cancelling stops the next renewal; the current period stays '
         'active until it ends.',
-        ElType.body,
+        TextStyles.body,
       ),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return ElCard(
+    return Card(
       children: <Widget>[
-        ElCardHeader(
-          title: const ElCardTitle('Subscription & Billing'),
-          description: const ElCardDescription(
+        CardHeader(
+          title: const CardTitle('Subscription & Billing'),
+          description: const CardDescription(
             'Common questions about plans and billing.',
           ),
         ),
-        ElCardContent(
-          child: ElAccordion(
+        CardContent(
+          child: Accordion(
             items: _items,
             openIndex: _openIndex,
             onChanged: (int? next) => setState(() => _openIndex = next),
@@ -828,18 +840,18 @@ class _AccordionCardPreviewState extends State<_AccordionCardPreview> {
 }
 
 const String _cardCode = '''
-ElCard(
+Card(
   children: [
-    ElCardHeader(
-      title: const ElCardTitle('Subscription & Billing'),
-      description: const ElCardDescription(
+    CardHeader(
+      title: const CardTitle('Subscription & Billing'),
+      description: const CardDescription(
         'Common questions about plans and billing.',
       ),
     ),
-    ElCardContent(
-      child: ElAccordion(
-        items: const <ElAccordionItem>[
-          ElAccordionItem(
+    CardContent(
+      child: Accordion(
+        items: const <AccordionItem>[
+          AccordionItem(
             title: 'What plans are available?',
             content: Text('Starter, Pro, and Enterprise.'),
           ),

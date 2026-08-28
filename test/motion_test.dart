@@ -1,6 +1,18 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The motion layer: the three interaction utilities the shell and the docs
@@ -8,13 +20,13 @@ import 'package:flutter_test/flutter_test.dart';
 /// with its `anim-jelly` arrival — and the keyframe layer underneath the named
 /// animations.
 
-Widget host(Widget child, {ElThemeMode mode = ElThemeMode.dark}) {
+Widget host(Widget child, {ColorMode mode = ColorMode.dark}) {
   return MediaQuery(
     data: const MediaQueryData(size: Size(1440, 900)),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Center(child: child),
       ),
     ),
@@ -42,7 +54,7 @@ double translationYOf(WidgetTester t, Finder of) {
 ///
 /// The [MediaQuery] goes *inside* [host]'s own, because the nearer one wins and
 /// [host] declares a size the widgets under test need.
-Widget stilledHost(Widget child, {ElThemeMode mode = ElThemeMode.dark}) => host(
+Widget stilledHost(Widget child, {ColorMode mode = ColorMode.dark}) => host(
   MediaQuery(
     data: const MediaQueryData(size: Size(1440, 900), disableAnimations: true),
     child: child,
@@ -64,26 +76,26 @@ Widget stilledHost(Widget child, {ElThemeMode mode = ElThemeMode.dark}) => host(
 const double stopTolerance = 1e-3;
 
 void main() {
-  group('ElPress', () {
+  group('Press', () {
     testWidgets('squishes on pointer-down and springs back on up', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(
-        host(ElPress(child: const SizedBox(width: 80, height: 32))),
+        host(Press(child: const SizedBox(width: 80, height: 32))),
       );
 
-      final Finder press = find.byType(ElPress);
+      final Finder press = find.byType(Press);
       expect(scaleOf(t, press).x, 1.0, reason: 'at rest');
 
       final TestGesture gesture = await t.startGesture(t.getCenter(press));
       await t.pump(); // the ticker's first frame is its zero point
-      await t.pump(ElDurations.pressDown);
-      expect(scaleOf(t, press).x, closeTo(ElTransforms.pressScale, 1e-6));
-      expect(scaleOf(t, press).y, closeTo(ElTransforms.pressScale, 1e-6));
+      await t.pump(MotionDurations.pressIn);
+      expect(scaleOf(t, press).x, closeTo(MotionTransforms.press, 1e-6));
+      expect(scaleOf(t, press).y, closeTo(MotionTransforms.press, 1e-6));
 
       await gesture.up();
       await t.pump();
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
       expect(scaleOf(t, press).x, closeTo(1.0, 1e-6));
     });
 
@@ -91,22 +103,22 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(
-        host(ElPress(child: const SizedBox(width: 80, height: 32))),
+        host(Press(child: const SizedBox(width: 80, height: 32))),
       );
-      final Finder press = find.byType(ElPress);
+      final Finder press = find.byType(Press);
 
       final TestGesture gesture = await t.startGesture(t.getCenter(press));
       await t.pump();
-      await t.pump(ElDurations.pressDown);
+      await t.pump(MotionDurations.pressIn);
       await gesture.up();
 
       // The asymmetry globals.css calls "the whole feel": 40ms down, 250ms
       // back. One press-length into the return the surface is still squished.
       await t.pump();
-      await t.pump(ElDurations.pressDown);
+      await t.pump(MotionDurations.pressIn);
       expect(scaleOf(t, press).x, lessThan(1.0));
 
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
       expect(scaleOf(t, press).x, closeTo(1.0, 1e-6));
     });
 
@@ -114,20 +126,20 @@ void main() {
       int taps = 0;
       await t.pumpWidget(
         host(
-          ElPress(
+          Press(
             onTap: () => taps++,
             child: const SizedBox(width: 80, height: 32),
           ),
         ),
       );
-      final Finder press = find.byType(ElPress);
+      final Finder press = find.byType(Press);
 
       final TestGesture gesture = await t.startGesture(t.getCenter(press));
       await t.pump();
-      await t.pump(ElDurations.pressDown);
+      await t.pump(MotionDurations.pressIn);
       await gesture.cancel();
       await t.pump();
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
 
       expect(scaleOf(t, press).x, closeTo(1.0, 1e-6));
       expect(taps, 0, reason: 'a cancelled press is not a tap');
@@ -137,42 +149,42 @@ void main() {
       int taps = 0;
       await t.pumpWidget(
         host(
-          ElPress(
+          Press(
             onTap: () => taps++,
             child: const SizedBox(width: 80, height: 32),
           ),
         ),
       );
 
-      await t.tap(find.byType(ElPress));
-      await t.pump(ElDurations.base);
+      await t.tap(find.byType(Press));
+      await t.pump(MotionDurations.normal);
       expect(taps, 1);
     });
 
     testWidgets('honours a custom scale', (WidgetTester t) async {
       await t.pumpWidget(
         host(
-          ElPress(
-            scale: ElTransforms.buttonScale,
+          Press(
+            scale: MotionTransforms.buttonPress,
             child: const SizedBox(width: 80, height: 32),
           ),
         ),
       );
-      final Finder press = find.byType(ElPress);
+      final Finder press = find.byType(Press);
 
       await t.startGesture(t.getCenter(press));
       await t.pump();
-      await t.pump(ElDurations.pressDown);
-      expect(scaleOf(t, press).x, closeTo(ElTransforms.buttonScale, 1e-6));
+      await t.pump(MotionDurations.pressIn);
+      expect(scaleOf(t, press).x, closeTo(MotionTransforms.buttonPress, 1e-6));
     });
   });
 
-  group('ElLift', () {
+  group('HoverBuilder', () {
     testWidgets('reports hover to its builder', (WidgetTester t) async {
       final List<bool> states = <bool>[];
       await t.pumpWidget(
         host(
-          ElLift(
+          HoverBuilder(
             builder: (BuildContext c, bool hovered) {
               states.add(hovered);
               return const SizedBox(width: 200, height: 120);
@@ -189,7 +201,7 @@ void main() {
       addTearDown(mouse.removePointer);
       await t.pump();
 
-      await mouse.moveTo(t.getCenter(find.byType(ElLift)));
+      await mouse.moveTo(t.getCenter(find.byType(HoverBuilder)));
       await t.pump();
       expect(states.last, isTrue);
 
@@ -199,7 +211,7 @@ void main() {
     });
   });
 
-  group('ElLiftCard', () {
+  group('InteractiveCard', () {
     Future<TestGesture> hoverOver(WidgetTester t, Finder target) async {
       final TestGesture mouse = await t.createGesture(
         kind: PointerDeviceKind.mouse,
@@ -216,7 +228,7 @@ void main() {
                 .widget<DecoratedBox>(
                   find
                       .descendant(
-                        of: find.byType(ElLiftCard),
+                        of: find.byType(InteractiveCard),
                         matching: find.byType(DecoratedBox),
                       )
                       .first,
@@ -227,13 +239,13 @@ void main() {
     testWidgets('rises 3px onto an e3 shadow and swaps its border', (
       WidgetTester t,
     ) async {
-      final Color hoverBorder = ElPalette.action.withValues(alpha: 0.45);
+      final Color hoverBorder = Palette.action.withValues(alpha: 0.45);
       await t.pumpWidget(
         host(
           SizedBox(
             width: 240,
             height: 140,
-            child: ElLiftCard(
+            child: InteractiveCard(
               hoverBorderColor: hoverBorder,
               builder: (BuildContext c, bool hovered) =>
                   const SizedBox.expand(),
@@ -242,22 +254,20 @@ void main() {
         ),
       );
 
-      final Finder card = find.byType(ElLiftCard);
+      final Finder card = find.byType(InteractiveCard);
       expect(translationYOf(t, card), 0);
       expect(decorationOf(t).boxShadow, isEmpty);
       expect(
         (decorationOf(t).border! as Border).top.color,
-        ElThemeData.dark.border,
+        ThemeTokens.dark.border,
       );
 
       await hoverOver(t, card);
       await t.pump();
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
 
-      expect(translationYOf(t, card), closeTo(ElTransforms.liftY, 1e-6));
-      final List<BoxShadow> lifted = ElShadows.e3.outerShadows(
-        ElThemeData.dark,
-      );
+      expect(translationYOf(t, card), closeTo(MotionTransforms.liftY, 1e-6));
+      final List<BoxShadow> lifted = Shadows.lg.outerShadows(ThemeTokens.dark);
       expect(decorationOf(t).boxShadow, hasLength(lifted.length));
       expect(decorationOf(t).boxShadow!.last.color, lifted.last.color);
       expect((decorationOf(t).border! as Border).top.color, hoverBorder);
@@ -269,23 +279,23 @@ void main() {
           SizedBox(
             width: 240,
             height: 140,
-            child: ElLiftCard(
+            child: InteractiveCard(
               builder: (BuildContext c, bool hovered) =>
                   const SizedBox.expand(),
             ),
           ),
         ),
       );
-      final Finder card = find.byType(ElLiftCard);
+      final Finder card = find.byType(InteractiveCard);
 
       final TestGesture mouse = await hoverOver(t, card);
       await t.pump();
-      await t.pump(ElDurations.base);
-      expect(translationYOf(t, card), closeTo(ElTransforms.liftY, 1e-6));
+      await t.pump(MotionDurations.normal);
+      expect(translationYOf(t, card), closeTo(MotionTransforms.liftY, 1e-6));
 
       await mouse.moveTo(Offset.zero);
       await t.pump();
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
       expect(translationYOf(t, card), closeTo(0, 1e-6));
     });
 
@@ -298,7 +308,7 @@ void main() {
           SizedBox(
             width: 240,
             height: 140,
-            child: ElLiftCard(
+            child: InteractiveCard(
               builder: (BuildContext c, bool hovered) {
                 seen = hovered;
                 return const SizedBox.expand();
@@ -308,7 +318,7 @@ void main() {
         ),
       );
 
-      await hoverOver(t, find.byType(ElLiftCard));
+      await hoverOver(t, find.byType(InteractiveCard));
       await t.pump();
       expect(seen, isTrue);
     });
@@ -324,14 +334,14 @@ void main() {
     ) async {
       const Key content = Key('content');
       const double outer = 240;
-      final double pad = el(5); // `p-5`, the index card
+      final double pad = space(5); // `p-5`, the index card
 
       await t.pumpWidget(
         host(
           SizedBox(
             width: outer,
             height: 140,
-            child: ElLiftCard(
+            child: InteractiveCard(
               padding: EdgeInsets.all(pad),
               builder: (BuildContext c, bool hovered) =>
                   const SizedBox.expand(key: content),
@@ -342,19 +352,22 @@ void main() {
 
       expect(
         t.getSize(find.byKey(content)).width,
-        outer - 2 * pad - 2 * ElWidths.hairline,
+        outer - 2 * pad - 2 * BorderWidths.hairline,
       );
       expect(
         t.getSize(find.byKey(content)).height,
-        140 - 2 * pad - 2 * ElWidths.hairline,
+        140 - 2 * pad - 2 * BorderWidths.hairline,
       );
       // And the border it is paying for is the token, not `Border.all`'s
       // coincidentally-identical default.
-      expect((decorationOf(t).border! as Border).top.width, ElWidths.hairline);
+      expect(
+        (decorationOf(t).border! as Border).top.width,
+        BorderWidths.hairline,
+      );
     });
   });
 
-  group('ElSlidingPillGroup', () {
+  group('ActiveIndicator', () {
     const Key pillKey = Key('pill');
     final List<Key> itemKeys = List<Key>.generate(
       3,
@@ -364,12 +377,12 @@ void main() {
     Widget group(int active, {double itemWidth = 28, Duration? travel}) => host(
       SizedBox(
         width: 300,
-        child: ElSlidingPillGroup(
+        child: ActiveIndicator(
           activeIndex: active,
-          pill: const SizedBox.expand(key: pillKey),
+          indicator: const SizedBox.expand(key: pillKey),
           gap: 1,
-          padding: EdgeInsets.all(el(0.5)),
-          travelDuration: travel,
+          padding: EdgeInsets.all(space(0.5)),
+          moveDuration: travel,
           children: <Widget>[
             for (int i = 0; i < 3; i++)
               SizedBox(key: itemKeys[i], width: itemWidth, height: 28),
@@ -383,7 +396,7 @@ void main() {
     double paintedOpacity(WidgetTester t) => t
         .widget<FadeTransition>(
           find.descendant(
-            of: find.byType(ElSlidingPillGroup),
+            of: find.byType(ActiveIndicator),
             matching: find.byType(FadeTransition),
           ),
         )
@@ -438,19 +451,19 @@ void main() {
       // post-frame re-measure, so the squash starts a frame after the pop; this
       // pump is that frame, and the jelly's own zero point.
       await t.pump();
-      expect(scaleOf(t, find.byType(ElSlidingPillGroup)).x, 1.0);
+      expect(scaleOf(t, find.byType(ActiveIndicator)).x, 1.0);
 
       await t.pump(const Duration(milliseconds: 180));
       // 30% of yuki-jelly's 600ms: scale3d(1.18, 0.82, 1).
       final ({double x, double y}) squashed = scaleOf(
         t,
-        find.byType(ElSlidingPillGroup),
+        find.byType(ActiveIndicator),
       );
       expect(squashed.x, closeTo(1.18, 0.01));
       expect(squashed.y, closeTo(0.82, 0.01));
 
-      await t.pump(ElDurations.animJelly);
-      expect(scaleOf(t, find.byType(ElSlidingPillGroup)).x, closeTo(1, 1e-6));
+      await t.pump(MotionDurations.stateChange);
+      expect(scaleOf(t, find.byType(ActiveIndicator)).x, closeTo(1, 1e-6));
     });
 
     testWidgets('travels to the new selection', (WidgetTester t) async {
@@ -465,7 +478,7 @@ void main() {
         reason: 'still in flight one frame in',
       );
 
-      await t.pump(ElDurations.animJelly);
+      await t.pump(MotionDurations.stateChange);
       expect(
         t.getRect(find.byKey(pillKey)),
         rectMoreOrLessEquals(t.getRect(find.byKey(itemKeys[2])), epsilon: 0.01),
@@ -483,15 +496,15 @@ void main() {
       await t.pump(const Duration(milliseconds: 180));
       final ({double x, double y}) squashed = scaleOf(
         t,
-        find.byType(ElSlidingPillGroup),
+        find.byType(ActiveIndicator),
       );
       expect(squashed.x, closeTo(1.18, 0.03));
       expect(squashed.y, closeTo(0.82, 0.03));
 
-      await t.pump(ElDurations.animJelly);
+      await t.pump(MotionDurations.stateChange);
       final ({double x, double y}) settled = scaleOf(
         t,
-        find.byType(ElSlidingPillGroup),
+        find.byType(ActiveIndicator),
       );
       expect(settled.x, closeTo(1.0, 1e-6));
       expect(settled.y, closeTo(1.0, 1e-6));
@@ -501,7 +514,7 @@ void main() {
         'squash does not replay', (WidgetTester t) async {
       await t.pumpWidget(group(1));
       await t.pump();
-      await t.pump(ElDurations.animJelly);
+      await t.pump(MotionDurations.stateChange);
       final Rect parked = t.getRect(find.byKey(pillKey));
       expect(paintedOpacity(t), 1);
 
@@ -520,7 +533,7 @@ void main() {
           reason: 'frame ${f + 1}: the rect must not move at all',
         );
         expect(
-          scaleOf(t, find.byType(ElSlidingPillGroup)).x,
+          scaleOf(t, find.byType(ActiveIndicator)).x,
           1.0,
           reason: 'frame ${f + 1}: the jelly held 1.000 on the reference',
         );
@@ -545,11 +558,11 @@ void main() {
     ) async {
       await t.pumpWidget(group(2));
       await t.pump();
-      await t.pump(ElDurations.animJelly);
+      await t.pump(MotionDurations.stateChange);
       final Rect parked = t.getRect(find.byKey(pillKey));
 
       await t.pumpWidget(group(-1));
-      await t.pump(ElDurations.fast);
+      await t.pump(MotionDurations.fast);
       await t.pump();
       expect(t.getRect(find.byKey(pillKey)), parked, reason: 'still parked');
 
@@ -562,18 +575,18 @@ void main() {
         greaterThan(t.getRect(find.byKey(itemKeys[0])).left),
         reason: 'in flight, still short of its target',
       );
-      await t.pump(ElDurations.animJelly);
+      await t.pump(MotionDurations.stateChange);
       expect(
         t.getRect(find.byKey(pillKey)),
         rectMoreOrLessEquals(t.getRect(find.byKey(itemKeys[0])), epsilon: 0.01),
       );
     });
 
-    testWidgets('travelDuration: zero jumps and still squashes — the theme '
+    testWidgets('moveDuration: zero jumps and still squashes — the theme '
         'toggle\'s contract', (WidgetTester t) async {
       await t.pumpWidget(group(0, travel: Duration.zero));
       await t.pump();
-      await t.pump(ElDurations.animJelly);
+      await t.pump(MotionDurations.stateChange);
 
       await t.pumpWidget(group(2, travel: Duration.zero));
       await t.pump();
@@ -587,10 +600,7 @@ void main() {
       // …and the arrival squash still plays: the class is re-added in the same
       // batch and runs its full 600ms whatever the travel did.
       await t.pump(const Duration(milliseconds: 180));
-      expect(
-        scaleOf(t, find.byType(ElSlidingPillGroup)).x,
-        closeTo(1.18, 0.01),
-      );
+      expect(scaleOf(t, find.byType(ActiveIndicator)).x, closeTo(1.18, 0.01));
     });
 
     testWidgets('re-measures when the row is laid out again', (
@@ -604,7 +614,7 @@ void main() {
       // catches this with a ResizeObserver, and so must this.
       await t.pumpWidget(group(1, itemWidth: 44));
       await t.pump();
-      await t.pump(ElDurations.animJelly);
+      await t.pump(MotionDurations.stateChange);
 
       expect(t.getRect(find.byKey(pillKey)), isNot(before));
       expect(
@@ -616,9 +626,9 @@ void main() {
 
   // ── keyframes ─────────────────────────────────────────────────────────────
 
-  group('ElSteps', () {
+  group('StepCurve', () {
     test('steps(8) holds eight positions and never shows the wrap frame', () {
-      const Curve steps = ElSteps(8);
+      const Curve steps = StepCurve(8);
       final Set<double> seen = <double>{};
       for (int i = 0; i < 800; i++) {
         final double value = steps.transform(i / 800);
@@ -636,13 +646,13 @@ void main() {
       // The frame `Curve.transform` is contractually asked for, and the one
       // CSS never paints: it holds the last position instead of reaching 1.
       expect(steps.transform(1), closeTo(7 / 8, 1e-12));
-      expect(ElRatchet.degreesAt(1), closeTo(315, 1e-9));
-      expect(ElRatchet.radiansAt(0), 0);
-      expect(ElRatchet.step, ElDurations.ratchetStep);
+      expect(DiscreteProgressMotion.degreesAt(1), closeTo(315, 1e-9));
+      expect(DiscreteProgressMotion.radiansAt(0), 0);
+      expect(DiscreteProgressMotion.step, MotionDurations.ratchetStep);
     });
 
     test('jump-start is the other CSS variant', () {
-      const Curve steps = ElSteps(2, jumpEnd: false);
+      const Curve steps = StepCurve(2, jumpEnd: false);
       expect(
         steps.transform(0),
         closeTo(0.5, 1e-12),
@@ -656,78 +666,78 @@ void main() {
   group('the finite keyframe tables', () {
     test('yuki-pop-in matches globals.css at every stop', () {
       expect(
-        ElPopIn.scale.transform(0),
+        EntranceMotion.scale.transform(0),
         offsetMoreOrLessEquals(const Offset(0.25, 0.25), epsilon: 1e-9),
       );
       expect(
-        ElPopIn.scale.transform(0.55),
+        EntranceMotion.scale.transform(0.55),
         offsetMoreOrLessEquals(
           const Offset(0.92, 1.08),
           epsilon: stopTolerance,
         ),
       );
       expect(
-        ElPopIn.scale.transform(0.80),
+        EntranceMotion.scale.transform(0.80),
         offsetMoreOrLessEquals(
           const Offset(1.04, 0.97),
           epsilon: stopTolerance,
         ),
       );
       expect(
-        ElPopIn.scale.transform(0.92),
+        EntranceMotion.scale.transform(0.92),
         offsetMoreOrLessEquals(
           const Offset(0.99, 1.01),
           epsilon: stopTolerance,
         ),
       );
       expect(
-        ElPopIn.scale.transform(1),
+        EntranceMotion.scale.transform(1),
         offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9),
       );
 
       // Declared at 0% and 55% only — and then it HOLDS, exactly, because the
       // tail is modelled rather than left to emerge.
-      expect(ElPopIn.opacity.transform(0), 0);
-      expect(ElPopIn.opacity.transform(0.55), closeTo(1, stopTolerance));
-      expect(ElPopIn.opacity.transform(0.8), 1);
-      expect(ElPopIn.opacity.transform(1), 1);
+      expect(EntranceMotion.opacity.transform(0), 0);
+      expect(EntranceMotion.opacity.transform(0.55), closeTo(1, stopTolerance));
+      expect(EntranceMotion.opacity.transform(0.8), 1);
+      expect(EntranceMotion.opacity.transform(1), 1);
     });
 
     test('yuki-jelly matches globals.css at every stop', () {
       expect(
-        ElJelly.scale.transform(0),
+        StateChangeMotion.scale.transform(0),
         offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9),
       );
       expect(
-        ElJelly.scale.transform(0.30),
+        StateChangeMotion.scale.transform(0.30),
         offsetMoreOrLessEquals(
           const Offset(1.18, 0.82),
           epsilon: stopTolerance,
         ),
       );
       expect(
-        ElJelly.scale.transform(0.45),
+        StateChangeMotion.scale.transform(0.45),
         offsetMoreOrLessEquals(
           const Offset(0.88, 1.12),
           epsilon: stopTolerance,
         ),
       );
       expect(
-        ElJelly.scale.transform(0.60),
+        StateChangeMotion.scale.transform(0.60),
         offsetMoreOrLessEquals(
           const Offset(1.06, 0.94),
           epsilon: stopTolerance,
         ),
       );
       expect(
-        ElJelly.scale.transform(0.78),
+        StateChangeMotion.scale.transform(0.78),
         offsetMoreOrLessEquals(
           const Offset(0.98, 1.02),
           epsilon: stopTolerance,
         ),
       );
       expect(
-        ElJelly.scale.transform(1),
+        StateChangeMotion.scale.transform(1),
         offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9),
       );
     });
@@ -736,139 +746,152 @@ void main() {
       // `from { stroke-dashoffset: 22 } to { stroke-dashoffset: 0 }`, and the
       // utility's own `stroke-dasharray: 22` is what makes one dash cover the
       // whole path.
-      expect(ElCheckDraw.dashArray, 22);
-      expect(ElCheckDraw.dashOffset.transform(0), 22);
-      expect(ElCheckDraw.dashOffset.transform(1), closeTo(0, 1e-9));
-      expect(ElCheckDraw.duration, ElDurations.checkDraw);
-      expect(ElCheckDraw.duration.inMilliseconds, 280);
-      expect(ElCheckDraw.curve, ElCurves.out);
+      expect(CheckmarkDrawMotion.dashArray, 22);
+      expect(CheckmarkDrawMotion.dashOffset.transform(0), 22);
+      expect(CheckmarkDrawMotion.dashOffset.transform(1), closeTo(0, 1e-9));
+      expect(CheckmarkDrawMotion.duration, MotionDurations.checkDraw);
+      expect(CheckmarkDrawMotion.duration.inMilliseconds, 280);
+      expect(CheckmarkDrawMotion.curve, MotionCurves.enter);
 
       // Read the other way round: nothing painted at 0, all of it at 1.
-      expect(ElCheckDraw.drawnFractionAt(0), closeTo(0, 1e-9));
-      expect(ElCheckDraw.drawnFractionAt(1), closeTo(1, 1e-9));
+      expect(CheckmarkDrawMotion.drawnFractionAt(0), closeTo(0, 1e-9));
+      expect(CheckmarkDrawMotion.drawnFractionAt(1), closeTo(1, 1e-9));
       // And the two readings are one table, not two — the fraction is the
       // offset, inverted, at every point in between.
       expect(
-        ElCheckDraw.drawnFractionAt(0.4),
-        closeTo(1 - ElCheckDraw.dashOffset.transform(0.4) / 22, 1e-12),
+        CheckmarkDrawMotion.drawnFractionAt(0.4),
+        closeTo(1 - CheckmarkDrawMotion.dashOffset.transform(0.4) / 22, 1e-12),
       );
     });
 
     test('dash-draw is the same mechanism over a 12-unit stroke, in 200ms', () {
-      expect(ElDashDraw.dashArray, 12);
-      expect(ElDashDraw.dashOffset.transform(0), 12);
-      expect(ElDashDraw.dashOffset.transform(1), closeTo(0, 1e-9));
-      expect(ElDashDraw.duration.inMilliseconds, 200);
-      expect(ElDashDraw.curve, ElCurves.out);
+      expect(DashDrawMotion.dashArray, 12);
+      expect(DashDrawMotion.dashOffset.transform(0), 12);
+      expect(DashDrawMotion.dashOffset.transform(1), closeTo(0, 1e-9));
+      expect(DashDrawMotion.duration.inMilliseconds, 200);
+      expect(DashDrawMotion.curve, MotionCurves.enter);
       // Shorter stroke, shorter run — the pair is why both numbers exist.
-      expect(ElDashDraw.duration, lessThan(ElCheckDraw.duration));
-      expect(ElDashDraw.dashArray, lessThan(ElCheckDraw.dashArray));
+      expect(DashDrawMotion.duration, lessThan(CheckmarkDrawMotion.duration));
+      expect(DashDrawMotion.dashArray, lessThan(CheckmarkDrawMotion.dashArray));
     });
 
     test('dot-pop overshoots to 1.35 at 55%, on the spring', () {
-      expect(ElDotPop.scale.transform(0), 0);
-      expect(ElDotPop.scale.transform(0.55), closeTo(1.35, stopTolerance));
-      expect(ElDotPop.scale.transform(1), closeTo(1, 1e-9));
+      expect(DotSelectionMotion.scale.transform(0), 0);
+      expect(
+        DotSelectionMotion.scale.transform(0.55),
+        closeTo(1.35, stopTolerance),
+      );
+      expect(DotSelectionMotion.scale.transform(1), closeTo(1, 1e-9));
 
       // Opacity reaches 1 at the same stop the dot is widest, so the flash and
       // the peak land together.
-      expect(ElDotPop.opacity.transform(0), 0);
-      expect(ElDotPop.opacity.transform(0.55), closeTo(1, stopTolerance));
-      expect(ElDotPop.opacity.transform(1), 1);
-
-      expect(ElDotPop.duration.inMilliseconds, 320);
+      expect(DotSelectionMotion.opacity.transform(0), 0);
       expect(
-        ElDotPop.curve,
-        ElCurves.spring,
+        DotSelectionMotion.opacity.transform(0.55),
+        closeTo(1, stopTolerance),
+      );
+      expect(DotSelectionMotion.opacity.transform(1), 1);
+
+      expect(DotSelectionMotion.duration.inMilliseconds, 320);
+      expect(
+        DotSelectionMotion.curve,
+        MotionCurves.emphasized,
         reason: 'the one selection-control table that is not --ease-out',
       );
     });
 
     test('swap-roll is a transition: 400ms spring, 160% a step', () {
-      expect(ElSwapRoll.duration, ElDurations.slow);
-      expect(ElSwapRoll.duration.inMilliseconds, 400);
-      expect(ElSwapRoll.curve, ElCurves.spring);
-      expect(ElSwapRoll.squashDelay, ElDurations.fast);
-      expect(ElSwapRoll.squashDelay.inMilliseconds, 150);
+      expect(ContentSwapMotion.duration, MotionDurations.slow);
+      expect(ContentSwapMotion.duration.inMilliseconds, 400);
+      expect(ContentSwapMotion.curve, MotionCurves.emphasized);
+      expect(ContentSwapMotion.squashDelay, MotionDurations.fast);
+      expect(ContentSwapMotion.squashDelay.inMilliseconds, 150);
 
       // A CSS percentage translate resolves against the element's OWN box, and
       // every strip cell is centred on one glyph — so a step is 1.6 × the
       // glyph, never 1.6 × the clip window.
-      expect(ElSwapRoll.travelFor(16), closeTo(25.6, 1e-9));
-      expect(ElSwapRoll.travelFor(20), closeTo(32, 1e-9));
-      expect(ElTransforms.swapRollTravel, 1.6);
+      expect(ContentSwapMotion.travelFor(16), closeTo(25.6, 1e-9));
+      expect(ContentSwapMotion.travelFor(20), closeTo(32, 1e-9));
+      expect(MotionTransforms.swapRollTravel, 1.6);
 
       // The spring exceeds 1 mid-flight, which is what sails the arriving
       // glyph past centre before it settles.
       final double peak = <double>[
-        for (int i = 0; i <= 100; i++) ElSwapRoll.curve.transform(i / 100),
+        for (int i = 0; i <= 100; i++)
+          ContentSwapMotion.curve.transform(i / 100),
       ].reduce((double a, double b) => a > b ? a : b);
       expect(peak, greaterThan(1));
       expect(peak, closeTo(1.098, 1e-2));
     });
 
     test('yuki-spring-up rises 32, overshoots 4, settles in three bounces', () {
-      expect(ElSpringUp.translateY.transform(0), 32);
-      expect(ElSpringUp.translateY.transform(0.55), closeTo(-4, stopTolerance));
+      expect(SpringEntranceMotion.translateY.transform(0), 32);
       expect(
-        ElSpringUp.translateY.transform(0.76),
+        SpringEntranceMotion.translateY.transform(0.55),
+        closeTo(-4, stopTolerance),
+      );
+      expect(
+        SpringEntranceMotion.translateY.transform(0.76),
         closeTo(1.5, stopTolerance),
       );
       expect(
-        ElSpringUp.translateY.transform(0.90),
+        SpringEntranceMotion.translateY.transform(0.90),
         closeTo(-0.5, stopTolerance),
       );
-      expect(ElSpringUp.translateY.transform(1), closeTo(0, 1e-9));
+      expect(SpringEntranceMotion.translateY.transform(1), closeTo(0, 1e-9));
 
-      expect(ElSpringUp.opacity.transform(0), 0);
-      expect(ElSpringUp.opacity.transform(0.55), closeTo(1, stopTolerance));
-      expect(ElSpringUp.opacity.transform(1), 1);
+      expect(SpringEntranceMotion.opacity.transform(0), 0);
       expect(
-        ElSpringUp.curve,
-        ElCurves.settle,
+        SpringEntranceMotion.opacity.transform(0.55),
+        closeTo(1, stopTolerance),
+      );
+      expect(SpringEntranceMotion.opacity.transform(1), 1);
+      expect(
+        SpringEntranceMotion.curve,
+        MotionCurves.settle,
         reason: 'the one table that is not --ease-out',
       );
     });
 
     test('yuki-jelly-in matches globals.css at every stop', () {
-      expect(ElJellyIn.scale.transform(0), 0.92);
-      expect(ElJellyIn.scale.transform(0.60), closeTo(1.02, stopTolerance));
-      expect(ElJellyIn.scale.transform(1), closeTo(1, 1e-9));
+      expect(OpenMotion.scale.transform(0), 0.92);
+      expect(OpenMotion.scale.transform(0.60), closeTo(1.02, stopTolerance));
+      expect(OpenMotion.scale.transform(1), closeTo(1, 1e-9));
 
-      expect(ElJellyIn.translateY.transform(0), 24);
-      expect(ElJellyIn.translateY.transform(0.60), closeTo(-4, stopTolerance));
-      expect(ElJellyIn.translateY.transform(1), closeTo(0, 1e-9));
+      expect(OpenMotion.translateY.transform(0), 24);
+      expect(OpenMotion.translateY.transform(0.60), closeTo(-4, stopTolerance));
+      expect(OpenMotion.translateY.transform(1), closeTo(0, 1e-9));
 
-      expect(ElJellyIn.opacity.transform(0), 0);
-      expect(ElJellyIn.opacity.transform(0.60), closeTo(1, stopTolerance));
-      expect(ElJellyIn.opacity.transform(1), 1);
+      expect(OpenMotion.opacity.transform(0), 0);
+      expect(OpenMotion.opacity.transform(0.60), closeTo(1, stopTolerance));
+      expect(OpenMotion.opacity.transform(1), 1);
     });
 
     test('pulls-reveal turns the card face-up flat, not in perspective', () {
-      expect(ElReveal.opacity.transform(0), 0);
-      expect(ElReveal.opacity.transform(1), 1);
+      expect(RevealMotion.opacity.transform(0), 0);
+      expect(RevealMotion.opacity.transform(1), 1);
       expect(
-        ElReveal.rotationY.transform(0),
-        closeTo(ElReveal.fromRadians, 1e-12),
+        RevealMotion.rotationY.transform(0),
+        closeTo(RevealMotion.fromRadians, 1e-12),
       );
-      expect(ElReveal.rotationY.transform(1), closeTo(0, 1e-9));
-      expect(ElReveal.scale.transform(0), ElReveal.fromScale);
-      expect(ElReveal.scale.transform(1), closeTo(1, 1e-9));
+      expect(RevealMotion.rotationY.transform(1), closeTo(0, 1e-9));
+      expect(RevealMotion.scale.transform(0), RevealMotion.fromScale);
+      expect(RevealMotion.scale.transform(1), closeTo(1, 1e-9));
 
       // cos(38°) = 0.78801, and the 0.9 uniform scale on top of it.
-      final Matrix4 start = ElReveal.transformAt(0);
+      final Matrix4 start = RevealMotion.transformAt(0);
       expect(start.storage[0], closeTo(0.9 * 0.78801, 1e-4));
       // Ruling M4: no perspective on the element or any ancestor, so the
       // matrix's perspective entry stays untouched.
       expect(start.storage[11], 0);
-      expect(ElReveal.transformAt(1).storage[0], closeTo(1, stopTolerance));
+      expect(RevealMotion.transformAt(1).storage[0], closeTo(1, stopTolerance));
     });
 
     test('the sweep bar grows 0 → 1 on --ease-out', () {
-      expect(ElSweep.widthFactor.transform(0), 0);
-      expect(ElSweep.widthFactor.transform(1), 1);
+      expect(SweepMotion.widthFactor.transform(0), 0);
+      expect(SweepMotion.widthFactor.transform(1), 1);
       expect(
-        ElSweep.widthFactor.transform(0.5),
+        SweepMotion.widthFactor.transform(0.5),
         greaterThan(0.5),
         reason: '--ease-out is front-loaded',
       );
@@ -877,23 +900,23 @@ void main() {
 
   group('yuki-sign-on', () {
     test('cuts rather than interpolates', () {
-      for (final ElSignOnFrame frame in ElSignOn.frames.skip(1)) {
+      for (final TextRevealFrame frame in TextRevealMotion.frames.skip(1)) {
         final double t = frame.percent / 100;
-        expect(ElSignOn.frameAt(t), same(frame));
+        expect(TextRevealMotion.frameAt(t), same(frame));
 
-        final ElSignOnFrame before = ElSignOn.frameAt(t - 1e-9);
+        final TextRevealFrame before = TextRevealMotion.frameAt(t - 1e-9);
         expect(before.percent, lessThan(frame.percent));
         expect(before.opacity, isNot(frame.opacity));
 
         // Just before the cut is still wholly the old frame, just after is
         // wholly the new one. Nothing in between is ever produced.
-        expect(ElSignOn.frameAt(t - 1e-6).opacity, before.opacity);
-        expect(ElSignOn.frameAt(t + 1e-6).opacity, frame.opacity);
+        expect(TextRevealMotion.frameAt(t - 1e-6).opacity, before.opacity);
+        expect(TextRevealMotion.frameAt(t + 1e-6).opacity, frame.opacity);
       }
     });
 
     test('opens dark at 0.12 and brightness 0.5, unlit', () {
-      final ElSignOnFrame first = ElSignOn.frameAt(0);
+      final TextRevealFrame first = TextRevealMotion.frameAt(0);
       expect(first.percent, 0);
       expect(first.opacity, 0.12);
       expect(first.brightness, 0.5);
@@ -901,7 +924,7 @@ void main() {
     });
 
     test('rests lit, not neutral — `both` holds the 70% frame', () {
-      final ElSignOnFrame resting = ElSignOn.frameAt(1);
+      final TextRevealFrame resting = TextRevealMotion.frameAt(1);
       expect(resting.percent, 70);
       expect(resting.opacity, 1);
       expect(resting.brightness, 1.15);
@@ -919,11 +942,11 @@ void main() {
       );
 
       // `text-shadow: 0 0 Npx` → offset 0, blur N, σ = N/2 — inverted through
-      // the same arithmetic ElShadowLayer.blurRadius uses for box-shadow.
-      final List<Shadow> glow = resting.shadows(ElThemeData.dark.valueInk);
+      // the same arithmetic ShadowLayer.blurRadius uses for box-shadow.
+      final List<Shadow> glow = resting.shadows(ThemeTokens.dark.premiumText);
       expect(glow, hasLength(2));
       expect(glow.first.offset, Offset.zero);
-      expect(glow.first.color, ElThemeData.dark.valueInk);
+      expect(glow.first.color, ThemeTokens.dark.premiumText);
       expect(glow.first.blurRadius, closeTo((6 / 2 - 0.5) / 0.57735, 1e-9));
       expect(glow.last.blurRadius, closeTo((18 / 2 - 0.5) / 0.57735, 1e-9));
     });
@@ -934,67 +957,74 @@ void main() {
     const double w = 299.333;
 
     test('slides one 2W tile from -2W to +2W, band -W to +3W', () {
-      expect(ElShimmer.tileWidth(w), closeTo(2 * w, 1e-9));
-      expect(ElShimmer.offsetAt(0, w), closeTo(-2 * w, 1e-9));
-      expect(ElShimmer.offsetAt(1, w), closeTo(2 * w, 1e-9));
-      expect(ElShimmer.bandCenterAt(0, w), closeTo(-w, 1e-9));
-      expect(ElShimmer.bandCenterAt(1, w), closeTo(3 * w, 1e-9));
+      expect(LoadingShimmerMotion.tileWidth(w), closeTo(2 * w, 1e-9));
+      expect(LoadingShimmerMotion.offsetAt(0, w), closeTo(-2 * w, 1e-9));
+      expect(LoadingShimmerMotion.offsetAt(1, w), closeTo(2 * w, 1e-9));
+      expect(LoadingShimmerMotion.bandCenterAt(0, w), closeTo(-w, 1e-9));
+      expect(LoadingShimmerMotion.bandCenterAt(1, w), closeTo(3 * w, 1e-9));
 
       // One crossing per cycle, left to right, never back.
-      double previous = ElShimmer.bandCenterAt(0, w);
+      double previous = LoadingShimmerMotion.bandCenterAt(0, w);
       for (int i = 1; i <= 20; i++) {
-        final double next = ElShimmer.bandCenterAt(i / 20, w);
+        final double next = LoadingShimmerMotion.bandCenterAt(i / 20, w);
         expect(next, greaterThan(previous));
         previous = next;
       }
     });
 
     test('takes its colours from the live theme, never frozen', () {
-      expect(ElShimmer.gradient(ElThemeData.dark).colors, <Color>[
-        ElThemeData.dark.popover,
-        ElThemeData.dark.accent,
-        ElThemeData.dark.popover,
+      expect(LoadingShimmerMotion.gradient(ThemeTokens.dark).colors, <Color>[
+        ThemeTokens.dark.popover,
+        ThemeTokens.dark.accent,
+        ThemeTokens.dark.popover,
       ]);
       expect(
-        ElShimmer.gradient(ElThemeData.light).colors.first,
-        ElThemeData.light.popover,
+        LoadingShimmerMotion.gradient(ThemeTokens.light).colors.first,
+        ThemeTokens.light.popover,
       );
-      expect(ElShimmer.gradient(ElThemeData.dark).stops, <double>[0, 0.5, 1]);
+      expect(LoadingShimmerMotion.gradient(ThemeTokens.dark).stops, <double>[
+        0,
+        0.5,
+        1,
+      ]);
     });
   });
 
   group('travel chip', () {
     test('is the verified no-op on a 24px chip (ruling M1)', () {
-      expect(ElTravel.inset, el(6));
-      expect(ElTravel.inset, 24);
+      expect(TravelMotion.inset, space(6));
+      expect(TravelMotion.inset, 24);
 
       // `calc(100% - 1.5rem)` where `100%` is the chip's own 24px border box.
-      expect(ElTravel.distanceFor(24), 0);
-      expect(ElTravel.translationAt(0, 24, curve: ElCurves.out), 0);
-      expect(ElTravel.translationAt(0.5, 24, curve: ElCurves.spring), 0);
-      expect(ElTravel.translationAt(1, 24, curve: ElCurves.out), 0);
+      expect(TravelMotion.distanceFor(24), 0);
+      expect(TravelMotion.translationAt(0, 24, curve: MotionCurves.enter), 0);
+      expect(
+        TravelMotion.translationAt(0.5, 24, curve: MotionCurves.emphasized),
+        0,
+      );
+      expect(TravelMotion.translationAt(1, 24, curve: MotionCurves.enter), 0);
 
       // …and stays honest if the utility is ever put on a wider element.
-      expect(ElTravel.distanceFor(482), 458);
-      expect(ElTravel.translationAt(0, 482, curve: ElCurves.out), 0);
+      expect(TravelMotion.distanceFor(482), 458);
+      expect(TravelMotion.translationAt(0, 482, curve: MotionCurves.enter), 0);
       expect(
-        ElTravel.translationAt(1, 482, curve: ElCurves.out),
+        TravelMotion.translationAt(1, 482, curve: MotionCurves.enter),
         closeTo(458, 1e-9),
       );
     });
   });
 
-  group('ElKeyframePlayer', () {
+  group('KeyframePlayer', () {
     Future<double> freezeFrame(
       WidgetTester t, {
       required Duration duration,
-      required ElKeyframeFill fill,
+      required KeyframeFill fill,
       required bool repeat,
     }) async {
       double seen = -1;
       await t.pumpWidget(
         stilledHost(
-          ElKeyframePlayer(
+          KeyframePlayer(
             duration: duration,
             fill: fill,
             repeat: repeat,
@@ -1015,15 +1045,15 @@ void main() {
         expect(
           await freezeFrame(
             t,
-            duration: ElPopIn.duration,
-            fill: ElPopIn.fill,
+            duration: EntranceMotion.duration,
+            fill: EntranceMotion.fill,
             repeat: false,
           ),
           1.0,
         );
-        expect(ElPopIn.opacity.transform(1), 1);
+        expect(EntranceMotion.opacity.transform(1), 1);
         expect(
-          ElPopIn.scale.transform(1),
+          EntranceMotion.scale.transform(1),
           offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9),
         );
       },
@@ -1037,19 +1067,19 @@ void main() {
       expect(
         await freezeFrame(
           t,
-          duration: ElRatchet.duration,
-          fill: ElRatchet.fill,
+          duration: DiscreteProgressMotion.duration,
+          fill: DiscreteProgressMotion.fill,
           repeat: true,
         ),
         0.0,
       );
-      expect(ElRatchet.degreesAt(0), 0);
+      expect(DiscreteProgressMotion.degreesAt(0), 0);
 
       expect(
         await freezeFrame(
           t,
-          duration: ElShimmer.duration,
-          fill: ElShimmer.fill,
+          duration: LoadingShimmerMotion.duration,
+          fill: LoadingShimmerMotion.fill,
           repeat: true,
         ),
         0.0,
@@ -1058,17 +1088,17 @@ void main() {
       expect(
         await freezeFrame(
           t,
-          duration: ElPulseLive.duration,
-          fill: ElPulseLive.fill,
+          duration: LivePulseMotion.duration,
+          fill: LivePulseMotion.fill,
           repeat: true,
         ),
         0.0,
       );
       // Stop 0 is a ring of exactly the dot's radius, i.e. hidden behind it —
       // motion-map §8.2's "plain 8px dot, no ring, opacity 1".
-      expect(ElPulseLive.ringRadiusAt(0), ElPulseLive.dotRadius);
-      expect(ElPulseLive.ringAlphaAt(0), ElPulseLive.ringAlpha);
-      expect(ElPulseLive.dotOpacityAt(0), 1);
+      expect(LivePulseMotion.ringRadiusAt(0), LivePulseMotion.dotRadius);
+      expect(LivePulseMotion.ringAlphaAt(0), LivePulseMotion.ringAlpha);
+      expect(LivePulseMotion.dotOpacityAt(0), 1);
     });
 
     testWidgets('a looper runs, fenced off behind a RepaintBoundary', (
@@ -1077,9 +1107,9 @@ void main() {
       double seen = -1;
       await t.pumpWidget(
         host(
-          ElKeyframePlayer(
-            duration: ElRatchet.duration,
-            fill: ElRatchet.fill,
+          KeyframePlayer(
+            duration: DiscreteProgressMotion.duration,
+            fill: DiscreteProgressMotion.fill,
             repeat: true,
             builder: (BuildContext c, double progress, Widget? child) {
               seen = progress;
@@ -1091,7 +1121,7 @@ void main() {
 
       expect(
         find.descendant(
-          of: find.byType(ElKeyframePlayer),
+          of: find.byType(KeyframePlayer),
           matching: find.byType(RepaintBoundary),
         ),
         findsOneWidget,
@@ -1100,10 +1130,10 @@ void main() {
       // No pumpAndSettle: this one never settles.
       await t.pump();
       for (int i = 0; i < 4; i++) {
-        await t.pump(ElDurations.ratchetStep);
+        await t.pump(MotionDurations.ratchetStep);
       }
       expect(seen, greaterThan(0));
-      expect(ElRatchet.degreesAt(seen) % 45, closeTo(0, 1e-9));
+      expect(DiscreteProgressMotion.degreesAt(seen) % 45, closeTo(0, 1e-9));
 
       // Unmount so the infinite ticker is disposed with the test.
       await t.pumpWidget(const SizedBox());
@@ -1115,9 +1145,9 @@ void main() {
       double seen = -1;
       await t.pumpWidget(
         host(
-          ElKeyframePlayer(
-            duration: ElPopIn.duration,
-            fill: ElPopIn.fill,
+          KeyframePlayer(
+            duration: EntranceMotion.duration,
+            fill: EntranceMotion.fill,
             builder: (BuildContext c, double progress, Widget? child) {
               seen = progress;
               return const SizedBox(width: 40, height: 40);
@@ -1128,22 +1158,22 @@ void main() {
 
       await t.pump();
       expect(seen, 0, reason: 'a freshly mounted demo starts at t=0');
-      await t.pump(ElDurations.popIn);
+      await t.pump(MotionDurations.popIn);
       expect(seen, 1.0);
     });
   });
 
-  group('ElSlidingPillGroup under reduced motion', () {
+  group('ActiveIndicator under reduced motion', () {
     const Key pillKey = Key('pill');
 
     Widget pillGroup(int active) => stilledHost(
       SizedBox(
         width: 300,
-        child: ElSlidingPillGroup(
+        child: ActiveIndicator(
           activeIndex: active,
-          pill: const SizedBox.expand(key: pillKey),
+          indicator: const SizedBox.expand(key: pillKey),
           gap: 1,
-          padding: EdgeInsets.all(el(0.5)),
+          padding: EdgeInsets.all(space(0.5)),
           children: <Widget>[
             for (int i = 0; i < 3; i++)
               SizedBox(key: ValueKey<int>(i), width: 28, height: 28),
@@ -1154,7 +1184,7 @@ void main() {
 
     // Regression: the arrival squash used to run at its full 600ms whatever the
     // platform asked for, because the controller's duration was set once at
-    // field init instead of being re-read through elAnimationDuration.
+    // field init instead of being re-read through effectiveMotionDuration.
     testWidgets('the arrival jelly does not squash', (WidgetTester t) async {
       await t.pumpWidget(pillGroup(0));
       await t.pump();
@@ -1164,7 +1194,7 @@ void main() {
 
       final ({double x, double y}) scale = scaleOf(
         t,
-        find.byType(ElSlidingPillGroup),
+        find.byType(ActiveIndicator),
       );
       expect(scale.x, 1.0);
       expect(scale.y, 1.0);

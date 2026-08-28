@@ -8,10 +8,10 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage.
+/// `ThemeController` is flipped in place for theme coverage.
 ///
 /// Keyboard behaviour is driven directly against the real `Focus` nodes
-/// `ElSlider` builds per thumb: the same technique `test/slider_test.dart`
+/// `Slider` builds per thumb: the same technique `test/slider_test.dart`
 /// (the package's own suite) uses, since there is no `WidgetsApp` traversal
 /// to Tab through and the control answers `Focus.onKeyEvent` itself.
 library;
@@ -23,7 +23,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -51,7 +77,7 @@ const List<String> _expectedSectionIds = <String>[
   'source',
 ];
 
-/// Every public constructor parameter of `ElSlider`, enumerated by reading
+/// Every public constructor parameter of `Slider`, enumerated by reading
 /// `lib/src/components/slider.dart` directly. The API table must cover all
 /// of these by name.
 const List<String> _sliderParams = <String>[
@@ -64,12 +90,12 @@ const List<String> _sliderParams = <String>[
   'label',
 ];
 
-/// The rest of the public surface: the two static geometry getters. `ElSlider`
+/// The rest of the public surface: the two static geometry getters. `Slider`
 /// exports no enum of its own: a range is just two entries in `values`, not a
 /// second type.
 const List<String> _sliderStatics = <String>[
-  'ElSlider.trackHeight',
-  'ElSlider.thumbSize',
+  'Slider.trackHeight',
+  'Slider.thumbSize',
 ];
 
 /// The single `DocsDisclosure` whose title is [title], matching
@@ -81,21 +107,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -111,8 +137,8 @@ Future<ElThemeController> _pump(
   return theme;
 }
 
-/// The `Focus` nodes `ElSlider` builds: one per thumb, in order. Found by key
-/// on the `ElSlider` itself so a page with several live specimens does not
+/// The `Focus` nodes `Slider` builds: one per thumb, in order. Found by key
+/// on the `Slider` itself so a page with several live specimens does not
 /// mix nodes from one slider into another.
 List<FocusNode> _thumbNodes(WidgetTester tester, Key sliderKey) => tester
     .widgetList<Focus>(
@@ -170,7 +196,7 @@ void main() {
   );
 
   testWidgets(
-    'the API table covers every ElSlider constructor parameter and both '
+    'the API table covers every Slider constructor parameter and both '
     'static members',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -179,7 +205,7 @@ void main() {
       await tester.ensureVisible(apiTrigger);
       await tester.tap(apiTrigger);
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -195,14 +221,14 @@ void main() {
         expect(
           documented,
           contains(param),
-          reason: 'ElSlider constructor parameter "$param" is undocumented',
+          reason: 'Slider constructor parameter "$param" is undocumented',
         );
       }
       for (final String member in _sliderStatics) {
         expect(
           documented,
           contains(member),
-          reason: 'ElSlider static member "$member" is undocumented',
+          reason: 'Slider static member "$member" is undocumented',
         );
       }
     },
@@ -218,17 +244,14 @@ void main() {
       await tester.ensureVisible(find.byKey(key));
 
       final double before = tester
-          .widget<ElSlider>(find.byKey(key))
+          .widget<Slider>(find.byKey(key))
           .values
           .single;
 
       await tester.drag(find.byKey(key), const Offset(80, 0));
       await tester.pump();
 
-      final double after = tester
-          .widget<ElSlider>(find.byKey(key))
-          .values
-          .single;
+      final double after = tester.widget<Slider>(find.byKey(key)).values.single;
       expect(
         after,
         greaterThan(before),
@@ -250,20 +273,20 @@ void main() {
       expect(_thumbNodes(tester, key), hasLength(2));
 
       final List<double> initial = tester
-          .widget<ElSlider>(find.byKey(key))
+          .widget<Slider>(find.byKey(key))
           .values;
 
       await _focusThumb(tester, key, 0);
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.pump();
-      List<double> after = tester.widget<ElSlider>(find.byKey(key)).values;
+      List<double> after = tester.widget<Slider>(find.byKey(key)).values;
       expect(after[0], greaterThan(initial[0]), reason: 'the low thumb moved');
       expect(after[1], initial[1], reason: 'the high thumb did not');
 
       await _focusThumb(tester, key, 1);
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
       await tester.pump();
-      after = tester.widget<ElSlider>(find.byKey(key)).values;
+      after = tester.widget<Slider>(find.byKey(key)).values;
       expect(after[1], lessThan(initial[1]), reason: 'the high thumb moved');
       expect(tester.takeException(), isNull);
     },
@@ -276,22 +299,22 @@ void main() {
 
     const Key key = ValueKey<String>('slider-live-specimen');
     await tester.ensureVisible(find.byKey(key));
-    final ElSlider widget = tester.widget<ElSlider>(find.byKey(key));
+    final Slider widget = tester.widget<Slider>(find.byKey(key));
 
     await _focusThumb(tester, key, 0);
     await tester.sendKeyEvent(LogicalKeyboardKey.home);
     await tester.pump();
-    expect(tester.widget<ElSlider>(find.byKey(key)).values.single, widget.min);
+    expect(tester.widget<Slider>(find.byKey(key)).values.single, widget.min);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.end);
     await tester.pump();
-    expect(tester.widget<ElSlider>(find.byKey(key)).values.single, widget.max);
+    expect(tester.widget<Slider>(find.byKey(key)).values.single, widget.max);
     expect(tester.takeException(), isNull);
   });
 
   testWidgets(
     'the Range, Multiple thumbs, Controlled and Disabled specimens all '
-    'mount their own live ElSlider',
+    'mount their own live Slider',
     (WidgetTester tester) async {
       await _pump(tester);
 
@@ -317,7 +340,7 @@ void main() {
     await tester.ensureVisible(statesTrigger);
     await tester.tap(statesTrigger);
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),
@@ -345,13 +368,10 @@ void main() {
   testWidgets(
     'both themes render the article with no exceptions when flipped in place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(sliderDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(sliderDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

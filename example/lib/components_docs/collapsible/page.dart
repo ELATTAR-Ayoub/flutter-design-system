@@ -1,9 +1,9 @@
 /// Public documentation page for the `collapsible` component —
-/// `lib/src/components/collapsible.dart`'s [ElCollapsible] and the shared
-/// [ElUnfold] expand/collapse animation it mounts (the same animation
-/// `ElAccordion` mounts per open item).
+/// `lib/src/components/collapsible.dart`'s [Collapsible] and the shared
+/// [Unfold] expand/collapse animation it mounts (the same animation
+/// `Accordion` mounts per open item).
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the shape `button` established. Every specimen
@@ -18,7 +18,7 @@
 /// **Composition stays a `SnippetSection`.** The reference's own
 /// Composition section is `Collapsible / ├── CollapsibleTrigger / └──
 /// CollapsibleContent`, an ASCII structural sketch, not compilable Dart —
-/// and ElCollapsible has no compound/context API to diagram in the first
+/// and Collapsible has no compound/context API to diagram in the first
 /// place, unlike the Radix primitives it mirrors: it is one
 /// `StatelessWidget` that stacks exactly two children. Staging a second,
 /// identical-looking live specimen next to Preview would show nothing new,
@@ -31,20 +31,20 @@
 /// Responsive — collapsible.dart itself wires no key handling at all
 /// (there is no `Focus` or `GestureDetector` anywhere in the file):
 /// whatever the caller passes as `trigger` owns activation entirely, which
-/// this page's specimens exercise through a real `ElButton` trigger.
+/// this page's specimens exercise through a real `Button` trigger.
 ///
 /// **Skipped, honestly**, unchanged from the original page's own ruling:
-/// * **Controlled State**: ElCollapsible has no uncontrolled mode to
+/// * **Controlled State**: Collapsible has no uncontrolled mode to
 ///   contrast it against, it is controlled on every specimen on this page
 ///   already, see Usage's own note.
 /// * **Basic** and **Settings Panel**: both are, on the reference, another
 ///   trigger-plus-chevron-plus-card disclosure, the exact shape Preview
 ///   already shows live: a second near-identical specimen would not answer
 ///   a new question.
-/// * **File Tree**: nesting one ElCollapsible inside another's `content` is
+/// * **File Tree**: nesting one Collapsible inside another's `content` is
 ///   unremarkable widget composition (content takes any Widget, see API
 ///   Reference), not a distinct capability worth its own specimen.
-/// * **RTL**: ElCollapsible makes no directional layout choice of its own
+/// * **RTL**: Collapsible makes no directional layout choice of its own
 ///   (`Column` and `Align(alignment: Alignment.topCenter)` are both
 ///   direction neutral), so there is nothing component-specific to
 ///   demonstrate beyond Flutter's ambient `Directionality`, already covered
@@ -52,7 +52,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -106,7 +118,7 @@ final ComponentDocSpec collapsibleDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'Controlled only, always: ElCollapsible keeps no open/closed '
+          'Controlled only, always: Collapsible keeps no open/closed '
           'state of its own, so there is no separate "uncontrolled" '
           'variant to opt into. The open flag below is the whole '
           'contract.',
@@ -116,7 +128,7 @@ final ComponentDocSpec collapsibleDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          'A structural sketch, not compilable source: ElCollapsible has '
+          'A structural sketch, not compilable source: Collapsible has '
           'no compound/context API to diagram, unlike the Radix '
           'primitives it mirrors, it is one StatelessWidget that stacks '
           'exactly two children. There is nothing new to stage live here '
@@ -133,7 +145,7 @@ final ComponentDocSpec collapsibleDocSpec = ComponentDocSpec(
       specimen: _IndependentPairPreview(),
       code: _independentCode,
       label: 'Independent instances specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     DisclosureSection(
       id: 'api',
@@ -165,7 +177,7 @@ final ComponentDocSpec collapsibleDocSpec = ComponentDocSpec(
       description:
           'collapsible.dart wires no key handling of its own — every '
           'fact here is about what does NOT happen, read off '
-          'ElCollapsible.build directly.',
+          'Collapsible.build directly.',
       child: _KeyboardContent(),
     ),
     DisclosureSection(
@@ -206,11 +218,12 @@ final ComponentDocSpec collapsibleDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Package tests',
-            value: "test/navigation_test.dart ('Collapsible and the shared "
+            value:
+                "test/navigation_test.dart ('Collapsible and the shared "
                 "unfold')",
             description:
-                'Package-level coverage for ElUnfold\'s height/opacity '
-                'tween and ElCollapsible\'s trigger/panel stacking.',
+                'Package-level coverage for Unfold\'s height/opacity '
+                'tween and Collapsible\'s trigger/panel stacking.',
           ),
           const DocsInstallFact(
             label: 'Docs test',
@@ -241,15 +254,12 @@ class CollapsibleDocPage extends StatelessWidget {
       title: collapsibleDoc.title,
       description: collapsibleDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Collapsible'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Collapsible'),
     ],
     toc: collapsibleDocSpec.toc,
-    previous: const DocsPageLink(
-      title: 'Select',
-      route: '/components/select',
-    ),
+    previous: const DocsPageLink(title: 'Select', route: '/components/select'),
     onNavigate: onNavigate,
     child: KeyedSubtree(
       key: const ValueKey<String>('collapsible-doc-article'),
@@ -268,14 +278,14 @@ class _ApiReferenceContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: const <Widget>[
       DocsApiTable(
-        title: 'ElCollapsible',
+        title: 'Collapsible',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'open',
             type: 'bool',
             description:
                 'Required, no default. Controlled: true expands the '
-                'panel, false collapses it. ElCollapsible keeps no '
+                'panel, false collapses it. Collapsible keeps no '
                 'open/closed state of its own.',
           ),
           DocsApiFact(
@@ -283,7 +293,7 @@ class _ApiReferenceContent extends StatelessWidget {
             type: 'Widget',
             description:
                 'Required, no default. The caller\'s own control, already '
-                'wired to flip open: a ElButton with an onPressed '
+                'wired to flip open: a Button with an onPressed '
                 'callback in every specimen on this page.',
           ),
           DocsApiFact(
@@ -297,14 +307,14 @@ class _ApiReferenceContent extends StatelessWidget {
       ),
       SizedBox(height: 24),
       DocsApiTable(
-        title: 'ElUnfold: the shared expand/collapse animation',
+        title: 'Unfold: the shared expand/collapse animation',
         facts: <DocsApiFact>[
           DocsApiFact(
             name: 'open',
             type: 'bool',
             description:
                 'Required, no default. Same controlled contract as '
-                'ElCollapsible.open, which forwards its value here '
+                'Collapsible.open, which forwards its value here '
                 'unchanged.',
           ),
           DocsApiFact(
@@ -313,7 +323,7 @@ class _ApiReferenceContent extends StatelessWidget {
             description:
                 'Required, no default. Measured at its own natural '
                 'height, then clipped as the panel animates open or '
-                'shut. ElCollapsible passes its content here.',
+                'shut. Collapsible passes its content here.',
           ),
         ],
       ),
@@ -326,20 +336,20 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Semantic role: none of its own. ElCollapsible adds no Semantics '
-            'node. The trigger supplies interactive semantics (a ElButton '
+      _bullets(ThemeScope.of(context), <String>[
+        'Semantic role: none of its own. Collapsible adds no Semantics '
+            'node. The trigger supplies interactive semantics (a Button '
             'trigger is already an accessible button), and the content '
             'simply mounts or unmounts.',
         'Focus behavior: never moves on toggle. Opening or closing the '
             'panel only mounts or unmounts the content beneath the '
             'trigger; focus stays on the trigger throughout.',
         'Screen reader: content is removed, not just hidden, when closed. '
-            'ElUnfold returns SizedBox.shrink() while closed and settled, '
+            'Unfold returns SizedBox.shrink() while closed and settled, '
             'so assistive technology never lands on off-screen content: '
             'the same contract as an unmounted Radix Content without '
             'forceMount.',
-        'Non-color signal: owned by the trigger. ElCollapsible paints '
+        'Non-color signal: owned by the trigger. Collapsible paints '
             'nothing of its own; an open/closed indicator such as a '
             'chevron belongs to the trigger, see the chevron in the live '
             'Preview specimen above.',
@@ -348,22 +358,22 @@ class _AccessibilityContent extends StatelessWidget {
       ]);
 }
 
-/// Read directly off `ElCollapsible.build`
+/// Read directly off `Collapsible.build`
 /// (`lib/src/components/collapsible.dart`): a bare `Column` stacking
-/// `trigger` and an `ElUnfold`, with no `Focus` widget and no
+/// `trigger` and an `Unfold`, with no `Focus` widget and no
 /// `GestureDetector` of its own anywhere in the file.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Activation: entirely delegated. collapsible.dart wires no key '
-            'handling of its own: ElCollapsible.build is a Column '
-            'stacking trigger and an ElUnfold, nothing else. Whatever '
+            'handling of its own: Collapsible.build is a Column '
+            'stacking trigger and an Unfold, nothing else. Whatever '
             'widget the caller passes as trigger owns focus and '
             'activation completely.',
-        'On this page: every specimen passes a real ElButton as trigger, '
+        'On this page: every specimen passes a real Button as trigger, '
             'so Enter, NumpadEnter and Space activate it through '
             'button.dart\'s own key handling, and Tab traversal follows '
             'button.dart\'s own canRequestFocus rule. A trigger built any '
@@ -380,7 +390,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in collapsible.dart: it is a '
             'Column(mainAxisSize: min) that sizes to whatever width its '
             'parent gives it, so a phone-width trigger and a '
@@ -413,18 +423,19 @@ class _DependenciesContent extends StatelessWidget {
             value: collapsibleDoc.dependencies.join(', '),
             description:
                 'Only lib/src/foundation/motion.dart (durations, curves) '
-                'and theme_scope.dart (elAnimationDuration). No '
+                'and theme_scope.dart (effectiveMotionDuration). No '
                 'component or effect file is imported.',
           ),
           const DocsInstallFact(
             label: 'Assets, fonts, shaders',
             value: 'None',
-            description: 'No images, fonts, or fragment shaders of any '
+            description:
+                'No images, fonts, or fragment shaders of any '
                 'kind.',
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Accordion', route: '/components/accordion'),
@@ -439,31 +450,36 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElCollapsible paints nothing itself, so it consumes no color, '
-            'radius, or shadow token directly: every visible pixel '
-            'belongs to the trigger and content widgets the caller '
-            'supplies, which already read ElTheme.of(context) on their '
-            'own.',
-        'The only tokens this file touches are motion: ElDurations.jelly '
-            '(420ms open) and ElDurations.base (250ms close), eased on '
-            'ElCurves.spring opening and ElCurves.inOut closing, both '
-            'gated by elAnimationDuration for reduced motion.',
-        'There is no source-mode theming knob because there is nothing '
-            'here to theme.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'Collapsible paints nothing itself, so it consumes no color, '
+        'radius, or shadow token directly: every visible pixel '
+        'belongs to the trigger and content widgets the caller '
+        'supplies, which already read ThemeScope.of(context) on their '
+        'own.',
+    'The only tokens this file touches are motion: MotionDurations.open '
+        '(420ms open) and MotionDurations.normal (250ms close), eased on '
+        'MotionCurves.emphasized opening and MotionCurves.move closing, both '
+        'gated by effectiveMotionDuration for reduced motion.',
+    'There is no source-mode theming knob because there is nothing '
+        'here to theme.',
+  ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -472,7 +488,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest / closed',
     treatment:
-        'open: false and settled, ElUnfold renders SizedBox.shrink(); '
+        'open: false and settled, Unfold renders SizedBox.shrink(); '
         'the panel is not mounted at all.',
     userSignal:
         'Only the trigger occupies space; no empty clipped box is left '
@@ -482,7 +498,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Open',
     treatment:
         'open: true: the panel unfolds on --ease-spring over '
-        'ElDurations.jelly (420ms) and settles with a slight overshoot.',
+        'MotionDurations.open (420ms) and settles with a slight overshoot.',
     userSignal:
         'Content opacity moves in exact lock-step with height, so it '
         'never reads as spilling out of the panel.',
@@ -490,25 +506,25 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Focus-visible',
     treatment:
-        'Owned entirely by the trigger widget, ElCollapsible paints no '
+        'Owned entirely by the trigger widget, Collapsible paints no '
         'focus ring of its own.',
     userSignal:
         'Whatever focus treatment the trigger already has, for example '
-        'ElButton\'s token-based ring.',
+        'Button\'s token-based ring.',
   ),
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        'N/A on this widget, ElCollapsible has no disabled concept. '
-        'Disable the trigger instead (ElButton\'s onPressed: null), '
+        'N/A on this widget, Collapsible has no disabled concept. '
+        'Disable the trigger instead (Button\'s onPressed: null), '
         'which stops open from ever changing.',
     userSignal: 'Whatever a disabled trigger already signals.',
   ),
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        'MediaQuery.disableAnimations collapses ElDurations.jelly and '
-        'ElDurations.base to Duration.zero through elAnimationDuration, '
+        'MediaQuery.disableAnimations collapses MotionDurations.open and '
+        'MotionDurations.normal to Duration.zero through effectiveMotionDuration, '
         'so the tween is skipped.',
     userSignal:
         'The panel still appears and disappears correctly: only the '
@@ -541,42 +557,45 @@ class _CollapsiblePreviewState extends State<_CollapsiblePreview> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElCollapsible(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Collapsible(
       open: _open,
-      trigger: ElButton(
-        variant: ElButtonVariant.outline,
+      trigger: Button(
+        variant: ButtonVariant.outline,
         onPressed: () => setState(() => _open = !_open),
         child: Row(
           // `className="w-full justify-between"`.
           children: <Widget>[
             const Text('Advanced filters'),
             const Spacer(),
-            ElIcon(
-              ElIconGlyph.chevronRight,
-              size: ElIconSize.sm,
-              tone: ElIconTone.subtle,
+            Icon(
+              IconGlyph.chevronRight,
+              size: IconSize.sm,
+              tone: IconTone.subtle,
             ),
           ],
         ),
       ),
       content: Padding(
         // `className="pt-4"` on the content.
-        padding: EdgeInsets.only(top: el(4)),
+        padding: EdgeInsets.only(top: space(4)),
         child: Container(
-          padding: EdgeInsets.all(el(4)),
+          padding: EdgeInsets.all(space(4)),
           decoration: BoxDecoration(
             color: theme.card,
-            borderRadius: BorderRadius.circular(ElRadii.lg),
-            border: Border.all(color: theme.border, width: ElWidths.hairline),
+            borderRadius: BorderRadius.circular(Radii.lg),
+            border: Border.all(
+              color: theme.border,
+              width: BorderWidths.hairline,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               for (int i = 0; i < _filterRows.length; i++) ...<Widget>[
-                if (i > 0) SizedBox(height: el(3)),
-                ElText(_filterRows[i], ElType.small),
+                if (i > 0) SizedBox(height: space(3)),
+                StyledText(_filterRows[i], TextStyles.small),
               ],
             ],
           ),
@@ -589,27 +608,27 @@ class _CollapsiblePreviewState extends State<_CollapsiblePreview> {
 const String _previewCode = '''
 bool open = false;
 
-ElCollapsible(
+Collapsible(
   open: open,
-  trigger: ElButton(
-    variant: ElButtonVariant.outline,
+  trigger: Button(
+    variant: ButtonVariant.outline,
     onPressed: () => setState(() => open = !open),
     child: Row(
       children: [
         const Text('Advanced filters'),
         const Spacer(),
-        const ElIcon(ElIconGlyph.chevronRight, size: ElIconSize.sm),
+        const Icon(IconGlyph.chevronRight, size: IconSize.sm),
       ],
     ),
   ),
   content: Padding(
-    padding: EdgeInsets.only(top: el(4)),
+    padding: EdgeInsets.only(top: space(4)),
     child: Container(
-      padding: EdgeInsets.all(el(4)),
+      padding: EdgeInsets.all(space(4)),
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -626,10 +645,10 @@ ElCollapsible(
 
 const String _usageCode = '''bool open = false;
 
-ElCollapsible(
+Collapsible(
   open: open,
-  trigger: ElButton(
-    variant: ElButtonVariant.outline,
+  trigger: Button(
+    variant: ButtonVariant.outline,
     onPressed: () => setState(() => open = !open),
     child: const Text('Advanced filters'),
   ),
@@ -638,19 +657,19 @@ ElCollapsible(
 
 /// The reference's own Composition section: a plain hierarchy, not a live
 /// specimen, mirroring `Collapsible / ├── CollapsibleTrigger / └──
-/// CollapsibleContent`. ElCollapsible has one fewer level than the Radix
-/// primitives it stands in for: [ElCollapsible.trigger] is any widget the
+/// CollapsibleContent`. Collapsible has one fewer level than the Radix
+/// primitives it stands in for: [Collapsible.trigger] is any widget the
 /// caller supplies directly (there is no `CollapsibleTrigger asChild`
-/// wrapper to name), and content only gains a level because [ElUnfold] is a
+/// wrapper to name), and content only gains a level because [Unfold] is a
 /// distinct, independently documented class.
-const String _compositionTree = '''ElCollapsible
+const String _compositionTree = '''Collapsible
 ├── trigger      (any Widget, caller-supplied)
-└── ElUnfold
+└── Unfold
     └── content  (any Widget, caller-supplied)''';
 
-/// Two `ElCollapsible`s, each with its own `bool` flag: the Independent
+/// Two `Collapsible`s, each with its own `bool` flag: the Independent
 /// instances section's live proof that opening one never reaches into the
-/// other, which is the whole functional distinction from `ElAccordion`.
+/// other, which is the whole functional distinction from `Accordion`.
 class _IndependentPairPreview extends StatefulWidget {
   const _IndependentPairPreview();
 
@@ -669,63 +688,63 @@ class _IndependentPairPreviewState extends State<_IndependentPairPreview> {
       key: const ValueKey<String>('collapsible-doc-independent'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElCollapsible(
+        Collapsible(
           open: _a,
-          trigger: ElButton(
+          trigger: Button(
             key: const ValueKey<String>(
               'collapsible-doc-independent-a-trigger',
             ),
-            variant: ElButtonVariant.ghost,
+            variant: ButtonVariant.ghost,
             onPressed: () => setState(() => _a = !_a),
             child: Row(
               children: <Widget>[
                 const Text('Shipping details'),
                 const Spacer(),
-                ElIcon(
-                  ElIconGlyph.chevronRight,
-                  size: ElIconSize.sm,
-                  tone: ElIconTone.subtle,
+                Icon(
+                  IconGlyph.chevronRight,
+                  size: IconSize.sm,
+                  tone: IconTone.subtle,
                 ),
               ],
             ),
           ),
           content: Padding(
             key: const ValueKey<String>('collapsible-doc-independent-a-panel'),
-            padding: EdgeInsets.only(top: el(3)),
-            child: ElText(
+            padding: EdgeInsets.only(top: space(3)),
+            child: StyledText(
               'Ships within two business days once graded.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElCollapsible(
+        SizedBox(height: space(3)),
+        Collapsible(
           open: _b,
-          trigger: ElButton(
+          trigger: Button(
             key: const ValueKey<String>(
               'collapsible-doc-independent-b-trigger',
             ),
-            variant: ElButtonVariant.ghost,
+            variant: ButtonVariant.ghost,
             onPressed: () => setState(() => _b = !_b),
             child: Row(
               children: <Widget>[
                 const Text('Return policy'),
                 const Spacer(),
-                ElIcon(
-                  ElIconGlyph.chevronRight,
-                  size: ElIconSize.sm,
-                  tone: ElIconTone.subtle,
+                Icon(
+                  IconGlyph.chevronRight,
+                  size: IconSize.sm,
+                  tone: IconTone.subtle,
                 ),
               ],
             ),
           ),
           content: Padding(
             key: const ValueKey<String>('collapsible-doc-independent-b-panel'),
-            padding: EdgeInsets.only(top: el(3)),
-            child: ElText(
+            padding: EdgeInsets.only(top: space(3)),
+            child: StyledText(
               'Sell-back is credited immediately; nothing here reacts to '
               'the section above opening or closing.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ),
@@ -741,20 +760,20 @@ bool returnsOpen = false;
 Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   children: [
-    ElCollapsible(
+    Collapsible(
       open: shippingOpen,
-      trigger: ElButton(
-        variant: ElButtonVariant.ghost,
+      trigger: Button(
+        variant: ButtonVariant.ghost,
         onPressed: () => setState(() => shippingOpen = !shippingOpen),
         child: const Text('Shipping details'),
       ),
       content: const Text('Ships within two business days once graded.'),
     ),
     const SizedBox(height: 12),
-    ElCollapsible(
+    Collapsible(
       open: returnsOpen,
-      trigger: ElButton(
-        variant: ElButtonVariant.ghost,
+      trigger: Button(
+        variant: ButtonVariant.ghost,
         onPressed: () => setState(() => returnsOpen = !returnsOpen),
         child: const Text('Return policy'),
       ),

@@ -2,9 +2,36 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/shell.dart';
 import 'package:example/site/site_routes.dart';
 import 'package:example/site/site_shell.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/rendering.dart' show RenderParagraph;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart' as flutter show RichText;
 
 /// [WidgetsApp]'s `_errorTextStyle`, the style a [Text] inherits when nothing
 /// above it declares one — "consider putting your text in a Material".
@@ -24,14 +51,17 @@ const Color _fallbackUnderline = Color(0xFFFFFF00);
 /// `MouseRegion` first, and that is the render object the element resolves to.
 TextStyle _paintedStyle(WidgetTester tester, String text) => tester
     .firstRenderObject<RenderParagraph>(
-      find.descendant(of: find.text(text), matching: find.byType(RichText)),
+      find.descendant(
+        of: find.text(text),
+        matching: find.byType(flutter.RichText),
+      ),
     )
     .text
     .style!;
 
 Widget _harness({required AppRouter router, required Widget child}) {
-  final ElThemeController theme = ElThemeController(mode: ElThemeMode.dark);
-  return ElTheme(
+  final ThemeController theme = ThemeController(mode: ColorMode.dark);
+  return ThemeScope(
     controller: theme,
     child: AppRouterScope(
       router: router,
@@ -97,7 +127,7 @@ void main() {
           route: router.route,
           // `.type-body` declares no `color`, so its ink is whatever the
           // enclosing `DefaultTextStyle` supplies — which is the leak.
-          child: ElText('Inherited probe paragraph', ElType.body),
+          child: StyledText('Inherited probe paragraph', TextStyles.body),
         ),
       ),
     );
@@ -105,7 +135,7 @@ void main() {
 
     final TextStyle probe = _paintedStyle(tester, 'Inherited probe paragraph');
     expect(probe.color, isNot(_fallbackInk));
-    expect(probe.color, ElThemeData.dark.foreground);
+    expect(probe.color, ThemeTokens.dark.foreground);
     expect(probe.decoration ?? TextDecoration.none, TextDecoration.none);
     expect(probe.decorationColor, isNot(_fallbackUnderline));
     expect(probe.decorationStyle, isNot(TextDecorationStyle.double));
@@ -218,7 +248,7 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Open site navigation'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(ElSheetPanel), findsOneWidget);
+    expect(find.byType(SheetPanel), findsOneWidget);
     expect(find.text('DESIGN SYSTEM'), findsWidgets);
 
     // Skills is a documentation page now, so it is reached from the
@@ -227,6 +257,6 @@ void main() {
     await tester.tap(find.text('Components').last);
     await tester.pumpAndSettle();
     expect(router.route, componentsRoute);
-    expect(find.byType(ElSheetPanel), findsNothing);
+    expect(find.byType(SheetPanel), findsNothing);
   });
 }

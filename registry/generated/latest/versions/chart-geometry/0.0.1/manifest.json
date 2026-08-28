@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/chart_geometry.dart",
+      "source": "lib/src/components/ui/chart_geometry.dart",
       "target": "@ui/chart_geometry.dart",
-      "sha256": "c906b0a88886122bf1332686120346fa0f598ef8de31550c6e2efcbef057b2dc"
+      "sha256": "cdb02431fa18e28ce3bc5f682b4579b7e38b9152d3daefcf853e7d6d99cfc609"
     }
   ],
   "registryDependencies": [],
@@ -20,6 +20,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/chart-geometry",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/chart_geometry.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/chart_geometry.dart",
   "deprecated": false
 }

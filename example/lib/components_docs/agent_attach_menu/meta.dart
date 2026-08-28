@@ -16,8 +16,8 @@ const ComponentDocEntry agentAttachMenuDoc = ComponentDocEntry(
   title: 'Agent Attach Menu',
   description:
       'The plus beside the composer: one control for picking a file or '
-      'running a skill, built on ElMenuSurface and ElMenuPointerDown over '
-      'ElPopover rather than the arrow-key-navigable ElDropdownMenu.',
+      'running a skill, built on MenuSurface and MenuPointerDown over '
+      'Popover rather than the arrow-key-navigable DropdownMenu.',
   // registry/components/agent-attach-menu.json's own registryDependencies,
   // verbatim.
   dependencies: <String>[
@@ -29,6 +29,6 @@ const ComponentDocEntry agentAttachMenuDoc = ComponentDocEntry(
     'popover',
     'source-foundation',
   ],
-  exports: <String>['ElAgentAttachMenu'],
+  exports: <String>['AgentAttachMenu'],
   sourcePath: 'lib/src/components/agent_attach_menu.dart',
 );

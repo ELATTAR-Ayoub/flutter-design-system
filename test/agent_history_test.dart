@@ -6,10 +6,10 @@
 /// decides **which** row replays its entrance on a pin, the confirmation's
 /// asymmetric in/out clocks, and the capabilities-are-absence contract.
 ///
-/// The headline is [ElFlipController]: `useFlip` is correct and paints nothing,
+/// The headline is [FlipController]: `useFlip` is correct and paints nothing,
 /// because `anim-row-in`'s `animation-fill-mode: both` outranks the inline
 /// transform it writes. The port reproduces the *render*, and keeps the
-/// discarded inversion in [ElFlipController.travel] so the drift is assertable
+/// discarded inversion in [FlipController.travel] so the drift is assertable
 /// rather than a claim in a comment.
 library;
 
@@ -19,7 +19,19 @@ import 'dart:typed_data';
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter/services.dart' show FontLoader;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -28,13 +40,13 @@ import 'package:flutter_test/flutter_test.dart';
 /// The mock store's own seed, at a frozen instant.
 final DateTime _now = DateTime(2026, 8, 16, 12);
 
-ElConversationSummary _c(
+ConversationSummary _c(
   String id,
   String title,
   int agoMinutes, {
   String? preview,
   bool pinned = false,
-}) => ElConversationSummary(
+}) => ConversationSummary(
   id: id,
   title: title,
   updatedAt: _now.subtract(Duration(minutes: agoMinutes)),
@@ -42,7 +54,7 @@ ElConversationSummary _c(
   pinned: pinned,
 );
 
-final List<ElConversationSummary> _seed = <ElConversationSummary>[
+final List<ConversationSummary> _seed = <ConversationSummary>[
   _c(
     'c-vault',
     'Sealed inventory check',
@@ -90,13 +102,13 @@ final List<ElConversationSummary> _seed = <ElConversationSummary>[
 ];
 
 /// A store with everything, or with the two optional capabilities removed.
-class _Store extends ElConversationStore {
+class _Store extends ConversationStore {
   _Store({
-    List<ElConversationSummary>? seed,
+    List<ConversationSummary>? seed,
     this.capabilities = true,
     this.isLoading = false,
     this.error,
-  }) : _rows = List<ElConversationSummary>.of(seed ?? _seed);
+  }) : _rows = List<ConversationSummary>.of(seed ?? _seed);
 
   final bool capabilities;
 
@@ -106,11 +118,11 @@ class _Store extends ElConversationStore {
   @override
   final String? error;
 
-  List<ElConversationSummary> _rows;
+  List<ConversationSummary> _rows;
   String? _activeId = 'c-vault';
 
   @override
-  List<ElConversationSummary> get conversations => _rows;
+  List<ConversationSummary> get conversations => _rows;
 
   @override
   String? get activeId => _activeId;
@@ -129,8 +141,8 @@ class _Store extends ElConversationStore {
 
   @override
   void rename(String id, String title) {
-    _rows = <ElConversationSummary>[
-      for (final ElConversationSummary c in _rows)
+    _rows = <ConversationSummary>[
+      for (final ConversationSummary c in _rows)
         if (c.id == id) c.copyWith(title: title) else c,
     ];
     notifyListeners();
@@ -138,7 +150,7 @@ class _Store extends ElConversationStore {
 
   @override
   void remove(String id) {
-    _rows = _rows.where((ElConversationSummary c) => c.id != id).toList();
+    _rows = _rows.where((ConversationSummary c) => c.id != id).toList();
     notifyListeners();
   }
 
@@ -148,8 +160,8 @@ class _Store extends ElConversationStore {
   @override
   void Function(String id, bool pinned)? get pin => capabilities
       ? (String id, bool pinned) {
-          _rows = <ElConversationSummary>[
-            for (final ElConversationSummary c in _rows)
+          _rows = <ConversationSummary>[
+            for (final ConversationSummary c in _rows)
               if (c.id == id) c.copyWith(pinned: pinned) else c,
           ];
           notifyListeners();
@@ -162,12 +174,12 @@ class _Store extends ElConversationStore {
 
 /// Mounts one widget under the tokens, a frozen clock and reduced motion.
 Future<void> _pump(WidgetTester tester, Widget child, {double width = 1030}) {
-  final ElThemeController theme = ElThemeController(mode: ElThemeMode.dark);
+  final ThemeController theme = ThemeController(mode: ColorMode.dark);
   addTearDown(theme.dispose);
   return tester.pumpWidget(
-    ElClock(
+    Clock(
       now: _now,
-      child: ElTheme(
+      child: ThemeScope(
         controller: theme,
         child: Builder(
           builder: (BuildContext context) => MediaQuery(
@@ -199,7 +211,7 @@ Future<void> _pump(WidgetTester tester, Widget child, {double width = 1030}) {
 }
 
 Finder _button(String label) =>
-    find.byWidgetPredicate((Widget w) => w is ElButton && w.label == label);
+    find.byWidgetPredicate((Widget w) => w is Button && w.label == label);
 
 Future<void> _hover(WidgetTester tester, Finder target) async {
   final TestGesture pointer = await tester.createGesture(
@@ -210,11 +222,11 @@ Future<void> _hover(WidgetTester tester, Finder target) async {
   await tester.pump();
   await pointer.moveTo(tester.getCenter(target));
   await tester.pump();
-  await tester.pump(ElDurations.transitionDefault);
+  await tester.pump(MotionDurations.normal);
 }
 
 Future<void> _openMenu(WidgetTester tester) async {
-  await _hover(tester, find.byType(ElHistoryCard));
+  await _hover(tester, find.byType(HistoryCard));
   await tester.tap(_button('Conversation actions'));
   await tester.pump();
   await tester.pump();
@@ -247,19 +259,19 @@ void main() {
       'an empty query gives pinned-first, then newest, capped at RECENT',
       () {
         final ({
-          List<ElConversationSummary> pinned,
-          List<ElConversationSummary> recent,
-          List<ElConversationSummary> results,
+          List<ConversationSummary> pinned,
+          List<ConversationSummary> recent,
+          List<ConversationSummary> results,
         })
-        split = ElHistorySearch.partition(_seed, '');
+        split = HistorySearch.partition(_seed, '');
 
-        expect(split.pinned.map((ElConversationSummary c) => c.id), <String>[
+        expect(split.pinned.map((ConversationSummary c) => c.id), <String>[
           'c-vault',
           'c-export',
         ]);
         // `RECENT = 6`, and the corpus has five unpinned rows — the cap is not
         // reached here, which is why it is asserted separately below.
-        expect(split.recent.map((ElConversationSummary c) => c.id), <String>[
+        expect(split.recent.map((ConversationSummary c) => c.id), <String>[
           'c-pricing',
           'c-hold',
           'c-odds',
@@ -271,16 +283,16 @@ void main() {
     );
 
     test('RECENT caps the unpinned list at six', () {
-      final List<ElConversationSummary> many = <ElConversationSummary>[
+      final List<ConversationSummary> many = <ConversationSummary>[
         for (int i = 0; i < 12; i++) _c('c-$i', 'Row $i', i * 10),
       ];
       final ({
-        List<ElConversationSummary> pinned,
-        List<ElConversationSummary> recent,
-        List<ElConversationSummary> results,
+        List<ConversationSummary> pinned,
+        List<ConversationSummary> recent,
+        List<ConversationSummary> results,
       })
-      split = ElHistorySearch.partition(many, '');
-      expect(split.recent, hasLength(ElHistorySearch.recent));
+      split = HistorySearch.partition(many, '');
+      expect(split.recent, hasLength(HistorySearch.recent));
       expect(split.recent.first.id, 'c-0');
       expect(split.recent.last.id, 'c-5');
     });
@@ -289,47 +301,47 @@ void main() {
       // "Export my last 30 days as a CSV" — the word is nowhere in the title,
       // and these are exactly the matches `shouldFilter={false}` protects.
       final ({
-        List<ElConversationSummary> pinned,
-        List<ElConversationSummary> recent,
-        List<ElConversationSummary> results,
+        List<ConversationSummary> pinned,
+        List<ConversationSummary> recent,
+        List<ConversationSummary> results,
       })
-      csv = ElHistorySearch.partition(_seed, 'CSV');
-      expect(csv.results.map((ElConversationSummary c) => c.id), <String>[
+      csv = HistorySearch.partition(_seed, 'CSV');
+      expect(csv.results.map((ConversationSummary c) => c.id), <String>[
         'c-export',
       ]);
       expect(csv.pinned, isEmpty);
       expect(csv.recent, isEmpty);
 
       expect(
-        ElHistorySearch.partition(
+        HistorySearch.partition(
           _seed,
           'odds',
-        ).results.map((ElConversationSummary c) => c.id),
+        ).results.map((ConversationSummary c) => c.id),
         <String>['c-odds'],
       );
       // Two hits: "Eclipse Vault" is in two previews, and the results stay in
       // newest-first order.
       expect(
-        ElHistorySearch.partition(
+        HistorySearch.partition(
           _seed,
           'eclipse vault',
-        ).results.map((ElConversationSummary c) => c.id),
+        ).results.map((ConversationSummary c) => c.id),
         <String>['c-pricing', 'c-hold'],
       );
     });
 
     test('matching is case-folded and trimmed', () {
-      expect(ElHistorySearch.partition(_seed, '   ').recent, hasLength(5));
+      expect(HistorySearch.partition(_seed, '   ').recent, hasLength(5));
       expect(
-        ElHistorySearch.partition(_seed, '  GRADING ').results,
+        HistorySearch.partition(_seed, '  GRADING ').results,
         hasLength(1),
       );
     });
 
     test('the heading pluralises the way the template literal does', () {
-      expect(ElHistorySearch.matchHeading(1), '1 match');
-      expect(ElHistorySearch.matchHeading(0), '0 matches');
-      expect(ElHistorySearch.matchHeading(2), '2 matches');
+      expect(HistorySearch.matchHeading(1), '1 match');
+      expect(HistorySearch.matchHeading(0), '0 matches');
+      expect(HistorySearch.matchHeading(2), '2 matches');
     });
   });
 
@@ -337,7 +349,7 @@ void main() {
 
   group('useFlip — measured, inverted, and discarded', () {
     test('nothing replays until measure() arms it', () {
-      final ElFlipController flip = ElFlipController();
+      final FlipController flip = FlipController();
       addTearDown(flip.dispose);
       flip.reconcile(<String>['a', 'b', 'c']);
       // A rename, a hover or a store refresh re-runs the build; without the
@@ -348,7 +360,7 @@ void main() {
     });
 
     test('a pin replays the entrance on exactly the row React re-places', () {
-      final ElFlipController flip = ElFlipController();
+      final FlipController flip = FlipController();
       addTearDown(flip.dispose);
       flip.reconcile(<String>['A', 'B', 'C', 'D']);
       flip.measure();
@@ -365,7 +377,7 @@ void main() {
     });
 
     test('an unpin replays the entrance on the row that leaves the top', () {
-      final ElFlipController flip = ElFlipController();
+      final FlipController flip = FlipController();
       addTearDown(flip.dispose);
       flip.reconcile(<String>['A', 'B', 'D', 'C']);
       flip.measure();
@@ -379,7 +391,7 @@ void main() {
     testWidgets('the inversion is measured and never painted', (
       WidgetTester tester,
     ) async {
-      final ElFlipController flip = ElFlipController();
+      final FlipController flip = FlipController();
       addTearDown(flip.dispose);
       final _Store store = _Store();
       addTearDown(store.dispose);
@@ -387,20 +399,20 @@ void main() {
       Widget list() => ListenableBuilder(
         listenable: store,
         builder: (BuildContext context, Widget? _) {
-          final List<ElConversationSummary> ordered =
-              List<ElConversationSummary>.of(store.conversations)
-                ..sort((ElConversationSummary a, ElConversationSummary b) {
+          final List<ConversationSummary> ordered =
+              List<ConversationSummary>.of(store.conversations)
+                ..sort((ConversationSummary a, ConversationSummary b) {
                   if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
                   return b.updatedAt.compareTo(a.updatedAt);
                 });
           flip.reconcile(<String>[
-            for (final ElConversationSummary c in ordered) c.id,
+            for (final ConversationSummary c in ordered) c.id,
           ]);
-          return ElItemGroup(
-            gapOverride: el(1),
+          return ItemGroup(
+            gapOverride: space(1),
             children: <Widget>[
-              for (final ElConversationSummary c in ordered)
-                ElHistoryCard(
+              for (final ConversationSummary c in ordered)
+                HistoryCard(
                   key: flip.keyFor(c.id),
                   conversation: c,
                   onOpen: (_) {},
@@ -420,14 +432,14 @@ void main() {
       await tester.pump();
 
       final double before = tester
-          .getTopLeft(find.byType(ElHistoryCard).at(3))
+          .getTopLeft(find.byType(HistoryCard).at(3))
           .dy;
-      await _hover(tester, find.byType(ElHistoryCard).at(3));
+      await _hover(tester, find.byType(HistoryCard).at(3));
       // Row 3 is "Putting a pack on hold" — the first UNPINNED row whose pin
       // actually reorders anything. Pinning it lands it third, one row up.
       await tester.tap(
         find.descendant(
-          of: find.byType(ElHistoryCard).at(3),
+          of: find.byType(HistoryCard).at(3),
           matching: _button('Pin conversation'),
         ),
       );
@@ -439,7 +451,7 @@ void main() {
       expect(flip.travel['c-hold']!.dy, closeTo(73.5, 0.5));
       expect(flip.travel['c-hold']!.dx, 0);
       expect(
-        before - tester.getTopLeft(find.byType(ElHistoryCard).at(2)).dy,
+        before - tester.getTopLeft(find.byType(HistoryCard).at(2)).dy,
         closeTo(73.5, 0.5),
       );
       // No row carries a paint transform: `anim-row-in`'s fill-both keeps
@@ -453,7 +465,7 @@ void main() {
     test('sub-pixel drift is not movement', () {
       // `Math.abs(dx) < 1 && Math.abs(dy) < 1` — transforming for it costs a
       // layer and buys nothing.
-      expect(ElFlipController.minimumTravel, 1);
+      expect(FlipController.minimumTravel, 1);
     });
   });
 
@@ -463,27 +475,27 @@ void main() {
     test('the delay is a flat --duration-tick, because nothing staggers', () {
       // `calc(--duration-tick + var(--row-index, 0) * --duration-tick / 2)`
       // with no `--row-index` set anywhere on the page.
-      expect(ElRowMotion.enterSpan, ElDurations.tick + ElDurations.base);
-      expect(ElRowMotion.enterDelayFraction, closeTo(80 / 330, 0.001));
-      // The hold: nothing has moved while the delay runs.
-      expect(ElRowMotion.enterCurve.transform(0), 0);
       expect(
-        ElRowMotion.enterCurve.transform(ElRowMotion.enterDelayFraction),
-        0,
+        RowMotion.enterSpan,
+        MotionDurations.tick + MotionDurations.normal,
       );
-      expect(ElRowMotion.enterCurve.transform(1), 1);
+      expect(RowMotion.enterDelayFraction, closeTo(80 / 330, 0.001));
+      // The hold: nothing has moved while the delay runs.
+      expect(RowMotion.enterCurve.transform(0), 0);
+      expect(RowMotion.enterCurve.transform(RowMotion.enterDelayFraction), 0);
+      expect(RowMotion.enterCurve.transform(1), 1);
     });
 
     test('the travels are the keyframes own', () {
-      expect(ElRowMotion.enterShift, -10);
-      expect(ElRowMotion.exitShift, -24);
-      expect(ElRowMotion.exitBreak, 0.45);
+      expect(RowMotion.enterShift, -10);
+      expect(RowMotion.exitShift, -24);
+      expect(RowMotion.exitBreak, 0.45);
     });
 
     testWidgets('a leaving row collapses its own height', (
       WidgetTester t,
     ) async {
-      Widget card({required bool leaving}) => ElHistoryCard(
+      Widget card({required bool leaving}) => HistoryCard(
         conversation: _seed.first,
         leaving: leaving,
         onOpen: (_) {},
@@ -493,14 +505,14 @@ void main() {
 
       await _pump(t, card(leaving: false));
       await t.pump();
-      final double tall = t.getSize(find.byType(ElHistoryCard)).height;
+      final double tall = t.getSize(find.byType(HistoryCard)).height;
       expect(tall, closeTo(69.5, 0.5));
 
       await _pump(t, card(leaving: true));
       await t.pump();
       // Under reduced motion the exit lands on its final frame, which is a
       // zero-height box — the collapse the list rises into.
-      expect(t.getSize(find.byType(ElHistoryCard)).height, 0);
+      expect(t.getSize(find.byType(HistoryCard)).height, 0);
     });
   });
 
@@ -510,16 +522,16 @@ void main() {
     testWidgets('the active conversation is marked by its GLYPH, not a fill', (
       WidgetTester tester,
     ) async {
-      for (final ({bool active, bool pinned, ElLucideGlyph glyph}) want
-          in <({bool active, bool pinned, ElLucideGlyph glyph})>[
-            (active: true, pinned: false, glyph: ElLucide.messageSquareDot),
-            (active: true, pinned: true, glyph: ElLucide.messageSquareDot),
-            (active: false, pinned: true, glyph: ElLucide.pin),
-            (active: false, pinned: false, glyph: ElLucide.messageSquare),
+      for (final ({bool active, bool pinned, LucideGlyph glyph}) want
+          in <({bool active, bool pinned, LucideGlyph glyph})>[
+            (active: true, pinned: false, glyph: Lucide.messageSquareDot),
+            (active: true, pinned: true, glyph: Lucide.messageSquareDot),
+            (active: false, pinned: true, glyph: Lucide.pin),
+            (active: false, pinned: false, glyph: Lucide.messageSquare),
           ]) {
         await _pump(
           tester,
-          ElHistoryCard(
+          HistoryCard(
             key: ValueKey<String>('${want.active}-${want.pinned}'),
             conversation: _seed.first.copyWith(pinned: want.pinned),
             active: want.active,
@@ -529,10 +541,10 @@ void main() {
           ),
         );
         await tester.pump();
-        final ElIcon media = tester.widget<ElIcon>(
+        final Icon media = tester.widget<Icon>(
           find.descendant(
-            of: find.byType(ElItemMedia),
-            matching: find.byType(ElIcon),
+            of: find.byType(ItemMedia),
+            matching: find.byType(Icon),
           ),
         );
         expect(
@@ -550,21 +562,20 @@ void main() {
       await _pump(
         tester,
         StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) =>
-              ElHistoryCard(
-                conversation: _seed.first.copyWith(title: title),
-                onOpen: (_) {},
-                onRename: (_, String next) => setState(() => title = next),
-                onRemove: (_) {},
-              ),
+          builder: (BuildContext context, StateSetter setState) => HistoryCard(
+            conversation: _seed.first.copyWith(title: title),
+            onOpen: (_) {},
+            onRename: (_, String next) => setState(() => title = next),
+            onRemove: (_) {},
+          ),
         ),
       );
       await tester.pump();
 
-      final Size box = tester.getSize(find.byType(ElHistoryCard));
-      final Offset media = tester.getTopLeft(find.byType(ElItemMedia));
+      final Size box = tester.getSize(find.byType(HistoryCard));
+      final Offset media = tester.getTopLeft(find.byType(ItemMedia));
       final Offset description = tester.getTopLeft(
-        find.byType(ElItemDescription),
+        find.byType(ItemDescription),
       );
 
       await _openMenu(tester);
@@ -572,18 +583,18 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      expect(find.byType(ElInput), findsOneWidget);
+      expect(find.byType(Input), findsOneWidget);
       // `h-6` in both states — the whole point of the inline form.
       expect(
-        tester.getSize(find.byType(ElInput)).height,
-        closeTo(ElHistoryCard.titleHeight, 0.01),
+        tester.getSize(find.byType(Input)).height,
+        closeTo(HistoryCard.titleHeight, 0.01),
       );
-      expect(tester.getSize(find.byType(ElHistoryCard)), box);
-      expect(tester.getTopLeft(find.byType(ElItemMedia)), media);
-      expect(tester.getTopLeft(find.byType(ElItemDescription)), description);
+      expect(tester.getSize(find.byType(HistoryCard)), box);
+      expect(tester.getTopLeft(find.byType(ItemMedia)), media);
+      expect(tester.getTopLeft(find.byType(ItemDescription)), description);
 
       // Escape abandons; the value is not committed.
-      await tester.enterText(find.byType(ElInput), 'Something else');
+      await tester.enterText(find.byType(Input), 'Something else');
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pump();
       expect(title, 'Sealed inventory check');
@@ -595,7 +606,7 @@ void main() {
       bool removed = false;
       await _pump(
         tester,
-        ElHistoryCard(
+        HistoryCard(
           conversation: _seed.first,
           onOpen: (_) {},
           onRename: (_, _) {},
@@ -603,7 +614,7 @@ void main() {
         ),
       );
       await tester.pump();
-      final Size box = tester.getSize(find.byType(ElHistoryCard));
+      final Size box = tester.getSize(find.byType(HistoryCard));
 
       await _openMenu(tester);
       await tester.tap(find.text('Delete'));
@@ -613,7 +624,7 @@ void main() {
       expect(find.text('Delete this?'), findsOneWidget);
       expect(find.text('Keep'), findsOneWidget);
       // `absolute inset-0` — the row is covered, not pushed.
-      expect(tester.getSize(find.byType(ElHistoryCard)), box);
+      expect(tester.getSize(find.byType(HistoryCard)), box);
       expect(
         tester.getSize(find.text('Delete this?')).height,
         lessThan(box.height),
@@ -623,7 +634,7 @@ void main() {
       await tester.pump();
       // `CONFIRM_EXIT_MS` — the confirm outlives its own dismissal.
       expect(find.text('Delete this?'), findsOneWidget);
-      await tester.pump(ElHistoryCard.confirmExit);
+      await tester.pump(HistoryCard.confirmExit);
       await tester.pump();
       expect(find.text('Delete this?'), findsNothing);
       expect(removed, isFalse);
@@ -634,8 +645,8 @@ void main() {
       // `anim-confirm-out` — `--duration-tick` (80) on `--ease-in`, opacity
       // only: *"retracing the slide on the way out drags attention away from
       // the row you are meant to be looking at again."*
-      expect(ElHistoryCard.confirmExit, ElDurations.tick);
-      expect(ElHistoryCard.confirmShift, 0.12);
+      expect(HistoryCard.confirmExit, MotionDurations.tick);
+      expect(HistoryCard.confirmShift, 0.12);
     });
 
     testWidgets('capabilities are absence — no pin, no Share row', (
@@ -643,7 +654,7 @@ void main() {
     ) async {
       await _pump(
         tester,
-        ElHistoryCard(
+        HistoryCard(
           conversation: _seed.first,
           onOpen: (_) {},
           onRename: (_, _) {},
@@ -669,7 +680,7 @@ void main() {
       for (final bool pinned in <bool>[true, false]) {
         await _pump(
           tester,
-          ElHistoryCard(
+          HistoryCard(
             key: ValueKey<bool>(pinned),
             conversation: _seed.first.copyWith(pinned: pinned),
             onOpen: (_) {},
@@ -691,7 +702,7 @@ void main() {
     ) async {
       await _pump(
         tester,
-        ElHistoryCard(
+        HistoryCard(
           conversation: _seed.first,
           onOpen: (_) {},
           onRename: (_, _) {},
@@ -718,7 +729,7 @@ void main() {
       final List<String> opened = <String>[];
       await _pump(
         tester,
-        ElHistoryCard(
+        HistoryCard(
           conversation: _seed.first,
           onOpen: opened.add,
           onRename: (_, _) {},
@@ -731,7 +742,7 @@ void main() {
       expect(opened, <String>['c-vault']);
 
       // The description is not a target.
-      await tester.tap(find.byType(ElItemDescription), warnIfMissed: false);
+      await tester.tap(find.byType(ItemDescription), warnIfMissed: false);
       await tester.pump();
       expect(opened, hasLength(1));
     });
@@ -741,7 +752,7 @@ void main() {
     ) async {
       await _pump(
         tester,
-        ElHistoryCard(
+        HistoryCard(
           conversation: _seed[3],
           onOpen: (_) {},
           onRename: (_, _) {},
@@ -767,7 +778,7 @@ void main() {
       addTearDown(store.dispose);
       await _pump(
         tester,
-        SizedBox(height: 608, child: ElChatHistory(store: store)),
+        SizedBox(height: 608, child: ChatHistory(store: store)),
         width: 1078,
       );
       await tester.pump();
@@ -779,8 +790,8 @@ void main() {
       // because the functions are.
       expect(_button('Pin conversation'), findsNothing);
       expect(_button('Unpin conversation'), findsNothing);
-      for (final Element e in find.byType(ElHistoryCard).evaluate()) {
-        final ElHistoryCard card = e.widget as ElHistoryCard;
+      for (final Element e in find.byType(HistoryCard).evaluate()) {
+        final HistoryCard card = e.widget as HistoryCard;
         expect(card.onPin, isNull);
         expect(card.onShare, isNull);
       }
@@ -793,7 +804,7 @@ void main() {
       addTearDown(store.dispose);
       await _pump(
         tester,
-        SizedBox(height: 608, child: ElChatHistory(store: store)),
+        SizedBox(height: 608, child: ChatHistory(store: store)),
         width: 1078,
       );
       await tester.pump();
@@ -807,21 +818,21 @@ void main() {
       expect(find.text('New chat'), findsOneWidget);
       expect(find.text('Pinned'), findsOneWidget);
       expect(find.text('Recents'), findsOneWidget);
-      expect(find.byType(ElHistoryCard), findsNWidgets(7));
+      expect(find.byType(HistoryCard), findsNWidgets(7));
       // `max-w-sm` — 384 *(measured)*.
-      expect(ElChatHistory.width, 384);
+      expect(ChatHistory.width, 384);
     });
 
     testWidgets('with nothing pinned there is no Recents heading either', (
       WidgetTester tester,
     ) async {
       final _Store store = _Store(
-        seed: <ElConversationSummary>[_c('c-1', 'Only one', 5)],
+        seed: <ConversationSummary>[_c('c-1', 'Only one', 5)],
       );
       addTearDown(store.dispose);
       await _pump(
         tester,
-        SizedBox(height: 608, child: ElChatHistory(store: store)),
+        SizedBox(height: 608, child: ChatHistory(store: store)),
         width: 1078,
       );
       await tester.pump();
@@ -833,7 +844,7 @@ void main() {
       // `{pinned.length > 0 ? <p>Recents</p> : null}` — the second heading
       // exists only to distinguish it from the first.
       expect(find.text('Recents'), findsNothing);
-      expect(find.byType(ElHistoryCard), findsOneWidget);
+      expect(find.byType(HistoryCard), findsOneWidget);
     });
 
     testWidgets('an empty store shows the empty state, loading or not', (
@@ -841,7 +852,7 @@ void main() {
     ) async {
       for (final bool loading in <bool>[false, true]) {
         final _Store store = _Store(
-          seed: const <ElConversationSummary>[],
+          seed: const <ConversationSummary>[],
           isLoading: loading,
         );
         addTearDown(store.dispose);
@@ -849,7 +860,7 @@ void main() {
           tester,
           SizedBox(
             height: 608,
-            child: ElChatHistory(key: ValueKey<bool>(loading), store: store),
+            child: ChatHistory(key: ValueKey<bool>(loading), store: store),
           ),
           width: 1078,
         );
@@ -862,7 +873,7 @@ void main() {
           find.text(loading ? 'Loading conversations' : 'No conversations yet'),
           findsOneWidget,
         );
-        expect(find.byType(ElSpinner), loading ? findsOneWidget : findsNothing);
+        expect(find.byType(Spinner), loading ? findsOneWidget : findsNothing);
       }
     });
 
@@ -870,13 +881,13 @@ void main() {
       WidgetTester tester,
     ) async {
       final _Store store = _Store(
-        seed: const <ElConversationSummary>[],
+        seed: const <ConversationSummary>[],
         error: 'The store said no.',
       );
       addTearDown(store.dispose);
       await _pump(
         tester,
-        SizedBox(height: 608, child: ElChatHistory(store: store)),
+        SizedBox(height: 608, child: ChatHistory(store: store)),
         width: 1078,
       );
       await tester.pump();
@@ -889,8 +900,8 @@ void main() {
       // `!store.error && …` — the empty state is suppressed by the error.
       expect(find.text('No conversations yet'), findsNothing);
       expect(
-        tester.widget<ElAlert>(find.byType(ElAlert)).variant,
-        ElAlertVariant.destructive,
+        tester.widget<Alert>(find.byType(Alert)).variant,
+        AlertVariant.destructive,
       );
     });
 
@@ -901,7 +912,7 @@ void main() {
       addTearDown(store.dispose);
       await _pump(
         tester,
-        SizedBox(height: 608, child: ElChatHistory(store: store)),
+        SizedBox(height: 608, child: ChatHistory(store: store)),
         width: 1078,
       );
       await tester.pump();
@@ -912,8 +923,8 @@ void main() {
       expect(store.conversations, hasLength(7));
       // The store call is deferred by `EXIT_MS` so the row can play
       // `anim-row-out` — without it the list snaps shut under the cursor.
-      expect(ElChatHistory.exit, ElDurations.base);
-      expect(ElChatHistory.panelIn, ElDurations.overlay);
+      expect(ChatHistory.exit, MotionDurations.normal);
+      expect(ChatHistory.panelIn, MotionDurations.overlayEnter);
     });
 
     testWidgets('New chat creates and closes; the drawer closes on its own X', (
@@ -923,7 +934,7 @@ void main() {
       addTearDown(store.dispose);
       await _pump(
         tester,
-        SizedBox(height: 608, child: ElChatHistory(store: store)),
+        SizedBox(height: 608, child: ChatHistory(store: store)),
         width: 1078,
       );
       await tester.pump();
@@ -943,15 +954,15 @@ void main() {
 
   group('blurClass(phase)', () {
     test('the two radii are the keyframes own', () {
-      expect(ElBlurSwitch.outRadius, 6);
-      expect(ElBlurSwitch.inRadius, 8);
+      expect(BlurSwitch.outRadius, 6);
+      expect(BlurSwitch.inRadius, 8);
     });
 
     testWidgets('idle wraps nothing at all', (WidgetTester tester) async {
       await _pump(
         tester,
-        const ElBlurSwitch(
-          phase: ElSwitchPhase.idle,
+        const BlurSwitch(
+          phase: SwitchPhase.idle,
           child: SizedBox(width: 10, height: 10),
         ),
       );
@@ -961,14 +972,14 @@ void main() {
     });
 
     testWidgets('out and in both paint', (WidgetTester tester) async {
-      for (final ElSwitchPhase phase in <ElSwitchPhase>[
-        ElSwitchPhase.out,
-        ElSwitchPhase.blurIn,
+      for (final SwitchPhase phase in <SwitchPhase>[
+        SwitchPhase.out,
+        SwitchPhase.blurIn,
       ]) {
         await _pump(
           tester,
-          ElBlurSwitch(
-            key: ValueKey<ElSwitchPhase>(phase),
+          BlurSwitch(
+            key: ValueKey<SwitchPhase>(phase),
             phase: phase,
             child: const SizedBox(width: 10, height: 10),
           ),
@@ -989,19 +1000,17 @@ void main() {
         tester,
         const Column(
           children: <Widget>[
-            ElItem(
-              variant: ElItemVariant.outline,
-              content: ElItemContent(children: <Widget>[ElItemTitle('a')]),
+            Item(
+              variant: ItemVariant.outline,
+              content: ItemContent(children: <Widget>[ItemTitle('a')]),
             ),
-            ElItem(
-              content: ElItemContent(children: <Widget>[ElItemTitle('b')]),
-            ),
+            Item(content: ItemContent(children: <Widget>[ItemTitle('b')])),
           ],
         ),
       );
       await tester.pump();
-      final ElThemeData theme = ElTheme.of(
-        tester.element(find.byType(ElItem).first),
+      final ThemeTokens theme = ThemeScope.of(
+        tester.element(find.byType(Item).first),
       );
       final List<Container> rows = tester
           .widgetList<Container>(find.byType(Container))
@@ -1009,7 +1018,7 @@ void main() {
       final BoxDecoration outline = rows.first.decoration! as BoxDecoration;
       final BoxDecoration plain = rows[1].decoration! as BoxDecoration;
       expect(outline.border!.top.color, theme.border);
-      expect(plain.border!.top.color, elTransparent);
+      expect(plain.border!.top.color, transparent);
       // Both pay for the 1px out of their own width.
       expect(outline.border!.top.width, plain.border!.top.width);
     });
@@ -1019,24 +1028,24 @@ void main() {
     ) async {
       await _pump(
         tester,
-        ElItemGroup(
-          gapOverride: el(1),
+        ItemGroup(
+          gapOverride: space(1),
           children: const <Widget>[SizedBox(height: 10), SizedBox(height: 10)],
         ),
       );
       await tester.pump();
       final List<Element> boxes = find.byType(SizedBox).evaluate().toList();
       // 10px of row, 4px of gap, 10px of row.
-      expect(tester.getSize(find.byType(ElItemGroup)).height, 24);
+      expect(tester.getSize(find.byType(ItemGroup)).height, 24);
       expect(boxes, isNotEmpty);
       // The default is still the measured 10px drift.
-      expect(ElItemGroup.gap, 10);
+      expect(ItemGroup.gap, 10);
     });
   });
 
   group('Command, reopened by the history palette', () {
     test('a two-line row derives its search value from all of its text', () {
-      const ElCommandItem row = ElCommandItem(
+      const CommandItem row = CommandItem(
         label: 'Thirty-day activity export',
         subtitle: 'Export my last 30 days as a CSV',
         meta: '2 hours ago',
@@ -1047,7 +1056,7 @@ void main() {
       );
       // …unless the call site supplies one, which `HistorySearch` does.
       expect(
-        const ElCommandItem(
+        const CommandItem(
           label: 'x',
           subtitle: 'y',
           value: 'c-export',
@@ -1062,15 +1071,15 @@ void main() {
         for (final bool inDialog in <bool>[false, true]) {
           await _pump(
             tester,
-            ElCommand(
+            Command(
               key: ValueKey<bool>(inDialog),
               inDialog: inDialog,
               shouldFilter: false,
-              groups: const <ElCommandGroup>[
-                ElCommandGroup(
+              groups: const <CommandGroup>[
+                CommandGroup(
                   heading: 'Pinned',
-                  items: <ElCommandItem>[
-                    ElCommandItem(
+                  items: <CommandItem>[
+                    CommandItem(
                       value: 'c-vault',
                       label: 'Sealed inventory check',
                       subtitle: 'What sealed boxes are left?',
@@ -1084,8 +1093,8 @@ void main() {
           );
           await tester.pump();
 
-          final ElThemeData theme = ElTheme.of(
-            tester.element(find.byType(ElCommand)),
+          final ThemeTokens theme = ThemeScope.of(
+            tester.element(find.byType(Command)),
           );
           final BoxDecoration root =
               tester
@@ -1109,14 +1118,14 @@ void main() {
     ) async {
       await _pump(
         tester,
-        const ElCommand(
+        const Command(
           inDialog: true,
           shouldFilter: false,
-          groups: <ElCommandGroup>[
-            ElCommandGroup(
+          groups: <CommandGroup>[
+            CommandGroup(
               heading: 'Recent',
-              items: <ElCommandItem>[
-                ElCommandItem(
+              items: <CommandItem>[
+                CommandItem(
                   value: 'c-odds',
                   label: 'How pack odds actually work',
                   subtitle: 'Explain the odds on a sealed box',
@@ -1133,7 +1142,7 @@ void main() {
       final double row =
           tester.getSize(find.text('How pack odds actually work')).height +
           tester.getSize(find.text('Explain the odds on a sealed box')).height +
-          el(2) * 2;
+          space(2) * 2;
       expect(row, closeTo(48.7, 0.5));
     });
   });

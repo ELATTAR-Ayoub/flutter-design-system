@@ -7,29 +7,55 @@ import 'package:example/components_docs/skeleton/page.dart';
 import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
+import 'package:flutter/rendering.dart' hide ScrollDirection;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The `skeleton` documentation page: re-housed onto the kit alongside the
 /// page. The section-order test now reads `DocsSection.id`/`.title`, and
 /// the API-table read opens the `DocsDisclosure` first — closed by default,
-/// unlike the old page's always-visible `ElSection`.
+/// unlike the old page's always-visible `Section`.
 ///
-/// `ElSkeleton`'s shimmer loops forever, so this file never calls
+/// `Skeleton`'s shimmer loops forever, so this file never calls
 /// `tester.pumpAndSettle()`: a looping `AnimationController.repeat()` under
-/// `ElSkeleton` means settle would poll forever. Every wait below is a
+/// `Skeleton` means settle would poll forever. Every wait below is a
 /// bounded `tester.pump()`/`tester.pump(Duration(...))` instead.
 Widget _harness({
   required Widget child,
   required Size size,
-  required ElThemeController controller,
+  required ThemeController controller,
   bool disableAnimations = false,
 }) => MediaQuery(
   data: MediaQueryData(size: size, disableAnimations: disableAnimations),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
+    child: ThemeScope(
       controller: controller,
       child: MaterialApp(home: SingleChildScrollView(child: child)),
     ),
@@ -98,7 +124,7 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(1440, 900),
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const SkeletonDocPage(),
           ),
         );
@@ -126,7 +152,7 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(1440, 900),
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: SkeletonDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -153,20 +179,20 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 300));
 
-        // The API table lists every ElSkeleton constructor parameter found
+        // The API table lists every Skeleton constructor parameter found
         // in lib/src/components/skeleton.dart.
         for (final String param in <String>['width', 'height', 'radius']) {
           expect(
             find.text(param),
             findsWidgets,
-            reason: 'missing ElSkeleton API row: $param',
+            reason: 'missing Skeleton API row: $param',
           );
         }
 
-        expect(find.byType(ElSkeleton), findsAtLeastNWidgets(4));
+        expect(find.byType(Skeleton), findsAtLeastNWidgets(4));
 
         expect(skeletonDoc.name, 'skeleton');
-        expect(skeletonDoc.exports, containsAll(<String>['ElSkeleton']));
+        expect(skeletonDoc.exports, containsAll(<String>['Skeleton']));
         expect(skeletonDoc.command, 'elattar add skeleton');
         expect(destination, isNull);
       },
@@ -179,33 +205,32 @@ void main() {
       );
     });
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            size: const Size(1440, 4000),
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const SkeletonDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          size: const Size(1440, 4000),
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const SkeletonDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> sectionIds = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.id)
-            .toList();
-        expect(sectionIds, _sectionIds);
+      final List<String> sectionIds = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
+          .toList();
+      expect(sectionIds, _sectionIds);
 
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     testWidgets(
       'the pager navigates through DocsLayout.onNavigate, back to Progress '
@@ -219,7 +244,7 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(1440, 900),
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: SkeletonDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -247,7 +272,7 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(1440, 900),
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const SkeletonDocPage(),
           ),
         );
@@ -261,7 +286,7 @@ void main() {
         await tester.ensureVisible(toggle);
         await tester.pump();
 
-        // The name renders through ElType.section, unmodified, as
+        // The name renders through TextStyles.section, unmodified, as
         // "Amara Chen" once the loaded state swaps the skeleton row for
         // the real content.
         expect(find.text('Amara Chen'), findsNothing);
@@ -282,7 +307,7 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(390, 844),
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const SkeletonDocPage(),
           ),
         );
@@ -320,7 +345,7 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(390, 844),
-            controller: ElThemeController(mode: ElThemeMode.light),
+            controller: ThemeController(mode: ColorMode.light),
             child: const SkeletonDocPage(),
           ),
         );
@@ -331,7 +356,7 @@ void main() {
           find.byKey(const ValueKey<String>('skeleton-doc-article')),
           findsOneWidget,
         );
-        expect(find.byType(ElSkeleton), findsWidgets);
+        expect(find.byType(Skeleton), findsWidgets);
       },
     );
 
@@ -342,9 +367,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       await tester.pumpWidget(
         _harness(
           size: const Size(1440, 900),
@@ -361,7 +384,7 @@ void main() {
       );
 
       // Flip the SAME controller in place: not a fresh widget tree.
-      controller.setMode(ElThemeMode.light);
+      controller.setMode(ColorMode.light);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
@@ -369,7 +392,7 @@ void main() {
         find.byKey(const ValueKey<String>('skeleton-doc-article')),
         findsOneWidget,
       );
-      expect(find.byType(ElSkeleton), findsWidgets);
+      expect(find.byType(Skeleton), findsWidgets);
     });
 
     testWidgets(
@@ -382,19 +405,19 @@ void main() {
         await tester.pumpWidget(
           _harness(
             size: const Size(1440, 900),
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             disableAnimations: true,
             child: const SkeletonDocPage(),
           ),
         );
-        // Under MediaQueryData.disableAnimations, elAnimationDuration
-        // collapses every ElKeyframePlayer repeat to Duration.zero
+        // Under MediaQueryData.disableAnimations, effectiveMotionDuration
+        // collapses every KeyframePlayer repeat to Duration.zero
         // (theme_scope.dart), so a couple of bounded pumps are enough to
         // reach the settled frame: never pumpAndSettle.
         await tester.pump();
         await tester.pump();
 
-        // ElKeyframePlayer(repeat: true) wraps its own painted output in a
+        // KeyframePlayer(repeat: true) wraps its own painted output in a
         // RepaintBoundary (keyframes.dart), which this rasterises directly:
         // the same technique test/feedback_effects_test.dart's
         // rasterise()/readRaster() use at package level, applied here to
@@ -409,7 +432,7 @@ void main() {
         expect(skeletonBoundary, findsOneWidget);
 
         final Uint8List frameA = await _captureBytes(tester, skeletonBoundary);
-        // Bounded, not pumpAndSettle: ElKeyframePlayer stops its controller
+        // Bounded, not pumpAndSettle: KeyframePlayer stops its controller
         // outright under reduced motion, so this must not hang.
         await tester.pump(const Duration(milliseconds: 470));
         final Uint8List frameB = await _captureBytes(tester, skeletonBoundary);

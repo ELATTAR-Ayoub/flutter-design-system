@@ -13,9 +13,9 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery`. Theme
-/// coverage flips a single live `ElThemeController` in place.
+/// coverage flips a single live `ThemeController` in place.
 ///
-/// `ElSheetOverlay` mounts its content through an `OverlayPortal`, so the
+/// `SheetOverlay` mounts its content through an `OverlayPortal`, so the
 /// live specimen needs a real `Overlay`: the harness wraps the page in a
 /// `MaterialApp`. No `pumpAndSettle` is used anywhere on this page: every
 /// open/close/disclosure step below advances with an explicit
@@ -27,7 +27,33 @@ import 'package:example/components_docs/sheet/meta.dart';
 import 'package:example/components_docs/sheet/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsAnchor, DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -55,28 +81,28 @@ const List<String> _sectionOrder = <String>[
 /// Every constructor parameter name declared on the public classes of
 /// `lib/src/components/sheet.dart`.
 const List<String> _sheetParamNames = <String>[
-  'builder', // ElSheet.showLeft
-  'width', // ElSheetPanel / ElSheetContent
-  'showCloseButton', // ElSheetPanel / ElSheetContent
-  'child', // ElSheetPanel / ElSheetTransition / ElSheetContentGroup
-  'trigger', // ElSheetOverlay
-  'content', // ElSheetOverlay
-  'side', // ElSheetOverlay / ElSheetTransition / ElSheetContent
-  'animation', // ElSheetTransition
-  'children', // ElSheetContent / ElSheetHeader / ElSheetFooter
-  'onClose', // ElSheetContent
-  'fill', // ElSheetContent
-  'text', // ElSheetTitle / ElSheetDescription
+  'builder', // Sheet.showLeft
+  'width', // SheetPanel / SheetContent
+  'showCloseButton', // SheetPanel / SheetContent
+  'child', // SheetPanel / SheetTransition / SheetContentGroup
+  'trigger', // SheetOverlay
+  'content', // SheetOverlay
+  'side', // SheetOverlay / SheetTransition / SheetContent
+  'animation', // SheetTransition
+  'children', // SheetContent / SheetHeader / SheetFooter
+  'onClose', // SheetContent
+  'fill', // SheetContent
+  'text', // SheetTitle / SheetDescription
 ];
 
-/// Matches only a [ElSheetContent] mounted by a live [ElSheetOverlay]
-/// trigger: the page also keeps two static, always-mounted [ElSheetContent]
+/// Matches only a [SheetContent] mounted by a live [SheetOverlay]
+/// trigger: the page also keeps two static, always-mounted [SheetContent]
 /// specimens on screen (the No close button and RTL sections' own
 /// presentational panels, keyed `sheet-no-close-button` and `sheet-rtl`), so
-/// `find.byType(ElSheetContent)` alone is never unique on this page.
+/// `find.byType(SheetContent)` alone is never unique on this page.
 Finder _liveOverlaySheet() => find.byWidgetPredicate(
   (Widget widget) =>
-      widget is ElSheetContent &&
+      widget is SheetContent &&
       widget.key != const ValueKey<String>('sheet-no-close-button') &&
       widget.key != const ValueKey<String>('sheet-rtl'),
 );
@@ -88,21 +114,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pumpSheetDoc(
+Future<ThemeController> _pumpSheetDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -129,28 +155,26 @@ void main() {
       expect(
         sheetDoc.exports,
         containsAll(<String>[
-          'ElSheet',
-          'ElSheetPanel',
-          'ElSheetSide',
-          'ElSheetOverlay',
-          'ElSheetTransition',
-          'ElSheetContent',
-          'ElSheetContentGroup',
-          'ElSheetHeader',
-          'ElSheetFooter',
-          'ElSheetTitle',
-          'ElSheetDescription',
+          'Sheet',
+          'SheetPanel',
+          'SheetSide',
+          'SheetOverlay',
+          'SheetTransition',
+          'SheetContent',
+          'SheetContentGroup',
+          'SheetHeader',
+          'SheetFooter',
+          'SheetTitle',
+          'SheetDescription',
         ]),
       );
       // No drawer symbols on this page's export list any more.
-      expect(sheetDoc.exports, isNot(contains('ElDrawer')));
+      expect(sheetDoc.exports, isNot(contains('Drawer')));
     });
   });
 
   group('SheetDocPage house shape', () {
-    testWidgets('renders every section, in order', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders every section, in order', (WidgetTester tester) async {
       await _pumpSheetDoc(tester, size: const Size(1440, 4000));
 
       final List<String> titles = tester
@@ -179,13 +203,13 @@ void main() {
           findsOneWidget,
         );
         expect(
-          tester.widget<ElSheetContent>(noCloseSpecimen).showCloseButton,
+          tester.widget<SheetContent>(noCloseSpecimen).showCloseButton,
           isFalse,
         );
         expect(
           find.descendant(
             of: find.byKey(DocsAnchor.keyFor('no-close-button')),
-            matching: find.byType(ElButton),
+            matching: find.byType(Button),
           ),
           findsNothing,
         );
@@ -235,7 +259,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _sheetParamNames) {
           expect(
@@ -245,12 +269,12 @@ void main() {
           );
         }
 
-        // ElSheetSide's four values, plus the isHorizontal getter row.
+        // SheetSide's four values, plus the isHorizontal getter row.
         for (final String value in <String>['top', 'right', 'bottom', 'left']) {
           expect(
             find.text(value),
             findsAtLeastNWidgets(1),
-            reason: 'ElSheetSide.$value missing from the API table',
+            reason: 'SheetSide.$value missing from the API table',
           );
         }
         expect(find.text('isHorizontal'), findsOneWidget);
@@ -284,7 +308,7 @@ void main() {
     testWidgets(
       'drops the sidebar and shows the anchor strip at mobile width',
       (WidgetTester tester) async {
-        await _pumpSheetDoc(tester, size: _narrow, mode: ElThemeMode.light);
+        await _pumpSheetDoc(tester, size: _narrow, mode: ColorMode.light);
 
         expect(
           find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
@@ -299,7 +323,7 @@ void main() {
     );
 
     testWidgets(
-      'a live ElSheetOverlay opens a real ElSheetContent and dismisses on '
+      'a live SheetOverlay opens a real SheetContent and dismisses on '
       'scrim tap',
       (WidgetTester tester) async {
         await _pumpSheetDoc(tester);
@@ -311,7 +335,7 @@ void main() {
         await tester.ensureVisible(trigger);
         await tester.tap(trigger);
         await tester.pump();
-        await tester.pump(ElDurations.overlay);
+        await tester.pump(MotionDurations.overlayEnter);
         await tester.pump();
 
         expect(_liveOverlaySheet(), findsOneWidget);
@@ -339,7 +363,7 @@ void main() {
       await tester.ensureVisible(trigger);
       await tester.tap(trigger);
       await tester.pump();
-      await tester.pump(ElDurations.overlay);
+      await tester.pump(MotionDurations.overlayEnter);
       await tester.pump();
       expect(_liveOverlaySheet(), findsOneWidget);
 
@@ -362,7 +386,7 @@ void main() {
       await tester.ensureVisible(sectionTrigger);
       await tester.tap(sectionTrigger);
       await tester.pump();
-      await tester.pump(ElDurations.overlay);
+      await tester.pump(MotionDurations.overlayEnter);
       await tester.pump();
 
       expect(_liveOverlaySheet(), findsOneWidget);
@@ -380,10 +404,10 @@ void main() {
     testWidgets('flips between light and dark with one live controller', (
       WidgetTester tester,
     ) async {
-      final ElThemeController controller = await _pumpSheetDoc(tester);
+      final ThemeController controller = await _pumpSheetDoc(tester);
       expect(tester.takeException(), isNull);
 
-      controller.setMode(ElThemeMode.light);
+      controller.setMode(ColorMode.light);
       await tester.pump();
       expect(tester.takeException(), isNull);
       expect(find.byType(SheetDocPage), findsOneWidget);

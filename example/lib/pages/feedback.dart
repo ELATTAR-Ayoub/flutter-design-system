@@ -22,10 +22,10 @@
 ///
 /// ## What is page-local, and why
 ///
-/// [_ToastPreview] and [_ToastPreviewStack] port `components/el/toast-preview.tsx`
+/// [_ToastPreview] and [_ToastPreviewStack] port `components/space/toast-preview.tsx`
 ///: a **docs-side** component, like `Panel` and `Note`, and the port's docs
 /// side is this package. It has exactly one consumer, so it stays here on the
-/// B10 precedent. Three things make it a different object from [ElToast] rather
+/// B10 precedent. Three things make it a different object from [Toast] rather
 /// than a call of it:
 ///
 ///  * it renders **the preview's own numbers**, which are measurably not the
@@ -33,8 +33,8 @@
 ///  * it writes its own `[data-button]`. `toast-preview.tsx` L42–46 spells the
 ///    `<button>` inline rather than letting sonner render one, so
 ///    [_ToastActionPill] is that element and not a stand-in for the live pill.
-///    The live one now comes from `ElToastAction`, which [_ToastSectionState._error]
-///    passes and `ElToast` paints: the two are the same 32px secondary pill
+///    The live one now comes from `ToastAction`, which [_ToastSectionState._error]
+///    passes and `Toast` paints: the two are the same 32px secondary pill
 ///    because `.cn-toast [data-button]` styles both, exactly as the preview's
 ///    own doc-comment claims of the whole object;
 ///  * it is static. No queue, no lifetime, no dismissal: a `<li>` in a list.
@@ -42,7 +42,7 @@
 /// [_PackCardSkeleton]'s and [_PullRowSkeletons]'s containers are inline
 /// `div`s on the reference and stay inline here. [_SeamedList] is the
 /// `space-y-px` container `selection.dart` already met: it **cannot** be
-/// `ElDividedList`, which fills with `--card` and draws each seam as a border
+/// `DividedList`, which fills with `--card` and draws each seam as a border
 /// on the row. This one declares no background at all, so its seams are the
 /// panel's `--background` showing through and every row supplies its own fill.
 ///
@@ -63,7 +63,7 @@
 /// | the error specimen, total | 93.88 | **96.5** |
 ///
 /// **This file renders the right-hand column**, because this file renders the
-/// preview. The live toaster the five buttons fire into is `ElToaster`, mounted
+/// preview. The live toaster the five buttons fire into is `Toaster`, mounted
 /// once by the shell, and its choreography is wave B2's.
 ///
 /// ## Drift register: recorded, shipped as written (feedback-map §16)
@@ -78,7 +78,7 @@
 ///     warning *toast* still carries `--color-value-bright` over
 ///     `--color-value-dark`, the pair the Alert was moved off after
 ///     `alert.tsx` recorded that it *"worked only by accident"*. Both ship as
-///     written, [ElBloomCosmic.toastWarning] is that pair.
+///     written, [FeedbackSurface.toastWarning] is that pair.
 ///  3. **Specimen 5 is `variant="info"` wearing an `AlertTriangle`** and
 ///     warning copy. A cyan triangle over a cyan bloom; every other specimen's
 ///     glyph matches its variant.
@@ -90,34 +90,34 @@
 ///     bare `<Progress value={20.6} />`; the other six all pass an
 ///     `aria-label`, including the two beside an identical `type-label`. Its
 ///     readout "412 / 2,000" is a sibling span, unassociated: so
-///     [ElProgress.label] goes unpassed exactly once.
+///     [Progress.label] goes unpassed exactly once.
 ///  7. **[_progressTones]' comment contradicts its contents**: see the
 ///     comment, transcribed verbatim above the array.
 ///  8. **`Empty`'s dashed border never paints.** `border-dashed` with no width
-///     class; carried by `ElEmpty`.
+///     class; carried by `Empty`.
 ///  9. **`EmptyMedia` defeats `Icon size="xl"`**: a 16px box drawn with the
-///     24px rung's stroke; carried by `ElEmptyMedia`.
+///     24px rung's stroke; carried by `EmptyMedia`.
 /// 10. **`Spinner`'s `role="status"` and `aria-label="Loading"` are dropped**
-///     by `Icon`'s destructure; carried by `ElSpinner` under ruling B9.
+///     by `Icon`'s destructure; carried by `Spinner` under ruling B9.
 /// 11. **`size-5` / `size-6` spinners keep the 16px stroke.** `Icon` computes
 ///     `strokeWidth` from the size **prop** and the class overrides only the
 ///     box, so the 20px and 24px spinners are drawn at 2.4 where the ladder
-///     would give 2. The port's `ElSpinner` takes a box and derives its stroke
+///     would give 2. The port's `Spinner` takes a box and derives its stroke
 ///     from it, so it renders those two at the ladder's own 2: the one place
 ///     on this page where the port is *more* consistent than the reference.
 ///     Recorded here rather than worked around from the call site: the fix is
 ///     one `strokeOverride` inside `spinner.dart`, which is not this file.
 /// 12. **`Alert` is `role="alert"` with no `aria-live`**: five permanently
-///     mounted live regions on one page. `ElAlert` already sets `liveRegion`.
+///     mounted live regions on one page. `Alert` already sets `liveRegion`.
 /// 13. **The live toast carries no role at all** and sonner announces through
-///     a separate visually-hidden region; `ElToast` labels itself instead: an
+///     a separate visually-hidden region; `Toast` labels itself instead: an
 ///     already-shipped, deliberate divergence.
 /// 14. **Two reduced-motion regimes.** `globals.css` collapses durations to
 ///     0.01ms; sonner's own sheet sets `animation: none`. The port has one
 ///     switch, `?motion=reduced`, and both regimes land on the resting frame.
 /// 15. **The bloom reaches the border but not past it.** `overflow: hidden`
 ///     clips to the padding box, so the 1px `--border` stroke sits outside the
-///     light. Modelled by `ElAlert` and by [_ToastPreview] here.
+///     light. Modelled by `Alert` and by [_ToastPreview] here.
 /// 16. **`.cn-toast`'s selector is written three times** to beat sonner's
 ///     unlayered sheet. The port has no cascade; the values are just the
 ///     values.
@@ -132,7 +132,19 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -170,16 +182,16 @@ const Duration _promiseLatency = Duration(
 ///
 /// The leading is `.cn-toast`'s own 1.5, which both slots inherit because
 /// neither declares one of their own; the size is `--text-small`. Both are
-/// read off [ElType.small]: the one spec that already transcribes that pair —
+/// read off [TextStyles.small]: the one spec that already transcribes that pair —
 /// so the only number written here is the weight.
 ///
-/// It is deliberately **not** `ElComponentType.buttonLabel`, which is the same
+/// It is deliberately **not** `TextStyles.buttonLabel`, which is the same
 /// 13/500 at `text-sm`'s 1.428571. On a five-toast stack that ratio is 8.4px of
 /// accumulated shortfall, and it is the whole of drift 4's leading column.
-final ElTypeSpec _toastMedium = ElTypeSpec(
-  family: ElFonts.sans,
-  size: ElType.small.size,
-  height: ElType.small.height,
+final TextStyleToken _toastMedium = TextStyleToken(
+  family: Fonts.sans,
+  size: TextStyles.small.size,
+  height: TextStyles.small.height,
   wght: _medium,
 );
 
@@ -191,24 +203,24 @@ final ElTypeSpec _toastMedium = ElTypeSpec(
 /// lucide's default 2, next to five `<Spinner/>`s of the same glyph at 2.4.
 /// Spelled as the ladder's own answer at the grid's own size rather than typed,
 /// which is the `theme_toggle.dart` precedent.
-final double _lucideStroke = ElIcon.strokeFor(ElIconPaths.viewBox);
+final double _lucideStroke = Icon.strokeFor(IconPaths.viewBox);
 
 /* Every tone the bar ships, rendered live rather than described. `default` and
    `value` are shown above in their own context, so this row is the four that
    say something about the reading itself. */
 const List<_ToneRow> _progressTones = <_ToneRow>[
-  (tone: ElProgressTone.normal, label: 'Steps today', value: 72),
-  (tone: ElProgressTone.success, label: 'Hydration goal met', value: 100),
-  (tone: ElProgressTone.warning, label: 'Storage used', value: 86),
+  (tone: ProgressTone.normal, label: 'Steps today', value: 72),
+  (tone: ProgressTone.success, label: 'Hydration goal met', value: 100),
+  (tone: ProgressTone.warning, label: 'Storage used', value: 86),
   (
-    tone: ElProgressTone.destructive,
+    tone: ProgressTone.destructive,
     label: 'Sleep against an 8h need',
     value: 67,
   ),
 ];
 
 /// One row of [_progressTones], `as const`, so the shape is the array's.
-typedef _ToneRow = ({ElProgressTone tone, String label, double value});
+typedef _ToneRow = ({ProgressTone tone, String label, double value});
 
 /* ── Page helpers ────────────────────────────────────────────────────────── */
 
@@ -262,12 +274,12 @@ class FeedbackPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('base', 'feedback');
+    final CategoryHit here = findCategory('base', 'feedback');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // The eyebrow says "Base" twice, on all fourteen base pages: the
           // group is already called "Base Components" and the page interpolates
           // a second literal after a U+00B7 anyway.
@@ -280,8 +292,8 @@ class FeedbackPage extends StatelessWidget {
         // `className="mb-12"`, 48px. The only Note in the corpus that sits
         // outside every section, and therefore the only one at the full 1080.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: const ElNote(
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: const Note(
             title: 'Which one to reach for',
             child: _WhichOneBody(),
           ),
@@ -293,7 +305,7 @@ class FeedbackPage extends StatelessWidget {
         const _EmptySection(),
         const _ApiSection(),
         const _RulesSection(),
-        const ElPageFootNav(groupId: 'base', slug: 'feedback'),
+        const PageFootNav(groupId: 'base', slug: 'feedback'),
       ],
     );
   }
@@ -306,11 +318,11 @@ class _WhichOneBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final TextStyle base = ElText.styleOf(context, ElType.small);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final TextStyle base = StyledText.styleOf(context, TextStyles.small);
     final TextStyle strong = _strong(base).copyWith(color: theme.foreground);
 
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           TextSpan(text: 'Alert', style: strong),
@@ -335,7 +347,7 @@ class _WhichOneBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -347,48 +359,48 @@ class _AlertSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'alert',
       title: 'Alert',
       description:
           'Five variants. Stock shadcn only ships default and '
           'destructive, so success, warning and information were added to '
           'cover the states the brief requires.',
-      child: ElPanel(
+      child: Panel(
         label: 'All five variants',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // `div.space-y-4`: five alerts, 16px between them.
-            const ElAlert(
-              icon: ElIcon(
-                ElIconGlyph.info,
-                size: ElIconSize.md,
-                tone: ElIconTone.inherit,
+            const Alert(
+              icon: Icon(
+                IconGlyph.info,
+                size: IconSize.md,
+                tone: IconTone.inherit,
               ),
               title: 'Provably fair',
               description:
                   'Every pack roll is seeded and verifiable. The seed '
                   'for this pack is published after opening.',
             ),
-            SizedBox(height: el(4)),
-            const ElAlert(
-              variant: ElAlertVariant.success,
-              icon: ElIcon(
-                ElIconGlyph.circleCheck,
-                size: ElIconSize.md,
-                tone: ElIconTone.inherit,
+            SizedBox(height: space(4)),
+            const Alert(
+              variant: AlertVariant.success,
+              icon: Icon(
+                IconGlyph.circleCheck,
+                size: IconSize.md,
+                tone: IconTone.inherit,
               ),
               title: 'Deposit cleared',
               description: r'$250.00 was added to your available balance.',
             ),
-            SizedBox(height: el(4)),
-            ElAlert(
-              variant: ElAlertVariant.warning,
-              icon: const ElIcon(
-                ElIconGlyph.hourglass,
-                size: ElIconSize.md,
-                tone: ElIconTone.inherit,
+            SizedBox(height: space(4)),
+            Alert(
+              variant: AlertVariant.warning,
+              icon: const Icon(
+                IconGlyph.hourglass,
+                size: IconSize.md,
+                tone: IconTone.inherit,
               ),
               title: 'Withdrawal under review',
               description:
@@ -398,41 +410,41 @@ class _AlertSection extends StatelessWidget {
               // a slot, and the button inside it is the page's. Its `onClick`
               // is absent on the reference, so it is live and does nothing;
               // a null handler here would dim it instead.
-              action: ElButton(
-                variant: ElButtonVariant.secondary,
-                size: ElButtonSize.sm,
+              action: Button(
+                variant: ButtonVariant.secondary,
+                size: ButtonSize.sm,
                 onPressed: () {},
                 child: const Text('Details'),
               ),
             ),
-            SizedBox(height: el(4)),
-            ElAlert(
-              variant: ElAlertVariant.destructive,
-              icon: const ElIcon(
-                ElIconGlyph.circleX,
-                size: ElIconSize.md,
-                tone: ElIconTone.inherit,
+            SizedBox(height: space(4)),
+            Alert(
+              variant: AlertVariant.destructive,
+              icon: const Icon(
+                IconGlyph.circleX,
+                size: IconSize.md,
+                tone: IconTone.inherit,
               ),
               title: 'Payment failed',
               description:
                   'Your card was declined. No packs were opened and '
                   'nothing was charged.',
-              action: ElButton(
-                variant: ElButtonVariant.secondary,
-                size: ElButtonSize.sm,
+              action: Button(
+                variant: ButtonVariant.secondary,
+                size: ButtonSize.sm,
                 onPressed: () {},
                 child: const Text('Retry'),
               ),
             ),
-            SizedBox(height: el(4)),
+            SizedBox(height: space(4)),
             // DRIFT 3: the `info` variant wearing an `AlertTriangle`, over
             // warning copy. A cyan triangle on a cyan bloom.
-            const ElAlert(
-              variant: ElAlertVariant.info,
-              icon: ElIcon(
-                ElIconGlyph.alertTriangle,
-                size: ElIconSize.md,
-                tone: ElIconTone.inherit,
+            const Alert(
+              variant: AlertVariant.info,
+              icon: Icon(
+                IconGlyph.alertTriangle,
+                size: IconSize.md,
+                tone: IconTone.inherit,
               ),
               title: 'Purchase limit approaching',
               description:
@@ -442,8 +454,8 @@ class _AlertSection extends StatelessWidget {
             ),
             // `className="mt-6"`. This Note is INSIDE the Panel, which is what
             // makes it 1030 wide where the page-level one is 1080.
-            SizedBox(height: el(6)),
-            const ElNote(
+            SizedBox(height: space(6)),
+            const Note(
               title: 'One surface, five meanings',
               child: _OneSurfaceBody(),
             ),
@@ -459,11 +471,11 @@ class _OneSurfaceBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final TextStyle base = ElText.styleOf(context, ElType.small);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final TextStyle base = StyledText.styleOf(context, TextStyles.small);
     final TextStyle strong = _strong(base).copyWith(color: theme.foreground);
 
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -484,7 +496,7 @@ class _OneSurfaceBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -512,14 +524,14 @@ class _ToastSectionState extends State<_ToastSection> {
   }
 
   /// `toast("Added to favourites")`: the untyped call, which is the one the
-  /// controller spells as [ElToastController.show].
+  /// controller spells as [ToastController.show].
   void _neutral() =>
-      docsToasts.show(const ElToastMessage(title: 'Added to favourites'));
+      docsToasts.show(const ToastMessage(title: 'Added to favourites'));
 
   /// `toast.success(…, { description })`.
   ///
   /// **No `glyph:` override anywhere on this page.** `TOAST_ICONS` is
-  /// [ElToastType.glyph]'s table to answer, and a call site that passed the
+  /// [ToastType.glyph]'s table to answer, and a call site that passed the
   /// geometry by hand would be routing around it.
   void _success() => docsToasts.success(
     r'Sold 3 cards for $2,481.00',
@@ -530,17 +542,17 @@ class _ToastSectionState extends State<_ToastSection> {
   ///
   /// The reference's options carry
   /// `action: { label: "Retry", onClick: () => {} }` (`page.tsx` L227), and the
-  /// live toast renders it as `[data-button]`. `ElToastMessage.action` landed
+  /// live toast renders it as `[data-button]`. `ToastMessage.action` landed
   /// with wave B2's toaster, so the fired toast now carries the pill itself and
   /// the preview one panel up is no longer the only place it can be looked at.
   ///
   /// No `onPressed`: the reference's handler is an empty arrow, and the
-  /// dismissal that follows a press is sonner's own, [ElToastAction] runs the
-  /// handler and `ElToaster` deletes the toast after it, handler or not.
+  /// dismissal that follows a press is sonner's own, [ToastAction] runs the
+  /// handler and `Toaster` deletes the toast after it, handler or not.
   void _error() => docsToasts.error(
     'Could not reach the vault',
     description: 'Nothing was charged. Try again in a moment.',
-    action: const ElToastAction(label: 'Retry'),
+    action: const ToastAction(label: 'Retry'),
   );
 
   /// `toast.warning(…)`.
@@ -570,7 +582,7 @@ class _ToastSectionState extends State<_ToastSection> {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'toast',
       title: 'Toast',
       description:
@@ -580,7 +592,7 @@ class _ToastSectionState extends State<_ToastSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'All five, side by side',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -589,12 +601,12 @@ class _ToastSectionState extends State<_ToastSection> {
                   children: <Widget>[
                     _ToastPreview(title: 'Added to favourites'),
                     _ToastPreview(
-                      type: ElToastType.success,
+                      type: ToastType.success,
                       title: r'Sold 3 cards for $2,481.00',
                       description: 'Credited to your available balance.',
                     ),
                     _ToastPreview(
-                      type: ElToastType.error,
+                      type: ToastType.error,
                       title: 'Could not reach the vault',
                       description:
                           'Nothing was charged. Try again in a '
@@ -602,63 +614,63 @@ class _ToastSectionState extends State<_ToastSection> {
                       action: 'Retry',
                     ),
                     _ToastPreview(
-                      type: ElToastType.warning,
+                      type: ToastType.warning,
                       title: 'Only 12 packs left in this print run',
                     ),
                     _ToastPreview(
-                      type: ElToastType.loading,
+                      type: ToastType.loading,
                       title: 'Requesting withdrawal…',
                       description: 'This usually takes a few seconds.',
                     ),
                   ],
                 ),
                 // `className="mt-6"`.
-                SizedBox(height: el(6)),
+                SizedBox(height: space(6)),
                 const _NotMockUpsBody(),
                 // `className="mt-3"`.
-                SizedBox(height: el(3)),
+                SizedBox(height: space(3)),
                 const _BloomIsSharedBody(),
               ],
             ),
           ),
           // `className="mt-4"`.
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Click to fire a real one',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ElRow(
+                SpecimenRow(
                   children: <Widget>[
-                    ElButton(
-                      variant: ElButtonVariant.outline,
+                    Button(
+                      variant: ButtonVariant.outline,
                       onPressed: _neutral,
                       child: const Text('Neutral'),
                     ),
-                    ElButton(
-                      variant: ElButtonVariant.outline,
+                    Button(
+                      variant: ButtonVariant.outline,
                       onPressed: _success,
                       child: const Text('Success'),
                     ),
-                    ElButton(
-                      variant: ElButtonVariant.outline,
+                    Button(
+                      variant: ButtonVariant.outline,
                       onPressed: _error,
                       child: const Text('Error'),
                     ),
-                    ElButton(
-                      variant: ElButtonVariant.outline,
+                    Button(
+                      variant: ButtonVariant.outline,
                       onPressed: _warning,
                       child: const Text('Warning'),
                     ),
-                    ElButton(
-                      variant: ElButtonVariant.outline,
+                    Button(
+                      variant: ButtonVariant.outline,
                       onPressed: _firePromise,
                       child: const Text('Promise'),
                     ),
                   ],
                 ),
                 // `className="mt-5"`.
-                SizedBox(height: el(5)),
+                SizedBox(height: space(5)),
                 const _ConfiguredOnceBody(),
               ],
             ),
@@ -684,14 +696,14 @@ class _ToastPreviewStack extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       for (int i = 0; i < children.length; i++) ...<Widget>[
-        if (i > 0) SizedBox(height: el(4)),
+        if (i > 0) SizedBox(height: space(4)),
         children[i],
       ],
     ],
   );
 }
 
-/// `components/el/toast-preview.tsx`, *"a toast, rendered where you can look
+/// `components/space/toast-preview.tsx`, *"a toast, rendered where you can look
 /// at one."*
 ///
 /// The same tree sonner builds, `[data-icon]`, `[data-content]`,
@@ -702,7 +714,7 @@ class _ToastPreviewStack extends StatelessWidget {
 ///
 /// | declaration | value |
 /// |---|---|
-/// | `width: var(--width, 22.25rem)` | **356px**, [ElToaster.width] |
+/// | `width: var(--width, 22.25rem)` | **356px**, [Toaster.width] |
 /// | `display: flex; align-items: flex-start` | icon beside content, both top-aligned |
 /// | `gap: calc(--spacing * 3)` | 12px |
 /// | `padding: calc(--spacing * 4)` | 16px |
@@ -713,19 +725,19 @@ class _ToastPreviewStack extends StatelessWidget {
 /// | `overflow: hidden` | the bloom's clip |
 ///
 /// The bloom is mounted per `data-type`, and it brings the starfield with it —
-/// `.bloom-cosmic [data-content]::before` is a **descendant** selector against
+/// `.feedback-surface [data-content]::before` is a **descendant** selector against
 /// an unpositioned `[data-content]`, so the sparkle box resolves against the
 /// whole toast. Four infinite animations per preview, twenty across the stack.
 class _ToastPreview extends StatelessWidget {
   const _ToastPreview({
-    this.type = ElToastType.normal,
+    this.type = ToastType.normal,
     required this.title,
     this.description,
     this.action,
   });
 
   /// `data-type`, `default` renders no glyph at all.
-  final ElToastType type;
+  final ToastType type;
 
   final String title;
   final String? description;
@@ -735,22 +747,22 @@ class _ToastPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final BorderRadius radius = BorderRadius.circular(ElRadii.lg);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final BorderRadius radius = BorderRadius.circular(Radii.lg);
     // `const Icon = type === "default" ? null : TOAST_ICONS[type]`.
-    final ElIconGlyph? glyph = type.glyph;
+    final IconGlyph? glyph = type.glyph;
 
     Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText(title, _toastMedium, color: theme.foreground),
+        StyledText(title, _toastMedium, color: theme.foreground),
         if (description != null) ...<Widget>[
           // `[data-content] { gap: calc(--spacing * 1) }`.
-          SizedBox(height: el(1)),
+          SizedBox(height: space(1)),
           // `[data-description]` sets font-size and colour and **no leading**,
           // so it keeps `.cn-toast`'s 1.5: which is `.type-small` exactly.
-          ElText(description!, ElType.small),
+          StyledText(description!, TextStyles.small),
         ],
       ],
     );
@@ -763,14 +775,14 @@ class _ToastPreview extends StatelessWidget {
           if (glyph != null) ...<Widget>[
             Padding(
               // `[data-icon] { margin-top: calc(--spacing * 0.5) }`.
-              padding: EdgeInsets.only(top: el(0.5)),
-              child: type == ElToastType.loading
+              padding: EdgeInsets.only(top: space(0.5)),
+              child: type == ToastType.loading
                   // `className="size-4 anim-spin"`, `pulls-spin`, 900ms,
                   // linear, forever. Reduced motion holds it at 0°, which is
                   // where a fill-less animation reverts to.
-                  ? ElKeyframePlayer(
-                      duration: ElDurations.spin,
-                      fill: ElKeyframeFill.none,
+                  ? KeyframePlayer(
+                      duration: MotionDurations.spin,
+                      fill: KeyframeFill.none,
                       repeat: true,
                       builder:
                           (BuildContext context, double t, Widget? child) =>
@@ -783,13 +795,13 @@ class _ToastPreview extends StatelessWidget {
                   : _previewGlyph(glyph, theme),
             ),
             // `gap: calc(--spacing * 3)`.
-            SizedBox(width: el(3)),
+            SizedBox(width: space(3)),
           ],
           // `[data-content] { min-width: 0 }`: it shrinks, and the pill's
           // `margin-left: auto` takes whatever is left over.
           Expanded(child: content),
           if (action != null) ...<Widget>[
-            SizedBox(width: el(3)),
+            SizedBox(width: space(3)),
             _ToastActionPill(label: action!),
           ],
         ],
@@ -798,7 +810,7 @@ class _ToastPreview extends StatelessWidget {
 
     Widget toast = Padding(
       // `padding: calc(--spacing * 4)`.
-      padding: EdgeInsets.all(el(4)),
+      padding: EdgeInsets.all(space(4)),
       child: content,
     );
 
@@ -807,62 +819,68 @@ class _ToastPreview extends StatelessWidget {
     // `box-shadow: var(--shadow-e3)` and `border: 1px solid var(--border)`,
     // outside the bloom's clip because `overflow: hidden` clips to the padding
     // box: so the border stroke sits outside the light (drift 15).
-    toast = ElMachineSurface(
-      spec: ElShadows.e3,
+    toast = Surface(
+      spec: Shadows.lg,
       radius: radius,
-      border: Border.all(color: theme.border, width: ElWidths.hairline),
+      border: Border.all(color: theme.border, width: BorderWidths.hairline),
       child: toast,
     );
 
-    return SizedBox(width: ElToaster.width, child: toast);
+    return SizedBox(width: Toaster.width, child: toast);
   }
 
   /// `<Icon className="size-4"/>`, raw, 16px at lucide's own stroke, in the
   /// type's `-ink`.
-  Widget _previewGlyph(ElIconGlyph glyph, ElThemeData theme) => ElIcon(
+  Widget _previewGlyph(IconGlyph glyph, ThemeTokens theme) => Icon(
     glyph,
-    sizePx: el(4),
+    sizePx: space(4),
     strokeOverride: _lucideStroke,
-    tone: ElIconTone.inherit,
+    tone: IconTone.inherit,
   );
 
   /// `.cn-toast[data-type="…"]`'s `--bloom-1` / `--bloom-2` pair.
   ///
   /// Four of the five agree with the Alert variant of the same name. `warning`
-  /// does not, DRIFT 2, and [ElBloomCosmic.toastWarning] is the pair the Alert
+  /// does not, DRIFT 2, and [FeedbackSurface.toastWarning] is the pair the Alert
   /// was moved off.
   static Widget _bloomFor(
-    ElToastType type, {
+    ToastType type, {
     required BorderRadius radius,
     required Color fill,
     required Widget child,
   }) => switch (type) {
-    ElToastType.success => ElBloomCosmic.success(
+    ToastType.success => FeedbackSurface(
+      variant: FeedbackVariant.success,
       radius: radius,
       fill: fill,
       child: child,
     ),
-    ElToastType.info => ElBloomCosmic.info(
+    ToastType.info => FeedbackSurface(
+      variant: FeedbackVariant.info,
       radius: radius,
       fill: fill,
       child: child,
     ),
-    ElToastType.warning => ElBloomCosmic.toastWarning(
+    ToastType.warning => FeedbackSurface(
+      variant: FeedbackVariant.warning,
       radius: radius,
       fill: fill,
       child: child,
     ),
-    ElToastType.error => ElBloomCosmic.destructive(
+    ToastType.error => FeedbackSurface(
+      variant: FeedbackVariant.error,
       radius: radius,
       fill: fill,
       child: child,
     ),
-    ElToastType.loading => ElBloomCosmic.loading(
+    ToastType.loading => FeedbackSurface(
+      variant: FeedbackVariant.loading,
       radius: radius,
       fill: fill,
       child: child,
     ),
-    ElToastType.normal => ElBloomCosmic.action(
+    ToastType.normal => FeedbackSurface(
+      variant: FeedbackVariant.neutral,
       radius: radius,
       fill: fill,
       child: child,
@@ -873,10 +891,10 @@ class _ToastPreview extends StatelessWidget {
 /// `[data-button]`, `variant="secondary" size="sm"` written out by hand,
 /// because sonner renders the button itself and never sees the cva.
 ///
-/// **The preview's own element**, not the live pill: `toast-preview.tsx`
+/// **The preview's own element**, not the live indicator: `toast-preview.tsx`
 /// L42–46 writes `<button type="button" data-button="">` into its own markup,
 /// so this is a port of that `<button>`. The live toast's pill is
-/// `ElToastAction`'s, painted by `ElToast`; both are the same 32px secondary
+/// `ToastAction`'s, painted by `Toast`; both are the same 32px secondary
 /// pill because the one `.cn-toast [data-button]` block styles both.
 ///
 /// `flex-shrink: 0; margin-left: auto; height: calc(--spacing * 8);
@@ -890,17 +908,17 @@ class _ToastPreview extends StatelessWidget {
 /// transparent control over moving light reads as a hole. The hover goes to
 /// `--accent`, and `--duration-base` is read from the variable directly here
 /// rather than through a `duration-<word>` utility, so it is genuinely
-/// [ElDurations.base].
+/// [MotionDurations.normal].
 class _ToastActionPill extends StatefulWidget {
   const _ToastActionPill({required this.label});
 
   final String label;
 
   /// `height: calc(--spacing * 8)`.
-  static double get height => el(8);
+  static double get height => space(8);
 
   /// `padding-inline: calc(--spacing * 3.5)`.
-  static double get paddingX => el(3.5);
+  static double get paddingX => space(3.5);
 
   @override
   State<_ToastActionPill> createState() => _ToastActionPillState();
@@ -916,7 +934,7 @@ class _ToastActionPillState extends State<_ToastActionPill> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final Color fill = _hovered ? theme.accent : theme.secondary;
 
     return MouseRegion(
@@ -925,18 +943,18 @@ class _ToastActionPillState extends State<_ToastActionPill> {
       onExit: (_) => _hover(false),
       child: TweenAnimationBuilder<Color?>(
         tween: ColorTween(end: fill),
-        duration: elAnimationDuration(context, ElDurations.base),
-        curve: ElCurves.out,
+        duration: effectiveMotionDuration(context, MotionDurations.normal),
+        curve: MotionCurves.enter,
         builder: (BuildContext context, Color? wash, Widget? child) =>
             DecoratedBox(
               decoration: BoxDecoration(
                 color: wash ?? fill,
-                borderRadius: BorderRadius.circular(ElRadii.pill),
+                borderRadius: BorderRadius.circular(Radii.full),
                 // `border: 1px solid transparent`: declared, and it still costs
                 // the pill its pixel on each side.
                 border: Border.all(
-                  color: elTransparent,
-                  width: ElWidths.hairline,
+                  color: transparent,
+                  width: BorderWidths.hairline,
                 ),
               ),
               child: child,
@@ -945,11 +963,11 @@ class _ToastActionPillState extends State<_ToastActionPill> {
           height: _ToastActionPill.height,
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: _ToastActionPill.paddingX - ElWidths.hairline,
+              horizontal: _ToastActionPill.paddingX - BorderWidths.hairline,
             ),
             child: Center(
               widthFactor: 1,
-              child: ElText(
+              child: StyledText(
                 widget.label,
                 _toastMedium,
                 color: theme.secondaryForeground,
@@ -967,7 +985,7 @@ class _NotMockUpsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -975,11 +993,11 @@ class _NotMockUpsBody extends StatelessWidget {
                 'These are not mock-ups. They render the same markup sonner '
                 'produces and are styled by the same ',
           ),
-          ElCode.span('.cn-toast'),
+          Code.span('.cn-toast'),
           const TextSpan(text: ' block in '),
-          ElCode.span('globals.css'),
+          Code.span('globals.css'),
           const TextSpan(text: ' — the only difference is the missing '),
-          ElCode.span('data-sonner-toast'),
+          Code.span('data-sonner-toast'),
           const TextSpan(
             text:
                 ' attribute that would make them fixed to the corner of the '
@@ -988,7 +1006,7 @@ class _NotMockUpsBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -998,11 +1016,11 @@ class _BloomIsSharedBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'The bloom is '),
-          ElCode.span('bloom-cosmic'),
+          Code.span('feedback-surface'),
           const TextSpan(
             text:
                 ', shared with Alert. Two layers drift at different speeds '
@@ -1012,7 +1030,7 @@ class _BloomIsSharedBody extends StatelessWidget {
                 'Each type sets two hues and nothing else. It is CSS rather '
                 'than a ',
           ),
-          ElCode.span('ShaderSurface'),
+          Code.span('ShaderSurface'),
           const TextSpan(
             text:
                 ' because sonner builds the live toast and offers nowhere to '
@@ -1022,7 +1040,7 @@ class _BloomIsSharedBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -1032,19 +1050,19 @@ class _ConfiguredOnceBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
             text: 'Position and theme are configured once on the ',
           ),
-          ElCode.span('<Toaster />'),
+          Code.span('<Toaster />'),
           const TextSpan(
             text: ' in the root layout, so no screen can move them.',
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -1056,7 +1074,7 @@ class _SkeletonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'skeleton',
       title: 'Skeleton',
       description:
@@ -1066,23 +1084,23 @@ class _SkeletonSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const ElGrid(
+          const Grid(
             lg: 2,
             children: <Widget>[
-              ElPanel(label: 'Pack card skeleton', child: _PackCardSkeleton()),
-              ElPanel(
+              Panel(label: 'Pack card skeleton', child: _PackCardSkeleton()),
+              Panel(
                 label: 'Live pull row skeleton',
                 child: _PullRowSkeletons(),
               ),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Inline placeholders',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ElRow(
+                SpecimenRow(
                   children: <Widget>[
                     ConstrainedBox(
                       constraints: const BoxConstraints(
@@ -1094,8 +1112,8 @@ class _SkeletonSection extends StatelessWidget {
                 ),
                 // DRIFT 5: no `mt-6`, and no gap at all. The list butts
                 // straight into the paragraph above it.
-                const ElMeta(
-                  items: <ElMetaItem>[
+                const Meta(
+                  items: <MetaItem>[
                     (
                       k: 'Default',
                       v: TextSpan(text: 'div — use for block placeholders'),
@@ -1109,9 +1127,9 @@ class _SkeletonSection extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          const ElNote(
-            tone: ElNoteTone.error,
+          SizedBox(height: space(4)),
+          const Note(
+            tone: NoteTone.error,
             title: 'The common mistake',
             child: _CommonMistakeBody(),
           ),
@@ -1128,47 +1146,55 @@ class _PackCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: Padding(
         // `p-4` plus the border it is measured inside: `box-sizing:
         // border-box` pays for the frame out of the box, and [DecoratedBox]
         // paints a border without reserving space for it.
-        padding: EdgeInsets.all(el(4) + ElWidths.hairline),
+        padding: EdgeInsets.all(space(4) + BorderWidths.hairline),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             // `mb-4 h-32 w-full rounded-md`: the art.
-            ElSkeleton(height: el(32)),
-            SizedBox(height: el(4)),
+            Skeleton(height: space(32)),
+            SizedBox(height: space(4)),
             // `h-3 w-24`: the set name.
-            _atLineStart(ElSkeleton(width: el(24), height: el(3))),
+            _atLineStart(Skeleton(width: space(24), height: space(3))),
             // `mt-2.5 h-4 w-40`: the card name.
-            SizedBox(height: el(2.5)),
-            _atLineStart(ElSkeleton(width: el(40), height: el(4))),
+            SizedBox(height: space(2.5)),
+            _atLineStart(Skeleton(width: space(40), height: space(4))),
             // `mt-4 flex gap-2`: two rarity pills.
-            SizedBox(height: el(4)),
+            SizedBox(height: space(4)),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElSkeleton(width: el(20), height: el(5), radius: ElRadii.pill),
-                SizedBox(width: el(2)),
-                ElSkeleton(width: el(16), height: el(5), radius: ElRadii.pill),
+                Skeleton(
+                  width: space(20),
+                  height: space(5),
+                  radius: Radii.full,
+                ),
+                SizedBox(width: space(2)),
+                Skeleton(
+                  width: space(16),
+                  height: space(5),
+                  radius: Radii.full,
+                ),
               ],
             ),
             // `mt-4 h-6 w-20`: the price.
-            SizedBox(height: el(4)),
-            _atLineStart(ElSkeleton(width: el(20), height: el(6))),
+            SizedBox(height: space(4)),
+            _atLineStart(Skeleton(width: space(20), height: space(6))),
             // `mt-4 h-10 w-full rounded-md`: the buy button.
-            SizedBox(height: el(4)),
-            ElSkeleton(height: el(10)),
+            SizedBox(height: space(4)),
+            Skeleton(height: space(10)),
           ],
         ),
       ),
@@ -1184,7 +1210,7 @@ class _PullRowSkeletons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return _SeamedList(
       children: <Widget>[
@@ -1192,29 +1218,38 @@ class _PullRowSkeletons extends StatelessWidget {
           ColoredBox(
             color: theme.card,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
+              padding: EdgeInsets.symmetric(
+                horizontal: space(4),
+                vertical: space(3),
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   // `size-8 rounded-pill`: the avatar.
-                  ElSkeleton(width: el(8), height: el(8), radius: ElRadii.pill),
-                  SizedBox(width: el(3)),
+                  Skeleton(
+                    width: space(8),
+                    height: space(8),
+                    radius: Radii.full,
+                  ),
+                  SizedBox(width: space(3)),
                   // `div.min-w-0.flex-1`.
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        _atLineStart(ElSkeleton(width: el(20), height: el(3))),
-                        SizedBox(height: el(2)),
                         _atLineStart(
-                          ElSkeleton(width: el(36), height: el(3.5)),
+                          Skeleton(width: space(20), height: space(3)),
+                        ),
+                        SizedBox(height: space(2)),
+                        _atLineStart(
+                          Skeleton(width: space(36), height: space(3.5)),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(width: el(3)),
-                  ElSkeleton(width: el(16), height: el(4)),
+                  SizedBox(width: space(3)),
+                  Skeleton(width: space(16), height: space(4)),
                 ],
               ),
             ),
@@ -1238,25 +1273,25 @@ class _SeamedList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(ElWidths.hairline),
+        padding: const EdgeInsets.all(BorderWidths.hairline),
         child: ClipRRect(
           // `overflow-hidden` against the border's inner edge, so the first
           // and last rows take the container's corners.
-          borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.lg - BorderWidths.hairline),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               for (int i = 0; i < children.length; i++) ...<Widget>[
-                if (i > 0) const SizedBox(height: ElWidths.hairline),
+                if (i > 0) const SizedBox(height: BorderWidths.hairline),
                 children[i],
               ],
             ],
@@ -1274,27 +1309,27 @@ class _InlinePlaceholderBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
             text: 'Standing in for words inside a sentence needs ',
           ),
-          ElCode.span('as="span"'),
+          Code.span('as="span"'),
           const TextSpan(text: ' — like '),
           // `h-3.5 w-28 align-middle`, `inline-block`, centred on the
           // surrounding lowercase, which is what `vertical-align: middle` is.
-          ElSkeleton.span(width: el(28), height: el(3.5)),
+          Skeleton.span(width: space(28), height: space(3.5)),
           const TextSpan(text: ' here — because a '),
-          ElCode.span('<div>'),
+          Code.span('<div>'),
           const TextSpan(text: ' inside a '),
-          ElCode.span('<p>'),
+          Code.span('<p>'),
           const TextSpan(
             text: ' is invalid HTML that every guard in this repo passes.',
           ),
         ],
       ),
-      ElType.body,
+      TextStyles.body,
     );
   }
 }
@@ -1304,11 +1339,11 @@ class _CommonMistakeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Do not build one '),
-          ElCode.span('SkeletonCard'),
+          Code.span('SkeletonCard'),
           const TextSpan(
             text:
                 ' and use it everywhere. Each component that loads gets a '
@@ -1320,7 +1355,7 @@ class _CommonMistakeBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -1332,9 +1367,9 @@ class _ProgressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'progress',
       // DRIFT 18: the title and the `id` disagree, and the chip list splits
       // the two halves into separate entries.
@@ -1345,7 +1380,7 @@ class _ProgressSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'Progress',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1362,16 +1397,16 @@ class _ProgressSection extends StatelessWidget {
                         value: 20.6,
                       ),
                       // `space-y-8`, 32px between rows.
-                      SizedBox(height: el(8)),
+                      SizedBox(height: space(8)),
                       _ProgressReading(
                         label: 'XP to Rank 25',
                         readout: '3,480 / 5,000',
-                        readoutColor: theme.valueInk,
+                        readoutColor: theme.premiumText,
                         value: 69.6,
-                        tone: ElProgressTone.value,
+                        tone: ProgressTone.value,
                         ariaLabel: 'XP to Rank 25',
                       ),
-                      SizedBox(height: el(8)),
+                      SizedBox(height: space(8)),
                       _ProgressReading(
                         label: 'Revealing cards',
                         readout: '4 of 6',
@@ -1381,21 +1416,21 @@ class _ProgressSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: el(6)),
-                ElText(
+                SizedBox(height: space(6)),
+                StyledText(
                   'The XP bar is the one place a progress track leaves the '
                   'action ramp — progression toward a reward is a value '
                   'signal.',
-                  ElType.small,
+                  TextStyles.small,
                 ),
-                SizedBox(height: el(4)),
+                SizedBox(height: space(4)),
                 // No title, default `action` tone: and inside the Panel.
-                const ElNote(child: _SunkenChannelBody()),
+                const Note(child: _SunkenChannelBody()),
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             // U+2014 in the label.
             label: 'Tone — the shape of the reading, not its direction',
             child: Column(
@@ -1411,7 +1446,7 @@ class _ProgressSection extends StatelessWidget {
                         i < _progressTones.length;
                         i++
                       ) ...<Widget>[
-                        if (i > 0) SizedBox(height: el(8)),
+                        if (i > 0) SizedBox(height: space(8)),
                         _ProgressReading(
                           label: _progressTones[i].label,
                           readout: '${_progressTones[i].value.toInt()}%',
@@ -1423,38 +1458,38 @@ class _ProgressSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: el(6)),
+                SizedBox(height: space(6)),
                 const _InkEndBody(),
-                SizedBox(height: el(4)),
-                const ElNote(tone: ElNoteTone.error, child: _SafeBandBody()),
+                SizedBox(height: space(4)),
+                const Note(tone: NoteTone.error, child: _SafeBandBody()),
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Spinner',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ElRow(
+                SpecimenRow(
                   children: <Widget>[
-                    const ElSpinner(),
+                    const Spinner(),
                     // `className="size-5"` / `"size-6"`: the class beats the
                     // attribute and only the box changes (drift 11).
-                    ElSpinner(size: el(5)),
+                    Spinner(size: space(5)),
                     DefaultTextStyle.merge(
-                      style: TextStyle(color: theme.actionInk),
-                      child: ElSpinner(size: el(6)),
+                      style: TextStyle(color: theme.actionText),
+                      child: Spinner(size: space(6)),
                     ),
-                    const ElButton(loading: true, child: Text('Opening pack')),
-                    const ElButton(
-                      variant: ElButtonVariant.premium,
+                    const Button(loading: true, child: Text('Opening pack')),
+                    const Button(
+                      variant: ButtonVariant.premium,
                       loading: true,
                       child: Text('Processing deposit'),
                     ),
                   ],
                 ),
-                SizedBox(height: el(5)),
+                SizedBox(height: space(5)),
                 const _LoadingPropBody(),
               ],
             ),
@@ -1472,7 +1507,7 @@ class _ProgressReading extends StatelessWidget {
     required this.readout,
     required this.value,
     this.readoutColor,
-    this.tone = ElProgressTone.normal,
+    this.tone = ProgressTone.normal,
     this.ariaLabel,
   });
 
@@ -1488,14 +1523,14 @@ class _ProgressReading extends StatelessWidget {
   /// `text-value-ink` on the XP row; `--muted-foreground` on the other six.
   final Color? readoutColor;
 
-  final ElProgressTone tone;
+  final ProgressTone tone;
 
   /// `aria-label`, absent exactly once: drift 6.
   final String? ariaLabel;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1506,17 +1541,17 @@ class _ProgressReading extends StatelessWidget {
           textBaseline: TextBaseline.alphabetic,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            ElText(label, ElType.label),
-            ElText(
+            StyledText(label, TextStyles.eyebrow),
+            StyledText(
               readout,
-              ElType.numSm,
+              TextStyles.numberSm,
               color: readoutColor ?? theme.mutedForeground,
             ),
           ],
         ),
         // `mb-2.5`, 10px.
-        SizedBox(height: el(2.5)),
-        ElProgress(value: value, tone: tone, label: ariaLabel),
+        SizedBox(height: space(2.5)),
+        Progress(value: value, tone: tone, label: ariaLabel),
       ],
     );
   }
@@ -1527,13 +1562,13 @@ class _SunkenChannelBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElText(
+    return StyledText(
       // `&rsquo;`: a real right single quotation mark.
       'Same 10px sunken channel as the Slider’s track, because it is the same '
       'object — a filled channel. The only difference is the missing thumb, '
       'because you cannot grab this one. Stock shadcn ships a 4px hair, which '
       'reads as a different component entirely next to a price filter.',
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -1543,11 +1578,11 @@ class _InkEndBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Every fill names the '),
-          ElCode.span('-ink'),
+          Code.span('-ink'),
           const TextSpan(
             text:
                 ' end of its ramp rather than the raw token, for the reason '
@@ -1555,19 +1590,19 @@ class _InkEndBody extends StatelessWidget {
                 'only thing that makes it visible is its contrast with the '
                 'track. Measured on this page, ',
           ),
-          ElCode.span('--primary'),
+          Code.span('--primary'),
           const TextSpan(text: ' is 1.63:1 against '),
-          ElCode.span('--muted'),
+          Code.span('--muted'),
           const TextSpan(text: ' and '),
-          ElCode.span('--action-ink'),
+          Code.span('--action-ink'),
           const TextSpan(text: ' is 6.97:1; on light, raw '),
-          ElCode.span('--color-success'),
+          Code.span('--color-success'),
           const TextSpan(text: ' is 1.73:1 and '),
-          ElCode.span('--success-ink'),
+          Code.span('--success-ink'),
           const TextSpan(text: ' is 4.93:1.'),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -1577,10 +1612,10 @@ class _SafeBandBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
-          ElCode.span('destructive'),
+          Code.span('destructive'),
           const TextSpan(text: ' is for a reading '),
           const TextSpan(text: 'outside its safe band', style: _em),
           const TextSpan(
@@ -1591,7 +1626,7 @@ class _SafeBandBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -1601,19 +1636,19 @@ class _LoadingPropBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Inside a button, use the '),
-          ElCode.span('loading'),
+          Code.span('loading'),
           const TextSpan(
             text: ' prop rather than placing a spinner by hand — it also sets ',
           ),
-          ElCode.span('aria-busy'),
+          Code.span('aria-busy'),
           const TextSpan(text: ' and disables the control.'),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -1625,7 +1660,7 @@ class _EmptySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'empty',
       title: 'Empty states',
       // Straight single quotes around 'No results', here and in §7's fourth
@@ -1637,31 +1672,31 @@ class _EmptySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElGrid(
+          Grid(
             lg: 2,
             children: <Widget>[
-              ElPanel(
+              Panel(
                 // U+2014 in both labels.
                 label: 'Empty Stash — first-time user',
-                child: ElEmpty(
+                child: Empty(
                   children: <Widget>[
-                    const ElEmptyHeader(
+                    const EmptyHeader(
                       children: <Widget>[
-                        ElEmptyMedia(
-                          glyph: ElIconGlyph.packageOpen,
-                          tone: ElIconTone.action,
+                        EmptyMedia(
+                          glyph: IconGlyph.packageOpen,
+                          tone: IconTone.action,
                         ),
-                        ElEmptyTitle('Your Stash is empty'),
-                        ElEmptyDescription(
+                        EmptyTitle('Your Stash is empty'),
+                        EmptyDescription(
                           'Cards land here the moment a pack finishes '
                           'opening. Open your first pack to start a '
                           'collection.',
                         ),
                       ],
                     ),
-                    ElEmptyContent(
+                    EmptyContent(
                       children: <Widget>[
-                        ElButton(
+                        Button(
                           onPressed: () {},
                           child: const Text('Browse Packs'),
                         ),
@@ -1670,27 +1705,27 @@ class _EmptySection extends StatelessWidget {
                   ],
                 ),
               ),
-              ElPanel(
+              Panel(
                 label: 'No search results — filters too narrow',
-                child: ElEmpty(
+                child: Empty(
                   children: <Widget>[
-                    const ElEmptyHeader(
+                    const EmptyHeader(
                       children: <Widget>[
-                        ElEmptyMedia(
-                          glyph: ElIconGlyph.search,
-                          tone: ElIconTone.subtle,
+                        EmptyMedia(
+                          glyph: IconGlyph.search,
+                          tone: IconTone.subtle,
                         ),
-                        ElEmptyTitle('No packs match those filters'),
-                        ElEmptyDescription(
+                        EmptyTitle('No packs match those filters'),
+                        EmptyDescription(
                           r'Nothing between $0 and $10 has a legendary floor. '
                           'Widening the price range will help.',
                         ),
                       ],
                     ),
-                    ElEmptyContent(
+                    EmptyContent(
                       children: <Widget>[
-                        ElButton(
-                          variant: ElButtonVariant.outline,
+                        Button(
+                          variant: ButtonVariant.outline,
                           onPressed: () {},
                           child: const Text('Reset filters'),
                         ),
@@ -1701,13 +1736,13 @@ class _EmptySection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElText(
+          SizedBox(height: space(4)),
+          StyledText(
             'Note the difference: the first is empty because the user is new, '
             'the second because their filters are too narrow. Same component, '
             'completely different copy and action. Brand-specific empty states '
             'belong to the product that needs them, not to the chassis.',
-            ElType.small,
+            TextStyles.small,
           ),
         ],
       ),
@@ -1722,11 +1757,11 @@ class _ApiSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ElSection(
+    return const Section(
       id: 'api',
       title: 'API',
-      child: ElMeta(
-        items: <ElMetaItem>[
+      child: Meta(
+        items: <MetaItem>[
           (
             k: 'Alert variant',
             v: TextSpan(
@@ -1790,12 +1825,12 @@ class _RulesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ElSection(
+    return const Section(
       id: 'rules',
       title: 'Rules',
       // Five and five. Every apostrophe inside an item is straight; only the
-      // panel heading's own "Don’t" carries U+2019, and that is `ElDoDont`'s.
-      child: ElDoDont(
+      // panel heading's own "Don’t" carries U+2019, and that is `DoDont`'s.
+      child: DoDont(
         dos: <String>[
           'Shape every skeleton like the component it stands in for.',
           "Pair a progress bar with the real numbers — '412 / 2,000', not just "

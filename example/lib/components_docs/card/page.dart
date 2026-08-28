@@ -10,10 +10,10 @@
 /// unchanged: it is the Footer section's specimen below, same title, same
 /// copy, same button label.
 ///
-/// `card` is not one widget but six: [ElCard] itself is the painted surface
+/// `card` is not one widget but six: [Card] itself is the painted surface
 /// (a ring rather than a border, a footer that cancels its own bottom
-/// padding), and [ElCardHeader], [ElCardTitle], [ElCardDescription],
-/// [ElCardContent] and [ElCardFooter] are the regions a caller composes by
+/// padding), and [CardHeader], [CardTitle], [CardDescription],
+/// [CardContent] and [CardFooter] are the regions a caller composes by
 /// hand into its `children`. There is no anatomy flag anywhere in the file:
 /// a header with no description renders one grid row instead of two because
 /// `description` was left null, not because a variant said so.
@@ -22,13 +22,25 @@
 /// (the smallest correct construction), then one showcase per region a
 /// caller actually composes — Header, Header with Action, Content, Footer —
 /// plus Custom Fill and Ring, live specimens of the two override fields
-/// `ElCard` exposes for a caller like the data page's own navigating stat
+/// `Card` exposes for a caller like the data page's own navigating stat
 /// card, reused from `example/lib/pages/data.dart`'s `_NavigatingStat`. Then
 /// the eight disclosures.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -51,7 +63,7 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     InstallSection(
       id: 'install',
@@ -78,7 +90,7 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElCard and its five region widgets '
+              'Add the export line so Card and its five region widgets '
               'are reachable the same way the CLI path already makes them.',
           code: "export 'card.dart';",
         ),
@@ -96,7 +108,7 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
       id: 'header',
       title: 'Header',
       description:
-          'ElCardHeader with a title and a description; no action. '
+          'CardHeader with a title and a description; no action. '
           "description's presence is what adds the second row: leave it "
           'null and the header is one line.',
       specimen: _HeaderSpecimen(),
@@ -118,7 +130,7 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
       id: 'content',
       title: 'Content',
       description:
-          'ElCardContent is horizontal padding around whatever a caller '
+          'CardContent is horizontal padding around whatever a caller '
           'gives it: prose, a row of figures, a form. It applies no other '
           'shape of its own.',
       specimen: _ContentSpecimen(),
@@ -131,7 +143,7 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
       description:
           'The old page\'s own "Account" specimen, unchanged: a header, a '
           'content paragraph, and a footer button. A footer as the last '
-          'child is what cancels ElCard\'s own bottom padding, so the '
+          'child is what cancels Card\'s own bottom padding, so the '
           "footer's band sits flush against the card's own edge.",
       specimen: _FooterSpecimen(),
       code: _footerCode,
@@ -141,11 +153,11 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
       id: 'fill-ring',
       title: 'Custom Fill and Ring',
       description:
-          'fill and ringColor are ElCard\'s only two override fields, read '
-          'live off ElTheme.of(context) when left null. Reused from '
+          'fill and ringColor are Card\'s only two override fields, read '
+          'live off ThemeScope.of(context) when left null. Reused from '
           'example/lib/pages/data.dart\'s own navigating stat card: hover '
           'to see theme.card animate to theme.accent while the ring '
-          'brightens to ElPalette.action at 45% alpha. ElCard computes '
+          'brightens to Palette.action at 45% alpha. Card computes '
           'neither transition itself — the caller\'s own '
           'TweenAnimationBuilder does, exactly as shown.',
       specimen: _FillRingSpecimen(),
@@ -157,18 +169,15 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every constructor parameter each of the six exported classes '
-          'declares, plus ElCard\'s own four static helpers: one table per '
+          'declares, plus Card\'s own four static helpers: one table per '
           'class.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElCard', anchor: 'api-elcard'),
-        DocsTocEntry(title: 'ElCardHeader', anchor: 'api-elcardheader'),
-        DocsTocEntry(title: 'ElCardTitle', anchor: 'api-elcardtitle'),
-        DocsTocEntry(
-          title: 'ElCardDescription',
-          anchor: 'api-elcarddescription',
-        ),
-        DocsTocEntry(title: 'ElCardContent', anchor: 'api-elcardcontent'),
-        DocsTocEntry(title: 'ElCardFooter', anchor: 'api-elcardfooter'),
+        DocsTocEntry(title: 'Card', anchor: 'api-elcard'),
+        DocsTocEntry(title: 'CardHeader', anchor: 'api-elcardheader'),
+        DocsTocEntry(title: 'CardTitle', anchor: 'api-elcardtitle'),
+        DocsTocEntry(title: 'CardDescription', anchor: 'api-elcarddescription'),
+        DocsTocEntry(title: 'CardContent', anchor: 'api-elcardcontent'),
+        DocsTocEntry(title: 'CardFooter', anchor: 'api-elcardfooter'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -176,7 +185,7 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElCard itself renders no MouseRegion, Focus or GestureDetector: '
+          'Card itself renders no MouseRegion, Focus or GestureDetector: '
           'every row here is either a structural fact read off card.dart, '
           'or a caller-built state like the Custom Fill and Ring specimen '
           'above.',
@@ -224,7 +233,7 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/data_display_test.dart',
             description:
-                'ElCard is covered inside the shared data-display suite: '
+                'Card is covered inside the shared data-display suite: '
                 'there is no dedicated card_test.dart in the package yet.',
           ),
           const DocsInstallFact(
@@ -259,15 +268,12 @@ class CardDocPage extends StatelessWidget {
       title: cardDocSpec.title,
       description: cardDocSpec.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Card'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Card'),
     ],
     toc: cardDocSpec.toc,
-    previous: const DocsPageLink(
-      title: 'Button',
-      route: '/components/button',
-    ),
+    previous: const DocsPageLink(title: 'Button', route: '/components/button'),
     next: const DocsPageLink(title: 'Dialog', route: '/components/dialog'),
     onNavigate: onNavigate,
     child: KeyedSubtree(
@@ -284,46 +290,41 @@ class _PreviewSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: el(2)),
+        padding: EdgeInsets.symmetric(horizontal: space(2)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
               key: const ValueKey<String>('card-preview:action'),
-              // el(80) (320px) overflows this row's 'Prize pool' label
+              // space(80) (320px) overflows this row's 'Prize pool' label
               // against the 'numMd' price by 53px once the card's own
               // 32px of horizontal padding is subtracted — widened to
-              // el(96) (384px), the same measure DocsShowcase.tallMinHeight
+              // space(96) (384px), the same measure DocsShowcase.tallMinHeight
               // uses, rather than shrinking the type or the copy.
-              width: el(96),
-              child: ElCard(
+              width: space(96),
+              child: Card(
                 children: <Widget>[
-                  const ElCardHeader(
-                    title: ElCardTitle('Weekly competition'),
-                    description: ElCardDescription(
-                      'Ends in 2 days, 14 hours.',
-                    ),
-                    action: ElBadge(
-                      label: 'Live',
-                      variant: ElBadgeVariant.premium,
-                    ),
+                  const CardHeader(
+                    title: CardTitle('Weekly competition'),
+                    description: CardDescription('Ends in 2 days, 14 hours.'),
+                    action: Badge(label: 'Live', variant: BadgeVariant.premium),
                   ),
-                  ElCardContent(
+                  CardContent(
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        ElText('Prize pool', ElType.section),
-                        ElText(
+                        StyledText('Prize pool', TextStyles.section),
+                        StyledText(
                           r'$24,000.00',
-                          ElType.numMd,
-                          color: theme.valueInk,
+                          TextStyles.numberMd,
+                          color: theme.premiumText,
                         ),
                       ],
                     ),
@@ -331,25 +332,25 @@ class _PreviewSpecimen extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: el(6)),
+            SizedBox(width: space(6)),
             SizedBox(
               key: const ValueKey<String>('card-preview:footer'),
-              width: el(80),
-              child: ElCard(
+              width: space(80),
+              child: Card(
                 children: <Widget>[
-                  const ElCardHeader(
-                    title: ElCardTitle('Account'),
-                    description: ElCardDescription(
+                  const CardHeader(
+                    title: CardTitle('Account'),
+                    description: CardDescription(
                       'Manage your account settings.',
                     ),
                   ),
-                  const ElCardContent(
+                  const CardContent(
                     child: Text(
                       'Your profile and security settings live here.',
                     ),
                   ),
-                  ElCardFooter(
-                    child: ElButton(
+                  CardFooter(
+                    child: Button(
                       expanded: true,
                       onPressed: () {},
                       child: const Text('Save changes'),
@@ -366,19 +367,19 @@ class _PreviewSpecimen extends StatelessWidget {
 }
 
 const String _previewCode = '''
-ElCard(
+Card(
   children: [
-    ElCardHeader(
-      title: ElCardTitle('Weekly competition'),
-      description: ElCardDescription('Ends in 2 days, 14 hours.'),
-      action: ElBadge(label: 'Live', variant: ElBadgeVariant.premium),
+    CardHeader(
+      title: CardTitle('Weekly competition'),
+      description: CardDescription('Ends in 2 days, 14 hours.'),
+      action: Badge(label: 'Live', variant: BadgeVariant.premium),
     ),
-    ElCardContent(
+    CardContent(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          ElText('Prize pool', ElType.section),
-          ElText(r'\$24,000.00', ElType.numMd, color: theme.valueInk),
+          StyledText('Prize pool', TextStyles.section),
+          StyledText(r'\$24,000.00', TextStyles.numberMd, color: theme.premiumText),
         ],
       ),
     ),
@@ -388,10 +389,10 @@ ElCard(
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElCard(
+Card(
   children: [
-    ElCardHeader(title: ElCardTitle('Title')),
-    ElCardContent(child: Text('Body copy.')),
+    CardHeader(title: CardTitle('Title')),
+    CardContent(child: Text('Body copy.')),
   ],
 )''';
 
@@ -401,27 +402,27 @@ class _HeaderSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     key: const ValueKey<String>('card-example:header'),
-    width: el(80),
-    child: ElCard(
+    width: space(80),
+    child: Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Your collection'),
-          description: ElCardDescription('Across 8 card sets.'),
+        const CardHeader(
+          title: CardTitle('Your collection'),
+          description: CardDescription('Across 8 card sets.'),
         ),
-        const ElCardContent(child: Text('1,284 cards owned.')),
+        const CardContent(child: Text('1,284 cards owned.')),
       ],
     ),
   );
 }
 
 const String _headerCode = '''
-ElCard(
+Card(
   children: [
-    ElCardHeader(
-      title: ElCardTitle('Your collection'),
-      description: ElCardDescription('Across 8 card sets.'),
+    CardHeader(
+      title: CardTitle('Your collection'),
+      description: CardDescription('Across 8 card sets.'),
     ),
-    ElCardContent(child: Text('1,284 cards owned.')),
+    CardContent(child: Text('1,284 cards owned.')),
   ],
 )''';
 
@@ -431,15 +432,15 @@ class _HeaderActionSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     key: const ValueKey<String>('card-example:header-action'),
-    width: el(80),
-    child: ElCard(
+    width: space(80),
+    child: Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Weekly competition'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Weekly competition'),
+          description: CardDescription(
             'Ends in 2 days, 14 hours. Top 100 collectors share the pool.',
           ),
-          action: ElBadge(label: 'Live', variant: ElBadgeVariant.premium),
+          action: Badge(label: 'Live', variant: BadgeVariant.premium),
         ),
       ],
     ),
@@ -447,14 +448,14 @@ class _HeaderActionSpecimen extends StatelessWidget {
 }
 
 const String _headerActionCode = '''
-ElCard(
+Card(
   children: [
-    ElCardHeader(
-      title: ElCardTitle('Weekly competition'),
-      description: ElCardDescription(
+    CardHeader(
+      title: CardTitle('Weekly competition'),
+      description: CardDescription(
         'Ends in 2 days, 14 hours. Top 100 collectors share the pool.',
       ),
-      action: ElBadge(label: 'Live', variant: ElBadgeVariant.premium),
+      action: Badge(label: 'Live', variant: BadgeVariant.premium),
     ),
   ],
 )''';
@@ -469,38 +470,38 @@ class _ContentSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
       key: const ValueKey<String>('card-example:content'),
-      // el(80) (320px) overflows this row's two figure columns by 40px
+      // space(80) (320px) overflows this row's two figure columns by 40px
       // once the card's own 32px of horizontal padding is subtracted —
-      // widened to el(96) (384px), the same fix Preview's action card
+      // widened to space(96) (384px), the same fix Preview's action card
       // above needed for the same reason.
-      width: el(96),
-      child: ElCard(
+      width: space(96),
+      child: Card(
         children: <Widget>[
-          const ElCardHeader(title: ElCardTitle('Your collection')),
-          ElCardContent(
+          const CardHeader(title: CardTitle('Your collection')),
+          CardContent(
             // `Expanded` rather than a bare `spaceBetween` Row: two
             // unconstrained columns summed past the available width at a
             // narrow viewport, where the frame can squeeze this specimen
-            // below its own requested `el(96)`. Splitting the row in half
+            // below its own requested `space(96)`. Splitting the row in half
             // keeps each figure's own left alignment while guaranteeing
             // neither column can push the row past its constraint.
             child: Row(
               children: <Widget>[
                 for (int i = 0; i < _figures.length; i++) ...<Widget>[
-                  if (i > 0) SizedBox(width: el(4)),
+                  if (i > 0) SizedBox(width: space(4)),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        ElText(_figures[i].k, ElType.section),
-                        SizedBox(height: el(1.5)),
-                        ElText(
+                        StyledText(_figures[i].k, TextStyles.section),
+                        SizedBox(height: space(1.5)),
+                        StyledText(
                           _figures[i].v,
-                          ElType.numMd,
+                          TextStyles.numberMd,
                           color: theme.foreground,
                         ),
                       ],
@@ -517,15 +518,15 @@ class _ContentSpecimen extends StatelessWidget {
 }
 
 const String _contentCode = '''
-ElCard(
+Card(
   children: [
-    ElCardHeader(title: ElCardTitle('Your collection')),
-    ElCardContent(
+    CardHeader(title: CardTitle('Your collection')),
+    CardContent(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(children: [ElText('Total value', ElType.section), Text(r'\$12,480.65')]),
-          Column(children: [ElText('Cards owned', ElType.section), Text('1,284')]),
+          Column(children: [StyledText('Total value', TextStyles.section), Text(r'\$12,480.65')]),
+          Column(children: [StyledText('Cards owned', TextStyles.section), Text('1,284')]),
         ],
       ),
     ),
@@ -541,18 +542,18 @@ class _FooterSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     key: const ValueKey<String>('card-example:footer'),
-    width: el(80),
-    child: ElCard(
+    width: space(80),
+    child: Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Account'),
-          description: ElCardDescription('Manage your account settings.'),
+        const CardHeader(
+          title: CardTitle('Account'),
+          description: CardDescription('Manage your account settings.'),
         ),
-        const ElCardContent(
+        const CardContent(
           child: Text('Your profile and security settings live here.'),
         ),
-        ElCardFooter(
-          child: ElButton(onPressed: () {}, child: const Text('Save changes')),
+        CardFooter(
+          child: Button(onPressed: () {}, child: const Text('Save changes')),
         ),
       ],
     ),
@@ -560,25 +561,25 @@ class _FooterSpecimen extends StatelessWidget {
 }
 
 const String _footerCode = '''
-ElCard(
+Card(
   children: [
-    ElCardHeader(
-      title: ElCardTitle('Account'),
-      description: ElCardDescription('Manage your account settings.'),
+    CardHeader(
+      title: CardTitle('Account'),
+      description: CardDescription('Manage your account settings.'),
     ),
-    ElCardContent(
+    CardContent(
       child: Text('Your profile and security settings live here.'),
     ),
-    ElCardFooter(
-      child: ElButton(onPressed: () {}, child: const Text('Save changes')),
+    CardFooter(
+      child: Button(onPressed: () {}, child: const Text('Save changes')),
     ),
   ],
 )''';
 
 /// The navigating stat card, reused from `example/lib/pages/data.dart`'s
 /// `_NavigatingStat`: `fill` tweens to `theme.accent` and `ringColor` to
-/// `ElPalette.action` at 45% alpha on hover, both driven by the call site's
-/// own `TweenAnimationBuilder`, not by `ElCard`.
+/// `Palette.action` at 45% alpha on hover, both driven by the call site's
+/// own `TweenAnimationBuilder`, not by `Card`.
 class _FillRingSpecimen extends StatefulWidget {
   const _FillRingSpecimen();
 
@@ -593,33 +594,27 @@ class _FillRingSpecimenState extends State<_FillRingSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: ElPress(
+      child: Press(
         onTap: () {},
         child: SizedBox(
           key: const ValueKey<String>('card-example:fill-ring'),
-          width: el(64),
+          width: space(64),
           child: TweenAnimationBuilder<Color?>(
-            duration: elAnimationDuration(
-              context,
-              ElDurations.transitionDefault,
-            ),
-            curve: ElCurves.out,
+            duration: effectiveMotionDuration(context, MotionDurations.normal),
+            curve: MotionCurves.enter,
             tween: ColorTween(end: _hovered ? theme.accent : theme.card),
-            builder: (BuildContext context, Color? fill, Widget? child) =>
-                ElCard(
-                  fill: fill,
-                  ringColor: _hovered
-                      ? ElPalette.action.withValues(alpha: _hoverRingAlpha)
-                      : ElCard.ringOf(theme),
-                  children: <Widget>[child!],
-                ),
-            child: const ElCardContent(
-              child: Text('Hover or press this card.'),
+            builder: (BuildContext context, Color? fill, Widget? child) => Card(
+              fill: fill,
+              ringColor: _hovered
+                  ? Palette.action.withValues(alpha: _hoverRingAlpha)
+                  : Card.ringOf(theme),
+              children: <Widget>[child!],
             ),
+            child: const CardContent(child: Text('Hover or press this card.')),
           ),
         ),
       ),
@@ -629,17 +624,17 @@ class _FillRingSpecimenState extends State<_FillRingSpecimen> {
 
 const String _fillRingCode = '''
 TweenAnimationBuilder<Color?>(
-  duration: elAnimationDuration(context, ElDurations.transitionDefault),
-  curve: ElCurves.out,
+  duration: effectiveMotionDuration(context, MotionDurations.normal),
+  curve: MotionCurves.enter,
   tween: ColorTween(end: hovered ? theme.accent : theme.card),
-  builder: (context, fill, child) => ElCard(
+  builder: (context, fill, child) => Card(
     fill: fill,
     ringColor: hovered
-        ? ElPalette.action.withValues(alpha: 0.45)
-        : ElCard.ringOf(theme),
+        ? Palette.action.withValues(alpha: 0.45)
+        : Card.ringOf(theme),
     children: [child!],
   ),
-  child: const ElCardContent(child: Text('Hover or press this card.')),
+  child: const CardContent(child: Text('Hover or press this card.')),
 )''';
 
 /* ── API Reference ──────────────────────────────────────────────────────── */
@@ -656,52 +651,52 @@ class _ApiReferenceContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const DocsApiTable(title: 'ElCard', facts: _cardApiFacts),
-            SizedBox(height: el(6)),
+            const DocsApiTable(title: 'Card', facts: _cardApiFacts),
+            SizedBox(height: space(6)),
             const DocsApiTable(
-              title: 'ElCard static helpers',
+              title: 'Card static helpers',
               facts: _cardStaticFacts,
             ),
           ],
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elcardheader',
         child: const DocsApiTable(
-          title: 'ElCardHeader',
+          title: 'CardHeader',
           facts: _cardHeaderApiFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elcardtitle',
         child: const DocsApiTable(
-          title: 'ElCardTitle',
+          title: 'CardTitle',
           facts: _cardTitleApiFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elcarddescription',
         child: const DocsApiTable(
-          title: 'ElCardDescription',
+          title: 'CardDescription',
           facts: _cardDescriptionApiFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elcardcontent',
         child: const DocsApiTable(
-          title: 'ElCardContent',
+          title: 'CardContent',
           facts: _cardContentApiFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elcardfooter',
         child: const DocsApiTable(
-          title: 'ElCardFooter',
+          title: 'CardFooter',
           facts: _cardFooterApiFacts,
         ),
       ),
@@ -714,8 +709,8 @@ const List<DocsApiFact> _cardApiFacts = <DocsApiFact>[
     name: 'children',
     type: 'List<Widget>',
     description:
-        'Required. ElCardHeader, ElCardContent, ElCardFooter, in the order '
-        'they are written; ElCard imposes no ordering of its own.',
+        'Required. CardHeader, CardContent, CardFooter, in the order '
+        'they are written; Card imposes no ordering of its own.',
   ),
   DocsApiFact(
     name: 'fill',
@@ -729,7 +724,7 @@ const List<DocsApiFact> _cardApiFacts = <DocsApiFact>[
     name: 'ringColor',
     type: 'Color?',
     description:
-        'Overrides the default ring (ElCard.ringOf(theme), theme.foreground '
+        'Overrides the default ring (Card.ringOf(theme), theme.foreground '
         'at 10% alpha). Null falls back to the default.',
   ),
 ];
@@ -739,22 +734,22 @@ const List<DocsApiFact> _cardStaticFacts = <DocsApiFact>[
     name: 'spacing',
     type: 'double (static getter)',
     description:
-        "el(4), 16px. One number for both ElCard's own padding and the gap "
+        "space(4), 16px. One number for both Card's own padding and the gap "
         'between its children.',
   ),
   DocsApiFact(
     name: 'radius',
     type: 'double (static getter)',
-    description: 'ElRadii.xl — the corner radius the whole card clips to.',
+    description: 'Radii.xl — the corner radius the whole card clips to.',
   ),
   DocsApiFact(
     name: 'ringWidth',
     type: 'double (static getter)',
-    description: 'ElWidths.hairline — the ring\'s own spread.',
+    description: 'BorderWidths.hairline — the ring\'s own spread.',
   ),
   DocsApiFact(
     name: 'ringOf(theme)',
-    type: 'Color Function(ElThemeData)',
+    type: 'Color Function(ThemeTokens)',
     description: 'The default ring colour: theme.foreground at 10% alpha.',
   ),
 ];
@@ -763,13 +758,13 @@ const List<DocsApiFact> _cardHeaderApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'title',
     type: 'Widget',
-    description: 'Required. Usually an ElCardTitle.',
+    description: 'Required. Usually an CardTitle.',
   ),
   DocsApiFact(
     name: 'description',
     type: 'Widget?',
     description:
-        "Usually an ElCardDescription. Its presence is what adds the "
+        "Usually an CardDescription. Its presence is what adds the "
         "header's second row; null leaves the header one line.",
   ),
   DocsApiFact(
@@ -787,7 +782,7 @@ const List<DocsApiFact> _cardTitleApiFacts = <DocsApiFact>[
     name: 'text',
     type: 'String (positional)',
     description:
-        'Required. Renders through ElText at ElComponentType.cardTitle.',
+        'Required. Renders through StyledText at TextStyles.cardTitle.',
   ),
 ];
 
@@ -796,7 +791,7 @@ const List<DocsApiFact> _cardDescriptionApiFacts = <DocsApiFact>[
     name: 'text',
     type: 'String (positional)',
     description:
-        'Required. Renders through ElText at ElComponentType.textSm, '
+        'Required. Renders through StyledText at TextStyles.bodySmall, '
         'coloured theme.mutedForeground.',
   ),
 ];
@@ -807,7 +802,7 @@ const List<DocsApiFact> _cardContentApiFacts = <DocsApiFact>[
     type: 'Widget',
     description:
         "Required. Whatever a caller wants: prose, a row of figures, a "
-        "form. ElCardContent adds only ElCard's own horizontal padding.",
+        "form. CardContent adds only Card's own horizontal padding.",
   ),
 ];
 
@@ -817,7 +812,7 @@ const List<DocsApiFact> _cardFooterApiFacts = <DocsApiFact>[
     type: 'Widget',
     description:
         'Required. Painted on a muted band with a top rule; as the last '
-        "child in ElCard.children it also cancels ElCard's own bottom "
+        "child in Card.children it also cancels Card's own bottom "
         'padding, so the band sits flush against the card edge.',
   ),
 ];
@@ -827,21 +822,21 @@ const List<DocsApiFact> _cardFooterApiFacts = <DocsApiFact>[
 const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Footer present',
-    treatment: 'The last item in children is an ElCardFooter.',
+    treatment: 'The last item in children is an CardFooter.',
     userSignal:
-        "ElCard's own bottom padding drops to 0; the footer's own padding "
+        "Card's own bottom padding drops to 0; the footer's own padding "
         'and top rule take over the band instead.',
   ),
   DocsStateFact(
     state: 'No footer',
     treatment: 'The last item in children is anything else.',
-    userSignal: 'Bottom padding stays at ElCard.spacing (16px).',
+    userSignal: 'Bottom padding stays at Card.spacing (16px).',
   ),
   DocsStateFact(
     state: 'Custom fill',
     treatment: 'Pass fill.',
     userSignal:
-        'Overrides theme.card. ElCard computes no hover fill of its own — '
+        'Overrides theme.card. Card computes no hover fill of its own — '
         'a caller animates it externally, shown in Custom Fill and Ring.',
   ),
   DocsStateFact(
@@ -849,11 +844,12 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment: 'Pass ringColor.',
     userSignal:
         'Overrides the default 10%-alpha foreground ring. Not animated by '
-        'ElCard itself.',
+        'Card itself.',
   ),
   DocsStateFact(
     state: 'No native interactive state',
-    treatment: 'Nothing — ElCard mounts no MouseRegion, Focus, or '
+    treatment:
+        'Nothing — Card mounts no MouseRegion, Focus, or '
         'GestureDetector.',
     userSignal:
         'Hover, press, and focus are entirely caller-built, as in the '
@@ -868,21 +864,21 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Semantic role: none. ElCard renders a DecoratedBox / ClipRRect / '
+      _bullets(ThemeScope.of(context), <String>[
+        'Semantic role: none. Card renders a DecoratedBox / ClipRRect / '
             'ColoredBox / Padding / Column tree and mounts no Semantics node '
             'of its own — a screen reader hears whatever its children '
             'announce, not a card-level container or region role.',
-        'Heading structure: ElCardTitle renders through ElText at '
-            'ElComponentType.cardTitle, a styled Text — it carries no '
+        'Heading structure: CardTitle renders through StyledText at '
+            'TextStyles.cardTitle, a styled Text — it carries no '
             'semantic heading level. A caller building a page outline needs '
             'to wrap it, or reach for a real heading widget instead.',
         'Interactivity is entirely opt-in: the Custom Fill and Ring '
-            'specimen above wraps its ElCard in MouseRegion, ElPress, and '
-            'the caller\'s own tap handler; ElCard itself supplies none of '
+            'specimen above wraps its Card in MouseRegion, Press, and '
+            'the caller\'s own tap handler; Card itself supplies none of '
             'that, and a card with no such wrapper is not focusable, not '
             'tappable, and announces no button or link role.',
-        'Contrast: fill and ringColor are read live off ElTheme.of(context) '
+        'Contrast: fill and ringColor are read live off ThemeScope.of(context) '
             'when left null, so the default ring and background already '
             'clear whatever the active theme guarantees; a caller passing '
             'either override owns that contrast decision.',
@@ -894,11 +890,11 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'card.dart wires no key handling of its own: ElCard takes no '
+      _bullets(ThemeScope.of(context), <String>[
+        'card.dart wires no key handling of its own: Card takes no '
             'focusNode, requests no focus, and reads no LogicalKeyboardKey.',
         'A caller that makes a card interactive — the Custom Fill and Ring '
-            "specimen's ElPress wrapper — owns whatever keyboard story that "
+            "specimen's Press wrapper — owns whatever keyboard story that "
             'gesture layer provides; the source contributes nothing beyond '
             'painting the surface underneath it.',
       ]);
@@ -909,17 +905,17 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in card.dart: BuildContext width '
             'is never read for a layout decision.',
-        'ElCard imposes no width of its own — it shrink-wraps whatever '
+        'Card imposes no width of its own — it shrink-wraps whatever '
             'constraint its caller hands it, which is why every specimen '
             'above sits inside its own SizedBox(width: ...).',
-        "ElCardHeader's action column is a fixed two-column shape at every "
+        "CardHeader's action column is a fixed two-column shape at every "
             'width: no responsive collapsing to a single column on a '
             'narrow viewport.',
         'Every measurement (spacing, radius, ringWidth, gap) is a fixed '
-            '4px-grid value from el(), never a value keyed to viewport.',
+            '4px-grid value from space(), never a value keyed to viewport.',
       ]);
 }
 
@@ -930,23 +926,23 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/card.dart — one file, no companions; the '
             'registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/widgets.dart only.',
-        'Foundation imports: foundation/shadows.dart (ElShadowSpec, the '
-            'ring), foundation/spacing.dart (el()), foundation/theme.dart, '
-            'foundation/typography.dart (ElComponentType.cardTitle / '
-            'textSm), theme_scope.dart (ElText, ElTheme).',
+        'Foundation imports: foundation/shadows.dart (ShadowStyle, the '
+            'ring), foundation/spacing.dart (space()), foundation/theme.dart, '
+            'foundation/typography.dart (TextStyles.cardTitle / '
+            'textSm), theme_scope.dart (StyledText, ThemeScope).',
         'No effect, motion, or sibling-component import: card.dart composes '
             'nothing else in the corpus.',
         'registryDependencies, resolved automatically by `elattar add '
             'card`: source-foundation — copied verbatim from '
             'registry/components/card.json.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: DocsLinkRow(
           links: <DocsLink>[
             DocsLink(label: 'Button', route: '/components/button'),
@@ -963,18 +959,18 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Every colour is read live off ElTheme.of(context) at build time '
+      _bullets(ThemeScope.of(context), <String>[
+        'Every colour is read live off ThemeScope.of(context) at build time '
             'when fill or ringColor is left null: theme.card for the fill, '
             'theme.foreground at 10% alpha for the ring, theme.muted at 50% '
             'alpha for the footer band, theme.border for the footer\'s top '
-            'rule. Flipping ElThemeController re-resolves every one on the '
+            'rule. Flipping ThemeController re-resolves every one on the '
             'next frame.',
-        'The ring is a shadow, not a border: ElShadowSpec draws an outset '
-            '1px spread at ElCard.ringWidth, which is why a card in an '
+        'The ring is a shadow, not a border: ShadowStyle draws an outset '
+            '1px spread at Card.ringWidth, which is why a card in an '
             "82-token column measures the full 82 rather than 80 — a real "
             'border would have cost the box a pixel each side.',
-        'Shape: ElRadii.xl, always. card.dart exposes no radius override; '
+        'Shape: Radii.xl, always. card.dart exposes no radius override; '
             'a caller wanting a different corner composes its own '
             'DecoratedBox instead.',
         'fill and ringColor are the only two theming escape hatches: both '
@@ -983,15 +979,19 @@ class _ThemingContent extends StatelessWidget {
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

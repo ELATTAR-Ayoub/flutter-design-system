@@ -17,15 +17,27 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_section.dart';
 import 'package:example/kit.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: ThemeScope(
+      controller: ThemeController(mode: ColorMode.dark),
       child: Center(child: child),
     ),
   ),
@@ -75,7 +87,9 @@ void main() {
     );
     await tester.pump();
 
-    for (final ElText text in tester.widgetList<ElText>(find.byType(ElText))) {
+    for (final StyledText text in tester.widgetList<StyledText>(
+      find.byType(StyledText),
+    )) {
       expect(
         text.spec.uppercase,
         isFalse,
@@ -84,12 +98,12 @@ void main() {
     }
   });
 
-  testWidgets('the anchor registry is shared with ElSection', (
+  testWidgets('the anchor registry is shared with Section', (
     WidgetTester tester,
   ) async {
-    // `docs_layout.dart` scrolls by `ElSection.anchorKey`. If the split gave
+    // `docs_layout.dart` scrolls by `Section.anchorKey`. If the split gave
     // the two classes separate registries, every table-of-contents link on
     // the site would silently stop working.
-    expect(DocsAnchor.keyFor('shared'), same(ElSection.anchorKey('shared')));
+    expect(DocsAnchor.keyFor('shared'), same(Section.anchorKey('shared')));
   });
 }

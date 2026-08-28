@@ -17,18 +17,30 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:elattar_design_system/src/components/icon_paths.g.index.dart';
-import 'package:flutter/rendering.dart';
+import 'package:elattar_design_system/src/components/ui/icon_paths.g.index.dart';
+import 'package:flutter/rendering.dart' hide ScrollDirection;
 import 'package:flutter/services.dart' show FontLoader;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget host(Widget child, {ElThemeMode mode = ElThemeMode.dark}) => MediaQuery(
+Widget host(Widget child, {ColorMode mode = ColorMode.dark}) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: mode),
+    child: ThemeScope(
+      controller: ThemeController(mode: mode),
       child: Center(child: child),
     ),
   ),
@@ -39,14 +51,14 @@ Widget _hosted = const SizedBox.shrink();
 
 /// A host with an [Overlay], for the one specimen that portals — the media
 /// preview mounts an `OverlayPortal` and needs a theatre to render into.
-Widget overlayHost(Widget child, {ElThemeMode mode = ElThemeMode.dark}) {
+Widget overlayHost(Widget child, {ColorMode mode = ColorMode.dark}) {
   _hosted = child;
   return MediaQuery(
     data: const MediaQueryData(size: Size(1440, 900)),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Overlay(
           initialEntries: <OverlayEntry>[
             OverlayEntry(builder: (BuildContext _) => Center(child: _hosted)),
@@ -57,8 +69,8 @@ Widget overlayHost(Widget child, {ElThemeMode mode = ElThemeMode.dark}) {
   );
 }
 
-ElThemeData themeIn(WidgetTester t, Type of) =>
-    ElTheme.of(t.element(find.byType(of).first));
+ThemeTokens themeIn(WidgetTester t, Type of) =>
+    ThemeScope.of(t.element(find.byType(of).first));
 
 Size sizeOf(WidgetTester t, Finder f) => t.renderObject<RenderBox>(f).size;
 
@@ -128,23 +140,23 @@ void main() {
 
   /* ── Bubble ───────────────────────────────────────────────────────────── */
 
-  group('ElBubbleContent — the painted surface', () {
+  group('BubbleContent — the painted surface', () {
     testWidgets('one line is 39.13 tall on every variant but ghost', (
       WidgetTester t,
     ) async {
-      for (final ElBubbleVariant v in ElBubbleVariant.values) {
+      for (final BubbleVariant v in BubbleVariant.values) {
         await t.pumpWidget(
           host(
             SizedBox(
               width: _column,
-              child: ElBubble(
+              child: Bubble(
                 variant: v,
-                child: const ElBubbleContent(child: Text('Up 14% overnight')),
+                child: const BubbleContent(child: Text('Up 14% overnight')),
               ),
             ),
           ),
         );
-        final double h = sizeOf(t, find.byType(ElBubbleContent)).height;
+        final double h = sizeOf(t, find.byType(BubbleContent)).height;
         // 21.125 line box + `py-2` twice + a 1px border twice = 39.125, and
         // `ghost` drops the padding and keeps the border.
         //
@@ -156,7 +168,7 @@ void main() {
         // accumulates it lives inside a fixed `h-80` panel.
         expect(
           h,
-          closeTo(v == ElBubbleVariant.ghost ? 23.125 : 39.125, 0.2),
+          closeTo(v == BubbleVariant.ghost ? 23.125 : 39.125, 0.2),
           reason: 'variant ${v.label}',
         );
       }
@@ -165,12 +177,9 @@ void main() {
     testWidgets('13px on a 21.125px line box — leading-relaxed, not text-sm', (
       WidgetTester t,
     ) async {
-      expect(ElComponentType.bubbleContent.size, 13);
-      expect(ElComponentType.bubbleContent.height, 1.625);
-      expect(
-        13 * ElComponentType.bubbleContent.height!,
-        closeTo(21.125, 0.001),
-      );
+      expect(TextStyles.bubbleContent.size, 13);
+      expect(TextStyles.bubbleContent.height, 1.625);
+      expect(13 * TextStyles.bubbleContent.height!, closeTo(21.125, 0.001));
     });
 
     testWidgets('the fills are the seven the reference paints', (
@@ -182,21 +191,21 @@ void main() {
             width: _column,
             child: Column(
               children: <Widget>[
-                for (final ElBubbleVariant v in ElBubbleVariant.values)
-                  ElBubble(
+                for (final BubbleVariant v in BubbleVariant.values)
+                  Bubble(
                     variant: v,
-                    child: const ElBubbleContent(child: Text('x')),
+                    child: const BubbleContent(child: Text('x')),
                   ),
               ],
             ),
           ),
         ),
       );
-      final ElThemeData theme = themeIn(t, ElBubble);
+      final ThemeTokens theme = themeIn(t, Bubble);
       final List<BoxDecoration> decorations = t
           .widgetList<AnimatedContainer>(
             find.descendant(
-              of: find.byType(ElBubbleContent),
+              of: find.byType(BubbleContent),
               matching: find.byType(AnimatedContainer),
             ),
           )
@@ -206,7 +215,7 @@ void main() {
       expect(decorations[0].color, theme.primary);
       expect(decorations[1].color, theme.secondary);
       expect(decorations[2].color, theme.muted);
-      expect(decorations[3].color, theme.bubbleTinted);
+      expect(decorations[3].color, theme.messageAccent);
       expect(decorations[4].color, theme.background);
       expect(decorations[5].color!.a, 0);
       expect(
@@ -228,9 +237,9 @@ void main() {
             width: _column,
             child: Column(
               children: <Widget>[
-                const ElBubble(child: ElBubbleContent(child: Text('inert'))),
-                ElBubble(
-                  child: ElBubbleContent(
+                const Bubble(child: BubbleContent(child: Text('inert'))),
+                Bubble(
+                  child: BubbleContent(
                     onPressed: () {},
                     child: const Text('control'),
                   ),
@@ -243,7 +252,7 @@ void main() {
       final List<AnimatedContainer> boxes = t
           .widgetList<AnimatedContainer>(
             find.descendant(
-              of: find.byType(ElBubbleContent),
+              of: find.byType(BubbleContent),
               matching: find.byType(AnimatedContainer),
             ),
           )
@@ -251,8 +260,8 @@ void main() {
       // Measured `transition-property: all` at 0s on a div.
       expect(boxes[0].duration, Duration.zero);
       // Measured 0.25s on `cubic-bezier(0.22, 1, 0.36, 1)`.
-      expect(boxes[1].duration, ElDurations.transitionDefault);
-      expect(boxes[1].curve, ElCurves.out);
+      expect(boxes[1].duration, MotionDurations.normal);
+      expect(boxes[1].curve, MotionCurves.enter);
     });
 
     testWidgets('ghost is the only variant allowed the full column', (
@@ -262,29 +271,26 @@ void main() {
           'Six cards, two of them graded, and every one of them listed inside '
           'the same eleven minutes on four accounts that had never bought this '
           'set before today, which is the part worth looking at.';
-      for (final ElBubbleVariant v in <ElBubbleVariant>[
-        ElBubbleVariant.muted,
-        ElBubbleVariant.ghost,
+      for (final BubbleVariant v in <BubbleVariant>[
+        BubbleVariant.muted,
+        BubbleVariant.ghost,
       ]) {
         await t.pumpWidget(
           host(
             SizedBox(
               width: _column,
-              child: ElBubble(
+              child: Bubble(
                 variant: v,
-                child: const ElBubbleContent(child: Text(long)),
+                child: const BubbleContent(child: Text(long)),
               ),
             ),
           ),
         );
-        final double w = sizeOf(t, find.byType(ElBubbleContent)).width;
-        if (v == ElBubbleVariant.ghost) {
+        final double w = sizeOf(t, find.byType(BubbleContent)).width;
+        if (v == BubbleVariant.ghost) {
           expect(w, closeTo(_column, 0.5));
         } else {
-          expect(
-            w,
-            lessThanOrEqualTo(_column * ElBubble.maxWidthFraction + 0.5),
-          );
+          expect(w, lessThanOrEqualTo(_column * Bubble.maxWidthFraction + 0.5));
         }
       }
     });
@@ -292,10 +298,10 @@ void main() {
 
   /* ── Reactions ────────────────────────────────────────────────────────── */
 
-  group('ElBubbleReactions', () {
-    const List<ElBubbleReaction> reactions = <ElBubbleReaction>[
-      ElBubbleReaction(emoji: 'A', count: 12, label: 'fire', mine: true),
-      ElBubbleReaction(emoji: 'B', count: 8, label: 'a heart'),
+  group('BubbleReactions', () {
+    const List<BubbleReaction> reactions = <BubbleReaction>[
+      BubbleReaction(emoji: 'A', count: 12, label: 'fire', mine: true),
+      BubbleReaction(emoji: 'B', count: 8, label: 'a heart'),
     ];
 
     testWidgets('the data rail drops its padding; the bare rail keeps 2/6', (
@@ -305,9 +311,9 @@ void main() {
         host(
           SizedBox(
             width: 400,
-            child: ElBubble(
-              reactions: const ElBubbleReactions(children: <Widget>[Text('A')]),
-              child: const ElBubbleContent(child: Text('Nice pull')),
+            child: Bubble(
+              reactions: const BubbleReactions(children: <Widget>[Text('A')]),
+              child: const BubbleContent(child: Text('Nice pull')),
             ),
           ),
         ),
@@ -315,23 +321,23 @@ void main() {
       Container rail = t.widget<Container>(
         find
             .descendant(
-              of: find.byType(ElBubbleReactions),
+              of: find.byType(BubbleReactions),
               matching: find.byType(Container),
             )
             .first,
       );
       expect(
         rail.padding,
-        EdgeInsets.symmetric(horizontal: el(1.5), vertical: el(0.5)),
+        EdgeInsets.symmetric(horizontal: space(1.5), vertical: space(0.5)),
       );
 
       await t.pumpWidget(
         host(
           SizedBox(
             width: 400,
-            child: ElBubble(
-              reactions: const ElBubbleReactions(reactions: reactions),
-              child: const ElBubbleContent(child: Text('Nice pull')),
+            child: Bubble(
+              reactions: const BubbleReactions(reactions: reactions),
+              child: const BubbleContent(child: Text('Nice pull')),
             ),
           ),
         ),
@@ -339,7 +345,7 @@ void main() {
       rail = t.widget<Container>(
         find
             .descendant(
-              of: find.byType(ElBubbleReactions),
+              of: find.byType(BubbleReactions),
               matching: find.byType(Container),
             )
             .first,
@@ -355,18 +361,18 @@ void main() {
         host(
           SizedBox(
             width: 400,
-            child: ElBubble(
-              reactions: const ElBubbleReactions(children: <Widget>[Text('A')]),
-              child: const ElBubbleContent(child: Text('Nice pull')),
+            child: Bubble(
+              reactions: const BubbleReactions(children: <Widget>[Text('A')]),
+              child: const BubbleContent(child: Text('Nice pull')),
             ),
           ),
         ),
       );
-      final ElThemeData theme = themeIn(t, ElBubble);
+      final ThemeTokens theme = themeIn(t, Bubble);
       final Container rail = t.widget<Container>(
         find
             .descendant(
-              of: find.byType(ElBubbleReactions),
+              of: find.byType(BubbleReactions),
               matching: find.byType(Container),
             )
             .first,
@@ -374,7 +380,7 @@ void main() {
       final BoxShadow ring =
           (rail.decoration! as BoxDecoration).boxShadow!.single;
       expect(ring.color, theme.card);
-      expect(ring.spreadRadius, ElBubbleReactions.ring);
+      expect(ring.spreadRadius, BubbleReactions.ring);
       expect(ring.blurRadius, 0);
       expect(ring.offset, Offset.zero);
     });
@@ -382,32 +388,32 @@ void main() {
     testWidgets('side flips the overhang; align flips the inset', (
       WidgetTester t,
     ) async {
-      for (final ElBubbleSide side in ElBubbleSide.values) {
+      for (final BubbleSide side in BubbleSide.values) {
         await t.pumpWidget(
           host(
             SizedBox(
               width: 400,
-              child: ElBubble(
-                reactions: ElBubbleReactions(
+              child: Bubble(
+                reactions: BubbleReactions(
                   side: side,
                   children: const <Widget>[Text('A')],
                 ),
-                child: const ElBubbleContent(child: Text('Nice pull')),
+                child: const BubbleContent(child: Text('Nice pull')),
               ),
             ),
           ),
         );
         final FractionalTranslation shift = t.widget<FractionalTranslation>(
           find.descendant(
-            of: find.byType(ElBubbleReactions),
+            of: find.byType(BubbleReactions),
             matching: find.byType(FractionalTranslation),
           ),
         );
         expect(
           shift.translation.dy,
-          side == ElBubbleSide.top
-              ? -ElBubbleReactions.overhang
-              : ElBubbleReactions.overhang,
+          side == BubbleSide.top
+              ? -BubbleReactions.overhang
+              : BubbleReactions.overhang,
         );
       }
     });
@@ -419,9 +425,9 @@ void main() {
           host(
             SizedBox(
               width: 400,
-              child: ElBubble(
-                reactions: const ElBubbleReactions(reactions: reactions),
-                child: const ElBubbleContent(child: Text('Nice pull')),
+              child: Bubble(
+                reactions: const BubbleReactions(reactions: reactions),
+                child: const BubbleContent(child: Text('Nice pull')),
               ),
             ),
           ),
@@ -431,8 +437,8 @@ void main() {
               find.byType(TweenAnimationBuilder<double>),
             )
             .first;
-        expect(reveal.duration, ElDurations.transitionDefault);
-        expect(reveal.curve, ElCurves.out);
+        expect(reveal.duration, MotionDurations.normal);
+        expect(reveal.curve, MotionCurves.enter);
       },
     );
 
@@ -443,12 +449,12 @@ void main() {
         host(
           SizedBox(
             width: 400,
-            child: ElBubble(
-              reactions: const ElBubbleReactions(
-                showCount: ElShowCount.always,
+            child: Bubble(
+              reactions: const BubbleReactions(
+                showCount: ShowCount.always,
                 reactions: reactions,
               ),
-              child: const ElBubbleContent(child: Text('Nice pull')),
+              child: const BubbleContent(child: Text('Nice pull')),
             ),
           ),
         ),
@@ -463,12 +469,12 @@ void main() {
           host(
             SizedBox(
               width: 400,
-              child: ElBubble(
-                reactions: const ElBubbleReactions(
-                  showCount: ElShowCount.always,
+              child: Bubble(
+                reactions: const BubbleReactions(
+                  showCount: ShowCount.always,
                   reactions: reactions,
                 ),
-                child: const ElBubbleContent(child: Text('Nice pull')),
+                child: const BubbleContent(child: Text('Nice pull')),
               ),
             ),
           ),
@@ -476,20 +482,20 @@ void main() {
         final List<Container> pills = t
             .widgetList<Container>(
               find.descendant(
-                of: find.byType(ElBubbleReactions),
+                of: find.byType(BubbleReactions),
                 matching: find.byType(Container),
               ),
             )
-            .where((Container c) => c.constraints?.maxHeight == el(7))
+            .where((Container c) => c.constraints?.maxHeight == space(7))
             .toList();
         expect(pills, hasLength(2));
-        final ElThemeData theme = themeIn(t, ElBubble);
+        final ThemeTokens theme = themeIn(t, Bubble);
         final BoxDecoration mine = pills[0].decoration! as BoxDecoration;
         final BoxDecoration theirs = pills[1].decoration! as BoxDecoration;
-        expect(mine.color, ElPalette.action.withValues(alpha: 0.10));
+        expect(mine.color, Palette.action.withValues(alpha: 0.10));
         expect(
           (mine.border! as Border).top.color,
-          ElPalette.action.withValues(alpha: 0.40),
+          Palette.action.withValues(alpha: 0.40),
         );
         expect(theirs.color, theme.muted);
         expect((theirs.border! as Border).top.color, theme.border);
@@ -507,24 +513,24 @@ void main() {
         host(
           SizedBox(
             width: 400,
-            child: ElBubble(
-              reactions: const ElBubbleReactions(reactions: reactions),
-              child: const ElBubbleContent(child: Text('Nice pull')),
+            child: Bubble(
+              reactions: const BubbleReactions(reactions: reactions),
+              child: const BubbleContent(child: Text('Nice pull')),
             ),
           ),
         ),
       );
-      final ElPress press = t.widgetList<ElPress>(find.byType(ElPress)).first;
+      final Press press = t.widgetList<Press>(find.byType(Press)).first;
       // Measured: 0.9374 min at ~39ms, spring back peaking at 1.0058.
-      expect(press.scale, ElTransforms.pressScale);
-      expect(press.downDuration, ElDurations.pressDown);
-      expect(press.upDuration, ElDurations.base);
+      expect(press.scale, MotionTransforms.press);
+      expect(press.downDuration, MotionDurations.pressIn);
+      expect(press.upDuration, MotionDurations.normal);
     });
   });
 
   /* ── Message ──────────────────────────────────────────────────────────── */
 
-  group('ElMessage', () {
+  group('Message', () {
     testWidgets('the avatar lifts 32px only when the row carries a footer', (
       WidgetTester t,
     ) async {
@@ -533,19 +539,19 @@ void main() {
           host(
             SizedBox(
               width: _column,
-              child: ElMessage(
-                avatar: ElMessageAvatar(
-                  size: el(8),
+              child: Message(
+                avatar: MessageAvatar(
+                  size: space(8),
                   lifted: withFooter,
                   child: const SizedBox(),
                 ),
-                content: ElMessageContent(
-                  header: const ElMessageHeader(text: 'Atlas'),
+                content: MessageContent(
+                  header: const MessageHeader(text: 'Atlas'),
                   footer: withFooter
-                      ? const ElMessageFooter(text: '09:41')
+                      ? const MessageFooter(text: '09:41')
                       : null,
                   children: const <Widget>[
-                    ElBubble(child: ElBubbleContent(child: Text('hi'))),
+                    Bubble(child: BubbleContent(child: Text('hi'))),
                   ],
                 ),
               ),
@@ -553,7 +559,7 @@ void main() {
           ),
         );
         final Finder lift = find.descendant(
-          of: find.byType(ElMessageAvatar),
+          of: find.byType(MessageAvatar),
           matching: find.byType(Transform),
         );
         expect(lift, withFooter ? findsOneWidget : findsNothing);
@@ -567,24 +573,24 @@ void main() {
           host(
             SizedBox(
               width: _column,
-              child: ElMessage(
-                align: ElBubbleAlign.end,
-                avatar: ElMessageAvatar(size: el(8), child: const SizedBox()),
-                content: const ElMessageContent(
+              child: Message(
+                align: BubbleAlign.end,
+                avatar: MessageAvatar(size: space(8), child: const SizedBox()),
+                content: const MessageContent(
                   children: <Widget>[
-                    ElBubble(child: ElBubbleContent(child: Text('Leave it.'))),
+                    Bubble(child: BubbleContent(child: Text('Leave it.'))),
                   ],
                 ),
               ),
             ),
           ),
         );
-        final RenderBox row = t.renderObject<RenderBox>(find.byType(ElMessage));
+        final RenderBox row = t.renderObject<RenderBox>(find.byType(Message));
         final RenderBox avatar = t.renderObject<RenderBox>(
-          find.byType(ElMessageAvatar),
+          find.byType(MessageAvatar),
         );
         final RenderBox bubble = t.renderObject<RenderBox>(
-          find.byType(ElBubbleContent),
+          find.byType(BubbleContent),
         );
         final double avatarX = avatar
             .localToGlobal(Offset.zero, ancestor: row)
@@ -597,7 +603,7 @@ void main() {
         // `self-end` on the bubble.
         expect(
           bubbleX + bubble.size.width,
-          closeTo(avatarX - ElMessage.gap, 0.5),
+          closeTo(avatarX - Message.gap, 0.5),
         );
       },
     );
@@ -605,20 +611,20 @@ void main() {
     testWidgets('header and footer are 12/16/500 inset 12px, zero on ghost', (
       WidgetTester t,
     ) async {
-      expect(ElComponentType.messageMeta.size, 12);
-      expect(12 * ElComponentType.messageMeta.height!, closeTo(16, 0.001));
+      expect(TextStyles.messageMetadata.size, 12);
+      expect(12 * TextStyles.messageMetadata.height!, closeTo(16, 0.001));
 
       for (final bool ghost in <bool>[false, true]) {
         await t.pumpWidget(
           host(
             SizedBox(
               width: _column,
-              child: ElMessage(
+              child: Message(
                 ghost: ghost,
-                content: const ElMessageContent(
-                  header: ElMessageHeader(text: 'Atlas'),
+                content: const MessageContent(
+                  header: MessageHeader(text: 'Atlas'),
                   children: <Widget>[
-                    ElBubble(child: ElBubbleContent(child: Text('hi'))),
+                    Bubble(child: BubbleContent(child: Text('hi'))),
                   ],
                 ),
               ),
@@ -628,59 +634,56 @@ void main() {
         final Padding pad = t.widget<Padding>(
           find
               .descendant(
-                of: find.byType(ElMessageHeader),
+                of: find.byType(MessageHeader),
                 matching: find.byType(Padding),
               )
               .first,
         );
         expect(
           (pad.padding as EdgeInsets).left,
-          ghost ? 0 : ElMessageHeader.inset,
+          ghost ? 0 : MessageHeader.inset,
         );
-        expect(
-          sizeOf(t, find.byType(ElMessageHeader)).height,
-          closeTo(16, 0.05),
-        );
+        expect(sizeOf(t, find.byType(MessageHeader)).height, closeTo(16, 0.05));
       }
     });
 
     testWidgets('the column stacks on a 10px gap and the group on 8', (
       WidgetTester t,
     ) async {
-      expect(ElMessageContent.gap, 10);
-      expect(ElMessageGroup.gap, 8);
-      expect(ElMessage.gap, 8);
-      expect(ElBubbleGroup.gap, 8);
+      expect(MessageContent.gap, 10);
+      expect(MessageGroup.gap, 8);
+      expect(Message.gap, 8);
+      expect(BubbleGroup.gap, 8);
     });
   });
 
   /* ── Message scroller ─────────────────────────────────────────────────── */
 
-  group('ElMessageScroller', () {
+  group('MessageScroller', () {
     Widget scroller(
-      ElMessageScrollerController c, {
+      MessageScrollerController c, {
       int turns = 11,
       double height = 320,
     }) => host(
       SizedBox(
         width: 1078,
         height: height,
-        child: ElMessageScrollerProvider(
+        child: MessageScrollerProvider(
           controller: c,
-          child: ElMessageScroller(
-            viewport: ElMessageScrollerViewport(
-              child: ElMessageScrollerContent(
-                padding: EdgeInsets.all(el(6)),
+          child: MessageScroller(
+            viewport: MessageScrollerViewport(
+              child: MessageScrollerContent(
+                padding: EdgeInsets.all(space(6)),
                 children: <Widget>[
                   for (int i = 0; i < turns; i++)
-                    ElMessageScrollerItem(
+                    MessageScrollerItem(
                       messageId: 'm$i',
-                      child: ElMessage(
-                        content: ElMessageContent(
+                      child: Message(
+                        content: MessageContent(
                           children: <Widget>[
-                            ElBubble(
-                              variant: ElBubbleVariant.muted,
-                              child: ElBubbleContent(child: Text('turn $i')),
+                            Bubble(
+                              variant: BubbleVariant.muted,
+                              child: BubbleContent(child: Text('turn $i')),
                             ),
                           ],
                         ),
@@ -689,7 +692,7 @@ void main() {
                 ],
               ),
             ),
-            button: const ElMessageScrollerButton(),
+            button: const MessageScrollerButton(),
           ),
         ),
       ),
@@ -698,24 +701,24 @@ void main() {
     testWidgets('the content column is 10px narrower — the stable gutter', (
       WidgetTester t,
     ) async {
-      final ElMessageScrollerController c = ElMessageScrollerController(
-        defaultScrollPosition: ElScrollPosition.start,
+      final MessageScrollerController c = MessageScrollerController(
+        defaultScrollPosition: ScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
       // Measured: a 1078px viewport hands its content 1068.
       expect(
-        sizeOf(t, find.byType(ElMessageScrollerContent)).width,
-        1078 - ElMessageScrollerViewport.gutter,
+        sizeOf(t, find.byType(MessageScrollerContent)).width,
+        1078 - MessageScrollerViewport.gutter,
       );
     });
 
     testWidgets('eleven single-line turns stack to 718.38', (
       WidgetTester t,
     ) async {
-      final ElMessageScrollerController c = ElMessageScrollerController(
-        defaultScrollPosition: ElScrollPosition.start,
+      final MessageScrollerController c = MessageScrollerController(
+        defaultScrollPosition: ScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
@@ -723,7 +726,7 @@ void main() {
       // `p-6` twice + eleven 39.125 items + ten 24px gaps = 718.375, less the
       // 0.125-per-line the engine quantises away (see the bubble height pin).
       expect(
-        sizeOf(t, find.byType(ElMessageScrollerContent)).height,
+        sizeOf(t, find.byType(MessageScrollerContent)).height,
         closeTo(48 + 11 * 39.125 + 10 * 24, 1.5),
       );
     });
@@ -731,20 +734,20 @@ void main() {
     testWidgets('defaultScrollPosition: start rests at the top', (
       WidgetTester t,
     ) async {
-      final ElMessageScrollerController c = ElMessageScrollerController(
-        defaultScrollPosition: ElScrollPosition.start,
+      final MessageScrollerController c = MessageScrollerController(
+        defaultScrollPosition: ScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
       expect(c.offset, 0);
-      expect(c.scrollable(ElScrollDirection.end), isTrue);
-      expect(c.scrollable(ElScrollDirection.start), isFalse);
+      expect(c.scrollable(ScrollDirection.end), isTrue);
+      expect(c.scrollable(ScrollDirection.start), isFalse);
     });
 
     testWidgets('the edge threshold is 8, inclusive', (WidgetTester t) async {
-      final ElMessageScrollerController c = ElMessageScrollerController(
-        defaultScrollPosition: ElScrollPosition.start,
+      final MessageScrollerController c = MessageScrollerController(
+        defaultScrollPosition: ScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
@@ -754,17 +757,17 @@ void main() {
       // Measured: still active at 8px from the end, inactive at 4.
       c.scroll.jumpTo(max - 8);
       await t.pump();
-      expect(c.scrollable(ElScrollDirection.end), isTrue);
+      expect(c.scrollable(ScrollDirection.end), isTrue);
       c.scroll.jumpTo(max - 4);
       await t.pump();
-      expect(c.scrollable(ElScrollDirection.end), isFalse);
+      expect(c.scrollable(ScrollDirection.end), isFalse);
     });
 
     testWidgets('the button snaps its transforms and fades over 250ms', (
       WidgetTester t,
     ) async {
-      final ElMessageScrollerController c = ElMessageScrollerController(
-        defaultScrollPosition: ElScrollPosition.start,
+      final MessageScrollerController c = MessageScrollerController(
+        defaultScrollPosition: ScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
@@ -772,7 +775,7 @@ void main() {
 
       AnimatedOpacity fade() => t.widget<AnimatedOpacity>(
         find.descendant(
-          of: find.byType(ElMessageScrollerButton),
+          of: find.byType(MessageScrollerButton),
           matching: find.byType(AnimatedOpacity),
         ),
       );
@@ -781,7 +784,7 @@ void main() {
       double scale() => t
           .widgetList<Transform>(
             find.descendant(
-              of: find.byType(ElMessageScrollerButton),
+              of: find.byType(MessageScrollerButton),
               matching: find.byType(Transform),
             ),
           )
@@ -790,7 +793,7 @@ void main() {
           .storage[0];
 
       expect(fade().opacity, 1);
-      expect(fade().curve, ElCurves.out);
+      expect(fade().curve, MotionCurves.enter);
       // Active: no scale.
       expect(scale(), 1);
 
@@ -798,32 +801,32 @@ void main() {
       await t.pump();
       expect(fade().opacity, 0);
       // `data-[active=false]:ease-in`.
-      expect(fade().curve, ElCurves.curveIn);
-      expect(fade().duration, ElDurations.transitionDefault);
+      expect(fade().curve, MotionCurves.exit);
+      expect(fade().duration, MotionDurations.normal);
       // `scale-95` — one frame, not a tween.
-      expect(scale(), closeTo(ElMessageScrollerButton.inactiveScale, 0.001));
+      expect(scale(), closeTo(MessageScrollerButton.inactiveScale, 0.001));
     });
 
     testWidgets('the button disables itself once the edge is reached', (
       WidgetTester t,
     ) async {
-      final ElMessageScrollerController c = ElMessageScrollerController(
-        defaultScrollPosition: ElScrollPosition.start,
+      final MessageScrollerController c = MessageScrollerController(
+        defaultScrollPosition: ScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
-      expect(t.widget<ElButton>(find.byType(ElButton)).onPressed, isNotNull);
+      expect(t.widget<Button>(find.byType(Button)).onPressed, isNotNull);
       c.scroll.jumpTo(c.maxOffset);
       await t.pump();
-      expect(t.widget<ElButton>(find.byType(ElButton)).onPressed, isNull);
+      expect(t.widget<Button>(find.byType(Button)).onPressed, isNull);
       expect(
         find.descendant(
-          of: find.byType(ElMessageScrollerButton),
+          of: find.byType(MessageScrollerButton),
           matching: find.byType(IgnorePointer),
         ),
         // Two: this component's `pointer-events-none`, and the disabled
-        // `ElButton`'s own.
+        // `Button`'s own.
         findsNWidgets(2),
       );
     });
@@ -831,16 +834,16 @@ void main() {
     testWidgets('the button carries the five measured colour overrides', (
       WidgetTester t,
     ) async {
-      final ElMessageScrollerController c = ElMessageScrollerController(
-        defaultScrollPosition: ElScrollPosition.start,
+      final MessageScrollerController c = MessageScrollerController(
+        defaultScrollPosition: ScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
-      final ElThemeData theme = themeIn(t, ElMessageScroller);
-      final ElButton button = t.widget<ElButton>(find.byType(ElButton));
-      expect(button.variant, ElButtonVariant.secondary);
-      expect(button.size, ElButtonSize.iconSm);
+      final ThemeTokens theme = themeIn(t, MessageScroller);
+      final Button button = t.widget<Button>(find.byType(Button));
+      expect(button.variant, ButtonVariant.secondary);
+      expect(button.size, ButtonSize.iconSm);
       expect(button.surface!.fill, theme.background);
       expect(button.surface!.hoverFill, theme.muted);
       expect(button.surface!.border, theme.border);
@@ -850,15 +853,15 @@ void main() {
     testWidgets('pressing it rides a √distance smooth scroll to the end', (
       WidgetTester t,
     ) async {
-      final ElMessageScrollerController c = ElMessageScrollerController(
-        defaultScrollPosition: ElScrollPosition.start,
+      final MessageScrollerController c = MessageScrollerController(
+        defaultScrollPosition: ScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
       final double max = c.maxOffset;
 
-      await t.tap(find.byType(ElMessageScrollerButton));
+      await t.tap(find.byType(MessageScrollerButton));
       await t.pump();
       expect(c.autoscrolling, isTrue);
       // 398px measured 335ms; this transcript's own travel is close to it, so
@@ -874,8 +877,8 @@ void main() {
     testWidgets('scrollToMessage finds an item by its id', (
       WidgetTester t,
     ) async {
-      final ElMessageScrollerController c = ElMessageScrollerController(
-        defaultScrollPosition: ElScrollPosition.start,
+      final MessageScrollerController c = MessageScrollerController(
+        defaultScrollPosition: ScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
@@ -890,16 +893,16 @@ void main() {
 
   /* ── scroll-fade-b ────────────────────────────────────────────────────── */
 
-  group('ElScrollFade — the measured mask', () {
+  group('ScrollFade — the measured mask', () {
     test('the full fade is min(12%, 40px) of the viewport', () {
       // 12% of 320 is 38.4, under the 40px cap.
       expect(
-        ElScrollFade.fadeFor(height: 320, offset: 0, max: 398),
+        ScrollFade.fadeFor(height: 320, offset: 0, max: 398),
         closeTo(38.4, 0.001),
       );
       // 12% of 400 is 48, over the cap.
       expect(
-        ElScrollFade.fadeFor(height: 400, offset: 0, max: 398),
+        ScrollFade.fadeFor(height: 400, offset: 0, max: 398),
         closeTo(40, 0.001),
       );
     });
@@ -907,7 +910,7 @@ void main() {
     test('it holds full height until the last 96px of travel', () {
       // Measured: full at scrollTop 299 of 398 (the range opens at 302).
       expect(
-        ElScrollFade.fadeFor(height: 320, offset: 299, max: 398),
+        ScrollFade.fadeFor(height: 320, offset: 299, max: 398),
         closeTo(38.4, 0.001),
       );
     });
@@ -916,34 +919,37 @@ void main() {
       const double full = 38.4;
       // 358 / 398 — 58.33% through the 96px range, measured 0.358826 remaining.
       expect(
-        ElScrollFade.fadeFor(height: 320, offset: 358, max: 398) / full,
+        ScrollFade.fadeFor(height: 320, offset: 358, max: 398) / full,
         closeTo(0.3588, 0.003),
       );
       // 374 — 75%, measured 0.129162.
       expect(
-        ElScrollFade.fadeFor(height: 320, offset: 374, max: 398) / full,
+        ScrollFade.fadeFor(height: 320, offset: 374, max: 398) / full,
         closeTo(0.1292, 0.003),
       );
       // 382 — 87.5%, measured 0.0561308.
       expect(
-        ElScrollFade.fadeFor(height: 320, offset: 382, max: 398) / full,
+        ScrollFade.fadeFor(height: 320, offset: 382, max: 398) / full,
         closeTo(0.0561, 0.003),
       );
       // The end.
-      expect(ElScrollFade.fadeFor(height: 320, offset: 398, max: 398), 0);
+      expect(ScrollFade.fadeFor(height: 320, offset: 398, max: 398), 0);
     });
 
     test('the curve is CSS ease-in-out, not --ease-in-out', () {
       // The measurement that separates them: 0.6412 against 0.716.
-      expect(ElCurves.cssEaseInOut.transform(0.5833), closeTo(0.6437, 0.005));
-      expect(ElCurves.inOut.transform(0.5833), isNot(closeTo(0.6437, 0.02)));
+      expect(
+        MotionCurves.cssEaseInOut.transform(0.5833),
+        closeTo(0.6437, 0.005),
+      );
+      expect(MotionCurves.move.transform(0.5833), isNot(closeTo(0.6437, 0.02)));
     });
 
     testWidgets('rendered: the bottom row is transparent and the top is opaque', (
       WidgetTester t,
     ) async {
-      final ElMessageScrollerController c = ElMessageScrollerController(
-        defaultScrollPosition: ElScrollPosition.start,
+      final MessageScrollerController c = MessageScrollerController(
+        defaultScrollPosition: ScrollPosition.start,
       );
       addTearDown(c.dispose);
       await t.pumpWidget(
@@ -953,11 +959,11 @@ void main() {
             child: SizedBox(
               width: 200,
               height: 320,
-              child: ElMessageScrollerProvider(
+              child: MessageScrollerProvider(
                 controller: c,
-                child: ElMessageScroller(
-                  viewport: ElMessageScrollerViewport(
-                    child: const ElMessageScrollerContent(
+                child: MessageScroller(
+                  viewport: MessageScrollerViewport(
+                    child: const MessageScrollerContent(
                       // One unbroken white column: `gap-6` between twenty boxes
                       // would put transparent stripes where the mask is sampled.
                       children: <Widget>[
@@ -987,31 +993,31 @@ void main() {
 
   /* ── Attachment ───────────────────────────────────────────────────────── */
 
-  group('ElAttachment', () {
+  group('Attachment', () {
     Widget card({
-      ElAttachmentState state = ElAttachmentState.done,
-      ElAttachmentSize size = ElAttachmentSize.md,
-      ElAttachmentOrientation orientation = ElAttachmentOrientation.horizontal,
+      AttachmentState state = AttachmentState.done,
+      AttachmentSize size = AttachmentSize.md,
+      AttachmentOrientation orientation = AttachmentOrientation.horizontal,
       bool content = true,
     }) => host(
       SizedBox(
         width: 400,
         child: Align(
           alignment: Alignment.centerLeft,
-          child: ElAttachment(
+          child: Attachment(
             state: state,
             size: size,
             orientation: orientation,
-            media: ElAttachmentMedia(
-              child: ElIcon.lucide(
-                ElLucide.fileText,
-                sizePx: ElAttachmentMedia.glyphFor(size, orientation),
+            media: AttachmentMedia(
+              child: Icon.lucide(
+                Lucide.fileText,
+                sizePx: AttachmentMedia.glyphFor(size, orientation),
               ),
             ),
             content: content
-                ? const ElAttachmentContent(
-                    title: ElAttachmentTitle('rarity-table.csv'),
-                    description: ElAttachmentDescription('18 KB'),
+                ? const AttachmentContent(
+                    title: AttachmentTitle('rarity-table.csv'),
+                    description: AttachmentDescription('18 KB'),
                   )
                 : null,
           ),
@@ -1022,35 +1028,35 @@ void main() {
     testWidgets('padding is uniform — the has-content rules are dead', (
       WidgetTester t,
     ) async {
-      const Map<ElAttachmentSize, double> measured = <ElAttachmentSize, double>{
-        ElAttachmentSize.md: 8,
-        ElAttachmentSize.sm: 6,
-        ElAttachmentSize.xs: 4,
+      const Map<AttachmentSize, double> measured = <AttachmentSize, double>{
+        AttachmentSize.md: 8,
+        AttachmentSize.sm: 6,
+        AttachmentSize.xs: 4,
       };
-      for (final MapEntry<ElAttachmentSize, double> e in measured.entries) {
-        expect(ElAttachment.paddingFor(e.key), e.value);
+      for (final MapEntry<AttachmentSize, double> e in measured.entries) {
+        expect(Attachment.paddingFor(e.key), e.value);
       }
     });
 
     testWidgets('the three horizontal rows measure 58 / 47 / 43', (
       WidgetTester t,
     ) async {
-      const Map<ElAttachmentSize, double> measured = <ElAttachmentSize, double>{
-        ElAttachmentSize.md: 58,
-        ElAttachmentSize.sm: 47,
-        ElAttachmentSize.xs: 43,
+      const Map<AttachmentSize, double> measured = <AttachmentSize, double>{
+        AttachmentSize.md: 58,
+        AttachmentSize.sm: 47,
+        AttachmentSize.xs: 43,
       };
-      for (final MapEntry<ElAttachmentSize, double> e in measured.entries) {
+      for (final MapEntry<AttachmentSize, double> e in measured.entries) {
         await t.pumpWidget(card(size: e.key));
         expect(
-          sizeOf(t, find.byType(ElAttachment)).height,
+          sizeOf(t, find.byType(Attachment)).height,
           closeTo(e.value, 0.6),
           reason: e.key.label,
         );
         // `min-w-40`.
         expect(
-          sizeOf(t, find.byType(ElAttachment)).width,
-          greaterThanOrEqualTo(ElAttachment.horizontalMinWidth),
+          sizeOf(t, find.byType(Attachment)).width,
+          greaterThanOrEqualTo(Attachment.horizontalMinWidth),
         );
       }
     });
@@ -1059,37 +1065,37 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(
-        card(orientation: ElAttachmentOrientation.vertical, content: false),
+        card(orientation: AttachmentOrientation.vertical, content: false),
       );
-      expect(sizeOf(t, find.byType(ElAttachment)).width, 96);
-      await t.pumpWidget(card(orientation: ElAttachmentOrientation.vertical));
-      expect(sizeOf(t, find.byType(ElAttachment)).width, 120);
+      expect(sizeOf(t, find.byType(Attachment)).width, 96);
+      await t.pumpWidget(card(orientation: AttachmentOrientation.vertical));
+      expect(sizeOf(t, find.byType(Attachment)).width, 120);
     });
 
     testWidgets('the wells are 40 / 32 / 28 and xs takes the tighter radius', (
       WidgetTester t,
     ) async {
-      expect(ElAttachmentMedia.wellFor(ElAttachmentSize.md), 40);
-      expect(ElAttachmentMedia.wellFor(ElAttachmentSize.sm), 32);
-      expect(ElAttachmentMedia.wellFor(ElAttachmentSize.xs), 28);
-      expect(ElAttachmentMedia.radiusFor(ElAttachmentSize.md), ElRadii.lg);
-      expect(ElAttachmentMedia.radiusFor(ElAttachmentSize.xs), ElRadii.md);
-      expect(ElAttachment.radiusFor(ElAttachmentSize.md), ElRadii.xl);
-      expect(ElAttachment.radiusFor(ElAttachmentSize.xs), ElRadii.lg);
+      expect(AttachmentMedia.wellFor(AttachmentSize.md), 40);
+      expect(AttachmentMedia.wellFor(AttachmentSize.sm), 32);
+      expect(AttachmentMedia.wellFor(AttachmentSize.xs), 28);
+      expect(AttachmentMedia.radiusFor(AttachmentSize.md), Radii.lg);
+      expect(AttachmentMedia.radiusFor(AttachmentSize.xs), Radii.md);
+      expect(Attachment.radiusFor(AttachmentSize.md), Radii.xl);
+      expect(Attachment.radiusFor(AttachmentSize.xs), Radii.lg);
     });
 
     testWidgets('the glyph is 16 / 16 / 14, and 24 in a vertical card', (
       WidgetTester t,
     ) async {
-      const ElAttachmentOrientation h = ElAttachmentOrientation.horizontal;
-      const ElAttachmentOrientation v = ElAttachmentOrientation.vertical;
-      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.md, h), 16);
-      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.sm, h), 16);
-      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.xs, h), 14);
-      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.md, v), 24);
-      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.sm, v), 24);
+      const AttachmentOrientation h = AttachmentOrientation.horizontal;
+      const AttachmentOrientation v = AttachmentOrientation.vertical;
+      expect(AttachmentMedia.glyphFor(AttachmentSize.md, h), 16);
+      expect(AttachmentMedia.glyphFor(AttachmentSize.sm, h), 16);
+      expect(AttachmentMedia.glyphFor(AttachmentSize.xs, h), 14);
+      expect(AttachmentMedia.glyphFor(AttachmentSize.md, v), 24);
+      expect(AttachmentMedia.glyphFor(AttachmentSize.sm, v), 24);
       // `xs` is written after `vertical`, so it wins even there.
-      expect(ElAttachmentMedia.glyphFor(ElAttachmentSize.xs, v), 14);
+      expect(AttachmentMedia.glyphFor(AttachmentSize.xs, v), 14);
     });
 
     testWidgets('a vertical sm well stays 32 wide inside a 120 tile', (
@@ -1097,8 +1103,8 @@ void main() {
     ) async {
       await t.pumpWidget(
         card(
-          size: ElAttachmentSize.sm,
-          orientation: ElAttachmentOrientation.vertical,
+          size: AttachmentSize.sm,
+          orientation: AttachmentOrientation.vertical,
         ),
       );
       // The *well*, not the slot: a vertical card stretches its children, so
@@ -1108,7 +1114,7 @@ void main() {
           t,
           find
               .descendant(
-                of: find.byType(ElAttachmentMedia),
+                of: find.byType(AttachmentMedia),
                 matching: find.byType(SizedBox),
               )
               .first,
@@ -1116,12 +1122,9 @@ void main() {
         const Size(32, 32),
       );
 
-      await t.pumpWidget(card(orientation: ElAttachmentOrientation.vertical));
+      await t.pumpWidget(card(orientation: AttachmentOrientation.vertical));
       // `default` takes `w-full`: 120 less `p-2` twice and the border twice.
-      expect(
-        sizeOf(t, find.byType(ElAttachmentMedia)).width,
-        closeTo(102, 0.5),
-      );
+      expect(sizeOf(t, find.byType(AttachmentMedia)).width, closeTo(102, 0.5));
     });
 
     testWidgets('error tints the border, the well and the description', (
@@ -1133,27 +1136,27 @@ void main() {
             width: 400,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: ElAttachment(
-                state: ElAttachmentState.error,
-                media: ElAttachmentMedia(
-                  child: ElIcon.lucide(ElLucide.circleAlert, sizePx: 16),
+              child: Attachment(
+                state: AttachmentState.error,
+                media: AttachmentMedia(
+                  child: Icon.lucide(Lucide.circleAlert, sizePx: 16),
                 ),
-                content: const ElAttachmentContent(
-                  title: ElAttachmentTitle('rarity-table.csv'),
-                  description: ElAttachmentDescription('Upload failed'),
+                content: const AttachmentContent(
+                  title: AttachmentTitle('rarity-table.csv'),
+                  description: AttachmentDescription('Upload failed'),
                 ),
               ),
             ),
           ),
         ),
       );
-      final ElThemeData theme = themeIn(t, ElAttachment);
+      final ThemeTokens theme = themeIn(t, Attachment);
       final BoxDecoration well =
           t
                   .widget<Container>(
                     find
                         .descendant(
-                          of: find.byType(ElAttachmentMedia),
+                          of: find.byType(AttachmentMedia),
                           matching: find.byType(Container),
                         )
                         .first,
@@ -1163,22 +1166,22 @@ void main() {
       expect(well.color, theme.destructive.withValues(alpha: 0.10));
 
       final Text desc = t.widget<Text>(find.text('Upload failed'));
-      expect(desc.style?.color, theme.destructiveInk);
+      expect(desc.style?.color, theme.destructiveText);
     });
 
     testWidgets('idle is the only dashed card', (WidgetTester t) async {
-      for (final ElAttachmentState s in ElAttachmentState.values) {
+      for (final AttachmentState s in AttachmentState.values) {
         await t.pumpWidget(card(state: s));
-        // `ElIcon` is a `CustomPaint` too, so the dash is found by the slot it
+        // `Icon` is a `CustomPaint` too, so the dash is found by the slot it
         // paints in rather than by type.
         expect(
           find.descendant(
-            of: find.byType(ElAttachment),
+            of: find.byType(Attachment),
             matching: find.byWidgetPredicate(
               (Widget w) => w is CustomPaint && w.foregroundPainter != null,
             ),
           ),
-          s == ElAttachmentState.idle ? findsOneWidget : findsNothing,
+          s == AttachmentState.idle ? findsOneWidget : findsNothing,
           reason: s.name,
         );
       }
@@ -1194,10 +1197,10 @@ void main() {
             child: SizedBox(
               width: 160,
               height: 80,
-              child: ElAttachment(
-                state: ElAttachmentState.idle,
-                media: ElAttachmentMedia(
-                  child: ElIcon.lucide(ElLucide.fileText, sizePx: 16),
+              child: Attachment(
+                state: AttachmentState.idle,
+                media: AttachmentMedia(
+                  child: Icon.lucide(Lucide.fileText, sizePx: 16),
                 ),
               ),
             ),
@@ -1214,7 +1217,7 @@ void main() {
       // The card's fill paints under the whole edge, so the dash is read as
       // "nearer `--border` than `--card`" rather than by alpha: the two are
       // rgb(39,39,42) and rgb(24,24,27) in dark, 15/255 apart.
-      final ElThemeData theme = themeIn(t, ElAttachment);
+      final ThemeTokens theme = themeIn(t, Attachment);
       double distance(Color a, Color b) =>
           (a.r - b.r).abs() + (a.g - b.g).abs() + (a.b - b.b).abs();
       int flips = 0;
@@ -1232,13 +1235,12 @@ void main() {
     testWidgets('the title shimmers only while uploading or processing', (
       WidgetTester t,
     ) async {
-      for (final ElAttachmentState s in ElAttachmentState.values) {
+      for (final AttachmentState s in AttachmentState.values) {
         await t.pumpWidget(card(state: s));
         final bool shimmering =
-            s == ElAttachmentState.uploading ||
-            s == ElAttachmentState.processing;
+            s == AttachmentState.uploading || s == AttachmentState.processing;
         expect(
-          find.byType(ElShimmerText),
+          find.byType(AttachmentStatusText),
           shimmering ? findsOneWidget : findsNothing,
           reason: s.name,
         );
@@ -1248,18 +1250,18 @@ void main() {
     testWidgets('the image variant dims to 60% unless done or idle', (
       WidgetTester t,
     ) async {
-      for (final ElAttachmentState s in ElAttachmentState.values) {
+      for (final AttachmentState s in AttachmentState.values) {
         await t.pumpWidget(
           host(
             SizedBox(
               width: 400,
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: ElAttachment(
+                child: Attachment(
                   state: s,
-                  orientation: ElAttachmentOrientation.vertical,
-                  media: const ElAttachmentMedia(
-                    variant: ElAttachmentMediaVariant.image,
+                  orientation: AttachmentOrientation.vertical,
+                  media: const AttachmentMedia(
+                    variant: AttachmentMediaVariant.image,
                     child: ColoredBox(color: Color(0xFF00FF00)),
                   ),
                 ),
@@ -1270,18 +1272,13 @@ void main() {
         final double opacity = t
             .widget<Opacity>(
               find.descendant(
-                of: find.byType(ElAttachmentMedia),
+                of: find.byType(AttachmentMedia),
                 matching: find.byType(Opacity),
               ),
             )
             .opacity;
-        final bool lit =
-            s == ElAttachmentState.done || s == ElAttachmentState.idle;
-        expect(
-          opacity,
-          lit ? 1 : ElAttachmentMedia.imageDimmed,
-          reason: s.name,
-        );
+        final bool lit = s == AttachmentState.done || s == AttachmentState.idle;
+        expect(opacity, lit ? 1 : AttachmentMedia.imageDimmed, reason: s.name);
       }
     });
 
@@ -1295,16 +1292,16 @@ void main() {
             width: 400,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: ElAttachment(
-                media: ElAttachmentMedia(
-                  child: ElIcon.lucide(ElLucide.fileText, sizePx: 16),
+              child: Attachment(
+                media: AttachmentMedia(
+                  child: Icon.lucide(Lucide.fileText, sizePx: 16),
                 ),
-                content: const ElAttachmentContent(
-                  title: ElAttachmentTitle('grading-report.pdf'),
+                content: const AttachmentContent(
+                  title: AttachmentTitle('grading-report.pdf'),
                 ),
-                actions: ElAttachmentActions(
+                actions: AttachmentActions(
                   children: <Widget>[
-                    ElAttachmentAction(
+                    AttachmentAction(
                       downloadName: 'grading-report.pdf',
                       onDownload: saved.add,
                     ),
@@ -1316,15 +1313,15 @@ void main() {
         ),
       );
 
-      expect(t.widget<ElIconSwap>(find.byType(ElIconSwap)).activeIndex, 0);
-      await t.tap(find.byType(ElAttachmentAction));
+      expect(t.widget<IconSwap>(find.byType(IconSwap)).activeIndex, 0);
+      await t.tap(find.byType(AttachmentAction));
       await t.pump();
       expect(saved, <String>['grading-report.pdf']);
-      expect(t.widget<ElIconSwap>(find.byType(ElIconSwap)).activeIndex, 1);
+      expect(t.widget<IconSwap>(find.byType(IconSwap)).activeIndex, 1);
 
-      await t.pump(ElAttachmentAction.savingWindow);
+      await t.pump(AttachmentAction.savingWindow);
       await t.pump();
-      expect(t.widget<ElIconSwap>(find.byType(ElIconSwap)).activeIndex, 0);
+      expect(t.widget<IconSwap>(find.byType(IconSwap)).activeIndex, 0);
       // Settle the swap's own tickers.
       await t.pump(const Duration(seconds: 1));
     });
@@ -1338,13 +1335,13 @@ void main() {
             width: 400,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: ElAttachment(
-                media: ElAttachmentMedia(
-                  child: ElIcon.lucide(ElLucide.fileText, sizePx: 16),
+              child: Attachment(
+                media: AttachmentMedia(
+                  child: Icon.lucide(Lucide.fileText, sizePx: 16),
                 ),
-                actions: const ElAttachmentActions(
+                actions: const AttachmentActions(
                   children: <Widget>[
-                    ElAttachmentAction(downloadName: 'grading-report.pdf'),
+                    AttachmentAction(downloadName: 'grading-report.pdf'),
                   ],
                 ),
               ),
@@ -1352,11 +1349,11 @@ void main() {
           ),
         ),
       );
-      final ElButton button = t.widget<ElButton>(find.byType(ElButton));
-      expect(button.variant, ElButtonVariant.ghost);
-      expect(button.size, ElButtonSize.iconXs);
+      final Button button = t.widget<Button>(find.byType(Button));
+      expect(button.variant, ButtonVariant.ghost);
+      expect(button.size, ButtonSize.iconXs);
       expect(button.label, 'Download grading-report.pdf');
-      expect(sizeOf(t, find.byType(ElButton)), const Size(24, 24));
+      expect(sizeOf(t, find.byType(Button)), const Size(24, 24));
       await t.pump(const Duration(seconds: 1));
     });
 
@@ -1369,31 +1366,31 @@ void main() {
             width: 400,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: ElAttachment(
-                orientation: ElAttachmentOrientation.vertical,
-                media: const ElAttachmentMedia(
-                  variant: ElAttachmentMediaVariant.image,
+              child: Attachment(
+                orientation: AttachmentOrientation.vertical,
+                media: const AttachmentMedia(
+                  variant: AttachmentMediaVariant.image,
                   previewName: 'sample-card.png',
                   preview: ColoredBox(color: Color(0xFF00FF00)),
                   child: ColoredBox(color: Color(0xFF00FF00)),
                 ),
-                content: const ElAttachmentContent(
-                  title: ElAttachmentTitle('sample-card.png'),
+                content: const AttachmentContent(
+                  title: AttachmentTitle('sample-card.png'),
                 ),
               ),
             ),
           ),
         ),
       );
-      expect(find.byType(ElAttachmentTrigger), findsOneWidget);
+      expect(find.byType(AttachmentTrigger), findsOneWidget);
       expect(
-        t.widget<ElAttachmentTrigger>(find.byType(ElAttachmentTrigger)).label,
+        t.widget<AttachmentTrigger>(find.byType(AttachmentTrigger)).label,
         'Open sample-card.png full size',
       );
       final MouseRegion region = t.widget<MouseRegion>(
         find
             .descendant(
-              of: find.byType(ElAttachmentTrigger),
+              of: find.byType(AttachmentTrigger),
               matching: find.byType(MouseRegion),
             )
             .first,
@@ -1404,56 +1401,47 @@ void main() {
     testWidgets('the tray keeps 12px gaps and fades only where it can travel', (
       WidgetTester t,
     ) async {
-      expect(ElAttachmentGroup.gap, 12);
-      expect(ElAttachmentGroup.paddingY, 4);
-      expect(ElAttachmentGroup.scrollPadding, 4);
+      expect(AttachmentGroup.gap, 12);
+      expect(AttachmentGroup.paddingY, 4);
+      expect(AttachmentGroup.scrollPadding, 4);
     });
   });
 
   /* ── The shared foundation extensions ─────────────────────────────────── */
 
   group('foundation', () {
-    test('ElCurves.cssEaseInOut is the CSS keyword, not the token', () {
-      expect(ElCurves.cssEaseInOut, const Cubic(0.42, 0, 0.58, 1));
-      expect(ElCurves.cssEaseInOut, isNot(ElCurves.inOut));
+    test('MotionCurves.cssEaseInOut is the CSS keyword, not the token', () {
+      expect(MotionCurves.cssEaseInOut, const Cubic(0.42, 0, 0.58, 1));
+      expect(MotionCurves.cssEaseInOut, isNot(MotionCurves.move));
       // Not on `all`: it is a stock keyword the system did not choose.
-      expect(ElCurves.all.contains(ElCurves.cssEaseInOut), isFalse);
+      expect(MotionCurves.all.contains(MotionCurves.cssEaseInOut), isFalse);
     });
 
-    test('ElDurations.frame is one 60 Hz frame', () {
-      expect(ElDurations.frame.inMicroseconds, 16667);
+    test('MotionDurations.frame is one 60 Hz frame', () {
+      expect(MotionDurations.frame.inMicroseconds, 16667);
       // The measured law: 100px in ~168ms, 398px in ~335ms.
-      expect((ElDurations.frame * 10).inMilliseconds, closeTo(167, 2));
-      expect((ElDurations.frame * 19.95).inMilliseconds, closeTo(332, 4));
+      expect((MotionDurations.frame * 10).inMilliseconds, closeTo(167, 2));
+      expect((MotionDurations.frame * 19.95).inMilliseconds, closeTo(332, 4));
     });
 
     test('the four chat type specs are the measured ones', () {
-      expect(ElComponentType.bubbleContent.size, 13);
-      expect(ElComponentType.bubbleReactions.size, 13);
-      expect(ElComponentType.attachmentTitle.size, 13);
-      expect(
-        13 * ElComponentType.attachmentTitle.height!,
-        closeTo(16.25, 0.001),
-      );
-      expect(ElComponentType.attachmentTitleSm.size, 12);
-      expect(
-        12 * ElComponentType.attachmentTitleSm.height!,
-        closeTo(15, 0.001),
-      );
-      expect(ElComponentType.attachmentDescription.size, 12);
-      expect(
-        12 * ElComponentType.attachmentDescription.height!,
-        closeTo(16, 0.001),
-      );
+      expect(TextStyles.bubbleContent.size, 13);
+      expect(TextStyles.bubbleReactions.size, 13);
+      expect(TextStyles.attachmentTitle.size, 13);
+      expect(13 * TextStyles.attachmentTitle.height!, closeTo(16.25, 0.001));
+      expect(TextStyles.attachmentTitleSmall.size, 12);
+      expect(12 * TextStyles.attachmentTitleSmall.height!, closeTo(15, 0.001));
+      expect(TextStyles.attachmentDescription.size, 12);
+      expect(12 * TextStyles.attachmentDescription.height!, closeTo(16, 0.001));
     });
 
-    testWidgets('ElIcon.lucide paints the generated registry', (
+    testWidgets('Icon.lucide paints the generated registry', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(const ElIcon.lucide(ElLucide.bot)));
-      expect(sizeOf(t, find.byType(ElIcon)), const Size(16, 16));
-      expect(ElLucide.bot.name, 'bot');
-      expect(elLucideByName['circle-alert'], ElLucide.circleAlert);
+      await t.pumpWidget(host(const Icon.lucide(Lucide.bot)));
+      expect(sizeOf(t, find.byType(Icon)), const Size(16, 16));
+      expect(Lucide.bot.name, 'bot');
+      expect(lucideByName['circle-alert'], Lucide.circleAlert);
     });
   });
 }

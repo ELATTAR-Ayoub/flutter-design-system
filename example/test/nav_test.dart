@@ -1,7 +1,7 @@
 import 'package:example/nav.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Locks `example/lib/nav.dart` to `design-system/lib/el/nav.ts`.
+/// Locks `example/lib/nav.dart` to `design-system/lib/space/nav.ts`.
 ///
 /// The nav is the one file the whole docs app reads: sidebar order, index
 /// cards, page headers and the page-foot prev/next all come out of it, so a
@@ -12,13 +12,13 @@ void main() {
   group('shape', () {
     test('four groups, in source order', () {
       expect(elGroups.length, 4);
-      expect(elGroups.map((ElGroup g) => g.id).toList(), <String>[
+      expect(elGroups.map((Group g) => g.id).toList(), <String>[
         'foundations',
         'base',
         'agent',
         'site',
       ]);
-      expect(elGroups.map((ElGroup g) => g.title).toList(), <String>[
+      expect(elGroups.map((Group g) => g.title).toList(), <String>[
         'Foundations',
         'Base Components',
         'Agent',
@@ -35,7 +35,7 @@ void main() {
 
     test('foundations order drives the sidebar and the foot nav', () {
       expect(
-        elGroupById('foundations').categories.map((ElCategory c) => c.slug),
+        elGroupById('foundations').categories.map((Category c) => c.slug),
         <String>[
           'colors',
           'typography',
@@ -46,7 +46,7 @@ void main() {
         ],
       );
       expect(
-        elGroupById('foundations').categories.map((ElCategory c) => c.title),
+        elGroupById('foundations').categories.map((Category c) => c.title),
         <String>[
           'Colors',
           'Typography',
@@ -69,12 +69,12 @@ void main() {
     });
 
     test('foundations categories hang off the root, not a group segment', () {
-      final ElCategoryHit hit = findCategory('foundations', 'colors');
+      final CategoryHit hit = findCategory('foundations', 'colors');
       expect(categoryHref(hit.group, hit.category), '/design-system/colors');
     });
 
     test('every other group nests under its own index', () {
-      final ElCategoryHit hit = findCategory('base', 'buttons');
+      final CategoryHit hit = findCategory('base', 'buttons');
       expect(
         categoryHref(hit.group, hit.category),
         '/design-system/components/base/buttons',
@@ -83,8 +83,8 @@ void main() {
 
     test('every href in the tree is unique', () {
       final List<String> hrefs = <String>[
-        for (final ElGroup group in elGroups)
-          for (final ElCategory category in group.categories)
+        for (final Group group in elGroups)
+          for (final Category category in group.categories)
             categoryHref(group, category),
       ];
       expect(hrefs.length, 32);
@@ -92,10 +92,10 @@ void main() {
     });
 
     test('every title and slug in the tree is non-empty', () {
-      for (final ElGroup group in elGroups) {
+      for (final Group group in elGroups) {
         expect(group.title, isNotEmpty, reason: group.id);
         expect(group.blurb, isNotEmpty, reason: group.id);
-        for (final ElCategory category in group.categories) {
+        for (final Category category in group.categories) {
           final String where = '${group.id}/${category.slug}';
           expect(category.title, isNotEmpty, reason: where);
           expect(category.slug, isNotEmpty, reason: group.id);
@@ -108,14 +108,14 @@ void main() {
 
   group('siblings', () {
     test('first category has no previous', () {
-      final ElSiblings s = siblings('foundations', 'colors');
+      final Siblings s = siblings('foundations', 'colors');
       expect(s.prev, isNull);
       expect(s.next?.title, 'Typography');
       expect(s.next?.href, '/design-system/typography');
     });
 
     test('a middle category sees both neighbours', () {
-      final ElSiblings s = siblings('foundations', 'spacing');
+      final Siblings s = siblings('foundations', 'spacing');
       expect(s.prev?.title, 'Typography');
       expect(s.prev?.href, '/design-system/typography');
       expect(s.next?.title, 'Shadows');
@@ -123,7 +123,7 @@ void main() {
     });
 
     test('last category has no next', () {
-      final ElSiblings s = siblings('foundations', 'icons');
+      final Siblings s = siblings('foundations', 'icons');
       expect(s.prev?.title, 'Motion');
       expect(s.next, isNull);
     });
@@ -137,13 +137,13 @@ void main() {
 
     // Both of these are the reference's behaviour, ported deliberately.
     test('unknown group degrades to nothing rather than throwing', () {
-      final ElSiblings s = siblings('nope', 'colors');
+      final Siblings s = siblings('nope', 'colors');
       expect(s.prev, isNull);
       expect(s.next, isNull);
     });
 
     test('unknown slug points at the top of the group (findIndex −1)', () {
-      final ElSiblings s = siblings('foundations', 'nope');
+      final Siblings s = siblings('foundations', 'nope');
       expect(s.prev, isNull);
       expect(s.next?.title, 'Colors');
     });

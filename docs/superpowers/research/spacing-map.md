@@ -2,7 +2,7 @@
 
 **Files that produce the render** (all under `D:\DESIGN\Design-System-2026-8\design-system\`):
 - `app\design-system\spacing\page.tsx` — the page (server component, no client code, no local components; all data in three module-level arrays: `spacing`, `radii`, `elevation`)
-- `components\el\kit.tsx` — `ElPageHeader`, `ElSection`, `Panel`, `Meta`, `Code`, `DoDont`, `Note`, `PageFootNav` (all used)
+- `components\el\kit.tsx` — `PageHeader`, `Section`, `Panel`, `Meta`, `Code`, `DoDont`, `Note`, `PageFootNav` (all used)
 - `components\ui\icon.tsx` — `Icon` (used inside `DoDont` and `PageFootNav`)
 - `lib\el\nav.ts` — `findCategory("foundations","spacing")` supplies header copy; `siblings()` supplies foot-nav
 - `app\design-system\layout.tsx` — shell around the page
@@ -13,7 +13,7 @@
 
 ## 0 · Shell / layout metrics (what frames the page)
 
-- Root `<body>`: `bg-background text-foreground`, plus fixed page-glow: `background-image: radial-gradient(120% 90% at 62% 34%, var(--page-glow) 0%, transparent 64%)`, `background-attachment: fixed`, antialiased. `--page-glow`: dark `hsl(240 8% 10%)`, light `hsl(240 30% 98%)`.
+- Root `<body>`: `bg-background text-foreground`, plus fixed background-effect: `background-image: radial-gradient(120% 90% at 62% 34%, var(--background-effect) 0%, transparent 64%)`, `background-attachment: fixed`, antialiased. `--background-effect`: dark `hsl(240 8% 10%)`, light `hsl(240 30% 98%)`.
 - Sticky site header: `sticky top-0 z-40 flex h-(--height-site-header) [4rem/64px] items-center gap-4 border-b border-border bg-background/85 px-6 backdrop-blur-xl`. Contents: mobile-nav trigger (`lg:hidden`, outline icon Button in a Sheet `w-72`), Logo link (`press`), pill "Design System v0.1" (`type-micro rounded-pill border border-border px-2.5 py-1`, `hidden sm:block`), right-aligned `type-micro hidden md:block` text: **"Desktop-first · 1440 frame · Light & dark"**, ThemeToggle.
 - Frame: `mx-auto flex w-full max-w-(--width-shell)` = **1680px**. Sidebar: `sticky top-16 hidden lg:block w-60` (240px) `h-[calc(100dvh-4rem)] overflow-y-auto border-r border-border px-6 pt-10`. Main: `min-w-0 flex-1 px-6 py-12 lg:px-12`; inner column `mx-auto max-w-(--width-content)` = **1080px**.
 - Anchor scrolling: `html { scroll-behavior: smooth; scroll-padding-block-start: var(--scroll-offset) }` where `--scroll-offset = calc(4rem + var(--spacing)*8)` = **96px**. Sections carry no `scroll-mt-*`.
@@ -23,7 +23,7 @@
 
 ---
 
-## 1 · Page header (`ElPageHeader`)
+## 1 · Page header (`PageHeader`)
 
 `<header class="mb-14 border-b border-border pb-10">` (56px below, 40px inner bottom)
 1. Eyebrow: `type-label text-action-ink` → **"Foundations"** — 11px/1, 600, uppercase, tracking 0.16em; color `--action-ink` (dark: `hsl(213 94% 78%)` ≈ #92C2FC; light: `hsl(224 76% 33%)` ≈ #143694).
@@ -35,7 +35,7 @@
 
 ## 2 · Section `#scale` — "Spacing scale"
 
-`ElSection` shell (all sections): `<section class="mb-20">` (80px); heading block `mb-6`; `<h2 class="type-h3 text-foreground">` — 21px (1.3125rem)/1.3, 600, −0.01em; description `type-small mt-2 max-w-2xl` — 13px/1.5, 400, muted.
+`Section` shell (all sections): `<section class="mb-20">` (80px); heading block `mb-6`; `<h2 class="type-h3 text-foreground">` — 21px (1.3125rem)/1.3, 600, −0.01em; description `type-small mt-2 max-w-2xl` — 13px/1.5, 400, muted.
 
 Heading: **"Spacing scale"**
 Description (verbatim): **"An 8-point system with a 4px half-step for tight interior spacing. Tailwind's default 0.25rem unit already matches, so the class number is simply the pixel value divided by four."**
@@ -85,7 +85,7 @@ Panel label: **"Seven steps"**. Body: `flex flex-wrap gap-5` (20px). Seven items
 | 3xl | 24 | The landing hero panel. Largest allowed. |
 | pill | 999 | Pills, filter chips, avatars, live indicator. |
 
-Tokens confirm all seven (`--radius-sm:6px; -md:10px; -lg:12px; -xl:16px; -2xl:20px; -3xl:24px; -pill:999px`). *Drift:* the token ladder has **nine** steps — `--radius-xs: 2px` (tips/swatches only) and `--radius-4xl: 32px` (soft-slab) exist in globals.css but are not shown on this page ("Seven steps" and "3xl … Largest allowed" are the page's claim; the tokens go further).
+Tokens confirm all seven (`--radius-sm:6px; -md:10px; -lg:12px; -xl:16px; -2xl:20px; -3xl:24px; -indicator:999px`). *Drift:* the token ladder has **nine** steps — `--radius-xs: 2px` (tips/swatches only) and `--radius-4xl: 32px` (soft-slab) exist in globals.css but are not shown on this page ("Seven steps" and "3xl … Largest allowed" are the page's claim; the tokens go further).
 
 ---
 

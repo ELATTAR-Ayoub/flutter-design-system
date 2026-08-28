@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/hover_card.dart",
+      "source": "lib/src/components/ui/hover_card.dart",
       "target": "@ui/hover_card.dart",
-      "sha256": "1f4d596c77035c99dd38008af22e31be8757bfccddf1ff6928268d08e9874601"
+      "sha256": "3a39e9a14dd0dfa0e32a5a5e401c9d85b624249d309b6863498168b862b6cfb7"
     }
   ],
   "registryDependencies": [
@@ -24,5 +24,9 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/hover-card",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/hover_card.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/hover_card.dart",
+  "exports": [
+    "HoverCard",
+    "HoverCardContent"
+  ]
 }

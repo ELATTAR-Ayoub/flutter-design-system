@@ -1,13 +1,13 @@
 /// Tests for `components_docs/input_group/page.dart`'s [InputGroupDocPage].
 ///
-/// Split off the merged test that used to cover [ElInputGroup],
-/// [ElButtonGroup], and [ElInputOtp] together on one page. This file now
-/// covers [ElInputGroup] and its addon/button/text family only: see
+/// Split off the merged test that used to cover [InputGroup],
+/// [ButtonGroup], and [InputOtp] together on one page. This file now
+/// covers [InputGroup] and its addon/button/text family only: see
 /// `button_group_test.dart` and `input_otp_test.dart` for the other two.
 ///
 /// Re-housed onto the documentation kit (`ComponentDocSpec` +
 /// `ComponentDocPage`): sections now render as `DocsSection` (from
-/// `docs_section.dart`), not the old `kit.dart` `ElSection`, and the live
+/// `docs_section.dart`), not the old `kit.dart` `Section`, and the live
 /// preview is a real `Preview` section with its own rail entry rather than
 /// an unheaded `DocsCodeExample` above the first heading. The API Reference
 /// and States sections are now `DocsDisclosure`s, closed by default (a
@@ -21,7 +21,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage.
+/// `ThemeController` is flipped in place for theme coverage.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -31,7 +31,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
@@ -54,11 +80,11 @@ Future<void> _openDisclosure(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 /// The full section list, in order, this page must render: Preview,
-/// Installation, Usage, then ElInputGroup's own sections, API Reference,
+/// Installation, Usage, then InputGroup's own sections, API Reference,
 /// then the eight fixed disclosures.
 const List<String> _expectedSectionOrder = <String>[
   'Preview',
@@ -83,23 +109,23 @@ const List<String> _expectedSectionOrder = <String>[
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every `ElApiTable` this page must render, by title, and every public
+/// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class, read directly off
 /// `lib/src/components/input_group.dart`.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElInputGroup': <String>[
+  'InputGroup': <String>[
     'child',
     'startAddon',
     'endAddon',
     'invalid',
     'enabled',
     'focusNode',
-    'ElInputGroup.height',
-    'ElInputGroup.addonInset',
-    'ElInputGroup.addonButtonPull',
-    'ElInputGroup.clearance',
+    'InputGroup.height',
+    'InputGroup.addonInset',
+    'InputGroup.addonButtonPull',
+    'InputGroup.clearance',
   ],
-  'ElInputGroupInput': <String>[
+  'InputGroupInput': <String>[
     'controller',
     'initialValue',
     'placeholder',
@@ -112,15 +138,15 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'textSpec',
     'label',
   ],
-  'ElInputGroupAddon': <String>[
+  'InputGroupAddon': <String>[
     'child',
     'align',
     'holdsButton',
-    'ElInputGroupAddon.insetY',
-    'ElInputGroupAddon.gap',
+    'InputGroupAddon.insetY',
+    'InputGroupAddon.gap',
   ],
-  'ElInputGroupText': <String>['text', 'spec'],
-  'ElInputGroupButton': <String>[
+  'InputGroupText': <String>['text', 'spec'],
+  'InputGroupButton': <String>[
     'child',
     'onPressed',
     'label',
@@ -128,30 +154,30 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'focusNode',
     'size',
     'cancelPressFill',
-    'ElInputGroupButton.height',
-    'ElInputGroupButton.paddingX',
-    'ElInputGroupButton.paddingXFor',
-    'ElInputGroupButton.gap',
+    'InputGroupButton.height',
+    'InputGroupButton.paddingX',
+    'InputGroupButton.paddingXFor',
+    'InputGroupButton.gap',
   ],
-  'ElInputGroupAlign': <String>['start', 'end'],
-  'ElInputGroupButtonSize': <String>['xs', 'iconXs'],
+  'InputGroupAlign': <String>['start', 'end'],
+  'InputGroupButtonSize': <String>['xs', 'iconXs'],
 };
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -183,7 +209,7 @@ void main() {
 
       await _pump(tester, size: _narrow);
       // Not pumpAndSettle(): the "Spinner addon: loading state" specimen
-      // holds a live ElSpinner, which repeat()s its AnimationController
+      // holds a live Spinner, which repeat()s its AnimationController
       // forever and never reaches quiescence. Bounded pumps instead.
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
@@ -206,7 +232,7 @@ void main() {
     (WidgetTester tester) async {
       await _pump(tester);
 
-      final Finder spinner = find.byType(ElSpinner);
+      final Finder spinner = find.byType(Spinner);
       await tester.ensureVisible(spinner.first);
       expect(spinner, findsWidgets);
 
@@ -246,7 +272,7 @@ void main() {
   );
 
   testWidgets(
-    'each ElApiTable covers every public constructor parameter and static '
+    'each ApiTable covers every public constructor parameter and static '
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -270,7 +296,7 @@ void main() {
         expect(
           documented,
           isNotNull,
-          reason: 'no ElApiTable titled "${expected.key}" was rendered',
+          reason: 'no ApiTable titled "${expected.key}" was rendered',
         );
         for (final String param in expected.value) {
           expect(
@@ -297,8 +323,8 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the live specimen: a password ElInputGroupInput with a '
-      'ElInputGroupButton visibility toggle that flips obscureText', (
+  testWidgets('the live specimen: a password InputGroupInput with a '
+      'InputGroupButton visibility toggle that flips obscureText', (
     WidgetTester tester,
   ) async {
     await _pump(tester);
@@ -309,15 +335,15 @@ void main() {
 
     final Finder input = find.descendant(
       of: find.byKey(fieldKey),
-      matching: find.byType(ElInput),
+      matching: find.byType(Input),
     );
-    expect(tester.widget<ElInput>(input).obscureText, isTrue);
+    expect(tester.widget<Input>(input).obscureText, isTrue);
 
     await tester.ensureVisible(find.byKey(toggleKey));
     await tester.tap(find.byKey(toggleKey));
     await tester.pump();
 
-    expect(tester.widget<ElInput>(input).obscureText, isFalse);
+    expect(tester.widget<Input>(input).obscureText, isFalse);
     expect(tester.takeException(), isNull);
   });
 
@@ -352,13 +378,10 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(inputGroupDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(inputGroupDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

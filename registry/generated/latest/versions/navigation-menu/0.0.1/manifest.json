@@ -7,21 +7,21 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/navigation_menu.dart",
+      "source": "lib/src/components/ui/navigation_menu.dart",
       "target": "@ui/navigation_menu.dart",
-      "sha256": "3701dc887c39d0b7b11c39d12c5ea2c8d299803d56d747f87531a10eeeb47f1f"
+      "sha256": "02bd6a4912b00b3eaf4e4e9d811e67c81bcb52792d7a35531e1d10249ed291bb"
     }
   ],
   "registryDependencies": [
     "icon",
     "popover",
-    "press-motion",
+    "press",
     "source-foundation"
   ],
   "semanticDependencies": [
     "icon",
     "popover",
-    "press-motion"
+    "press"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/navigation-menu",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/navigation_menu.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/navigation_menu.dart",
   "deprecated": false
 }

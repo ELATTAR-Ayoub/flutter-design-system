@@ -18,7 +18,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
@@ -67,9 +79,9 @@ class _RegistryDocsPageState extends State<RegistryDocsPage> {
           'declares, how dependencies resolve, and why the URL carries a '
           'version number.',
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Docs'),
-      ElBreadcrumbEntry.page('Registry'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Docs'),
+      BreadcrumbEntry.page('Registry'),
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'What ships today', anchor: 'shipped'),
@@ -152,9 +164,9 @@ class _RegistryArticle extends StatelessWidget {
     ],
   );
 
-  Widget _prose(String text, {ElTypeSpec? spec}) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-    child: ElText(text, spec ?? ElType.body),
+  Widget _prose(String text, {TextStyleToken? spec}) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+    child: StyledText(text, spec ?? TextStyles.body),
   );
 
   Widget _item() => DocsSection(
@@ -241,22 +253,22 @@ class _RegistryArticle extends StatelessWidget {
           'so a file never lands before something it imports. Cycles are '
           'detected and reported by name rather than followed.',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'bash',
           code:
-              '# button depends on icon, field, machine-surface and the\n'
+              '# button depends on icon, field, surface and the\n'
               '# foundation, so all of them are installed with it.\n'
               'elattar add button\n\n'
               '# See the closure without writing anything.\n'
               'elattar add button --dry-run',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         _prose(
           'An item appears once however many times it is depended on, and '
           'installing something twice is a no-op rather than a conflict — the '
           'installer compares bytes before it writes.',
-          spec: ElType.small,
+          spec: TextStyles.small,
         ),
       ],
     ),
@@ -312,12 +324,12 @@ class _RegistryArticle extends StatelessWidget {
           'exactly as it was rather than half-installed behind a barrel that '
           'references files which never came.',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         _prose(
           'The same hashes are recorded in your .elattar/manifest.json when '
           'the files land, which is how a later add knows whether you edited '
           'an installed file or not.',
-          spec: ElType.small,
+          spec: TextStyles.small,
         ),
       ],
     ),
@@ -337,7 +349,7 @@ class _RegistryArticle extends StatelessWidget {
           'published version with different bytes, which is what makes the '
           'pin mean something.',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'bash',
           code:
@@ -346,12 +358,12 @@ class _RegistryArticle extends StatelessWidget {
               '# A registry you generated yourself.\n'
               'elattar list --registry ../flutter-design-system/registry/generated/latest',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         _prose(
           'A URL is recorded in elattar.yaml and is safe to commit. A local '
           'path is recorded only when it sits inside your project: an '
           'absolute path in a committed config works on exactly one machine.',
-          spec: ElType.small,
+          spec: TextStyles.small,
         ),
       ],
     ),
@@ -368,14 +380,14 @@ class _RegistryArticle extends StatelessWidget {
           'with ELATTAR_CACHE_DIR as the override. --offline reads only that '
           'cache and never opens a connection.',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'bash',
           code:
               'elattar add button            # populates the cache\n'
               'elattar list --offline        # reads only the cache',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         _prose(
           'A cache miss and a network failure are reported differently, '
           'because they have different fixes: one asks you to run the command '
@@ -383,7 +395,7 @@ class _RegistryArticle extends StatelessWidget {
           'online install also warms the catalog, so list and search work '
           'offline afterwards rather than missing on a file no install '
           'fetched.',
-          spec: ElType.small,
+          spec: TextStyles.small,
         ),
       ],
     ),
@@ -418,15 +430,15 @@ class _RegistryArticle extends StatelessWidget {
           'nothing. The only thing that reaches back in is elattar add '
           '--overwrite, and only for the files it installed.',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         _prose(
           'Items that redistribute somebody else\'s work bring the notice '
           'with them. Keep those files: carrying the notice is the condition '
           'their licenses attach to the grant.',
         ),
-        SizedBox(height: el(5)),
-        ElButton(
-          variant: ElButtonVariant.outline,
+        SizedBox(height: space(5)),
+        Button(
+          variant: ButtonVariant.outline,
           onPressed: onNavigate == null
               ? null
               : () => onNavigate!(docsInstallationRoute),
@@ -506,8 +518,8 @@ class _Loading extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         for (int row = 0; row < 4; row++) ...<Widget>[
-          ElSkeleton(height: el(10)),
-          SizedBox(height: el(3)),
+          Skeleton(height: space(10)),
+          SizedBox(height: space(3)),
         ],
       ],
     ),
@@ -523,14 +535,14 @@ class _Empty extends StatelessWidget {
   const _Empty();
 
   @override
-  Widget build(BuildContext context) => ElEmpty(
+  Widget build(BuildContext context) => Empty(
     key: const ValueKey<String>('registry-empty'),
     children: <Widget>[
-      const ElEmptyHeader(
+      const EmptyHeader(
         children: <Widget>[
-          ElEmptyMedia(glyph: ElIconGlyph.package),
-          ElEmptyTitle('This registry is empty'),
-          ElEmptyDescription(
+          EmptyMedia(glyph: IconGlyph.package),
+          EmptyTitle('This registry is empty'),
+          EmptyDescription(
             'It parsed correctly and declares no items. A registry built from '
             'a tree with no manifests looks like this.',
           ),
@@ -552,21 +564,21 @@ class _Failed extends StatelessWidget {
     key: const ValueKey<String>('registry-error'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      // `ElAlert`'s destructive variant carries an icon and a title as well as
+      // `Alert`'s destructive variant carries an icon and a title as well as
       // its colour, so the state is legible without relying on hue — and it is
       // announced rather than merely coloured.
-      ElAlert(
-        variant: ElAlertVariant.destructive,
-        icon: const ElIcon(ElIconGlyph.circleX),
+      Alert(
+        variant: AlertVariant.destructive,
+        icon: const Icon(IconGlyph.circleX),
         title: 'The registry figures could not be read',
         description: error is RegistryDocumentException
             ? '$error'
             : 'The bundled registry could not be read: $error',
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       Align(
         alignment: Alignment.centerLeft,
-        child: ElButton(onPressed: onRetry, child: const Text('Try again')),
+        child: Button(onPressed: onRetry, child: const Text('Try again')),
       ),
     ],
   );
@@ -579,10 +591,10 @@ class _TargetsUnavailable extends StatelessWidget {
   const _TargetsUnavailable();
 
   @override
-  Widget build(BuildContext context) => ElAlert(
+  Widget build(BuildContext context) => Alert(
     key: const ValueKey<String>('registry-targets-unavailable'),
-    variant: ElAlertVariant.warning,
-    icon: const ElIcon(ElIconGlyph.alertTriangle),
+    variant: AlertVariant.warning,
+    icon: const Icon(IconGlyph.alertTriangle),
     title: 'Target counts unavailable',
     description:
         'These are counted from the same registry the figures above could '

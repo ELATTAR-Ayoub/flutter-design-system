@@ -1,0 +1,3206 @@
+{
+  "schemaVersion": 1,
+  "baseline": "f6f51eb",
+  "renames": [
+    {
+      "current": "Accordion",
+      "future": "Accordion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AccordionItem",
+      "future": "AccordionItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ActionChip",
+      "future": "ActionChip",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ActionTurn",
+      "future": "ActionTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentActionTurn",
+      "future": "AgentActionTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentApprovalState",
+      "future": "AgentApprovalState",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAttachMenu",
+      "future": "AgentAttachMenu",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAttachment",
+      "future": "AgentAttachment",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAttachmentCard",
+      "future": "AgentAttachmentCard",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAttachmentDelivery",
+      "future": "AgentAttachmentDelivery",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAttachmentKind",
+      "future": "AgentAttachmentKind",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAttachmentList",
+      "future": "AgentAttachmentList",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAttachmentSupport",
+      "future": "AgentAttachmentSupport",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAvatarBuilder",
+      "future": "AgentAvatarBuilder",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAvatarRegistry",
+      "future": "AgentAvatarRegistry",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAvatarSize",
+      "future": "AgentAvatarSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCapabilities",
+      "future": "AgentCapabilities",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCapability",
+      "future": "AgentCapability",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCodeBlock",
+      "future": "AgentCodeBlock",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCommand",
+      "future": "AgentCommand",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCommandGroup",
+      "future": "AgentCommandGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentComposer",
+      "future": "AgentComposer",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentConsole",
+      "future": "AgentConsole",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCube",
+      "future": "AgentCube",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCubeFaces",
+      "future": "AgentCubeFaces",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCubeKeyframe",
+      "future": "AgentCubeKeyframe",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCubeKeyframes",
+      "future": "AgentCubeKeyframes",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCubeMotion",
+      "future": "AgentCubeMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCubeScene",
+      "future": "AgentCubeScene",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCubeSpec",
+      "future": "AgentCubeSpec",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentCubeTokens",
+      "future": "AgentCubeTokens",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentDelivery",
+      "future": "AgentDelivery",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentDeliveryBadge",
+      "future": "AgentDeliveryBadge",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentDeliverySent",
+      "future": "AgentDeliverySent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentErrorTurn",
+      "future": "AgentErrorTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentFace",
+      "future": "AgentFace",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentFeatures",
+      "future": "AgentFeatures",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentLauncher",
+      "future": "AgentLauncher",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentMarkdown",
+      "future": "AgentMarkdown",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentMessage",
+      "future": "AgentMessage",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentModel",
+      "future": "AgentModel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentOrbBuilder",
+      "future": "AgentOrbBuilder",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentPendingApproval",
+      "future": "AgentPendingApproval",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentPersona",
+      "future": "AgentPersona",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentSendOptions",
+      "future": "AgentSendOptions",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentAttachmentStatusText",
+      "future": "AgentStatusText",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentSignals",
+      "future": "AgentSignals",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentSlashPalette",
+      "future": "AgentSlashPalette",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentState",
+      "future": "AgentState",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentStatusLine",
+      "future": "AgentStatusLine",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentTextTurn",
+      "future": "AgentTextTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentToolStateMap",
+      "future": "AgentToolStateMap",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentToolTurn",
+      "future": "AgentToolTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentTransport",
+      "future": "AgentTransport",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentTurn",
+      "future": "AgentTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentTurnStatus",
+      "future": "AgentTurnStatus",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentUserTurn",
+      "future": "AgentUserTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentVisualiserBuilder",
+      "future": "AgentVisualiserBuilder",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AgentVoice",
+      "future": "AgentVoice",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Alert",
+      "future": "Alert",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AlertDialog",
+      "future": "AlertDialog",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AlertDialogAction",
+      "future": "AlertDialogAction",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AlertDialogCancel",
+      "future": "AlertDialogCancel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AlertDialogContent",
+      "future": "AlertDialogContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AlertDialogDescription",
+      "future": "AlertDialogDescription",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AlertDialogFooter",
+      "future": "AlertDialogFooter",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AlertDialogHeader",
+      "future": "AlertDialogHeader",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AlertDialogSize",
+      "future": "AlertDialogSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AlertDialogTitle",
+      "future": "AlertDialogTitle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AlertVariant",
+      "future": "AlertVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ApprovalCard",
+      "future": "ApprovalCard",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ApprovalOutcome",
+      "future": "ApprovalOutcome",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AspectRatio",
+      "future": "AspectRatio",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Attachment",
+      "future": "Attachment",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentAction",
+      "future": "AttachmentAction",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentActions",
+      "future": "AttachmentActions",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentContent",
+      "future": "AttachmentContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentDescription",
+      "future": "AttachmentDescription",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentGroup",
+      "future": "AttachmentGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentMedia",
+      "future": "AttachmentMedia",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentMediaVariant",
+      "future": "AttachmentMediaVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentOrientation",
+      "future": "AttachmentOrientation",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentScope",
+      "future": "AttachmentScope",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentSize",
+      "future": "AttachmentSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentState",
+      "future": "AttachmentState",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentTitle",
+      "future": "AttachmentTitle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentTrigger",
+      "future": "AttachmentTrigger",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Avatar",
+      "future": "Avatar",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AvatarBadge",
+      "future": "AvatarBadge",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AvatarGroup",
+      "future": "AvatarGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AvatarGroupCount",
+      "future": "AvatarGroupCount",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AvatarRimPainter",
+      "future": "AvatarRimPainter",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AvatarRing",
+      "future": "AvatarRing",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AvatarSize",
+      "future": "AvatarSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Badge",
+      "future": "Badge",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BadgeVariant",
+      "future": "BadgeVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BandScale",
+      "future": "BandScale",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BarRect",
+      "future": "BarRect",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BarSeriesPainter",
+      "future": "BarSeriesPainter",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BarSlot",
+      "future": "BarSlot",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BarVisualizer",
+      "future": "BarVisualizer",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BloomCosmic",
+      "future": "FeedbackSurface",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BloomDrift",
+      "future": "BloomDrift",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BloomDriftStop",
+      "future": "BloomDriftStop",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BloomInk",
+      "future": "BloomInk",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BlurSwitch",
+      "future": "BlurSwitch",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BlurSwitchController",
+      "future": "BlurSwitchController",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Blurs",
+      "future": "Blurs",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Breadcrumb",
+      "future": "Breadcrumb",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BreadcrumbEntry",
+      "future": "BreadcrumbEntry",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Breakpoints",
+      "future": "Breakpoints",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Bubble",
+      "future": "Bubble",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BubbleAlign",
+      "future": "BubbleAlign",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BubbleAlignScope",
+      "future": "BubbleAlignScope",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BubbleContent",
+      "future": "BubbleContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BubbleGroup",
+      "future": "BubbleGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BubbleReaction",
+      "future": "BubbleReaction",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BubbleReactions",
+      "future": "BubbleReactions",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BubbleSide",
+      "future": "BubbleSide",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "BubbleVariant",
+      "future": "BubbleVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Button",
+      "future": "Button",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ButtonEmphasis",
+      "future": "ButtonEmphasis",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ButtonGroup",
+      "future": "ButtonGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ButtonGroupSeparator",
+      "future": "ButtonGroupSeparator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ButtonGroupText",
+      "future": "ButtonGroupText",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ButtonSize",
+      "future": "ButtonSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ButtonSurface",
+      "future": "ButtonStyleRecipe",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ButtonVariant",
+      "future": "ButtonVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Calendar",
+      "future": "Calendar",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CalendarBandPainter",
+      "future": "CalendarBandPainter",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CalendarDay",
+      "future": "CalendarDay",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CalendarMode",
+      "future": "CalendarMode",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CalendarMonth",
+      "future": "CalendarMonth",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CalendarSurface",
+      "future": "CalendarPresentation",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CalendarType",
+      "future": "CalendarTextStyles",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Card",
+      "future": "Card",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CardContent",
+      "future": "CardContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CardDescription",
+      "future": "CardDescription",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CardFooter",
+      "future": "CardFooter",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CardHeader",
+      "future": "CardHeader",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CardTitle",
+      "future": "CardTitle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Carousel",
+      "future": "Carousel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CarouselController",
+      "future": "CarouselController",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CartesianChart",
+      "future": "CartesianChart",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartAxis",
+      "future": "ChartAxis",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartAxisType",
+      "future": "ChartAxisType",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartConfig",
+      "future": "ChartConfig",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartContainer",
+      "future": "ChartContainer",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartDot",
+      "future": "ChartDot",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartDotSpec",
+      "future": "ChartDotSpec",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartGrid",
+      "future": "ChartGrid",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartIndicator",
+      "future": "ChartIndicator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartLabelList",
+      "future": "ChartLabelList",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartLabelPosition",
+      "future": "ChartLabelPosition",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartLayout",
+      "future": "ChartLayout",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartLegendAlign",
+      "future": "ChartLegendAlign",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartLegendContent",
+      "future": "ChartLegendContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartLegendItem",
+      "future": "ChartLegendItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartLegendSpec",
+      "future": "ChartLegendSpec",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartMargin",
+      "future": "ChartMargin",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartMotion",
+      "future": "ChartMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartScope",
+      "future": "ChartScope",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartSeries",
+      "future": "ChartSeries",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartSeriesKind",
+      "future": "ChartSeriesKind",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartSeriesSpec",
+      "future": "ChartSeriesSpec",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartText",
+      "future": "ChartText",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartTooltipContent",
+      "future": "ChartTooltipContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartTooltipItem",
+      "future": "ChartTooltipItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChartTooltipSpec",
+      "future": "ChartTooltipSpec",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ChatHistory",
+      "future": "ChatHistory",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CheckDraw",
+      "future": "CheckmarkDrawMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Checkbox",
+      "future": "Checkbox",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CheckboxState",
+      "future": "CheckboxState",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Clock",
+      "future": "Clock",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CodeToken",
+      "future": "CodeToken",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Collapsible",
+      "future": "Collapsible",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Combobox",
+      "future": "Combobox",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ComboboxItem",
+      "future": "ComboboxItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Command",
+      "future": "Command",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CommandGroup",
+      "future": "CommandGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CommandItem",
+      "future": "CommandItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ComponentType",
+      "future": "ComponentTextStyles",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Containers",
+      "future": "Containers",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ContextMenu",
+      "future": "ContextMenu",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ConversationStore",
+      "future": "ConversationStore",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ConversationSummary",
+      "future": "ConversationSummary",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CubeAvatar",
+      "future": "AgentAvatar",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CubeScene",
+      "future": "CubeScene",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "CurveType",
+      "future": "CurveType",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Curves",
+      "future": "MotionCurves",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DashDraw",
+      "future": "DashDrawMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DateFormat",
+      "future": "DateFormat",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DatePicker",
+      "future": "DatePicker",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DateRange",
+      "future": "DateRange",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Dialog",
+      "future": "Dialog",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DialogContent",
+      "future": "DialogContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DialogContentGroup",
+      "future": "DialogContentGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DialogDescription",
+      "future": "DialogDescription",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DialogFooter",
+      "future": "DialogFooter",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DialogHeader",
+      "future": "DialogHeader",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DialogMedia",
+      "future": "DialogMedia",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DialogOverlay",
+      "future": "DialogOverlay",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DialogTitle",
+      "future": "DialogTitle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DialogVariant",
+      "future": "DialogVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DotPop",
+      "future": "DotSelectionMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Drawer",
+      "future": "Drawer",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DrawerContent",
+      "future": "DrawerContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DrawerDescription",
+      "future": "DrawerDescription",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DrawerFooter",
+      "future": "DrawerFooter",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DrawerHandle",
+      "future": "DrawerHandle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DrawerHeader",
+      "future": "DrawerHeader",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DrawerTitle",
+      "future": "DrawerTitle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "DropdownMenu",
+      "future": "DropdownMenu",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Durations",
+      "future": "MotionDurations",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Empty",
+      "future": "Empty",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "EmptyContent",
+      "future": "EmptyContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "EmptyDescription",
+      "future": "EmptyDescription",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "EmptyHeader",
+      "future": "EmptyHeader",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "EmptyMedia",
+      "future": "EmptyMedia",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "EmptyTitle",
+      "future": "EmptyTitle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ErrorTurn",
+      "future": "ErrorTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FadeUp",
+      "future": "FadeUp",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Field",
+      "future": "Field",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldActivator",
+      "future": "FieldActivator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldDescription",
+      "future": "FieldDescription",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldError",
+      "future": "FieldError",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldGroup",
+      "future": "FieldGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldLabel",
+      "future": "FieldLabel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldLegend",
+      "future": "FieldLegend",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldOrientation",
+      "future": "FieldOrientation",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldScope",
+      "future": "FieldScope",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldSet",
+      "future": "FieldSet",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldSurface",
+      "future": "FieldSurfaceRecipe",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FieldVisibility",
+      "future": "FieldVisibility",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FlipController",
+      "future": "FlipController",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Fluid",
+      "future": "Fluid",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FoilValue",
+      "future": "PremiumSurface",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Fonts",
+      "future": "Fonts",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Form",
+      "future": "Form",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FormField",
+      "future": "FormField",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "FormFieldBase",
+      "future": "FormFieldBase",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "GlassVariant.control",
+      "future": "GlassVariant.control",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "GlassVariant.panel",
+      "future": "GlassVariant.panel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "GlassVariant.navigation",
+      "future": "GlassVariant.navigation",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "GlassVariant.prominent",
+      "future": "GlassVariant.prominent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "HistoryCard",
+      "future": "HistoryCard",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "HistoryConfirm",
+      "future": "HistoryConfirm",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "HistoryRename",
+      "future": "HistoryRename",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "HistorySearch",
+      "future": "HistorySearch",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "HitArea",
+      "future": "HitArea",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "HoverCard",
+      "future": "HoverCard",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "HoverCardContent",
+      "future": "HoverCardContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Icon",
+      "future": "Icon",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconCircleElement",
+      "future": "IconCircleElement",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconElement",
+      "future": "IconElement",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconEllipseElement",
+      "future": "IconEllipseElement",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconGlyph",
+      "future": "IconGlyph",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconLineElement",
+      "future": "IconLineElement",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconPathElement",
+      "future": "IconPathElement",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconPaths",
+      "future": "IconPaths",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconPolygonElement",
+      "future": "IconPolygonElement",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconPolylineElement",
+      "future": "IconPolylineElement",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconRectElement",
+      "future": "IconRectElement",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconSize",
+      "future": "IconSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconSwap",
+      "future": "IconSwap",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IconTone",
+      "future": "IconTone",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InlineBox",
+      "future": "InlineBox",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Input",
+      "future": "Input",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InputGroup",
+      "future": "InputGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InputGroupAddon",
+      "future": "InputGroupAddon",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InputGroupAlign",
+      "future": "InputGroupAlign",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InputGroupButton",
+      "future": "InputGroupButton",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InputGroupButtonSize",
+      "future": "InputGroupButtonSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InputGroupInput",
+      "future": "InputGroupInput",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InputGroupText",
+      "future": "InputGroupText",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InputOtp",
+      "future": "InputOtp",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InputOtpSeparator",
+      "future": "InputOtpSeparator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "InputOtpSlot",
+      "future": "InputOtpSlot",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "IssueMode",
+      "future": "IssueMode",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Item",
+      "future": "Item",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ItemActions",
+      "future": "ItemActions",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ItemContent",
+      "future": "ItemContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ItemDescription",
+      "future": "ItemDescription",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ItemGroup",
+      "future": "ItemGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ItemMedia",
+      "future": "ItemMedia",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ItemTitle",
+      "future": "ItemTitle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ItemVariant",
+      "future": "ItemVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Jelly",
+      "future": "StateChangeMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "JellyIn",
+      "future": "OpenMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "JellyReplay",
+      "future": "StateChangeFeedback",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "JellyTransition",
+      "future": "OpenTransition",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Kbd",
+      "future": "Kbd",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "KbdGroup",
+      "future": "KbdGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "KeyframeFill",
+      "future": "KeyframeFill",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "KeyframePlayer",
+      "future": "KeyframePlayer",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "KeyframeStop",
+      "future": "KeyframeStop",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Keyframes",
+      "future": "Keyframes",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Lift",
+      "future": "HoverBuilder",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "LiftCard",
+      "future": "InteractiveCard",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "LineBox",
+      "future": "LineBox",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "LinearScale",
+      "future": "LinearScale",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "LiveWaveform",
+      "future": "LiveWaveform",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Lucide",
+      "future": "Lucide",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "LucideGlyph",
+      "future": "LucideGlyph",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MachineSurface",
+      "future": "Surface",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkdownAlign",
+      "future": "MarkdownAlign",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkdownBlock",
+      "future": "MarkdownBlock",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkdownBullets",
+      "future": "MarkdownBullets",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkdownFence",
+      "future": "MarkdownFence",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkdownHeading",
+      "future": "MarkdownHeading",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkdownNumbers",
+      "future": "MarkdownNumbers",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkdownOrderedItem",
+      "future": "MarkdownOrderedItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkdownParagraph",
+      "future": "MarkdownParagraph",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkdownQuote",
+      "future": "MarkdownQuote",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkdownTable",
+      "future": "MarkdownTable",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Marker",
+      "future": "Marker",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MarkerVariant",
+      "future": "MarkerVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MediaRatios",
+      "future": "AspectRatios",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MediaScrim",
+      "future": "MediaScrim",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MediaScrimTokens",
+      "future": "MediaScrimTokens",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Menu",
+      "future": "Menu",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuCheckboxItem",
+      "future": "MenuCheckboxItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuChild",
+      "future": "MenuChild",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuContent",
+      "future": "MenuContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuGroup",
+      "future": "MenuGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuIndicatorSide",
+      "future": "MenuIndicatorSide",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuItem",
+      "future": "MenuItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuItemVariant",
+      "future": "MenuItemVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuLabel",
+      "future": "MenuLabel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuMotion",
+      "future": "MenuMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuPointerDown",
+      "future": "MenuPointerDown",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuRadioGroup",
+      "future": "MenuRadioGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuRadioItem",
+      "future": "MenuRadioItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuSeparator",
+      "future": "MenuSeparator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuSub",
+      "future": "MenuSub",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuSurface",
+      "future": "MenuSurface",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuSurfaceKind",
+      "future": "MenuSurfaceVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenuTriggerScope",
+      "future": "MenuTriggerScope",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Menubar",
+      "future": "Menubar",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MenubarMenu",
+      "future": "MenubarMenu",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Message",
+      "future": "Message",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageAvatar",
+      "future": "MessageAvatar",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageContent",
+      "future": "MessageContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageFooter",
+      "future": "MessageFooter",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageGroup",
+      "future": "MessageGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageHeader",
+      "future": "MessageHeader",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageScope",
+      "future": "MessageScope",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageScroller",
+      "future": "MessageScroller",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageScrollerButton",
+      "future": "MessageScrollerButton",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageScrollerContent",
+      "future": "MessageScrollerContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageScrollerController",
+      "future": "MessageScrollerController",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageScrollerItem",
+      "future": "MessageScrollerItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageScrollerProvider",
+      "future": "MessageScrollerProvider",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MessageScrollerViewport",
+      "future": "MessageScrollerViewport",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "MicControl",
+      "future": "MicControl",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ModalCompact",
+      "future": "CompactDialogLayout",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ModalContentBuilder",
+      "future": "ModalContentBuilder",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ModalPortal",
+      "future": "OverlayPortal",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ModalPortalState",
+      "future": "OverlayPortalState",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ModalTransitionBuilder",
+      "future": "ModalTransitionBuilder",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ModalTriggerBuilder",
+      "future": "ModalTriggerBuilder",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "NativeSelect",
+      "future": "NativeSelect",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "NativeSelectSize",
+      "future": "NativeSelectSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "NavUser",
+      "future": "UserMenu",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "NavUserAccount",
+      "future": "UserMenuAccount",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "NavUserItem",
+      "future": "UserMenuItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "NavigationMenu",
+      "future": "NavigationMenu",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "NavigationMenuIndicator",
+      "future": "NavigationMenuIndicator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "NavigationMenuItem",
+      "future": "NavigationMenuItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "NavigationMenuLink",
+      "future": "NavigationMenuLink",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Oklab",
+      "future": "OklabColor",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "OrbProgram",
+      "future": "VoiceIndicatorProgram",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "OrbState",
+      "future": "VoiceIndicatorState",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PageGlow",
+      "future": "BackgroundEffect",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Pagination",
+      "future": "Pagination",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PaginationEllipsis",
+      "future": "PaginationEllipsis",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PaginationLink",
+      "future": "PaginationLink",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PaginationStep",
+      "future": "PaginationStep",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Palette",
+      "future": "Palette",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PendingApproval",
+      "future": "PendingApproval",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PieChart",
+      "future": "PieChart",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PieSpec",
+      "future": "PieSpec",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PointScale",
+      "future": "PointScale",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PolarAngleAxis",
+      "future": "PolarAngleAxis",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PolarGrid",
+      "future": "PolarGrid",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PolarGridType",
+      "future": "PolarGridType",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PolarRadiusAxis",
+      "future": "PolarRadiusAxis",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PopIn",
+      "future": "EntranceMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PopInEntrance",
+      "future": "PopInEntrance",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Popover",
+      "future": "Popover",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PopoverAlign",
+      "future": "PopoverAlign",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PopoverAnchorMetrics",
+      "future": "PopoverAnchorMetrics",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PopoverBarrier",
+      "future": "PopoverBarrier",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PopoverContentBuilder",
+      "future": "PopoverContentBuilder",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PopoverOriginModel",
+      "future": "PopoverAnchorMode",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PopoverPlacement",
+      "future": "PopoverPlacement",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PopoverSide",
+      "future": "PopoverSide",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PopoverSurface",
+      "future": "PopoverSurface",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PreformattedCode",
+      "future": "PreformattedCode",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Press",
+      "future": "Press",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PrismPalette",
+      "future": "PrismPalette",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Progress",
+      "future": "Progress",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ProgressTone",
+      "future": "ProgressTone",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "PulseLive",
+      "future": "LivePulseMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Questionnaire",
+      "future": "Questionnaire",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireActions",
+      "future": "QuestionnaireActions",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireChoice",
+      "future": "QuestionnaireChoice",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireChoices",
+      "future": "QuestionnaireChoices",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireController",
+      "future": "QuestionnaireController",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireDescription",
+      "future": "QuestionnaireDescription",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireError",
+      "future": "QuestionnaireError",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireInput",
+      "future": "QuestionnaireInput",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireItem",
+      "future": "QuestionnaireItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireNext",
+      "future": "QuestionnaireNext",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnairePrevious",
+      "future": "QuestionnairePrevious",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireProgress",
+      "future": "QuestionnaireProgress",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireShortcuts",
+      "future": "QuestionnaireShortcuts",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireSkip",
+      "future": "QuestionnaireSkip",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireSubmit",
+      "future": "QuestionnaireSubmit",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "QuestionnaireTitle",
+      "future": "QuestionnaireTitle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "RadarChart",
+      "future": "RadarChart",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "RadarSpec",
+      "future": "RadarSpec",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "RadialBarChart",
+      "future": "RadialBarChart",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "RadialBarSpec",
+      "future": "RadialBarSpec",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Radii",
+      "future": "Radii",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "RadioGroup",
+      "future": "RadioGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "RadioGroupItem",
+      "future": "RadioGroupItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Ratchet",
+      "future": "DiscreteProgressMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ResizablePanel",
+      "future": "ResizablePanel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ResizablePanelGroup",
+      "future": "ResizablePanelGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Reveal",
+      "future": "RevealMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "RichText",
+      "future": "RichText",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "RowIn",
+      "future": "RowIn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "RowMotion",
+      "future": "RowMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Rule",
+      "future": "ValidationRule",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "RuleTest",
+      "future": "ValidationTest",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Rules",
+      "future": "Validators",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SafeArea",
+      "future": "SafeArea",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ScrollArea",
+      "future": "ScrollArea",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ScrollAreaBehavior",
+      "future": "ScrollAreaBehavior",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ScrollDirection",
+      "future": "ScrollDirection",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ScrollFade",
+      "future": "ScrollFade",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ScrollPosition",
+      "future": "ScrollPosition",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Select",
+      "future": "Select",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SelectChild",
+      "future": "SelectChild",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SelectGroup",
+      "future": "SelectGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SelectMenu",
+      "future": "SelectMenu",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SelectOption",
+      "future": "SelectOption",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SelectSeparator",
+      "future": "SelectSeparator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SelectSize",
+      "future": "SelectSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SelectionControl",
+      "future": "SelectionControl",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Separator",
+      "future": "Separator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SeparatorOrientation",
+      "future": "SeparatorOrientation",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SerialisedMessage",
+      "future": "SerialisedMessage",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ShadowLayer",
+      "future": "ShadowLayer",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ShadowSpec",
+      "future": "ShadowStyle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Shadows",
+      "future": "Shadows",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheenAction",
+      "future": "ActionFeedback",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Sheet",
+      "future": "Sheet",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheetContent",
+      "future": "SheetContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheetContentGroup",
+      "future": "SheetContentGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheetDescription",
+      "future": "SheetDescription",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheetFooter",
+      "future": "SheetFooter",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheetHeader",
+      "future": "SheetHeader",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheetOverlay",
+      "future": "SheetOverlay",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheetPanel",
+      "future": "SheetPanel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheetSide",
+      "future": "SheetSide",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheetTitle",
+      "future": "SheetTitle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SheetTransition",
+      "future": "SheetTransition",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Shimmer",
+      "future": "LoadingShimmerMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "AttachmentStatusText",
+      "future": "AttachmentStatusText",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ShowCount",
+      "future": "ShowCount",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Sidebar",
+      "future": "Sidebar",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarChrome",
+      "future": "SidebarChrome",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarCollapsible",
+      "future": "SidebarCollapsible",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarCollapsibleGroup",
+      "future": "SidebarCollapsibleGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarContent",
+      "future": "SidebarContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarFooter",
+      "future": "SidebarFooter",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarGroup",
+      "future": "SidebarGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarGroupAction",
+      "future": "SidebarGroupAction",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarGroupContent",
+      "future": "SidebarGroupContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarGroupLabel",
+      "future": "SidebarGroupLabel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarHeader",
+      "future": "SidebarHeader",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarInput",
+      "future": "SidebarInput",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarInset",
+      "future": "SidebarInset",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenu",
+      "future": "SidebarMenu",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuAction",
+      "future": "SidebarMenuAction",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuBadge",
+      "future": "SidebarMenuBadge",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuButton",
+      "future": "SidebarMenuButton",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuButtonSize",
+      "future": "SidebarMenuButtonSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuItem",
+      "future": "SidebarMenuItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuLabel",
+      "future": "SidebarMenuLabel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuRow",
+      "future": "SidebarMenuRow",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuSkeleton",
+      "future": "SidebarMenuSkeleton",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuSub",
+      "future": "SidebarMenuSub",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuSubButton",
+      "future": "SidebarMenuSubButton",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuSubButtonSize",
+      "future": "SidebarMenuSubButtonSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarMenuSubItem",
+      "future": "SidebarMenuSubItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarProvider",
+      "future": "SidebarProvider",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarRail",
+      "future": "SidebarRail",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarScope",
+      "future": "SidebarScope",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarSeparator",
+      "future": "SidebarSeparator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarSide",
+      "future": "SidebarSide",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarTrigger",
+      "future": "SidebarTrigger",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SidebarVariant",
+      "future": "SidebarVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SignOn",
+      "future": "TextRevealMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SignOnFrame",
+      "future": "TextRevealFrame",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Skeleton",
+      "future": "Skeleton",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Slider",
+      "future": "Slider",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SlidingPillGroup",
+      "future": "ActiveIndicator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Sparkle",
+      "future": "Sparkle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Spinner",
+      "future": "Spinner",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SpringUp",
+      "future": "SpringEntranceMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SpringUpEntrance",
+      "future": "SpringUpEntrance",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Starfield",
+      "future": "AmbientPattern",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "StarfieldCluster",
+      "future": "StarfieldCluster",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Stat",
+      "future": "Stat",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "StatDelta",
+      "future": "StatDelta",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "StatDeltaMark",
+      "future": "StatDeltaMark",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "StatDirection",
+      "future": "StatDirection",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "StatState",
+      "future": "StatState",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Steps",
+      "future": "StepCurve",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SurfaceOpacity",
+      "future": "SurfaceOpacity",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SwapIn",
+      "future": "ContentChange",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SwapRoll",
+      "future": "ContentSwapMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Sweep",
+      "future": "SweepMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Switch",
+      "future": "Switch",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SwitchPhase",
+      "future": "SwitchPhase",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "SwitchSize",
+      "future": "SwitchSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TabItem",
+      "future": "TabItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Table",
+      "future": "Table",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TableAlign",
+      "future": "TableAlign",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TableCellSpec",
+      "future": "TableCellSpec",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TableColumnWidth",
+      "future": "TableColumnWidth",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TableRowSpec",
+      "future": "TableRowSpec",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Tabs",
+      "future": "Tabs",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TabsVariant",
+      "future": "TabsVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Text",
+      "future": "StyledText",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TextFormField",
+      "future": "TextFormField",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TextTurn",
+      "future": "TextTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Textarea",
+      "future": "Textarea",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Theme",
+      "future": "ThemeScope",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ThemeController",
+      "future": "ThemeController",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ThemeData",
+      "future": "ThemeTokens",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ThemeKind",
+      "future": "ResolvedColorMode",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ThemeMode",
+      "future": "ColorMode",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Toast",
+      "future": "Toast",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToastAction",
+      "future": "ToastAction",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToastController",
+      "future": "ToastController",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToastMessage",
+      "future": "ToastMessage",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToastPosition",
+      "future": "ToastPosition",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToastType",
+      "future": "ToastType",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Toaster",
+      "future": "Toaster",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Toggle",
+      "future": "Toggle",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToggleGroup",
+      "future": "ToggleGroup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToggleGroupItem",
+      "future": "ToggleGroupItem",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToggleSize",
+      "future": "ToggleSize",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToggleVariant",
+      "future": "ToggleVariant",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToolChip",
+      "future": "ToolChip",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToolStateMap",
+      "future": "ToolStateMap",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ToolTurn",
+      "future": "ToolTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Tooltip",
+      "future": "Tooltip",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TooltipContent",
+      "future": "TooltipContent",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TooltipSide",
+      "future": "TooltipSide",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Transforms",
+      "future": "MotionTransforms",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Travel",
+      "future": "TravelMotion",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Type",
+      "future": "TextStyles",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TypeColor",
+      "future": "TextColorRole",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TypeSpec",
+      "future": "TextStyleToken",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "TypingCursor",
+      "future": "TypingCursor",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Unfold",
+      "future": "Unfold",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "UserMessage",
+      "future": "UserMessage",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "UserTurn",
+      "future": "UserTurn",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "ValidateMode",
+      "future": "ValidateMode",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "VoiceOrb",
+      "future": "VoiceIndicator",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "WelcomeCard",
+      "future": "WelcomeCard",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "Widths",
+      "future": "LayoutWidths",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "el",
+      "future": "space",
+      "occurrencesInLib": 620
+    },
+    {
+      "current": "elAgentAttachmentGlyph",
+      "future": "agentAttachmentGlyph",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elAgentAttachmentIsVideo",
+      "future": "agentAttachmentIsVideo",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elAgentAttachmentKind",
+      "future": "agentAttachmentKind",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "elAgentCubeScene",
+      "future": "agentCubeScene",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elAgentFaceSize",
+      "future": "agentFaceSize",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elAgentIsBusy",
+      "future": "agentIsBusy",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "elAgentIsNarrating",
+      "future": "agentIsNarrating",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "elAgentStateForTool",
+      "future": "agentStateForTool",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "elAnimationDuration",
+      "future": "effectiveMotionDuration",
+      "occurrencesInLib": 119
+    },
+    {
+      "current": "elAreaPath",
+      "future": "areaPath",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elAttachmentKind",
+      "future": "attachmentKind",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elAvatarRingWidth",
+      "future": "avatarRingWidth",
+      "occurrencesInLib": 4
+    },
+    {
+      "current": "elBarRRect",
+      "future": "barRRect",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elBarSlots",
+      "future": "barSlots",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elChartNiceDomain",
+      "future": "chartNiceDomain",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elChartNiceTicks",
+      "future": "chartNiceTicks",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elChartNumber",
+      "future": "chartNumber",
+      "occurrencesInLib": 6
+    },
+    {
+      "current": "elCollatorContains",
+      "future": "collatorContains",
+      "occurrencesInLib": 5
+    },
+    {
+      "current": "elCommandScore",
+      "future": "commandScore",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elContentAreaHeight",
+      "future": "contentAreaHeight",
+      "occurrencesInLib": 6
+    },
+    {
+      "current": "elCurvePath",
+      "future": "curvePath",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elEngineLineHeight",
+      "future": "engineLineHeight",
+      "occurrencesInLib": 4
+    },
+    {
+      "current": "elFilterCommands",
+      "future": "filterCommands",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elFormatBytes",
+      "future": "formatBytes",
+      "occurrencesInLib": 6
+    },
+    {
+      "current": "elFormatMs",
+      "future": "formatMs",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elGlueInlineBoxes",
+      "future": "glueInlineBoxes",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elHsl",
+      "future": "hslColor",
+      "occurrencesInLib": 93
+    },
+    {
+      "current": "elHumaniseToolName",
+      "future": "humaniseToolName",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elIsTextual",
+      "future": "isTextual",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elLanguageAliases",
+      "future": "languageAliases",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elLucideAliases",
+      "future": "lucideAliases",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elLucideByName",
+      "future": "lucideByName",
+      "occurrencesInLib": 6
+    },
+    {
+      "current": "elLucideLookup",
+      "future": "lucideLookup",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "elMaxJsonChars",
+      "future": "maxJsonChars",
+      "occurrencesInLib": 4
+    },
+    {
+      "current": "elParseMarkdown",
+      "future": "parseMarkdown",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elPolarMaxRadius",
+      "future": "polarMaxRadius",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elPolarPolygonPath",
+      "future": "polarPolygonPath",
+      "occurrencesInLib": 4
+    },
+    {
+      "current": "elPolarToCartesian",
+      "future": "polarToCartesian",
+      "occurrencesInLib": 21
+    },
+    {
+      "current": "elPopoverPlacement",
+      "future": "popoverPlacement",
+      "occurrencesInLib": 4
+    },
+    {
+      "current": "elRelativeTime",
+      "future": "relativeTime",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elRelativeTimeOf",
+      "future": "relativeTimeOf",
+      "occurrencesInLib": 4
+    },
+    {
+      "current": "elRenderMarkdownInline",
+      "future": "renderMarkdownInline",
+      "occurrencesInLib": 7
+    },
+    {
+      "current": "elResizableHandleFocusLabel",
+      "future": "resizableHandleFocusLabel",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elResolveAgentState",
+      "future": "resolveAgentState",
+      "occurrencesInLib": 4
+    },
+    {
+      "current": "elSafeHref",
+      "future": "safeHref",
+      "occurrencesInLib": 4
+    },
+    {
+      "current": "elSaturate",
+      "future": "saturate",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elSectorPath",
+      "future": "sectorPath",
+      "occurrencesInLib": 6
+    },
+    {
+      "current": "elSectorWithCornerPath",
+      "future": "sectorWithCornerPath",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elSerialiseAttachments",
+      "future": "serialiseAttachments",
+      "occurrencesInLib": 4
+    },
+    {
+      "current": "elSlashQuery",
+      "future": "slashQuery",
+      "occurrencesInLib": 3
+    },
+    {
+      "current": "elStarfieldDense",
+      "future": "starfieldDense",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elStarfieldThin",
+      "future": "starfieldThin",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elStateForTool",
+      "future": "stateForTool",
+      "occurrencesInLib": 5
+    },
+    {
+      "current": "elStripProtocol",
+      "future": "stripProtocol",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elTableHoverCurve",
+      "future": "tableHoverCurve",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elTableHoverDuration",
+      "future": "tableHoverDuration",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elTokenise",
+      "future": "tokenise",
+      "occurrencesInLib": 2
+    },
+    {
+      "current": "elTransparent",
+      "future": "transparent",
+      "occurrencesInLib": 66
+    },
+    {
+      "current": "kElAgentStateId",
+      "future": "agentStateId",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "kElAgentStateLabel",
+      "future": "agentStateLabel",
+      "occurrencesInLib": 1
+    },
+    {
+      "current": "kElMaxFileBytes",
+      "future": "maxFileBytes",
+      "occurrencesInLib": 4
+    },
+    {
+      "current": "kElMaxInlineChars",
+      "future": "maxInlineChars",
+      "occurrencesInLib": 3
+    }
+  ]
+}

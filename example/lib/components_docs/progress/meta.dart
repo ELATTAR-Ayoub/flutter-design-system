@@ -1,8 +1,8 @@
 /// Documentation metadata for the `progress` component.
 ///
-/// **Split.** This route used to carry both `ElProgress` and `ElSkeleton`
+/// **Split.** This route used to carry both `Progress` and `Skeleton`
 /// under one [ComponentDocEntry] (see the git history of this file for that
-/// shape). `ElSkeleton` now has its own route and its own entry:
+/// shape). `Skeleton` now has its own route and its own entry:
 /// `example/lib/components_docs/skeleton/meta.dart`'s `skeletonDoc`. [name],
 /// [route] (`/components/progress`), and the page class (`ProgressDocPage`)
 /// are unchanged, so `catalog.dart`'s `progress.progressDoc` reference and
@@ -26,7 +26,7 @@ const ComponentDocEntry progressDoc = ComponentDocEntry(
   description:
       'A determinate progress channel: a 10px sunken bar with five tones, '
       'for the moment you can compute a fraction done.',
-  dependencies: <String>['machine-surface', 'source-foundation'],
-  exports: <String>['ElProgress', 'ElProgressTone'],
+  dependencies: <String>['surface', 'source-foundation'],
+  exports: <String>['Progress', 'ProgressTone'],
   sourcePath: 'lib/src/components/progress.dart',
 );

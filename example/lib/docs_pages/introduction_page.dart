@@ -15,7 +15,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
@@ -38,9 +50,9 @@ class IntroductionDocsPage extends StatelessWidget {
           'visible, every component is executable, and every useful '
           'artifact can be installed or owned as source.',
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Docs'),
-      ElBreadcrumbEntry.page('Introduction'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Docs'),
+      BreadcrumbEntry.page('Introduction'),
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'What this is', anchor: 'overview'),
@@ -69,7 +81,7 @@ class _IntroductionArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       key: const ValueKey<String>('introduction-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -86,13 +98,13 @@ class _IntroductionArticle extends StatelessWidget {
     );
   }
 
-  Widget _prose(String text, ElThemeData theme, {ElTypeSpec? spec}) =>
+  Widget _prose(String text, ThemeTokens theme, {TextStyleToken? spec}) =>
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText(text, spec ?? ElType.body),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(text, spec ?? TextStyles.body),
       );
 
-  Widget _overview(ElThemeData theme) => DocsSection(
+  Widget _overview(ThemeTokens theme) => DocsSection(
     id: 'overview',
     title: 'What this is',
     child: Column(
@@ -106,7 +118,7 @@ class _IntroductionArticle extends StatelessWidget {
           'copy of that code instead of only depending on it.',
           theme,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         _prose(
           'It targets Flutter developers evaluating the system, product '
           'teams installing components into an existing application, '
@@ -118,7 +130,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _ownership(ElThemeData theme) => DocsSection(
+  Widget _ownership(ThemeTokens theme) => DocsSection(
     id: 'ownership',
     title: 'Source-first ownership',
     description:
@@ -137,7 +149,7 @@ class _IntroductionArticle extends StatelessWidget {
           'need. There is no framework watching for drift back to upstream.',
           theme,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         _prose(
           'This is the opposite trade from a typical UI package. A package '
           'dependency stays a black box you configure through the '
@@ -146,25 +158,25 @@ class _IntroductionArticle extends StatelessWidget {
           'a version bump.',
           theme,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
-            ElText('See ', ElType.small, color: theme.mutedForeground),
+            StyledText('See ', TextStyles.small, color: theme.mutedForeground),
             const DocsLink(
               label: 'Installation',
               route: docsInstallationRoute,
               underline: true,
             ),
-            ElText(' and ', ElType.small, color: theme.mutedForeground),
+            StyledText(' and ', TextStyles.small, color: theme.mutedForeground),
             const DocsLink(
               label: 'Registry',
               route: docsRegistryRoute,
               underline: true,
             ),
-            ElText(
+            StyledText(
               ' for how the copy and its dependency graph are produced.',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -173,12 +185,12 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _composition(ElThemeData theme) => DocsSection(
+  Widget _composition(ThemeTokens theme) => DocsSection(
     id: 'composition',
     title: 'Composition through public El* APIs',
     child: _prose(
       'Every component, effect, and motion primitive is reached through a '
-      'public El-prefixed class: ElButton, ElCard, ElSidebar, ElToaster, '
+      'public El-prefixed class: Button, Card, Sidebar, Toaster, '
       'and so on, exported from the package barrel '
       '(package:elattar_design_system/elattar_design_system.dart) or, once '
       'copied, from a project-local lib/components/ui/ui.dart barrel the '
@@ -189,7 +201,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _distribution(ElThemeData theme) => DocsSection(
+  Widget _distribution(ThemeTokens theme) => DocsSection(
     id: 'distribution',
     title: 'Registry and CLI distribution',
     child: Column(
@@ -204,33 +216,29 @@ class _IntroductionArticle extends StatelessWidget {
           'assets, and font registrations into a consumer project.',
           theme,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
-            ElText('See ', ElType.small, color: theme.mutedForeground),
-            const DocsLink(
-              label: 'CLI',
-              route: docsCliRoute,
-              underline: true,
-            ),
-            ElText(' and ', ElType.small, color: theme.mutedForeground),
+            StyledText('See ', TextStyles.small, color: theme.mutedForeground),
+            const DocsLink(label: 'CLI', route: docsCliRoute, underline: true),
+            StyledText(' and ', TextStyles.small, color: theme.mutedForeground),
             const DocsLink(
               label: 'Registry',
               route: docsRegistryRoute,
               underline: true,
             ),
-            ElText(
+            StyledText(
               ' for the full command surface and item schema.',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ],
         ),
-        SizedBox(height: el(4)),
-        ElAlert(
-          variant: ElAlertVariant.info,
-          icon: const ElIcon(ElIconGlyph.info),
+        SizedBox(height: space(4)),
+        Alert(
+          variant: AlertVariant.info,
+          icon: const Icon(IconGlyph.info),
           title: 'Not published to an external index yet',
           description:
               'See Installation for exactly what that means and what '
@@ -240,7 +248,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _defaults(ElThemeData theme) => DocsSection(
+  Widget _defaults(ThemeTokens theme) => DocsSection(
     id: 'defaults',
     title: 'Beautiful, coherent defaults',
     child: Column(
@@ -256,19 +264,19 @@ class _IntroductionArticle extends StatelessWidget {
           'at the repository root).',
           theme,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
-            ElText('See ', ElType.small, color: theme.mutedForeground),
+            StyledText('See ', TextStyles.small, color: theme.mutedForeground),
             const DocsLink(
               label: 'Theming',
               route: docsThemingRoute,
               underline: true,
             ),
-            ElText(
+            StyledText(
               ' for how that token set resolves.',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -277,7 +285,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _platforms(ElThemeData theme) => DocsSection(
+  Widget _platforms(ThemeTokens theme) => DocsSection(
     id: 'platforms',
     title: 'Flutter platform support',
     child: _prose(
@@ -291,7 +299,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _skill(ElThemeData theme) => DocsSection(
+  Widget _skill(ThemeTokens theme) => DocsSection(
     id: 'skill',
     title: 'AI-ready skill and open code',
     child: Column(
@@ -308,19 +316,15 @@ class _IntroductionArticle extends StatelessWidget {
           'installed components through the CLI.',
           theme,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
-            ElText('See ', ElType.small, color: theme.mutedForeground),
-            const DocsLink(
-              label: 'Skills',
-              route: '/skills',
-              underline: true,
-            ),
-            ElText(
+            StyledText('See ', TextStyles.small, color: theme.mutedForeground),
+            const DocsLink(label: 'Skills', route: '/skills', underline: true),
+            StyledText(
               ' for supported agents and what it reads and provides.',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -329,7 +333,7 @@ class _IntroductionArticle extends StatelessWidget {
     ),
   );
 
-  Widget _modes(ElThemeData theme) => DocsSection(
+  Widget _modes(ThemeTokens theme) => DocsSection(
     id: 'modes',
     title: 'Package versus CLI ownership',
     description:

@@ -1,5 +1,17 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The navigation family: `Tabs`, `Breadcrumb`, `Pagination`,
@@ -15,7 +27,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 Widget host(
   Widget child, {
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   Size size = const Size(1440, 900),
   TextDirection direction = TextDirection.ltr,
 }) {
@@ -23,8 +35,8 @@ Widget host(
     data: MediaQueryData(size: size),
     child: Directionality(
       textDirection: direction,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Center(child: child),
       ),
     ),
@@ -37,7 +49,7 @@ Widget _hosted = const SizedBox.shrink();
 
 Widget overlayHost(
   Widget child, {
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   Size size = const Size(1440, 900),
   Alignment align = Alignment.topCenter,
 }) {
@@ -46,8 +58,8 @@ Widget overlayHost(
     data: MediaQueryData(size: size),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Overlay(
           initialEntries: <OverlayEntry>[
             OverlayEntry(
@@ -61,8 +73,8 @@ Widget overlayHost(
   );
 }
 
-ElThemeData themeIn(WidgetTester t, Type of) =>
-    ElTheme.of(t.element(find.byType(of).first));
+ThemeTokens themeIn(WidgetTester t, Type of) =>
+    ThemeScope.of(t.element(find.byType(of).first));
 
 /// Opens (or closes) an overlay: one frame for the prop, one for the portal.
 Future<void> settleOverlay(WidgetTester tester) async {
@@ -77,59 +89,55 @@ Future<void> settleOverlay(WidgetTester tester) async {
 /// 2.5% of its height further down. Every geometry assertion below waits.
 Future<void> settleEntrance(WidgetTester tester) async {
   await settleOverlay(tester);
-  await tester.pump(ElDurations.overlay);
+  await tester.pump(MotionDurations.overlayEnter);
   await tester.pump();
 }
 
 /// §3's first tab set.
-List<ElTabItem> _liveTabs() => <ElTabItem>[
-  const ElTabItem(label: 'Live Pulls', content: Text('live')),
-  const ElTabItem(label: 'Top Hits', content: Text('hits')),
-  const ElTabItem(label: 'My Pulls', content: Text('mine')),
+List<TabItem> _liveTabs() => <TabItem>[
+  const TabItem(label: 'Live Pulls', content: Text('live')),
+  const TabItem(label: 'Top Hits', content: Text('hits')),
+  const TabItem(label: 'My Pulls', content: Text('mine')),
 ];
 
 void main() {
   /* ── Tabs ──────────────────────────────────────────────────────────────── */
 
-  group('ElTabs — the ladder §3 states in prose', () {
+  group('Tabs — the ladder §3 states in prose', () {
     test('40px track, 4px inset, 32px triggers on 16px padding', () {
       // The section's own trailing caption, asserted as numbers *(measured:
       // the track is 40 tall on `p-1`, the triggers 32 on `px-4`)*.
-      expect(ElTabs.trackHeight, 40);
-      expect(ElTabs.trackPadding, 4);
-      expect(ElTabs.triggerHeight, 32);
-      expect(ElTabs.triggerPaddingX, 16);
+      expect(Tabs.trackHeight, 40);
+      expect(Tabs.trackPadding, 4);
+      expect(Tabs.triggerHeight, 32);
+      expect(Tabs.triggerPaddingX, 16);
       // Stock shadcn's 32 / 3 / 25 is what the caption is arguing against.
-      expect(ElTabs.trackHeight, isNot(32));
+      expect(Tabs.trackHeight, isNot(32));
     });
 
     test('the two variants gap differently', () {
       // `gap-1` on the filled track, `gap-2` on the bare one *(measured 4 and
       // 8)*.
-      expect(ElTabs.gapFor(ElTabsVariant.standard), 4);
-      expect(ElTabs.gapFor(ElTabsVariant.line), 8);
+      expect(Tabs.gapFor(TabsVariant.standard), 4);
+      expect(Tabs.gapFor(TabsVariant.line), 8);
       // `h-0.5`.
-      expect(ElTabs.ruleHeight, 2);
+      expect(Tabs.ruleHeight, 2);
       // `flex gap-2` between the track and the view.
-      expect(ElTabs.rootGap, 8);
+      expect(Tabs.rootGap, 8);
     });
 
     testWidgets('the standard mark is a `--primary` pill under the label', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        host(
-          ElTabs(items: _liveTabs(), selectedIndex: 0, onChanged: (int _) {}),
-        ),
+        host(Tabs(items: _liveTabs(), selectedIndex: 0, onChanged: (int _) {})),
       );
       await tester.pump();
 
-      final ElThemeData theme = themeIn(tester, ElTabs);
-      final ElMachineSurface pill = tester.widget<ElMachineSurface>(
-        find.byType(ElMachineSurface).first,
-      );
+      final ThemeTokens theme = themeIn(tester, Tabs);
+      final Surface pill = tester.widget<Surface>(find.byType(Surface).first);
       expect(pill.fill, theme.primary);
-      expect(pill.spec, ElShadows.chip);
+      expect(pill.spec, Shadows.compactControl);
       // The pill is painted FIRST, so the label is never behind it — the
       // reference gets the same result from `z-10` on the trigger.
       expect(find.text('Live Pulls'), findsOneWidget);
@@ -140,8 +148,8 @@ void main() {
       (WidgetTester tester) async {
         await tester.pumpWidget(
           host(
-            ElTabs(
-              variant: ElTabsVariant.line,
+            Tabs(
+              variant: TabsVariant.line,
               items: _liveTabs(),
               selectedIndex: 0,
               onChanged: (int _) {},
@@ -150,18 +158,18 @@ void main() {
         );
         await tester.pump();
 
-        final ElThemeData theme = themeIn(tester, ElTabs);
+        final ThemeTokens theme = themeIn(tester, Tabs);
         final Iterable<BoxDecoration> rules = tester
             .widgetList<DecoratedBox>(find.byType(DecoratedBox))
             .map((DecoratedBox b) => b.decoration as BoxDecoration)
-            .where((BoxDecoration d) => d.color == theme.actionInk);
+            .where((BoxDecoration d) => d.color == theme.actionText);
         expect(rules, hasLength(1));
-        expect(rules.first.borderRadius, BorderRadius.circular(ElRadii.pill));
+        expect(rules.first.borderRadius, BorderRadius.circular(Radii.full));
         // No filled pill anywhere in this variant.
         expect(
           tester
-              .widgetList<ElMachineSurface>(find.byType(ElMachineSurface))
-              .where((ElMachineSurface s) => s.fill == theme.primary),
+              .widgetList<Surface>(find.byType(Surface))
+              .where((Surface s) => s.fill == theme.primary),
           isEmpty,
         );
       },
@@ -172,8 +180,8 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          ElTabs(
-            variant: ElTabsVariant.line,
+          Tabs(
+            variant: TabsVariant.line,
             items: _liveTabs(),
             selectedIndex: 0,
             onChanged: (int _) {},
@@ -183,20 +191,18 @@ void main() {
       await tester.pump();
       expect(
         tester
-            .widget<ElSlidingPillGroup>(find.byType(ElSlidingPillGroup))
+            .widget<ActiveIndicator>(find.byType(ActiveIndicator))
             .jellyAlignment,
         Alignment.bottomCenter,
       );
 
       await tester.pumpWidget(
-        host(
-          ElTabs(items: _liveTabs(), selectedIndex: 0, onChanged: (int _) {}),
-        ),
+        host(Tabs(items: _liveTabs(), selectedIndex: 0, onChanged: (int _) {})),
       );
       await tester.pump();
       expect(
         tester
-            .widget<ElSlidingPillGroup>(find.byType(ElSlidingPillGroup))
+            .widget<ActiveIndicator>(find.byType(ActiveIndicator))
             .jellyAlignment,
         Alignment.center,
       );
@@ -209,7 +215,7 @@ void main() {
       await tester.pumpWidget(
         host(
           StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) => ElTabs(
+            builder: (BuildContext context, StateSetter setState) => Tabs(
               items: _liveTabs(),
               selectedIndex: selected,
               onChanged: (int i) => setState(() => selected = i),
@@ -234,10 +240,10 @@ void main() {
       // Five triggers and one `TabsContent` is what §3's account set ships.
       await tester.pumpWidget(
         host(
-          ElTabs(
-            items: const <ElTabItem>[
-              ElTabItem(label: 'Overview', content: Text('overview')),
-              ElTabItem(label: 'Security'),
+          Tabs(
+            items: const <TabItem>[
+              TabItem(label: 'Overview', content: Text('overview')),
+              TabItem(label: 'Security'),
             ],
             selectedIndex: 1,
             onChanged: (int _) {},
@@ -252,14 +258,13 @@ void main() {
     testWidgets('the active ink differs by variant', (
       WidgetTester tester,
     ) async {
-      for (final (ElTabsVariant variant, bool onPrimary)
-          in <(ElTabsVariant, bool)>[
-            (ElTabsVariant.standard, true),
-            (ElTabsVariant.line, false),
-          ]) {
+      for (final (TabsVariant variant, bool onPrimary) in <(TabsVariant, bool)>[
+        (TabsVariant.standard, true),
+        (TabsVariant.line, false),
+      ]) {
         await tester.pumpWidget(
           host(
-            ElTabs(
+            Tabs(
               variant: variant,
               items: _liveTabs(),
               selectedIndex: 0,
@@ -268,14 +273,14 @@ void main() {
           ),
         );
         await tester.pump();
-        await tester.pump(ElDurations.transitionDefault);
+        await tester.pump(MotionDurations.normal);
 
-        final ElThemeData theme = themeIn(tester, ElTabs);
-        final ElText active = tester.widget<ElText>(
+        final ThemeTokens theme = themeIn(tester, Tabs);
+        final StyledText active = tester.widget<StyledText>(
           find
               .ancestor(
                 of: find.text('Live Pulls'),
-                matching: find.byType(ElText),
+                matching: find.byType(StyledText),
               )
               .first,
         );
@@ -286,11 +291,11 @@ void main() {
               'the filled pill carries white ink; the rule leaves the '
               'label on `--foreground`',
         );
-        final ElText resting = tester.widget<ElText>(
+        final StyledText resting = tester.widget<StyledText>(
           find
               .ancestor(
                 of: find.text('My Pulls'),
-                matching: find.byType(ElText),
+                matching: find.byType(StyledText),
               )
               .first,
         );
@@ -301,12 +306,12 @@ void main() {
 
   /* ── Breadcrumb ────────────────────────────────────────────────────────── */
 
-  group('ElBreadcrumb', () {
+  group('Breadcrumb', () {
     test('the two spacings the list and its separator carry', () {
       // `gap-1.5` on the `ol`, `[&>svg]:size-3.5` on the separator
       // *(measured 6 and 14)*.
-      expect(ElBreadcrumb.gap, 6);
-      expect(ElBreadcrumb.separatorPx, 14);
+      expect(Breadcrumb.gap, 6);
+      expect(Breadcrumb.separatorPx, 14);
     });
 
     testWidgets('a separator is derived between every pair, and nowhere else', (
@@ -314,11 +319,11 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const ElBreadcrumb(
-            items: <ElBreadcrumbEntry>[
-              ElBreadcrumbEntry.link('Packs'),
-              ElBreadcrumbEntry.link('Eclipse Vault'),
-              ElBreadcrumbEntry.page('Origin Pulse — Series I'),
+          const Breadcrumb(
+            items: <BreadcrumbEntry>[
+              BreadcrumbEntry.link('Packs'),
+              BreadcrumbEntry.link('Eclipse Vault'),
+              BreadcrumbEntry.page('Origin Pulse — Series I'),
             ],
           ),
         ),
@@ -326,20 +331,20 @@ void main() {
       await tester.pump();
       expect(
         tester
-            .widgetList<ElIcon>(find.byType(ElIcon))
-            .where((ElIcon i) => i.glyph == ElIconGlyph.chevronRight),
+            .widgetList<Icon>(find.byType(Icon))
+            .where((Icon i) => i.glyph == IconGlyph.chevronRight),
         hasLength(2),
       );
 
       await tester.pumpWidget(
         host(
-          const ElBreadcrumb(
-            items: <ElBreadcrumbEntry>[ElBreadcrumbEntry.page('Only')],
+          const Breadcrumb(
+            items: <BreadcrumbEntry>[BreadcrumbEntry.page('Only')],
           ),
         ),
       );
       await tester.pump();
-      expect(find.byType(ElIcon), findsNothing);
+      expect(find.byType(Icon), findsNothing);
     });
 
     testWidgets('the current page is `--foreground` and is not a link', (
@@ -348,29 +353,32 @@ void main() {
       int taps = 0;
       await tester.pumpWidget(
         host(
-          ElBreadcrumb(
-            items: <ElBreadcrumbEntry>[
-              ElBreadcrumbEntry.link('Packs', onTap: () => taps++),
-              const ElBreadcrumbEntry.page('Series I'),
+          Breadcrumb(
+            items: <BreadcrumbEntry>[
+              BreadcrumbEntry.link('Packs', onTap: () => taps++),
+              const BreadcrumbEntry.page('Series I'),
             ],
           ),
         ),
       );
       await tester.pump();
-      final ElThemeData theme = themeIn(tester, ElBreadcrumb);
+      final ThemeTokens theme = themeIn(tester, Breadcrumb);
 
-      final ElText page = tester.widget<ElText>(
+      final StyledText page = tester.widget<StyledText>(
         find
-            .ancestor(of: find.text('Series I'), matching: find.byType(ElText))
+            .ancestor(
+              of: find.text('Series I'),
+              matching: find.byType(StyledText),
+            )
             .first,
       );
       expect(page.color, theme.foreground);
       // `font-normal` on a `text-sm` list — 13px at the inherited 400.
-      expect(page.spec, ElComponentType.textSm);
+      expect(page.spec, TextStyles.bodySmall);
 
-      final ElText link = tester.widget<ElText>(
+      final StyledText link = tester.widget<StyledText>(
         find
-            .ancestor(of: find.text('Packs'), matching: find.byType(ElText))
+            .ancestor(of: find.text('Packs'), matching: find.byType(StyledText))
             .first,
       );
       expect(link.color, theme.mutedForeground);
@@ -386,10 +394,10 @@ void main() {
     testWidgets('direction is context: the trail reverses under an RTL scope', (
       WidgetTester tester,
     ) async {
-      const Widget trail = ElBreadcrumb(
-        items: <ElBreadcrumbEntry>[
-          ElBreadcrumbEntry.link('first'),
-          ElBreadcrumbEntry.page('last'),
+      const Widget trail = Breadcrumb(
+        items: <BreadcrumbEntry>[
+          BreadcrumbEntry.link('first'),
+          BreadcrumbEntry.page('last'),
         ],
       );
       await tester.pumpWidget(host(trail));
@@ -413,16 +421,16 @@ void main() {
 
   /* ── Pagination ────────────────────────────────────────────────────────── */
 
-  group('ElPagination', () {
+  group('Pagination', () {
     test('the cells sit on `gap-0.5`, and the two ends break `px-4`', () {
-      expect(ElPagination.gap, 2);
+      expect(Pagination.gap, 2);
       // `pl-1.5!` / `pr-1.5!` against the `default` rung's own `px-4`
       // *(measured `padding: 0 16px 0 6px` on Previous)*.
-      expect(ElPaginationStep.tightPadding, 6);
-      expect(ElPaginationStep.loosePadding, 16);
+      expect(PaginationStep.tightPadding, 6);
+      expect(PaginationStep.loosePadding, 16);
       // `size-8` around a `size-4` glyph.
-      expect(ElPaginationEllipsis.boxSize, 32);
-      expect(ElPaginationEllipsis.glyphSize, 16);
+      expect(PaginationEllipsis.boxSize, 32);
+      expect(PaginationEllipsis.glyphSize, 16);
     });
 
     testWidgets('the current page is `outline` and every other cell `ghost`', (
@@ -430,35 +438,35 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const ElPagination(
+          const Pagination(
             children: <Widget>[
-              ElPaginationStep.previous(),
-              ElPaginationLink(label: '1'),
-              ElPaginationLink(label: '2', isActive: true),
-              ElPaginationEllipsis(),
-              ElPaginationStep.next(),
+              PaginationStep.previous(),
+              PaginationLink(label: '1'),
+              PaginationLink(label: '2', isActive: true),
+              PaginationEllipsis(),
+              PaginationStep.next(),
             ],
           ),
         ),
       );
       await tester.pump();
 
-      final List<ElButton> buttons = tester
-          .widgetList<ElButton>(find.byType(ElButton))
+      final List<Button> buttons = tester
+          .widgetList<Button>(find.byType(Button))
           .toList();
       expect(buttons, hasLength(4));
-      expect(buttons.map((ElButton b) => b.variant).toList(), <ElButtonVariant>[
-        ElButtonVariant.ghost,
-        ElButtonVariant.ghost,
-        ElButtonVariant.outline,
-        ElButtonVariant.ghost,
+      expect(buttons.map((Button b) => b.variant).toList(), <ButtonVariant>[
+        ButtonVariant.ghost,
+        ButtonVariant.ghost,
+        ButtonVariant.outline,
+        ButtonVariant.ghost,
       ]);
       // Two squares and two word buttons.
-      expect(buttons.map((ElButton b) => b.size).toList(), <ElButtonSize>[
-        ElButtonSize.md,
-        ElButtonSize.icon,
-        ElButtonSize.icon,
-        ElButtonSize.md,
+      expect(buttons.map((Button b) => b.size).toList(), <ButtonSize>[
+        ButtonSize.md,
+        ButtonSize.icon,
+        ButtonSize.icon,
+        ButtonSize.md,
       ]);
     });
 
@@ -467,21 +475,18 @@ void main() {
       (WidgetTester tester) async {
         await tester.pumpWidget(
           host(
-            const ElPagination(
+            const Pagination(
               children: <Widget>[
-                ElPaginationLink(label: '2', isActive: true),
-                ElPaginationEllipsis(),
+                PaginationLink(label: '2', isActive: true),
+                PaginationEllipsis(),
               ],
             ),
           ),
         );
         await tester.pump();
+        expect(tester.getSize(find.byType(PaginationLink)), const Size(40, 40));
         expect(
-          tester.getSize(find.byType(ElPaginationLink)),
-          const Size(40, 40),
-        );
-        expect(
-          tester.getSize(find.byType(ElPaginationEllipsis)),
+          tester.getSize(find.byType(PaginationEllipsis)),
           const Size(32, 32),
         );
       },
@@ -493,13 +498,10 @@ void main() {
       // answers null and the button merges only the ink *(measured
       // `16px/24px 500` on the squares against `13px/18.5714px 500` on the two
       // word buttons)*.
+      expect(Button.typeFor(ButtonSize.icon, ButtonEmphasis.none), isNull);
       expect(
-        ElButton.typeFor(ElButtonSize.icon, ElButtonEmphasis.none),
-        isNull,
-      );
-      expect(
-        ElButton.typeFor(ElButtonSize.md, ElButtonEmphasis.none),
-        ElComponentType.buttonLabel,
+        Button.typeFor(ButtonSize.md, ButtonEmphasis.none),
+        TextStyles.buttonLabel,
       );
     });
 
@@ -508,22 +510,22 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const ElPagination(
+          const Pagination(
             children: <Widget>[
-              ElPaginationStep.previous(),
-              ElPaginationStep.next(),
+              PaginationStep.previous(),
+              PaginationStep.next(),
             ],
           ),
         ),
       );
       await tester.pump();
       expect(
-        tester.getTopLeft(find.byType(ElIcon).first).dx <
+        tester.getTopLeft(find.byType(Icon).first).dx <
             tester.getTopLeft(find.text('Previous')).dx,
         isTrue,
       );
       expect(
-        tester.getTopLeft(find.byType(ElIcon).last).dx >
+        tester.getTopLeft(find.byType(Icon).last).dx >
             tester.getTopLeft(find.text('Next')).dx,
         isTrue,
       );
@@ -532,34 +534,34 @@ void main() {
 
   /* ── Navigation menu ───────────────────────────────────────────────────── */
 
-  group('ElNavigationMenu', () {
-    List<ElNavigationMenuItem> items() => <ElNavigationMenuItem>[
-      const ElNavigationMenuItem.trigger(
+  group('NavigationMenu', () {
+    List<NavigationMenuItem> items() => <NavigationMenuItem>[
+      const NavigationMenuItem.trigger(
         label: 'Packs',
         content: SizedBox(width: 200, height: 60, child: Text('packs')),
       ),
-      const ElNavigationMenuItem.trigger(
+      const NavigationMenuItem.trigger(
         label: 'Marketplace',
         content: SizedBox(width: 200, height: 60, child: Text('market')),
       ),
-      const ElNavigationMenuItem.link(label: 'Leaderboard'),
+      const NavigationMenuItem.link(label: 'Leaderboard'),
     ];
 
     test('the 40px pill on 16px clearance, and the panel\'s own 8 + 8', () {
       // *"The trigger is a 40px pill, not a 36px rounded rectangle."*
-      expect(ElNavigationMenu.triggerHeight, 40);
-      expect(ElNavigationMenu.triggerPaddingX, 16);
-      expect(ElNavigationMenu.triggerGap, 6);
-      expect(ElNavigationMenu.listGap, 4);
+      expect(NavigationMenu.triggerHeight, 40);
+      expect(NavigationMenu.triggerPaddingX, 16);
+      expect(NavigationMenu.triggerGap, 6);
+      expect(NavigationMenu.listGap, 4);
       // `mt-2` on the viewport and `p-2` inside it.
-      expect(ElNavigationMenu.panelOffset, 8);
-      expect(ElNavigationMenu.panelPadding, 8);
+      expect(NavigationMenu.panelOffset, 8);
+      expect(NavigationMenu.panelPadding, 8);
       // `h-2` around a `size-2` square — the same eight pixels the offset
       // spends, which is why a menu with an indicator does not pay both.
-      expect(ElNavigationMenu.indicatorHeight, 8);
-      expect(ElNavigationMenu.caretSize, 8);
+      expect(NavigationMenu.indicatorHeight, 8);
+      expect(NavigationMenu.caretSize, 8);
       // `size="sm"` on the chevron.
-      expect(ElNavigationMenu.chevronPx, 14);
+      expect(NavigationMenu.chevronPx, 14);
     });
 
     test(
@@ -568,29 +570,29 @@ void main() {
         // *(Measured: the trigger and its plain-link sibling read
         // `13.5px/20.25px 500`; the top-nav buttons three sections up, which wear
         // the `.type-nav` class, read `13.5px/16.2px 500`.)*
-        expect(ElComponentType.navMenuTrigger.size, 13.5);
-        expect(ElType.nav.size, 13.5);
-        expect(ElComponentType.navMenuTrigger.height, 1.5);
-        expect(ElType.nav.height, 1.2);
-        expect(ElComponentType.navMenuTrigger.weight, ElType.nav.weight);
+        expect(TextStyles.navMenuTrigger.size, 13.5);
+        expect(TextStyles.nav.size, 13.5);
+        expect(TextStyles.navMenuTrigger.height, 1.5);
+        expect(TextStyles.nav.height, 1.2);
+        expect(TextStyles.navMenuTrigger.weight, TextStyles.nav.weight);
       },
     );
 
     testWidgets('a tap opens the shared viewport and a second tap closes it', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(overlayHost(ElNavigationMenu(items: items())));
+      await tester.pumpWidget(overlayHost(NavigationMenu(items: items())));
       await tester.pump();
-      expect(find.byType(ElPopoverSurface), findsNothing);
+      expect(find.byType(PopoverSurface), findsNothing);
 
       await tester.tap(find.text('Packs'));
       await settleOverlay(tester);
-      expect(find.byType(ElPopoverSurface), findsOneWidget);
+      expect(find.byType(PopoverSurface), findsOneWidget);
       expect(find.text('packs'), findsOneWidget);
 
       await tester.tap(find.text('Packs'));
       await settleOverlay(tester);
-      await tester.pump(ElDurations.overlay);
+      await tester.pump(MotionDurations.overlayEnter);
       await tester.pump();
       expect(find.text('packs'), findsNothing);
     });
@@ -598,7 +600,7 @@ void main() {
     testWidgets('one panel at a time, and it swaps between triggers', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(overlayHost(ElNavigationMenu(items: items())));
+      await tester.pumpWidget(overlayHost(NavigationMenu(items: items())));
       await tester.pump();
 
       await tester.tap(find.text('Packs'));
@@ -609,13 +611,13 @@ void main() {
       await settleOverlay(tester);
       expect(find.text('market'), findsOneWidget);
       expect(find.text('packs'), findsNothing);
-      expect(find.byType(ElPopoverSurface), findsOneWidget);
+      expect(find.byType(PopoverSurface), findsOneWidget);
     });
 
     testWidgets('the chevron rotates a half turn, on the spring', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(overlayHost(ElNavigationMenu(items: items())));
+      await tester.pumpWidget(overlayHost(NavigationMenu(items: items())));
       await tester.pump();
 
       double angleOf() => tester
@@ -627,7 +629,7 @@ void main() {
 
       await tester.tap(find.text('Packs'));
       await settleOverlay(tester);
-      await tester.pump(ElDurations.transitionDefault);
+      await tester.pump(MotionDurations.normal);
       // sin(π) is 0 to the engine's precision, so the settled state is read
       // off the cosine instead: a half turn is −1.
       final double cos = tester
@@ -640,25 +642,25 @@ void main() {
     testWidgets('a plain link is a trigger without a chevron', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(overlayHost(ElNavigationMenu(items: items())));
+      await tester.pumpWidget(overlayHost(NavigationMenu(items: items())));
       await tester.pump();
       // Two chevrons for three items.
       expect(
         tester
-            .widgetList<ElIcon>(find.byType(ElIcon))
-            .where((ElIcon i) => i.glyph == ElIconGlyph.chevronDown),
+            .widgetList<Icon>(find.byType(Icon))
+            .where((Icon i) => i.glyph == IconGlyph.chevronDown),
         hasLength(2),
       );
       // …and tapping it opens nothing.
       await tester.tap(find.text('Leaderboard'));
       await settleOverlay(tester);
-      expect(find.byType(ElPopoverSurface), findsNothing);
+      expect(find.byType(PopoverSurface), findsNothing);
     });
 
     testWidgets('DRIFT — the indicator takes the open trigger\'s width and '
         'stays at the list\'s leading edge', (WidgetTester tester) async {
       await tester.pumpWidget(
-        overlayHost(ElNavigationMenu(indicator: true, items: items())),
+        overlayHost(NavigationMenu(indicator: true, items: items())),
       );
       await tester.pump();
 
@@ -666,15 +668,13 @@ void main() {
 
       await tester.tap(find.text('Packs'));
       await settleEntrance(tester);
-      final Rect first = tester.getRect(find.byType(ElNavigationMenuIndicator));
-      expect(first.height, ElNavigationMenu.indicatorHeight);
+      final Rect first = tester.getRect(find.byType(NavigationMenuIndicator));
+      expect(first.height, NavigationMenu.indicatorHeight);
       expect(first.left, closeTo(listLeft, 0.5));
 
       await tester.tap(find.text('Marketplace'));
       await settleEntrance(tester);
-      final Rect second = tester.getRect(
-        find.byType(ElNavigationMenuIndicator),
-      );
+      final Rect second = tester.getRect(find.byType(NavigationMenuIndicator));
       // The width follows the trigger…
       expect(second.width, greaterThan(first.width));
       // …and the position does not. Radix reads `offsetLeft`, and every
@@ -690,7 +690,7 @@ void main() {
             // Keyed per case: without it the second pump reuses the first
             // menu's State, whose panel is already open, and the tap below
             // closes it instead.
-            ElNavigationMenu(
+            NavigationMenu(
               key: ValueKey<bool>(indicator),
               indicator: indicator,
               items: items(),
@@ -702,14 +702,12 @@ void main() {
         await settleEntrance(tester);
 
         final double barBottom = tester
-            .getRect(find.byType(ElNavigationMenu))
+            .getRect(find.byType(NavigationMenu))
             .bottom;
-        final double panelTop = tester
-            .getRect(find.byType(ElPopoverSurface))
-            .top;
+        final double panelTop = tester.getRect(find.byType(PopoverSurface)).top;
         expect(
           panelTop - barBottom,
-          closeTo(ElNavigationMenu.panelOffset, 0.5),
+          closeTo(NavigationMenu.panelOffset, 0.5),
           reason:
               'the panel is `mt-2` below the bar either way; with an '
               'indicator those eight pixels are the caret\'s clipping band',
@@ -725,48 +723,46 @@ void main() {
           const Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElNavigationMenuLink(active: true, child: Text('Browse all')),
-              ElNavigationMenuLink(child: Text('Trending')),
+              NavigationMenuLink(active: true, child: Text('Browse all')),
+              NavigationMenuLink(child: Text('Trending')),
             ],
           ),
         ),
       );
       await tester.pump();
 
-      final ElThemeData theme = themeIn(tester, ElNavigationMenuLink);
+      final ThemeTokens theme = themeIn(tester, NavigationMenuLink);
       final List<BoxDecoration> fills = tester
           .widgetList<DecoratedBox>(
             find.descendant(
-              of: find.byType(ElNavigationMenuLink),
+              of: find.byType(NavigationMenuLink),
               matching: find.byType(DecoratedBox),
             ),
           )
           .map((DecoratedBox b) => b.decoration as BoxDecoration)
           .toList();
       expect(fills.first.color, theme.accent);
-      expect(fills.last.color, elTransparent);
-      expect(fills.first.borderRadius, BorderRadius.circular(ElRadii.md));
+      expect(fills.last.color, transparent);
+      expect(fills.first.borderRadius, BorderRadius.circular(Radii.md));
       // `px-3 py-2 gap-2`.
-      expect(ElNavigationMenuLink.paddingX, 12);
-      expect(ElNavigationMenuLink.paddingY, 8);
-      expect(ElNavigationMenuLink.gap, 8);
+      expect(NavigationMenuLink.paddingX, 12);
+      expect(NavigationMenuLink.paddingY, 8);
+      expect(NavigationMenuLink.gap, 8);
     });
 
     testWidgets('`viewport: false` anchors each panel to its own item', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        overlayHost(ElNavigationMenu(viewport: false, items: items())),
+        overlayHost(NavigationMenu(viewport: false, items: items())),
       );
       await tester.pump();
 
       await tester.tap(find.text('Marketplace'));
       await settleOverlay(tester);
-      final double panelLeft = tester
-          .getRect(find.byType(ElPopoverSurface))
-          .left;
+      final double panelLeft = tester.getRect(find.byType(PopoverSurface)).left;
       final double itemLeft = tester.getTopLeft(find.text('Marketplace')).dx;
-      final double barLeft = tester.getRect(find.byType(ElNavigationMenu)).left;
+      final double barLeft = tester.getRect(find.byType(NavigationMenu)).left;
       // Its own item, not the bar: the second trigger's panel starts to the
       // right of the bar's own edge.
       expect(panelLeft, greaterThan(barLeft));
@@ -776,19 +772,19 @@ void main() {
 
   /* ── Accordion ─────────────────────────────────────────────────────────── */
 
-  group('ElAccordion', () {
-    List<ElAccordionItem> items() => const <ElAccordionItem>[
-      ElAccordionItem(title: 'odds', content: Text('rolled')),
-      ElAccordionItem(title: 'sell', content: Text('sell-back')),
-      ElAccordionItem(title: 'ship', content: Text('shipment')),
+  group('Accordion', () {
+    List<AccordionItem> items() => const <AccordionItem>[
+      AccordionItem(title: 'odds', content: Text('rolled')),
+      AccordionItem(title: 'sell', content: Text('sell-back')),
+      AccordionItem(title: 'ship', content: Text('shipment')),
     ];
 
     test('`py-2.5` on the trigger and `pb-2.5` under the panel', () {
-      expect(ElAccordion.triggerPaddingY, 10);
-      expect(ElAccordion.contentPaddingBottom, 10);
+      expect(Accordion.triggerPaddingY, 10);
+      expect(Accordion.contentPaddingBottom, 10);
       // `Icon`'s own `md` default, which is what renders — the `size-4` the
       // trigger declares through a dead variant agrees by accident.
-      expect(ElAccordion.chevronPx, 16);
+      expect(Accordion.chevronPx, 16);
     });
 
     testWidgets('one open at a time, and the open one closes itself', (
@@ -798,12 +794,11 @@ void main() {
       await tester.pumpWidget(
         host(
           StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) =>
-                ElAccordion(
-                  items: items(),
-                  openIndex: open,
-                  onChanged: (int? i) => setState(() => open = i),
-                ),
+            builder: (BuildContext context, StateSetter setState) => Accordion(
+              items: items(),
+              openIndex: open,
+              onChanged: (int? i) => setState(() => open = i),
+            ),
           ),
         ),
       );
@@ -812,7 +807,7 @@ void main() {
 
       await tester.tap(find.text('sell'));
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
       expect(open, 1);
       expect(find.text('sell-back'), findsOneWidget);
       expect(find.text('rolled'), findsNothing);
@@ -820,7 +815,7 @@ void main() {
       // `collapsible`: the open item reports null rather than its own index.
       await tester.tap(find.text('sell'));
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
       expect(open, isNull);
       expect(find.text('sell-back'), findsNothing);
     });
@@ -830,11 +825,11 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          ElAccordion(items: items(), openIndex: null, onChanged: (int? _) {}),
+          Accordion(items: items(), openIndex: null, onChanged: (int? _) {}),
         ),
       );
       await tester.pump();
-      final ElThemeData theme = themeIn(tester, ElAccordion);
+      final ThemeTokens theme = themeIn(tester, Accordion);
       final Iterable<BoxDecoration> seams = tester
           .widgetList<Container>(find.byType(Container))
           .map((Container c) => c.decoration)
@@ -853,19 +848,19 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        host(ElAccordion(items: items(), openIndex: 1, onChanged: (int? _) {})),
+        host(Accordion(items: items(), openIndex: 1, onChanged: (int? _) {})),
       );
       await tester.pump();
-      final List<ElIconGlyph?> glyphs = tester
-          .widgetList<ElIcon>(find.byType(ElIcon))
-          .map((ElIcon i) => i.glyph)
+      final List<IconGlyph?> glyphs = tester
+          .widgetList<Icon>(find.byType(Icon))
+          .map((Icon i) => i.glyph)
           .toList();
       expect(
-        glyphs.where((ElIconGlyph? g) => g == ElIconGlyph.chevronUp),
+        glyphs.where((IconGlyph? g) => g == IconGlyph.chevronUp),
         hasLength(1),
       );
       expect(
-        glyphs.where((ElIconGlyph? g) => g == ElIconGlyph.chevronDown),
+        glyphs.where((IconGlyph? g) => g == IconGlyph.chevronDown),
         hasLength(2),
       );
       // Nothing on this control carries a rotation at all.
@@ -876,32 +871,30 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        host(ElAccordion(items: items(), openIndex: 0, onChanged: (int? _) {})),
+        host(Accordion(items: items(), openIndex: 0, onChanged: (int? _) {})),
       );
       await tester.pump();
       // `**:data-[slot=accordion-trigger-icon]:text-muted-foreground` never
       // matches, because `Icon` does not forward `data-slot` — probed, the
       // selector returns zero elements.
-      for (final ElIcon icon in tester.widgetList<ElIcon>(
-        find.byType(ElIcon),
-      )) {
-        expect(icon.tone, ElIconTone.normal);
+      for (final Icon icon in tester.widgetList<Icon>(find.byType(Icon))) {
+        expect(icon.tone, IconTone.normal);
       }
     });
   });
 
   /* ── Collapsible and the shared unfold ─────────────────────────────────── */
 
-  group('ElUnfold — `anim-unfold` / `anim-fold`', () {
+  group('Unfold — `anim-unfold` / `anim-fold`', () {
     testWidgets('a closed panel is not in the tree at all', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        host(const ElUnfold(open: false, child: Text('filters'))),
+        host(const Unfold(open: false, child: Text('filters'))),
       );
       await tester.pump();
       expect(find.text('filters'), findsNothing);
-      expect(tester.getSize(find.byType(ElUnfold)), Size.zero);
+      expect(tester.getSize(find.byType(Unfold)), Size.zero);
     });
 
     testWidgets(
@@ -916,7 +909,7 @@ void main() {
                 set = setState;
                 return SizedBox(
                   width: 200,
-                  child: ElUnfold(
+                  child: Unfold(
                     open: open,
                     child: const SizedBox(height: 100, child: Text('body')),
                   ),
@@ -931,11 +924,11 @@ void main() {
         await tester.pump();
         // Halfway through `--duration-jelly` the spring is already past its
         // target, which is the overshoot `overflow-hidden` exists to contain.
-        await tester.pump(ElDurations.jelly ~/ 2);
-        final double mid = tester.getSize(find.byType(ElUnfold)).height;
+        await tester.pump(MotionDurations.open ~/ 2);
+        final double mid = tester.getSize(find.byType(Unfold)).height;
         expect(mid, greaterThan(0));
-        await tester.pump(ElDurations.jelly);
-        expect(tester.getSize(find.byType(ElUnfold)).height, 100);
+        await tester.pump(MotionDurations.open);
+        expect(tester.getSize(find.byType(Unfold)).height, 100);
 
         set(() => open = false);
         await tester.pump();
@@ -943,17 +936,17 @@ void main() {
         // reversing from wherever an interrupted unfold had reached, so the
         // first frame of a close is always the settled box.
         await tester.pump(const Duration(milliseconds: 1));
-        expect(tester.getSize(find.byType(ElUnfold)).height, closeTo(100, 1));
+        expect(tester.getSize(find.byType(Unfold)).height, closeTo(100, 1));
         // `yuki-fold` runs `--duration-base`, not `--duration-jelly`.
-        await tester.pump(ElDurations.base);
+        await tester.pump(MotionDurations.normal);
         await tester.pump();
         await tester.pump();
-        expect(tester.getSize(find.byType(ElUnfold)).height, 0);
+        expect(tester.getSize(find.byType(Unfold)).height, 0);
         expect(find.text('body'), findsNothing);
       },
     );
 
-    testWidgets('ElCollapsible stacks its trigger over the panel', (
+    testWidgets('Collapsible stacks its trigger over the panel', (
       WidgetTester tester,
     ) async {
       bool open = false;
@@ -962,10 +955,10 @@ void main() {
           StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) => SizedBox(
               width: 300,
-              child: ElCollapsible(
+              child: Collapsible(
                 open: open,
-                trigger: ElButton(
-                  variant: ElButtonVariant.outline,
+                trigger: Button(
+                  variant: ButtonVariant.outline,
                   onPressed: () => setState(() => open = !open),
                   child: const Text('Advanced filters'),
                 ),
@@ -980,7 +973,7 @@ void main() {
 
       await tester.tap(find.text('Advanced filters'));
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
       expect(find.text('Volatility'), findsOneWidget);
       expect(
         tester.getTopLeft(find.text('Volatility')).dy >

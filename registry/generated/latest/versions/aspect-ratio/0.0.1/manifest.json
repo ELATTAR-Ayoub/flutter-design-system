@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/aspect_ratio.dart",
+      "source": "lib/src/components/ui/aspect_ratio.dart",
       "target": "@ui/aspect_ratio.dart",
-      "sha256": "b2955c6d3390b2aaa0651768503e7bcf5767e725b581e002e0d786d3c6ee14c6"
+      "sha256": "8287a8474539d47ebec5b73510bf375265d4338ce8d69965cb5e2b00dc726ffa"
     }
   ],
   "registryDependencies": [],
@@ -20,6 +20,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/aspect-ratio",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/aspect_ratio.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/aspect_ratio.dart",
   "deprecated": false
 }

@@ -1,14 +1,14 @@
 /// Public documentation metadata for the `glass` effect.
 ///
-/// `glass` HAS a real `registry/effects/glass.json` manifest: [dependencies]
+/// `glass` HAS a real `registry/components/glass.json` manifest: [dependencies]
 /// below is that manifest's own `registryDependencies` list, copied
-/// verbatim: `machine-surface`, `source-foundation`. `page.dart` renders the
+/// verbatim: `surface`, `source-foundation`. `page.dart` renders the
 /// real `elattar add glass` command from it.
 ///
-/// Not a component: `lib/src/effects/glass.dart` exports four
+/// Not a component: `lib/src/components/ui/glass.dart` exports four
 /// `StatelessWidget`s, none with a variant or size of their own —
-/// `ElGlassPanel`, `ElGlassPanelClear`, `ElGlassPanelDeep`, and
-/// `ElGlassControl`, one material split by scale (globals.css's own
+/// `GlassVariant.panel`, `GlassVariant.navigation`, `GlassVariant.prominent`, and
+/// `GlassVariant.control`, one material split by scale (globals.css's own
 /// `glass-panel` / `glass-panel-deep` / `glass-control` utilities).
 library;
 
@@ -23,13 +23,8 @@ const ComponentDocEntry glassDoc = ComponentDocEntry(
       'by scale into a card-weight panel and a blur-free control. Reach '
       'for it over an opaque card when the page\'s own light should show '
       'through.',
-  // registry/effects/glass.json's own registryDependencies, verbatim.
-  dependencies: <String>['machine-surface', 'source-foundation'],
-  exports: <String>[
-    'ElGlassPanel',
-    'ElGlassPanelClear',
-    'ElGlassPanelDeep',
-    'ElGlassControl',
-  ],
-  sourcePath: 'lib/src/effects/glass.dart',
+  // registry/components/glass.json's own registryDependencies, verbatim.
+  dependencies: <String>['surface', 'source-foundation'],
+  exports: <String>['Glass', 'GlassVariant'],
+  sourcePath: 'lib/src/components/ui/glass.dart',
 );

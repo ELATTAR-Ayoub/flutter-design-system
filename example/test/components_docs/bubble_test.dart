@@ -4,7 +4,7 @@
 /// carry facts across from — this is the page's whole coverage: the article
 /// mounts, the API Reference disclosure documents every constructor
 /// parameter of every exported class and every value of every exported enum,
-/// a live specimen of every `ElBubbleVariant` mounts somewhere on the page,
+/// a live specimen of every `BubbleVariant` mounts somewhere on the page,
 /// and the page renders at a wide and a narrow viewport, in both themes,
 /// without throwing.
 library;
@@ -17,16 +17,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -36,19 +60,19 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter each exported class of `bubble.dart`
-/// declares (excluding `key`), plus every field `ElBubbleReaction` carries —
+/// declares (excluding `key`), plus every field `BubbleReaction` carries —
 /// the same set the page's nine `DocsApiTable`s claim to cover. Names shared
 /// by more than one class (`child`, `align`, `reactions`) appear once.
 const List<String> _bubbleApiParams = <String>[
-  // ElBubble
+  // Bubble
   'child', 'variant', 'align', 'reactions',
-  // ElBubbleContent
+  // BubbleContent
   'onPressed', 'semanticsLabel',
-  // ElBubbleGroup
+  // BubbleGroup
   'children',
-  // ElBubbleReactions
+  // BubbleReactions
   'side', 'showCount', 'onReact',
-  // ElBubbleReaction
+  // BubbleReaction
   'emoji', 'count', 'label', 'mine',
 ];
 
@@ -70,7 +94,7 @@ void main() {
   group('bubble docs page', () {
     testWidgets(
       'renders the article, the full API table across all nine classes and '
-      'enums, and a live specimen of every ElBubbleVariant this page claims '
+      'enums, and a live specimen of every BubbleVariant this page claims '
       'to show',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
@@ -80,7 +104,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: BubbleDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -98,51 +122,51 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _bubbleApiParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
 
-        // Every ElBubbleVariant value is named in the ElBubbleVariant table,
+        // Every BubbleVariant value is named in the BubbleVariant table,
         // and every value of the other three enums in their own tables.
-        for (final ElBubbleVariant variant in ElBubbleVariant.values) {
+        for (final BubbleVariant variant in BubbleVariant.values) {
           expect(
             find.text(variant.name),
             findsWidgets,
-            reason: 'ElBubbleVariant.${variant.name} missing from API table',
+            reason: 'BubbleVariant.${variant.name} missing from API table',
           );
         }
-        for (final ElBubbleAlign align in ElBubbleAlign.values) {
+        for (final BubbleAlign align in BubbleAlign.values) {
           expect(
             find.text(align.name),
             findsWidgets,
-            reason: 'ElBubbleAlign.${align.name} missing from API table',
+            reason: 'BubbleAlign.${align.name} missing from API table',
           );
         }
-        for (final ElBubbleSide side in ElBubbleSide.values) {
+        for (final BubbleSide side in BubbleSide.values) {
           expect(
             find.text(side.name),
             findsWidgets,
-            reason: 'ElBubbleSide.${side.name} missing from API table',
+            reason: 'BubbleSide.${side.name} missing from API table',
           );
         }
-        for (final ElShowCount count in ElShowCount.values) {
+        for (final ShowCount count in ShowCount.values) {
           expect(
             find.text(count.name),
             findsWidgets,
-            reason: 'ElShowCount.${count.name} missing from API table',
+            reason: 'ShowCount.${count.name} missing from API table',
           );
         }
 
-        // A live ElBubble specimen of every variant mounts somewhere on the
+        // A live Bubble specimen of every variant mounts somewhere on the
         // page (Preview stages all seven, and each also gets its own
         // section below it).
-        final Set<ElBubbleVariant> mountedVariants = tester
-            .widgetList<ElBubble>(find.byType(ElBubble))
-            .map((ElBubble bubble) => bubble.variant)
+        final Set<BubbleVariant> mountedVariants = tester
+            .widgetList<Bubble>(find.byType(Bubble))
+            .map((Bubble bubble) => bubble.variant)
             .toSet();
-        expect(mountedVariants, containsAll(ElBubbleVariant.values));
+        expect(mountedVariants, containsAll(BubbleVariant.values));
 
         for (final String key in _exampleKeys) {
           expect(
@@ -151,7 +175,7 @@ void main() {
             reason: 'missing example specimen $key',
           );
         }
-        for (final ElBubbleVariant variant in ElBubbleVariant.values) {
+        for (final BubbleVariant variant in BubbleVariant.values) {
           expect(
             find.byKey(ValueKey<String>('bubble-preview:${variant.name}')),
             findsOneWidget,
@@ -161,23 +185,23 @@ void main() {
 
         // The As Child example actually carries a real onPressed, the port
         // of asChild — not just labelled interactive.
-        final ElBubbleContent asChild = tester.widget<ElBubbleContent>(
+        final BubbleContent asChild = tester.widget<BubbleContent>(
           find.descendant(
             of: find.byKey(const ValueKey<String>('bubble-example:as-child')),
-            matching: find.byType(ElBubbleContent),
+            matching: find.byType(BubbleContent),
           ),
         );
         expect(asChild.onPressed, isNotNull);
 
         // The Reactions with Counts example actually carries reaction data,
         // not the bare-rail form.
-        final ElBubbleReactions counts = tester.widget<ElBubbleReactions>(
+        final BubbleReactions counts = tester.widget<BubbleReactions>(
           find
               .descendant(
                 of: find.byKey(
                   const ValueKey<String>('bubble-example:reactions-counts'),
                 ),
-                matching: find.byType(ElBubbleReactions),
+                matching: find.byType(BubbleReactions),
               )
               .first,
         );
@@ -188,48 +212,44 @@ void main() {
         expect(
           bubbleDoc.exports,
           containsAll(<String>[
-            'ElBubble',
-            'ElBubbleContent',
-            'ElBubbleGroup',
-            'ElBubbleReactions',
-            'ElBubbleReaction',
-            'ElBubbleVariant',
-            'ElBubbleAlign',
-            'ElBubbleSide',
-            'ElShowCount',
+            'Bubble',
+            'BubbleContent',
+            'BubbleGroup',
+            'BubbleReactions',
+            'BubbleReaction',
+            'BubbleVariant',
+            'BubbleAlign',
+            'BubbleSide',
+            'ShowCount',
           ]),
         );
         expect(bubbleDoc.command, 'elattar add bubble');
-        expect(bubbleDoc.dependencies, <String>[
-          'press-motion',
-          'source-foundation',
-        ]);
+        expect(bubbleDoc.dependencies, <String>['press', 'source-foundation']);
         expect(destination, isNull);
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const BubbleDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const BubbleDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Twelve specimen stages: Preview, the seven variants, Alignment,
-        // As Child, Reactions, Reactions with Counts.
-        expect(find.byType(DocsShowcase), findsNWidgets(12));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Twelve specimen stages: Preview, the seven variants, Alignment,
+      // As Child, Reactions, Reactions with Counts.
+      expect(find.byType(DocsShowcase), findsNWidgets(12));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -262,45 +282,41 @@ void main() {
       final DocsTocEntry api = bubbleDocSpec.toc.firstWhere(
         (DocsTocEntry e) => e.anchor == 'api',
       );
-      expect(
-        api.children.map((DocsTocEntry e) => e.anchor).toList(),
-        <String>[
-          'api-elbubble',
-          'api-elbubblecontent',
-          'api-elbubblegroup',
-          'api-elbubblereactions',
-          'api-elbubblereaction',
-          'api-elbubblevariant',
-          'api-elbubblealign',
-          'api-elbubbleside',
-          'api-elshowcount',
-        ],
-      );
+      expect(api.children.map((DocsTocEntry e) => e.anchor).toList(), <String>[
+        'api-elbubble',
+        'api-elbubblecontent',
+        'api-elbubblegroup',
+        'api-elbubblereactions',
+        'api-elbubblereaction',
+        'api-elbubblevariant',
+        'api-elbubblealign',
+        'api-elbubbleside',
+        'api-elshowcount',
+      ]);
     });
 
-    testWidgets(
-      'sections render in declaration order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const BubbleDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const BubbleDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, bubbleDocSpec.toc.map((e) => e.title).toList());
-      },
-    );
+      expect(titles, bubbleDocSpec.toc.map((e) => e.title).toList());
+    });
 
     testWidgets('renders at narrow width with the anchor strip', (
       WidgetTester tester,
@@ -311,7 +327,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const BubbleDocPage(),
         ),
       );
@@ -335,16 +351,14 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       await tester.pumpWidget(
         _harness(controller: controller, child: const BubbleDocPage()),
       );
       await tester.pump();
       expect(tester.takeException(), isNull);
 
-      controller.setMode(ElThemeMode.light);
+      controller.setMode(ColorMode.light);
       await tester.pump();
       expect(tester.takeException(), isNull);
 

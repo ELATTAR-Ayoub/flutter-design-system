@@ -2,7 +2,7 @@
 ///
 /// The other suites each prove one segment: `remote_registry_test.dart` proves
 /// the commands work against a URL, `cli_integration_test.dart` proves a local
-/// registry install analyses, `shot_install_test.dart` proves the `shot` item
+/// registry install analyses, `block_install_test.dart` proves the `block` item
 /// kind survives generate → validate → install → analyse against a *synthetic*
 /// registry it builds for itself.
 ///
@@ -61,7 +61,7 @@ import 'package:$_consumerName/components/ui/ui.dart';
 import 'package:$_consumerName/design_system/foundation.dart';
 
 void main() {
-  testWidgets('an installed ElButton builds, paints and reports its press', (
+  testWidgets('an installed Button builds, paints and reports its press', (
     WidgetTester tester,
   ) async {
     int presses = 0;
@@ -71,10 +71,10 @@ void main() {
         data: const MediaQueryData(size: Size(1440, 900)),
         child: Directionality(
           textDirection: TextDirection.ltr,
-          child: ElTheme(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+          child: ThemeScope(
+            controller: ThemeController(mode: ColorMode.dark),
             child: Center(
-              child: ElButton(
+              child: Button(
                 onPressed: () => presses++,
                 child: const Text('Install me'),
               ),
@@ -85,9 +85,9 @@ void main() {
     );
 
     expect(find.text('Install me'), findsOneWidget);
-    expect(tester.getSize(find.byType(ElButton)).height, el(10));
+    expect(tester.getSize(find.byType(Button)).height, space(10));
 
-    await tester.tap(find.byType(ElButton));
+    await tester.tap(find.byType(Button));
     await tester.pump();
     expect(presses, 1);
   });

@@ -8,10 +8,10 @@
 ///
 /// `agent_transcript.dart` is a family of parts, not one widget — the same
 /// shape `field` documents: every kind of row a transcript can draw
-/// (`ElUserMessage`, `ElAgentMessage`, `ElToolChip`, `ElActionChip`,
-/// `ElApprovalCard`, `ElWelcomeCard`) plus the small entrance utilities
-/// (`ElTypingCursor`, `ElFadeUp`, `ElRowIn`) and the plain data class
-/// (`ElAgentCapability`) they all share.
+/// (`UserMessage`, `AgentMessage`, `ToolChip`, `ActionChip`,
+/// `ApprovalCard`, `WelcomeCard`) plus the small entrance utilities
+/// (`TypingCursor`, `FadeUp`, `RowIn`) and the plain data class
+/// (`AgentCapability`) they all share.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
@@ -36,16 +36,16 @@ const ComponentDocEntry agentTranscriptDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>[
-    'ElUserMessage',
-    'ElAgentMessage',
-    'ElTypingCursor',
-    'ElToolChip',
-    'ElActionChip',
-    'ElApprovalCard',
-    'ElFadeUp',
-    'ElRowIn',
-    'ElAgentCapability',
-    'ElWelcomeCard',
+    'UserMessage',
+    'AgentMessage',
+    'TypingCursor',
+    'ToolChip',
+    'ActionChip',
+    'ApprovalCard',
+    'FadeUp',
+    'RowIn',
+    'AgentCapability',
+    'WelcomeCard',
   ],
   sourcePath: 'lib/src/components/agent_transcript.dart',
 );

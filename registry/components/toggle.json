@@ -7,26 +7,31 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/toggle.dart",
+      "source": "lib/src/components/ui/toggle.dart",
       "target": "@ui/toggle.dart",
-      "sha256": "c8635c79d18935dcb533573deda8ac2c7c0b9c9c4448b6b22d96a9e581ddcd7f"
+      "sha256": "28bcc947dd10c269d370b53ebff610d61308739094a3b94cd68f4b6d9abfd4d9"
     }
   ],
   "registryDependencies": [
     "button",
     "icon",
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "semanticDependencies": [
     "button",
     "icon",
-    "machine-surface"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/toggle",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/toggle.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/toggle.dart",
+  "exports": [
+    "Toggle",
+    "ToggleSize",
+    "ToggleVariant"
+  ]
 }

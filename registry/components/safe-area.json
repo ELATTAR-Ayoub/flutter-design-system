@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/safe_area.dart",
+      "source": "lib/src/components/ui/safe_area.dart",
       "target": "@ui/safe_area.dart",
-      "sha256": "7288d4180792761d303fb4ef8cedd2908f1fd1affbead928571f8e2816b6a64f"
+      "sha256": "0d172c5d9b79560a0dc78dc682c43461f1e26e79483d1b2b16887ed54ebd80bc"
     }
   ],
   "registryDependencies": [],
@@ -19,5 +19,8 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/safe-area",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/safe_area.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/safe_area.dart",
+  "exports": [
+    "SafeArea"
+  ]
 }

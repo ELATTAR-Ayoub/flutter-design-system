@@ -7,7 +7,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 class DocsDisclosure extends StatefulWidget {
   const DocsDisclosure({
@@ -28,7 +40,7 @@ class DocsDisclosure extends StatefulWidget {
   );
 
   /// The trigger row's height.
-  static double get triggerHeight => el(12);
+  static double get triggerHeight => space(12);
 
   /// A half turn: chevron down closed, chevron up open.
   static const double openTurns = 0.5;
@@ -43,14 +55,14 @@ class _DocsDisclosureState extends State<DocsDisclosure>
 
   late final AnimationController _chevron = AnimationController(
     vsync: this,
-    duration: ElDurations.base,
+    duration: MotionDurations.normal,
     value: _open ? 1 : 0,
   );
 
   late final Animation<double> _turns = Tween<double>(
     begin: 0,
     end: DocsDisclosure.openTurns,
-  ).animate(CurvedAnimation(parent: _chevron, curve: ElCurves.inOut));
+  ).animate(CurvedAnimation(parent: _chevron, curve: MotionCurves.move));
 
   @override
   void dispose() {
@@ -69,9 +81,9 @@ class _DocsDisclosureState extends State<DocsDisclosure>
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElCollapsible(
+    return Collapsible(
       open: _open,
       trigger: Semantics(
         button: true,
@@ -102,21 +114,18 @@ class _DocsDisclosureState extends State<DocsDisclosure>
                 // above carries it as this control's label, so a screen
                 // reader still hears all of it.
                 Expanded(
-                  child: ElText(
+                  child: StyledText(
                     widget.title,
-                    ElType.h4,
+                    TextStyles.h4,
                     color: theme.foreground,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(width: el(2)),
+                SizedBox(width: space(2)),
                 RotationTransition(
                   turns: _turns,
-                  child: ElIcon.lucide(
-                    ElLucide.chevronDown,
-                    size: ElIconSize.md,
-                  ),
+                  child: Icon.lucide(Lucide.chevronDown, size: IconSize.md),
                 ),
               ],
             ),
@@ -124,7 +133,7 @@ class _DocsDisclosureState extends State<DocsDisclosure>
         ),
       ),
       content: Padding(
-        padding: EdgeInsets.only(top: el(4)),
+        padding: EdgeInsets.only(top: space(4)),
         child: widget.child,
       ),
     );

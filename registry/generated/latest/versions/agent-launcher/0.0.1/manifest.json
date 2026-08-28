@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/agent_launcher.dart",
+      "source": "lib/src/components/ui/agent_launcher.dart",
       "target": "@ui/agent_launcher.dart",
-      "sha256": "c6f19118d0c06a9f2cf45a2b8b86b5824bd44b1beee5c36d2d8fe4fefb6c2687"
+      "sha256": "066a6f9df175be6d896295b1ffd50254a536c3d724ab17dd100d4297a1decb4f"
     }
   ],
   "registryDependencies": [
@@ -31,6 +31,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/agent-launcher",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/agent_launcher.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_launcher.dart",
   "deprecated": false
 }

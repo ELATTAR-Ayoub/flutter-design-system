@@ -23,7 +23,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -41,8 +53,8 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
       description:
           'One small card, built from four of the foundation\'s own '
           'layers at once: theme.card and theme.foreground for colour, '
-          'ElType.h4 and ElType.small for type, el(...) for every '
-          'measure in it, and ElShadows.e2 for its elevation. Nothing on '
+          'TextStyles.h4 and TextStyles.small for type, space(...) for every '
+          'measure in it, and Shadows.md for its elevation. Nothing on '
           'it is a literal.',
       host: const _PreviewHost(),
       code: _previewCode,
@@ -91,15 +103,15 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'Wrap the app once in ElTheme; every token below reads off '
-          'ElTheme.of(context) or a bare static from there on.',
+          'Wrap the app once in ThemeScope; every token below reads off '
+          'ThemeScope.of(context) or a bare static from there on.',
       code: _usageCode,
     ),
     EffectSection(
       id: 'color',
       title: 'Semantic Color',
       description:
-          'A representative seven of ElThemeData\'s roughly thirty '
+          'A representative seven of ThemeTokens\'s roughly thirty '
           'colour fields, each a background/foreground pair rather than '
           'a lone swatch — every semantic colour in this system is '
           'issued in pairs so a caller never has to guess which text '
@@ -113,9 +125,9 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
       id: 'type',
       title: 'Type Ramp',
       description:
-          'Seven of ElType\'s roughly thirty specs, display down to '
-          'code — each an ElTypeSpec carrying its own family, size, '
-          'weight and leading, applied through ElText rather than a '
+          'Seven of TextStyles\'s roughly thirty specs, display down to '
+          'code — each an TextStyleToken carrying its own family, size, '
+          'weight and leading, applied through StyledText rather than a '
           'bare TextStyle.',
       host: const _TypeHost(),
       code: _typeCode,
@@ -125,7 +137,7 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
       id: 'spacing',
       title: 'Spacing Rhythm',
       description:
-          'el(n) = n × 4 logical pixels — Tailwind\'s own spacing unit, '
+          'space(n) = n × 4 logical pixels — Tailwind\'s own spacing unit, '
           'never redeclared in the reference stylesheet. Six rungs, 1 '
           'through 32, the same function that sizes every gap, padding '
           'and radius on every page in this kit.',
@@ -137,10 +149,10 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
       id: 'motion',
       title: 'Motion',
       description:
-          'Three ElDurations/ElCurves pairings a caller reaches for '
-          'constantly: ElDurations.tick with ElCurves.out for a hover, '
-          'ElDurations.base with ElCurves.spring for a press response, '
-          'ElDurations.slow with ElCurves.settle for a panel opening. '
+          'Three MotionDurations/MotionCurves pairings a caller reaches for '
+          'constantly: MotionDurations.tick with MotionCurves.enter for a hover, '
+          'MotionDurations.normal with MotionCurves.emphasized for a press response, '
+          'MotionDurations.slow with MotionCurves.settle for a panel opening. '
           'Tap any chip to replay it.',
       host: const _MotionHost(),
       code: _motionCode,
@@ -150,11 +162,11 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
       id: 'shadow',
       title: 'Shadow Elevation',
       description:
-          'ElShadows.e1 through e4 — the ambient depth ladder, the '
+          'Shadows.sm through e4 — the ambient depth ladder, the '
           'other shadow family being the MACHINE surfaces '
-          '(ElShadows.btn and its kin) the Machine Surface page '
+          '(Shadows.control and its kin) the Machine Surface page '
           'documents on its own. Every layer stores a Color '
-          'Function(ElThemeData), never a literal Color, which is why '
+          'Function(ThemeTokens), never a literal Color, which is why '
           'this ladder repaints correctly in both themes without this '
           'page doing anything special.',
       host: const _ShadowHost(),
@@ -228,8 +240,7 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value:
-                'example/test/components_docs/source_foundation_test.dart',
+            value: 'example/test/components_docs/source_foundation_test.dart',
             description:
                 'Covers this page: the article mounts, the API table, '
                 'every specimen this page claims to show, and both '
@@ -237,8 +248,7 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Edit these docs',
-            value:
-                'example/lib/components_docs/source_foundation/page.dart',
+            value: 'example/lib/components_docs/source_foundation/page.dart',
             description: 'This file.',
           ),
         ],
@@ -260,9 +270,9 @@ class SourceFoundationDocPage extends StatelessWidget {
       title: sourceFoundationDoc.title,
       description: sourceFoundationDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Source Foundation'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Source Foundation'),
     ],
     toc: sourceFoundationDocSpec.toc,
     previous: null,
@@ -289,8 +299,12 @@ class _Captioned extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       child,
-      SizedBox(height: el(2)),
-      ElText(caption, ElType.section, color: ElTheme.of(context).mutedForeground),
+      SizedBox(height: space(2)),
+      StyledText(
+        caption,
+        TextStyles.section,
+        color: ThemeScope.of(context).mutedForeground,
+      ),
     ],
   );
 }
@@ -304,13 +318,13 @@ class _Row extends StatelessWidget {
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
     child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(2)),
+      padding: EdgeInsets.symmetric(horizontal: space(2)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           for (int i = 0; i < children.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(width: el(6)),
+            if (i > 0) SizedBox(width: space(6)),
             children[i],
           ],
         ],
@@ -326,26 +340,30 @@ class _PreviewHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
       key: const ValueKey<String>('source-foundation-example:preview'),
-      width: el(72),
-      padding: EdgeInsets.all(el(5)),
+      width: space(72),
+      padding: EdgeInsets.all(space(5)),
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(ElRadii.xl),
-        boxShadow: ElShadows.e2.outerShadows(theme),
+        borderRadius: BorderRadius.circular(Radii.xl),
+        boxShadow: Shadows.md.outerShadows(theme),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElText('Every layer, at once', ElType.h4, color: theme.cardForeground),
-          SizedBox(height: el(2)),
-          ElText(
-            'theme.card, ElType.h4, el(5) padding, ElShadows.e2 — four '
+          StyledText(
+            'Every layer, at once',
+            TextStyles.h4,
+            color: theme.cardForeground,
+          ),
+          SizedBox(height: space(2)),
+          StyledText(
+            'theme.card, TextStyles.h4, space(5) padding, Shadows.md — four '
             'foundation layers, one card.',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ],
@@ -357,13 +375,13 @@ class _PreviewHost extends StatelessWidget {
 const String _previewCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
     'Container(\n'
-    '  padding: EdgeInsets.all(el(5)),\n'
+    '  padding: EdgeInsets.all(space(5)),\n'
     '  decoration: BoxDecoration(\n'
     '    color: theme.card,\n'
-    '    borderRadius: BorderRadius.circular(ElRadii.xl),\n'
-    '    boxShadow: ElShadows.e2.outerShadows(theme),\n'
+    '    borderRadius: BorderRadius.circular(Radii.xl),\n'
+    '    boxShadow: Shadows.md.outerShadows(theme),\n'
     '  ),\n'
-    "  child: ElText('Every layer, at once', ElType.h4, color: theme.cardForeground),\n"
+    "  child: StyledText('Every layer, at once', TextStyles.h4, color: theme.cardForeground),\n"
     ')';
 
 /* ── Semantic Color ──────────────────────────────────────────────────────── */
@@ -383,18 +401,18 @@ class _ColorPair extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
       key: ValueKey<String>(keyValue),
-      width: el(24),
-      height: el(16),
+      width: space(24),
+      height: space(16),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
-      child: ElText(label, ElType.small, color: foreground),
+      child: StyledText(label, TextStyles.small, color: foreground),
     );
   }
 }
@@ -404,7 +422,7 @@ class _ColorHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return _Row(
       children: <Widget>[
         _ColorPair(
@@ -458,7 +476,7 @@ const String _colorCode =
     '// Every semantic colour is issued in a background/foreground pair.\n'
     'Container(\n'
     '  color: theme.primary,\n'
-    "  child: ElText('primary', ElType.small, color: theme.primaryForeground),\n"
+    "  child: StyledText('primary', TextStyles.small, color: theme.primaryForeground),\n"
     ')';
 
 /* ── Type Ramp ───────────────────────────────────────────────────────────── */
@@ -468,38 +486,38 @@ class _TypeHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       key: const ValueKey<String>('source-foundation-example:type'),
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         // .type-display and .type-h1 carry no intrinsic size of their own —
-        // both are clamp()ed against the viewport, so ElFluid supplies the
-        // fontSize every other rung gets from its own ElTypeSpec.
-        ElText(
-          'ElType.display',
-          ElType.display,
+        // both are clamp()ed against the viewport, so Fluid supplies the
+        // fontSize every other rung gets from its own TextStyleToken.
+        StyledText(
+          'TextStyles.display',
+          TextStyles.display,
           color: theme.foreground,
-          fontSize: ElFluid.display(context),
+          fontSize: Fluid.display(context),
         ),
-        SizedBox(height: el(2)),
-        ElText(
-          'ElType.h1',
-          ElType.h1,
+        SizedBox(height: space(2)),
+        StyledText(
+          'TextStyles.h1',
+          TextStyles.h1,
           color: theme.foreground,
-          fontSize: ElFluid.h1(context),
+          fontSize: Fluid.h1(context),
         ),
-        SizedBox(height: el(2)),
-        for (final (String, ElTypeSpec) pair in <(String, ElTypeSpec)>[
-          ('h2', ElType.h2),
-          ('lead', ElType.lead),
-          ('body', ElType.body),
-          ('small', ElType.small),
-          ('code', ElType.code),
+        SizedBox(height: space(2)),
+        for (final (String, TextStyleToken) pair in <(String, TextStyleToken)>[
+          ('h2', TextStyles.h2),
+          ('lead', TextStyles.lead),
+          ('body', TextStyles.body),
+          ('small', TextStyles.small),
+          ('code', TextStyles.code),
         ]) ...<Widget>[
-          ElText('ElType.${pair.$1}', pair.$2, color: theme.foreground),
-          SizedBox(height: el(2)),
+          StyledText('TextStyles.${pair.$1}', pair.$2, color: theme.foreground),
+          SizedBox(height: space(2)),
         ],
       ],
     );
@@ -507,9 +525,9 @@ class _TypeHost extends StatelessWidget {
 }
 
 const String _typeCode =
-    "ElText('ElType.display', ElType.display, color: theme.foreground)\n"
-    "ElText('ElType.h1', ElType.h1, color: theme.foreground)\n"
-    "ElText('ElType.body', ElType.body, color: theme.foreground)";
+    "StyledText('TextStyles.display', TextStyles.display, color: theme.foreground)\n"
+    "StyledText('TextStyles.h1', TextStyles.h1, color: theme.foreground)\n"
+    "StyledText('TextStyles.body', TextStyles.body, color: theme.foreground)";
 
 /* ── Spacing Rhythm ──────────────────────────────────────────────────────── */
 
@@ -518,7 +536,7 @@ class _SpacingHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
       key: const ValueKey<String>('source-foundation-example:spacing'),
       child: SingleChildScrollView(
@@ -529,17 +547,17 @@ class _SpacingHost extends StatelessWidget {
           children: <Widget>[
             for (final int n in <int>[1, 2, 4, 8, 16, 32]) ...<Widget>[
               _Captioned(
-                caption: 'el($n)',
+                caption: 'space($n)',
                 child: Container(
-                  width: el(n),
-                  height: el(n),
+                  width: space(n),
+                  height: space(n),
                   decoration: BoxDecoration(
                     color: theme.primary,
-                    borderRadius: BorderRadius.circular(ElRadii.xs),
+                    borderRadius: BorderRadius.circular(Radii.xs),
                   ),
                 ),
               ),
-              SizedBox(width: el(3)),
+              SizedBox(width: space(3)),
             ],
           ],
         ),
@@ -548,7 +566,8 @@ class _SpacingHost extends StatelessWidget {
   }
 }
 
-const String _spacingCode = 'SizedBox(width: el(8), height: el(8)) // 32px';
+const String _spacingCode =
+    'SizedBox(width: space(8), height: space(8)) // 32px';
 
 /* ── Motion ──────────────────────────────────────────────────────────────── */
 
@@ -574,16 +593,16 @@ class _MotionChipState extends State<_MotionChip> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final Duration duration = elAnimationDuration(context, widget.duration);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final Duration duration = effectiveMotionDuration(context, widget.duration);
     return _Captioned(
       caption: widget.caption,
-      child: ElPress(
+      child: Press(
         onTap: () => setState(() => _out = !_out),
         child: SizedBox(
           key: ValueKey<String>(widget.keyValue),
-          width: el(20),
-          height: el(9),
+          width: space(20),
+          height: space(9),
           child: TweenAnimationBuilder<double>(
             tween: Tween<double>(end: _out ? 1 : 0),
             duration: duration,
@@ -593,16 +612,16 @@ class _MotionChipState extends State<_MotionChip> {
                   alignment: Alignment.centerLeft + Alignment(t * 2, 0),
                   decoration: BoxDecoration(
                     color: theme.secondary,
-                    borderRadius: BorderRadius.circular(ElRadii.pill),
+                    borderRadius: BorderRadius.circular(Radii.full),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(el(1)),
+                    padding: EdgeInsets.all(space(1)),
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: theme.primary,
                         shape: BoxShape.circle,
                       ),
-                      child: SizedBox(width: el(6), height: el(6)),
+                      child: SizedBox(width: space(6), height: space(6)),
                     ),
                   ),
                 ),
@@ -622,20 +641,20 @@ class _MotionHost extends StatelessWidget {
       _MotionChip(
         keyValue: 'source-foundation-example:motion-tick',
         caption: 'tick + out',
-        duration: ElDurations.tick,
-        curve: ElCurves.out,
+        duration: MotionDurations.tick,
+        curve: MotionCurves.enter,
       ),
       _MotionChip(
         keyValue: 'source-foundation-example:motion-base',
         caption: 'base + spring',
-        duration: ElDurations.base,
-        curve: ElCurves.spring,
+        duration: MotionDurations.normal,
+        curve: MotionCurves.emphasized,
       ),
       _MotionChip(
         keyValue: 'source-foundation-example:motion-slow',
         caption: 'slow + settle',
-        duration: ElDurations.slow,
-        curve: ElCurves.settle,
+        duration: MotionDurations.slow,
+        curve: MotionCurves.settle,
       ),
     ],
   );
@@ -644,8 +663,8 @@ class _MotionHost extends StatelessWidget {
 const String _motionCode =
     'TweenAnimationBuilder<double>(\n'
     '  tween: Tween(end: pressed ? 1 : 0),\n'
-    '  duration: ElDurations.base,\n'
-    '  curve: ElCurves.spring,\n'
+    '  duration: MotionDurations.normal,\n'
+    '  curve: MotionCurves.emphasized,\n'
     '  builder: (context, t, child) => Transform.translate(\n'
     '    offset: Offset(t * travel, 0),\n'
     '    child: child,\n'
@@ -659,24 +678,26 @@ class _ShadowHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return _Row(
       children: <Widget>[
-        for (final (String, ElShadowSpec) pair in <(String, ElShadowSpec)>[
-          ('e1', ElShadows.e1),
-          ('e2', ElShadows.e2),
-          ('e3', ElShadows.e3),
-          ('e4', ElShadows.e4),
+        for (final (String, ShadowStyle) pair in <(String, ShadowStyle)>[
+          ('e1', Shadows.sm),
+          ('e2', Shadows.md),
+          ('e3', Shadows.lg),
+          ('e4', Shadows.xl),
         ])
           _Captioned(
-            caption: 'ElShadows.${pair.$1}',
+            caption: 'Shadows.${pair.$1}',
             child: Container(
-              key: ValueKey<String>('source-foundation-example:shadow-${pair.$1}'),
-              width: el(18),
-              height: el(18),
+              key: ValueKey<String>(
+                'source-foundation-example:shadow-${pair.$1}',
+              ),
+              width: space(18),
+              height: space(18),
               decoration: BoxDecoration(
                 color: theme.card,
-                borderRadius: BorderRadius.circular(ElRadii.lg),
+                borderRadius: BorderRadius.circular(Radii.lg),
                 boxShadow: pair.$2.outerShadows(theme),
               ),
             ),
@@ -690,7 +711,7 @@ const String _shadowCode =
     'Container(\n'
     '  decoration: BoxDecoration(\n'
     '    color: theme.card,\n'
-    '    boxShadow: ElShadows.e2.outerShadows(theme),\n'
+    '    boxShadow: Shadows.md.outerShadows(theme),\n'
     '  ),\n'
     ')';
 
@@ -700,12 +721,12 @@ const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
 void main() => runApp(
-  ElTheme(
-    controller: ElThemeController(mode: ElThemeMode.dark),
+  ThemeScope(
+    controller: ThemeController(mode: ColorMode.dark),
     child: Builder(
       builder: (context) {
-        final theme = ElTheme.of(context);
-        return ElText('Hello', ElType.h1, color: theme.foreground);
+        final theme = ThemeScope.of(context);
+        return StyledText('Hello', TextStyles.h1, color: theme.foreground);
       },
     ),
   ),
@@ -721,15 +742,15 @@ class _ApiReferenceContent extends StatelessWidget {
 
 const List<DocsApiFact> _apiFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'el',
+    name: 'space',
     type: 'double Function(num n)',
     description:
-        'Tailwind\'s spacing unit: el(n) = n × 4 logical pixels. The one '
+        'Tailwind\'s spacing unit: space(n) = n × 4 logical pixels. The one '
         'function almost every geometry value under lib/ and example/lib/ '
         'is expressed through.',
   ),
   DocsApiFact(
-    name: 'ElWidths / ElRadii / ElContainers / ElBreakpoints / ElBlurs',
+    name: 'LayoutWidths / Radii / Containers / Breakpoints / Blurs',
     type: 'static double constants',
     description:
         'The rest of the geometry ladders: measures the shell is built '
@@ -738,63 +759,64 @@ const List<DocsApiFact> _apiFacts = <DocsApiFact>[
         'for.',
   ),
   DocsApiFact(
-    name: 'ElTheme / ElThemeData / ElThemeController / ElThemeMode',
+    name: 'ThemeScope / ThemeTokens / ThemeController / ColorMode',
     type: 'InheritedNotifier, data class, ChangeNotifier, enum',
     description:
-        'The theme system: ElTheme.of(context) reads the live '
-        'ElThemeData; ElThemeController holds the mode (dark/light) and '
-        'notifies on change. ElThemeData carries roughly thirty semantic '
+        'The theme system: ThemeScope.of(context) reads the live '
+        'ThemeTokens; ThemeController holds the mode (dark/light) and '
+        'notifies on change. ThemeTokens carries roughly thirty semantic '
         'colour fields, always in background/foreground pairs.',
   ),
   DocsApiFact(
-    name: 'ElPalette / ElOklab',
+    name: 'Palette / OklabColor',
     type: 'static Color constants, and a mixing/conversion toolkit',
     description:
         'The handful of colours that do NOT flip with the theme '
         '(action, value, success/warning/info/destructive inks), plus '
-        'ElOklab.mix and the OKLab/OKLCH conversion the theme layer '
+        'OklabColor.mix and the OKLab/OKLCH conversion the theme layer '
         'mixes through for perceptually-even colour math.',
   ),
   DocsApiFact(
-    name: 'ElType / ElComponentType / ElTypeSpec / ElText',
-    type: 'static ElTypeSpec constants, and the widget that paints them',
+    name: 'TextStyles / ComponentTextStyles / TextStyleToken / StyledText',
+    type: 'static TextStyleToken constants, and the widget that paints them',
     description:
         'The full type scale (display through the numeric rungs) plus '
         'every component\'s own bespoke spec (buttonLabel, cardTitle, '
-        'and dozens more). ElText(text, spec, {color}) is how every one '
+        'and dozens more). StyledText(text, spec, {color}) is how every one '
         'of them is actually painted — never a bare Text with a manual '
         'TextStyle.',
   ),
   DocsApiFact(
-    name: 'ElDurations / ElCurves / ElTransforms / elAnimationDuration',
+    name:
+        'MotionDurations / MotionCurves / MotionTransforms / effectiveMotionDuration',
     type: 'static Duration/Curve/double constants, and a helper function',
     description:
         'Every named duration and cubic-bezier easing in the system, '
-        'plus the `:active` scale amounts (ElTransforms). '
-        'elAnimationDuration(context, duration) is the one call every '
+        'plus the `:active` scale amounts (MotionTransforms). '
+        'effectiveMotionDuration(context, duration) is the one call every '
         'animated widget in the package routes its durations through, '
         'so MediaQuery.disableAnimations stills the whole system at '
         'once.',
   ),
   DocsApiFact(
-    name: 'ElShadows / ElShadowSpec / ElShadowLayer',
-    type: 'static ElShadowSpec constants, and their layer model',
+    name: 'Shadows / ShadowStyle / ShadowLayer',
+    type: 'static ShadowStyle constants, and their layer model',
     description:
         'The elevation ladder (e1-e4) and the MACHINE-surface family '
         '(btn and its kin). Every layer stores a Color Function'
-        '(ElThemeData) rather than a literal, so the whole ladder '
+        '(ThemeTokens) rather than a literal, so the whole ladder '
         'repaints correctly under a theme flip with no caller-side '
         'branching.',
   ),
   DocsApiFact(
-    name: 'ElSurfaceOpacity',
+    name: 'SurfaceOpacity',
     type: 'static double constants',
     description:
         'The two glass-panel opacities (glassPanel, navigationGlass) '
         'the Glass effect and the sticky docs header both read.',
   ),
   DocsApiFact(
-    name: 'ElDateFormat',
+    name: 'DateFormat',
     type: 'static formatting helpers',
     description:
         'Locale-aware date and time formatting, used by the Calendar '
@@ -807,15 +829,15 @@ class _StatesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The foundation itself has exactly one piece of runtime state: '
-            'ElThemeController.mode (dark or light), a ChangeNotifier '
-            'every ElTheme.of(context) call subscribes to. Everything '
+            'ThemeController.mode (dark or light), a ChangeNotifier '
+            'every ThemeScope.of(context) call subscribes to. Everything '
             'else on this page — every colour, every type spec, every '
             'duration — is a compile-time constant or a pure function of '
             'that one mode.',
         'MediaQuery.disableAnimations is the second real variable, read '
-            'through elAnimationDuration by every animated consumer of '
+            'through effectiveMotionDuration by every animated consumer of '
             'this foundation (not by the foundation\'s own files, which '
             'declare no animation of their own) — see the Motion section '
             'above and this system\'s dedicated motion primitives, Press '
@@ -828,15 +850,15 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Every ElThemeData colour pair is issued together specifically '
+      _bullets(ThemeScope.of(context), <String>[
+        'Every ThemeTokens colour pair is issued together specifically '
             'so a caller cannot accidentally pick a foreground that '
-            'fails contrast against its own background — ElButton\'s '
+            'fails contrast against its own background — Button\'s '
             'destructive variant (a 10% tint rather than a solid fill) '
             'is the system\'s own worked example of choosing the pairing '
             'that clears AA over one that does not.',
-        'ElText routes every string through the same text-layout '
-            'machinery (ElLineBox, text_layout.dart), so font scaling, '
+        'StyledText routes every string through the same text-layout '
+            'machinery (LineBox, text_layout.dart), so font scaling, '
             'selection and semantics behave identically everywhere a '
             'caller reaches for a token instead of a bare Text.',
         'The foundation carries no ARIA-equivalent contrast checker or '
@@ -851,10 +873,10 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The foundation itself takes no focus and handles no key: it is '
             'tokens and pure functions, not an interactive widget. '
-            'ElTheme is an InheritedNotifier with no Focus of its own; '
+            'ThemeScope is an InheritedNotifier with no Focus of its own; '
             'every keyboard story on this kit belongs to a component '
             'built on top of it, never to lib/src/foundation/ directly.',
       ]);
@@ -865,19 +887,19 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElBreakpoints (sm/md/lg/xl) and ElContainers are exactly the '
+      _bullets(ThemeScope.of(context), <String>[
+        'Breakpoints (sm/md/lg/xl) and Containers are exactly the '
             'foundation\'s own responsive vocabulary: every breakpoint '
             'check anywhere else in this package (the docs shell\'s own '
             'rail-vs-sheet switch, a dialog\'s width cap) reads one of '
             'these two ladders rather than a literal pixel comparison.',
-        'ElFluid (theme_scope.dart) is the type scale\'s own responsive '
-            'half: ElType.displaySize(vw) and h1Size(vw) clamp a '
+        'Fluid (theme_scope.dart) is the type scale\'s own responsive '
+            'half: TextStyles.displaySize(vw) and h1Size(vw) clamp a '
             'viewport-relative size between a floor and a ceiling, the '
             'one place in the foundation where a token is a function of '
             'width rather than a constant.',
         'None of this page\'s own six specimen sections branch on '
-            'width themselves — every one is sized off el(...) so it '
+            'width themselves — every one is sized off space(...) so it '
             'reflows with whatever column the docs shell gives it, the '
             'same as every other kit page.',
       ]);
@@ -890,7 +912,7 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'This page\'s Dependencies disclosure runs the other way from '
             'every other page\'s: source-foundation depends on nothing '
             '— registryDependencies is empty — so what belongs here is '
@@ -902,7 +924,7 @@ class _DependenciesContent extends StatelessWidget {
             'would be most of the catalog; a representative sample '
             'follows instead.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
@@ -911,7 +933,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Avatar', route: '/components/avatar'),
           DocsLink(label: 'Dialog', route: '/components/dialog'),
           DocsLink(label: 'Chart', route: '/components/chart'),
-          DocsLink(label: 'Press Motion', route: '/components/press_motion'),
+          DocsLink(label: 'Press Motion', route: '/components/press'),
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
         ],
       ),
@@ -924,19 +946,19 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'This IS the theming system, so this disclosure states the '
             'mechanism rather than describing how something else reads '
-            'it. ElThemeData is one immutable value per mode; '
-            'ElThemeController swaps the whole value on '
-            'setMode(ElThemeMode.light/dark) and notifies every '
-            'listening ElTheme.of(context) in one frame.',
+            'it. ThemeTokens is one immutable value per mode; '
+            'ThemeController swaps the whole value on '
+            'setMode(ColorMode.light/dark) and notifies every '
+            'listening ThemeScope.of(context) in one frame.',
         'The two theme blocks are hand-authored siblings, not one '
             'block with computed overrides: every field on this page\'s '
             'Semantic Color specimen is a real, separately-chosen colour '
             'in each mode, not a formula applied to a single source '
             'colour.',
-        'ElPalette is the deliberate exception: action, value and the '
+        'Palette is the deliberate exception: action, value and the '
             'four status inks (success/warning/info/destructive-adjacent) '
             'stay fixed across both themes on purpose — see the Foil '
             'Value page\'s own Theming section for the clearest worked '
@@ -944,15 +966,19 @@ class _ThemingContent extends StatelessWidget {
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

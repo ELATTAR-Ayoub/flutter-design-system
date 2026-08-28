@@ -1,6 +1,6 @@
 /// Public documentation page for the `tooltip` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels; it now declares a [ComponentDocSpec]
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// [ComponentDocPage], the same shape `button`, `popover` and `field`
@@ -13,9 +13,9 @@
 /// closing the same gap there (previously a code panel only); and a
 /// dedicated Keyboard disclosure, split out of the old combined
 /// "Accessibility and keyboard behavior" section's own "Keyboard
-/// interactions" row. `ElTooltipSide`'s own two-value table moves into API
+/// interactions" row. `TooltipSide`'s own two-value table moves into API
 /// Reference as a second, sub-anchored table, the same shape `popover`'s
-/// `ElPopoverSide` table takes — Side itself is now a live showcase, not a
+/// `PopoverSide` table takes — Side itself is now a live showcase, not a
 /// table.
 ///
 /// `tooltip` is Wave 1 of the component-documentation plan, and: unlike
@@ -34,12 +34,12 @@
 ///
 ///  * **With Keyboard Shortcut**: skipped. Their `TooltipContent` takes
 ///    arbitrary children, so their demo pairs a label with a separately
-///    styled `<kbd>` chip. `ElTooltip.label` and `ElTooltipContent.label`
+///    styled `<kbd>` chip. `Tooltip.label` and `TooltipContent.label`
 ///    are both a single `String`: there is no child slot to hold a second,
 ///    differently styled element, so their demo cannot be composed here
 ///    without inventing an API surface the source does not have.
 ///  * **RTL**: skipped. `_TooltipLayout.getPositionForChild` positions
-///    `ElTooltipSide.right` off `anchor.right`, a physical, LTR-only
+///    `TooltipSide.right` off `anchor.right`, a physical, LTR-only
 ///    coordinate: the source never reads `Directionality`, so there is no
 ///    flip to demonstrate.
 ///
@@ -53,7 +53,7 @@
 /// real source (`lib/src/components/tooltip.dart`), which is the documented
 /// source of truth here:
 ///
-///  * The touch path is a **tap**, not a long press, [ElTooltip] opens on
+///  * The touch path is a **tap**, not a long press, [Tooltip] opens on
 ///    a `PointerDownEvent`, immediately, with no dwell. The Responsive
 ///    section below documents this as measured from the source, not as the
 ///    brief's assumption.
@@ -67,13 +67,25 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
-import '../../kit.dart' show ElNote, ElNoteTone, ElPanel;
+import '../../kit.dart' show Note, NoteTone, Panel;
 import 'meta.dart';
 
 final ComponentDocSpec tooltipDocSpec = ComponentDocSpec(
@@ -125,10 +137,10 @@ final ComponentDocSpec tooltipDocSpec = ComponentDocSpec(
       title: 'Composition',
       description:
           "shadcn's Tooltip composes three pieces the caller assembles: "
-          'Tooltip, TooltipTrigger asChild, and TooltipContent. ElTooltip '
+          'Tooltip, TooltipTrigger asChild, and TooltipContent. Tooltip '
           'is one widget instead: it owns the hover and tap wiring itself '
-          'and builds ElTooltipContent through an OverlayPortal for you. '
-          'ElTooltipContent is exported and public, but a caller does not '
+          'and builds TooltipContent through an OverlayPortal for you. '
+          'TooltipContent is exported and public, but a caller does not '
           'normally construct it by hand.',
       code: _compositionTreeCode,
     ),
@@ -137,7 +149,7 @@ final ComponentDocSpec tooltipDocSpec = ComponentDocSpec(
       title: 'Side',
       description:
           "shadcn's Side section offers four positions: left, top, "
-          'bottom, right. ElTooltipSide has two: top, the default (see '
+          'bottom, right. TooltipSide has two: top, the default (see '
           "Preview above), and right, the shape a collapsed sidebar rail "
           'row needs when it has no other label — the live trigger below.',
       specimen: const _SideSpecimen(),
@@ -162,9 +174,9 @@ final ComponentDocSpec tooltipDocSpec = ComponentDocSpec(
           "shadcn's own Disabled Button demo needs a span wrapper "
           'around the trigger: a native disabled button drops pointer '
           "events entirely, so TooltipTrigger asChild would have "
-          "nothing left to hover. ElTooltip needs no such workaround: "
+          "nothing left to hover. Tooltip needs no such workaround: "
           'its MouseRegion and Listener sit around the trigger, not '
-          "inside it, and a disabled ElButton's own IgnorePointer only "
+          "inside it, and a disabled Button's own IgnorePointer only "
           "removes the button's own input, not the region watching it "
           'from outside. A disabled trigger still opens its tooltip on '
           'hover or tap.',
@@ -177,7 +189,7 @@ final ComponentDocSpec tooltipDocSpec = ComponentDocSpec(
       title: 'Hidden trigger',
       description:
           "shadcn has no counterpart for this: it is SidebarMenuButton's "
-          'own pattern, where every row stays wrapped in a ElTooltip '
+          'own pattern, where every row stays wrapped in a Tooltip '
           "from the start and hidden only turns false once the panel "
           "has collapsed to a rail and the row's own text label has "
           'gone. hidden keeps the hover and tap wiring alive; it just '
@@ -193,12 +205,9 @@ final ComponentDocSpec tooltipDocSpec = ComponentDocSpec(
           'Every public class, constructor parameter, and static layout '
           'constant the source declares.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElTooltip', anchor: 'api-eltooltip'),
-        DocsTocEntry(
-          title: 'ElTooltipContent',
-          anchor: 'api-eltooltipcontent',
-        ),
-        DocsTocEntry(title: 'ElTooltipSide', anchor: 'api-eltooltipside'),
+        DocsTocEntry(title: 'Tooltip', anchor: 'api-eltooltip'),
+        DocsTocEntry(title: 'TooltipContent', anchor: 'api-eltooltipcontent'),
+        DocsTocEntry(title: 'TooltipSide', anchor: 'api-eltooltipside'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -241,7 +250,11 @@ final ComponentDocSpec tooltipDocSpec = ComponentDocSpec(
           'component needs to install and run.',
       child: _DependenciesContent(),
     ),
-    DisclosureSection(id: 'theming', title: 'Theming', child: _ThemingContent()),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: _ThemingContent(),
+    ),
     DisclosureSection(
       id: 'source',
       title: 'Source',
@@ -263,7 +276,7 @@ final ComponentDocSpec tooltipDocSpec = ComponentDocSpec(
           const DocsInstallFact(
             label: 'Tests',
             value:
-                'test/dialogs_test.dart (ElTooltip, ElTooltip: the '
+                'test/dialogs_test.dart (Tooltip, Tooltip: the '
                 'tap path)',
             description:
                 'Package-level behavioral coverage: geometry, the '
@@ -296,15 +309,12 @@ class TooltipDocPage extends StatelessWidget {
       title: tooltipDoc.title,
       description: tooltipDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Tooltip'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Tooltip'),
     ],
     toc: tooltipDocSpec.toc,
-    previous: const DocsPageLink(
-      title: 'Toggle',
-      route: '/components/toggle',
-    ),
+    previous: const DocsPageLink(title: 'Toggle', route: '/components/toggle'),
     // tooltip is the last entry in Wave 1's own list: nothing to link
     // forward to yet.
     onNavigate: onNavigate,
@@ -325,59 +335,62 @@ class _TooltipPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText('Top side: the default', ElType.section),
-        SizedBox(height: el(3)),
+        StyledText('Top side: the default', TextStyles.section),
+        SizedBox(height: space(3)),
         Wrap(
-          spacing: el(4),
-          runSpacing: el(4),
+          spacing: space(4),
+          runSpacing: space(4),
           children: <Widget>[
-            ElTooltip(
+            Tooltip(
               key: const ValueKey<String>('tooltip-doc-specimen-top'),
               label: 'Add to favourites',
-              child: ElButton(
-                variant: ElButtonVariant.ghost,
-                size: ElButtonSize.icon,
+              child: Button(
+                variant: ButtonVariant.ghost,
+                size: ButtonSize.icon,
                 label: 'Add to favourites',
                 onPressed: () {},
-                child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
+                child: const Icon(IconGlyph.heart, size: IconSize.md),
               ),
             ),
-            ElTooltip(
+            Tooltip(
               label: 'Settings',
-              child: ElButton(
-                variant: ElButtonVariant.ghost,
-                size: ElButtonSize.icon,
+              child: Button(
+                variant: ButtonVariant.ghost,
+                size: ButtonSize.icon,
                 label: 'Settings',
                 onPressed: () {},
-                child: const ElIcon(ElIconGlyph.settings, size: ElIconSize.md),
+                child: const Icon(IconGlyph.settings, size: IconSize.md),
               ),
             ),
           ],
         ),
-        SizedBox(height: el(6)),
-        ElText("Right side: a collapsed rail row's only label", ElType.section),
-        SizedBox(height: el(3)),
-        ElTooltip(
+        SizedBox(height: space(6)),
+        StyledText(
+          "Right side: a collapsed rail row's only label",
+          TextStyles.section,
+        ),
+        SizedBox(height: space(3)),
+        Tooltip(
           key: const ValueKey<String>('tooltip-doc-specimen-right'),
           label: 'Dashboard',
-          side: ElTooltipSide.right,
-          child: ElButton(
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.icon,
+          side: TooltipSide.right,
+          child: Button(
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.icon,
             label: 'Dashboard',
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.layoutGrid, size: ElIconSize.md),
+            child: const Icon(IconGlyph.layoutGrid, size: IconSize.md),
           ),
         ),
-        SizedBox(height: el(6)),
-        ElText(
+        SizedBox(height: space(6)),
+        StyledText(
           'A mouse resting on either trigger for 200ms opens the label; a '
           'finger opens it on the spot with a single tap, no dwell.',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
       ],
@@ -385,34 +398,34 @@ class _TooltipPreview extends StatelessWidget {
   }
 }
 
-/// Closes what used to be a code-only section: a live [ElTooltipSide.right]
+/// Closes what used to be a code-only section: a live [TooltipSide.right]
 /// trigger, the shape a collapsed sidebar rail row needs.
 class _SideSpecimen extends StatelessWidget {
   const _SideSpecimen();
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElTooltip(
+        Tooltip(
           key: const ValueKey<String>('tooltip-doc-side-right'),
           label: 'Dashboard',
-          side: ElTooltipSide.right,
-          child: ElButton(
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.icon,
+          side: TooltipSide.right,
+          child: Button(
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.icon,
             label: 'Dashboard',
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.layoutGrid, size: ElIconSize.md),
+            child: const Icon(IconGlyph.layoutGrid, size: IconSize.md),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           'Content sits to the right, vertically centered, arrow lane on '
           'its left.',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
       ],
@@ -427,41 +440,41 @@ class _TooltipComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Expanded(
-          child: ElText(
+          child: StyledText(
             'Autumn Collection',
-            ElType.h4,
+            TextStyles.h4,
             color: theme.foreground,
           ),
         ),
-        SizedBox(width: el(3)),
+        SizedBox(width: space(3)),
         Wrap(
-          spacing: el(2),
+          spacing: space(2),
           children: <Widget>[
-            ElTooltip(
+            Tooltip(
               label: 'Add to favourites',
-              child: ElButton(
-                variant: ElButtonVariant.ghost,
-                size: ElButtonSize.icon,
+              child: Button(
+                variant: ButtonVariant.ghost,
+                size: ButtonSize.icon,
                 label: 'Add to favourites',
                 onPressed: () {},
-                child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
+                child: const Icon(IconGlyph.heart, size: IconSize.md),
               ),
             ),
-            ElTooltip(
+            Tooltip(
               label: 'Filter and sort',
-              child: ElButton(
-                variant: ElButtonVariant.ghost,
-                size: ElButtonSize.icon,
+              child: Button(
+                variant: ButtonVariant.ghost,
+                size: ButtonSize.icon,
                 label: 'Filters',
                 onPressed: () {},
-                child: const ElIcon(
-                  ElIconGlyph.slidersHorizontal,
-                  size: ElIconSize.md,
+                child: const Icon(
+                  IconGlyph.slidersHorizontal,
+                  size: IconSize.md,
                 ),
               ),
             ),
@@ -472,7 +485,7 @@ class _TooltipComposition extends StatelessWidget {
   }
 }
 
-/// A disabled trigger, still wrapped in a live [ElTooltip]. Unlike the
+/// A disabled trigger, still wrapped in a live [Tooltip]. Unlike the
 /// reference, which needs a `<span>` wrapper for a disabled button to stay
 /// hoverable, this needs no workaround: the tooltip's MouseRegion and
 /// Listener sit around the trigger, not inside it.
@@ -481,26 +494,26 @@ class _TooltipDisabledPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElTooltip(
+        Tooltip(
           key: const ValueKey<String>('tooltip-doc-specimen-disabled'),
           label: 'Add to favourites',
-          child: ElButton(
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.icon,
+          child: Button(
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.icon,
             label: 'Add to favourites',
             onPressed: null,
-            child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
+            child: const Icon(IconGlyph.heart, size: IconSize.md),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           'Faded and inert to a click, still hoverable: the label opens '
           'the same way it does on an enabled trigger.',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
       ],
@@ -516,8 +529,7 @@ class _HiddenTriggerSpecimen extends StatefulWidget {
   const _HiddenTriggerSpecimen();
 
   @override
-  State<_HiddenTriggerSpecimen> createState() =>
-      _HiddenTriggerSpecimenState();
+  State<_HiddenTriggerSpecimen> createState() => _HiddenTriggerSpecimenState();
 }
 
 class _HiddenTriggerSpecimenState extends State<_HiddenTriggerSpecimen> {
@@ -525,39 +537,39 @@ class _HiddenTriggerSpecimenState extends State<_HiddenTriggerSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElButton(
+        Button(
           key: const ValueKey<String>('tooltip-doc-specimen-hidden-toggle'),
-          variant: ElButtonVariant.outline,
-          size: ElButtonSize.sm,
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
           label: _collapsed ? 'Expand the rail' : 'Collapse the rail',
           onPressed: () => setState(() => _collapsed = !_collapsed),
           child: Text(_collapsed ? 'Expand the rail' : 'Collapse the rail'),
         ),
-        SizedBox(height: el(4)),
-        ElTooltip(
+        SizedBox(height: space(4)),
+        Tooltip(
           key: const ValueKey<String>('tooltip-doc-specimen-hidden'),
           label: 'Dashboard',
-          side: ElTooltipSide.right,
+          side: TooltipSide.right,
           hidden: !_collapsed,
-          child: ElButton(
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.icon,
+          child: Button(
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.icon,
             label: 'Dashboard',
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.layoutGrid, size: ElIconSize.md),
+            child: const Icon(IconGlyph.layoutGrid, size: IconSize.md),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           _collapsed
               ? 'Collapsed: hidden is false, the label is live.'
               : 'Expanded: hidden is true, hover and tap still wired, '
                     'nothing paints.',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
       ],
@@ -576,20 +588,20 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-eltooltip',
-        child: DocsApiTable(title: 'ElTooltip', facts: _tooltipFacts),
+        child: DocsApiTable(title: 'Tooltip', facts: _tooltipFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eltooltipcontent',
         child: DocsApiTable(
-          title: 'ElTooltipContent',
+          title: 'TooltipContent',
           facts: _tooltipContentFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eltooltipside',
-        child: DocsApiTable(title: 'ElTooltipSide', facts: _sideFacts),
+        child: DocsApiTable(title: 'TooltipSide', facts: _sideFacts),
       ),
     ],
   );
@@ -602,14 +614,14 @@ class _AccessibilityContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      ElPanel(
+      Panel(
         label: 'What the semantics tree actually carries',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             _A11yRow(
               'Semantic role',
-              'ElTooltip renders no Semantics node of its own anywhere in '
+              'Tooltip renders no Semantics node of its own anywhere in '
                   'its source: not on the trigger, not on the pill, and '
                   'nothing wires the label into the accessible name of '
                   'whatever child it wraps.',
@@ -618,7 +630,7 @@ class _AccessibilityContent extends StatelessWidget {
               'Required labels',
               'None are set automatically. If a trigger has no other '
                   'accessible name of its own (no visible text, no '
-                  'Semantics label, no ElButton.label), the tooltip does '
+                  'Semantics label, no Button.label), the tooltip does '
                   'not supply one either.',
             ),
             const _A11yRow(
@@ -629,18 +641,18 @@ class _AccessibilityContent extends StatelessWidget {
             ),
             const _A11yRow(
               'Touch target',
-              'ElTooltip adds no padding of its own; the tap target is '
+              'Tooltip adds no padding of its own; the tap target is '
                   "whatever the wrapped trigger already provides (a "
-                  'ElButton icon size, for example).',
+                  'Button icon size, for example).',
             ),
             const _A11yRow(
               'Non-color signal',
-              'The label is plain text on a solid pill: no information is '
+              'The label is plain text on a solid indicator: no information is '
                   'carried by color alone.',
             ),
             const _A11yRow(
               'Error wiring',
-              'None, ElTooltip never participates in form validation or '
+              'None, Tooltip never participates in form validation or '
                   'an error state.',
             ),
             const _A11yRow(
@@ -658,11 +670,11 @@ class _AccessibilityContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
-      ElNote(
-        tone: ElNoteTone.error,
+      SizedBox(height: space(5)),
+      Note(
+        tone: NoteTone.error,
         title: "Known gap: a tooltip cannot be a control's only name",
-        child: ElText(
+        child: StyledText(
           'The source itself composes exactly the risky case: a '
           "SidebarMenuButton-style collapsed rail row, where the "
           "tooltip's label is used as the only name a control has once "
@@ -672,9 +684,9 @@ class _AccessibilityContent extends StatelessWidget {
           'control has no accessible name at all in that state. If a '
           'trigger has no other name, pair the tooltip label with a real '
           'accessible name on the trigger itself (for example '
-          'ElButton.label): do not rely on the tooltip alone to supply '
+          'Button.label): do not rely on the tooltip alone to supply '
           'it.',
-          ElType.small,
+          TextStyles.small,
         ),
       ),
     ],
@@ -686,14 +698,14 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'None. There is no Focus or FocusNode anywhere in the source, so '
             'Tab-ing to the trigger never shows the label.',
         'There is no Escape-to-close path either: dismissal is pointer '
             'and touch only (pointer-exit for hover, a second tap, a tap '
             'elsewhere, or the touchDwell timeout for touch).',
         'The trigger keeps whatever tab order and key bindings its own '
-            "widget already had: ElTooltip adds no key handling to it, "
+            "widget already had: Tooltip adds no key handling to it, "
             'and wraps it in no FocusScope of its own.',
         'This means a keyboard-only user can reach and activate the '
             'trigger, but can never see the tooltip label form itself: '
@@ -705,19 +717,19 @@ class _ResponsiveContent extends StatelessWidget {
   const _ResponsiveContent();
 
   @override
-  Widget build(BuildContext context) => ElPanel(
+  Widget build(BuildContext context) => Panel(
     label: 'Pointer versus touch',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText(
+        StyledText(
           'Pointer (mouse, a stylus hovering): resting on the trigger '
-          'for delay (200ms default, ElDurations.tooltipDelay) opens '
+          'for delay (200ms default, MotionDurations.tooltipShowDelay) opens '
           'the label; the pointer leaving the trigger closes it.',
-          ElType.small,
+          TextStyles.small,
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           'Touch: this is a tap, not a long press. A single tap on the '
           'trigger opens the label immediately, with no dwell, '
           'delayDuration is a hover-intent filter, and a tap has '
@@ -726,23 +738,23 @@ class _ResponsiveContent extends StatelessWidget {
           'through a translucent barrier that observes the pointer '
           'without stealing it, so the dismissing tap still reaches '
           'whatever it landed on.',
-          ElType.small,
+          TextStyles.small,
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           'If nothing else closes it first, a tap-opened label takes '
-          'itself down automatically after ElTooltip.touchDwell (1500ms: '
-          'ten steps of ElDurations.fast) so it can never be stranded on '
+          'itself down automatically after Tooltip.touchDwell (1500ms: '
+          'ten steps of MotionDurations.fast) so it can never be stranded on '
           'screen.',
-          ElType.small,
+          TextStyles.small,
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           'This is a deliberate mobile adaptation ordered on top of a '
           'reference that has no touch path of its own: hover does not '
           "exist on a touch screen. It is documented in the source's own "
           'top-of-file comment.',
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     ),
@@ -773,8 +785,7 @@ class _DependenciesContent extends StatelessWidget {
           const DocsInstallFact(
             label: 'Dart / Flutter',
             value: '>=3.12.2 <4.0.0 / >=3.44.8',
-            description:
-                "The manifest's minDart and minFlutter constraints.",
+            description: "The manifest's minDart and minFlutter constraints.",
           ),
           const DocsInstallFact(
             label: 'Destination',
@@ -810,21 +821,20 @@ class _DependenciesContent extends StatelessWidget {
           const DocsInstallFact(
             label: 'Platforms',
             value: 'Android, iOS, Web, macOS, Windows, Linux',
-            description:
-                'Pure widget composition; nothing platform-gated.',
+            description: 'Pure widget composition; nothing platform-gated.',
           ),
           const DocsInstallFact(
             label: 'Verified',
             value: 'package tests + this docs specimen',
             description:
-                "test/dialogs_test.dart's ElTooltip and 'ElTooltip: the "
+                "test/dialogs_test.dart's Tooltip and 'Tooltip: the "
                 "tap path' groups, plus this page's own live specimens. "
                 'No fixture install was run as part of writing this '
                 'page.',
           ),
         ],
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       DocsLinkRow(
         links: <DocsLink>[
           DocsLink(
@@ -844,36 +854,36 @@ class _ThemingContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      ElPanel(
+      Panel(
         label: 'What actually varies with the theme',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            ElText(
+            StyledText(
               'The pill is a fixed, inverted pairing, theme.foreground '
               'fill, theme.background ink: the same relationship a '
               'native OS tooltip uses, and it does not change with a '
-              'surface or variant parameter because ElTooltip has none.',
-              ElType.small,
+              'surface or variant parameter because Tooltip has none.',
+              TextStyles.small,
             ),
-            SizedBox(height: el(3)),
-            ElText(
-              'The label always renders at ElComponentType.tooltipLabel '
+            SizedBox(height: space(3)),
+            StyledText(
+              'The label always renders at TextStyles.tooltipLabel '
               '(12px, weight 400) and the pill corner radius is always '
-              'ElRadii.md, neither is configurable per instance.',
-              ElType.small,
+              'Radii.md, neither is configurable per instance.',
+              TextStyles.small,
             ),
-            SizedBox(height: el(3)),
-            ElText(
+            SizedBox(height: space(3)),
+            StyledText(
               'The arrow is painted, not composed, and always fills with '
               'theme.foreground to match the pill exactly, so it never '
               'reads as a separate shape in either theme.',
-              ElType.small,
+              TextStyles.small,
             ),
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsApiTable(
         title: 'Layout tokens',
         facts: <DocsApiFact>[
@@ -887,15 +897,14 @@ class _ThemingContent extends StatelessWidget {
           DocsApiFact(
             name: 'arrowRadius',
             type: 'static double (get)',
-            description:
-                'rounded-xs corner radius on the arrow, ElRadii.xs.',
+            description: 'rounded-xs corner radius on the arrow, Radii.xs.',
           ),
           DocsApiFact(
             name: 'arrowLift',
             type: 'static double (get)',
             description:
                 "How far the arrow's centre is pushed out of its lane: "
-                'half the arrow plus ElRadii.xs.',
+                'half the arrow plus Radii.xs.',
           ),
           DocsApiFact(
             name: 'horizontalPadding',
@@ -918,7 +927,7 @@ class _ThemingContent extends StatelessWidget {
             name: 'touchDwell',
             type: 'static Duration (get)',
             description:
-                '1500ms (ten steps of ElDurations.fast): how long a '
+                '1500ms (ten steps of MotionDurations.fast): how long a '
                 'tap-opened label stays up on its own before it closes '
                 'itself.',
           ),
@@ -937,119 +946,123 @@ class _A11yRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : el(3)),
+      padding: EdgeInsets.only(bottom: last ? 0 : space(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.section, color: theme.actionInk),
-          SizedBox(height: el(1)),
-          ElText(body, ElType.small),
+          StyledText(label, TextStyles.section, color: theme.actionText),
+          SizedBox(height: space(1)),
+          StyledText(body, TextStyles.small),
         ],
       ),
     );
   }
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
 
 /* ── Code ────────────────────────────────────────────────────────────────── */
 
-const String _previewCode = '''ElTooltip(
+const String _previewCode = '''Tooltip(
   label: 'Add to favourites',
-  child: ElButton(
-    variant: ElButtonVariant.ghost,
-    size: ElButtonSize.icon,
+  child: Button(
+    variant: ButtonVariant.ghost,
+    size: ButtonSize.icon,
     label: 'Add to favourites',
     onPressed: () {},
-    child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
+    child: const Icon(IconGlyph.heart, size: IconSize.md),
   ),
 )
 
-ElTooltip(
+Tooltip(
   label: 'Dashboard',
-  side: ElTooltipSide.right, // the collapsed-rail shape
-  child: ElButton(
-    variant: ElButtonVariant.ghost,
-    size: ElButtonSize.icon,
+  side: TooltipSide.right, // the collapsed-rail shape
+  child: Button(
+    variant: ButtonVariant.ghost,
+    size: ButtonSize.icon,
     label: 'Dashboard',
     onPressed: () {},
-    child: const ElIcon(ElIconGlyph.layoutGrid, size: ElIconSize.md),
+    child: const Icon(IconGlyph.layoutGrid, size: IconSize.md),
   ),
 )''';
 
 const String _usageBasicCode =
     '''import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElTooltip(
+Tooltip(
   label: 'Add to favourites',
-  child: ElButton(
-    variant: ElButtonVariant.ghost,
-    size: ElButtonSize.icon,
+  child: Button(
+    variant: ButtonVariant.ghost,
+    size: ButtonSize.icon,
     label: 'Add to favourites',
     onPressed: () {},
-    child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
+    child: const Icon(IconGlyph.heart, size: IconSize.md),
   ),
 )''';
 
 /// The real shape: one widget wrapping a trigger, no separate Trigger or
 /// Content pieces for the caller to assemble.
 const String _compositionTreeCode =
-    '''ElTooltip                              // one widget, not three
+    '''Tooltip                              // one widget, not three
 ├─ child                              the trigger, rendered verbatim
-└─ (built for you) ElTooltipContent   never constructed by the caller
+└─ (built for you) TooltipContent   never constructed by the caller
    └─ label                          the pill's text, positioned by `side`''';
 
-const String _sideRightCode = '''ElTooltip(
+const String _sideRightCode = '''Tooltip(
   label: 'Dashboard',
-  side: ElTooltipSide.right,
-  child: ElButton(
-    variant: ElButtonVariant.ghost,
-    size: ElButtonSize.icon,
+  side: TooltipSide.right,
+  child: Button(
+    variant: ButtonVariant.ghost,
+    size: ButtonSize.icon,
     label: 'Dashboard',
     onPressed: () {},
-    child: const ElIcon(ElIconGlyph.layoutGrid, size: ElIconSize.md),
+    child: const Icon(IconGlyph.layoutGrid, size: IconSize.md),
   ),
 )''';
 
 const String _toolbarCode = '''Row(
   children: <Widget>[
-    Expanded(child: ElText('Autumn Collection', ElType.h4)),
+    Expanded(child: StyledText('Autumn Collection', TextStyles.h4)),
     Wrap(
-      spacing: el(2),
+      spacing: space(2),
       children: <Widget>[
-        ElTooltip(
+        Tooltip(
           label: 'Add to favourites',
-          child: ElButton(
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.icon,
+          child: Button(
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.icon,
             label: 'Add to favourites',
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
+            child: const Icon(IconGlyph.heart, size: IconSize.md),
           ),
         ),
-        ElTooltip(
+        Tooltip(
           label: 'Filter and sort',
-          child: ElButton(
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.icon,
+          child: Button(
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.icon,
             label: 'Filters',
             onPressed: () {},
-            child: const ElIcon(
-              ElIconGlyph.slidersHorizontal,
-              size: ElIconSize.md,
+            child: const Icon(
+              IconGlyph.slidersHorizontal,
+              size: IconSize.md,
             ),
           ),
         ),
@@ -1058,24 +1071,24 @@ const String _toolbarCode = '''Row(
   ],
 )''';
 
-const String _disabledCode = '''ElTooltip(
+const String _disabledCode = '''Tooltip(
   label: 'Add to favourites',
-  child: ElButton(
-    variant: ElButtonVariant.ghost,
-    size: ElButtonSize.icon,
+  child: Button(
+    variant: ButtonVariant.ghost,
+    size: ButtonSize.icon,
     label: 'Add to favourites',
     onPressed: null, // disabled — still hoverable, still opens
-    child: const ElIcon(ElIconGlyph.heart, size: ElIconSize.md),
+    child: const Icon(IconGlyph.heart, size: IconSize.md),
   ),
 )''';
 
 const String _hiddenTriggerCode =
     '''// SidebarMenuButton's own pattern: every row stays wrapped in a
-// ElTooltip from the start, and `hidden` only turns false once the panel
+// Tooltip from the start, and `hidden` only turns false once the panel
 // has collapsed to a rail and the row's own text label has gone.
-ElTooltip(
+Tooltip(
   label: 'Dashboard',
-  side: ElTooltipSide.right,
+  side: TooltipSide.right,
   hidden: !collapsed,
   child: sidebarRow,
 )''';
@@ -1099,15 +1112,15 @@ const List<DocsApiFact> _tooltipFacts = <DocsApiFact>[
     name: 'delay',
     type: 'Duration',
     description:
-        'Default ElDurations.tooltipDelay (200ms). Hover-intent delay '
+        'Default MotionDurations.tooltipShowDelay (200ms). Hover-intent delay '
         'before a pointer-opened label shows; a tap has no dwell and '
         'ignores this.',
   ),
   DocsApiFact(
     name: 'side',
-    type: 'ElTooltipSide',
+    type: 'TooltipSide',
     description:
-        'Default ElTooltipSide.top. Which edge of the trigger the '
+        'Default TooltipSide.top. Which edge of the trigger the '
         'content sits on.',
   ),
   DocsApiFact(
@@ -1127,9 +1140,9 @@ const List<DocsApiFact> _tooltipContentFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'side',
-    type: 'ElTooltipSide',
+    type: 'TooltipSide',
     description:
-        'Default ElTooltipSide.top. Which edge the arrow lane sits on '
+        'Default TooltipSide.top. Which edge the arrow lane sits on '
         'relative to the pill.',
   ),
 ];
@@ -1137,14 +1150,14 @@ const List<DocsApiFact> _tooltipContentFacts = <DocsApiFact>[
 const List<DocsApiFact> _sideFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'top',
-    type: 'ElTooltipSide',
+    type: 'TooltipSide',
     description:
         'The default. Content sits above the trigger, centered, with '
         "the arrow lane below it: the reference's own measured shape.",
   ),
   DocsApiFact(
     name: 'right',
-    type: 'ElTooltipSide',
+    type: 'TooltipSide',
     description:
         "Content sits to the trigger's right, vertically centered, "
         'arrow lane on its left: the shape a collapsed sidebar rail row '
@@ -1215,7 +1228,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        'N/A, ElTooltip has no enabled or disabled parameter of its '
+        'N/A, Tooltip has no enabled or disabled parameter of its '
         'own; a caller wraps whatever trigger it likes, including a '
         'disabled one, and the label still opens.',
     userSignal: 'N/A',
@@ -1224,7 +1237,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         'The 320ms fade, zoom, and slide-in transition runs through '
-        'elAnimationDuration, so it collapses under reduced motion. The '
+        'effectiveMotionDuration, so it collapses under reduced motion. The '
         '200ms hover delay and 1500ms touchDwell are timing, not '
         'motion, and are unaffected.',
     userSignal:

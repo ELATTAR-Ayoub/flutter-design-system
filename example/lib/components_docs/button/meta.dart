@@ -2,7 +2,7 @@
 ///
 /// `button` HAS a real `registry/components/button.json` manifest:
 /// [dependencies] below is that manifest's own `registryDependencies` list,
-/// copied verbatim: `foil-value`, `machine-surface`, `sheen-action`,
+/// copied verbatim: `premium-surface`, `surface`, `action-feedback`,
 /// `source-foundation`, `spinner`. `page.dart` renders the
 /// real `elattar add button` command from it rather than a "not available
 /// yet" disclosure.
@@ -27,18 +27,18 @@ const ComponentDocEntry buttonDoc = ComponentDocEntry(
       'action, never for navigating to one.',
   // registry/components/button.json's own registryDependencies, verbatim.
   dependencies: <String>[
-    'foil-value',
-    'machine-surface',
-    'sheen-action',
+    'premium-surface',
+    'surface',
+    'action-feedback',
     'source-foundation',
     'spinner',
   ],
   exports: <String>[
-    'ElButton',
-    'ElButtonVariant',
-    'ElButtonSize',
-    'ElButtonEmphasis',
-    'ElButtonSurface',
+    'Button',
+    'ButtonVariant',
+    'ButtonSize',
+    'ButtonEmphasis',
+    'ButtonStyleRecipe',
   ],
   sourcePath: 'lib/src/components/button.dart',
 );

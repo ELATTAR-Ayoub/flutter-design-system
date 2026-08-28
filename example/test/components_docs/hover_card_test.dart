@@ -5,10 +5,10 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
-/// coverage uses a live `ElThemeController` flipped in place rather than two
+/// coverage uses a live `ThemeController` flipped in place rather than two
 /// independent pumps.
 ///
-/// ElHoverCard mounts through [OverlayPortal] directly (not ElPopover), so
+/// HoverCard mounts through [OverlayPortal] directly (not Popover), so
 /// the live specimens need a real [Overlay]: the harness wraps the page in a
 /// `MaterialApp`, the same fix Popover and Select needed.
 ///
@@ -32,27 +32,53 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-Future<ElThemeController> _pumpPage(
+Future<ThemeController> _pumpPage(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -85,7 +111,7 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 void main() {
@@ -101,7 +127,7 @@ void main() {
       expect(hoverCardDoc.sourcePath, 'lib/src/components/hover_card.dart');
       expect(
         hoverCardDoc.exports,
-        containsAll(<String>['ElHoverCard', 'ElHoverCardContent']),
+        containsAll(<String>['HoverCard', 'HoverCardContent']),
       );
       // Short description: one sentence, no trailing ellipsis.
       expect(hoverCardDoc.description, isNot(contains('..')));
@@ -142,19 +168,18 @@ void main() {
       ]);
     });
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        await _pumpPage(tester);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      await _pumpPage(tester);
 
-        // Four specimen stages: Preview, Trigger Delays, Basic, RTL.
-        expect(find.byType(DocsShowcase), findsNWidgets(4));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Four specimen stages: Preview, Trigger Delays, Basic, RTL.
+      expect(find.byType(DocsShowcase), findsNWidgets(4));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     testWidgets(
       'renders the article and all three live specimens under distinct keys',
@@ -193,7 +218,7 @@ void main() {
         expect(find.text('width'), findsWidgets);
         expect(find.text('openDelay'), findsOneWidget);
         expect(find.text('closeDelay'), findsOneWidget);
-        expect(find.text('ElHoverCardContent'), findsWidgets);
+        expect(find.text('HoverCardContent'), findsWidgets);
         expect(find.text('child'), findsWidgets);
       },
     );
@@ -217,7 +242,7 @@ void main() {
       await _open(tester, 'Accessibility');
 
       expect(find.textContaining('Pointer only'), findsWidgets);
-      // ElNote's title renders through ElType.label, which uppercases its
+      // Note's title renders through TextStyles.eyebrow, which uppercases its
       // text, so match on the body copy instead of the title.
       expect(find.textContaining('optional detail'), findsWidgets);
     });
@@ -303,7 +328,7 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpPage(tester, mode: ElThemeMode.light);
+      await _pumpPage(tester, mode: ColorMode.light);
       expect(
         find.byKey(const ValueKey<String>('hover-card-specimen')),
         findsOneWidget,
@@ -312,7 +337,7 @@ void main() {
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpPage(tester, mode: ElThemeMode.dark);
+      await _pumpPage(tester, mode: ColorMode.dark);
       expect(
         find.byKey(const ValueKey<String>('hover-card-specimen')),
         findsOneWidget,
@@ -323,16 +348,16 @@ void main() {
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpPage(
+      final ThemeController theme = await _pumpPage(
         tester,
-        mode: ElThemeMode.dark,
+        mode: ColorMode.dark,
       );
       expect(
         find.byKey(const ValueKey<String>('hover-card-specimen')),
         findsOneWidget,
       );
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
       expect(

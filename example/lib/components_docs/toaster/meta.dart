@@ -14,9 +14,9 @@ import '../catalog.dart';
 /// toaster) `alert/page.dart`'s own Dependencies disclosure already states.
 ///
 /// [ComponentDocEntry.exports] names both halves of the public surface:
-/// [ElToaster] itself is only the overlay host: every constructor a caller
+/// [Toaster] itself is only the overlay host: every constructor a caller
 /// actually fires (`toast.success(...)` and friends) lives on
-/// [ElToastController], and both are documented in full on the page.
+/// [ToastController], and both are documented in full on the page.
 const ComponentDocEntry toasterDoc = ComponentDocEntry(
   name: 'toaster',
   title: 'Toaster',
@@ -24,20 +24,20 @@ const ComponentDocEntry toasterDoc = ComponentDocEntry(
       'A transient, self-dismissing notification stack mounted once at the '
       'app root, fired into from anywhere through a queue-backed controller.',
   dependencies: <String>[
-    'bloom-cosmic',
+    'feedback-surface',
     'icon',
-    'machine-surface',
+    'surface',
     'safe-area',
     'source-foundation',
   ],
   exports: <String>[
-    'ElToaster',
-    'ElToastController',
-    'ElToastMessage',
-    'ElToastAction',
-    'ElToastType',
-    'ElToastPosition',
-    'ElToast',
+    'Toaster',
+    'ToastController',
+    'ToastMessage',
+    'ToastAction',
+    'ToastType',
+    'ToastPosition',
+    'Toast',
   ],
   sourcePath: 'lib/src/components/toaster.dart',
 );

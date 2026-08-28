@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title], matching the kit's own
 /// convention (`DocsDisclosure.triggerKey` is one constant shared by every
@@ -27,8 +51,8 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// The union of every named constructor parameter `ElPieChart`,
-/// `ElRadarChart` and `ElRadialBarChart` declare
+/// The union of every named constructor parameter `PieChart`,
+/// `RadarChart` and `RadialBarChart` declare
 /// (`lib/src/components/chart_polar.dart`), excluding `key`.
 const List<String> _polarConstructorParams = <String>[
   'pies',
@@ -85,86 +109,85 @@ const List<String> _sectionTitles = <String>[
 
 void main() {
   group('chart-polar docs page', () {
-    testWidgets(
-      'renders the article and the full API table for every exported '
-      'class, enum and constructor parameter this page claims to document',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('renders the article and the full API table for every exported '
+        'class, enum and constructor parameter this page claims to document', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        String? destination;
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: ChartPolarDocPage(
-              onNavigate: (String route) => destination = route,
-            ),
+      String? destination;
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: ChartPolarDocPage(
+            onNavigate: (String route) => destination = route,
           ),
-        );
-        await tester.pump();
+        ),
+      );
+      await tester.pump();
 
+      expect(
+        find.byKey(const ValueKey<String>('chart-polar-doc-article')),
+        findsOneWidget,
+      );
+
+      final Finder apiTrigger = _disclosureTrigger('API Reference');
+      await tester.ensureVisible(apiTrigger);
+      await tester.pump();
+      await tester.tap(apiTrigger);
+      await tester.pump();
+      await tester.pump(MotionDurations.open);
+
+      for (final String export in chartPolarDoc.exports) {
+        expect(find.text(export), findsWidgets, reason: 'missing $export');
+      }
+
+      for (final String param in _polarConstructorParams) {
         expect(
-          find.byKey(const ValueKey<String>('chart-polar-doc-article')),
+          find.text(param),
+          findsWidgets,
+          reason:
+              '$param is a constructor parameter and must be '
+              'documented',
+        );
+      }
+
+      for (final String key in _exampleKeys) {
+        expect(
+          find.byKey(ValueKey<String>(key)),
           findsOneWidget,
+          reason: 'missing example specimen $key',
         );
+      }
 
-        final Finder apiTrigger = _disclosureTrigger('API Reference');
-        await tester.ensureVisible(apiTrigger);
-        await tester.pump();
-        await tester.tap(apiTrigger);
-        await tester.pump();
-        await tester.pump(ElDurations.jelly);
+      expect(chartPolarDoc.name, 'chart_polar');
+      expect(chartPolarDoc.command, 'elattar add chart-polar');
+      expect(destination, isNull);
+    });
 
-        for (final String export in chartPolarDoc.exports) {
-          expect(find.text(export), findsWidgets, reason: 'missing $export');
-        }
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        for (final String param in _polarConstructorParams) {
-          expect(
-            find.text(param),
-            findsWidgets,
-            reason: '$param is a constructor parameter and must be '
-                'documented',
-          );
-        }
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const ChartPolarDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        for (final String key in _exampleKeys) {
-          expect(
-            find.byKey(ValueKey<String>(key)),
-            findsOneWidget,
-            reason: 'missing example specimen $key',
-          );
-        }
-
-        expect(chartPolarDoc.name, 'chart_polar');
-        expect(chartPolarDoc.command, 'elattar add chart-polar');
-        expect(destination, isNull);
-      },
-    );
-
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 6000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
-
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const ChartPolarDocPage(),
-          ),
-        );
-        await tester.pump();
-
-        // Six specimen stages: Preview, Pie, Active & Labels, Radar,
-        // Radial Bar, Legend & Tooltip.
-        expect(find.byType(DocsShowcase), findsNWidgets(6));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Six specimen stages: Preview, Pie, Active & Labels, Radar,
+      // Radial Bar, Legend & Tooltip.
+      expect(find.byType(DocsShowcase), findsNWidgets(6));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -173,29 +196,26 @@ void main() {
       );
     });
 
-    testWidgets(
-      'sections render in declaration order',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 6000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
-        );
-        await tester.pumpWidget(
-          _harness(controller: controller, child: const ChartPolarDocPage()),
-        );
-        await tester.pump();
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
+      await tester.pumpWidget(
+        _harness(controller: controller, child: const ChartPolarDocPage()),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, _sectionTitles);
-      },
-    );
+      expect(titles, _sectionTitles);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -206,7 +226,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const ChartPolarDocPage(),
           ),
         );
@@ -235,24 +255,24 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const ChartPolarDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('chart-polar-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('chart-polar-doc-article')),
           ),

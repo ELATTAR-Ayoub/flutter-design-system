@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/agent_transcript.dart",
+      "source": "lib/src/components/ui/agent_transcript.dart",
       "target": "@ui/agent_transcript.dart",
-      "sha256": "8cbbdd3e3718c556291153297aaf3094f4d039e9579b1b9ab506bbd93088c22f"
+      "sha256": "852206791e35464d0639255a8c535b6d0fe2f40f21da0afa490cc7f746dc4732"
     }
   ],
   "registryDependencies": [
@@ -35,6 +35,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/agent-transcript",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/agent_transcript.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_transcript.dart",
   "deprecated": false
 }

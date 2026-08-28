@@ -1,0 +1,49 @@
+{
+  "name": "voice-indicator",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`components/agent/voice/orb.tsx` — the voice face.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/voice_indicator.dart",
+      "target": "@ui/voice_indicator.dart",
+      "sha256": "df7585504842f5e54c93f4d18d7a83087ed009313f5976d819a4cf4e605d0416"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [
+    {
+      "source": "assets/textures/perlin-noise.png",
+      "target": "@assets/textures/perlin-noise.png",
+      "sha256": "3fa8bdce594fad7586bfe3be10be04bcf77eca38ef85d2ab811c5e0445ce0785"
+    }
+  ],
+  "fonts": [],
+  "shaders": [
+    {
+      "source": "shaders/orb.frag",
+      "target": "@shaders/orb.frag",
+      "sha256": "4ece99223fec1d84a38186aca76b35b2be62652dc1b65e47f3a63420a360fb8f"
+    }
+  ],
+  "licenses": [
+    {
+      "source": "third_party/elevenlabs-ui/LICENSE",
+      "target": "@license/ElevenLabs-UI-MIT.txt",
+      "sha256": "ad3f66b8568970d067e3bd47b690ad013945a61f972559743946a3a6558dc828"
+    }
+  ],
+  "documentationRoute": "/components/voice-indicator",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/voice_indicator.dart",
+  "exports": [
+    "VoiceIndicator",
+    "VoiceIndicatorProgram",
+    "VoiceIndicatorState"
+  ]
+}

@@ -3,7 +3,7 @@
 /// documentation page.
 ///
 /// Re-housed onto the kit alongside the page: sections are now
-/// `DocsSection`s rather than `ElSection`s, and the eight disclosures (API
+/// `DocsSection`s rather than `Section`s, and the eight disclosures (API
 /// Reference, States, Accessibility, Keyboard, Responsive, Dependencies,
 /// Theming, Source) are collapsed `DocsDisclosure`s that mount no content
 /// until opened — see `_openDisclosure`, the same helper `button_test.dart`
@@ -17,17 +17,41 @@ import 'package:example/components_docs/pagination/meta.dart';
 import 'package:example/components_docs/pagination/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title], opened. A closed
 /// `DocsDisclosure` mounts no content, so a test reading anything inside one
@@ -43,67 +67,66 @@ Future<void> _openDisclosure(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 /// Every constructor parameter [pagination.dart](../../../lib/src/components/pagination.dart)
-/// declares across its four public classes: [ElPagination], [ElPaginationLink],
-/// [ElPaginationStep] (both named constructors share the same field set) and
-/// [ElPaginationEllipsis] (key only). The API table must render each of
+/// declares across its four public classes: [Pagination], [PaginationLink],
+/// [PaginationStep] (both named constructors share the same field set) and
+/// [PaginationEllipsis] (key only). The API table must render each of
 /// these names somewhere.
 const List<String> _apiParamNames = <String>[
-  'children', // ElPagination
-  'label', 'isActive', 'onTap', // ElPaginationLink
-  'text', // ElPaginationStep (onTap repeats, already listed)
+  'children', // Pagination
+  'label', 'isActive', 'onTap', // PaginationLink
+  'text', // PaginationStep (onTap repeats, already listed)
 ];
 
 void main() {
   group('pagination docs page', () {
-    testWidgets(
-      'renders the house-shape section list, in order',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 8000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('renders the house-shape section list, in order', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 8000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const PaginationDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const PaginationDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, <String>[
-          'Preview',
-          'Installation',
-          'Usage',
-          'Computed range',
-          'Composition',
-          'Composed with other primitives',
-          'Truncation rule',
-          'First page',
-          'Last page',
-          'Single page',
-          'Simple',
-          'Icons only',
-          'RTL',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Keyboard',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
-      },
-    );
+      expect(titles, <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'Computed range',
+        'Composition',
+        'Composed with other primitives',
+        'Truncation rule',
+        'First page',
+        'Last page',
+        'Single page',
+        'Simple',
+        'Icons only',
+        'RTL',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+    });
 
     testWidgets(
       'renders the article, the full API table, and the truncation worked '
@@ -116,7 +139,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: PaginationDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -137,10 +160,10 @@ void main() {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
         // The two named constructors are the real public surface of
-        // ElPaginationStep: both must be documented as their own rows.
+        // PaginationStep: both must be documented as their own rows.
         for (final String ctor in <String>[
-          'ElPaginationStep.previous',
-          'ElPaginationStep.next',
+          'PaginationStep.previous',
+          'PaginationStep.next',
         ]) {
           expect(
             find.textContaining(ctor),
@@ -150,11 +173,11 @@ void main() {
         }
         // Static tokens every class exposes.
         for (final String token in <String>[
-          'ElPagination.gap',
-          'ElPaginationStep.tightPadding',
-          'ElPaginationStep.loosePadding',
-          'ElPaginationEllipsis.boxSize',
-          'ElPaginationEllipsis.glyphSize',
+          'Pagination.gap',
+          'PaginationStep.tightPadding',
+          'PaginationStep.loosePadding',
+          'PaginationEllipsis.boxSize',
+          'PaginationEllipsis.glyphSize',
         ]) {
           expect(
             find.textContaining(token),
@@ -180,7 +203,7 @@ void main() {
         expect(
           find.descendant(
             of: worked,
-            matching: find.byType(ElPaginationEllipsis),
+            matching: find.byType(PaginationEllipsis),
           ),
           findsNWidgets(2),
         );
@@ -236,16 +259,16 @@ void main() {
         expect(
           find.descendant(
             of: single,
-            matching: find.byType(ElPaginationEllipsis),
+            matching: find.byType(PaginationEllipsis),
           ),
           findsNothing,
         );
         expect(
-          find.descendant(of: single, matching: find.byType(ElPaginationStep)),
+          find.descendant(of: single, matching: find.byType(PaginationStep)),
           findsNothing,
         );
 
-        // ElPagination declares an accessible container name: the page's
+        // Pagination declares an accessible container name: the page's
         // own Accessibility section claims this and the test proves it.
         expect(find.bySemanticsLabel('pagination'), findsWidgets);
 
@@ -253,10 +276,10 @@ void main() {
         expect(
           paginationDoc.exports,
           containsAll(<String>[
-            'ElPagination',
-            'ElPaginationLink',
-            'ElPaginationStep',
-            'ElPaginationEllipsis',
+            'Pagination',
+            'PaginationLink',
+            'PaginationStep',
+            'PaginationEllipsis',
           ]),
         );
         expect(destination, isNull);
@@ -272,7 +295,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const PaginationDocPage(),
           ),
         );
@@ -284,18 +307,18 @@ void main() {
         );
         expect(simple, findsOneWidget);
         expect(
-          find.descendant(of: simple, matching: find.byType(ElPaginationStep)),
+          find.descendant(of: simple, matching: find.byType(PaginationStep)),
           findsNothing,
         );
         expect(
           find.descendant(
             of: simple,
-            matching: find.byType(ElPaginationEllipsis),
+            matching: find.byType(PaginationEllipsis),
           ),
           findsNothing,
         );
         expect(
-          find.descendant(of: simple, matching: find.byType(ElPaginationLink)),
+          find.descendant(of: simple, matching: find.byType(PaginationLink)),
           findsNWidgets(5),
         );
 
@@ -305,17 +328,11 @@ void main() {
         );
         expect(iconsOnly, findsOneWidget);
         expect(
-          find.descendant(
-            of: iconsOnly,
-            matching: find.byType(ElPaginationLink),
-          ),
+          find.descendant(of: iconsOnly, matching: find.byType(PaginationLink)),
           findsNothing,
         );
         expect(
-          find.descendant(
-            of: iconsOnly,
-            matching: find.byType(ElPaginationStep),
-          ),
+          find.descendant(of: iconsOnly, matching: find.byType(PaginationStep)),
           findsNWidgets(2),
         );
 
@@ -354,7 +371,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const PaginationDocPage(),
           ),
         );
@@ -408,8 +425,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         addTearDown(controller.dispose);
         await tester.pumpWidget(
@@ -420,27 +437,27 @@ void main() {
         final Finder worked = find.byKey(
           const ValueKey<String>('pagination-preview:worked-example'),
         );
-        ElButtonVariant activeVariant() {
-          final ElPaginationLink active = tester
-              .widgetList<ElPaginationLink>(
+        ButtonVariant activeVariant() {
+          final PaginationLink active = tester
+              .widgetList<PaginationLink>(
                 find.descendant(
                   of: worked,
-                  matching: find.byType(ElPaginationLink),
+                  matching: find.byType(PaginationLink),
                 ),
               )
-              .singleWhere((ElPaginationLink link) => link.isActive);
+              .singleWhere((PaginationLink link) => link.isActive);
           final Finder activeFinder = find.descendant(
             of: find.byWidget(active),
-            matching: find.byType(ElButton),
+            matching: find.byType(Button),
           );
-          return tester.widget<ElButton>(activeFinder).variant;
+          return tester.widget<Button>(activeFinder).variant;
         }
 
-        expect(activeVariant(), ElButtonVariant.outline);
+        expect(activeVariant(), ButtonVariant.outline);
 
         // Flip the SAME controller in place, not a fresh widget tree: the
         // same object every real theme toggle mutates.
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
         expect(
@@ -460,7 +477,7 @@ void main() {
 
     testWidgets(
       'every cell is Tab-reachable and Enter activates a focused page link, '
-      'inherited whole from ElButton',
+      'inherited whole from Button',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 8000);
         tester.view.devicePixelRatio = 1;
@@ -468,7 +485,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const PaginationDocPage(),
           ),
         );
@@ -480,8 +497,8 @@ void main() {
         await tester.ensureVisible(simple);
         await tester.pump();
 
-        // Every ElPaginationLink cell wraps a genuinely focusable ElButton:
-        // Focus.canRequestFocus tracks ElButton's own _enabled, which is
+        // Every PaginationLink cell wraps a genuinely focusable Button:
+        // Focus.canRequestFocus tracks Button's own _enabled, which is
         // always true here (onTap ?? () {} means onPressed is never null).
         final Iterable<Focus> focusNodes = tester.widgetList<Focus>(
           find.descendant(of: simple, matching: find.byType(Focus)),
@@ -491,21 +508,24 @@ void main() {
 
         // Enter activates a focused page link the same way a tap does: the
         // Preview specimen has real, observable onTap callbacks (Simple's
-        // do not), so request focus on its page-48 cell's own ElButton
+        // do not), so request focus on its page-48 cell's own Button
         // FocusNode directly and send Enter, then read the "current page"
         // text back.
         final Finder worked = find.byKey(
           const ValueKey<String>('pagination-preview:worked-example'),
         );
-        final ElPaginationLink link48 = tester
-            .widgetList<ElPaginationLink>(
-              find.descendant(of: worked, matching: find.byType(ElPaginationLink)),
+        final PaginationLink link48 = tester
+            .widgetList<PaginationLink>(
+              find.descendant(
+                of: worked,
+                matching: find.byType(PaginationLink),
+              ),
             )
-            .firstWhere((ElPaginationLink link) => link.label == '48');
+            .firstWhere((PaginationLink link) => link.label == '48');
         final Finder link48Cell = find.byWidget(link48);
         await tester.ensureVisible(link48Cell);
         await tester.pump();
-        // ElPaginationLink passes no focusNode of its own to the ElButton
+        // PaginationLink passes no focusNode of its own to the Button
         // it wraps, so Focus auto-creates one internally; reach it through
         // a genuine descendant's context (the '48' label itself) rather
         // than the Focus widget's own field, which stays null unset.
@@ -532,7 +552,7 @@ void main() {
       (WidgetTester tester) async {
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const PaginationDocPage(),
           ),
         );

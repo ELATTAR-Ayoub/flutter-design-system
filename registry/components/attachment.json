@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/attachment.dart",
+      "source": "lib/src/components/ui/attachment.dart",
       "target": "@ui/attachment.dart",
-      "sha256": "52adb0e2089bf1d1a549dfadc50af6ae9c81f439a17969a0fbe6718972d174d9"
+      "sha256": "a56235e7b3e1f96d70f41fde37951a34d753090bee9b861ad449511a0eb6ee58"
     }
   ],
   "registryDependencies": [
@@ -30,5 +30,22 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/attachment",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/attachment.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/attachment.dart",
+  "exports": [
+    "Attachment",
+    "AttachmentAction",
+    "AttachmentActions",
+    "AttachmentContent",
+    "AttachmentDescription",
+    "AttachmentGroup",
+    "AttachmentMedia",
+    "AttachmentMediaVariant",
+    "AttachmentOrientation",
+    "AttachmentScope",
+    "AttachmentSize",
+    "AttachmentState",
+    "AttachmentStatusText",
+    "AttachmentTitle",
+    "AttachmentTrigger"
+  ]
 }

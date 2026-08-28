@@ -60,7 +60,7 @@ Weight tokens: `--font-weight-normal: 400; --font-weight-medium: 500; --font-wei
 **Shell — root layout (`app/layout.tsx`) + docs layout (`app/design-system/layout.tsx`):**
 | Icon | Where | Rendered spec |
 |---|---|---|
-| `Menu` | `components/el/el-nav.tsx` `ElMobileNav` trigger (Button variant outline size icon, `lg:hidden`) | via `Icon`, md 16px, stroke 2.4, tone inherit |
+| `Menu` | `components/el/el-nav.tsx` `MobileNav` trigger (Button variant outline size icon, `lg:hidden`) | via `Icon`, md 16px, stroke 2.4, tone inherit |
 | `XIcon` | `components/ui/sheet.tsx` close button inside the mobile nav SheetContent (absolute top-3 right-3, `size="icon-sm"`, sr-only "Close") | via `Icon`, md 16px, stroke 2.4 |
 | `SunIcon`, `MonitorIcon`, `MoonIcon` | `components/el/theme-toggle.tsx` (Light · System · Dark radiogroup, order: light/system/dark) | direct render, `size-3.5` = 14px, stroke 2 |
 | *(custom, not lucide)* logo chevron | `components/el/logo.tsx` `LogoMark` | inline SVG `viewBox="0 0 24 24"`, `size-4` (16px) in a `size-7` (28px) `rounded-md bg-action` tile; path 1 `M6 15.5 12 6l6 9.5` stroke `var(--primary-foreground)` width 2.4 linecap square; path 2 `M6 19h12` stroke `var(--color-value-bright)` width 2.4. Wordmark text: `ELATTAR` + `ELATTAR` in `text-value-ink`, `.type-wordmark` |
@@ -79,7 +79,7 @@ Weight tokens: `--font-weight-normal: 400; --font-weight-medium: 500; --font-wei
 **Spacing `/design-system/spacing`:**
 - Identical set: **Check, X, ArrowLeft, ArrowRight** (DoDont + PageFootNav).
 
-**Images/videos on these five surfaces: NONE.** No `next/image`, `<img>`, or `<video>` anywhere in the shell or the four pages. The only raster the shell references is `app/favicon.ico` (25,931 B, browser tab). Everything visual is CSS/tokens/inline SVG. (The starfield/`bloom-cosmic` textures in globals.css lines 3472–3479 are inline SVG **data URIs** — two layers of white 4-point star paths with exact opacities/transforms, `star-sway` ±6°/`star-sway-alt` ∓5° keyframes — used by toasts/reward surfaces, not by these pages at rest.)
+**Images/videos on these five surfaces: NONE.** No `next/image`, `<img>`, or `<video>` anywhere in the shell or the four pages. The only raster the shell references is `app/favicon.ico` (25,931 B, browser tab). Everything visual is CSS/tokens/inline SVG. (The starfield/`feedback-surface` textures in globals.css lines 3472–3479 are inline SVG **data URIs** — two layers of white 4-point star paths with exact opacities/transforms, `star-sway` ±6°/`star-sway-alt` ∓5° keyframes — used by toasts/reward surfaces, not by these pages at rest.)
 
 ---
 

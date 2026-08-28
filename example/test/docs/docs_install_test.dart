@@ -10,15 +10,27 @@ import 'package:example/components_docs/catalog.dart';
 import 'package:example/docs/docs_code.dart' show DocsCodeFile;
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_snippet.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: ThemeScope(
+      controller: ThemeController(mode: ColorMode.dark),
       child: child,
     ),
   ),
@@ -59,7 +71,7 @@ void main() {
             manualFiles: <DocsCodeFile>[
               DocsCodeFile(
                 path: 'lib/components/ui/button.dart',
-                code: 'class ElButton {}',
+                code: 'class Button {}',
               ),
             ],
           ),
@@ -92,7 +104,7 @@ void main() {
                 path: 'lib/components/ui/button.dart',
                 title: '1. Copy the source',
                 description: "Copy the generated source into components/ui.",
-                code: 'class ElButton {}',
+                code: 'class Button {}',
               ),
             ],
           ),
@@ -130,7 +142,8 @@ void main() {
     expect(
       componentDocs.length,
       greaterThanOrEqualTo(99),
-      reason: 'the command-truth guard must not pass vacuously over an empty catalog',
+      reason:
+          'the command-truth guard must not pass vacuously over an empty catalog',
     );
 
     for (final ComponentDocEntry entry in componentDocs) {

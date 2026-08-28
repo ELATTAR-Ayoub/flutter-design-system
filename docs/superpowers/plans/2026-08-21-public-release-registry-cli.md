@@ -193,7 +193,7 @@ Source mode stores colors in:
 lib/design_system/foundation/colors.dart
 ```
 
-The file separates primitive palette values from semantic roles. Components consume semantic theme colors through `ElTheme.of(context)` and never depend directly on product-specific palette choices.
+The file separates primitive palette values from semantic roles. Components consume semantic theme colors through `Theme.of(context)` and never depend directly on product-specific palette choices.
 
 ### 5.2 Typography
 
@@ -229,7 +229,7 @@ The typed foundation replaces Tailwind's configuration and utilities:
 - Reduced-motion resolution.
 - Shared timing and transition tokens.
 
-Optional motion implementations such as press, lift, swap-in, sliding-pill, and keyframe helpers are registry dependencies installed only when requested or transitively required.
+Optional motion implementations such as press, lift, content-change, active-indicator, and keyframe helpers are registry dependencies installed only when requested or transitively required.
 
 ### 5.5 Assets and shaders
 
@@ -348,11 +348,11 @@ Example:
   "description": "Semantic button with variants, sizes, loading, focus, and disabled states.",
   "files": [
     {
-      "source": "lib/src/components/button.dart",
+      "source": "lib/src/components/ui/button.dart",
       "target": "@ui/button.dart"
     }
   ],
-  "registryDependencies": ["icon", "press-motion"],
+  "registryDependencies": ["icon", "press"],
   "pubDependencies": {},
   "assets": [],
   "shaders": []
@@ -423,7 +423,7 @@ Snapshots are retained for diff and migration workflows. Material deletion shoul
 
 ### 8.4 Import transformation
 
-Registry payloads use logical targets such as `@ui/`, `@foundation/`, `@effects/`, and `@motion/`. The CLI resolves these against `elattar.yaml` and generates valid relative imports for source mode or `package:elattar_core/...` imports for package mode.
+Registry payloads use logical targets such as `@ui/`, `@foundation/`, `@ui/`, and `@ui/`. The CLI resolves these against `elattar.yaml` and generates valid relative imports for source mode or `package:elattar_core/...` imports for package mode.
 
 Components must not embed a consumer package name.
 

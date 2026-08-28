@@ -2,12 +2,12 @@
 /// `components_docs/menu/page.dart`: the public documentation page for the
 /// shared engine `dropdown-menu`, `context-menu` and `menubar` all mount.
 ///
-/// `ElMenuContent` composes an `ElPopover` for its own submenu row, and
-/// `ElPopover` walks up to a real `Overlay` (`Overlay.maybeOf`), so every
+/// `MenuContent` composes an `Popover` for its own submenu row, and
+/// `Popover` walks up to a real `Overlay` (`Overlay.maybeOf`), so every
 /// harness here wraps the page in a `MaterialApp` — the same reason
 /// `select_test.dart` and `dropdown_menu_test.dart` both give.
 ///
-/// No `pumpAndSettle` anywhere a menu specimen is mounted: `ElMenuContent`'s
+/// No `pumpAndSettle` anywhere a menu specimen is mounted: `MenuContent`'s
 /// own submenu can be timer-driven (a hover schedules a 100ms open), and a
 /// `DocsDisclosure` on the same page drives a chevron controller — both are
 /// advanced with an explicit `pump()`/`pump(duration)` pair instead.
@@ -22,34 +22,58 @@ import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_link.dart' show DocsLink, DocsLinkRow;
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: SingleChildScrollView(child: child),
-  ),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: SingleChildScrollView(child: child),
+      ),
+    );
 
-Future<ElThemeController> _pumpMenuDoc(
+Future<ThemeController> _pumpMenuDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   await tester.pumpWidget(
     _harness(
       controller: theme,
@@ -86,7 +110,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 /// `children`, `enabled`, `inset`, `icon`, `onSelect`, `kind`, `value`) are
 /// listed once.
 const List<String> _menuApiParams = <String>[
-  // ElMenuItem.
+  // MenuItem.
   'label',
   'icon',
   'lucideIcon',
@@ -96,16 +120,16 @@ const List<String> _menuApiParams = <String>[
   'enabled',
   'inset',
   'onSelect',
-  // ElMenuCheckboxItem.
+  // MenuCheckboxItem.
   'checked',
-  // ElMenuRadioItem / ElMenuRadioGroup.
+  // MenuRadioItem / MenuRadioGroup.
   'value',
   'children',
   'onChanged',
-  // ElMenuLabel.
+  // MenuLabel.
   'text',
   'child',
-  // ElMenuContent.
+  // MenuContent.
   'onClose',
   'width',
   'minWidth',
@@ -114,26 +138,26 @@ const List<String> _menuApiParams = <String>[
   'autofocus',
   'initialHighlight',
   'onEscape',
-  // ElMenuPointerDown.
+  // MenuPointerDown.
   'onPointerDown',
 ];
 
 const List<String> _menuApiTables = <String>[
-  'ElMenuItem',
-  'ElMenuItemVariant',
-  'ElMenuCheckboxItem',
-  'ElMenuRadioItem',
-  'ElMenuRadioGroup',
-  'ElMenuLabel',
-  'ElMenuSeparator',
-  'ElMenuGroup',
-  'ElMenuSub',
-  'ElMenuIndicatorSide',
-  'ElMenuSurfaceKind',
-  'ElMenuSurface',
-  'ElMenuContent',
-  'ElMenuPointerDown',
-  'ElMenuMotion',
+  'MenuItem',
+  'MenuItemVariant',
+  'MenuCheckboxItem',
+  'MenuRadioItem',
+  'MenuRadioGroup',
+  'MenuLabel',
+  'MenuSeparator',
+  'MenuGroup',
+  'MenuSub',
+  'MenuIndicatorSide',
+  'MenuSurfaceVariant',
+  'MenuSurface',
+  'MenuContent',
+  'MenuPointerDown',
+  'MenuMotion',
 ];
 
 void main() {
@@ -145,27 +169,31 @@ void main() {
       expect(menuDoc.command, 'elattar add menu');
       expect(menuDoc.sourcePath, 'lib/src/components/menu.dart');
       // registry/components/menu.json's own registryDependencies, verbatim.
-      expect(menuDoc.dependencies, <String>['icon', 'popover', 'source-foundation']);
+      expect(menuDoc.dependencies, <String>[
+        'icon',
+        'popover',
+        'source-foundation',
+      ]);
       expect(
         menuDoc.exports,
         containsAll(<String>[
-          'ElMenuChild',
-          'ElMenuItemVariant',
-          'ElMenuItem',
-          'ElMenuCheckboxItem',
-          'ElMenuRadioItem',
-          'ElMenuRadioGroup',
-          'ElMenuLabel',
-          'ElMenuSeparator',
-          'ElMenuGroup',
-          'ElMenuSub',
-          'ElMenuIndicatorSide',
-          'ElMenuSurfaceKind',
-          'ElMenu',
-          'ElMenuSurface',
-          'ElMenuContent',
-          'ElMenuPointerDown',
-          'ElMenuMotion',
+          'MenuChild',
+          'MenuItemVariant',
+          'MenuItem',
+          'MenuCheckboxItem',
+          'MenuRadioItem',
+          'MenuRadioGroup',
+          'MenuLabel',
+          'MenuSeparator',
+          'MenuGroup',
+          'MenuSub',
+          'MenuIndicatorSide',
+          'MenuSurfaceVariant',
+          'Menu',
+          'MenuSurface',
+          'MenuContent',
+          'MenuPointerDown',
+          'MenuMotion',
         ]),
       );
       expect(menuDoc.description, isNot(contains('..')));
@@ -195,7 +223,7 @@ void main() {
         find.byKey(const ValueKey<String>('menu-preview:menubar')),
         findsOneWidget,
       );
-      expect(find.byType(ElMenuContent), findsWidgets);
+      expect(find.byType(MenuContent), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
@@ -274,13 +302,17 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _menuApiParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
         for (final String table in _menuApiTables) {
-          expect(find.textContaining(table), findsWidgets, reason: 'missing $table');
+          expect(
+            find.textContaining(table),
+            findsWidgets,
+            reason: 'missing $table',
+          );
         }
       },
     );
@@ -305,7 +337,7 @@ void main() {
         await tester.pump();
         await tester.tap(depsTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         // Scoped to the DocsLinkRow itself: the sidebar's own component nav
         // renders links with the same names, and a bare find.text('Menubar')
@@ -332,7 +364,7 @@ void main() {
       await tester.pump();
       await tester.tap(keyboardTrigger);
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
       expect(find.textContaining('NO WRAP'), findsWidgets);
       expect(find.textContaining('Tab closes'), findsWidgets);
@@ -347,7 +379,7 @@ void main() {
         onNavigate: (String route) => destination = route,
       );
 
-      final Finder nextLink = find.widgetWithText(ElButton, 'Menubar').last;
+      final Finder nextLink = find.widgetWithText(Button, 'Menubar').last;
       await tester.ensureVisible(nextLink);
       await tester.tap(nextLink);
       expect(destination, '/components/menubar');
@@ -355,88 +387,89 @@ void main() {
   });
 
   group('live specimens', () {
-    testWidgets('the Preview dropdown column commits an item and toggles a check row', (
-      WidgetTester tester,
-    ) async {
-      await _pumpMenuDoc(tester);
+    testWidgets(
+      'the Preview dropdown column commits an item and toggles a check row',
+      (WidgetTester tester) async {
+        await _pumpMenuDoc(tester);
 
-      expect(find.text('Last action: Nothing yet'), findsOneWidget);
+        expect(find.text('Last action: Nothing yet'), findsOneWidget);
 
-      await tester.tap(find.text('Profile'));
-      await tester.pump();
-      expect(find.text('Last action: Profile'), findsOneWidget);
+        await tester.tap(find.text('Profile'));
+        await tester.pump();
+        expect(find.text('Last action: Profile'), findsOneWidget);
 
-      final ElMenuContent dropdown = tester.widget<ElMenuContent>(
-        find.descendant(
-          of: find.byKey(const ValueKey<String>('menu-preview:dropdown')),
-          matching: find.byType(ElMenuContent),
-        ),
-      );
-      expect(dropdown.minWidth, ElMenu.minWidthDropdown);
+        final MenuContent dropdown = tester.widget<MenuContent>(
+          find.descendant(
+            of: find.byKey(const ValueKey<String>('menu-preview:dropdown')),
+            matching: find.byType(MenuContent),
+          ),
+        );
+        expect(dropdown.minWidth, Menu.minWidthDropdown);
 
-      final Finder checkboxRow = find.text('Show sidebar');
-      await tester.ensureVisible(checkboxRow);
-      await tester.pump();
-      await tester.tap(checkboxRow);
-      await tester.pump();
-      // The checkbox commits through onSelect; the row's own checked value
-      // is read back off the rebuilt ElMenuCheckboxItem in the child list.
-      final ElMenuContent dropdownAfter = tester.widget<ElMenuContent>(
-        find.descendant(
-          of: find.byKey(const ValueKey<String>('menu-preview:dropdown')),
-          matching: find.byType(ElMenuContent),
-        ),
-      );
-      final ElMenuCheckboxItem checkbox =
-          dropdownAfter.children.whereType<ElMenuCheckboxItem>().first;
-      expect(checkbox.checked, isFalse);
-    });
+        final Finder checkboxRow = find.text('Show sidebar');
+        await tester.ensureVisible(checkboxRow);
+        await tester.pump();
+        await tester.tap(checkboxRow);
+        await tester.pump();
+        // The checkbox commits through onSelect; the row's own checked value
+        // is read back off the rebuilt MenuCheckboxItem in the child list.
+        final MenuContent dropdownAfter = tester.widget<MenuContent>(
+          find.descendant(
+            of: find.byKey(const ValueKey<String>('menu-preview:dropdown')),
+            matching: find.byType(MenuContent),
+          ),
+        );
+        final MenuCheckboxItem checkbox = dropdownAfter.children
+            .whereType<MenuCheckboxItem>()
+            .first;
+        expect(checkbox.checked, isFalse);
+      },
+    );
 
     testWidgets('the Preview menubar column uses indicatorSide.start', (
       WidgetTester tester,
     ) async {
       await _pumpMenuDoc(tester);
 
-      final ElMenuContent menubar = tester.widget<ElMenuContent>(
+      final MenuContent menubar = tester.widget<MenuContent>(
         find.descendant(
           of: find.byKey(const ValueKey<String>('menu-preview:menubar')),
-          matching: find.byType(ElMenuContent),
+          matching: find.byType(MenuContent),
         ),
       );
-      expect(menubar.indicatorSide, ElMenuIndicatorSide.start);
+      expect(menubar.indicatorSide, MenuIndicatorSide.start);
     });
 
-    testWidgets(
-      'the Preview context column opens its submenu and reads back '
-      'ElMenuSurfaceKind.subBordered — the documented gap',
-      (WidgetTester tester) async {
-        await _pumpMenuDoc(tester, size: const Size(1440, 1400));
+    testWidgets('the Preview context column opens its submenu and reads back '
+        'MenuSurfaceVariant.subBordered — the documented gap', (
+      WidgetTester tester,
+    ) async {
+      await _pumpMenuDoc(tester, size: const Size(1440, 1400));
 
-        // The page's own Surface kinds section mounts a static subBordered
-        // sample regardless of this submenu, so the fact under test is not
-        // "a subBordered surface exists somewhere" but "opening the
-        // submenu adds exactly one more of them" — counted before and
-        // after, rather than singled out through an ancestor chain that
-        // OverlayEntry-based submenu placement makes ambiguous to walk.
-        int subBorderedCount() => tester
-            .widgetList<ElMenuSurface>(find.byType(ElMenuSurface))
-            .where((ElMenuSurface s) => s.kind == ElMenuSurfaceKind.subBordered)
-            .length;
-        final int before = subBorderedCount();
+      // The page's own Surface kinds section mounts a static subBordered
+      // sample regardless of this submenu, so the fact under test is not
+      // "a subBordered surface exists somewhere" but "opening the
+      // submenu adds exactly one more of them" — counted before and
+      // after, rather than singled out through an ancestor chain that
+      // OverlayEntry-based submenu placement makes ambiguous to walk.
+      int subBorderedCount() => tester
+          .widgetList<MenuSurface>(find.byType(MenuSurface))
+          .where((MenuSurface s) => s.kind == MenuSurfaceVariant.subBordered)
+          .length;
+      final int before = subBorderedCount();
 
-        await tester.ensureVisible(find.text('Share'));
-        await tester.pump();
-        await tester.tap(find.text('Share'));
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 150));
-        await tester.pump(ElDurations.overlay);
+      await tester.ensureVisible(find.text('Share'));
+      await tester.pump();
+      await tester.tap(find.text('Share'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+      await tester.pump(MotionDurations.overlayEnter);
 
-        expect(find.text('Copy link'), findsOneWidget);
-        expect(subBorderedCount(), before + 1);
-      },
-    );
+      expect(find.text('Copy link'), findsOneWidget);
+      expect(subBorderedCount(), before + 1);
+    });
 
-    testWidgets('Row kinds mounts one of every ElMenuChild case', (
+    testWidgets('Row kinds mounts one of every MenuChild case', (
       WidgetTester tester,
     ) async {
       await _pumpMenuDoc(tester);
@@ -447,24 +480,24 @@ void main() {
       await tester.ensureVisible(host);
       await tester.pump();
 
-      final ElMenuContent content = tester.widget<ElMenuContent>(
-        find.descendant(of: host, matching: find.byType(ElMenuContent)),
+      final MenuContent content = tester.widget<MenuContent>(
+        find.descendant(of: host, matching: find.byType(MenuContent)),
       );
-      expect(content.children.whereType<ElMenuLabel>(), isNotEmpty);
-      expect(content.children.whereType<ElMenuSeparator>(), isNotEmpty);
-      expect(content.children.whereType<ElMenuGroup>(), isNotEmpty);
-      expect(content.children.whereType<ElMenuCheckboxItem>(), isNotEmpty);
-      expect(content.children.whereType<ElMenuRadioGroup>(), isNotEmpty);
-      expect(content.children.whereType<ElMenuSub>(), isNotEmpty);
+      expect(content.children.whereType<MenuLabel>(), isNotEmpty);
+      expect(content.children.whereType<MenuSeparator>(), isNotEmpty);
+      expect(content.children.whereType<MenuGroup>(), isNotEmpty);
+      expect(content.children.whereType<MenuCheckboxItem>(), isNotEmpty);
+      expect(content.children.whereType<MenuRadioGroup>(), isNotEmpty);
+      expect(content.children.whereType<MenuSub>(), isNotEmpty);
       expect(
-        content.children
-            .whereType<ElMenuItem>()
-            .where((ElMenuItem i) => i.variant == ElMenuItemVariant.destructive),
+        content.children.whereType<MenuItem>().where(
+          (MenuItem i) => i.variant == MenuItemVariant.destructive,
+        ),
         isNotEmpty,
       );
     });
 
-    testWidgets('Surface kinds mounts all three ElMenuSurfaceKind values', (
+    testWidgets('Surface kinds mounts all three MenuSurfaceVariant values', (
       WidgetTester tester,
     ) async {
       await _pumpMenuDoc(tester);
@@ -473,36 +506,35 @@ void main() {
       await tester.ensureVisible(section);
       await tester.pump();
 
-      final Set<ElMenuSurfaceKind> kinds = tester
-          .widgetList<ElMenuSurface>(
-            find.descendant(of: section, matching: find.byType(ElMenuSurface)),
+      final Set<MenuSurfaceVariant> kinds = tester
+          .widgetList<MenuSurface>(
+            find.descendant(of: section, matching: find.byType(MenuSurface)),
           )
-          .map((ElMenuSurface surface) => surface.kind)
+          .map((MenuSurface surface) => surface.kind)
           .toSet();
-      expect(kinds, containsAll(ElMenuSurfaceKind.values));
+      expect(kinds, containsAll(MenuSurfaceVariant.values));
     });
 
-    testWidgets(
-      'Indicator side mounts one end column and one start column',
-      (WidgetTester tester) async {
-        await _pumpMenuDoc(tester);
+    testWidgets('Indicator side mounts one end column and one start column', (
+      WidgetTester tester,
+    ) async {
+      await _pumpMenuDoc(tester);
 
-        final Finder section = _sectionByTitle('Indicator side');
-        await tester.ensureVisible(section);
-        await tester.pump();
+      final Finder section = _sectionByTitle('Indicator side');
+      await tester.ensureVisible(section);
+      await tester.pump();
 
-        final Set<ElMenuIndicatorSide> sides = tester
-            .widgetList<ElMenuContent>(
-              find.descendant(of: section, matching: find.byType(ElMenuContent)),
-            )
-            .map((ElMenuContent content) => content.indicatorSide)
-            .toSet();
-        expect(sides, <ElMenuIndicatorSide>{
-          ElMenuIndicatorSide.end,
-          ElMenuIndicatorSide.start,
-        });
-      },
-    );
+      final Set<MenuIndicatorSide> sides = tester
+          .widgetList<MenuContent>(
+            find.descendant(of: section, matching: find.byType(MenuContent)),
+          )
+          .map((MenuContent content) => content.indicatorSide)
+          .toSet();
+      expect(sides, <MenuIndicatorSide>{
+        MenuIndicatorSide.end,
+        MenuIndicatorSide.start,
+      });
+    });
   });
 
   group('viewport widths', () {
@@ -546,30 +578,30 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpMenuDoc(tester, mode: ElThemeMode.light);
-      expect(find.byType(ElMenuContent), findsWidgets);
+      await _pumpMenuDoc(tester, mode: ColorMode.light);
+      expect(find.byType(MenuContent), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpMenuDoc(tester, mode: ElThemeMode.dark);
-      expect(find.byType(ElMenuContent), findsWidgets);
+      await _pumpMenuDoc(tester, mode: ColorMode.dark);
+      expect(find.byType(MenuContent), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpMenuDoc(
+      final ThemeController theme = await _pumpMenuDoc(
         tester,
-        mode: ElThemeMode.dark,
+        mode: ColorMode.dark,
       );
-      expect(find.byType(ElMenuContent), findsWidgets);
+      expect(find.byType(MenuContent), findsWidgets);
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
-      expect(find.byType(ElMenuContent), findsWidgets);
+      expect(find.byType(MenuContent), findsWidgets);
       expect(tester.takeException(), isNull);
     });
   });

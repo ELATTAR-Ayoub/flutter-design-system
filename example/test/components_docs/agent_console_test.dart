@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -28,14 +52,14 @@ Finder _disclosureTrigger(String title) => find.descendant(
 /// five tables — extracted mechanically from `page.dart` so this list
 /// cannot silently drift from what the page actually renders.
 const List<String> _agentConsoleApiFactNames = <String>[
-  'ElAgentConsole.gap',
-  'ElAgentConsole.headerGap',
-  'ElAgentConsole.headerInset',
-  'ElAgentConsole.padding',
-  'ElAgentConsole.pinTolerance',
-  'ElAgentConsole.scrollerInset',
-  'ElAgentConsole.turnGap',
-  'ElAgentFeatures.all',
+  'AgentConsole.gap',
+  'AgentConsole.headerGap',
+  'AgentConsole.headerInset',
+  'AgentConsole.padding',
+  'AgentConsole.pinTolerance',
+  'AgentConsole.scrollerInset',
+  'AgentConsole.turnGap',
+  'AgentFeatures.all',
   'accent',
   'attachments',
   'avatar',
@@ -77,7 +101,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: AgentConsoleDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -95,13 +119,13 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String name in _agentConsoleApiFactNames) {
           expect(find.text(name), findsWidgets, reason: 'missing $name');
         }
 
-        // Preview: a real console over a real ElMockTransport. It starts
+        // Preview: a real console over a real MockTransport. It starts
         // with an empty transcript, so the welcome card renders with the
         // real persona, suggestion and skill this page configured.
         //
@@ -136,13 +160,13 @@ void main() {
         final Finder previewSend = find.descendant(
           of: preview,
           matching: find.byWidgetPredicate(
-            (Widget w) => w is ElButton && w.label == 'Send',
+            (Widget w) => w is Button && w.label == 'Send',
           ),
         );
-        expect(tester.widget<ElButton>(previewSend).onPressed, isNull);
+        expect(tester.widget<Button>(previewSend).onPressed, isNull);
         await tester.enterText(previewInput, 'How much is Eclipse Vault?');
         await tester.pump();
-        expect(tester.widget<ElButton>(previewSend).onPressed, isNotNull);
+        expect(tester.widget<Button>(previewSend).onPressed, isNotNull);
 
         // Features: every switch off — no avatar/header row, no
         // suggestions, no model picker, no reset/stop command. The
@@ -167,9 +191,7 @@ void main() {
           findsOneWidget,
         );
         expect(
-          find.byKey(
-            const ValueKey<String>('agent-console-height-minimal'),
-          ),
+          find.byKey(const ValueKey<String>('agent-console-height-minimal')),
           findsOneWidget,
         );
 
@@ -177,10 +199,10 @@ void main() {
         expect(
           agentConsoleDoc.exports,
           containsAll(<String>[
-            'ElAgentConsole',
-            'ElAgentFeatures',
-            'ElAgentPersona',
-            'ElAgentModel',
+            'AgentConsole',
+            'AgentFeatures',
+            'AgentPersona',
+            'AgentModel',
           ]),
         );
         expect(agentConsoleDoc.command, 'elattar add agent-console');
@@ -188,31 +210,32 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 6000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentConsoleDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentConsoleDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Four specimen stages: Preview, Features, Header slot, Height.
-        expect(find.byType(DocsShowcase), findsNWidgets(4));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Four specimen stages: Preview, Features, Header slot, Height.
+      expect(find.byType(DocsShowcase), findsNWidgets(4));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
-        agentConsoleDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        agentConsoleDocSpec.toc
+            .map((DocsTocEntry entry) => entry.title)
+            .toList(),
         <String>[
           'Preview',
           'Installation',
@@ -238,44 +261,43 @@ void main() {
       );
     });
 
-    testWidgets(
-      'sections render in declaration order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentConsoleDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentConsoleDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, <String>[
-          'Preview',
-          'Installation',
-          'Usage',
-          'Features',
-          'Header slot',
-          'Height',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Keyboard',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
-      },
-    );
+      expect(titles, <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'Features',
+        'Header slot',
+        'Height',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -286,7 +308,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const AgentConsoleDocPage(),
           ),
         );
@@ -315,24 +337,24 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const AgentConsoleDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-console-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-console-doc-article')),
           ),

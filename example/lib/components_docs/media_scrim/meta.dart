@@ -1,12 +1,12 @@
 /// Public documentation metadata for the `media-scrim` effect.
 ///
-/// `media-scrim` HAS a real `registry/effects/media-scrim.json` manifest:
+/// `media-scrim` HAS a real `registry/components/media-scrim.json` manifest:
 /// [dependencies] below is that manifest's own `registryDependencies` list,
 /// copied verbatim: `source-foundation`. `page.dart` renders the real
 /// `elattar add media-scrim` command from it.
 ///
-/// Not a component: `lib/src/effects/media_scrim.dart` exports one
-/// `StatelessWidget`, `ElMediaScrim`, with no variant, no size, and exactly
+/// Not a component: `lib/src/components/ui/media_scrim.dart` exports one
+/// `StatelessWidget`, `MediaScrim`, with no variant, no size, and exactly
 /// one constructor parameter (`child`). It is a sizing-preserving,
 /// top-to-bottom readability gradient for copy placed directly on media —
 /// the same treatment `showcase_reels.dart`'s reels overlay uses.
@@ -22,8 +22,8 @@ const ComponentDocEntry mediaScrimDoc = ComponentDocEntry(
       'readable without adding an opaque information card: fully '
       'transparent at the top, rising to a readable neutral ink only '
       'toward the bottom edge.',
-  // registry/effects/media-scrim.json's own registryDependencies, verbatim.
+  // registry/components/media-scrim.json's own registryDependencies, verbatim.
   dependencies: <String>['source-foundation'],
-  exports: <String>['ElMediaScrim'],
-  sourcePath: 'lib/src/effects/media_scrim.dart',
+  exports: <String>['MediaScrim'],
+  sourcePath: 'lib/src/components/ui/media_scrim.dart',
 );

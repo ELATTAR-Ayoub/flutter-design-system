@@ -7,16 +7,16 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/select.dart",
+      "source": "lib/src/components/ui/select.dart",
       "target": "@ui/select.dart",
-      "sha256": "85e960c69d929988c6dbba075be41e276736b5671d946e2f32d43e0c6509c2d3"
+      "sha256": "d0f62fb317e8a844d22142cc471d00a4aa182a3f4128bdaf79a7dcef30ae98a5"
     }
   ],
   "registryDependencies": [
     "button",
     "field",
     "icon",
-    "machine-surface",
+    "surface",
     "popover",
     "source-foundation"
   ],
@@ -25,20 +25,20 @@
     "button",
     "field",
     "icon",
-    "machine-surface",
+    "surface",
     "popover"
   ],
   "assets": [],
   "fonts": [],
   "shaders": [],
   "exports": [
-    "ElSelect",
-    "ElSelectSize",
-    "ElSelectOption",
-    "ElSelectGroup",
-    "ElSelectSeparator",
-    "ElSelectMenu"
+    "Select",
+    "SelectSize",
+    "SelectOption",
+    "SelectGroup",
+    "SelectSeparator",
+    "SelectMenu"
   ],
   "documentationRoute": "/components/select",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/select.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/select.dart"
 }

@@ -1,6 +1,6 @@
 /// Public documentation page for the `radio` (radio group) component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` established. Every specimen
@@ -28,12 +28,24 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart' show ElStateCell;
+import '../../kit.dart' show StateCell;
 import 'meta.dart';
 
 final ComponentDocSpec radioDocSpec = ComponentDocSpec(
@@ -41,15 +53,15 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
   title: radioDoc.title,
   description:
       'An exclusive choice among a small, fully visible set of mutually '
-      'exclusive options, built from real ElRadioGroup and ElRadioGroupItem '
+      'exclusive options, built from real RadioGroup and RadioGroupItem '
       'widgets.',
   sections: <DocsPageSection>[
     ShowcaseSection(
       id: 'preview',
       title: 'Preview',
       description:
-          'Six live specimens, all built from real ElRadioGroup and '
-          'ElRadioGroupItem widgets. Payout rhythm, Focus-visible and Error '
+          'Six live specimens, all built from real RadioGroup and '
+          'RadioGroupItem widgets. Payout rhythm, Focus-visible and Error '
           'are operable: tap an option. Disabled, Disabled (selected) and '
           'Group disabled are deliberately inert; all three are explained '
           'in States below.',
@@ -81,7 +93,7 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElRadioGroup and ElRadioGroupItem '
+              'Add the export line so RadioGroup and RadioGroupItem '
               'are reachable the same way the CLI path already makes '
               'them.',
           code: "export 'radio.dart';",
@@ -92,11 +104,11 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'A bare ElRadioGroupItem renders no visible text of its own, its '
+          'A bare RadioGroupItem renders no visible text of its own, its '
           'label only supplies the accessible name, the same rule '
-          'ElCheckbox follows. The composed-forms pattern below (see '
-          'Composition) pairs a ElFieldSet and ElFieldLegend for the '
-          'group\'s visible caption with one horizontal ElField per item '
+          'Checkbox follows. The composed-forms pattern below (see '
+          'Composition) pairs a FieldSet and FieldLegend for the '
+          'group\'s visible caption with one horizontal Field per item '
           'for each option\'s own visible label.',
       code: _smallestUsageCode,
     ),
@@ -105,9 +117,9 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
       title: 'Composition',
       description:
           'The shape every fieldset example on this page builds on: a '
-          'ElRadioGroup owns the value, a ElFieldSet and ElFieldLegend '
+          'RadioGroup owns the value, a FieldSet and FieldLegend '
           'give the group its visible caption, and each option is a '
-          'horizontal ElField wrapping one ElRadioGroupItem.',
+          'horizontal Field wrapping one RadioGroupItem.',
       specimen: _CompositionSpecimen(),
       code: _fieldSetUsageCode,
       label: 'Composition specimen view',
@@ -116,8 +128,8 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
       id: 'description',
       title: 'Description',
       description:
-          'A one-line description per option, the same ElField.'
-          'description prop ElCheckbox and every other field-composed '
+          'A one-line description per option, the same Field.'
+          'description prop Checkbox and every other field-composed '
           'control reads.',
       specimen: _DescriptionSpecimen(),
       code: _descriptionUsageCode,
@@ -127,8 +139,8 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
       id: 'choice-card',
       title: 'Choice Card',
       description:
-          'ElRadioGroupItem has no card variant of its own, but a ElCard '
-          'wrapping a horizontal ElField composes one: the field\'s own '
+          'RadioGroupItem has no card variant of its own, but a Card '
+          'wrapping a horizontal Field composes one: the field\'s own '
           'label-tap wiring still selects the item, the card only '
           'supplies the border.',
       specimen: _ChoiceCardSpecimen(),
@@ -139,9 +151,9 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
       id: 'fieldset',
       title: 'Fieldset',
       description:
-          'The full grouped shape: a ElFieldSet and ElFieldLegend for the '
-          'group\'s own visible caption, one horizontal ElField per '
-          'option, and a ElFieldError row that mounts only once there is '
+          'The full grouped shape: a FieldSet and FieldLegend for the '
+          'group\'s own visible caption, one horizontal Field per '
+          'option, and a FieldError row that mounts only once there is '
           'an error to show.',
       specimen: _FieldsetSpecimen(),
       code: _shippingMethodCode,
@@ -173,10 +185,10 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Neither ElRadioGroup nor ElRadioGroupItem takes a variant or '
-          'size parameter: ElRadioGroupItem.size fixes one 20px geometry, '
-          'level with ElCheckbox, and there is no third "held" state the '
-          'way ElCheckbox has an inert flag.',
+          'Neither RadioGroup nor RadioGroupItem takes a variant or '
+          'size parameter: RadioGroupItem.size fixes one 20px geometry, '
+          'level with Checkbox, and there is no third "held" state the '
+          'way Checkbox has an inert flag.',
       child: _ApiReferenceContent(),
     ),
     DisclosureSection(
@@ -233,7 +245,7 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
             label: 'Shared machinery',
             value: 'lib/src/components/selection_control.dart',
             description:
-                'ElSelectionControl, ElHitArea and ElJellyReplay, shared '
+                'SelectionControl, HitArea and StateChangeFeedback, shared '
                 'with the checkbox and switch families and documented on '
                 'their own component pages.',
           ),
@@ -242,8 +254,8 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
             value: 'test/selection_feedback_test.dart',
             description:
                 'State-matrix, arrow-key traversal, roving-tabindex and '
-                'field-adoption coverage for ElRadioGroup and '
-                'ElRadioGroupItem in the package itself.',
+                'field-adoption coverage for RadioGroup and '
+                'RadioGroupItem in the package itself.',
           ),
           const DocsInstallFact(
             label: 'Docs page tests',
@@ -272,9 +284,9 @@ class RadioDocPage extends StatelessWidget {
       title: radioDocSpec.title,
       description: radioDocSpec.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Radio group'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Radio group'),
     ],
     toc: radioDocSpec.toc,
     previous: const DocsPageLink(
@@ -309,32 +321,32 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(3),
-    runSpacing: el(3),
+    spacing: space(3),
+    runSpacing: space(3),
     children: <Widget>[
-      ElStateCell(
+      StateCell(
         label: 'Payout rhythm',
         note: 'Tap an option: the previous one deselects',
-        child: ElRadioGroup<String>(
+        child: RadioGroup<String>(
           key: const ValueKey<String>('radio-live-specimen'),
           value: _payout,
           label: 'Payout rhythm',
           onChanged: (String next) => setState(() => _payout = next),
           children: const <Widget>[
-            ElRadioGroupItem<String>(value: 'daily', label: 'Daily'),
-            ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
-            ElRadioGroupItem<String>(value: 'monthly', label: 'Monthly'),
+            RadioGroupItem<String>(value: 'daily', label: 'Daily'),
+            RadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+            RadioGroupItem<String>(value: 'monthly', label: 'Monthly'),
           ],
         ),
       ),
-      ElStateCell(
+      StateCell(
         label: 'Focus-visible',
         note: 'Ring painted, not focused',
-        child: ElRadioGroup<String>(
+        child: RadioGroup<String>(
           value: _focusValue,
           onChanged: (String next) => setState(() => _focusValue = next),
           children: <Widget>[
-            ElRadioGroupItem<String>(
+            RadioGroupItem<String>(
               value: 'focus',
               forceFocusRing: true,
               label: 'Focus-visible',
@@ -342,27 +354,27 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           ],
         ),
       ),
-      ElStateCell(
+      StateCell(
         label: 'Error',
         note: 'invalid: true',
-        child: ElRadioGroup<String>(
+        child: RadioGroup<String>(
           value: _errorValue,
           invalid: true,
           onChanged: (String next) => setState(() => _errorValue = next),
           children: const <Widget>[
-            ElRadioGroupItem<String>(value: 'daily', label: 'Daily'),
-            ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+            RadioGroupItem<String>(value: 'daily', label: 'Daily'),
+            RadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
           ],
         ),
       ),
-      ElStateCell(
+      StateCell(
         label: 'Disabled',
         note: 'enabled: false on the item itself',
-        child: ElRadioGroup<String>(
+        child: RadioGroup<String>(
           value: null,
           onChanged: (String _) {},
           children: const <Widget>[
-            ElRadioGroupItem<String>(
+            RadioGroupItem<String>(
               value: 'daily',
               enabled: false,
               label: 'Disabled',
@@ -370,14 +382,14 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           ],
         ),
       ),
-      ElStateCell(
+      StateCell(
         label: 'Disabled (selected)',
         note: 'enabled: false, and it is the group\'s value',
-        child: ElRadioGroup<String>(
+        child: RadioGroup<String>(
           value: 'daily',
           onChanged: (String _) {},
           children: const <Widget>[
-            ElRadioGroupItem<String>(
+            RadioGroupItem<String>(
               value: 'daily',
               enabled: false,
               label: 'Disabled selected',
@@ -385,14 +397,14 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           ],
         ),
       ),
-      const ElStateCell(
+      const StateCell(
         label: 'Group disabled',
         note: 'onChanged: null: no item in the group can be operated',
-        child: ElRadioGroup<String>(
+        child: RadioGroup<String>(
           value: 'weekly',
           onChanged: null,
           children: <Widget>[
-            ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+            RadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
           ],
         ),
       ),
@@ -404,44 +416,44 @@ const String _previewCode = '''Wrap(
   spacing: 12,
   runSpacing: 12,
   children: [
-    ElRadioGroup<String>(
+    RadioGroup<String>(
       value: payout,
       label: 'Payout rhythm',
       onChanged: (next) => setState(() => payout = next),
       children: const [
-        ElRadioGroupItem<String>(value: 'daily', label: 'Daily'),
-        ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
-        ElRadioGroupItem<String>(value: 'monthly', label: 'Monthly'),
+        RadioGroupItem<String>(value: 'daily', label: 'Daily'),
+        RadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+        RadioGroupItem<String>(value: 'monthly', label: 'Monthly'),
       ],
     ),
-    ElRadioGroup<String>(
+    RadioGroup<String>(
       value: null,
       onChanged: (_) {},
       children: const [
-        ElRadioGroupItem<String>(
+        RadioGroupItem<String>(
           value: 'daily',
           enabled: false,
           label: 'Disabled',
         ),
       ],
     ),
-    const ElRadioGroup<String>(
+    const RadioGroup<String>(
       value: 'weekly',
       onChanged: null,
-      children: [ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly')],
+      children: [RadioGroupItem<String>(value: 'weekly', label: 'Weekly')],
     ),
   ],
 )''';
 
 const String _smallestUsageCode = '''String? payout;
 
-ElRadioGroup<String>(
+RadioGroup<String>(
   value: payout,
   label: 'Payout rhythm',
   onChanged: (String next) => setState(() => payout = next),
   children: const <Widget>[
-    ElRadioGroupItem<String>(value: 'daily', label: 'Daily'),
-    ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+    RadioGroupItem<String>(value: 'daily', label: 'Daily'),
+    RadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
   ],
 )''';
 
@@ -463,26 +475,26 @@ class _CompositionSpecimenState extends State<_CompositionSpecimen> {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      const ElFieldLegend('Payout rhythm'),
-      SizedBox(height: ElFieldLegend.spaceBelow),
-      ElFieldSet(
+      const FieldLegend('Payout rhythm'),
+      SizedBox(height: FieldLegend.spaceBelow),
+      FieldSet(
         tightForGroup: true,
         children: <Widget>[
-          ElRadioGroup<String>(
+          RadioGroup<String>(
             value: _payout,
-            gap: ElFieldSet.groupGap,
+            gap: FieldSet.groupGap,
             label: 'Payout rhythm',
             onChanged: (String next) => setState(() => _payout = next),
             children: <Widget>[
-              ElField(
+              Field(
                 label: 'Daily',
-                orientation: ElFieldOrientation.horizontal,
-                child: const ElRadioGroupItem<String>(value: 'daily'),
+                orientation: FieldOrientation.horizontal,
+                child: const RadioGroupItem<String>(value: 'daily'),
               ),
-              ElField(
+              Field(
                 label: 'Weekly',
-                orientation: ElFieldOrientation.horizontal,
-                child: const ElRadioGroupItem<String>(value: 'weekly'),
+                orientation: FieldOrientation.horizontal,
+                child: const RadioGroupItem<String>(value: 'weekly'),
               ),
             ],
           ),
@@ -498,26 +510,26 @@ Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   mainAxisSize: MainAxisSize.min,
   children: <Widget>[
-    const ElFieldLegend('Payout rhythm'),
-    SizedBox(height: ElFieldLegend.spaceBelow),
-    ElFieldSet(
+    const FieldLegend('Payout rhythm'),
+    SizedBox(height: FieldLegend.spaceBelow),
+    FieldSet(
       tightForGroup: true,
       children: <Widget>[
-        ElRadioGroup<String>(
+        RadioGroup<String>(
           value: payout,
-          gap: ElFieldSet.groupGap,
+          gap: FieldSet.groupGap,
           label: 'Payout rhythm',
           onChanged: (String next) => setState(() => payout = next),
           children: const <Widget>[
-            ElField(
+            Field(
               label: 'Daily',
-              orientation: ElFieldOrientation.horizontal,
-              child: ElRadioGroupItem<String>(value: 'daily'),
+              orientation: FieldOrientation.horizontal,
+              child: RadioGroupItem<String>(value: 'daily'),
             ),
-            ElField(
+            Field(
               label: 'Weekly',
-              orientation: ElFieldOrientation.horizontal,
-              child: ElRadioGroupItem<String>(value: 'weekly'),
+              orientation: FieldOrientation.horizontal,
+              child: RadioGroupItem<String>(value: 'weekly'),
             ),
           ],
         ),
@@ -541,28 +553,28 @@ class _DescriptionSpecimenState extends State<_DescriptionSpecimen> {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      const ElFieldLegend('Digest frequency'),
-      SizedBox(height: ElFieldLegend.spaceBelow),
-      ElFieldSet(
+      const FieldLegend('Digest frequency'),
+      SizedBox(height: FieldLegend.spaceBelow),
+      FieldSet(
         tightForGroup: true,
         children: <Widget>[
-          ElRadioGroup<String>(
+          RadioGroup<String>(
             value: _frequency,
-            gap: ElFieldSet.groupGap,
+            gap: FieldSet.groupGap,
             label: 'Digest frequency',
             onChanged: (String next) => setState(() => _frequency = next),
             children: <Widget>[
-              ElField(
+              Field(
                 label: 'Daily',
                 description: 'One email every morning.',
-                orientation: ElFieldOrientation.horizontal,
-                child: const ElRadioGroupItem<String>(value: 'daily'),
+                orientation: FieldOrientation.horizontal,
+                child: const RadioGroupItem<String>(value: 'daily'),
               ),
-              ElField(
+              Field(
                 label: 'Weekly',
                 description: 'One email every Monday.',
-                orientation: ElFieldOrientation.horizontal,
-                child: const ElRadioGroupItem<String>(value: 'weekly'),
+                orientation: FieldOrientation.horizontal,
+                child: const RadioGroupItem<String>(value: 'weekly'),
               ),
             ],
           ),
@@ -578,28 +590,28 @@ Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   mainAxisSize: MainAxisSize.min,
   children: <Widget>[
-    const ElFieldLegend('Digest frequency'),
-    SizedBox(height: ElFieldLegend.spaceBelow),
-    ElFieldSet(
+    const FieldLegend('Digest frequency'),
+    SizedBox(height: FieldLegend.spaceBelow),
+    FieldSet(
       tightForGroup: true,
       children: <Widget>[
-        ElRadioGroup<String>(
+        RadioGroup<String>(
           value: frequency,
-          gap: ElFieldSet.groupGap,
+          gap: FieldSet.groupGap,
           label: 'Digest frequency',
           onChanged: (String next) => setState(() => frequency = next),
           children: const <Widget>[
-            ElField(
+            Field(
               label: 'Daily',
               description: 'One email every morning.',
-              orientation: ElFieldOrientation.horizontal,
-              child: ElRadioGroupItem<String>(value: 'daily'),
+              orientation: FieldOrientation.horizontal,
+              child: RadioGroupItem<String>(value: 'daily'),
             ),
-            ElField(
+            Field(
               label: 'Weekly',
               description: 'One email every Monday.',
-              orientation: ElFieldOrientation.horizontal,
-              child: ElRadioGroupItem<String>(value: 'weekly'),
+              orientation: FieldOrientation.horizontal,
+              child: RadioGroupItem<String>(value: 'weekly'),
             ),
           ],
         ),
@@ -619,44 +631,44 @@ class _ChoiceCardSpecimenState extends State<_ChoiceCardSpecimen> {
   String? _plan = 'pro';
 
   @override
-  Widget build(BuildContext context) => ElRadioGroup<String>(
+  Widget build(BuildContext context) => RadioGroup<String>(
     value: _plan,
     label: 'Plan',
-    gap: el(3),
+    gap: space(3),
     onChanged: (String next) => setState(() => _plan = next),
     children: <Widget>[
-      ElCard(
+      Card(
         children: <Widget>[
-          ElCardContent(
-            child: ElField(
+          CardContent(
+            child: Field(
               label: 'Free',
               description: 'For trying things out.',
-              orientation: ElFieldOrientation.horizontal,
-              child: const ElRadioGroupItem<String>(value: 'free'),
+              orientation: FieldOrientation.horizontal,
+              child: const RadioGroupItem<String>(value: 'free'),
             ),
           ),
         ],
       ),
-      ElCard(
+      Card(
         children: <Widget>[
-          ElCardContent(
-            child: ElField(
+          CardContent(
+            child: Field(
               label: 'Pro',
               description: 'For a team that ships every week.',
-              orientation: ElFieldOrientation.horizontal,
-              child: const ElRadioGroupItem<String>(value: 'pro'),
+              orientation: FieldOrientation.horizontal,
+              child: const RadioGroupItem<String>(value: 'pro'),
             ),
           ),
         ],
       ),
-      ElCard(
+      Card(
         children: <Widget>[
-          ElCardContent(
-            child: ElField(
+          CardContent(
+            child: Field(
               label: 'Vault',
               description: 'For everything that must never move.',
-              orientation: ElFieldOrientation.horizontal,
-              child: const ElRadioGroupItem<String>(value: 'vault'),
+              orientation: FieldOrientation.horizontal,
+              child: const RadioGroupItem<String>(value: 'vault'),
             ),
           ),
         ],
@@ -667,44 +679,44 @@ class _ChoiceCardSpecimenState extends State<_ChoiceCardSpecimen> {
 
 const String _choiceCardCode = '''String? plan = 'pro';
 
-ElRadioGroup<String>(
+RadioGroup<String>(
   value: plan,
   label: 'Plan',
-  gap: el(3),
+  gap: space(3),
   onChanged: (String next) => setState(() => plan = next),
   children: <Widget>[
-    ElCard(
+    Card(
       children: <Widget>[
-        ElCardContent(
-          child: ElField(
+        CardContent(
+          child: Field(
             label: 'Free',
             description: 'For trying things out.',
-            orientation: ElFieldOrientation.horizontal,
-            child: const ElRadioGroupItem<String>(value: 'free'),
+            orientation: FieldOrientation.horizontal,
+            child: const RadioGroupItem<String>(value: 'free'),
           ),
         ),
       ],
     ),
-    ElCard(
+    Card(
       children: <Widget>[
-        ElCardContent(
-          child: ElField(
+        CardContent(
+          child: Field(
             label: 'Pro',
             description: 'For a team that ships every week.',
-            orientation: ElFieldOrientation.horizontal,
-            child: const ElRadioGroupItem<String>(value: 'pro'),
+            orientation: FieldOrientation.horizontal,
+            child: const RadioGroupItem<String>(value: 'pro'),
           ),
         ),
       ],
     ),
-    ElCard(
+    Card(
       children: <Widget>[
-        ElCardContent(
-          child: ElField(
+        CardContent(
+          child: Field(
             label: 'Vault',
             description: 'For everything that must never move.',
-            orientation: ElFieldOrientation.horizontal,
-            child: const ElRadioGroupItem<String>(value: 'vault'),
+            orientation: FieldOrientation.horizontal,
+            child: const RadioGroupItem<String>(value: 'vault'),
           ),
         ),
       ],
@@ -728,37 +740,37 @@ class _FieldsetSpecimenState extends State<_FieldsetSpecimen> {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      const ElFieldLegend('Shipping method'),
-      SizedBox(height: ElFieldLegend.spaceBelow),
-      ElFieldSet(
+      const FieldLegend('Shipping method'),
+      SizedBox(height: FieldLegend.spaceBelow),
+      FieldSet(
         tightForGroup: true,
         children: <Widget>[
-          ElRadioGroup<String>(
+          RadioGroup<String>(
             value: _method,
-            gap: ElFieldSet.groupGap,
+            gap: FieldSet.groupGap,
             invalid: _errors.isNotEmpty,
             label: 'Shipping method',
             hint: _errors.isEmpty ? null : _errors.join(' '),
             onChanged: (String next) => setState(() => _method = next),
             children: <Widget>[
-              ElField(
+              Field(
                 label: 'Standard, 5 to 7 days',
-                orientation: ElFieldOrientation.horizontal,
-                child: const ElRadioGroupItem<String>(value: 'standard'),
+                orientation: FieldOrientation.horizontal,
+                child: const RadioGroupItem<String>(value: 'standard'),
               ),
-              ElField(
+              Field(
                 label: 'Express, 2 days',
-                orientation: ElFieldOrientation.horizontal,
-                child: const ElRadioGroupItem<String>(value: 'express'),
+                orientation: FieldOrientation.horizontal,
+                child: const RadioGroupItem<String>(value: 'express'),
               ),
-              ElField(
+              Field(
                 label: 'Overnight',
-                orientation: ElFieldOrientation.horizontal,
-                child: const ElRadioGroupItem<String>(value: 'overnight'),
+                orientation: FieldOrientation.horizontal,
+                child: const RadioGroupItem<String>(value: 'overnight'),
               ),
             ],
           ),
-          if (_errors.isNotEmpty) ElFieldError(_errors),
+          if (_errors.isNotEmpty) FieldError(_errors),
         ],
       ),
     ],
@@ -772,37 +784,37 @@ Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   mainAxisSize: MainAxisSize.min,
   children: <Widget>[
-    const ElFieldLegend('Shipping method'),
-    SizedBox(height: ElFieldLegend.spaceBelow),
-    ElFieldSet(
+    const FieldLegend('Shipping method'),
+    SizedBox(height: FieldLegend.spaceBelow),
+    FieldSet(
       tightForGroup: true,
       children: <Widget>[
-        ElRadioGroup<String>(
+        RadioGroup<String>(
           value: method,
-          gap: ElFieldSet.groupGap,
+          gap: FieldSet.groupGap,
           invalid: errors.isNotEmpty,
           label: 'Shipping method',
           hint: errors.isEmpty ? null : errors.join(' '),
           onChanged: (String next) => setState(() => method = next),
           children: const <Widget>[
-            ElField(
+            Field(
               label: 'Standard, 5 to 7 days',
-              orientation: ElFieldOrientation.horizontal,
-              child: ElRadioGroupItem<String>(value: 'standard'),
+              orientation: FieldOrientation.horizontal,
+              child: RadioGroupItem<String>(value: 'standard'),
             ),
-            ElField(
+            Field(
               label: 'Express, 2 days',
-              orientation: ElFieldOrientation.horizontal,
-              child: ElRadioGroupItem<String>(value: 'express'),
+              orientation: FieldOrientation.horizontal,
+              child: RadioGroupItem<String>(value: 'express'),
             ),
-            ElField(
+            Field(
               label: 'Overnight',
-              orientation: ElFieldOrientation.horizontal,
-              child: ElRadioGroupItem<String>(value: 'overnight'),
+              orientation: FieldOrientation.horizontal,
+              child: RadioGroupItem<String>(value: 'overnight'),
             ),
           ],
         ),
-        if (errors.isNotEmpty) ElFieldError(errors),
+        if (errors.isNotEmpty) FieldError(errors),
       ],
     ),
   ],
@@ -812,22 +824,22 @@ class _DisabledSpecimen extends StatelessWidget {
   const _DisabledSpecimen();
 
   @override
-  Widget build(BuildContext context) => const ElRadioGroup<String>(
+  Widget build(BuildContext context) => const RadioGroup<String>(
     value: null,
     onChanged: null,
     children: <Widget>[
-      ElRadioGroupItem<String>(value: 'daily', label: 'Daily'),
-      ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+      RadioGroupItem<String>(value: 'daily', label: 'Daily'),
+      RadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
     ],
   );
 }
 
-const String _disabledUsageCode = '''ElRadioGroup<String>(
+const String _disabledUsageCode = '''RadioGroup<String>(
   value: null,
   onChanged: null,
   children: const <Widget>[
-    ElRadioGroupItem<String>(value: 'daily', label: 'Daily'),
-    ElRadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
+    RadioGroupItem<String>(value: 'daily', label: 'Daily'),
+    RadioGroupItem<String>(value: 'weekly', label: 'Weekly'),
   ],
 )''';
 
@@ -842,26 +854,26 @@ class _InvalidSpecimenState extends State<_InvalidSpecimen> {
   String? _method;
 
   @override
-  Widget build(BuildContext context) => ElRadioGroup<String>(
+  Widget build(BuildContext context) => RadioGroup<String>(
     value: _method,
     invalid: true,
     hint: 'Choose a shipping method.',
     onChanged: (String next) => setState(() => _method = next),
     children: const <Widget>[
-      ElRadioGroupItem<String>(value: 'standard', label: 'Standard'),
-      ElRadioGroupItem<String>(value: 'express', label: 'Express'),
+      RadioGroupItem<String>(value: 'standard', label: 'Standard'),
+      RadioGroupItem<String>(value: 'express', label: 'Express'),
     ],
   );
 }
 
-const String _invalidUsageCode = '''ElRadioGroup<String>(
+const String _invalidUsageCode = '''RadioGroup<String>(
   value: method,
   invalid: true,
   hint: 'Choose a shipping method.',
   onChanged: (String next) => setState(() => method = next),
   children: const <Widget>[
-    ElRadioGroupItem<String>(value: 'standard', label: 'Standard'),
-    ElRadioGroupItem<String>(value: 'express', label: 'Express'),
+    RadioGroupItem<String>(value: 'standard', label: 'Standard'),
+    RadioGroupItem<String>(value: 'express', label: 'Express'),
   ],
 )''';
 
@@ -874,13 +886,13 @@ class _ApiReferenceContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const DocsApiTable(title: 'ElRadioGroup<T>', facts: _radioGroupFacts),
-      SizedBox(height: el(5)),
+      const DocsApiTable(title: 'RadioGroup<T>', facts: _radioGroupFacts),
+      SizedBox(height: space(5)),
       const DocsApiTable(
-        title: 'ElRadioGroupItem<T>',
+        title: 'RadioGroupItem<T>',
         facts: _radioGroupItemFacts,
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsApiTable(title: 'Static helpers', facts: _staticFacts),
     ],
   );
@@ -906,8 +918,8 @@ const List<DocsApiFact> _radioGroupFacts = <DocsApiFact>[
     name: 'children',
     type: 'List<Widget>',
     description:
-        'The rows. Each holds a ElRadioGroupItem<T> somewhere inside it: '
-        'either bare, or wrapped in its own ElField for a visible '
+        'The rows. Each holds a RadioGroupItem<T> somewhere inside it: '
+        'either bare, or wrapped in its own Field for a visible '
         'per-option label.',
   ),
   DocsApiFact(
@@ -915,23 +927,23 @@ const List<DocsApiFact> _radioGroupFacts = <DocsApiFact>[
     type: 'double?',
     description:
         'The vertical space between rows. Defaults to '
-        'ElRadioGroup.defaultGap (8px); the composed forms page passes '
-        'ElFieldSet.groupGap (12px) instead.',
+        'RadioGroup.defaultGap (8px); the composed forms page passes '
+        'FieldSet.groupGap (12px) instead.',
   ),
   DocsApiFact(
     name: 'enabled',
     type: 'bool',
     description:
         'Defaults to true. Disables every item; ANDed with the enclosing '
-        'ElFieldScope\'s own enabled flag when the group itself sits in a '
-        'ElField.',
+        'FieldScope\'s own enabled flag when the group itself sits in a '
+        'Field.',
   ),
   DocsApiFact(
     name: 'invalid',
     type: 'bool',
     description:
         'Defaults to false. true paints the destructive border and ring '
-        'on every item. ORed with the enclosing ElFieldScope\'s own '
+        'on every item. ORed with the enclosing FieldScope\'s own '
         'invalid flag.',
   ),
   DocsApiFact(
@@ -939,7 +951,7 @@ const List<DocsApiFact> _radioGroupFacts = <DocsApiFact>[
     type: 'FocusNode?',
     description:
         'The node a failed form submit lands on, adopted from the '
-        'enclosing ElFieldScope when null. The group itself never keeps '
+        'enclosing FieldScope when null. The group itself never keeps '
         'this focus: it forwards it straight to the roving tab-stop item, '
         'so a keyboard user always lands on a real, operable radio and '
         'never on the group container.',
@@ -977,7 +989,7 @@ const List<DocsApiFact> _radioGroupItemFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Defaults to true. ANDed with the group\'s own enabled flag and, '
-        'when this item sits in its own nested ElField, with that '
+        'when this item sits in its own nested Field, with that '
         'field\'s enabled flag too.',
   ),
   DocsApiFact(
@@ -985,7 +997,7 @@ const List<DocsApiFact> _radioGroupItemFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Defaults to false. ORed with the group\'s invalid flag and, '
-        'when this item has its own nested ElField, with that field\'s '
+        'when this item has its own nested Field, with that field\'s '
         'invalid flag.',
   ),
   DocsApiFact(
@@ -1001,7 +1013,7 @@ const List<DocsApiFact> _radioGroupItemFacts = <DocsApiFact>[
     type: 'String?',
     description:
         'This item\'s own accessible name: never the group\'s legend. '
-        'Falls back to this item\'s own nested ElField\'s label when it '
+        'Falls back to this item\'s own nested Field\'s label when it '
         'has one, and to nothing when it does not.',
   ),
   DocsApiFact(
@@ -1015,16 +1027,17 @@ const List<DocsApiFact> _radioGroupItemFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _staticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElRadioGroup.defaultGap',
+    name: 'RadioGroup.defaultGap',
     type: 'static double',
-    description: 'The Root\'s own row gap, 8px, used whenever gap is left '
+    description:
+        'The Root\'s own row gap, 8px, used whenever gap is left '
         'null.',
   ),
   DocsApiFact(
-    name: 'ElRadioGroupItem.size',
+    name: 'RadioGroupItem.size',
     type: 'static double',
     description:
-        'The 20px circle: sized to sit level with ElCheckbox rather than '
+        'The 20px circle: sized to sit level with Checkbox rather than '
         'the reference\'s own smaller default.',
   ),
 ];
@@ -1037,19 +1050,19 @@ class _StatesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsStateMatrix(facts: _stateFacts),
-      SizedBox(height: el(4)),
-      ElText(
+      SizedBox(height: space(4)),
+      StyledText(
         'Omitted: Hover: no control in this family authors a hover skin; '
         'only the pointer cursor changes. Pressed, there is no separate '
         'pointer-down look; each socket that actually changes value '
-        'squashes once, after the change, via ElJellyReplay: both the '
+        'squashes once, after the change, via StateChangeFeedback: both the '
         'item that becomes selected and the one that was selected a '
         'moment ago squash, because both genuinely changed state. '
-        'Loading and Empty, ElRadioGroup is a synchronous primitive with '
+        'Loading and Empty, RadioGroup is a synchronous primitive with '
         'no async operation and nothing to list, so neither applies. '
         'Success: the component defines no success semantics of its own.',
-        ElType.small,
-        color: ElTheme.of(context).mutedForeground,
+        TextStyles.small,
+        color: ThemeScope.of(context).mutedForeground,
       ),
     ],
   );
@@ -1102,7 +1115,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'rendering: the group\'s own enabled: false; the group\'s '
         'onChanged: null (which disables every item even when each '
         'item\'s own enabled stays true); or one item\'s own enabled: '
-        'false, including through that item\'s own nested ElField going '
+        'false, including through that item\'s own nested Field going '
         'disabled.',
     userSignal:
         '50% opacity, out of the tab order, deaf to pointer and '
@@ -1139,14 +1152,14 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
         'as the legend for the whole set. Each item\'s own label (or its '
         'own nested field\'s: never the group\'s) is announced as that '
         'one option\'s name. Neither is rendered as visible text on its '
-        'own; a ElFieldSet + ElFieldLegend gives the group a visible '
-        'caption, and a per-item ElField gives each option one.',
+        'own; a FieldSet + FieldLegend gives the group a visible '
+        'caption, and a per-item Field gives each option one.',
   ),
   DocsInstallFact(
     label: 'Focus behavior',
     value: 'border-ring plus a 3px ring at 50% alpha',
     description:
-        'The group\'s own Focus node (adopted from a ElFieldScope, e.g. '
+        'The group\'s own Focus node (adopted from a FieldScope, e.g. '
         'a failed form submit) skips traversal and immediately forwards '
         'to the tab-stop item rather than holding focus itself: the '
         'group is not itself operable, so a keyboard user always sees '
@@ -1158,10 +1171,10 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
         'Tapping the group\'s label focuses; tapping an item\'s own '
         'label selects',
     description:
-        'A ElFieldSet + ElFieldLegend caption over the whole group only '
+        'A FieldSet + FieldLegend caption over the whole group only '
         'moves focus to the tab-stop item when tapped: a legend cannot '
         'select on behalf of a set it only names. A visible label from '
-        'an item\'s own nested ElField genuinely selects that one option '
+        'an item\'s own nested Field genuinely selects that one option '
         'when tapped, the same activator wiring an HTML <label for> '
         'click uses.',
   ),
@@ -1169,8 +1182,8 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
     label: 'Touch target',
     value: '42 x 34, centred on each 20 x 20 circle',
     description:
-        'ElHitArea grows the hit test past the painted circle, identical '
-        'to ElCheckbox\'s own measurement, 2px short of the system\'s own '
+        'HitArea grows the hit test past the painted circle, identical '
+        'to Checkbox\'s own measurement, 2px short of the system\'s own '
         '44px floor on both axes, recorded rather than corrected.',
   ),
   DocsInstallFact(
@@ -1183,11 +1196,12 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
   ),
   DocsInstallFact(
     label: 'Error wiring',
-    value: 'invalid, ORed across the item, the group, and a per-item '
+    value:
+        'invalid, ORed across the item, the group, and a per-item '
         'nested field',
     description:
-        'A ElField around the whole group folds its own invalid flag in '
-        'at the group level, reaching every item; a ElField around one '
+        'A Field around the whole group folds its own invalid flag in '
+        'at the group level, reaching every item; a Field around one '
         'item folds in at that item alone.',
   ),
   DocsInstallFact(
@@ -1211,8 +1225,7 @@ const List<DocsInstallFact> _keyboardFacts = <DocsInstallFact>[
   ),
   DocsInstallFact(
     label: 'Arrows',
-    value:
-        'Arrow Up/Left and Down/Right move AND select, and they wrap',
+    value: 'Arrow Up/Left and Down/Right move AND select, and they wrap',
     description:
         'Verified against the real implementation rather than assumed: '
         'an arrow key does not just move focus, it calls onChanged with '
@@ -1233,7 +1246,7 @@ const List<DocsInstallFact> _keyboardFacts = <DocsInstallFact>[
     value: 'No FocusTraversalPolicy of its own',
     description:
         'Tab and Shift+Tab, and which item the roving tab stop names, '
-        'walk whatever order the surrounding page (or ElFieldSet) '
+        'walk whatever order the surrounding page (or FieldSet) '
         'already declares. The arrow-key order above is a separate '
         'mechanism from Tab order: it walks _items in registration '
         'order, wrapping.',
@@ -1245,16 +1258,16 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElRadioGroup fills whatever width it is given (a loose, not a '
+      _bullets(ThemeScope.of(context), <String>[
+        'RadioGroup fills whatever width it is given (a loose, not a '
             'stretching, constraint), but does not stretch its rows to '
-            'match: a bare ElRadioGroupItem stays a fixed 20 x 20 circle '
-            'with a fixed 42 x 34 hit area while a ElField row placed '
+            'match: a bare RadioGroupItem stays a fixed 20 x 20 circle '
+            'with a fixed 42 x 34 hit area while a Field row placed '
             'beside it still fills the available width: the same '
             'distinction a CSS grid\'s default item-stretch would blur, '
             'made explicit here because the item declares its own size.',
         'What reflows with layout belongs to whatever composes the '
-            'group: a ElFieldSet + ElFieldLegend wraps its own caption, '
+            'group: a FieldSet + FieldLegend wraps its own caption, '
             'and a settings page decides its own row wrapping.',
         'Keyboard activation (Enter/Space, the roving tab stop, and the '
             'arrow keys) and pointer activation behave identically on '
@@ -1297,13 +1310,13 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Local file dependencies',
             value:
                 'selection_control.dart, field.dart, '
-                'effects/machine_surface.dart, motion/keyframes.dart',
+                'effects/surface.dart, motion/keyframes.dart',
             description:
                 'radio.dart imports these directly: selection_control.dart '
                 'for the shared socket / hit-area / focus-ring machinery '
-                '(ElSelectionControl), field.dart for ElFieldScope '
-                'wiring, effects/machine_surface.dart for the raised '
-                'dot\'s own surface (ElMachineSurface: used directly here, '
+                '(SelectionControl), field.dart for FieldScope '
+                'wiring, effects/surface.dart for the raised '
+                'dot\'s own surface (Surface: used directly here, '
                 'unlike checkbox\'s hand-drawn path), and '
                 'motion/keyframes.dart for the dot-pop player. None are '
                 'copyable in isolation.',
@@ -1316,12 +1329,13 @@ class _DependenciesContent extends StatelessWidget {
                 'theme_scope.dart',
             description:
                 'Token sources: durations and curves, shadow specs, the '
-                'el() spacing scale, and the live theme.',
+                'space() spacing scale, and the live theme.',
           ),
           DocsInstallFact(
             label: 'Exports',
             value: radioDoc.exports.join(', '),
-            description: 'The public symbols this component makes '
+            description:
+                'The public symbols this component makes '
                 'available.',
           ),
           const DocsInstallFact(
@@ -1329,14 +1343,14 @@ class _DependenciesContent extends StatelessWidget {
             value: 'none',
             description:
                 'The dot is a plain filled circle drawn with '
-                'ElMachineSurface, not an image or an icon-font glyph, '
+                'Surface, not an image or an icon-font glyph, '
                 'radio needs no icon grid at all, unlike checkbox\'s '
                 'hand-authored tick path.',
           ),
           const DocsInstallFact(
             label: 'Fonts',
             value: 'none',
-            description: 'No text is rendered by ElRadioGroupItem itself.',
+            description: 'No text is rendered by RadioGroupItem itself.',
           ),
           const DocsInstallFact(
             label: 'Shaders',
@@ -1345,7 +1359,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
@@ -1355,10 +1369,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Selection control',
             route: '/components/selection_control',
           ),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
           DocsLink(
             label: 'Source Foundation',
@@ -1391,8 +1402,8 @@ const List<DocsInstallFact> _themingFacts = <DocsInstallFact>[
   DocsInstallFact(
     label: 'Shadow',
     value:
-        'ElShadows.pressed (rest) / ElShadows.btnPrimary (selected) on '
-        'the socket; ElShadows.e1 on the dot',
+        'Shadows.inset (rest) / Shadows.controlPrimary (selected) on '
+        'the socket; Shadows.sm on the dot',
     description:
         'The socket shadow spec, composed with the focus or invalid '
         'ring; the dot carries its own raised shadow, separately from '
@@ -1401,37 +1412,40 @@ const List<DocsInstallFact> _themingFacts = <DocsInstallFact>[
   DocsInstallFact(
     label: 'Radius',
     value: 'BorderRadius.circular(size / 2)',
-    description:
-        'A full circle: half the 20px box, not a named ElRadii token.',
+    description: 'A full circle: half the 20px box, not a named Radii token.',
   ),
   DocsInstallFact(
     label: 'Motion',
-    value: 'ElDurations.transitionDefault, ElDotPop, ElJellyReplay',
+    value: 'MotionDurations.normal, DotSelectionMotion, StateChangeFeedback',
     description:
         'Socket colour/border/ring tween duration, the dot\'s own '
         'pop-in keyframe (scale and opacity, on the spring curve), and '
         'the post-selection squash: all resolved through '
-        'elAnimationDuration, so reduced motion shortens or removes '
+        'effectiveMotionDuration, so reduced motion shortens or removes '
         'them automatically.',
   ),
   DocsInstallFact(
     label: 'Row gap',
-    value: 'ElRadioGroup.defaultGap (8px) or ElFieldSet.groupGap (12px)',
+    value: 'RadioGroup.defaultGap (8px) or FieldSet.groupGap (12px)',
     description:
         'The group\'s own default, or the tighter step the composed '
-        'forms page passes when the group sits inside a ElFieldSet.',
+        'forms page passes when the group sits inside a FieldSet.',
   ),
 ];
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

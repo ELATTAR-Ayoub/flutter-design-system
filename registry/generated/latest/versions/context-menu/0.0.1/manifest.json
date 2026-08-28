@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/context_menu.dart",
+      "source": "lib/src/components/ui/context_menu.dart",
       "target": "@ui/context_menu.dart",
-      "sha256": "33abc11802eeb0d87cc6886ea03900a6a1ca4b795e7486aa52bb69c436ed2609"
+      "sha256": "0784136b9fcdc84d265c6194b0122e3abfe69071efe0907ea3f6f39729b98b21"
     }
   ],
   "registryDependencies": [
@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/context-menu",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/context_menu.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/context_menu.dart",
   "deprecated": false
 }

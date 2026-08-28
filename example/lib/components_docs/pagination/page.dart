@@ -1,6 +1,6 @@
 /// Public documentation page for the `pagination` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` established. Every specimen
@@ -16,16 +16,16 @@
 /// the hypothetical call site the comment describes, not in this file, so
 /// a live stage would have to invent an app around them. New: a Keyboard
 /// disclosure, between Accessibility and Responsive — pagination.dart
-/// wires none of its own, but every cell is a real, composed [ElButton],
+/// wires none of its own, but every cell is a real, composed [Button],
 /// so Tab and Enter both genuinely work here, inherited whole.
 ///
 /// **The one fact this page exists to get right:** `lib/src/components/`
 /// `pagination.dart` contains zero truncation logic. There is no
 /// `siblingCount`, no `boundaryCount`, and no `generatePagination`-style
-/// helper anywhere in that file, [ElPagination.children] is a bare
+/// helper anywhere in that file, [Pagination.children] is a bare
 /// `List<Widget>` and the caller decides, before it ever reaches the widget,
-/// exactly which [ElPaginationLink] / [ElPaginationEllipsis] /
-/// [ElPaginationStep] cells appear and in what order. The `1 … 46 47 48 …
+/// exactly which [PaginationLink] / [PaginationEllipsis] /
+/// [PaginationStep] cells appear and in what order. The `1 … 46 47 48 …
 /// 100` recipe the live demo and Truncation rule section render with is
 /// **this documentation page's own function** (`_truncatedPageRange` below),
 /// not a package API.
@@ -36,7 +36,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -118,7 +130,7 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          'ElPagination has no PaginationContent, PaginationItem, or '
+          'Pagination has no PaginationContent, PaginationItem, or '
           'PaginationLink to assemble by hand: children is a bare '
           'List<Widget> and the caller builds each cell directly. This is '
           'what a full row looks like once built — a structure diagram, '
@@ -136,7 +148,7 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
           'paired with the range label the Rules section of that same '
           'reference page recommends: "Showing 25–48 of 184 packs." '
           'Wrapped in the same horizontal scroll every specimen on this '
-          'page uses: ElPagination\'s own Row neither wraps nor scrolls; '
+          'page uses: Pagination\'s own Row neither wraps nor scrolls; '
           'see Responsive.',
       specimen: _ComposedWithPrimitivesSpecimen(),
       code: _navigationReferenceCode,
@@ -151,10 +163,10 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
           'lib/src/components/pagination.dart is 227 lines and none of '
           'them compute a page range: there is no siblingCount, no '
           'boundaryCount, and no generatePagination-shaped helper '
-          'anywhere in the file. ElPagination.children is a bare '
+          'anywhere in the file. Pagination.children is a bare '
           'List<Widget>: the caller decides, before construction, exactly '
-          'which ElPaginationLink, ElPaginationEllipsis, and '
-          'ElPaginationStep cells appear and in what order — the way '
+          'which PaginationLink, PaginationEllipsis, and '
+          'PaginationStep cells appear and in what order — the way '
           "example/lib/pages/navigation.dart's own reference section "
           'hard-codes one fixed shape (1, 2•, 3, …, 12) rather than '
           'deriving it from a page count. The rule the Preview specimen '
@@ -162,19 +174,19 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
           '(this documentation page\'s own function, not a package API): '
           'page 1 and the last page are always shown; the current page '
           'keeps one sibling on each side (siblingCount: 1, a call-site '
-          'parameter of the demo function, not of ElPagination); a gap '
+          'parameter of the demo function, not of Pagination); a gap '
           'that hides exactly one page shows that page plainly instead of '
           'an ellipsis, since collapsing a single number into a dots '
           'glyph the same width as the number would save nothing; a gap '
           'that hides two or more pages collapses to exactly one '
-          'ElPaginationEllipsis cell. Worked at 100 pages, current page '
+          'PaginationEllipsis cell. Worked at 100 pages, current page '
           '47: siblingCount: 1 keeps 46 and 48, page 1 and page 100 are '
           'always shown, and both the 44-page gap and the 51-page gap '
           'collapse to one ellipsis each. Move to page 2 instead and the '
           'left side has nothing left to hide (1 is both the boundary and '
           'the left sibling), so only the right side collapses. The same '
           'rule applies at both boundaries by omission, not by a disabled '
-          'parameter: ElPaginationLink and ElPaginationStep have no '
+          'parameter: PaginationLink and PaginationStep have no '
           'enabled flag; see States.',
       code: _truncationDiagramsCode,
     ),
@@ -220,7 +232,7 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
           'Previous and Next with no page numbers between them: useful '
           'for a data table with its own rows-per-page control, where a '
           'page link row would only repeat what the table already shows. '
-          'ElPagination renders no rows-per-page picker of its own; pair '
+          'Pagination renders no rows-per-page picker of its own; pair '
           'it with whatever selection control the table already owns, '
           'the same way Composed with other primitives pairs the '
           'numbered row with a range label.',
@@ -233,12 +245,12 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
       title: 'RTL',
       description:
           'A genuinely direction-aware cell, not a recorded gap: '
-          'ElPaginationStep builds its tight/loose padding from '
+          'PaginationStep builds its tight/loose padding from '
           'EdgeInsetsDirectional and resolves it against '
           'Directionality.of(context), so the tightened edge swaps sides '
           'under RTL the same way the reference\'s own pl-1.5!/pr-1.5! '
           'pair does. The chevron glyph itself does not mirror: '
-          'ElPaginationStep.previous always draws chevronLeft, regardless '
+          'PaginationStep.previous always draws chevronLeft, regardless '
           'of direction, exactly as the port\'s own source records.',
       specimen: _RtlSpecimen(),
       code: _rtlCode,
@@ -251,17 +263,11 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
           'Every public class and constructor parameter the source '
           'declares: four classes, no enums.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElPagination', anchor: 'api-elpagination'),
+        DocsTocEntry(title: 'Pagination', anchor: 'api-elpagination'),
+        DocsTocEntry(title: 'PaginationLink', anchor: 'api-elpaginationlink'),
+        DocsTocEntry(title: 'PaginationStep', anchor: 'api-elpaginationstep'),
         DocsTocEntry(
-          title: 'ElPaginationLink',
-          anchor: 'api-elpaginationlink',
-        ),
-        DocsTocEntry(
-          title: 'ElPaginationStep',
-          anchor: 'api-elpaginationstep',
-        ),
-        DocsTocEntry(
-          title: 'ElPaginationEllipsis',
+          title: 'PaginationEllipsis',
           anchor: 'api-elpaginationellipsis',
         ),
         DocsTocEntry(title: 'Static tokens', anchor: 'api-statics'),
@@ -272,13 +278,13 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Every cell is a ElButton, so hover, focus-visible, and pressed '
+          'Every cell is a Button, so hover, focus-visible, and pressed '
           'are inherited wholesale: the source\'s own words are "the pill, '
           'the spring, the focus ring and the press are the button\'s and '
           'are not restated," and that is reflected here rather than '
-          're-described. There is no ElPaginationVariant and no size axis '
-          'of its own: ElPaginationLink\'s only look decision is isActive, '
-          'and every cell sits on a fixed ElButtonSize rung (icon for the '
+          're-described. There is no PaginationVariant and no size axis '
+          'of its own: PaginationLink\'s only look decision is isActive, '
+          'and every cell sits on a fixed ButtonSize rung (icon for the '
           'numbers and the ellipsis box, md for Previous/Next) that a '
           'caller cannot override.',
       child: const DocsStateMatrix(facts: _stateFacts),
@@ -293,7 +299,7 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'pagination.dart wires no key handling of its own — every fact '
-          'here is inherited wholesale from ElButton, because every cell '
+          'here is inherited wholesale from Button, because every cell '
           'is one. Read off button.dart\'s own _onKey and Focus wrapper, '
           'the same source Button\'s own Keyboard section cites.',
       child: _KeyboardContent(),
@@ -369,20 +375,20 @@ class PaginationDocPage extends StatelessWidget {
       eyebrow: 'COMPONENTS / BASE',
       title: paginationDoc.title,
       description:
-          'ElPagination is a centred row of cells, page links, an optional '
+          'Pagination is a centred row of cells, page links, an optional '
           'ellipsis, and a Previous/Next step, built entirely out of '
-          'ElButton: "every cell is a Button asChild wrapped around an '
+          'Button: "every cell is a Button asChild wrapped around an '
           '<a>, so the pill, the spring, the focus ring and the press are '
           'the button\'s and are not restated." Reach for it when the '
           'list is bounded and addressable, a grid or table with a known '
           'total page count, not for a feed that only grows from the top '
           '(that is a load-more button). Pair it with a range label at '
-          'the call site: ElPagination renders the page links only and '
+          'the call site: Pagination renders the page links only and '
           'has no count or total of its own.',
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Pagination'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Pagination'),
     ],
     toc: paginationDocSpec.toc,
     // The five already-routed pages, the same cautious fallback
@@ -452,7 +458,7 @@ List<int?> _truncatedPageRange({
 
 /// The interactive worked example: 100 pages, starting on page 47. Tapping
 /// any rendered page number (or Previous/Next) moves the current page and
-/// re-truncates the row around it: a real, mounted [ElPagination], not an
+/// re-truncates the row around it: a real, mounted [Pagination], not an
 /// illustration.
 class _PreviewSpecimen extends StatefulWidget {
   const _PreviewSpecimen();
@@ -472,7 +478,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final List<int?> range = _truncatedPageRange(
       totalPages: _totalPages,
       currentPage: _current,
@@ -484,30 +490,30 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           // Horizontal scroll is this page's own mitigation for the Row
-          // that ElPagination itself never wraps or scrolls: see
+          // that Pagination itself never wraps or scrolls: see
           // Responsive.
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: ElPagination(
+            child: Pagination(
               children: <Widget>[
-                ElPaginationStep.previous(onTap: () => _goTo(_current - 1)),
+                PaginationStep.previous(onTap: () => _goTo(_current - 1)),
                 for (final int? page in range)
                   if (page == null)
-                    const ElPaginationEllipsis()
+                    const PaginationEllipsis()
                   else
-                    ElPaginationLink(
+                    PaginationLink(
                       label: '$page',
                       isActive: page == _current,
                       onTap: () => _goTo(page),
                     ),
-                ElPaginationStep.next(onTap: () => _goTo(_current + 1)),
+                PaginationStep.next(onTap: () => _goTo(_current + 1)),
               ],
             ),
           ),
-          SizedBox(height: el(3)),
-          ElText(
+          SizedBox(height: space(3)),
+          StyledText(
             'Current page: $_current of $_totalPages',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ],
@@ -521,28 +527,28 @@ class _ComposedWithPrimitivesSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText(
+        StyledText(
           'Showing 25–48 of 184 packs.',
-          ElType.small,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: const ElPagination(
+          child: const Pagination(
             children: <Widget>[
-              ElPaginationStep.previous(),
-              ElPaginationLink(label: '1'),
-              ElPaginationLink(label: '2', isActive: true),
-              ElPaginationLink(label: '3'),
-              ElPaginationEllipsis(),
-              ElPaginationLink(label: '12'),
-              ElPaginationStep.next(),
+              PaginationStep.previous(),
+              PaginationLink(label: '1'),
+              PaginationLink(label: '2', isActive: true),
+              PaginationLink(label: '3'),
+              PaginationEllipsis(),
+              PaginationLink(label: '12'),
+              PaginationStep.next(),
             ],
           ),
         ),
@@ -559,14 +565,14 @@ class _FirstPageSpecimen extends StatelessWidget {
     key: const ValueKey<String>('pagination-preview:first-page'),
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: const ElPagination(
+      child: const Pagination(
         children: <Widget>[
-          ElPaginationLink(label: '1', isActive: true),
-          ElPaginationLink(label: '2'),
-          ElPaginationLink(label: '3'),
-          ElPaginationEllipsis(),
-          ElPaginationLink(label: '10'),
-          ElPaginationStep.next(),
+          PaginationLink(label: '1', isActive: true),
+          PaginationLink(label: '2'),
+          PaginationLink(label: '3'),
+          PaginationEllipsis(),
+          PaginationLink(label: '10'),
+          PaginationStep.next(),
         ],
       ),
     ),
@@ -581,14 +587,14 @@ class _LastPageSpecimen extends StatelessWidget {
     key: const ValueKey<String>('pagination-preview:last-page'),
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: const ElPagination(
+      child: const Pagination(
         children: <Widget>[
-          ElPaginationStep.previous(),
-          ElPaginationLink(label: '1'),
-          ElPaginationEllipsis(),
-          ElPaginationLink(label: '8'),
-          ElPaginationLink(label: '9'),
-          ElPaginationLink(label: '10', isActive: true),
+          PaginationStep.previous(),
+          PaginationLink(label: '1'),
+          PaginationEllipsis(),
+          PaginationLink(label: '8'),
+          PaginationLink(label: '9'),
+          PaginationLink(label: '10', isActive: true),
         ],
       ),
     ),
@@ -601,8 +607,8 @@ class _SinglePageSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('pagination-preview:single-page'),
-    child: const ElPagination(
-      children: <Widget>[ElPaginationLink(label: '1', isActive: true)],
+    child: const Pagination(
+      children: <Widget>[PaginationLink(label: '1', isActive: true)],
     ),
   );
 }
@@ -613,13 +619,13 @@ class _SimpleSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('pagination-simple'),
-    child: const ElPagination(
+    child: const Pagination(
       children: <Widget>[
-        ElPaginationLink(label: '1'),
-        ElPaginationLink(label: '2', isActive: true),
-        ElPaginationLink(label: '3'),
-        ElPaginationLink(label: '4'),
-        ElPaginationLink(label: '5'),
+        PaginationLink(label: '1'),
+        PaginationLink(label: '2', isActive: true),
+        PaginationLink(label: '3'),
+        PaginationLink(label: '4'),
+        PaginationLink(label: '5'),
       ],
     ),
   );
@@ -631,11 +637,8 @@ class _IconsOnlySpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('pagination-icons-only'),
-    child: const ElPagination(
-      children: <Widget>[
-        ElPaginationStep.previous(),
-        ElPaginationStep.next(),
-      ],
+    child: const Pagination(
+      children: <Widget>[PaginationStep.previous(), PaginationStep.next()],
     ),
   );
 }
@@ -650,13 +653,13 @@ class _RtlSpecimen extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: KeyedSubtree(
         key: ValueKey<String>('pagination-rtl'),
-        child: ElPagination(
+        child: Pagination(
           children: <Widget>[
-            ElPaginationStep.previous(text: 'السابق'),
-            ElPaginationLink(label: '1'),
-            ElPaginationLink(label: '2', isActive: true),
-            ElPaginationLink(label: '3'),
-            ElPaginationStep.next(text: 'التالي'),
+            PaginationStep.previous(text: 'السابق'),
+            PaginationLink(label: '1'),
+            PaginationLink(label: '2', isActive: true),
+            PaginationLink(label: '3'),
+            PaginationStep.next(text: 'التالي'),
           ],
         ),
       ),
@@ -678,31 +681,32 @@ final List<int?> range = _truncatedPageRange(
 
 SingleChildScrollView(
   scrollDirection: Axis.horizontal,
-  child: ElPagination(
+  child: Pagination(
     children: [
-      ElPaginationStep.previous(onTap: () => goTo(current - 1)),
+      PaginationStep.previous(onTap: () => goTo(current - 1)),
       for (final int? page in range)
         if (page == null)
-          const ElPaginationEllipsis()
+          const PaginationEllipsis()
         else
-          ElPaginationLink(
+          PaginationLink(
             label: '\$page',
             isActive: page == current,
             onTap: () => goTo(page),
           ),
-      ElPaginationStep.next(onTap: () => goTo(current + 1)),
+      PaginationStep.next(onTap: () => goTo(current + 1)),
     ],
   ),
 )''';
 
-const String _usageCode = '''// The smallest correct call: a fixed row, no computed range at all.
-const ElPagination(
+const String _usageCode =
+    '''// The smallest correct call: a fixed row, no computed range at all.
+const Pagination(
   children: <Widget>[
-    ElPaginationStep.previous(),
-    ElPaginationLink(label: '1', isActive: true),
-    ElPaginationLink(label: '2'),
-    ElPaginationLink(label: '3'),
-    ElPaginationStep.next(),
+    PaginationStep.previous(),
+    PaginationLink(label: '1', isActive: true),
+    PaginationLink(label: '2'),
+    PaginationLink(label: '3'),
+    PaginationStep.next(),
   ],
 )''';
 
@@ -710,112 +714,111 @@ const String _computedRangeCode =
     '''// A real caller with a page count computes the range itself: pagination
 // does not do this for you (see Truncation rule): then builds the same
 // shapes:
-ElPagination(
+Pagination(
   children: <Widget>[
-    ElPaginationStep.previous(onTap: page > 1 ? () => goTo(page - 1) : null),
+    PaginationStep.previous(onTap: page > 1 ? () => goTo(page - 1) : null),
     for (final int? p in myTruncatedRange(total: total, current: page))
       if (p == null)
-        const ElPaginationEllipsis()
+        const PaginationEllipsis()
       else
-        ElPaginationLink(
+        PaginationLink(
           label: '\$p',
           isActive: p == page,
           onTap: () => goTo(p),
         ),
-    ElPaginationStep.next(
+    PaginationStep.next(
       onTap: page < total ? () => goTo(page + 1) : null,
     ),
   ],
 )
 
 // onTap: null above is still tappable: it just becomes a no-op via
-// `onTap ?? () {}`. Omit the whole ElPaginationStep cell instead if the
+// `onTap ?? () {}`. Omit the whole PaginationStep cell instead if the
 // boundary must render as genuinely inert; see States.''';
 
-const String _compositionTree = '''ElPagination(children: [ … ])
+const String _compositionTree = '''Pagination(children: [ … ])
  // each cell in children is one of:
- ElPaginationStep.previous()   // chevron + word, before the numbers
- ElPaginationLink(label: '1')  // one numbered page
- ElPaginationEllipsis()        // a collapsed run of hidden pages
- ElPaginationStep.next()       // chevron + word, after the numbers''';
+ PaginationStep.previous()   // chevron + word, before the numbers
+ PaginationLink(label: '1')  // one numbered page
+ PaginationEllipsis()        // a collapsed run of hidden pages
+ PaginationStep.next()       // chevron + word, after the numbers''';
 
 const String _navigationReferenceCode =
     '''// example/lib/pages/navigation.dart, verbatim: a hard-coded shape, not
 // a derived one.
-const ElPagination(
+const Pagination(
   children: <Widget>[
-    ElPaginationStep.previous(),
-    ElPaginationLink(label: '1'),
-    ElPaginationLink(label: '2', isActive: true),
-    ElPaginationLink(label: '3'),
-    ElPaginationEllipsis(),
-    ElPaginationLink(label: '12'),
-    ElPaginationStep.next(),
+    PaginationStep.previous(),
+    PaginationLink(label: '1'),
+    PaginationLink(label: '2', isActive: true),
+    PaginationLink(label: '3'),
+    PaginationEllipsis(),
+    PaginationLink(label: '12'),
+    PaginationStep.next(),
   ],
 )''';
 
-const String _truncationDiagramsCode =
-    '''100 pages, current page 47:
+const String _truncationDiagramsCode = '''100 pages, current page 47:
 1  …  46  47  48  …  100
 
 Current page 2 (left boundary and left sibling are the same page,
 nothing left to hide on that side):
 1  2  3  …  100''';
 
-const String _firstPageCode = '''const ElPagination(
+const String _firstPageCode = '''const Pagination(
   children: <Widget>[
-    ElPaginationLink(label: '1', isActive: true),
-    ElPaginationLink(label: '2'),
-    ElPaginationLink(label: '3'),
-    ElPaginationEllipsis(),
-    ElPaginationLink(label: '10'),
-    ElPaginationStep.next(),
+    PaginationLink(label: '1', isActive: true),
+    PaginationLink(label: '2'),
+    PaginationLink(label: '3'),
+    PaginationEllipsis(),
+    PaginationLink(label: '10'),
+    PaginationStep.next(),
   ],
 )''';
 
-const String _lastPageCode = '''const ElPagination(
+const String _lastPageCode = '''const Pagination(
   children: <Widget>[
-    ElPaginationStep.previous(),
-    ElPaginationLink(label: '1'),
-    ElPaginationEllipsis(),
-    ElPaginationLink(label: '8'),
-    ElPaginationLink(label: '9'),
-    ElPaginationLink(label: '10', isActive: true),
+    PaginationStep.previous(),
+    PaginationLink(label: '1'),
+    PaginationEllipsis(),
+    PaginationLink(label: '8'),
+    PaginationLink(label: '9'),
+    PaginationLink(label: '10', isActive: true),
   ],
 )''';
 
-const String _singlePageCode = '''const ElPagination(
+const String _singlePageCode = '''const Pagination(
   children: <Widget>[
-    ElPaginationLink(label: '1', isActive: true),
+    PaginationLink(label: '1', isActive: true),
   ],
 )''';
 
-const String _simpleCode = '''const ElPagination(
+const String _simpleCode = '''const Pagination(
   children: <Widget>[
-    ElPaginationLink(label: '1'),
-    ElPaginationLink(label: '2', isActive: true),
-    ElPaginationLink(label: '3'),
-    ElPaginationLink(label: '4'),
-    ElPaginationLink(label: '5'),
+    PaginationLink(label: '1'),
+    PaginationLink(label: '2', isActive: true),
+    PaginationLink(label: '3'),
+    PaginationLink(label: '4'),
+    PaginationLink(label: '5'),
   ],
 )''';
 
-const String _iconsOnlyCode = '''const ElPagination(
+const String _iconsOnlyCode = '''const Pagination(
   children: <Widget>[
-    ElPaginationStep.previous(),
-    ElPaginationStep.next(),
+    PaginationStep.previous(),
+    PaginationStep.next(),
   ],
 )''';
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElPagination(
+  child: Pagination(
     children: <Widget>[
-      ElPaginationStep.previous(text: 'السابق'),
-      ElPaginationLink(label: '1'),
-      ElPaginationLink(label: '2', isActive: true),
-      ElPaginationLink(label: '3'),
-      ElPaginationStep.next(text: 'التالي'),
+      PaginationStep.previous(text: 'السابق'),
+      PaginationLink(label: '1'),
+      PaginationLink(label: '2', isActive: true),
+      PaginationLink(label: '3'),
+      PaginationStep.next(text: 'التالي'),
     ],
   ),
 )''';
@@ -832,25 +835,25 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-elpagination',
         child: DocsApiTable(
-          title: 'ElPagination',
+          title: 'Pagination',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'children',
               type: 'List<Widget>',
               description:
-                  'Required. One cell each, in order, ElPaginationLink, '
-                  'ElPaginationEllipsis, and/or ElPaginationStep, already '
-                  'decided by the caller. ElPagination lays them out; it '
+                  'Required. One cell each, in order, PaginationLink, '
+                  'PaginationEllipsis, and/or PaginationStep, already '
+                  'decided by the caller. Pagination lays them out; it '
                   'does not choose them.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpaginationlink',
         child: DocsApiTable(
-          title: 'ElPaginationLink',
+          title: 'PaginationLink',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'label',
@@ -861,7 +864,7 @@ class _ApiReferenceContent extends StatelessWidget {
               name: 'isActive',
               type: 'bool',
               description:
-                  'Defaults to false. Picks the ElButton variant, '
+                  'Defaults to false. Picks the Button variant, '
                   'outline when true, ghost when false, and sets '
                   'Semantics.selected, which is what an assistive '
                   'technology reads as "current." There is no third '
@@ -871,29 +874,29 @@ class _ApiReferenceContent extends StatelessWidget {
               name: 'onTap',
               type: 'VoidCallback?',
               description:
-                  'Defaults to null, which ElPaginationLink itself '
+                  'Defaults to null, which PaginationLink itself '
                   'replaces with an empty closure before handing it to '
-                  'ElButton.onPressed: so the cell is always tappable. '
+                  'Button.onPressed: so the cell is always tappable. '
                   'There is no way to make one inert; see States.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpaginationstep',
         child: DocsApiTable(
-          title: 'ElPaginationStep',
+          title: 'PaginationStep',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'ElPaginationStep.previous',
+              name: 'PaginationStep.previous',
               type: 'const constructor',
               description:
                   'A chevron-left icon before the word. Defaults text to '
                   '"Previous".',
             ),
             DocsApiFact(
-              name: 'ElPaginationStep.next',
+              name: 'PaginationStep.next',
               type: 'const constructor',
               description:
                   'A chevron-right icon after the word. Defaults text to '
@@ -913,17 +916,17 @@ class _ApiReferenceContent extends StatelessWidget {
               type: 'VoidCallback?',
               description:
                   'Same fallback-to-no-op behavior as '
-                  'ElPaginationLink.onTap: always tappable, never truly '
+                  'PaginationLink.onTap: always tappable, never truly '
                   'disabled.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elpaginationellipsis',
         child: DocsApiTable(
-          title: 'ElPaginationEllipsis',
+          title: 'PaginationEllipsis',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: '(no fields)',
@@ -937,38 +940,38 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-statics',
         child: DocsApiTable(
           title: 'Static tokens',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'ElPagination.gap',
+              name: 'Pagination.gap',
               type: 'static double',
               description: 'The 2px gap between cells (gap-0.5).',
             ),
             DocsApiFact(
-              name: 'ElPaginationStep.tightPadding',
+              name: 'PaginationStep.tightPadding',
               type: 'static double',
               description:
                   'The 6px !important-tightened edge: the side the '
                   'chevron sits against.',
             ),
             DocsApiFact(
-              name: 'ElPaginationStep.loosePadding',
+              name: 'PaginationStep.loosePadding',
               type: 'static double',
               description:
-                  'The untouched edge, ElButtonSize.md\'s own 16px '
+                  'The untouched edge, ButtonSize.md\'s own 16px '
                   'horizontal padding, unchanged.',
             ),
             DocsApiFact(
-              name: 'ElPaginationEllipsis.boxSize',
+              name: 'PaginationEllipsis.boxSize',
               type: 'static double',
               description: 'The 32px square the glyph centres in (size-8).',
             ),
             DocsApiFact(
-              name: 'ElPaginationEllipsis.glyphSize',
+              name: 'PaginationEllipsis.glyphSize',
               type: 'static double',
               description: 'The 16px glyph itself (size-4).',
             ),
@@ -984,8 +987,8 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Semantic role and name: ElPagination wraps its row in '
+      _bullets(ThemeScope.of(context), <String>[
+        'Semantic role and name: Pagination wraps its row in '
             "Semantics(container: true, label: 'pagination', "
             'explicitChildNodes: true): a named, boundary-marked group '
             'with a real accessible name. It does not set role: '
@@ -997,26 +1000,26 @@ class _AccessibilityContent extends StatelessWidget {
             'against the web reference\'s role="navigation", not an '
             'oversight left undone.',
         'Current-page announcement: the current page IS announced as a '
-            'state, not styling alone, ElPaginationLink wraps every cell '
+            'state, not styling alone, PaginationLink wraps every cell '
             'in Semantics(link: true, selected: isActive). The underlying '
             'flag is "selected," not the web reference\'s '
             'aria-current="page": a different attribute name, same '
             'practical outcome, assistive tech distinguishes the current '
             'page from the rest.',
-        'A merged role: ElButton itself also declares Semantics(button: '
+        'A merged role: Button itself also declares Semantics(button: '
             'true, enabled: true, ...) inside every cell, and neither '
             'wrapper sets its own container: true, so Flutter merges the '
             'two into one node carrying both link and button flags '
             'together. Recorded as observed, not corrected: the merge is '
-            'a property of how ElButton is composed into, not a defect '
+            'a property of how Button is composed into, not a defect '
             'unique to pagination.',
-        'Keyboard interactions: real, inherited from ElButton. See '
+        'Keyboard interactions: real, inherited from Button. See '
             'Keyboard below for the full account.',
         'Focus behavior: never moved automatically. Tapping a page '
             'number does not shift focus to a new location or announce '
             'the page change beyond the selected flag updating.',
-        'Touch target: whatever ElButtonSize.icon (40×40) and '
-            'ElButtonSize.md (Previous/Next, auto-width) already '
+        'Touch target: whatever ButtonSize.icon (40×40) and '
+            'ButtonSize.md (Previous/Next, auto-width) already '
             'guarantee, pagination adds no padding of its own around a '
             'cell.',
         'Non-colour signal: the outline vs. ghost variant border, plus '
@@ -1024,7 +1027,7 @@ class _AccessibilityContent extends StatelessWidget {
             'signals: colour is never the only cue for which page is '
             'current.',
         'Screen-reader announcements for the ellipsis: '
-            'ElPaginationEllipsis wraps its glyph in ExcludeSemantics, so '
+            'PaginationEllipsis wraps its glyph in ExcludeSemantics, so '
             'nothing is announced for it at all: no "more pages," no '
             'count of hidden pages. The source\'s own comment records the '
             'same intent the reference ships (an aria-hidden span around '
@@ -1042,17 +1045,17 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Tab order: every cell is a real, reachable stop. Each '
-            'ElPaginationLink and ElPaginationStep wraps an ElButton whose '
-            'onTap is never null (onTap ?? () {}), so ElButton\'s own '
+            'PaginationLink and PaginationStep wraps an Button whose '
+            'onTap is never null (onTap ?? () {}), so Button\'s own '
             '_enabled — and canRequestFocus, which tracks it — is always '
             'true, on every cell, including a boundary cell a caller '
             'chose to omit entirely rather than disable.',
         'Activation: Enter, NumpadEnter, and Space activate a focused '
-            'cell, the same _onKey button.dart wires for every ElButton: '
+            'cell, the same _onKey button.dart wires for every Button: '
             'pagination.dart adds no key handling of its own, it is '
-            'inherited whole because every cell genuinely is a ElButton.',
+            'inherited whole because every cell genuinely is a Button.',
         'No arrow-key roving tabindex: pagination.dart wires no '
             'Shortcuts, Actions, or onKeyEvent of its own. A native '
             'pagination or tablist widget conventionally moves between '
@@ -1064,7 +1067,7 @@ class _KeyboardContent extends StatelessWidget {
             'whatever order the surrounding page already declares, cell '
             'by cell, left to right as composed.',
         'Focus ring: real and live here, unlike Tabs\' permanently inert '
-            'one — whatever ElButton\'s own focus-visible ring does for '
+            'one — whatever Button\'s own focus-visible ring does for '
             'the ghost or outline variant is exactly what a focused '
             'pagination cell shows, because nothing here repaints it.',
       ]);
@@ -1075,8 +1078,8 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElPagination lays its children out in a plain Row with '
+      _bullets(ThemeScope.of(context), <String>[
+        'Pagination lays its children out in a plain Row with '
             'mainAxisAlignment.center: a Row, not a Wrap. It does not '
             'wrap onto a second line and it does not scroll on its own. '
             'A long page range at a narrow width (the classic case: this '
@@ -1084,14 +1087,14 @@ class _ResponsiveContent extends StatelessWidget {
             'that Row and trigger a RenderFlex overflow unless the call '
             'site does something about it.',
         'This page\'s own mitigation, used for every specimen above: '
-            'wrap ElPagination in a horizontally scrollable region '
+            'wrap Pagination in a horizontally scrollable region '
             '(SingleChildScrollView(scrollDirection: Axis.horizontal)). '
-            'That is docs-authored composition, not a ElPagination '
+            'That is docs-authored composition, not a Pagination '
             'feature: the alternative most callers reach for instead is '
             'shrinking siblingCount at narrow widths so the row simply '
             'has fewer cells to lay out.',
-        'Cell sizes do not change with width, ElButtonSize.icon stays a '
-            'fixed 40×40 and ElButtonSize.md keeps its own padding at '
+        'Cell sizes do not change with width, ButtonSize.icon stays a '
+            'fixed 40×40 and ButtonSize.md keeps its own padding at '
             'every breakpoint; nothing here reflows or shrinks a cell '
             'for a small screen.',
         'Platform parity: Android, iOS, Web, macOS, Windows, and Linux '
@@ -1107,13 +1110,13 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: ${paginationDoc.sourcePath}: one file, four public '
             'classes, no companion parts.',
-        'Direct imports: button.dart (ElButton, ElButtonVariant, '
-            'ElButtonSize: every cell is one), icon.dart (ElIcon, '
-            'ElIconTone) and icon_paths.dart (ElIconGlyph: the chevrons '
-            'and the ellipsis glyph), and foundation/spacing.dart (el()) '
+        'Direct imports: button.dart (Button, ButtonVariant, '
+            'ButtonSize: every cell is one), icon.dart (Icon, '
+            'IconTone) and icon_paths.dart (IconGlyph: the chevrons '
+            'and the ellipsis glyph), and foundation/spacing.dart (space()) '
             'for every measurement on this page. No import of theme.dart, '
             'colors.dart, or shadows.dart directly: see Theming.',
         'No registry/components/pagination.json manifest wires these in '
@@ -1126,7 +1129,7 @@ class _DependenciesContent extends StatelessWidget {
         'Platforms: Android, iOS, Web, macOS, Windows, Linux — no '
             'platform-conditional code in pagination.dart.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
@@ -1146,44 +1149,48 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElPagination, ElPaginationLink, ElPaginationStep, and '
-            'ElPaginationEllipsis paint no colour of their own: no '
+      _bullets(ThemeScope.of(context), <String>[
+        'Pagination, PaginationLink, PaginationStep, and '
+            'PaginationEllipsis paint no colour of their own: no '
             'DecoratedBox, no BoxDecoration, no direct theme.* read '
             'anywhere in pagination.dart. Every fill, border, and ink a '
-            'cell shows comes from the ElButton it wraps (outline or '
-            'ghost variant) or from ElIcon(tone: inherit) reading the '
+            'cell shows comes from the Button it wraps (outline or '
+            'ghost variant) or from Icon(tone: inherit) reading the '
             'button\'s own DefaultTextStyle.',
-        'Type is inherited, not owned: ElButtonSize.icon sets no text-* '
+        'Type is inherited, not owned: ButtonSize.icon sets no text-* '
             'class of its own, so the page numbers ("1", "2", "12") '
             'render at the ambient body type, while Previous and Next '
-            'sit one size class smaller (ElButtonSize.md\'s own text-sm) '
+            'sit one size class smaller (ButtonSize.md\'s own text-sm) '
             'because they carry a word, not a bare number, a fact about '
-            'ElButton\'s size rungs, not a themeable pagination property.',
-        'ElPaginationEllipsis is a fixed 32px square in the 40px row, '
+            'Button\'s size rungs, not a themeable pagination property.',
+        'PaginationEllipsis is a fixed 32px square in the 40px row, '
             '4px shorter on every side than the number cells beside it, '
             'at every theme and breakpoint: sizing is not a themeable '
             'token here.',
-        'Flipping ElThemeController between light and dark re-resolves '
-            'ElButton\'s own outline/ghost tokens exactly as it does '
-            'anywhere else ElButton is used: pagination has no cached '
+        'Flipping ThemeController between light and dark re-resolves '
+            'Button\'s own outline/ghost tokens exactly as it does '
+            'anywhere else Button is used: pagination has no cached '
             'or independent colour of its own to go stale.',
         'There is no pagination-specific theming surface to override: a '
             'caller who needs a different look for a cell is overriding '
-            'ElButton\'s variant tokens, not a parameter this component '
+            'Button\'s variant tokens, not a parameter this component '
             'exposes.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -1194,8 +1201,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest',
     treatment:
-        'ElButtonVariant.ghost (numbers, Previous, Next) or .outline '
-        '(the active page) at rest, exactly as ElButton paints those '
+        'ButtonVariant.ghost (numbers, Previous, Next) or .outline '
+        '(the active page) at rest, exactly as Button paints those '
         'variants elsewhere.',
     userSignal:
         'The resting variant already distinguishes the current page '
@@ -1205,16 +1212,16 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Hover / Focus-visible / Pressed',
     treatment:
         'Not repainted by pagination.dart: inherited entirely from '
-        'ElButton\'s own hover fill, focus ring, and press spring for '
+        'Button\'s own hover fill, focus ring, and press spring for '
         'whichever variant (ghost or outline) the cell resolved to.',
     userSignal:
         'Identical to hovering, focusing, or pressing any other '
-        'ghost/outline ElButton in the system.',
+        'ghost/outline Button in the system.',
   ),
   DocsStateFact(
     state: 'Selected',
     treatment:
-        'isActive: true on ElPaginationLink switches the variant to '
+        'isActive: true on PaginationLink switches the variant to '
         'outline and sets Semantics(selected: true): a real semantic '
         'flag, not styling alone. See Accessibility for what "selected" '
         'does and does not announce.',
@@ -1225,22 +1232,22 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        'N/A by design gap, not by choice, ElPaginationLink and '
-        'ElPaginationStep have no enabled/disabled parameter at all. '
-        'onTap ?? () {} means ElButton.onPressed is never null, so '
-        'ElButton\'s own _enabled is always true: a cell with no onTap '
+        'N/A by design gap, not by choice, PaginationLink and '
+        'PaginationStep have no enabled/disabled parameter at all. '
+        'onTap ?? () {} means Button.onPressed is never null, so '
+        'Button\'s own _enabled is always true: a cell with no onTap '
         'given is still fully hoverable, focusable, and pressable, it '
         'just does nothing when pressed.',
     userSignal:
         'A caller wanting a "disabled Previous" on page 1 must omit '
-        'the ElPaginationStep.previous cell entirely: see First page '
+        'the PaginationStep.previous cell entirely: see First page '
         'above, because nothing here renders a dimmed, inert version '
         'of it.',
   ),
   DocsStateFact(
     state: 'Loading / Empty / Error / Success',
     treatment:
-        'N/A, ElPagination and its three cell types are all '
+        'N/A, Pagination and its three cell types are all '
         'StatelessWidgets with no async parameter, no error state, and '
         'no empty-state rendering. A caller building a loading or '
         'empty list state owns that entirely outside this component.',
@@ -1249,9 +1256,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        'Not reimplemented here: whatever ElButton\'s own press spring '
+        'Not reimplemented here: whatever Button\'s own press spring '
         'does under a reduced-motion preference is what every '
-        'pagination cell does too, because every cell is a ElButton.',
-    userSignal: 'Same as any other ElButton on the page.',
+        'pagination cell does too, because every cell is a Button.',
+    userSignal: 'Same as any other Button on the page.',
   ),
 ];

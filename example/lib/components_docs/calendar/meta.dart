@@ -13,7 +13,7 @@
 ///  * `source-foundation`, `colors`, `date_format`, `motion`, `spacing`,
 ///    `theme` and `typography`. `date_format.dart` is inside the foundation
 ///    item (`registry/foundations/source.json` lists it), which is what puts
-///    `ElDateFormat`, `ElClock` and `ElCalendarType` there rather than here.
+///    `DateFormat`, `Clock` and `CalendarTextStyles` there rather than here.
 ///  * `button`: the date picker's outline trigger.
 ///  * `icon`: the two chevrons and the trigger's calendar glyph. That item
 ///    already ships `icon_paths.dart` and `icon_paths.g.dart`, so the
@@ -34,14 +34,14 @@ const ComponentDocEntry calendarDoc = ComponentDocEntry(
       'a popover, built on local calendar dates rather than instants.',
   dependencies: <String>['button', 'icon', 'popover', 'source-foundation'],
   exports: <String>[
-    'ElCalendar',
-    'ElCalendarMode',
-    'ElCalendarSurface',
-    'ElDateRange',
-    'ElCalendarDay',
-    'ElCalendarMonth',
-    'ElCalendarBandPainter',
-    'ElDatePicker',
+    'Calendar',
+    'CalendarMode',
+    'CalendarPresentation',
+    'DateRange',
+    'CalendarDay',
+    'CalendarMonth',
+    'CalendarBandPainter',
+    'DatePicker',
   ],
   sourcePath: 'lib/src/components/calendar.dart',
 );

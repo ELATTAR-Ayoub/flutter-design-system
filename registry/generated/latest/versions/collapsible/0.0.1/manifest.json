@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/collapsible.dart",
+      "source": "lib/src/components/ui/collapsible.dart",
       "target": "@ui/collapsible.dart",
-      "sha256": "bde02c6cb673ae1800df292ca9833cbe0e6c0b6d08d70d33b5929801ecf0eccf"
+      "sha256": "1855a087e72b23e72bb71b8099917563f719c567f73fc5299d9065532c0add2d"
     }
   ],
   "registryDependencies": [
@@ -22,6 +22,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/collapsible",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/collapsible.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/collapsible.dart",
   "deprecated": false
 }

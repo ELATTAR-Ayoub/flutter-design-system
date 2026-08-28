@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/message.dart",
+      "source": "lib/src/components/ui/message.dart",
       "target": "@ui/message.dart",
-      "sha256": "419295ffd925381069d9b60a38d8865fccef9c739d45b06676aeb9a99a8f235b"
+      "sha256": "3cfb1e98454b37508842382a028f80c72bfb2faac2bc5c70a6d0476d041b409b"
     }
   ],
   "registryDependencies": [
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/message",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/message.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/message.dart",
   "deprecated": false
 }

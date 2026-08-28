@@ -1,18 +1,30 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The component layer: the three primitives the docs shell is assembled from.
 
-Widget host(Widget child, {ElThemeMode mode = ElThemeMode.dark}) {
+Widget host(Widget child, {ColorMode mode = ColorMode.dark}) {
   return MediaQuery(
     data: const MediaQueryData(size: Size(1440, 900)),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Center(child: child),
       ),
     ),
@@ -21,12 +33,12 @@ Widget host(Widget child, {ElThemeMode mode = ElThemeMode.dark}) {
 
 /// A navigable host, for the one component that pushes a route.
 ///
-/// `ElTheme` sits **above** the app, matching what the example app does: the
+/// `ThemeScope` sits **above** the app, matching what the example app does: the
 /// Navigator's overlay has to be inside the theme scope, or a pushed route
 /// cannot resolve a token.
-Widget navHost(Widget child, {ElThemeMode mode = ElThemeMode.dark}) {
-  return ElTheme(
-    controller: ElThemeController(mode: mode),
+Widget navHost(Widget child, {ColorMode mode = ColorMode.dark}) {
+  return ThemeScope(
+    controller: ThemeController(mode: mode),
     child: WidgetsApp(
       color: const Color(0xFF000000),
       pageRouteBuilder: <T>(RouteSettings settings, WidgetBuilder builder) =>
@@ -61,28 +73,28 @@ Future<TestGesture> hoverOver(WidgetTester t, Finder target) async {
 }
 
 void main() {
-  group('ElIcon', () {
+  group('Icon', () {
     testWidgets('the size ladder is 12/14/16/20/24/32/40', (
       WidgetTester t,
     ) async {
-      const Map<ElIconSize, double> ladder = <ElIconSize, double>{
-        ElIconSize.xs: 12,
-        ElIconSize.sm: 14,
-        ElIconSize.md: 16,
-        ElIconSize.lg: 20,
-        ElIconSize.xl: 24,
-        ElIconSize.xl2: 32,
-        ElIconSize.xl3: 40,
+      const Map<IconSize, double> ladder = <IconSize, double>{
+        IconSize.xs: 12,
+        IconSize.sm: 14,
+        IconSize.md: 16,
+        IconSize.lg: 20,
+        IconSize.xl: 24,
+        IconSize.xl2: 32,
+        IconSize.xl3: 40,
       };
-      for (final MapEntry<ElIconSize, double> step in ladder.entries) {
-        expect(ElIcon.pxFor(step.key), step.value);
+      for (final MapEntry<IconSize, double> step in ladder.entries) {
+        expect(Icon.pxFor(step.key), step.value);
       }
-      expect(ladder.length, ElIconSize.values.length);
+      expect(ladder.length, IconSize.values.length);
     });
 
     testWidgets('md renders 16×16', (WidgetTester t) async {
-      await t.pumpWidget(host(const ElIcon(ElIconGlyph.menu)));
-      expect(t.getSize(find.byType(ElIcon)), const Size(16, 16));
+      await t.pumpWidget(host(const Icon(IconGlyph.menu)));
+      expect(t.getSize(find.byType(Icon)), const Size(16, 16));
     });
 
     test('stroke follows the reference ternary, not a clamp', () {
@@ -91,13 +103,13 @@ void main() {
       // The middle branch is a literal 2 — it is NOT the raw 48/px. That makes
       // lg, xl and 2xl all stroke 2.0, where a clamp reading would give
       // 2.4 / 2.0 / 1.5.
-      expect(ElIcon.strokeFor(12), 2.4); // 4.00 > 2.6
-      expect(ElIcon.strokeFor(14), 2.4); // 3.43 > 2.6
-      expect(ElIcon.strokeFor(16), 2.4); // 3.00 > 2.6
-      expect(ElIcon.strokeFor(20), 2.0); // 2.40 — middle branch
-      expect(ElIcon.strokeFor(24), 2.0); // 2.00 — middle branch
-      expect(ElIcon.strokeFor(32), 2.0); // 1.50 is NOT < 1.5 — middle branch
-      expect(ElIcon.strokeFor(40), 1.6); // 1.20 < 1.5
+      expect(Icon.strokeFor(12), 2.4); // 4.00 > 2.6
+      expect(Icon.strokeFor(14), 2.4); // 3.43 > 2.6
+      expect(Icon.strokeFor(16), 2.4); // 3.00 > 2.6
+      expect(Icon.strokeFor(20), 2.0); // 2.40 — middle branch
+      expect(Icon.strokeFor(24), 2.0); // 2.00 — middle branch
+      expect(Icon.strokeFor(32), 2.0); // 1.50 is NOT < 1.5 — middle branch
+      expect(Icon.strokeFor(40), 1.6); // 1.20 < 1.5
     });
 
     testWidgets('tones resolve against the live theme', (WidgetTester t) async {
@@ -113,16 +125,16 @@ void main() {
         ),
       );
 
-      final ElThemeData dark = ElThemeData.dark;
-      expect(ElIcon.colorFor(context, ElIconTone.normal), dark.foreground);
-      expect(ElIcon.colorFor(context, ElIconTone.muted), dark.mutedForeground);
-      expect(ElIcon.colorFor(context, ElIconTone.subtle), dark.mutedForeground);
-      expect(ElIcon.colorFor(context, ElIconTone.action), dark.actionInk);
-      expect(ElIcon.colorFor(context, ElIconTone.value), dark.valueInk);
-      expect(ElIcon.colorFor(context, ElIconTone.success), dark.successInk);
-      expect(ElIcon.colorFor(context, ElIconTone.warning), dark.warningInk);
-      expect(ElIcon.colorFor(context, ElIconTone.info), dark.infoInk);
-      expect(ElIcon.colorFor(context, ElIconTone.error), dark.destructiveInk);
+      final ThemeTokens dark = ThemeTokens.dark;
+      expect(Icon.colorFor(context, IconTone.normal), dark.foreground);
+      expect(Icon.colorFor(context, IconTone.muted), dark.mutedForeground);
+      expect(Icon.colorFor(context, IconTone.subtle), dark.mutedForeground);
+      expect(Icon.colorFor(context, IconTone.action), dark.actionText);
+      expect(Icon.colorFor(context, IconTone.value), dark.premiumText);
+      expect(Icon.colorFor(context, IconTone.success), dark.successText);
+      expect(Icon.colorFor(context, IconTone.warning), dark.warningText);
+      expect(Icon.colorFor(context, IconTone.info), dark.infoText);
+      expect(Icon.colorFor(context, IconTone.error), dark.destructiveText);
     });
 
     testWidgets('inherit takes the surrounding text colour', (
@@ -132,7 +144,7 @@ void main() {
       await t.pumpWidget(
         host(
           DefaultTextStyle(
-            style: TextStyle(color: ElThemeData.dark.valueInk),
+            style: TextStyle(color: ThemeTokens.dark.premiumText),
             child: Builder(
               builder: (BuildContext c) {
                 inside = c;
@@ -143,8 +155,8 @@ void main() {
         ),
       );
       expect(
-        ElIcon.colorFor(inside, ElIconTone.inherit),
-        ElThemeData.dark.valueInk,
+        Icon.colorFor(inside, IconTone.inherit),
+        ThemeTokens.dark.premiumText,
       );
     });
 
@@ -163,20 +175,18 @@ void main() {
         ),
       );
       expect(
-        ElIcon.colorFor(bare, ElIconTone.inherit),
-        ElThemeData.dark.foreground,
+        Icon.colorFor(bare, IconTone.inherit),
+        ThemeTokens.dark.foreground,
       );
     });
 
     testWidgets('every glyph paints in both themes', (WidgetTester t) async {
-      for (final ElThemeMode mode in <ElThemeMode>[
-        ElThemeMode.dark,
-        ElThemeMode.light,
+      for (final ColorMode mode in <ColorMode>[
+        ColorMode.dark,
+        ColorMode.light,
       ]) {
-        for (final ElIconGlyph glyph in ElIconGlyph.values) {
-          await t.pumpWidget(
-            host(ElIcon(glyph, size: ElIconSize.xl), mode: mode),
-          );
+        for (final IconGlyph glyph in IconGlyph.values) {
+          await t.pumpWidget(host(Icon(glyph, size: IconSize.xl), mode: mode));
           expect(t.takeException(), isNull, reason: '$glyph in $mode');
         }
       }
@@ -184,45 +194,45 @@ void main() {
 
     testWidgets('sizePx and strokeOverride win', (WidgetTester t) async {
       await t.pumpWidget(
-        host(const ElIcon(ElIconGlyph.check, sizePx: 18, strokeOverride: 3)),
+        host(const Icon(IconGlyph.check, sizePx: 18, strokeOverride: 3)),
       );
-      expect(t.getSize(find.byType(ElIcon)), const Size(18, 18));
+      expect(t.getSize(find.byType(Icon)), const Size(18, 18));
       expect(t.takeException(), isNull);
     });
   });
 
-  group('ElButton', () {
-    ElMachineSurface surfaceOf(WidgetTester t) =>
-        t.widget<ElMachineSurface>(find.byType(ElMachineSurface));
+  group('Button', () {
+    Surface surfaceOf(WidgetTester t) =>
+        t.widget<Surface>(find.byType(Surface));
 
     testWidgets('all nine rungs render at their cva height', (
       WidgetTester t,
     ) async {
-      Future<Size> sizeOf(ElButtonSize size) async {
+      Future<Size> sizeOf(ButtonSize size) async {
         await t.pumpWidget(
           host(
-            ElButton(
-              variant: ElButtonVariant.outline,
+            Button(
+              variant: ButtonVariant.outline,
               size: size,
               onPressed: () {},
-              child: const ElIcon(ElIconGlyph.menu),
+              child: const Icon(IconGlyph.menu),
             ),
           ),
         );
-        return t.getSize(find.byType(ElButton));
+        return t.getSize(find.byType(Button));
       }
 
       // The five text rungs — 24 / 32 / 40 / 48 / 56.
-      expect((await sizeOf(ElButtonSize.xs)).height, el(6));
-      expect((await sizeOf(ElButtonSize.sm)).height, el(8));
-      expect((await sizeOf(ElButtonSize.md)).height, el(10));
-      expect((await sizeOf(ElButtonSize.lg)).height, el(12));
-      expect((await sizeOf(ElButtonSize.xl)).height, el(14));
+      expect((await sizeOf(ButtonSize.xs)).height, space(6));
+      expect((await sizeOf(ButtonSize.sm)).height, space(8));
+      expect((await sizeOf(ButtonSize.md)).height, space(10));
+      expect((await sizeOf(ButtonSize.lg)).height, space(12));
+      expect((await sizeOf(ButtonSize.xl)).height, space(14));
       // The four squares, which are square.
-      expect(await sizeOf(ElButtonSize.iconXs), Size(el(6), el(6)));
-      expect(await sizeOf(ElButtonSize.iconSm), Size(el(8), el(8)));
-      expect(await sizeOf(ElButtonSize.icon), Size(el(10), el(10)));
-      expect(await sizeOf(ElButtonSize.iconLg), Size(el(12), el(12)));
+      expect(await sizeOf(ButtonSize.iconXs), Size(space(6), space(6)));
+      expect(await sizeOf(ButtonSize.iconSm), Size(space(8), space(8)));
+      expect(await sizeOf(ButtonSize.icon), Size(space(10), space(10)));
+      expect(await sizeOf(ButtonSize.iconLg), Size(space(12), space(12)));
     });
 
     testWidgets('outline is card on input with --shadow-btn', (
@@ -230,35 +240,35 @@ void main() {
     ) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
 
-      final ElMachineSurface surface = surfaceOf(t);
-      expect(surface.fill, ElThemeData.dark.card);
-      expect((surface.border! as Border).top.color, ElThemeData.dark.input);
-      expect(surface.spec, same(ElShadows.btn));
-      expect(surface.radius, BorderRadius.circular(ElRadii.pill));
+      final Surface surface = surfaceOf(t);
+      expect(surface.fill, ThemeTokens.dark.card);
+      expect((surface.border! as Border).top.color, ThemeTokens.dark.input);
+      expect(surface.spec, same(Shadows.control));
+      expect(surface.radius, BorderRadius.circular(Radii.full));
     });
 
     testWidgets('outline fills with --muted on hover', (WidgetTester t) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
 
-      await hoverOver(t, find.byType(ElButton));
+      await hoverOver(t, find.byType(Button));
       await t.pumpAndSettle();
-      expect(surfaceOf(t).fill, ElThemeData.dark.muted);
+      expect(surfaceOf(t).fill, ThemeTokens.dark.muted);
     });
 
     testWidgets('outline drops into --shadow-btn-down while held', (
@@ -266,56 +276,56 @@ void main() {
     ) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
 
       final TestGesture gesture = await t.startGesture(
-        t.getCenter(find.byType(ElButton)),
+        t.getCenter(find.byType(Button)),
       );
       await t.pump();
-      expect(surfaceOf(t).spec, same(ElShadows.btnDown));
+      expect(surfaceOf(t).spec, same(Shadows.controlPressed));
 
       await gesture.up();
-      await t.pump(ElDurations.base);
-      expect(surfaceOf(t).spec, same(ElShadows.btn));
+      await t.pump(MotionDurations.normal);
+      expect(surfaceOf(t).spec, same(Shadows.control));
     });
 
     testWidgets('ghost is bare, muted, and shadowless', (WidgetTester t) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.ghost,
+          Button(
+            variant: ButtonVariant.ghost,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.x),
+            child: const Icon(IconGlyph.x),
           ),
         ),
       );
 
-      final ElMachineSurface surface = surfaceOf(t);
-      expect(surface.fill, elTransparent);
+      final Surface surface = surfaceOf(t);
+      expect(surface.fill, transparent);
       // The base class list is `border border-transparent` for every variant:
       // a real 1px border, invisible but paid for in inner width.
-      expect((surface.border! as Border).top.color, elTransparent);
-      expect((surface.border! as Border).top.width, ElWidths.hairline);
+      expect((surface.border! as Border).top.color, transparent);
+      expect((surface.border! as Border).top.width, BorderWidths.hairline);
       expect(surface.spec.layers, isEmpty);
       expect(
         t
             .widget<DefaultTextStyle>(
               find
                   .descendant(
-                    of: find.byType(ElButton),
+                    of: find.byType(Button),
                     matching: find.byType(DefaultTextStyle),
                   )
                   .first,
             )
             .style
             .color,
-        ElThemeData.dark.mutedForeground,
+        ThemeTokens.dark.mutedForeground,
       );
     });
 
@@ -324,17 +334,17 @@ void main() {
     ) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.ghost,
+          Button(
+            variant: ButtonVariant.ghost,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.x),
+            child: const Icon(IconGlyph.x),
           ),
         ),
       );
 
-      await hoverOver(t, find.byType(ElButton));
+      await hoverOver(t, find.byType(Button));
       await t.pumpAndSettle();
-      expect(surfaceOf(t).fill, ElThemeData.dark.secondary);
+      expect(surfaceOf(t).fill, ThemeTokens.dark.secondary);
     });
 
     /// The scale the button is currently drawn at — the first [Transform] under
@@ -343,7 +353,7 @@ void main() {
         .widget<Transform>(
           find
               .descendant(
-                of: find.byType(ElButton),
+                of: find.byType(Button),
                 matching: find.byType(Transform),
               )
               .first,
@@ -356,17 +366,17 @@ void main() {
     ) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
 
       expect(scaleOf(t), 1.0);
 
-      await t.startGesture(t.getCenter(find.byType(ElButton)));
+      await t.startGesture(t.getCenter(find.byType(Button)));
       // RETUNED (behaviour-audit B1). This used to pump `--duration-tick`
       // before asserting, on the theory that `btn-spring`'s `:active`
       // duration eased the squish over 80ms. It does not: Tailwind v4 compiles
@@ -374,7 +384,7 @@ void main() {
       // `btn-spring`'s transition-property list. One frame is all it takes on
       // the reference, so one frame is all this pumps — stricter, and true.
       await t.pump();
-      expect(scaleOf(t), ElTransforms.buttonScale);
+      expect(scaleOf(t), MotionTransforms.buttonPress);
     });
 
     // ── Measured behaviour — behaviour-audit §3 ────────────────────────────
@@ -387,10 +397,10 @@ void main() {
     ) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
@@ -398,13 +408,13 @@ void main() {
 
       final List<double> frames = <double>[];
       final TestGesture press = await t.startGesture(
-        t.getCenter(find.byType(ElButton)),
+        t.getCenter(find.byType(Button)),
       );
 
       // Measured: 9.5ms after `pointerdown` — the very next frame — the button
       // is already fully at 0.95, with no intermediate value sampled.
       await t.pump();
-      expect(scaleOf(t), ElTransforms.buttonScale);
+      expect(scaleOf(t), MotionTransforms.buttonPress);
       for (int i = 0; i < 24; i++) {
         await t.pump(const Duration(milliseconds: 16));
         frames.add(scaleOf(t));
@@ -421,8 +431,8 @@ void main() {
 
       // The whole press, sampled: two values and nothing else. No 80ms
       // down-stroke, no 250ms spring back, and none of the ≈1.005 release
-      // overshoot the port used to carry through `ElPress`.
-      expect(frames.toSet(), <double>{ElTransforms.buttonScale, 1.0});
+      // overshoot the port used to carry through `Press`.
+      expect(frames.toSet(), <double>{MotionTransforms.buttonPress, 1.0});
     });
 
     testWidgets('B6 — a 10, 20 or 30ms tap still shows the full 0.95', (
@@ -430,10 +440,10 @@ void main() {
     ) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
@@ -443,12 +453,20 @@ void main() {
       // depend on hold length.
       for (final int ms in <int>[10, 20, 30]) {
         final TestGesture tap = await t.startGesture(
-          t.getCenter(find.byType(ElButton)),
+          t.getCenter(find.byType(Button)),
         );
         await t.pump();
-        expect(scaleOf(t), ElTransforms.buttonScale, reason: '${ms}ms hold');
+        expect(
+          scaleOf(t),
+          MotionTransforms.buttonPress,
+          reason: '${ms}ms hold',
+        );
         await t.pump(Duration(milliseconds: ms));
-        expect(scaleOf(t), ElTransforms.buttonScale, reason: '${ms}ms hold');
+        expect(
+          scaleOf(t),
+          MotionTransforms.buttonPress,
+          reason: '${ms}ms hold',
+        );
 
         await tap.up();
         await t.pump();
@@ -463,18 +481,18 @@ void main() {
       (WidgetTester t) async {
         await t.pumpWidget(
           host(
-            ElButton(
-              variant: ElButtonVariant.outline,
+            Button(
+              variant: ButtonVariant.outline,
               suppressPressScale: true,
               onPressed: () {},
-              child: const ElIcon(ElIconGlyph.menu),
+              child: const Icon(IconGlyph.menu),
             ),
           ),
         );
 
         final List<double> frames = <double>[scaleOf(t)];
         final TestGesture press = await t.startGesture(
-          t.getCenter(find.byType(ElButton)),
+          t.getCenter(find.byType(Button)),
         );
         await t.pump();
         frames.add(scaleOf(t));
@@ -499,45 +517,45 @@ void main() {
     ) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             suppressPressScale: true,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
 
       final TestGesture press = await t.startGesture(
-        t.getCenter(find.byType(ElButton)),
+        t.getCenter(find.byType(Button)),
       );
       await t.pump();
       // `active:shadow-btn-down` carries no `not-` guard, so a trigger sinks
       // into its socket exactly like every other button.
-      expect(surfaceOf(t).spec, same(ElShadows.btnDown));
+      expect(surfaceOf(t).spec, same(Shadows.controlPressed));
       expect(scaleOf(t), 1.0);
 
       await press.up();
-      await t.pump(ElDurations.base);
-      expect(surfaceOf(t).spec, same(ElShadows.btn));
+      await t.pump(MotionDurations.normal);
+      expect(surfaceOf(t).spec, same(Shadows.control));
     });
 
     testWidgets('B2 — the pressed shadow hard-cuts: the token pair cannot '
         'interpolate', (WidgetTester t) async {
       await t.pumpWidget(
-        host(ElButton(onPressed: () {}, child: const ElIcon(ElIconGlyph.menu))),
+        host(Button(onPressed: () {}, child: const Icon(IconGlyph.menu))),
       );
-      ElShadowSpec spec() =>
-          t.widget<ElSheenAction>(find.byType(ElSheenAction)).spec;
+      ShadowStyle spec() =>
+          t.widget<ActionFeedback>(find.byType(ActionFeedback)).spec;
 
       // `--shadow-btn-primary` is 4 layers (2 inset, 2 not) against
       // `--shadow-btn-down`'s 2 (1 inset, 1 not). Mismatched layer counts AND
       // mismatched `inset` flags: CSS refuses to interpolate, and the browser
       // was measured swapping the value inside a single frame. A later
       // well-meaning tween here would be motion the reference never shows.
-      final List<ElShadowSpec> seen = <ElShadowSpec>[spec()];
+      final List<ShadowStyle> seen = <ShadowStyle>[spec()];
       final TestGesture press = await t.startGesture(
-        t.getCenter(find.byType(ElButton)),
+        t.getCenter(find.byType(Button)),
       );
       for (int i = 0; i < 8; i++) {
         await t.pump(const Duration(milliseconds: 16));
@@ -549,12 +567,17 @@ void main() {
         seen.add(spec());
       }
 
-      expect(seen.first, same(ElShadows.btnPrimary));
-      expect(seen[1], same(ElShadows.btnDown), reason: 'the very next frame');
-      expect(seen.last, same(ElShadows.btnPrimary));
-      for (final ElShadowSpec s in seen) {
+      expect(seen.first, same(Shadows.controlPrimary));
+      expect(
+        seen[1],
+        same(Shadows.controlPressed),
+        reason: 'the very next frame',
+      );
+      expect(seen.last, same(Shadows.controlPrimary));
+      for (final ShadowStyle s in seen) {
         expect(
-          identical(s, ElShadows.btnPrimary) || identical(s, ElShadows.btnDown),
+          identical(s, Shadows.controlPrimary) ||
+              identical(s, Shadows.controlPressed),
           isTrue,
           reason: 'no third, interpolated value may ever appear',
         );
@@ -566,21 +589,21 @@ void main() {
     ) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.premium,
+          Button(
+            variant: ButtonVariant.premium,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
-      ElShadowSpec spec() =>
-          t.widget<ElFoilValue>(find.byType(ElFoilValue)).spec;
+      ShadowStyle spec() =>
+          t.widget<PremiumSurface>(find.byType(PremiumSurface)).spec;
 
-      expect(spec(), same(ElShadows.btnValue));
+      expect(spec(), same(Shadows.controlPremium));
       // Measured at **1.2ms** after `pointerover`: `--shadow-btn-value` (8
       // computed layers, insets) → `--shadow-glow-value` (6, none). Snap.
-      await hoverOver(t, find.byType(ElButton));
-      expect(spec(), same(ElShadows.glowValue));
+      await hoverOver(t, find.byType(Button));
+      expect(spec(), same(Shadows.glowValue));
     });
 
     testWidgets('B12 — the focus ring springs its spread 0 → 3.29 → 3', (
@@ -590,11 +613,11 @@ void main() {
       addTearDown(node.dispose);
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             focusNode: node,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
@@ -602,13 +625,17 @@ void main() {
       // The ring lands in one of the token's leading transparent placeholder
       // slots, so the layer count and the per-layer `inset` flags never change
       // and `box-shadow` interpolates normally — the opposite case to B2/B3.
-      expect(surfaceOf(t).spec, same(ElShadows.btn), reason: 'no ring at rest');
+      expect(
+        surfaceOf(t).spec,
+        same(Shadows.control),
+        reason: 'no ring at rest',
+      );
 
       node.requestFocus();
       await t.pump();
       double spread() => surfaceOf(t).spec.layers.first.spread;
       double alpha() =>
-          surfaceOf(t).spec.layers.first.color(ElThemeData.dark).a;
+          surfaceOf(t).spec.layers.first.color(ThemeTokens.dark).a;
 
       double peak = 0;
       double peakAlpha = 0;
@@ -645,17 +672,17 @@ void main() {
       WidgetTester t,
     ) async {
       Widget button({required bool enabled}) => host(
-        ElButton(
-          variant: ElButtonVariant.outline,
+        Button(
+          variant: ButtonVariant.outline,
           onPressed: enabled ? () {} : null,
-          child: const ElIcon(ElIconGlyph.menu),
+          child: const Icon(IconGlyph.menu),
         ),
       );
       double opacity() => t
           .widget<Opacity>(
             find
                 .descendant(
-                  of: find.byType(ElButton),
+                  of: find.byType(Button),
                   matching: find.byType(Opacity),
                 )
                 .first,
@@ -683,39 +710,36 @@ void main() {
       int presses = 0;
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             onPressed: () => presses++,
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
 
-      await t.tap(find.byType(ElButton));
-      await t.pump(ElDurations.base);
+      await t.tap(find.byType(Button));
+      await t.pump(MotionDurations.normal);
       expect(presses, 1);
     });
 
     testWidgets('a null onPressed disables it', (WidgetTester t) async {
       await t.pumpWidget(
         host(
-          const ElButton(
-            variant: ElButtonVariant.outline,
-            child: ElIcon(ElIconGlyph.menu),
+          const Button(
+            variant: ButtonVariant.outline,
+            child: Icon(IconGlyph.menu),
           ),
         ),
       );
 
-      await t.tap(find.byType(ElButton), warnIfMissed: false);
-      await t.pump(ElDurations.base);
+      await t.tap(find.byType(Button), warnIfMissed: false);
+      await t.pump(MotionDurations.normal);
       expect(t.takeException(), isNull);
 
       final Opacity opacity = t.widget<Opacity>(
         find
-            .descendant(
-              of: find.byType(ElButton),
-              matching: find.byType(Opacity),
-            )
+            .descendant(of: find.byType(Button), matching: find.byType(Opacity))
             .first,
       );
       expect(opacity.opacity, lessThan(1));
@@ -725,10 +749,10 @@ void main() {
       WidgetTester t,
     ) async {
       Widget button({required bool enabled}) => host(
-        ElButton(
-          variant: ElButtonVariant.outline,
+        Button(
+          variant: ButtonVariant.outline,
           onPressed: enabled ? () {} : null,
-          child: const ElIcon(ElIconGlyph.menu),
+          child: const Icon(IconGlyph.menu),
         ),
       );
       MouseRegion region() => t.widget<MouseRegion>(find.byType(MouseRegion));
@@ -747,43 +771,43 @@ void main() {
     // is 6 and `px-2.5` is 10.
 
     test('the enum is nine members in the cva\'s declaration order', () {
-      expect(ElButtonSize.values, <ElButtonSize>[
-        ElButtonSize.xs,
-        ElButtonSize.sm,
-        ElButtonSize.md,
-        ElButtonSize.lg,
-        ElButtonSize.xl,
-        ElButtonSize.iconXs,
-        ElButtonSize.iconSm,
-        ElButtonSize.icon,
-        ElButtonSize.iconLg,
+      expect(ButtonSize.values, <ButtonSize>[
+        ButtonSize.xs,
+        ButtonSize.sm,
+        ButtonSize.md,
+        ButtonSize.lg,
+        ButtonSize.xl,
+        ButtonSize.iconXs,
+        ButtonSize.iconSm,
+        ButtonSize.icon,
+        ButtonSize.iconLg,
       ]);
     });
 
     test('height — 24 / 32 / 40 / 48 / 56, squares included', () {
-      expect(ElButton.heightFor(ElButtonSize.xs), 24);
-      expect(ElButton.heightFor(ElButtonSize.sm), 32);
-      expect(ElButton.heightFor(ElButtonSize.md), 40);
-      expect(ElButton.heightFor(ElButtonSize.lg), 48);
-      expect(ElButton.heightFor(ElButtonSize.xl), 56);
-      expect(ElButton.heightFor(ElButtonSize.iconXs), 24);
-      expect(ElButton.heightFor(ElButtonSize.iconSm), 32);
-      expect(ElButton.heightFor(ElButtonSize.icon), 40);
-      expect(ElButton.heightFor(ElButtonSize.iconLg), 48);
+      expect(Button.heightFor(ButtonSize.xs), 24);
+      expect(Button.heightFor(ButtonSize.sm), 32);
+      expect(Button.heightFor(ButtonSize.md), 40);
+      expect(Button.heightFor(ButtonSize.lg), 48);
+      expect(Button.heightFor(ButtonSize.xl), 56);
+      expect(Button.heightFor(ButtonSize.iconXs), 24);
+      expect(Button.heightFor(ButtonSize.iconSm), 32);
+      expect(Button.heightFor(ButtonSize.icon), 40);
+      expect(Button.heightFor(ButtonSize.iconLg), 48);
     });
 
     test('gap — 4 / 6 / 8 / 10 / 10, and none on any square', () {
-      expect(ElButton.gapFor(ElButtonSize.xs), 4);
-      expect(ElButton.gapFor(ElButtonSize.sm), 6);
-      expect(ElButton.gapFor(ElButtonSize.md), 8);
+      expect(Button.gapFor(ButtonSize.xs), 4);
+      expect(Button.gapFor(ButtonSize.sm), 6);
+      expect(Button.gapFor(ButtonSize.md), 8);
       // `lg` and `xl` share `gap-2.5`; the ladder does not step here.
-      expect(ElButton.gapFor(ElButtonSize.lg), 10);
-      expect(ElButton.gapFor(ElButtonSize.xl), 10);
-      for (final ElButtonSize square in ElButtonSize.values.where(
-        ElButton.isSquare,
+      expect(Button.gapFor(ButtonSize.lg), 10);
+      expect(Button.gapFor(ButtonSize.xl), 10);
+      for (final ButtonSize square in ButtonSize.values.where(
+        Button.isSquare,
       )) {
         expect(
-          ElButton.gapFor(square),
+          Button.gapFor(square),
           0,
           reason: '${square.name} declares no gap',
         );
@@ -791,24 +815,24 @@ void main() {
     });
 
     test('padding-x — 10 / 14 / 16 / 24 / 32, and none on any square', () {
-      expect(ElButton.paddingXFor(ElButtonSize.xs), 10);
-      expect(ElButton.paddingXFor(ElButtonSize.sm), 14);
-      expect(ElButton.paddingXFor(ElButtonSize.md), 16);
-      expect(ElButton.paddingXFor(ElButtonSize.lg), 24);
-      expect(ElButton.paddingXFor(ElButtonSize.xl), 32);
-      for (final ElButtonSize square in ElButtonSize.values.where(
-        ElButton.isSquare,
+      expect(Button.paddingXFor(ButtonSize.xs), 10);
+      expect(Button.paddingXFor(ButtonSize.sm), 14);
+      expect(Button.paddingXFor(ButtonSize.md), 16);
+      expect(Button.paddingXFor(ButtonSize.lg), 24);
+      expect(Button.paddingXFor(ButtonSize.xl), 32);
+      for (final ButtonSize square in ButtonSize.values.where(
+        Button.isSquare,
       )) {
-        expect(ElButton.paddingXFor(square), 0);
+        expect(Button.paddingXFor(square), 0);
       }
     });
 
     test('exactly four rungs are squares', () {
-      expect(ElButtonSize.values.where(ElButton.isSquare), <ElButtonSize>[
-        ElButtonSize.iconXs,
-        ElButtonSize.iconSm,
-        ElButtonSize.icon,
-        ElButtonSize.iconLg,
+      expect(ButtonSize.values.where(Button.isSquare), <ButtonSize>[
+        ButtonSize.iconXs,
+        ButtonSize.iconSm,
+        ButtonSize.icon,
+        ButtonSize.iconLg,
       ]);
     });
 
@@ -816,27 +840,27 @@ void main() {
       // `[&_svg:not([class*='size-'])]:size-*`. `md` and `lg` are the two text
       // rungs that never override the base `size-4`, which is why a 48px `lg`
       // button and a 40px `md` button hold the same 16px glyph.
-      expect(ElButton.iconPxFor(ElButtonSize.xs), 12);
-      expect(ElButton.iconPxFor(ElButtonSize.sm), 14);
-      expect(ElButton.iconPxFor(ElButtonSize.md), 16);
-      expect(ElButton.iconPxFor(ElButtonSize.lg), 16);
-      expect(ElButton.iconPxFor(ElButtonSize.xl), 20);
-      expect(ElButton.iconPxFor(ElButtonSize.iconXs), 12);
-      expect(ElButton.iconPxFor(ElButtonSize.iconSm), 14);
-      expect(ElButton.iconPxFor(ElButtonSize.icon), 16);
-      expect(ElButton.iconPxFor(ElButtonSize.iconLg), 20);
+      expect(Button.iconPxFor(ButtonSize.xs), 12);
+      expect(Button.iconPxFor(ButtonSize.sm), 14);
+      expect(Button.iconPxFor(ButtonSize.md), 16);
+      expect(Button.iconPxFor(ButtonSize.lg), 16);
+      expect(Button.iconPxFor(ButtonSize.xl), 20);
+      expect(Button.iconPxFor(ButtonSize.iconXs), 12);
+      expect(Button.iconPxFor(ButtonSize.iconSm), 14);
+      expect(Button.iconPxFor(ButtonSize.icon), 16);
+      expect(Button.iconPxFor(ButtonSize.iconLg), 20);
     });
 
     test('five rungs, three type sizes, three leadings — drift 15', () {
-      ElTypeSpec spec(ElButtonSize size) =>
-          ElButton.typeFor(size, ElButtonEmphasis.none)!;
+      TextStyleToken spec(ButtonSize size) =>
+          Button.typeFor(size, ButtonEmphasis.none)!;
 
       // Three sizes across five rungs: only `xs` is unique.
-      expect(spec(ElButtonSize.xs).size, 12);
-      expect(spec(ElButtonSize.sm).size, 13);
-      expect(spec(ElButtonSize.md).size, 13);
-      expect(spec(ElButtonSize.lg).size, 15);
-      expect(spec(ElButtonSize.xl).size, 15);
+      expect(spec(ButtonSize.xs).size, 12);
+      expect(spec(ButtonSize.sm).size, 13);
+      expect(spec(ButtonSize.md).size, 13);
+      expect(spec(ButtonSize.lg).size, 15);
+      expect(spec(ButtonSize.xl).size, 15);
 
       // And the leadings do not agree with the sizes. `text-xs`, `text-sm` and
       // `text-base` are Tailwind steps repointed at this scale, so their stock
@@ -851,37 +875,37 @@ void main() {
       // centred its label; `SidebarMenuButton` is the corpus's first `h-auto`
       // button and it measures the difference — a default row is 37.5 tall on
       // the reference and came out 34.
-      expect(spec(ElButtonSize.xs).height, closeTo(1 / 0.75, 1e-12));
-      expect(spec(ElButtonSize.sm).height, 1.5);
-      expect(spec(ElButtonSize.md).height, closeTo(1.25 / 0.875, 1e-12));
-      expect(spec(ElButtonSize.lg).height, 1.5);
-      expect(spec(ElButtonSize.xl).height, closeTo(1.5 / 1, 1e-12));
+      expect(spec(ButtonSize.xs).height, closeTo(1 / 0.75, 1e-12));
+      expect(spec(ButtonSize.sm).height, 1.5);
+      expect(spec(ButtonSize.md).height, closeTo(1.25 / 0.875, 1e-12));
+      expect(spec(ButtonSize.lg).height, 1.5);
+      expect(spec(ButtonSize.xl).height, closeTo(1.5 / 1, 1e-12));
 
       // Computed line boxes: 16.0 / 19.5 / 18.571 / 22.5 / 22.5.
-      expect(spec(ElButtonSize.xs).height! * 12, closeTo(16.0, 1e-9));
-      expect(spec(ElButtonSize.sm).height! * 13, closeTo(19.5, 1e-9));
-      expect(spec(ElButtonSize.md).height! * 13, closeTo(18.571, 1e-3));
-      expect(spec(ElButtonSize.lg).height! * 15, closeTo(22.5, 1e-9));
-      expect(spec(ElButtonSize.xl).height! * 15, closeTo(22.5, 1e-9));
+      expect(spec(ButtonSize.xs).height! * 12, closeTo(16.0, 1e-9));
+      expect(spec(ButtonSize.sm).height! * 13, closeTo(19.5, 1e-9));
+      expect(spec(ButtonSize.md).height! * 13, closeTo(18.571, 1e-3));
+      expect(spec(ButtonSize.lg).height! * 15, closeTo(22.5, 1e-9));
+      expect(spec(ButtonSize.xl).height! * 15, closeTo(22.5, 1e-9));
 
       // Every text rung is `font-medium`.
-      for (final ElButtonSize size in <ElButtonSize>[
-        ElButtonSize.xs,
-        ElButtonSize.sm,
-        ElButtonSize.md,
-        ElButtonSize.lg,
-        ElButtonSize.xl,
+      for (final ButtonSize size in <ButtonSize>[
+        ButtonSize.xs,
+        ButtonSize.sm,
+        ButtonSize.md,
+        ButtonSize.lg,
+        ButtonSize.xl,
       ]) {
         expect(spec(size).weight, FontWeight.w500);
       }
     });
 
     test('the four squares declare no text class at all', () {
-      for (final ElButtonSize square in ElButtonSize.values.where(
-        ElButton.isSquare,
+      for (final ButtonSize square in ButtonSize.values.where(
+        Button.isSquare,
       )) {
         expect(
-          ElButton.typeFor(square, ElButtonEmphasis.none),
+          Button.typeFor(square, ButtonEmphasis.none),
           isNull,
           reason: '${square.name} sets no text-*; it inherits from the page',
         );
@@ -898,9 +922,9 @@ void main() {
         host(
           DefaultTextStyle(
             style: ambient,
-            child: ElButton(
-              variant: ElButtonVariant.ghost,
-              size: ElButtonSize.icon,
+            child: Button(
+              variant: ButtonVariant.ghost,
+              size: ButtonSize.icon,
               onPressed: () {},
               child: const Text('x'),
             ),
@@ -912,7 +936,7 @@ void main() {
           .widget<DefaultTextStyle>(
             find
                 .descendant(
-                  of: find.byType(ElButton),
+                  of: find.byType(Button),
                   matching: find.byType(DefaultTextStyle),
                 )
                 .first,
@@ -920,16 +944,16 @@ void main() {
           .style;
       expect(resolved.fontSize, 31);
       expect(resolved.fontFamily, 'Ambient');
-      expect(resolved.color, ElThemeData.dark.mutedForeground);
+      expect(resolved.color, ThemeTokens.dark.mutedForeground);
     });
   });
 
-  group('ElButton emphasis: caps', () {
+  group('Button emphasis: caps', () {
     TextStyle labelStyleOf(WidgetTester t) => t
         .widget<DefaultTextStyle>(
           find
               .descendant(
-                of: find.byType(ElButton),
+                of: find.byType(Button),
                 matching: find.byType(DefaultTextStyle),
               )
               .first,
@@ -939,13 +963,13 @@ void main() {
     testWidgets('is 12px / 600 / 0.09em on every rung, including default', (
       WidgetTester t,
     ) async {
-      for (final ElButtonSize size in ElButtonSize.values) {
+      for (final ButtonSize size in ButtonSize.values) {
         await t.pumpWidget(
           host(
-            ElButton(
-              variant: ElButtonVariant.premium,
+            Button(
+              variant: ButtonVariant.premium,
               size: size,
-              emphasis: ElButtonEmphasis.caps,
+              emphasis: ButtonEmphasis.caps,
               onPressed: () {},
               child: const Text('Claim Reward'),
             ),
@@ -974,14 +998,14 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(
-        host(ElButton(onPressed: () {}, child: const Text('Open Pack'))),
+        host(Button(onPressed: () {}, child: const Text('Open Pack'))),
       );
       expect(labelStyleOf(t).fontSize, 13);
 
       await t.pumpWidget(
         host(
-          ElButton(
-            emphasis: ElButtonEmphasis.caps,
+          Button(
+            emphasis: ButtonEmphasis.caps,
             onPressed: () {},
             child: const Text('Claim Reward'),
           ),
@@ -995,9 +1019,9 @@ void main() {
     ) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.premium,
-            emphasis: ElButtonEmphasis.caps,
+          Button(
+            variant: ButtonVariant.premium,
+            emphasis: ButtonEmphasis.caps,
             onPressed: () {},
             child: const Text('Claim Reward'),
           ),
@@ -1005,7 +1029,7 @@ void main() {
       );
 
       final Text rendered = t.widget<Text>(
-        find.descendant(of: find.byType(ElButton), matching: find.byType(Text)),
+        find.descendant(of: find.byType(Button), matching: find.byType(Text)),
       );
       // `text-transform` repaints the glyphs; the DOM text — and therefore the
       // accessible name — stays as authored.
@@ -1016,26 +1040,26 @@ void main() {
     testWidgets('leaves a non-Text child alone', (WidgetTester t) async {
       await t.pumpWidget(
         host(
-          ElButton(
-            emphasis: ElButtonEmphasis.caps,
+          Button(
+            emphasis: ButtonEmphasis.caps,
             onPressed: () {},
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           ),
         ),
       );
       expect(t.takeException(), isNull);
-      expect(find.byType(ElIcon), findsOneWidget);
+      expect(find.byType(Icon), findsOneWidget);
     });
   });
 
-  group('ElButton.loading', () {
+  group('Button.loading', () {
     testWidgets('prepends a spinner and disables the button', (
       WidgetTester t,
     ) async {
       int presses = 0;
       await t.pumpWidget(
         host(
-          ElButton(
+          Button(
             loading: true,
             onPressed: () => presses++,
             child: const Text('Saving'),
@@ -1043,24 +1067,21 @@ void main() {
         ),
       );
 
-      expect(find.byType(ElSpinner), findsOneWidget);
+      expect(find.byType(Spinner), findsOneWidget);
       // The spinner leads: `<>{loading && <Spinner />}{children}</>`.
-      final Offset spinner = t.getCenter(find.byType(ElSpinner));
+      final Offset spinner = t.getCenter(find.byType(Spinner));
       final Offset label = t.getCenter(find.text('Saving'));
       expect(spinner.dx, lessThan(label.dx));
 
       // `disabled = disabled || loading` — the callback is live and still must
       // not fire.
-      await t.tap(find.byType(ElButton), warnIfMissed: false);
-      await t.pump(ElDurations.base);
+      await t.tap(find.byType(Button), warnIfMissed: false);
+      await t.pump(MotionDurations.normal);
       expect(presses, 0);
 
       final Opacity opacity = t.widget<Opacity>(
         find
-            .descendant(
-              of: find.byType(ElButton),
-              matching: find.byType(Opacity),
-            )
+            .descendant(of: find.byType(Button), matching: find.byType(Opacity))
             .first,
       );
       expect(opacity.opacity, 0.45);
@@ -1070,49 +1091,45 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(
-        host(ElButton(onPressed: () {}, child: const Text('Saving'))),
+        host(Button(onPressed: () {}, child: const Text('Saving'))),
       );
-      final double resting = t.getSize(find.byType(ElButton)).width;
+      final double resting = t.getSize(find.byType(Button)).width;
 
       await t.pumpWidget(
         host(
-          ElButton(
-            loading: true,
-            onPressed: () {},
-            child: const Text('Saving'),
-          ),
+          Button(loading: true, onPressed: () {}, child: const Text('Saving')),
         ),
       );
-      final double busy = t.getSize(find.byType(ElButton)).width;
+      final double busy = t.getSize(find.byType(Button)).width;
 
       // 16px of glyph plus the rung's own `gap-2`. Four separate sentences in
       // the reference say this does not happen.
       expect(
         busy - resting,
-        closeTo(ElSpinner.px + ElButton.gapFor(ElButtonSize.md), 1e-9),
+        closeTo(Spinner.px + Button.gapFor(ButtonSize.md), 1e-9),
       );
     });
 
     testWidgets('the gap in front of the label is the rung\'s own', (
       WidgetTester t,
     ) async {
-      for (final ElButtonSize size in <ElButtonSize>[
-        ElButtonSize.xs,
-        ElButtonSize.sm,
-        ElButtonSize.md,
-        ElButtonSize.lg,
-        ElButtonSize.xl,
+      for (final ButtonSize size in <ButtonSize>[
+        ButtonSize.xs,
+        ButtonSize.sm,
+        ButtonSize.md,
+        ButtonSize.lg,
+        ButtonSize.xl,
       ]) {
         await t.pumpWidget(
           host(
-            ElButton(size: size, onPressed: () {}, child: const Text('Saving')),
+            Button(size: size, onPressed: () {}, child: const Text('Saving')),
           ),
         );
-        final double resting = t.getSize(find.byType(ElButton)).width;
+        final double resting = t.getSize(find.byType(Button)).width;
 
         await t.pumpWidget(
           host(
-            ElButton(
+            Button(
               size: size,
               loading: true,
               onPressed: () {},
@@ -1120,11 +1137,11 @@ void main() {
             ),
           ),
         );
-        final double busy = t.getSize(find.byType(ElButton)).width;
+        final double busy = t.getSize(find.byType(Button)).width;
 
         expect(
           busy - resting,
-          closeTo(ElSpinner.px + ElButton.gapFor(size), 1e-9),
+          closeTo(Spinner.px + Button.gapFor(size), 1e-9),
           reason: '${size.name}: spinner + gap-*',
         );
       }
@@ -1139,7 +1156,7 @@ void main() {
       final SemanticsHandle handle = t.ensureSemantics();
       await t.pumpWidget(
         host(
-          ElButton(
+          Button(
             loading: true,
             label: 'Save Account',
             onPressed: () {},
@@ -1152,7 +1169,7 @@ void main() {
       // flags, and a whole-node match would also be pinning whichever actions
       // the gesture layer happens to expose under an `IgnorePointer`.
       expect(
-        t.getSemantics(find.byType(ElButton).first),
+        t.getSemantics(find.byType(Button).first),
         isSemantics(
           label: 'Save Account',
           isButton: true,
@@ -1164,13 +1181,13 @@ void main() {
     });
   });
 
-  group('ElSpinner', () {
+  group('Spinner', () {
     testWidgets('is 16px and turns once every 900ms, linearly', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(const ElSpinner()));
+      await t.pumpWidget(host(const Spinner()));
 
-      expect(t.getSize(find.byType(ElSpinner)), const Size(16, 16));
+      expect(t.getSize(find.byType(Spinner)), const Size(16, 16));
 
       double turnsNow() => t
           .widget<RotationTransition>(find.byType(RotationTransition))
@@ -1196,11 +1213,11 @@ void main() {
       WidgetTester t,
     ) async {
       final SemanticsHandle handle = t.ensureSemantics();
-      await t.pumpWidget(host(const ElSpinner()));
+      await t.pumpWidget(host(const Spinner()));
       // `role="status"` and `aria-label="Loading"` are handed to `Icon` and
       // dropped by its destructure; the glyph renders `aria-hidden`.
       expect(find.byType(ExcludeSemantics), findsWidgets);
-      expect(t.getSemantics(find.byType(ElSpinner)).label, isEmpty);
+      expect(t.getSemantics(find.byType(Spinner)).label, isEmpty);
       handle.dispose();
       await t.pumpWidget(host(const SizedBox()));
     });
@@ -1216,9 +1233,9 @@ void main() {
           ),
           child: Directionality(
             textDirection: TextDirection.ltr,
-            child: ElTheme(
-              controller: ElThemeController(mode: ElThemeMode.dark),
-              child: const Center(child: ElSpinner()),
+            child: ThemeScope(
+              controller: ThemeController(mode: ColorMode.dark),
+              child: const Center(child: Spinner()),
             ),
           ),
         ),
@@ -1232,36 +1249,33 @@ void main() {
       // `pulls-spin` declares no fill mode, so the blanket reduced-motion rule
       // leaves it at the element's resting style rather than its final stop.
       expect(turnsNow(), 0);
-      await t.pump(ElDurations.spin);
+      await t.pump(MotionDurations.spin);
       expect(turnsNow(), 0);
-      await t.pump(ElDurations.spin);
+      await t.pump(MotionDurations.spin);
       expect(turnsNow(), 0);
     });
   });
 
-  group('ElToggle', () {
-    ElMachineSurface surfaceOf(WidgetTester t) => t.widget<ElMachineSurface>(
+  group('Toggle', () {
+    Surface surfaceOf(WidgetTester t) => t.widget<Surface>(
       find
-          .descendant(
-            of: find.byType(ElToggle),
-            matching: find.byType(ElMachineSurface),
-          )
+          .descendant(of: find.byType(Toggle), matching: find.byType(Surface))
           .first,
     );
 
     Widget toggle({
       bool pressed = false,
       bool enabled = true,
-      ElToggleSize size = ElToggleSize.md,
-      ElToggleVariant variant = ElToggleVariant.standard,
+      ToggleSize size = ToggleSize.md,
+      ToggleVariant variant = ToggleVariant.standard,
     }) => host(
-      ElToggle(
+      Toggle(
         pressed: pressed,
         size: size,
         variant: variant,
         label: 'Favourite',
         onChanged: enabled ? (bool _) {} : null,
-        child: const ElIcon(ElIconGlyph.heart),
+        child: const Icon(IconGlyph.heart),
       ),
     );
 
@@ -1269,44 +1283,44 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(toggle());
-      final Size box = t.getSize(find.byType(ElToggle));
+      final Size box = t.getSize(find.byType(Toggle));
       // `h-8 min-w-8 px-2.5` around a 16px glyph: 16 + 20 = 36 × 32.
-      expect(box.height, el(8));
-      expect(box.width, el(9));
+      expect(box.height, space(8));
+      expect(box.width, space(9));
       expect(
         surfaceOf(t).radius,
-        BorderRadius.circular(ElRadii.lg),
+        BorderRadius.circular(Radii.lg),
         reason: 'rounded-lg — a Toggle is not a pill',
       );
     });
 
     test('the ladder: 28 / 32 / 36, and sm clamps its own radius', () {
-      expect(ElToggle.heightFor(ElToggleSize.sm), 28);
-      expect(ElToggle.heightFor(ElToggleSize.md), 32);
-      expect(ElToggle.heightFor(ElToggleSize.lg), 36);
-      expect(ElToggle.minWidthFor(ElToggleSize.sm), 28);
-      expect(ElToggle.minWidthFor(ElToggleSize.md), 32);
-      expect(ElToggle.minWidthFor(ElToggleSize.lg), 36);
+      expect(Toggle.heightFor(ToggleSize.sm), 28);
+      expect(Toggle.heightFor(ToggleSize.md), 32);
+      expect(Toggle.heightFor(ToggleSize.lg), 36);
+      expect(Toggle.minWidthFor(ToggleSize.sm), 28);
+      expect(Toggle.minWidthFor(ToggleSize.md), 32);
+      expect(Toggle.minWidthFor(ToggleSize.lg), 36);
       // `rounded-[min(var(--radius-md),12px)]` — 10px today, and it stays a
       // live clamp so a rebrand that raises --radius-md still ceilings at 12.
-      expect(ElToggle.radiusFor(ElToggleSize.sm), ElRadii.md);
-      expect(ElToggle.radiusFor(ElToggleSize.md), ElRadii.lg);
-      expect(ElToggle.radiusFor(ElToggleSize.lg), ElRadii.lg);
+      expect(Toggle.radiusFor(ToggleSize.sm), Radii.md);
+      expect(Toggle.radiusFor(ToggleSize.md), Radii.lg);
+      expect(Toggle.radiusFor(ToggleSize.lg), Radii.lg);
       // All three rungs declare the same `px-2.5` and `gap-1`.
-      expect(ElToggle.paddingX, 10);
-      expect(ElToggle.gap, 4);
+      expect(Toggle.paddingX, 10);
+      expect(Toggle.gap, 4);
     });
 
     testWidgets('rest is bare — no fill, no border box, no shadow', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(toggle());
-      final ElMachineSurface surface = surfaceOf(t);
-      expect(surface.fill, elTransparent);
+      final Surface surface = surfaceOf(t);
+      expect(surface.fill, transparent);
       // `variant="default"` is `bg-transparent` with no `border` class at all,
       // which is exactly why `focus-visible:border-ring` is inert on it.
       expect(surface.border, isNull);
-      expect(surface.spec.layers.single.color(ElThemeData.dark).a, 0);
+      expect(surface.spec.layers.single.color(ThemeTokens.dark).a, 0);
     });
 
     testWidgets('hover fills with --muted and moves no ink — drift 10', (
@@ -1317,7 +1331,7 @@ void main() {
           .widget<DefaultTextStyle>(
             find
                 .descendant(
-                  of: find.byType(ElToggle),
+                  of: find.byType(Toggle),
                   matching: find.byType(DefaultTextStyle),
                 )
                 .first,
@@ -1325,11 +1339,11 @@ void main() {
           .style
           .color!;
 
-      await hoverOver(t, find.byType(ElToggle));
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await hoverOver(t, find.byType(Toggle));
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
 
-      expect(surfaceOf(t).fill, ElThemeData.dark.muted);
+      expect(surfaceOf(t).fill, ThemeTokens.dark.muted);
       // `hover:text-foreground` restates the colour the element already
       // inherits: the base sets no resting ink, so the hover half is inert.
       expect(
@@ -1337,7 +1351,7 @@ void main() {
             .widget<DefaultTextStyle>(
               find
                   .descendant(
-                    of: find.byType(ElToggle),
+                    of: find.byType(Toggle),
                     matching: find.byType(DefaultTextStyle),
                   )
                   .first,
@@ -1346,20 +1360,20 @@ void main() {
             .color,
         restingInk,
       );
-      expect(restingInk, ElThemeData.dark.foreground);
+      expect(restingInk, ThemeTokens.dark.foreground);
     });
 
     testWidgets('the pressed fill is --muted — GREY, not blue — drift 5', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(toggle(pressed: true));
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
       // The panel's own caption says "the pressed state fills with the blue
       // tint — selection is always blue". `data-[state=on]:bg-muted` says
       // otherwise, and blue selection is real one panel further down.
-      expect(surfaceOf(t).fill, ElThemeData.dark.muted);
-      expect(surfaceOf(t).fill, isNot(ElThemeData.dark.primary));
+      expect(surfaceOf(t).fill, ThemeTokens.dark.muted);
+      expect(surfaceOf(t).fill, isNot(ThemeTokens.dark.primary));
     });
 
     testWidgets('disabled is 50%, not the Button\'s 45% — drift 12', (
@@ -1368,10 +1382,7 @@ void main() {
       await t.pumpWidget(toggle(enabled: false));
       final Opacity opacity = t.widget<Opacity>(
         find
-            .descendant(
-              of: find.byType(ElToggle),
-              matching: find.byType(Opacity),
-            )
+            .descendant(of: find.byType(Toggle), matching: find.byType(Opacity))
             .first,
       );
       expect(opacity.opacity, 0.50);
@@ -1383,26 +1394,23 @@ void main() {
       await t.pumpWidget(toggle());
       // A Toggle's class list has no `:active` rule and no `press` utility, so
       // nothing may scale it — measured (audit G2): `scale` and `transform`
-      // both read `none` in every state, `:active` included. `ElButton` does
-      // not reach for `ElPress` either any more (B1) — it snaps its own scale —
+      // both read `none` in every state, `:active` included. `Button` does
+      // not reach for `Press` either any more (B1) — it snaps its own scale —
       // but this assertion is about the utility being absent, which is what a
       // regression here would reintroduce.
       expect(
-        find.descendant(
-          of: find.byType(ElToggle),
-          matching: find.byType(ElPress),
-        ),
+        find.descendant(of: find.byType(Toggle), matching: find.byType(Press)),
         findsNothing,
       );
 
       final TestGesture hold = await t.startGesture(
-        t.getCenter(find.byType(ElToggle)),
+        t.getCenter(find.byType(Toggle)),
       );
-      await t.pump(ElDurations.tick);
-      final Size held = t.getSize(find.byType(ElToggle));
-      expect(held.height, el(8));
+      await t.pump(MotionDurations.tick);
+      final Size held = t.getSize(find.byType(Toggle));
+      expect(held.height, space(8));
       await hold.up();
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
     });
 
     testWidgets('focus draws the 3px ring at --ring @50%', (
@@ -1412,27 +1420,27 @@ void main() {
       addTearDown(node.dispose);
       await t.pumpWidget(
         host(
-          ElToggle(
+          Toggle(
             pressed: false,
             focusNode: node,
             label: 'Favourite',
             onChanged: (bool _) {},
-            child: const ElIcon(ElIconGlyph.heart),
+            child: const Icon(IconGlyph.heart),
           ),
         ),
       );
 
       node.requestFocus();
       await t.pump();
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
 
-      final ElShadowLayer ring = surfaceOf(t).spec.layers.single;
+      final ShadowLayer ring = surfaceOf(t).spec.layers.single;
       expect(ring.spread, 3);
       expect(ring.blur, 0);
       expect(
-        ring.color(ElThemeData.dark),
-        ElThemeData.dark.ring.withValues(alpha: 0.50),
+        ring.color(ThemeTokens.dark),
+        ThemeTokens.dark.ring.withValues(alpha: 0.50),
       );
     });
 
@@ -1442,17 +1450,17 @@ void main() {
       addTearDown(node.dispose);
       await t.pumpWidget(
         host(
-          ElToggle(
+          Toggle(
             pressed: false,
             focusNode: node,
             label: 'Favourite',
             onChanged: changes.add,
-            child: const ElIcon(ElIconGlyph.heart),
+            child: const Icon(IconGlyph.heart),
           ),
         ),
       );
 
-      await t.tap(find.byType(ElToggle));
+      await t.tap(find.byType(Toggle));
       await t.pump();
       node.requestFocus();
       await t.pump();
@@ -1463,30 +1471,30 @@ void main() {
     });
   });
 
-  group('ElToggleGroup', () {
+  group('ToggleGroup', () {
     Widget group({int? selected, ValueChanged<int?>? onChanged}) => host(
-      ElToggleGroup(
+      ToggleGroup(
         selectedIndex: selected,
         onChanged: onChanged ?? (int? _) {},
-        items: const <ElToggleGroupItem>[
-          ElToggleGroupItem(label: 'Newest'),
-          ElToggleGroupItem(label: 'Price'),
-          ElToggleGroupItem(label: 'Popular'),
+        items: const <ToggleGroupItem>[
+          ToggleGroupItem(label: 'Newest'),
+          ToggleGroupItem(label: 'Price'),
+          ToggleGroupItem(label: 'Popular'),
         ],
       ),
     );
 
     test('the group gap is `--gap: 2`, i.e. 8px', () {
-      expect(ElToggleGroup.gap, el(2));
+      expect(ToggleGroup.gap, space(2));
     });
 
     testWidgets('lays three items out 8px apart', (WidgetTester t) async {
       await t.pumpWidget(group(selected: 0));
       await t.pump();
 
-      final Rect first = t.getRect(find.byType(ElToggle).at(0));
-      final Rect second = t.getRect(find.byType(ElToggle).at(1));
-      expect(second.left - first.right, closeTo(el(2), 1e-9));
+      final Rect first = t.getRect(find.byType(Toggle).at(0));
+      final Rect second = t.getRect(find.byType(Toggle).at(1));
+      expect(second.left - first.right, closeTo(space(2), 1e-9));
     });
 
     testWidgets('the pill is a --primary stadium over a 12px item — drift 9', (
@@ -1496,45 +1504,45 @@ void main() {
       await t.pump();
       await t.pump();
 
-      // The pill: `bg-primary rounded-pill shadow-chip`.
-      final ElMachineSurface pill = t.widget<ElMachineSurface>(
+      // The indicator: `bg-primary rounded-pill shadow-chip`.
+      final Surface pill = t.widget<Surface>(
         find
             .descendant(
-              of: find.byType(ElSlidingPillGroup),
-              matching: find.byType(ElMachineSurface),
+              of: find.byType(ActiveIndicator),
+              matching: find.byType(Surface),
             )
             .first,
       );
-      expect(pill.fill, ElThemeData.dark.primary);
-      expect(pill.radius, BorderRadius.circular(ElRadii.pill));
-      expect(pill.spec, same(ElShadows.chip));
+      expect(pill.fill, ThemeTokens.dark.primary);
+      expect(pill.radius, BorderRadius.circular(Radii.full));
+      expect(pill.spec, same(Shadows.compactControl));
 
       // The item underneath it is still `rounded-lg`. Two shapes, one slot:
       // hover-on-unselected paints a 12px rect where selection paints a
       // 16px stadium.
-      final ElMachineSurface item = t.widget<ElMachineSurface>(
+      final Surface item = t.widget<Surface>(
         find
             .descendant(
-              of: find.byType(ElToggle).at(0),
-              matching: find.byType(ElMachineSurface),
+              of: find.byType(Toggle).at(0),
+              matching: find.byType(Surface),
             )
             .first,
       );
-      expect(item.radius, BorderRadius.circular(ElRadii.lg));
+      expect(item.radius, BorderRadius.circular(Radii.lg));
     });
 
     testWidgets('the selected item gives up its fill and flips to white ink', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(group(selected: 1));
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
 
-      ElMachineSurface itemAt(int i) => t.widget<ElMachineSurface>(
+      Surface itemAt(int i) => t.widget<Surface>(
         find
             .descendant(
-              of: find.byType(ElToggle).at(i),
-              matching: find.byType(ElMachineSurface),
+              of: find.byType(Toggle).at(i),
+              matching: find.byType(Surface),
             )
             .first,
       );
@@ -1542,7 +1550,7 @@ void main() {
           .widget<DefaultTextStyle>(
             find
                 .descendant(
-                  of: find.byType(ElToggle).at(i),
+                  of: find.byType(Toggle).at(i),
                   matching: find.byType(DefaultTextStyle),
                 )
                 .first,
@@ -1551,11 +1559,11 @@ void main() {
 
       // `data-[state=on]:bg-transparent` — declared last on purpose, because
       // the pill is the background now.
-      expect(itemAt(1).fill, elTransparent);
-      expect(inkAt(1).color, ElThemeData.dark.primaryForeground);
+      expect(itemAt(1).fill, transparent);
+      expect(inkAt(1).color, ThemeTokens.dark.primaryForeground);
       // Its unselected neighbours are unchanged.
-      expect(itemAt(0).fill, elTransparent);
-      expect(inkAt(0).color, ElThemeData.dark.foreground);
+      expect(itemAt(0).fill, transparent);
+      expect(inkAt(0).color, ThemeTokens.dark.foreground);
     });
 
     testWidgets('tapping the selected item deselects — ruling B7', (
@@ -1566,12 +1574,12 @@ void main() {
       await t.pump();
 
       // Radix `type="single"` clears on a second press of the active item.
-      await t.tap(find.byType(ElToggle).at(1));
+      await t.tap(find.byType(Toggle).at(1));
       await t.pump();
       expect(changes, <int?>[null]);
 
       // And an unselected neighbour still selects normally.
-      await t.tap(find.byType(ElToggle).at(2));
+      await t.tap(find.byType(Toggle).at(2));
       await t.pump();
       expect(changes, <int?>[null, 2]);
     });
@@ -1580,15 +1588,15 @@ void main() {
       await t.pumpWidget(group(selected: null));
       await t.pump();
       await t.pump();
-      await t.pump(ElDurations.fast);
-      await t.pump(ElDurations.fast);
+      await t.pump(MotionDurations.fast);
+      await t.pump(MotionDurations.fast);
 
       // `activeIndex: -1` — the substrate's documented out-of-range path, and
       // the reason it exists at all.
       final AnimatedOpacity fade = t.widget<AnimatedOpacity>(
         find
             .descendant(
-              of: find.byType(ElSlidingPillGroup),
+              of: find.byType(ActiveIndicator),
               matching: find.byType(AnimatedOpacity),
             )
             .first,
@@ -1597,54 +1605,54 @@ void main() {
     });
   });
 
-  group('ElButtonGroup', () {
+  group('ButtonGroup', () {
     // The three groups the page renders, verbatim (buttons-map §6.2).
     List<Widget> groupA() => <Widget>[
-      ElButton(
-        variant: ElButtonVariant.outline,
+      Button(
+        variant: ButtonVariant.outline,
         onPressed: () {},
         child: const Text('Newest'),
       ),
-      ElButton(
-        variant: ElButtonVariant.outline,
+      Button(
+        variant: ButtonVariant.outline,
         onPressed: () {},
         child: const Text('Price'),
       ),
-      ElButton(
-        variant: ElButtonVariant.outline,
+      Button(
+        variant: ButtonVariant.outline,
         onPressed: () {},
         child: const Text('Popularity'),
       ),
     ];
 
     List<Widget> groupB() => <Widget>[
-      const ElButtonGroupText('Quantity'),
-      const ElButtonGroupSeparator(),
-      ElButton(
-        variant: ElButtonVariant.outline,
-        size: ElButtonSize.icon,
+      const ButtonGroupText('Quantity'),
+      const ButtonGroupSeparator(),
+      Button(
+        variant: ButtonVariant.outline,
+        size: ButtonSize.icon,
         label: 'Decrease quantity',
         onPressed: () {},
-        child: const ElIcon(ElIconGlyph.minus),
+        child: const Icon(IconGlyph.minus),
       ),
-      const ElButtonGroupText('3', numeric: true),
-      ElButton(
-        variant: ElButtonVariant.outline,
-        size: ElButtonSize.icon,
+      const ButtonGroupText('3', numeric: true),
+      Button(
+        variant: ButtonVariant.outline,
+        size: ButtonSize.icon,
         label: 'Increase quantity',
         onPressed: () {},
-        child: const ElIcon(ElIconGlyph.plus),
+        child: const Icon(IconGlyph.plus),
       ),
     ];
 
     List<Widget> groupC() => <Widget>[
-      ElButton(onPressed: () {}, child: const Text('Open Pack')),
-      const ElButtonGroupSeparator(),
-      ElButton(
-        size: ElButtonSize.icon,
+      Button(onPressed: () {}, child: const Text('Open Pack')),
+      const ButtonGroupSeparator(),
+      Button(
+        size: ButtonSize.icon,
         label: 'More open options',
         onPressed: () {},
-        child: const ElIcon(ElIconGlyph.chevronDown),
+        child: const Icon(IconGlyph.chevronDown),
       ),
     ];
 
@@ -1652,27 +1660,27 @@ void main() {
       final List<Widget> a = groupA();
       // The leading member keeps its own radius; the trailing one is forced to
       // `--radius-lg` by an `!important` rule. Asymmetric by construction.
-      expect(ElButtonGroup.radiiOf(a, 0).topLeft.x, ElRadii.pill);
-      expect(ElButtonGroup.radiiOf(a, 0).topRight.x, 0);
+      expect(ButtonGroup.radiiOf(a, 0).topLeft.x, Radii.full);
+      expect(ButtonGroup.radiiOf(a, 0).topRight.x, 0);
       // Interior corners are squared on both sides.
-      expect(ElButtonGroup.radiiOf(a, 1).topLeft.x, 0);
-      expect(ElButtonGroup.radiiOf(a, 1).topRight.x, 0);
-      expect(ElButtonGroup.radiiOf(a, 2).topLeft.x, 0);
-      expect(ElButtonGroup.radiiOf(a, 2).topRight.x, ElRadii.lg);
+      expect(ButtonGroup.radiiOf(a, 1).topLeft.x, 0);
+      expect(ButtonGroup.radiiOf(a, 1).topRight.x, 0);
+      expect(ButtonGroup.radiiOf(a, 2).topLeft.x, 0);
+      expect(ButtonGroup.radiiOf(a, 2).topRight.x, Radii.lg);
     });
 
     test('group B is symmetric only because it opens with a Text cell', () {
       final List<Widget> b = groupB();
       // 12px both ends — and the left 12 is the `ButtonGroupText`'s own
       // `rounded-lg`, not anything the group did.
-      expect(ElButtonGroup.radiiOf(b, 0).topLeft.x, ElRadii.lg);
-      expect(ElButtonGroup.radiiOf(b, 4).topRight.x, ElRadii.lg);
+      expect(ButtonGroup.radiiOf(b, 0).topLeft.x, Radii.lg);
+      expect(ButtonGroup.radiiOf(b, 4).topRight.x, Radii.lg);
     });
 
     test('group C: pill left, 12px right', () {
       final List<Widget> c = groupC();
-      expect(ElButtonGroup.radiiOf(c, 0).topLeft.x, ElRadii.pill);
-      expect(ElButtonGroup.radiiOf(c, 2).topRight.x, ElRadii.lg);
+      expect(ButtonGroup.radiiOf(c, 0).topLeft.x, Radii.full);
+      expect(ButtonGroup.radiiOf(c, 2).topRight.x, Radii.lg);
     });
 
     test('the rounding rule reaches PAST a Text cell — drift 8', () {
@@ -1680,80 +1688,80 @@ void main() {
       // `[&>[data-slot]:not(:has(~[data-slot]))]` and the rule lands on the
       // last member that can — here the Button, which is not last.
       final List<Widget> trailing = <Widget>[
-        ElButton(onPressed: () {}, child: const Text('Open Pack')),
-        const ElButtonGroupText('of 12'),
+        Button(onPressed: () {}, child: const Text('Open Pack')),
+        const ButtonGroupText('of 12'),
       ];
       expect(
-        ElButtonGroup.radiiOf(trailing, 0).topRight.x,
-        ElRadii.lg,
+        ButtonGroup.radiiOf(trailing, 0).topRight.x,
+        Radii.lg,
         reason: 'an interior Button forced to 12px by the reach-past',
       );
     });
 
     test('only the first member keeps a left border — border-l-0', () {
       final List<Widget> a = groupA();
-      expect(ElButtonGroup.hasLeftBorder(a, 0), isTrue);
-      expect(ElButtonGroup.hasLeftBorder(a, 1), isFalse);
-      expect(ElButtonGroup.hasLeftBorder(a, 2), isFalse);
+      expect(ButtonGroup.hasLeftBorder(a, 0), isTrue);
+      expect(ButtonGroup.hasLeftBorder(a, 1), isFalse);
+      expect(ButtonGroup.hasLeftBorder(a, 2), isFalse);
     });
 
     testWidgets('members are flush and stretch to the tallest', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(ElButtonGroup(children: groupB())));
+      await t.pumpWidget(host(ButtonGroup(children: groupB())));
 
       // `items-stretch` is what gives the height-less Text cell its 40px.
-      final double rowHeight = t.getSize(find.byType(ElButtonGroup)).height;
-      expect(rowHeight, el(10));
-      expect(t.getSize(find.byType(ElButtonGroupText).first).height, el(10));
+      final double rowHeight = t.getSize(find.byType(ButtonGroup)).height;
+      expect(rowHeight, space(10));
+      expect(t.getSize(find.byType(ButtonGroupText).first).height, space(10));
 
       // `gap` is 0 — the `has-[>[data-slot=button-group]]:gap-2` rule needs a
       // nested group, and nothing on this page nests.
-      final Rect text = t.getRect(find.byType(ElButtonGroupText).first);
-      final Rect rule = t.getRect(find.byType(ElButtonGroupSeparator));
+      final Rect text = t.getRect(find.byType(ButtonGroupText).first);
+      final Rect rule = t.getRect(find.byType(ButtonGroupSeparator));
       expect(rule.left, closeTo(text.right, 1e-9));
     });
 
     testWidgets('the separator is 1px wide and inset 1px top and bottom', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(ElButtonGroup(children: groupC())));
+      await t.pumpWidget(host(ButtonGroup(children: groupC())));
 
       // `self-stretch` makes the separator's own box the full row height…
-      expect(t.getSize(find.byType(ElButtonGroupSeparator)).height, el(10));
+      expect(t.getSize(find.byType(ButtonGroupSeparator)).height, space(10));
 
       // …and `my-px` is a *margin*, so the painted rule stops one pixel short
       // at each end. `w-px` is the width.
       final Size rule = t.getSize(
         find.descendant(
-          of: find.byType(ElButtonGroupSeparator),
+          of: find.byType(ButtonGroupSeparator),
           matching: find.byType(ColoredBox),
         ),
       );
-      expect(rule.width, ElWidths.hairline);
-      expect(rule.height, el(10) - 2 * ElWidths.hairline);
+      expect(rule.width, BorderWidths.hairline);
+      expect(rule.height, space(10) - 2 * BorderWidths.hairline);
     });
 
     testWidgets('a Text cell is --muted at 13/500, 10px in from its border', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(ElButtonGroup(children: groupB())));
+      await t.pumpWidget(host(ButtonGroup(children: groupB())));
 
       final DecoratedBox box = t.widget<DecoratedBox>(
         find
             .descendant(
-              of: find.byType(ElButtonGroupText).first,
+              of: find.byType(ButtonGroupText).first,
               matching: find.byType(DecoratedBox),
             )
             .first,
       );
-      expect((box.decoration as BoxDecoration).color, ElThemeData.dark.muted);
-      expect(ElButtonGroupText.paddingX, 10);
+      expect((box.decoration as BoxDecoration).color, ThemeTokens.dark.muted);
+      expect(ButtonGroupText.paddingX, 10);
 
       final TextStyle style = t
           .widget<Text>(
             find.descendant(
-              of: find.byType(ElButtonGroupText).first,
+              of: find.byType(ButtonGroupText).first,
               matching: find.byType(Text),
             ),
           )
@@ -1765,12 +1773,12 @@ void main() {
     testWidgets('className="type-num" renders 13px/500 mono — drift 16', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(ElButtonGroup(children: groupB())));
+      await t.pumpWidget(host(ButtonGroup(children: groupB())));
 
       final TextStyle style = t
           .widget<Text>(
             find.descendant(
-              of: find.byType(ElButtonGroupText).at(1),
+              of: find.byType(ButtonGroupText).at(1),
               matching: find.byType(Text),
             ),
           )
@@ -1791,30 +1799,27 @@ void main() {
     });
   });
 
-  group('ElKbd', () {
+  group('Kbd', () {
     test('20 tall, 20 minimum wide, 4px padding, 4px gaps', () {
-      expect(ElKbd.height, 20);
-      expect(ElKbd.minWidth, 20);
-      expect(ElKbd.paddingX, 4);
-      expect(ElKbd.gap, 4);
-      expect(ElKbdGroup.gap, 4);
+      expect(Kbd.height, 20);
+      expect(Kbd.minWidth, 20);
+      expect(Kbd.paddingX, 4);
+      expect(Kbd.gap, 4);
+      expect(KbdGroup.gap, 4);
     });
 
     testWidgets(
       'is a flat 6px --muted chip — no border, no shadow — drift 18',
       (WidgetTester t) async {
-        await t.pumpWidget(host(const ElKbd('Esc')));
+        await t.pumpWidget(host(const Kbd('Esc')));
 
-        final ElMachineSurface surface = t.widget<ElMachineSurface>(
+        final Surface surface = t.widget<Surface>(
           find
-              .descendant(
-                of: find.byType(ElKbd),
-                matching: find.byType(ElMachineSurface),
-              )
+              .descendant(of: find.byType(Kbd), matching: find.byType(Surface))
               .first,
         );
-        expect(surface.fill, ElThemeData.dark.muted);
-        expect(surface.radius, BorderRadius.circular(ElRadii.sm));
+        expect(surface.fill, ThemeTokens.dark.muted);
+        expect(surface.radius, BorderRadius.circular(Radii.sm));
         // `--shadow-key`, `--shadow-key-down` and `press-key` all exist for
         // exactly this object, one foundations page away, and Kbd uses none.
         expect(surface.spec.layers, isEmpty);
@@ -1825,49 +1830,46 @@ void main() {
     testWidgets('is 20px tall and never narrower than 20', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(const ElKbd('K')));
-      final Size box = t.getSize(find.byType(ElKbd));
+      await t.pumpWidget(host(const Kbd('K')));
+      final Size box = t.getSize(find.byType(Kbd));
       expect(box.height, 20);
       // A single narrow glyph plus 4+4 of padding is under the floor, so
       // `min-w-5` decides.
       expect(box.width, 20);
 
-      await t.pumpWidget(host(const ElKbd('Space')));
-      expect(t.getSize(find.byType(ElKbd)).width, greaterThan(20));
+      await t.pumpWidget(host(const Kbd('Space')));
+      expect(t.getSize(find.byType(Kbd)).width, greaterThan(20));
     });
 
     testWidgets('the key label is 12px/500 at --muted-foreground', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(const ElKbd('Ctrl')));
+      await t.pumpWidget(host(const Kbd('Ctrl')));
       final TextStyle style = t
           .widget<Text>(
-            find.descendant(
-              of: find.byType(ElKbd),
-              matching: find.byType(Text),
-            ),
+            find.descendant(of: find.byType(Kbd), matching: find.byType(Text)),
           )
           .style!;
       expect(style.fontSize, 12);
-      expect(style.color, ElThemeData.dark.mutedForeground);
+      expect(style.color, ThemeTokens.dark.mutedForeground);
     });
 
     testWidgets('a group is one shortcut, 4px apart — drift 19', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(
-        host(const ElKbdGroup(children: <Widget>[ElKbd('Ctrl'), ElKbd('K')])),
+        host(const KbdGroup(children: <Widget>[Kbd('Ctrl'), Kbd('K')])),
       );
 
-      final Rect ctrl = t.getRect(find.byType(ElKbd).at(0));
-      final Rect k = t.getRect(find.byType(ElKbd).at(1));
-      expect(k.left - ctrl.right, closeTo(ElKbdGroup.gap, 1e-9));
+      final Rect ctrl = t.getRect(find.byType(Kbd).at(0));
+      final Rect k = t.getRect(find.byType(Kbd).at(1));
+      expect(k.left - ctrl.right, closeTo(KbdGroup.gap, 1e-9));
 
       // `<kbd><kbd>Ctrl</kbd><kbd>K</kbd></kbd>` is one keyboard object, and
       // it is announced as one.
       expect(
         find.descendant(
-          of: find.byType(ElKbdGroup),
+          of: find.byType(KbdGroup),
           matching: find.byType(MergeSemantics),
         ),
         findsOneWidget,
@@ -1875,15 +1877,15 @@ void main() {
     });
   });
 
-  group('ElIconSwap', () {
+  group('IconSwap', () {
     Widget swap(int active) => host(
-      ElIconSwap(
+      IconSwap(
         activeIndex: active,
         window: 20,
         cell: 16,
         icons: const <Widget>[
-          ElIcon(ElIconGlyph.layoutGrid),
-          ElIcon(ElIconGlyph.rows3),
+          Icon(IconGlyph.layoutGrid),
+          Icon(IconGlyph.rows3),
         ],
       ),
     );
@@ -1892,51 +1894,51 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(swap(0));
-      expect(t.getSize(find.byType(ElIconSwap)), const Size(20, 20));
+      expect(t.getSize(find.byType(IconSwap)), const Size(20, 20));
     });
 
     test('an unknown index clamps to 0, as Math.max(0, indexOf) does', () {
-      expect(ElIconSwap.resolveIndex(-1, 2), 0);
-      expect(ElIconSwap.resolveIndex(7, 2), 0);
-      expect(ElIconSwap.resolveIndex(1, 2), 1);
+      expect(IconSwap.resolveIndex(-1, 2), 0);
+      expect(IconSwap.resolveIndex(7, 2), 0);
+      expect(IconSwap.resolveIndex(1, 2), 1);
     });
 
     testWidgets('the leaver exits through the top and the arriver rises', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(swap(0));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElSwapRoll.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(ContentSwapMotion.duration);
 
-      double yOf(int i) => t.getRect(find.byType(ElIcon).at(i)).center.dy;
-      final double windowCentre = t.getRect(find.byType(ElIconSwap)).center.dy;
+      double yOf(int i) => t.getRect(find.byType(Icon).at(i)).center.dy;
+      final double windowCentre = t.getRect(find.byType(IconSwap)).center.dy;
 
       // At rest: glyph 0 centred, glyph 1 parked one full step BELOW.
       expect(yOf(0), closeTo(windowCentre, 0.51));
-      expect(yOf(1) - yOf(0), closeTo(ElSwapRoll.travelFor(16), 0.51));
+      expect(yOf(1) - yOf(0), closeTo(ContentSwapMotion.travelFor(16), 0.51));
 
       await t.pumpWidget(swap(1));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
 
       // After the roll the strip has moved up by exactly one step: glyph 1 is
       // centred and glyph 0 has left through the top.
       expect(yOf(1), closeTo(windowCentre, 0.51));
       expect(yOf(0), lessThan(windowCentre));
-      expect(yOf(1) - yOf(0), closeTo(ElSwapRoll.travelFor(16), 0.51));
+      expect(yOf(1) - yOf(0), closeTo(ContentSwapMotion.travelFor(16), 0.51));
     });
 
     testWidgets('the arriving glyph squashes on FIRST MOUNT too', (
       WidgetTester t,
     ) async {
-      // The one place IconSwap is the inverse of the sliding pill: the pill
+      // The one place IconSwap is the inverse of the sliding indicator: the pill
       // deliberately lands its first placement silently, and every IconSwap
       // demo deliberately squashes once on page load.
       List<double> scalesUnderSwap() => t
           .widgetList<Transform>(
             find.descendant(
-              of: find.byType(ElIconSwap),
+              of: find.byType(IconSwap),
               matching: find.byType(Transform),
             ),
           )
@@ -1947,7 +1949,7 @@ void main() {
       await t.pump();
 
       // `animation-delay: var(--duration-fast)` — still identity at 150ms…
-      await t.pump(ElSwapRoll.squashDelay);
+      await t.pump(ContentSwapMotion.squashDelay);
       expect(
         scalesUnderSwap().every((double s) => (s - 1).abs() < 1e-6),
         isTrue,
@@ -1959,7 +1961,7 @@ void main() {
       expect(scalesUnderSwap().any((double s) => s > 1.1), isTrue);
 
       // It settles back to identity by the end of the run.
-      await t.pump(ElJelly.duration);
+      await t.pump(StateChangeMotion.duration);
       expect(
         scalesUnderSwap().every((double s) => (s - 1).abs() < 1e-6),
         isTrue,
@@ -1976,16 +1978,16 @@ void main() {
         ),
         child: Directionality(
           textDirection: TextDirection.ltr,
-          child: ElTheme(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+          child: ThemeScope(
+            controller: ThemeController(mode: ColorMode.dark),
             child: Center(
-              child: ElIconSwap(
+              child: IconSwap(
                 activeIndex: active,
                 window: 20,
                 cell: 16,
                 icons: const <Widget>[
-                  ElIcon(ElIconGlyph.play),
-                  ElIcon(ElIconGlyph.pause),
+                  Icon(IconGlyph.play),
+                  Icon(IconGlyph.pause),
                 ],
               ),
             ),
@@ -2000,9 +2002,9 @@ void main() {
       await t.pump();
       await t.pump();
 
-      final double windowCentre = t.getRect(find.byType(ElIconSwap)).center.dy;
+      final double windowCentre = t.getRect(find.byType(IconSwap)).center.dy;
       expect(
-        t.getRect(find.byType(ElIcon).at(1)).center.dy,
+        t.getRect(find.byType(Icon).at(1)).center.dy,
         closeTo(windowCentre, 0.51),
       );
     });
@@ -2017,14 +2019,13 @@ void main() {
     // with no test is a leg a well-meaning later "fix" can quietly retune. Each
     // number below is the measured web value, not a derivation.
 
-    double centre(WidgetTester t) =>
-        t.getRect(find.byType(ElIconSwap)).center.dy;
+    double centre(WidgetTester t) => t.getRect(find.byType(IconSwap)).center.dy;
     double yOf(WidgetTester t, int i) =>
-        t.getRect(find.byType(ElIcon).at(i)).center.dy;
+        t.getRect(find.byType(Icon).at(i)).center.dy;
     List<double> opacities(WidgetTester t) => t
         .widgetList<Opacity>(
           find.descendant(
-            of: find.byType(ElIconSwap),
+            of: find.byType(IconSwap),
             matching: find.byType(Opacity),
           ),
         )
@@ -2037,13 +2038,13 @@ void main() {
       // Measured 25.6px against a 16px glyph. A CSS percentage translate
       // resolves against the element's own border box, so the multiplier hangs
       // off the cell and never off the 20/24px clip window.
-      expect(ElSwapRoll.travelFor(16), closeTo(25.6, 1e-9));
-      expect(ElSwapRoll.travelFor(20), closeTo(32, 1e-9));
-      expect(ElTransforms.swapRollTravel, 1.6);
+      expect(ContentSwapMotion.travelFor(16), closeTo(25.6, 1e-9));
+      expect(ContentSwapMotion.travelFor(20), closeTo(32, 1e-9));
+      expect(MotionTransforms.swapRollTravel, 1.6);
 
       await t.pumpWidget(swap(0));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
       expect(
         yOf(t, 1) - yOf(t, 0),
         closeTo(25.6, 0.51),
@@ -2056,12 +2057,12 @@ void main() {
     ) async {
       // 400ms `--ease-spring`, peaking 9.77% past centre. The transform is left
       // unclamped on purpose — clamping it is the "fix" this guards against.
-      expect(ElSwapRoll.duration, const Duration(milliseconds: 400));
-      expect(ElSwapRoll.curve, ElCurves.spring);
+      expect(ContentSwapMotion.duration, const Duration(milliseconds: 400));
+      expect(ContentSwapMotion.curve, MotionCurves.emphasized);
 
       await t.pumpWidget(swap(0));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
       final double home = centre(t);
 
       await t.pumpWidget(swap(1));
@@ -2073,13 +2074,13 @@ void main() {
         if (past > furthest) furthest = past;
       }
       expect(
-        furthest / ElSwapRoll.travelFor(16),
+        furthest / ContentSwapMotion.travelFor(16),
         closeTo(0.0977, 0.015),
         reason: 'measured +9.77% of travel past centre, mid-flight',
       );
 
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
       expect(
         yOf(t, 1),
         closeTo(home, 0.51),
@@ -2094,8 +2095,8 @@ void main() {
       // 400ms and the browser clamps the overshoot, so the crossfade is
       // visually finished at 163ms while the strip is still travelling.
       await t.pumpWidget(swap(0));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
 
       await t.pumpWidget(swap(1));
       for (int ms = 0; ms < 400; ms += 10) {
@@ -2108,7 +2109,7 @@ void main() {
           );
         }
       }
-      await t.pump(ElJelly.duration);
+      await t.pump(StateChangeMotion.duration);
       expect(opacities(t), <double>[0, 1]);
     });
 
@@ -2116,8 +2117,8 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(swap(0));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
       final double home = centre(t);
 
       await t.pumpWidget(swap(1));
@@ -2139,13 +2140,13 @@ void main() {
       // Advance sends the leaver up and out the top; reversing mirrors it with
       // no special-casing anywhere — `offset = i - strip(t)` does both.
       await t.pumpWidget(swap(0));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
       final double home = centre(t);
 
       await t.pumpWidget(swap(1));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
       expect(
         yOf(t, 0),
         lessThan(home),
@@ -2154,8 +2155,8 @@ void main() {
       final double advanced = home - yOf(t, 0);
 
       await t.pumpWidget(swap(0));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
       expect(
         yOf(t, 1),
         greaterThan(home),
@@ -2167,10 +2168,10 @@ void main() {
     testWidgets('S5: the squash waits 150ms, then runs 600 — one 750ms clock', (
       WidgetTester t,
     ) async {
-      expect(ElSwapRoll.squashDelay, const Duration(milliseconds: 150));
-      expect(ElJelly.duration, const Duration(milliseconds: 600));
+      expect(ContentSwapMotion.squashDelay, const Duration(milliseconds: 150));
+      expect(StateChangeMotion.duration, const Duration(milliseconds: 600));
       expect(
-        ElSwapRoll.squashDelay + ElJelly.duration,
+        ContentSwapMotion.squashDelay + StateChangeMotion.duration,
         const Duration(milliseconds: 750),
         reason: 'total visible motion, roll included, is 750ms',
       );
@@ -2182,14 +2183,11 @@ void main() {
       // Not an AnimatedSwitcher: the strip is one Stack holding all of them,
       // which is why the leaver can be seen travelling out.
       await t.pumpWidget(swap(0));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
 
       expect(
-        find.descendant(
-          of: find.byType(ElIconSwap),
-          matching: find.byType(ElIcon),
-        ),
+        find.descendant(of: find.byType(IconSwap), matching: find.byType(Icon)),
         findsNWidgets(2),
       );
       expect(opacities(t), <double>[1, 0]);
@@ -2216,12 +2214,12 @@ void main() {
       expect(opacities(t), <double>[0, 1], reason: 'and no crossfade either');
 
       // …while `yuki-jelly` (delay 0.15s, `both`) does run its full 600ms once.
-      await t.pump(ElSwapRoll.squashDelay);
+      await t.pump(ContentSwapMotion.squashDelay);
       await t.pump(const Duration(milliseconds: 180));
       final List<double> scales = t
           .widgetList<Transform>(
             find.descendant(
-              of: find.byType(ElIconSwap),
+              of: find.byType(IconSwap),
               matching: find.byType(Transform),
             ),
           )
@@ -2232,7 +2230,7 @@ void main() {
         isTrue,
         reason: 'stop 2 of the jelly, 1.18',
       );
-      await t.pump(ElJelly.duration);
+      await t.pump(StateChangeMotion.duration);
     });
 
     testWidgets('S8: an interruption re-targets from the CURRENT transform and '
@@ -2242,8 +2240,8 @@ void main() {
       // where the box actually is and restarts the whole duration; snapping to
       // the target first, or finishing early, are both the regression.
       await t.pumpWidget(swap(0));
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
       final double home = centre(t);
 
       await t.pumpWidget(swap(1));
@@ -2251,7 +2249,7 @@ void main() {
       final double interrupted = yOf(t, 0);
       expect(
         home - interrupted,
-        greaterThan(ElSwapRoll.travelFor(16)),
+        greaterThan(ContentSwapMotion.travelFor(16)),
         reason: 'at 264ms the leaver is PAST its target, mid-overshoot',
       );
 
@@ -2273,24 +2271,25 @@ void main() {
         reason: 'a shortened or scaled-down return is the regression',
       );
 
-      await t.pump(ElSwapRoll.duration);
-      await t.pump(ElJelly.duration);
+      await t.pump(ContentSwapMotion.duration);
+      await t.pump(StateChangeMotion.duration);
       expect(yOf(t, 0), closeTo(home, 0.51));
     });
   });
 
-  group('ElSheet', () {
+  group('Sheet', () {
     Widget trigger({double? width}) => navHost(
       Builder(
         builder: (BuildContext context) {
-          return ElButton(
-            variant: ElButtonVariant.outline,
-            onPressed: () => ElSheet.showLeft(
+          return Button(
+            variant: ButtonVariant.outline,
+            onPressed: () => Sheet.showLeft(
               context,
-              width: width ?? ElWidths.sidebarMobile,
-              builder: (BuildContext c) => ElText('Design system', ElType.nav),
+              width: width ?? LayoutWidths.sidebarMobile,
+              builder: (BuildContext c) =>
+                  StyledText('Design system', TextStyles.nav),
             ),
-            child: const ElIcon(ElIconGlyph.menu),
+            child: const Icon(IconGlyph.menu),
           );
         },
       ),
@@ -2301,23 +2300,23 @@ void main() {
     ) async {
       useFrame(t);
       await t.pumpWidget(trigger());
-      await t.tap(find.byType(ElButton));
+      await t.tap(find.byType(Button));
       await t.pumpAndSettle();
 
       expect(find.text('Design system'), findsOneWidget);
-      final Rect panel = t.getRect(find.byType(ElSheetPanel));
-      expect(panel.width, ElWidths.sidebarMobile);
+      final Rect panel = t.getRect(find.byType(SheetPanel));
+      expect(panel.width, LayoutWidths.sidebarMobile);
       expect(panel.left, 0);
       expect(panel.height, 900);
     });
 
     testWidgets('honours an explicit width', (WidgetTester t) async {
       useFrame(t);
-      await t.pumpWidget(trigger(width: ElWidths.sidebar));
-      await t.tap(find.byType(ElButton));
+      await t.pumpWidget(trigger(width: LayoutWidths.sidebar));
+      await t.tap(find.byType(Button));
       await t.pumpAndSettle();
 
-      expect(t.getRect(find.byType(ElSheetPanel)).width, ElWidths.sidebar);
+      expect(t.getRect(find.byType(SheetPanel)).width, LayoutWidths.sidebar);
     });
 
     testWidgets('the right-hand hairline comes out of the 288, not off it', (
@@ -2328,12 +2327,12 @@ void main() {
       // the page resumes.
       useFrame(t);
       await t.pumpWidget(trigger());
-      await t.tap(find.byType(ElButton));
+      await t.tap(find.byType(Button));
       await t.pumpAndSettle();
 
       expect(
-        t.getSize(find.byType(ElSafeArea)).width,
-        ElWidths.sidebarMobile - ElWidths.hairline,
+        t.getSize(find.byType(SafeArea)).width,
+        LayoutWidths.sidebarMobile - BorderWidths.hairline,
       );
     });
 
@@ -2342,7 +2341,7 @@ void main() {
     ) async {
       useFrame(t);
       await t.pumpWidget(trigger());
-      await t.tap(find.byType(ElButton));
+      await t.tap(find.byType(Button));
       await t.pump(); // route pushed, animation at zero
 
       // CORRECTED 2026-08-16, measured. `slide-in-from-left-10` is **not** 10
@@ -2351,18 +2350,18 @@ void main() {
       // live sheet's first `enter` frame reads `matrix(1,0,0,1,38.4,0)` against
       // a 384px panel — so the 288px docs sheet travels 28.8, not 40.
       expect(
-        t.getRect(find.byType(ElSheetPanel)).left,
-        closeTo(-ElWidths.sidebarMobile * 0.1, 0.5),
+        t.getRect(find.byType(SheetPanel)).left,
+        closeTo(-LayoutWidths.sidebarMobile * 0.1, 0.5),
       );
 
-      await t.pump(ElDurations.overlay);
-      expect(t.getRect(find.byType(ElSheetPanel)).left, closeTo(0, 0.5));
+      await t.pump(MotionDurations.overlayEnter);
+      expect(t.getRect(find.byType(SheetPanel)).left, closeTo(0, 0.5));
     });
 
     testWidgets('blurs and tints what is behind it', (WidgetTester t) async {
       useFrame(t);
       await t.pumpWidget(trigger());
-      await t.tap(find.byType(ElButton));
+      await t.tap(find.byType(Button));
       await t.pumpAndSettle();
 
       expect(find.byType(BackdropFilter), findsOneWidget);
@@ -2371,7 +2370,7 @@ void main() {
     testWidgets('a tap outside dismisses it', (WidgetTester t) async {
       useFrame(t);
       await t.pumpWidget(trigger());
-      await t.tap(find.byType(ElButton));
+      await t.tap(find.byType(Button));
       await t.pumpAndSettle();
       expect(find.text('Design system'), findsOneWidget);
 
@@ -2386,27 +2385,27 @@ void main() {
   // plus the Input's two = 22. `destructive` and `link` complete the enum
   // (supervisor ruling S5) and are exercised here too.
   //
-  // NOTE: not one `pumpAndSettle` below. `foil-value` runs two forever-loops
-  // and `sheen-action`'s beat runs while hovered, so a settle would never
+  // NOTE: not one `pumpAndSettle` below. `premium-surface` runs two forever-loops
+  // and `action-feedback`'s beat runs while hovered, so a settle would never
   // return. `pump(Duration)` with explicit steps only.
-  group('ElButton state matrix', () {
-    /// The one [ElMachineSurface] a flat variant paints itself with. The two
+  group('Button state matrix', () {
+    /// The one [Surface] a flat variant paints itself with. The two
     /// gradient variants also contain one — the inset half of their spec —
-    /// so those read [ElSheenAction] / [ElFoilValue] instead.
-    ElMachineSurface surfaceOf(WidgetTester t) =>
-        t.widget<ElMachineSurface>(find.byType(ElMachineSurface));
+    /// so those read [ActionFeedback] / [PremiumSurface] instead.
+    Surface surfaceOf(WidgetTester t) =>
+        t.widget<Surface>(find.byType(Surface));
 
-    ElSheenAction sheenOf(WidgetTester t) =>
-        t.widget<ElSheenAction>(find.byType(ElSheenAction));
+    ActionFeedback sheenOf(WidgetTester t) =>
+        t.widget<ActionFeedback>(find.byType(ActionFeedback));
 
-    ElFoilValue foilOf(WidgetTester t) =>
-        t.widget<ElFoilValue>(find.byType(ElFoilValue));
+    PremiumSurface foilOf(WidgetTester t) =>
+        t.widget<PremiumSurface>(find.byType(PremiumSurface));
 
     TextStyle labelStyleOf(WidgetTester t) => t
         .widget<DefaultTextStyle>(
           find
               .descendant(
-                of: find.byType(ElButton),
+                of: find.byType(Button),
                 matching: find.byType(DefaultTextStyle),
               )
               .first,
@@ -2418,16 +2417,16 @@ void main() {
 
     Future<void> mount(
       WidgetTester t,
-      ElButtonVariant variant, {
-      ElThemeMode mode = ElThemeMode.dark,
+      ButtonVariant variant, {
+      ColorMode mode = ColorMode.dark,
       FocusNode? focusNode,
     }) => t.pumpWidget(
       host(
-        ElButton(
+        Button(
           variant: variant,
           focusNode: focusNode,
           onPressed: () {},
-          child: const ElIcon(ElIconGlyph.check),
+          child: const Icon(IconGlyph.check),
         ),
         mode: mode,
       ),
@@ -2435,58 +2434,56 @@ void main() {
 
     /// Hover, then run the 250ms `btn-spring` colour transition to its end.
     Future<TestGesture> hoverAndSettle(WidgetTester t) async {
-      final TestGesture mouse = await hoverOver(t, find.byType(ElButton));
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      final TestGesture mouse = await hoverOver(t, find.byType(Button));
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
       return mouse;
     }
 
     Future<TestGesture> holdDown(WidgetTester t) async {
       final TestGesture g = await t.startGesture(
-        t.getCenter(find.byType(ElButton)),
+        t.getCenter(find.byType(Button)),
       );
       await t.pump();
-      await t.pump(ElDurations.tick);
+      await t.pump(MotionDurations.tick);
       return g;
     }
 
     Future<void> focusAndSettle(WidgetTester t, FocusNode node) async {
       node.requestFocus();
       await t.pump();
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
     }
 
     testWidgets('the cva default is `default`, i.e. primary', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(
-        host(
-          ElButton(onPressed: () {}, child: const ElIcon(ElIconGlyph.check)),
-        ),
+        host(Button(onPressed: () {}, child: const Icon(IconGlyph.check))),
       );
       expect(
-        find.byType(ElSheenAction),
+        find.byType(ActionFeedback),
         findsOneWidget,
         reason: 'defaultVariants.variant = "default" in button.tsx',
       );
       expect(
-        t.widget<ElButton>(find.byType(ElButton)).variant,
-        ElButtonVariant.primary,
+        t.widget<Button>(find.byType(Button)).variant,
+        ButtonVariant.primary,
       );
     });
 
     testWidgets('the enum carries all seven cva variants, in source order', (
       WidgetTester t,
     ) async {
-      expect(ElButtonVariant.values, <ElButtonVariant>[
-        ElButtonVariant.primary,
-        ElButtonVariant.premium,
-        ElButtonVariant.secondary,
-        ElButtonVariant.outline,
-        ElButtonVariant.ghost,
-        ElButtonVariant.destructive,
-        ElButtonVariant.link,
+      expect(ButtonVariant.values, <ButtonVariant>[
+        ButtonVariant.primary,
+        ButtonVariant.premium,
+        ButtonVariant.secondary,
+        ButtonVariant.outline,
+        ButtonVariant.ghost,
+        ButtonVariant.destructive,
+        ButtonVariant.link,
       ]);
     });
 
@@ -2497,44 +2494,41 @@ void main() {
       /// The two pumps are belt and braces: `btn-spring` carries colour over
       /// 250ms, but a button mounted already-expanded has nothing to spring
       /// *from*, so the fill is right on the first frame and stays right.
-      Future<void> mountExpanded(
-        WidgetTester t,
-        ElButtonVariant variant,
-      ) async {
+      Future<void> mountExpanded(WidgetTester t, ButtonVariant variant) async {
         await t.pumpWidget(
           host(
-            ElButton(
+            Button(
               variant: variant,
               expanded: true,
               onPressed: () {},
-              child: const ElIcon(ElIconGlyph.check),
+              child: const Icon(IconGlyph.check),
             ),
           ),
         );
-        await t.pump(ElDurations.base);
-        await t.pump(ElDurations.base);
+        await t.pump(MotionDurations.normal);
+        await t.pump(MotionDurations.normal);
       }
 
       testWidgets('ghost: --secondary over --foreground, with no pointer '
           'anywhere near it', (WidgetTester t) async {
-        await mountExpanded(t, ElButtonVariant.ghost);
+        await mountExpanded(t, ButtonVariant.ghost);
         // `aria-expanded:bg-secondary aria-expanded:text-foreground` — the
         // pair its hover already paints, held while the menu is open. The gap
         // this closes is exactly the pointer-less case.
-        expect(surfaceOf(t).fill, ElThemeData.dark.secondary);
-        expect(labelStyleOf(t).color, ElThemeData.dark.foreground);
+        expect(surfaceOf(t).fill, ThemeTokens.dark.secondary);
+        expect(labelStyleOf(t).color, ThemeTokens.dark.foreground);
       });
 
       testWidgets('outline: --muted, which is its own hover fill', (
         WidgetTester t,
       ) async {
-        await mountExpanded(t, ElButtonVariant.outline);
-        expect(surfaceOf(t).fill, ElThemeData.dark.muted);
+        await mountExpanded(t, ButtonVariant.outline);
+        expect(surfaceOf(t).fill, ThemeTokens.dark.muted);
       });
 
       testWidgets('secondary: --accent, likewise', (WidgetTester t) async {
-        await mountExpanded(t, ElButtonVariant.secondary);
-        expect(surfaceOf(t).fill, ElThemeData.dark.accent);
+        await mountExpanded(t, ButtonVariant.secondary);
+        expect(surfaceOf(t).fill, ThemeTokens.dark.accent);
       });
 
       testWidgets('the other four declare no `aria-expanded:` class at all', (
@@ -2542,28 +2536,28 @@ void main() {
       ) async {
         // The two ramps read `hovered` themselves, and an open trigger is not
         // a hovered one.
-        await mountExpanded(t, ElButtonVariant.primary);
+        await mountExpanded(t, ButtonVariant.primary);
         expect(sheenOf(t).hovered, isFalse);
-        expect(sheenOf(t).spec, same(ElShadows.btnPrimary));
+        expect(sheenOf(t).spec, same(Shadows.controlPrimary));
 
-        await mountExpanded(t, ElButtonVariant.premium);
+        await mountExpanded(t, ButtonVariant.premium);
         expect(foilOf(t).hovered, isFalse);
-        expect(foilOf(t).spec, same(ElShadows.btnValue));
+        expect(foilOf(t).spec, same(Shadows.controlPremium));
 
         // The two flat ones are compared against their own rest. The pumps
         // matter: the element survives a re-pump, so the fill springs from the
         // *previous* variant's colour and a reading taken on the first frame
         // would be the one before it.
-        Future<Color?> restFillOf(ElButtonVariant variant) async {
+        Future<Color?> restFillOf(ButtonVariant variant) async {
           await mount(t, variant);
-          await t.pump(ElDurations.base);
-          await t.pump(ElDurations.base);
+          await t.pump(MotionDurations.normal);
+          await t.pump(MotionDurations.normal);
           return surfaceOf(t).fill;
         }
 
-        for (final ElButtonVariant variant in <ElButtonVariant>[
-          ElButtonVariant.destructive,
-          ElButtonVariant.link,
+        for (final ButtonVariant variant in <ButtonVariant>[
+          ButtonVariant.destructive,
+          ButtonVariant.link,
         ]) {
           final Color? rest = await restFillOf(variant);
           await mountExpanded(t, variant);
@@ -2573,34 +2567,34 @@ void main() {
         // …and the teeth for that comparison: destructive's hover IS a
         // different fill, so the equality above is an assertion rather than
         // two identical nothings agreeing.
-        final Color? rest = await restFillOf(ElButtonVariant.destructive);
+        final Color? rest = await restFillOf(ButtonVariant.destructive);
         await hoverAndSettle(t);
         expect(surfaceOf(t).fill, isNot(rest));
       });
     });
 
-    group('primary — sheen-action bg-primary shadow-btn-primary', () {
+    group('primary — action-feedback bg-primary shadow-btn-primary', () {
       testWidgets('rest: btn-primary, white ink, transparent border', (
         WidgetTester t,
       ) async {
-        await mount(t, ElButtonVariant.primary);
-        final ElSheenAction sheen = sheenOf(t);
-        expect(sheen.spec, same(ElShadows.btnPrimary));
+        await mount(t, ButtonVariant.primary);
+        final ActionFeedback sheen = sheenOf(t);
+        expect(sheen.spec, same(Shadows.controlPrimary));
         expect(sheen.hovered, isFalse);
         expect(sheen.pressed, isFalse);
-        expect((sheen.border! as Border).top.color, elTransparent);
-        expect(labelStyleOf(t).color, ElThemeData.dark.primaryForeground);
+        expect((sheen.border! as Border).top.color, transparent);
+        expect(labelStyleOf(t).color, ThemeTokens.dark.primaryForeground);
       });
 
       testWidgets('hover starts the beat and changes nothing else', (
         WidgetTester t,
       ) async {
-        await mount(t, ElButtonVariant.primary);
+        await mount(t, ButtonVariant.primary);
         await hoverAndSettle(t);
         expect(sheenOf(t).hovered, isTrue);
         expect(
           sheenOf(t).spec,
-          same(ElShadows.btnPrimary),
+          same(Shadows.controlPrimary),
           reason: 'hover changes no shadow on the default variant',
         );
       });
@@ -2608,14 +2602,14 @@ void main() {
       testWidgets('active: drops to btn-down and runs one beat', (
         WidgetTester t,
       ) async {
-        await mount(t, ElButtonVariant.primary);
+        await mount(t, ButtonVariant.primary);
         final TestGesture g = await holdDown(t);
-        expect(sheenOf(t).spec, same(ElShadows.btnDown));
+        expect(sheenOf(t).spec, same(Shadows.controlPressed));
         expect(sheenOf(t).pressed, isTrue);
 
         await g.up();
-        await t.pump(ElDurations.base);
-        expect(sheenOf(t).spec, same(ElShadows.btnPrimary));
+        await t.pump(MotionDurations.normal);
+        expect(sheenOf(t).spec, same(Shadows.controlPrimary));
       });
 
       testWidgets('focus-visible: --ring border plus a 3px ring in front', (
@@ -2623,36 +2617,36 @@ void main() {
       ) async {
         final FocusNode node = FocusNode();
         addTearDown(node.dispose);
-        await mount(t, ElButtonVariant.primary, focusNode: node);
+        await mount(t, ButtonVariant.primary, focusNode: node);
         await focusAndSettle(t, node);
 
-        final ElSheenAction sheen = sheenOf(t);
-        expect((sheen.border! as Border).top.color, ElThemeData.dark.ring);
+        final ActionFeedback sheen = sheenOf(t);
+        expect((sheen.border! as Border).top.color, ThemeTokens.dark.ring);
         // `focus-visible:ring-3 focus-visible:ring-ring/50`, prepended so it
         // composites IN FRONT of --tw-shadow (Tailwind v4's slot order).
-        final ElShadowLayer ring = sheen.spec.layers.first;
+        final ShadowLayer ring = sheen.spec.layers.first;
         expect(ring.inset, isFalse);
         expect(
           <double>[ring.dx, ring.dy, ring.blur, ring.spread],
           <double>[0, 0, 0, 3],
         );
         expect(
-          ring.color(ElThemeData.dark),
-          ElThemeData.dark.ring.withValues(alpha: 0.50),
+          ring.color(ThemeTokens.dark),
+          ThemeTokens.dark.ring.withValues(alpha: 0.50),
         );
         expect(
           sheen.spec.layers.length,
-          ElShadows.btnPrimary.layers.length + 1,
+          Shadows.controlPrimary.layers.length + 1,
         );
       });
     });
 
-    group('premium — foil-value shadow-btn-value', () {
+    group('premium — premium-surface shadow-btn-value', () {
       testWidgets('rest: btn-value under a foil, semibold', (
         WidgetTester t,
       ) async {
-        await mount(t, ElButtonVariant.premium);
-        expect(foilOf(t).spec, same(ElShadows.btnValue));
+        await mount(t, ButtonVariant.premium);
+        expect(foilOf(t).spec, same(Shadows.controlPremium));
         expect(foilOf(t).hovered, isFalse);
         expect(
           labelStyleOf(t).fontWeight,
@@ -2664,14 +2658,14 @@ void main() {
       testWidgets('the value foreground does not flip with the theme', (
         WidgetTester t,
       ) async {
-        for (final ElThemeMode mode in <ElThemeMode>[
-          ElThemeMode.dark,
-          ElThemeMode.light,
+        for (final ColorMode mode in <ColorMode>[
+          ColorMode.dark,
+          ColorMode.light,
         ]) {
-          await mount(t, ElButtonVariant.premium, mode: mode);
+          await mount(t, ButtonVariant.premium, mode: mode);
           expect(
             labelStyleOf(t).color,
-            ElPalette.valueForeground,
+            Palette.valueForeground,
             reason: '--color-value-foreground is fixed at #121216 ($mode)',
           );
         }
@@ -2680,50 +2674,50 @@ void main() {
       testWidgets('hover: shadow-glow-value replaces the token wholesale', (
         WidgetTester t,
       ) async {
-        await mount(t, ElButtonVariant.premium);
+        await mount(t, ButtonVariant.premium);
         await hoverAndSettle(t);
-        expect(foilOf(t).spec, same(ElShadows.glowValue));
+        expect(foilOf(t).spec, same(Shadows.glowValue));
         expect(foilOf(t).hovered, isTrue);
         // The inset rim and the inner shade DISAPPEAR — the glow is not added
         // to the machine surface, it replaces it.
-        expect(ElShadows.glowValue.hasInset, isFalse);
+        expect(Shadows.glowValue.hasInset, isFalse);
       });
 
       testWidgets('active outranks hover: btn-down wins over the glow', (
         WidgetTester t,
       ) async {
-        await mount(t, ElButtonVariant.premium);
+        await mount(t, ButtonVariant.premium);
         await hoverAndSettle(t);
-        expect(foilOf(t).spec, same(ElShadows.glowValue));
+        expect(foilOf(t).spec, same(Shadows.glowValue));
 
         await holdDown(t);
-        expect(foilOf(t).spec, same(ElShadows.btnDown));
+        expect(foilOf(t).spec, same(Shadows.controlPressed));
         expect(foilOf(t).hovered, isTrue, reason: 'still hovered underneath');
       });
     });
 
     group('secondary — bg-secondary, no shadow at all', () {
       testWidgets('rest and hover', (WidgetTester t) async {
-        await mount(t, ElButtonVariant.secondary);
-        expect(surfaceOf(t).fill, ElThemeData.dark.secondary);
+        await mount(t, ButtonVariant.secondary);
+        expect(surfaceOf(t).fill, ThemeTokens.dark.secondary);
         expect(
           surfaceOf(t).spec.layers,
           isEmpty,
           reason: 'drift 1: the shadows page copy claims shadow-btn here',
         );
-        expect(labelStyleOf(t).color, ElThemeData.dark.secondaryForeground);
+        expect(labelStyleOf(t).color, ThemeTokens.dark.secondaryForeground);
 
         await hoverAndSettle(t);
-        expect(surfaceOf(t).fill, ElThemeData.dark.accent);
+        expect(surfaceOf(t).fill, ThemeTokens.dark.accent);
       });
 
       testWidgets('active changes nothing but the scale', (
         WidgetTester t,
       ) async {
-        await mount(t, ElButtonVariant.secondary);
+        await mount(t, ButtonVariant.secondary);
         await hoverAndSettle(t);
         await holdDown(t);
-        expect(surfaceOf(t).fill, ElThemeData.dark.accent);
+        expect(surfaceOf(t).fill, ThemeTokens.dark.accent);
         expect(surfaceOf(t).spec.layers, isEmpty);
       });
     });
@@ -2732,18 +2726,18 @@ void main() {
       testWidgets('rest: 10% wash inside a 25% border, destructive ink', (
         WidgetTester t,
       ) async {
-        await mount(t, ElButtonVariant.destructive);
-        final ElThemeData dark = ElThemeData.dark;
+        await mount(t, ButtonVariant.destructive);
+        final ThemeTokens dark = ThemeTokens.dark;
         expect(surfaceOf(t).fill, dark.destructive.withValues(alpha: 0.10));
         expect(borderOf(t), dark.destructive.withValues(alpha: 0.25));
         expect(surfaceOf(t).spec.layers, isEmpty);
-        expect(labelStyleOf(t).color, dark.destructiveInk);
+        expect(labelStyleOf(t).color, dark.destructiveText);
       });
 
       testWidgets('hover deepens both, to 20% and 40%', (WidgetTester t) async {
-        await mount(t, ElButtonVariant.destructive);
+        await mount(t, ButtonVariant.destructive);
         await hoverAndSettle(t);
-        final ElThemeData dark = ElThemeData.dark;
+        final ThemeTokens dark = ThemeTokens.dark;
         expect(surfaceOf(t).fill, dark.destructive.withValues(alpha: 0.20));
         expect(borderOf(t), dark.destructive.withValues(alpha: 0.40));
       });
@@ -2753,10 +2747,10 @@ void main() {
       ) async {
         final FocusNode node = FocusNode();
         addTearDown(node.dispose);
-        await mount(t, ElButtonVariant.destructive, focusNode: node);
+        await mount(t, ButtonVariant.destructive, focusNode: node);
         await focusAndSettle(t, node);
 
-        final ElThemeData dark = ElThemeData.dark;
+        final ThemeTokens dark = ThemeTokens.dark;
         expect(borderOf(t), dark.destructive.withValues(alpha: 0.50));
         expect(
           surfaceOf(t).spec.layers.first.color(dark),
@@ -2768,40 +2762,40 @@ void main() {
 
     group('link — text only', () {
       testWidgets('rest: action ink on nothing', (WidgetTester t) async {
-        await mount(t, ElButtonVariant.link);
-        expect(surfaceOf(t).fill, elTransparent);
-        expect(borderOf(t), elTransparent);
+        await mount(t, ButtonVariant.link);
+        expect(surfaceOf(t).fill, transparent);
+        expect(borderOf(t), transparent);
         expect(surfaceOf(t).spec.layers, isEmpty);
-        expect(labelStyleOf(t).color, ElThemeData.dark.actionInk);
+        expect(labelStyleOf(t).color, ThemeTokens.dark.actionText);
         expect(labelStyleOf(t).decoration, isNot(TextDecoration.underline));
       });
 
       testWidgets('hover:underline', (WidgetTester t) async {
-        await mount(t, ElButtonVariant.link);
+        await mount(t, ButtonVariant.link);
         await hoverAndSettle(t);
         expect(labelStyleOf(t).decoration, TextDecoration.underline);
       });
     });
 
-    group('ElButtonSurface — the class-list override', () {
+    group('ButtonStyleRecipe — the class-list override', () {
       /// `variant="outline"` under a class list appended to it, which is how
       /// the reference restyles a `Button` and what this class is a parameter
       /// for.
-      Future<void> mountSurface(WidgetTester t, ElButtonSurface surface) =>
+      Future<void> mountSurface(WidgetTester t, ButtonStyleRecipe surface) =>
           t.pumpWidget(
             host(
-              ElButton(
-                variant: ElButtonVariant.outline,
+              Button(
+                variant: ButtonVariant.outline,
                 surface: surface,
                 onPressed: () {},
-                child: const ElIcon(ElIconGlyph.check),
+                child: const Icon(IconGlyph.check),
               ),
             ),
           );
 
       /// `--agent/50` — the colour both call sites of the fifth override name.
-      final Color agentRim = ElThemeData.dark.agent.withValues(
-        alpha: ElAgentLauncher.hoverRimAlpha,
+      final Color agentRim = ThemeTokens.dark.agentAccent.withValues(
+        alpha: AgentLauncher.hoverRimAlpha,
       );
 
       testWidgets('hoverBorder moves the rim on hover, and only on hover', (
@@ -2810,12 +2804,12 @@ void main() {
         // The assertion has teeth only if the two colours differ — a rim that
         // happened to equal the outline variant's own would pass this test
         // with the field deleted.
-        expect(agentRim, isNot(ElThemeData.dark.input));
+        expect(agentRim, isNot(ThemeTokens.dark.input));
 
-        await mountSurface(t, ElButtonSurface(hoverBorder: agentRim));
+        await mountSurface(t, ButtonStyleRecipe(hoverBorder: agentRim));
         expect(
           borderOf(t),
-          ElThemeData.dark.input,
+          ThemeTokens.dark.input,
           reason:
               '`hover:border-*` is a hover utility: at rest the '
               "variant's own hairline is untouched",
@@ -2830,9 +2824,9 @@ void main() {
         // was missing, which is why the KNOWN GAP closed as one field.
         await mouse.moveTo(Offset.zero);
         await t.pump();
-        await t.pump(ElDurations.base);
-        await t.pump(ElDurations.base);
-        expect(borderOf(t), ElThemeData.dark.input);
+        await t.pump(MotionDurations.normal);
+        await t.pump(MotionDurations.normal);
+        expect(borderOf(t), ThemeTokens.dark.input);
       });
 
       testWidgets('an absent hoverBorder leaves the resting override standing', (
@@ -2842,30 +2836,30 @@ void main() {
         // `hover:border-*` keeps the border it does name. Every override in
         // the corpus before this one was of exactly that shape, so this is the
         // case that must not have regressed.
-        await mountSurface(t, ElButtonSurface(border: ElThemeData.dark.ring));
-        expect(borderOf(t), ElThemeData.dark.ring);
+        await mountSurface(t, ButtonStyleRecipe(border: ThemeTokens.dark.ring));
+        expect(borderOf(t), ThemeTokens.dark.ring);
         await hoverAndSettle(t);
-        expect(borderOf(t), ElThemeData.dark.ring);
+        expect(borderOf(t), ThemeTokens.dark.ring);
       });
 
       testWidgets('hoverBorder alone does not disturb the other four slots', (
         WidgetTester t,
       ) async {
-        await mountSurface(t, ElButtonSurface(hoverBorder: agentRim));
+        await mountSurface(t, ButtonStyleRecipe(hoverBorder: agentRim));
         await hoverAndSettle(t);
         // `outline`'s own hover fill and ink, unchanged: the fifth field is
         // additive, not a replacement for the surface it lands on.
-        expect(surfaceOf(t).fill, ElThemeData.dark.muted);
-        expect(labelStyleOf(t).color, ElThemeData.dark.foreground);
+        expect(surfaceOf(t).fill, ThemeTokens.dark.muted);
+        expect(labelStyleOf(t).color, ThemeTokens.dark.foreground);
       });
     });
 
     testWidgets('outline and ghost still take the base focus ring', (
       WidgetTester t,
     ) async {
-      for (final ElButtonVariant variant in <ElButtonVariant>[
-        ElButtonVariant.outline,
-        ElButtonVariant.ghost,
+      for (final ButtonVariant variant in <ButtonVariant>[
+        ButtonVariant.outline,
+        ButtonVariant.ghost,
       ]) {
         final FocusNode node = FocusNode();
         addTearDown(node.dispose);
@@ -2874,7 +2868,7 @@ void main() {
 
         expect(
           borderOf(t),
-          ElThemeData.dark.ring,
+          ThemeTokens.dark.ring,
           reason: 'focus-visible:border-ring on $variant',
         );
         expect(
@@ -2889,28 +2883,28 @@ void main() {
       WidgetTester t,
     ) async {
       // CSS paints the FIRST-listed box-shadow on top, and
-      // `ElShadowSpec.outerShadows` reverses the list to reproduce that — so a
+      // `ShadowStyle.outerShadows` reverses the list to reproduce that — so a
       // prepended ring must come out LAST, i.e. painted last, i.e. on top.
-      final ElShadowSpec ringed = ElButton.withFocusRing(
-        ElShadows.btn,
-        ElPalette.action,
+      final ShadowStyle ringed = Button.withFocusRing(
+        Shadows.control,
+        Palette.action,
       );
       expect(ringed.layers.first.spread, 3);
-      final List<BoxShadow> painted = ringed.outerShadows(ElThemeData.dark);
+      final List<BoxShadow> painted = ringed.outerShadows(ThemeTokens.dark);
       expect(painted.last.spreadRadius, 3);
-      expect(painted.last.color, ElPalette.action);
+      expect(painted.last.color, Palette.action);
       // The inset half is untouched — the ring is not inset.
-      expect(ringed.insetLayers, ElShadows.btn.insetLayers);
+      expect(ringed.insetLayers, Shadows.control.insetLayers);
     });
 
     testWidgets('every variant paints in both themes', (WidgetTester t) async {
-      for (final ElThemeMode mode in <ElThemeMode>[
-        ElThemeMode.dark,
-        ElThemeMode.light,
+      for (final ColorMode mode in <ColorMode>[
+        ColorMode.dark,
+        ColorMode.light,
       ]) {
-        for (final ElButtonVariant variant in ElButtonVariant.values) {
+        for (final ButtonVariant variant in ButtonVariant.values) {
           await mount(t, variant, mode: mode);
-          await t.pump(ElDurations.base);
+          await t.pump(MotionDurations.normal);
           expect(t.takeException(), isNull, reason: '$variant in $mode');
         }
       }
@@ -2924,11 +2918,11 @@ void main() {
       addTearDown(node.dispose);
       await t.pumpWidget(
         host(
-          ElButton(
-            variant: ElButtonVariant.outline,
+          Button(
+            variant: ButtonVariant.outline,
             focusNode: node,
             onPressed: () => presses++,
-            child: const ElIcon(ElIconGlyph.check),
+            child: const Icon(IconGlyph.check),
           ),
         ),
       );
@@ -2945,9 +2939,9 @@ void main() {
     });
   });
 
-  group('ElInput', () {
-    ElMachineSurface surfaceOf(WidgetTester t) =>
-        t.widget<ElMachineSurface>(find.byType(ElMachineSurface));
+  group('Input', () {
+    Surface surfaceOf(WidgetTester t) =>
+        t.widget<Surface>(find.byType(Surface));
 
     Color borderOf(WidgetTester t) =>
         (surfaceOf(t).border! as Border).top.color;
@@ -2955,12 +2949,12 @@ void main() {
     Widget field({
       TextEditingController? controller,
       FocusNode? focusNode,
-      ElThemeMode mode = ElThemeMode.dark,
+      ColorMode mode = ColorMode.dark,
     }) => host(
       SizedBox(
         // `max-w-sm` = 24rem = 384px, the cap the shadows page applies.
         width: 384,
-        child: ElInput(
+        child: Input(
           controller: controller,
           focusNode: focusNode,
           placeholder: 'Search packs, cards and sets',
@@ -2974,13 +2968,13 @@ void main() {
     ) async {
       await t.pumpWidget(field());
 
-      expect(t.getSize(find.byType(ElInput)).height, el(10));
-      expect(t.getSize(find.byType(ElInput)).width, 384);
-      expect(surfaceOf(t).radius, BorderRadius.circular(ElRadii.pill));
-      expect(surfaceOf(t).fill, ElThemeData.dark.card);
-      expect(borderOf(t), ElThemeData.dark.input);
-      expect(surfaceOf(t).spec, same(ElShadows.pressed));
-      expect(ElInput.height, el(10));
+      expect(t.getSize(find.byType(Input)).height, space(10));
+      expect(t.getSize(find.byType(Input)).width, 384);
+      expect(surfaceOf(t).radius, BorderRadius.circular(Radii.full));
+      expect(surfaceOf(t).fill, ThemeTokens.dark.card);
+      expect(borderOf(t), ThemeTokens.dark.input);
+      expect(surfaceOf(t).spec, same(Shadows.inset));
+      expect(Input.height, space(10));
     });
 
     testWidgets('shows the placeholder at muted until something is typed', (
@@ -2992,8 +2986,8 @@ void main() {
 
       expect(find.text('Search packs, cards and sets'), findsOneWidget);
       expect(
-        t.widget<ElText>(find.byType(ElText).first).color,
-        ElThemeData.dark.mutedForeground,
+        t.widget<StyledText>(find.byType(StyledText).first).color,
+        ThemeTokens.dark.mutedForeground,
       );
 
       await t.enterText(find.byType(EditableText), 'charizard');
@@ -3015,7 +3009,7 @@ void main() {
       );
       expect(editable.controller.text, 'base set');
       expect(editable.focusNode.hasFocus, isTrue);
-      expect(editable.cursorColor, ElThemeData.dark.foreground);
+      expect(editable.cursorColor, ThemeTokens.dark.foreground);
       expect(editable.readOnly, isFalse);
     });
 
@@ -3028,18 +3022,18 @@ void main() {
 
       node.requestFocus();
       await t.pump();
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
 
-      final ElThemeData dark = ElThemeData.dark;
+      final ThemeTokens dark = ThemeTokens.dark;
       expect(
         borderOf(t),
         dark.primary.withValues(alpha: 0.50),
         reason: 'focus-visible:border-primary/50 — --primary, not --ring',
       );
 
-      final ElShadowSpec spec = surfaceOf(t).spec;
-      final ElShadowLayer ring = spec.layers.first;
+      final ShadowStyle spec = surfaceOf(t).spec;
+      final ShadowLayer ring = spec.layers.first;
       expect(
         <double>[ring.dx, ring.dy, ring.blur, ring.spread],
         <double>[0, 0, 0, 3],
@@ -3051,33 +3045,33 @@ void main() {
         reason: 'focus-visible:ring-ring/35',
       );
       // The socket is still every one of its own layers, untouched.
-      expect(spec.insetLayers, ElShadows.pressed.insetLayers);
-      expect(spec.layers.length, ElShadows.pressed.layers.length + 1);
+      expect(spec.insetLayers, Shadows.inset.insetLayers);
+      expect(spec.layers.length, Shadows.inset.layers.length + 1);
     });
 
     testWidgets('has no hover state at all', (WidgetTester t) async {
       await t.pumpWidget(field());
       final Color restBorder = borderOf(t);
 
-      await hoverOver(t, find.byType(ElInput));
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await hoverOver(t, find.byType(Input));
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
 
       expect(borderOf(t), restBorder);
       expect(
         surfaceOf(t).spec,
-        same(ElShadows.pressed),
+        same(Shadows.inset),
         reason: 'the field is already sunken and only its ring changes',
       );
     });
 
     testWidgets('renders in both themes', (WidgetTester t) async {
-      for (final ElThemeMode mode in <ElThemeMode>[
-        ElThemeMode.dark,
-        ElThemeMode.light,
+      for (final ColorMode mode in <ColorMode>[
+        ColorMode.dark,
+        ColorMode.light,
       ]) {
         await t.pumpWidget(field(mode: mode));
-        await t.pump(ElDurations.base);
+        await t.pump(MotionDurations.normal);
         expect(t.takeException(), isNull, reason: '$mode');
       }
     });

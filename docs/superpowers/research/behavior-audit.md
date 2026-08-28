@@ -21,7 +21,7 @@ Probe scripts (kept, re-runnable):
 |---|---|
 | `…\scratchpad\ba-lib.js` | shared harness — rAF sampler, `MutationObserver` recorder, `__css` / `__pseudo` readouts, real-input timestamps |
 | `…\scratchpad\ba-inventory.js` | DOM inventory of the buttons page |
-| `…\scratchpad\ba-toggle.js` | toggle-group pill: three travels + keyboard |
+| `…\scratchpad\ba-toggle.js` | toggle-group indicator: three travels + keyboard |
 | `…\scratchpad\ba-toggle2.js` | first mount, interruption, standalone `Toggle` |
 | `…\scratchpad\ba-swap.js` | icon swap: both demos, forward and back |
 | `…\scratchpad\ba-button.js` | button press/hover with pseudo-element sampling |
@@ -107,7 +107,7 @@ stated duration.
 | measured plateau at | — | Δ134–185 | Δ268–285 | Δ334–368 | Δ418–501 | Δ518+ |
 
 Measured stops land on the declared clock to within one frame. **The port's
-`ElJelly` / `ElKeyframePlayer` reproduces this exactly** — linear clock, curve on
+`Jelly` / `KeyframePlayer` reproduces this exactly** — linear clock, curve on
 each gap. That is right, and a naive port would have eased twice. Do not touch it.
 
 ---
@@ -236,11 +236,11 @@ not wire arrow keys to selection on the theory that it would restore something.
 
 | # | aspect | measured web | shipped port | verdict |
 |---|---|---|---|---|
-| T1 | travel duration / curve | 250ms `--ease-spring`, +9.7% overshoot | `AnimatedPositioned` 250ms `ElCurves.spring` | **match** |
+| T1 | travel duration / curve | 250ms `--ease-spring`, +9.7% overshoot | `AnimatedPositioned` 250ms `Curves.spring` | **match** |
 | T2 | position vs size timing | identical clock, identical curve, no lag | fused on one `AnimatedPositioned` controller | **match** (values agree; fusion is a latent risk only if the CSS ever splits them) |
 | T3 | squash timing | 600ms, starts on the **same frame** as the travel | `_jelly.forward(from:0)` in `didUpdateWidget`, concurrent | **match** |
-| T4 | squash keyframes + per-segment easing | 6 stops, per-segment `ease-out`, plateaus verified to ±1 frame | `ElJelly` via `ElKeyframePlayer`, linear clock + per-gap curve | **match — protect this** |
-| T5 | label colour | transitioned, 250ms `ease-out` | `_TransitionAllColors`, 250ms `ElCurves.out` | **match** |
+| T4 | squash keyframes + per-segment easing | 6 stops, per-segment `ease-out`, plateaus verified to ±1 frame | `Jelly` via `KeyframePlayer`, linear clock + per-gap curve | **match — protect this** |
+| T5 | label colour | transitioned, 250ms `ease-out` | `_TransitionAllColors`, 250ms `Curves.out` | **match** |
 | T6 | **first mount — pill appearance** | **instant** (`transition: none` for one frame): opacity 0→1 and width 0→W in a single frame | `AnimatedOpacity` is **ungated** by `_placed` → fades in over 150ms `ease-out` | **DIVERGE** — port fades in where the web pops in |
 | T7 | **first mount — squash** | **plays once** (ResizeObserver's initial callback re-enters `move()`) | `_replayJelly()` returns early while `!_placed` → **no squash on load** | **DIVERGE** — port is silent where the web squashes |
 | T8 | **deselection — geometry** | **measured:** one style write, `opacity: 0` only; width/height/transform untouched; pill fades in place over 150ms `ease-out` | `left/top/width/height` re-target to `0/0/0/0` over 250ms spring under the fade | **DIVERGE** — port slides the pill to the group origin while fading |
@@ -272,7 +272,7 @@ Source: `components/ui/icon-swap.tsx`, `@utility swap-roll`
 
 The percentage resolves against the **cell**, not the window — confirmed by
 direct measurement of the resting inactive cell's offset. The port's call sites
-pass `window: el(5)/el(6)` and `cell: ElButton.iconPxFor(size)`, which produce
+pass `window: el(5)/el(6)` and `cell: Button.iconPxFor(size)`, which produce
 the same 20/16 and 24/20 pairs. **Geometry matches.**
 
 ### 2.2 What React flips
@@ -323,8 +323,8 @@ Total visible motion **750ms**.
 
 | # | aspect | measured web | shipped port | verdict |
 |---|---|---|---|---|
-| S1 | travel distance | 160% of the **cell** — 25.6px / 32px | `cell × ElTransforms.swapRollTravel (1.6)`; call sites pass the same 16/20 | **match** |
-| S2 | travel duration / curve | 400ms `--ease-spring`, +9.77% overshoot past centre | `_roll` 400ms `ElCurves.spring`, transform left unclamped | **match** |
+| S1 | travel distance | 160% of the **cell** — 25.6px / 32px | `cell × Transforms.swapRollTravel (1.6)`; call sites pass the same 16/20 | **match** |
+| S2 | travel duration / curve | 400ms `--ease-spring`, +9.77% overshoot past centre | `_roll` 400ms `Curves.spring`, transform left unclamped | **match** |
 | S3 | opacity leg | same 400ms spring clock, **clamped** by the browser → visually done at 163ms | same clock, `clampDouble(…, 0, 1)` | **match** |
 | S4 | direction sign | advance = up; reverse = exact inverse | `offset = i − strip(t)`, no special-casing | **match** |
 | S5 | squash delay | **150ms** after the flip, then 600ms | `_squashStart = 150/750`, one 750ms clock | **match** |
@@ -357,7 +357,7 @@ control — including this one.
 ## 3 · Buttons — the headline defect
 
 Source: `components/ui/button.tsx`, `@utility btn-spring`
-(`app/globals.css` L1886–1898), `@utility sheen-action` (L2089–2160),
+(`app/globals.css` L1886–1898), `@utility action-feedback` (L2089–2160),
 `@keyframes action-beat` (L2059–2088).
 
 ### 3.1 The transition list, measured
@@ -414,8 +414,8 @@ So "shadows snap" is not a rule about this design system. It is a property of
 each specific token pair, and it has to be decided per transition.
 
 The port's own specs mirror the same structure, which is why its hard cut is
-structurally right rather than lucky — `ElShadows.btnPrimary` is 4 layers
-(2 inset, 2 not) and `ElShadows.btnDown` is 2 layers (1 inset, 1 not), the same
+structurally right rather than lucky — `Shadows.controlPrimary` is 4 layers
+(2 inset, 2 not) and `Shadows.controlPressed` is 2 layers (1 inset, 1 not), the same
 count-and-inset mismatch the browser refuses to interpolate. (The browser's
 computed value reads 8 and 6 because Tailwind pads every shadow with four
 transparent placeholder slots; the *real* layers correspond one-to-one.) A
@@ -466,7 +466,7 @@ Adding `disabled` live: opacity 1 → **undershoots to 0.3969** at Δ~180 → se
 **0.45** at Δ~280. Overshoot (0.45 − 0.3969) / (1 − 0.45) = **+9.65%** — the
 spring, on `opacity`, exactly as `btn-spring` declares.
 
-### 3.6 Sheen (`sheen-action::before`) — one animation, never restarted
+### 3.6 Sheen (`action-feedback::before`) — one animation, never restarted
 
 | event | measured |
 |---|---|
@@ -495,7 +495,7 @@ Two consequences that matter more than the arithmetic:
 2. **Hover-in always restarts from frame 0**, because hover-out deletes the
    animation outright.
 
-### 3.7 Foil (`foil-value`, premium)
+### 3.7 Foil (`premium-surface`, premium)
 
 Both layers run **always**, at rest, unhovered.
 
@@ -547,10 +547,10 @@ elapsed time: the port continues smoothly where the browser jumps.
 
 | # | aspect | measured web | shipped port | verdict |
 |---|---|---|---|---|
-| **B1** | **press scale** | **instant snap 1 → 0.95, and instant 0.95 → 1 on release. No transition, no curve, no overshoot.** `scale` is not in `transition-property`. | `ElPress(scale: 0.95, downDuration: 80ms, upDuration: 250ms)` with `ElCurves.spring` + flipped reverse — an 80ms eased squish and a 250ms spring return that **overshoots to ≈1.005** | **DIVERGE — the primary defect.** The port animates what the web cuts. |
+| **B1** | **press scale** | **instant snap 1 → 0.95, and instant 0.95 → 1 on release. No transition, no curve, no overshoot.** `scale` is not in `transition-property`. | `Press(scale: 0.95, downDuration: 80ms, upDuration: 250ms)` with `Curves.spring` + flipped reverse — an 80ms eased squish and a 250ms spring return that **overshoots to ≈1.005** | **DIVERGE — the primary defect.** The port animates what the web cuts. |
 | **B2** | **shadow on press** | `btn-primary → btn-down` **snaps** (non-interpolable layer lists) | hard cut | **match** — accidentally right, and it must stay right |
 | **B3** | **shadow on premium hover** | `btn-value → glow-value` **snaps** (1.2ms) | hard cut | **match** |
-| **B4** | hover colours | 250ms `--ease-spring` **with overshoot past the target colour** | `_SpringColors`, 250ms `ElCurves.spring` | **match** |
+| **B4** | hover colours | 250ms `--ease-spring` **with overshoot past the target colour** | `_SpringColors`, 250ms `Curves.spring` | **match** |
 | **B5** | colour legs while held | shorten to **80ms** | `_pressed ? tick(80ms) : base(250ms)` | **match** |
 | **B6** | short taps | scale is instant, so **any** tap — 10ms or 500ms — shows the **full** 0.95 for exactly as long as the button is held | port depth depends on hold length: 10ms → 0.9756, 20ms → 0.9592, 30ms → 0.9497. On top of that, `CurvedAnimation._curveDirection` latches to `forward` and only clears at an endpoint, so a release before the 80ms down-stroke completes replays the **forward** curve backwards; and `reverse()` scales its run by the remaining fraction, so the return is also short | **DIVERGE (compound)** — wrong depth, wrong curve *and* wrong duration on every quick tap |
 | **B7** | sheen on hover-in | fresh animation from **frame 0** every time | `_beat.repeat()` resumes from the controller's current value | **DIVERGE** |
@@ -596,9 +596,9 @@ transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1)
 | 283.6 | 1.00000 ← settled |
 
 Release overshoot **+0.0058 on a 0.06 delta = +9.67%** — the spring signature,
-on the release leg, exactly as `ElPress` computes it (0.94 + 0.06 × 1.0967 =
-1.0058). **`ElPress` is correct and must be kept.** The defect is not the
-utility; it is that `ElButton` routes its `scale-95` through it, when
+on the release leg, exactly as `Press` computes it (0.94 + 0.06 × 1.0967 =
+1.0058). **`Press` is correct and must be kept.** The defect is not the
+utility; it is that `Button` routes its `scale-95` through it, when
 `scale-95` is a different property that the button does not transition at all.
 
 ---
@@ -613,9 +613,9 @@ utility; it is that `ElButton` routes its `scale-95` through it, when
 
 | # | aspect | web | port | verdict |
 |---|---|---|---|---|
-| G1 | colour curve | 250ms `ease-out`, no overshoot | `_TransitionAllColors` 250ms `ElCurves.out` | **match** |
-| G2 | press scale | none | none (no `ElPress` on `ElToggle`) | **match** |
-| G3 | arrival squash | `animation-name: none` in every state — a standalone `Toggle` never squashes | no `ElJelly` / `ElJellyReplay` anywhere in `toggle.dart` | **match** |
+| G1 | colour curve | 250ms `ease-out`, no overshoot | `_TransitionAllColors` 250ms `Curves.out` | **match** |
+| G2 | press scale | none | none (no `Press` on `Toggle`) | **match** |
+| G3 | arrival squash | `animation-name: none` in every state — a standalone `Toggle` never squashes | no `Jelly` / `JellyReplay` anywhere in `toggle.dart` | **match** |
 
 ---
 
@@ -665,7 +665,7 @@ Ordered by how much of the user's "does not behave like the web" this buys.
 
 ### P0 — the press feel is inverted (B1, B6)
 
-`ElButton` must **not** animate its scale. The web snaps to 0.95 on pointer-down
+`Button` must **not** animate its scale. The web snaps to 0.95 on pointer-down
 and snaps back on pointer-up, with no easing in either direction. The port ships
 an 80ms eased squish plus a 250ms springy return that overshoots to ~1.005 —
 a bounce the reference does not have, on every single button press in the system.
@@ -674,12 +674,12 @@ This is the single most-felt divergence: it is on every button, it fires on
 every interaction, and the port's version is *longer and bouncier* than the
 reference, which is exactly what "looks right, feels wrong" describes.
 
-**Fix, precisely scoped.** Stop `ElButton` from routing its squish through
-`ElPress`; drive the scale directly off the pressed flag with no interpolation
+**Fix, precisely scoped.** Stop `Button` from routing its squish through
+`Press`; drive the scale directly off the pressed flag with no interpolation
 (a plain `Transform.scale`, no controller). Keep the **colour** legs on their
 existing 80ms-down / 250ms-up spring — those are measured correct (B4, B5).
 
-**Do not touch `ElPress` itself.** §3.9 measures a `.press` surface on the live
+**Do not touch `Press` itself.** §3.9 measures a `.press` surface on the live
 reference and it matches the port's implementation to four decimal places,
 release overshoot included. `press` animates `transform`, which *is* in its
 transition list; `Button`'s `scale-95` is a different property that is *not*.
@@ -687,13 +687,13 @@ One utility, two properties, opposite behaviour — that is the whole bug.
 
 Separately, B6's `CurvedAnimation` reverse-curve latch (a release before
 `forward()` completes replays the forward curve backwards, and the run is
-shortened by the remaining fraction) is a real defect in `ElPress` that survives
+shortened by the remaining fraction) is a real defect in `Press` that survives
 the button fix. It is worth fixing on its own merits for every remaining
-`ElPress` surface, but it is not what makes buttons feel wrong.
+`Press` surface, but it is not what makes buttons feel wrong.
 
 ### P1 — toggle-group mount and deselect (T6, T7, T8, T8b)
 
-Three separable, small fixes to `sliding_pill.dart`:
+Three separable, small fixes to `active_indicator.dart`:
 
 - **T6** gate `AnimatedOpacity` behind the same `_placed` flag that gates the
   travel, so the first placement pops in rather than fading over 150ms.
@@ -728,7 +728,7 @@ and record it either way.
 
 ### P2.5 — the focus ring springs open (B12)
 
-`ElButton`'s focus ring is a hard cut; the reference animates its **spread**
+`Button`'s focus ring is a hard cut; the reference animates its **spread**
 from 0 to 3px over 250ms on `--ease-spring`, overshooting to 3.29px, with the
 border colour springing alongside. This is a per-frame geometry animation, not
 a colour fade, so the existing colour-tween plumbing will not produce it — the
@@ -768,11 +768,11 @@ the port's clock the same way the rAF sampler samples the browser's.
 not merely kept green:
 
 - `test/components_test.dart:280` — *"squishes to 0.95 — the button scale, not
-  press's 0.94"*. It pumps `ElDurations.tick` (80ms) before asserting 0.95, so
+  press's 0.94"*. It pumps `Durations.tick` (80ms) before asserting 0.95, so
   it will still pass after B1 — but its structure and comment assert an 80ms
   eased down-stroke that the reference does not have. Rewrite it to pump a
   **single frame** and assert 0.95 exactly, which is both stricter and true.
-- `test/components_test.dart:882` — asserts a `ElToggle` has **no** `ElPress`.
+- `test/components_test.dart:882` — asserts a `Toggle` has **no** `Press`.
   Correct (G2), measured; keep it.
 - `test/components_test.dart:~1366` (`scalesUnderSwap`) — asserts the icon
   swap's squash fires. Correct (S5, S7); keep it.
@@ -785,13 +785,13 @@ one module measured fully correct.
 
 ### Explicitly protect — do not "fix" these
 
-`ElJelly`'s per-segment easing (T4), the pill's fused position/size timing
+`Jelly`'s per-segment easing (T4), the pill's fused position/size timing
 (T1, T2), the label colour curve (T5), the resize-replay trigger (T9 — the
 reference's `ResizeObserver` path replays the squash too, so this is correct as
 shipped), the entire icon-swap module (S1–S8), the
 hard-cut shadows on button press and premium hover (B2, B3), the 80ms
 held-colour legs (B5), the spring-with-overshoot hover colours (B4), the instant
-spinner-entry width jump (B13), and `ElToggle`'s ease-out colours with no press
+spinner-entry width jump (B13), and `Toggle`'s ease-out colours with no press
 scale (G1, G2). All measured, all correct. The hard-cut shadows especially look
 like bugs and are not: CSS genuinely refuses to interpolate those two token
 pairs. Note that this does **not** extend to the focus ring, which does

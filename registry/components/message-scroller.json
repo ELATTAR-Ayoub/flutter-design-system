@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/message_scroller.dart",
+      "source": "lib/src/components/ui/message_scroller.dart",
       "target": "@ui/message_scroller.dart",
-      "sha256": "a1c5921c8195596fcb0fa498e379eac117b7ef1f6fa8491abe729e8a642fa609"
+      "sha256": "ffa6689149e236df1e3564e77610d231755d5a1a29fb02cf4e1c5616a0bec3a3"
     }
   ],
   "registryDependencies": [
@@ -26,5 +26,17 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/message-scroller",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/message_scroller.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/message_scroller.dart",
+  "exports": [
+    "MessageScroller",
+    "MessageScrollerButton",
+    "MessageScrollerContent",
+    "MessageScrollerController",
+    "MessageScrollerItem",
+    "MessageScrollerProvider",
+    "MessageScrollerViewport",
+    "ScrollDirection",
+    "ScrollFade",
+    "ScrollPosition"
+  ]
 }

@@ -5,13 +5,25 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_showcase.dart';
 import 'package:example/docs/docs_snippet.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
-  child: ElTheme(
-    controller: ElThemeController(mode: ElThemeMode.dark),
+  child: ThemeScope(
+    controller: ThemeController(mode: ColorMode.dark),
     child: child,
   ),
 );
@@ -37,10 +49,7 @@ void main() {
     await tester.pumpWidget(_host(_showcase()));
     await tester.pump();
 
-    expect(
-      tester.getSize(find.byType(DocsShowcaseFrame)).height,
-      el(96),
-    );
+    expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, space(96));
   });
 
   testWidgets('an explicit minHeight overrides the breakpoint default', (
@@ -55,13 +64,13 @@ void main() {
         DocsShowcase(
           specimen: const SizedBox(height: 40, width: 120),
           code: 'const SizedBox(height: 40, width: 120)',
-          minHeight: el(64),
+          minHeight: space(64),
         ),
       ),
     );
     await tester.pump();
 
-    expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, el(64));
+    expect(tester.getSize(find.byType(DocsShowcaseFrame)).height, space(64));
   });
 
   testWidgets('a taller specimen still outgrows its minimum', (
@@ -78,7 +87,7 @@ void main() {
         DocsShowcase(
           specimen: const SizedBox(height: 900, width: 120),
           code: 'x',
-          minHeight: el(64),
+          minHeight: space(64),
         ),
       ),
     );
@@ -101,10 +110,10 @@ void main() {
     await tester.pump();
 
     final double height = tester.getSize(find.byType(DocsShowcaseFrame)).height;
-    expect(height, greaterThanOrEqualTo(el(96)));
+    expect(height, greaterThanOrEqualTo(space(96)));
     expect(
       height,
-      lessThan(el(160)),
+      lessThan(space(160)),
       reason: '640 is taller than a phone viewport minus header and toggle',
     );
   });
@@ -121,7 +130,7 @@ void main() {
 
     expect(find.byType(DocsSnippet), findsNothing);
     expect(
-      tester.widget<ElToggleGroup>(find.byType(ElToggleGroup)).selectedIndex,
+      tester.widget<ToggleGroup>(find.byType(ToggleGroup)).selectedIndex,
       0,
     );
   });
@@ -154,14 +163,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      _host(
-        Column(
-          children: <Widget>[
-            _showcase(),
-            _showcase(),
-          ],
-        ),
-      ),
+      _host(Column(children: <Widget>[_showcase(), _showcase()])),
     );
     await tester.pump();
 

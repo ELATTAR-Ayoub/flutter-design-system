@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -25,8 +49,12 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// The shared three-field constructor every glass widget declares
-/// (`lib/src/effects/glass.dart`), excluding `key`.
-const List<String> _glassConstructorParams = <String>['radius', 'padding', 'child'];
+/// (`lib/src/components/ui/glass.dart`), excluding `key`.
+const List<String> _glassConstructorParams = <String>[
+  'radius',
+  'padding',
+  'child',
+];
 
 void main() {
   group('glass docs page', () {
@@ -40,7 +68,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: GlassDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -58,18 +86,22 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         // Every class name appears (one table heading each) and every
         // shared constructor parameter appears at least four times, once
         // per table.
         for (final String className in <String>[
-          'ElGlassPanel',
-          'ElGlassPanelClear',
-          'ElGlassPanelDeep',
-          'ElGlassControl',
+          'GlassVariant.panel',
+          'GlassVariant.navigation',
+          'GlassVariant.prominent',
+          'GlassVariant.control',
         ]) {
-          expect(find.text(className), findsWidgets, reason: 'missing $className');
+          expect(
+            find.text(className),
+            findsWidgets,
+            reason: 'missing $className',
+          );
         }
         for (final String param in _glassConstructorParams) {
           expect(find.text(param), findsNWidgets(4), reason: 'missing $param');
@@ -92,48 +124,44 @@ void main() {
           );
         }
 
-        // A live specimen of every exported class mounts somewhere.
-        expect(find.byType(ElGlassPanel), findsNWidgets(3));
-        expect(find.byType(ElGlassPanelClear), findsOneWidget);
-        expect(find.byType(ElGlassPanelDeep), findsOneWidget);
-        expect(find.byType(ElGlassControl), findsOneWidget);
+        Finder variant(GlassVariant value) => find.byWidgetPredicate(
+          (Widget widget) => widget is Glass && widget.variant == value,
+        );
+        expect(variant(GlassVariant.panel), findsNWidgets(3));
+        expect(variant(GlassVariant.navigation), findsOneWidget);
+        expect(variant(GlassVariant.prominent), findsOneWidget);
+        expect(variant(GlassVariant.control), findsOneWidget);
 
         expect(glassDoc.name, 'glass');
         expect(
           glassDoc.exports,
-          containsAll(<String>[
-            'ElGlassPanel',
-            'ElGlassPanelClear',
-            'ElGlassPanelDeep',
-            'ElGlassControl',
-          ]),
+          containsAll(<String>['Glass', 'GlassVariant']),
         );
         expect(glassDoc.command, 'elattar add glass');
         expect(destination, isNull);
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const GlassDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const GlassDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Four specimen stages: Preview, Control, Deep, Clear.
-        expect(find.byType(DocsShowcase), findsNWidgets(4));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Four specimen stages: Preview, Control, Deep, Clear.
+      expect(find.byType(DocsShowcase), findsNWidgets(4));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -160,15 +188,12 @@ void main() {
       final DocsTocEntry api = glassDocSpec.toc.firstWhere(
         (DocsTocEntry e) => e.anchor == 'api',
       );
-      expect(
-        api.children.map((DocsTocEntry e) => e.anchor).toList(),
-        <String>[
-          'api-elglasspanel',
-          'api-elglasspanelclear',
-          'api-elglasspaneldeep',
-          'api-elglasscontrol',
-        ],
-      );
+      expect(api.children.map((DocsTocEntry e) => e.anchor).toList(), <String>[
+        'api-elglasspanel',
+        'api-elglasspanelclear',
+        'api-elglasspaneldeep',
+        'api-elglasscontrol',
+      ]);
     });
 
     testWidgets('sections render in declaration order', (
@@ -178,9 +203,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       await tester.pumpWidget(
         _harness(controller: controller, child: const GlassDocPage()),
       );
@@ -218,7 +241,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const GlassDocPage(),
           ),
         );
@@ -246,13 +269,13 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      for (final ElThemeMode mode in <ElThemeMode>[
-        ElThemeMode.dark,
-        ElThemeMode.light,
+      for (final ColorMode mode in <ColorMode>[
+        ColorMode.dark,
+        ColorMode.light,
       ]) {
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: mode),
+            controller: ThemeController(mode: mode),
             child: const GlassDocPage(),
           ),
         );

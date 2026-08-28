@@ -9,7 +9,7 @@
 /// *"a real AgentTransport… that answers from a script instead of from a
 /// model… every state in the machine becomes reachable on the
 /// documentation page."* Every specimen below drives a real
-/// `ElMockTransport`, so typing and pressing send genuinely walks the
+/// `MockTransport`, so typing and pressing send genuinely walks the
 /// twenty-state machine `agent-core` documents — nothing here is a
 /// screenshot standing in for that.
 ///
@@ -27,7 +27,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../agent/mock_transport.dart';
 import '../../docs/component_doc_page.dart';
@@ -45,7 +57,7 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'A real, functioning console over a real ElMockTransport '
+          'A real, functioning console over a real MockTransport '
           '(example/lib/agent/mock_transport.dart) — type a message and '
           'send it. Try a word like "buy" for the approval path, '
           '"report" for a tool call that returns a file, or "price" for '
@@ -54,7 +66,7 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     InstallSection(
       id: 'install',
@@ -84,8 +96,8 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElAgentConsole, ElAgentFeatures, '
-              'ElAgentPersona and ElAgentModel are reachable the same way '
+              'Add the export line so AgentConsole, AgentFeatures, '
+              'AgentPersona and AgentModel are reachable the same way '
               'the CLI path already makes them.',
           code: "export 'agent_console.dart';",
         ),
@@ -104,7 +116,7 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
       id: 'features',
       title: 'Features',
       description:
-          'ElAgentFeatures: nine switches, all on by default. Every one '
+          'AgentFeatures: nine switches, all on by default. Every one '
           'is turned off here — *"a console with everything turned off '
           'is still a console"*, the source\'s own test that the parts '
           'are genuinely separable rather than merely arranged. Compare '
@@ -112,7 +124,7 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
       specimen: _FeaturesSpecimen(),
       code: _featuresCode,
       label: 'Features specimen view',
-      minHeight: el(88),
+      minHeight: space(88),
     ),
     ShowcaseSection(
       id: 'header-slot',
@@ -127,7 +139,7 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
       specimen: _HeaderSlotSpecimen(),
       code: _headerSlotCode,
       label: 'Header slot specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     ShowcaseSection(
       id: 'height',
@@ -141,24 +153,24 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
       specimen: _HeightSpecimen(),
       code: _heightCode,
       label: 'Height specimen view',
-      minHeight: el(240),
+      minHeight: space(240),
     ),
     DisclosureSection(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every named constructor parameter ElAgentConsole declares, its '
+          'Every named constructor parameter AgentConsole declares, its '
           'seven static geometry getters, and the three small data '
           'classes a caller composes it with.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElAgentConsole', anchor: 'api-elagentconsole'),
+        DocsTocEntry(title: 'AgentConsole', anchor: 'api-elagentconsole'),
         DocsTocEntry(
-          title: 'ElAgentConsole statics',
+          title: 'AgentConsole statics',
           anchor: 'api-elagentconsole-static',
         ),
-        DocsTocEntry(title: 'ElAgentFeatures', anchor: 'api-elagentfeatures'),
-        DocsTocEntry(title: 'ElAgentPersona', anchor: 'api-elagentpersona'),
-        DocsTocEntry(title: 'ElAgentModel', anchor: 'api-elagentmodel'),
+        DocsTocEntry(title: 'AgentFeatures', anchor: 'api-elagentfeatures'),
+        DocsTocEntry(title: 'AgentPersona', anchor: 'api-elagentpersona'),
+        DocsTocEntry(title: 'AgentModel', anchor: 'api-elagentmodel'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -169,7 +181,7 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
           'The console itself draws no interaction states — hover, '
           'press, focus belong to the buttons and fields it composes, '
           'each documented on its own page. What varies here is which '
-          'ElAgentState the resolver picks, and what the console shows '
+          'AgentState the resolver picks, and what the console shows '
           'for it — see the Agent Core page\'s own Resolve agent state '
           'section for the real precedence ladder.',
       child: DocsStateMatrix(facts: _stateFacts),
@@ -231,7 +243,7 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
             label: 'Mock transport',
             value: 'example/lib/agent/mock_transport.dart',
             description:
-                'The scripted ElAgentTransport every specimen on this '
+                'The scripted AgentTransport every specimen on this '
                 'page drives — see that file\'s own doc for why it '
                 'exists and what it is a reference implementation of.',
           ),
@@ -259,9 +271,9 @@ class AgentConsoleDocPage extends StatelessWidget {
       title: agentConsoleDoc.title,
       description: agentConsoleDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Agent Console'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Agent Console'),
     ],
     toc: agentConsoleDocSpec.toc,
     previous: const DocsPageLink(
@@ -282,13 +294,13 @@ class AgentConsoleDocPage extends StatelessWidget {
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-const List<ElAgentCommand> _demoCommands = <ElAgentCommand>[
-  ElAgentCommand(
+const List<AgentCommand> _demoCommands = <AgentCommand>[
+  AgentCommand(
     id: 'find',
     label: 'Find a card',
     hint: 'Search the catalogue for a card or a sealed box',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.search,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.search,
   ),
 ];
 
@@ -300,7 +312,7 @@ class _PreviewSpecimen extends StatefulWidget {
 }
 
 class _PreviewSpecimenState extends State<_PreviewSpecimen> {
-  final ElMockTransport _transport = ElMockTransport();
+  final MockTransport _transport = MockTransport();
 
   @override
   void dispose() {
@@ -309,40 +321,36 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentConsole(
+  Widget build(BuildContext context) => AgentConsole(
     key: const ValueKey<String>('agent-console-preview'),
     transport: _transport,
-    persona: const ElAgentPersona(
+    persona: const AgentPersona(
       name: 'Vault Assistant',
       blurb: 'Ask about inventory, pricing, or your account.',
       suggestions: <String>['What is Eclipse Vault worth right now?'],
       placeholder: 'Ask about your collection…',
     ),
-    models: const <ElAgentModel>[
-      ElAgentModel(
-        id: 'fast',
-        label: 'Fast',
-        hint: 'Quick answers, less depth',
-      ),
-      ElAgentModel(id: 'deep', label: 'Deep', hint: 'Slower, more thorough'),
+    models: const <AgentModel>[
+      AgentModel(id: 'fast', label: 'Fast', hint: 'Quick answers, less depth'),
+      AgentModel(id: 'deep', label: 'Deep', hint: 'Slower, more thorough'),
     ],
     commands: _demoCommands,
-    height: el(152),
+    height: space(152),
   );
 }
 
-const String _previewCode = '''final transport = ElMockTransport();
+const String _previewCode = '''final transport = MockTransport();
 
-ElAgentConsole(
+AgentConsole(
   transport: transport,
-  persona: const ElAgentPersona(
+  persona: const AgentPersona(
     name: 'Vault Assistant',
     blurb: 'Ask about inventory, pricing, or your account.',
     suggestions: ['What is Eclipse Vault worth right now?'],
   ),
   models: const [
-    ElAgentModel(id: 'fast', label: 'Fast'),
-    ElAgentModel(id: 'deep', label: 'Deep'),
+    AgentModel(id: 'fast', label: 'Fast'),
+    AgentModel(id: 'deep', label: 'Deep'),
   ],
   height: 608,
 )''';
@@ -350,8 +358,8 @@ ElAgentConsole(
 const String _usageCode =
     '''import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElAgentConsole(
-  transport: myTransport, // implements ElAgentTransport
+AgentConsole(
+  transport: myTransport, // implements AgentTransport
 )''';
 
 class _FeaturesSpecimen extends StatefulWidget {
@@ -362,7 +370,7 @@ class _FeaturesSpecimen extends StatefulWidget {
 }
 
 class _FeaturesSpecimenState extends State<_FeaturesSpecimen> {
-  final ElMockTransport _transport = ElMockTransport();
+  final MockTransport _transport = MockTransport();
 
   @override
   void dispose() {
@@ -371,10 +379,10 @@ class _FeaturesSpecimenState extends State<_FeaturesSpecimen> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentConsole(
+  Widget build(BuildContext context) => AgentConsole(
     key: const ValueKey<String>('agent-console-features'),
     transport: _transport,
-    features: const ElAgentFeatures(
+    features: const AgentFeatures(
       avatar: false,
       suggestions: false,
       toolTrace: false,
@@ -385,13 +393,13 @@ class _FeaturesSpecimenState extends State<_FeaturesSpecimen> {
       models: false,
       reset: false,
     ),
-    height: el(80),
+    height: space(80),
   );
 }
 
-const String _featuresCode = '''ElAgentConsole(
+const String _featuresCode = '''AgentConsole(
   transport: transport,
-  features: const ElAgentFeatures(
+  features: const AgentFeatures(
     avatar: false,
     suggestions: false,
     toolTrace: false,
@@ -413,7 +421,7 @@ class _HeaderSlotSpecimen extends StatefulWidget {
 }
 
 class _HeaderSlotSpecimenState extends State<_HeaderSlotSpecimen> {
-  final ElMockTransport _transport = ElMockTransport();
+  final MockTransport _transport = MockTransport();
 
   @override
   void dispose() {
@@ -422,31 +430,31 @@ class _HeaderSlotSpecimenState extends State<_HeaderSlotSpecimen> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentConsole(
+  Widget build(BuildContext context) => AgentConsole(
     key: const ValueKey<String>('agent-console-header-slot'),
     transport: _transport,
-    persona: const ElAgentPersona(name: 'Vault Assistant'),
-    headerSlot: ElButton(
+    persona: const AgentPersona(name: 'Vault Assistant'),
+    headerSlot: Button(
       key: const ValueKey<String>('agent-console-header-slot-button'),
-      variant: ElButtonVariant.ghost,
-      size: ElButtonSize.iconSm,
+      variant: ButtonVariant.ghost,
+      size: ButtonSize.iconSm,
       label: 'History',
       onPressed: () {},
-      child: const ElIcon.lucide(ElLucide.rotateCcwClock, sizePx: 16),
+      child: const Icon.lucide(Lucide.rotateCcwClock, sizePx: 16),
     ),
-    height: el(152),
+    height: space(152),
   );
 }
 
-const String _headerSlotCode = '''ElAgentConsole(
+const String _headerSlotCode = '''AgentConsole(
   transport: transport,
-  persona: const ElAgentPersona(name: 'Vault Assistant'),
-  headerSlot: ElButton(
-    variant: ElButtonVariant.ghost,
-    size: ElButtonSize.iconSm,
+  persona: const AgentPersona(name: 'Vault Assistant'),
+  headerSlot: Button(
+    variant: ButtonVariant.ghost,
+    size: ButtonSize.iconSm,
     label: 'History',
     onPressed: openHistory,
-    child: const ElIcon.lucide(ElLucide.rotateCcwClock, sizePx: 16),
+    child: const Icon.lucide(Lucide.rotateCcwClock, sizePx: 16),
   ),
 )''';
 
@@ -458,8 +466,8 @@ class _HeightSpecimen extends StatefulWidget {
 }
 
 class _HeightSpecimenState extends State<_HeightSpecimen> {
-  final ElMockTransport _live = ElMockTransport();
-  final ElMockTransport _minimal = ElMockTransport();
+  final MockTransport _live = MockTransport();
+  final MockTransport _minimal = MockTransport();
 
   @override
   void dispose() {
@@ -470,34 +478,43 @@ class _HeightSpecimenState extends State<_HeightSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText('height: 608 ("live")', ElType.section, color: theme.mutedForeground),
-        SizedBox(height: el(2)),
-        ElAgentConsole(
+        StyledText(
+          'height: 608 ("live")',
+          TextStyles.section,
+          color: theme.mutedForeground,
+        ),
+        SizedBox(height: space(2)),
+        AgentConsole(
           key: const ValueKey<String>('agent-console-height-live'),
           transport: _live,
-          persona: const ElAgentPersona(name: 'Vault Assistant'),
-          height: el(152),
+          persona: const AgentPersona(name: 'Vault Assistant'),
+          height: space(152),
         ),
-        SizedBox(height: el(6)),
-        ElText('height: 320 ("minimal")', ElType.section, color: theme.mutedForeground),
-        SizedBox(height: el(2)),
-        ElAgentConsole(
+        SizedBox(height: space(6)),
+        StyledText(
+          'height: 320 ("minimal")',
+          TextStyles.section,
+          color: theme.mutedForeground,
+        ),
+        SizedBox(height: space(2)),
+        AgentConsole(
           key: const ValueKey<String>('agent-console-height-minimal'),
           transport: _minimal,
-          height: el(80),
+          height: space(80),
         ),
       ],
     );
   }
 }
 
-const String _heightCode = '''ElAgentConsole(transport: transport, height: 608) // 'live'
-ElAgentConsole(transport: transport, height: 320) // 'minimal\'''';
+const String _heightCode =
+    '''AgentConsole(transport: transport, height: 608) // 'live'
+AgentConsole(transport: transport, height: 320) // 'minimal\'''';
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
 
@@ -510,30 +527,30 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elagentconsole',
-        child: DocsApiTable(title: 'ElAgentConsole', facts: _consoleFacts),
+        child: DocsApiTable(title: 'AgentConsole', facts: _consoleFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentconsole-static',
         child: DocsApiTable(
-          title: 'ElAgentConsole statics',
+          title: 'AgentConsole statics',
           facts: _consoleStaticFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentfeatures',
-        child: DocsApiTable(title: 'ElAgentFeatures', facts: _featuresFacts),
+        child: DocsApiTable(title: 'AgentFeatures', facts: _featuresFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentpersona',
-        child: DocsApiTable(title: 'ElAgentPersona', facts: _personaFacts),
+        child: DocsApiTable(title: 'AgentPersona', facts: _personaFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentmodel',
-        child: DocsApiTable(title: 'ElAgentModel', facts: _modelFacts),
+        child: DocsApiTable(title: 'AgentModel', facts: _modelFacts),
       ),
     ],
   );
@@ -542,47 +559,48 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _consoleFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'transport',
-    type: 'ElAgentTransport',
+    type: 'AgentTransport',
     description:
         'Required. What it talks to — the whole reason this widget is '
         'reusable.',
   ),
   DocsApiFact(
     name: 'persona',
-    type: 'ElAgentPersona?',
+    type: 'AgentPersona?',
     description: 'Optional. Name, blurb, suggestions, and a placeholder.',
   ),
   DocsApiFact(
     name: 'toolStates',
-    type: 'ElToolStateMap?',
+    type: 'ToolStateMap?',
     description:
         'Optional. What this agent\'s tools mean, so the face and the '
         'chips can describe them honestly.',
   ),
   DocsApiFact(
     name: 'models',
-    type: 'List<ElAgentModel>',
-    description: 'Defaults to []. The model picker hides itself below two '
+    type: 'List<AgentModel>',
+    description:
+        'Defaults to []. The model picker hides itself below two '
         'entries.',
   ),
   DocsApiFact(
     name: 'commands',
-    type: 'List<ElAgentCommand>',
+    type: 'List<AgentCommand>',
     description:
         'Defaults to []. Skills and browser commands offered under "/" '
         'and from the plus menu; clear and stop are added automatically.',
   ),
   DocsApiFact(
     name: 'avatar',
-    type: 'ElAgentAvatarBuilder?',
+    type: 'AgentAvatarBuilder?',
     description:
         'Optional. What it looks like — swap the renderer, keep the '
-        'machine. Defaults to ElAgentAvatarRegistry.renderer.',
+        'machine. Defaults to AgentAvatarRegistry.renderer.',
   ),
   DocsApiFact(
     name: 'features',
-    type: 'ElAgentFeatures',
-    description: 'Defaults to ElAgentFeatures.all — every switch on.',
+    type: 'AgentFeatures',
+    description: 'Defaults to AgentFeatures.all — every switch on.',
   ),
   DocsApiFact(
     name: 'accent',
@@ -596,7 +614,7 @@ const List<DocsApiFact> _consoleFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'renderToolResult',
-    type: 'Widget Function(ElToolTurn)?',
+    type: 'Widget Function(ToolTurn)?',
     description:
         'Optional. Turns a settled tool result into the product\'s own '
         'components.',
@@ -617,11 +635,11 @@ const List<DocsApiFact> _consoleFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'switchPhase',
-    type: 'ElSwitchPhase',
+    type: 'SwitchPhase',
     description:
-        'Defaults to ElSwitchPhase.idle. The transcript\'s cross-fade '
+        'Defaults to SwitchPhase.idle. The transcript\'s cross-fade '
         'phase while switching conversations — supplied by '
-        'ElBlurSwitchController (agent-core), never derived here.',
+        'BlurSwitchController (agent-core), never derived here.',
   ),
   DocsApiFact(
     name: 'height',
@@ -634,38 +652,39 @@ const List<DocsApiFact> _consoleFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _consoleStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElAgentConsole.padding',
+    name: 'AgentConsole.padding',
     type: 'static double (get)',
     description: '20px — the console\'s own inset, on every edge.',
   ),
   DocsApiFact(
-    name: 'ElAgentConsole.gap',
+    name: 'AgentConsole.gap',
     type: 'static double (get)',
     description: '16px between the header, the scroller and the composer.',
   ),
   DocsApiFact(
-    name: 'ElAgentConsole.headerGap',
+    name: 'AgentConsole.headerGap',
     type: 'static double (get)',
     description: '12px inside the header.',
   ),
   DocsApiFact(
-    name: 'ElAgentConsole.headerInset',
+    name: 'AgentConsole.headerInset',
     type: 'static double (get)',
-    description: '24px right padding on the header, clearing a dialog\'s '
+    description:
+        '24px right padding on the header, clearing a dialog\'s '
         'own close button.',
   ),
   DocsApiFact(
-    name: 'ElAgentConsole.turnGap',
+    name: 'AgentConsole.turnGap',
     type: 'static double (get)',
     description: '16px between rows in the scroller.',
   ),
   DocsApiFact(
-    name: 'ElAgentConsole.scrollerInset',
+    name: 'AgentConsole.scrollerInset',
     type: 'static double (get)',
     description: '4px, beside the scrollbar.',
   ),
   DocsApiFact(
-    name: 'ElAgentConsole.pinTolerance',
+    name: 'AgentConsole.pinTolerance',
     type: 'static double (get)',
     description:
         '32px. A reader within this of the bottom stays pinned there as '
@@ -682,7 +701,8 @@ const List<DocsApiFact> _featuresFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'suggestions',
     type: 'bool',
-    description: 'Defaults to true. Starter prompts, on an empty '
+    description:
+        'Defaults to true. Starter prompts, on an empty '
         'conversation.',
   ),
   DocsApiFact(
@@ -710,7 +730,8 @@ const List<DocsApiFact> _featuresFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'attachments',
     type: 'bool',
-    description: 'Defaults to true. The file tray, drag-and-drop and '
+    description:
+        'Defaults to true. The file tray, drag-and-drop and '
         'paste.',
   ),
   DocsApiFact(
@@ -729,8 +750,8 @@ const List<DocsApiFact> _featuresFacts = <DocsApiFact>[
     description: 'Defaults to true. Clear the conversation.',
   ),
   DocsApiFact(
-    name: 'ElAgentFeatures.all',
-    type: 'static const ElAgentFeatures',
+    name: 'AgentFeatures.all',
+    type: 'static const AgentFeatures',
     description: 'Every switch on — the constructor default itself.',
   ),
 ];
@@ -748,7 +769,7 @@ const List<DocsApiFact> _personaFacts = <DocsApiFact>[
     type: 'String?',
     description:
         'Optional. Overrides the composer\'s own '
-        'ElAgentComposer.defaultPlaceholder.',
+        'AgentComposer.defaultPlaceholder.',
   ),
 ];
 
@@ -767,9 +788,11 @@ const List<DocsApiFact> _modelFacts = <DocsApiFact>[
 const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Empty conversation',
-    treatment: 'transport.turns.isEmpty renders ElWelcomeCard instead of '
+    treatment:
+        'transport.turns.isEmpty renders WelcomeCard instead of '
         'the scroller\'s own rows.',
-    userSignal: 'The persona, its blurb, skill chips and suggestions, '
+    userSignal:
+        'The persona, its blurb, skill chips and suggestions, '
         'centred.',
   ),
   DocsStateFact(
@@ -777,13 +800,14 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'The transport notifies; the console rebuilds and, while '
         'pinned, autoscrolls to the new bottom on the next frame.',
-    userSignal: 'The transcript grows and the view follows it, unless '
+    userSignal:
+        'The transcript grows and the view follows it, unless '
         'the reader has scrolled up to read.',
   ),
   DocsStateFact(
     state: 'Approval pending',
     treatment:
-        'transport.pendingApprovals renders an ElApprovalCard after '
+        'transport.pendingApprovals renders an ApprovalCard after '
         'every turn, not in the transcript position the action turn '
         'occupies — drift, reproduced as the reference has it.',
     userSignal: 'A card with Approve/Decline appears at the bottom.',
@@ -794,7 +818,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'Pressing stop calls transport.abort() and marks the turn '
         'stopped locally; the half-written text renders unstreaming, '
         'with a "Stopped by you" marker after it.',
-    userSignal: 'The cursor disappears and a small marker names what '
+    userSignal:
+        'The cursor disappears and a small marker names what '
         'happened.',
   ),
   DocsStateFact(
@@ -804,7 +829,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'MediaQuery.viewInsets.bottom at the end of the column lifts the '
         'composer by the keyboard\'s height; the scroller\'s Expanded '
         'gives up the same amount.',
-    userSignal: 'The composer stays above the keyboard instead of '
+    userSignal:
+        'The composer stays above the keyboard instead of '
         'hiding behind it.',
   ),
   DocsStateFact(
@@ -812,8 +838,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'Every animated part this console composes (the typing cursor, '
         'the welcome card\'s entrance, the avatar) routes its own '
-        'duration through elAnimationDuration.',
-    userSignal: 'Every entrance and pulse lands on its end frame '
+        'duration through effectiveMotionDuration.',
+    userSignal:
+        'Every entrance and pulse lands on its end frame '
         'immediately.',
   ),
 ];
@@ -823,14 +850,14 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The console itself sets no top-level Semantics container — each '
             'part it composes (the composer\'s textField Semantics, the '
             'approval card\'s liveRegion, a tool chip\'s expanded state) '
             'carries its own, documented on that part\'s own page.',
         'The error banner (a turn-level error or the transport\'s own '
-            'standing one) is plain ElText with no Semantics.liveRegion '
-            'of its own — unlike ElFieldError\'s live region (Field '
+            'standing one) is plain StyledText with no Semantics.liveRegion '
+            'of its own — unlike FieldError\'s live region (Field '
             'page), a screen reader is not proactively told the '
             'transport failed.',
         'The model picker\'s trigger reads the chosen model\'s label as '
@@ -844,7 +871,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Every keyboard interaction this page can show — Enter to send, '
             'arrow keys in the slash palette — belongs to the composer, '
             'documented on the Agent Composer page.',
@@ -861,7 +888,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching: the same widget tree renders at 390px '
             'and 1440px; only the keyboard-inset spacer (below) ever '
             'changes the tree shape, and only on a phone.',
@@ -895,14 +922,15 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Component imports',
-            value: 'agent_avatar.dart, agent_composer.dart, '
+            value:
+                'agent_avatar.dart, agent_composer.dart, '
                 'agent_core.dart, agent_face.dart, agent_history.dart '
-                '(ElBlurSwitch only), agent_slash_palette.dart, '
+                '(BlurSwitch only), agent_slash_palette.dart, '
                 'agent_transcript.dart, button.dart, dropdown_menu.dart, '
                 'icon.dart, icon_paths.g.dart, marker.dart, menu.dart, '
                 'popover.dart',
             description:
-                'agent_history.dart is imported for ElBlurSwitch alone — '
+                'agent_history.dart is imported for BlurSwitch alone — '
                 'the widget form of blurClass, kept to that one owner '
                 'rather than a second copy here.',
           ),
@@ -919,18 +947,21 @@ class _DependenciesContent extends StatelessWidget {
             description:
                 'useBrowserSpeech and useDictation are browser hooks '
                 'with no Flutter equivalent, and this port invents none: '
-                'ElAgentFeatures.speech and .microphone are honoured as '
-                'flags only, ElAgentVoice stays at rest, and the '
+                'AgentFeatures.speech and .microphone are honoured as '
+                'flags only, AgentVoice stays at rest, and the '
                 'built-in "voice" command never appears.',
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Agent Avatar', route: '/components/agent_avatar'),
           DocsLink(label: 'Agent Core', route: '/components/agent-core'),
-          DocsLink(label: 'Agent Composer', route: '/components/agent-composer'),
+          DocsLink(
+            label: 'Agent Composer',
+            route: '/components/agent-composer',
+          ),
           DocsLink(label: 'Agent Face', route: '/components/agent_face'),
           DocsLink(label: 'Agent History', route: '/components/agent_history'),
           DocsLink(
@@ -961,9 +992,10 @@ class _ThemingContent extends StatelessWidget {
     title: 'What actually varies with the theme',
     facts: const <DocsInstallFact>[
       DocsInstallFact(
-        label: 'theme.destructive / theme.destructiveInk',
+        label: 'theme.destructive / theme.destructiveText',
         value: 'the error banner',
-        description: '8% fill, 30% border, on a turn-level or a '
+        description:
+            '8% fill, 30% border, on a turn-level or a '
             'transport-level error.',
       ),
       DocsInstallFact(
@@ -971,7 +1003,7 @@ class _ThemingContent extends StatelessWidget {
         value: 'the whole avatar set',
         description:
             'Any colour, recolouring every avatar frame — a prop this '
-            'file passes straight through to ElAgentFace, not a theme '
+            'file passes straight through to AgentFace, not a theme '
             'token of its own.',
       ),
       DocsInstallFact(
@@ -987,15 +1019,19 @@ class _ThemingContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

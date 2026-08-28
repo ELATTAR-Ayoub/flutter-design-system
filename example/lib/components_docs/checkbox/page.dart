@@ -1,6 +1,6 @@
 /// Public documentation page for the `checkbox` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` established. Every specimen
@@ -14,7 +14,7 @@
 /// rather than surviving as standalone headings, content preserved, not
 /// dropped:
 /// * Description folded into Basic's own description: both were about the
-///   same wiring (`ElField.description` reaching `ElCheckbox.hint`), and
+///   same wiring (`Field.description` reaching `Checkbox.hint`), and
 ///   Basic already carries the live specimen that shows it.
 /// * RTL folded into the Responsive disclosure as its own bullet: RTL and
 ///   viewport-independence are both "what does NOT change this control's
@@ -26,17 +26,29 @@
 ///
 /// New: a Keyboard disclosure, between Accessibility and Responsive, read
 /// directly off `lib/src/components/selection_control.dart`'s shared
-/// `_onKey` (checkbox.dart composes `ElSelectionControl`, it does not wire
+/// `_onKey` (checkbox.dart composes `SelectionControl`, it does not wire
 /// its own key handler).
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart' show ElStateCell;
+import '../../kit.dart' show StateCell;
 import 'meta.dart';
 
 final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
@@ -48,7 +60,7 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'Seven live specimens, all built from the same ElCheckbox '
+          'Seven live specimens, all built from the same Checkbox '
           'constructor. Unchecked, Checked, Focus-visible and Error are '
           'operable: tap them. Indeterminate is deliberately held still and '
           'Disabled is deliberately inert; both are explained in States '
@@ -81,7 +93,7 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElCheckbox and ElCheckboxState are '
+              'Add the export line so Checkbox and CheckboxState are '
               'reachable the same way the CLI path already makes them.',
           code: "export 'checkbox.dart';",
         ),
@@ -90,15 +102,15 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
     SnippetSection(
       id: 'usage',
       title: 'Usage',
-      description: 'Import the package, then construct a ElCheckbox.',
+      description: 'Import the package, then construct a Checkbox.',
       code: _basicUsageCode,
     ),
     ShowcaseSection(
       id: 'checked-state',
       title: 'Checked state',
       description:
-          'ElCheckbox is always controlled: state carries the current '
-          'ElCheckboxState and onChanged reports the next one on tap.',
+          'Checkbox is always controlled: state carries the current '
+          'CheckboxState and onChanged reports the next one on tap.',
       specimen: _CheckedStateSpecimen(),
       code: _smallestUsageCode,
       label: 'Checked state specimen view',
@@ -118,15 +130,15 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
       id: 'basic',
       title: 'Basic',
       description:
-          'ElCheckbox renders no visible text of its own: label only '
-          'supplies the accessible name. Pair it with ElField for a visible '
-          'caption, and its ElFieldScope threads the label straight '
+          'Checkbox renders no visible text of its own: label only '
+          'supplies the accessible name. Pair it with Field for a visible '
+          'caption, and its FieldScope threads the label straight '
           'through. The same wiring carries description: '
           '"You can withdraw consent at any time in Settings." below feeds '
-          'ElCheckbox.hint, read after the label through Semantics.hint — '
+          'Checkbox.hint, read after the label through Semantics.hint — '
           'the aria-describedby analogue shadcn\'s FieldDescription '
-          'authors by hand. No separate prop on ElCheckbox itself is '
-          'needed once it is composed inside a ElField.',
+          'authors by hand. No separate prop on Checkbox itself is '
+          'needed once it is composed inside a Field.',
       specimen: _BasicSpecimen(),
       code: _fieldUsageCode,
       label: 'Basic specimen view',
@@ -146,7 +158,7 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
       title: 'Group',
       description:
           'A list of independent checkboxes sharing one row layout, each '
-          'one still a plain, uncoordinated ElCheckbox.',
+          'one still a plain, uncoordinated Checkbox.',
       specimen: _GroupSpecimen(),
       code: _filterRowCode,
       label: 'Group specimen view',
@@ -156,7 +168,7 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
       title: 'Table',
       description:
           'A header checkbox reflecting a partial selection across table '
-          'rows: the case ElCheckboxState.indeterminate exists for.',
+          'rows: the case CheckboxState.indeterminate exists for.',
       specimen: _TableSpecimen(),
       code: _bulkSelectionCode,
       label: 'Table specimen view',
@@ -165,8 +177,8 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElCheckbox declares, plus '
-          'ElCheckboxState and the static helpers callers reach for.',
+          'Every constructor parameter Checkbox declares, plus '
+          'CheckboxState and the static helpers callers reach for.',
       child: _ApiReferenceContent(),
     ),
     DisclosureSection(
@@ -187,7 +199,7 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'Read off lib/src/components/selection_control.dart\'s shared '
-          '_onKey: checkbox.dart composes ElSelectionControl rather than '
+          '_onKey: checkbox.dart composes SelectionControl rather than '
           'wiring its own key handler.',
       child: _KeyboardContent(),
     ),
@@ -223,7 +235,7 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
             label: 'Shared machinery',
             value: 'lib/src/components/selection_control.dart',
             description:
-                'ElSelectionControl, ElHitArea and ElJellyReplay, shared '
+                'SelectionControl, HitArea and StateChangeFeedback, shared '
                 'with the switch and radio families and documented on '
                 'their own component page.',
           ),
@@ -231,7 +243,7 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/selection_feedback_test.dart',
             description:
-                'State-matrix and geometry coverage for ElCheckbox in the '
+                'State-matrix and geometry coverage for Checkbox in the '
                 'package itself.',
           ),
           const DocsInstallFact(
@@ -260,9 +272,9 @@ class CheckboxDocPage extends StatelessWidget {
       title: checkboxDoc.title,
       description: checkboxDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Checkbox'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Checkbox'),
     ],
     toc: checkboxDocSpec.toc,
     previous: const DocsPageLink(
@@ -291,73 +303,72 @@ class _PreviewSpecimen extends StatefulWidget {
 }
 
 class _PreviewSpecimenState extends State<_PreviewSpecimen> {
-  ElCheckboxState _unchecked = ElCheckboxState.unchecked;
-  ElCheckboxState _checked = ElCheckboxState.checked;
-  ElCheckboxState _focus = ElCheckboxState.unchecked;
-  ElCheckboxState _error = ElCheckboxState.unchecked;
+  CheckboxState _unchecked = CheckboxState.unchecked;
+  CheckboxState _checked = CheckboxState.checked;
+  CheckboxState _focus = CheckboxState.unchecked;
+  CheckboxState _error = CheckboxState.unchecked;
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(3),
-    runSpacing: el(3),
+    spacing: space(3),
+    runSpacing: space(3),
     children: <Widget>[
-      ElStateCell(
+      StateCell(
         label: 'Unchecked',
         note: 'Tap to toggle',
-        child: ElCheckbox(
+        child: Checkbox(
           key: const ValueKey<String>('checkbox-live-specimen'),
           state: _unchecked,
           label: 'Unchecked',
-          onChanged: (ElCheckboxState next) =>
-              setState(() => _unchecked = next),
+          onChanged: (CheckboxState next) => setState(() => _unchecked = next),
         ),
       ),
-      ElStateCell(
+      StateCell(
         label: 'Checked',
         note: 'Tap to toggle',
-        child: ElCheckbox(
+        child: Checkbox(
           state: _checked,
           label: 'Checked',
-          onChanged: (ElCheckboxState next) => setState(() => _checked = next),
+          onChanged: (CheckboxState next) => setState(() => _checked = next),
         ),
       ),
-      const ElStateCell(
+      const StateCell(
         label: 'Indeterminate',
         note: 'Held here on purpose: see States',
-        child: ElCheckbox(
-          state: ElCheckboxState.indeterminate,
+        child: Checkbox(
+          state: CheckboxState.indeterminate,
           inert: true,
           label: 'Indeterminate',
         ),
       ),
-      ElStateCell(
+      StateCell(
         label: 'Focus-visible',
         note: 'Ring painted, not focused',
-        child: ElCheckbox(
+        child: Checkbox(
           state: _focus,
           forceFocusRing: true,
           label: 'Focus-visible',
-          onChanged: (ElCheckboxState next) => setState(() => _focus = next),
+          onChanged: (CheckboxState next) => setState(() => _focus = next),
         ),
       ),
-      ElStateCell(
+      StateCell(
         label: 'Error',
         note: 'invalid: true',
-        child: ElCheckbox(
+        child: Checkbox(
           state: _error,
           invalid: true,
           label: 'Error',
-          onChanged: (ElCheckboxState next) => setState(() => _error = next),
+          onChanged: (CheckboxState next) => setState(() => _error = next),
         ),
       ),
-      const ElStateCell(
+      const StateCell(
         label: 'Disabled',
-        child: ElCheckbox(enabled: false, label: 'Disabled'),
+        child: Checkbox(enabled: false, label: 'Disabled'),
       ),
-      const ElStateCell(
+      const StateCell(
         label: 'Disabled checked',
-        child: ElCheckbox(
-          state: ElCheckboxState.checked,
+        child: Checkbox(
+          state: CheckboxState.checked,
           enabled: false,
           label: 'Disabled checked',
         ),
@@ -366,30 +377,29 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   );
 }
 
-const String _previewCode =
-    '''Wrap(
+const String _previewCode = '''Wrap(
   spacing: 12,
   runSpacing: 12,
   children: [
-    ElCheckbox(
-      state: unchecked ? ElCheckboxState.checked : ElCheckboxState.unchecked,
+    Checkbox(
+      state: unchecked ? CheckboxState.checked : CheckboxState.unchecked,
       label: 'Unchecked',
       onChanged: (next) => setState(() => unchecked = next),
     ),
-    const ElCheckbox(
-      state: ElCheckboxState.indeterminate,
+    const Checkbox(
+      state: CheckboxState.indeterminate,
       inert: true,
       label: 'Indeterminate',
     ),
-    ElCheckbox(
+    Checkbox(
       forceFocusRing: true,
       label: 'Focus-visible',
       onChanged: (next) {},
     ),
-    ElCheckbox(invalid: true, label: 'Error', onChanged: (next) {}),
-    const ElCheckbox(enabled: false, label: 'Disabled'),
-    const ElCheckbox(
-      state: ElCheckboxState.checked,
+    Checkbox(invalid: true, label: 'Error', onChanged: (next) {}),
+    const Checkbox(enabled: false, label: 'Disabled'),
+    const Checkbox(
+      state: CheckboxState.checked,
       enabled: false,
       label: 'Disabled checked',
     ),
@@ -407,26 +417,26 @@ class _CheckedStateSpecimenState extends State<_CheckedStateSpecimen> {
   bool _accepted = false;
 
   @override
-  Widget build(BuildContext context) => ElCheckbox(
-    state: _accepted ? ElCheckboxState.checked : ElCheckboxState.unchecked,
+  Widget build(BuildContext context) => Checkbox(
+    state: _accepted ? CheckboxState.checked : CheckboxState.unchecked,
     label: 'Accept the terms',
-    onChanged: (ElCheckboxState next) =>
-        setState(() => _accepted = next == ElCheckboxState.checked),
+    onChanged: (CheckboxState next) =>
+        setState(() => _accepted = next == CheckboxState.checked),
   );
 }
 
 const String _basicUsageCode =
     '''import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElCheckbox(label: 'Accept the terms')''';
+Checkbox(label: 'Accept the terms')''';
 
 const String _smallestUsageCode = '''bool accepted = false;
 
-ElCheckbox(
-  state: accepted ? ElCheckboxState.checked : ElCheckboxState.unchecked,
+Checkbox(
+  state: accepted ? CheckboxState.checked : CheckboxState.unchecked,
   label: 'Accept the terms',
-  onChanged: (ElCheckboxState next) {
-    setState(() => accepted = next == ElCheckboxState.checked);
+  onChanged: (CheckboxState next) {
+    setState(() => accepted = next == CheckboxState.checked);
   },
 )''';
 
@@ -435,15 +445,15 @@ class _InvalidStateSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      const ElCheckbox(invalid: true, label: 'Accept the terms');
+      const Checkbox(invalid: true, label: 'Accept the terms');
 }
 
-const String _invalidUsageCode = '''ElCheckbox(
+const String _invalidUsageCode = '''Checkbox(
   invalid: true,
   label: 'Accept the terms',
 )''';
 
-/// A live, functioning `ElField`-wrapped checkbox: proof the composition
+/// A live, functioning `Field`-wrapped checkbox: proof the composition
 /// Basic documents actually renders and toggles, not just a code excerpt.
 class _BasicSpecimen extends StatefulWidget {
   const _BasicSpecimen();
@@ -456,26 +466,26 @@ class _BasicSpecimenState extends State<_BasicSpecimen> {
   bool _accepted = false;
 
   @override
-  Widget build(BuildContext context) => ElField(
+  Widget build(BuildContext context) => Field(
     label: 'Accept the terms and conditions',
     description: 'You can withdraw consent at any time in Settings.',
-    orientation: ElFieldOrientation.horizontal,
-    child: ElCheckbox(
-      state: _accepted ? ElCheckboxState.checked : ElCheckboxState.unchecked,
-      onChanged: (ElCheckboxState next) =>
-          setState(() => _accepted = next == ElCheckboxState.checked),
+    orientation: FieldOrientation.horizontal,
+    child: Checkbox(
+      state: _accepted ? CheckboxState.checked : CheckboxState.unchecked,
+      onChanged: (CheckboxState next) =>
+          setState(() => _accepted = next == CheckboxState.checked),
     ),
   );
 }
 
-const String _fieldUsageCode = '''ElField(
+const String _fieldUsageCode = '''Field(
   label: 'Accept the terms and conditions',
   description: 'You can withdraw consent at any time in Settings.',
-  orientation: ElFieldOrientation.horizontal,
-  child: ElCheckbox(
-    state: accepted ? ElCheckboxState.checked : ElCheckboxState.unchecked,
-    onChanged: (ElCheckboxState next) {
-      setState(() => accepted = next == ElCheckboxState.checked);
+  orientation: FieldOrientation.horizontal,
+  child: Checkbox(
+    state: accepted ? CheckboxState.checked : CheckboxState.unchecked,
+    onChanged: (CheckboxState next) {
+      setState(() => accepted = next == CheckboxState.checked);
     },
   ),
 )''';
@@ -485,10 +495,10 @@ class _DisabledSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      const ElCheckbox(enabled: false, label: 'Disabled');
+      const Checkbox(enabled: false, label: 'Disabled');
 }
 
-const String _disabledUsageCode = '''ElCheckbox(
+const String _disabledUsageCode = '''Checkbox(
   enabled: false,
   label: 'Disabled',
 )''';
@@ -525,7 +535,7 @@ class _GroupSpecimenState extends State<_GroupSpecimen> {
           checked: _checked[label]!,
           onChanged: (bool next) => setState(() => _checked[label] = next),
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
       ],
     ],
   );
@@ -548,21 +558,21 @@ class _FilterRow extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: <Widget>[
-      ElCheckbox(
-        state: checked ? ElCheckboxState.checked : ElCheckboxState.unchecked,
+      Checkbox(
+        state: checked ? CheckboxState.checked : CheckboxState.unchecked,
         label: label,
-        onChanged: (ElCheckboxState next) =>
-            onChanged(next == ElCheckboxState.checked),
+        onChanged: (CheckboxState next) =>
+            onChanged(next == CheckboxState.checked),
       ),
-      SizedBox(width: ElField.gap),
+      SizedBox(width: Field.gap),
       Expanded(
-        child: ElFieldLabel(
+        child: FieldLabel(
           label,
-          spec: ElFieldLabel.normal,
+          spec: FieldLabel.normal,
           onTap: () => onChanged(!checked),
         ),
       ),
-      ElText(count, ElType.numSm),
+      StyledText(count, TextStyles.numberSm),
     ],
   );
 }
@@ -570,21 +580,21 @@ class _FilterRow extends StatelessWidget {
 const String _filterRowCode = '''Row(
   crossAxisAlignment: CrossAxisAlignment.center,
   children: <Widget>[
-    ElCheckbox(
-      state: checked ? ElCheckboxState.checked : ElCheckboxState.unchecked,
+    Checkbox(
+      state: checked ? CheckboxState.checked : CheckboxState.unchecked,
       label: label,
-      onChanged: (ElCheckboxState next) =>
-          onChanged(next == ElCheckboxState.checked),
+      onChanged: (CheckboxState next) =>
+          onChanged(next == CheckboxState.checked),
     ),
-    SizedBox(width: ElField.gap),
+    SizedBox(width: Field.gap),
     Expanded(
-      child: ElFieldLabel(
+      child: FieldLabel(
         label,
-        spec: ElFieldLabel.normal,
+        spec: FieldLabel.normal,
         onTap: () => onChanged(!checked),
       ),
     ),
-    ElText(count, ElType.numSm),
+    StyledText(count, TextStyles.numberSm),
   ],
 )''';
 
@@ -601,20 +611,20 @@ class _TableSpecimenState extends State<_TableSpecimen> {
   @override
   Widget build(BuildContext context) {
     final int selected = _rows.where((bool v) => v).length;
-    final ElCheckboxState headerState = selected == 0
-        ? ElCheckboxState.unchecked
+    final CheckboxState headerState = selected == 0
+        ? CheckboxState.unchecked
         : selected == _rows.length
-        ? ElCheckboxState.checked
-        : ElCheckboxState.indeterminate;
+        ? CheckboxState.checked
+        : CheckboxState.indeterminate;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElCheckbox(
+        Checkbox(
           state: headerState,
           label: 'Select all ${_rows.length} rows',
-          onChanged: (ElCheckboxState next) {
-            final bool selectAll = next == ElCheckboxState.checked;
+          onChanged: (CheckboxState next) {
+            final bool selectAll = next == CheckboxState.checked;
             setState(() {
               for (int i = 0; i < _rows.length; i++) {
                 _rows[i] = selectAll;
@@ -622,17 +632,15 @@ class _TableSpecimenState extends State<_TableSpecimen> {
             });
           },
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         for (int i = 0; i < _rows.length; i++) ...<Widget>[
-          ElCheckbox(
-            state: _rows[i]
-                ? ElCheckboxState.checked
-                : ElCheckboxState.unchecked,
+          Checkbox(
+            state: _rows[i] ? CheckboxState.checked : CheckboxState.unchecked,
             label: 'Row ${i + 1}',
-            onChanged: (ElCheckboxState next) =>
-                setState(() => _rows[i] = next == ElCheckboxState.checked),
+            onChanged: (CheckboxState next) =>
+                setState(() => _rows[i] = next == CheckboxState.checked),
           ),
-          SizedBox(height: el(2)),
+          SizedBox(height: space(2)),
         ],
       ],
     );
@@ -641,15 +649,15 @@ class _TableSpecimenState extends State<_TableSpecimen> {
 
 const String _bulkSelectionCode =
     '''// selectedCount tracks how many of `total` rows are checked.
-ElCheckbox(
+Checkbox(
   state: selectedCount == 0
-      ? ElCheckboxState.unchecked
+      ? CheckboxState.unchecked
       : selectedCount == total
-          ? ElCheckboxState.checked
-          : ElCheckboxState.indeterminate,
+          ? CheckboxState.checked
+          : CheckboxState.indeterminate,
   label: 'Select all \$total rows',
-  onChanged: (ElCheckboxState next) {
-    final bool selectAll = next == ElCheckboxState.checked;
+  onChanged: (CheckboxState next) {
+    final bool selectAll = next == CheckboxState.checked;
     setState(() {
       for (int i = 0; i < total; i++) {
         rowSelected[i] = selectAll;
@@ -667,10 +675,10 @@ class _ApiReferenceContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const DocsApiTable(title: 'ElCheckbox', facts: _checkboxApiFacts),
-      SizedBox(height: el(5)),
+      const DocsApiTable(title: 'Checkbox', facts: _checkboxApiFacts),
+      SizedBox(height: space(5)),
       const DocsApiTable(
-        title: 'ElCheckboxState and statics',
+        title: 'CheckboxState and statics',
         facts: _checkboxStateFacts,
       ),
     ],
@@ -680,17 +688,17 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _checkboxApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'state',
-    type: 'ElCheckboxState',
+    type: 'CheckboxState',
     description:
         'Which of the three data-state values is rendered. Defaults to '
-        'ElCheckboxState.unchecked.',
+        'CheckboxState.unchecked.',
   ),
   DocsApiFact(
     name: 'onChanged',
-    type: 'ValueChanged<ElCheckboxState>?',
+    type: 'ValueChanged<CheckboxState>?',
     description:
         'Called with the next state on tap or Enter/Space. Null disables '
-        'the control: the same "no handler, no operation" rule ElButton '
+        'the control: the same "no handler, no operation" rule Button '
         'follows.',
   ),
   DocsApiFact(
@@ -713,7 +721,7 @@ const List<DocsApiFact> _checkboxApiFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Defaults to false. true paints the destructive border and ring. '
-        'ORed with the enclosing ElFieldScope\'s own invalid flag.',
+        'ORed with the enclosing FieldScope\'s own invalid flag.',
   ),
   DocsApiFact(
     name: 'forceFocusRing',
@@ -726,14 +734,14 @@ const List<DocsApiFact> _checkboxApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'focusNode',
     type: 'FocusNode?',
-    description: 'Overrides the node a ElFieldScope would otherwise supply.',
+    description: 'Overrides the node a FieldScope would otherwise supply.',
   ),
   DocsApiFact(
     name: 'label',
     type: 'String?',
     description:
         'The accessible name. Not rendered as visible text, pair with '
-        'ElField (or ElFieldLabel) for a visible caption.',
+        'Field (or FieldLabel) for a visible caption.',
   ),
   DocsApiFact(
     name: 'hint',
@@ -746,31 +754,32 @@ const List<DocsApiFact> _checkboxApiFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _checkboxStateFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElCheckboxState.unchecked',
+    name: 'CheckboxState.unchecked',
     type: 'enum value',
     description: 'No indicator mounted. isOn is false.',
   ),
   DocsApiFact(
-    name: 'ElCheckboxState.checked',
+    name: 'CheckboxState.checked',
     type: 'enum value',
     description: 'The self-drawing tick mark. isOn is true.',
   ),
   DocsApiFact(
-    name: 'ElCheckboxState.indeterminate',
+    name: 'CheckboxState.indeterminate',
     type: 'enum value',
-    description: 'The same lit box, carrying a bar instead of a tick. isOn '
+    description:
+        'The same lit box, carrying a bar instead of a tick. isOn '
         'is true.',
   ),
   DocsApiFact(
-    name: 'ElCheckbox.size',
+    name: 'Checkbox.size',
     type: 'static double',
     description:
         'The 20px box size: bigger than the reference\'s own default '
         'because a 16px target and tick were judged illegible.',
   ),
   DocsApiFact(
-    name: 'ElCheckbox.nextAfter',
-    type: 'static ElCheckboxState Function(ElCheckboxState)',
+    name: 'Checkbox.nextAfter',
+    type: 'static CheckboxState Function(CheckboxState)',
     description:
         'What a click produces: anything not already checked becomes '
         'checked, and checked becomes unchecked.',
@@ -785,18 +794,18 @@ class _StatesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsStateMatrix(facts: _stateFacts),
-      SizedBox(height: el(4)),
-      ElText(
+      SizedBox(height: space(4)),
+      StyledText(
         'Omitted: Hover: no control in this family authors a hover skin; '
         'only the pointer cursor changes. Pressed, there is no separate '
         'pointer-down look; the box squashes once, after the state '
-        'actually changes, via ElJellyReplay, which is a post-toggle '
+        'actually changes, via StateChangeFeedback, which is a post-toggle '
         'reveal rather than a held-down state. Loading and Empty, '
-        'ElCheckbox is a synchronous primitive with no async operation and '
+        'Checkbox is a synchronous primitive with no async operation and '
         'nothing to list, so neither applies. Success: the component '
         'defines no success semantics of its own.',
-        ElType.small,
-        color: ElTheme.of(context).mutedForeground,
+        TextStyles.small,
+        color: ThemeScope.of(context).mutedForeground,
       ),
     ],
   );
@@ -805,8 +814,7 @@ class _StatesContent extends StatelessWidget {
 const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest (unchecked)',
-    treatment:
-        'theme.card fill, theme.input border, pressed-style shadow.',
+    treatment: 'theme.card fill, theme.input border, pressed-style shadow.',
     userSignal: 'An empty 20px box; no indicator is mounted.',
   ),
   DocsStateFact(
@@ -868,7 +876,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'reduced-motion context lands directly on the finished stroke '
         'instead of drawing to it; the socket colour and shadow tween '
         'collapses to its resolved (near-zero) duration.',
-    userSignal: 'The same end state, with no draw-on animation to sit '
+    userSignal:
+        'The same end state, with no draw-on animation to sit '
         'through.',
   ),
 ];
@@ -887,8 +896,8 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
     value: 'label',
     description:
         'Feeds the control\'s accessible name directly. It is never '
-        'rendered as visible text: compose with ElField (or a '
-        'ElFieldLabel) for a caption a sighted user can read; tapping '
+        'rendered as visible text: compose with Field (or a '
+        'FieldLabel) for a caption a sighted user can read; tapping '
         'that visible label activates the control through the same '
         'activator wiring an HTML <label for> click would use.',
   ),
@@ -904,7 +913,7 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
     label: 'Touch target',
     value: '42 x 34, centred on a 20 x 20 box',
     description:
-        'ElHitArea grows the hit test past the painted box. Measured from '
+        'HitArea grows the hit test past the painted box. Measured from '
         'the reference at 2px short of the system\'s own 44px floor on '
         'both axes: recorded, not corrected, because it is what the '
         'reference renders.',
@@ -919,10 +928,10 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
   ),
   DocsInstallFact(
     label: 'Error wiring',
-    value: 'invalid, ORed with the enclosing ElFieldScope',
+    value: 'invalid, ORed with the enclosing FieldScope',
     description:
-        'A ElField around the control folds its own invalid flag in, and '
-        'colours the field\'s text with theme.destructiveInk when either '
+        'A Field around the control folds its own invalid flag in, and '
+        'colours the field\'s text with theme.destructiveText when either '
         'is true.',
   ),
   DocsInstallFact(
@@ -945,7 +954,7 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
 ];
 
 /// Read directly off `lib/src/components/selection_control.dart`'s shared
-/// `_onKey`: `checkbox.dart` composes `ElSelectionControl` rather than
+/// `_onKey`: `checkbox.dart` composes `SelectionControl` rather than
 /// wiring its own key handler, so every fact here is that file's, not
 /// invented for this page.
 class _KeyboardContent extends StatelessWidget {
@@ -953,7 +962,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Activation: Enter, NumpadEnter, and Space toggle a focused, '
             'enabled, non-inert checkbox. The shared _onKey only inspects '
             'KeyDownEvent, a matching KeyUpEvent is ignored, and any other '
@@ -967,11 +976,11 @@ class _KeyboardContent extends StatelessWidget {
         'No custom ordering: neither checkbox.dart nor '
             'selection_control.dart wires a FocusTraversalPolicy of its '
             'own. Tab and Shift+Tab walk whatever order the surrounding '
-            'page (or ElFieldGroup) already declares.',
+            'page (or FieldGroup) already declares.',
         'Pointer vs keyboard: a bare pointer tap never requests focus on '
             'the node in this family; only keyboard traversal, or an '
             'explicit focusNode.requestFocus() from outside, does — the '
-            'same asymmetry ElButton\'s own Keyboard section documents, '
+            'same asymmetry Button\'s own Keyboard section documents, '
             'shared machinery.',
       ]);
 }
@@ -981,11 +990,11 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElCheckbox has no responsive breakpoints of its own: it is a '
+      _bullets(ThemeScope.of(context), <String>[
+        'Checkbox has no responsive breakpoints of its own: it is a '
             'fixed 20 x 20 atomic control with a fixed 42 x 34 hit area, '
             'identical across mobile, tablet, desktop and web. What '
-            'changes with layout belongs to whatever composes it: ElField '
+            'changes with layout belongs to whatever composes it: Field '
             'reflows its label and description, and a filter list or '
             'bulk-selection row decides its own wrap behaviour.',
         'Keyboard activation (Enter/Space) and pointer activation behave '
@@ -993,11 +1002,11 @@ class _ResponsiveContent extends StatelessWidget {
             'there is no platform channel and nothing here is web-only or '
             'desktop-only.',
         'RTL: checkbox.dart carries no left/right-specific geometry of '
-            'its own: the socket is square, ElHitArea\'s insets grow '
+            'its own: the socket is square, HitArea\'s insets grow '
             'symmetrically on every side, and the tick/bar paths are '
             'drawn in a fixed local coordinate space rather than '
             'mirrored. What flips under Directionality.rtl belongs '
-            'entirely to whatever composes it: ElField and ElFieldLabel '
+            'entirely to whatever composes it: Field and FieldLabel '
             'reorder label, control and description the same way any '
             'other Flutter row does under RTL, because nothing in '
             'checkbox.dart hardcodes a left-to-right assumption.',
@@ -1048,8 +1057,8 @@ class _DependenciesContent extends StatelessWidget {
             description:
                 'checkbox.dart imports these directly: '
                 'selection_control.dart for the shared socket / hit-area '
-                '/ focus-ring machinery (ElSelectionControl), field.dart '
-                'for ElFieldScope wiring, icon_paths.dart for the 24-unit '
+                '/ focus-ring machinery (SelectionControl), field.dart '
+                'for FieldScope wiring, icon_paths.dart for the 24-unit '
                 'icon grid, and motion/keyframes.dart for the '
                 'self-drawing stroke player. None are copyable in '
                 'isolation.',
@@ -1062,12 +1071,13 @@ class _DependenciesContent extends StatelessWidget {
                 'theme_scope.dart',
             description:
                 'Token sources: durations and curves, shadow specs, the '
-                'el() spacing scale, and the live theme.',
+                'space() spacing scale, and the live theme.',
           ),
           DocsInstallFact(
             label: 'Exports',
             value: checkboxDoc.exports.join(', '),
-            description: 'The public symbols this component makes '
+            description:
+                'The public symbols this component makes '
                 'available.',
           ),
           const DocsInstallFact(
@@ -1080,7 +1090,7 @@ class _DependenciesContent extends StatelessWidget {
           const DocsInstallFact(
             label: 'Fonts',
             value: 'none',
-            description: 'No text is rendered by ElCheckbox itself.',
+            description: 'No text is rendered by Checkbox itself.',
           ),
           const DocsInstallFact(
             label: 'Shaders',
@@ -1089,7 +1099,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
@@ -1108,8 +1118,7 @@ class _DependenciesContent extends StatelessWidget {
 const List<DocsInstallFact> _themingFacts = <DocsInstallFact>[
   DocsInstallFact(
     label: 'Fill',
-    value:
-        'theme.card (rest) / theme.primary (checked or indeterminate)',
+    value: 'theme.card (rest) / theme.primary (checked or indeterminate)',
     description: 'Socket background.',
   ),
   DocsInstallFact(
@@ -1126,36 +1135,39 @@ const List<DocsInstallFact> _themingFacts = <DocsInstallFact>[
   ),
   DocsInstallFact(
     label: 'Shadow',
-    value: 'ElShadows.pressed (rest) / ElShadows.btnPrimary (lit)',
+    value: 'Shadows.inset (rest) / Shadows.controlPrimary (lit)',
     description:
         'The socket shadow spec, composed with the focus or invalid ring.',
   ),
   DocsInstallFact(
     label: 'Radius',
-    value: 'ElRadii.sm (6px)',
+    value: 'Radii.sm (6px)',
     description: 'The socket corner.',
   ),
   DocsInstallFact(
     label: 'Motion',
-    value:
-        'ElDurations.transitionDefault, ElKeyframePlayer, ElJellyReplay',
+    value: 'MotionDurations.normal, KeyframePlayer, StateChangeFeedback',
     description:
         'Socket colour/border/ring tween duration, the self-drawing '
         'stroke, and the post-toggle squash: all resolved through '
-        'elAnimationDuration, so reduced motion shortens or removes them '
+        'effectiveMotionDuration, so reduced motion shortens or removes them '
         'automatically.',
   ),
 ];
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

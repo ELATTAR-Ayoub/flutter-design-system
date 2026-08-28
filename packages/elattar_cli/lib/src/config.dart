@@ -69,8 +69,7 @@ class ElattarConfig {
   /// land.
   String get foundationPath => foundationDirectory;
   String get componentsPath => uiDirectory;
-  String get effectsPath => effectsDirectory;
-  String get motionPath => motionDirectory;
+  String get blocksPath => blocksDirectory;
   String get fontsPath => fontsDirectory;
 
   factory ElattarConfig.fromYaml(String source) {

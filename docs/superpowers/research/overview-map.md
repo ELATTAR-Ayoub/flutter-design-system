@@ -9,14 +9,14 @@ Source files read in full: `app/design-system/page.tsx`, `app/design-system/layo
 Wrapper: `div.flex.min-h-dvh.flex-col`.
 
 **Header** — `sticky top-0 z-40 flex h-(--height-site-header) shrink-0 items-center gap-4 border-b border-border bg-background/85 px-6 backdrop-blur-xl`. `--height-site-header: 4rem` (64px). Children left→right:
-1. `ElMobileNav` — visible `<lg` only: `Button variant="outline" size="icon"` (`size-10`, `border-input bg-card shadow-btn hover:bg-muted active:shadow-btn-down`, rounded per Button) containing `Icon icon={Menu}` (16px, stroke 2.4) + `sr-only` "Open design system navigation". Opens shadcn `Sheet side="left"` `w-72 overflow-y-auto px-6` with `SheetHeader px-0` → `SheetTitle` → Logo link → same `NavTree` as sidebar.
+1. `MobileNav` — visible `<lg` only: `Button variant="outline" size="icon"` (`size-10`, `border-input bg-card shadow-btn hover:bg-muted active:shadow-btn-down`, rounded per Button) containing `Icon icon={Menu}` (16px, stroke 2.4) + `sr-only` "Open design system navigation". Opens shadcn `Sheet side="left"` `w-72 overflow-y-auto px-6` with `SheetHeader px-0` → `SheetTitle` → Logo link → same `NavTree` as sidebar.
 2. `Link href="/design-system"` class `press` wrapping `Logo`.
-3. Version pill: `<span class="type-micro hidden rounded-pill border border-border px-2.5 py-1 sm:block" aria-label="Design system version">` — text verbatim: **"Design System v0.1"**.
+3. Version indicator: `<span class="type-micro hidden rounded-pill border border-border px-2.5 py-1 sm:block" aria-label="Design system version">` — text verbatim: **"Design System v0.1"**.
 4. `<span class="ml-auto type-micro hidden md:block">` — verbatim: **"Desktop-first · 1440 frame · Light & dark"** (`&amp;` → "&").
 5. `ThemeToggle className="ml-auto md:ml-4"`.
 
 **Body row**: `div.mx-auto flex w-full max-w-(--width-shell) flex-1 items-start` — `--width-shell: 1680px`.
-- `ElSidebar`: `aside.sticky top-(--height-site-header) hidden h-[calc(100dvh-var(--height-site-header))] w-60 shrink-0 overflow-y-auto border-r border-border px-6 pt-10 scrollbar-thin lg:block` (240px wide; thin scrollbar: `scrollbar-width: thin; scrollbar-color: var(--border) transparent`, WebKit 8px, thumb `--border` radius 999px, hover `--muted-foreground`).
+- `Sidebar`: `aside.sticky top-(--height-site-header) hidden h-[calc(100dvh-var(--height-site-header))] w-60 shrink-0 overflow-y-auto border-r border-border px-6 pt-10 scrollbar-thin lg:block` (240px wide; thin scrollbar: `scrollbar-width: thin; scrollbar-color: var(--border) transparent`, WebKit 8px, thumb `--border` radius 999px, hover `--muted-foreground`).
 - `main.min-w-0 flex-1 px-6 py-12 lg:px-12` → inner `div.mx-auto max-w-(--width-content)` — `--width-content: 1080px`. Page children render here.
 
 **NavTree** (sidebar + sheet): `nav[aria-label="Design system"].pb-16`; per group `div.mb-8`: group link `type-label mb-3 block transition-colors duration-fast hover:text-muted-foreground`, `text-action-ink` when `pathname === group.href` else `text-muted-foreground` — on this route the **Foundations** group link is active (its href IS `/design-system`). Category list `ul.space-y-px.border-l.border-border`; item link `type-nav -ml-px block border-l py-2 pl-4 transition-colors duration-fast`; active: `border-action bg-action/12 text-foreground` + `aria-current="page"`; inactive: `border-transparent text-muted-foreground hover:border-input hover:text-foreground`. Group order: Foundations (6), Base Components (14), Agent (6), Site Pages (6).
@@ -25,11 +25,11 @@ Wrapper: `div.flex.min-h-dvh.flex-col`.
 
 **Logo** — `span.flex.items-center.gap-2.5`: `LogoMark` = `span aria-hidden` `relative grid size-7 shrink-0 place-items-center rounded-md bg-action` containing `svg viewBox="0 0 24 24" class="size-4" fill="none"` with two paths: chevron `d="M6 15.5 12 6l6 9.5"` stroke `var(--primary-foreground)` width 2.4 linecap square; baseline `d="M6 19h12"` stroke `var(--color-value-bright)` width 2.4. Wordmark: `span.type-wordmark.text-foreground` → `ELATTAR` + nested `span.text-value-ink` → `ELATTAR`.
 
-Page atmosphere (from `@layer base`): `body` carries `background-image: radial-gradient(120% 90% at 62% 34%, var(--page-glow) 0%, transparent 64%); background-attachment: fixed; background-repeat: no-repeat` over `bg-background`. `--page-glow`: dark `hsl(240 8% 10%)`, light `hsl(240 30% 98%)`. `html`: `scroll-behavior: smooth`, `scroll-padding-block-start: var(--scroll-offset)` where `--scroll-offset = calc(4rem + var(--spacing)*8)` = 96px (no `scroll-mt-*` anywhere — `ElSection` deliberately has none). `:focus-visible` = `outline: 2px solid var(--ring); outline-offset: 2px`. `::selection` = `color-mix(in oklab, var(--color-action) 35%, transparent)` behind `var(--foreground)`. Default transition: 250ms `var(--ease-out)`.
+Page atmosphere (from `@layer base`): `body` carries `background-image: radial-gradient(120% 90% at 62% 34%, var(--background-effect) 0%, transparent 64%); background-attachment: fixed; background-repeat: no-repeat` over `bg-background`. `--background-effect`: dark `hsl(240 8% 10%)`, light `hsl(240 30% 98%)`. `html`: `scroll-behavior: smooth`, `scroll-padding-block-start: var(--scroll-offset)` where `--scroll-offset = calc(4rem + var(--spacing)*8)` = 96px (no `scroll-mt-*` anywhere — `Section` deliberately has none). `:focus-visible` = `outline: 2px solid var(--ring); outline-offset: 2px`. `::selection` = `color-mix(in oklab, var(--color-action) 35%, transparent)` behind `var(--foreground)`. Default transition: 250ms `var(--ease-out)`.
 
 ---
 
-## 1. Page header — `ElPageHeader`
+## 1. Page header — `PageHeader`
 
 `header.mb-14.border-b.border-border.pb-10`:
 - Eyebrow `p.type-label.text-action-ink` — verbatim: **"Elattar's Design System"**
@@ -41,7 +41,7 @@ Page atmosphere (from `@layer base`): `body` carries `background-image: radial-g
 
 ## 2. Section `#foundations` — "Foundations"
 
-`ElSection` markup: `section#foundations.mb-20` → `div.mb-6` → `h2.type-h3.text-foreground` **"Foundations"** + `p.type-small.mt-2.max-w-2xl` **"The decisions everything else inherits. Change something here and it propagates through every base component and the entire agent console."** (Note: section titles are `h2` styled with `.type-h3`.)
+`Section` markup: `section#foundations.mb-20` → `div.mb-6` → `h2.type-h3.text-foreground` **"Foundations"** + `p.type-small.mt-2.max-w-2xl` **"The decisions everything else inherits. Change something here and it propagates through every base component and the entire agent console."** (Note: section titles are `h2` styled with `.type-h3`.)
 
 Body: `IndexGrid` = `div.grid.gap-4.sm:grid-cols-2.xl:grid-cols-3` (1 col → 2 ≥640px → 3 ≥1280px, 16px gap) with **6 `IndexCard`s**, order and verbatim data from `lib/el/nav.ts`:
 
@@ -64,7 +64,7 @@ Body: `IndexGrid` = `div.grid.gap-4.sm:grid-cols-2.xl:grid-cols-3` (1 col → 2 
 
 ## 3. Section `#components` — "Components"
 
-`ElSection id="components"`, `h2.type-h3` **"Components"**, description (verbatim): **"Three families, deliberately separated. Base is the generic chassis any product could use. Agent is a complete AI console, written from scratch and pointed at a transport you supply. Site pages own no visual values of their own — only the composition rules that assemble the other two into a page."**
+`Section id="components"`, `h2.type-h3` **"Components"**, description (verbatim): **"Three families, deliberately separated. Base is the generic chassis any product could use. Agent is a complete AI console, written from scratch and pointed at a transport you supply. Site pages own no visual values of their own — only the composition rules that assemble the other two into a page."**
 
 Body: `div.grid.gap-4.md:grid-cols-2` (1 col → 2 ≥768px; the third card wraps to row 2 left cell). **3 group cards**, inline in page.tsx (not IndexCard — larger padding, different label row):
 
@@ -86,7 +86,7 @@ Verbatim card data (order = EL_GROUPS order minus foundations):
 
 ## 4. Section `#rules` — "The rules that outrank taste"
 
-`ElSection id="rules"`, `h2.type-h3` **"The rules that outrank taste"**, description: **"Six non-negotiables. If a screen breaks one of these, the screen is wrong — not the rule."**
+`Section id="rules"`, `h2.type-h3` **"The rules that outrank taste"**, description: **"Six non-negotiables. If a screen breaks one of these, the screen is wrong — not the rule."**
 
 Body: `ol.divide-y.divide-border.overflow-hidden.rounded-xl.border.border-border.bg-card` (one card, 16px radius, 1px row dividers). Each `li.flex.gap-5.px-6.py-5`:
 - Number: `span.type-num-sm.shrink-0.text-action-ink`, zero-padded `01`–`06` (Geist Mono, 12px, 600, tabular).
@@ -104,7 +104,7 @@ Verbatim rules:
 
 ## 5. Closing `Note` (tone="value")
 
-`div.rounded-lg.border.p-5` + tone classes `border-value/30 bg-value/[0.08] text-value-ink` (12px radius). Title `p.type-label.mb-2` (inherits value-ink): **"Scope of this phase"**. Body `div.type-small.text-muted-foreground`, verbatim: **"This is the design system and component library. The ten product screens are built on top of it and are tracked separately — nothing in here implements a real wallet, payment, blockchain or shipping integration. All figures, packs, cards and users are placeholder data."** Not inside a ElSection — no `mb-20`; it is the last child of the page.
+`div.rounded-lg.border.p-5` + tone classes `border-value/30 bg-value/[0.08] text-value-ink` (12px radius). Title `p.type-label.mb-2` (inherits value-ink): **"Scope of this phase"**. Body `div.type-small.text-muted-foreground`, verbatim: **"This is the design system and component library. The ten product screens are built on top of it and are tracked separately — nothing in here implements a real wallet, payment, blockchain or shipping integration. All figures, packs, cards and users are placeholder data."** Not inside a Section — no `mb-20`; it is the last child of the page.
 
 ---
 
@@ -119,7 +119,7 @@ Verbatim rules:
 - `.type-label`: 0.6875rem (11px) / 1 / 600 / uppercase / tracking 0.16em / color `--muted-foreground`
 - `.type-caption`: 0.65625rem (10.5px) / 1.35 / 500
 - `.type-micro`: 0.65625rem / 1 / 600 / uppercase / tracking 0.18em / color `--muted-foreground`
-- `.type-chip`: 0.71875rem (11.5px) / 1.2 / 500 (used by ElPageHeader chips — not rendered here)
+- `.type-chip`: 0.71875rem (11.5px) / 1.2 / 500 (used by PageHeader chips — not rendered here)
 - `.type-nav`: 0.84375rem (13.5px) / 1.2 / 500 (sidebar)
 - `.type-num-sm`: `--font-mono` (Geist Mono) / 0.75rem (12px) / 1.2 / 600 / tabular-nums / tracking −0.01em
 - `.type-wordmark`: 0.9375rem (15px) / 1 / 700 / tracking −0.01em
@@ -201,5 +201,5 @@ shape on `/design-system/components/base/navigation`'s `type-nav press` rows.
 
 **Port impact.** `example\lib\kit.dart`'s `_CardArrow`,
 `example\lib\shell.dart`'s `_ColorFade` (shared by both nav levels) and
-`example\lib\theme_toggle.dart` moved from `ElDurations.fast` to
-`ElDurations.transitionDefault`.
+`example\lib\theme_toggle.dart` moved from `Durations.fast` to
+`Durations.transitionDefault`.

@@ -4,14 +4,40 @@
 /// A specimen sheet that quietly omits a role is worse than no sheet: a
 /// developer who cannot find `numMd` here concludes it does not exist and
 /// writes a size instead. The first group therefore checks the catalog
-/// against `ElType.all` by identity — every role present, none twice, none
+/// against `TextStyles.all` by identity — every role present, none twice, none
 /// invented — rather than checking that the page renders something.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs_pages/typeset_catalog.dart';
 import 'package:example/docs_pages/typeset_page.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The page under a real app root.
@@ -22,7 +48,7 @@ import 'package:flutter_test/flutter_test.dart';
 Widget host(
   Widget child, {
   Size size = const Size(1440, 900),
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   double textScale = 1,
   bool disableAnimations = false,
 }) {
@@ -32,8 +58,8 @@ Widget host(
       textScaler: TextScaler.linear(textScale),
       disableAnimations: disableAnimations,
     ),
-    child: ElTheme(
-      controller: ElThemeController(mode: mode),
+    child: ThemeScope(
+      controller: ThemeController(mode: mode),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: SingleChildScrollView(child: child),
@@ -44,32 +70,32 @@ Widget host(
 
 void main() {
   group('the catalog is the whole scale', () {
-    test('it covers ElType.all exactly once, by identity', () {
-      // Identity, not equality: `ElTypeSpec` declares no `==`, and two roles
+    test('it covers TextStyles.all exactly once, by identity', () {
+      // Identity, not equality: `TextStyleToken` declares no `==`, and two roles
       // can hold the same values anyway. `badge` and `label` differ only in
       // tracking, so value matching would happily accept a catalog that
       // listed one of them twice and called the job done.
-      final List<ElTypeSpec> catalogued = <ElTypeSpec>[
+      final List<TextStyleToken> catalogued = <TextStyleToken>[
         for (final TypesetRole role in typesetRoles) role.spec,
       ];
 
       expect(
         catalogued.length,
-        ElType.all.length,
+        TextStyles.all.length,
         reason:
-            'the catalog lists ${catalogued.length} roles and ElType.all has '
-            '${ElType.all.length}',
+            'the catalog lists ${catalogued.length} roles and TextStyles.all has '
+            '${TextStyles.all.length}',
       );
 
-      for (final ElTypeSpec spec in ElType.all) {
+      for (final TextStyleToken spec in TextStyles.all) {
         final int matches = catalogued
-            .where((ElTypeSpec candidate) => identical(candidate, spec))
+            .where((TextStyleToken candidate) => identical(candidate, spec))
             .length;
         expect(
           matches,
           1,
           reason:
-              'every spec in ElType.all must appear in the catalog exactly '
+              'every spec in TextStyles.all must appear in the catalog exactly '
               'once; found $matches',
         );
       }
@@ -82,7 +108,7 @@ void main() {
       }
     });
 
-    test('every name is a real ElType member spelling', () {
+    test('every name is a real TextStyles member spelling', () {
       // The name is the one thing the catalog asserts that the spec cannot
       // confirm, so it is at least held to the shape a call site would use.
       final RegExp member = RegExp(r'^[a-z][A-Za-z0-9]*$');
@@ -161,7 +187,7 @@ void main() {
 
       for (final TypesetRole role in typesetRoles) {
         expect(
-          find.text('ElType.${role.name}'),
+          find.text('TextStyles.${role.name}'),
           findsWidgets,
           reason: '${role.name} is not named on the page',
         );
@@ -192,14 +218,14 @@ void main() {
       await tester.pumpAndSettle();
 
       for (final TypesetRole role in typesetRoles) {
-        final Iterable<ElText> texts = tester
-            .widgetList<ElText>(find.byType(ElText))
-            .where((ElText text) => text.text == role.sample);
+        final Iterable<StyledText> texts = tester
+            .widgetList<StyledText>(find.byType(StyledText))
+            .where((StyledText text) => text.text == role.sample);
         expect(
-          texts.any((ElText text) => identical(text.spec, role.spec)),
+          texts.any((StyledText text) => identical(text.spec, role.spec)),
           isTrue,
           reason:
-              '${role.name}\'s specimen does not use ElType.${role.name} '
+              '${role.name}\'s specimen does not use TextStyles.${role.name} '
               'itself',
         );
       }
@@ -221,15 +247,15 @@ void main() {
 
       for (final TypesetRole role in typesetRoles) {
         if (role.spec.size != null) continue;
-        final Iterable<ElText> texts = tester
-            .widgetList<ElText>(find.byType(ElText))
+        final Iterable<StyledText> texts = tester
+            .widgetList<StyledText>(find.byType(StyledText))
             .where(
-              (ElText text) =>
+              (StyledText text) =>
                   text.text == role.sample && identical(text.spec, role.spec),
             );
         expect(texts, isNotEmpty, reason: role.name);
         expect(
-          texts.every((ElText text) => text.fontSize != null),
+          texts.every((StyledText text) => text.fontSize != null),
           isTrue,
           reason: '${role.name} must be rendered at an explicit size',
         );
@@ -246,9 +272,11 @@ void main() {
           host(const TypesetDocsPage(), size: Size(width, 900)),
         );
         await tester.pumpAndSettle();
-        final ElText specimen = tester
-            .widgetList<ElText>(find.byType(ElText))
-            .firstWhere((ElText text) => identical(text.spec, ElType.display));
+        final StyledText specimen = tester
+            .widgetList<StyledText>(find.byType(StyledText))
+            .firstWhere(
+              (StyledText text) => identical(text.spec, TextStyles.display),
+            );
         return specimen.fontSize!;
       }
 
@@ -256,8 +284,8 @@ void main() {
       final double narrow = await displaySizeAt(430);
       final double wide = await displaySizeAt(1600);
 
-      expect(narrow, ElType.displaySize(430));
-      expect(wide, ElType.displaySize(1600));
+      expect(narrow, TextStyles.displaySize(430));
+      expect(wide, TextStyles.displaySize(1600));
       expect(wide, greaterThan(narrow));
     });
   });
@@ -307,7 +335,7 @@ void main() {
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(
-        host(const TypesetDocsPage(), mode: ElThemeMode.light),
+        host(const TypesetDocsPage(), mode: ColorMode.light),
       );
       await tester.pumpAndSettle();
 
@@ -388,7 +416,7 @@ void main() {
       // A screen-reader user navigating by heading has to be able to reach a
       // role without walking every specimen in between.
       expect(
-        find.bySemanticsLabel('ElType.numLg'),
+        find.bySemanticsLabel('TextStyles.numberLg'),
         findsWidgets,
         reason: 'role names should be reachable as semantic headers',
       );
@@ -409,7 +437,7 @@ void main() {
       // Eight two-word rows in a column are meaningless read one at a time;
       // the group says what they are values of.
       expect(
-        find.bySemanticsLabel(RegExp('Token values for ElType.body')),
+        find.bySemanticsLabel(RegExp('Token values for TextStyles.body')),
         findsWidgets,
       );
       handle.dispose();

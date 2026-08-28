@@ -1,27 +1,39 @@
 /// Public documentation page for the `agent-attachments` component.
 ///
-/// `agent_attachments.dart` declares three widgets — [ElAgentAttachmentCard],
-/// [ElAgentAttachmentList], [ElAgentDeliveryBadge] — and two top-level
-/// functions, [elAgentAttachmentGlyph] and [elAgentAttachmentIsVideo]. API
+/// `agent_attachments.dart` declares three widgets — [AgentAttachmentCard],
+/// [AgentAttachmentList], [AgentDeliveryBadge] — and two top-level
+/// functions, [agentAttachmentGlyph] and [agentAttachmentIsVideo]. API
 /// Reference gives each its own table, with a rail sub-anchor per table.
 ///
-/// **The domain type lives elsewhere.** [ElAgentAttachment],
-/// [ElAgentAttachmentKind], [ElAgentDelivery] and [ElAgentDeliverySent] are
+/// **The domain type lives elsewhere.** [AgentAttachment],
+/// [AgentAttachmentKind], [AgentDelivery] and [AgentDeliverySent] are
 /// declared in `agent_core.dart`, not in this file — this file only
 /// consumes them to draw a card. The manifest's own `registryDependencies`
 /// lists `agent-core` for exactly that reason, and this page's Dependencies
 /// disclosure names it in prose without a link: `agent-core` carries no
 /// documentation page of its own yet.
 ///
-/// `ElAgentAttachment` carries no upload lifecycle of its own — no `error`,
+/// `AgentAttachment` carries no upload lifecycle of its own — no `error`,
 /// no `uploading`, nothing between "picked" and "gone" — so every specimen
-/// on this page is `ElAttachmentState.done` underneath: the source's own
+/// on this page is `AttachmentState.done` underneath: the source's own
 /// library note says the primitive's other two states are real, but this
 /// domain type cannot produce them.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -41,15 +53,15 @@ final ComponentDocSpec agentAttachmentsDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'ElAgentAttachmentList over the three delivery outcomes '
-          '[ElAgentDeliveryBadge] can draw: content (inlined and read), '
+          'AgentAttachmentList over the three delivery outcomes '
+          '[AgentDeliveryBadge] can draw: content (inlined and read), '
           'reference (name only), and produced (the agent\'s own output — '
           'no badge at all, delivery does not apply to a file the agent '
           'made itself).',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(64),
+      minHeight: space(64),
     ),
     InstallSection(
       id: 'install',
@@ -77,8 +89,8 @@ final ComponentDocSpec agentAttachmentsDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElAgentAttachmentCard, '
-              'ElAgentAttachmentList and ElAgentDeliveryBadge are reachable '
+              'Add the export line so AgentAttachmentCard, '
+              'AgentAttachmentList and AgentDeliveryBadge are reachable '
               'the same way the CLI path already makes them.',
           code: "export 'agent_attachments.dart';",
         ),
@@ -98,7 +110,7 @@ final ComponentDocSpec agentAttachmentsDocSpec = ComponentDocSpec(
       id: 'delivery-badge',
       title: 'Delivery badge',
       description:
-          'ElAgentDeliveryBadge in isolation, one per ElAgentDeliverySent '
+          'AgentDeliveryBadge in isolation, one per AgentDeliverySent '
           'value. content reads "Read"; reference shows an info glyph and '
           '"Name only" behind a tooltip carrying delivery.reason; produced '
           'renders SizedBox.shrink() — nothing at all, on purpose.',
@@ -111,7 +123,7 @@ final ComponentDocSpec agentAttachmentsDocSpec = ComponentDocSpec(
       title: 'Image attachment',
       description:
           'An attachment whose kind is image and whose url is non-null '
-          'gets the large-image treatment instead of ElAgentAttachmentCard '
+          'gets the large-image treatment instead of AgentAttachmentCard '
           "'s 40px well — capped in height, and clickable to open full "
           'size in a modal. The picture itself is a placeholder painter: '
           "this domain's own url field is a plain String with no decoder "
@@ -119,7 +131,7 @@ final ComponentDocSpec agentAttachmentsDocSpec = ComponentDocSpec(
       specimen: _ImageSpecimen(),
       code: _imageCode,
       label: 'Image attachment specimen view',
-      minHeight: el(80),
+      minHeight: space(80),
     ),
     ShowcaseSection(
       id: 'remove',
@@ -141,15 +153,15 @@ final ComponentDocSpec agentAttachmentsDocSpec = ComponentDocSpec(
           'functions.',
       children: const <DocsTocEntry>[
         DocsTocEntry(
-          title: 'ElAgentAttachmentCard',
+          title: 'AgentAttachmentCard',
           anchor: 'api-elagentattachmentcard',
         ),
         DocsTocEntry(
-          title: 'ElAgentAttachmentList',
+          title: 'AgentAttachmentList',
           anchor: 'api-elagentattachmentlist',
         ),
         DocsTocEntry(
-          title: 'ElAgentDeliveryBadge',
+          title: 'AgentDeliveryBadge',
           anchor: 'api-elagentdeliverybadge',
         ),
         DocsTocEntry(
@@ -163,8 +175,8 @@ final ComponentDocSpec agentAttachmentsDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off ElAgentAttachmentCard.build, _ImageAttachment.build '
-          'and ElAgentDeliveryBadge.build, not inferred.',
+          'Read off AgentAttachmentCard.build, _ImageAttachment.build '
+          'and AgentDeliveryBadge.build, not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
     DisclosureSection(
@@ -236,9 +248,9 @@ class AgentAttachmentsDocPage extends StatelessWidget {
       title: agentAttachmentsDoc.title,
       description: agentAttachmentsDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Agent Attachments'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Agent Attachments'),
     ],
     toc: agentAttachmentsDocSpec.toc,
     previous: null,
@@ -253,64 +265,64 @@ class AgentAttachmentsDocPage extends StatelessWidget {
 
 /* ── Sample data ─────────────────────────────────────────────────────────── */
 
-const ElAgentAttachment _contentAttachment = ElAgentAttachment(
+const AgentAttachment _contentAttachment = AgentAttachment(
   id: 'attach-content',
   name: 'inventory-export.csv',
   mime: 'text/csv',
-  kind: ElAgentAttachmentKind.data,
+  kind: AgentAttachmentKind.data,
   size: 18422,
-  delivery: ElAgentDelivery.content(),
+  delivery: AgentDelivery.content(),
 );
 
-const ElAgentAttachment _referenceAttachment = ElAgentAttachment(
+const AgentAttachment _referenceAttachment = AgentAttachment(
   id: 'attach-reference',
   name: 'condition-report.pdf',
   mime: 'application/pdf',
-  kind: ElAgentAttachmentKind.document,
+  kind: AgentAttachmentKind.document,
   size: 2620000,
-  delivery: ElAgentDelivery.reference(
+  delivery: AgentDelivery.reference(
     'This file is not text, so its contents could not be inlined.',
   ),
 );
 
-const ElAgentAttachment _producedAttachment = ElAgentAttachment(
+const AgentAttachment _producedAttachment = AgentAttachment(
   id: 'attach-produced',
   name: 'summary-30d.csv',
   mime: 'text/csv',
-  kind: ElAgentAttachmentKind.data,
+  kind: AgentAttachmentKind.data,
   size: 4821,
-  delivery: ElAgentDelivery.produced(),
+  delivery: AgentDelivery.produced(),
 );
 
 const String _pictureUrl =
     'data:image/svg+xml;utf8,agent-attachments-doc-specimen';
 
-const ElAgentAttachment _imageAttachment = ElAgentAttachment(
+const AgentAttachment _imageAttachment = AgentAttachment(
   id: 'attach-image',
   name: 'shelf-photo.png',
   mime: 'image/png',
-  kind: ElAgentAttachmentKind.image,
+  kind: AgentAttachmentKind.image,
   size: 184220,
   url: _pictureUrl,
-  delivery: ElAgentDelivery.content(),
+  delivery: AgentDelivery.content(),
 );
 
-/// The seam [ElAgentAttachmentList.imageBuilder] exists for: `url` is a
+/// The seam [AgentAttachmentList.imageBuilder] exists for: `url` is a
 /// plain String and the one specimen in the corpus is a data URI this port
 /// cannot decode, so every image on this page is this placeholder rather
 /// than a real decoded picture.
-Widget _placeholderPicture(BuildContext context, ElAgentAttachment attachment) {
-  final ElThemeData theme = ElTheme.of(context);
+Widget _placeholderPicture(BuildContext context, AgentAttachment attachment) {
+  final ThemeTokens theme = ThemeScope.of(context);
   return ColoredBox(
     color: theme.accent,
     child: SizedBox(
-      width: el(160),
-      height: el(90),
+      width: space(160),
+      height: space(90),
       child: Center(
-        child: ElIcon.lucide(
-          ElLucide.image,
-          sizePx: el(10),
-          tone: ElIconTone.muted,
+        child: Icon.lucide(
+          Lucide.image,
+          sizePx: space(10),
+          tone: IconTone.muted,
         ),
       ),
     ),
@@ -323,9 +335,9 @@ class _PreviewSpecimen extends StatelessWidget {
   const _PreviewSpecimen();
 
   @override
-  Widget build(BuildContext context) => const ElAgentAttachmentList(
+  Widget build(BuildContext context) => const AgentAttachmentList(
     key: ValueKey<String>('agent-attachments-preview:list'),
-    attachments: <ElAgentAttachment>[
+    attachments: <AgentAttachment>[
       _contentAttachment,
       _referenceAttachment,
       _producedAttachment,
@@ -334,7 +346,7 @@ class _PreviewSpecimen extends StatelessWidget {
 }
 
 const String _previewCode = '''
-ElAgentAttachmentList(
+AgentAttachmentList(
   attachments: [contentFile, referenceFile, producedFile],
 )''';
 
@@ -343,15 +355,15 @@ class _DeliveryBadgeSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    Widget labelled(String label, String key, ElAgentAttachment attachment) =>
+    final ThemeTokens theme = ThemeScope.of(context);
+    Widget labelled(String label, String key, AgentAttachment attachment) =>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ElText(label, ElType.section, color: theme.mutedForeground),
-            SizedBox(height: el(2)),
-            ElAgentDeliveryBadge(
+            StyledText(label, TextStyles.section, color: theme.mutedForeground),
+            SizedBox(height: space(2)),
+            AgentDeliveryBadge(
               key: ValueKey<String>(key),
               attachment: attachment,
             ),
@@ -359,8 +371,8 @@ class _DeliveryBadgeSpecimen extends StatelessWidget {
         );
 
     return Wrap(
-      spacing: el(8),
-      runSpacing: el(4),
+      spacing: space(8),
+      runSpacing: space(4),
       crossAxisAlignment: WrapCrossAlignment.start,
       children: <Widget>[
         labelled(
@@ -384,9 +396,9 @@ class _DeliveryBadgeSpecimen extends StatelessWidget {
 }
 
 const String _deliveryBadgeCode = '''
-ElAgentDeliveryBadge(attachment: contentFile);   // "Read"
-ElAgentDeliveryBadge(attachment: referenceFile); // info glyph + "Name only"
-ElAgentDeliveryBadge(attachment: producedFile);  // SizedBox.shrink()''';
+AgentDeliveryBadge(attachment: contentFile);   // "Read"
+AgentDeliveryBadge(attachment: referenceFile); // info glyph + "Name only"
+AgentDeliveryBadge(attachment: producedFile);  // SizedBox.shrink()''';
 
 class _ImageSpecimen extends StatelessWidget {
   const _ImageSpecimen();
@@ -394,9 +406,9 @@ class _ImageSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     key: const ValueKey<String>('agent-attachments-example:image'),
-    width: el(80),
-    child: ElAgentAttachmentList(
-      attachments: const <ElAgentAttachment>[_imageAttachment],
+    width: space(80),
+    child: AgentAttachmentList(
+      attachments: const <AgentAttachment>[_imageAttachment],
       imageBuilder: _placeholderPicture,
       onDownload: (String _) {},
     ),
@@ -404,7 +416,7 @@ class _ImageSpecimen extends StatelessWidget {
 }
 
 const String _imageCode = '''
-ElAgentAttachmentList(
+AgentAttachmentList(
   attachments: [imageFile], // kind: image, url: non-null
   imageBuilder: (context, attachment) => yourDecodedImage(attachment),
   onDownload: (name) => showSavingToast(name),
@@ -418,31 +430,31 @@ class _RemoveSpecimen extends StatefulWidget {
 }
 
 class _RemoveSpecimenState extends State<_RemoveSpecimen> {
-  List<ElAgentAttachment> _attachments = const <ElAgentAttachment>[
+  List<AgentAttachment> _attachments = const <AgentAttachment>[
     _contentAttachment,
     _referenceAttachment,
   ];
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElAgentAttachmentList(
+        AgentAttachmentList(
           key: const ValueKey<String>('agent-attachments-example:remove-list'),
           attachments: _attachments,
           onRemove: (String id) => setState(
             () => _attachments = _attachments
-                .where((ElAgentAttachment a) => a.id != id)
+                .where((AgentAttachment a) => a.id != id)
                 .toList(),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           _attachments.isEmpty ? 'All attachments removed.' : ' ',
-          ElType.small,
+          TextStyles.small,
           key: const ValueKey<String>(
             'agent-attachments-example:remove-status',
           ),
@@ -454,7 +466,7 @@ class _RemoveSpecimenState extends State<_RemoveSpecimen> {
 }
 
 const String _removeCode = '''
-ElAgentAttachmentList(
+AgentAttachmentList(
   attachments: attachments,
   onRemove: (id) => setState(
     () => attachments = attachments.where((a) => a.id != id).toList(),
@@ -466,7 +478,7 @@ ElAgentAttachmentList(
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElAgentAttachmentList(attachments: attachments)''';
+AgentAttachmentList(attachments: attachments)''';
 
 class _ApiReferenceContent extends StatelessWidget {
   const _ApiReferenceContent();
@@ -477,28 +489,19 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elagentattachmentcard',
-        child: DocsApiTable(
-          title: 'ElAgentAttachmentCard',
-          facts: _cardFacts,
-        ),
+        child: DocsApiTable(title: 'AgentAttachmentCard', facts: _cardFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentattachmentlist',
-        child: DocsApiTable(
-          title: 'ElAgentAttachmentList',
-          facts: _listFacts,
-        ),
+        child: DocsApiTable(title: 'AgentAttachmentList', facts: _listFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentdeliverybadge',
-        child: DocsApiTable(
-          title: 'ElAgentDeliveryBadge',
-          facts: _badgeFacts,
-        ),
+        child: DocsApiTable(title: 'AgentDeliveryBadge', facts: _badgeFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-top-level-functions',
         child: DocsApiTable(
@@ -513,7 +516,7 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _cardFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'attachment',
-    type: 'ElAgentAttachment',
+    type: 'AgentAttachment',
     description: 'Required. The file this card draws.',
   ),
   DocsApiFact(
@@ -533,7 +536,7 @@ const List<DocsApiFact> _cardFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'imageBuilder',
-    type: 'Widget Function(BuildContext, ElAgentAttachment)?',
+    type: 'Widget Function(BuildContext, AgentAttachment)?',
     description:
         'Optional. Renders the thumbnail for an image attachment with a '
         'url. With no builder the well is a plain --muted plate at the '
@@ -543,7 +546,7 @@ const List<DocsApiFact> _cardFacts = <DocsApiFact>[
     name: 'descriptionGap',
     type: 'double',
     description:
-        'Static. el(2) — 8. Between the formatted size string and the '
+        'Static. space(2) — 8. Between the formatted size string and the '
         'delivery badge.',
   ),
 ];
@@ -551,8 +554,9 @@ const List<DocsApiFact> _cardFacts = <DocsApiFact>[
 const List<DocsApiFact> _listFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'attachments',
-    type: 'List<ElAgentAttachment>',
-    description: 'Required. Images with a url lay out separately from '
+    type: 'List<AgentAttachment>',
+    description:
+        'Required. Images with a url lay out separately from '
         'everything else — see the Image attachment specimen above.',
   ),
   DocsApiFact(
@@ -566,25 +570,26 @@ const List<DocsApiFact> _listFacts = <DocsApiFact>[
     name: 'compact',
     type: 'bool',
     description:
-        'Optional. Defaults to false. Caps an image well at el(32) '
-        '(compact — a composer tray) instead of el(80) (a transcript).',
+        'Optional. Defaults to false. Caps an image well at space(32) '
+        '(compact — a composer tray) instead of space(80) (a transcript).',
   ),
   DocsApiFact(
     name: 'imageBuilder',
-    type: 'Widget Function(BuildContext, ElAgentAttachment)?',
+    type: 'Widget Function(BuildContext, AgentAttachment)?',
     description: 'Optional. Forwarded to every image in the list.',
   ),
   DocsApiFact(
     name: 'onDownload',
     type: 'void Function(String name)?',
-    description: 'Optional. Forwarded to every card and every image '
+    description:
+        'Optional. Forwarded to every card and every image '
         'caption.',
   ),
   DocsApiFact(
     name: 'gap',
     type: 'double',
     description:
-        'Static. el(2) — 8. Between the image group and the rest group, '
+        'Static. space(2) — 8. Between the image group and the rest group, '
         'and inside each group\'s own grid.',
   ),
 ];
@@ -592,22 +597,23 @@ const List<DocsApiFact> _listFacts = <DocsApiFact>[
 const List<DocsApiFact> _badgeFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'attachment',
-    type: 'ElAgentAttachment',
+    type: 'AgentAttachment',
     description:
         'Required. Only attachment.delivery is read: null or '
-        'ElAgentDeliverySent.produced both render SizedBox.shrink().',
+        'AgentDeliverySent.produced both render SizedBox.shrink().',
   ),
   DocsApiFact(
     name: 'gap',
     type: 'double',
-    description: 'Static. el(1) — 4. Between the info glyph and the words '
+    description:
+        'Static. space(1) — 4. Between the info glyph and the words '
         'on the reference badge.',
   ),
   DocsApiFact(
     name: 'tooltipMaxWidth',
     type: 'double',
     description:
-        'Static. ElContainers.xs. What ElTooltip\'s own content already '
+        'Static. Containers.xs. What Tooltip\'s own content already '
         'caps itself at — the source notes the value is asked for but is '
         'a no-op against the tooltip\'s own ceiling.',
   ),
@@ -615,19 +621,19 @@ const List<DocsApiFact> _badgeFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _functionFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'elAgentAttachmentGlyph(kind)',
-    type: 'ElLucideGlyph Function(ElAgentAttachmentKind)',
+    name: 'agentAttachmentGlyph(kind)',
+    type: 'LucideGlyph Function(AgentAttachmentKind)',
     description:
-        'One glyph per ElAgentAttachmentKind value: image, fileText '
+        'One glyph per AgentAttachmentKind value: image, fileText '
         '(document), sheet (data), fileCode (code), music2 (audio), file '
         '(other).',
   ),
   DocsApiFact(
-    name: 'elAgentAttachmentIsVideo(attachment)',
-    type: 'bool Function(ElAgentAttachment)',
+    name: 'agentAttachmentIsVideo(attachment)',
+    type: 'bool Function(AgentAttachment)',
     description:
         'attachment.mime.startsWith(\'video/\'). Video is not its own '
-        'ElAgentAttachmentKind — the domain classifies it other — so the '
+        'AgentAttachmentKind — the domain classifies it other — so the '
         'lightbox asks the MIME type directly instead.',
   ),
 ];
@@ -637,8 +643,8 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElAgentAttachmentCard composes the vendored attachment.dart '
+      _bullets(ThemeScope.of(context), <String>[
+        'AgentAttachmentCard composes the vendored attachment.dart '
             'primitive: its own accessibility contract (title, '
             'description, action Semantics) is that primitive\'s, not '
             'reauthored here.',
@@ -649,11 +655,11 @@ class _AccessibilityContent extends StatelessWidget {
             'SystemMouseCursors.zoomIn — a sighted, mouse-using reader '
             'gets a hint no keyboard-only signal accompanies (see '
             'Keyboard).',
-        'The close control inside the opened preview is a real ElButton '
+        'The close control inside the opened preview is a real Button '
             'labelled "Close": the same activation keys (Enter, '
             'NumpadEnter, Space) as every other button on this system.',
         'A delivery badge in the reference state wraps its icon-and-text '
-            'row in an ElTooltip carrying delivery.reason: the reason is '
+            'row in an Tooltip carrying delivery.reason: the reason is '
             'available on hover/focus, not printed as visible text.',
       ]);
 }
@@ -663,13 +669,13 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Download and remove are both real ElButton / ElAttachmentAction '
+      _bullets(ThemeScope.of(context), <String>[
+        'Download and remove are both real Button / AttachmentAction '
             'controls: Tab reaches them, Enter / NumpadEnter / Space '
             'activate them, the same as every button on this system.',
-        'The full-size image trigger (ElAttachmentTrigger) opens on tap; '
+        'The full-size image trigger (AttachmentTrigger) opens on tap; '
             'this file gives it no separate keyboard binding of its own '
-            'beyond whatever ElAttachmentTrigger itself wires — read that '
+            'beyond whatever AttachmentTrigger itself wires — read that '
             "primitive's own page for the exact contract.",
         'No custom FocusTraversalPolicy anywhere in '
             'agent_attachments.dart: Tab and Shift+Tab walk whatever order '
@@ -682,13 +688,13 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElAgentAttachmentList reads MediaQuery.sizeOf(context).width '
-            'once: at or above ElBreakpoints.sm, images lay out two per '
+      _bullets(ThemeScope.of(context), <String>[
+        'AgentAttachmentList reads MediaQuery.sizeOf(context).width '
+            'once: at or above Breakpoints.sm, images lay out two per '
             'row when there is more than one; below it, and for the '
             'non-image group always, one per row.',
-        'compact switches the image well\'s own cap between el(32) (a '
-            'composer tray) and el(80) (a transcript) — a caller\'s own '
+        'compact switches the image well\'s own cap between space(32) (a '
+            'composer tray) and space(80) (a transcript) — a caller\'s own '
             'choice, not a breakpoint.',
         'The full-size preview panel caps its own height at a fraction '
             'of MediaQuery.sizeOf(context).height, so a tall screenshot '
@@ -703,18 +709,18 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/agent_attachments.dart. No companion '
             'parts.',
         'Flutter imports: package:flutter/widgets.dart.',
-        'Foundation imports: shadows.dart, spacing.dart (el()), '
+        'Foundation imports: shadows.dart, spacing.dart (space()), '
             'theme.dart, typography.dart, theme_scope.dart.',
-        'Component imports: agent_core.dart (ElAgentAttachment, '
-            'ElAgentAttachmentKind, ElAgentDelivery, ElAgentDeliverySent, '
-            'elFormatBytes — the domain type, declared elsewhere), '
-            'attachment.dart (ElAttachment and every part it composes), '
-            'button.dart, dialog.dart (ElModalPortal, ElJellyTransition), '
-            'icon.dart, icon_paths.g.dart, tooltip.dart (ElTooltip).',
+        'Component imports: agent_core.dart (AgentAttachment, '
+            'AgentAttachmentKind, AgentDelivery, AgentDeliverySent, '
+            'formatBytes — the domain type, declared elsewhere), '
+            'attachment.dart (Attachment and every part it composes), '
+            'button.dart, dialog.dart (OverlayPortal, OpenTransition), '
+            'icon.dart, icon_paths.g.dart, tooltip.dart (Tooltip).',
         'registryDependencies, resolved automatically by `elattar add '
             'agent-attachments`: agent-core, attachment, button, dialog, '
             'icon, source-foundation, tooltip — copied verbatim from '
@@ -722,9 +728,9 @@ class _DependenciesContent extends StatelessWidget {
         'semanticDependencies (the manifest\'s own, narrower field): '
             'agent-core, attachment, button, dialog, icon, tooltip.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: DocsLinkRow(
           links: <DocsLink>[
             DocsLink(label: 'Agent Core', route: '/components/agent-core'),
@@ -745,34 +751,38 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Every colour is read live off ElTheme.of(context) at build time: '
+      _bullets(ThemeScope.of(context), <String>[
+        'Every colour is read live off ThemeScope.of(context) at build time: '
             'theme.muted (an icon well\'s plate), theme.mutedForeground '
             '(the size string and an image caption), theme.card and '
             'theme.border (the image caption\'s own frame), '
-            'theme.successInk ("Read"), theme.warningInk ("Name only"). '
-            'Flipping ElThemeController re-resolves every one on the '
+            'theme.successText ("Read"), theme.warningText ("Name only"). '
+            'Flipping ThemeController re-resolves every one on the '
             'next frame.',
         'The full-size preview panel\'s own ring is theme.foreground at a '
-            'fixed alpha (ElAttachmentMedia.previewRingAlpha) rather than '
+            'fixed alpha (AttachmentMedia.previewRingAlpha) rather than '
             'theme.border — a deliberate escalation for an overlay that '
             'sits above everything else.',
-        'No override hatch of its own: neither ElAgentAttachmentCard nor '
-            'ElAgentAttachmentList takes a colour or shape parameter — '
+        'No override hatch of its own: neither AgentAttachmentCard nor '
+            'AgentAttachmentList takes a colour or shape parameter — '
             'every visible fill and radius comes from attachment.dart\'s '
             'own primitives underneath.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -780,51 +790,59 @@ Widget _bullets(ElThemeData theme, List<String> lines) => Column(
 const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Generic file',
-    treatment: 'ElAttachmentMediaVariant.icon: elAgentAttachmentGlyph(kind) '
+    treatment:
+        'AttachmentMediaVariant.icon: agentAttachmentGlyph(kind) '
         'centred in a 40px well.',
     userSignal: 'The document and data cards in Preview above.',
   ),
   DocsStateFact(
     state: 'Image, no url',
-    treatment: 'Falls through to the generic file treatment: isImage '
+    treatment:
+        'Falls through to the generic file treatment: isImage '
         'requires both kind == image AND url != null.',
-    userSignal: 'A picked-but-not-yet-uploaded image reads as a plain file '
+    userSignal:
+        'A picked-but-not-yet-uploaded image reads as a plain file '
         'row, not a broken picture.',
   ),
   DocsStateFact(
     state: 'Image, with url',
-    treatment: 'The large-image treatment: a --muted well capped at '
-        'el(32) or el(80) depending on compact, clickable when a picture '
+    treatment:
+        'The large-image treatment: a --muted well capped at '
+        'space(32) or space(80) depending on compact, clickable when a picture '
         'was actually supplied by imageBuilder.',
     userSignal: 'See the Image attachment specimen above.',
   ),
   DocsStateFact(
     state: 'Delivery: content',
-    treatment: 'ElAgentDeliveryBadge renders "Read" in theme.successInk.',
+    treatment: 'AgentDeliveryBadge renders "Read" in theme.successText.',
     userSignal: 'The model received these bytes.',
   ),
   DocsStateFact(
     state: 'Delivery: reference',
-    treatment: 'An info glyph plus "Name only" in theme.warningInk, '
-        'wrapped in an ElTooltip carrying delivery.reason.',
+    treatment:
+        'An info glyph plus "Name only" in theme.warningText, '
+        'wrapped in an Tooltip carrying delivery.reason.',
     userSignal: 'Only the filename reached the model, not the contents.',
   ),
   DocsStateFact(
     state: 'Delivery: produced or null',
-    treatment: 'ElAgentDeliveryBadge.build returns SizedBox.shrink().',
-    userSignal: 'No badge at all: delivery does not apply to a file the '
+    treatment: 'AgentDeliveryBadge.build returns SizedBox.shrink().',
+    userSignal:
+        'No badge at all: delivery does not apply to a file the '
         'agent made itself.',
   ),
   DocsStateFact(
     state: 'Remove vs download',
-    treatment: 'onRemove != null shows a remove action; onRemove == null '
+    treatment:
+        'onRemove != null shows a remove action; onRemove == null '
         'and attachment.url != null shows a download action. Never both '
         'on the same attachment.',
     userSignal: 'See the Remove specimen above.',
   ),
   DocsStateFact(
     state: 'Empty list',
-    treatment: 'ElAgentAttachmentList.build returns SizedBox.shrink() when '
+    treatment:
+        'AgentAttachmentList.build returns SizedBox.shrink() when '
         'attachments is empty.',
     userSignal: 'Nothing renders at all, not an empty frame.',
   ),

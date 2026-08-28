@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/button_group.dart",
+      "source": "lib/src/components/ui/button_group.dart",
       "target": "@ui/button_group.dart",
-      "sha256": "a304bae1e012a322c876c67ea325abe36eff4fad3ef017ce339074583cc0a93a"
+      "sha256": "4802b13e894bc1fbf6aceb79450e27fa831d92a784133ebb6b66067bb05a7fde"
     }
   ],
   "registryDependencies": [
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/button-group",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/button_group.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/button_group.dart",
   "deprecated": false
 }

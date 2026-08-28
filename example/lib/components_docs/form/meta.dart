@@ -1,11 +1,11 @@
 /// Public documentation metadata for the `form` component.
 ///
-/// [ElForm] is not a layout wrapper and not a visual component at all: it is
+/// [Form] is not a layout wrapper and not a visual component at all: it is
 /// the non-visual form state container — fields in registration order,
 /// validation rules, submission policy, and focus-on-error logic. Bind it
 /// with `ListenableBuilder` and read field state on every rebuild. This page
-/// also documents its field types: [ElFormFieldBase], [ElFormField],
-/// [ElTextFormField], and [ElValidateMode].
+/// also documents its field types: [FormFieldBase], [FormField],
+/// [TextFormField], and [ValidateMode].
 ///
 /// `https://ui.shadcn.com/docs/components/form` has no counterpart content
 /// of its own to mirror: it is a "pick your framework" gateway page (React
@@ -28,13 +28,13 @@ const ComponentDocEntry formDoc = ComponentDocEntry(
       'The non-visual form state container: fields in registration order, '
       'validation rules, submission policy, and focus-on-error logic.',
   // Registry dependencies are resolved by `elattar add form`.
-  dependencies: <String>['rule'],
+  dependencies: <String>['validation-rule'],
   exports: <String>[
-    'ElForm',
-    'ElFormFieldBase',
-    'ElFormField',
-    'ElTextFormField',
-    'ElValidateMode',
+    'Form',
+    'FormFieldBase',
+    'FormField',
+    'TextFormField',
+    'ValidateMode',
   ],
   sourcePath: 'lib/src/components/form.dart',
 );

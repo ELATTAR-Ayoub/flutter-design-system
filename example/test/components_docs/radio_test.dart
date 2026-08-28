@@ -5,11 +5,11 @@
 /// reads `DocsSection.title` (the kit's own section widget), and the
 /// API-table / state-matrix tests open the relevant `DocsDisclosure` first —
 /// closed by default in the new kit, unlike the old page's always-visible
-/// `ElSection`.
+/// `Section`.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `ElThemeController` is flipped in place for theme
+/// Phase J brief. The live `ThemeController` is flipped in place for theme
 /// coverage rather than re-pumped under a new controller.
 library;
 
@@ -20,7 +20,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -49,7 +75,7 @@ const List<String> _expectedSectionTitles = <String>[
   'Source',
 ];
 
-/// Every public constructor parameter of `ElRadioGroup<T>`, enumerated by
+/// Every public constructor parameter of `RadioGroup<T>`, enumerated by
 /// reading `lib/src/components/radio.dart` directly (Step 1 of the task
 /// cycle). The API table must cover all of these by name.
 const List<String> _radioGroupParams = <String>[
@@ -64,7 +90,7 @@ const List<String> _radioGroupParams = <String>[
   'hint',
 ];
 
-/// Every public constructor parameter of `ElRadioGroupItem<T>`.
+/// Every public constructor parameter of `RadioGroupItem<T>`.
 const List<String> _radioGroupItemParams = <String>[
   'value',
   'enabled',
@@ -74,13 +100,13 @@ const List<String> _radioGroupItemParams = <String>[
   'hint',
 ];
 
-/// The rest of the public surface: the static helpers on `ElRadioGroup` and
-/// `ElRadioGroupItem`. Neither type exposes an enum the way `ElCheckboxState`
+/// The rest of the public surface: the static helpers on `RadioGroup` and
+/// `RadioGroupItem`. Neither type exposes an enum the way `CheckboxState`
 /// does: a radio item's checked-ness is derived by comparing the group's
 /// `value` against the item's own, not read off a state field.
 const List<String> _radioStatics = <String>[
-  'ElRadioGroup.defaultGap',
-  'ElRadioGroupItem.size',
+  'RadioGroup.defaultGap',
+  'RadioGroupItem.size',
 ];
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
@@ -95,21 +121,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -126,19 +152,18 @@ Future<ElThemeController> _pump(
 }
 
 void main() {
-  testWidgets(
-    'sections render in the house-shape order, section for section',
-    (WidgetTester tester) async {
-      await _pump(tester);
+  testWidgets('sections render in the house-shape order, section for section', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
 
-      final List<String> titles = tester
-          .widgetList<DocsSection>(find.byType(DocsSection))
-          .map((DocsSection section) => section.title)
-          .toList();
+    final List<String> titles = tester
+        .widgetList<DocsSection>(find.byType(DocsSection))
+        .map((DocsSection section) => section.title)
+        .toList();
 
-      expect(titles, _expectedSectionTitles);
-    },
-  );
+    expect(titles, _expectedSectionTitles);
+  });
 
   testWidgets(
     'renders the article at wide and narrow widths with no exceptions',
@@ -168,7 +193,7 @@ void main() {
     },
   );
 
-  testWidgets('the API table covers every ElRadioGroup and ElRadioGroupItem '
+  testWidgets('the API table covers every RadioGroup and RadioGroupItem '
       'constructor parameter and every static helper', (
     WidgetTester tester,
   ) async {
@@ -178,7 +203,7 @@ void main() {
     await tester.ensureVisible(apiTrigger);
     await tester.tap(apiTrigger);
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     final List<DocsApiTable> tables = tester
         .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -194,15 +219,14 @@ void main() {
       expect(
         documented,
         contains(param),
-        reason: 'ElRadioGroup constructor parameter "$param" is undocumented',
+        reason: 'RadioGroup constructor parameter "$param" is undocumented',
       );
     }
     for (final String param in _radioGroupItemParams) {
       expect(
         documented,
         contains(param),
-        reason:
-            'ElRadioGroupItem constructor parameter "$param" is undocumented',
+        reason: 'RadioGroupItem constructor parameter "$param" is undocumented',
       );
     }
     for (final String member in _radioStatics) {
@@ -221,34 +245,34 @@ void main() {
       expect(group, findsOneWidget);
       await tester.ensureVisible(group);
 
-      expect(tester.widget<ElRadioGroup<String>>(group).value, 'daily');
+      expect(tester.widget<RadioGroup<String>>(group).value, 'daily');
 
       final Finder items = find.descendant(
         of: group,
-        matching: find.byType(ElRadioGroupItem<String>),
+        matching: find.byType(RadioGroupItem<String>),
       );
       expect(items, findsNWidgets(3));
 
       // Selecting "weekly" (index 1) moves the group's value off "daily" —
-      // ElRadioGroup.value is a single nullable T, so this alone proves the
+      // RadioGroup.value is a single nullable T, so this alone proves the
       // control cannot hold two selections: setting it to a new value is what
       // "deselects the previous one" means for a component with exactly one
       // value field.
       await tester.tap(items.at(1), warnIfMissed: false);
       await tester.pump();
-      expect(tester.widget<ElRadioGroup<String>>(group).value, 'weekly');
+      expect(tester.widget<RadioGroup<String>>(group).value, 'weekly');
 
       // …and selecting a third option moves it again, off "weekly" this time
       // proof that at most one item is ever "the" value, since the group
       // holds exactly one T? and nothing else.
       await tester.tap(items.at(2), warnIfMissed: false);
       await tester.pump();
-      expect(tester.widget<ElRadioGroup<String>>(group).value, 'monthly');
+      expect(tester.widget<RadioGroup<String>>(group).value, 'monthly');
 
       // …and back to the first option, off "monthly".
       await tester.tap(items.at(0), warnIfMissed: false);
       await tester.pump();
-      expect(tester.widget<ElRadioGroup<String>>(group).value, 'daily');
+      expect(tester.widget<RadioGroup<String>>(group).value, 'daily');
 
       expect(tester.takeException(), isNull);
     },
@@ -262,7 +286,7 @@ void main() {
     await tester.ensureVisible(statesTrigger);
     await tester.tap(statesTrigger);
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),
@@ -290,13 +314,10 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(radioDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(radioDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

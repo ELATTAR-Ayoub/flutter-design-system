@@ -15,6 +15,6 @@ const ComponentDocEntry iconDoc = ComponentDocEntry(
       'Curated, token-sized icon renderer and generated path catalog used by interactive components.',
   // registry/components/icon.json's registryDependencies, verbatim.
   dependencies: <String>['source-foundation'],
-  exports: <String>['ElIcon', 'ElIconGlyph', 'ElIconSize', 'ElIconTone'],
+  exports: <String>['Icon', 'IconGlyph', 'IconSize', 'IconTone'],
   sourcePath: 'lib/src/components/icon.dart',
 );

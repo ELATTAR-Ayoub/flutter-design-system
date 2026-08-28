@@ -4,17 +4,17 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
-/// coverage uses a live `ElThemeController` flipped in place rather than two
+/// coverage uses a live `ThemeController` flipped in place rather than two
 /// independent pumps. `pumpAndSettle` is never used: several documentation-
 /// shell widgets run controllers that repeat forever, so settling on this
 /// page would hang; every wait below is a bounded `tester.pump()` instead.
 ///
-/// ElNavigationMenu mounts through [OverlayPortal] (via ElPopover), so the
+/// NavigationMenu mounts through [OverlayPortal] (via Popover), so the
 /// live specimen needs a real [Overlay]: the harness wraps the page in a
 /// `MaterialApp`, the same fix Popover and Select needed.
 ///
 /// Re-housed onto the kit alongside the page: sections are now
-/// `DocsSection`s rather than `ElSection`s, and the eight disclosures (API
+/// `DocsSection`s rather than `Section`s, and the eight disclosures (API
 /// Reference, States, Accessibility, Keyboard, Responsive, Dependencies,
 /// Theming, Source) are collapsed `DocsDisclosure`s that mount no content
 /// until opened — see `_openDisclosure`, the same helper `button_test.dart`
@@ -26,27 +26,53 @@ import 'package:example/components_docs/navigation_menu/meta.dart';
 import 'package:example/components_docs/navigation_menu/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-Future<ElThemeController> _pumpPage(
+Future<ThemeController> _pumpPage(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -76,7 +102,7 @@ Future<void> _openDisclosure(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 void main() {
@@ -88,7 +114,7 @@ void main() {
       expect(navigationMenuDoc.dependencies, <String>[
         'icon',
         'popover',
-        'press-motion',
+        'press',
         'source-foundation',
       ]);
       expect(
@@ -98,10 +124,10 @@ void main() {
       expect(
         navigationMenuDoc.exports,
         containsAll(<String>[
-          'ElNavigationMenu',
-          'ElNavigationMenuItem',
-          'ElNavigationMenuIndicator',
-          'ElNavigationMenuLink',
+          'NavigationMenu',
+          'NavigationMenuItem',
+          'NavigationMenuIndicator',
+          'NavigationMenuLink',
         ]),
       );
       // Short description: one sentence, no trailing ellipsis.
@@ -167,22 +193,22 @@ void main() {
         await _pumpPage(tester);
         await _openDisclosure(tester, 'API Reference');
 
-        // ElNavigationMenu.
+        // NavigationMenu.
         expect(find.text('items'), findsWidgets);
         expect(find.text('viewport'), findsOneWidget);
         expect(find.text('indicator'), findsOneWidget);
 
-        // ElNavigationMenuItem.
+        // NavigationMenuItem.
         expect(find.text('label'), findsWidgets);
         expect(find.text('content'), findsWidgets);
         expect(find.text('onTap'), findsWidgets);
 
-        // ElNavigationMenuLink.
+        // NavigationMenuLink.
         expect(find.text('child'), findsWidgets);
         expect(find.text('active'), findsOneWidget);
 
-        // ElNavigationMenuIndicator: previously missing entirely.
-        expect(find.text('ElNavigationMenuIndicator'), findsWidgets);
+        // NavigationMenuIndicator: previously missing entirely.
+        expect(find.text('NavigationMenuIndicator'), findsWidgets);
         expect(find.text('width'), findsOneWidget);
       },
     );
@@ -195,26 +221,23 @@ void main() {
       expect(find.textContaining('elattar add navigation-menu'), findsWidgets);
     });
 
-    testWidgets('documents that the component is built on ElPopover', (
+    testWidgets('documents that the component is built on Popover', (
       WidgetTester tester,
     ) async {
       await _pumpPage(tester);
       await _openDisclosure(tester, 'Dependencies');
 
-      expect(find.textContaining('ElPopover'), findsWidgets);
+      expect(find.textContaining('Popover'), findsWidgets);
     });
 
-    testWidgets(
-      'the Keyboard disclosure names the real, total absence of key '
-      'handling',
-      (WidgetTester tester) async {
-        await _pumpPage(tester);
-        await _openDisclosure(tester, 'Keyboard');
+    testWidgets('the Keyboard disclosure names the real, total absence of key '
+        'handling', (WidgetTester tester) async {
+      await _pumpPage(tester);
+      await _openDisclosure(tester, 'Keyboard');
 
-        expect(find.textContaining('Focus'), findsWidgets);
-        expect(find.textContaining('ElPress'), findsWidgets);
-      },
-    );
+      expect(find.textContaining('Focus'), findsWidgets);
+      expect(find.textContaining('Press'), findsWidgets);
+    });
 
     testWidgets(
       'navigating previous fires onNavigate with the already-routed popover',
@@ -302,7 +325,7 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpPage(tester, mode: ElThemeMode.light);
+      await _pumpPage(tester, mode: ColorMode.light);
       expect(
         find.byKey(const ValueKey<String>('nav-menu-specimen')),
         findsOneWidget,
@@ -311,7 +334,7 @@ void main() {
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpPage(tester, mode: ElThemeMode.dark);
+      await _pumpPage(tester, mode: ColorMode.dark);
       expect(
         find.byKey(const ValueKey<String>('nav-menu-specimen')),
         findsOneWidget,
@@ -322,16 +345,16 @@ void main() {
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpPage(
+      final ThemeController theme = await _pumpPage(
         tester,
-        mode: ElThemeMode.dark,
+        mode: ColorMode.dark,
       );
       expect(
         find.byKey(const ValueKey<String>('nav-menu-specimen')),
         findsOneWidget,
       );
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
       expect(

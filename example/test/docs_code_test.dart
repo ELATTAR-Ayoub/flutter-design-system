@@ -1,10 +1,36 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_code.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness(Widget child) => ElTheme(
-  controller: ElThemeController(mode: ElThemeMode.dark),
+Widget _harness(Widget child) => ThemeScope(
+  controller: ThemeController(mode: ColorMode.dark),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     home: Scaffold(body: SingleChildScrollView(child: child)),
@@ -48,7 +74,7 @@ void main() {
     WidgetTester tester,
   ) async {
     String? copied;
-    final List<ElToastMessage> feedback = <ElToastMessage>[];
+    final List<ToastMessage> feedback = <ToastMessage>[];
 
     await tester.pumpWidget(
       _harness(
@@ -70,14 +96,14 @@ void main() {
     expect(copied, 'dart run lfr add button');
     expect(feedback, hasLength(1));
     expect(feedback.single.title, 'Command copied');
-    expect(feedback.single.type, ElToastType.success);
+    expect(feedback.single.type, ToastType.success);
     expect(feedback.single.description, 'Install button');
   });
 
   testWidgets(
     'copy failure emits error feedback and keeps manual source visible',
     (WidgetTester tester) async {
-      final List<ElToastMessage> feedback = <ElToastMessage>[];
+      final List<ToastMessage> feedback = <ToastMessage>[];
 
       await tester.pumpWidget(
         _harness(
@@ -104,7 +130,7 @@ void main() {
 
       expect(feedback, hasLength(1));
       expect(feedback.single.title, 'Copy failed');
-      expect(feedback.single.type, ElToastType.error);
+      expect(feedback.single.type, ToastType.error);
       expect(find.text('class CardWidget {}'), findsOneWidget);
     },
   );

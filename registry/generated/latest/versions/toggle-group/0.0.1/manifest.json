@@ -7,20 +7,20 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/toggle_group.dart",
+      "source": "lib/src/components/ui/toggle_group.dart",
       "target": "@ui/toggle_group.dart",
-      "sha256": "d0b3d62d1338f6c2ab3098141d6c13a2ecedb85a351681a5dcee442794aa1ee5"
+      "sha256": "6816d8946cb051b4a2d80f34552208c679bf256e86cb0595ba3676b13cac439a"
     }
   ],
   "registryDependencies": [
-    "machine-surface",
-    "sliding-pill",
+    "surface",
+    "active-indicator",
     "source-foundation",
     "toggle"
   ],
   "semanticDependencies": [
-    "machine-surface",
-    "sliding-pill",
+    "surface",
+    "active-indicator",
     "toggle"
   ],
   "pubDependencies": {},
@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/toggle-group",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/toggle_group.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/toggle_group.dart",
   "deprecated": false
 }

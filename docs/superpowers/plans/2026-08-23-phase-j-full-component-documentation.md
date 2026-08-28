@@ -15,8 +15,8 @@
 - Usage examples must be real Dart against the real API. IA §9.5: "Do not manufacture shadcn examples that the Dart API does not support."
 - State matrix rows (IA §9.7) are omitted or marked N/A **with a reason**. Never invent asynchronous behaviour for a synchronous primitive.
 - Every page carries the installation facts panel of IA §9.9.
-- Tokens only: no `Colors.`, no `Color(`, no `TextStyle(`, no bare `Text(` for prose, no hardcoded numeric layout. `el()`, `ElText`/`ElType`, `ElTheme.of(context)`.
-- Real test-view sizing (`tester.view.physicalSize` + `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Live `ElThemeController` flipped in place for theme coverage.
+- Tokens only: no `Colors.`, no `Color(`, no `TextStyle(`, no bare `Text(` for prose, no hardcoded numeric layout. `el()`, `Text`/`Type`, `Theme.of(context)`.
+- Real test-view sizing (`tester.view.physicalSize` + `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Live `ThemeController` flipped in place for theme coverage.
 - A registry manifest's `registryDependencies` may only name items that exist. Adding a component to the registry means adding its real transitive support items too.
 - `dart format` clean on every file touched.
 

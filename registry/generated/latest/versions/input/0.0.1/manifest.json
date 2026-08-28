@@ -7,21 +7,21 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/input.dart",
+      "source": "lib/src/components/ui/input.dart",
       "target": "@ui/input.dart",
-      "sha256": "89373e5b8ebcdfec298f42e3e7bc9fbb3193b03a2cb8585c724ce6d23533ab16"
+      "sha256": "e5dd47e0a1c6c0fda9d4e552bb12d6999f3f296dd4dd141ed67ef954a08d964d"
     }
   ],
   "registryDependencies": [
     "button",
     "field",
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "semanticDependencies": [
     "button",
     "field",
-    "machine-surface"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/input",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/input.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/input.dart",
   "deprecated": false
 }

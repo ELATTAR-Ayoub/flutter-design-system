@@ -3,7 +3,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import 'docs_code.dart' show DocsCodeFile;
 import 'docs_snippet.dart';
@@ -31,7 +43,7 @@ class _DocsInstallState extends State<DocsInstall> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -40,18 +52,18 @@ class _DocsInstallState extends State<DocsInstall> {
         Align(
           alignment: Alignment.centerLeft,
           // The same toggle the showcase uses. One toggle pattern per page.
-          child: ElToggleGroup(
+          child: ToggleGroup(
             label: 'Installation method',
-            items: const <ElToggleGroupItem>[
-              ElToggleGroupItem(label: 'CLI'),
-              ElToggleGroupItem(label: 'Manual'),
+            items: const <ToggleGroupItem>[
+              ToggleGroupItem(label: 'CLI'),
+              ToggleGroupItem(label: 'Manual'),
             ],
             selectedIndex: _selected,
             onChanged: (int? index) =>
                 setState(() => _selected = index ?? _selected),
           ),
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         if (_selected == 0)
           DocsSnippet(code: widget.command, language: 'bash')
         else
@@ -61,29 +73,33 @@ class _DocsInstallState extends State<DocsInstall> {
               for (final DocsCodeFile file in widget.manualFiles) ...<Widget>[
                 // The heading the replaced page carried: a numbered step
                 // when one is given, falling back to the bare path.
-                ElText(
+                StyledText(
                   file.title ?? file.path,
-                  ElType.small,
+                  TextStyles.small,
                   color: theme.mutedForeground,
                 ),
                 // A title reads as a step, not a location, so the path still
                 // needs to be on screen somewhere — it is where the file
                 // goes.
                 if (file.title != null) ...<Widget>[
-                  SizedBox(height: el(1)),
-                  ElText(file.path, ElType.code, color: theme.mutedForeground),
-                ],
-                if (file.description != null) ...<Widget>[
-                  SizedBox(height: el(1)),
-                  ElText(
-                    file.description!,
-                    ElType.small,
+                  SizedBox(height: space(1)),
+                  StyledText(
+                    file.path,
+                    TextStyles.code,
                     color: theme.mutedForeground,
                   ),
                 ],
-                SizedBox(height: el(2)),
+                if (file.description != null) ...<Widget>[
+                  SizedBox(height: space(1)),
+                  StyledText(
+                    file.description!,
+                    TextStyles.small,
+                    color: theme.mutedForeground,
+                  ),
+                ],
+                SizedBox(height: space(2)),
                 DocsSnippet(code: file.code),
-                SizedBox(height: el(4)),
+                SizedBox(height: space(4)),
               ],
             ],
           ),

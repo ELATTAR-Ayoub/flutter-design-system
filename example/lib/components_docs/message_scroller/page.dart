@@ -1,12 +1,12 @@
 /// Public documentation page for the `message-scroller` component.
 ///
 /// `message-scroller` is a transcript viewport that manages its own scroll:
-/// [ElMessageScrollerProvider] publishes an [ElMessageScrollerController],
-/// [ElMessageScrollerViewport] is the element that actually scrolls (a
-/// bottom fade wrapped around it via [ElScrollFade]), [ElMessageScrollerItem]
-/// wraps each turn so it can register itself by [ElMessageScrollerItem.messageId]
-/// or as the [ElMessageScrollerItem.scrollAnchor], and
-/// [ElMessageScrollerButton] hides itself the instant its own direction has
+/// [MessageScrollerProvider] publishes an [MessageScrollerController],
+/// [MessageScrollerViewport] is the element that actually scrolls (a
+/// bottom fade wrapped around it via [ScrollFade]), [MessageScrollerItem]
+/// wraps each turn so it can register itself by [MessageScrollerItem.messageId]
+/// or as the [MessageScrollerItem.scrollAnchor], and
+/// [MessageScrollerButton] hides itself the instant its own direction has
 /// nowhere left to travel.
 ///
 /// This page is new — `message-scroller` had no page before this pass —
@@ -15,13 +15,25 @@
 /// `example/lib/pages/chat.dart`'s "Message Scroller" section, reused here
 /// rather than invented fresh, per the rollout's own brief. Every stage on
 /// this page is a real, eleven-turn scrolling transcript rather than a
-/// picture — `minHeight: el(160)` throughout, since a scroller judged in the
-/// house default (`el(96)`, 384px) reads as barely a window onto its own
+/// picture — `minHeight: space(160)` throughout, since a scroller judged in the
+/// house default (`space(96)`, 384px) reads as barely a window onto its own
 /// content.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -46,7 +58,7 @@ final ComponentDocSpec messageScrollerDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     InstallSection(
       id: 'install',
@@ -74,7 +86,7 @@ final ComponentDocSpec messageScrollerDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElMessageScroller and its nine '
+              'Add the export line so MessageScroller and its nine '
               'companion classes and enums are reachable the same way '
               'the CLI path already makes them.',
           code: "export 'message_scroller.dart';",
@@ -101,13 +113,13 @@ final ComponentDocSpec messageScrollerDocSpec = ComponentDocSpec(
       specimen: _ScrollPositionSpecimen(),
       code: _scrollPositionCode,
       label: 'Scroll Position specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     ShowcaseSection(
       id: 'button',
       title: 'Button',
       description:
-          'ElMessageScrollerButton.direction is start (travels to the '
+          'MessageScrollerButton.direction is start (travels to the '
           'oldest turn) or end (the default, travels to the newest). '
           'Each hides itself — opacity only; the reference\'s own '
           'translate/scale transition loses to Button\'s class list and '
@@ -116,7 +128,7 @@ final ComponentDocSpec messageScrollerDocSpec = ComponentDocSpec(
       specimen: _ButtonSpecimen(),
       code: _buttonCode,
       label: 'Button specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     ShowcaseSection(
       id: 'anchor',
@@ -130,7 +142,7 @@ final ComponentDocSpec messageScrollerDocSpec = ComponentDocSpec(
       specimen: _AnchorSpecimen(),
       code: _anchorCode,
       label: 'Anchor specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     DisclosureSection(
       id: 'api',
@@ -141,38 +153,32 @@ final ComponentDocSpec messageScrollerDocSpec = ComponentDocSpec(
           'enum.',
       children: const <DocsTocEntry>[
         DocsTocEntry(
-          title: 'ElMessageScrollerController',
+          title: 'MessageScrollerController',
           anchor: 'api-elmessagescrollercontroller',
         ),
         DocsTocEntry(
-          title: 'ElMessageScrollerProvider',
+          title: 'MessageScrollerProvider',
           anchor: 'api-elmessagescrollerprovider',
         ),
+        DocsTocEntry(title: 'MessageScroller', anchor: 'api-elmessagescroller'),
         DocsTocEntry(
-          title: 'ElMessageScroller',
-          anchor: 'api-elmessagescroller',
-        ),
-        DocsTocEntry(
-          title: 'ElMessageScrollerViewport',
+          title: 'MessageScrollerViewport',
           anchor: 'api-elmessagescrollerviewport',
         ),
         DocsTocEntry(
-          title: 'ElMessageScrollerContent',
+          title: 'MessageScrollerContent',
           anchor: 'api-elmessagescrollercontent',
         ),
         DocsTocEntry(
-          title: 'ElMessageScrollerItem',
+          title: 'MessageScrollerItem',
           anchor: 'api-elmessagescrolleritem',
         ),
         DocsTocEntry(
-          title: 'ElMessageScrollerButton',
+          title: 'MessageScrollerButton',
           anchor: 'api-elmessagescrollerbutton',
         ),
-        DocsTocEntry(title: 'ElScrollPosition', anchor: 'api-elscrollposition'),
-        DocsTocEntry(
-          title: 'ElScrollDirection',
-          anchor: 'api-elscrolldirection',
-        ),
+        DocsTocEntry(title: 'ScrollPosition', anchor: 'api-elscrollposition'),
+        DocsTocEntry(title: 'ScrollDirection', anchor: 'api-elscrolldirection'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -180,9 +186,9 @@ final ComponentDocSpec messageScrollerDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off ElMessageScrollerController.scrollable, '
-          '_ElMessageScrollerViewportState.build and '
-          'ElMessageScrollerButton.build, not inferred.',
+          'Read off MessageScrollerController.scrollable, '
+          '_MessageScrollerViewportState.build and '
+          'MessageScrollerButton.build, not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
     DisclosureSection(
@@ -227,7 +233,7 @@ final ComponentDocSpec messageScrollerDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/chat_test.dart',
             description:
-                'ElMessageScroller and its controller are covered inside '
+                'MessageScroller and its controller are covered inside '
                 'the shared chat-family suite alongside bubble and '
                 'message: there is no dedicated message_scroller_test.dart '
                 'in the package yet.',
@@ -264,9 +270,9 @@ class MessageScrollerDocPage extends StatelessWidget {
       title: messageScrollerDocSpec.title,
       description: messageScrollerDocSpec.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Message Scroller'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Message Scroller'),
     ],
     toc: messageScrollerDocSpec.toc,
     previous: const DocsPageLink(
@@ -335,23 +341,21 @@ const List<_Turn> _transcript = <_Turn>[
 ];
 
 /// A transcript, built once per specimen so each can own its own
-/// [ElMessageScrollerController] without repeating the item-building code.
-Widget _transcriptContent() => ElMessageScrollerContent(
-  padding: EdgeInsets.all(el(6)),
+/// [MessageScrollerController] without repeating the item-building code.
+Widget _transcriptContent() => MessageScrollerContent(
+  padding: EdgeInsets.all(space(6)),
   children: <Widget>[
     for (final _Turn t in _transcript)
-      ElMessageScrollerItem(
+      MessageScrollerItem(
         messageId: t.id,
-        child: ElMessage(
-          align: t.user ? ElBubbleAlign.end : ElBubbleAlign.start,
-          content: ElMessageContent(
+        child: Message(
+          align: t.user ? BubbleAlign.end : BubbleAlign.start,
+          content: MessageContent(
             children: <Widget>[
-              ElBubble(
-                variant: t.user
-                    ? ElBubbleVariant.normal
-                    : ElBubbleVariant.muted,
-                align: t.user ? ElBubbleAlign.end : ElBubbleAlign.start,
-                child: ElBubbleContent(child: Text(t.text)),
+              Bubble(
+                variant: t.user ? BubbleVariant.normal : BubbleVariant.muted,
+                align: t.user ? BubbleAlign.end : BubbleAlign.start,
+                child: BubbleContent(child: Text(t.text)),
               ),
             ],
           ),
@@ -363,21 +367,21 @@ Widget _transcriptContent() => ElMessageScrollerContent(
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-final controller = ElMessageScrollerController();
+final controller = MessageScrollerController();
 
-ElMessageScrollerProvider(
+MessageScrollerProvider(
   controller: controller,
   child: SizedBox(
     height: 320,
-    child: ElMessageScroller(
-      viewport: ElMessageScrollerViewport(
-        child: ElMessageScrollerContent(
+    child: MessageScroller(
+      viewport: MessageScrollerViewport(
+        child: MessageScrollerContent(
           children: [
-            ElMessageScrollerItem(
+            MessageScrollerItem(
               messageId: 'm1',
-              child: ElMessage(
-                content: ElMessageContent(
-                  children: [ElBubble(child: ElBubbleContent(child: Text('Hi.')))],
+              child: Message(
+                content: MessageContent(
+                  children: [Bubble(child: BubbleContent(child: Text('Hi.')))],
                 ),
               ),
             ),
@@ -396,9 +400,9 @@ class _PreviewSpecimen extends StatefulWidget {
 }
 
 class _PreviewSpecimenState extends State<_PreviewSpecimen> {
-  final ElMessageScrollerController _controller = ElMessageScrollerController(
+  final MessageScrollerController _controller = MessageScrollerController(
     autoScroll: true,
-    defaultScrollPosition: ElScrollPosition.start,
+    defaultScrollPosition: ScrollPosition.start,
   );
 
   @override
@@ -411,12 +415,12 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('message-scroller-example:preview'),
     child: SizedBox(
-      height: el(80),
-      child: ElMessageScrollerProvider(
+      height: space(80),
+      child: MessageScrollerProvider(
         controller: _controller,
-        child: ElMessageScroller(
-          viewport: ElMessageScrollerViewport(child: _transcriptContent()),
-          button: const ElMessageScrollerButton(),
+        child: MessageScroller(
+          viewport: MessageScrollerViewport(child: _transcriptContent()),
+          button: const MessageScrollerButton(),
         ),
       ),
     ),
@@ -424,18 +428,18 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 }
 
 const String _previewCode = '''
-final controller = ElMessageScrollerController(
+final controller = MessageScrollerController(
   autoScroll: true,
-  defaultScrollPosition: ElScrollPosition.start,
+  defaultScrollPosition: ScrollPosition.start,
 );
 
 SizedBox(
   height: 320,
-  child: ElMessageScrollerProvider(
+  child: MessageScrollerProvider(
     controller: controller,
-    child: ElMessageScroller(
-      viewport: ElMessageScrollerViewport(child: transcript),
-      button: const ElMessageScrollerButton(),
+    child: MessageScroller(
+      viewport: MessageScrollerViewport(child: transcript),
+      button: const MessageScrollerButton(),
     ),
   ),
 )''';
@@ -449,8 +453,8 @@ class _ScrollPositionSpecimen extends StatefulWidget {
 }
 
 class _ScrollPositionSpecimenState extends State<_ScrollPositionSpecimen> {
-  final ElMessageScrollerController _controller = ElMessageScrollerController(
-    defaultScrollPosition: ElScrollPosition.start,
+  final MessageScrollerController _controller = MessageScrollerController(
+    defaultScrollPosition: ScrollPosition.start,
   );
 
   @override
@@ -463,12 +467,12 @@ class _ScrollPositionSpecimenState extends State<_ScrollPositionSpecimen> {
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('message-scroller-example:scroll-position'),
     child: SizedBox(
-      height: el(80),
-      child: ElMessageScrollerProvider(
+      height: space(80),
+      child: MessageScrollerProvider(
         controller: _controller,
-        child: ElMessageScroller(
-          viewport: ElMessageScrollerViewport(child: _transcriptContent()),
-          button: const ElMessageScrollerButton(),
+        child: MessageScroller(
+          viewport: MessageScrollerViewport(child: _transcriptContent()),
+          button: const MessageScrollerButton(),
         ),
       ),
     ),
@@ -476,7 +480,7 @@ class _ScrollPositionSpecimenState extends State<_ScrollPositionSpecimen> {
 }
 
 const String _scrollPositionCode = '''
-ElMessageScrollerController(defaultScrollPosition: ElScrollPosition.start)''';
+MessageScrollerController(defaultScrollPosition: ScrollPosition.start)''';
 
 class _ButtonSpecimen extends StatefulWidget {
   const _ButtonSpecimen();
@@ -486,8 +490,8 @@ class _ButtonSpecimen extends StatefulWidget {
 }
 
 class _ButtonSpecimenState extends State<_ButtonSpecimen> {
-  final ElMessageScrollerController _controller = ElMessageScrollerController(
-    defaultScrollPosition: ElScrollPosition.start,
+  final MessageScrollerController _controller = MessageScrollerController(
+    defaultScrollPosition: ScrollPosition.start,
   );
 
   @override
@@ -500,12 +504,12 @@ class _ButtonSpecimenState extends State<_ButtonSpecimen> {
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('message-scroller-example:button'),
     child: SizedBox(
-      height: el(80),
-      child: ElMessageScrollerProvider(
+      height: space(80),
+      child: MessageScrollerProvider(
         controller: _controller,
-        child: ElMessageScroller(
-          viewport: ElMessageScrollerViewport(child: _transcriptContent()),
-          button: const ElMessageScrollerButton(direction: ElScrollDirection.end),
+        child: MessageScroller(
+          viewport: MessageScrollerViewport(child: _transcriptContent()),
+          button: const MessageScrollerButton(direction: ScrollDirection.end),
         ),
       ),
     ),
@@ -513,7 +517,7 @@ class _ButtonSpecimenState extends State<_ButtonSpecimen> {
 }
 
 const String _buttonCode = '''
-const ElMessageScrollerButton(direction: ElScrollDirection.end)''';
+const MessageScrollerButton(direction: ScrollDirection.end)''';
 
 class _AnchorSpecimen extends StatefulWidget {
   const _AnchorSpecimen();
@@ -523,8 +527,8 @@ class _AnchorSpecimen extends StatefulWidget {
 }
 
 class _AnchorSpecimenState extends State<_AnchorSpecimen> {
-  final ElMessageScrollerController _controller = ElMessageScrollerController(
-    defaultScrollPosition: ElScrollPosition.start,
+  final MessageScrollerController _controller = MessageScrollerController(
+    defaultScrollPosition: ScrollPosition.start,
   );
 
   @override
@@ -540,21 +544,21 @@ class _AnchorSpecimenState extends State<_AnchorSpecimen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         SizedBox(
-          height: el(70),
-          child: ElMessageScrollerProvider(
+          height: space(70),
+          child: MessageScrollerProvider(
             controller: _controller,
-            child: ElMessageScroller(
-              viewport: ElMessageScrollerViewport(child: _transcriptContent()),
-              button: const ElMessageScrollerButton(),
+            child: MessageScroller(
+              viewport: MessageScrollerViewport(child: _transcriptContent()),
+              button: const MessageScrollerButton(),
             ),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElButton(
+        SizedBox(height: space(3)),
+        Button(
           key: const ValueKey<String>(
             'message-scroller-example:anchor-trigger',
           ),
-          variant: ElButtonVariant.outline,
+          variant: ButtonVariant.outline,
           onPressed: () => _controller.scrollToMessage('m6'),
           child: const Text('Jump to "Show me what I hold in that set."'),
         ),
@@ -564,7 +568,7 @@ class _AnchorSpecimenState extends State<_AnchorSpecimen> {
 }
 
 const String _anchorCode = '''
-ElButton(
+Button(
   onPressed: () => controller.scrollToMessage('m6'),
   child: const Text('Jump to that message'),
 )''';
@@ -581,71 +585,71 @@ class _ApiReferenceContent extends StatelessWidget {
       DocsAnchor(
         id: 'api-elmessagescrollercontroller',
         child: const DocsApiTable(
-          title: 'ElMessageScrollerController',
+          title: 'MessageScrollerController',
           facts: _controllerFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elmessagescrollerprovider',
         child: const DocsApiTable(
-          title: 'ElMessageScrollerProvider',
+          title: 'MessageScrollerProvider',
           facts: _providerFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elmessagescroller',
         child: const DocsApiTable(
-          title: 'ElMessageScroller',
+          title: 'MessageScroller',
           facts: _scrollerFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elmessagescrollerviewport',
         child: const DocsApiTable(
-          title: 'ElMessageScrollerViewport',
+          title: 'MessageScrollerViewport',
           facts: _viewportFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elmessagescrollercontent',
         child: const DocsApiTable(
-          title: 'ElMessageScrollerContent',
+          title: 'MessageScrollerContent',
           facts: _contentFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elmessagescrolleritem',
         child: const DocsApiTable(
-          title: 'ElMessageScrollerItem',
+          title: 'MessageScrollerItem',
           facts: _itemFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elmessagescrollerbutton',
         child: const DocsApiTable(
-          title: 'ElMessageScrollerButton',
+          title: 'MessageScrollerButton',
           facts: _buttonFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elscrollposition',
         child: const DocsApiTable(
-          title: 'ElScrollPosition',
+          title: 'ScrollPosition',
           facts: _scrollPositionFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elscrolldirection',
         child: const DocsApiTable(
-          title: 'ElScrollDirection',
+          title: 'ScrollDirection',
           facts: _scrollDirectionFacts,
         ),
       ),
@@ -663,9 +667,9 @@ const List<DocsApiFact> _controllerFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'defaultScrollPosition',
-    type: 'ElScrollPosition',
+    type: 'ScrollPosition',
     description:
-        'Optional. Defaults to ElScrollPosition.end. Applied once, after '
+        'Optional. Defaults to ScrollPosition.end. Applied once, after '
         'first layout.',
   ),
   DocsApiFact(
@@ -681,7 +685,7 @@ const List<DocsApiFact> _controllerFacts = <DocsApiFact>[
 const List<DocsApiFact> _providerFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'controller',
-    type: 'ElMessageScrollerController',
+    type: 'MessageScrollerController',
     description:
         'Required. Owned by whatever mounts the scroller — publish it '
         'once above the frame the same way the reference\'s own provider '
@@ -698,14 +702,14 @@ const List<DocsApiFact> _scrollerFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'viewport',
     type: 'Widget',
-    description: 'Required. Usually an ElMessageScrollerViewport.',
+    description: 'Required. Usually an MessageScrollerViewport.',
   ),
   DocsApiFact(
     name: 'button',
     type: 'Widget?',
     description:
         'Optional. Defaults to null. Usually an '
-        'ElMessageScrollerButton, absolutely positioned against this '
+        'MessageScrollerButton, absolutely positioned against this '
         'frame.',
   ),
 ];
@@ -714,7 +718,7 @@ const List<DocsApiFact> _viewportFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'child',
     type: 'Widget',
-    description: 'Required. Usually an ElMessageScrollerContent.',
+    description: 'Required. Usually an MessageScrollerContent.',
   ),
   DocsApiFact(
     name: 'semanticsLabel',
@@ -745,7 +749,7 @@ const List<DocsApiFact> _itemFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'child',
     type: 'Widget',
-    description: 'Required. One turn — usually an ElMessage.',
+    description: 'Required. One turn — usually an Message.',
   ),
   DocsApiFact(
     name: 'messageId',
@@ -759,15 +763,15 @@ const List<DocsApiFact> _itemFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to false. Makes this item the resting point '
-        'for ElScrollPosition.lastAnchor.',
+        'for ScrollPosition.lastAnchor.',
   ),
 ];
 
 const List<DocsApiFact> _buttonFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'direction',
-    type: 'ElScrollDirection',
-    description: 'Optional. Defaults to ElScrollDirection.end.',
+    type: 'ScrollDirection',
+    description: 'Optional. Defaults to ScrollDirection.end.',
   ),
 ];
 
@@ -810,7 +814,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Fade at rest',
     treatment:
-        'Full height (min(12% of the viewport, el(10)/40px)) whenever '
+        'Full height (min(12% of the viewport, space(10)/40px)) whenever '
         'the viewport is more than 96px from its own max scroll extent.',
     userSignal: 'A soft mask over the bottom edge, signalling more below.',
   ),
@@ -818,7 +822,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Fade closing',
     treatment:
         'Shrinks to zero over the last 96px of scroll travel, on '
-        'ElCurves.cssEaseInOut — the CSS ease-in-out keyword, not this '
+        'MotionCurves.cssEaseInOut — the CSS ease-in-out keyword, not this '
         "system's own --ease-in-out.",
     userSignal: 'The mask visibly thins as the reader nears the bottom.',
   ),
@@ -835,7 +839,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'scrollable(direction) is false. Scale and a translate off its '
         'own edge both snap in one frame (the reference\'s own '
         'transition list drops them); only opacity animates, 250ms on '
-        'ElCurves.curveIn.',
+        'MotionCurves.exit.',
     userSignal: 'Fades out and stops answering taps — IgnorePointer.',
   ),
   DocsStateFact(
@@ -844,7 +848,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'A programmatic smooth scroll is running (scrollToEnd, '
         'scrollToStart, scrollToMessage, or autoScroll following new '
         'content).',
-    userSignal: 'The scrollbar thumb goes fully transparent for the '
+    userSignal:
+        'The scrollbar thumb goes fully transparent for the '
         'duration of the jump.',
   ),
 ];
@@ -856,12 +861,12 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        "ElMessageScrollerViewport wraps its content in "
+      _bullets(ThemeScope.of(context), <String>[
+        "MessageScrollerViewport wraps its content in "
             'Semantics(container: true, label: semanticsLabel), '
             "'Messages' by default — role=\"region\" aria-label on the "
             'reference.',
-        'ElMessageScrollerButton is a real ElButton underneath, and '
+        'MessageScrollerButton is a real Button underneath, and '
             'inherits everything Button\'s own Accessibility disclosure '
             'documents — including a fixed accessible label ("Scroll to '
             'end" / "Scroll to start") independent of the arrow glyph.',
@@ -880,13 +885,13 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The viewport itself is a SingleChildScrollView with '
             'ClampingScrollPhysics: Flutter\'s own scroll view answers '
             'arrow-key and Page Up/Down scrolling when it holds focus, '
             'the same as any other Scrollable — message_scroller.dart '
             'adds nothing on top of that default.',
-        'ElMessageScrollerButton is a real ElButton and inherits its '
+        'MessageScrollerButton is a real Button and inherits its '
             'keyboard story whole: focusable via Tab when active, '
             'removed from traversal when inactive (onPressed: null), '
             'and activates on Enter/Space.',
@@ -902,17 +907,17 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in message_scroller.dart: '
             'BuildContext width is never read for a layout decision.',
-        'ElMessageScroller fills whatever box its caller gives it '
+        'MessageScroller fills whatever box its caller gives it '
             '(size: full in the reference) — every specimen on this page '
             'sets its own SizedBox height for that reason; the component '
             'declares no height of its own.',
         'The fade\'s own height is a fraction of the viewport '
-            '(min(12%, el(10))), so it scales down automatically on a '
+            '(min(12%, space(10))), so it scales down automatically on a '
             'short viewport rather than reading a breakpoint.',
-        'ElMessageScrollerItem carries no content-visibility skip in '
+        'MessageScrollerItem carries no content-visibility skip in '
             'this port (Flutter has no off-screen remembered-size '
             'primitive): every item renders its full content regardless '
             'of scroll position, unlike the CSS reference.',
@@ -926,7 +931,7 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/message_scroller.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
@@ -934,20 +939,20 @@ class _DependenciesContent extends StatelessWidget {
             'duration), package:flutter/gestures.dart (PointerDeviceKind, '
             'the scroll behaviour\'s drag devices), '
             'package:flutter/widgets.dart.',
-        'Foundation imports: foundation/colors.dart (elTransparent), '
-            'foundation/motion.dart (elAnimationDuration), '
-            'foundation/spacing.dart (el()), foundation/theme.dart, '
+        'Foundation imports: foundation/colors.dart (transparent), '
+            'foundation/motion.dart (effectiveMotionDuration), '
+            'foundation/spacing.dart (space()), foundation/theme.dart, '
             'theme_scope.dart.',
-        'Component imports: button.dart (ElButton, for the jump '
-            'control) and icon.dart / icon_paths.g.dart (ElIcon.lucide, '
+        'Component imports: button.dart (Button, for the jump '
+            'control) and icon.dart / icon_paths.g.dart (Icon.lucide, '
             'the arrow glyph).',
         'registryDependencies, resolved automatically by `elattar add '
             'message-scroller`: button, icon, source-foundation — '
             'copied verbatim from registry/components/message-scroller.json.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: DocsLinkRow(
           links: <DocsLink>[
             DocsLink(label: 'Button', route: '/components/button'),
@@ -969,34 +974,38 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The viewport reads theme.border for its scrollbar thumb (and '
-            'elTransparent while autoscrolling) — the one colour '
+            'transparent while autoscrolling) — the one colour '
             'message_scroller.dart resolves directly.',
-        "ElMessageScrollerButton composes ElButton with an explicit "
-            'ElButtonSurface — fill: theme.background, hoverFill: '
+        "MessageScrollerButton composes Button with an explicit "
+            'ButtonStyleRecipe — fill: theme.background, hoverFill: '
             'theme.muted, border: theme.border, ink/hoverInk: '
             'theme.foreground — five overrides on top of the secondary '
             'variant, rather than a bespoke variant of its own.',
         'The bottom fade is a stencil mask (opaque black to transparent), '
             'not a themed colour: it reveals whatever is already painted '
             'beneath it rather than tinting it.',
-        'No override field on ElMessageScroller/ElMessageScrollerViewport '
+        'No override field on MessageScroller/MessageScrollerViewport '
             'itself: restyle the button through its own surface, or the '
-            'items inside through whatever they compose (an ElMessage, an '
-            'ElBubble).',
+            'items inside through whatever they compose (an Message, an '
+            'Bubble).',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

@@ -57,33 +57,33 @@ Every count below came from a grep across `lib/` and `example/lib/` during the a
 | Symbol | Call sites |
 | --- | --- |
 | `el(n)` | 3,749 — **not renamed** |
-| `ElMachineSurface` | 67 across 38 files |
-| `ElType.small` | 697 |
-| `ElType.label` | 53 |
-| `ElComponentType.textSm` | 47 |
-| `ElComponentType.sheetBody` | 29 across 12 components |
-| `ElDurations.transitionDefault` | 29 — **not renamed** |
-| `ElDurations.base` | 26 — **not renamed** |
-| `ElType.micro` | 24 |
-| `ElBloomCosmic` | 11 |
+| `MachineSurface` | 67 across 38 files |
+| `Type.small` | 697 |
+| `Type.label` | 53 |
+| `ComponentType.textSm` | 47 |
+| `ComponentType.sheetBody` | 29 across 12 components |
+| `Durations.transitionDefault` | 29 — **not renamed** |
+| `Durations.base` | 26 — **not renamed** |
+| `Type.micro` | 24 |
+| `BloomCosmic` | 11 |
 
 ---
 
 ## Task 1: Hide the theme's internal plumbing
 
-`ElThemeData` exposes 61 members. Roughly 33 are legitimate shadcn-parity tokens; the rest are single-effect plumbing a consumer scrolling for a colour has to wade through. None has a consumer outside its own defining file.
+`ThemeData` exposes 61 members. Roughly 33 are legitimate shadcn-parity tokens; the rest are single-effect plumbing a consumer scrolling for a colour has to wade through. None has a consumer outside its own defining file.
 
 **Files:**
-- Modify: `lib/src/foundation/theme.dart`
-- Modify: `lib/src/foundation/shadows.dart`
-- Modify: `lib/src/effects/bloom_cosmic.dart`
-- Modify: `lib/src/effects/starfield.dart`
-- Modify: `lib/src/components/agent_avatar.dart`
-- Test: `test/foundation_colors_test.dart` — the existing home for `ElThemeData` and `ElPalette` assertions. There is no `foundation_theme_test.dart`; do not create one.
+- Modify: `lib/src/design_system/foundation/theme.dart`
+- Modify: `lib/src/design_system/foundation/shadows.dart`
+- Modify: `lib/src/components/ui/feedback_surface.dart`
+- Modify: `lib/src/components/ui/ambient_pattern.dart`
+- Modify: `lib/src/components/ui/agent_avatar.dart`
+- Test: `test/foundation_colors_test.dart` — the existing home for `ThemeData` and `Palette` assertions. There is no `foundation_theme_test.dart`; do not create one.
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: a smaller `ElThemeData`. Later tasks assume these members are gone from the public surface.
+- Produces: a smaller `ThemeData`. Later tasks assume these members are gone from the public surface.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -91,7 +91,7 @@ Add to `test/foundation_colors_test.dart`:
 
 ```dart
   test('the theme exposes only tokens a consumer would reach for', () {
-    // ElThemeData is the object a consumer reads colour off. Every member is
+    // ThemeData is the object a consumer reads colour off. Every member is
     // a name they have to scroll past. These were single-effect plumbing —
     // starfield glow parameters, bloom drift stops, the agent cube's twelve
     // faces — reachable only by the one file that painted with them.
@@ -108,13 +108,13 @@ Add to `test/foundation_colors_test.dart`:
       'cube',
     ];
     final String source =
-        File('lib/src/foundation/theme.dart').readAsStringSync();
+        File('lib/src/design_system/foundation/theme.dart').readAsStringSync();
     for (final String name in gone) {
       expect(
         RegExp('\\bfinal\\s+\\w[\\w<>?]*\\s+$name\\b').hasMatch(source),
         isFalse,
         reason:
-            '$name is still a public field on ElThemeData. It has no consumer '
+            '$name is still a public field on ThemeData. It has no consumer '
             'outside its own effect, so it is noise on the one object every '
             'user reads colour from.',
       );
@@ -131,7 +131,7 @@ Expected: FAIL — every name still matches.
 
 - [ ] **Step 3: Move each member to its owner**
 
-For the five `bloom*` colours: delete the fields from `ElThemeData` and declare them as private statics or a private class inside `lib/src/effects/bloom_cosmic.dart`, resolved from the theme's public tokens the same way they are today. Same shape for `starGlowSize`/`starGlowMix` into `starfield.dart`, `ink1`–`ink4`/`rim`/`rimStrong`/`wall` into `shadows.dart`, and `cube` plus the whole `ElAgentCubeTokens` class into `agent_avatar.dart`.
+For the five `bloom*` colours: delete the fields from `ThemeData` and declare them as private statics or a private class inside `lib/src/components/ui/feedback_surface.dart`, resolved from the theme's public tokens the same way they are today. Same shape for `starGlowSize`/`starGlowMix` into `starfield.dart`, `ink1`–`ink4`/`rim`/`rimStrong`/`wall` into `shadows.dart`, and `cube` plus the whole `AgentCubeTokens` class into `agent_avatar.dart`.
 
 Each of these is currently read exactly once or twice. Follow the reference from the call site backwards; do not invent a new resolution path.
 
@@ -162,18 +162,18 @@ git commit -m "refactor(theme): take single-effect plumbing off the public theme
 
 ## Task 2: Hide the keyframes nothing plays
 
-Six keyframe classes have zero consumers in `lib/`. Only the motion demo page and tests construct them. Two (`ElSweep`, `ElTravel`) say so in their own doc comments.
+Six keyframe classes have zero consumers in `lib/`. Only the motion demo page and tests construct them. Two (`Sweep`, `Travel`) say so in their own doc comments.
 
 **Files:**
-- Modify: `lib/src/motion/keyframes.dart`
-- Modify: `lib/src/foundation/motion.dart`
+- Modify: `lib/src/components/ui/keyframes.dart`
+- Modify: `lib/src/design_system/foundation/motion.dart`
 - Modify: `example/lib/pages/motion.dart`
 - Modify: `example/lib/components_docs/keyframes/page.dart`
 - Test: `test/foundation_type_motion_test.dart`
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: `ElJellyIn`, `ElRatchet`, `ElSignOn`, `ElSignOnFrame`, `ElReveal`, `ElSweep`, `ElTravel` no longer exported; `ElDurations.reward`, `signOn`, `ratchet`, `ratchetStep`, `pressSpringUp` no longer public.
+- Produces: `JellyIn`, `Ratchet`, `SignOn`, `SignOnFrame`, `Reveal`, `Sweep`, `Travel` no longer exported; `Durations.reward`, `signOn`, `ratchet`, `ratchetStep`, `pressSpringUp` no longer public.
 
 - [ ] **Step 1: Decide per class, then write the test**
 
@@ -187,12 +187,12 @@ For every class you make private, add to `test/foundation_type_motion_test.dart`
     // was right; exporting all fourteen was not. A public class no component
     // plays is a name a user has to rule out.
     const List<String> private = <String>[
-      'ElJellyIn', 'ElRatchet', 'ElSignOn', 'ElSignOnFrame',
-      'ElReveal', 'ElSweep', 'ElTravel',
+      'JellyIn', 'Ratchet', 'SignOn', 'SignOnFrame',
+      'Reveal', 'Sweep', 'Travel',
     ];
     final String barrel =
         File('lib/elattar_design_system.dart').readAsStringSync();
-    final String source = File('lib/src/motion/keyframes.dart').readAsStringSync();
+    final String source = File('lib/src/components/ui/keyframes.dart').readAsStringSync();
     for (final String name in private) {
       expect(
         RegExp('\\bclass\\s+$name\\b').hasMatch(source),
@@ -211,7 +211,7 @@ Expected: FAIL.
 
 - [ ] **Step 3: Make them private and repoint the demo**
 
-Rename each class to a leading-underscore name inside `keyframes.dart`. The motion demo page and the `keyframes` docs page construct them; those pages must stop doing so. Replace the demo's use with the same visual built from `ElKeyframes` directly, or drop that panel and say so in the page's own prose — do not leave a page describing an animation the reader cannot reach.
+Rename each class to a leading-underscore name inside `keyframes.dart`. The motion demo page and the `keyframes` docs page construct them; those pages must stop doing so. Replace the demo's use with the same visual built from `Keyframes` directly, or drop that panel and say so in the page's own prose — do not leave a page describing an animation the reader cannot reach.
 
 Do the same for the durations that back only these: `reward`, `signOn`, `ratchet`, `ratchetStep`, `pressSpringUp`.
 
@@ -233,19 +233,19 @@ git commit -m "refactor(motion): stop exporting keyframes nothing plays"
 
 ---
 
-## Task 3: Merge ElComponentType into ElType
+## Task 3: Merge ComponentType into Type
 
-Two classes, 27 and 38 members, **zero shared names**. A user writing `ElType.buttonLabel` gets a compile error and no hint, because the name lives on the other class. The repository's own rollout plan wrote `ElType.inputSerial` and `ElType.buttonLabelCaps` — both wrong, both on `ElComponentType`. The document warning about the trap fell into it.
+Two classes, 27 and 38 members, **zero shared names**. A user writing `Type.buttonLabel` gets a compile error and no hint, because the name lives on the other class. The repository's own rollout plan wrote `Type.inputSerial` and `Type.buttonLabelCaps` — both wrong, both on `ComponentType`. The document warning about the trap fell into it.
 
 **Files:**
-- Modify: `lib/src/foundation/typography.dart`
+- Modify: `lib/src/design_system/foundation/typography.dart`
 - Modify: `lib/elattar_design_system.dart`
-- Modify: every file referencing `ElComponentType` (grep first — expect ~40 in `lib/`, ~60 in `example/lib/`)
+- Modify: every file referencing `ComponentType` (grep first — expect ~40 in `lib/`, ~60 in `example/lib/`)
 - Test: `test/foundation_type_motion_test.dart`
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: one `ElType` carrying all 65 specs. `ElComponentType` no longer exists. Tasks 4 and 5 rename members *on the merged class*.
+- Produces: one `Type` carrying all 65 specs. `ComponentType` no longer exists. Tasks 4 and 5 rename members *on the merged class*.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -266,18 +266,18 @@ Two classes, 27 and 38 members, **zero shared names**. A user writing `ElType.bu
       'section', 'display',
     ];
     final String source =
-        File('lib/src/foundation/typography.dart').readAsStringSync();
+        File('lib/src/design_system/foundation/typography.dart').readAsStringSync();
 
     expect(
-      RegExp(r'\bclass\s+ElComponentType\b').hasMatch(source),
+      RegExp(r'\bclass\s+ComponentType\b').hasMatch(source),
       isFalse,
-      reason: 'ElComponentType still exists — the split is what confuses',
+      reason: 'ComponentType still exists — the split is what confuses',
     );
     for (final String name in <String>[...fromComponentType, ...fromElType]) {
       expect(
-        RegExp('ElTypeSpec\\s+$name\\b').hasMatch(source),
+        RegExp('TypeSpec\\s+$name\\b').hasMatch(source),
         isTrue,
-        reason: '$name is missing from the merged ElType',
+        reason: '$name is missing from the merged Type',
       );
     }
   });
@@ -286,18 +286,18 @@ Two classes, 27 and 38 members, **zero shared names**. A user writing `ElType.bu
 - [ ] **Step 2: Run it to make sure it fails**
 
 Run: `wsl.exe -d Ubuntu-24.04 -- bash -c "FT_ID=n3 ft root test test/foundation_type_motion_test.dart"`
-Expected: FAIL — `ElComponentType` still exists.
+Expected: FAIL — `ComponentType` still exists.
 
 - [ ] **Step 3: Merge**
 
-Move every member of `ElComponentType` into `ElType`, keeping each member's doc comment verbatim — those comments carry the CSS provenance and are the reason the values are trusted. Delete the now-empty `ElComponentType` and its export.
+Move every member of `ComponentType` into `Type`, keeping each member's doc comment verbatim — those comments carry the CSS provenance and are the reason the values are trusted. Delete the now-empty `ComponentType` and its export.
 
 Then replace every reference:
 
 ```bash
-grep -rln "ElComponentType" lib example test | \
-  xargs sed -i 's/\bElComponentType\./ElType./g'
-grep -rn "ElComponentType" lib example test | grep -v "^Binary"
+grep -rln "ComponentType" lib example test | \
+  xargs sed -i 's/\bElComponentType\./Type./g'
+grep -rn "ComponentType" lib example test | grep -v "^Binary"
 ```
 
 The second command must print nothing except doc comments that deliberately describe the history. Rewrite those to say the classes were merged and why — do not delete the provenance.
@@ -328,14 +328,14 @@ git commit -m "refactor(type): one type class, not two"
 ## Task 4: Rename the type roles that lie
 
 **Files:**
-- Modify: `lib/src/foundation/typography.dart`
+- Modify: `lib/src/design_system/foundation/typography.dart`
 - Modify: every consumer (grep per name)
 - Modify: `example/test/docs/docs_no_uppercase_test.dart`
 - Test: `test/foundation_type_motion_test.dart`
 
 **Interfaces:**
-- Consumes: Task 3's merged `ElType`.
-- Produces: `ElType.body`, `ElType.bodySm`, `ElType.overline`, `ElType.overlineSm`.
+- Consumes: Task 3's merged `Type`.
+- Produces: `Type.body`, `Type.bodySm`, `Type.overline`, `Type.overlineSm`.
 
 | Now | Becomes | Why | Sites |
 | --- | --- | --- | --- |
@@ -344,24 +344,24 @@ git commit -m "refactor(type): one type class, not two"
 | `label` | `overline` | uppercase eyebrow; collides in meaning with five sentence-case `*Label` members | 53 |
 | `micro` | `overlineSm` | names its size, not its job; it is the smaller rung of the same eyebrow ladder | 24 |
 
-Note the collision this resolves: after the merge, `ElType.body` already exists (the 15px reading size) and `sheetBody` wants that name. **They are different specs.** Read both before merging names — if their values differ, the reading size keeps `body` and `sheetBody` becomes `bodyCompact`. Verify, then pick, and record which you chose in the commit message.
+Note the collision this resolves: after the merge, `Type.body` already exists (the 15px reading size) and `sheetBody` wants that name. **They are different specs.** Read both before merging names — if their values differ, the reading size keeps `body` and `sheetBody` becomes `bodyCompact`. Verify, then pick, and record which you chose in the commit message.
 
 - [ ] **Step 1: Write the failing test**
 
 ```dart
   test('type roles are named for their job', () {
     final String source =
-        File('lib/src/foundation/typography.dart').readAsStringSync();
+        File('lib/src/design_system/foundation/typography.dart').readAsStringSync();
     for (final String gone in <String>['sheetBody', 'textSm', 'micro']) {
       expect(
-        RegExp('ElTypeSpec\\s+$gone\\b').hasMatch(source),
+        RegExp('TypeSpec\\s+$gone\\b').hasMatch(source),
         isFalse,
         reason: '$gone names a size or the wrong component, not a job',
       );
     }
     for (final String present in <String>['bodySm', 'overline', 'overlineSm']) {
       expect(
-        RegExp('ElTypeSpec\\s+$present\\b').hasMatch(source),
+        RegExp('TypeSpec\\s+$present\\b').hasMatch(source),
         isTrue,
         reason: '$present is missing',
       );
@@ -377,9 +377,9 @@ Expected: FAIL.
 - [ ] **Step 3: Rename, one name at a time**
 
 ```bash
-grep -rln "ElType\.textSm" lib example test | xargs sed -i 's/ElType\.textSm/ElType.bodySm/g'
-grep -rln "ElType\.micro"  lib example test | xargs sed -i 's/ElType\.micro/ElType.overlineSm/g'
-grep -rln "ElType\.label"  lib example test | xargs sed -i 's/ElType\.label/ElType.overline/g'
+grep -rln "Type\.textSm" lib example test | xargs sed -i 's/Type\.textSm/Type.bodySm/g'
+grep -rln "Type\.micro"  lib example test | xargs sed -i 's/Type\.micro/Type.overlineSm/g'
+grep -rln "Type\.label"  lib example test | xargs sed -i 's/Type\.label/Type.overline/g'
 ```
 
 `sheetBody` last, after the `body` collision above is settled. Rename the declarations in `typography.dart` too — `sed` over call sites does not touch the definition.
@@ -407,22 +407,22 @@ git commit -m "refactor(type): name the roles for their job"
 ## Task 5: Rename the motion names that lie
 
 **Files:**
-- Modify: `lib/src/foundation/motion.dart`
-- Modify: `lib/src/motion/keyframes.dart`
-- Modify: `lib/src/components/collapsible.dart`, `dialog.dart`, `sidebar.dart`, `icon_swap.dart`, `selection_control.dart`, `message_scroller.dart`
-- Modify: `lib/src/motion/sliding_pill.dart`
+- Modify: `lib/src/design_system/foundation/motion.dart`
+- Modify: `lib/src/components/ui/keyframes.dart`
+- Modify: `lib/src/components/ui/collapsible.dart`, `dialog.dart`, `sidebar.dart`, `icon_swap.dart`, `selection_control.dart`, `message_scroller.dart`
+- Modify: `lib/src/components/ui/active_indicator.dart`
 - Test: `test/foundation_type_motion_test.dart`
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: `ElDurations.open`, `ElDurations.squash`, `ElDurations.scrollFrameBudget`, `ElSquash`.
+- Produces: `Durations.open`, `Durations.squash`, `Durations.scrollFrameBudget`, `Squash`.
 
 | Now | Becomes | Why |
 | --- | --- | --- |
-| `ElDurations.jelly` (420ms) | `open` | dialog opening, collapsible expanding — confirmed at the call sites |
-| `ElDurations.animJelly` (600ms) | `squash` | backs `ElJelly`, the arrival squash shared by sliding_pill, sidebar, icon_swap, selection_control |
-| `ElJelly` | `ElSquash` | same |
-| `ElDurations.frame` (16667µs) | `scrollFrameBudget` | a 60Hz frame budget for smooth-scroll maths, not a duration token |
+| `Durations.jelly` (420ms) | `open` | dialog opening, collapsible expanding — confirmed at the call sites |
+| `Durations.animJelly` (600ms) | `squash` | backs `Jelly`, the arrival squash shared by active_indicator, sidebar, icon_swap, selection_control |
+| `Jelly` | `Squash` | same |
+| `Durations.frame` (16667µs) | `scrollFrameBudget` | a 60Hz frame budget for smooth-scroll maths, not a duration token |
 
 **Not renamed, and this reverses an earlier judgement:** `base` and `transitionDefault` are both 250ms, but `transitionDefault` is the most-used token in the system (29 sites to `base`'s 26), is already job-named, and the two carry different declared CSS sources. Deleting either is churn with no gain.
 
@@ -430,7 +430,7 @@ git commit -m "refactor(type): name the roles for their job"
 
 ```dart
   test('durations are named for what they animate', () {
-    final String source = File('lib/src/foundation/motion.dart').readAsStringSync();
+    final String source = File('lib/src/design_system/foundation/motion.dart').readAsStringSync();
     for (final String gone in <String>['jelly', 'animJelly', 'frame']) {
       expect(
         RegExp('Duration\\s+$gone\\s*=').hasMatch(source),
@@ -464,10 +464,10 @@ Expected: FAIL.
 `animJelly` before `jelly`, or the shorter name's `sed` will corrupt the longer one:
 
 ```bash
-grep -rln "ElDurations\.animJelly" lib example test | xargs sed -i 's/ElDurations\.animJelly/ElDurations.squash/g'
-grep -rln "ElDurations\.jelly"     lib example test | xargs sed -i 's/ElDurations\.jelly/ElDurations.open/g'
-grep -rln "ElDurations\.frame"     lib example test | xargs sed -i 's/ElDurations\.frame/ElDurations.scrollFrameBudget/g'
-grep -rln "\bElJelly\b"            lib example test | xargs sed -i 's/\bElJelly\b/ElSquash/g'
+grep -rln "Durations\.animJelly" lib example test | xargs sed -i 's/Durations\.animJelly/Durations.squash/g'
+grep -rln "Durations\.jelly"     lib example test | xargs sed -i 's/Durations\.jelly/Durations.open/g'
+grep -rln "Durations\.frame"     lib example test | xargs sed -i 's/Durations\.frame/Durations.scrollFrameBudget/g'
+grep -rln "\bElJelly\b"            lib example test | xargs sed -i 's/\bElJelly\b/Squash/g'
 ```
 
 Then the declarations in `motion.dart` and the class in `keyframes.dart`. Update each doc comment: `jelly`'s explains the 420ms overshoot and stays, but must stop calling itself jelly.
@@ -493,26 +493,26 @@ git commit -m "refactor(motion): name the durations for what they animate"
 ## Task 6: Rename the effect classes
 
 **Files:**
-- Rename: `lib/src/effects/foil_value.dart` → `value_shimmer.dart`
-- Rename: `lib/src/effects/sheen_action.dart` → `action_beat.dart`
-- Rename: `lib/src/effects/bloom_cosmic.dart` → `feedback_glow.dart`
-- Modify: `lib/elattar_design_system.dart`, `lib/src/components/button.dart`, `alert.dart`, `toaster.dart`
+- Rename: `lib/src/components/ui/premium_surface.dart` → `value_shimmer.dart`
+- Rename: `lib/src/components/ui/action_feedback.dart` → `action_beat.dart`
+- Rename: `lib/src/components/ui/feedback_surface.dart` → `feedback_glow.dart`
+- Modify: `lib/elattar_design_system.dart`, `lib/src/components/ui/button.dart`, `alert.dart`, `toaster.dart`
 - Modify: `registry/components/*.json` and the example's `components_docs/` directories for each
 - Test: `test/effects_test.dart`
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: `ElValueShimmer`, `ElActionBeat`, `ElFeedbackGlow`.
+- Produces: `ValueShimmer`, `ActionBeat`, `FeedbackGlow`.
 
 | Now | Becomes | Sites |
 | --- | --- | --- |
-| `ElFoilValue` | `ElValueShimmer` | 1 (Button, premium) |
-| `ElSheenAction` | `ElActionBeat` | 1 (Button, default) |
-| `ElBloomCosmic` | `ElFeedbackGlow` | 11 (Alert, Toaster) |
+| `FoilValue` | `ValueShimmer` | 1 (Button, premium) |
+| `SheenAction` | `ActionBeat` | 1 (Button, default) |
+| `BloomCosmic` | `FeedbackGlow` | 11 (Alert, Toaster) |
 
-`ElMediaScrim`, `ElPageGlow` and `ElStarfield` **keep their names** — "scrim", "page glow" and "starfield" each say what the thing is.
+`MediaScrim`, `PageGlow` and `Starfield` **keep their names** — "scrim", "page glow" and "starfield" each say what the thing is.
 
-This task moves files, so the registry item names, the docs directories and the routes move with them. Rule 3: registry name, file name and class name must agree. `foil-value` → `value-shimmer`, `sheen-action` → `action-beat`, `bloom-cosmic` → `feedback-glow`.
+This task moves files, so the registry item names, the docs directories and the routes move with them. Rule 3: registry name, file name and class name must agree. `premium-surface` → `value-shimmer`, `action-feedback` → `action-beat`, `feedback-surface` → `feedback-glow`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -520,12 +520,12 @@ This task moves files, so the registry item names, the docs directories and the 
   test('effects are named for what they do', () {
     final String barrel = File('lib/elattar_design_system.dart').readAsStringSync();
     for (final String gone in <String>[
-      'ElFoilValue', 'ElSheenAction', 'ElBloomCosmic',
+      'FoilValue', 'SheenAction', 'BloomCosmic',
     ]) {
       expect(barrel.contains(gone), isFalse, reason: '$gone still exported');
     }
     for (final String present in <String>[
-      'ElValueShimmer', 'ElActionBeat', 'ElFeedbackGlow',
+      'ValueShimmer', 'ActionBeat', 'FeedbackGlow',
     ]) {
       expect(barrel.contains(present), isTrue, reason: '$present missing');
     }
@@ -540,15 +540,15 @@ Expected: FAIL.
 - [ ] **Step 3: Rename classes, files, registry items and docs pages**
 
 ```bash
-git mv lib/src/effects/foil_value.dart   lib/src/effects/value_shimmer.dart
-git mv lib/src/effects/sheen_action.dart lib/src/effects/action_beat.dart
-git mv lib/src/effects/bloom_cosmic.dart lib/src/effects/feedback_glow.dart
-git mv registry/components/foil-value.json   registry/components/value-shimmer.json
-git mv registry/components/sheen-action.json registry/components/action-beat.json
-git mv registry/components/bloom-cosmic.json registry/components/feedback-glow.json
-git mv example/lib/components_docs/foil_value   example/lib/components_docs/value_shimmer
-git mv example/lib/components_docs/sheen_action example/lib/components_docs/action_beat
-git mv example/lib/components_docs/bloom_cosmic example/lib/components_docs/feedback_glow
+git mv lib/src/components/ui/premium_surface.dart   lib/src/components/ui/value_shimmer.dart
+git mv lib/src/components/ui/action_feedback.dart lib/src/components/ui/action_beat.dart
+git mv lib/src/components/ui/feedback_surface.dart lib/src/components/ui/feedback_glow.dart
+git mv registry/components/premium-surface.json   registry/components/value-shimmer.json
+git mv registry/components/action-feedback.json registry/components/action-beat.json
+git mv registry/components/feedback-surface.json registry/components/feedback-glow.json
+git mv example/lib/components_docs/premium_surface   example/lib/components_docs/value_shimmer
+git mv example/lib/components_docs/action_feedback example/lib/components_docs/action_beat
+git mv example/lib/components_docs/feedback_surface example/lib/components_docs/feedback_glow
 ```
 
 Then the identifiers, the `name:` inside each manifest and each `meta.dart`, the imports, `catalog.dart`, `specs.dart` and `main.dart`'s route map. The docs test files move too.
@@ -574,28 +574,28 @@ git commit -m "refactor(effects): name the effects for what they do"
 
 ---
 
-## Task 7: ElMachineSurface → ElRaisedSurface
+## Task 7: MachineSurface → RaisedSurface
 
 The most-consumed effect in the system: **67 call sites across 38 files**. It is the name a user meets most, and "machine" tells them nothing. Approved explicitly as in-scope.
 
 **Files:**
-- Rename: `lib/src/effects/machine_surface.dart` → `raised_surface.dart`
-- Modify: 24 files under `lib/src/components/`, 3 under `lib/src/effects/`, 14 under `example/lib/`
-- Modify: `registry/components/machine-surface.json` → `raised-surface.json`
-- Modify: `example/lib/components_docs/machine_surface/` → `raised_surface/`
+- Rename: `lib/src/components/ui/surface.dart` → `raised_surface.dart`
+- Modify: 24 files under `lib/src/components/`, 3 under `lib/src/components/ui/`, 14 under `example/lib/`
+- Modify: `registry/components/surface.json` → `raised-surface.json`
+- Modify: `example/lib/components_docs/surface/` → `raised_surface/`
 - Test: `test/machine_surface_test.dart` → `test/raised_surface_test.dart`
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: `ElRaisedSurface`, and `ElRaisedSurfaceSpec` if the spec type is named to match.
+- Produces: `RaisedSurface`, and `RaisedSurfaceSpec` if the spec type is named to match.
 
 - [ ] **Step 1: Write the failing test**
 
 ```dart
   test('the raised surface is named for what it does', () {
     final String barrel = File('lib/elattar_design_system.dart').readAsStringSync();
-    expect(barrel.contains('ElMachineSurface'), isFalse);
-    expect(barrel.contains('ElRaisedSurface'), isTrue);
+    expect(barrel.contains('MachineSurface'), isFalse);
+    expect(barrel.contains('RaisedSurface'), isTrue);
   });
 ```
 
@@ -607,18 +607,18 @@ Expected: FAIL.
 - [ ] **Step 3: Rename mechanically, then read the diff**
 
 ```bash
-git mv lib/src/effects/machine_surface.dart lib/src/effects/raised_surface.dart
+git mv lib/src/components/ui/surface.dart lib/src/components/ui/raised_surface.dart
 git mv test/machine_surface_test.dart test/raised_surface_test.dart
-git mv registry/components/machine-surface.json registry/components/raised-surface.json
-git mv example/lib/components_docs/machine_surface example/lib/components_docs/raised_surface
-grep -rln "MachineSurface\|machine_surface\|machine-surface" lib example test registry tool | \
-  xargs sed -i -e 's/ElMachineSurface/ElRaisedSurface/g' \
-               -e 's/machine_surface/raised_surface/g' \
-               -e 's/machine-surface/raised-surface/g'
+git mv registry/components/surface.json registry/components/raised-surface.json
+git mv example/lib/components_docs/surface example/lib/components_docs/raised_surface
+grep -rln "MachineSurface\|surface\|surface" lib example test registry tool | \
+  xargs sed -i -e 's/MachineSurface/RaisedSurface/g' \
+               -e 's/surface/raised_surface/g' \
+               -e 's/surface/raised-surface/g'
 git diff --stat
 ```
 
-**Then read the diff.** A blind `sed` across 38 files will also rewrite the word inside prose that explains the metaphor. Some of that prose is worth keeping and rewording, not renaming — a doc comment reading "the machine-surface metaphor" becomes nonsense as "the raised-surface metaphor" if the sentence was explaining why it was called that.
+**Then read the diff.** A blind `sed` across 38 files will also rewrite the word inside prose that explains the metaphor. Some of that prose is worth keeping and rewording, not renaming — a doc comment reading "the surface metaphor" becomes nonsense as "the raised-surface metaphor" if the sentence was explaining why it was called that.
 
 - [ ] **Step 4: Run absolutely everything**
 
@@ -644,19 +644,19 @@ git commit -m "refactor(effects): machine surface is a raised surface"
 
 ## Task 8: One glass class, not four
 
-`ElGlassPanel`, `ElGlassPanelClear`, `ElGlassPanelDeep` and `ElGlassControl` take the same three parameters, differ only in fill and blur, and are thin wrappers over one private `_ElGlassSurface`. `ElButton` already solves this shape with one class and a variant enum.
+`GlassVariant.panel`, `GlassVariant.navigation`, `GlassVariant.prominent` and `GlassVariant.control` take the same three parameters, differ only in fill and blur, and are thin wrappers over one private `_GlassSurface`. `Button` already solves this shape with one class and a variant enum.
 
-Only three exist in the source CSS; `ElGlassPanelClear` is a Flutter-only addition. An enum makes that honest instead of implying four co-equal utilities.
+Only three exist in the source CSS; `GlassVariant.navigation` is a Flutter-only addition. An enum makes that honest instead of implying four co-equal utilities.
 
 **Files:**
-- Modify: `lib/src/effects/glass.dart`
+- Modify: `lib/src/components/ui/glass.dart`
 - Modify: `example/lib/showcase/showcase_app.dart`, `showcase_dashboard.dart`, `example/lib/pages/shadows.dart`
 - Modify: `example/lib/components_docs/glass/page.dart`
 - Test: `test/effects_test.dart`
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: `ElGlass({ElGlassVariant variant, BorderRadius radius, EdgeInsets padding, Widget child})` and `enum ElGlassVariant { panel, panelClear, panelDeep, control }`.
+- Produces: `Glass({GlassVariant variant, BorderRadius radius, EdgeInsets padding, Widget child})` and `enum GlassVariant { panel, panelClear, panelDeep, control }`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -664,21 +664,21 @@ Only three exist in the source CSS; `ElGlassPanelClear` is a Flutter-only additi
   test('glass is one class with a variant, like every other family', () {
     final String barrel = File('lib/elattar_design_system.dart').readAsStringSync();
     for (final String gone in <String>[
-      'ElGlassPanelClear', 'ElGlassPanelDeep', 'ElGlassControl',
+      'GlassVariant.navigation', 'GlassVariant.prominent', 'GlassVariant.control',
     ]) {
       expect(barrel.contains(gone), isFalse, reason: '$gone still exported');
     }
-    expect(barrel.contains('ElGlassVariant'), isTrue);
+    expect(barrel.contains('GlassVariant'), isTrue);
   });
 
   testWidgets('each variant paints its own fill', (WidgetTester tester) async {
-    for (final ElGlassVariant variant in ElGlassVariant.values) {
+    for (final GlassVariant variant in GlassVariant.values) {
       await tester.pumpWidget(
-        ElTheme(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+        Theme(
+          controller: ThemeController(mode: ThemeMode.dark),
           child: Directionality(
             textDirection: TextDirection.ltr,
-            child: ElGlass(variant: variant, child: const SizedBox(height: 40)),
+            child: Glass(variant: variant, child: const SizedBox(height: 40)),
           ),
         ),
       );
@@ -691,13 +691,13 @@ Only three exist in the source CSS; `ElGlassPanelClear` is a Flutter-only additi
 - [ ] **Step 2: Run it to make sure it fails**
 
 Run: `wsl.exe -d Ubuntu-24.04 -- bash -c "FT_ID=n8 ft root test test/effects_test.dart"`
-Expected: FAIL — `ElGlassVariant` undefined.
+Expected: FAIL — `GlassVariant` undefined.
 
 - [ ] **Step 3: Collapse the four**
 
-Add the enum, give `ElGlass` a `variant` parameter defaulting to `ElGlassVariant.panel`, and move each old class's fill/blur/shadow choice into a switch over the enum — reading the values off the existing classes, not re-deriving them. Delete the three extra classes.
+Add the enum, give `Glass` a `variant` parameter defaulting to `GlassVariant.panel`, and move each old class's fill/blur/shadow choice into a switch over the enum — reading the values off the existing classes, not re-deriving them. Delete the three extra classes.
 
-Document on `ElGlassVariant.panelClear` that it has no counterpart in the reference CSS, which its own former class name concealed.
+Document on `GlassVariant.panelClear` that it has no counterpart in the reference CSS, which its own former class name concealed.
 
 - [ ] **Step 4: Run the tests**
 
@@ -722,23 +722,23 @@ git commit -m "refactor(glass): one class and a variant, like every other family
 Two items where the registry name, the file name and the class name disagree.
 
 **Files:**
-- Modify: `registry/motion/press.json` (item name `press-motion` → `press`)
-- Modify: `lib/src/motion/sliding_pill.dart` (`ElSlidingPillGroup` → `ElSlidingPill`)
-- Modify: `example/lib/components_docs/press_motion/` → `press/`
+- Modify: `registry/components/press.json` (item name `press` → `press`)
+- Modify: `lib/src/components/ui/active_indicator.dart` (`SlidingPillGroup` → `SlidingPill`)
+- Modify: `example/lib/components_docs/press/` → `press/`
 - Modify: `catalog.dart`, `specs.dart`, `main.dart`, the meta and page files
 - Test: `test/registry_naming_test.dart` (create)
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: registry item `press`; class `ElSlidingPill`.
+- Produces: registry item `press`; class `SlidingPill`.
 
 - [ ] **Step 1: Write the failing test**
 
 ```dart
 // test/registry_naming_test.dart
 /// A registry item, the file that implements it and the class it exports must
-/// agree. `press-motion` / `press.dart` / `ElPress` was three names for one
-/// thing, and `sliding-pill` / `sliding_pill.dart` / `ElSlidingPillGroup` was
+/// agree. `press` / `press.dart` / `Press` was three names for one
+/// thing, and `active-indicator` / `active_indicator.dart` / `SlidingPillGroup` was
 /// a fourth shape again.
 library;
 
@@ -773,15 +773,15 @@ This test will surface every mismatch, not only the two known ones. Some may be 
 - [ ] **Step 2: Run it to make sure it fails**
 
 Run: `wsl.exe -d Ubuntu-24.04 -- bash -c "FT_ID=n9 ft root test test/registry_naming_test.dart"`
-Expected: FAIL, listing `press-motion` and any others.
+Expected: FAIL, listing `press` and any others.
 
 - [ ] **Step 3: Rename**
 
 ```bash
-git mv registry/motion/press-motion.json registry/motion/press.json 2>/dev/null || true
-git mv example/lib/components_docs/press_motion example/lib/components_docs/press
-grep -rln "press-motion" lib example registry tool | xargs sed -i 's/press-motion/press/g'
-grep -rln "ElSlidingPillGroup" lib example test | xargs sed -i 's/ElSlidingPillGroup/ElSlidingPill/g'
+git mv registry/components/press.json registry/components/press.json 2>/dev/null || true
+git mv example/lib/components_docs/press example/lib/components_docs/press
+grep -rln "press" lib example registry tool | xargs sed -i 's/press/press/g'
+grep -rln "SlidingPillGroup" lib example test | xargs sed -i 's/SlidingPillGroup/SlidingPill/g'
 ```
 
 - [ ] **Step 4: Run the tests**
@@ -804,7 +804,7 @@ git commit -m "refactor(registry): one name per thing"
 
 ## Task 10: Categories a user can guess
 
-`effect` holds nine unrelated things, `motion` holds five, and `icon-swap` is filed as a `component`. `sheen-action` (an interaction animation) sits under `effect` while `lift` (also an interaction animation) sits under `motion`.
+`effect` holds nine unrelated things, `motion` holds five, and `icon-swap` is filed as a `component`. `action-feedback` (an interaction animation) sits under `effect` while `lift` (also an interaction animation) sits under `motion`.
 
 **Files:**
 - Modify: every `registry/{components,effects,motion}/*.json` whose `type` changes
@@ -820,10 +820,10 @@ git commit -m "refactor(registry): one name per thing"
 | Category | Items |
 | --- | --- |
 | `surface` | glass, raised-surface, media-scrim, **value-shimmer** |
-| `atmosphere` | page-glow, starfield, feedback-glow |
-| `interaction` | action-beat, lift, press, sliding-pill, swap-in, icon-swap |
+| `atmosphere` | background-effect, starfield, feedback-glow |
+| `interaction` | action-beat, lift, press, active-indicator, content-change, icon-swap |
 | `primitive` | keyframes |
-| `component` | voice-orb (moves **out** of effect), and the existing 84 |
+| `component` | voice-indicator (moves **out** of effect), and the existing 84 |
 
 `value-shimmer` goes to **surface**, decided explicitly: it paints a container's fill like glass and raised-surface do, and its perpetual drift is a property of that surface rather than a response to the user.
 
@@ -836,17 +836,17 @@ git commit -m "refactor(registry): one name per thing"
       'raised-surface': 'surface',
       'media-scrim': 'surface',
       'value-shimmer': 'surface',
-      'page-glow': 'atmosphere',
+      'background-effect': 'atmosphere',
       'starfield': 'atmosphere',
       'feedback-glow': 'atmosphere',
       'action-beat': 'interaction',
       'lift': 'interaction',
       'press': 'interaction',
-      'sliding-pill': 'interaction',
-      'swap-in': 'interaction',
+      'active-indicator': 'interaction',
+      'content-change': 'interaction',
       'icon-swap': 'interaction',
       'keyframes': 'primitive',
-      'voice-orb': 'component',
+      'voice-indicator': 'component',
     };
     final Map<String, Object?> registry = jsonDecode(
       File('registry/generated/latest/registry.json').readAsStringSync(),
@@ -934,9 +934,9 @@ This step exists because a green suite has already shipped four visible defects 
 ## Out of scope
 
 - `el(n)` — 3,749 call sites, mnemonic documented, no rename earns that.
-- `ElWidths`, `ElRadii`, `ElBreakpoints`, `ElContainers`, `ElShadows` — audited and found correct. An earlier claim that `ElWidths` mixed border widths with layout widths was **wrong**: there is no `ElWidths.md`. The `md = 10` is `ElRadii.md`, a corner radius, correctly placed.
-- `ElDurations.base` / `transitionDefault` — same value, both kept. See Task 5.
-- `ElPalette`'s ramp names — the raw layer, documented as theme-independent by design.
+- `Widths`, `Radii`, `Breakpoints`, `Containers`, `Shadows` — audited and found correct. An earlier claim that `Widths` mixed border widths with layout widths was **wrong**: there is no `Widths.md`. The `md = 10` is `Radii.md`, a corner radius, correctly placed.
+- `Durations.base` / `transitionDefault` — same value, both kept. See Task 5.
+- `Palette`'s ramp names — the raw layer, documented as theme-independent by design.
 - The charts gallery and the six site fixes — separate spec,
   `docs/superpowers/specs/2026-08-26-charts-and-site-fixes-design.md`.
 
@@ -944,5 +944,5 @@ This step exists because a green suite has already shipped four visible defects 
 
 - **Task 7 is the dangerous one.** 67 sites, 38 files, and a mechanical `sed` that will also hit prose explaining the old metaphor. Read the diff before committing.
 - **Renames change the registry payloads.** Every task rebuilds it; Task 11 Step 2 proves reproducibility. A task that forgets leaves CI red.
-- **`ElType.body` may already be taken** when `sheetBody` wants that name. Task 4 says to check the two specs' values before choosing, rather than assuming they are the same.
+- **`Type.body` may already be taken** when `sheetBody` wants that name. Task 4 says to check the two specs' values before choosing, rather than assuming they are the same.
 - **The docs app is a consumer.** 99 component pages reference these names, so `ft example test` is not optional in any task.

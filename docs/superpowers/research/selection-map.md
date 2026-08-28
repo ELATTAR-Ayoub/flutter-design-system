@@ -4,7 +4,7 @@
 
 **Files that produce the render** (all under `D:\DESIGN\Design-System-2026-8\design-system\`):
 - `app\design-system\components\base\selection\page.tsx` — the page. **`"use client"`**, 367 lines, **two** `useState`s (`price`, `odds`), no page-local components at all. Every specimen is inline JSX.
-- `components\el\kit.tsx` — `ElPageHeader`, `ElSection`, `Panel`, `StateGrid` (:145), `StateCell` (:173), `Meta` (:202), `Code`, `DoDont`, `Note`, `PageFootNav`.
+- `components\el\kit.tsx` — `PageHeader`, `Section`, `Panel`, `StateGrid` (:145), `StateCell` (:173), `Meta` (:202), `Code`, `DoDont`, `Note`, `PageFootNav`.
 - `components\ui\checkbox.tsx` (77 lines) · `radio-group.tsx` (70) · `switch.tsx` (65) — the three the port already ships.
 - `components\ui\slider.tsx` (84 lines) — **the fourth family, and the one the port does not have.**
 - `components\ui\use-replay-on-state-change.ts` (43 lines) — the jelly hook, imported by the first three and **not** by `Slider`.
@@ -44,7 +44,7 @@ Per-section heights *(probed, 1440 frame)* — useful for bisecting a vertical-p
 
 ---
 
-## 1 · Page header (`ElPageHeader`)
+## 1 · Page header (`PageHeader`)
 
 `<header class="mb-14 border-b border-border pb-10">`, fed from `nav.ts:194–199`.
 
@@ -54,7 +54,7 @@ Per-section heights *(probed, 1440 frame)* — useful for bisecting a vertical-p
 4. Chips from `category.contents`, verbatim, in order:
    **Checkbox · Radio Group · Switch · Slider · Range Slider**
 
-**Five chips, six sections, and the fifth chip names no section.** On `forms` the chips *were* the section titles. Here `Range Slider` is a chip with no `ElSection`, and `API`/`Rules` are sections with no chip. See §14 drift 1.
+**Five chips, six sections, and the fifth chip names no section.** On `forms` the chips *were* the section titles. Here `Range Slider` is a chip with no `Section`, and `API`/`Rules` are sections with no chip. See §14 drift 1.
 
 `example\lib\nav.dart:256–267` already carries all five contents byte-for-byte.
 
@@ -62,7 +62,7 @@ Per-section heights *(probed, 1440 frame)* — useful for bisecting a vertical-p
 
 ## 2 · Section inventory (verbatim)
 
-Six `ElSection`s, `PageFootNav` last. Shell: `<section id class="mb-20">`; `<h2 class="type-h3">`; description `type-small mt-2 max-w-2xl`.
+Six `Section`s, `PageFootNav` last. Shell: `<section id class="mb-20">`; `<h2 class="type-h3">`; description `type-small mt-2 max-w-2xl`.
 
 | # | `id` | title | description (verbatim) |
 |---|---|---|---|
@@ -70,7 +70,7 @@ Six `ElSection`s, `PageFootNav` last. Shell: `<section id class="mb-20">`; `<h2 
 | 2 | `radio` | **Radio Group** | One choice from a set the user can see at once. If the options need explaining, the description belongs inside the option, not beneath the group. |
 | 3 | `switch` | **Switch** | Only for settings that take effect the moment they are flipped. If there is a Save button on the screen, use a checkbox instead. |
 | 4 | `slider` | **Slider** | Ranges. The current value is always shown as a number beside the track — a slider without a readout is guesswork. |
-| 5 | `api` | **API** | *(none — `ElSection` with no `description` prop)* |
+| 5 | `api` | **API** | *(none — `Section` with no `description` prop)* |
 | 6 | `rules` | **Rules** | *(none)* |
 
 §4's description carries **U+2014**.
@@ -103,11 +103,11 @@ Per-section children, in DOM order:
 | 3 | 4 | `268.75 × 4` | 124.50 |
 | 4 | **3** | `358.656 358.672 358.656` | 124.50 |
 
-*(The 6-col row carries one 178.844 column — Chrome's sub-pixel distribution of 1080 − 5 gaps over six tracks. `ElGrid` must round the same way or the lattice drifts.)*
+*(The 6-col row carries one 178.844 column — Chrome's sub-pixel distribution of 1080 − 5 gaps over six tracks. `Grid` must round the same way or the lattice drifts.)*
 
 `StateCell` (`kit.tsx:173`), 6-col instance *(probed)*: **178.83 × 142.67**, `bg-background` (`rgb(9,9,11)` dark), `p-5` = **20px**. Stage `mb-4 flex min-h-14 items-center justify-center` → **56px** min-height, **16px** below, 138.83 wide. Label `type-micro text-center text-muted-foreground` → **10.5px / 10.5px / 600 / letter-spacing 1.89px / uppercase** *(probed)*. Note `type-caption mt-1.5 text-center text-muted-foreground` → 10.5 / 1.35 / 500, 6px above.
 
-**`ElStateGrid` already supports `cols: 6` and `cols: 3`** (`example\lib\kit.dart:503`, the switch maps 2/3/4/5 and falls through to 6). Nothing to add.
+**`StateGrid` already supports `cols: 6` and `cols: 3`** (`example\lib\kit.dart:503`, the switch maps 2/3/4/5 and falls through to 6). Nothing to add.
 
 ---
 
@@ -124,11 +124,11 @@ Per-section children, in DOM order:
 | 5 | **Disabled** | — | `disabled` | opacity **0.5** | static |
 | 6 | **Disabled checked** | — | `disabled defaultChecked` | lit skin at opacity **0.5** | static |
 
-**Cell 3 is controlled with no `onCheckedChange`.** Radix holds it at the prop value, so it never changes — but it carries no `disabled`, so it is **fully opaque and still focusable**. The port has no spelling for this: `ElCheckbox(onChanged: null)` drives `_enabled == false` in `ElSelectionControl` (`selection_control.dart:299`), which applies `Opacity(0.5)` **and** `IgnorePointer`. Rendering this cell today would dim a box the reference renders at full strength. **Gap 2 in §12.**
+**Cell 3 is controlled with no `onCheckedChange`.** Radix holds it at the prop value, so it never changes — but it carries no `disabled`, so it is **fully opaque and still focusable**. The port has no spelling for this: `Checkbox(onChanged: null)` drives `_enabled == false` in `SelectionControl` (`selection_control.dart:299`), which applies `Opacity(0.5)` **and** `IgnorePointer`. Rendering this cell today would dim a box the reference renders at full strength. **Gap 2 in §12.**
 
 **Cell 4 is a lie painted with class names.** `cn()` is `extendTailwindMerge` (`lib\utils.ts`), and `border-input` / `border-ring` are one `border-color` group, so tw-merge **deletes `border-input` from the string entirely** — confirmed by probing `el.className`, which reads `… border-ring ring-3 ring-ring/50` with no `border-input`. Nothing is focused; the ring is a permanent box-shadow. Two such cells exist on the page (checkbox and radio), and **Flutter cannot have two genuinely-focused controls at once**, so the port needs a way to paint the ring without owning focus. **Gap 3 in §12.**
 
-*(Ring composition, measured: `.shadow-pressed` @92704 sets `--tw-shadow`; `.ring-3` @94521 sets `--tw-ring-shadow`; both emit the same five-slot `box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)`. The ring is **added to** the socket, never replacing it — exactly what `ElButton.withFocusRing` already does.)*
+*(Ring composition, measured: `.shadow-pressed` @92704 sets `--tw-shadow`; `.ring-3` @94521 sets `--tw-ring-shadow`; both emit the same five-slot `box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)`. The ring is **added to** the socket, never replacing it — exactly what `Button.withFocusRing` already does.)*
 
 ### 4.2 · §2 Radio Group, `cols={4}` (`page.tsx:151–176`)
 
@@ -141,7 +141,7 @@ Each cell wraps its item in **its own `<RadioGroup>`** — four independent grou
 | 3 | **Focus** | `className="border-ring ring-3 ring-ring/50"` | border `rgb(146,194,252)` | **STATIC FAKE** |
 | 4 | **Disabled** | `disabled` on the item | opacity **0.5** | static |
 
-The `RadioGroup` root is `grid w-full gap-2`, so inside a 138.83px stage it renders **228.75 × 20** *(probed — it fills the cell's content box and the item stays 20px)*. `ElRadioGroup` already reproduces this with loose constraints (`radio.dart:239–243`).
+The `RadioGroup` root is `grid w-full gap-2`, so inside a 138.83px stage it renders **228.75 × 20** *(probed — it fills the cell's content box and the item stays 20px)*. `RadioGroup` already reproduces this with loose constraints (`radio.dart:239–243`).
 
 No cell passes `aria-label` to the group; each item carries its own.
 
@@ -189,7 +189,7 @@ FieldSet className="max-w-sm"          → 384 × 164.56, gap 16px   (probed)
 | Coming soon | 6 packs | false |
 | Sold out | 41 packs | false |
 
-`FieldLabel` here is **weight 400** *(probed: `fontWeight: "400"`, colour `rgb(250,250,250)` = `--foreground`, 13px / 17.875px)* because of `className="font-normal"` overriding Label's `font-medium`. `ElFieldLabel` (`field.dart:503`) renders `ElText(text, ElComponentType.fieldLabel)` with **no weight override** — **gap 4 in §12**.
+`FieldLabel` here is **weight 400** *(probed: `fontWeight: "400"`, colour `rgb(250,250,250)` = `--foreground`, 13px / 17.875px)* because of `className="font-normal"` overriding Label's `font-medium`. `FieldLabel` (`field.dart:503`) renders `Text(text, ComponentType.fieldLabel)` with **no weight override** — **gap 4 in §12**.
 
 Count column: `type-num-sm` = **12px / 14.4px / 600 / GeistMono / letter-spacing −0.12px / `--muted-foreground`** *(probed)*.
 
@@ -260,7 +260,7 @@ Trailing `<p class="type-small mt-5">`:
 
 **The circle is 20px, not 16.** Drift 2.
 
-**This is the first hover state in the family.** `ElSelectionControl`'s own doc comment states *"No control on this page authors a hover state (forms-map §8.2), so the cursor is the only thing a pointer changes"* (`selection_control.dart:404–406`). That remains true of the **controls**; the **card around one** does author hover. **Gap 6 in §12.**
+**This is the first hover state in the family.** `SelectionControl`'s own doc comment states *"No control on this page authors a hover state (forms-map §8.2), so the cursor is the only thing a pointer changes"* (`selection_control.dart:404–406`). That remains true of the **controls**; the **card around one** does author hover. **Gap 6 in §12.**
 
 ### 5.4 · §3 "Notification preferences" (`page.tsx:228–245`)
 
@@ -401,11 +401,11 @@ The transition utilities all fall back:
 
 **`forms-map.md` §8.3 records `Checkbox`, `RadioGroupItem` at "150ms (`--duration-fast`)". That is wrong** — it reads the class name rather than the cascade. The port took it at face value:
 
-- `lib\src\components\checkbox.dart:238` — `duration: ElDurations.fast`
-- `lib\src\components\radio.dart:418` — `duration: ElDurations.fast`
-- `test\selection_feedback_test.dart:104, 217, 351` — `await t.pump(ElDurations.fast)`
+- `lib\src\components\ui\checkbox.dart:238` — `duration: Durations.fast`
+- `lib\src\components\ui\radio.dart:418` — `duration: Durations.fast`
+- `test\selection_feedback_test.dart:104, 217, 351` — `await t.pump(Durations.fast)`
 
-**Both shipped painters run their colour/shadow transition at 150ms where the browser runs 250ms.** `ElSwitch` is unaffected (`ElDurations.base` == 250ms == the fallback, by coincidence). This is a phase-3 defect surfaced by this page, not a new-page requirement. **Gap 1 in §12; ruling requested in §15 Q1.**
+**Both shipped painters run their colour/shadow transition at 150ms where the browser runs 250ms.** `Switch` is unaffected (`Durations.base` == 250ms == the fallback, by coincidence). This is a phase-3 defect surfaced by this page, not a new-page requirement. **Gap 1 in §12; ruling requested in §15 Q1.**
 
 ### 7.2 · Full inventory
 
@@ -429,9 +429,9 @@ dash-draw   from { stroke-dashoffset: 12 } to { stroke-dashoffset: 0 }
 dot-pop     0% scale(0) opacity 0 · 55% scale(1.35) opacity 1 · 100% scale(1) opacity 1
 yuki-jelly  0% (1,1,1) · 30% (1.18,.82,1) · 45% (.88,1.12,1) · 60% (1.06,.94,1) · 78% (.98,1.02,1) · 100% (1,1,1)
 ```
-All four already live in the port as `ElCheckDraw` / `ElDashDraw` / `ElDotPop` / `ElJelly` (`foundation\motion.dart:124, 130, 138, 71`) at the right numbers. **Only the two socket transitions are wrong.**
+All four already live in the port as `CheckDraw` / `DashDraw` / `DotPop` / `Jelly` (`foundation\motion.dart:124, 130, 138, 71`) at the right numbers. **Only the two socket transitions are wrong.**
 
-Reduced motion: `globals.css:2534–2542` collapses everything on `*, *::before, *::after`. The port routes this through `elAnimationDuration(context, …)`, already wired in `ElSelectionControl` and `_Thumb`.
+Reduced motion: `globals.css:2534–2542` collapses everything on `*, *::before, *::after`. The port routes this through `elAnimationDuration(context, …)`, already wired in `SelectionControl` and `_Thumb`.
 
 ---
 
@@ -539,7 +539,7 @@ Type classes consumed: `type-h1`, `type-h3`, `type-lead`, `type-small`, `type-ch
 
 Radii: `sm` 6 (checkbox), `lg` 12 (StateGrid, cards, bulk list, Note, Meta), `pill` 999 (switch track, slider track), `full` (radio, thumbs).
 
-**All three of `ElType.h4`, `ElType.numBase`, `ElType.numSm` already exist** (`foundation\typography.dart:604`, `:794`, `:783`). No new type specs.
+**All three of `Type.h4`, `Type.numBase`, `Type.numSm` already exist** (`foundation\typography.dart:604`, `:794`, `:783`). No new type specs.
 
 ---
 
@@ -551,19 +551,19 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 
 | need | where |
 |---|---|
-| `ElCheckbox` incl. tri-state, drawn tick/dash, `nextAfter` | `lib\src\components\checkbox.dart:98` |
-| `ElRadioGroup` / `ElRadioGroupItem` incl. roving tabindex, arrow-wrap, dot-pop | `lib\src\components\radio.dart:102`, `:288` |
-| `ElSwitch` incl. two sizes, recessed track / raised knob, spring thumb | `lib\src\components\switch.dart:83` |
-| `ElSelectionControl`, `ElHitArea`, `ElJellyReplay` | `lib\src\components\selection_control.dart:217`, `:76`, `:144` |
-| `ElFieldScope` / `ElFieldActivator` (label-for **activation**) | `lib\src\components\field.dart:95`, `:85` |
-| `ElFieldGroup` (20px) · `ElFieldSet` (16/12 + legend special-case) · `ElFieldLegend` · `ElField` horizontal · `ElFieldDescription` | `field.dart:156`, `:190`, `:247`, `:291`, `:604` |
-| `ElStateGrid` — **`cols: 6` and `cols: 3` already mapped** | `example\lib\kit.dart:503` |
-| `ElStateCell`, `ElPanel`, `ElNote`(+tone), `ElMeta`, `ElDoDont`, `ElCode`, `ElPageHeader`, `ElSection`, `ElPageFootNav` | `example\lib\kit.dart:587, 242, 1124, 679, 1025, 737, 54, 148, 1446` |
-| `ElShadows.pressed / btn / btnPrimary / e1` | `lib\src\foundation\shadows.dart` |
-| `ElCheckDraw` 280 · `ElDashDraw` 200 · `ElDotPop` 320 · `ElJelly` 600 | `lib\src\foundation\motion.dart:124, 130, 138, 71` |
-| `ElType.h4 / numBase / numSm / label / micro / caption / small` | `lib\src\foundation\typography.dart:604, 794, 783, 680, 723, 663, 629` |
-| `theme.muted / mutedForeground / actionInk / valueInk / input / ring / primary / card / background / border` | `lib\src\foundation\theme.dart` |
-| `ElPalette.action` = `hsl(217 91% 53%)` | `lib\src\foundation\colors.dart:311` |
+| `Checkbox` incl. tri-state, drawn tick/dash, `nextAfter` | `lib\src\components\ui\checkbox.dart:98` |
+| `RadioGroup` / `RadioGroupItem` incl. roving tabindex, arrow-wrap, dot-pop | `lib\src\components\ui\radio.dart:102`, `:288` |
+| `Switch` incl. two sizes, recessed track / raised knob, spring thumb | `lib\src\components\ui\switch.dart:83` |
+| `SelectionControl`, `HitArea`, `JellyReplay` | `lib\src\components\ui\selection_control.dart:217`, `:76`, `:144` |
+| `FieldScope` / `FieldActivator` (label-for **activation**) | `lib\src\components\ui\field.dart:95`, `:85` |
+| `FieldGroup` (20px) · `FieldSet` (16/12 + legend special-case) · `FieldLegend` · `Field` horizontal · `FieldDescription` | `field.dart:156`, `:190`, `:247`, `:291`, `:604` |
+| `StateGrid` — **`cols: 6` and `cols: 3` already mapped** | `example\lib\kit.dart:503` |
+| `StateCell`, `Panel`, `Note`(+tone), `Meta`, `DoDont`, `Code`, `PageHeader`, `Section`, `PageFootNav` | `example\lib\kit.dart:587, 242, 1124, 679, 1025, 737, 54, 148, 1446` |
+| `Shadows.inset / btn / btnPrimary / e1` | `lib\src\design_system\foundation\shadows.dart` |
+| `CheckDraw` 280 · `DashDraw` 200 · `DotPop` 320 · `Jelly` 600 | `lib\src\design_system\foundation\motion.dart:124, 130, 138, 71` |
+| `Type.h4 / numBase / numSm / label / micro / caption / small` | `lib\src\design_system\foundation\typography.dart:604, 794, 783, 680, 723, 663, 629` |
+| `theme.muted / mutedForeground / actionText / premiumText / input / ring / primary / card / background / border` | `lib\src\design_system\foundation\theme.dart` |
+| `Palette.action` = `hsl(217 91% 53%)` | `lib\src\design_system\foundation\colors.dart:311` |
 | Nav entry for `selection` — slug/title/blurb/5 contents, verbatim | `example\lib\nav.dart:256–267` |
 
 **The three shipped controls need no structural work.** This is a page-build plus one new component plus four pinned-state gaps.
@@ -572,14 +572,14 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 
 | # | item | notes |
 |---|---|---|
-| 1 | **Checkbox and Radio socket duration is 150ms; the reference renders 250ms** | *(probed, §7.1)* Fix `checkbox.dart:238` and `radio.dart:418` to `ElDurations.base`, and the three `t.pump(ElDurations.fast)` calls at `test\selection_feedback_test.dart:104, 217, 351`. Also correct `forms-map.md` §8.3. **A painter-timing change → re-pin rendered pixels + keep the browser probe on record.** |
-| 2 | **"Controlled, no handler, not disabled"** | Matrix cell 3 and bulk row 1. Today `ElCheckbox(onChanged: null)` → `_enabled == false` → `Opacity(0.5)` + `IgnorePointer` (`selection_control.dart:299, 411–414`). The reference paints opacity **1**. Needs a third state distinct from both "operable" and "disabled" — e.g. `ElCheckbox.onChanged: null` staying undimmed while `enabled: false` dims, which is the split `ElSwitch` already documents at `switch.dart:104–107` but `ElSelectionControl` collapses. |
-| 3 | **A way to paint the focus ring without owning focus** | Two "Focus" cells on one page; Flutter has one focus. `ElSelectionControl` derives the ring from its private `_focused` (`:297`, `:324–341`) with no external override. Needs something like `focusRing: bool?` forcing `_borderTarget`/`_ringTarget`. Affects `ElCheckbox` and `ElRadioGroupItem` signatures. |
-| 4 | **`ElFieldLabel` weight override** | Filter list passes `font-normal` → **400** *(probed)*. `field.dart:503` renders `ElText(text, ElComponentType.fieldLabel)` (500) with no hook. |
-| 5 | **`ElSlider`** | The whole component — §6. Track 10px pill on `shadow-pressed`, Range 8px `--action-ink` on `shadow-btn-primary`, 20px thumbs on `shadow-btn`, single **and** range values, drag + keyboard, `hover:scale-110`, `active:scale-125`, `focus-visible:ring-3` at `ring/50`, 36 × 36 hit area, `data-disabled:opacity-50` on the root, **no jelly**, and the two-coordinate-space positioning formula. New painter → rendered-pixel pins + browser probe mandatory. |
-| 6 | **A hover state in this family** | The withdrawal card hovers `border-input`; `ElSelectionControl` deliberately authors none. The hover belongs to the **card**, not the control, so it can live in the page or in a new card widget — but it is the first one. |
-| 7 | **A selectable option card** | Whole-card target wrapping a radio, with `has-[[data-state=checked]]` border + tint. `ElFieldActivator` already carries "a tap on the label selects the item" for a radio in its own nested field (`radio.dart:394`), so the wiring exists; the **card skin** (16px pad, 12px gap, 12 radius, items-start, 250ms colour transition, hover) does not. |
-| 8 | **A tinted-row gapped list** | Bulk header: `space-y-px` inside a bordered, radiused, **background-less** container, so the 1px seams show the *parent*'s fill. **`ElDividedList` (`example\lib\kit.dart:1580`) cannot be reused** — verified: it fills with `theme.card` and draws each seam as a `border-top` **on the row** (`divide-y` semantics). That paints a `--border` hairline over an opaque card; the reference paints nothing and lets `--background` show. Needs a sibling widget — transparent fill, 1px **gaps**, per-row background supplied by the caller. |
+| 1 | **Checkbox and Radio socket duration is 150ms; the reference renders 250ms** | *(probed, §7.1)* Fix `checkbox.dart:238` and `radio.dart:418` to `Durations.base`, and the three `t.pump(Durations.fast)` calls at `test\selection_feedback_test.dart:104, 217, 351`. Also correct `forms-map.md` §8.3. **A painter-timing change → re-pin rendered pixels + keep the browser probe on record.** |
+| 2 | **"Controlled, no handler, not disabled"** | Matrix cell 3 and bulk row 1. Today `Checkbox(onChanged: null)` → `_enabled == false` → `Opacity(0.5)` + `IgnorePointer` (`selection_control.dart:299, 411–414`). The reference paints opacity **1**. Needs a third state distinct from both "operable" and "disabled" — e.g. `Checkbox.onChanged: null` staying undimmed while `enabled: false` dims, which is the split `Switch` already documents at `switch.dart:104–107` but `SelectionControl` collapses. |
+| 3 | **A way to paint the focus ring without owning focus** | Two "Focus" cells on one page; Flutter has one focus. `SelectionControl` derives the ring from its private `_focused` (`:297`, `:324–341`) with no external override. Needs something like `focusRing: bool?` forcing `_borderTarget`/`_ringTarget`. Affects `Checkbox` and `RadioGroupItem` signatures. |
+| 4 | **`FieldLabel` weight override** | Filter list passes `font-normal` → **400** *(probed)*. `field.dart:503` renders `Text(text, ComponentType.fieldLabel)` (500) with no hook. |
+| 5 | **`Slider`** | The whole component — §6. Track 10px pill on `shadow-pressed`, Range 8px `--action-ink` on `shadow-btn-primary`, 20px thumbs on `shadow-btn`, single **and** range values, drag + keyboard, `hover:scale-110`, `active:scale-125`, `focus-visible:ring-3` at `ring/50`, 36 × 36 hit area, `data-disabled:opacity-50` on the root, **no jelly**, and the two-coordinate-space positioning formula. New painter → rendered-pixel pins + browser probe mandatory. |
+| 6 | **A hover state in this family** | The withdrawal card hovers `border-input`; `SelectionControl` deliberately authors none. The hover belongs to the **card**, not the control, so it can live in the page or in a new card widget — but it is the first one. |
+| 7 | **A selectable option card** | Whole-card target wrapping a radio, with `has-[[data-state=checked]]` border + tint. `FieldActivator` already carries "a tap on the label selects the item" for a radio in its own nested field (`radio.dart:394`), so the wiring exists; the **card skin** (16px pad, 12px gap, 12 radius, items-start, 250ms colour transition, hover) does not. |
+| 8 | **A tinted-row gapped list** | Bulk header: `space-y-px` inside a bordered, radiused, **background-less** container, so the 1px seams show the *parent*'s fill. **`DividedList` (`example\lib\kit.dart:1580`) cannot be reused** — verified: it fills with `theme.card` and draws each seam as a `border-top` **on the row** (`divide-y` semantics). That paints a `--border` hairline over an opaque card; the reference paints nothing and lets `--background` show. Needs a sibling widget — transparent fill, 1px **gaps**, per-row background supplied by the caller. |
 | 9 | **`example\lib\pages\selection.dart`** + a route arm | `example\lib\main.dart:157–167` routes 10 pages; `selection` falls to `PlaceholderPage` (`:177–184`). |
 | 10 | **`_referenceHeight['selection'] = 4252.14`** | `example\test\vertical_parity_probe_test.dart:56–64`. Measured on `main > div.mx-auto.max-w-(--width-content)` at 1440 × 900, **identical light and dark**, page fully idle. Unlike `forms`, nothing here changes height with state *provided* the pump does not drag a slider or toggle a live control — the matrices' live cells all keep their box size, so one plain `pump` is enough. |
 | 11 | Page test + wrap-parity entry | Model on `example\test\forms_page_test.dart` / `wrap_parity_probe_test.dart`. |
@@ -588,9 +588,9 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`.
 
 `test\token_guard_test.dart:40–53` (raw text scan, comments included; escape hatch `allow-hardcoded: <reason>` anywhere on the line).
 
-- **No new durations needed.** 250 is `ElDurations.base`; 280/200/320/600 already exist. The §12.2-1 fix *removes* a literal rather than adding one.
-- **`ElSlider` adds three scalars**: `hover:scale-110` → 1.10, `active:scale-125` → 1.25, and `translateX(-50%)` → 0.5. The first two belong beside `ElTransforms` in `foundation\motion.dart` (the file already holds `ElDotPop`'s 1.35); the third is arithmetic, not a token.
-- Slider sizes are all `el()` multiples: track `h-2.5` = `el(2.5)`, thumb `size-5` = `el(5)`, hit `-inset-2` = `el(2)`. Radius `pill` and `full` are `ElRadii`.
+- **No new durations needed.** 250 is `Durations.base`; 280/200/320/600 already exist. The §12.2-1 fix *removes* a literal rather than adding one.
+- **`Slider` adds three scalars**: `hover:scale-110` → 1.10, `active:scale-125` → 1.25, and `translateX(-50%)` → 0.5. The first two belong beside `Transforms` in `foundation\motion.dart` (the file already holds `DotPop`'s 1.35); the third is arithmetic, not a token.
+- Slider sizes are all `el()` multiples: track `h-2.5` = `el(2.5)`, thumb `size-5` = `el(5)`, hit `-inset-2` = `el(2)`. Radius `pill` and `full` are `Radii`.
 - The `(50 − P) × thumbSize / 100` formula's `50` and `100` are percentage arithmetic — no rule matches them, but write them as named locals so the derivation survives review.
 - Doc comments quoting `Duration(milliseconds: 250)` will trip the scanner. State timings in prose.
 
@@ -628,11 +628,11 @@ Two traps hit during the probe, worth recording for whoever repeats it:
 
 ## 15 · Open questions for the supervisor
 
-1. **The 150 → 250ms socket fix (§7.1, §12.2-1).** Two shipped painters transition at the wrong speed, and the evidence is a measured absence in the built stylesheet plus a live `getComputedStyle` on all six affected elements. **Recommendation: fix `checkbox.dart:238` and `radio.dart:418` to `ElDurations.base`, update the three test pumps, and add a one-line correction note to `forms-map.md` §8.3** so the wrong number does not get re-derived. Because this is a painter-timing change, the phase-3 rule applies: re-pin rendered pixels and keep the probe transcript. **Do you want this landed as part of the selection phase, or split into its own corrective commit ahead of it?**
-2. **`ElSlider` scope.** It is a fourth control family, a genuinely new painter, and the nav lists it as two chips ("Slider", "Range Slider"). The page needs: drag, keyboard, single + range, hover/active scale, focus ring, disabled, and the two-coordinate-space geometry. It does **not** need vertical orientation (`data-vertical:*` classes are present and no call site uses them), inversion, or field integration. **Recommendation: build horizontal-only to full parity, skip the vertical branch, and record the omission here.** Confirm.
-3. **`bg-action/12` — which port token?** `--primary` and `--color-action` are numerically identical in both themes, so `theme.primary.withValues(alpha: .12)` renders correctly today. But the page *names* `action`, and `--ring` proves the two aliases can diverge per theme. **Recommendation: expose `ElPalette.action` through the page (or add `theme.action`) so the port names the token the reference names.** Needs your call on whether `ElThemeData` grows a field for a raw-palette colour.
+1. **The 150 → 250ms socket fix (§7.1, §12.2-1).** Two shipped painters transition at the wrong speed, and the evidence is a measured absence in the built stylesheet plus a live `getComputedStyle` on all six affected elements. **Recommendation: fix `checkbox.dart:238` and `radio.dart:418` to `Durations.base`, update the three test pumps, and add a one-line correction note to `forms-map.md` §8.3** so the wrong number does not get re-derived. Because this is a painter-timing change, the phase-3 rule applies: re-pin rendered pixels and keep the probe transcript. **Do you want this landed as part of the selection phase, or split into its own corrective commit ahead of it?**
+2. **`Slider` scope.** It is a fourth control family, a genuinely new painter, and the nav lists it as two chips ("Slider", "Range Slider"). The page needs: drag, keyboard, single + range, hover/active scale, focus ring, disabled, and the two-coordinate-space geometry. It does **not** need vertical orientation (`data-vertical:*` classes are present and no call site uses them), inversion, or field integration. **Recommendation: build horizontal-only to full parity, skip the vertical branch, and record the omission here.** Confirm.
+3. **`bg-action/12` — which port token?** `--primary` and `--color-action` are numerically identical in both themes, so `theme.primary.withValues(alpha: .12)` renders correctly today. But the page *names* `action`, and `--ring` proves the two aliases can diverge per theme. **Recommendation: expose `Palette.action` through the page (or add `theme.action`) so the port names the token the reference names.** Needs your call on whether `ThemeData` grows a field for a raw-palette colour.
 4. **The three "unpinned state" gaps (§12.2-2, -3, -4).** Undimmed-inert, forced focus ring, and a 400-weight field label are all small API additions to shipped components. They exist only because a state *matrix* renders states a real form never asks for. **Recommendation: add all three as explicit, documented props rather than letting the page fake them locally** — the next matrix page (`selects`, `feedback`) will want the same two. Confirm you want `lib\` touched for page-driven needs.
-5. **Bulk header and option card — shared or page-local?** Both are compositions the reference builds inline out of `div`s and `Label`; neither is exported from `components\ui\`. `ElDividedList` is confirmed unusable for the first (§12.2-8, it is `divide-y` over an opaque card). **Recommendation: build both page-local in `example\lib\pages\selection.dart`.** The gapped-tinted list is one `Column` with `SizedBox(height: ElWidths.hairline)` seams over a transparent parent — small enough that lifting it into `kit.dart` before a second page wants it would be speculative. Confirm you would rather it stay local.
+5. **Bulk header and option card — shared or page-local?** Both are compositions the reference builds inline out of `div`s and `Label`; neither is exported from `components\ui\`. `DividedList` is confirmed unusable for the first (§12.2-8, it is `divide-y` over an opaque card). **Recommendation: build both page-local in `example\lib\pages\selection.dart`.** The gapped-tinted list is one `Column` with `SizedBox(height: Widths.hairline)` seams over a transparent parent — small enough that lifting it into `kit.dart` before a second page wants it would be speculative. Confirm you would rather it stay local.
 6. **Reproducing drift 3 (the frozen bulk tints).** The demo's row backgrounds are literal classes that do not follow their checkboxes, so clicking a row in the Flutter port must *also* leave the tint alone. That is faithful, it looks like a bug, and §6 don't 4 is the rule it breaks. **Recommendation: reproduce exactly and carry a source comment pointing at this entry**, consistent with ruling F5 on `aria-invalid` beating focus. Confirm.
 7. **Reproducing drift 11 (the slider thumb's dead disabled classes).** *(now probed — the question is only what to build.)* The reference dims a disabled slider **once**, at the root; the thumb's `disabled:opacity-50` and `disabled:pointer-events-none` never match a `<span>`. **Recommendation: port the render — one `Opacity(0.5)` and one `IgnorePointer` at the root — and record the dead classes rather than reproducing them.** There is no visible divergence either way, so this is a code-shape call, not a fidelity one.
 
@@ -656,7 +656,7 @@ the finding is the utility mechanism, not a stylesheet-wide flattening.
 
 **Landed:**
 
-- `lib\src\foundation\motion.dart` - new `ElDurations.transitionDefault`
+- `lib\src\design_system\foundation\motion.dart` - new `Durations.transitionDefault`
   (250ms), documented with the Tailwind v4 no-op mechanism and cited to the
   probe.
 - **Value fixed (150 -> 250ms):** `checkbox.dart`, `radio.dart`,
@@ -667,10 +667,10 @@ the finding is the utility mechanism, not a stylesheet-wide flattening.
   `toggle.dart`.
 - **Untouched, because they read `var(--duration-*)` directly:** `btn-spring`
   (`button.dart` and `input_group.dart`'s press), `lift.dart`, `press.dart`,
-  `sliding_pill.dart`, every `keyframes.dart` member,
+  `active_indicator.dart`, every `keyframes.dart` member,
   `example\lib\pages\typography.dart` (the prose-link underline - probed at
   0.15s) and the motion page's own token demos.
-- **Tests:** the three `pump(ElDurations.fast)` calls plus the two `ElSwitch`
+- **Tests:** the three `pump(Durations.fast)` calls plus the two `Switch`
   duration assertions in `test\selection_feedback_test.dart`; a new
   `transitionDefault` pair in `test\foundation_type_motion_test.dart`.
 - **Maps:** correction blocks appended to `forms-map.md` (§8.3),
@@ -679,6 +679,6 @@ the finding is the utility mechanism, not a stylesheet-wide flattening.
 
 **§12.2-1 is closed, and drift 5 is confirmed corpus-wide rather than
 page-local.** The remaining §12.2 items - undimmed-inert (2), forced focus ring
-(3), `ElFieldLabel` weight (4), `ElSlider` (5), the hover state (6), the option
+(3), `FieldLabel` weight (4), `Slider` (5), the hover state (6), the option
 card (7), the gapped list (8), the page and its route (9-11) - are untouched and
 still belong to the selection phase.

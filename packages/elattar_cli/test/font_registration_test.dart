@@ -12,7 +12,7 @@
 ///  * deriving the family from the file name (`InterVariable`) instead of the
 ///    registry entry (`InterLocal`), or hard-coding any wrong family such as
 ///    `'zzz'`;
-///  * leaving `ElFonts.package = 'elattar_design_system'` in installed source,
+///  * leaving `Fonts.package = 'elattar_design_system'` in installed source,
 ///    which resolves every family to `packages/elattar_design_system/<Family>`
 ///    in a project that has no such dependency.
 library;
@@ -24,7 +24,7 @@ import 'package:yaml/yaml.dart';
 
 import '../lib/src/install/models.dart';
 
-/// Families named by `ElFonts` in installed foundation source, e.g.
+/// Families named by `Fonts` in installed foundation source, e.g.
 /// `static const String sans = 'InterLocal';`.
 ///
 /// `package` is deliberately not matched: installation rewrites it to
@@ -37,8 +37,8 @@ final RegExp _dsFontsFamily = RegExp(
 );
 
 Set<String> _familiesAskedFor(String typographySource) {
-  final int classStart = typographySource.indexOf('class ElFonts {');
-  expect(classStart, greaterThanOrEqualTo(0), reason: 'ElFonts not found');
+  final int classStart = typographySource.indexOf('class Fonts {');
+  expect(classStart, greaterThanOrEqualTo(0), reason: 'Fonts not found');
   final int classEnd = typographySource.indexOf('\n}', classStart);
   final String body = typographySource.substring(classStart, classEnd);
   return <String>{
@@ -180,7 +180,7 @@ void main() {
     // a surviving package name resolves every face into a bundle the consumer
     // does not have.
     expect(typography(), contains('static const String? package = null;'));
-    expect(typography(), contains('package: ElFonts.package'));
+    expect(typography(), contains('package: Fonts.package'));
     expect(typography(), isNot(contains('elattar_design_system')));
   });
 

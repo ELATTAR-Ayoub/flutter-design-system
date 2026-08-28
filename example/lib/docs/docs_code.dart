@@ -4,7 +4,19 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/material.dart' show SelectionArea;
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 
@@ -12,7 +24,7 @@ import '../kit.dart';
 typedef DocsClipboardWriter = Future<void> Function(String text);
 
 /// Emits a feedback message after a docs-code action completes.
-typedef DocsCodeFeedback = void Function(ElToastMessage message);
+typedef DocsCodeFeedback = void Function(ToastMessage message);
 
 Future<void> _systemClipboardWrite(String text) =>
     Clipboard.setData(ClipboardData(text: text));
@@ -82,7 +94,7 @@ class _DocsCodeExampleState extends State<DocsCodeExample>
   String? _pendingCopyId;
 
   /// Which control last copied successfully, held on screen for
-  /// [ElDurations.attachmentSaving].
+  /// [MotionDurations.attachmentSaving].
   String? _copiedId;
 
   /// Holds that "Copied" state on screen.
@@ -96,7 +108,7 @@ class _DocsCodeExampleState extends State<DocsCodeExample>
   /// ever touched would first run inside [dispose], where creating a [Ticker]
   /// means an inherited-widget lookup on a deactivated element.
   ///
-  /// [ElDurations.attachmentSaving] is the token, not a number of its own:
+  /// [MotionDurations.attachmentSaving] is the token, not a number of its own:
   /// it is already this system's answer to "how long does a control's glyph
   /// stay on the check after the action it confirms".
   late final AnimationController _confirmation;
@@ -105,12 +117,14 @@ class _DocsCodeExampleState extends State<DocsCodeExample>
   void initState() {
     super.initState();
     _confirmation =
-        AnimationController(vsync: this, duration: ElDurations.attachmentSaving)
-          ..addStatusListener((AnimationStatus status) {
-            if (status == AnimationStatus.completed && mounted) {
-              setState(() => _copiedId = null);
-            }
-          });
+        AnimationController(
+          vsync: this,
+          duration: MotionDurations.attachmentSaving,
+        )..addStatusListener((AnimationStatus status) {
+          if (status == AnimationStatus.completed && mounted) {
+            setState(() => _copiedId = null);
+          }
+        });
   }
 
   @override
@@ -139,20 +153,20 @@ class _DocsCodeExampleState extends State<DocsCodeExample>
         _confirmation.forward(from: 0);
       }
       widget.onFeedback?.call(
-        ElToastMessage(
+        ToastMessage(
           title: successTitle,
           description: successDescription,
-          type: ElToastType.success,
-          glyph: ElIconGlyph.copy,
+          type: ToastType.success,
+          glyph: IconGlyph.copy,
         ),
       );
     } catch (_) {
       widget.onFeedback?.call(
-        const ElToastMessage(
+        const ToastMessage(
           title: 'Copy failed',
           description: 'Try selecting and copying the code manually.',
-          type: ElToastType.error,
-          glyph: ElIconGlyph.copy,
+          type: ToastType.error,
+          glyph: IconGlyph.copy,
         ),
       );
     } finally {
@@ -162,7 +176,7 @@ class _DocsCodeExampleState extends State<DocsCodeExample>
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final List<({String label, _DocsCodeTab tab, Widget content})> tabs =
         <({String label, _DocsCodeTab tab, Widget content})>[
           if (widget.hasPreview)
@@ -208,9 +222,9 @@ class _DocsCodeExampleState extends State<DocsCodeExample>
             ),
         ];
 
-    final List<ElTabItem> items = <ElTabItem>[
+    final List<TabItem> items = <TabItem>[
       for (final ({String label, _DocsCodeTab tab, Widget content}) row in tabs)
-        ElTabItem(
+        TabItem(
           label: row.label,
           content: KeyedSubtree(
             key: ValueKey<_DocsCodeTab>(row.tab),
@@ -220,25 +234,25 @@ class _DocsCodeExampleState extends State<DocsCodeExample>
     ];
 
     if (items.length == 1) {
-      return ElPanel(
+      return Panel(
         label: widget.title,
         note: tabs.first.label,
         child: tabs.first.content,
       );
     }
 
-    return ElPanel(
+    return Panel(
       label: widget.title,
       note: 'Preview and source',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElText(
+          StyledText(
             'Choose the live preview, the CLI command, or the source files you want to install.',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
           _DocsCodeTabs(items: items),
         ],
       ),
@@ -249,7 +263,7 @@ class _DocsCodeExampleState extends State<DocsCodeExample>
 class _DocsCodeTabs extends StatefulWidget {
   const _DocsCodeTabs({required this.items});
 
-  final List<ElTabItem> items;
+  final List<TabItem> items;
 
   @override
   State<_DocsCodeTabs> createState() => _DocsCodeTabsState();
@@ -260,7 +274,7 @@ class _DocsCodeTabsState extends State<_DocsCodeTabs> {
 
   @override
   Widget build(BuildContext context) {
-    return ElTabs(
+    return Tabs(
       items: widget.items,
       selectedIndex: _selectedIndex,
       onChanged: (int index) => setState(() => _selectedIndex = index),
@@ -276,20 +290,27 @@ class _PreviewPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         if (description != null) ...<Widget>[
-          ElText(description!, ElType.small, color: theme.mutedForeground),
-          SizedBox(height: el(4)),
+          StyledText(
+            description!,
+            TextStyles.small,
+            color: theme.mutedForeground,
+          ),
+          SizedBox(height: space(4)),
         ],
         Container(
-          padding: EdgeInsets.all(el(5)),
+          padding: EdgeInsets.all(space(5)),
           decoration: BoxDecoration(
             color: theme.background,
-            borderRadius: BorderRadius.circular(ElRadii.lg),
-            border: Border.all(color: theme.border, width: ElWidths.hairline),
+            borderRadius: BorderRadius.circular(Radii.lg),
+            border: Border.all(
+              color: theme.border,
+              width: BorderWidths.hairline,
+            ),
           ),
           child: preview,
         ),
@@ -313,17 +334,17 @@ class _CommandPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         if (command.description != null) ...<Widget>[
-          ElText(
+          StyledText(
             command.description!,
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
-          SizedBox(height: el(3)),
+          SizedBox(height: space(3)),
         ],
         _CopyableCodeBlock(
           codeKey: const ValueKey<String>('docs-command-code'),
@@ -358,7 +379,7 @@ class _ManualPane extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         for (int i = 0; i < files.length; i++) ...<Widget>[
-          if (i > 0) SizedBox(height: el(5)),
+          if (i > 0) SizedBox(height: space(5)),
           _ManualFileCard(
             file: files[i],
             pending:
@@ -387,23 +408,27 @@ class _ManualFileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         // A quiet filename caption in the code's own type, the way the
         // reference names a file above its card instead of boxing the name
         // and a labelled button into a panel strip of their own.
-        ElText(
+        StyledText(
           file.title ?? file.path,
-          ElType.code,
+          TextStyles.code,
           color: theme.mutedForeground,
         ),
         if (file.description != null) ...<Widget>[
-          SizedBox(height: el(1)),
-          ElText(file.description!, ElType.small, color: theme.mutedForeground),
+          SizedBox(height: space(1)),
+          StyledText(
+            file.description!,
+            TextStyles.small,
+            color: theme.mutedForeground,
+          ),
         ],
-        SizedBox(height: el(2)),
+        SizedBox(height: space(2)),
         _CopyableCodeBlock(
           codeKey: ValueKey<String>('docs-file:${file.path}'),
           code: file.code,
@@ -450,8 +475,8 @@ class _CopyableCodeBlock extends StatelessWidget {
       children: <Widget>[
         DocsSelectableCodeBlock(key: codeKey, code: code),
         Positioned(
-          top: el(2),
-          right: el(2),
+          top: space(2),
+          right: space(2),
           child: _DocsCodeCopyButton(
             pending: pending,
             copied: copied,
@@ -491,17 +516,17 @@ class _DocsCodeCopyButton extends StatelessWidget {
   Widget build(BuildContext context) {
     // Nothing on screen but the glyph distinguishes a copy from a mis-tap, so
     // the accessible name carries that state instead of a visible label.
-    final ElLucideGlyph glyph = switch ((pending, copied)) {
-      (true, _) => ElLucide.loaderCircle,
-      (_, true) => ElLucide.check,
-      _ => ElLucide.copy,
+    final LucideGlyph glyph = switch ((pending, copied)) {
+      (true, _) => Lucide.loaderCircle,
+      (_, true) => Lucide.check,
+      _ => Lucide.copy,
     };
-    return ElButton(
-      variant: ElButtonVariant.ghost,
-      size: ElButtonSize.iconSm,
+    return Button(
+      variant: ButtonVariant.ghost,
+      size: ButtonSize.iconSm,
       label: copied ? copiedLabel : copyLabel,
       onPressed: pending ? null : onCopy,
-      child: ElIcon.lucide(glyph, size: ElIconSize.sm),
+      child: Icon.lucide(glyph, size: IconSize.sm),
     );
   }
 }
@@ -541,7 +566,7 @@ class DocsSelectableCodeBlock extends StatefulWidget {
   /// The default cap for a source listing — 140 steps, ~28 lines of
   /// `.type-code`, enough to read a file's shape without the page becoming the
   /// file.
-  static double get sourceMaxHeight => el(140);
+  static double get sourceMaxHeight => space(140);
 
   @override
   State<DocsSelectableCodeBlock> createState() =>
@@ -567,12 +592,12 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final TextStyle style = ElText.styleOf(
+    final ThemeTokens theme = ThemeScope.of(context);
+    final TextStyle style = StyledText.styleOf(
       context,
-      ElType.code,
+      TextStyles.code,
       color: theme.foreground,
-    ).copyWith(height: ElComponentType.textareaBody.height);
+    ).copyWith(height: TextStyles.textareaBody.height);
 
     final List<String> sourceLines = widget.code.split('\n');
     final bool multiline = sourceLines.length > 1;
@@ -580,7 +605,7 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
     // A small, honest tokeniser (`_tokeniseDartLine` below): it covers
     // keywords, strings, line comments, numbers, annotations and
     // `PascalCase` type names, and nothing else. Every colour comes from this
-    // system's own semantic palette (`ElPalette.action/.value/.success/
+    // system's own semantic palette (`Palette.action/.value/.success/
     // .warning/.info`, `--foreground`, `--muted-foreground`) rather than a
     // fixed third-party theme, so the block stays correct under a rebrand and
     // flips with light/dark the way the rest of the page does. Concatenated
@@ -605,7 +630,7 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
       softWrap: false,
     );
 
-    // [ElLineBox] restores the half-pixel per line the engine rounds away, but
+    // [LineBox] restores the half-pixel per line the engine rounds away, but
     // it does so by growing the *paragraph* and centring the difference — half
     // above the first line, half below the last. On one line that is the whole
     // truth and the correction is invisible. On a 300-line source listing it is
@@ -615,13 +640,13 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
     // multi-line listing is laid out as the engine gives it.
     final Widget paragraph = multiline
         ? text
-        : ElLineBox(style: style, child: text);
+        : LineBox(style: style, child: text);
 
     // Multi-line only: a single command reads fine bare, and the reference
     // itself shows no gutter on its one-line install commands either.
     final EdgeInsets contentPadding = multiline
-        ? EdgeInsets.fromLTRB(el(3), el(5), el(5), el(5))
-        : EdgeInsets.all(el(5));
+        ? EdgeInsets.fromLTRB(space(3), space(5), space(5), space(5))
+        : EdgeInsets.all(space(5));
 
     Widget block = SingleChildScrollView(
       key: const ValueKey<String>('docs-code-scroll'),
@@ -629,7 +654,7 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
       scrollDirection: Axis.horizontal,
       padding: contentPadding,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: ElContainers.sm),
+        constraints: const BoxConstraints(minWidth: Containers.sm),
         child: SelectionArea(child: paragraph),
       ),
     );
@@ -639,18 +664,22 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
       // — a drag that selects the code can never pull a line number into the
       // clipboard, the same outcome the reference gets from generating its
       // numbers as a `::before` pseudo-element, which carries no real text
-      // node to copy. `elEngineLineHeight` is the exact per-line height the
+      // node to copy. `engineLineHeight` is the exact per-line height the
       // paragraph above already renders at (same style, same engine), so the
       // numbers land beside their own line and nowhere else.
       final TextStyle numberStyle = style.copyWith(
         color: theme.mutedForeground,
       );
-      final double lineHeight = elEngineLineHeight(style);
+      final double lineHeight = engineLineHeight(style);
       block = Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(top: el(5), bottom: el(5), left: el(5)),
+            padding: EdgeInsets.only(
+              top: space(5),
+              bottom: space(5),
+              left: space(5),
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -678,8 +707,8 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
         child: RawScrollbar(
           controller: _vertical,
           thumbColor: theme.border,
-          thickness: el(2),
-          radius: Radius.circular(ElRadii.pill),
+          thickness: space(2),
+          radius: Radius.circular(Radii.full),
           thumbVisibility: true,
           // The horizontal view nested below reports at depth 1; without an
           // axis test the default depth-0 predicate would let its notifications
@@ -697,13 +726,15 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.muted,
-        borderRadius: BorderRadius.circular(ElRadii.xl2),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.xl2),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(ElWidths.hairline),
+        padding: const EdgeInsets.all(BorderWidths.hairline),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(ElRadii.xl2 - ElWidths.hairline),
+          borderRadius: BorderRadius.circular(
+            Radii.xl2 - BorderWidths.hairline,
+          ),
           // Outside the vertical viewport, so the horizontal thumb rides the
           // bottom edge of what the reader can see rather than the bottom edge
           // of the file. Same reason its predicate has to name the axis: once
@@ -711,8 +742,8 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
           child: RawScrollbar(
             controller: _scroller,
             thumbColor: theme.border,
-            thickness: el(2),
-            radius: Radius.circular(ElRadii.pill),
+            thickness: space(2),
+            radius: Radius.circular(Radii.full),
             thumbVisibility: true,
             notificationPredicate: _isHorizontal,
             child: block,
@@ -726,12 +757,12 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
 /* ── Dart source tokeniser ───────────────────────────────────────────────
  *
  * A grep of both `lib/` and `example/lib/` for an existing highlighter found
- * exactly one: `elTokenise`/`ElCodeToken`/`ElPrismPalette` in
+ * exactly one: `tokenise`/`CodeToken`/`PrismPalette` in
  * `package:elattar_design_system`'s `agent_markdown.dart`, reused by the
  * agent chat transcript. It was not reusable here for two independent
  * reasons: its registered grammars are typescript/tsx/javascript/jsx/css/
  * sql/json/python/bash/markdown — Dart is not one of them — and its palette
- * (`ElPrismPalette`) is a verbatim copy of `react-syntax-highlighter`'s fixed
+ * (`PrismPalette`) is a verbatim copy of `react-syntax-highlighter`'s fixed
  * VS Code Dark Plus theme, deliberately marked `allow-hardcoded` in that file
  * because it is reproducing a third-party theme span-for-span, not this
  * system's own tokens. A docs code block has to answer to light *and* dark
@@ -739,7 +770,7 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
  * regardless of the language gap.
  *
  * What follows is a small tokeniser for Dart instead, structured the same
- * way `elTokenise`'s C-like grammar is (a single per-line scan, no state
+ * way `tokenise`'s C-like grammar is (a single per-line scan, no state
  * carried across a newline). It is a scanner, not a parser — see
  * `_tokeniseDartLine`'s doc comment for exactly what it does and does not
  * recognise.
@@ -764,17 +795,17 @@ class _DsCodeToken {
 }
 
 /// This system's own semantic colours, not a fixed syntax theme: every hue is
-/// one already defined for state (`ElPalette.action/.value/.success/.warning/
+/// one already defined for state (`Palette.action/.value/.success/.warning/
 /// .info`) or for text (`--foreground`/`--muted-foreground`), so a block
 /// painted from it stays correct under a rebrand and flips with light/dark
 /// exactly as the rest of the page does.
-Color _dsCodeTokenColor(_DsCodeTokenKind kind, ElThemeData theme) =>
+Color _dsCodeTokenColor(_DsCodeTokenKind kind, ThemeTokens theme) =>
     switch (kind) {
-      _DsCodeTokenKind.keyword => ElPalette.action,
-      _DsCodeTokenKind.string => ElPalette.success,
-      _DsCodeTokenKind.number => ElPalette.warning,
-      _DsCodeTokenKind.type => ElPalette.info,
-      _DsCodeTokenKind.annotation => ElPalette.value,
+      _DsCodeTokenKind.keyword => Palette.action,
+      _DsCodeTokenKind.string => Palette.success,
+      _DsCodeTokenKind.number => Palette.warning,
+      _DsCodeTokenKind.type => Palette.info,
+      _DsCodeTokenKind.annotation => Palette.value,
       _DsCodeTokenKind.comment => theme.mutedForeground,
       _DsCodeTokenKind.plain => theme.foreground,
     };

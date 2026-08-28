@@ -1,6 +1,6 @@
 /// Public documentation page for the `field` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` established. Every specimen
@@ -10,18 +10,18 @@
 /// are genuinely live now, built from the exact same quoted source.
 ///
 /// `field` is not one widget but a family of nine classes plus one enum:
-/// [ElField] itself, the threading primitives [ElFieldScope] and
-/// [ElFieldActivator], the layout orientation enum [ElFieldOrientation], the
-/// stacking helpers [ElFieldGroup] and [ElFieldSet] with its
-/// [ElFieldLegend], and the three parts a hand-built composition reaches for
-/// directly, [ElFieldLabel], [ElFieldDescription], and [ElFieldError]. API
+/// [Field] itself, the threading primitives [FieldScope] and
+/// [FieldActivator], the layout orientation enum [FieldOrientation], the
+/// stacking helpers [FieldGroup] and [FieldSet] with its
+/// [FieldLegend], and the three parts a hand-built composition reaches for
+/// directly, [FieldLabel], [FieldDescription], and [FieldError]. API
 /// Reference gives each of the ten its own [DocsApiTable] rather than
 /// merging them, with a rail sub-anchor per table — the same
 /// `children:`-on-a-disclosure shape `form`'s own API Reference uses.
 ///
 /// **Section order**, matching `button`'s own house shape: Preview,
 /// Installation, Usage (the smallest correct example only), Composition,
-/// Anatomy, then one section per control ElField wraps (Input, Textarea,
+/// Anatomy, then one section per control Field wraps (Input, Textarea,
 /// Select, Slider, Fieldset, Checkbox, Switch), Field group, Validation and
 /// errors, then the eight disclosures. The old page's standalone "Form"
 /// section — three sentences pointing at the Form page — is folded into the
@@ -39,7 +39,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -65,7 +77,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     InstallSection(
       id: 'install',
@@ -92,7 +104,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElField and the rest of the field '
+              'Add the export line so Field and the rest of the field '
               'family are reachable the same way the CLI path already '
               'makes them.',
           code: "export 'field.dart';",
@@ -104,7 +116,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       title: 'Usage',
       description:
           'The smallest correct composition. Every other example on this '
-          'page only changes what control ElField wraps.',
+          'page only changes what control Field wraps.',
       code: _usageBasicCode,
     ),
     SnippetSection(
@@ -112,8 +124,8 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       title: 'Composition',
       description:
           'The two shapes a stack of fields takes: independent fields '
-          'side by side (ElFieldGroup), or several fields grouped under '
-          'one legend (ElFieldSet). Both are quoted from '
+          'side by side (FieldGroup), or several fields grouped under '
+          'one legend (FieldSet). Both are quoted from '
           'example/lib/pages/forms.dart below, in Fieldset and Field '
           'group.',
       code: '$_compositionGroupTree\n\n$_compositionSetTree',
@@ -122,8 +134,8 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       id: 'anatomy',
       title: 'Anatomy',
       description:
-          'The one fixed order every ElField renders, and never varies. '
-          'ElFieldOrientation.horizontal reorders only the first two, '
+          'The one fixed order every Field renders, and never varies. '
+          'FieldOrientation.horizontal reorders only the first two, '
           'control then label, for a checkbox, switch, or radio row: see '
           'API for both values.',
       code: _anatomyCode,
@@ -132,8 +144,8 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       id: 'input',
       title: 'Input',
       description:
-          'ElInput already carries its own optional label and hint for '
-          'standalone use; leave both null so ElField supplies the '
+          'Input already carries its own optional label and hint for '
+          'standalone use; leave both null so Field supplies the '
           'visible label and description instead.',
       specimen: _InputSpecimen(),
       code: _inputCode,
@@ -143,7 +155,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       id: 'textarea',
       title: 'Textarea',
       description:
-          'The same ElFieldScope wiring ElInput reads: ElTextarea ORs '
+          'The same FieldScope wiring Input reads: Textarea ORs '
           'its own invalid with the field\'s and focuses the scope\'s '
           'focusNode when it registers none of its own.',
       specimen: _TextareaSpecimen(),
@@ -154,7 +166,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       id: 'select',
       title: 'Select',
       description:
-          'ElNativeSelect reads ElFieldScope the same way: the closed '
+          'NativeSelect reads FieldScope the same way: the closed '
           'control is what the field labels, the reference\'s own '
           'operating-system picker is off-canvas either way.',
       specimen: _SelectSpecimen(),
@@ -165,8 +177,8 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       id: 'slider',
       title: 'Slider',
       description:
-          'ElField still lays out the label, description and error '
-          'around ElSlider, but ElSlider itself reads no ElFieldScope: it '
+          'Field still lays out the label, description and error '
+          'around Slider, but Slider itself reads no FieldScope: it '
           'has no invalid ring and no scope-supplied focusNode, so its '
           'own label prop is the one accessible name a caller has to set '
           'directly.',
@@ -179,10 +191,10 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       title: 'Fieldset',
       description:
           'Quoted from example/lib/pages/forms.dart\'s _PayoutFieldSet: a '
-          'ElFieldLegend outside the ElFieldSet (a rendered legend sits '
+          'FieldLegend outside the FieldSet (a rendered legend sits '
           'above the set rather than inside its flex flow), '
-          'tightForGroup: true because a ElRadioGroup is the set\'s '
-          'direct child, and one horizontal ElField per option so each '
+          'tightForGroup: true because a RadioGroup is the set\'s '
+          'direct child, and one horizontal Field per option so each '
           'radio keeps its own selectable label. See the Radio group page '
           'for the live version of this exact composition.',
       code: _compositionSetCode,
@@ -191,7 +203,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       id: 'checkbox',
       title: 'Checkbox',
       description:
-          'ElFieldOrientation.horizontal puts the checkbox before its '
+          'FieldOrientation.horizontal puts the checkbox before its '
           'label; the live version in Preview above is this exact '
           'composition, tap either the box or the words.',
       specimen: _CheckboxFieldSpecimen(),
@@ -202,7 +214,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       id: 'switch',
       title: 'Switch',
       description:
-          'The same horizontal shape as Checkbox above, around ElSwitch '
+          'The same horizontal shape as Checkbox above, around Switch '
           'instead.',
       specimen: _SwitchSpecimen(),
       code: _switchCode,
@@ -213,10 +225,10 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       title: 'Field group',
       description:
           'Quoted from example/lib/pages/forms.dart\'s #profile-panel '
-          'composition, the ElFieldGroup around the Handle and Email '
+          'composition, the FieldGroup around the Handle and Email '
           'fields, trimmed to the two fields: the surrounding '
           'ListenableBuilder and submit button are that page\'s own '
-          'form-state plumbing, not part of what ElField needs to be '
+          'form-state plumbing, not part of what Field needs to be '
           'shown correctly here. See the Form page for the live, bound '
           'version.',
       code: _compositionGroupCode,
@@ -227,8 +239,8 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       description:
           'invalid defaults to errors.isNotEmpty but the two are '
           'separable switches. Both fields below colour their label and '
-          'control red, because both set ElFieldScope.invalid; only the '
-          'left one mounts a ElFieldError live region, because that is '
+          'control red, because both set FieldScope.invalid; only the '
+          'left one mounts a FieldError live region, because that is '
           'driven by errors alone, not by invalid.',
       specimen: _ValidationSpecimen(),
       code: _validationCode,
@@ -242,23 +254,20 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
           'static member the source declares: one table per exported '
           'class or enum.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElField', anchor: 'api-elfield'),
-        DocsTocEntry(title: 'ElFieldScope', anchor: 'api-elfieldscope'),
+        DocsTocEntry(title: 'Field', anchor: 'api-elfield'),
+        DocsTocEntry(title: 'FieldScope', anchor: 'api-elfieldscope'),
+        DocsTocEntry(title: 'FieldActivator', anchor: 'api-elfieldactivator'),
+        DocsTocEntry(title: 'FieldGroup', anchor: 'api-elfieldgroup'),
+        DocsTocEntry(title: 'FieldSet', anchor: 'api-elfieldset'),
+        DocsTocEntry(title: 'FieldLegend', anchor: 'api-elfieldlegend'),
+        DocsTocEntry(title: 'FieldLabel', anchor: 'api-elfieldlabel'),
         DocsTocEntry(
-          title: 'ElFieldActivator',
-          anchor: 'api-elfieldactivator',
-        ),
-        DocsTocEntry(title: 'ElFieldGroup', anchor: 'api-elfieldgroup'),
-        DocsTocEntry(title: 'ElFieldSet', anchor: 'api-elfieldset'),
-        DocsTocEntry(title: 'ElFieldLegend', anchor: 'api-elfieldlegend'),
-        DocsTocEntry(title: 'ElFieldLabel', anchor: 'api-elfieldlabel'),
-        DocsTocEntry(
-          title: 'ElFieldDescription',
+          title: 'FieldDescription',
           anchor: 'api-elfielddescription',
         ),
-        DocsTocEntry(title: 'ElFieldError', anchor: 'api-elfielderror'),
+        DocsTocEntry(title: 'FieldError', anchor: 'api-elfielderror'),
         DocsTocEntry(
-          title: 'ElFieldOrientation',
+          title: 'FieldOrientation',
           anchor: 'api-elfieldorientation',
         ),
       ],
@@ -268,7 +277,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElField itself owns rest, error, disabled, and the empty "no '
+          'Field itself owns rest, error, disabled, and the empty "no '
           'errors" case. Hover, pressed, focus-visible, selected, '
           'loading, and success belong to whatever control is wrapped — '
           'not to the field around it: so they are recorded here as N/A '
@@ -289,7 +298,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'field.dart wires no key handling of its own — every fact here '
-          'is about what does NOT happen, read off ElFieldLabel.build '
+          'is about what does NOT happen, read off FieldLabel.build '
           'directly.',
       child: _KeyboardContent(),
     ),
@@ -326,7 +335,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Package tests',
-            value: "test/inputs_test.dart ('ElField', 'ElFieldSet')",
+            value: "test/inputs_test.dart ('Field', 'FieldSet')",
             description:
                 'Geometry, semantics, the label activation ladder, and '
                 'the live-region contract, exercised against the real '
@@ -364,9 +373,9 @@ class FieldDocPage extends StatelessWidget {
       title: fieldDocSpec.title,
       description: fieldDocSpec.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Field'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Field'),
     ],
     toc: fieldDocSpec.toc,
     previous: const DocsPageLink(
@@ -397,24 +406,24 @@ class _PreviewSpecimen extends StatefulWidget {
 
 class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   bool _emailInvalid = false;
-  ElCheckboxState _subscribed = ElCheckboxState.unchecked;
+  CheckboxState _subscribed = CheckboxState.unchecked;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText('Vertical, with a live error', ElType.section),
-        SizedBox(height: el(3)),
+        StyledText('Vertical, with a live error', TextStyles.section),
+        SizedBox(height: space(3)),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElContainers.sm),
-          child: ElField(
-            // Scopes the docs test's "no ElFieldError at rest" assertion to
+          constraints: const BoxConstraints(maxWidth: Containers.sm),
+          child: Field(
+            // Scopes the docs test's "no FieldError at rest" assertion to
             // this one toggleable specimen: the static "Separable" pairing
-            // further down deliberately keeps a ElFieldError mounted at all
-            // times, so a page-wide byType(ElFieldError) search cannot tell
+            // further down deliberately keeps a FieldError mounted at all
+            // times, so a page-wide byType(FieldError) search cannot tell
             // the two apart.
             key: const ValueKey<String>('field-doc-toggle-field'),
             label: 'Email',
@@ -422,75 +431,78 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
             errors: _emailInvalid
                 ? const <String>['Enter a valid email address.']
                 : const <String>[],
-            child: const ElInput(
+            child: const Input(
               key: ValueKey<String>('field-doc-specimen-email'),
               placeholder: 'you@example.com',
             ),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElButton(
+        SizedBox(height: space(3)),
+        Button(
           key: const ValueKey<String>('field-doc-toggle-error'),
-          variant: ElButtonVariant.outline,
-          size: ElButtonSize.sm,
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
           label: _emailInvalid ? 'Clear the error' : 'Show an error',
           onPressed: () => setState(() => _emailInvalid = !_emailInvalid),
-          child: ElText(
+          child: StyledText(
             _emailInvalid ? 'Clear the error' : 'Show an error',
-            ElComponentType.buttonLabel,
+            TextStyles.buttonLabel,
           ),
         ),
-        SizedBox(height: el(7)),
-        ElText(
+        SizedBox(height: space(7)),
+        StyledText(
           'Horizontal, around a checkbox: tap the box or the words',
-          ElType.section,
+          TextStyles.section,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElContainers.sm),
-          child: ElField(
+          constraints: const BoxConstraints(maxWidth: Containers.sm),
+          child: Field(
             label: 'Email me about product updates',
-            orientation: ElFieldOrientation.horizontal,
-            child: ElCheckbox(
+            orientation: FieldOrientation.horizontal,
+            child: Checkbox(
               key: const ValueKey<String>('field-doc-specimen-checkbox'),
               state: _subscribed,
-              onChanged: (ElCheckboxState next) =>
+              onChanged: (CheckboxState next) =>
                   setState(() => _subscribed = next),
             ),
           ),
         ),
-        SizedBox(height: el(7)),
-        ElText('Disabled: the field wins over the control', ElType.section),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(7)),
+        StyledText(
+          'Disabled: the field wins over the control',
+          TextStyles.section,
+        ),
+        SizedBox(height: space(3)),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElContainers.sm),
+          constraints: const BoxConstraints(maxWidth: Containers.sm),
           // The control's own `enabled: true` is deliberately left in
-          // place: ElField.enabled: false still wins, because a control
+          // place: Field.enabled: false still wins, because a control
           // ANDs the two rather than reading only its own: see the API
           // and States sections.
-          child: ElField(
+          child: Field(
             label: 'Handle',
             description: 'Set by your workspace admin.',
             enabled: false,
-            child: ElInput(initialValue: 'ayoub', enabled: true),
+            child: Input(initialValue: 'ayoub', enabled: true),
           ),
         ),
-        SizedBox(height: el(7)),
-        ElText(
+        SizedBox(height: space(7)),
+        StyledText(
           'Separable: invalid and errors are two different switches',
-          ElType.section,
+          TextStyles.section,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         const _ValidationSpecimen(),
-        SizedBox(height: el(2)),
+        SizedBox(height: space(2)),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-          child: ElText(
+          constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+          child: StyledText(
             'Both colour the label and control red, because both set '
-            'ElFieldScope.invalid. Only the left one mounts a ElFieldError '
+            'FieldScope.invalid. Only the left one mounts a FieldError '
             'live region, because that is driven by errors alone, not by '
             'invalid.',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ),
@@ -500,38 +512,38 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 }
 
 const String _previewCode = '''ConstrainedBox(
-  constraints: const BoxConstraints(maxWidth: ElContainers.sm),
-  child: ElField(
+  constraints: const BoxConstraints(maxWidth: Containers.sm),
+  child: Field(
     label: 'Email',
     description: "We'll only use this for receipts.",
     errors: emailInvalid ? const ['Enter a valid email address.'] : const [],
-    child: const ElInput(placeholder: 'you@example.com'),
+    child: const Input(placeholder: 'you@example.com'),
   ),
 )
 
-ElField(
+Field(
   label: 'Email me about product updates',
-  orientation: ElFieldOrientation.horizontal,
-  child: ElCheckbox(
+  orientation: FieldOrientation.horizontal,
+  child: Checkbox(
     state: subscribed,
     onChanged: (next) => setState(() => subscribed = next),
   ),
 )
 
-const ElField(
+const Field(
   label: 'Handle',
   description: 'Set by your workspace admin.',
   enabled: false,
-  child: ElInput(initialValue: 'ayoub', enabled: true),
+  child: Input(initialValue: 'ayoub', enabled: true),
 )''';
 
 const String _usageBasicCode =
     '''import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElField(
+Field(
   label: 'Display name',
   description: 'Shown publicly on your profile.',
-  child: ElInput(placeholder: 'Astra Vale'),
+  child: Input(placeholder: 'Astra Vale'),
 )''';
 
 /// The Composition section's own map of the shape below: not real code (no
@@ -555,46 +567,46 @@ FieldSet
    └─ FieldLabel''';
 
 const String _anatomyCode =
-    '''// Fixed render order inside every ElField, never varies:
+    '''// Fixed render order inside every Field, never varies:
 // FieldLabel -> control -> FieldDescription -> FieldError
 //
-// ElField.gap           8px   between label, control, and what follows
-// ElField.describedGap  4px   description's own gap once an error joins it
+// Field.gap           8px   between label, control, and what follows
+// Field.describedGap  4px   description's own gap once an error joins it
 //
-// ElFieldOrientation.horizontal reorders only the first two (control,
+// FieldOrientation.horizontal reorders only the first two (control,
 // then label) for a checkbox, switch, or radio row.''';
 
 class _InputSpecimen extends StatelessWidget {
   const _InputSpecimen();
 
   @override
-  Widget build(BuildContext context) => const ElFieldGroup(
+  Widget build(BuildContext context) => const FieldGroup(
     children: <Widget>[
-      ElField(
+      Field(
         label: 'Username',
         description: 'This is your public display name.',
-        child: ElInput(placeholder: 'ayoub'),
+        child: Input(placeholder: 'ayoub'),
       ),
-      ElField(
+      Field(
         label: 'Password',
         description: 'Must be at least 8 characters.',
-        child: ElInput(obscureText: true),
+        child: Input(obscureText: true),
       ),
     ],
   );
 }
 
-const String _inputCode = '''ElFieldGroup(
+const String _inputCode = '''FieldGroup(
   children: <Widget>[
-    ElField(
+    Field(
       label: 'Username',
       description: 'This is your public display name.',
-      child: ElInput(placeholder: 'ayoub'),
+      child: Input(placeholder: 'ayoub'),
     ),
-    ElField(
+    Field(
       label: 'Password',
       description: 'Must be at least 8 characters.',
-      child: ElInput(obscureText: true),
+      child: Input(obscureText: true),
     ),
   ],
 )''';
@@ -603,19 +615,17 @@ class _TextareaSpecimen extends StatelessWidget {
   const _TextareaSpecimen();
 
   @override
-  Widget build(BuildContext context) => const ElField(
+  Widget build(BuildContext context) => const Field(
     label: 'Feedback',
     description: 'We read every word: keep it under 500 characters.',
-    child: ElTextarea(
-      placeholder: 'Tell us what is working and what is not.',
-    ),
+    child: Textarea(placeholder: 'Tell us what is working and what is not.'),
   );
 }
 
-const String _textareaCode = '''ElField(
+const String _textareaCode = '''Field(
   label: 'Feedback',
   description: 'We read every word: keep it under 500 characters.',
-  child: ElTextarea(
+  child: Textarea(
     placeholder: 'Tell us what is working and what is not.',
   ),
 )''';
@@ -631,31 +641,31 @@ class _SelectSpecimenState extends State<_SelectSpecimen> {
   String _department = 'support';
 
   @override
-  Widget build(BuildContext context) => ElField(
+  Widget build(BuildContext context) => Field(
     label: 'Department',
     description: 'Routes your ticket to the right team.',
-    child: ElNativeSelect<String>(
+    child: NativeSelect<String>(
       value: _department,
       onChanged: (String next) => setState(() => _department = next),
-      options: const <ElSelectChild<String>>[
-        ElSelectOption(value: 'support', label: 'Support'),
-        ElSelectOption(value: 'billing', label: 'Billing'),
-        ElSelectOption(value: 'sales', label: 'Sales'),
+      options: const <SelectChild<String>>[
+        SelectOption(value: 'support', label: 'Support'),
+        SelectOption(value: 'billing', label: 'Billing'),
+        SelectOption(value: 'sales', label: 'Sales'),
       ],
     ),
   );
 }
 
-const String _selectCode = '''ElField(
+const String _selectCode = '''Field(
   label: 'Department',
   description: 'Routes your ticket to the right team.',
-  child: ElNativeSelect<String>(
+  child: NativeSelect<String>(
     value: department,
     onChanged: (String next) => setState(() => department = next),
-    options: const <ElSelectChild<String>>[
-      ElSelectOption(value: 'support', label: 'Support'),
-      ElSelectOption(value: 'billing', label: 'Billing'),
-      ElSelectOption(value: 'sales', label: 'Sales'),
+    options: const <SelectChild<String>>[
+      SelectOption(value: 'support', label: 'Support'),
+      SelectOption(value: 'billing', label: 'Billing'),
+      SelectOption(value: 'sales', label: 'Sales'),
     ],
   ),
 )''';
@@ -671,10 +681,10 @@ class _SliderSpecimenState extends State<_SliderSpecimen> {
   List<double> _priceRange = <double>[50, 250];
 
   @override
-  Widget build(BuildContext context) => ElField(
+  Widget build(BuildContext context) => Field(
     label: 'Price range',
     description: 'Drag either handle to set your budget.',
-    child: ElSlider(
+    child: Slider(
       values: _priceRange,
       onChanged: (List<double> next) => setState(() => _priceRange = next),
       min: 0,
@@ -683,10 +693,10 @@ class _SliderSpecimenState extends State<_SliderSpecimen> {
   );
 }
 
-const String _sliderCode = '''ElField(
+const String _sliderCode = '''Field(
   label: 'Price range',
   description: 'Drag either handle to set your budget.',
-  child: ElSlider(
+  child: Slider(
     values: priceRange,
     onChanged: (List<double> next) => setState(() => priceRange = next),
     min: 0,
@@ -702,72 +712,71 @@ const String _compositionSetCode = '''Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   mainAxisSize: MainAxisSize.min,
   children: <Widget>[
-    const ElFieldLegend('Payout rhythm'),
-    SizedBox(height: ElFieldLegend.spaceBelow),
-    ElFieldSet(
+    const FieldLegend('Payout rhythm'),
+    SizedBox(height: FieldLegend.spaceBelow),
+    FieldSet(
       tightForGroup: true,
       children: <Widget>[
-        ElRadioGroup<String>(
+        RadioGroup<String>(
           value: field.value,
           onChanged: (String next) => field.value = next,
-          gap: ElFieldSet.groupGap,
+          gap: FieldSet.groupGap,
           invalid: field.invalid,
           focusNode: field.focusNode,
           label: 'Payout rhythm',
           hint: field.errors.isEmpty ? null : field.errors.join(' '),
           children: const <Widget>[
-            ElField(
+            Field(
               label: 'Daily',
-              orientation: ElFieldOrientation.horizontal,
-              child: ElRadioGroupItem<String>(value: 'daily'),
+              orientation: FieldOrientation.horizontal,
+              child: RadioGroupItem<String>(value: 'daily'),
             ),
-            ElField(
+            Field(
               label: 'Weekly',
-              orientation: ElFieldOrientation.horizontal,
-              child: ElRadioGroupItem<String>(value: 'weekly'),
+              orientation: FieldOrientation.horizontal,
+              child: RadioGroupItem<String>(value: 'weekly'),
             ),
           ],
         ),
-        if (field.errors.isNotEmpty) ElFieldError(field.errors),
+        if (field.errors.isNotEmpty) FieldError(field.errors),
       ],
     ),
   ],
 )''';
 
-const String _usageHorizontalCode = '''ElField(
+const String _usageHorizontalCode = '''Field(
   label: 'Email me about product updates',
-  orientation: ElFieldOrientation.horizontal,
-  child: ElCheckbox(
-    state: subscribed ? ElCheckboxState.checked : ElCheckboxState.unchecked,
-    onChanged: (ElCheckboxState next) {
-      setState(() => subscribed = next == ElCheckboxState.checked);
+  orientation: FieldOrientation.horizontal,
+  child: Checkbox(
+    state: subscribed ? CheckboxState.checked : CheckboxState.unchecked,
+    onChanged: (CheckboxState next) {
+      setState(() => subscribed = next == CheckboxState.checked);
     },
   ),
 )''';
 
-/// A live, functioning `ElField`-wrapped checkbox: proof the composition
+/// A live, functioning `Field`-wrapped checkbox: proof the composition
 /// Checkbox documents actually renders and toggles, not just a code
 /// excerpt.
 class _CheckboxFieldSpecimen extends StatefulWidget {
   const _CheckboxFieldSpecimen();
 
   @override
-  State<_CheckboxFieldSpecimen> createState() =>
-      _CheckboxFieldSpecimenState();
+  State<_CheckboxFieldSpecimen> createState() => _CheckboxFieldSpecimenState();
 }
 
 class _CheckboxFieldSpecimenState extends State<_CheckboxFieldSpecimen> {
   bool _accepted = false;
 
   @override
-  Widget build(BuildContext context) => ElField(
+  Widget build(BuildContext context) => Field(
     label: 'Accept the terms and conditions',
     description: 'You can withdraw consent at any time in Settings.',
-    orientation: ElFieldOrientation.horizontal,
-    child: ElCheckbox(
-      state: _accepted ? ElCheckboxState.checked : ElCheckboxState.unchecked,
-      onChanged: (ElCheckboxState next) =>
-          setState(() => _accepted = next == ElCheckboxState.checked),
+    orientation: FieldOrientation.horizontal,
+    child: Checkbox(
+      state: _accepted ? CheckboxState.checked : CheckboxState.unchecked,
+      onChanged: (CheckboxState next) =>
+          setState(() => _accepted = next == CheckboxState.checked),
     ),
   );
 }
@@ -783,51 +792,51 @@ class _SwitchSpecimenState extends State<_SwitchSpecimen> {
   bool _mfaEnabled = false;
 
   @override
-  Widget build(BuildContext context) => ElField(
+  Widget build(BuildContext context) => Field(
     label: 'Two-factor authentication',
     description: 'Require a code from your authenticator app at sign-in.',
-    orientation: ElFieldOrientation.horizontal,
-    child: ElSwitch(
+    orientation: FieldOrientation.horizontal,
+    child: Switch(
       value: _mfaEnabled,
       onChanged: (bool next) => setState(() => _mfaEnabled = next),
     ),
   );
 }
 
-const String _switchCode = '''ElField(
+const String _switchCode = '''Field(
   label: 'Two-factor authentication',
   description: 'Require a code from your authenticator app at sign-in.',
-  orientation: ElFieldOrientation.horizontal,
-  child: ElSwitch(
+  orientation: FieldOrientation.horizontal,
+  child: Switch(
     value: mfaEnabled,
     onChanged: (bool next) => setState(() => mfaEnabled = next),
   ),
 )''';
 
 /// Quoted from `example/lib/pages/forms.dart`'s `#profile-panel`
-/// composition (the `ElFieldGroup` around the Handle and Email fields),
+/// composition (the `FieldGroup` around the Handle and Email fields),
 /// trimmed to the two fields. Illustrative — `handle`/`email` are that
 /// page's own form-state plumbing, not defined here; see the Form page for
 /// the live, bound version.
-const String _compositionGroupCode = '''ElFieldGroup(
+const String _compositionGroupCode = '''FieldGroup(
   children: <Widget>[
-    ElField(
+    Field(
       label: 'Handle',
       description: 'This is how you appear on leaderboards.',
       errors: handle.errors,
       focusNode: handle.focusNode,
-      child: ElInput(
+      child: Input(
         controller: handle.controller,
         placeholder: 'ayoub',
         autofillHints: const <String>[AutofillHints.username],
       ),
     ),
-    ElField(
+    Field(
       label: 'Email',
       description: 'Receipts and nothing else.',
       errors: email.errors,
       focusNode: email.focusNode,
-      child: ElInput(
+      child: Input(
         controller: email.controller,
         placeholder: 'you@example.com',
         keyboardType: TextInputType.emailAddress,
@@ -842,23 +851,23 @@ class _ValidationSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(5),
-    runSpacing: el(5),
+    spacing: space(5),
+    runSpacing: space(5),
     children: <Widget>[
       SizedBox(
-        width: el(64),
-        child: const ElField(
+        width: space(64),
+        child: const Field(
           label: 'errors: [...]',
           errors: <String>['This field is required.'],
-          child: ElInput(),
+          child: Input(),
         ),
       ),
       SizedBox(
-        width: el(64),
-        child: const ElField(
+        width: space(64),
+        child: const Field(
           label: 'invalid: true, no errors',
           invalid: true,
-          child: ElInput(),
+          child: Input(),
         ),
       ),
     ],
@@ -867,18 +876,18 @@ class _ValidationSpecimen extends StatelessWidget {
 
 const String _validationCode =
     '''// invalid defaults to errors.isNotEmpty, but the two are separable.
-ElField(
+Field(
   label: 'Email',
   errors: const <String>['Enter a valid email address.'],
-  child: const ElInput(),
+  child: const Input(),
 )
 
 // invalid: true colours the label and control red with no message: the
 // aria-invalid-only shape the reference's own inputs page uses.
-ElField(
+Field(
   label: 'Email',
   invalid: true,
-  child: const ElInput(),
+  child: const Input(),
 )''';
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
@@ -892,59 +901,59 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elfield',
-        child: DocsApiTable(title: 'ElField', facts: _fieldFacts),
+        child: DocsApiTable(title: 'Field', facts: _fieldFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfieldscope',
-        child: DocsApiTable(title: 'ElFieldScope', facts: _fieldScopeFacts),
+        child: DocsApiTable(title: 'FieldScope', facts: _fieldScopeFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfieldactivator',
         child: DocsApiTable(
-          title: 'ElFieldActivator',
+          title: 'FieldActivator',
           facts: _fieldActivatorFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfieldgroup',
-        child: DocsApiTable(title: 'ElFieldGroup', facts: _fieldGroupFacts),
+        child: DocsApiTable(title: 'FieldGroup', facts: _fieldGroupFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfieldset',
-        child: DocsApiTable(title: 'ElFieldSet', facts: _fieldSetFacts),
+        child: DocsApiTable(title: 'FieldSet', facts: _fieldSetFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfieldlegend',
-        child: DocsApiTable(title: 'ElFieldLegend', facts: _fieldLegendFacts),
+        child: DocsApiTable(title: 'FieldLegend', facts: _fieldLegendFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfieldlabel',
-        child: DocsApiTable(title: 'ElFieldLabel', facts: _fieldLabelFacts),
+        child: DocsApiTable(title: 'FieldLabel', facts: _fieldLabelFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfielddescription',
         child: DocsApiTable(
-          title: 'ElFieldDescription',
+          title: 'FieldDescription',
           facts: _fieldDescriptionFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfielderror',
-        child: DocsApiTable(title: 'ElFieldError', facts: _fieldErrorFacts),
+        child: DocsApiTable(title: 'FieldError', facts: _fieldErrorFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfieldorientation',
         child: DocsApiTable(
-          title: 'ElFieldOrientation',
+          title: 'FieldOrientation',
           facts: _fieldOrientationFacts,
         ),
       ),
@@ -953,13 +962,17 @@ class _ApiReferenceContent extends StatelessWidget {
 }
 
 const List<DocsApiFact> _fieldFacts = <DocsApiFact>[
-  DocsApiFact(name: 'child', type: 'Widget', description: 'Required. The control.'),
+  DocsApiFact(
+    name: 'child',
+    type: 'Widget',
+    description: 'Required. The control.',
+  ),
   DocsApiFact(
     name: 'label',
     type: 'String?',
     description:
         "FieldLabel's text: rendered visibly and announced as the "
-        "control's accessible name through ElFieldScope, one string, one "
+        "control's accessible name through FieldScope, one string, one "
         'announcement.',
   ),
   DocsApiFact(
@@ -988,7 +1001,7 @@ const List<DocsApiFact> _fieldFacts = <DocsApiFact>[
     type: 'bool',
     description:
         "Defaults to true. false disables the control through "
-        "ElFieldScope, ANDed with the control's own enabled, so the "
+        "FieldScope, ANDed with the control's own enabled, so the "
         'control cannot opt back in.',
   ),
   DocsApiFact(
@@ -1000,18 +1013,18 @@ const List<DocsApiFact> _fieldFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'orientation',
-    type: 'ElFieldOrientation',
+    type: 'FieldOrientation',
     description:
-        'Defaults to vertical. See the ElFieldOrientation table below '
+        'Defaults to vertical. See the FieldOrientation table below '
         'for both values.',
   ),
   DocsApiFact(
-    name: 'ElField.gap',
+    name: 'Field.gap',
     type: 'static double (get)',
     description: '8px: between label, control, and what follows.',
   ),
   DocsApiFact(
-    name: 'ElField.describedGap',
+    name: 'Field.describedGap',
     type: 'static double (get)',
     description:
         '4px: the gap the description tucks to the moment an error '
@@ -1048,12 +1061,12 @@ const List<DocsApiFact> _fieldScopeFacts = <DocsApiFact>[
     name: 'focusNode',
     type: 'FocusNode?',
     description:
-        'The node a tapped ElFieldLabel focuses when no activator is '
+        'The node a tapped FieldLabel focuses when no activator is '
         'registered.',
   ),
   DocsApiFact(
     name: 'activator',
-    type: 'ElFieldActivator?',
+    type: 'FieldActivator?',
     description:
         'Where a control registers what activating this field does. A '
         'hand-built scope may leave this null.',
@@ -1064,8 +1077,8 @@ const List<DocsApiFact> _fieldScopeFacts = <DocsApiFact>[
     description: 'Required. The control this scope wraps.',
   ),
   DocsApiFact(
-    name: 'ElFieldScope.maybeOf',
-    type: 'static ElFieldScope? Function(BuildContext)',
+    name: 'FieldScope.maybeOf',
+    type: 'static FieldScope? Function(BuildContext)',
     description:
         'The InheritedWidget lookup a control reads to opt into '
         'everything above.',
@@ -1079,7 +1092,7 @@ const List<DocsApiFact> _fieldActivatorFacts = <DocsApiFact>[
     description:
         'Mutable, not constructor-injected: a one-slot holder. A control '
         'assigns what its own activation does during its own build; '
-        'ElFieldLabel reads it at tap time. Every instance starts with '
+        'FieldLabel reads it at tap time. Every instance starts with '
         'callback: null.',
   ),
 ];
@@ -1098,12 +1111,12 @@ const List<DocsApiFact> _fieldGroupFacts = <DocsApiFact>[
         'a group inside a group.',
   ),
   DocsApiFact(
-    name: 'ElFieldGroup.gap',
+    name: 'FieldGroup.gap',
     type: 'static double (get)',
     description: '20px: the default gap between fields.',
   ),
   DocsApiFact(
-    name: 'ElFieldGroup.nestedGap',
+    name: 'FieldGroup.nestedGap',
     type: 'static double (get)',
     description: '16px: the nested: true gap.',
   ),
@@ -1115,7 +1128,7 @@ const List<DocsApiFact> _fieldSetFacts = <DocsApiFact>[
     type: 'List<Widget>',
     description:
         'Required. Everything inside the set: typically a selection '
-        'group, then an optional ElFieldError.',
+        'group, then an optional FieldError.',
   ),
   DocsApiFact(
     name: 'tightForGroup',
@@ -1125,12 +1138,12 @@ const List<DocsApiFact> _fieldSetFacts = <DocsApiFact>[
         'a radio or checkbox group is a direct child.',
   ),
   DocsApiFact(
-    name: 'ElFieldSet.gap',
+    name: 'FieldSet.gap',
     type: 'static double (get)',
     description: '16px: the default gap.',
   ),
   DocsApiFact(
-    name: 'ElFieldSet.groupGap',
+    name: 'FieldSet.groupGap',
     type: 'static double (get)',
     description: '12px: the tightForGroup: true gap.',
   ),
@@ -1140,10 +1153,10 @@ const List<DocsApiFact> _fieldLegendFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'text',
     type: 'String',
-    description: 'Required, positional. The heading over a ElFieldSet.',
+    description: 'Required, positional. The heading over a FieldSet.',
   ),
   DocsApiFact(
-    name: 'ElFieldLegend.spaceBelow',
+    name: 'FieldLegend.spaceBelow',
     type: 'static double (get)',
     description:
         '6px, on top of: not instead of: the enclosing set\'s own gap, '
@@ -1160,9 +1173,9 @@ const List<DocsApiFact> _fieldLabelFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'spec',
-    type: 'ElTypeSpec?',
+    type: 'TextStyleToken?',
     description:
-        'Overrides ElComponentType.fieldLabel. ElFieldLabel.normal is '
+        'Overrides TextStyles.fieldLabel. FieldLabel.normal is '
         'the one built-in override — see statics.',
   ),
   DocsApiFact(
@@ -1170,14 +1183,14 @@ const List<DocsApiFact> _fieldLabelFacts = <DocsApiFact>[
     type: 'FocusNode?',
     description:
         'Focused on tap when no activator is registered. Falls back to '
-        'the enclosing ElFieldScope.',
+        'the enclosing FieldScope.',
   ),
   DocsApiFact(
     name: 'activator',
-    type: 'ElFieldActivator?',
+    type: 'FieldActivator?',
     description:
         'Where the control registered what activating this field does. '
-        'Falls back to the enclosing ElFieldScope.',
+        'Falls back to the enclosing FieldScope.',
   ),
   DocsApiFact(
     name: 'enabled',
@@ -1194,14 +1207,14 @@ const List<DocsApiFact> _fieldLabelFacts = <DocsApiFact>[
         'focus-node rungs. See Accessibility for the full ladder.',
   ),
   DocsApiFact(
-    name: 'ElFieldLabel.normal',
-    type: 'static ElTypeSpec (get)',
+    name: 'FieldLabel.normal',
+    type: 'static TextStyleToken (get)',
     description:
         'fieldLabel\'s size and leading with textSm\'s 400 weight '
         'substituted in: the filter-row "font-normal" override.',
   ),
   DocsApiFact(
-    name: 'ElFieldLabel.disabledOpacity',
+    name: 'FieldLabel.disabledOpacity',
     type: 'static const double',
     description: '0.50.',
   ),
@@ -1224,12 +1237,12 @@ const List<DocsApiFact> _fieldErrorFacts = <DocsApiFact>[
         'renders as a bare line; two or more render as a bulleted list.',
   ),
   DocsApiFact(
-    name: 'ElFieldError.listIndent',
+    name: 'FieldError.listIndent',
     type: 'static double (get)',
     description: '16px: where the bullet list starts.',
   ),
   DocsApiFact(
-    name: 'ElFieldError.itemGap',
+    name: 'FieldError.itemGap',
     type: 'static double (get)',
     description: '4px: between list items.',
   ),
@@ -1250,8 +1263,8 @@ const List<DocsApiFact> _fieldOrientationFacts = <DocsApiFact>[
     description:
         'Row: control first, then a gap, then the label, grown to fill '
         'the remaining width so the whole row is a click target, not '
-        'just the words. Used for ElCheckbox, ElSwitch, and each '
-        'ElRadioGroupItem.',
+        'just the words. Used for Checkbox, Switch, and each '
+        'RadioGroupItem.',
   ),
 ];
 
@@ -1260,7 +1273,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Rest',
     treatment:
         'Label, control, and description render in order; no '
-        'destructive tint; no ElFieldError widget exists in the tree at '
+        'destructive tint; no FieldError widget exists in the tree at '
         'all.',
     userSignal:
         'Plain label and helper text at theme.foreground and '
@@ -1269,9 +1282,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Error',
     treatment:
-        'errors non-empty (or invalid: true) merges theme.destructiveInk '
+        'errors non-empty (or invalid: true) merges theme.destructiveText '
         'over the label and the control\'s own text via DefaultTextStyle, '
-        'and mounts a ElFieldError node wrapped in '
+        'and mounts a FieldError node wrapped in '
         'Semantics(liveRegion: true).',
     userSignal:
         'Red label and message text, and the message is announced the '
@@ -1281,7 +1294,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Empty (no errors)',
     treatment:
-        'ElFieldError.build returns const SizedBox.shrink() when '
+        'FieldError.build returns const SizedBox.shrink() when '
         'messages is empty: not a zero-height live region kept mounted '
         'for later.',
     userSignal:
@@ -1292,25 +1305,25 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        "enabled: false publishes ElFieldScope.enabled: false; a "
+        "enabled: false publishes FieldScope.enabled: false; a "
         'wrapped control reads widget.enabled && (scope?.enabled ?? '
         "true), so the field's false always wins even if the control's "
         'own enabled is left true.',
     userSignal:
-        "Whatever the control's own disabled look is (ElInput and "
-        'ElCheckbox both dim). ElFieldLabel itself drops to 50% opacity '
+        "Whatever the control's own disabled look is (Input and "
+        'Checkbox both dim). FieldLabel itself drops to 50% opacity '
         'and its tap handler is removed.',
   ),
   DocsStateFact(
     state: 'Hover / Pressed / Focus-visible / Selected / Loading / Success',
     treatment:
-        'N/A, ElField paints none of these itself. A focus ring, a '
+        'N/A, Field paints none of these itself. A focus ring, a '
         'hover skin, a pressed squash, a selected fill, a spinner, and a '
-        'success tint all belong to the wrapped control (ElInput, '
-        'ElCheckbox, ElSwitch…), each documented on its own component '
+        'success tint all belong to the wrapped control (Input, '
+        'Checkbox, Switch…), each documented on its own component '
         'page.',
     userSignal:
-        'What the control renders is what shows, ElField contributes '
+        'What the control renders is what shows, Field contributes '
         'only the label, gap, and error wiring around it.',
   ),
   DocsStateFact(
@@ -1332,7 +1345,7 @@ class _AccessibilityContent extends StatelessWidget {
     children: const <Widget>[
       _A11yRow(
         'Semantic role',
-        'ElField wraps its whole subtree in Semantics(container: true, '
+        'Field wraps its whole subtree in Semantics(container: true, '
             'validationResult:), the nearest Flutter analogue to '
             'role="group" plus aria-invalid. This is set unconditionally '
             'on the field itself: it does not depend on the wrapped '
@@ -1340,9 +1353,9 @@ class _AccessibilityContent extends StatelessWidget {
       ),
       _A11yRow(
         'Label wiring',
-        'label is threaded through ElFieldScope so the control reads it '
+        'label is threaded through FieldScope so the control reads it '
             'as its own accessible name (widget.label ?? scope?.label). '
-            'The visible ElFieldLabel wraps its text in ExcludeSemantics '
+            'The visible FieldLabel wraps its text in ExcludeSemantics '
             "so the same words are not announced twice, once as the "
             'label, once as the name.',
       ),
@@ -1350,17 +1363,17 @@ class _AccessibilityContent extends StatelessWidget {
         'Description wiring',
         "description feeds Semantics.hint on the control (the "
             'aria-describedby analogue) by joining with errors, '
-            'description first, into one string. ElField renders the '
-            'visible ElFieldDescription too, but wraps that copy in '
+            'description first, into one string. Field renders the '
+            'visible FieldDescription too, but wraps that copy in '
             "ExcludeSemantics, the string is already the control's hint, "
             'so this is the one avoided double-announcement, not a '
             'second one.',
       ),
       _A11yRow(
         'Error wiring and live region: is it announced?',
-        'Yes. ElFieldError wraps its message(s) in Semantics(container: '
+        'Yes. FieldError wraps its message(s) in Semantics(container: '
             'true, liveRegion: true), the role="alert" translation. '
-            'Because ElFieldError.build returns null-equivalent '
+            'Because FieldError.build returns null-equivalent '
             '(SizedBox.shrink()) when messages is empty, that live-region '
             'node does not exist in the tree at rest: going from zero to '
             'one-or-more errors mounts a brand-new live-region node, '
@@ -1371,7 +1384,7 @@ class _AccessibilityContent extends StatelessWidget {
       ),
       _A11yRow(
         'Touch target',
-        "ElFieldLabel's own tap target is intentionally narrowed to the "
+        "FieldLabel's own tap target is intentionally narrowed to the "
             'words themselves (Align + heightFactor: 1, no forced width): '
             'tapping empty space to the right of a short label inside a '
             "wide field does not activate the control. This mirrors an "
@@ -1381,8 +1394,8 @@ class _AccessibilityContent extends StatelessWidget {
       _A11yRow(
         'Non-colour signal',
         "The error message's own words are the primary signal; "
-            'destructiveInk on top of that is reinforcement, not the '
-            'only cue, ElField never ships a red-only, textless error '
+            'destructiveText on top of that is reinforcement, not the '
+            'only cue, Field never ships a red-only, textless error '
             'state.',
       ),
       _A11yRow(
@@ -1399,7 +1412,7 @@ class _AccessibilityContent extends StatelessWidget {
             'so no label there turns red despite an API table claiming '
             'the field "handles the invalid colouring for the whole '
             'group": while its forms page does set it, and there it '
-            'fires. ElField.invalid reproduces that separable switch '
+            'fires. Field.invalid reproduces that separable switch '
             'rather than papering over it; the "invalid: true, no '
             'message" specimen in Preview is that exact case.',
         last: true,
@@ -1417,22 +1430,22 @@ class _A11yRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : el(3)),
+      padding: EdgeInsets.only(bottom: last ? 0 : space(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.section, color: theme.actionInk),
-          SizedBox(height: el(1)),
-          ElText(body, ElType.small),
+          StyledText(label, TextStyles.section, color: theme.actionText),
+          SizedBox(height: space(1)),
+          StyledText(body, TextStyles.small),
         ],
       ),
     );
   }
 }
 
-/// Read directly off `ElFieldLabel.build` (`lib/src/components/field.dart`):
+/// Read directly off `FieldLabel.build` (`lib/src/components/field.dart`):
 /// field.dart wires no `Focus.onKeyEvent` of its own anywhere, so every fact
 /// here is about what does NOT happen.
 class _KeyboardContent extends StatelessWidget {
@@ -1440,26 +1453,26 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No key handling of its own: field.dart wires no '
             'Focus.onKeyEvent anywhere. Every key a keyboard user presses '
-            'while a field is focused reaches whatever control ElField '
+            'while a field is focused reaches whatever control Field '
             'wraps, unfiltered.',
-        'ElFieldLabel is tap-only: it is built from a bare GestureDetector, '
+        'FieldLabel is tap-only: it is built from a bare GestureDetector, '
             'never a Focus node of its own. It cannot receive keyboard '
             'focus and has no key binding — a keyboard user tabs straight '
             'past the visible label to the control it names.',
         'Tab order: field.dart declares no FocusTraversalPolicy. Tab and '
             'Shift+Tab walk whatever order the surrounding page — or '
-            'ElFieldGroup\'s own child order — already declares.',
+            'FieldGroup\'s own child order — already declares.',
         'focusNode only moves focus programmatically, never in response '
-            'to a key event: it is the node a tapped ElFieldLabel calls '
+            'to a key event: it is the node a tapped FieldLabel calls '
             '.requestFocus() on (the last rung of the tap-activation '
-            'ladder, see Accessibility), and the node a failed ElForm '
+            'ladder, see Accessibility), and the node a failed Form '
             'submit lands on via focusFirstError().',
         'The wrapped control\'s own keyboard behaviour (Enter/Space on '
-            'ElCheckbox and ElSwitch, arrow keys on a ElRadioGroup, typed '
-            'characters on ElInput and ElTextarea) is entirely that '
+            'Checkbox and Switch, arrow keys on a RadioGroup, typed '
+            'characters on Input and Textarea) is entirely that '
             "control's own: field.dart neither adds nor removes a "
             'binding.',
       ]);
@@ -1470,18 +1483,18 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'No responsive breakpoints of its own, ElField reads no '
+      _bullets(ThemeScope.of(context), <String>[
+        'No responsive breakpoints of its own, Field reads no '
             'MediaQuery and renders the same Column or Row at 390px and '
             '1440px. *:w-full is real here: CrossAxisAlignment.stretch '
             'forces every direct child (label, control, description, '
-            'error) to the field\'s own width, so a ElInput inside a '
-            "ElField always fills the field's measure rather than sizing "
+            'error) to the field\'s own width, so a Input inside a '
+            "Field always fills the field's measure rather than sizing "
             'to its content.',
-        'ElFieldGroup and ElFieldSet are Columns with mainAxisSize: '
+        'FieldGroup and FieldSet are Columns with mainAxisSize: '
             'MainAxisSize.min: they take exactly the height their '
             'children need and never impose a width; the surrounding '
-            'layout (a ElCard, a form panel measure) decides how wide a '
+            'layout (a Card, a form panel measure) decides how wide a '
             'stack of fields gets.',
         'Keyboard activation (the label tap ladder above) and pointer '
             'activation behave identically on every Flutter target this '
@@ -1526,7 +1539,7 @@ class _DependenciesContent extends StatelessWidget {
             description:
                 "The manifest's registryDependencies, resolved "
                 'automatically by the registry client. rule supplies '
-                'ElRules.dedupe, used to deduplicate errors before '
+                'Validators.dedupe, used to deduplicate errors before '
                 'render.',
           ),
           const DocsInstallFact(
@@ -1538,26 +1551,25 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Shaders',
             value: 'none',
             description:
-                'The bullet marker in a multi-message ElFieldError is a '
+                'The bullet marker in a multi-message FieldError is a '
                 'text glyph, not a painted shape.',
           ),
           const DocsInstallFact(
             label: 'Platforms',
             value: 'Android, iOS, Web, macOS, Windows, Linux',
-            description:
-                'Pure widget composition; nothing platform-gated.',
+            description: 'Pure widget composition; nothing platform-gated.',
           ),
           const DocsInstallFact(
             label: 'Verified',
             value: 'package tests + this docs specimen',
             description:
-                "test/inputs_test.dart's 'ElField' and 'ElFieldSet' "
+                "test/inputs_test.dart's 'Field' and 'FieldSet' "
                 "groups, plus this page's own live specimens. No fixture "
                 'install was run as part of writing this page.',
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Rule', route: '/components/rule'),
@@ -1567,10 +1579,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Switch', route: '/components/switch'),
           DocsLink(label: 'Textarea', route: '/components/textarea'),
           DocsLink(label: 'Slider', route: '/components/slider'),
-          DocsLink(
-            label: 'Native select',
-            route: '/components/native_select',
-          ),
+          DocsLink(label: 'Native select', route: '/components/native_select'),
           DocsLink(
             label: 'Selection control',
             route: '/components/selection_control',
@@ -1589,25 +1598,25 @@ class _ThemingContent extends StatelessWidget {
     title: 'What actually varies with the theme',
     facts: const <DocsInstallFact>[
       DocsInstallFact(
-        label: 'destructiveInk',
-        value: 'theme.destructiveInk',
+        label: 'destructiveText',
+        value: 'theme.destructiveText',
         description:
-            'The one theme colour ElField reads directly, merged over '
+            'The one theme colour Field reads directly, merged over '
             'the subtree via DefaultTextStyle when invalid. Everything '
             'else — the label\'s own ink, the description\'s '
             'theme.mutedForeground, the control\'s own fill and border — '
-            "belongs to ElText's type specs or to the wrapped control, "
+            "belongs to StyledText's type specs or to the wrapped control, "
             'not to field.dart itself.',
       ),
       DocsInstallFact(
         label: 'Type specs',
         value:
-            'ElComponentType.fieldLabel, ElType.small, '
-            'ElComponentType.textSm',
+            'TextStyles.fieldLabel, TextStyles.small, '
+            'TextStyles.bodySmall',
         description:
             'The label, description, and error each carry their own '
             'fixed type spec: none configurable per instance except '
-            'ElFieldLabel.spec, which ElField itself never overrides '
+            'FieldLabel.spec, which Field itself never overrides '
             '(it always renders the plain fieldLabel spec).',
       ),
       DocsInstallFact(
@@ -1622,15 +1631,19 @@ class _ThemingContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

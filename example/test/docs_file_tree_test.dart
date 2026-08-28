@@ -10,8 +10,35 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_file_tree.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart' as flutter show RichText;
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
@@ -32,22 +59,22 @@ const List<DocsCodeFile> _duplicateBasenames = <DocsCodeFile>[
   DocsCodeFile(path: 'lib/widgets/two/config.dart', code: 'class ConfigTwo {}'),
 ];
 
-Future<ElThemeController> _pumpTree(
+Future<ThemeController> _pumpTree(
   WidgetTester tester, {
   required List<DocsCodeFile> files,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   String label = 'Files',
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -106,7 +133,7 @@ void main() {
     expect(find.bySemanticsLabel('Selected file solo.dart'), findsOneWidget);
     // The one file-entry row, plus the copy control for its source — not
     // the bare 1 this used to assert before the copy affordance existed.
-    expect(find.byType(ElButton), findsNWidgets(2));
+    expect(find.byType(Button), findsNWidgets(2));
 
     // Tapping the only, already-selected entry must not throw or blank the
     // pane.
@@ -120,12 +147,12 @@ void main() {
   ) async {
     await _pumpTree(tester, files: _twoFiles);
 
-    final Iterable<ElButton> entries = tester
-        .widgetList<ElButton>(find.byType(ElButton))
-        .where((ElButton b) => b.key is ValueKey<String>);
+    final Iterable<Button> entries = tester
+        .widgetList<Button>(find.byType(Button))
+        .where((Button b) => b.key is ValueKey<String>);
     expect(entries.length, 2);
-    for (final ElButton entry in entries) {
-      // A ElButton always carries a callback and an accessible label — a
+    for (final Button entry in entries) {
+      // A Button always carries a callback and an accessible label — a
       // disabled or unlabeled control here would mean the row degraded to
       // decoration.
       expect(entry.onPressed, isNotNull);
@@ -138,12 +165,12 @@ void main() {
     (WidgetTester tester) async {
       await _pumpTree(tester, files: _twoFiles, size: _wide);
 
-      final List<ElButton> entries = tester
-          .widgetList<ElButton>(find.byType(ElButton))
-          .where((ElButton b) => b.key is ValueKey<String>)
+      final List<Button> entries = tester
+          .widgetList<Button>(find.byType(Button))
+          .where((Button b) => b.key is ValueKey<String>)
           .toList();
       expect(entries, isNotEmpty);
-      for (final ElButton entry in entries) {
+      for (final Button entry in entries) {
         expect(entry.expanded, isTrue);
       }
     },
@@ -154,12 +181,12 @@ void main() {
     (WidgetTester tester) async {
       await _pumpTree(tester, files: _twoFiles, size: _narrow);
 
-      final List<ElButton> entries = tester
-          .widgetList<ElButton>(find.byType(ElButton))
-          .where((ElButton b) => b.key is ValueKey<String>)
+      final List<Button> entries = tester
+          .widgetList<Button>(find.byType(Button))
+          .where((Button b) => b.key is ValueKey<String>)
           .toList();
       expect(entries, isNotEmpty);
-      for (final ElButton entry in entries) {
+      for (final Button entry in entries) {
         expect(entry.expanded, isFalse);
       }
 
@@ -174,23 +201,23 @@ void main() {
     testWidgets('renders the same structure on light', (
       WidgetTester tester,
     ) async {
-      await _pumpTree(tester, files: _twoFiles, mode: ElThemeMode.light);
+      await _pumpTree(tester, files: _twoFiles, mode: ColorMode.light);
 
       expect(find.text('class A {}'), findsOneWidget);
       // 2 file-entry rows + 1 copy control for the selected file.
-      expect(find.byType(ElButton), findsNWidgets(3));
+      expect(find.byType(Button), findsNWidgets(3));
     });
 
     testWidgets('flipping the theme in place preserves selection', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpTree(tester, files: _twoFiles);
+      final ThemeController theme = await _pumpTree(tester, files: _twoFiles);
 
       await tester.tap(find.bySemanticsLabel('Select file b.dart'));
       await tester.pump();
       expect(find.text('class B {}'), findsOneWidget);
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
       // The theme flip must not reset internal selection state.
@@ -207,12 +234,10 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController theme = ElThemeController(
-          mode: ElThemeMode.dark,
-        );
+        final ThemeController theme = ThemeController(mode: ColorMode.dark);
         addTearDown(theme.dispose);
 
-        Widget host(List<DocsCodeFile> files) => ElTheme(
+        Widget host(List<DocsCodeFile> files) => ThemeScope(
           controller: theme,
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -255,7 +280,7 @@ void main() {
         find.byKey(const ValueKey<String>('docs-file-tree-empty')),
         findsOneWidget,
       );
-      expect(find.byType(ElButton), findsNothing);
+      expect(find.byType(Button), findsNothing);
     });
   });
 
@@ -316,13 +341,11 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController theme = ElThemeController(
-          mode: ElThemeMode.dark,
-        );
+        final ThemeController theme = ThemeController(mode: ColorMode.dark);
         addTearDown(theme.dispose);
 
         await tester.pumpWidget(
-          ElTheme(
+          ThemeScope(
             controller: theme,
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -356,11 +379,11 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController theme = ElThemeController(mode: ElThemeMode.dark);
+      final ThemeController theme = ThemeController(mode: ColorMode.dark);
       addTearDown(theme.dispose);
 
       await tester.pumpWidget(
-        ElTheme(
+        ThemeScope(
           controller: theme,
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -468,7 +491,7 @@ void main() {
       expect(vertical.position.maxScrollExtent, greaterThan(0));
     });
 
-    // Catches: re-wrapping a multi-line listing in `ElLineBox`. That widget
+    // Catches: re-wrapping a multi-line listing in `LineBox`. That widget
     // restores a paragraph's CSS height by growing the *paragraph* and
     // centring the difference, so 400 lines of half-pixel correction landed as
     // one lump of dead air above the first line — the audit's F6.
@@ -480,7 +503,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(DocsSelectableCodeBlock),
-          matching: find.byType(ElLineBox),
+          matching: find.byType(LineBox),
         ),
         findsNothing,
         reason: 'a whole-paragraph leading correction belongs to one line',
@@ -493,16 +516,19 @@ void main() {
           .getRect(
             find.descendant(
               of: find.text(longSource),
-              matching: find.byType(RichText),
+              matching: find.byType(flutter.RichText),
             ),
           )
           .top;
       // `p-5` and the hairline the frame is paid out of — nothing else.
-      expect(firstLineTop - blockTop, closeTo(el(5) + ElWidths.hairline, 1));
+      expect(
+        firstLineTop - blockTop,
+        closeTo(space(5) + BorderWidths.hairline, 1),
+      );
     });
 
     // The single-line command block keeps its line box: there the correction
-    // is one line's worth, which is exactly what `ElLineBox` is for.
+    // is one line's worth, which is exactly what `LineBox` is for.
     testWidgets('a one-line block keeps its CSS line box', (
       WidgetTester tester,
     ) async {
@@ -511,7 +537,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(DocsSelectableCodeBlock),
-          matching: find.byType(ElLineBox),
+          matching: find.byType(LineBox),
         ),
         findsOneWidget,
       );

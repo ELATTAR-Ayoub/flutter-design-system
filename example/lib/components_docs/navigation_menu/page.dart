@@ -1,6 +1,6 @@
 /// Public documentation page for the `navigation_menu` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` established. Every specimen
@@ -8,7 +8,7 @@
 /// page carried; the Preview section gains real matching code (it had a
 /// live specimen but no code before). New: a Keyboard disclosure, between
 /// Accessibility and Responsive — navigation_menu.dart wires none, and
-/// nothing in ElPress (motion/press.dart), which every trigger and link
+/// nothing in Press (motion/press.dart), which every trigger and link
 /// row is built on, wires one either: no Focus widget anywhere in either
 /// file, so this is the same "genuinely nothing to report" story
 /// `breadcrumb` and `tabs` already carry, confirmed by grep, not assumed.
@@ -18,7 +18,7 @@
 /// still says the same — both stale.
 /// `registry/components/navigation-menu.json` exists on disk today, with
 /// the exact `registryDependencies` `meta.dart` already lists (icon,
-/// popover, press-motion, source-foundation), so `elattar add
+/// popover, press, source-foundation), so `elattar add
 /// navigation-menu` genuinely resolves. Installation and Dependencies below
 /// both say so; `meta.dart` is left as found, out of this rollout's scope.
 ///
@@ -26,17 +26,29 @@
 /// `https://ui.shadcn.com/docs/components/base/navigation-menu`: Navigation
 /// Menu, Installation, Usage, Composition, Link Component, RTL, API
 /// Reference. `Link Component` is skipped and named here instead: it
-/// composes a Next.js `Link` render prop; `ElNavigationMenuItem.link()`
+/// composes a Next.js `Link` render prop; `NavigationMenuItem.link()`
 /// takes a plain `onTap` callback, so there is nothing analogous to show.
 ///
 /// **Split history.** This directory used to document `navigation_menu`,
 /// `menubar`, `context_menu`, and `hover_card` together as one page (they
-/// all build on [ElPopover]). Phase F/J split each into its own
+/// all build on [Popover]). Phase F/J split each into its own
 /// `<name>/page.dart`; this file keeps only the navigation menu.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -65,7 +77,7 @@ final ComponentDocSpec navigationMenuDocSpec = ComponentDocSpec(
       description:
           'navigation-menu is a registry item: elattar add navigation-menu '
           'installs lib/src/components/navigation_menu.dart and resolves '
-          'icon, popover, press-motion and source-foundation '
+          'icon, popover, press and source-foundation '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
       command: navigationMenuDoc.command,
@@ -85,7 +97,7 @@ final ComponentDocSpec navigationMenuDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElNavigationMenu and the rest of '
+              'Add the export line so NavigationMenu and the rest of '
               'the family are reachable the same way the CLI path '
               'already makes them.',
           code: "export 'navigation_menu.dart';",
@@ -105,7 +117,7 @@ final ComponentDocSpec navigationMenuDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          'What the constructor assembles internally. ElNavigationMenu '
+          'What the constructor assembles internally. NavigationMenu '
           'does not take a caller-assembled tree of sub-widgets the way '
           "shadcn's NavigationMenuList markup does: it takes a flat "
           'items list and builds the tree below from it — a structure '
@@ -118,7 +130,7 @@ final ComponentDocSpec navigationMenuDocSpec = ComponentDocSpec(
       title: 'RTL',
       description:
           'The same trigger-and-panel composition read right-to-left '
-          'under a Directionality. Nothing in ElNavigationMenu mirrors '
+          'under a Directionality. Nothing in NavigationMenu mirrors '
           'by hand: the chevron rotation and the panel anchoring both '
           'follow direction automatically.',
       specimen: _RtlSpecimen(),
@@ -129,29 +141,26 @@ final ComponentDocSpec navigationMenuDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElNavigationMenu, '
-          'ElNavigationMenuItem, ElNavigationMenuLink, and '
-          'ElNavigationMenuIndicator declare, plus the static layout '
+          'Every constructor parameter NavigationMenu, '
+          'NavigationMenuItem, NavigationMenuLink, and '
+          'NavigationMenuIndicator declare, plus the static layout '
           'helpers a caller composing around the trigger reaches for.',
       children: const <DocsTocEntry>[
+        DocsTocEntry(title: 'NavigationMenu', anchor: 'api-elnavigationmenu'),
         DocsTocEntry(
-          title: 'ElNavigationMenu',
-          anchor: 'api-elnavigationmenu',
-        ),
-        DocsTocEntry(
-          title: 'ElNavigationMenu static helpers',
+          title: 'NavigationMenu static helpers',
           anchor: 'api-elnavigationmenu-static',
         ),
         DocsTocEntry(
-          title: 'ElNavigationMenuItem',
+          title: 'NavigationMenuItem',
           anchor: 'api-elnavigationmenuitem',
         ),
         DocsTocEntry(
-          title: 'ElNavigationMenuLink',
+          title: 'NavigationMenuLink',
           anchor: 'api-elnavigationmenulink',
         ),
         DocsTocEntry(
-          title: 'ElNavigationMenuIndicator',
+          title: 'NavigationMenuIndicator',
           anchor: 'api-elnavigationmenuindicator',
         ),
       ],
@@ -177,7 +186,7 @@ final ComponentDocSpec navigationMenuDocSpec = ComponentDocSpec(
       description:
           'navigation_menu.dart wires no key handling of its own — every '
           'fact here is about what does NOT happen, read off it and its '
-          'one trigger/link primitive, ElPress (motion/press.dart), '
+          'one trigger/link primitive, Press (motion/press.dart), '
           'directly.',
       child: _KeyboardContent(),
     ),
@@ -241,9 +250,9 @@ class NavigationMenuDocPage extends StatelessWidget {
       title: navigationMenuDoc.title,
       description: navigationMenuDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Navigation Menu'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Navigation Menu'),
     ],
     toc: navigationMenuDocSpec.toc,
     previous: const DocsPageLink(
@@ -271,34 +280,42 @@ class _PreviewSpecimen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: ElNavigationMenu(
+      child: NavigationMenu(
         key: const ValueKey<String>('nav-menu-specimen'),
         viewport: true,
         indicator: false,
-        items: <ElNavigationMenuItem>[
-          ElNavigationMenuItem.trigger(
+        items: <NavigationMenuItem>[
+          NavigationMenuItem.trigger(
             label: 'Products',
             content: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElNavigationMenuLink(child: ElText('Item 1', ElType.small)),
-                ElNavigationMenuLink(child: ElText('Item 2', ElType.small)),
+                NavigationMenuLink(
+                  child: StyledText('Item 1', TextStyles.small),
+                ),
+                NavigationMenuLink(
+                  child: StyledText('Item 2', TextStyles.small),
+                ),
               ],
             ),
           ),
-          ElNavigationMenuItem.trigger(
+          NavigationMenuItem.trigger(
             label: 'Company',
             content: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElNavigationMenuLink(child: ElText('About', ElType.small)),
-                ElNavigationMenuLink(child: ElText('Careers', ElType.small)),
+                NavigationMenuLink(
+                  child: StyledText('About', TextStyles.small),
+                ),
+                NavigationMenuLink(
+                  child: StyledText('Careers', TextStyles.small),
+                ),
               ],
             ),
           ),
-          ElNavigationMenuItem.link(label: 'Contact'),
+          NavigationMenuItem.link(label: 'Contact'),
         ],
       ),
     );
@@ -314,21 +331,25 @@ class _RtlSpecimen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: ElNavigationMenu(
+        child: NavigationMenu(
           viewport: true,
-          items: <ElNavigationMenuItem>[
-            ElNavigationMenuItem.trigger(
+          items: <NavigationMenuItem>[
+            NavigationMenuItem.trigger(
               label: 'المنتجات',
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  ElNavigationMenuLink(child: ElText('العنصر 1', ElType.small)),
-                  ElNavigationMenuLink(child: ElText('العنصر 2', ElType.small)),
+                  NavigationMenuLink(
+                    child: StyledText('العنصر 1', TextStyles.small),
+                  ),
+                  NavigationMenuLink(
+                    child: StyledText('العنصر 2', TextStyles.small),
+                  ),
                 ],
               ),
             ),
-            ElNavigationMenuItem.link(label: 'اتصل بنا'),
+            NavigationMenuItem.link(label: 'اتصل بنا'),
           ],
         ),
       ),
@@ -338,90 +359,90 @@ class _RtlSpecimen extends StatelessWidget {
 
 /* ── Source strings ─────────────────────────────────────────────────────── */
 
-const String _previewCode = '''ElNavigationMenu(
+const String _previewCode = '''NavigationMenu(
   viewport: true,
   indicator: false,
-  items: <ElNavigationMenuItem>[
-    ElNavigationMenuItem.trigger(
+  items: <NavigationMenuItem>[
+    NavigationMenuItem.trigger(
       label: 'Products',
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElNavigationMenuLink(child: ElText('Item 1', ElType.small)),
-          ElNavigationMenuLink(child: ElText('Item 2', ElType.small)),
+          NavigationMenuLink(child: StyledText('Item 1', TextStyles.small)),
+          NavigationMenuLink(child: StyledText('Item 2', TextStyles.small)),
         ],
       ),
     ),
-    ElNavigationMenuItem.trigger(
+    NavigationMenuItem.trigger(
       label: 'Company',
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElNavigationMenuLink(child: ElText('About', ElType.small)),
-          ElNavigationMenuLink(child: ElText('Careers', ElType.small)),
+          NavigationMenuLink(child: StyledText('About', TextStyles.small)),
+          NavigationMenuLink(child: StyledText('Careers', TextStyles.small)),
         ],
       ),
     ),
-    ElNavigationMenuItem.link(label: 'Contact'),
+    NavigationMenuItem.link(label: 'Contact'),
   ],
 )''';
 
 const String _navMenuCode =
-    '''final List<ElNavigationMenuItem> items = <ElNavigationMenuItem>[
-  ElNavigationMenuItem.trigger(
+    '''final List<NavigationMenuItem> items = <NavigationMenuItem>[
+  NavigationMenuItem.trigger(
     label: 'Products',
     content: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElNavigationMenuLink(child: const ElText('Item 1', ElType.small)),
-        ElNavigationMenuLink(child: const ElText('Item 2', ElType.small)),
+        NavigationMenuLink(child: const StyledText('Item 1', TextStyles.small)),
+        NavigationMenuLink(child: const StyledText('Item 2', TextStyles.small)),
       ],
     ),
   ),
-  ElNavigationMenuItem.link(label: 'Contact', onTap: () {}),
+  NavigationMenuItem.link(label: 'Contact', onTap: () {}),
 ];
 
-return ElNavigationMenu(
+return NavigationMenu(
   viewport: true,
   indicator: false,
   items: items,
 );''';
 
-const String _navMenuCompositionCode = '''ElNavigationMenu(
-  items: <ElNavigationMenuItem>[
-    ElNavigationMenuItem.trigger(       // opens a shared or per-item panel
+const String _navMenuCompositionCode = '''NavigationMenu(
+  items: <NavigationMenuItem>[
+    NavigationMenuItem.trigger(       // opens a shared or per-item panel
       label: '...',
       content: Column(
         children: <Widget>[
-          ElNavigationMenuLink(child: ...),  // one row per destination
+          NavigationMenuLink(child: ...),  // one row per destination
         ],
       ),
     ),
-    ElNavigationMenuItem.link(label: '...'), // a plain destination, no panel
+    NavigationMenuItem.link(label: '...'), // a plain destination, no panel
   ],
-  indicator: false,  // when true, mounts a ElNavigationMenuIndicator
+  indicator: false,  // when true, mounts a NavigationMenuIndicator
 )''';
 
 const String _navMenuRtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElNavigationMenu(
+  child: NavigationMenu(
     viewport: true,
-    items: <ElNavigationMenuItem>[
-      ElNavigationMenuItem.trigger(
+    items: <NavigationMenuItem>[
+      NavigationMenuItem.trigger(
         label: 'المنتجات',
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ElNavigationMenuLink(child: const ElText('العنصر 1', ElType.small)),
-            ElNavigationMenuLink(child: const ElText('العنصر 2', ElType.small)),
+            NavigationMenuLink(child: const StyledText('العنصر 1', TextStyles.small)),
+            NavigationMenuLink(child: const StyledText('العنصر 2', TextStyles.small)),
           ],
         ),
       ),
-      ElNavigationMenuItem.link(label: 'اتصل بنا'),
+      NavigationMenuItem.link(label: 'اتصل بنا'),
     ],
   ),
 )''';
@@ -438,39 +459,39 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-elnavigationmenu',
         child: DocsApiTable(
-          title: 'ElNavigationMenu',
+          title: 'NavigationMenu',
           facts: _navigationMenuApiFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elnavigationmenu-static',
         child: DocsApiTable(
-          title: 'ElNavigationMenu static helpers',
+          title: 'NavigationMenu static helpers',
           facts: _navigationMenuStaticFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elnavigationmenuitem',
         child: DocsApiTable(
-          title: 'ElNavigationMenuItem',
+          title: 'NavigationMenuItem',
           facts: _navigationMenuItemApiFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elnavigationmenulink',
         child: DocsApiTable(
-          title: 'ElNavigationMenuLink',
+          title: 'NavigationMenuLink',
           facts: _navigationMenuLinkApiFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elnavigationmenuindicator',
         child: DocsApiTable(
-          title: 'ElNavigationMenuIndicator',
+          title: 'NavigationMenuIndicator',
           facts: _navigationMenuIndicatorApiFacts,
         ),
       ),
@@ -483,11 +504,11 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Semantic role: Semantics(button: true, expanded: ...) on a '
             'trigger (expanded only when the trigger has a chevron); '
             'Semantics(link: true, selected: active) on a panel row '
-            '(ElNavigationMenuLink).',
+            '(NavigationMenuLink).',
         'Keyboard interactions: none. See Keyboard below for the full '
             'account, read directly off the source.',
         'Escape behavior: closes the panel if focus is inside it. Focus '
@@ -504,11 +525,11 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No Focus or FocusNode anywhere in navigation_menu.dart, '
             'confirmed by grep, not assumed: every trigger and panel row '
-            'wraps a MouseRegion and ElPress, never a Focus widget.',
-        'ElPress itself (motion/press.dart), the trigger and link\'s own '
+            'wraps a MouseRegion and Press, never a Focus widget.',
+        'Press itself (motion/press.dart), the trigger and link\'s own '
             'tap/hover primitive, wires no Focus either: only '
             'PointerDownEvent/PointerUpEvent listeners for the press '
             'squash. Neither file this page depends on gives a trigger a '
@@ -533,16 +554,16 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching in navigation_menu.dart: BuildContext '
             'width is never read for a layout decision.',
         'Every measurement (listGap, triggerHeight, triggerPaddingX, '
             'triggerGap, panelOffset, panelPadding, indicatorHeight, '
-            'caretSize) is a fixed el() value.',
+            'caretSize) is a fixed space() value.',
         'viewport controls anchoring, not screen size: true anchors one '
             "shared panel to the bar's own leading edge; false anchors "
             'each item\'s panel to that item instead.',
-        "The panel relies on ElPopover's collision algorithm to flip "
+        "The panel relies on Popover's collision algorithm to flip "
             'sides and shift along the cross axis near a viewport edge, '
             'and snaps without transition when it does.',
         'Platform parity: Android, iOS, Web, macOS, Windows, and Linux '
@@ -558,25 +579,25 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Registry item: registry/components/navigation-menu.json exists '
             'and lists exactly the dependencies below: elattar add '
             'navigation-menu is a real, working install path.',
-        'Primary dependency: ElPopover. Mounts the shared or per-item '
-            'panel through ElPopover for placement, animation, and '
-            'barrier behavior (ElPopoverBarrier.none: hover would '
+        'Primary dependency: Popover. Mounts the shared or per-item '
+            'panel through Popover for placement, animation, and '
+            'barrier behavior (PopoverBarrier.none: hover would '
             'otherwise fight a dismiss barrier).',
-        'Also imports: ElIcon (chevron, from icon.dart) and ElPress '
+        'Also imports: Icon (chevron, from icon.dart) and Press '
             '(trigger tap/hover, from motion/press.dart).',
         'Platforms: Android, iOS, Web, macOS, Windows, Linux — pure '
             'widget composition; nothing platform-gated.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Popover', route: '/components/popover'),
-          DocsLink(label: 'Press Motion', route: '/components/press_motion'),
+          DocsLink(label: 'Press Motion', route: '/components/press'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',
@@ -592,36 +613,40 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Trigger, rest: theme.mutedForeground text, transparent fill. '
             'Trigger, hover or open: theme.secondary fill, '
             'theme.foreground text: neither transitions (drift: only '
             'transform is declared as transitioning, so colour '
             'hard-cuts).',
         'Panel: theme.popover fill, theme.popoverForeground text, via '
-            'ElPopoverSurface, which also applies the ring and shadow.',
-        'Panel row (ElNavigationMenuLink), rest: theme.mutedForeground '
+            'PopoverSurface, which also applies the ring and shadow.',
+        'Panel row (NavigationMenuLink), rest: theme.mutedForeground '
             'text, transparent fill. Hover or active: theme.accent fill, '
             'theme.accentForeground text.',
         'Indicator caret: theme.popover fill, theme.foreground at 10% '
-            "alpha for its ring (matching ElPopoverSurface's own rim).",
+            "alpha for its ring (matching PopoverSurface's own rim).",
         'Animation: panel zoom-in-95/fade-in-0 (no slide) runs through '
-            'ElDurations.overlay; the chevron rotates over '
-            'ElDurations.transitionDefault on ElCurves.spring. Both '
+            'MotionDurations.overlayEnter; the chevron rotates over '
+            'MotionDurations.normal on MotionCurves.emphasized. Both '
             'collapse to zero under reduced motion via '
-            'elAnimationDuration.',
+            'effectiveMotionDuration.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -631,7 +656,7 @@ Widget _bullets(ElThemeData theme, List<String> lines) => Column(
 const List<DocsApiFact> _navigationMenuApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'items',
-    type: 'List<ElNavigationMenuItem>',
+    type: 'List<NavigationMenuItem>',
     description:
         'Required. Trigger items with panels, and link items without '
         'panels, in bar order.',
@@ -648,58 +673,58 @@ const List<DocsApiFact> _navigationMenuApiFacts = <DocsApiFact>[
     name: 'indicator',
     type: 'bool',
     description:
-        'Optional. Defaults to false. Mounts a ElNavigationMenuIndicator '
+        'Optional. Defaults to false. Mounts a NavigationMenuIndicator '
         'caret sized to the open trigger. Documented drift: it does not '
         'point at the open trigger past the first item (see '
-        'ElNavigationMenuIndicator below).',
+        'NavigationMenuIndicator below).',
   ),
 ];
 
 const List<DocsApiFact> _navigationMenuStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElNavigationMenu.listGap',
+    name: 'NavigationMenu.listGap',
     type: 'static double',
     description: 'Gap between triggers in the bar: 4px.',
   ),
   DocsApiFact(
-    name: 'ElNavigationMenu.triggerHeight',
+    name: 'NavigationMenu.triggerHeight',
     type: 'static double',
     description: 'A trigger\'s fixed height: 40px.',
   ),
   DocsApiFact(
-    name: 'ElNavigationMenu.triggerPaddingX',
+    name: 'NavigationMenu.triggerPaddingX',
     type: 'static double',
     description: 'A trigger\'s horizontal padding: 16px.',
   ),
   DocsApiFact(
-    name: 'ElNavigationMenu.triggerGap',
+    name: 'NavigationMenu.triggerGap',
     type: 'static double',
     description: 'Gap between a trigger\'s label and its chevron: 6px.',
   ),
   DocsApiFact(
-    name: 'ElNavigationMenu.chevronPx',
+    name: 'NavigationMenu.chevronPx',
     type: 'static double',
-    description: 'The trigger chevron\'s rendered size: 14px (ElIconSize.sm).',
+    description: 'The trigger chevron\'s rendered size: 14px (IconSize.sm).',
   ),
   DocsApiFact(
-    name: 'ElNavigationMenu.panelOffset',
+    name: 'NavigationMenu.panelOffset',
     type: 'static double',
     description: 'Gap between the bar and the panel: 8px.',
   ),
   DocsApiFact(
-    name: 'ElNavigationMenu.panelPadding',
+    name: 'NavigationMenu.panelPadding',
     type: 'static double',
     description: 'Padding inside the panel: 8px.',
   ),
   DocsApiFact(
-    name: 'ElNavigationMenu.indicatorHeight',
+    name: 'NavigationMenu.indicatorHeight',
     type: 'static double',
     description:
         'The indicator\'s clipping band: 8px, exactly panelOffset, so an '
         'indicator and a panel never fight for the same pixels.',
   ),
   DocsApiFact(
-    name: 'ElNavigationMenu.caretSize',
+    name: 'NavigationMenu.caretSize',
     type: 'static double',
     description:
         'The square that becomes the indicator\'s caret once rotated: 8px.',
@@ -708,14 +733,14 @@ const List<DocsApiFact> _navigationMenuStaticFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _navigationMenuItemApiFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElNavigationMenuItem.trigger()',
+    name: 'NavigationMenuItem.trigger()',
     type: 'constructor',
     description:
         'A trigger that opens a panel of content: requires label and '
         'content.',
   ),
   DocsApiFact(
-    name: 'ElNavigationMenuItem.link()',
+    name: 'NavigationMenuItem.link()',
     type: 'constructor',
     description:
         'A plain destination link, no panel: requires label, optional '
@@ -731,7 +756,7 @@ const List<DocsApiFact> _navigationMenuItemApiFacts = <DocsApiFact>[
     type: 'Widget?',
     description:
         'The panel body for a trigger item: the caller\'s row of '
-        'ElNavigationMenuLink widgets. Always null for a link item.',
+        'NavigationMenuLink widgets. Always null for a link item.',
   ),
   DocsApiFact(
     name: 'onTap',
@@ -771,7 +796,7 @@ const List<DocsApiFact> _navigationMenuIndicatorApiFacts = <DocsApiFact>[
     type: 'double',
     description:
         'Required. The open trigger\'s measured width (rounded to an '
-        'integer, matching how Radix reads offsetWidth). ElNavigationMenu '
+        'integer, matching how Radix reads offsetWidth). NavigationMenu '
         'mounts this itself when indicator is true; a caller does not '
         'construct it directly in practice.',
   ),
@@ -799,9 +824,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Open',
     treatment:
-        'The panel mounts through ElPopover and animates in with '
+        'The panel mounts through Popover and animates in with '
         'zoom-in-95 and fade-in-0 only — no slide, unlike every menu in '
-        'the ElMenu family. The trigger fill and text colour change land '
+        'the Menu family. The trigger fill and text colour change land '
         'in the same frame the panel starts opening (drift: only '
         '`transform` is declared as transitioning, so colour hard-cuts).',
     userSignal: 'The panel zooms and fades in; the trigger snaps lit.',
@@ -834,7 +859,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        'ElNavigationMenu and ElNavigationMenuItem carry no disabled/'
+        'NavigationMenu and NavigationMenuItem carry no disabled/'
         'enabled parameter; the caller is responsible for omitting or '
         'graying an item itself.',
     userSignal: 'N/A: nothing in the API models a disabled item.',
@@ -843,7 +868,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         'The panel\'s open/close animation and the chevron\'s rotation '
-        'both route through elAnimationDuration, which is Duration.zero '
+        'both route through effectiveMotionDuration, which is Duration.zero '
         'under MediaQuery.disableAnimations.',
     userSignal: 'The panel and chevron snap instead of animating.',
   ),

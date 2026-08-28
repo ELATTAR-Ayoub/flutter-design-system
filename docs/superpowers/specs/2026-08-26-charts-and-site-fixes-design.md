@@ -62,7 +62,7 @@ public-page shell, as the home page does. This follows the reference and avoids
 a rail whose "ON THIS PAGE" would list six cards.
 
 `/charts/tooltip` is deliberately **not** ported. Tooltip is a chart *feature*
-here, not a family — `ElChartTooltipSpec` is a parameter, and a family page for
+here, not a family — `ChartTooltipSpec` is a parameter, and a family page for
 it would document a field. If that proves wrong it is one more route later.
 
 ## A family page
@@ -107,9 +107,9 @@ candidates:
 
 1. the specimen hands the chart an unbounded or over-wide constraint, in which
    case the fix is in `example/lib/`; or
-2. `ElCartesianChart` lays out from an intrinsic width rather than the
+2. `CartesianChart` lays out from an intrinsic width rather than the
    constraint it is given, and does not clip, in which case the fix is in
-   `lib/src/components/chart_cartesian.dart` — the package itself, and a
+   `lib/src/components/ui/chart_cartesian.dart` — the package itself, and a
    published registry item.
 
 The rollout's "nothing under `lib/src/`" rule was that plan's constraint, not a
@@ -170,12 +170,12 @@ and means "you can select this."
 **Symptom.** No visible scrollbar while scrolling in dark mode.
 
 **Cause.** `MaterialApp` is constructed with **no `theme:`**
-(`main.dart:540`). The app themes everything through `ElTheme`, but Material's
+(`main.dart:540`). The app themes everything through `Theme`, but Material's
 scrollbar reads `ThemeData`, which therefore defaults to the *light* theme — a
 near-black thumb on a near-black page.
 
 **Fix.** A `scrollBehavior` on `MaterialApp` whose scrollbar is themed from
-`ElTheme`, so the thumb follows the live theme. Preferred over passing a Material
+`Theme`, so the thumb follows the live theme. Preferred over passing a Material
 `theme:`, which would introduce a second source of truth for colour beside the
 token system.
 
@@ -204,7 +204,7 @@ reads *"a page a reader cannot open does not belong in an index."* The footer
 was missed. It gets real destinations: Documentation, Components, Charts,
 Installation, Theming, CLI, Registry, Changelog, Skills.
 
-**No hover.** `_FooterColumn` uses `MouseRegion` + `ElPress` + `ElText` with no
+**No hover.** `_FooterColumn` uses `MouseRegion` + `Press` + `Text` with no
 colour change. It moves to `DocsLink`, so the footer, the sidebar, the rail and
 the components index all behave alike.
 

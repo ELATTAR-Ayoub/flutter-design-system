@@ -1,8 +1,8 @@
 /// Public documentation metadata for the `input_otp` component.
 ///
 /// Split off Phase F/J's merged `input_group` page, which documented three
-/// unrelated components (`ElInputGroup`, `ElButtonGroup`, `ElInputOtp`) on
-/// one route. This entry covers `ElInputOtp` and its slot/separator parts
+/// unrelated components (`InputGroup`, `ButtonGroup`, `InputOtp`) on
+/// one route. This entry covers `InputOtp` and its slot/separator parts
 /// only: see `../input_group/meta.dart` and `../button_group/meta.dart` for
 /// the other two, each its own route and its own `<name>Doc` const.
 ///
@@ -19,7 +19,7 @@ const ComponentDocEntry inputOtpDoc = ComponentDocEntry(
   name: 'input_otp',
   title: 'Input OTP',
   description:
-      'ElInputOtp is a six-digit verification field: six painted boxes '
+      'InputOtp is a six-digit verification field: six painted boxes '
       'over one hidden input, advancing focus and retreating on backspace. '
       'A native Flutter reimplementation of the input-otp JavaScript '
       'package\'s mechanism, not a port of the package itself.',
@@ -29,9 +29,9 @@ const ComponentDocEntry inputOtpDoc = ComponentDocEntry(
     'icon',
     'input',
     'keyframes',
-    'machine-surface',
+    'surface',
     'source-foundation',
   ],
-  exports: <String>['ElInputOtp', 'ElInputOtpSlot', 'ElInputOtpSeparator'],
+  exports: <String>['InputOtp', 'InputOtpSlot', 'InputOtpSeparator'],
   sourcePath: 'lib/src/components/input_otp.dart',
 );

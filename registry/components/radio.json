@@ -7,22 +7,22 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/radio.dart",
+      "source": "lib/src/components/ui/radio.dart",
       "target": "@ui/radio.dart",
-      "sha256": "95b2524b1fce3e8ea0a9727aa8f17768c9c126c841344aa451c700c0a133e8c8"
+      "sha256": "fa775232a5652f475c1bd6b920776b28059d5806719fdafdfe0302e5f1ee9056"
     }
   ],
   "registryDependencies": [
     "field",
     "keyframes",
-    "machine-surface",
+    "surface",
     "selection-control",
     "source-foundation"
   ],
   "semanticDependencies": [
     "field",
     "keyframes",
-    "machine-surface",
+    "surface",
     "selection-control"
   ],
   "pubDependencies": {},
@@ -30,5 +30,9 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/radio",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/radio.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/radio.dart",
+  "exports": [
+    "RadioGroup",
+    "RadioGroupItem"
+  ]
 }

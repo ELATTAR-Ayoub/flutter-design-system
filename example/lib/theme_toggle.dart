@@ -1,4 +1,4 @@
-/// The three-way theme control, `components/el/theme-toggle.tsx`.
+/// The three-way theme control, `components/space/theme-toggle.tsx`.
 ///
 /// The reference's own reasoning, kept because it is the design decision:
 /// *"A two-way switch would have been smaller, but it cannot express 'follow
@@ -8,7 +8,7 @@
 ///
 /// **The selection travels, because RULES §4 says it must.** Each option
 /// paints no background of its own; one pill moves between them
-/// ([ElSlidingPillGroup]) and lands with a squash. The web arrived here after
+/// ([ActiveIndicator]) and lands with a squash. The web arrived here after
 /// shipping the forbidden version: every option owning `bg-card shadow-e1`
 /// when checked, one blinking on as another blinked off: for a long time.
 ///
@@ -17,35 +17,47 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// `size-7`: one option.
-final double _optionPx = el(7);
+final double _optionPx = space(7);
 
 /// `size-3.5`: the glyph inside it.
-final double _iconPx = el(3.5);
+final double _iconPx = space(3.5);
 
 /// These three icons are rendered **directly** in the reference
 /// (`<SunIcon className="size-3.5"/>`), not through `Icon`, so they keep
 /// lucide's own authored `stroke-width` instead of the size ladder's: which
 /// at 14px would have snapped to 2.4.
-final double _iconStroke = ElIcon.strokeFor(ElIconPaths.viewBox);
+final double _iconStroke = Icon.strokeFor(IconPaths.viewBox);
 
 /// `p-0.5` on the container.
-final EdgeInsets _containerPadding = EdgeInsets.all(el(0.5));
+final EdgeInsets _containerPadding = EdgeInsets.all(space(0.5));
 
 class _Option {
   const _Option(this.mode, this.label, this.glyph);
 
-  final ElThemeMode mode;
+  final ColorMode mode;
   final String label;
-  final ElIconGlyph glyph;
+  final IconGlyph glyph;
 }
 
 const List<_Option> _options = <_Option>[
-  _Option(ElThemeMode.light, 'Light', ElIconGlyph.sun),
-  _Option(ElThemeMode.system, 'System', ElIconGlyph.monitor),
-  _Option(ElThemeMode.dark, 'Dark', ElIconGlyph.moon),
+  _Option(ColorMode.light, 'Light', IconGlyph.sun),
+  _Option(ColorMode.system, 'System', IconGlyph.monitor),
+  _Option(ColorMode.dark, 'Dark', IconGlyph.moon),
 ];
 
 /// Light · System · Dark.
@@ -54,9 +66,9 @@ class ThemeToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final ElThemeController controller = ElTheme.controllerOf(context);
-    final ElThemeMode mode = ElTheme.modeOf(context);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final ThemeController controller = ThemeScope.controllerOf(context);
+    final ColorMode mode = ThemeScope.modeOf(context);
 
     return Semantics(
       container: true,
@@ -64,16 +76,16 @@ class ThemeToggle extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: theme.muted,
-          borderRadius: BorderRadius.circular(ElRadii.pill),
-          border: Border.all(color: theme.border, width: ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.full),
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
-        child: ElSlidingPillGroup(
+        child: ActiveIndicator(
           activeIndex: _options.indexWhere(
             (_Option option) => option.mode == mode,
           ),
           padding: _containerPadding,
           // `gap-px`.
-          gap: ElWidths.hairline,
+          gap: BorderWidths.hairline,
           // **The pill snaps here, and only here.**
           //
           // Clicking an option flips the theme, and `next-themes` writes
@@ -87,10 +99,10 @@ class ThemeToggle extends StatelessWidget {
           // same batch and plays its full 600ms once the freeze lifts. So this
           // control is a snap plus a jelly, never a travel. The nav rail's
           // pill flips no theme, is not frozen, and keeps its 250ms spring.
-          travelDuration: Duration.zero,
-          pill: ElMachineSurface(
-            spec: ElShadows.e1,
-            radius: BorderRadius.circular(ElRadii.pill),
+          moveDuration: Duration.zero,
+          indicator: Surface(
+            spec: Shadows.sm,
+            radius: BorderRadius.circular(Radii.full),
             fill: theme.card,
             child: const SizedBox.expand(),
           ),
@@ -133,7 +145,7 @@ class _ThemeOptionState extends State<_ThemeOption> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     // `text-foreground` when checked; `text-muted-foreground
     // hover:text-foreground` otherwise.
     final Color ink = widget.active || _hovered
@@ -148,7 +160,7 @@ class _ThemeOptionState extends State<_ThemeOption> {
         cursor: SystemMouseCursors.click,
         onEnter: (_) => _hover(true),
         onExit: (_) => _hover(false),
-        child: ElPress(
+        child: Press(
           onTap: widget.onTap,
           // **The squish SNAPS on this control, and only on this one.**
           //
@@ -169,7 +181,7 @@ class _ThemeOptionState extends State<_ThemeOption> {
           // glyph's colour, which is tweened separately below.
           //
           // Zero on both legs rather than a different widget: the asymmetry
-          // [ElPress] exists to express is real everywhere else, and every
+          // [Press] exists to express is real everywhere else, and every
           // other call site keeps it.
           downDuration: Duration.zero,
           upDuration: Duration.zero,
@@ -182,17 +194,17 @@ class _ThemeOptionState extends State<_ThemeOption> {
                 // `transition-colors duration-fast ease-out`: and
                 // `duration-fast` emits no CSS, so this is the framework
                 // default, probed at 0.25s.
-                duration: elAnimationDuration(
+                duration: effectiveMotionDuration(
                   context,
-                  ElDurations.transitionDefault,
+                  MotionDurations.normal,
                 ),
-                curve: ElCurves.out,
+                curve: MotionCurves.enter,
                 builder: (BuildContext context, Color? colour, Widget? child) =>
                     DefaultTextStyle.merge(
                       style: TextStyle(color: colour),
                       child: child!,
                     ),
-                child: ElIcon(
+                child: Icon(
                   widget.option.glyph,
                   sizePx: _iconPx,
                   strokeOverride: _iconStroke,

@@ -5,7 +5,19 @@
 /// nothing.
 library;
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// No-op off the web. The signature is the contract; the behaviour is not.
 void elInstallScrollBridge(ScrollController controller) {}

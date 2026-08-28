@@ -22,10 +22,10 @@ const ComponentDocEntry tabsDoc = ComponentDocEntry(
   // Registry dependencies resolved by `elattar add tabs`.
   dependencies: <String>[
     'button',
-    'machine-surface',
-    'sliding-pill',
+    'surface',
+    'active-indicator',
     'source-foundation',
   ],
-  exports: <String>['ElTabs', 'ElTabItem', 'ElTabsVariant'],
+  exports: <String>['Tabs', 'TabItem', 'TabsVariant'],
   sourcePath: 'lib/src/components/tabs.dart',
 );

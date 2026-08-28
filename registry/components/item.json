@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/item.dart",
+      "source": "lib/src/components/ui/item.dart",
       "target": "@ui/item.dart",
-      "sha256": "bf3f661e173eeffbc8d68493776703ff75728304e17799b3720512f7b88b9e8f"
+      "sha256": "e1e1078410e188c7858dc0e380356ef97be04600070c5437b936573e1bfff973"
     }
   ],
   "registryDependencies": [
@@ -21,5 +21,15 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/item",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/item.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/item.dart",
+  "exports": [
+    "Item",
+    "ItemActions",
+    "ItemContent",
+    "ItemDescription",
+    "ItemGroup",
+    "ItemMedia",
+    "ItemTitle",
+    "ItemVariant"
+  ]
 }

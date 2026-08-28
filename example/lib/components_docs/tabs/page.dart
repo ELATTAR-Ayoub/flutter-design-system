@@ -1,6 +1,6 @@
 /// Public documentation page for the `tabs` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` established. Every specimen
@@ -21,17 +21,29 @@
 /// **Section order**, matching `button`'s own house shape: Preview,
 /// Installation, Usage, Panels, Composition, Account settings, Line,
 /// Section switcher, Empty tab, RTL, then the eight disclosures. Vertical
-/// and Icons have no counterpart: ElTabs records an `orientation` axis in
+/// and Icons have no counterpart: Tabs records an `orientation` axis in
 /// its own doc comment but never wires it to a real parameter (see Line's
-/// description), and ElTabItem takes a label and a content widget only,
+/// description), and TabItem takes a label and a content widget only,
 /// with no leading-icon slot to fill. Disabled has no counterpart either,
-/// folded into States' own omission note, because ElTabItem carries no
+/// folded into States' own omission note, because TabItem carries no
 /// enabled flag at all: every tab this component renders is always
 /// operable.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -49,7 +61,7 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       title: 'Preview',
       description:
           'Two live specimens, one per variant, both built from the same '
-          'ElTabs constructor: tap a trigger on either to switch its '
+          'Tabs constructor: tap a trigger on either to switch its '
           'panel. The standard specimen\'s third trigger, More, carries '
           'no content: tapping it moves the mark and shows nothing '
           'underneath, which is Empty tab below, not a gap in this page.',
@@ -63,7 +75,7 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       description:
           'tabs is a registry item: elattar add tabs installs '
           'lib/src/components/tabs.dart and resolves button, '
-          'machine-surface, sliding-pill and source-foundation '
+          'surface, active-indicator and source-foundation '
           'automatically. The Manual tab is for a project not using the '
           'CLI — copying tabs.dart alone will not compile without those '
           'same sibling files.',
@@ -84,8 +96,8 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElTabs, ElTabItem and '
-              'ElTabsVariant are reachable the same way the CLI path '
+              'Add the export line so Tabs, TabItem and '
+              'TabsVariant are reachable the same way the CLI path '
               'already makes them.',
           code: "export 'tabs.dart';",
         ),
@@ -103,7 +115,7 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       description:
           'A trigger with no content renders nothing when selected: the '
           'Usage example above never mounts a panel at all. Give an item '
-          'a content widget and ElTabs shows it under the track whenever '
+          'a content widget and Tabs shows it under the track whenever '
           'that trigger is active.',
       specimen: _PanelsSpecimen(),
       code: _panelsUsageCode,
@@ -113,11 +125,11 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          'ElTabs has no separate TabsList, TabsTrigger, or TabsContent '
+          'Tabs has no separate TabsList, TabsTrigger, or TabsContent '
           'to assemble by hand: items builds the whole track and its '
-          'panel in one call, and the mark itself is ElSlidingPillGroup, '
-          'the same travelling-indicator primitive ElToggleGroup and the '
-          'theme toggle share. This is what a single ElTabs(items: …) '
+          'panel in one call, and the mark itself is ActiveIndicator, '
+          'the same travelling-indicator primitive ToggleGroup and the '
+          'theme toggle share. This is what a single Tabs(items: …) '
           'call assembles internally, read out of tabs.dart\'s own '
           'build() — a structure diagram, not code a caller would write, '
           'so it stays a snippet rather than a stage with nothing live '
@@ -146,19 +158,19 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       id: 'line',
       title: 'Line',
       description:
-          'ElTabsVariant carries the two rungs the source ports from '
+          'TabsVariant carries the two rungs the source ports from '
           'tabsListVariants: standard, the filled pill sliding on a '
           'muted track, and line, a bare row with a 2px underline rule '
           'sliding beneath the active label instead. There is no size '
           'parameter at all: every trigger is fixed at '
-          'ElTabs.triggerHeight (32px) in both variants, unlike ElButton '
-          'or ElToggle, which each expose a size enum. Two shadcn '
+          'Tabs.triggerHeight (32px) in both variants, unlike Button '
+          'or Toggle, which each expose a size enum. Two shadcn '
           'examples this page cannot mirror for the same reason a size '
           'section would be empty: Vertical, because the source\'s own '
           'doc comment names orientation as a third axis that is '
           'recorded in prose but never wired to a real parameter, so '
           'nothing here can be switched into it, and Icons, because '
-          'ElTabItem takes a label and a content widget only, with no '
+          'TabItem takes a label and a content widget only, with no '
           'leading-icon slot to fill.',
       specimen: _LineSpecimen(),
       code: _lineUsageCode,
@@ -169,7 +181,7 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       title: 'Section switcher',
       description:
           'A product page\'s own section switcher, not a route change: '
-          'every panel already exists on the screen and ElTabs only '
+          'every panel already exists on the screen and Tabs only '
           'picks which one shows. This names ProductOverview, '
           'ProductSpecs and ProductReviews, widgets that exist only in '
           'the hypothetical product page the comment describes, not in '
@@ -182,10 +194,10 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       id: 'empty-tab',
       title: 'Empty tab',
       description:
-          'A ElTabItem with content: null is a real, source-documented '
-          'state (see the doc comment on ElTabItem.content), not an '
+          'A TabItem with content: null is a real, source-documented '
+          'state (see the doc comment on TabItem.content), not an '
           'authoring mistake: the reference simply renders nothing for a '
-          'value with no registered TabsContent, and ElTabs matches that '
+          'value with no registered TabsContent, and Tabs matches that '
           'by omitting its content branch entirely when the active '
           'item\'s content is null. The mark still travels to a '
           'contentless trigger and the trigger still takes its full '
@@ -204,20 +216,20 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       id: 'rtl',
       title: 'RTL',
       description:
-          'ElTabs takes no direction parameter of its own: it reads '
+          'Tabs takes no direction parameter of its own: it reads '
           'whatever Directionality is already in scope, the same as '
           'every other widget in the tree. The track\'s own alignment is '
           'AlignmentDirectional.centerStart (tabs.dart), which is '
           'directional-aware and hugs the trailing edge under an RTL '
           'Directionality rather than staying pinned to the physical '
-          'left. More importantly, ElSlidingPillGroup never computes the '
+          'left. More importantly, ActiveIndicator never computes the '
           'travelling mark\'s position from a formula that assumes a '
-          'direction: its _measure() (sliding_pill.dart) reads each '
+          'direction: its _measure() (active_indicator.dart) reads each '
           'trigger\'s real, already-laid-out rect with localToGlobal, '
           'and the mark\'s own AnimatedPositioned paints straight from '
           'that measurement. Because Flutter\'s own Row resolves its '
           'child order from the ambient Directionality before '
-          'ElSlidingPillGroup ever measures it, the rects it reads are '
+          'ActiveIndicator ever measures it, the rects it reads are '
           'already mirrored, so the mark lands on the correct trigger '
           'with no RTL-specific branch anywhere in this component.',
       specimen: _RtlSpecimen(),
@@ -228,10 +240,10 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElTabs', anchor: 'api-eltabs'),
-        DocsTocEntry(title: 'ElTabItem', anchor: 'api-eltabitem'),
+        DocsTocEntry(title: 'Tabs', anchor: 'api-eltabs'),
+        DocsTocEntry(title: 'TabItem', anchor: 'api-eltabitem'),
         DocsTocEntry(
-          title: 'ElTabsVariant and statics',
+          title: 'TabsVariant and statics',
           anchor: 'api-eltabsvariant',
         ),
       ],
@@ -256,7 +268,7 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       description:
           'tabs.dart wires no key handling of its own — every fact here '
           'is about what does NOT happen, read off _DsTabsTrigger and '
-          'ElSlidingPillGroup directly.',
+          'ActiveIndicator directly.',
       child: _KeyboardContent(),
     ),
     DisclosureSection(
@@ -285,7 +297,7 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
           DocsInstallFact(
             label: 'Mark fill',
             value:
-                'theme.primary (standard pill) / theme.actionInk (line '
+                'theme.primary (standard pill) / theme.actionText (line '
                 'rule)',
             description:
                 'The travelling mark\'s own colour: different tokens '
@@ -302,23 +314,23 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
           ),
           DocsInstallFact(
             label: 'Shadow',
-            value: 'ElShadows.chip',
+            value: 'Shadows.compactControl',
             description: 'The standard variant\'s pill shadow spec.',
           ),
           DocsInstallFact(
             label: 'Radius',
-            value: 'ElRadii.pill',
+            value: 'Radii.full',
             description: 'Both the pill and the underline rule.',
           ),
           DocsInstallFact(
             label: 'Motion',
             value:
-                'ElDurations.transitionDefault, ElDurations.base, '
-                'ElDurations.animJelly',
+                'MotionDurations.normal, MotionDurations.normal, '
+                'MotionDurations.stateChange',
             description:
                 'The trigger\'s own colour tween, and '
-                'ElSlidingPillGroup\'s travel and jelly squash: all '
-                'resolved through elAnimationDuration, so reduced '
+                'ActiveIndicator\'s travel and jelly squash: all '
+                'resolved through effectiveMotionDuration, so reduced '
                 'motion shortens them automatically.',
           ),
         ],
@@ -337,9 +349,9 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Shared machinery',
-            value: 'lib/src/motion/sliding_pill.dart',
+            value: 'lib/src/components/ui/active_indicator.dart',
             description:
-                'ElSlidingPillGroup: shared with ElToggleGroup and the '
+                'ActiveIndicator: shared with ToggleGroup and the '
                 'theme toggle.',
           ),
           const DocsInstallFact(
@@ -377,9 +389,9 @@ class TabsDocPage extends StatelessWidget {
       title: tabsDoc.title,
       description: tabsDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Tabs'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Tabs'),
     ],
     toc: tabsDocSpec.toc,
     // Wave 3's alphabetical neighbours (Phase J plan inventory). Neither
@@ -401,8 +413,8 @@ class TabsDocPage extends StatelessWidget {
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-/// The two-cell live specimen for the Preview section, one [ElTabsVariant]
-/// per cell, each a real, switchable [ElTabs].
+/// The two-cell live specimen for the Preview section, one [TabsVariant]
+/// per cell, each a real, switchable [Tabs].
 class _PreviewSpecimen extends StatefulWidget {
   const _PreviewSpecimen();
 
@@ -416,54 +428,58 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText('Standard', ElType.section, color: theme.mutedForeground),
-        SizedBox(height: el(3)),
-        ElTabs(
+        StyledText(
+          'Standard',
+          TextStyles.section,
+          color: theme.mutedForeground,
+        ),
+        SizedBox(height: space(3)),
+        Tabs(
           key: const ValueKey<String>('tabs-live-specimen'),
-          items: <ElTabItem>[
-            ElTabItem(
+          items: <TabItem>[
+            TabItem(
               label: 'Info',
-              content: ElText(
+              content: StyledText(
                 'Update your account details here.',
-                ElType.small,
+                TextStyles.small,
               ),
             ),
-            ElTabItem(
+            TabItem(
               label: 'Team',
-              content: ElText(
+              content: StyledText(
                 'See who else has access to this workspace.',
-                ElType.small,
+                TextStyles.small,
               ),
             ),
-            const ElTabItem(label: 'More'),
+            const TabItem(label: 'More'),
           ],
           selectedIndex: _standardIndex,
           onChanged: (int next) => setState(() => _standardIndex = next),
         ),
-        SizedBox(height: el(8)),
-        ElText('Line', ElType.section, color: theme.mutedForeground),
-        SizedBox(height: el(3)),
-        ElTabs(
+        SizedBox(height: space(8)),
+        StyledText('Line', TextStyles.section, color: theme.mutedForeground),
+        SizedBox(height: space(3)),
+        Tabs(
           key: const ValueKey<String>('tabs-line-specimen'),
-          variant: ElTabsVariant.line,
-          items: <ElTabItem>[
-            ElTabItem(
+          variant: TabsVariant.line,
+          items: <TabItem>[
+            TabItem(
               label: 'Overview',
-              content: ElText(
+              content: StyledText(
                 'The dashboard\'s top-level summary panel.',
-                ElType.small,
+                TextStyles.small,
               ),
             ),
-            ElTabItem(
+            TabItem(
               label: 'Stats',
-              content: ElText(
+              content: StyledText(
                 'Traffic and conversion, broken down by channel.',
-                ElType.small,
+                TextStyles.small,
               ),
             ),
           ],
@@ -488,16 +504,19 @@ class _PanelsSpecimenState extends State<_PanelsSpecimen> {
   int _selectedIndex = 0;
 
   @override
-  Widget build(BuildContext context) => ElTabs(
+  Widget build(BuildContext context) => Tabs(
     key: const ValueKey<String>('tabs-panels-specimen'),
-    items: <ElTabItem>[
-      ElTabItem(
+    items: <TabItem>[
+      TabItem(
         label: 'Account',
-        content: ElText('Update your account details here.', ElType.small),
+        content: StyledText(
+          'Update your account details here.',
+          TextStyles.small,
+        ),
       ),
-      ElTabItem(
+      TabItem(
         label: 'Password',
-        content: ElText('Change your password here.', ElType.small),
+        content: StyledText('Change your password here.', TextStyles.small),
       ),
     ],
     selectedIndex: _selectedIndex,
@@ -524,32 +543,32 @@ class _AccountSettingsSpecimenState extends State<_AccountSettingsSpecimen> {
     // Three real triggers (Account, Password, Team) run wider than a
     // narrow docs column: Responsive below names exactly this mitigation
     // ("a caller with more triggers than fit a narrow layout must wrap
-    // ElTabs in its own horizontal scroll view"), so this specimen does
+    // Tabs in its own horizontal scroll view"), so this specimen does
     // it. The quoted code beside it stays the bare construction — the
-    // wrapper is a caller's own choice, not something ElTabs does itself.
+    // wrapper is a caller's own choice, not something Tabs does itself.
     scrollDirection: Axis.horizontal,
     child: SizedBox(
-      width: el(95),
-      child: ElTabs(
+      width: space(95),
+      child: Tabs(
         key: const ValueKey<String>('tabs-account-settings-specimen'),
-        items: <ElTabItem>[
-          ElTabItem(
+        items: <TabItem>[
+          TabItem(
             label: 'Account',
-            content: ElText(
+            content: StyledText(
               'Update your name, email, and time zone.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
-          ElTabItem(
+          TabItem(
             label: 'Password',
-            content: ElText(
+            content: StyledText(
               'Change your password and manage two-factor login.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
           // No content: selecting Team moves the mark and shows nothing.
           // Real, documented behaviour, not an accident of this example.
-          ElTabItem(label: 'Team'),
+          TabItem(label: 'Team'),
         ],
         selectedIndex: _selectedIndex,
         onChanged: (int next) => setState(() => _selectedIndex = next),
@@ -577,22 +596,22 @@ class _LineSpecimenState extends State<_LineSpecimen> {
   int _selectedIndex = 0;
 
   @override
-  Widget build(BuildContext context) => ElTabs(
+  Widget build(BuildContext context) => Tabs(
     key: const ValueKey<String>('tabs-line-variant-specimen'),
-    variant: ElTabsVariant.line,
-    items: <ElTabItem>[
-      ElTabItem(
+    variant: TabsVariant.line,
+    items: <TabItem>[
+      TabItem(
         label: 'Overview',
-        content: ElText(
+        content: StyledText(
           'The dashboard\'s top-level summary panel.',
-          ElType.small,
+          TextStyles.small,
         ),
       ),
-      ElTabItem(
+      TabItem(
         label: 'Stats',
-        content: ElText(
+        content: StyledText(
           'Traffic and conversion, broken down by channel.',
-          ElType.small,
+          TextStyles.small,
         ),
       ),
     ],
@@ -601,7 +620,7 @@ class _LineSpecimenState extends State<_LineSpecimen> {
   );
 }
 
-/// The RTL section's own live specimen: the same [ElTabs] constructor, under
+/// The RTL section's own live specimen: the same [Tabs] constructor, under
 /// a right-to-left [Directionality] with Arabic labels and content, backing
 /// the RTL section's mirroring claim.
 class _RtlSpecimen extends StatefulWidget {
@@ -617,18 +636,18 @@ class _RtlSpecimenState extends State<_RtlSpecimen> {
   @override
   Widget build(BuildContext context) => Directionality(
     textDirection: TextDirection.rtl,
-    child: ElTabs(
+    child: Tabs(
       key: const ValueKey<String>('tabs-rtl-specimen'),
-      items: <ElTabItem>[
-        ElTabItem(
+      items: <TabItem>[
+        TabItem(
           label: 'الحساب',
-          content: ElText('تحديث بيانات حسابك هنا.', ElType.small),
+          content: StyledText('تحديث بيانات حسابك هنا.', TextStyles.small),
         ),
-        ElTabItem(
+        TabItem(
           label: 'الفريق',
-          content: ElText(
+          content: StyledText(
             'من يملك صلاحية الوصول إلى مساحة العمل هذه.',
-            ElType.small,
+            TextStyles.small,
           ),
         ),
       ],
@@ -641,22 +660,22 @@ class _RtlSpecimenState extends State<_RtlSpecimen> {
 /* ── Source strings ─────────────────────────────────────────────────────── */
 
 const String _previewCode = '''// Standard
-ElTabs(
-  items: <ElTabItem>[
-    ElTabItem(label: 'Info', content: ElText('Update your account details here.', ElType.small)),
-    ElTabItem(label: 'Team', content: ElText('See who else has access to this workspace.', ElType.small)),
-    const ElTabItem(label: 'More'), // content: null
+Tabs(
+  items: <TabItem>[
+    TabItem(label: 'Info', content: StyledText('Update your account details here.', TextStyles.small)),
+    TabItem(label: 'Team', content: StyledText('See who else has access to this workspace.', TextStyles.small)),
+    const TabItem(label: 'More'), // content: null
   ],
   selectedIndex: selectedIndex,
   onChanged: (int next) => setState(() => selectedIndex = next),
 )
 
 // Line
-ElTabs(
-  variant: ElTabsVariant.line,
-  items: <ElTabItem>[
-    ElTabItem(label: 'Overview', content: ElText('The dashboard\\'s top-level summary panel.', ElType.small)),
-    ElTabItem(label: 'Stats', content: ElText('Traffic and conversion, broken down by channel.', ElType.small)),
+Tabs(
+  variant: TabsVariant.line,
+  items: <TabItem>[
+    TabItem(label: 'Overview', content: StyledText('The dashboard\\'s top-level summary panel.', TextStyles.small)),
+    TabItem(label: 'Stats', content: StyledText('Traffic and conversion, broken down by channel.', TextStyles.small)),
   ],
   selectedIndex: selectedIndex,
   onChanged: (int next) => setState(() => selectedIndex = next),
@@ -664,29 +683,29 @@ ElTabs(
 
 const String _smallestUsageCode = '''int selectedIndex = 0;
 
-ElTabs(
-  items: const <ElTabItem>[
-    ElTabItem(label: 'Overview'),
-    ElTabItem(label: 'Analytics'),
+Tabs(
+  items: const <TabItem>[
+    TabItem(label: 'Overview'),
+    TabItem(label: 'Analytics'),
   ],
   selectedIndex: selectedIndex,
   onChanged: (int next) => setState(() => selectedIndex = next),
 )''';
 
-const String _panelsUsageCode = '''ElTabs(
-  items: <ElTabItem>[
-    ElTabItem(
+const String _panelsUsageCode = '''Tabs(
+  items: <TabItem>[
+    TabItem(
       label: 'Account',
-      content: ElText(
+      content: StyledText(
         'Update your account details here.',
-        ElType.small,
+        TextStyles.small,
       ),
     ),
-    ElTabItem(
+    TabItem(
       label: 'Password',
-      content: ElText(
+      content: StyledText(
         'Change your password here.',
-        ElType.small,
+        TextStyles.small,
       ),
     ),
   ],
@@ -695,13 +714,13 @@ const String _panelsUsageCode = '''ElTabs(
 )''';
 
 const String _compositionCode =
-    '''// What ElTabs(items: …) builds, read out of tabs.dart's own build():
+    '''// What Tabs(items: …) builds, read out of tabs.dart's own build():
 Column(
   children: [
     Align(
       alignment: AlignmentDirectional.centerStart,
       // The mark paints first, so it sits behind every trigger.
-      child: ElSlidingPillGroup(pill: mark, children: triggers),
+      child: ActiveIndicator(indicator: mark, children: triggers),
     ),
     if (selectedItem.content != null)
       DefaultTextStyle.merge(
@@ -711,11 +730,11 @@ Column(
   ],
 )''';
 
-const String _lineUsageCode = '''ElTabs(
-  variant: ElTabsVariant.line,
-  items: <ElTabItem>[
-    ElTabItem(label: 'Overview', content: overviewPanel),
-    ElTabItem(label: 'Analytics', content: analyticsPanel),
+const String _lineUsageCode = '''Tabs(
+  variant: TabsVariant.line,
+  items: <TabItem>[
+    TabItem(label: 'Overview', content: overviewPanel),
+    TabItem(label: 'Analytics', content: analyticsPanel),
   ],
   selectedIndex: selectedIndex,
   onChanged: (int next) => setState(() => selectedIndex = next),
@@ -723,19 +742,19 @@ const String _lineUsageCode = '''ElTabs(
 
 const String _accountSettingsCode =
     '''// selectedIndex is owned by the enclosing State.
-ElTabs(
-  items: <ElTabItem>[
-    ElTabItem(
+Tabs(
+  items: <TabItem>[
+    TabItem(
       label: 'Account',
       content: AccountSettingsForm(user: user),
     ),
-    ElTabItem(
+    TabItem(
       label: 'Password',
       content: PasswordSettingsForm(user: user),
     ),
     // No content: selecting Team moves the mark and shows nothing.
     // Real, documented behaviour, not an accident of this example.
-    const ElTabItem(label: 'Team'),
+    const TabItem(label: 'Team'),
   ],
   selectedIndex: selectedIndex,
   onChanged: (int next) => setState(() => selectedIndex = next),
@@ -743,14 +762,14 @@ ElTabs(
 
 const String _sectionSwitcherCode =
     '''// A product page's own section switcher, not a route change: every
-// panel already exists on this screen and ElTabs only picks which one
+// panel already exists on this screen and Tabs only picks which one
 // shows.
-ElTabs(
-  variant: ElTabsVariant.line,
-  items: <ElTabItem>[
-    ElTabItem(label: 'Overview', content: ProductOverview(product: product)),
-    ElTabItem(label: 'Specs', content: ProductSpecs(product: product)),
-    ElTabItem(label: 'Reviews', content: ProductReviews(product: product)),
+Tabs(
+  variant: TabsVariant.line,
+  items: <TabItem>[
+    TabItem(label: 'Overview', content: ProductOverview(product: product)),
+    TabItem(label: 'Specs', content: ProductSpecs(product: product)),
+    TabItem(label: 'Reviews', content: ProductReviews(product: product)),
   ],
   selectedIndex: section,
   onChanged: (int next) => setState(() => section = next),
@@ -759,19 +778,19 @@ ElTabs(
 const String _emptyTabCode = '''// content: null — a real, source-documented
 // state, not an omission. Selecting it still moves the mark; nothing
 // mounts underneath.
-const ElTabItem(label: 'Team')''';
+const TabItem(label: 'Team')''';
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElTabs(
-    items: <ElTabItem>[
-      ElTabItem(
+  child: Tabs(
+    items: <TabItem>[
+      TabItem(
         label: 'الحساب',
-        content: ElText('تحديث بيانات حسابك هنا.', ElType.small),
+        content: StyledText('تحديث بيانات حسابك هنا.', TextStyles.small),
       ),
-      ElTabItem(
+      TabItem(
         label: 'الفريق',
-        content: ElText('من يملك صلاحية الوصول إلى مساحة العمل هذه.', ElType.small),
+        content: StyledText('من يملك صلاحية الوصول إلى مساحة العمل هذه.', TextStyles.small),
       ),
     ],
     selectedIndex: selectedIndex,
@@ -791,11 +810,11 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-eltabs',
         child: DocsApiTable(
-          title: 'ElTabs',
+          title: 'Tabs',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'items',
-              type: 'List<ElTabItem>',
+              type: 'List<TabItem>',
               description:
                   'Every tab: its trigger\'s label, and the optional '
                   'panel it reveals when selected.',
@@ -805,7 +824,7 @@ class _ApiReferenceContent extends StatelessWidget {
               type: 'int',
               description:
                   'Which tab is active: Radix\'s value, resolved to an '
-                  'index for ElSlidingPillGroup\'s positional substrate. '
+                  'index for ActiveIndicator\'s positional substrate. '
                   'Out of range hides the mark and mounts no panel.',
             ),
             DocsApiFact(
@@ -813,7 +832,7 @@ class _ApiReferenceContent extends StatelessWidget {
               type: 'ValueChanged<int>',
               description:
                   'Called with the tapped trigger\'s index. Not '
-                  'nullable: ElTabs is controlled only (see the '
+                  'nullable: Tabs is controlled only (see the '
                   'source\'s own "Controlled, where the reference is '
                   'uncontrolled" note), so there is no '
                   'null-disables-the-control convention here: the '
@@ -821,30 +840,30 @@ class _ApiReferenceContent extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'variant',
-              type: 'ElTabsVariant',
+              type: 'TabsVariant',
               description:
-                  'Defaults to ElTabsVariant.standard. standard is the '
+                  'Defaults to TabsVariant.standard. standard is the '
                   'filled travelling pill on a muted track; line is the '
                   '2px underline rule on a bare row.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eltabitem',
         child: DocsApiTable(
-          title: 'ElTabItem',
+          title: 'TabItem',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'ElTabItem.label',
+              name: 'TabItem.label',
               type: 'String',
               description:
                   'The trigger\'s label: what it says and what its '
                   'Semantics node announces.',
             ),
             DocsApiFact(
-              name: 'ElTabItem.content',
+              name: 'TabItem.content',
               type: 'Widget?',
               description:
                   'The panel this trigger reveals when selected. '
@@ -855,68 +874,70 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eltabsvariant',
         child: DocsApiTable(
-          title: 'ElTabsVariant and statics',
+          title: 'TabsVariant and statics',
           facts: <DocsApiFact>[
             DocsApiFact(
-              name: 'ElTabsVariant.standard',
+              name: 'TabsVariant.standard',
               type: 'enum value',
               description:
                   'The filled pill on a --muted track: theme.primary '
-                  'fill, ElShadows.chip, primaryForeground ink on the '
+                  'fill, Shadows.compactControl, primaryForeground ink on the '
                   'active label.',
             ),
             DocsApiFact(
-              name: 'ElTabsVariant.line',
+              name: 'TabsVariant.line',
               type: 'enum value',
               description:
-                  'A 2px rule under a bare row: theme.actionInk fill, '
+                  'A 2px rule under a bare row: theme.actionText fill, '
                   'no track background, no radius spent on the row '
                   'itself.',
             ),
             DocsApiFact(
-              name: 'ElTabs.trackHeight',
+              name: 'Tabs.trackHeight',
               type: 'static double',
               description:
                   '40px: the ladder\'s own top rung ("40px track, 4px '
                   'inset, 32px triggers").',
             ),
             DocsApiFact(
-              name: 'ElTabs.triggerHeight',
+              name: 'Tabs.triggerHeight',
               type: 'static double',
               description:
                   '32px: every trigger\'s fixed height, standard and '
                   'line alike.',
             ),
             DocsApiFact(
-              name: 'ElTabs.triggerPaddingX',
+              name: 'Tabs.triggerPaddingX',
               type: 'static double',
               description: '16px horizontal padding inside a trigger.',
             ),
             DocsApiFact(
-              name: 'ElTabs.ruleHeight',
+              name: 'Tabs.ruleHeight',
               type: 'static double',
               description: '2px: the line variant\'s underline thickness.',
             ),
             DocsApiFact(
-              name: 'ElTabs.rootGap',
+              name: 'Tabs.rootGap',
               type: 'static double',
-              description: '8px: the space between the track and the content panel.',
+              description:
+                  '8px: the space between the track and the content panel.',
             ),
             DocsApiFact(
-              name: 'ElTabs.trackPadding',
+              name: 'Tabs.trackPadding',
               type: 'static double',
               description:
                   '4px: the standard track\'s own inset around its '
                   'triggers; line spends nothing here (see gapFor).',
             ),
             DocsApiFact(
-              name: 'ElTabs.gapFor',
-              type: 'static double Function(ElTabsVariant)',
-              description: 'The space between triggers: 4px on standard, 8px on line.',
+              name: 'Tabs.gapFor',
+              type: 'static double Function(TabsVariant)',
+              description:
+                  'The space between triggers: 4px on standard, 8px on line.',
             ),
           ],
         ),
@@ -930,7 +951,7 @@ class _StatesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -939,7 +960,7 @@ class _StatesContent extends StatelessWidget {
             DocsStateFact(
               state: 'Rest (unselected)',
               treatment:
-                  'Transparent fill, a transparent ${ElWidths.hairline}px '
+                  'Transparent fill, a transparent ${BorderWidths.hairline}px '
                   'hairline border, theme.mutedForeground ink.',
               userSignal:
                   'Only the label is visible, in a dimmer ink than the '
@@ -953,16 +974,16 @@ class _StatesContent extends StatelessWidget {
               userSignal:
                   'A cursor-only affordance: the pointer becomes a click '
                   'cursor and the label recolours, with no hover '
-                  'background at all, unlike ElToggleGroup\'s own item, '
+                  'background at all, unlike ToggleGroup\'s own item, '
                   'which paints theme.muted on hover.',
             ),
             const DocsStateFact(
               state: 'Selected',
               treatment:
                   'standard: the travelling pill (theme.primary, '
-                  'ElShadows.chip, pill radius) slides under the trigger '
+                  'Shadows.compactControl, pill radius) slides under the trigger '
                   'and its ink becomes theme.primaryForeground. line: a '
-                  '2px rule (theme.actionInk) slides to the trigger\'s '
+                  '2px rule (theme.actionText) slides to the trigger\'s '
                   'bottom edge and its ink becomes theme.foreground. Both '
                   'squash once via the shared jelly on every change.',
               userSignal:
@@ -975,36 +996,36 @@ class _StatesContent extends StatelessWidget {
               state: 'Focus-visible',
               treatment:
                   'Coded, not live: the trigger\'s shadow spec calls '
-                  'ElButton.withFocusRing(ElShadows.none, theme.ring at '
+                  'Button.withFocusRing(Shadows.none, theme.ring at '
                   '50% alpha, progress: 0). Progress is a hardcoded '
                   'literal 0, not read from any FocusNode, so the '
                   'ring\'s spread and alpha are multiplied by zero on '
                   'every build.',
               userSignal:
                   'No focus ring is ever painted, because nothing in '
-                  'ElTabs ever focuses a trigger in the first place: see '
+                  'Tabs ever focuses a trigger in the first place: see '
                   'Accessibility and Keyboard.',
             ),
             const DocsStateFact(
               state: 'Empty',
               treatment:
-                  'ElTabItem.content: null. Selecting that item still '
+                  'TabItem.content: null. Selecting that item still '
                   'runs the trigger\'s own selected treatment; the '
                   'column below the track omits its content branch '
                   'entirely, so no gap and no panel is inserted.',
               userSignal:
                   'The mark still travels, but nothing renders '
                   'underneath: a real, source-documented state (see the '
-                  'ElTabItem.content doc comment and Empty tab above), '
+                  'TabItem.content doc comment and Empty tab above), '
                   'not a bug.',
             ),
             const DocsStateFact(
               state: 'Reduced motion',
               treatment:
                   'The pill\'s travel and jelly squash '
-                  '(ElSlidingPillGroup) and the trigger\'s own colour '
+                  '(ActiveIndicator) and the trigger\'s own colour '
                   'tween all resolve their duration through '
-                  'elAnimationDuration, which '
+                  'effectiveMotionDuration, which '
                   'MediaQueryData(disableAnimations: true) collapses '
                   'toward zero.',
               userSignal:
@@ -1014,22 +1035,22 @@ class _StatesContent extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-          child: ElText(
+          constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+          child: StyledText(
             'Omitted. Pressed: no separate pointer-down look is '
             'authored; only the post-selection jelly squash marks a '
             'change, the same "no held-down state, only a post-toggle '
-            'reveal" precedent ElCheckbox documents for its own squash. '
-            'Disabled: neither ElTabs nor ElTabItem exposes an enabled '
-            'or disabled parameter (contrast ElToggleGroupItem.enabled, '
-            'which ElTabItem has no equivalent of); every trigger this '
-            'component renders is always operable. Loading: ElTabs is a '
+            'reveal" precedent Checkbox documents for its own squash. '
+            'Disabled: neither Tabs nor TabItem exposes an enabled '
+            'or disabled parameter (contrast ToggleGroupItem.enabled, '
+            'which TabItem has no equivalent of); every trigger this '
+            'component renders is always operable. Loading: Tabs is a '
             'synchronous layout primitive with no async operation of '
             'its own. Error and Success: the component defines neither '
             'invalid nor success semantics.',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ),
@@ -1043,7 +1064,7 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Semantic role: each trigger reports Semantics(button: true, '
             'selected: active, inMutuallyExclusiveGroup: true) and its '
             'label — Flutter has no distinct tab SemanticsFlag, so this '
@@ -1054,12 +1075,12 @@ class _AccessibilityContent extends StatelessWidget {
         'Keyboard interactions: none. See Keyboard below for the full '
             'account, read directly off the source.',
         'Focus behavior: the ring is coded but permanently inert — '
-            'ElButton.withFocusRing is called with progress: 0 '
+            'Button.withFocusRing is called with progress: 0 '
             'hardcoded, and with no FocusNode in the tree there is no '
             'real focus state that could ever change that value.',
-        'Touch target: ElTabs.triggerHeight (32px) tall, label-width '
-            'wide, no hit-area growth. Unlike ElCheckbox\'s 42x34 '
-            'ElHitArea, tabs.dart wraps each trigger in a plain '
+        'Touch target: Tabs.triggerHeight (32px) tall, label-width '
+            'wide, no hit-area growth. Unlike Checkbox\'s 42x34 '
+            'HitArea, tabs.dart wraps each trigger in a plain '
             'GestureDetector with no hit-area expansion: the tappable '
             'region is exactly the visible 32px-tall box, under the '
             '~44px platform target floor on the vertical axis.',
@@ -1068,7 +1089,7 @@ class _AccessibilityContent extends StatelessWidget {
             'ink colour change, though on the line variant that '
             'position is the sole non-textual cue, with no icon or '
             'glyph reinforcing it.',
-        'Error wiring: none, ElTabs defines no invalid or error '
+        'Error wiring: none, Tabs defines no invalid or error '
             'concept.',
         'Screen-reader announcements: no live region. Nothing announces '
             'a tab switch beyond whatever the reader happens to read '
@@ -1085,10 +1106,10 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Read plainly rather than described as the ARIA ideal: no '
             'keyboard interaction is wired at all. Neither '
-            '_DsTabsTrigger nor ElSlidingPillGroup contains a Focus '
+            '_DsTabsTrigger nor ActiveIndicator contains a Focus '
             'widget, a FocusNode, a Shortcuts or Actions mapping, or an '
             'onKeyEvent handler anywhere in the file.',
         'A tab list is conventionally one keyboard tab stop with arrow '
@@ -1111,11 +1132,11 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-    child: ElText(
-      'ElTabs neither scrolls nor wraps its triggers when they exceed '
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+    child: StyledText(
+      'Tabs neither scrolls nor wraps its triggers when they exceed '
       'the available width, and it does not clip them either: the '
-      'track\'s Row (inside ElSlidingPillGroup) keeps Flutter\'s '
+      'track\'s Row (inside ActiveIndicator) keeps Flutter\'s '
       'Row/Flex default clipBehavior of Clip.none, so content that does '
       'not fit paints straight past the track\'s right edge instead of '
       'being cut off at it. Verified directly at a 390px-class width: '
@@ -1129,14 +1150,14 @@ class _ResponsiveContent extends StatelessWidget {
       'the right of the tab set; in a clipped one (a ListView tile, a '
       'Card with ClipBehavior.hardEdge) it is invisibly cut instead. '
       'Either way, a caller with more triggers than fit a narrow layout '
-      'must wrap ElTabs in its own horizontal scroll view or reduce the '
+      'must wrap Tabs in its own horizontal scroll view or reduce the '
       'trigger count itself. The component supplies neither. Beyond '
-      'that, ElTabs has no other responsive behaviour: no breakpoint '
+      'that, Tabs has no other responsive behaviour: no breakpoint '
       'changes shape and keyboard versus pointer operation is identical '
       'on every Flutter target this package supports (there is no '
       'keyboard operation to differ, per Keyboard above).',
-      ElType.small,
-      color: ElTheme.of(context).mutedForeground,
+      TextStyles.small,
+      color: ThemeScope.of(context).mutedForeground,
     ),
   );
 }
@@ -1148,47 +1169,47 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Source file: ${tabsDoc.sourcePath}.',
         'Local file dependencies: tabs.dart imports '
-            'motion/sliding_pill.dart directly, for ElSlidingPillGroup, '
-            'the travelling-mark primitive it shares with ElToggleGroup '
-            'and the theme toggle; effects/machine_surface.dart, for '
-            'ElMachineSurface, the trigger\'s own fill/border/shadow '
+            'motion/active_indicator.dart directly, for ActiveIndicator, '
+            'the travelling-mark primitive it shares with ToggleGroup '
+            'and the theme toggle; effects/surface.dart, for '
+            'Surface, the trigger\'s own fill/border/shadow '
             'machinery; and button.dart, pulled in for exactly one '
-            'symbol, ElButton.withFocusRing, which drags in Button\'s own '
-            'dependency tree even though ElTabs never renders a '
-            'ElButton.',
+            'symbol, Button.withFocusRing, which drags in Button\'s own '
+            'dependency tree even though Tabs never renders a '
+            'Button.',
         'Foundation dependencies: foundation/colors.dart, '
             'foundation/motion.dart, foundation/shadows.dart, '
             'foundation/spacing.dart, foundation/theme.dart, '
             'foundation/typography.dart, theme_scope.dart — token '
             'sources: colours, durations and curves, shadow specs, the '
-            'el() spacing scale, type specs, and the live theme.',
+            'space() spacing scale, type specs, and the live theme.',
         'Exports: ${tabsDoc.exports.join(', ')}.',
         'Platforms: Android, iOS, Web, macOS, Windows, Linux — a pure '
             'Flutter widget tree of Row/Stack/DecoratedBox: no platform '
             'channel and no platform-specific branch, so nothing here '
             'differs by target.',
         'Assets: none. The pill and the underline rule are DecoratedBox '
-            'fills inside ElMachineSurface, not images or drawn '
+            'fills inside Surface, not images or drawn '
             'CustomPainter glyphs.',
         'Fonts: none dedicated. Trigger labels and panel text resolve '
-            'through the ambient ElComponentType.buttonLabel and '
-            'ElComponentType.textSm type specs: the same system type '
+            'through the ambient TextStyles.buttonLabel and '
+            'TextStyles.bodySmall type specs: the same system type '
             'scale every other component reads, not a font loaded for '
             'tabs itself.',
         'Shaders: none. No fragment shader is used.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
-          DocsLink(label: 'Sliding Pill', route: '/components/sliding_pill'),
           DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
+            label: 'Sliding Pill',
+            route: '/components/active_indicator',
           ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',
@@ -1199,15 +1220,19 @@ class _DependenciesContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

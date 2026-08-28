@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/agent_slash_palette.dart",
+      "source": "lib/src/components/ui/agent_slash_palette.dart",
       "target": "@ui/agent_slash_palette.dart",
-      "sha256": "ae8d13ada34db5b321bb43ec96f95695717410d35e3c5ecf02191ab267ff5699"
+      "sha256": "f8da166861f5c08e07468f2637f81271ec52e4e7adf9320a16f2c1d71970d379"
     }
   ],
   "registryDependencies": [
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/agent-slash-palette",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/agent_slash_palette.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_slash_palette.dart",
   "deprecated": false
 }

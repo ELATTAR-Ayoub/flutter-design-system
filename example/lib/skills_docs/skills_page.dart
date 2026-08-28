@@ -17,7 +17,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../docs/docs_code.dart';
 import '../docs/docs_facts.dart';
@@ -77,7 +89,7 @@ class SkillsPage extends StatelessWidget {
         title: skill.title,
         description: skill.description,
       ),
-      breadcrumbs: const <ElBreadcrumbEntry>[ElBreadcrumbEntry.page('Skills')],
+      breadcrumbs: const <BreadcrumbEntry>[BreadcrumbEntry.page('Skills')],
       sidebar: _sidebar(skill.route),
       toc: const <DocsTocEntry>[
         DocsTocEntry(title: 'Overview', anchor: 'overview'),
@@ -132,17 +144,17 @@ class _SkillArticle extends StatelessWidget {
         key: docsAnchorKey('overview'),
         child: _OverviewPanel(entry: entry),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       KeyedSubtree(
         key: docsAnchorKey('agents'),
         child: _AgentsPanel(entry: entry),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       KeyedSubtree(
         key: docsAnchorKey('install'),
         child: _InstallPanel(entry: entry),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       KeyedSubtree(
         key: docsAnchorKey('files'),
         child: DocsFileTree(
@@ -155,7 +167,7 @@ class _SkillArticle extends StatelessWidget {
           files: _files,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       KeyedSubtree(
         key: docsAnchorKey('version'),
         child: _VersionPanel(entry: entry),
@@ -171,23 +183,27 @@ class _OverviewPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Semantics(
       key: const ValueKey<String>('skill-overview'),
       container: true,
       label: 'Overview',
-      child: ElPanel(
+      child: Panel(
         label: 'Overview',
         note: '${entry.workflow.length} workflow steps',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            ElText(entry.summary, ElType.body, color: theme.foreground),
-            SizedBox(height: el(5)),
-            ElText('WORKFLOW', ElType.label, color: theme.mutedForeground),
-            SizedBox(height: el(3)),
+            StyledText(entry.summary, TextStyles.body, color: theme.foreground),
+            SizedBox(height: space(5)),
+            StyledText(
+              'WORKFLOW',
+              TextStyles.eyebrow,
+              color: theme.mutedForeground,
+            ),
+            SizedBox(height: space(3)),
             for (int i = 0; i < entry.workflow.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(height: el(2)),
+              if (i > 0) SizedBox(height: space(2)),
               _WorkflowStep(index: i + 1, text: entry.workflow[i]),
             ],
           ],
@@ -205,7 +221,7 @@ class _WorkflowStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Semantics(
       container: true,
       label: 'Step $index: $text',
@@ -213,14 +229,14 @@ class _WorkflowStep extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           SizedBox(
-            width: el(6),
-            child: ElText(
+            width: space(6),
+            child: StyledText(
               '$index.',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ),
-          Expanded(child: ElText(text, ElType.small)),
+          Expanded(child: StyledText(text, TextStyles.small)),
         ],
       ),
     );
@@ -234,29 +250,29 @@ class _AgentsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Semantics(
       key: const ValueKey<String>('skill-agents'),
       container: true,
       label: 'Supported agents',
-      child: ElPanel(
+      child: Panel(
         label: 'Supported agents',
         note: '${entry.supportedAgents.length} verified',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            ElRow(
+            SpecimenRow(
               children: <Widget>[
                 for (final String agent in entry.supportedAgents)
-                  ElBadge(label: agent, variant: ElBadgeVariant.success),
+                  Badge(label: agent, variant: BadgeVariant.success),
               ],
             ),
-            SizedBox(height: el(3)),
-            ElText(
+            SizedBox(height: space(3)),
+            StyledText(
               'This skill is written for, and verified only against, the '
               'harness named above. No other agent harness has a recorded '
               'install route, so none is claimed here.',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -273,25 +289,25 @@ class _InstallPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Semantics(
       key: const ValueKey<String>('skill-install'),
       container: true,
       label: 'Install and manage',
-      child: ElPanel(
+      child: Panel(
         label: 'Install & manage',
         note: '${entry.installRoutes.length} routes',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            ElText(
+            StyledText(
               entry.licenseStatus,
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
             for (final SkillInstallRoute route
                 in entry.installRoutes) ...<Widget>[
-              SizedBox(height: el(6)),
+              SizedBox(height: space(6)),
               _RoutePanel(route: route),
             ],
           ],
@@ -310,18 +326,18 @@ class _RoutePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Semantics(
       container: true,
       label:
           '${route.title}, ${_pending ? 'pending verification' : 'works today'}',
       child: Container(
         key: ValueKey<String>('skill-route:${route.id}'),
-        padding: EdgeInsets.all(el(5)),
+        padding: EdgeInsets.all(space(5)),
         decoration: BoxDecoration(
           color: theme.card,
-          borderRadius: BorderRadius.circular(ElRadii.lg),
-          border: Border.all(color: theme.border, width: ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.lg),
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -329,26 +345,34 @@ class _RoutePanel extends StatelessWidget {
             Wrap(
               alignment: WrapAlignment.spaceBetween,
               crossAxisAlignment: WrapCrossAlignment.center,
-              runSpacing: el(2),
-              spacing: el(3),
+              runSpacing: space(2),
+              spacing: space(3),
               children: <Widget>[
-                ElText(route.title, ElType.label, color: theme.foreground),
-                ElBadge(
+                StyledText(
+                  route.title,
+                  TextStyles.eyebrow,
+                  color: theme.foreground,
+                ),
+                Badge(
                   label: _pending ? 'Pending verification' : 'Works today',
                   variant: _pending
-                      ? ElBadgeVariant.warning
-                      : ElBadgeVariant.success,
+                      ? BadgeVariant.warning
+                      : BadgeVariant.success,
                 ),
               ],
             ),
-            SizedBox(height: el(2)),
-            ElText(route.summary, ElType.small, color: theme.mutedForeground),
+            SizedBox(height: space(2)),
+            StyledText(
+              route.summary,
+              TextStyles.small,
+              color: theme.mutedForeground,
+            ),
             if (route.blockedBy != null) ...<Widget>[
-              SizedBox(height: el(3)),
-              ElNote(
-                tone: ElNoteTone.error,
+              SizedBox(height: space(3)),
+              Note(
+                tone: NoteTone.error,
                 title: 'Pending',
-                child: ElText(route.blockedBy!, ElType.small),
+                child: StyledText(route.blockedBy!, TextStyles.small),
               ),
             ],
             _RouteAction(label: 'Install', commands: route.install),
@@ -376,23 +400,23 @@ class _RouteAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (commands.isEmpty && note == null) return const SizedBox.shrink();
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.only(top: el(4)),
+      padding: EdgeInsets.only(top: space(4)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElText(
+          StyledText(
             label.toUpperCase(),
-            ElType.label,
+            TextStyles.eyebrow,
             color: theme.mutedForeground,
           ),
-          SizedBox(height: el(2)),
+          SizedBox(height: space(2)),
           if (commands.isEmpty)
-            ElText(note!, ElType.small, color: theme.mutedForeground)
+            StyledText(note!, TextStyles.small, color: theme.mutedForeground)
           else
             for (int i = 0; i < commands.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(height: el(3)),
+              if (i > 0) SizedBox(height: space(3)),
               _CommandBlock(command: commands[i]),
             ],
         ],
@@ -408,7 +432,7 @@ class _CommandBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     // Mapped onto `docs_code.dart`'s own command type rather than a
     // hand-rolled equivalent: see that file's `DocsCodeCommand` and this
     // page's library doc.
@@ -420,16 +444,20 @@ class _CommandBlock extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElText(docsCommand.label, ElType.small, color: theme.foreground),
+        StyledText(
+          docsCommand.label,
+          TextStyles.small,
+          color: theme.foreground,
+        ),
         if (docsCommand.description != null) ...<Widget>[
-          SizedBox(height: el(1)),
-          ElText(
+          SizedBox(height: space(1)),
+          StyledText(
             docsCommand.description!,
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ],
-        SizedBox(height: el(2)),
+        SizedBox(height: space(2)),
         DocsSelectableCodeBlock(
           key: ValueKey<String>('skill-command:${docsCommand.command}'),
           code: docsCommand.command,

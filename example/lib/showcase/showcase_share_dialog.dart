@@ -1,6 +1,18 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// Reusable sharing workflow for published Signal Studio content.
 ///
@@ -21,15 +33,15 @@ class ShowcaseShareDialog extends StatelessWidget {
   final String description;
   final String subject;
   final String link;
-  final ElToastController toasts;
-  final ElModalTriggerBuilder trigger;
+  final ToastController toasts;
+  final ModalTriggerBuilder trigger;
 
   void _copy() {
     Clipboard.setData(ClipboardData(text: link));
     toasts.success(
       'Share link copied',
       description: '“$subject” is ready to send.',
-      glyph: ElIconGlyph.copy,
+      glyph: IconGlyph.copy,
     );
   }
 
@@ -37,80 +49,77 @@ class ShowcaseShareDialog extends StatelessWidget {
     toasts.success(
       'Ready for $network',
       description: '$subject and its public link are prepared for your post.',
-      glyph: ElIconGlyph.externalLink,
+      glyph: IconGlyph.externalLink,
     );
   }
 
   @override
-  Widget build(BuildContext context) => ElDialog(
+  Widget build(BuildContext context) => Dialog(
     trigger: trigger,
-    content: (BuildContext context, VoidCallback close) => ElDialogContent(
+    content: (BuildContext context, VoidCallback close) => DialogContent(
       onClose: close,
       children: <Widget>[
-        ElDialogHeader(
+        DialogHeader(
           children: <Widget>[
-            ElDialogTitle(dialogTitle),
-            ElDialogDescription(description),
+            DialogTitle(dialogTitle),
+            DialogDescription(description),
           ],
         ),
-        ElFieldGroup(
+        FieldGroup(
           children: <Widget>[
-            ElField(
+            Field(
               label: 'Public link',
               description: 'Anyone with this link can view $subject.',
-              child: ElInput(initialValue: link, readOnly: true),
+              child: Input(initialValue: link, readOnly: true),
             ),
-            ElButton(
+            Button(
               key: const Key('share-copy-link'),
-              variant: ElButtonVariant.primary,
+              variant: ButtonVariant.primary,
               label: 'Copy link',
               onPressed: _copy,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const ElIcon.lucide(ElLucide.copy, size: ElIconSize.sm),
-                  SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
-                  ElText('Copy link', ElComponentType.buttonLabel),
+                  const Icon.lucide(Lucide.copy, size: IconSize.sm),
+                  SizedBox(width: Button.gapFor(ButtonSize.md)),
+                  StyledText('Copy link', TextStyles.buttonLabel),
                 ],
               ),
             ),
             Row(
               children: <Widget>[
                 Expanded(
-                  child: ElButton(
+                  child: Button(
                     key: const Key('share-threads'),
-                    variant: ElButtonVariant.secondary,
+                    variant: ButtonVariant.secondary,
                     label: 'Prepare for Threads',
                     onPressed: () => _preparePost('Threads'),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        const ElIcon.lucide(
-                          ElLucide.atSign,
-                          size: ElIconSize.sm,
-                        ),
-                        SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
-                        ElText('Threads', ElComponentType.buttonLabel),
+                        const Icon.lucide(Lucide.atSign, size: IconSize.sm),
+                        SizedBox(width: Button.gapFor(ButtonSize.md)),
+                        StyledText('Threads', TextStyles.buttonLabel),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(width: el(3)),
+                SizedBox(width: space(3)),
                 Expanded(
-                  child: ElButton(
+                  child: Button(
                     key: const Key('share-x'),
-                    variant: ElButtonVariant.secondary,
+                    variant: ButtonVariant.secondary,
                     label: 'Prepare for X',
                     onPressed: () => _preparePost('X'),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        const ElIcon.lucide(ElLucide.send, size: ElIconSize.sm),
-                        SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
-                        ElText('X', ElComponentType.buttonLabel),
+                        const Icon.lucide(Lucide.send, size: IconSize.sm),
+                        SizedBox(width: Button.gapFor(ButtonSize.md)),
+                        StyledText('X', TextStyles.buttonLabel),
                       ],
                     ),
                   ),
@@ -119,13 +128,13 @@ class ShowcaseShareDialog extends StatelessWidget {
             ),
           ],
         ),
-        ElDialogFooter(
+        DialogFooter(
           children: <Widget>[
-            ElButton(
+            Button(
               key: const Key('share-done'),
-              variant: ElButtonVariant.ghost,
+              variant: ButtonVariant.ghost,
               onPressed: close,
-              child: ElText('Done', ElComponentType.buttonLabel),
+              child: StyledText('Done', TextStyles.buttonLabel),
             ),
           ],
         ),

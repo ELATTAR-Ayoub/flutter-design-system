@@ -6,11 +6,37 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsAnchor, DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-/// Trimmed on 2026-08-24: `ElNavUser` and `ElMarker` moved to
-/// `nav_user_test.dart` and `marker_test.dart` along with their pages, so
+/// Trimmed on 2026-08-24: `UserMenu` and `Marker` moved to
+/// `user_menu_test.dart` and `marker_test.dart` along with their pages, so
 /// nothing about either is asserted here any more.
 ///
 /// The page's own section order, matching the house shape: `Preview` first,
@@ -58,9 +84,9 @@ const List<String> _sectionTitles = <String>[
   'Source',
 ];
 
-/// Every named constructor parameter `ElCarousel` declares
+/// Every named constructor parameter `Carousel` declares
 /// (`lib/src/components/carousel.dart`), excluding `key`: the same set the
-/// page's `ElCarousel` API table claims to cover.
+/// page's `Carousel` API table claims to cover.
 const List<String> _carouselConstructorParams = <String>[
   'basis',
   'items',
@@ -69,16 +95,14 @@ const List<String> _carouselConstructorParams = <String>[
   'nextLabel',
 ];
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: Scaffold(body: SingleChildScrollView(child: child)),
-  ),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(body: SingleChildScrollView(child: child)),
+      ),
+    );
 
 /// The single `DocsDisclosure` whose title is [title].
 Finder _disclosureTrigger(String title) => find.descendant(
@@ -101,24 +125,21 @@ Future<void> _open(WidgetTester tester, String title) async {
 
 void main() {
   group('meta', () {
-    test('carouselDoc names ElCarousel only, after the split', () {
+    test('carouselDoc names Carousel only, after the split', () {
       expect(carouselDoc.name, 'carousel');
       expect(carouselDoc.title, 'Carousel');
       expect(carouselDoc.route, '/components/carousel');
       expect(carouselDoc.command, 'elattar add carousel');
       expect(carouselDoc.sourcePath, 'lib/src/components/carousel.dart');
-      expect(carouselDoc.exports, <String>[
-        'ElCarousel',
-        'ElCarouselController',
-      ]);
+      expect(carouselDoc.exports, <String>['Carousel', 'CarouselController']);
       expect(carouselDoc.dependencies, <String>[
         'button',
         'icon',
         'source-foundation',
       ]);
       // The two families that moved out are gone from this entry.
-      expect(carouselDoc.exports, isNot(contains('ElNavUser')));
-      expect(carouselDoc.exports, isNot(contains('ElMarker')));
+      expect(carouselDoc.exports, isNot(contains('UserMenu')));
+      expect(carouselDoc.exports, isNot(contains('Marker')));
     });
   });
 
@@ -134,7 +155,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: CarouselDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -156,15 +177,15 @@ void main() {
           expect(
             find.text(param),
             findsWidgets,
-            reason: 'missing ElCarousel param $param',
+            reason: 'missing Carousel param $param',
           );
         }
 
-        // The ElCarouselController table names its own constructor
+        // The CarouselController table names its own constructor
         // parameter and its public members, which the pre-split table did
         // not.
         for (final String member in <String>[
-          'ElCarouselController({vsync})',
+          'CarouselController({vsync})',
           'instant',
           'location',
           'selectedIndex',
@@ -183,7 +204,7 @@ void main() {
           expect(
             find.text(member),
             findsWidgets,
-            reason: 'missing ElCarouselController member $member',
+            reason: 'missing CarouselController member $member',
           );
         }
 
@@ -205,8 +226,8 @@ void main() {
 
         // Both basis values the Sizes section claims to show are real.
         final Set<double> mountedBases = tester
-            .widgetList<ElCarousel>(find.byType(ElCarousel))
-            .map((ElCarousel carousel) => carousel.basis)
+            .widgetList<Carousel>(find.byType(Carousel))
+            .map((Carousel carousel) => carousel.basis)
             .toSet();
         expect(mountedBases, containsAll(<double>[0.5, 0.333]));
 
@@ -222,31 +243,30 @@ void main() {
       );
     });
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const CarouselDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const CarouselDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Five specimen stages: Preview, Composition, Sizes, RTL — four —
-        // the motion note and the not-ported table carry no specimen of
-        // their own.
-        expect(find.byType(DocsShowcase), findsNWidgets(4));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Nine collapsed sections: Not ported, plus the
-        // eight required disclosures.
-        expect(find.byType(DocsDisclosure), findsNWidgets(9));
-      },
-    );
+      // Five specimen stages: Preview, Composition, Sizes, RTL — four —
+      // the motion note and the not-ported table carry no specimen of
+      // their own.
+      expect(find.byType(DocsShowcase), findsNWidgets(4));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Nine collapsed sections: Not ported, plus the
+      // eight required disclosures.
+      expect(find.byType(DocsDisclosure), findsNWidgets(9));
+    });
 
     testWidgets(
       'sections render in the documented order, section for section',
@@ -257,7 +277,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const CarouselDocPage(),
           ),
         );
@@ -296,7 +316,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const CarouselDocPage(),
           ),
         );
@@ -319,14 +339,14 @@ void main() {
           );
         }
 
-        // The honest skip's own causal framing, verbatim: ElCarousel really
+        // The honest skip's own causal framing, verbatim: Carousel really
         // does declare no `controller` parameter, so the page must not
         // start implying that the exported controller is attachable.
         expect(
           find.text(
             'API state-tracking and Events are both the same missing '
             'parameter, not two independent gaps. Adding a controller '
-            'argument to ElCarousel would close both at once; until then '
+            'argument to Carousel would close both at once; until then '
             'neither is available, and this page does not pretend '
             'otherwise.',
           ),
@@ -344,7 +364,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const CarouselDocPage(),
         ),
       );
@@ -367,31 +387,31 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const CarouselDocPage(),
         ),
       );
       await tester.pump();
 
-      final List<ElButton> buttons = tester
-          .widgetList<ElButton>(find.byType(ElButton))
+      final List<Button> buttons = tester
+          .widgetList<Button>(find.byType(Button))
           .toList();
       expect(buttons.length, greaterThanOrEqualTo(2));
 
       final Set<String?> labels = buttons
-          .map((ElButton button) => button.label)
+          .map((Button button) => button.label)
           .toSet();
       expect(labels, contains('Previous slide'));
       expect(labels, contains('Next slide'));
 
       // The previous arrow starts disabled: canScrollPrev is false at index
       // 0, which the page's own States and Accessibility sections claim.
-      final Iterable<ElButton> previous = buttons.where(
-        (ElButton button) => button.label == 'Previous slide',
+      final Iterable<Button> previous = buttons.where(
+        (Button button) => button.label == 'Previous slide',
       );
       expect(previous, isNotEmpty);
       expect(
-        previous.every((ElButton button) => button.onPressed == null),
+        previous.every((Button button) => button.onPressed == null),
         isTrue,
       );
     });
@@ -405,7 +425,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const CarouselDocPage(),
           ),
         );
@@ -433,15 +453,15 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const CarouselDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('carousel-doc-article')),
           ),
@@ -449,10 +469,10 @@ void main() {
 
         // Flip the SAME controller in place. A single pump(), never
         // pumpAndSettle().
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('carousel-doc-article')),
           ),

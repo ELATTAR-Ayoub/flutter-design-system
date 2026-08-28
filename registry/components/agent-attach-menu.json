@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/agent_attach_menu.dart",
+      "source": "lib/src/components/ui/agent_attach_menu.dart",
       "target": "@ui/agent_attach_menu.dart",
-      "sha256": "b040d7f25d3862eab5056e278acf52190ea84f302cf88b9547a633215fa5fe45"
+      "sha256": "416cabc877c32714521ec91af83cdc2b2195c7f3d0ce3599e2ee33e435275053"
     }
   ],
   "registryDependencies": [
@@ -34,5 +34,8 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent-attach-menu",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/agent_attach_menu.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_attach_menu.dart",
+  "exports": [
+    "AgentAttachMenu"
+  ]
 }

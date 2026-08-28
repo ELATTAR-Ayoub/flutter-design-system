@@ -21,26 +21,26 @@ void main() {
       contains('lib/design_system/foundation'),
     );
     expect(
-      mapper.destination(root, '@effects/machine_surface.dart'),
-      contains('lib/design_system/effects'),
+      mapper.destination(root, '@ui/surface.dart'),
+      contains('lib/components/ui'),
     );
     expect(
-      mapper.destination(root, '@motion/press.dart'),
-      contains('lib/design_system/motion'),
+      mapper.destination(root, '@ui/press.dart'),
+      contains('lib/components/ui'),
     );
     expect(
       mapper.destination(root, '@assets/textures/perlin-noise.png'),
-      contains('assets'),
+      contains('assets/ui'),
     );
     expect(
       mapper.destination(root, '@shaders/orb.frag').replaceAll('\\', '/'),
-      endsWith('shaders/orb.frag'),
+      endsWith('shaders/ui/orb.frag'),
     );
     expect(
       mapper
-          .destination(root, '@app/shots/console/console_shot.dart')
+          .destination(root, '@block/console/console.dart')
           .replaceAll('\\', '/'),
-      endsWith('lib/shots/console/console_shot.dart'),
+      endsWith('lib/blocks/console/console.dart'),
     );
   });
 
@@ -58,8 +58,8 @@ void main() {
         "import 'package:flutter/widgets.dart';\n"
         "import 'package:elattar_design_system/elattar_design_system.dart';\n";
     final String result = transformer.transform(
-      sourcePath: 'repo/lib/shots/console/console_shot.dart',
-      targetPath: 'consumer/lib/shots/console/console_shot.dart',
+      sourcePath: 'repo/lib/src/blocks/console/console_shot.dart',
+      targetPath: 'consumer/lib/blocks/console/console_shot.dart',
       projectRoot: 'consumer',
       content: source,
     );
@@ -80,8 +80,8 @@ void main() {
     const String source =
         "import 'package:elattar_design_system/elattar_design_system.dart';\n";
     final String shallow = transformer.transform(
-      sourcePath: 'repo/lib/shots/minimal_shot.dart',
-      targetPath: 'consumer/lib/shots/minimal_shot.dart',
+      sourcePath: 'repo/lib/src/blocks/minimal_shot.dart',
+      targetPath: 'consumer/lib/blocks/minimal_shot.dart',
       projectRoot: 'consumer',
       content: source,
     );
@@ -89,8 +89,8 @@ void main() {
     expect(shallow, contains("import '../design_system/foundation.dart'"));
 
     final String deep = transformer.transform(
-      sourcePath: 'repo/lib/shots/a/b/deep_shot.dart',
-      targetPath: 'consumer/lib/shots/a/b/deep_shot.dart',
+      sourcePath: 'repo/lib/src/blocks/a/b/deep_shot.dart',
+      targetPath: 'consumer/lib/blocks/a/b/deep_shot.dart',
       projectRoot: 'consumer',
       content: source,
     );
@@ -101,11 +101,11 @@ void main() {
   test('direct package library imports map onto their logical targets', () {
     final DartImportTransformer transformer = DartImportTransformer();
     const String source =
-        "import 'package:elattar_design_system/src/components/button.dart';\n"
-        "import 'package:elattar_design_system/src/foundation/colors.dart';\n";
+        "import 'package:elattar_design_system/src/components/ui/button.dart' as UI;\n"
+        "import 'package:elattar_design_system/src/design_system/foundation/colors.dart' as UI;\n";
     final String result = transformer.transform(
-      sourcePath: 'repo/lib/shots/console/console_shot.dart',
-      targetPath: 'consumer/lib/shots/console/console_shot.dart',
+      sourcePath: 'repo/lib/src/blocks/console/console_shot.dart',
+      targetPath: 'consumer/lib/blocks/console/console_shot.dart',
       projectRoot: 'consumer',
       content: source,
     );
@@ -117,25 +117,25 @@ void main() {
   });
 
   // A combinator or prefix on the umbrella import lands on whichever directive
-  // the fan-out emits LAST, so `show ElButton` would attach to the foundation
-  // barrel and ElButton would not resolve. All three forms must be refused,
+  // the fan-out emits LAST, so `show Button` would attach to the foundation
+  // barrel and Button would not resolve. All three forms must be refused,
   // not just `as`.
   for (final ({String label, String trailing}) form
       in <({String label, String trailing})>[
-        (label: 'a prefix', trailing: ' as el'),
-        (label: 'a show combinator', trailing: ' show ElButton'),
-        (label: 'a hide combinator', trailing: ' hide ElButton'),
-        (label: 'a prefix and a combinator', trailing: ' as el show ElButton'),
+        (label: 'a prefix', trailing: ' as space'),
+        (label: 'a show combinator', trailing: ' show Button'),
+        (label: 'a hide combinator', trailing: ' hide Button'),
+        (label: 'a prefix and a combinator', trailing: ' as space show Button'),
       ]) {
     test('an umbrella import with ${form.label} is refused, not mangled', () {
       final DartImportTransformer transformer = DartImportTransformer();
       expect(
         () => transformer.transform(
-          sourcePath: 'repo/lib/shots/console/console_shot.dart',
-          targetPath: 'consumer/lib/shots/console/console_shot.dart',
+          sourcePath: 'repo/lib/src/blocks/console/console_shot.dart',
+          targetPath: 'consumer/lib/blocks/console/console_shot.dart',
           projectRoot: 'consumer',
           content:
-              "import 'package:elattar_design_system/elattar_design_system.dart'"
+              "import 'package:elattar_design_system/elattar_design_system.dart' as UI"
               '${form.trailing};\n',
         ),
         throwsA(
@@ -152,8 +152,8 @@ void main() {
   test('an umbrella export fans out to the generated barrels', () {
     final DartImportTransformer transformer = DartImportTransformer();
     final String result = transformer.transform(
-      sourcePath: 'repo/lib/shots/api.dart',
-      targetPath: 'consumer/lib/shots/api.dart',
+      sourcePath: 'repo/lib/src/blocks/api.dart',
+      targetPath: 'consumer/lib/blocks/api.dart',
       projectRoot: 'consumer',
       content:
           "export 'package:elattar_design_system/elattar_design_system.dart';\n",
@@ -173,7 +173,7 @@ void main() {
   // usage, and string literals that quote snippets. A rewrite that matched the
   // word `import` anywhere would fan the umbrella barrel out into the middle of
   // a class body ("Directives must appear before any declarations") or into the
-  // middle of a string literal, and a commented-out `as el` import would abort
+  // middle of a string literal, and a commented-out `as space` import would abort
   // the whole install.
 
   test('an import inside a doc comment is not a directive', () {
@@ -187,8 +187,8 @@ void main() {
         '  const ConsoleShot();\n'
         '}\n';
     final String result = transformer.transform(
-      sourcePath: 'repo/lib/shots/console/console_shot.dart',
-      targetPath: 'consumer/lib/shots/console/console_shot.dart',
+      sourcePath: 'repo/lib/src/blocks/console/console_shot.dart',
+      targetPath: 'consumer/lib/blocks/console/console_shot.dart',
       projectRoot: 'consumer',
       content: source,
     );
@@ -222,8 +222,8 @@ void main() {
         'class Foo {}\n';
     expect(
       transformer.transform(
-        sourcePath: 'repo/lib/shots/console/console_shot.dart',
-        targetPath: 'consumer/lib/shots/console/console_shot.dart',
+        sourcePath: 'repo/lib/src/blocks/console/console_shot.dart',
+        targetPath: 'consumer/lib/blocks/console/console_shot.dart',
         projectRoot: 'consumer',
         content: source,
       ),
@@ -240,8 +240,8 @@ void main() {
         '    \'import "package:elattar_design_system/elattar_design_system.dart";\';\n';
     expect(
       transformer.transform(
-        sourcePath: 'repo/lib/shots/console/console_shot.dart',
-        targetPath: 'consumer/lib/shots/console/console_shot.dart',
+        sourcePath: 'repo/lib/src/blocks/console/console_shot.dart',
+        targetPath: 'consumer/lib/blocks/console/console_shot.dart',
         projectRoot: 'consumer',
         content: source,
       ),
@@ -259,8 +259,8 @@ void main() {
         "''';\n";
     expect(
       transformer.transform(
-        sourcePath: 'repo/lib/shots/console/console_shot.dart',
-        targetPath: 'consumer/lib/shots/console/console_shot.dart',
+        sourcePath: 'repo/lib/src/blocks/console/console_shot.dart',
+        targetPath: 'consumer/lib/blocks/console/console_shot.dart',
         projectRoot: 'consumer',
         content: source,
       ),
@@ -271,16 +271,16 @@ void main() {
   test('a commented-out umbrella import with a prefix does not throw', () {
     final DartImportTransformer transformer = DartImportTransformer();
     const String source =
-        "// import 'package:elattar_design_system/elattar_design_system.dart' as el;\n"
+        "// import 'package:elattar_design_system/elattar_design_system.dart' as space;\n"
         '/*\n'
-        "import 'package:elattar_design_system/elattar_design_system.dart' show ElButton;\n"
+        "import 'package:elattar_design_system/elattar_design_system.dart' as UI show Button;\n"
         '*/\n'
         "import 'package:flutter/widgets.dart';\n";
     late String result;
     expect(
       () => result = transformer.transform(
-        sourcePath: 'repo/lib/shots/console/console_shot.dart',
-        targetPath: 'consumer/lib/shots/console/console_shot.dart',
+        sourcePath: 'repo/lib/src/blocks/console/console_shot.dart',
+        targetPath: 'consumer/lib/blocks/console/console_shot.dart',
         projectRoot: 'consumer',
         content: source,
       ),
@@ -294,8 +294,8 @@ void main() {
   test('a consumer root containing a lib directory resolves correctly', () {
     final DartImportTransformer transformer = DartImportTransformer();
     final String result = transformer.transform(
-      sourcePath: 'repo/lib/shots/console/console_shot.dart',
-      targetPath: 'C:/dev/lib/myapp/lib/shots/console/console_shot.dart',
+      sourcePath: 'repo/lib/src/blocks/console/console_shot.dart',
+      targetPath: 'C:/dev/lib/myapp/lib/blocks/console/console_shot.dart',
       projectRoot: 'C:/dev/lib/myapp',
       content:
           "import 'package:elattar_design_system/elattar_design_system.dart';\n",
@@ -309,7 +309,7 @@ void main() {
   test('a target outside lib/ resolves against the project root', () {
     final DartImportTransformer transformer = DartImportTransformer();
     final String result = transformer.transform(
-      sourcePath: 'repo/lib/shots/console_shot.dart',
+      sourcePath: 'repo/lib/src/blocks/console_shot.dart',
       targetPath: 'consumer/console_shot.dart',
       projectRoot: 'consumer',
       content:
@@ -322,9 +322,9 @@ void main() {
   test('relative imports resolve from source layout to copied layout', () {
     final DartImportTransformer transformer = DartImportTransformer();
     const String source =
-        "import '../foundation/theme.dart';\nimport 'spinner.dart';\n";
+        "import '../../design_system/foundation/theme.dart';\nimport 'spinner.dart';\n";
     final String result = transformer.transform(
-      sourcePath: 'repo/lib/src/components/button.dart',
+      sourcePath: 'repo/lib/src/components/ui/button.dart',
       targetPath: 'consumer/lib/components/ui/button.dart',
       projectRoot: 'consumer',
       content: source,
@@ -341,7 +341,7 @@ void main() {
     () {
       final DartImportTransformer transformer = DartImportTransformer();
       const String source =
-          "import 'foundation/theme.dart';\nimport 'foundation/typography.dart';\n";
+          "import './theme.dart';\nimport './typography.dart';\n";
       final String result = transformer.transform(
         sourcePath: 'repo/lib/src/theme_scope.dart',
         targetPath: 'consumer/lib/design_system/foundation/theme_scope.dart',
@@ -364,7 +364,7 @@ void main() {
       version: '0.0.1',
       files: const <InstallFile>[
         InstallFile(
-          source: 'lib/src/components/card.dart',
+          source: 'lib/src/components/ui/card.dart',
           target: '@ui/card.dart',
         ),
       ],
@@ -511,7 +511,7 @@ flutter:
       repositoryRoot: repository,
       items: const <InstallItem>[
         InstallItem(
-          name: 'voice-orb',
+          name: 'voice-indicator',
           version: '0.0.1',
           files: <InstallFile>[],
           assets: <InstallResource>[
@@ -530,8 +530,8 @@ flutter:
       ],
     );
     expect(plan.canApply, isTrue);
-    expect(plan.pubspec, contains('assets/textures/perlin-noise.png'));
-    expect(plan.pubspec, contains('shaders/orb.frag'));
+    expect(plan.pubspec, contains('assets/ui/textures/perlin-noise.png'));
+    expect(plan.pubspec, contains('shaders/ui/orb.frag'));
     expect(() => loadYaml(plan.pubspec), returnsNormally);
     Installer().apply(plan);
     expect(() => loadYaml(pubspec.readAsStringSync()), returnsNormally);
@@ -556,7 +556,7 @@ flutter:
           version: '0.0.1',
           files: <InstallFile>[
             InstallFile(
-              source: 'lib/src/components/card.dart',
+              source: 'lib/src/components/ui/card.dart',
               target: '@ui/card.dart',
             ),
           ],
@@ -595,7 +595,7 @@ flutter:
             version: '0.0.1',
             files: <InstallFile>[
               InstallFile(
-                source: 'lib/src/components/card.dart',
+                source: 'lib/src/components/ui/card.dart',
                 target: '@ui/card.dart',
               ),
             ],
@@ -605,7 +605,7 @@ flutter:
       expect(plan.canApply, isTrue);
       final InstallOperation card = plan.operations.firstWhere(
         (InstallOperation operation) =>
-            operation.source == 'lib/src/components/card.dart',
+            operation.source == 'lib/src/components/ui/card.dart',
       );
       final String content = card.content.toString();
       expect(

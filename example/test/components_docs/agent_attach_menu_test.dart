@@ -2,13 +2,13 @@
 /// [AgentAttachMenuDocPage]: the agent-attach-menu component documentation
 /// page.
 ///
-/// `agent_attach_menu.dart` declares one widget, [ElAgentAttachMenu], read
+/// `agent_attach_menu.dart` declares one widget, [AgentAttachMenu], read
 /// directly from `lib/src/components/agent_attach_menu.dart`. The
 /// API-completeness test checks its two `DocsApiTable`s (constructor
 /// parameters, then public statics) by title.
 ///
-/// The menu opens on a pointer-DOWN, not a tap-up (`ElMenuPointerDown`), and
-/// its content is a real `ElPopover` overlay — `tester.tap` still opens it,
+/// The menu opens on a pointer-DOWN, not a tap-up (`MenuPointerDown`), and
+/// its content is a real `Popover` overlay — `tester.tap` still opens it,
 /// since a synthesized tap delivers a pointer-down before its pointer-up,
 /// but reading the popup afterwards needs a frame or two for the overlay's
 /// own enter animation, mirrored from `dropdown_menu_test.dart`'s own
@@ -25,7 +25,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const List<String> _expectedSectionOrder = <String>[
@@ -45,13 +71,13 @@ const List<String> _expectedSectionOrder = <String>[
 ];
 
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElAgentAttachMenu': <String>[
+  'AgentAttachMenu': <String>[
     'onPickFiles',
     'commands',
     'onRunCommand',
     'disabled',
   ],
-  'ElAgentAttachMenu static values': <String>[
+  'AgentAttachMenu static values': <String>[
     'triggerSize',
     'width',
     'maxHeight',
@@ -73,21 +99,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -112,7 +138,7 @@ Future<void> _open(WidgetTester tester, String key) async {
   await tester.tap(trigger);
   await tester.pump();
   await tester.pump();
-  await tester.pump(ElDurations.overlay);
+  await tester.pump(MotionDurations.overlayEnter);
 }
 
 void main() {
@@ -149,19 +175,18 @@ void main() {
       },
     );
 
-    testWidgets(
-      'renders the house-shape section order, section for section',
-      (WidgetTester tester) async {
-        await _pump(tester);
+    testWidgets('renders the house-shape section order, section for section', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester);
 
-        final List<String> ids = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.id)
-            .toList();
+      final List<String> ids = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
+          .toList();
 
-        expect(ids, _expectedSectionOrder);
-      },
-    );
+      expect(ids, _expectedSectionOrder);
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -182,7 +207,7 @@ void main() {
         await tester.ensureVisible(apiTrigger);
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         final List<DocsApiTable> tables = tester
             .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -232,28 +257,25 @@ void main() {
         final Finder status = find.byKey(
           const ValueKey<String>('agent-attach-menu-preview:status'),
         );
-        expect(tester.widget<ElText>(status).text, 'Nothing run yet.');
+        expect(tester.widget<StyledText>(status).text, 'Nothing run yet.');
 
         await tester.tap(find.text('Find comps'), warnIfMissed: false);
         await tester.pump();
 
-        expect(tester.widget<ElText>(status).text, 'Ran: Find comps');
+        expect(tester.widget<StyledText>(status).text, 'Ran: Find comps');
         expect(tester.takeException(), isNull);
       },
     );
 
-    testWidgets(
-      'the Skills only specimen shows no Photos & files row and no '
-      'separator',
-      (WidgetTester tester) async {
-        await _pump(tester);
-        await _open(tester, 'agent-attach-menu-example:skills-only');
+    testWidgets('the Skills only specimen shows no Photos & files row and no '
+        'separator', (WidgetTester tester) async {
+      await _pump(tester);
+      await _open(tester, 'agent-attach-menu-example:skills-only');
 
-        expect(find.text('Photos & files'), findsNothing);
-        expect(find.text('Find comps'), findsOneWidget);
-        expect(find.text('Summarize'), findsOneWidget);
-      },
-    );
+      expect(find.text('Photos & files'), findsNothing);
+      expect(find.text('Find comps'), findsOneWidget);
+      expect(find.text('Summarize'), findsOneWidget);
+    });
 
     testWidgets(
       'the Disabled specimen renders its trigger with a null onPressed and '
@@ -268,14 +290,14 @@ void main() {
 
         final Finder disabledButton = find.descendant(
           of: trigger,
-          matching: find.byType(ElButton),
+          matching: find.byType(Button),
         );
-        expect(tester.widget<ElButton>(disabledButton).onPressed, isNull);
+        expect(tester.widget<Button>(disabledButton).onPressed, isNull);
 
         await tester.tap(trigger, warnIfMissed: false);
         await tester.pump();
         await tester.pump();
-        await tester.pump(ElDurations.overlay);
+        await tester.pump(MotionDurations.overlayEnter);
 
         expect(find.text('Find comps'), findsNothing);
         expect(tester.takeException(), isNull);
@@ -286,13 +308,13 @@ void main() {
       'both themes render the article with no exceptions when flipped in '
       'place',
       (WidgetTester tester) async {
-        final ElThemeController theme = await _pump(
+        final ThemeController theme = await _pump(
           tester,
-          mode: ElThemeMode.light,
+          mode: ColorMode.light,
         );
         expect(find.text(agentAttachMenuDoc.title), findsWidgets);
 
-        theme.setMode(ElThemeMode.dark);
+        theme.setMode(ColorMode.dark);
         await tester.pump();
         expect(find.text(agentAttachMenuDoc.title), findsWidgets);
         expect(tester.takeException(), isNull);
@@ -324,7 +346,7 @@ void main() {
         'popover',
         'source-foundation',
       ]);
-      expect(agentAttachMenuDoc.exports, <String>['ElAgentAttachMenu']);
+      expect(agentAttachMenuDoc.exports, <String>['AgentAttachMenu']);
     });
   });
 }

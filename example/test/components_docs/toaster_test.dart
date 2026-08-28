@@ -4,20 +4,20 @@
 /// reads `DocsSection.id` (the kit's own section widget), and the
 /// API-table / accessibility / keyboard / dependencies assertions each open
 /// the relevant `DocsDisclosure` first — closed by default in the new kit,
-/// unlike the old page's always-visible `ElSection`.
+/// unlike the old page's always-visible `Section`.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never a synthetic `MediaQuery`. Theme
-/// coverage flips a single live [ElThemeController] in place rather than
+/// coverage flips a single live [ThemeController] in place rather than
 /// rebuilding with a second controller instance.
 ///
-/// **No `pumpAndSettle` anywhere in this file.** [ElToaster]'s own choreology
-/// mixes forever-loop effects ([ElBloomCosmic]'s drift/starfield) with timed,
+/// **No `pumpAndSettle` anywhere in this file.** [Toaster]'s own choreology
+/// mixes forever-loop effects ([FeedbackSurface]'s drift/starfield) with timed,
 /// non-looping clocks (the 4000ms lifetime, the 200ms unmount window): the
 /// forever loops mean `pumpAndSettle` would hang, so every timed assertion
 /// below drives the clock with an explicit `tester.pump(duration)` using the
 /// real durations read off `lib/src/components/toaster.dart`
-/// ([ElToaster.transition], [ElToaster.lifetime], [ElToaster.unmountDelay]),
+/// ([Toaster.transition], [Toaster.lifetime], [Toaster.unmountDelay]),
 /// exactly the pattern `test/feedback_effects_test.dart` already established
 /// for this widget.
 library;
@@ -27,12 +27,38 @@ import 'package:example/components_docs/toaster/meta.dart';
 import 'package:example/components_docs/toaster/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness(Widget child, {required ElThemeController controller}) =>
-    ElTheme(
+Widget _harness(Widget child, {required ThemeController controller}) =>
+    ThemeScope(
       controller: controller,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -76,7 +102,7 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 void main() {
@@ -90,19 +116,19 @@ void main() {
     expect(
       toasterDoc.exports,
       containsAll(<String>[
-        'ElToaster',
-        'ElToastController',
-        'ElToastMessage',
-        'ElToastAction',
-        'ElToastType',
-        'ElToastPosition',
-        'ElToast',
+        'Toaster',
+        'ToastController',
+        'ToastMessage',
+        'ToastAction',
+        'ToastType',
+        'ToastPosition',
+        'Toast',
       ]),
     );
     expect(toasterDoc.dependencies, <String>[
-      'bloom-cosmic',
+      'feedback-surface',
       'icon',
-      'machine-surface',
+      'surface',
       'safe-area',
       'source-foundation',
     ]);
@@ -116,9 +142,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
-    );
+    final ThemeController controller = ThemeController(mode: ColorMode.dark);
     addTearDown(controller.dispose);
     String? destination;
 
@@ -145,16 +169,14 @@ void main() {
   });
 
   testWidgets(
-    'the Types specimen fires all six ElToastType values live, including '
+    'the Types specimen fires all six ToastType values live, including '
     'loading and normal',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       addTearDown(controller.dispose);
 
       await tester.pumpWidget(
@@ -166,7 +188,10 @@ void main() {
         const ValueKey<String>('toaster-example:types-host'),
       );
       expect(host, findsOneWidget);
-      expect(find.descendant(of: host, matching: find.byType(ElToast)), findsNothing);
+      expect(
+        find.descendant(of: host, matching: find.byType(Toast)),
+        findsNothing,
+      );
 
       for (final (String key, String title) in <(String, String)>[
         ('toaster-example:types-loading', 'Uploading…'),
@@ -177,7 +202,7 @@ void main() {
         await tester.tap(trigger);
         await tester.pump();
         await tester.pump();
-        await tester.pump(ElToaster.transition);
+        await tester.pump(Toaster.transition);
         expect(
           find.descendant(of: host, matching: find.text(title)),
           findsOneWidget,
@@ -196,9 +221,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
-    );
+    final ThemeController controller = ThemeController(mode: ColorMode.dark);
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
@@ -212,26 +235,26 @@ void main() {
     );
     expect(apiSection, findsOneWidget);
     for (final String parameter in <String>[
-      // ElToaster's own two constructor parameters.
+      // Toaster's own two constructor parameters.
       'controller',
       'position',
-      // ElToastController: the imperative entry point ("toast(...)"), the
-      // members with no ElToastType-value twin.
+      // ToastController: the imperative entry point ("toast(...)"), the
+      // members with no ToastType-value twin.
       'show',
       'settle',
       'dismiss',
       'clear',
-      // ElToastMessage's constructor fields.
+      // ToastMessage's constructor fields.
       'title',
       'description',
       'type',
       'glyph',
       'duration',
       'action',
-      // ElToastAction's constructor fields.
+      // ToastAction's constructor fields.
       'label',
       'onPressed',
-      // ElToastType's own value with no ElToastController-method twin.
+      // ToastType's own value with no ToastController-method twin.
       'normal',
     ]) {
       expect(
@@ -240,11 +263,11 @@ void main() {
         reason: 'API member "$parameter" should be documented',
       );
     }
-    // 'promise' names both a ElToastController method (`promise<T>(...)`)
-    // and a ElToastMessage field (`final bool promise`): a real collision
+    // 'promise' names both a ToastController method (`promise<T>(...)`)
+    // and a ToastMessage field (`final bool promise`): a real collision
     // in the source itself, not a test bug, so it is asserted present
     // rather than asserted unique. 'success' / 'error' / 'info' / 'warning'
-    // / 'loading' name both a ElToastController method AND an ElToastType
+    // / 'loading' name both a ToastController method AND an ToastType
     // value, now that the type table lives in the same API Reference
     // disclosure -- the same kind of real, source-level collision, so each
     // is asserted present twice rather than asserted unique.
@@ -264,21 +287,15 @@ void main() {
     }
 
     // The real timing values -- not invented ones -- are documented. 4000ms
-    // is ElToastMessage's default duration/ElToaster.lifetime; 200ms is
-    // ElToaster.unmountDelay.
+    // is ToastMessage's default duration/Toaster.lifetime; 200ms is
+    // Toaster.unmountDelay.
     expect(
-      find.descendant(
-        of: apiSection,
-        matching: find.textContaining('4000ms'),
-      ),
+      find.descendant(of: apiSection, matching: find.textContaining('4000ms')),
       findsWidgets,
       reason: 'the real 4000ms auto-dismiss lifetime should be documented',
     );
     expect(
-      find.descendant(
-        of: apiSection,
-        matching: find.textContaining('200ms'),
-      ),
+      find.descendant(of: apiSection, matching: find.textContaining('200ms')),
       findsWidgets,
       reason: 'the real 200ms unmount delay should be documented',
     );
@@ -292,9 +309,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       addTearDown(controller.dispose);
 
       await tester.pumpWidget(
@@ -309,7 +324,7 @@ void main() {
       expect(
         find.descendant(
           of: actionSection,
-          matching: find.textContaining('ElToastAction'),
+          matching: find.textContaining('ToastAction'),
         ),
         findsWidgets,
       );
@@ -321,7 +336,7 @@ void main() {
       expect(
         find.descendant(
           of: promiseSection,
-          matching: find.textContaining('ElToastController.promise'),
+          matching: find.textContaining('ToastController.promise'),
         ),
         findsWidgets,
       );
@@ -336,9 +351,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       addTearDown(controller.dispose);
 
       await tester.pumpWidget(
@@ -379,9 +392,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
-    );
+    final ThemeController controller = ThemeController(mode: ColorMode.dark);
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
@@ -411,9 +422,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       addTearDown(controller.dispose);
 
       await tester.pumpWidget(
@@ -438,16 +447,14 @@ void main() {
   );
 
   testWidgets(
-    'the live Preview specimen fires a real toast through ElToastController, '
+    'the live Preview specimen fires a real toast through ToastController, '
     'it announces via a live region, and it disappears on its own timer',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       addTearDown(controller.dispose);
 
       await tester.pumpWidget(
@@ -455,42 +462,45 @@ void main() {
       );
       await tester.pump();
 
-      // The Preview section mounts a real ElToaster over a real
-      // ElToastController: nothing is queued until a specimen control fires
-      // one, exactly like the package's own ElToaster.build, which paints
+      // The Preview section mounts a real Toaster over a real
+      // ToastController: nothing is queued until a specimen control fires
+      // one, exactly like the package's own Toaster.build, which paints
       // nothing while its controller is empty. Types mounts a second,
-      // independent ElToaster/ElToastController pair, so this scopes to
+      // independent Toaster/ToastController pair, so this scopes to
       // the Preview section explicitly rather than a bare byType search.
       final Finder previewSection = find.byWidgetPredicate(
         (Widget widget) => widget is DocsSection && widget.id == 'preview',
       );
       expect(
-        find.descendant(of: previewSection, matching: find.byType(ElToaster)),
+        find.descendant(of: previewSection, matching: find.byType(Toaster)),
         findsOneWidget,
       );
       expect(
-        find.descendant(of: previewSection, matching: find.byType(ElToast)),
+        find.descendant(of: previewSection, matching: find.byType(Toast)),
         findsNothing,
       );
 
       final Finder trigger = find.descendant(
         of: previewSection,
-        matching: find.widgetWithText(ElButton, 'Show success'),
+        matching: find.widgetWithText(Button, 'Show success'),
       );
       expect(trigger, findsOneWidget);
       await tester.ensureVisible(trigger);
       await tester.tap(trigger);
       await tester.pump(); // schedule
       await tester.pump(); // the post-frame callback that flips data-mounted
-      await tester.pump(ElToaster.transition); // ride the entrance in
+      await tester.pump(Toaster.transition); // ride the entrance in
 
       final Finder toast = find.descendant(
         of: previewSection,
-        matching: find.byType(ElToast),
+        matching: find.byType(Toast),
       );
       expect(toast, findsOneWidget);
       expect(
-        find.descendant(of: previewSection, matching: find.text('Changes saved')),
+        find.descendant(
+          of: previewSection,
+          matching: find.text('Changes saved'),
+        ),
         findsOneWidget,
       );
 
@@ -498,10 +508,10 @@ void main() {
       // requests focus (no FocusScope call exists anywhere in toaster.dart —
       // nothing here steals focus while it does). `Semantics(container:
       // true, label: message.title)` is a semantics boundary, so the
-      // title/description ElText children below it: which are not
+      // title/description StyledText children below it: which are not
       // boundaries of their own: merge their literal text upward into this
       // one node rather than staying separate: the real announced label is
-      // the explicit title, the title again (from the merged ElText), then
+      // the explicit title, the title again (from the merged StyledText), then
       // the description: not just the title alone.
       final SemanticsNode node = tester.getSemantics(toast);
       expect(node.flagsCollection.isLiveRegion, isTrue);
@@ -519,75 +529,73 @@ void main() {
         findsNothing,
       );
 
-      // The real 4000ms lifetime: ElToaster.lifetime, expires the clock;
+      // The real 4000ms lifetime: Toaster.lifetime, expires the clock;
       // one more pump lets the completion listener call
-      // ElToastController.dismiss, which starts the 200ms unmount window.
-      await tester.pump(ElToaster.lifetime);
+      // ToastController.dismiss, which starts the 200ms unmount window.
+      await tester.pump(Toaster.lifetime);
       await tester.pump();
       // The toast is leaving but is not torn out of the tree yet.
       expect(
-        find.descendant(of: previewSection, matching: find.byType(ElToast)),
+        find.descendant(of: previewSection, matching: find.byType(Toast)),
         findsOneWidget,
       );
 
-      await tester.pump(ElToaster.unmountDelay);
+      await tester.pump(Toaster.unmountDelay);
       await tester.pump();
 
       // Gone on its own: nothing here tapped a dismiss control.
       expect(
-        find.descendant(of: previewSection, matching: find.byType(ElToast)),
+        find.descendant(of: previewSection, matching: find.byType(Toast)),
         findsNothing,
       );
       expect(
-        find.descendant(of: previewSection, matching: find.text('Changes saved')),
+        find.descendant(
+          of: previewSection,
+          matching: find.text('Changes saved'),
+        ),
         findsNothing,
       );
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets(
-    'toaster docs page adapts across breakpoints and themes without '
-    'exceptions',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(390, 844);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
+  testWidgets('toaster docs page adapts across breakpoints and themes without '
+      'exceptions', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.light,
-      );
-      addTearDown(controller.dispose);
+    final ThemeController controller = ThemeController(mode: ColorMode.light);
+    addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        _harness(const ToasterDocPage(), controller: controller),
-      );
-      await tester.pump();
+    await tester.pumpWidget(
+      _harness(const ToasterDocPage(), controller: controller),
+    );
+    await tester.pump();
 
-      expect(
-        find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(const ValueKey<String>('docs-layout-sidebar')),
-        findsNothing,
-      );
-      expect(find.byType(ElToaster), findsNWidgets(2));
-      expect(tester.takeException(), isNull);
+    expect(
+      find.byKey(const ValueKey<String>('docs-layout-anchor-strip')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+      findsNothing,
+    );
+    expect(find.byType(Toaster), findsNWidgets(2));
+    expect(tester.takeException(), isNull);
 
-      // The controller is flipped in place: no new app, no new element tree.
-      controller.setMode(ElThemeMode.dark);
-      await tester.pump();
-      expect(tester.takeException(), isNull);
+    // The controller is flipped in place: no new app, no new element tree.
+    controller.setMode(ColorMode.dark);
+    await tester.pump();
+    expect(tester.takeException(), isNull);
 
-      tester.view.physicalSize = const Size(1440, 900);
-      await tester.pump();
-      expect(
-        find.byKey(const ValueKey<String>('docs-layout-sidebar')),
-        findsOneWidget,
-      );
-      expect(find.byType(ElToaster), findsNWidgets(2));
-      expect(tester.takeException(), isNull);
-    },
-  );
+    tester.view.physicalSize = const Size(1440, 900);
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey<String>('docs-layout-sidebar')),
+      findsOneWidget,
+    );
+    expect(find.byType(Toaster), findsNWidgets(2));
+    expect(tester.takeException(), isNull);
+  });
 }

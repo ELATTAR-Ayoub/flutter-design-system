@@ -19,10 +19,10 @@ const ComponentDocEntry radioDoc = ComponentDocEntry(
   dependencies: <String>[
     'field',
     'keyframes',
-    'machine-surface',
+    'surface',
     'selection-control',
     'source-foundation',
   ],
-  exports: <String>['ElRadioGroup', 'ElRadioGroupItem'],
+  exports: <String>['RadioGroup', 'RadioGroupItem'],
   sourcePath: 'lib/src/components/radio.dart',
 );

@@ -3,13 +3,13 @@
 ///
 /// Re-housed onto the kit alongside the page: the section-order test now
 /// reads `DocsSection.id` (the kit's own section widget) instead of the old
-/// `ElSection.anchorKey`, and the API-table / state-matrix tests open the
+/// `Section.anchorKey`, and the API-table / state-matrix tests open the
 /// relevant `DocsDisclosure` first — closed by default in the new kit,
-/// unlike the old page's always-visible `ElSection`.
+/// unlike the old page's always-visible `Section`.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `ElThemeController` is flipped in place for theme
+/// Phase J brief. The live `ThemeController` is flipped in place for theme
 /// coverage rather than re-pumped under a new controller.
 library;
 
@@ -20,7 +20,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -49,7 +75,7 @@ const List<String> _expectedSectionIds = <String>[
   'source',
 ];
 
-/// Every public constructor parameter of `ElCheckbox`, enumerated by reading
+/// Every public constructor parameter of `Checkbox`, enumerated by reading
 /// `lib/src/components/checkbox.dart` directly (Step 1 of the task cycle).
 /// The API table must cover all of these by name.
 const List<String> _checkboxParams = <String>[
@@ -64,14 +90,14 @@ const List<String> _checkboxParams = <String>[
   'hint',
 ];
 
-/// The rest of the public surface: the static helpers on `ElCheckbox` and
-/// every member of the tri-state `ElCheckboxState` enum.
+/// The rest of the public surface: the static helpers on `Checkbox` and
+/// every member of the tri-state `CheckboxState` enum.
 const List<String> _checkboxStatics = <String>[
-  'ElCheckbox.size',
-  'ElCheckbox.nextAfter',
-  'ElCheckboxState.unchecked',
-  'ElCheckboxState.checked',
-  'ElCheckboxState.indeterminate',
+  'Checkbox.size',
+  'Checkbox.nextAfter',
+  'CheckboxState.unchecked',
+  'CheckboxState.checked',
+  'CheckboxState.indeterminate',
 ];
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
@@ -86,21 +112,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -159,8 +185,8 @@ void main() {
   );
 
   testWidgets(
-    'the API table covers every ElCheckbox constructor parameter and every '
-    'ElCheckboxState member',
+    'the API table covers every Checkbox constructor parameter and every '
+    'CheckboxState member',
     (WidgetTester tester) async {
       await _pump(tester);
 
@@ -168,7 +194,7 @@ void main() {
       await tester.ensureVisible(apiTrigger);
       await tester.tap(apiTrigger);
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -184,14 +210,14 @@ void main() {
         expect(
           documented,
           contains(param),
-          reason: 'ElCheckbox constructor parameter "$param" is undocumented',
+          reason: 'Checkbox constructor parameter "$param" is undocumented',
         );
       }
       for (final String member in _checkboxStatics) {
         expect(
           documented,
           contains(member),
-          reason: 'ElCheckbox/ElCheckboxState member "$member" is undocumented',
+          reason: 'Checkbox/CheckboxState member "$member" is undocumented',
         );
       }
     },
@@ -207,22 +233,22 @@ void main() {
       expect(find.byKey(key), findsOneWidget);
       await tester.ensureVisible(find.byKey(key));
       expect(
-        tester.widget<ElCheckbox>(find.byKey(key)).state,
-        ElCheckboxState.unchecked,
+        tester.widget<Checkbox>(find.byKey(key)).state,
+        CheckboxState.unchecked,
       );
 
       await tester.tap(find.byKey(key), warnIfMissed: false);
       await tester.pump();
       expect(
-        tester.widget<ElCheckbox>(find.byKey(key)).state,
-        ElCheckboxState.checked,
+        tester.widget<Checkbox>(find.byKey(key)).state,
+        CheckboxState.checked,
       );
 
       await tester.tap(find.byKey(key), warnIfMissed: false);
       await tester.pump();
       expect(
-        tester.widget<ElCheckbox>(find.byKey(key)).state,
-        ElCheckboxState.unchecked,
+        tester.widget<Checkbox>(find.byKey(key)).state,
+        CheckboxState.unchecked,
       );
 
       expect(tester.takeException(), isNull);
@@ -237,7 +263,7 @@ void main() {
     await tester.ensureVisible(statesTrigger);
     await tester.tap(statesTrigger);
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),
@@ -266,13 +292,10 @@ void main() {
   testWidgets(
     'both themes render the article with no exceptions when flipped in place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(checkboxDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(checkboxDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

@@ -227,7 +227,7 @@ into your project's `LICENSES/` directory:
 | anything (`init`) | `ELATTAR-MIT.txt` |
 | the foundation | `Inter-OFL-1.1.txt`, `Geist-Mono-OFL-1.1.txt`, `Redaction-OFL-1.1.txt` |
 | `icon`, and so most components | `Lucide-ISC.txt` |
-| `voice-orb` | `ElevenLabs-UI-MIT.txt` |
+| `voice-indicator` | `ElevenLabs-UI-MIT.txt` |
 
 Keep those files. MIT, ISC and the SIL Open Font License all make carrying the
 notice the condition of the grant. None of them asks for visible credit in your

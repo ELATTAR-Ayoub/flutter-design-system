@@ -4,7 +4,7 @@
 /// manifest: [dependencies] below is that manifest's own
 /// `registryDependencies` list, copied verbatim: `agent-attach-menu`,
 /// `agent-attachments`, `agent-core`, `agent-slash-palette`, `button`,
-/// `icon`, `input`, `machine-surface`, `source-foundation`.
+/// `icon`, `input`, `surface`, `source-foundation`.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
@@ -26,9 +26,9 @@ const ComponentDocEntry agentComposerDoc = ComponentDocEntry(
     'button',
     'icon',
     'input',
-    'machine-surface',
+    'surface',
     'source-foundation',
   ],
-  exports: <String>['ElAgentComposer'],
+  exports: <String>['AgentComposer'],
   sourcePath: 'lib/src/components/agent_composer.dart',
 );

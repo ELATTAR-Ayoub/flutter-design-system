@@ -71,7 +71,7 @@ const List<DocsPageEntry> docsPageEntries = <DocsPageEntry>[
     slug: 'theming',
     title: 'Theming',
     description:
-        'Semantic tokens, ElThemeController, light and dark resolution, and '
+        'Semantic tokens, ThemeController, light and dark resolution, and '
         'how a consumer overrides them.',
     route: docsThemingRoute,
   ),
@@ -87,7 +87,7 @@ const List<DocsPageEntry> docsPageEntries = <DocsPageEntry>[
     slug: 'typeset',
     title: 'Typeset',
     description:
-        'The ElType scale, ElTypeSpec anatomy, the fluid clamps, and the '
+        'The TextStyles scale, TextStyleToken anatomy, the fluid clamps, and the '
         'three font families.',
     route: docsTypesetRoute,
   ),

@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/agent_history.dart",
+      "source": "lib/src/components/ui/agent_history.dart",
       "target": "@ui/agent_history.dart",
-      "sha256": "bfec24f48db67d76456d3571c29e1298edeebc31042dbe4c06240557293a7a9d"
+      "sha256": "65e593dcc278848826ac56970eb42959d98d0e69fd3f04116d5651f8a07f98c3"
     }
   ],
   "registryDependencies": [
@@ -25,7 +25,7 @@
     "icon",
     "input",
     "item",
-    "machine-surface",
+    "surface",
     "menu",
     "popover",
     "source-foundation",
@@ -44,7 +44,7 @@
     "icon",
     "input",
     "item",
-    "machine-surface",
+    "surface",
     "menu",
     "popover",
     "spinner"
@@ -55,6 +55,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/agent-history",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/agent_history.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_history.dart",
   "deprecated": false
 }

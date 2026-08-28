@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/resizable.dart",
+      "source": "lib/src/components/ui/resizable.dart",
       "target": "@ui/resizable.dart",
-      "sha256": "2b2d500be9886287b90604fa57a5174bf07fb8dcfc7a5a598ab0deeddadd2418"
+      "sha256": "2a88a4c7473ac7fd326df11847c27a847db10e81e9b7306a200b850d363452a0"
     }
   ],
   "registryDependencies": [
@@ -21,5 +21,9 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/resizable",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/resizable.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/resizable.dart",
+  "exports": [
+    "ResizablePanel",
+    "ResizablePanelGroup"
+  ]
 }

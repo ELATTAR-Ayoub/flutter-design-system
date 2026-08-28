@@ -6,29 +6,41 @@
 /// `test/agent_history_test.dart`.
 ///
 /// **THE FLIP IS DEAD, AND THAT IS WHAT A READER SEES.** The source's own
-/// library note, quoted rather than paraphrased: `ElFlipController` ports
+/// library note, quoted rather than paraphrased: `FlipController` ports
 /// `use-flip.ts` correctly — it measures before a reorder, inverts with a
 /// transform, and releases on a curve — and none of it reaches the screen,
-/// because every card also carries `ElRowMotion`'s own entrance animation,
+/// because every card also carries `RowMotion`'s own entrance animation,
 /// whose `animation-fill-mode: both` outranks the inversion. Pinning a row
 /// teleports it and replays the entrance on the one neighbour the
 /// reconciliation displaces. The live specimen in Preview reproduces this
 /// exactly: pin a row and watch it jump, not glide.
 ///
 /// **Every live specimen owns a small store built for this page**,
-/// implementing `ElConversationStore` — the same abstract interface a real
+/// implementing `ConversationStore` — the same abstract interface a real
 /// product implements — rather than importing one: this page's own
 /// dependency closure stops at the registry manifest's `registryDependencies`,
 /// and a store is product code, not a registry item.
 ///
-/// **`ElChatHistory`'s drawer opens over a plain placeholder**, not a real
+/// **`ChatHistory`'s drawer opens over a plain placeholder**, not a real
 /// console: the console family (`agent-core`, `agent-console`,
 /// `agent-transcript`, `agent-composer`) is a separate, not-yet-documented
 /// part of this registry, and this page does not claim to show it.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -52,7 +64,7 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     InstallSection(
       id: 'install',
@@ -79,8 +91,8 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElHistoryCard, ElHistorySearch, '
-              'ElChatHistory and their supporting classes are reachable '
+              'Add the export line so HistoryCard, HistorySearch, '
+              'ChatHistory and their supporting classes are reachable '
               'the same way the CLI path already makes them.',
           code: "export 'agent_history.dart';",
         ),
@@ -115,7 +127,7 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
           'TOP of the row\'s own controls (translateX(12%) in, a plain '
           'fade out) rather than beside them, so the delete button is '
           'physically gone by the time the question is up. The dialog '
-          'confirm is the system ElAlertDialog, for something genuinely '
+          'confirm is the system AlertDialog, for something genuinely '
           'costly.',
       specimen: _DeleteSpecimen(),
       code: _deleteCode,
@@ -145,7 +157,7 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
       specimen: _CapabilitiesSpecimen(),
       code: _capabilitiesCode,
       label: 'Capabilities specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     ShowcaseSection(
       id: 'search',
@@ -164,7 +176,7 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
       id: 'drawer',
       title: 'Chat History Drawer',
       description:
-          'ElChatHistory arranges the whole list behind a trigger: a '
+          'ChatHistory arranges the whole list behind a trigger: a '
           '384px drawer (max-w-sm) sliding in over a scrim, laid out '
           'through an OverlayPortal against surfaceKey — the console\'s '
           'own root — rather than the page\'s Overlay, so a caller with '
@@ -172,29 +184,23 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
       specimen: _DrawerSpecimen(),
       code: _drawerCode,
       label: 'Chat History Drawer specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     DisclosureSection(
       id: 'api',
       title: 'API Reference',
       description:
-          'The three real widgets in full — ElHistoryCard, '
-          'ElHistorySearch, ElChatHistory — the two enums that shape a '
+          'The three real widgets in full — HistoryCard, '
+          'HistorySearch, ChatHistory — the two enums that shape a '
           'card, and the shared motion machinery underneath all three.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElHistoryCard', anchor: 'api-elhistorycard'),
-        DocsTocEntry(
-          title: 'ElHistorySearch',
-          anchor: 'api-elhistorysearch',
-        ),
-        DocsTocEntry(title: 'ElChatHistory', anchor: 'api-elchathistory'),
+        DocsTocEntry(title: 'HistoryCard', anchor: 'api-elhistorycard'),
+        DocsTocEntry(title: 'HistorySearch', anchor: 'api-elhistorysearch'),
+        DocsTocEntry(title: 'ChatHistory', anchor: 'api-elchathistory'),
         DocsTocEntry(title: 'Enums', anchor: 'api-enums'),
-        DocsTocEntry(title: 'ElRowMotion', anchor: 'api-elrowmotion'),
-        DocsTocEntry(title: 'ElBlurSwitch', anchor: 'api-elblurswitch'),
-        DocsTocEntry(
-          title: 'ElFlipController',
-          anchor: 'api-elflipcontroller',
-        ),
+        DocsTocEntry(title: 'RowMotion', anchor: 'api-elrowmotion'),
+        DocsTocEntry(title: 'BlurSwitch', anchor: 'api-elblurswitch'),
+        DocsTocEntry(title: 'FlipController', anchor: 'api-elflipcontroller'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -202,7 +208,7 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off _ElHistoryCardState and the library note directly, '
+          'Read off _HistoryCardState and the library note directly, '
           'not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -254,7 +260,7 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
             value: 'example/test/components_docs/agent_history_test.dart',
             description:
                 'Covers this page: the article mounts, the API tables '
-                'for ElHistoryCard, ElHistorySearch and ElChatHistory '
+                'for HistoryCard, HistorySearch and ChatHistory '
                 'this page claims to document, and both themes at two '
                 'viewport widths.',
           ),
@@ -282,9 +288,9 @@ class AgentHistoryDocPage extends StatelessWidget {
       title: agentHistoryDoc.title,
       description: agentHistoryDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Agent History'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Agent History'),
     ],
     toc: agentHistoryDocSpec.toc,
     previous: null,
@@ -300,12 +306,12 @@ class AgentHistoryDocPage extends StatelessWidget {
 /* ── A store built for this page ────────────────────────────────────────── */
 
 /// A conversation store with nothing behind it, implementing the whole
-/// [ElConversationStore] interface a real product would — including the
+/// [ConversationStore] interface a real product would — including the
 /// two optional capabilities, so [_CapabilitiesSpecimen] can show the list
 /// both with and without them. Timestamps are offsets from [now] rather
 /// than fixed strings, because relativeTime renders "3 hours ago" against
 /// the clock and a fixed ISO string would quietly rot.
-class _DocStore extends ElConversationStore {
+class _DocStore extends ConversationStore {
   _DocStore({required DateTime now, this.capabilities = true})
     : _conversations = _seed(now);
 
@@ -314,41 +320,40 @@ class _DocStore extends ElConversationStore {
   static DateTime _ago(int minutes, DateTime from) =>
       from.subtract(Duration(minutes: minutes));
 
-  static List<ElConversationSummary> _seed(DateTime now) =>
-      <ElConversationSummary>[
-        ElConversationSummary(
-          id: 'c-vault',
-          title: 'Sealed inventory check',
-          updatedAt: _ago(14, now),
-          preview: 'What sealed boxes are left, and what is the best one?',
-          pinned: true,
-        ),
-        ElConversationSummary(
-          id: 'c-export',
-          title: 'Thirty-day activity export',
-          updatedAt: _ago(95, now),
-          preview: 'Export my last 30 days as a CSV',
-        ),
-        ElConversationSummary(
-          id: 'c-pricing',
-          title: 'Pricing service outage',
-          updatedAt: _ago(260, now),
-          preview: 'What is Eclipse Vault worth right now?',
-        ),
-        ElConversationSummary(
-          id: 'c-odds',
-          title: 'How pack odds actually work',
-          updatedAt: _ago(4300, now),
-          preview: 'Explain the odds on a sealed box',
-        ),
-      ];
+  static List<ConversationSummary> _seed(DateTime now) => <ConversationSummary>[
+    ConversationSummary(
+      id: 'c-vault',
+      title: 'Sealed inventory check',
+      updatedAt: _ago(14, now),
+      preview: 'What sealed boxes are left, and what is the best one?',
+      pinned: true,
+    ),
+    ConversationSummary(
+      id: 'c-export',
+      title: 'Thirty-day activity export',
+      updatedAt: _ago(95, now),
+      preview: 'Export my last 30 days as a CSV',
+    ),
+    ConversationSummary(
+      id: 'c-pricing',
+      title: 'Pricing service outage',
+      updatedAt: _ago(260, now),
+      preview: 'What is Eclipse Vault worth right now?',
+    ),
+    ConversationSummary(
+      id: 'c-odds',
+      title: 'How pack odds actually work',
+      updatedAt: _ago(4300, now),
+      preview: 'Explain the odds on a sealed box',
+    ),
+  ];
 
-  List<ElConversationSummary> _conversations;
+  List<ConversationSummary> _conversations;
   String? _activeId = 'c-vault';
 
   @override
-  List<ElConversationSummary> get conversations =>
-      List<ElConversationSummary>.unmodifiable(_conversations);
+  List<ConversationSummary> get conversations =>
+      List<ConversationSummary>.unmodifiable(_conversations);
 
   @override
   String? get activeId => _activeId;
@@ -374,8 +379,8 @@ class _DocStore extends ElConversationStore {
 
   @override
   void rename(String id, String title) {
-    _conversations = <ElConversationSummary>[
-      for (final ElConversationSummary c in _conversations)
+    _conversations = <ConversationSummary>[
+      for (final ConversationSummary c in _conversations)
         if (c.id == id) c.copyWith(title: title) else c,
     ];
     notifyListeners();
@@ -384,7 +389,7 @@ class _DocStore extends ElConversationStore {
   @override
   void remove(String id) {
     _conversations = _conversations
-        .where((ElConversationSummary c) => c.id != id)
+        .where((ConversationSummary c) => c.id != id)
         .toList();
     if (_activeId == id) _activeId = null;
     notifyListeners();
@@ -397,8 +402,8 @@ class _DocStore extends ElConversationStore {
   void Function(String id, bool pinned)? get pin => capabilities ? _pin : null;
 
   void _pin(String id, bool pinned) {
-    _conversations = <ElConversationSummary>[
-      for (final ElConversationSummary c in _conversations)
+    _conversations = <ConversationSummary>[
+      for (final ConversationSummary c in _conversations)
         if (c.id == id) c.copyWith(pinned: pinned) else c,
     ];
     notifyListeners();
@@ -415,8 +420,8 @@ class _DocStore extends ElConversationStore {
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-/// The live list: [_DocStore] plus [ElFlipController], sorted pinned-first
-/// then newest, exactly the order [ElChatHistory]'s own drawer uses.
+/// The live list: [_DocStore] plus [FlipController], sorted pinned-first
+/// then newest, exactly the order [ChatHistory]'s own drawer uses.
 class _ListSpecimen extends StatefulWidget {
   const _ListSpecimen({this.capabilities = true});
 
@@ -428,13 +433,13 @@ class _ListSpecimen extends StatefulWidget {
 
 class _ListSpecimenState extends State<_ListSpecimen> {
   _DocStore? _store;
-  final ElFlipController _flip = ElFlipController();
+  final FlipController _flip = FlipController();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _store ??= _DocStore(
-      now: ElClock.nowOf(context),
+      now: Clock.nowOf(context),
       capabilities: widget.capabilities,
     );
   }
@@ -460,22 +465,22 @@ class _ListSpecimenState extends State<_ListSpecimen> {
     listenable: _store!,
     builder: (BuildContext context, Widget? _) {
       final _DocStore store = _store!;
-      final List<ElConversationSummary> ordered =
-          List<ElConversationSummary>.of(store.conversations)
-            ..sort((ElConversationSummary a, ElConversationSummary b) {
+      final List<ConversationSummary> ordered =
+          List<ConversationSummary>.of(store.conversations)
+            ..sort((ConversationSummary a, ConversationSummary b) {
               if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
               return b.updatedAt.compareTo(a.updatedAt);
             });
       _flip.reconcile(<String>[
-        for (final ElConversationSummary c in ordered) c.id,
+        for (final ConversationSummary c in ordered) c.id,
       ]);
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          for (final ElConversationSummary c in ordered) ...<Widget>[
-            ElHistoryCard(
+          for (final ConversationSummary c in ordered) ...<Widget>[
+            HistoryCard(
               key: _flip.keyFor(c.id),
               conversation: c,
               active: c.id == store.activeId,
@@ -486,7 +491,7 @@ class _ListSpecimenState extends State<_ListSpecimen> {
               onPin: _pin,
               onShare: store.share,
             ),
-            SizedBox(height: el(1)),
+            SizedBox(height: space(1)),
           ],
         ],
       );
@@ -501,14 +506,13 @@ class _PreviewSpecimen extends StatelessWidget {
   Widget build(BuildContext context) => const _ListSpecimen();
 }
 
-const String _previewCode =
-    '''
+const String _previewCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-// A store implements ElConversationStore; the list sorts pinned-first
+// A store implements ConversationStore; the list sorts pinned-first
 // then newest and wires each card to it.
 for (final conversation in store.conversations)
-  ElHistoryCard(
+  HistoryCard(
     conversation: conversation,
     onOpen: store.open,
     onRename: store.rename,
@@ -517,12 +521,11 @@ for (final conversation in store.conversations)
     onShare: store.share,
   )''';
 
-const String _usageCode =
-    '''
+const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElHistoryCard(
-  conversation: ElConversationSummary(
+HistoryCard(
+  conversation: ConversationSummary(
     id: 'c-1',
     title: 'Sealed inventory check',
     updatedAt: DateTime.now(),
@@ -532,21 +535,21 @@ ElHistoryCard(
   onRemove: (id) {},
 )''';
 
-/// One card over a fixed [ElConversationSummary], its title, pin, and
+/// One card over a fixed [ConversationSummary], its title, pin, and
 /// presence held in local state so a reader can actually rename, pin, and
 /// delete it.
 class _CardSpecimen extends StatefulWidget {
   const _CardSpecimen({
     required this.keyValue,
-    this.confirm = ElHistoryConfirm.inline,
-    this.rename = ElHistoryRename.inline,
+    this.confirm = HistoryConfirm.inline,
+    this.rename = HistoryRename.inline,
     this.pinned = false,
     this.active = false,
   });
 
   final String keyValue;
-  final ElHistoryConfirm confirm;
-  final ElHistoryRename rename;
+  final HistoryConfirm confirm;
+  final HistoryRename rename;
   final bool pinned;
   final bool active;
 
@@ -566,33 +569,33 @@ class _CardSpecimenState extends State<_CardSpecimen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _updatedAt ??= ElClock.nowOf(context).subtract(_CardSpecimen.age);
+    _updatedAt ??= Clock.nowOf(context).subtract(_CardSpecimen.age);
   }
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     if (_gone) {
       return Container(
         key: ValueKey<String>(widget.keyValue),
-        padding: EdgeInsets.all(el(3)),
+        padding: EdgeInsets.all(space(3)),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(ElRadii.lg),
-          border: Border.all(color: theme.border, width: ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.lg),
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
         child: Row(
           children: <Widget>[
             Expanded(
-              child: ElText(
+              child: StyledText(
                 'Deleted.',
-                ElType.caption,
+                TextStyles.caption,
                 color: theme.mutedForeground,
               ),
             ),
-            SizedBox(width: el(3)),
-            ElButton(
-              size: ElButtonSize.sm,
-              variant: ElButtonVariant.outline,
+            SizedBox(width: space(3)),
+            Button(
+              size: ButtonSize.sm,
+              variant: ButtonVariant.outline,
               onPressed: () => setState(() => _gone = false),
               child: const Text('Put it back'),
             ),
@@ -600,9 +603,9 @@ class _CardSpecimenState extends State<_CardSpecimen> {
         ),
       );
     }
-    return ElHistoryCard(
+    return HistoryCard(
       key: ValueKey<String>(widget.keyValue),
-      conversation: ElConversationSummary(
+      conversation: ConversationSummary(
         id: 'spec-card',
         title: _title,
         updatedAt: _updatedAt!,
@@ -631,22 +634,21 @@ class _RenameSpecimen extends StatelessWidget {
     children: <Widget>[
       const _CardSpecimen(
         keyValue: 'agent-history-example:rename-inline',
-        rename: ElHistoryRename.inline,
+        rename: HistoryRename.inline,
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const _CardSpecimen(
         keyValue: 'agent-history-example:rename-dialog',
-        rename: ElHistoryRename.dialog,
+        rename: HistoryRename.dialog,
       ),
     ],
   );
 }
 
-const String _renameCode =
-    '''
-ElHistoryCard(
+const String _renameCode = '''
+HistoryCard(
   conversation: conversation,
-  rename: ElHistoryRename.inline, // or ElHistoryRename.dialog
+  rename: HistoryRename.inline, // or HistoryRename.dialog
   onOpen: (id) {},
   onRename: (id, title) {},
   onRemove: (id) {},
@@ -662,22 +664,21 @@ class _DeleteSpecimen extends StatelessWidget {
     children: <Widget>[
       const _CardSpecimen(
         keyValue: 'agent-history-example:delete-inline',
-        confirm: ElHistoryConfirm.inline,
+        confirm: HistoryConfirm.inline,
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const _CardSpecimen(
         keyValue: 'agent-history-example:delete-dialog',
-        confirm: ElHistoryConfirm.dialog,
+        confirm: HistoryConfirm.dialog,
       ),
     ],
   );
 }
 
-const String _deleteCode =
-    '''
-ElHistoryCard(
+const String _deleteCode = '''
+HistoryCard(
   conversation: conversation,
-  confirm: ElHistoryConfirm.inline, // or ElHistoryConfirm.dialog
+  confirm: HistoryConfirm.inline, // or HistoryConfirm.dialog
   onOpen: (id) {},
   onRename: (id, title) {},
   onRemove: (id) {},
@@ -695,7 +696,7 @@ class _PinSpecimen extends StatelessWidget {
         keyValue: 'agent-history-example:pin-pinned',
         pinned: true,
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const _CardSpecimen(
         keyValue: 'agent-history-example:pin-active',
         active: true,
@@ -704,9 +705,8 @@ class _PinSpecimen extends StatelessWidget {
   );
 }
 
-const String _pinCode =
-    '''
-ElHistoryCard(
+const String _pinCode = '''
+HistoryCard(
   conversation: conversation, // conversation.pinned: true
   onOpen: (id) {},
   onRename: (id, title) {},
@@ -722,11 +722,10 @@ class _CapabilitiesSpecimen extends StatelessWidget {
       const _ListSpecimen(capabilities: false);
 }
 
-const String _capabilitiesCode =
-    '''
+const String _capabilitiesCode = '''
 // A store whose pin and share getters both return null: no pin button
 // and no Share menu item are drawn, on any card.
-class NoCapabilitiesStore extends ElConversationStore {
+class NoCapabilitiesStore extends ConversationStore {
   @override
   void Function(String, bool)? get pin => null;
   @override
@@ -739,27 +738,27 @@ class NoCapabilitiesStore extends ElConversationStore {
 /// rather than `const`. The Search specimen never renders `updatedAt` (it
 /// sorts by it, and every entry here ties), so a fixed instant is honest:
 /// nothing about this specimen depends on when the page happens to build.
-final List<ElConversationSummary> _searchSeed = <ElConversationSummary>[
-  ElConversationSummary(
+final List<ConversationSummary> _searchSeed = <ConversationSummary>[
+  ConversationSummary(
     id: 's-vault',
     title: 'Sealed inventory check',
     updatedAt: DateTime.fromMillisecondsSinceEpoch(0),
     preview: 'What sealed boxes are left, and what is the best one?',
     pinned: true,
   ),
-  ElConversationSummary(
+  ConversationSummary(
     id: 's-export',
     title: 'Thirty-day activity export',
     updatedAt: DateTime.fromMillisecondsSinceEpoch(0),
     preview: 'Export my last 30 days as a CSV',
   ),
-  ElConversationSummary(
+  ConversationSummary(
     id: 's-odds',
     title: 'How pack odds actually work',
     updatedAt: DateTime.fromMillisecondsSinceEpoch(0),
     preview: 'Explain the odds on a sealed box',
   ),
-  ElConversationSummary(
+  ConversationSummary(
     id: 's-balance',
     title: 'Balance and recent movement',
     updatedAt: DateTime.fromMillisecondsSinceEpoch(0),
@@ -781,26 +780,26 @@ class _SearchSpecimenState extends State<_SearchSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElButton(
+          Button(
             key: const ValueKey<String>('agent-history-search-trigger'),
-            variant: ElButtonVariant.outline,
+            variant: ButtonVariant.outline,
             onPressed: () => setState(() => _open = true),
             child: const Text('Search conversations'),
           ),
-          SizedBox(height: el(3)),
-          ElText(
+          SizedBox(height: space(3)),
+          StyledText(
             _opened == null ? 'Nothing opened yet.' : 'Opened: $_opened',
-            ElType.caption,
+            TextStyles.caption,
             color: theme.mutedForeground,
           ),
-          ElHistorySearch(
+          HistorySearch(
             key: const ValueKey<String>('agent-history-search'),
             conversations: _searchSeed,
             open: _open,
@@ -815,9 +814,8 @@ class _SearchSpecimenState extends State<_SearchSpecimen> {
   }
 }
 
-const String _searchCode =
-    '''
-ElHistorySearch(
+const String _searchCode = '''
+HistorySearch(
   conversations: conversations,
   open: open,
   onOpenChange: (v) => setState(() => open = v),
@@ -840,7 +838,7 @@ class _DrawerSpecimenState extends State<_DrawerSpecimen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _store ??= _DocStore(now: ElClock.nowOf(context));
+    _store ??= _DocStore(now: Clock.nowOf(context));
   }
 
   @override
@@ -851,16 +849,16 @@ class _DrawerSpecimenState extends State<_DrawerSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
       key: _surface,
-      height: el(64),
+      height: space(64),
       width: double.infinity,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: theme.background,
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: Stack(
         children: <Widget>[
@@ -868,8 +866,8 @@ class _DrawerSpecimenState extends State<_DrawerSpecimen> {
             left: 0,
             top: 0,
             child: Padding(
-              padding: EdgeInsets.all(el(3)),
-              child: ElChatHistory(
+              padding: EdgeInsets.all(space(3)),
+              child: ChatHistory(
                 key: const ValueKey<String>('agent-history-drawer'),
                 store: _store!,
                 surfaceKey: _surface,
@@ -877,9 +875,9 @@ class _DrawerSpecimenState extends State<_DrawerSpecimen> {
             ),
           ),
           Center(
-            child: ElText(
+            child: StyledText(
               'the console\'s own surface',
-              ElType.caption,
+              TextStyles.caption,
               color: theme.mutedForeground,
             ),
           ),
@@ -889,11 +887,10 @@ class _DrawerSpecimenState extends State<_DrawerSpecimen> {
   }
 }
 
-const String _drawerCode =
-    '''
+const String _drawerCode = '''
 Container(
   key: surfaceKey,
-  child: ElChatHistory(store: store, surfaceKey: surfaceKey),
+  child: ChatHistory(store: store, surfaceKey: surfaceKey),
 )''';
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
@@ -907,41 +904,38 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elhistorycard',
-        child: DocsApiTable(title: 'ElHistoryCard', facts: _historyCardFacts),
+        child: DocsApiTable(title: 'HistoryCard', facts: _historyCardFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elhistorysearch',
-        child: DocsApiTable(
-          title: 'ElHistorySearch',
-          facts: _historySearchFacts,
-        ),
+        child: DocsApiTable(title: 'HistorySearch', facts: _historySearchFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elchathistory',
-        child: DocsApiTable(title: 'ElChatHistory', facts: _chatHistoryFacts),
+        child: DocsApiTable(title: 'ChatHistory', facts: _chatHistoryFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-enums',
         child: DocsApiTable(title: 'Enums', facts: _enumFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elrowmotion',
-        child: DocsApiTable(title: 'ElRowMotion', facts: _rowMotionFacts),
+        child: DocsApiTable(title: 'RowMotion', facts: _rowMotionFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elblurswitch',
-        child: DocsApiTable(title: 'ElBlurSwitch', facts: _blurSwitchFacts),
+        child: DocsApiTable(title: 'BlurSwitch', facts: _blurSwitchFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elflipcontroller',
         child: DocsApiTable(
-          title: 'ElFlipController',
+          title: 'FlipController',
           facts: _flipControllerFacts,
         ),
       ),
@@ -954,12 +948,12 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElHistoryCard is built on ElItem, not beside it: the row\'s '
+      _bullets(ThemeScope.of(context), <String>[
+        'HistoryCard is built on Item, not beside it: the row\'s '
             'border, radius, padding, gap, and colour transition are all '
-            "ElItem's own — including whatever Semantics ElItem itself "
+            "Item's own — including whatever Semantics Item itself "
             'contributes.',
-        'The pin and menu-trigger buttons are ordinary ElButton instances '
+        'The pin and menu-trigger buttons are ordinary Button instances '
             '(ghost, icon-sm): each carries its own accessible name '
             '(Pin/Unpin, and the menu\'s own trigger label), independent '
             'of the card\'s title.',
@@ -968,12 +962,12 @@ class _AccessibilityContent extends StatelessWidget {
             'border rather than a Flutter Semantics.namesRoute region — '
             'the confirmation text and the two buttons are still real '
             'Semantics nodes, but nothing marks the group as an alert.',
-        'The dialog confirm is the system ElAlertDialog, which carries '
+        'The dialog confirm is the system AlertDialog, which carries '
             'its own accessibility contract in full — see that '
             "component's own page.",
-        'ElHistorySearch is built on ElCommand: type-ahead filtering, '
+        'HistorySearch is built on Command: type-ahead filtering, '
             'arrow-key row traversal, and Enter-to-choose are all '
-            "ElCommand's own.",
+            "Command's own.",
       ]);
 }
 
@@ -982,15 +976,15 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Inline rename: Enter commits (a blank draft is discarded, same '
             'as blur), Escape abandons and restores the original title, '
             'blur commits.',
         'Inline confirm: no bespoke key handling in agent_history.dart '
             'itself — the Cancel and Delete buttons are ordinary '
-            'ElButtons, focusable and activated by Enter/Space like any '
+            'Buttons, focusable and activated by Enter/Space like any '
             'other.',
-        'ElHistorySearch inherits ElCommand\'s own keyboard model: arrow '
+        'HistorySearch inherits Command\'s own keyboard model: arrow '
             'keys move the highlighted row, Enter chooses it, and typing '
             'filters — none of that is agent_history.dart\'s own code.',
         'agent_history.dart wires no FocusTraversalPolicy of its own '
@@ -1004,16 +998,16 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in agent_history.dart: '
             'BuildContext width is never read for a layout decision.',
-        'ElChatHistory.width is a fixed el(96) = 384px (max-w-sm) '
+        'ChatHistory.width is a fixed space(96) = 384px (max-w-sm) '
             'regardless of viewport; on a narrow phone the drawer can '
             'exceed the screen width, which is the same trade-off '
-            "ElDrawer's own full-bleed panels make.",
+            "Drawer's own full-bleed panels make.",
         'A long title is not truncated specially in the rename input; '
             'the resting ItemTitle uses whatever overflow behaviour '
-            'ElText already applies.',
+            'StyledText already applies.',
         'Platform parity: Android, iOS, Web, macOS, Windows, and Linux '
             'all render the same widget tree; no dart:io Platform branch '
             'anywhere in the file.',
@@ -1027,19 +1021,19 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/agent_history.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
         'registryDependencies, resolved automatically by `elattar add '
             'agent-history`: agent-core, alert, alert-dialog, button, '
             'command, dialog, dropdown-menu, empty, field, icon, input, '
-            'item, machine-surface, menu, popover, source-foundation, '
+            'item, surface, menu, popover, source-foundation, '
             'spinner — seventeen items, copied verbatim from '
             'registry/components/agent-history.json. alert-dialog backs '
-            'the dialog confirm shape; command backs ElHistorySearch; '
+            'the dialog confirm shape; command backs HistorySearch; '
             'dropdown-menu backs the card\'s own menu trigger; item is '
-            'the row ElHistoryCard is built on; field and input back the '
+            'the row HistoryCard is built on; field and input back the '
             'inline rename control; spinner covers a loading store\'s own '
             'affordance (not shown live on this page — this port\'s mock '
             'store never reports isLoading: true).',
@@ -1048,7 +1042,7 @@ class _DependenciesContent extends StatelessWidget {
             'at what this component is commonly composed WITH, not a '
             'second import list.',
       ]),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Agent Core', route: '/components/agent-core'),
@@ -1057,19 +1051,13 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Command', route: '/components/command'),
           DocsLink(label: 'Dialog', route: '/components/dialog'),
-          DocsLink(
-            label: 'Dropdown Menu',
-            route: '/components/dropdown-menu',
-          ),
+          DocsLink(label: 'Dropdown Menu', route: '/components/dropdown-menu'),
           DocsLink(label: 'Empty', route: '/components/empty'),
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Input', route: '/components/input'),
           DocsLink(label: 'Item', route: '/components/item'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(label: 'Menu', route: '/components/menu'),
           DocsLink(label: 'Popover', route: '/components/popover'),
           DocsLink(label: 'Spinner', route: '/components/spinner'),
@@ -1084,31 +1072,35 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Every colour is read live off ElTheme.of(context) at build '
+      _bullets(ThemeScope.of(context), <String>[
+        'Every colour is read live off ThemeScope.of(context) at build '
             'time, mostly through the components this file composes '
-            '(ElItem, ElButton, ElAlertDialog, ElCommand) rather than '
+            '(Item, Button, AlertDialog, Command) rather than '
             'painted directly here.',
         'The one bespoke colour is the inline destructive confirm\'s '
             'border: theme.destructive at confirmBorderAlpha (0.50), on '
             'an opaque theme.card fill — a tint rather than a solid, the '
-            'same reasoning ElButton\'s own destructive variant states on '
+            'same reasoning Button\'s own destructive variant states on '
             "its own page.",
-        'ElRowMotion and ElBlurSwitch paint no colour at all: both are '
+        'RowMotion and BlurSwitch paint no colour at all: both are '
             'pure geometry and opacity transforms over whatever child '
             'they wrap.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -1116,7 +1108,7 @@ Widget _bullets(ElThemeData theme, List<String> lines) => Column(
 const List<DocsApiFact> _historyCardFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'conversation',
-    type: 'ElConversationSummary',
+    type: 'ConversationSummary',
     description: 'Required. The row this card renders.',
   ),
   DocsApiFact(
@@ -1128,12 +1120,12 @@ const List<DocsApiFact> _historyCardFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'confirm',
-    type: 'ElHistoryConfirm',
+    type: 'HistoryConfirm',
     description: 'Defaults to inline.',
   ),
   DocsApiFact(
     name: 'rename',
-    type: 'ElHistoryRename',
+    type: 'HistoryRename',
     description: 'Defaults to inline.',
   ),
   DocsApiFact(
@@ -1170,23 +1162,23 @@ const List<DocsApiFact> _historyCardFacts = <DocsApiFact>[
     name: 'entranceGeneration',
     type: 'int',
     description:
-        'Defaults to 0. Bump it (ElFlipController.generationOf) to '
+        'Defaults to 0. Bump it (FlipController.generationOf) to '
         'replay the entrance animation.',
   ),
   DocsApiFact(
     name: 'confirmExit',
     type: 'static Duration get',
-    description: 'ElDurations.tick.',
+    description: 'MotionDurations.tick.',
   ),
   DocsApiFact(
     name: 'rowExit',
     type: 'static Duration get',
-    description: 'ElDurations.base.',
+    description: 'MotionDurations.normal.',
   ),
   DocsApiFact(
     name: 'titleHeight',
     type: 'static double get',
-    description: 'el(6) — the title/input\'s shared height.',
+    description: 'space(6) — the title/input\'s shared height.',
   ),
   DocsApiFact(
     name: 'confirmShift',
@@ -1203,14 +1195,10 @@ const List<DocsApiFact> _historyCardFacts = <DocsApiFact>[
 const List<DocsApiFact> _historySearchFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'conversations',
-    type: 'List<ElConversationSummary>',
+    type: 'List<ConversationSummary>',
     description: 'Required.',
   ),
-  DocsApiFact(
-    name: 'open',
-    type: 'bool',
-    description: 'Required. Controlled.',
-  ),
+  DocsApiFact(name: 'open', type: 'bool', description: 'Required. Controlled.'),
   DocsApiFact(
     name: 'onOpenChange',
     type: 'ValueChanged<bool>',
@@ -1248,8 +1236,7 @@ const List<DocsApiFact> _historySearchFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'partition',
-    type:
-        'static ({pinned, recent, results}) Function(conversations, query)',
+    type: 'static ({pinned, recent, results}) Function(conversations, query)',
     description:
         'The two-key order every list here shares: pinned first, then '
         'newest.',
@@ -1259,7 +1246,7 @@ const List<DocsApiFact> _historySearchFacts = <DocsApiFact>[
 const List<DocsApiFact> _chatHistoryFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'store',
-    type: 'ElConversationStore',
+    type: 'ConversationStore',
     description: 'Required.',
   ),
   DocsApiFact(
@@ -1290,59 +1277,51 @@ const List<DocsApiFact> _chatHistoryFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'width',
     type: 'static double get',
-    description: 'ElContainers.sm = 384px (max-w-sm).',
+    description: 'Containers.sm = 384px (max-w-sm).',
   ),
   DocsApiFact(
     name: 'exit',
     type: 'static Duration get',
-    description: 'ElDurations.base.',
+    description: 'MotionDurations.normal.',
   ),
   DocsApiFact(
     name: 'panelIn',
     type: 'static Duration get',
-    description: 'ElDurations.overlay.',
+    description: 'MotionDurations.overlayEnter.',
   ),
 ];
 
 const List<DocsApiFact> _enumFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElHistoryConfirm.inline',
+    name: 'HistoryConfirm.inline',
     type: 'enum value',
     description: 'The default: the confirmation lands inside the row.',
   ),
   DocsApiFact(
-    name: 'ElHistoryConfirm.dialog',
+    name: 'HistoryConfirm.dialog',
     type: 'enum value',
-    description: 'The system ElAlertDialog.',
+    description: 'The system AlertDialog.',
   ),
   DocsApiFact(
-    name: 'ElHistoryRename.inline',
+    name: 'HistoryRename.inline',
     type: 'enum value',
     description: 'The default: an input on the title\'s own baseline.',
   ),
   DocsApiFact(
-    name: 'ElHistoryRename.dialog',
+    name: 'HistoryRename.dialog',
     type: 'enum value',
     description: 'A dedicated rename dialog.',
   ),
 ];
 
 const List<DocsApiFact> _rowMotionFacts = <DocsApiFact>[
-  DocsApiFact(
-    name: 'child',
-    type: 'Widget',
-    description: 'Required.',
-  ),
+  DocsApiFact(name: 'child', type: 'Widget', description: 'Required.'),
   DocsApiFact(
     name: 'generation',
     type: 'int',
     description: 'Defaults to 0. Bumped to replay the entrance.',
   ),
-  DocsApiFact(
-    name: 'leaving',
-    type: 'bool',
-    description: 'Defaults to false.',
-  ),
+  DocsApiFact(name: 'leaving', type: 'bool', description: 'Defaults to false.'),
   DocsApiFact(
     name: 'enterShift',
     type: 'static const double',
@@ -1363,7 +1342,7 @@ const List<DocsApiFact> _rowMotionFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'enterSpan',
     type: 'static Duration get',
-    description: 'ElDurations.tick + ElDurations.base.',
+    description: 'MotionDurations.tick + MotionDurations.normal.',
   ),
   DocsApiFact(
     name: 'enterDelayFraction',
@@ -1373,14 +1352,14 @@ const List<DocsApiFact> _rowMotionFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'enterCurve',
     type: 'static Curve get',
-    description: 'A hold, then ElCurves.out.',
+    description: 'A hold, then MotionCurves.enter.',
   ),
 ];
 
 const List<DocsApiFact> _blurSwitchFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'phase',
-    type: 'ElSwitchPhase',
+    type: 'SwitchPhase',
     description:
         'Required. idle / out / blurIn — agent-core\'s own enum, driving '
         'this widget rather than declared by it.',
@@ -1402,7 +1381,7 @@ const List<DocsApiFact> _flipControllerFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'duration',
     type: 'Duration',
-    description: 'Defaults to ElDurations.base. Not currently painted.',
+    description: 'Defaults to MotionDurations.normal. Not currently painted.',
   ),
   DocsApiFact(
     name: 'keyFor',
@@ -1457,24 +1436,24 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   ),
   DocsStateFact(
     state: 'renaming (inline)',
-    treatment: 'ElField/ElInput replaces the title at the same baseline',
+    treatment: 'Field/Input replaces the title at the same baseline',
     userSignal: 'Nothing else in the row moves.',
   ),
   DocsStateFact(
     state: 'confirming delete (inline)',
-    treatment: 'the confirm slides in over the row on ElRowMotion\'s own clock',
+    treatment: 'the confirm slides in over the row on RowMotion\'s own clock',
     userSignal: 'The delete control is physically covered, not just disabled.',
   ),
   DocsStateFact(
     state: 'entering the list (new / replayed)',
-    treatment: 'ElRowMotion\'s entrance: opacity + translateX(-10px) in',
+    treatment: 'RowMotion\'s entrance: opacity + translateX(-10px) in',
     userSignal:
         'A pinned row TELEPORTS (the FLIP inversion is computed and '
         'discarded); the one row it displaces replays this entrance.',
   ),
   DocsStateFact(
     state: 'leaving the list (removed)',
-    treatment: 'ElRowMotion\'s exit: slide, then height collapse',
+    treatment: 'RowMotion\'s exit: slide, then height collapse',
     userSignal: 'The rows below rise into the gap in one movement.',
   ),
 ];

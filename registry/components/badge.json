@@ -7,22 +7,26 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/badge.dart",
+      "source": "lib/src/components/ui/badge.dart",
       "target": "@ui/badge.dart",
-      "sha256": "52f939f0366901d11de13387e78993a623a0aac67c013042dd3860ed02e019ac"
+      "sha256": "4a32ef430a035f04b2494a345f90f36f3decafb0cdc59ba0792548140da63c1c"
     }
   ],
   "registryDependencies": [
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "semanticDependencies": [
-    "machine-surface"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/badge",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/badge.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/badge.dart",
+  "exports": [
+    "Badge",
+    "BadgeVariant"
+  ]
 }

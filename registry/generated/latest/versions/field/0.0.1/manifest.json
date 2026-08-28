@@ -7,17 +7,17 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/field.dart",
+      "source": "lib/src/components/ui/field.dart",
       "target": "@ui/field.dart",
-      "sha256": "c1d4c4503e48e1e9c3643601751f265dc56041c3117ba7fadd6e627048a29705"
+      "sha256": "56639622852fe2b72b167b9772a4adb4965bd3fadc1bde94259a8af3cbce25e3"
     }
   ],
   "registryDependencies": [
-    "rule",
+    "validation-rule",
     "source-foundation"
   ],
   "semanticDependencies": [
-    "rule"
+    "validation-rule"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/field",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/field.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/field.dart",
   "deprecated": false
 }

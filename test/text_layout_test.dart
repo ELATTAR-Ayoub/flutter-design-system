@@ -16,7 +16,19 @@ import 'dart:typed_data';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/services.dart' show FontLoader;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// Anything opaque; these tests measure boxes, not colour.
@@ -38,11 +50,11 @@ Future<Size> _measure(
   double width = 400,
 }) async {
   final GlobalKey key = GlobalKey();
-  final ElThemeController controller = ElThemeController();
+  final ThemeController controller = ThemeController();
   addTearDown(controller.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: controller,
       child: Directionality(
         textDirection: TextDirection.ltr,
@@ -71,27 +83,27 @@ void main() {
     testWidgets('for every class the four foundation pages set', (
       WidgetTester tester,
     ) async {
-      final Map<String, (ElTypeSpec, double)> classes =
-          <String, (ElTypeSpec, double)>{
-            '.type-small': (ElType.small, 13),
-            '.type-h3': (ElType.h3, 21),
-            '.type-h4': (ElType.h4, 17),
-            '.type-lead': (ElType.lead, 17),
-            '.type-body': (ElType.body, 15),
-            '.type-micro': (ElType.micro, 10.5),
-            '.type-label': (ElType.label, 11),
-            '.type-num-sm': (ElType.numSm, 12),
-            '.type-chip': (ElType.chip, 11.5),
-            '.type-caption': (ElType.caption, 10.5),
+      final Map<String, (TextStyleToken, double)> classes =
+          <String, (TextStyleToken, double)>{
+            '.type-small': (TextStyles.small, 13),
+            '.type-h3': (TextStyles.h3, 21),
+            '.type-h4': (TextStyles.h4, 17),
+            '.type-lead': (TextStyles.lead, 17),
+            '.type-body': (TextStyles.body, 15),
+            '.type-micro': (TextStyles.eyebrowSmall, 10.5),
+            '.type-label': (TextStyles.eyebrow, 11),
+            '.type-num-sm': (TextStyles.numberSm, 12),
+            '.type-chip': (TextStyles.chip, 11.5),
+            '.type-caption': (TextStyles.caption, 10.5),
           };
 
-      for (final MapEntry<String, (ElTypeSpec, double)> entry
+      for (final MapEntry<String, (TextStyleToken, double)> entry
           in classes.entries) {
-        final (ElTypeSpec spec, double size) = entry.value;
+        final (TextStyleToken spec, double size) = entry.value;
         final Size box = await _measure(
           tester,
           // allow-hardcoded: a specimen word, not copy.
-          ElText('Hxg', spec, color: _ink, fontSize: size),
+          StyledText('Hxg', spec, color: _ink, fontSize: size),
           width: 600,
         );
         expect(
@@ -106,15 +118,15 @@ void main() {
       // Narrow enough that this wraps to four lines of `.type-small`.
       final Size box = await _measure(
         tester,
-        ElText(
+        StyledText(
           'A state colour has one job: to be unmistakable for anything else '
           'on the screen, in either theme, at any size.',
-          ElType.small,
+          TextStyles.small,
           color: _ink,
         ),
         width: 260,
       );
-      final double line = ElType.small.size! * ElType.small.height!;
+      final double line = TextStyles.small.size! * TextStyles.small.height!;
       expect(box.height % line, closeTo(0, 0.001));
       expect(box.height / line, greaterThan(1));
     });
@@ -128,13 +140,13 @@ void main() {
       // a sentence is only as tall as Geist Mono's own ascent + descent.
       final Size block = await _measure(
         tester,
-        ElText('globals.css', ElType.code, color: _ink),
+        StyledText('globals.css', TextStyles.code, color: _ink),
       );
       final Size inline = await _measure(
         tester,
-        ElText('globals.css', ElType.code, color: _ink, inline: true),
+        StyledText('globals.css', TextStyles.code, color: _ink, inline: true),
       );
-      expect(block.height, closeTo(12.5 * ElType.code.height!, 0.001));
+      expect(block.height, closeTo(12.5 * TextStyles.code.height!, 0.001));
       expect(inline.height, lessThan(block.height));
     });
 
@@ -147,17 +159,17 @@ void main() {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 2), // allow-hardcoded
           color: _ink,
-          child: ElText('x', ElType.code, color: _ink, inline: true),
+          child: StyledText('x', TextStyles.code, color: _ink, inline: true),
         ),
       );
       final Size hidden = await _measure(
         tester,
-        ElInlineBox(
+        InlineBox(
           trim: frame,
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 2), // allow-hardcoded
             color: _ink,
-            child: ElText('x', ElType.code, color: _ink, inline: true),
+            child: StyledText('x', TextStyles.code, color: _ink, inline: true),
           ),
         ),
       );

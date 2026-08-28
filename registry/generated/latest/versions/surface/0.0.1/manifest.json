@@ -1,0 +1,27 @@
+{
+  "name": "surface",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "Reusable raised and pressed surface effect used by controls and overlays.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/surface.dart",
+      "target": "@ui/surface.dart",
+      "sha256": "4c7ec63ba8e59d469f3caff182216d8d1ce1762ded044cab20682ad947a569bd"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/surface",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/surface.dart",
+  "deprecated": false
+}

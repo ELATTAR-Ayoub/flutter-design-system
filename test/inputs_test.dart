@@ -9,12 +9,24 @@ import 'dart:ui' as ui show Image, ImageByteFormat;
 import 'package:elattar_design_system/elattar_design_system.dart';
 // `rendering.dart` re-exports `semantics.dart`, and brings `RenderRepaintBoundary`
 // for the raster reads.
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/rendering.dart' hide ScrollDirection;
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
-/// The text-entry and field layer: `ElInput`'s widening, `ElTextarea`,
-/// `ElInputGroup`, `ElInputOtp`, the `ElField` family, and the validator.
+/// The text-entry and field layer: `Input`'s widening, `Textarea`,
+/// `InputGroup`, `InputOtp`, the `Field` family, and the validator.
 ///
 /// State matrices are pinned against `inputs-map.md` §12 and `forms-map.md` §3
 /// and §5 — the tables, not the specimens. Nothing here measures a glyph, so
@@ -22,7 +34,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 Widget host(
   Widget child, {
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   bool reducedMotion = false,
 }) {
   return MediaQuery(
@@ -32,8 +44,8 @@ Widget host(
     ),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Center(child: child),
       ),
     ),
@@ -42,21 +54,19 @@ Widget host(
 
 /// The surface a component paints itself on, scoped so a group's own socket is
 /// not mistaken for its control's.
-ElMachineSurface surfaceIn(WidgetTester t, Finder of) =>
-    t.widget<ElMachineSurface>(
-      find.descendant(of: of, matching: find.byType(ElMachineSurface)).first,
-    );
+Surface surfaceIn(WidgetTester t, Finder of) => t.widget<Surface>(
+  find.descendant(of: of, matching: find.byType(Surface)).first,
+);
 
-Color borderOf(ElMachineSurface surface) =>
-    (surface.border! as Border).top.color;
+Color borderOf(Surface surface) => (surface.border! as Border).top.color;
 
 /// The one focus/error ring a field ever paints, or null when it paints none.
-ElShadowLayer? ringOf(ElMachineSurface surface) {
-  final List<ElShadowLayer> outer = surface.spec.layers
-      .where((ElShadowLayer l) => !l.inset)
+ShadowLayer? ringOf(Surface surface) {
+  final List<ShadowLayer> outer = surface.spec.layers
+      .where((ShadowLayer l) => !l.inset)
       .toList(growable: false);
   if (outer.isEmpty) return null;
-  final ElShadowLayer first = outer.first;
+  final ShadowLayer first = outer.first;
   return first.spread == 3 && first.blur == 0 ? first : null;
 }
 
@@ -76,13 +86,13 @@ double _luma(Color c) => c.r * 0.2126 + c.g * 0.7152 + c.b * 0.0722;
 /// One rasterised pixel column straight down the middle of [child].
 ///
 /// The socket is the one thing in this family that no widget-tree assertion can
-/// reach: `ElMachineSurface` paints its inset layers with a [CustomPainter], so
-/// what a `ElShadowSpec` *says* and what lands on the canvas are two different
+/// reach: `Surface` paints its inset layers with a [CustomPainter], so
+/// what a `ShadowStyle` *says* and what lands on the canvas are two different
 /// claims. This reads the canvas.
 Future<List<Color>> _column(
   WidgetTester t,
   Widget child, {
-  required ElThemeMode mode,
+  required ColorMode mode,
 }) async {
   await t.pumpWidget(
     host(
@@ -90,8 +100,8 @@ Future<List<Color>> _column(
       mode: mode,
     ),
   );
-  await t.pump(ElDurations.base);
-  await t.pump(ElDurations.base);
+  await t.pump(MotionDurations.normal);
+  await t.pump(MotionDurations.normal);
 
   final RenderRepaintBoundary box = t.renderObject(
     find.byKey(const Key('raster')),
@@ -128,26 +138,23 @@ void main() {
     /// anti-assertion rather than left implicit in "the interior is the card":
     /// it names the failure mode, so a future reader of a red test knows what
     /// broke and not merely that something did.
-    Color collapsed(ElThemeData theme) =>
+    Color collapsed(ThemeTokens theme) =>
         _over(theme.ink3, _over(theme.ink4, theme.card));
 
-    for (final ElThemeMode mode in <ElThemeMode>[
-      ElThemeMode.light,
-      ElThemeMode.dark,
-    ]) {
-      final ElThemeData theme = mode == ElThemeMode.light
-          ? ElThemeData.light
-          : ElThemeData.dark;
+    for (final ColorMode mode in <ColorMode>[ColorMode.light, ColorMode.dark]) {
+      final ThemeTokens theme = mode == ColorMode.light
+          ? ThemeTokens.light
+          : ThemeTokens.dark;
 
       testWidgets('$mode: the interior is the card token, the edges are inset', (
         WidgetTester t,
       ) async {
         final List<Color> column = await _column(
           t,
-          const SizedBox(width: 120, child: ElInput()),
+          const SizedBox(width: 120, child: Input()),
           mode: mode,
         );
-        expect(column.length, ElInput.height.round());
+        expect(column.length, Input.height.round());
 
         // The socket darkens the EDGES and leaves the fill alone. Anything
         // that inverts the ring paints the complement of this.
@@ -196,10 +203,10 @@ void main() {
       ) async {
         final List<Color> column = await _column(
           t,
-          const SizedBox(width: 120, child: ElTextarea()),
+          const SizedBox(width: 120, child: Textarea()),
           mode: mode,
         );
-        expect(column.length, ElTextarea.minHeight.round());
+        expect(column.length, Textarea.minHeight.round());
         for (int y = 20; y <= 60; y++) {
           expect(column[y], theme.card, reason: '$mode interior at y=$y');
         }
@@ -213,7 +220,7 @@ void main() {
   // The validator — forms-map §5
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElRule — the Zod-4 email predicate, verbatim', () {
+  group('ValidationRule — the Zod-4 email predicate, verbatim', () {
     test('accepts what the reference accepts', () {
       for (final String address in <String>[
         'collector@pulls.xyz',
@@ -221,36 +228,40 @@ void main() {
         "o'brien+tag@sub.domain.co.uk",
         'a.b@c.dd',
       ]) {
-        expect(ElRule.emailPattern.hasMatch(address), isTrue, reason: address);
+        expect(
+          ValidationRule.emailPattern.hasMatch(address),
+          isTrue,
+          reason: address,
+        );
       }
     });
 
     test('is stricter than HTML5 in exactly the four documented ways', () {
       // No bare TLD — `a@b` is accepted by a browser's own type="email".
-      expect(ElRule.emailPattern.hasMatch('a@b'), isFalse);
+      expect(ValidationRule.emailPattern.hasMatch('a@b'), isFalse);
       // No leading dot.
-      expect(ElRule.emailPattern.hasMatch('.a@b.cc'), isFalse);
+      expect(ValidationRule.emailPattern.hasMatch('.a@b.cc'), isFalse);
       // No consecutive dots, anywhere.
-      expect(ElRule.emailPattern.hasMatch('a..b@c.dd'), isFalse);
+      expect(ValidationRule.emailPattern.hasMatch('a..b@c.dd'), isFalse);
       // A TLD is two letters or more.
-      expect(ElRule.emailPattern.hasMatch('a@b.c'), isFalse);
+      expect(ValidationRule.emailPattern.hasMatch('a@b.c'), isFalse);
     });
 
     test('rejects the page\'s own failing specimens', () {
       // The state grid's Error cell, and the validation section's field 1.
-      expect(ElRule.emailPattern.hasMatch('not-an-email'), isFalse);
-      expect(ElRule.emailPattern.hasMatch('collector@pulls'), isFalse);
-      expect(ElRule.emailPattern.hasMatch('a b@c.dd'), isFalse);
-      expect(ElRule.emailPattern.hasMatch(''), isFalse);
+      expect(ValidationRule.emailPattern.hasMatch('not-an-email'), isFalse);
+      expect(ValidationRule.emailPattern.hasMatch('collector@pulls'), isFalse);
+      expect(ValidationRule.emailPattern.hasMatch('a b@c.dd'), isFalse);
+      expect(ValidationRule.emailPattern.hasMatch(''), isFalse);
     });
   });
 
-  group('ElRules — collection', () {
+  group('Validators — collection', () {
     // accountSchema.handle, verbatim (forms-map §5.1).
-    final List<ElRule<String>> handle = <ElRule<String>>[
-      ElRule.minLength(3, 'At least 3 characters.'),
-      ElRule.maxLength(20, 'No more than 20 characters.'),
-      ElRule.pattern(
+    final List<ValidationRule<String>> handle = <ValidationRule<String>>[
+      ValidationRule.minLength(3, 'At least 3 characters.'),
+      ValidationRule.maxLength(20, 'No more than 20 characters.'),
+      ValidationRule.pattern(
         RegExp(r'^[a-z0-9_]+$'),
         'Lowercase letters, numbers and underscores only.',
       ),
@@ -268,23 +279,23 @@ void main() {
         'ayoub_9': null,
       };
       for (final MapEntry<String, String?> row in table.entries) {
-        final List<String> issues = ElRules.check<String>(row.key, handle);
+        final List<String> issues = Validators.check<String>(row.key, handle);
         expect(
           issues,
           row.value == null ? isEmpty : <String>[row.value!],
           reason: '"${row.key}"',
         );
       }
-      expect(ElRules.check<String>('a' * 21, handle), <String>[
+      expect(Validators.check<String>('a' * 21, handle), <String>[
         'No more than 20 characters.',
       ]);
     });
 
     test('firstError truncates a value that fails two checks at once', () {
       // `""` raises too_small AND invalid_format; only the first renders.
-      expect(ElRules.check<String>('', handle).length, 1);
+      expect(Validators.check<String>('', handle).length, 1);
       expect(
-        ElRules.check<String>('', handle, mode: ElIssueMode.all).length,
+        Validators.check<String>('', handle, mode: IssueMode.all).length,
         2,
         reason: 'criteriaMode "all" keeps both',
       );
@@ -292,14 +303,14 @@ void main() {
 
     test('all renders the password form\'s four-message list', () {
       // passwordSchema, verbatim (forms-map §5.1 / §5.4).
-      final List<ElRule<String>> password = <ElRule<String>>[
-        ElRule.minLength(10, 'At least 10 characters.'),
-        ElRule.pattern(RegExp(r'[A-Z]'), 'One capital letter.'),
-        ElRule.pattern(RegExp(r'[0-9]'), 'One number.'),
-        ElRule.pattern(RegExp(r'[^A-Za-z0-9]'), 'One symbol.'),
+      final List<ValidationRule<String>> password = <ValidationRule<String>>[
+        ValidationRule.minLength(10, 'At least 10 characters.'),
+        ValidationRule.pattern(RegExp(r'[A-Z]'), 'One capital letter.'),
+        ValidationRule.pattern(RegExp(r'[0-9]'), 'One number.'),
+        ValidationRule.pattern(RegExp(r'[^A-Za-z0-9]'), 'One symbol.'),
       ];
       List<String> check(String v) =>
-          ElRules.check<String>(v, password, mode: ElIssueMode.all);
+          Validators.check<String>(v, password, mode: IssueMode.all);
 
       expect(check('a'), <String>[
         'At least 10 characters.',
@@ -318,7 +329,7 @@ void main() {
     });
 
     test('dedupe keeps the first occurrence, in order', () {
-      expect(ElRules.dedupe(<String>['b', 'a', 'b', 'c', 'a']), <String>[
+      expect(Validators.dedupe(<String>['b', 'a', 'b', 'c', 'a']), <String>[
         'b',
         'a',
         'c',
@@ -327,7 +338,7 @@ void main() {
 
     test('accepted and oneOf carry the composed schema', () {
       // `terms` is `.refine(v => v)`, not `z.literal(true)`.
-      final ElRule<bool> terms = ElRule.accepted(
+      final ValidationRule<bool> terms = ValidationRule.accepted(
         'You have to accept the terms.',
       );
       expect(terms.issue(false), 'You have to accept the terms.');
@@ -335,10 +346,10 @@ void main() {
 
       // `z.enum(["daily","weekly"])` — Zod 4 applies the message to the
       // invalid-TYPE case too, which is how `undefined` renders it.
-      final ElRule<String?> payout = ElRule.oneOf<String>(<String>[
-        'daily',
-        'weekly',
-      ], 'Pick a payout rhythm.');
+      final ValidationRule<String?> payout = ValidationRule.oneOf<String>(
+        <String>['daily', 'weekly'],
+        'Pick a payout rhythm.',
+      );
       expect(payout.issue(null), 'Pick a payout rhythm.');
       expect(payout.issue('monthly'), 'Pick a payout rhythm.');
       expect(payout.issue('weekly'), isNull);
@@ -349,26 +360,26 @@ void main() {
   // The form controller — forms-map §3.4, §5.2, §5.5
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElForm', () {
-    ElForm accountForm() => ElForm(
-      fields: <ElFormFieldBase>[
-        ElTextFormField(
+  group('Form', () {
+    Form accountForm() => Form(
+      fields: <FormFieldBase>[
+        TextFormField(
           name: 'handle',
-          rules: <ElRule<String>>[
-            ElRule.minLength(3, 'At least 3 characters.'),
+          rules: <ValidationRule<String>>[
+            ValidationRule.minLength(3, 'At least 3 characters.'),
           ],
         ),
-        ElTextFormField(
+        TextFormField(
           name: 'email',
-          rules: <ElRule<String>>[
-            ElRule.email('That is not an email address.'),
+          rules: <ValidationRule<String>>[
+            ValidationRule.email('That is not an email address.'),
           ],
         ),
       ],
     );
 
     test('onSubmit asks nothing until submit, then asks on every edit', () {
-      final ElForm form = accountForm();
+      final Form form = accountForm();
       addTearDown(form.dispose);
 
       form.text('handle').controller.text = 'a';
@@ -391,15 +402,15 @@ void main() {
     });
 
     test('onChange asks from the first keystroke', () {
-      final ElForm form = ElForm(
-        mode: ElValidateMode.onChange,
-        fields: <ElFormFieldBase>[
-          ElTextFormField(
+      final Form form = Form(
+        mode: ValidateMode.onChange,
+        fields: <FormFieldBase>[
+          TextFormField(
             name: 'password',
-            issueMode: ElIssueMode.all,
-            rules: <ElRule<String>>[
-              ElRule.minLength(10, 'At least 10 characters.'),
-              ElRule.pattern(RegExp(r'[A-Z]'), 'One capital letter.'),
+            issueMode: IssueMode.all,
+            rules: <ValidationRule<String>>[
+              ValidationRule.minLength(10, 'At least 10 characters.'),
+              ValidationRule.pattern(RegExp(r'[A-Z]'), 'One capital letter.'),
             ],
           ),
         ],
@@ -415,35 +426,37 @@ void main() {
 
     test('the composed form fails exactly three fields at its defaults', () {
       // forms-map §5.5, pressing Save Preferences untouched.
-      final ElForm form = ElForm(
-        fields: <ElFormFieldBase>[
-          ElFormField<String>(
+      final Form form = Form(
+        fields: <FormFieldBase>[
+          FormField<String>(
             name: 'plan',
             initialValue: '',
-            rules: <ElRule<String>>[ElRule.minLength(1, 'Pick a plan.')],
+            rules: <ValidationRule<String>>[
+              ValidationRule.minLength(1, 'Pick a plan.'),
+            ],
           ),
-          ElFormField<String?>(
+          FormField<String?>(
             name: 'payout',
             initialValue: null,
-            rules: <ElRule<String?>>[
-              ElRule.oneOf<String>(<String>[
+            rules: <ValidationRule<String?>>[
+              ValidationRule.oneOf<String>(<String>[
                 'daily',
                 'weekly',
               ], 'Pick a payout rhythm.'),
             ],
           ),
-          ElTextFormField(
+          TextFormField(
             name: 'bio',
-            rules: <ElRule<String>>[
-              ElRule.maxLength(160, '160 characters is the ceiling.'),
+            rules: <ValidationRule<String>>[
+              ValidationRule.maxLength(160, '160 characters is the ceiling.'),
             ],
           ),
-          ElFormField<bool>(name: 'alerts', initialValue: true),
-          ElFormField<bool>(
+          FormField<bool>(name: 'alerts', initialValue: true),
+          FormField<bool>(
             name: 'terms',
             initialValue: false,
-            rules: <ElRule<bool>>[
-              ElRule.accepted('You have to accept the terms.'),
+            rules: <ValidationRule<bool>>[
+              ValidationRule.accepted('You have to accept the terms.'),
             ],
           ),
         ],
@@ -464,17 +477,21 @@ void main() {
         // Ruling F4. On the reference this is a complete no-op in the composed
         // form, because `plan` is a hand-wired Select with no DOM ref. Here the
         // first invalid field in registration order is focused whatever it is.
-        final ElForm form = ElForm(
-          fields: <ElFormFieldBase>[
-            ElFormField<bool>(name: 'alerts', initialValue: true),
-            ElFormField<String>(
+        final Form form = Form(
+          fields: <FormFieldBase>[
+            FormField<bool>(name: 'alerts', initialValue: true),
+            FormField<String>(
               name: 'plan',
               initialValue: '',
-              rules: <ElRule<String>>[ElRule.minLength(1, 'Pick a plan.')],
+              rules: <ValidationRule<String>>[
+                ValidationRule.minLength(1, 'Pick a plan.'),
+              ],
             ),
-            ElTextFormField(
+            TextFormField(
               name: 'bio',
-              rules: <ElRule<String>>[ElRule.minLength(1, 'Say something.')],
+              rules: <ValidationRule<String>>[
+                ValidationRule.minLength(1, 'Say something.'),
+              ],
             ),
           ],
         );
@@ -485,7 +502,7 @@ void main() {
           host(
             Column(
               children: <Widget>[
-                for (final ElFormFieldBase field in form.fields)
+                for (final FormFieldBase field in form.fields)
                   Focus(
                     focusNode: field.focusNode,
                     child: const SizedBox(height: 8),
@@ -511,14 +528,14 @@ void main() {
     testWidgets('setError does not focus — shouldFocus is not passed', (
       WidgetTester t,
     ) async {
-      final ElForm form = accountForm();
+      final Form form = accountForm();
       addTearDown(form.dispose);
 
       await t.pumpWidget(
         host(
           Column(
             children: <Widget>[
-              for (final ElFormFieldBase field in form.fields)
+              for (final FormFieldBase field in form.fields)
                 Focus(
                   focusNode: field.focusNode,
                   child: const SizedBox(height: 8),
@@ -536,7 +553,7 @@ void main() {
     });
 
     test('a server error is cleared by the next edit', () {
-      final ElForm form = accountForm();
+      final Form form = accountForm();
       addTearDown(form.dispose);
 
       form.submit();
@@ -550,7 +567,7 @@ void main() {
     });
 
     test('isSubmitting is held for the duration of onValid', () async {
-      final ElForm form = accountForm();
+      final Form form = accountForm();
       addTearDown(form.dispose);
       form.text('handle').controller.text = 'voidwing';
       form.text('email').controller.text = 'you@example.com';
@@ -564,7 +581,7 @@ void main() {
     });
 
     test('a failed submit never runs onValid', () async {
-      final ElForm form = accountForm();
+      final Form form = accountForm();
       addTearDown(form.dispose);
       bool ran = false;
       expect(await form.submit(() => ran = true), isFalse);
@@ -573,7 +590,7 @@ void main() {
     });
 
     test('a text field keeps its controller and its value in step', () {
-      final ElTextFormField field = ElTextFormField(
+      final TextFormField field = TextFormField(
         name: 'handle',
         initialValue: 'voidwing',
       );
@@ -588,7 +605,7 @@ void main() {
     });
 
     test('an unknown field name names what is declared', () {
-      final ElForm form = accountForm();
+      final Form form = accountForm();
       addTearDown(form.dispose);
       expect(
         () => form['nope'],
@@ -604,21 +621,21 @@ void main() {
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // ElInput — the widening, and the alpha fix
+  // Input — the widening, and the alpha fix
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElInput', () {
+  group('Input', () {
     Widget field({
       String? initialValue,
       bool invalid = false,
       bool readOnly = false,
       FocusNode? focusNode,
-      ElTypeSpec? textSpec,
-      ElThemeMode mode = ElThemeMode.dark,
+      TextStyleToken? textSpec,
+      ColorMode mode = ColorMode.dark,
     }) => host(
       SizedBox(
         width: 384,
-        child: ElInput(
+        child: Input(
           initialValue: initialValue,
           invalid: invalid,
           readOnly: readOnly,
@@ -641,7 +658,7 @@ void main() {
       );
       expect(
         editable.selectionColor,
-        ElThemeData.dark.primary.withValues(alpha: 0.35),
+        ThemeTokens.dark.primary.withValues(alpha: 0.35),
       );
     });
 
@@ -660,20 +677,20 @@ void main() {
       final FocusNode node = FocusNode();
       addTearDown(node.dispose);
       await t.pumpWidget(field(invalid: true, focusNode: node));
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
 
-      final ElThemeData dark = ElThemeData.dark;
-      final ElMachineSurface rest = surfaceIn(t, find.byType(ElInput));
+      final ThemeTokens dark = ThemeTokens.dark;
+      final Surface rest = surfaceIn(t, find.byType(Input));
       expect(borderOf(rest), dark.destructive);
       expect(ringOf(rest)!.color(dark).a, closeTo(0.20, 1e-6));
 
       node.requestFocus();
       await t.pump();
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
 
-      final ElMachineSurface focused = surfaceIn(t, find.byType(ElInput));
+      final Surface focused = surfaceIn(t, find.byType(Input));
       expect(
         borderOf(focused),
         dark.destructive,
@@ -685,7 +702,7 @@ void main() {
         reason: 'no ring-ring/35 — invalid wins',
       );
       // The socket is untouched either way.
-      expect(focused.spec.insetLayers, ElShadows.pressed.insetLayers);
+      expect(focused.spec.insetLayers, Shadows.inset.insetLayers);
     });
 
     testWidgets('the invalid ring has no dark variant on the bare field', (
@@ -693,18 +710,18 @@ void main() {
     ) async {
       // inputs-map drift 6: 20% in BOTH themes here, where a group rings at 40
       // on dark.
-      for (final ElThemeMode mode in <ElThemeMode>[
-        ElThemeMode.dark,
-        ElThemeMode.light,
+      for (final ColorMode mode in <ColorMode>[
+        ColorMode.dark,
+        ColorMode.light,
       ]) {
         await t.pumpWidget(field(invalid: true, mode: mode));
-        await t.pump(ElDurations.base);
-        await t.pump(ElDurations.base);
-        final ElThemeData theme = mode == ElThemeMode.dark
-            ? ElThemeData.dark
-            : ElThemeData.light;
+        await t.pump(MotionDurations.normal);
+        await t.pump(MotionDurations.normal);
+        final ThemeTokens theme = mode == ColorMode.dark
+            ? ThemeTokens.dark
+            : ThemeTokens.light;
         expect(
-          ringOf(surfaceIn(t, find.byType(ElInput)))!.color(theme).a,
+          ringOf(surfaceIn(t, find.byType(Input)))!.color(theme).a,
           closeTo(0.20, 1e-6),
           reason: '$mode',
         );
@@ -721,17 +738,17 @@ void main() {
       await t.pumpWidget(
         host(
           DefaultTextStyle(
-            style: TextStyle(color: ElThemeData.dark.mutedForeground),
+            style: TextStyle(color: ThemeTokens.dark.mutedForeground),
             child: const SizedBox(
               width: 384,
-              child: ElInput(initialValue: '0xA71c…4F2b', readOnly: true),
+              child: Input(initialValue: '0xA71c…4F2b', readOnly: true),
             ),
           ),
         ),
       );
       expect(
         t.widget<EditableText>(find.byType(EditableText)).style.color,
-        ElThemeData.dark.mutedForeground,
+        ThemeTokens.dark.mutedForeground,
       );
     });
 
@@ -739,7 +756,7 @@ void main() {
       WidgetTester t,
     ) async {
       // Ruling I7 / inputs-map §4.3 and drift 8.
-      await t.pumpWidget(field(textSpec: ElComponentType.inputNum));
+      await t.pumpWidget(field(textSpec: TextStyles.inputNumber));
       final TextStyle style = t
           .widget<EditableText>(find.byType(EditableText))
           .style;
@@ -754,15 +771,12 @@ void main() {
         host(
           const SizedBox(
             width: 384,
-            child: ElInput(placeholder: 'x', bare: true),
+            child: Input(placeholder: 'x', bare: true),
           ),
         ),
       );
       expect(
-        find.descendant(
-          of: find.byType(ElInput),
-          matching: find.byType(ElMachineSurface),
-        ),
+        find.descendant(of: find.byType(Input), matching: find.byType(Surface)),
         findsNothing,
         reason: 'border-0 shadow-none ring-0 bg-transparent leaves nothing',
       );
@@ -777,7 +791,7 @@ void main() {
         host(
           const SizedBox(
             width: 384,
-            child: ElInput(
+            child: Input(
               label: 'Email',
               hint: 'That is not an email address.',
               invalid: true,
@@ -786,7 +800,7 @@ void main() {
         ),
       );
 
-      final SemanticsNode node = t.getSemantics(find.byType(ElInput));
+      final SemanticsNode node = t.getSemantics(find.byType(Input));
       expect(node.validationResult, SemanticsValidationResult.invalid);
       // Trailing newline: the node merges [EditableText]'s own empty label in,
       // and `SemanticsConfiguration` joins labels with one. It is one node,
@@ -798,10 +812,10 @@ void main() {
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // ElTextarea — inputs-map §5.1, §12.3
+  // Textarea — inputs-map §5.1, §12.3
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElTextarea', () {
+  group('Textarea', () {
     testWidgets('is an 80px minimum on the radius ladder, not a pill', (
       WidgetTester t,
     ) async {
@@ -809,40 +823,40 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElTextarea(
+            child: Textarea(
               placeholder: 'Anything the packing team should know',
             ),
           ),
         ),
       );
 
-      final ElMachineSurface surface = surfaceIn(t, find.byType(ElTextarea));
+      final Surface surface = surfaceIn(t, find.byType(Textarea));
       expect(
         surface.radius,
-        BorderRadius.circular(ElRadii.lg),
+        BorderRadius.circular(Radii.lg),
         reason: 'rounded-lg 12 — the family\'s one non-pill member',
       );
-      expect(surface.fill, ElThemeData.dark.card);
-      expect(surface.spec, same(ElShadows.pressed));
-      expect(t.getSize(find.byType(ElTextarea)).height, ElTextarea.minHeight);
-      expect(ElTextarea.minHeight, el(20));
+      expect(surface.fill, ThemeTokens.dark.card);
+      expect(surface.spec, same(Shadows.inset));
+      expect(t.getSize(find.byType(Textarea)).height, Textarea.minHeight);
+      expect(Textarea.minHeight, space(20));
       expect(
-        ElTextarea.insets,
-        EdgeInsets.symmetric(horizontal: el(3.5), vertical: el(2.5)),
+        Textarea.insets,
+        EdgeInsets.symmetric(horizontal: space(3.5), vertical: space(2.5)),
       );
     });
 
     testWidgets('grows with its content and has no ceiling', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(const SizedBox(width: 512, child: ElTextarea())));
-      final double floor = t.getSize(find.byType(ElTextarea)).height;
-      expect(floor, ElTextarea.minHeight);
+      await t.pumpWidget(host(const SizedBox(width: 512, child: Textarea())));
+      final double floor = t.getSize(find.byType(Textarea)).height;
+      expect(floor, Textarea.minHeight);
 
       await t.enterText(find.byType(EditableText), 'a\nb\nc\nd\ne\nf\ng\nh');
       await t.pump();
       expect(
-        t.getSize(find.byType(ElTextarea)).height,
+        t.getSize(find.byType(Textarea)).height,
         greaterThan(floor),
         reason: 'field-sizing: content, with min-h-20 as the floor only',
       );
@@ -851,12 +865,12 @@ void main() {
     testWidgets('types at leading-relaxed, which the input does not', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(const SizedBox(width: 512, child: ElTextarea())));
+      await t.pumpWidget(host(const SizedBox(width: 512, child: Textarea())));
       final TextStyle style = t
           .widget<EditableText>(find.byType(EditableText))
           .style;
       expect(style.fontSize, 13);
-      expect(style.height, ElComponentType.textareaBody.height);
+      expect(style.height, TextStyles.textareaBody.height);
       expect(
         style.fontSize! * style.height!,
         closeTo(21.125, 1e-6),
@@ -871,12 +885,12 @@ void main() {
       // carries, so it still shows `cursor-not-allowed` for a pointer the
       // input would have refused.
       await t.pumpWidget(
-        host(const SizedBox(width: 512, child: ElTextarea(enabled: false))),
+        host(const SizedBox(width: 512, child: Textarea(enabled: false))),
       );
       final MouseRegion region = t.widget<MouseRegion>(
         find
             .descendant(
-              of: find.byType(ElTextarea),
+              of: find.byType(Textarea),
               matching: find.byType(MouseRegion),
             )
             .first,
@@ -887,7 +901,7 @@ void main() {
             .widget<Opacity>(
               find
                   .descendant(
-                    of: find.byType(ElTextarea),
+                    of: find.byType(Textarea),
                     matching: find.byType(Opacity),
                   )
                   .first,
@@ -900,27 +914,27 @@ void main() {
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // ElInputGroup — inputs-map §4.2, §12.2
+  // InputGroup — inputs-map §4.2, §12.2
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElInputGroup', () {
+  group('InputGroup', () {
     Widget group({
       Widget? start,
       Widget? end,
       bool invalid = false,
       bool enabled = true,
       FocusNode? focusNode,
-      ElThemeMode mode = ElThemeMode.dark,
+      ColorMode mode = ColorMode.dark,
     }) => host(
       SizedBox(
         width: 512,
-        child: ElInputGroup(
+        child: InputGroup(
           startAddon: start,
           endAddon: end,
           invalid: invalid,
           enabled: enabled,
           focusNode: focusNode,
-          child: const ElInputGroupInput(placeholder: 'x'),
+          child: const InputGroupInput(placeholder: 'x'),
         ),
       ),
       mode: mode,
@@ -931,7 +945,7 @@ void main() {
                 .widget<Padding>(
                   find
                       .descendant(
-                        of: find.byType(ElInputGroupInput),
+                        of: find.byType(InputGroupInput),
                         matching: find.byWidgetPredicate(
                           (Widget w) =>
                               w is Padding &&
@@ -945,12 +959,12 @@ void main() {
 
     testWidgets('is a 40px pill in a permanent socket', (WidgetTester t) async {
       await t.pumpWidget(group());
-      expect(t.getSize(find.byType(ElInputGroup)).height, el(10));
-      final ElMachineSurface surface = surfaceIn(t, find.byType(ElInputGroup));
-      expect(surface.radius, BorderRadius.circular(ElRadii.pill));
-      expect(surface.fill, ElThemeData.dark.card);
-      expect(borderOf(surface), ElThemeData.dark.input);
-      expect(surface.spec, same(ElShadows.pressed));
+      expect(t.getSize(find.byType(InputGroup)).height, space(10));
+      final Surface surface = surfaceIn(t, find.byType(InputGroup));
+      expect(surface.radius, BorderRadius.circular(Radii.full));
+      expect(surface.fill, ThemeTokens.dark.card);
+      expect(borderOf(surface), ThemeTokens.dark.input);
+      expect(surface.spec, same(Shadows.inset));
     });
 
     testWidgets('focus is the BUTTON\'s recipe, not the bare field\'s', (
@@ -964,11 +978,11 @@ void main() {
 
       node.requestFocus();
       await t.pump();
-      await t.pump(ElDurations.base);
-      await t.pump(ElDurations.base);
+      await t.pump(MotionDurations.normal);
+      await t.pump(MotionDurations.normal);
 
-      final ElThemeData dark = ElThemeData.dark;
-      final ElMachineSurface surface = surfaceIn(t, find.byType(ElInputGroup));
+      final ThemeTokens dark = ThemeTokens.dark;
+      final Surface surface = surfaceIn(t, find.byType(InputGroup));
       expect(borderOf(surface), dark.ring);
       expect(ringOf(surface)!.color(dark).a, closeTo(0.50, 1e-6));
     });
@@ -978,21 +992,18 @@ void main() {
     ) async {
       // inputs-map drift 6, the other half: the same error state is two
       // different reds depending on whether an addon happens to be present.
-      const Map<ElThemeMode, double> expected = <ElThemeMode, double>{
-        ElThemeMode.light: 0.20,
-        ElThemeMode.dark: 0.40,
+      const Map<ColorMode, double> expected = <ColorMode, double>{
+        ColorMode.light: 0.20,
+        ColorMode.dark: 0.40,
       };
-      for (final MapEntry<ElThemeMode, double> row in expected.entries) {
+      for (final MapEntry<ColorMode, double> row in expected.entries) {
         await t.pumpWidget(group(invalid: true, mode: row.key));
-        await t.pump(ElDurations.base);
-        await t.pump(ElDurations.base);
-        final ElThemeData theme = row.key == ElThemeMode.dark
-            ? ElThemeData.dark
-            : ElThemeData.light;
-        final ElMachineSurface surface = surfaceIn(
-          t,
-          find.byType(ElInputGroup),
-        );
+        await t.pump(MotionDurations.normal);
+        await t.pump(MotionDurations.normal);
+        final ThemeTokens theme = row.key == ColorMode.dark
+            ? ThemeTokens.dark
+            : ThemeTokens.light;
+        final Surface surface = surfaceIn(t, find.byType(InputGroup));
         expect(borderOf(surface), theme.destructive);
         expect(
           ringOf(surface)!.color(theme).a,
@@ -1011,7 +1022,7 @@ void main() {
             .widget<Opacity>(
               find
                   .descendant(
-                    of: find.byType(ElInputGroup),
+                    of: find.byType(InputGroup),
                     matching: find.byType(Opacity),
                   )
                   .first,
@@ -1026,41 +1037,41 @@ void main() {
     ) async {
       // inputs-map §4.2 — the table of nine fields, reduced to its four shapes.
       await t.pumpWidget(group());
-      expect(controlInsets(t).start, el(4));
-      expect(controlInsets(t).end, el(4));
+      expect(controlInsets(t).start, space(4));
+      expect(controlInsets(t).end, space(4));
 
       await t.pumpWidget(
-        group(start: const ElInputGroupAddon(child: ElInputGroupText(r'$'))),
+        group(start: const InputGroupAddon(child: InputGroupText(r'$'))),
       );
-      expect(controlInsets(t).start, el(2), reason: 'has-[inline-start]');
-      expect(controlInsets(t).end, el(4), reason: 'only that side changes');
-
-      await t.pumpWidget(
-        group(
-          end: const ElInputGroupAddon(
-            align: ElInputGroupAlign.end,
-            child: ElInputGroupText('packs'),
-          ),
-        ),
-      );
-      expect(controlInsets(t).start, el(4));
-      expect(controlInsets(t).end, el(2));
+      expect(controlInsets(t).start, space(2), reason: 'has-[inline-start]');
+      expect(controlInsets(t).end, space(4), reason: 'only that side changes');
 
       await t.pumpWidget(
         group(
-          start: const ElInputGroupAddon(child: ElInputGroupText(r'$')),
-          end: const ElInputGroupAddon(
-            align: ElInputGroupAlign.end,
-            child: ElInputGroupText('USD'),
+          end: const InputGroupAddon(
+            align: InputGroupAlign.end,
+            child: InputGroupText('packs'),
           ),
         ),
       );
-      expect(controlInsets(t).start, el(2));
-      expect(controlInsets(t).end, el(2));
+      expect(controlInsets(t).start, space(4));
+      expect(controlInsets(t).end, space(2));
+
+      await t.pumpWidget(
+        group(
+          start: const InputGroupAddon(child: InputGroupText(r'$')),
+          end: const InputGroupAddon(
+            align: InputGroupAlign.end,
+            child: InputGroupText('USD'),
+          ),
+        ),
+      );
+      expect(controlInsets(t).start, space(2));
+      expect(controlInsets(t).end, space(2));
 
       // `py-1` survives the strip — only the horizontal padding is contested.
-      expect(controlInsets(t).top, el(1));
-      expect(controlInsets(t).bottom, el(1));
+      expect(controlInsets(t).top, space(1));
+      expect(controlInsets(t).bottom, space(1));
     });
 
     testWidgets('an addon holding a button pulls back 2px', (
@@ -1068,14 +1079,14 @@ void main() {
     ) async {
       // `has-[>button]:-ml-0.5` — 16 becomes 14.
       await t.pumpWidget(
-        group(start: const ElInputGroupAddon(child: ElInputGroupText('@'))),
+        group(start: const InputGroupAddon(child: InputGroupText('@'))),
       );
       EdgeInsetsDirectional addonInsets() =>
           t
                   .widget<Padding>(
                     find
                         .descendant(
-                          of: find.byType(ElInputGroupAddon),
+                          of: find.byType(InputGroupAddon),
                           matching: find.byWidgetPredicate(
                             (Widget w) =>
                                 w is Padding &&
@@ -1086,19 +1097,19 @@ void main() {
                   )
                   .padding
               as EdgeInsetsDirectional;
-      expect(addonInsets().start, el(4));
+      expect(addonInsets().start, space(4));
 
       await t.pumpWidget(
         group(
-          start: ElInputGroupAddon(
-            child: ElInputGroupButton(
+          start: InputGroupAddon(
+            child: InputGroupButton(
               child: const Text('Apply'),
               onPressed: () {},
             ),
           ),
         ),
       );
-      expect(addonInsets().start, el(4) - el(0.5));
+      expect(addonInsets().start, space(4) - space(0.5));
     });
 
     testWidgets('addon text computes 13px at an 18.5714px line box', (
@@ -1109,9 +1120,9 @@ void main() {
       // `--text-sm--line-height`, so it beats `.type-num`'s 15px AND its 1.2.
       await t.pumpWidget(
         group(
-          end: const ElInputGroupAddon(
-            align: ElInputGroupAlign.end,
-            child: ElInputGroupText('packs'),
+          end: const InputGroupAddon(
+            align: InputGroupAlign.end,
+            child: InputGroupText('packs'),
           ),
         ),
       );
@@ -1119,7 +1130,7 @@ void main() {
           .widget<Text>(
             find
                 .descendant(
-                  of: find.byType(ElInputGroupText),
+                  of: find.byType(InputGroupText),
                   matching: find.byType(Text),
                 )
                 .first,
@@ -1127,7 +1138,7 @@ void main() {
           .style!;
       expect(style.fontSize, 13);
       expect(style.fontSize! * style.height!, closeTo(18.5714, 1e-3));
-      expect(style.color, ElThemeData.dark.mutedForeground);
+      expect(style.color, ThemeTokens.dark.mutedForeground);
     });
 
     testWidgets('a numeric addon keeps the mono treatment and loses the size', (
@@ -1135,8 +1146,8 @@ void main() {
     ) async {
       await t.pumpWidget(
         group(
-          start: ElInputGroupAddon(
-            child: ElInputGroupText('+1', spec: ElComponentType.inputNum),
+          start: InputGroupAddon(
+            child: InputGroupText('+1', spec: TextStyles.inputNumber),
           ),
         ),
       );
@@ -1144,7 +1155,7 @@ void main() {
           .widget<Text>(
             find
                 .descendant(
-                  of: find.byType(ElInputGroupText),
+                  of: find.byType(InputGroupText),
                   matching: find.byType(Text),
                 )
                 .first,
@@ -1157,14 +1168,14 @@ void main() {
 
     testWidgets('an addon click focuses the control', (WidgetTester t) async {
       await t.pumpWidget(
-        group(start: const ElInputGroupAddon(child: ElInputGroupText('@'))),
+        group(start: const InputGroupAddon(child: InputGroupText('@'))),
       );
       expect(
         t.widget<EditableText>(find.byType(EditableText)).focusNode.hasFocus,
         isFalse,
       );
 
-      await t.tap(find.byType(ElInputGroupAddon));
+      await t.tap(find.byType(InputGroupAddon));
       await t.pump();
       expect(
         t.widget<EditableText>(find.byType(EditableText)).focusNode.hasFocus,
@@ -1173,28 +1184,25 @@ void main() {
     });
   });
 
-  group('ElInputGroupButton', () {
+  group('InputGroupButton', () {
     testWidgets('is 24px tall on the only derived corner in the system', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(
-        host(ElInputGroupButton(onPressed: () {}, child: const Text('Apply'))),
+        host(InputGroupButton(onPressed: () {}, child: const Text('Apply'))),
       );
 
-      expect(t.getSize(find.byType(ElInputGroupButton)).height, el(6));
-      expect(ElInputGroupButton.paddingX, el(1.5));
-      expect(ElInputGroupButton.gap, el(1));
+      expect(t.getSize(find.byType(InputGroupButton)).height, space(6));
+      expect(InputGroupButton.paddingX, space(1.5));
+      expect(InputGroupButton.gap, space(1));
 
-      final ElMachineSurface surface = surfaceIn(
-        t,
-        find.byType(ElInputGroupButton),
-      );
-      expect(surface.radius, BorderRadius.circular(ElRadii.addonButton));
+      final Surface surface = surfaceIn(t, find.byType(InputGroupButton));
+      expect(surface.radius, BorderRadius.circular(Radii.addonButton));
       // `calc(var(--radius) - 3px)` with `--radius` at 10 in both themes.
-      expect(ElRadii.addonButton, 7);
-      expect(ElRadii.addonButton, ElRadii.md - 3);
+      expect(Radii.addonButton, 7);
+      expect(Radii.addonButton, Radii.md - 3);
       // `shadow-none` at rest.
-      expect(surface.spec, same(ElShadows.none));
+      expect(surface.spec, same(Shadows.none));
     });
 
     testWidgets('publishes aria-pressed as a toggled state', (
@@ -1204,7 +1212,7 @@ void main() {
 
       await t.pumpWidget(
         host(
-          ElInputGroupButton(
+          InputGroupButton(
             onPressed: () {},
             label: 'Hide password',
             toggled: true,
@@ -1213,9 +1221,7 @@ void main() {
         ),
       );
 
-      final SemanticsNode node = t.getSemantics(
-        find.byType(ElInputGroupButton),
-      );
+      final SemanticsNode node = t.getSemantics(find.byType(InputGroupButton));
       expect(node.label, 'Hide password');
       expect(node.flagsCollection.isToggled, Tristate.isTrue);
       handle.dispose();
@@ -1223,18 +1229,18 @@ void main() {
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // ElInputOtp — inputs-map §6
+  // InputOtp — inputs-map §6
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElInputOtp', () {
+  group('InputOtp', () {
     Widget otp({
       String? initialValue,
       FocusNode? focusNode,
       bool reducedMotion = false,
-      ElThemeMode mode = ElThemeMode.dark,
+      ColorMode mode = ColorMode.dark,
       Key? key,
     }) => host(
-      ElInputOtp(
+      InputOtp(
         // `initialValue` is `defaultValue`: read once, when the field
         // builds its own controller. A test that re-pumps with a different
         // seed has to re-key, or it keeps the first one — which is the
@@ -1249,16 +1255,13 @@ void main() {
 
     testWidgets('the strip is 96 + 16 + 96 = 208', (WidgetTester t) async {
       await t.pumpWidget(otp());
-      expect(t.getSize(find.byType(ElInputOtp)), Size(208, el(8)));
-      expect(ElInputOtp.slotSize, el(8));
-      expect(ElInputOtp.separatorWidth, 16);
-      expect(find.byType(ElInputOtpSlot), findsNWidgets(6));
-      expect(find.byType(ElInputOtpSeparator), findsOneWidget);
+      expect(t.getSize(find.byType(InputOtp)), Size(208, space(8)));
+      expect(InputOtp.slotSize, space(8));
+      expect(InputOtp.separatorWidth, 16);
+      expect(find.byType(InputOtpSlot), findsNWidgets(6));
+      expect(find.byType(InputOtpSeparator), findsOneWidget);
       for (int i = 0; i < 6; i++) {
-        expect(
-          t.getSize(find.byType(ElInputOtpSlot).at(i)),
-          const Size(32, 32),
-        );
+        expect(t.getSize(find.byType(InputOtpSlot).at(i)), const Size(32, 32));
       }
     });
 
@@ -1267,22 +1270,17 @@ void main() {
       // Slots are painted in group order with the active one last; at rest that
       // is left to right, so `.at(0)` is the group's first.
       final Finder opener = find.byWidgetPredicate(
-        (Widget w) => w is ElInputOtpSlot && w.first,
+        (Widget w) => w is InputOtpSlot && w.first,
       );
       expect(opener, findsNWidgets(2), reason: 'one per group');
-      final ElMachineSurface surface = t.widget<ElMachineSurface>(
-        find
-            .descendant(
-              of: opener.first,
-              matching: find.byType(ElMachineSurface),
-            )
-            .first,
+      final Surface surface = t.widget<Surface>(
+        find.descendant(of: opener.first, matching: find.byType(Surface)).first,
       );
       final Border border = surface.border! as Border;
       expect(border.left, isNot(BorderSide.none), reason: 'first:border-l');
       expect(
         surface.radius.topLeft,
-        Radius.circular(ElRadii.lg),
+        Radius.circular(Radii.lg),
         reason: 'first:rounded-l-lg',
       );
       expect(
@@ -1300,11 +1298,11 @@ void main() {
       await t.pumpWidget(otp(initialValue: '4082'));
       for (int i = 0; i < 6; i++) {
         expect(
-          t.widget<ElInputOtpSlot>(find.byType(ElInputOtpSlot).at(i)).active,
+          t.widget<InputOtpSlot>(find.byType(InputOtpSlot).at(i)).active,
           isFalse,
         );
       }
-      expect(find.byType(ElKeyframePlayer), findsNothing);
+      expect(find.byType(KeyframePlayer), findsNothing);
     });
 
     testWidgets('focus lands the ring where the package puts the selection', (
@@ -1331,9 +1329,9 @@ void main() {
         await t.pump();
         await t.pump();
 
-        final Iterable<ElInputOtpSlot> slots = t
-            .widgetList<ElInputOtpSlot>(find.byType(ElInputOtpSlot))
-            .where((ElInputOtpSlot s) => s.active);
+        final Iterable<InputOtpSlot> slots = t
+            .widgetList<InputOtpSlot>(find.byType(InputOtpSlot))
+            .where((InputOtpSlot s) => s.active);
         expect(slots.length, 1, reason: '"${row.key}"');
         // The caret is drawn only where the active slot is empty.
         expect(slots.single.showsCaret, row.key.length < 6, reason: row.key);
@@ -1351,19 +1349,19 @@ void main() {
       await t.pump();
       await t.pump();
 
-      expect(find.byType(ElKeyframePlayer), findsOneWidget);
+      expect(find.byType(KeyframePlayer), findsOneWidget);
       final Finder rule = find.descendant(
-        of: find.byType(ElKeyframePlayer),
+        of: find.byType(KeyframePlayer),
         matching: find.byType(ColoredBox),
       );
-      expect(t.getSize(rule), Size(ElWidths.hairline, el(4)));
-      expect(t.widget<ColoredBox>(rule).color, ElThemeData.dark.foreground);
+      expect(t.getSize(rule), Size(BorderWidths.hairline, space(4)));
+      expect(t.widget<ColoredBox>(rule).color, ThemeTokens.dark.foreground);
 
       double opacity() => t
           .widget<Opacity>(
             find
                 .descendant(
-                  of: find.byType(ElKeyframePlayer),
+                  of: find.byType(KeyframePlayer),
                   matching: find.byType(Opacity),
                 )
                 .first,
@@ -1397,7 +1395,7 @@ void main() {
           .widget<Opacity>(
             find
                 .descendant(
-                  of: find.byType(ElKeyframePlayer),
+                  of: find.byType(KeyframePlayer),
                   matching: find.byType(Opacity),
                 )
                 .first,
@@ -1436,7 +1434,7 @@ void main() {
       final TextStyle style = t
           .widget<Text>(
             find.descendant(
-              of: find.byType(ElInputOtpSlot),
+              of: find.byType(InputOtpSlot),
               matching: find.text('4'),
             ),
           )
@@ -1450,7 +1448,7 @@ void main() {
   // The field layer — forms-map §3.2, inputs-map §7.1
   // ───────────────────────────────────────────────────────────────────────────
 
-  group('ElField', () {
+  group('Field', () {
     testWidgets('the stack is 20 between fields and 8 inside one', (
       WidgetTester t,
     ) async {
@@ -1458,29 +1456,29 @@ void main() {
         host(
           SizedBox(
             width: 512,
-            child: ElFieldGroup(
+            child: FieldGroup(
               children: <Widget>[
-                const ElField(label: 'Username', child: ElInput()),
-                const ElField(label: 'Email', child: ElInput()),
+                const Field(label: 'Username', child: Input()),
+                const Field(label: 'Email', child: Input()),
               ],
             ),
           ),
         ),
       );
 
-      expect(ElFieldGroup.gap, el(5));
-      expect(ElFieldGroup.nestedGap, el(4));
-      expect(ElField.gap, el(2));
+      expect(FieldGroup.gap, space(5));
+      expect(FieldGroup.nestedGap, space(4));
+      expect(Field.gap, space(2));
 
-      final double first = t.getBottomLeft(find.byType(ElField).at(0)).dy;
-      final double second = t.getTopLeft(find.byType(ElField).at(1)).dy;
-      expect(second - first, el(5));
+      final double first = t.getBottomLeft(find.byType(Field).at(0)).dy;
+      final double second = t.getTopLeft(find.byType(Field).at(1)).dy;
+      expect(second - first, space(5));
 
       final double labelBottom = t
-          .getBottomLeft(find.byType(ElFieldLabel).first)
+          .getBottomLeft(find.byType(FieldLabel).first)
           .dy;
-      final double controlTop = t.getTopLeft(find.byType(ElInput).first).dy;
-      expect(controlTop - labelBottom, el(2));
+      final double controlTop = t.getTopLeft(find.byType(Input).first).dy;
+      expect(controlTop - labelBottom, space(2));
     });
 
     testWidgets('the description tucks 4px closer once an error appears', (
@@ -1493,25 +1491,25 @@ void main() {
           host(
             SizedBox(
               width: 512,
-              child: ElField(
+              child: Field(
                 label: 'Shipping note',
                 description: 'Grows as you type.',
                 errors: errors,
-                child: const ElInput(),
+                child: const Input(),
               ),
             ),
           ),
         );
-        return t.getTopLeft(find.byType(ElFieldDescription)).dy -
-            t.getBottomLeft(find.byType(ElInput)).dy;
+        return t.getTopLeft(find.byType(FieldDescription)).dy -
+            t.getBottomLeft(find.byType(Input)).dy;
       }
 
-      expect(await gapWith(const <String>[]), el(2));
+      expect(await gapWith(const <String>[]), space(2));
       expect(
         await gapWith(const <String>['Please provide 20 characters.']),
-        el(1),
+        space(1),
       );
-      expect(ElField.describedGap, el(1));
+      expect(Field.describedGap, space(1));
     });
 
     testWidgets('an error is a live region; a valid field builds none', (
@@ -1523,12 +1521,12 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElField(label: 'Email', child: ElInput()),
+            child: Field(label: 'Email', child: Input()),
           ),
         ),
       );
       expect(
-        find.byType(ElFieldError),
+        find.byType(FieldError),
         findsNothing,
         reason: 'FieldError returns null when valid — not an empty region',
       );
@@ -1537,15 +1535,15 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElField(
+            child: Field(
               label: 'Email',
               errors: <String>['That address is missing a domain.'],
-              child: ElInput(),
+              child: Input(),
             ),
           ),
         ),
       );
-      final SemanticsNode node = t.getSemantics(find.byType(ElFieldError));
+      final SemanticsNode node = t.getSemantics(find.byType(FieldError));
       expect(node.flagsCollection.isLiveRegion, isTrue);
       handle.dispose();
     });
@@ -1557,7 +1555,7 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElFieldError(<String>[
+            child: FieldError(<String>[
               'One capital letter.',
               'One number.',
               'One capital letter.',
@@ -1567,19 +1565,19 @@ void main() {
       );
 
       expect(find.text('•'), findsNWidgets(2), reason: 'deduped to two');
-      expect(ElFieldError.listIndent, el(4));
-      expect(ElFieldError.itemGap, el(1));
+      expect(FieldError.listIndent, space(4));
+      expect(FieldError.itemGap, space(1));
 
       final double textLeft = t.getTopLeft(find.text('One capital letter.')).dx;
-      final double errorLeft = t.getTopLeft(find.byType(ElFieldError)).dx;
-      expect(textLeft - errorLeft, el(4), reason: 'ml-4 on the list');
+      final double errorLeft = t.getTopLeft(find.byType(FieldError)).dx;
+      expect(textLeft - errorLeft, space(4), reason: 'ml-4 on the list');
 
       // EVERY item lands on the declared box, marker included — bare, each one
       // quantized on its own and a four-message password error drifted by
       // nearly two pixels. Two items at 18.5714 with one 4px gap between them.
       expect(
-        t.getSize(find.byType(ElFieldError)).height,
-        closeTo(18.5714 * 2 + el(1), 1e-3),
+        t.getSize(find.byType(FieldError)).height,
+        closeTo(18.5714 * 2 + space(1), 1e-3),
         reason: 'the list is exactly its items plus its gaps',
       );
     });
@@ -1589,7 +1587,7 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElFieldError(<String>['That address is missing a domain.']),
+            child: FieldError(<String>['That address is missing a domain.']),
           ),
         ),
       );
@@ -1608,17 +1606,17 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElField(
+            child: Field(
               label: 'Email',
               description: 'Receipts and nothing else.',
               errors: <String>['That is not an email address.'],
-              child: ElInput(),
+              child: Input(),
             ),
           ),
         ),
       );
 
-      final SemanticsNode node = t.getSemantics(find.byType(ElInput));
+      final SemanticsNode node = t.getSemantics(find.byType(Input));
       expect(
         node.label.trim(),
         'Email',
@@ -1636,7 +1634,7 @@ void main() {
     testWidgets('the field marks itself invalid, not only its control', (
       WidgetTester t,
     ) async {
-      // A control that does not read ElFieldScope — everything another owner
+      // A control that does not read FieldScope — everything another owner
       // builds, until it does — still lands inside a node announced as
       // invalid, because the field states it too.
       final SemanticsHandle handle = t.ensureSemantics();
@@ -1645,7 +1643,7 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElField(
+            child: Field(
               label: 'Plan',
               errors: <String>['Pick a plan.'],
               child: SizedBox(width: 44, height: 24, key: Key('opaque')),
@@ -1666,22 +1664,22 @@ void main() {
     ) async {
       // REGRESSION: the horizontal branch once put the bare `child` in its Row
       // where the vertical branch put the scope-wrapped control, so a
-      // horizontal field published no ElFieldScope at all. That is the branch
+      // horizontal field published no FieldScope at all. That is the branch
       // the switch and the checkbox live on — the two composed-form controls
       // focus-on-error has to reach — so the failure was invisible and landed
       // exactly where it hurt. Both orientations are asserted together so
       // neither can drift from the other again.
-      for (final ElFieldOrientation orientation in ElFieldOrientation.values) {
+      for (final FieldOrientation orientation in FieldOrientation.values) {
         final FocusNode node = FocusNode(debugLabel: orientation.name);
         addTearDown(node.dispose);
-        ElFieldScope? seen;
+        FieldScope? seen;
 
         await t.pumpWidget(
           host(
             SizedBox(
               width: 512,
-              child: ElField(
-                key: ValueKey<ElFieldOrientation>(orientation),
+              child: Field(
+                key: ValueKey<FieldOrientation>(orientation),
                 label: 'Price alerts',
                 description: 'Only for the packs you follow.',
                 errors: const <String>['You have to accept the terms.'],
@@ -1690,7 +1688,7 @@ void main() {
                 orientation: orientation,
                 child: Builder(
                   builder: (BuildContext c) {
-                    seen = ElFieldScope.maybeOf(c);
+                    seen = FieldScope.maybeOf(c);
                     return const SizedBox(width: 44, height: 24);
                   },
                 ),
@@ -1704,7 +1702,7 @@ void main() {
           seen,
           isNotNull,
           reason:
-              '$why publishes no ElFieldScope — nothing under it can '
+              '$why publishes no FieldScope — nothing under it can '
               'adopt a label, a describedby, a disabled state or a node',
         );
         expect(seen!.label, 'Price alerts', reason: why);
@@ -1732,12 +1730,12 @@ void main() {
         host(
           SizedBox(
             width: 512,
-            child: ElField(
+            child: Field(
               label: 'Price alerts',
               enabled: false,
               focusNode: node,
-              orientation: ElFieldOrientation.horizontal,
-              child: const SizedBox(width: 200, child: ElInput()),
+              orientation: FieldOrientation.horizontal,
+              child: const SizedBox(width: 200, child: Input()),
             ),
           ),
         ),
@@ -1769,16 +1767,16 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElField(label: 'Email', child: ElInput()),
+            child: Field(label: 'Email', child: Input()),
           ),
         ),
       );
 
-      final SemanticsNode field = t.getSemantics(find.byType(ElInput));
+      final SemanticsNode field = t.getSemantics(find.byType(Input));
       // The label widget publishes nothing of its own, so asking for its
       // semantics walks up to the very node the control is on — one node for
       // the whole field, which is the contract.
-      expect(t.getSemantics(find.byType(ElFieldLabel)), same(field));
+      expect(t.getSemantics(find.byType(FieldLabel)), same(field));
       expect(
         field.label.trim(),
         'Email',
@@ -1798,10 +1796,10 @@ void main() {
         host(
           SizedBox(
             width: 512,
-            child: ElField(
+            child: Field(
               label: 'Username',
               focusNode: node,
-              child: const ElInput(),
+              child: const Input(),
             ),
           ),
         ),
@@ -1824,11 +1822,11 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElField(label: 'Email', child: ElInput()),
+            child: Field(label: 'Email', child: Input()),
           ),
         ),
       );
-      expect(t.getSize(find.byType(ElField)).width, 512);
+      expect(t.getSize(find.byType(Field)).width, 512);
       expect(t.getSize(find.text('Email')).width, lessThan(512));
     });
 
@@ -1841,34 +1839,34 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElField(
+            child: Field(
               label: 'Handle',
               description: 'Shown on live pulls.',
               errors: <String>['At least 3 characters.'],
-              child: ElInput(),
+              child: Input(),
             ),
           ),
         ),
       );
 
-      final ElThemeData dark = ElThemeData.dark;
+      final ThemeTokens dark = ThemeTokens.dark;
       expect(
         t
             .widget<Text>(
               find
                   .descendant(
-                    of: find.byType(ElFieldLabel),
+                    of: find.byType(FieldLabel),
                     matching: find.byType(Text),
                   )
                   .first,
             )
             .style!
             .color,
-        dark.destructiveInk,
+        dark.destructiveText,
       );
       expect(
         t.widget<EditableText>(find.byType(EditableText)).style.color,
-        dark.destructiveInk,
+        dark.destructiveText,
         reason: 'input { color: inherit }',
       );
       expect(
@@ -1876,7 +1874,7 @@ void main() {
             .widget<Text>(
               find
                   .descendant(
-                    of: find.byType(ElFieldDescription),
+                    of: find.byType(FieldDescription),
                     matching: find.byType(Text),
                   )
                   .first,
@@ -1903,11 +1901,11 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElField(
+            child: Field(
               label: 'Handle',
               description: 'Shown on live pulls.',
               errors: <String>['At least 3 characters.'],
-              child: ElInput(),
+              child: Input(),
             ),
           ),
         ),
@@ -1932,9 +1930,9 @@ void main() {
         'error': 18.5714, // 13 × text-sm's 1.428571
       };
       final Map<String, Finder> parts = <String, Finder>{
-        'label': find.byType(ElFieldLabel),
-        'description': find.byType(ElFieldDescription),
-        'error': find.byType(ElFieldError),
+        'label': find.byType(FieldLabel),
+        'description': find.byType(FieldDescription),
+        'error': find.byType(FieldError),
       };
 
       for (final MapEntry<String, Finder> part in parts.entries) {
@@ -1960,7 +1958,7 @@ void main() {
         host(
           const SizedBox(
             width: 512,
-            child: ElField(label: 'Email', enabled: false, child: ElInput()),
+            child: Field(label: 'Email', enabled: false, child: Input()),
           ),
         ),
       );
@@ -1982,17 +1980,17 @@ void main() {
         host(
           SizedBox(
             width: 512,
-            child: ElField(
+            child: Field(
               label: 'Price alerts',
-              orientation: ElFieldOrientation.horizontal,
+              orientation: FieldOrientation.horizontal,
               child: const SizedBox(width: 44, height: 24, key: Key('switch')),
             ),
           ),
         ),
       );
 
-      final Rect field = t.getRect(find.byType(ElField));
-      final Rect label = t.getRect(find.byType(ElFieldLabel));
+      final Rect field = t.getRect(find.byType(Field));
+      final Rect label = t.getRect(find.byType(FieldLabel));
       final Rect control = t.getRect(find.byKey(const Key('switch')));
 
       expect(
@@ -2002,7 +2000,7 @@ void main() {
       );
       expect(control.left, field.left, reason: 'and sits at the row\'s edge');
       expect(control.width, 44, reason: 'the control keeps its own size');
-      expect(label.left - control.right, ElField.gap);
+      expect(label.left - control.right, Field.gap);
       // `flex-auto`: the label takes every remaining pixel, which is what makes
       // the rest of the row a target.
       expect(label.right, field.right);
@@ -2013,9 +2011,9 @@ void main() {
     ) async {
       // `<label for=id>` forwards a click: tapping "I accept the terms" ticks
       // the checkbox. The control says what activation means by registering on
-      // the scope's ElFieldActivator; the label calls it.
+      // the scope's FieldActivator; the label calls it.
       //
-      // The control here is a checkbox-shaped stub rather than `ElCheckbox`,
+      // The control here is a checkbox-shaped stub rather than `Checkbox`,
       // because registration lives in each control's own build and those files
       // belong to another owner — this pins THIS side of the contract, which is
       // the half that has to exist before the other half can be written.
@@ -2032,13 +2030,13 @@ void main() {
           StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) => SizedBox(
               width: 512,
-              child: ElField(
+              child: Field(
                 label: 'I accept the terms',
                 focusNode: node,
-                orientation: ElFieldOrientation.horizontal,
+                orientation: FieldOrientation.horizontal,
                 child: Builder(
                   builder: (BuildContext inner) {
-                    ElFieldScope.maybeOf(inner)?.activator?.callback = () =>
+                    FieldScope.maybeOf(inner)?.activator?.callback = () =>
                         setState(() => checked = !checked);
                     return const SizedBox(width: 16, height: 16);
                   },
@@ -2070,10 +2068,10 @@ void main() {
         host(
           SizedBox(
             width: 512,
-            child: ElField(
+            child: Field(
               label: 'Username',
               focusNode: node,
-              child: const ElInput(),
+              child: const Input(),
             ),
           ),
         ),
@@ -2101,9 +2099,9 @@ void main() {
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => outer++,
-              child: ElFieldScope(
+              child: FieldScope(
                 label: 'Price alerts',
-                child: ElFieldLabel('Price alerts', focusNode: null),
+                child: FieldLabel('Price alerts', focusNode: null),
               ),
             ),
           ),
@@ -2127,10 +2125,10 @@ void main() {
         host(
           SizedBox(
             width: 512,
-            child: ElField(
+            child: Field(
               label: 'Plan',
               focusNode: node,
-              child: ElFieldLabel('Plan', onTap: () => taps++),
+              child: FieldLabel('Plan', onTap: () => taps++),
             ),
           ),
         ),
@@ -2143,7 +2141,7 @@ void main() {
     });
   });
 
-  group('ElFieldSet', () {
+  group('FieldSet', () {
     testWidgets('a leading legend clears by 6, not by 6 plus the set\'s gap', (
       WidgetTester t,
     ) async {
@@ -2151,18 +2149,18 @@ void main() {
       // out of the fieldset's anonymous flex content box, so the box's own
       // `gap` never applies to it and only its `mb-1.5` does. This pin once
       // asserted the set's gap here, which is the bug.
-      expect(ElFieldSet.gap, el(4));
-      expect(ElFieldSet.groupGap, el(3));
-      expect(ElFieldLegend.spaceBelow, el(1.5));
+      expect(FieldSet.gap, space(4));
+      expect(FieldSet.groupGap, space(3));
+      expect(FieldLegend.spaceBelow, space(1.5));
 
       await t.pumpWidget(
         host(
           SizedBox(
             width: 512,
-            child: ElFieldSet(
+            child: FieldSet(
               tightForGroup: true,
               children: const <Widget>[
-                ElFieldLegend('Payout rhythm'),
+                FieldLegend('Payout rhythm'),
                 SizedBox(height: 20, key: Key('radios')),
                 SizedBox(height: 20, key: Key('message')),
               ],
@@ -2173,15 +2171,15 @@ void main() {
 
       expect(
         t.getTopLeft(find.byKey(const Key('radios'))).dy -
-            t.getBottomLeft(find.byType(ElFieldLegend)).dy,
-        el(1.5),
+            t.getBottomLeft(find.byType(FieldLegend)).dy,
+        space(1.5),
         reason: 'only the legend\'s own mb-1.5',
       );
       // …and every other gap in the set is the normal one.
       expect(
         t.getTopLeft(find.byKey(const Key('message'))).dy -
             t.getBottomLeft(find.byKey(const Key('radios'))).dy,
-        el(3),
+        space(3),
         reason: 'the content box keeps its gap-3',
       );
 
@@ -2189,7 +2187,7 @@ void main() {
       // in the foundation, so it is the easiest of the four to leave un-boxed:
       // 13 × text-sm's 1.428571, rendered, not declared.
       expect(
-        t.getSize(find.byType(ElFieldLegend)).height,
+        t.getSize(find.byType(FieldLegend)).height,
         closeTo(18.5714, 1e-3),
       );
     });
@@ -2201,7 +2199,7 @@ void main() {
         host(
           SizedBox(
             width: 512,
-            child: ElFieldSet(
+            child: FieldSet(
               children: const <Widget>[
                 SizedBox(height: 20, key: Key('a')),
                 SizedBox(height: 20, key: Key('b')),
@@ -2213,7 +2211,7 @@ void main() {
       expect(
         t.getTopLeft(find.byKey(const Key('b'))).dy -
             t.getBottomLeft(find.byKey(const Key('a'))).dy,
-        el(4),
+        space(4),
       );
     });
   });
@@ -2225,7 +2223,7 @@ void main() {
      hand. What is pinned is the rule and its price — the rule works on a phone,
      and it costs a desktop frame exactly nothing.                          */
 
-  group('ElFieldVisibility — a focused field is never behind the keyboard', () {
+  group('FieldVisibility — a focused field is never behind the keyboard', () {
     /// The phone the order names.
     const Size phone = Size(375, 812);
 
@@ -2258,8 +2256,8 @@ void main() {
           ),
           child: Directionality(
             textDirection: TextDirection.ltr,
-            child: ElTheme(
-              controller: ElThemeController(mode: ElThemeMode.dark),
+            child: ThemeScope(
+              controller: ThemeController(mode: ColorMode.dark),
               child: SingleChildScrollView(
                 controller: controller,
                 child: Column(
@@ -2285,14 +2283,14 @@ void main() {
           t,
           controller: controller,
           viewInsetsBottom: keyboard,
-          field: ElInput(focusNode: node),
+          field: Input(focusNode: node),
         );
 
         // The bug, reproduced first: on screen by the viewport's reckoning, and
         // 228px of it behind the keyboard.
         expect(controller.offset, 0);
-        expect(t.getRect(find.byType(ElInput)).bottom, lead + ElInput.height);
-        expect(lead + ElInput.height, greaterThan(keyboardTop));
+        expect(t.getRect(find.byType(Input)).bottom, lead + Input.height);
+        expect(lead + Input.height, greaterThan(keyboardTop));
 
         node.requestFocus();
         await t.pump();
@@ -2300,15 +2298,15 @@ void main() {
 
         // Lifted to sit exactly one margin above the keyboard's top edge, and no
         // further: the reveal is the minimum scroll that clears it.
-        final Rect field = t.getRect(find.byType(ElInput));
+        final Rect field = t.getRect(find.byType(Input));
         expect(
           field.bottom,
-          closeTo(keyboardTop - ElFieldVisibility.margin, 0.01),
+          closeTo(keyboardTop - FieldVisibility.margin, 0.01),
         );
         expect(
           controller.offset,
           closeTo(
-            lead + ElInput.height - keyboardTop + ElFieldVisibility.margin,
+            lead + Input.height - keyboardTop + FieldVisibility.margin,
             0.01,
           ),
         );
@@ -2327,10 +2325,10 @@ void main() {
         t,
         controller: controller,
         viewInsetsBottom: 0,
-        field: ElInput(focusNode: node),
+        field: Input(focusNode: node),
       );
 
-      final Rect before = t.getRect(find.byType(ElInput));
+      final Rect before = t.getRect(find.byType(Input));
       node.requestFocus();
       await t.pump();
       await t.pumpAndSettle();
@@ -2338,7 +2336,7 @@ void main() {
       // The desktop guarantee, stated as an equality rather than a tolerance:
       // `viewInsets.bottom == 0` is the gate on every path in the mechanism.
       expect(controller.offset, 0);
-      expect(t.getRect(find.byType(ElInput)), before);
+      expect(t.getRect(find.byType(Input)), before);
     });
 
     testWidgets('a keyboard that opens AFTER the focus still lifts it', (
@@ -2353,7 +2351,7 @@ void main() {
         t,
         controller: controller,
         viewInsetsBottom: 0,
-        field: ElInput(focusNode: node),
+        field: Input(focusNode: node),
       );
 
       node.requestFocus();
@@ -2366,14 +2364,14 @@ void main() {
         t,
         controller: controller,
         viewInsetsBottom: keyboard,
-        field: ElInput(focusNode: node),
+        field: Input(focusNode: node),
       );
       await t.pumpAndSettle();
 
       expect(node.hasFocus, isTrue);
       expect(
-        t.getRect(find.byType(ElInput)).bottom,
-        closeTo(keyboardTop - ElFieldVisibility.margin, 0.01),
+        t.getRect(find.byType(Input)).bottom,
+        closeTo(keyboardTop - FieldVisibility.margin, 0.01),
       );
     });
 
@@ -2386,16 +2384,16 @@ void main() {
         t,
         controller: controller,
         viewInsetsBottom: keyboard,
-        field: ElInput(focusNode: node),
+        field: Input(focusNode: node),
       );
       // Parked where the field is already whole, already inside its margin and
       // already above the keyboard: the reveal's third branch runs and returns.
       controller.jumpTo(400);
       await t.pumpAndSettle();
       final double parked = controller.offset;
-      final Rect resting = t.getRect(find.byType(ElInput));
+      final Rect resting = t.getRect(find.byType(Input));
       expect(resting.bottom, lessThan(keyboardTop));
-      expect(resting.top, greaterThan(ElFieldVisibility.margin));
+      expect(resting.top, greaterThan(FieldVisibility.margin));
 
       node.requestFocus();
       await t.pump();
@@ -2417,21 +2415,17 @@ void main() {
             width: 320,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const ElInput(),
-                const ElTextarea(),
-                ElInputOtp(),
-              ],
+              children: <Widget>[const Input(), const Textarea(), InputOtp()],
             ),
           ),
         ),
       );
 
-      for (final Type field in <Type>[ElInput, ElTextarea, ElInputOtp]) {
+      for (final Type field in <Type>[Input, Textarea, InputOtp]) {
         expect(
           find.descendant(
             of: find.byType(field),
-            matching: find.byType(ElFieldVisibility),
+            matching: find.byType(FieldVisibility),
           ),
           findsOneWidget,
           reason: '$field must route through the shared focus-visibility hook',

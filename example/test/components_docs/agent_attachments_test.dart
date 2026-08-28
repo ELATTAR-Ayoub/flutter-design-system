@@ -2,9 +2,9 @@
 /// [AgentAttachmentsDocPage]: the agent-attachments component documentation
 /// page.
 ///
-/// `agent_attachments.dart` declares three widgets ([ElAgentAttachmentCard],
-/// [ElAgentAttachmentList], [ElAgentDeliveryBadge]) and two top-level
-/// functions ([elAgentAttachmentGlyph], [elAgentAttachmentIsVideo]) — read
+/// `agent_attachments.dart` declares three widgets ([AgentAttachmentCard],
+/// [AgentAttachmentList], [AgentDeliveryBadge]) and two top-level
+/// functions ([agentAttachmentGlyph], [agentAttachmentIsVideo]) — read
 /// directly from `lib/src/components/agent_attachments.dart`. The
 /// API-completeness test checks each `DocsApiTable` by its own title.
 ///
@@ -19,7 +19,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const List<String> _expectedSectionOrder = <String>[
@@ -40,14 +66,14 @@ const List<String> _expectedSectionOrder = <String>[
 ];
 
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElAgentAttachmentCard': <String>[
+  'AgentAttachmentCard': <String>[
     'attachment',
     'onRemove',
     'onDownload',
     'imageBuilder',
     'descriptionGap',
   ],
-  'ElAgentAttachmentList': <String>[
+  'AgentAttachmentList': <String>[
     'attachments',
     'onRemove',
     'compact',
@@ -55,10 +81,10 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'onDownload',
     'gap',
   ],
-  'ElAgentDeliveryBadge': <String>['attachment', 'gap', 'tooltipMaxWidth'],
+  'AgentDeliveryBadge': <String>['attachment', 'gap', 'tooltipMaxWidth'],
   'Top-level functions': <String>[
-    'elAgentAttachmentGlyph(kind)',
-    'elAgentAttachmentIsVideo(attachment)',
+    'agentAttachmentGlyph(kind)',
+    'agentAttachmentIsVideo(attachment)',
   ],
 };
 
@@ -72,21 +98,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -110,9 +136,7 @@ void main() {
         await _pump(tester, size: _wide);
 
         expect(
-          find.byKey(
-            const ValueKey<String>('agent-attachments-doc-article'),
-          ),
+          find.byKey(const ValueKey<String>('agent-attachments-doc-article')),
           findsOneWidget,
         );
         expect(find.text(agentAttachmentsDoc.title), findsWidgets);
@@ -138,19 +162,18 @@ void main() {
       },
     );
 
-    testWidgets(
-      'renders the house-shape section order, section for section',
-      (WidgetTester tester) async {
-        await _pump(tester);
+    testWidgets('renders the house-shape section order, section for section', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester);
 
-        final List<String> ids = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.id)
-            .toList();
+      final List<String> ids = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
+          .toList();
 
-        expect(ids, _expectedSectionOrder);
-      },
-    );
+      expect(ids, _expectedSectionOrder);
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -171,7 +194,7 @@ void main() {
         await tester.ensureVisible(apiTrigger);
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         final List<DocsApiTable> tables = tester
             .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -224,10 +247,7 @@ void main() {
           findsOneWidget,
         );
         expect(
-          find.descendant(
-            of: list,
-            matching: find.byType(ElAgentAttachmentCard),
-          ),
+          find.descendant(of: list, matching: find.byType(AgentAttachmentCard)),
           findsNWidgets(3),
         );
       },
@@ -240,9 +260,7 @@ void main() {
         await _pump(tester);
 
         final Finder content = find.byKey(
-          const ValueKey<String>(
-            'agent-attachments-example:delivery-content',
-          ),
+          const ValueKey<String>('agent-attachments-example:delivery-content'),
         );
         final Finder reference = find.byKey(
           const ValueKey<String>(
@@ -250,9 +268,7 @@ void main() {
           ),
         );
         final Finder produced = find.byKey(
-          const ValueKey<String>(
-            'agent-attachments-example:delivery-produced',
-          ),
+          const ValueKey<String>('agent-attachments-example:delivery-produced'),
         );
         await tester.ensureVisible(content);
 
@@ -292,7 +308,7 @@ void main() {
           of: specimen,
           matching: find.byWidgetPredicate(
             (Widget w) =>
-                w is ElAttachmentTrigger &&
+                w is AttachmentTrigger &&
                 w.label == 'Open shelf-photo.png full size',
           ),
         );
@@ -301,23 +317,23 @@ void main() {
         // own hit area is the picture well's computed height, which depends
         // on constraint propagation through attachment.dart's FittedBox —
         // not this page's concern. Calling the real onPressed callback the
-        // mounted widget carries exercises the same open path ElModalPortal
+        // mounted widget carries exercises the same open path OverlayPortal
         // wires, without depending on that geometry.
-        tester.widget<ElAttachmentTrigger>(opener).onPressed();
+        tester.widget<AttachmentTrigger>(opener).onPressed();
         await tester.pump();
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         // The close control's visible child is a bare icon; "Close" is its
         // accessible label, never rendered as a Text widget, so this looks
-        // for the ElButton by that label instead of by find.text.
+        // for the Button by that label instead of by find.text.
         final Finder closeButton = find.byWidgetPredicate(
-          (Widget w) => w is ElButton && w.label == 'Close',
+          (Widget w) => w is Button && w.label == 'Close',
         );
         expect(closeButton, findsOneWidget);
-        tester.widget<ElButton>(closeButton).onPressed!();
+        tester.widget<Button>(closeButton).onPressed!();
         await tester.pump();
-        await tester.pump(ElDurations.base);
+        await tester.pump(MotionDurations.normal);
         expect(tester.takeException(), isNull);
       },
     );
@@ -333,10 +349,7 @@ void main() {
         );
         await tester.ensureVisible(list);
         expect(
-          find.descendant(
-            of: list,
-            matching: find.byType(ElAgentAttachmentCard),
-          ),
+          find.descendant(of: list, matching: find.byType(AgentAttachmentCard)),
           findsNWidgets(2),
         );
 
@@ -344,7 +357,7 @@ void main() {
           const ValueKey<String>('agent-attachments-example:remove-status'),
         );
         expect(
-          tester.widget<ElText>(statusText).text,
+          tester.widget<StyledText>(statusText).text,
           isNot('All attachments removed.'),
         );
 
@@ -352,7 +365,8 @@ void main() {
           final Finder removeButtons = find.descendant(
             of: list,
             matching: find.byWidgetPredicate(
-              (Widget w) => w is ElButton && (w.label ?? '').startsWith('Remove '),
+              (Widget w) =>
+                  w is Button && (w.label ?? '').startsWith('Remove '),
             ),
           );
           expect(removeButtons, findsWidgets);
@@ -361,14 +375,11 @@ void main() {
         }
 
         expect(
-          find.descendant(
-            of: list,
-            matching: find.byType(ElAgentAttachmentCard),
-          ),
+          find.descendant(of: list, matching: find.byType(AgentAttachmentCard)),
           findsNothing,
         );
         expect(
-          tester.widget<ElText>(statusText).text,
+          tester.widget<StyledText>(statusText).text,
           'All attachments removed.',
         );
         expect(tester.takeException(), isNull);
@@ -379,13 +390,13 @@ void main() {
       'both themes render the article with no exceptions when flipped in '
       'place',
       (WidgetTester tester) async {
-        final ElThemeController theme = await _pump(
+        final ThemeController theme = await _pump(
           tester,
-          mode: ElThemeMode.light,
+          mode: ColorMode.light,
         );
         expect(find.text(agentAttachmentsDoc.title), findsWidgets);
 
-        theme.setMode(ElThemeMode.dark);
+        theme.setMode(ColorMode.dark);
         await tester.pump();
         expect(find.text(agentAttachmentsDoc.title), findsWidgets);
         expect(tester.takeException(), isNull);
@@ -420,11 +431,11 @@ void main() {
       expect(
         agentAttachmentsDoc.exports,
         containsAll(<String>[
-          'ElAgentAttachmentCard',
-          'ElAgentAttachmentList',
-          'ElAgentDeliveryBadge',
-          'elAgentAttachmentGlyph',
-          'elAgentAttachmentIsVideo',
+          'AgentAttachmentCard',
+          'AgentAttachmentList',
+          'AgentDeliveryBadge',
+          'agentAttachmentGlyph',
+          'agentAttachmentIsVideo',
         ]),
       );
     });

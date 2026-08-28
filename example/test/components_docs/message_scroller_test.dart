@@ -9,7 +9,7 @@
 /// throwing.
 ///
 /// No test here calls `pumpAndSettle`, and none taps the Anchor specimen's
-/// jump control: `ElMessageScrollerController.scrollToMessage` runs a real
+/// jump control: `MessageScrollerController.scrollToMessage` runs a real
 /// `ScrollPosition.animateTo`, which is exactly the kind of controller this
 /// suite is told never to settle on.
 library;
@@ -22,16 +22,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -43,22 +67,22 @@ Finder _disclosureTrigger(String title) => find.descendant(
 /// Every named constructor parameter each of the seven exported classes of
 /// `message_scroller.dart` declares (excluding `key`) — the same set the
 /// page's nine `DocsApiTable`s claim to cover. `child` is shared by
-/// `ElMessageScrollerProvider`, `ElMessageScrollerViewport` and
-/// `ElMessageScrollerItem`, and appears once.
+/// `MessageScrollerProvider`, `MessageScrollerViewport` and
+/// `MessageScrollerItem`, and appears once.
 const List<String> _apiParams = <String>[
-  // ElMessageScrollerController
+  // MessageScrollerController
   'autoScroll', 'defaultScrollPosition', 'scrollEdgeThreshold',
-  // ElMessageScrollerProvider
+  // MessageScrollerProvider
   'controller', 'child',
-  // ElMessageScroller
+  // MessageScroller
   'viewport', 'button',
-  // ElMessageScrollerViewport
+  // MessageScrollerViewport
   'semanticsLabel',
-  // ElMessageScrollerContent
+  // MessageScrollerContent
   'children', 'padding',
-  // ElMessageScrollerItem
+  // MessageScrollerItem
   'messageId', 'scrollAnchor',
-  // ElMessageScrollerButton
+  // MessageScrollerButton
   'direction',
 ];
 
@@ -83,7 +107,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: MessageScrollerDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -101,24 +125,24 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _apiParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
 
-        for (final ElScrollPosition p in ElScrollPosition.values) {
+        for (final ScrollPosition p in ScrollPosition.values) {
           expect(
             find.text(p.name),
             findsWidgets,
-            reason: 'ElScrollPosition.${p.name} missing from API table',
+            reason: 'ScrollPosition.${p.name} missing from API table',
           );
         }
-        for (final ElScrollDirection d in ElScrollDirection.values) {
+        for (final ScrollDirection d in ScrollDirection.values) {
           expect(
             find.text(d.name),
             findsWidgets,
-            reason: 'ElScrollDirection.${d.name} missing from API table',
+            reason: 'ScrollDirection.${d.name} missing from API table',
           );
         }
 
@@ -132,7 +156,7 @@ void main() {
 
         // Every stage mounts a real, eleven-turn transcript, not a picture.
         expect(
-          find.byType(ElMessageScrollerItem),
+          find.byType(MessageScrollerItem),
           findsNWidgets(11 * 4),
           reason:
               'Preview, Scroll Position, Button and Anchor each stage the '
@@ -141,21 +165,21 @@ void main() {
 
         // The Button specimen's own button carries direction: end, its
         // declared default made real.
-        final ElMessageScrollerButton button = tester
-            .widgetList<ElMessageScrollerButton>(
+        final MessageScrollerButton button = tester
+            .widgetList<MessageScrollerButton>(
               find.descendant(
                 of: find.byKey(
                   const ValueKey<String>('message-scroller-example:button'),
                 ),
-                matching: find.byType(ElMessageScrollerButton),
+                matching: find.byType(MessageScrollerButton),
               ),
             )
             .single;
-        expect(button.direction, ElScrollDirection.end);
+        expect(button.direction, ScrollDirection.end);
 
         // The Anchor specimen's trigger is a real, enabled control — not
         // tapped here (see the library note above).
-        final ElButton trigger = tester.widget<ElButton>(
+        final Button trigger = tester.widget<Button>(
           find.byKey(
             const ValueKey<String>('message-scroller-example:anchor-trigger'),
           ),
@@ -166,16 +190,16 @@ void main() {
         expect(
           messageScrollerDoc.exports,
           containsAll(<String>[
-            'ElScrollPosition',
-            'ElScrollDirection',
-            'ElMessageScrollerController',
-            'ElMessageScrollerProvider',
-            'ElMessageScroller',
-            'ElMessageScrollerViewport',
-            'ElScrollFade',
-            'ElMessageScrollerContent',
-            'ElMessageScrollerItem',
-            'ElMessageScrollerButton',
+            'ScrollPosition',
+            'ScrollDirection',
+            'MessageScrollerController',
+            'MessageScrollerProvider',
+            'MessageScroller',
+            'MessageScrollerViewport',
+            'ScrollFade',
+            'MessageScrollerContent',
+            'MessageScrollerItem',
+            'MessageScrollerButton',
           ]),
         );
         expect(messageScrollerDoc.command, 'elattar add message-scroller');
@@ -188,27 +212,26 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const MessageScrollerDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const MessageScrollerDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Four specimen stages: Preview, Scroll Position, Button, Anchor.
-        expect(find.byType(DocsShowcase), findsNWidgets(4));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Four specimen stages: Preview, Scroll Position, Button, Anchor.
+      expect(find.byType(DocsShowcase), findsNWidgets(4));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -235,48 +258,41 @@ void main() {
       final DocsTocEntry api = messageScrollerDocSpec.toc.firstWhere(
         (DocsTocEntry e) => e.anchor == 'api',
       );
-      expect(
-        api.children.map((DocsTocEntry e) => e.anchor).toList(),
-        <String>[
-          'api-elmessagescrollercontroller',
-          'api-elmessagescrollerprovider',
-          'api-elmessagescroller',
-          'api-elmessagescrollerviewport',
-          'api-elmessagescrollercontent',
-          'api-elmessagescrolleritem',
-          'api-elmessagescrollerbutton',
-          'api-elscrollposition',
-          'api-elscrolldirection',
-        ],
-      );
+      expect(api.children.map((DocsTocEntry e) => e.anchor).toList(), <String>[
+        'api-elmessagescrollercontroller',
+        'api-elmessagescrollerprovider',
+        'api-elmessagescroller',
+        'api-elmessagescrollerviewport',
+        'api-elmessagescrollercontent',
+        'api-elmessagescrolleritem',
+        'api-elmessagescrollerbutton',
+        'api-elscrollposition',
+        'api-elscrolldirection',
+      ]);
     });
 
-    testWidgets(
-      'sections render in declaration order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const MessageScrollerDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const MessageScrollerDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(
-          titles,
-          messageScrollerDocSpec.toc.map((e) => e.title).toList(),
-        );
-      },
-    );
+      expect(titles, messageScrollerDocSpec.toc.map((e) => e.title).toList());
+    });
 
     testWidgets('renders at narrow width with the anchor strip', (
       WidgetTester tester,
@@ -287,7 +303,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const MessageScrollerDocPage(),
         ),
       );
@@ -311,16 +327,14 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       await tester.pumpWidget(
         _harness(controller: controller, child: const MessageScrollerDocPage()),
       );
       await tester.pump();
       expect(tester.takeException(), isNull);
 
-      controller.setMode(ElThemeMode.light);
+      controller.setMode(ColorMode.light);
       await tester.pump();
       expect(tester.takeException(), isNull);
 

@@ -7,22 +7,22 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/toaster.dart",
+      "source": "lib/src/components/ui/toaster.dart",
       "target": "@ui/toaster.dart",
-      "sha256": "82cd824cfd9d49f49e042725a447fb262afa656760742604a0f6da1e46794512"
+      "sha256": "6bbf3d6e6e8d4cc3a28c18fd26d1631e0fa99e3fce881d0394b387329ea89c32"
     }
   ],
   "registryDependencies": [
-    "bloom-cosmic",
+    "feedback-surface",
     "icon",
-    "machine-surface",
+    "surface",
     "safe-area",
     "source-foundation"
   ],
   "semanticDependencies": [
-    "bloom-cosmic",
+    "feedback-surface",
     "icon",
-    "machine-surface",
+    "surface",
     "safe-area"
   ],
   "pubDependencies": {},
@@ -31,6 +31,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/toaster",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/toaster.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/toaster.dart",
   "deprecated": false
 }

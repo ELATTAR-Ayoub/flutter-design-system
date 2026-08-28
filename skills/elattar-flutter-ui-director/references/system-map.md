@@ -46,7 +46,7 @@ file and the tree disagree, the tree wins.
 | Components barrel | `lib/components/ui/ui.dart` | Generated; the entry point for installed components. |
 | Components | `lib/components/ui/` | Installed `El*` component sources. Owned by the consumer, editable. |
 | Foundation barrel | `lib/design_system/foundation.dart` | Generated; the entry point for tokens and theme. |
-| Tokens | `lib/design_system/foundation/` | `el`, measures, breakpoints, radii, type, themes, shadows, colors, motion. |
+| Tokens | `lib/design_system/foundation/` | `space`, measures, breakpoints, radii, type, themes, shadows, colors, motion. |
 | Effects | `lib/design_system/effects/` | Installed effect sources. |
 | Motion | `lib/design_system/motion/` | Installed motion sources. |
 | Shots | `lib/shots/` | Installed application compositions. |
@@ -84,17 +84,17 @@ Use the public barrel first:
 
 ```powershell
 Get-Content lib/elattar_design_system.dart
-rg -n "class El|enum El|typedef El" lib/src/components lib/src/effects lib/src/motion
+rg -n "class El|enum El|typedef El" lib/src/components/ui lib/src/blocks
 rg -n "El<ComponentName>" example/lib test
 ```
 
 | Concern | Source of truth | Use |
 | --- | --- | --- |
 | Public API | `lib/elattar_design_system.dart` | Verify a type is exported before consuming it. |
-| Tokens | `lib/src/foundation/` | `el`, measures, breakpoints, radii, type, themes, shadows, colors, motion. |
-| Context | `lib/src/theme_scope.dart` | `ElTheme`, `ElText`, typography resolution. |
-| Components | `lib/src/components/` | Controls, navigation, feedback, data display, overlays, agent family. |
-| Effects/motion | `lib/src/effects/`, `lib/src/motion/` | System-owned visuals and mechanics. |
+| Tokens | `lib/src/design_system/foundation/` | `space`, measures, breakpoints, radii, type, themes, shadows, colors, motion. |
+| Context | `lib/src/design_system/foundation/theme_scope.dart` | `ThemeScope`, `StyledText`, typography resolution. |
+| Components | `lib/src/components/ui/` | Controls, navigation, feedback, data display, overlays, effects, and motion widgets. |
+| Blocks | `lib/src/blocks/` | Complete opt-in application compositions. |
 | Specimens | `example/lib/` | Composition, routing, responsive conventions. |
 | Contracts | `test/`, `example/test/`, `test/token_guard_test.dart` | API behavior and no-literal guard. |
 | Visual rig | `tool/verify/README.md` | Capture/comparison workflow. |
@@ -104,7 +104,7 @@ Import `package:elattar_design_system/elattar_design_system.dart` unless editing
 the package itself.
 
 Product pages, data adapters, and composed flows belong in the app or `example/`
-layer. Add `lib/src/components/` code only when it has a reusable contract,
+layer. Add `lib/src/components/ui/` code only when it has a reusable contract,
 public export, specimen, and focused tests.
 
 The legacy web project is design lineage only. This Flutter package's barrel,
@@ -117,9 +117,9 @@ Every other reference in this skill names the repository-mode path. Translate:
 | Repository mode | Consumer mode |
 | --- | --- |
 | `package:elattar_design_system/elattar_design_system.dart` | relative imports of `lib/components/ui/ui.dart` and `lib/design_system/foundation.dart` |
-| `lib/src/foundation/` | `lib/design_system/foundation/` |
-| `lib/src/components/` | `lib/components/ui/` |
-| `lib/src/effects/`, `lib/src/motion/` | `lib/design_system/effects/`, `lib/design_system/motion/` |
+| `lib/src/design_system/foundation/` | `lib/design_system/foundation/` |
+| `lib/src/components/ui/` | `lib/components/ui/` |
+| `lib/src/blocks/` | `lib/blocks/` |
 | `example/lib/` (specimens) | `lib/shots/` (installed compositions), then the consumer's own `lib/` |
 | `test/token_guard_test.dart` | no equivalent; apply the token rules by review |
 | `tool/verify/README.md` | no equivalent; see the consumer ladder in [verify.md](verify.md) |

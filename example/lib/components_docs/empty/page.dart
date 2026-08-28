@@ -1,6 +1,6 @@
 /// Public documentation page for the `empty` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the shape `button` established. Every specimen
@@ -24,16 +24,16 @@
 ///   `rounded-xl border-dashed` in its base class list (empty.tsx L10, no
 ///   width class), and its docs demo overrides that with a real `border`
 ///   utility passed through `className` to make it visible — a prop this
-///   Flutter `ElEmpty` does not expose at all. `ElEmpty.build` is
+///   Flutter `Empty` does not expose at all. `Empty.build` is
 ///   `Padding(child: Column(...))`: no `Container`, no `BoxDecoration`, no
 ///   border or background of any kind. A caller wanting either wraps
-///   `ElEmpty` in its own `DecoratedBox` — composition at the call site, not
+///   `Empty` in its own `DecoratedBox` — composition at the call site, not
 ///   a capability this component owns — so faking a section around a
 ///   decoration the widget itself never paints would misrepresent it.
-/// * Avatar / Avatar Group: `ElEmptyMedia`'s constructor takes `required
-///   this.glyph` — a `ElIconGlyph`, not an arbitrary `Widget` child. Unlike
-///   `ElItemMedia` (which accepts any widget, see the `item` page's own
-///   Avatar section), `ElEmptyMedia` cannot host a `ElAvatar`: there is no
+/// * Avatar / Avatar Group: `EmptyMedia`'s constructor takes `required
+///   this.glyph` — a `IconGlyph`, not an arbitrary `Widget` child. Unlike
+///   `ItemMedia` (which accepts any widget, see the `item` page's own
+///   Avatar section), `EmptyMedia` cannot host a `Avatar`: there is no
 ///   avatar variant to build a section around.
 ///
 /// **Composition** has nothing live of its own to stage on top of what
@@ -46,7 +46,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -63,13 +75,13 @@ final ComponentDocSpec emptyDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'ElEmpty is a structured empty state: an optional media tile, a '
-          'title, a description, and one clear way out (ElEmptyContent), '
+          'Empty is a structured empty state: an optional media tile, a '
+          'title, a description, and one clear way out (EmptyContent), '
           'centred in a column with 16px between its parts. Reach for it '
           'whenever a collection, search, or workspace has nothing to show '
           'and the user needs to know why and what to do next. Reach for a '
           'spinner or skeleton instead when the empty appearance is '
-          'temporary: ElEmpty never resolves itself, it has no loading '
+          'temporary: Empty never resolves itself, it has no loading '
           'concept.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
@@ -100,7 +112,7 @@ final ComponentDocSpec emptyDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElEmpty and its five parts are '
+              'Add the export line so Empty and its five parts are '
               'reachable the same way the CLI path already makes them.',
           code: "export 'empty.dart';",
         ),
@@ -116,7 +128,7 @@ final ComponentDocSpec emptyDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          'ElEmpty has no size or variant axis: its shape comes entirely '
+          'Empty has no size or variant axis: its shape comes entirely '
           'from which of the six parts a caller includes, not from a prop. '
           'Nothing live to stage beyond what Preview already shows, so '
           'here: the part tree, then a real composed shape from elsewhere '
@@ -127,8 +139,8 @@ final ComponentDocSpec emptyDocSpec = ComponentDocSpec(
       id: 'input-group',
       title: 'Input group',
       description:
-          'ElEmptyContent\'s "way out" does not have to be a button: any '
-          'widget is a valid child, including a ElInputGroup that lets the '
+          'EmptyContent\'s "way out" does not have to be a button: any '
+          'widget is a valid child, including a InputGroup that lets the '
           'reader search again in place.',
       specimen: _InputGroupSpecimen(),
       code: _inputGroupCode,
@@ -138,7 +150,7 @@ final ComponentDocSpec emptyDocSpec = ComponentDocSpec(
       id: 'rtl',
       title: 'RTL',
       description:
-          'ElEmpty paints no direction-specific layout of its own: it is a '
+          'Empty paints no direction-specific layout of its own: it is a '
           'centred column with a short-measure cap on both header and '
           'content, and it reads right-to-left under a plain '
           'Directionality.',
@@ -153,15 +165,15 @@ final ComponentDocSpec emptyDocSpec = ComponentDocSpec(
           'One prop table per exported class, plus a static-tokens table '
           'for each.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElEmpty', anchor: 'api-elempty'),
-        DocsTocEntry(title: 'ElEmptyHeader', anchor: 'api-elemptyheader'),
-        DocsTocEntry(title: 'ElEmptyMedia', anchor: 'api-elemptymedia'),
-        DocsTocEntry(title: 'ElEmptyTitle', anchor: 'api-elemptytitle'),
+        DocsTocEntry(title: 'Empty', anchor: 'api-elempty'),
+        DocsTocEntry(title: 'EmptyHeader', anchor: 'api-elemptyheader'),
+        DocsTocEntry(title: 'EmptyMedia', anchor: 'api-elemptymedia'),
+        DocsTocEntry(title: 'EmptyTitle', anchor: 'api-elemptytitle'),
         DocsTocEntry(
-          title: 'ElEmptyDescription',
+          title: 'EmptyDescription',
           anchor: 'api-elemptydescription',
         ),
-        DocsTocEntry(title: 'ElEmptyContent', anchor: 'api-elemptycontent'),
+        DocsTocEntry(title: 'EmptyContent', anchor: 'api-elemptycontent'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -169,7 +181,7 @@ final ComponentDocSpec emptyDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElEmpty and every part are static, presentational '
+          'Empty and every part are static, presentational '
           'StatelessWidgets: none owns onPressed/enabled, a '
           'GestureDetector, a FocusNode, or an async flag.',
       child: const DocsStateMatrix(facts: _stateFacts),
@@ -183,10 +195,10 @@ final ComponentDocSpec emptyDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       child: _OneSentence(
-        'ElEmpty adds no keyboard behaviour of its own: nothing in '
+        'Empty adds no keyboard behaviour of its own: nothing in '
         'empty.dart owns a Focus node or a key handler, so tab order on an '
         'empty state comes entirely from whatever interactive child '
-        'ElEmptyContent happens to hold (the ElButton in Preview above, '
+        'EmptyContent happens to hold (the Button in Preview above, '
         'say), the same way that child supplies its own focus and '
         'keyboard handling anywhere else it is used.',
       ),
@@ -257,9 +269,9 @@ class EmptyDocPage extends StatelessWidget {
       title: emptyDoc.title,
       description: emptyDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Empty'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Empty'),
     ],
     toc: emptyDocSpec.toc,
     previous: null,
@@ -283,11 +295,11 @@ class _OneSentence extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-    child: ElText(
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+    child: StyledText(
       text,
-      ElType.small,
-      color: ElTheme.of(context).mutedForeground,
+      TextStyles.small,
+      color: ThemeScope.of(context).mutedForeground,
     ),
   );
 }
@@ -302,47 +314,47 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-elempty',
         child: DocsApiTable(
-          title: 'ElEmpty',
+          title: 'Empty',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'children',
               type: 'List<Widget>',
               description:
-                  'Required. Typically a ElEmptyHeader and a '
-                  'ElEmptyContent, in order, joined by a 16px gap '
-                  '(ElEmpty.gap).',
+                  'Required. Typically a EmptyHeader and a '
+                  'EmptyContent, in order, joined by a 16px gap '
+                  '(Empty.gap).',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsApiTable(
-        title: 'ElEmpty static tokens',
+        title: 'Empty static tokens',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElEmpty.padding',
+            name: 'Empty.padding',
             type: 'static double',
             description: '24px outer padding.',
           ),
           DocsApiFact(
-            name: 'ElEmpty.gap',
+            name: 'Empty.gap',
             type: 'static double',
             description: '16px between children.',
           ),
           DocsApiFact(
-            name: 'ElEmpty.radius',
+            name: 'Empty.radius',
             type: 'static double',
             description:
-                '16px corner radius. Shapes nothing today: ElEmpty paints '
+                '16px corner radius. Shapes nothing today: Empty paints '
                 'no border or background to clip (see Theming).',
           ),
         ],
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elemptyheader',
         child: DocsApiTable(
-          title: 'ElEmptyHeader',
+          title: 'EmptyHeader',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'children',
@@ -354,74 +366,74 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsApiTable(
-        title: 'ElEmptyHeader static tokens',
+        title: 'EmptyHeader static tokens',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElEmptyHeader.gap',
+            name: 'EmptyHeader.gap',
             type: 'static double',
             description: '8px between children.',
           ),
           DocsApiFact(
-            name: 'ElEmptyHeader.maxWidth',
+            name: 'EmptyHeader.maxWidth',
             type: 'static double',
-            description: '384px (ElContainers.sm).',
+            description: '384px (Containers.sm).',
           ),
         ],
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elemptymedia',
         child: DocsApiTable(
-          title: 'ElEmptyMedia',
+          title: 'EmptyMedia',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'glyph',
-              type: 'ElIconGlyph',
+              type: 'IconGlyph',
               description:
                   'Required. The icon drawn inside the 32px tile. Not an '
-                  'arbitrary widget slot: ElEmptyMedia cannot host a '
-                  'ElAvatar (compare ElItemMedia on the item page, which '
+                  'arbitrary widget slot: EmptyMedia cannot host a '
+                  'Avatar (compare ItemMedia on the item page, which '
                   'takes any Widget).',
             ),
             DocsApiFact(
               name: 'tone',
-              type: 'ElIconTone',
-              description: 'Optional. Defaults to ElIconTone.normal.',
+              type: 'IconTone',
+              description: 'Optional. Defaults to IconTone.normal.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsApiTable(
-        title: 'ElEmptyMedia static tokens',
+        title: 'EmptyMedia static tokens',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElEmptyMedia.box',
+            name: 'EmptyMedia.box',
             type: 'static double',
             description: '32px tile.',
           ),
           DocsApiFact(
-            name: 'ElEmptyMedia.radius',
+            name: 'EmptyMedia.radius',
             type: 'static double',
             description: '12px corners.',
           ),
           DocsApiFact(
-            name: 'ElEmptyMedia.marginBottom',
+            name: 'EmptyMedia.marginBottom',
             type: 'static double',
             description: '8px gap to the title.',
           ),
           DocsApiFact(
-            name: 'ElEmptyMedia.glyphSize',
+            name: 'EmptyMedia.glyphSize',
             type: 'static double',
             description:
                 '16px: the glyph box actually drawn, forced regardless of '
-                'the ElIconSize rung passed elsewhere (a deliberate '
+                'the IconSize rung passed elsewhere (a deliberate '
                 'drift, see Theming).',
           ),
           DocsApiFact(
-            name: 'ElEmptyMedia.glyphStroke',
+            name: 'EmptyMedia.glyphStroke',
             type: 'static double',
             description:
                 'The stroke width computed for a 24px glyph (2), not the '
@@ -429,27 +441,26 @@ class _ApiReferenceContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elemptytitle',
         child: DocsApiTable(
-          title: 'ElEmptyTitle',
+          title: 'EmptyTitle',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'text',
               type: 'String (positional)',
-              description:
-                  'Required. The heading, 13px/500, −0.26px tracking.',
+              description: 'Required. The heading, 13px/500, −0.26px tracking.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsApiTable(
-        title: 'ElEmptyTitle static members',
+        title: 'EmptyTitle static members',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElEmptyTitle.styleOf(context, {color})',
+            name: 'EmptyTitle.styleOf(context, {color})',
             type: 'static TextStyle Function',
             description:
                 'Resolves the title\'s text style so a caller building '
@@ -457,11 +468,11 @@ class _ApiReferenceContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elemptydescription',
         child: DocsApiTable(
-          title: 'ElEmptyDescription',
+          title: 'EmptyDescription',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'text',
@@ -473,24 +484,24 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsApiTable(
-        title: 'ElEmptyDescription static members',
+        title: 'EmptyDescription static members',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElEmptyDescription.spec',
-            type: 'static ElTypeSpec',
+            name: 'EmptyDescription.spec',
+            type: 'static TextStyleToken',
             description:
-                'ElComponentType.textareaBody: the resolved rung the '
+                'TextStyles.textareaBody: the resolved rung the '
                 'description renders with.',
           ),
         ],
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elemptycontent',
         child: DocsApiTable(
-          title: 'ElEmptyContent',
+          title: 'EmptyContent',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'children',
@@ -502,19 +513,19 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsApiTable(
-        title: 'ElEmptyContent static tokens',
+        title: 'EmptyContent static tokens',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElEmptyContent.gap',
+            name: 'EmptyContent.gap',
             type: 'static double',
             description: '10px between children.',
           ),
           DocsApiFact(
-            name: 'ElEmptyContent.maxWidth',
+            name: 'EmptyContent.maxWidth',
             type: 'static double',
-            description: '384px (ElContainers.sm).',
+            description: '384px (Containers.sm).',
           ),
         ],
       ),
@@ -527,23 +538,23 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Semantic role: none of its own. ElEmpty, ElEmptyHeader, '
-            'ElEmptyMedia, and ElEmptyContent are plain Column/Padding/'
+      _bullets(ThemeScope.of(context), <String>[
+        'Semantic role: none of its own. Empty, EmptyHeader, '
+            'EmptyMedia, and EmptyContent are plain Column/Padding/'
             'ConstrainedBox widgets with no Semantics wrapper.',
-        'Not silent: ElEmptyTitle and ElEmptyDescription render through '
-            'Text (via ElLineBox/ElText), which carries Flutter\'s default '
+        'Not silent: EmptyTitle and EmptyDescription render through '
+            'Text (via LineBox/StyledText), which carries Flutter\'s default '
             'static-text semantics: the title and the description are '
             'individually reachable and readable by a screen reader.',
         'The gap: nothing announces the *arrival* of an empty state. '
             'There is no Semantics(liveRegion: true) anywhere in '
-            'empty.dart and no heading semantics on ElEmptyTitle. Wiring a '
+            'empty.dart and no heading semantics on EmptyTitle. Wiring a '
             'live announcement at the call site (e.g. Semantics(liveRegion: '
             'true) around the swap, or SemanticsService.announce) is on '
             'the caller today.',
-        'ElEmptyMedia\'s icon carries no separate accessible label '
+        'EmptyMedia\'s icon carries no separate accessible label '
             'parameter of its own: appropriate, since the adjacent '
-            'ElEmptyTitle already states the same information in text.',
+            'EmptyTitle already states the same information in text.',
         'Known platform differences: none observed: no platform branch in '
             'empty.dart.',
       ]);
@@ -554,16 +565,16 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No responsive branching: BuildContext width is never read for a '
             'layout decision; the same widget tree renders at 390px and '
             '1440px.',
-        'ElEmptyHeader and ElEmptyContent both cap at 384px '
-            '(ElContainers.sm) regardless of viewport. At 390px that cap '
+        'EmptyHeader and EmptyContent both cap at 384px '
+            '(Containers.sm) regardless of viewport. At 390px that cap '
             'rarely binds: the phone\'s own content width is already '
             'close to or narrower than it. At 1440px it keeps the title '
             'and description from stretching edge to edge inside a much '
-            'wider ElEmpty panel.',
+            'wider Empty panel.',
         'Platform parity: Android, iOS, Web, macOS, Windows, and Linux '
             'all render the same widget tree.',
       ]);
@@ -586,14 +597,15 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Imports',
-            value: 'foundation/spacing.dart, foundation/theme.dart, '
-                'foundation/typography.dart (ElComponentType, '
-                'ElTypeSpec), text_layout.dart (ElLineBox), '
-                'theme_scope.dart (ElText, ElTheme), icon.dart (ElIcon, '
-                'ElIconTone), icon_paths.dart (ElIconGlyph)',
+            value:
+                'foundation/spacing.dart, foundation/theme.dart, '
+                'foundation/typography.dart (ComponentTextStyles, '
+                'TextStyleToken), text_layout.dart (LineBox), '
+                'theme_scope.dart (StyledText, ThemeScope), icon.dart (Icon, '
+                'IconTone), icon_paths.dart (IconGlyph)',
             description:
-                'The one real component dependency: ElEmptyMedia renders '
-                'a ElIcon.',
+                'The one real component dependency: EmptyMedia renders '
+                'a Icon.',
           ),
           const DocsInstallFact(
             label: 'Assets, fonts, shaders',
@@ -618,7 +630,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       DocsLinkRow(
         links: <DocsLink>[
           const DocsLink(label: 'Icon', route: '/components/icon'),
@@ -628,16 +640,16 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText(
-          'Icon is a real dependency: ElEmptyMedia renders one. Input '
-          'Group is not: it is shown composed inside ElEmptyContent in '
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          'Icon is a real dependency: EmptyMedia renders one. Input '
+          'Group is not: it is shown composed inside EmptyContent in '
           'the Input group section above, a relationship at the call '
           'site rather than something empty.dart imports.',
-          ElType.small,
-          color: ElTheme.of(context).mutedForeground,
+          TextStyles.small,
+          color: ThemeScope.of(context).mutedForeground,
         ),
       ),
     ],
@@ -649,16 +661,16 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Media background is theme.muted, title is theme.foreground, '
             'description is theme.mutedForeground; the glyph\'s tone is '
-            'theme-resolved through ElIconTone. All re-resolve on a live '
+            'theme-resolved through IconTone. All re-resolve on a live '
             'theme flip.',
-        'The corner radius (ElRadii.xl, 16px) shapes nothing today: there '
-            'is no border to shape and no background fill on ElEmpty '
+        'The corner radius (Radii.xl, 16px) shapes nothing today: there '
+            'is no border to shape and no background fill on Empty '
             'itself to clip. It is kept because it is what a future '
             'border width would follow.',
-        'ElEmptyMedia\'s icon is a deliberate drift, not an oversight: it '
+        'EmptyMedia\'s icon is a deliberate drift, not an oversight: it '
             'draws at a forced 16px with the stroke width computed for '
             '24px (2, not the 2.4 a genuine 16px glyph gets elsewhere in '
             'this package), matching the reference\'s own '
@@ -668,15 +680,19 @@ class _ThemingContent extends StatelessWidget {
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -686,7 +702,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Rest',
     treatment:
         'Paints a centred column: a muted 32px tile behind the glyph if '
-        'ElEmptyMedia is present, the title in theme.foreground, the '
+        'EmptyMedia is present, the title in theme.foreground, the '
         'description in theme.mutedForeground.',
     userSignal: 'The resting paint is the only paint.',
   ),
@@ -694,7 +710,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: '"Empty" (as a matrix row)',
     treatment:
         'This row usually asks what a stateful component looks like with '
-        'no data. ElEmpty does not have that state: ElEmpty *is* the '
+        'no data. Empty does not have that state: Empty *is* the '
         'widget another component renders when its own data is empty.',
     userSignal:
         'Named explicitly so this row is not mistaken for an unfilled '
@@ -703,17 +719,17 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Loading / Error / Success',
     treatment:
-        'N/A: ElEmpty owns no async flag. A caller renders a different '
-        'ElEmpty (a different glyph/title/description) for an error '
+        'N/A: Empty owns no async flag. A caller renders a different '
+        'Empty (a different glyph/title/description) for an error '
         'versus an empty-by-design state.',
     userSignal: 'A different specimen, not a live state change.',
   ),
   DocsStateFact(
     state: 'Hover / Focus-visible / Pressed / Selected / Disabled',
     treatment:
-        'N/A: ElEmpty owns none of these. ElEmptyContent can *hold* an '
-        'interactive child (the ElButton in Preview above), whose own '
-        'states apply to it, not to ElEmpty.',
+        'N/A: Empty owns none of these. EmptyContent can *hold* an '
+        'interactive child (the Button in Preview above), whose own '
+        'states apply to it, not to Empty.',
     userSignal: 'Compose with an interactive component at the call site.',
   ),
   DocsStateFact(
@@ -733,22 +749,18 @@ class _PreviewSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const KeyedSubtree(
     key: ValueKey<String>('empty-preview'),
-    child: ElEmpty(
+    child: Empty(
       children: <Widget>[
-        ElEmptyHeader(
+        EmptyHeader(
           children: <Widget>[
-            ElEmptyMedia(glyph: ElIconGlyph.search, tone: ElIconTone.subtle),
-            ElEmptyTitle('No results found'),
-            ElEmptyDescription(
+            EmptyMedia(glyph: IconGlyph.search, tone: IconTone.subtle),
+            EmptyTitle('No results found'),
+            EmptyDescription(
               'Try a different search term or clear your filters.',
             ),
           ],
         ),
-        ElEmptyContent(
-          children: <Widget>[
-            _ClearFiltersButton(),
-          ],
-        ),
+        EmptyContent(children: <Widget>[_ClearFiltersButton()]),
       ],
     ),
   );
@@ -758,11 +770,11 @@ class _ClearFiltersButton extends StatelessWidget {
   const _ClearFiltersButton();
 
   @override
-  Widget build(BuildContext context) => ElButton(
-    variant: ElButtonVariant.secondary,
-    size: ElButtonSize.sm,
+  Widget build(BuildContext context) => Button(
+    variant: ButtonVariant.secondary,
+    size: ButtonSize.sm,
     onPressed: () {},
-    child: ElText('Clear filters', ElComponentType.buttonLabel),
+    child: StyledText('Clear filters', TextStyles.buttonLabel),
   );
 }
 
@@ -772,26 +784,26 @@ class _InputGroupSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('empty-example:input-group'),
-    child: ElEmpty(
+    child: Empty(
       children: <Widget>[
-        const ElEmptyHeader(
+        const EmptyHeader(
           children: <Widget>[
-            ElEmptyMedia(glyph: ElIconGlyph.search, tone: ElIconTone.subtle),
-            ElEmptyTitle('No results found'),
-            ElEmptyDescription('Try a broader search term.'),
+            EmptyMedia(glyph: IconGlyph.search, tone: IconTone.subtle),
+            EmptyTitle('No results found'),
+            EmptyDescription('Try a broader search term.'),
           ],
         ),
-        ElEmptyContent(
+        EmptyContent(
           children: <Widget>[
-            ElInputGroup(
-              startAddon: ElInputGroupAddon(
-                child: ElIcon(
-                  ElIconGlyph.search,
-                  size: ElIconSize.sm,
-                  tone: ElIconTone.inherit,
+            InputGroup(
+              startAddon: InputGroupAddon(
+                child: Icon(
+                  IconGlyph.search,
+                  size: IconSize.sm,
+                  tone: IconTone.inherit,
                 ),
               ),
-              child: const ElInputGroupInput(placeholder: 'Search again...'),
+              child: const InputGroupInput(placeholder: 'Search again...'),
             ),
           ],
         ),
@@ -808,16 +820,16 @@ class _RtlSpecimen extends StatelessWidget {
     textDirection: TextDirection.rtl,
     child: const KeyedSubtree(
       key: ValueKey<String>('rtl-example:empty'),
-      child: ElEmpty(
+      child: Empty(
         children: <Widget>[
-          ElEmptyHeader(
+          EmptyHeader(
             children: <Widget>[
-              ElEmptyMedia(glyph: ElIconGlyph.search),
-              ElEmptyTitle('لا توجد نتائج'),
-              ElEmptyDescription('جرب كلمة بحث مختلفة.'),
+              EmptyMedia(glyph: IconGlyph.search),
+              EmptyTitle('لا توجد نتائج'),
+              EmptyDescription('جرب كلمة بحث مختلفة.'),
             ],
           ),
-          ElEmptyContent(children: <Widget>[_ClearFiltersArButton()]),
+          EmptyContent(children: <Widget>[_ClearFiltersArButton()]),
         ],
       ),
     ),
@@ -828,33 +840,33 @@ class _ClearFiltersArButton extends StatelessWidget {
   const _ClearFiltersArButton();
 
   @override
-  Widget build(BuildContext context) => ElButton(
-    variant: ElButtonVariant.secondary,
-    size: ElButtonSize.sm,
+  Widget build(BuildContext context) => Button(
+    variant: ButtonVariant.secondary,
+    size: ButtonSize.sm,
     onPressed: () {},
-    child: ElText('مسح الفلاتر', ElComponentType.buttonLabel),
+    child: StyledText('مسح الفلاتر', TextStyles.buttonLabel),
   );
 }
 
 /* ── Code strings ───────────────────────────────────────────────────────── */
 
 const String _previewCode = '''
-ElEmpty(
+Empty(
   children: [
-    ElEmptyHeader(
+    EmptyHeader(
       children: [
-        ElEmptyMedia(glyph: ElIconGlyph.search, tone: ElIconTone.subtle),
-        ElEmptyTitle('No results found'),
-        ElEmptyDescription('Try a different search term or clear your filters.'),
+        EmptyMedia(glyph: IconGlyph.search, tone: IconTone.subtle),
+        EmptyTitle('No results found'),
+        EmptyDescription('Try a different search term or clear your filters.'),
       ],
     ),
-    ElEmptyContent(
+    EmptyContent(
       children: [
-        ElButton(
-          variant: ElButtonVariant.secondary,
-          size: ElButtonSize.sm,
+        Button(
+          variant: ButtonVariant.secondary,
+          size: ButtonSize.sm,
           onPressed: () {},
-          child: ElText('Clear filters', ElComponentType.buttonLabel),
+          child: StyledText('Clear filters', TextStyles.buttonLabel),
         ),
       ],
     ),
@@ -864,51 +876,52 @@ ElEmpty(
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElEmpty(
+Empty(
   children: [
-    ElEmptyHeader(
+    EmptyHeader(
       children: [
-        ElEmptyMedia(glyph: ElIconGlyph.search, tone: ElIconTone.subtle),
-        ElEmptyTitle('No results found'),
-        ElEmptyDescription('Try a different search term.'),
+        EmptyMedia(glyph: IconGlyph.search, tone: IconTone.subtle),
+        EmptyTitle('No results found'),
+        EmptyDescription('Try a different search term.'),
       ],
     ),
-    ElEmptyContent(
+    EmptyContent(
       children: [
-        ElButton(
-          variant: ElButtonVariant.secondary,
-          size: ElButtonSize.sm,
+        Button(
+          variant: ButtonVariant.secondary,
+          size: ButtonSize.sm,
           onPressed: () {},
-          child: ElText('Clear filters', ElComponentType.buttonLabel),
+          child: StyledText('Clear filters', TextStyles.buttonLabel),
         ),
       ],
     ),
   ],
 )''';
 
-const String _compositionTree = '''ElEmpty
-├─ ElEmptyHeader
-│  ├─ ElEmptyMedia        (optional)
-│  ├─ ElEmptyTitle
-│  └─ ElEmptyDescription
-└─ ElEmptyContent''';
+const String _compositionTree = '''Empty
+├─ EmptyHeader
+│  ├─ EmptyMedia        (optional)
+│  ├─ EmptyTitle
+│  └─ EmptyDescription
+└─ EmptyContent''';
 
-const String _compositionSiteCode = '''// example/lib/site/site_shell.dart — the site search's empty state
-ElEmpty(
+const String _compositionSiteCode =
+    '''// example/lib/site/site_shell.dart — the site search's empty state
+Empty(
   children: <Widget>[
-    const ElEmptyHeader(
+    const EmptyHeader(
       children: <Widget>[
-        ElEmptyMedia(glyph: ElIconGlyph.search),
-        ElEmptyTitle('Nothing matched that search'),
-        ElEmptyDescription(
+        EmptyMedia(glyph: IconGlyph.search),
+        EmptyTitle('Nothing matched that search'),
+        EmptyDescription(
           'Try a broader term, or jump straight into the documentation index.',
         ),
       ],
     ),
-    ElEmptyContent(
+    EmptyContent(
       children: <Widget>[
-        ElButton(
-          variant: ElButtonVariant.secondary,
+        Button(
+          variant: ButtonVariant.secondary,
           onPressed: () => onNavigate(docsRoute),
           child: const Text('Open documentation'),
         ),
@@ -917,22 +930,22 @@ ElEmpty(
   ],
 )''';
 
-const String _inputGroupCode = '''ElEmpty(
+const String _inputGroupCode = '''Empty(
   children: [
-    const ElEmptyHeader(
+    const EmptyHeader(
       children: [
-        ElEmptyMedia(glyph: ElIconGlyph.search, tone: ElIconTone.subtle),
-        ElEmptyTitle('No results found'),
-        ElEmptyDescription('Try a broader search term.'),
+        EmptyMedia(glyph: IconGlyph.search, tone: IconTone.subtle),
+        EmptyTitle('No results found'),
+        EmptyDescription('Try a broader search term.'),
       ],
     ),
-    ElEmptyContent(
+    EmptyContent(
       children: [
-        ElInputGroup(
-          startAddon: ElInputGroupAddon(
-            child: ElIcon(ElIconGlyph.search, size: ElIconSize.sm),
+        InputGroup(
+          startAddon: InputGroupAddon(
+            child: Icon(IconGlyph.search, size: IconSize.sm),
           ),
-          child: ElInputGroupInput(placeholder: 'Search again...'),
+          child: InputGroupInput(placeholder: 'Search again...'),
         ),
       ],
     ),
@@ -941,22 +954,22 @@ const String _inputGroupCode = '''ElEmpty(
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElEmpty(
+  child: Empty(
     children: [
-      ElEmptyHeader(
+      EmptyHeader(
         children: [
-          ElEmptyMedia(glyph: ElIconGlyph.search),
-          ElEmptyTitle('لا توجد نتائج'),
-          ElEmptyDescription('جرب كلمة بحث مختلفة.'),
+          EmptyMedia(glyph: IconGlyph.search),
+          EmptyTitle('لا توجد نتائج'),
+          EmptyDescription('جرب كلمة بحث مختلفة.'),
         ],
       ),
-      ElEmptyContent(
+      EmptyContent(
         children: [
-          ElButton(
-            variant: ElButtonVariant.secondary,
-            size: ElButtonSize.sm,
+          Button(
+            variant: ButtonVariant.secondary,
+            size: ButtonSize.sm,
             onPressed: () {},
-            child: ElText('مسح الفلاتر', ElComponentType.buttonLabel),
+            child: StyledText('مسح الفلاتر', TextStyles.buttonLabel),
           ),
         ],
       ),

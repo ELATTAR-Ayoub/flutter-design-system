@@ -78,14 +78,14 @@ class _Tool extends _Beat {
     required this.params,
     required this.ms,
     required this.result,
-    this.attachments = const <ElAgentAttachment>[],
+    this.attachments = const <AgentAttachment>[],
   });
 
   final String name;
   final Map<String, Object?> params;
   final int ms;
   final Map<String, Object?> result;
-  final List<ElAgentAttachment> attachments;
+  final List<AgentAttachment> attachments;
 }
 
 /// *"Ask to do something, and stop until a human answers."*
@@ -103,11 +103,11 @@ class _Fail extends _Beat {
 
 /// The CSV `export_activity` hands back, *"so the attachment renderer has
 /// something to draw in the direction that is easy to forget: agent to user."*
-final ElAgentAttachment _activityCsv = ElAgentAttachment(
+final AgentAttachment _activityCsv = AgentAttachment(
   id: 'mock-activity-csv',
   name: 'activity-30d.csv',
   mime: 'text/csv',
-  kind: ElAgentAttachmentKind.data,
+  kind: AgentAttachmentKind.data,
   size: 4821,
   text: <String>[
     'date,event,item,value',
@@ -116,7 +116,7 @@ final ElAgentAttachment _activityCsv = ElAgentAttachment(
     '2026-07-19,pull,Cobalt Run,72.00',
     '2026-08-02,sale,Eclipse Vault,240.00',
   ].join('\n'),
-  delivery: const ElAgentDelivery.produced(),
+  delivery: const AgentDelivery.produced(),
 );
 
 const List<_Beat> _defaultScript = <_Beat>[
@@ -180,7 +180,7 @@ List<_Beat> get _reportScript => <_Beat>[
     params: const <String, Object?>{'window': '30d', 'format': 'csv'},
     ms: 1200,
     result: const <String, Object?>{'rows': 148},
-    attachments: <ElAgentAttachment>[_activityCsv],
+    attachments: <AgentAttachment>[_activityCsv],
   ),
   const _Say(
     '148 rows, attached above. Net position over the window is '
@@ -232,10 +232,10 @@ class _Aborted implements Exception {
 /// The reference is a hook whose consumer re-renders because React re-runs it;
 /// the port's console listens, so this is the notifier. Every `setTurns` in the
 /// original is a mutation followed by [notifyListeners] here.
-class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
-  ElMockTransport({
+class MockTransport extends ChangeNotifier implements AgentTransport {
+  MockTransport({
     this.latency = const Duration(milliseconds: _thinkMs),
-    this.capabilities = const ElAgentCapabilities(),
+    this.capabilities = const AgentCapabilities(),
   });
 
   /// *"Delay before the first event. The console shows `awaitingFirstEvent`
@@ -244,10 +244,10 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   final Duration latency;
 
   @override
-  final ElAgentCapabilities capabilities;
+  final AgentCapabilities capabilities;
 
-  final List<ElAgentTurn> _turns = <ElAgentTurn>[];
-  final List<ElPendingApproval> _pending = <ElPendingApproval>[];
+  final List<AgentTurn> _turns = <AgentTurn>[];
+  final List<PendingApproval> _pending = <PendingApproval>[];
 
   _Abort? _abort;
   bool _isLoading = false;
@@ -256,11 +256,11 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   int _askCount = 0;
 
   @override
-  List<ElAgentTurn> get turns => List<ElAgentTurn>.unmodifiable(_turns);
+  List<AgentTurn> get turns => List<AgentTurn>.unmodifiable(_turns);
 
   @override
-  List<ElPendingApproval> get pendingApprovals =>
-      List<ElPendingApproval>.unmodifiable(_pending);
+  List<PendingApproval> get pendingApprovals =>
+      List<PendingApproval>.unmodifiable(_pending);
 
   @override
   bool get isLoading => _isLoading;
@@ -288,8 +288,8 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   /// tool calls ago, and `resolveState` cannot tell 'writing' from 'wrote'."*
   void _closeStreaming() {
     if (_turns.isEmpty) return;
-    final ElAgentTurn last = _turns.last;
-    if (last is! ElTextTurn || !last.streaming) return;
+    final AgentTurn last = _turns.last;
+    if (last is! TextTurn || !last.streaming) return;
     _turns[_turns.length - 1] = last.notStreaming();
   }
 
@@ -299,10 +299,10 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   /// arguments is still a retry."*
   int _priorFailures(String name) {
     int count = 0;
-    for (final ElAgentTurn turn in _turns) {
-      if (turn is ElToolTurn &&
+    for (final AgentTurn turn in _turns) {
+      if (turn is ToolTurn &&
           turn.name == name &&
-          turn.status == ElAgentTurnStatus.error) {
+          turn.status == AgentTurnStatus.error) {
         count += 1;
       }
     }
@@ -312,16 +312,16 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   /// `reduceEvent`'s `text` arm.
   void _emitText(String content) {
     if (content.isEmpty) return;
-    final ElAgentTurn? last = _turns.isEmpty ? null : _turns.last;
-    if (last is ElTextTurn) {
-      _turns[_turns.length - 1] = ElTextTurn(
+    final AgentTurn? last = _turns.isEmpty ? null : _turns.last;
+    if (last is TextTurn) {
+      _turns[_turns.length - 1] = TextTurn(
         id: last.id,
         text: last.text + content,
         attachments: last.attachments,
         streaming: true,
       );
     } else {
-      _turns.add(ElTextTurn(id: _nextId, text: content, streaming: true));
+      _turns.add(TextTurn(id: _nextId, text: content, streaming: true));
     }
     notifyListeners();
   }
@@ -330,11 +330,11 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   void _emitToolCall(String name, Map<String, Object?> params) {
     _closeStreaming();
     _turns.add(
-      ElToolTurn(
+      ToolTurn(
         id: _nextId,
         name: name,
         params: params,
-        status: ElAgentTurnStatus.running,
+        status: AgentTurnStatus.running,
         startedAt: DateTime.now().millisecondsSinceEpoch,
         attempt: _priorFailures(name) + 1,
       ),
@@ -349,20 +349,20 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
     required bool success,
     Object? result,
     String? error,
-    List<ElAgentAttachment> attachments = const <ElAgentAttachment>[],
+    List<AgentAttachment> attachments = const <AgentAttachment>[],
   }) {
     for (int i = _turns.length - 1; i >= 0; i -= 1) {
-      final ElAgentTurn turn = _turns[i];
-      if (turn is! ElToolTurn ||
+      final AgentTurn turn = _turns[i];
+      if (turn is! ToolTurn ||
           turn.name != name ||
-          turn.status != ElAgentTurnStatus.running) {
+          turn.status != AgentTurnStatus.running) {
         continue;
       }
-      _turns[i] = ElToolTurn(
+      _turns[i] = ToolTurn(
         id: turn.id,
         name: turn.name,
         params: turn.params,
-        status: success ? ElAgentTurnStatus.ok : ElAgentTurnStatus.error,
+        status: success ? AgentTurnStatus.ok : AgentTurnStatus.error,
         startedAt: turn.startedAt,
         result: result,
         error: error,
@@ -389,11 +389,11 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   ) {
     _closeStreaming();
     _turns.add(
-      ElActionTurn(
+      ActionTurn(
         id: correlationId,
         action: action,
         params: params,
-        status: ElAgentTurnStatus.running,
+        status: AgentTurnStatus.running,
         startedAt: DateTime.now().millisecondsSinceEpoch,
       ),
     );
@@ -404,17 +404,17 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   /// action."*
   void _settleAction(String action, {required bool success, String? error}) {
     for (int i = _turns.length - 1; i >= 0; i -= 1) {
-      final ElAgentTurn turn = _turns[i];
-      if (turn is! ElActionTurn ||
+      final AgentTurn turn = _turns[i];
+      if (turn is! ActionTurn ||
           turn.action != action ||
-          turn.status != ElAgentTurnStatus.running) {
+          turn.status != AgentTurnStatus.running) {
         continue;
       }
-      _turns[i] = ElActionTurn(
+      _turns[i] = ActionTurn(
         id: turn.id,
         action: turn.action,
         params: turn.params,
-        status: success ? ElAgentTurnStatus.ok : ElAgentTurnStatus.error,
+        status: success ? AgentTurnStatus.ok : AgentTurnStatus.error,
         startedAt: turn.startedAt,
         error: error,
         ms: DateTime.now().millisecondsSinceEpoch - turn.startedAt,
@@ -426,11 +426,11 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   }
 
   /// `markApproval`, *"flag an action turn as held at an approval gate."*
-  void _markApproval(String turnId, ElApprovalOutcome outcome) {
+  void _markApproval(String turnId, ApprovalOutcome outcome) {
     for (int i = _turns.length - 1; i >= 0; i -= 1) {
-      final ElAgentTurn turn = _turns[i];
-      if (turn is! ElActionTurn || turn.id != turnId) continue;
-      _turns[i] = ElActionTurn(
+      final AgentTurn turn = _turns[i];
+      if (turn is! ActionTurn || turn.id != turnId) continue;
+      _turns[i] = ActionTurn(
         id: turn.id,
         action: turn.action,
         params: turn.params,
@@ -448,7 +448,7 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   /// `reduceEvent`'s `error` arm.
   void _emitError(String message, {required bool fatal}) {
     _closeStreaming();
-    _turns.add(ElErrorTurn(id: _nextId, message: message, fatal: fatal));
+    _turns.add(ErrorTurn(id: _nextId, message: message, fatal: fatal));
     notifyListeners();
   }
 
@@ -479,16 +479,16 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
     final Completer<bool> completer = Completer<bool>();
     void settle(bool approved) {
       if (completer.isCompleted) return;
-      _pending.removeWhere((ElPendingApproval p) => p.turnId == turnId);
+      _pending.removeWhere((PendingApproval p) => p.turnId == turnId);
       _markApproval(
         turnId,
-        approved ? ElApprovalOutcome.approved : ElApprovalOutcome.rejected,
+        approved ? ApprovalOutcome.approved : ApprovalOutcome.rejected,
       );
       completer.complete(approved);
     }
 
     _pending.add(
-      ElPendingApproval(
+      PendingApproval(
         turnId: turnId,
         action: action,
         params: params,
@@ -503,7 +503,7 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
   @override
   Future<void> send(
     String text, [
-    ElAgentSendOptions options = const ElAgentSendOptions(),
+    AgentSendOptions options = const AgentSendOptions(),
   ]) async {
     _abort?.cancelled = true;
     final _Abort signal = _Abort();
@@ -512,7 +512,7 @@ class ElMockTransport extends ChangeNotifier implements ElAgentTransport {
     _error = null;
     _isLoading = true;
     _turns.add(
-      ElUserTurn(id: _nextId, text: text, attachments: options.attachments),
+      UserTurn(id: _nextId, text: text, attachments: options.attachments),
     );
     notifyListeners();
 

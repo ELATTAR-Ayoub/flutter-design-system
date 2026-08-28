@@ -146,7 +146,7 @@ const List<SiteRoute> siteRoutes = <SiteRoute>[
     section: SiteSection.docs,
     title: 'Theming',
     description:
-        'Semantic tokens, ElThemeController, light and dark resolution, and '
+        'Semantic tokens, ThemeController, light and dark resolution, and '
         'how a consumer overrides them.',
     keywords: <String>['theming', 'theme', 'tokens', 'dark mode', 'colors'],
   ),
@@ -164,7 +164,7 @@ const List<SiteRoute> siteRoutes = <SiteRoute>[
     section: SiteSection.docs,
     title: 'Typeset',
     description:
-        'The ElType scale, ElTypeSpec anatomy, the fluid clamps, and the '
+        'The TextStyles scale, TextStyleToken anatomy, the fluid clamps, and the '
         'three font families.',
     keywords: <String>[
       'typeset',
@@ -315,7 +315,7 @@ final List<SearchRoute> searchableRoutes = List<SearchRoute>.unmodifiable(
           ...component.exports,
         ]),
       ),
-    for (final ElGroup group in elGroups)
+    for (final Group group in elGroups)
       SearchRoute(
         path: group.href,
         title: group.title,
@@ -327,8 +327,8 @@ final List<SearchRoute> searchableRoutes = List<SearchRoute>.unmodifiable(
         ]),
         groupId: group.id,
       ),
-    for (final ElGroup group in elGroups)
-      for (final ElCategory category in group.categories)
+    for (final Group group in elGroups)
+      for (final Category category in group.categories)
         SearchRoute(
           path: categoryHref(group, category),
           title: category.title,

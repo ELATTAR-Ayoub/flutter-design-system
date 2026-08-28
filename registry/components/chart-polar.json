@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/chart_polar.dart",
+      "source": "lib/src/components/ui/chart_polar.dart",
       "target": "@ui/chart_polar.dart",
-      "sha256": "482707fc3065b5d78b421a316588bcfe2f517d31e5771fca00ca3dec322b4e98"
+      "sha256": "e000852ffd07d83c512739f1dea0cb5767c4ee18a09d30001a85cbd677a56609"
     }
   ],
   "registryDependencies": [
@@ -28,5 +28,18 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/chart-polar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/chart_polar.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/chart_polar.dart",
+  "exports": [
+    "ChartDotSpec",
+    "PieChart",
+    "PieSpec",
+    "PolarAngleAxis",
+    "PolarGrid",
+    "PolarGridType",
+    "PolarRadiusAxis",
+    "RadarChart",
+    "RadarSpec",
+    "RadialBarChart",
+    "RadialBarSpec"
+  ]
 }

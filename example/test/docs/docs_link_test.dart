@@ -11,14 +11,38 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_link.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/semantics.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _host(Widget child) {
-  final ElThemeController controller = ElThemeController(
-    mode: ElThemeMode.dark,
-  );
-  return ElTheme(
+  final ThemeController controller = ThemeController(mode: ColorMode.dark);
+  return ThemeScope(
     controller: controller,
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -29,9 +53,7 @@ Widget _host(Widget child) {
 
 void main() {
   testWidgets('a link wears a pointer cursor', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      _host(DocsLink(label: 'Button', onTap: () {})),
-    );
+    await tester.pumpWidget(_host(DocsLink(label: 'Button', onTap: () {})));
     await tester.pump();
 
     final Iterable<MouseRegion> regions = tester.widgetList<MouseRegion>(
@@ -49,17 +71,13 @@ void main() {
     );
   });
 
-  testWidgets('a link announces itself as a link', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('a link announces itself as a link', (WidgetTester tester) async {
     // Disposed inline, not via addTearDown: the framework's
     // `_endOfTestVerifications` runs BEFORE teardown callbacks and fails the
     // test on a live handle.
     final SemanticsHandle handle = tester.ensureSemantics();
 
-    await tester.pumpWidget(
-      _host(DocsLink(label: 'Button', onTap: () {})),
-    );
+    await tester.pumpWidget(_host(DocsLink(label: 'Button', onTap: () {})));
     await tester.pump();
 
     final SemanticsNode node = tester.getSemantics(
@@ -82,12 +100,10 @@ void main() {
   });
 
   testWidgets('a link changes ink on hover', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      _host(DocsLink(label: 'Button', onTap: () {})),
-    );
+    await tester.pumpWidget(_host(DocsLink(label: 'Button', onTap: () {})));
     await tester.pump();
 
-    Color? ink() => tester.widget<ElText>(find.byType(ElText)).color;
+    Color? ink() => tester.widget<StyledText>(find.byType(StyledText)).color;
 
     final Color? resting = ink();
     expect(resting, isNotNull);
@@ -101,7 +117,7 @@ void main() {
     // The cross-fade is a TweenAnimationBuilder, so it needs time, not just
     // a frame.
     await tester.pump();
-    await tester.pump(ElDurations.transitionDefault);
+    await tester.pump(MotionDurations.normal);
 
     expect(
       ink(),

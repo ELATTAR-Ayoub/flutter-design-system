@@ -11,7 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 ///   * motion tokens      L395–432
 ///
 /// 1 CSS `rem` = 16px. `tracking` is kept in CSS **em** and multiplied by the
-/// resolved font size only inside [ElTypeSpec.resolve].
+/// resolved font size only inside [TextStyleToken.resolve].
 
 /// A colour to resolve against; the value is irrelevant to these assertions.
 const Color _ink = Color(0xFF92C2FC);
@@ -19,7 +19,7 @@ const Color _ink = Color(0xFF92C2FC);
 /// Asserts one `.type-*` class field by field.
 void expectSpec(
   String css,
-  ElTypeSpec spec, {
+  TextStyleToken spec, {
   required String family,
   required double? size,
   required double? height,
@@ -28,7 +28,7 @@ void expectSpec(
   required double? tracking,
   required bool uppercase,
   required bool tabular,
-  required ElTypeColor defaultColor,
+  required TextColorRole defaultColor,
   FontStyle fontStyle = FontStyle.normal,
 }) {
   expect(spec.family, family, reason: '$css font-family');
@@ -50,551 +50,566 @@ void expectSpec(
 void main() {
   // ─── typography ──────────────────────────────────────────────────────────
 
-  group('ElFonts — the three faces (globals.css L169–172)', () {
+  group('Fonts — the three faces (globals.css L169–172)', () {
     test('families follow the tokens, not the Space Grotesk prose', () {
-      expect(ElFonts.sans, 'InterLocal');
-      expect(ElFonts.heading, 'InterLocal');
-      expect(ElFonts.mono, 'GeistMono');
-      expect(ElFonts.accent, 'Redaction35');
+      expect(Fonts.sans, 'InterLocal');
+      expect(Fonts.heading, 'InterLocal');
+      expect(Fonts.mono, 'GeistMono');
+      expect(Fonts.accent, 'Redaction35');
     });
 
     test('package name is the asset prefix flutter_tools registers', () {
-      expect(ElFonts.package, 'elattar_design_system');
+      expect(Fonts.package, 'elattar_design_system');
     });
   });
 
-  group('ElType — fluid sizes (clamp)', () {
+  group('TextStyles — fluid sizes (clamp)', () {
     test(
       'displaySize is clamp(2.75rem, 4.4vw, 4rem) = clamp(44, 4.4vw, 64)',
       () {
         expect(
-          ElType.displaySize(1000),
+          TextStyles.displaySize(1000),
           44,
         ); // 4.4vw of 1000 = 44 — the min edge
-        expect(ElType.displaySize(700), 44); // 30.8 → floored at 44
-        expect(ElType.displaySize(1280), closeTo(56.32, 1e-9));
-        expect(ElType.displaySize(1440), closeTo(63.36, 1e-9));
-        expect(ElType.displaySize(1600), 64); // 70.4 → clamped at the 64 max
-        expect(ElType.displaySize(2560), 64);
+        expect(TextStyles.displaySize(700), 44); // 30.8 → floored at 44
+        expect(TextStyles.displaySize(1280), closeTo(56.32, 1e-9));
+        expect(TextStyles.displaySize(1440), closeTo(63.36, 1e-9));
+        expect(
+          TextStyles.displaySize(1600),
+          64,
+        ); // 70.4 → clamped at the 64 max
+        expect(TextStyles.displaySize(2560), 64);
       },
     );
 
     test('h1Size is clamp(2rem, 2.8vw, 2.5rem) = clamp(32, 2.8vw, 40)', () {
-      expect(ElType.h1Size(1440), 40); // 40.32 → clamped at the 40 max
-      expect(ElType.h1Size(1000), 32); // 28 → floored at 32
-      expect(ElType.h1Size(1280), closeTo(35.84, 1e-9));
-      expect(ElType.h1Size(1200), closeTo(33.6, 1e-9));
+      expect(TextStyles.h1Size(1440), 40); // 40.32 → clamped at the 40 max
+      expect(TextStyles.h1Size(1000), 32); // 28 → floored at 32
+      expect(TextStyles.h1Size(1280), closeTo(35.84, 1e-9));
+      expect(TextStyles.h1Size(1200), closeTo(33.6, 1e-9));
     });
 
     test('accentSize is 1.055em — it rides the size it is set inside', () {
-      expect(ElType.accentSize(64), closeTo(67.52, 1e-9));
-      expect(ElType.accentSize(ElType.displaySize(1000)), closeTo(46.42, 1e-9));
+      expect(TextStyles.accentSize(64), closeTo(67.52, 1e-9));
+      expect(
+        TextStyles.accentSize(TextStyles.displaySize(1000)),
+        closeTo(46.42, 1e-9),
+      );
     });
   });
 
-  group('ElType — every .type-* class, value for value (globals.css §5)', () {
-    test(
-      '.type-display — heading face, clamp 44–64/1, 500, -0.03em (L1019)',
-      () {
+  group(
+    'TextStyles — every .type-* class, value for value (globals.css §5)',
+    () {
+      test(
+        '.type-display — heading face, clamp 44–64/1, 500, -0.03em (L1019)',
+        () {
+          expectSpec(
+            '.type-display',
+            TextStyles.display,
+            family: 'InterLocal',
+            size: null, // clamp() — resolved from the viewport
+            height: 1,
+            weight: FontWeight.w500,
+            wght: 500,
+            tracking: -0.03,
+            uppercase: false,
+            tabular: false,
+            defaultColor: TextColorRole.none,
+          );
+        },
+      );
+
+      test(
+        '.type-accent — Redaction 35, 1.055em italic, 400, -0.03em (L1046)',
+        () {
+          expectSpec(
+            '.type-accent',
+            TextStyles.accent,
+            family: 'Redaction35',
+            size: null, // 1.055em — relative to the inherited size
+            height: null, // no line-height declared: inherits
+            weight: FontWeight.w400,
+            wght: 400,
+            tracking: -0.03,
+            uppercase: false,
+            tabular: false,
+            defaultColor: TextColorRole.none,
+            fontStyle: FontStyle.italic,
+          );
+        },
+      );
+
+      test('.type-h1 — clamp 32–40/1.1, 700, -0.02em (L1070)', () {
         expectSpec(
-          '.type-display',
-          ElType.display,
+          '.type-h1',
+          TextStyles.h1,
           family: 'InterLocal',
-          size: null, // clamp() — resolved from the viewport
-          height: 1,
-          weight: FontWeight.w500,
-          wght: 500,
-          tracking: -0.03,
+          size: null, // clamp()
+          height: 1.1,
+          weight: FontWeight.w700,
+          wght: 700,
+          tracking: -0.02,
           uppercase: false,
           tabular: false,
-          defaultColor: ElTypeColor.none,
+          defaultColor: TextColorRole.none,
         );
-      },
-    );
+      });
 
-    test(
-      '.type-accent — Redaction 35, 1.055em italic, 400, -0.03em (L1046)',
-      () {
+      test('.type-h2 — 28/1.2, weight 650 via wght axis, -0.015em (L1077)', () {
         expectSpec(
-          '.type-accent',
-          ElType.accent,
-          family: 'Redaction35',
-          size: null, // 1.055em — relative to the inherited size
-          height: null, // no line-height declared: inherits
+          '.type-h2',
+          TextStyles.h2,
+          family: 'InterLocal',
+          size: 28, // 1.75rem
+          height: 1.2,
+          weight:
+              FontWeight.w600, // non-variable fallback; 650 has no FontWeight
+          wght: 650,
+          tracking: -0.015,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test('.type-h2 renders wght 650 through variations, not weight', () {
+        expect(TextStyles.h2.variations, hasLength(1));
+        expect(TextStyles.h2.variations.single.axis, 'wght');
+        expect(TextStyles.h2.variations.single.value, 650);
+        // resolve() adds the browser's `font-optical-sizing: auto`: opsz = the
+        // CSS px size, clamped to Inter's 14–32 axis range.
+        expect(TextStyles.h2.resolve(28, _ink).fontVariations, <FontVariation>[
+          FontVariation('wght', 650),
+          FontVariation('opsz', 28),
+        ]);
+      });
+
+      test('optical sizing mirrors the browser: sans only, clamped 14–32', () {
+        // 13px body-adjacent text → opsz 14 (clamped up from 13).
+        expect(
+          TextStyles.small.resolve(13, _ink).fontVariations,
+          contains(const FontVariation('opsz', 14)),
+        );
+        // 40px h1 → opsz 32 (clamped down from 40).
+        expect(
+          TextStyles.h1.resolve(40, _ink).fontVariations,
+          contains(const FontVariation('opsz', 32)),
+        );
+        // 17px lead → opsz tracks the size exactly inside the range.
+        expect(
+          TextStyles.lead.resolve(17, _ink).fontVariations,
+          contains(const FontVariation('opsz', 17)),
+        );
+        // Geist Mono has no opsz axis — mono classes must not carry one.
+        final List<FontVariation>? mono = TextStyles.numberSm
+            .resolve(12, _ink)
+            .fontVariations;
+        expect(mono!.where((FontVariation v) => v.axis == 'opsz'), isEmpty);
+      });
+
+      test('.type-h3 — 21/1.3, 600, -0.01em (L1084)', () {
+        expectSpec(
+          '.type-h3',
+          TextStyles.h3,
+          family: 'InterLocal',
+          size: 21, // 1.3125rem
+          height: 1.3,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: -0.01,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test('.type-h4 — 17/1.4, 600, no tracking (L1091)', () {
+        expectSpec(
+          '.type-h4',
+          TextStyles.h4,
+          family: 'InterLocal',
+          size: 17, // 1.0625rem
+          height: 1.4,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: null,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test('.type-lead — 17/1.65, 400, muted-foreground (L1099)', () {
+        expectSpec(
+          '.type-lead',
+          TextStyles.lead,
+          family: 'InterLocal',
+          size: 17, // 1.0625rem
+          height: 1.65,
           weight: FontWeight.w400,
           wght: 400,
-          tracking: -0.03,
+          tracking: null,
           uppercase: false,
           tabular: false,
-          defaultColor: ElTypeColor.none,
-          fontStyle: FontStyle.italic,
+          defaultColor: TextColorRole.muted,
         );
-      },
-    );
+      });
 
-    test('.type-h1 — clamp 32–40/1.1, 700, -0.02em (L1070)', () {
-      expectSpec(
-        '.type-h1',
-        ElType.h1,
-        family: 'InterLocal',
-        size: null, // clamp()
-        height: 1.1,
-        weight: FontWeight.w700,
-        wght: 700,
-        tracking: -0.02,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-h2 — 28/1.2, weight 650 via wght axis, -0.015em (L1077)', () {
-      expectSpec(
-        '.type-h2',
-        ElType.h2,
-        family: 'InterLocal',
-        size: 28, // 1.75rem
-        height: 1.2,
-        weight: FontWeight.w600, // non-variable fallback; 650 has no FontWeight
-        wght: 650,
-        tracking: -0.015,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-h2 renders wght 650 through variations, not weight', () {
-      expect(ElType.h2.variations, hasLength(1));
-      expect(ElType.h2.variations.single.axis, 'wght');
-      expect(ElType.h2.variations.single.value, 650);
-      // resolve() adds the browser's `font-optical-sizing: auto`: opsz = the
-      // CSS px size, clamped to Inter's 14–32 axis range.
-      expect(ElType.h2.resolve(28, _ink).fontVariations, <FontVariation>[
-        FontVariation('wght', 650),
-        FontVariation('opsz', 28),
-      ]);
-    });
-
-    test('optical sizing mirrors the browser: sans only, clamped 14–32', () {
-      // 13px body-adjacent text → opsz 14 (clamped up from 13).
-      expect(
-        ElType.small.resolve(13, _ink).fontVariations,
-        contains(const FontVariation('opsz', 14)),
-      );
-      // 40px h1 → opsz 32 (clamped down from 40).
-      expect(
-        ElType.h1.resolve(40, _ink).fontVariations,
-        contains(const FontVariation('opsz', 32)),
-      );
-      // 17px lead → opsz tracks the size exactly inside the range.
-      expect(
-        ElType.lead.resolve(17, _ink).fontVariations,
-        contains(const FontVariation('opsz', 17)),
-      );
-      // Geist Mono has no opsz axis — mono classes must not carry one.
-      final List<FontVariation>? mono = ElType.numSm
-          .resolve(12, _ink)
-          .fontVariations;
-      expect(mono!.where((FontVariation v) => v.axis == 'opsz'), isEmpty);
-    });
-
-    test('.type-h3 — 21/1.3, 600, -0.01em (L1084)', () {
-      expectSpec(
-        '.type-h3',
-        ElType.h3,
-        family: 'InterLocal',
-        size: 21, // 1.3125rem
-        height: 1.3,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: -0.01,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-h4 — 17/1.4, 600, no tracking (L1091)', () {
-      expectSpec(
-        '.type-h4',
-        ElType.h4,
-        family: 'InterLocal',
-        size: 17, // 1.0625rem
-        height: 1.4,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: null,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-lead — 17/1.65, 400, muted-foreground (L1099)', () {
-      expectSpec(
-        '.type-lead',
-        ElType.lead,
-        family: 'InterLocal',
-        size: 17, // 1.0625rem
-        height: 1.65,
-        weight: FontWeight.w400,
-        wght: 400,
-        tracking: null,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.muted,
-      );
-    });
-
-    test('.type-body — 15/1.6, 400 (L1105)', () {
-      expectSpec(
-        '.type-body',
-        ElType.body,
-        family: 'InterLocal',
-        size: 15, // --text-body
-        height: 1.6,
-        weight: FontWeight.w400,
-        wght: 400,
-        tracking: null,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-small — 13/1.5, 400, muted-foreground (L1120)', () {
-      expectSpec(
-        '.type-small',
-        ElType.small,
-        family: 'InterLocal',
-        size: 13, // --text-small
-        height: 1.5,
-        weight: FontWeight.w400,
-        wght: 400,
-        tracking: null,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.muted,
-      );
-    });
-
-    test('.type-nav — 13.5/1.2, 500 (L1128)', () {
-      expectSpec(
-        '.type-nav',
-        ElType.nav,
-        family: 'InterLocal',
-        size: 13.5, // --text-nav
-        height: 1.2,
-        weight: FontWeight.w500,
-        wght: 500,
-        tracking: null,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-nav-sm — 11.5/1.2, 500 (L1139)', () {
-      expectSpec(
-        '.type-nav-sm',
-        ElType.navSm,
-        family: 'InterLocal',
-        size: 11.5, // --text-chip
-        height: 1.2,
-        weight: FontWeight.w500,
-        wght: 500,
-        tracking: null,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-chip — 11.5/1.2, 500 (L1145)', () {
-      expectSpec(
-        '.type-chip',
-        ElType.chip,
-        family: 'InterLocal',
-        size: 11.5, // --text-chip
-        height: 1.2,
-        weight: FontWeight.w500,
-        wght: 500,
-        tracking: null,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-caption — 10.5/1.35, 500 (L1151)', () {
-      expectSpec(
-        '.type-caption',
-        ElType.caption,
-        family: 'InterLocal',
-        size: 10.5, // --text-micro
-        height: 1.35,
-        weight: FontWeight.w500,
-        wght: 500,
-        tracking: null,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-code — mono 12.5/1.4, NO font-weight declared (L1157)', () {
-      expectSpec(
-        '.type-code',
-        ElType.code,
-        family: 'GeistMono',
-        size: 12.5, // --text-code
-        height: 1.4,
-        weight: null, // inherits — globals.css declares none
-        wght: null,
-        tracking: null,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test(
-      '.type-label — 11/1, 600 uppercase 0.16em muted-foreground (L1164)',
-      () {
-        expect(ElType.label.uppercase, isTrue);
-        expect(ElType.label.size, 11);
-        expect(ElType.label.tracking, 0.16);
+      test('.type-body — 15/1.6, 400 (L1105)', () {
         expectSpec(
-          '.type-label',
-          ElType.label,
+          '.type-body',
+          TextStyles.body,
+          family: 'InterLocal',
+          size: 15, // --text-body
+          height: 1.6,
+          weight: FontWeight.w400,
+          wght: 400,
+          tracking: null,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test('.type-small — 13/1.5, 400, muted-foreground (L1120)', () {
+        expectSpec(
+          '.type-small',
+          TextStyles.small,
+          family: 'InterLocal',
+          size: 13, // --text-small
+          height: 1.5,
+          weight: FontWeight.w400,
+          wght: 400,
+          tracking: null,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.muted,
+        );
+      });
+
+      test('.type-nav — 13.5/1.2, 500 (L1128)', () {
+        expectSpec(
+          '.type-nav',
+          TextStyles.nav,
+          family: 'InterLocal',
+          size: 13.5, // --text-nav
+          height: 1.2,
+          weight: FontWeight.w500,
+          wght: 500,
+          tracking: null,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test('.type-nav-sm — 11.5/1.2, 500 (L1139)', () {
+        expectSpec(
+          '.type-nav-sm',
+          TextStyles.navSm,
+          family: 'InterLocal',
+          size: 11.5, // --text-chip
+          height: 1.2,
+          weight: FontWeight.w500,
+          wght: 500,
+          tracking: null,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test('.type-chip — 11.5/1.2, 500 (L1145)', () {
+        expectSpec(
+          '.type-chip',
+          TextStyles.chip,
+          family: 'InterLocal',
+          size: 11.5, // --text-chip
+          height: 1.2,
+          weight: FontWeight.w500,
+          wght: 500,
+          tracking: null,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test('.type-caption — 10.5/1.35, 500 (L1151)', () {
+        expectSpec(
+          '.type-caption',
+          TextStyles.caption,
+          family: 'InterLocal',
+          size: 10.5, // --text-micro
+          height: 1.35,
+          weight: FontWeight.w500,
+          wght: 500,
+          tracking: null,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test('.type-code — mono 12.5/1.4, NO font-weight declared (L1157)', () {
+        expectSpec(
+          '.type-code',
+          TextStyles.code,
+          family: 'GeistMono',
+          size: 12.5, // --text-code
+          height: 1.4,
+          weight: null, // inherits — globals.css declares none
+          wght: null,
+          tracking: null,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test(
+        '.type-label — 11/1, 600 uppercase 0.16em muted-foreground (L1164)',
+        () {
+          expect(TextStyles.eyebrow.uppercase, isTrue);
+          expect(TextStyles.eyebrow.size, 11);
+          expect(TextStyles.eyebrow.tracking, 0.16);
+          expectSpec(
+            '.type-label',
+            TextStyles.eyebrow,
+            family: 'InterLocal',
+            size: 11, // --text-label
+            height: 1,
+            weight: FontWeight.w600,
+            wght: 600,
+            tracking: 0.16, // --tracking-label
+            uppercase: true,
+            tabular: false,
+            defaultColor: TextColorRole.muted,
+          );
+        },
+      );
+
+      test('.type-section — 13/1.4, 600, muted-foreground (L1192)', () {
+        expectSpec(
+          '.type-section',
+          TextStyles.section,
+          family: 'InterLocal',
+          size: 13, // --text-small
+          height: 1.4,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: null,
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.muted,
+        );
+      });
+
+      test('.type-wordmark — 15/1, 700, -0.01em (L1201)', () {
+        expectSpec(
+          '.type-wordmark',
+          TextStyles.wordmark,
+          family: 'InterLocal',
+          size: 15, // --text-body
+          height: 1,
+          weight: FontWeight.w700,
+          wght: 700,
+          tracking: -0.01, // --tracking-num
+          uppercase: false,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test(
+        '.type-serial — mono 15/1.4 uppercase -0.01em, NO weight (L1211)',
+        () {
+          expectSpec(
+            '.type-serial',
+            TextStyles.identifier,
+            family: 'GeistMono',
+            size: 15, // --text-body
+            height: 1.4,
+            weight: null, // inherits — globals.css declares none
+            wght: null,
+            tracking: -0.01, // --tracking-num
+            uppercase: true,
+            tabular: false, // .type-serial is NOT part of the numeric rule
+            defaultColor: TextColorRole.none,
+          );
+        },
+      );
+
+      test('.type-micro — 10.5/1, 600 uppercase 0.18em muted (L1218)', () {
+        expectSpec(
+          '.type-micro',
+          TextStyles.eyebrowSmall,
+          family: 'InterLocal',
+          size: 10.5, // --text-micro
+          height: 1,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: 0.18, // --tracking-micro
+          uppercase: true,
+          tabular: false,
+          defaultColor: TextColorRole.muted,
+        );
+      });
+
+      test('.type-tag — 10/1, 600 uppercase 0.12em (L1238)', () {
+        expectSpec(
+          '.type-tag',
+          TextStyles.tag,
+          family: 'InterLocal',
+          size: 10, // --text-tag
+          height: 1,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: 0.12, // --tracking-tag
+          uppercase: true,
+          tabular: false,
+          defaultColor: TextColorRole.none,
+        );
+      });
+
+      test('.type-badge — 11/1, 600 uppercase 0.14em (L1246)', () {
+        expectSpec(
+          '.type-badge',
+          TextStyles.badge,
           family: 'InterLocal',
           size: 11, // --text-label
           height: 1,
           weight: FontWeight.w600,
           wght: 600,
-          tracking: 0.16, // --tracking-label
+          tracking: 0.14, // --tracking-badge
           uppercase: true,
           tabular: false,
-          defaultColor: ElTypeColor.muted,
+          defaultColor: TextColorRole.none,
         );
-      },
-    );
+      });
 
-    test('.type-section — 13/1.4, 600, muted-foreground (L1192)', () {
-      expectSpec(
-        '.type-section',
-        ElType.section,
-        family: 'InterLocal',
-        size: 13, // --text-small
-        height: 1.4,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: null,
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.muted,
-      );
-    });
+      test('.type-num-xs — mono 11/1.2, 600 tabular -0.01em (L1267)', () {
+        expectSpec(
+          '.type-num-xs',
+          TextStyles.numberXs,
+          family: 'GeistMono',
+          size: 11, // --text-label
+          height: 1.2,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: -0.01, // --tracking-num, from the shared rule L1256–1266
+          uppercase: false,
+          tabular: true,
+          defaultColor: TextColorRole.none,
+        );
+      });
 
-    test('.type-wordmark — 15/1, 700, -0.01em (L1201)', () {
-      expectSpec(
-        '.type-wordmark',
-        ElType.wordmark,
-        family: 'InterLocal',
-        size: 15, // --text-body
-        height: 1,
-        weight: FontWeight.w700,
-        wght: 700,
-        tracking: -0.01, // --tracking-num
-        uppercase: false,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
+      test('.type-num-sm — mono 12/1.2, 600 tabular -0.01em (L1271)', () {
+        expect(TextStyles.numberSm.family, Fonts.mono);
+        expect(TextStyles.numberSm.size, 12);
+        expect(TextStyles.numberSm.height, 1.2);
+        expect(TextStyles.numberSm.weight, FontWeight.w600);
+        expect(TextStyles.numberSm.tabular, isTrue);
+        expect(TextStyles.numberSm.tracking, -0.01);
+        expectSpec(
+          '.type-num-sm',
+          TextStyles.numberSm,
+          family: 'GeistMono',
+          size: 12, // --text-num-sm
+          height: 1.2,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: -0.01,
+          uppercase: false,
+          tabular: true,
+          defaultColor: TextColorRole.none,
+        );
+      });
 
-    test('.type-serial — mono 15/1.4 uppercase -0.01em, NO weight (L1211)', () {
-      expectSpec(
-        '.type-serial',
-        ElType.serial,
-        family: 'GeistMono',
-        size: 15, // --text-body
-        height: 1.4,
-        weight: null, // inherits — globals.css declares none
-        wght: null,
-        tracking: -0.01, // --tracking-num
-        uppercase: true,
-        tabular: false, // .type-serial is NOT part of the numeric rule
-        defaultColor: ElTypeColor.none,
-      );
-    });
+      test('.type-num — mono 15/1.2, 600 tabular -0.01em (L1275)', () {
+        expectSpec(
+          '.type-num',
+          TextStyles.numberBase,
+          family: 'GeistMono',
+          size: 15, // --text-body
+          height: 1.2,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: -0.01,
+          uppercase: false,
+          tabular: true,
+          defaultColor: TextColorRole.none,
+        );
+      });
 
-    test('.type-micro — 10.5/1, 600 uppercase 0.18em muted (L1218)', () {
-      expectSpec(
-        '.type-micro',
-        ElType.micro,
-        family: 'InterLocal',
-        size: 10.5, // --text-micro
-        height: 1,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: 0.18, // --tracking-micro
-        uppercase: true,
-        tabular: false,
-        defaultColor: ElTypeColor.muted,
-      );
-    });
+      test('.type-num-md — mono 20/1.15, 600 tabular -0.01em (L1279)', () {
+        expectSpec(
+          '.type-num-md',
+          TextStyles.numberMd,
+          family: 'GeistMono',
+          size: 20, // 1.25rem
+          height: 1.15,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: -0.01,
+          uppercase: false,
+          tabular: true,
+          defaultColor: TextColorRole.none,
+        );
+      });
 
-    test('.type-tag — 10/1, 600 uppercase 0.12em (L1238)', () {
-      expectSpec(
-        '.type-tag',
-        ElType.tag,
-        family: 'InterLocal',
-        size: 10, // --text-tag
-        height: 1,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: 0.12, // --tracking-tag
-        uppercase: true,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
+      test('.type-num-lg — mono 28/1.05, 600 tabular -0.01em (L1283)', () {
+        expectSpec(
+          '.type-num-lg',
+          TextStyles.numberLg,
+          family: 'GeistMono',
+          size: 28, // 1.75rem
+          height: 1.05,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: -0.01,
+          uppercase: false,
+          tabular: true,
+          defaultColor: TextColorRole.none,
+        );
+      });
 
-    test('.type-badge — 11/1, 600 uppercase 0.14em (L1246)', () {
-      expectSpec(
-        '.type-badge',
-        ElType.badge,
-        family: 'InterLocal',
-        size: 11, // --text-label
-        height: 1,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: 0.14, // --tracking-badge
-        uppercase: true,
-        tabular: false,
-        defaultColor: ElTypeColor.none,
-      );
-    });
+      test('.type-num-xl — mono 40/1, 600 tabular, tracking overridden to '
+          '-0.025em (L1287)', () {
+        expectSpec(
+          '.type-num-xl',
+          TextStyles.numberXl,
+          family: 'GeistMono',
+          size: 40, // 2.5rem
+          height: 1,
+          weight: FontWeight.w600,
+          wght: 600,
+          tracking: -0.025, // the one numeric that leaves --tracking-num
+          uppercase: false,
+          tabular: true,
+          defaultColor: TextColorRole.none,
+        );
+      });
+    },
+  );
 
-    test('.type-num-xs — mono 11/1.2, 600 tabular -0.01em (L1267)', () {
-      expectSpec(
-        '.type-num-xs',
-        ElType.numXs,
-        family: 'GeistMono',
-        size: 11, // --text-label
-        height: 1.2,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: -0.01, // --tracking-num, from the shared rule L1256–1266
-        uppercase: false,
-        tabular: true,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-num-sm — mono 12/1.2, 600 tabular -0.01em (L1271)', () {
-      expect(ElType.numSm.family, ElFonts.mono);
-      expect(ElType.numSm.size, 12);
-      expect(ElType.numSm.height, 1.2);
-      expect(ElType.numSm.weight, FontWeight.w600);
-      expect(ElType.numSm.tabular, isTrue);
-      expect(ElType.numSm.tracking, -0.01);
-      expectSpec(
-        '.type-num-sm',
-        ElType.numSm,
-        family: 'GeistMono',
-        size: 12, // --text-num-sm
-        height: 1.2,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: -0.01,
-        uppercase: false,
-        tabular: true,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-num — mono 15/1.2, 600 tabular -0.01em (L1275)', () {
-      expectSpec(
-        '.type-num',
-        ElType.numBase,
-        family: 'GeistMono',
-        size: 15, // --text-body
-        height: 1.2,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: -0.01,
-        uppercase: false,
-        tabular: true,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-num-md — mono 20/1.15, 600 tabular -0.01em (L1279)', () {
-      expectSpec(
-        '.type-num-md',
-        ElType.numMd,
-        family: 'GeistMono',
-        size: 20, // 1.25rem
-        height: 1.15,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: -0.01,
-        uppercase: false,
-        tabular: true,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-num-lg — mono 28/1.05, 600 tabular -0.01em (L1283)', () {
-      expectSpec(
-        '.type-num-lg',
-        ElType.numLg,
-        family: 'GeistMono',
-        size: 28, // 1.75rem
-        height: 1.05,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: -0.01,
-        uppercase: false,
-        tabular: true,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-
-    test('.type-num-xl — mono 40/1, 600 tabular, tracking overridden to '
-        '-0.025em (L1287)', () {
-      expectSpec(
-        '.type-num-xl',
-        ElType.numXl,
-        family: 'GeistMono',
-        size: 40, // 2.5rem
-        height: 1,
-        weight: FontWeight.w600,
-        wght: 600,
-        tracking: -0.025, // the one numeric that leaves --tracking-num
-        uppercase: false,
-        tabular: true,
-        defaultColor: ElTypeColor.none,
-      );
-    });
-  });
-
-  group('ElType — cross-class invariants', () {
+  group('TextStyles — cross-class invariants', () {
     test('exactly five classes set their own colour, all muted-foreground', () {
-      final List<ElTypeSpec> muted = <ElTypeSpec>[
-        ElType.lead,
-        ElType.small,
-        ElType.label,
-        ElType.micro,
-        ElType.section,
+      final List<TextStyleToken> muted = <TextStyleToken>[
+        TextStyles.lead,
+        TextStyles.small,
+        TextStyles.eyebrow,
+        TextStyles.eyebrowSmall,
+        TextStyles.section,
       ];
-      for (final ElTypeSpec spec in muted) {
-        expect(spec.defaultColor, ElTypeColor.muted);
+      for (final TextStyleToken spec in muted) {
+        expect(spec.defaultColor, TextColorRole.muted);
       }
       expect(
-        ElType.all.where((ElTypeSpec s) => s.defaultColor != ElTypeColor.none),
+        TextStyles.all.where(
+          (TextStyleToken s) => s.defaultColor != TextColorRole.none,
+        ),
         hasLength(5),
       );
     });
@@ -602,13 +617,16 @@ void main() {
     test(
       'exactly five classes uppercase: label, serial, micro, tag, badge',
       () {
-        expect(ElType.all.where((ElTypeSpec s) => s.uppercase), hasLength(5));
-        for (final ElTypeSpec spec in <ElTypeSpec>[
-          ElType.label,
-          ElType.serial,
-          ElType.micro,
-          ElType.tag,
-          ElType.badge,
+        expect(
+          TextStyles.all.where((TextStyleToken s) => s.uppercase),
+          hasLength(5),
+        );
+        for (final TextStyleToken spec in <TextStyleToken>[
+          TextStyles.eyebrow,
+          TextStyles.identifier,
+          TextStyles.eyebrowSmall,
+          TextStyles.tag,
+          TextStyles.badge,
         ]) {
           expect(spec.uppercase, isTrue);
         }
@@ -616,42 +634,44 @@ void main() {
     );
 
     test('exactly the six .type-num-* classes are tabular, all mono', () {
-      final Iterable<ElTypeSpec> tabular = ElType.all.where(
-        (ElTypeSpec s) => s.tabular,
+      final Iterable<TextStyleToken> tabular = TextStyles.all.where(
+        (TextStyleToken s) => s.tabular,
       );
       expect(tabular, hasLength(6));
-      for (final ElTypeSpec spec in tabular) {
-        expect(spec.family, ElFonts.mono);
+      for (final TextStyleToken spec in tabular) {
+        expect(spec.family, Fonts.mono);
         expect(spec.weight, FontWeight.w600);
       }
     });
 
     test('the mono face carries the numerics, code and serials only', () {
       expect(
-        ElType.all.where((ElTypeSpec s) => s.family == ElFonts.mono),
+        TextStyles.all.where((TextStyleToken s) => s.family == Fonts.mono),
         hasLength(8),
       ); // 6 numerics + code + serial
     });
 
     test('.type-accent is the only class off the two foundation faces', () {
       expect(
-        ElType.all.where((ElTypeSpec s) => s.family == ElFonts.accent),
-        <ElTypeSpec>[ElType.accent],
+        TextStyles.all.where((TextStyleToken s) => s.family == Fonts.accent),
+        <TextStyleToken>[TextStyles.accent],
       );
       expect(
-        ElType.all.where((ElTypeSpec s) => s.fontStyle == FontStyle.italic),
-        <ElTypeSpec>[ElType.accent],
+        TextStyles.all.where(
+          (TextStyleToken s) => s.fontStyle == FontStyle.italic,
+        ),
+        <TextStyleToken>[TextStyles.accent],
       );
     });
 
     test('all 27 classes are registered', () {
-      expect(ElType.all, hasLength(27));
+      expect(TextStyles.all, hasLength(27));
     });
   });
 
-  group('ElTypeSpec.resolve', () {
+  group('TextStyleToken.resolve', () {
     test('prefixes the family with the package so call sites never do', () {
-      final TextStyle style = ElType.numSm.resolve(12, _ink);
+      final TextStyle style = TextStyles.numberSm.resolve(12, _ink);
       expect(style.fontFamily, 'packages/elattar_design_system/GeistMono');
     });
 
@@ -659,103 +679,103 @@ void main() {
       'converts em tracking to px letterSpacing against the resolved size',
       () {
         expect(
-          ElType.numSm.resolve(12, _ink).letterSpacing,
+          TextStyles.numberSm.resolve(12, _ink).letterSpacing,
           closeTo(-0.12, 1e-9),
         ); // -0.01em × 12
         expect(
-          ElType.label.resolve(11, _ink).letterSpacing,
+          TextStyles.eyebrow.resolve(11, _ink).letterSpacing,
           closeTo(1.76, 1e-9),
         ); // 0.16em × 11
         expect(
-          ElType.display.resolve(64, _ink).letterSpacing,
+          TextStyles.display.resolve(64, _ink).letterSpacing,
           closeTo(-1.92, 1e-9),
         ); // -0.03em × 64
         expect(
-          ElType.numXl.resolve(40, _ink).letterSpacing,
+          TextStyles.numberXl.resolve(40, _ink).letterSpacing,
           closeTo(-1, 1e-9),
         ); // -0.025em × 40
       },
     );
 
     test('a class with no letter-spacing resolves to none', () {
-      expect(ElType.body.resolve(15, _ink).letterSpacing, isNull);
-      expect(ElType.h4.resolve(17, _ink).letterSpacing, isNull);
+      expect(TextStyles.body.resolve(15, _ink).letterSpacing, isNull);
+      expect(TextStyles.h4.resolve(17, _ink).letterSpacing, isNull);
     });
 
     test('a tabular class carries FontFeature.tabularFigures()', () {
-      final TextStyle style = ElType.numBase.resolve(15, _ink);
+      final TextStyle style = TextStyles.numberBase.resolve(15, _ink);
       expect(style.fontFeatures, contains(const FontFeature.tabularFigures()));
       expect(
-        ElType.body.resolve(15, _ink).fontFeatures,
+        TextStyles.body.resolve(15, _ink).fontFeatures,
         anyOf(isNull, isEmpty),
       );
     });
 
     test('carries size, height, weight, style and colour through', () {
-      final TextStyle style = ElType.lead.resolve(17, _ink);
+      final TextStyle style = TextStyles.lead.resolve(17, _ink);
       expect(style.fontSize, 17);
       expect(style.height, 1.65);
       expect(style.fontWeight, FontWeight.w400);
       expect(style.fontStyle, FontStyle.normal);
       expect(style.color, _ink);
 
-      final TextStyle accent = ElType.accent.resolve(67.52, _ink);
+      final TextStyle accent = TextStyles.accent.resolve(67.52, _ink);
       expect(accent.fontStyle, FontStyle.italic);
       expect(accent.height, isNull); // no line-height declared
     });
 
     test('an inherited font-weight stays unset', () {
-      expect(ElType.code.resolve(12.5, _ink).fontWeight, isNull);
+      expect(TextStyles.code.resolve(12.5, _ink).fontWeight, isNull);
       expect(
-        ElType.code.resolve(12.5, _ink).fontVariations,
+        TextStyles.code.resolve(12.5, _ink).fontVariations,
         anyOf(isNull, isEmpty),
       );
-      expect(ElType.serial.resolve(15, _ink).fontWeight, isNull);
+      expect(TextStyles.identifier.resolve(15, _ink).fontWeight, isNull);
     });
 
     test('an explicit size overrides a fixed-size class', () {
-      expect(ElType.body.size, 15);
-      final TextStyle style = ElType.body.resolve(24, _ink);
+      expect(TextStyles.body.size, 15);
+      final TextStyle style = TextStyles.body.resolve(24, _ink);
       expect(style.fontSize, 24);
-      expect(ElType.h2.resolve(24, _ink).fontSize, 24);
+      expect(TextStyles.h2.resolve(24, _ink).fontSize, 24);
     });
 
     test('uppercase is a flag only — resolve applies no transform', () {
-      expect(ElType.label.uppercase, isTrue);
+      expect(TextStyles.eyebrow.uppercase, isTrue);
       expect(
-        ElType.label.resolve(11, _ink).fontFeatures,
+        TextStyles.eyebrow.resolve(11, _ink).fontFeatures,
         anyOf(isNull, isEmpty),
       );
     });
 
     test('the fluid classes resolve at whatever the viewport hands them', () {
       expect(
-        ElType.display.resolve(ElType.displaySize(1440), _ink).fontSize,
+        TextStyles.display.resolve(TextStyles.displaySize(1440), _ink).fontSize,
         closeTo(63.36, 1e-9),
       );
-      expect(ElType.h1.resolve(ElType.h1Size(1440), _ink).fontSize, 40);
+      expect(TextStyles.h1.resolve(TextStyles.h1Size(1440), _ink).fontSize, 40);
     });
   });
 
   // ─── motion ──────────────────────────────────────────────────────────────
 
-  group('ElDurations (globals.css L395–418)', () {
+  group('MotionDurations (globals.css L395–418)', () {
     test('every duration token', () {
-      expect(ElDurations.tick, const Duration(milliseconds: 80));
-      expect(ElDurations.fast, const Duration(milliseconds: 150));
-      expect(ElDurations.base, const Duration(milliseconds: 250));
-      expect(ElDurations.slow, const Duration(milliseconds: 400));
-      expect(ElDurations.overlay, const Duration(milliseconds: 320));
-      expect(ElDurations.jelly, const Duration(milliseconds: 420));
-      expect(ElDurations.reward, const Duration(milliseconds: 550));
-      expect(ElDurations.bloom, const Duration(milliseconds: 1000));
-      expect(ElDurations.sway, const Duration(seconds: 44));
-      expect(ElDurations.swayAlt, const Duration(seconds: 33));
+      expect(MotionDurations.tick, const Duration(milliseconds: 80));
+      expect(MotionDurations.fast, const Duration(milliseconds: 150));
+      expect(MotionDurations.normal, const Duration(milliseconds: 250));
+      expect(MotionDurations.slow, const Duration(milliseconds: 400));
+      expect(MotionDurations.overlayEnter, const Duration(milliseconds: 320));
+      expect(MotionDurations.open, const Duration(milliseconds: 420));
+      expect(MotionDurations.reward, const Duration(milliseconds: 550));
+      expect(MotionDurations.bloom, const Duration(milliseconds: 1000));
+      expect(MotionDurations.sway, const Duration(seconds: 44));
+      expect(MotionDurations.swayAlt, const Duration(seconds: 33));
     });
 
     test('the framework default transition duration (L395)', () {
-      expect(ElDurations.transitionDefault, const Duration(milliseconds: 250));
-      expect(ElDurations.transitionDefault.inMilliseconds, 250);
+      expect(MotionDurations.normal, const Duration(milliseconds: 250));
+      expect(MotionDurations.normal.inMilliseconds, 250);
     });
 
     test('transitionDefault equals base and is a separate declaration', () {
@@ -768,129 +788,129 @@ void main() {
       // report a 0.25s transitionDuration; `:where(.prose) a` and
       // `slide-pill`'s opacity leg, which read `var(--duration-fast)` directly,
       // report 0.15s on the same pages.
-      expect(ElDurations.transitionDefault, ElDurations.base);
-      expect(ElDurations.transitionDefault, isNot(same(ElDurations.fast)));
-      expect(ElDurations.fast, const Duration(milliseconds: 150));
+      expect(MotionDurations.normal, MotionDurations.normal);
+      expect(MotionDurations.normal, isNot(same(MotionDurations.fast)));
+      expect(MotionDurations.fast, const Duration(milliseconds: 150));
     });
 
     test('the two sways are deliberately not multiples of each other', () {
       expect(
-        ElDurations.sway.inSeconds % ElDurations.swayAlt.inSeconds,
+        MotionDurations.sway.inSeconds % MotionDurations.swayAlt.inSeconds,
         isNot(0),
       );
     });
   });
 
-  group('ElCurves (globals.css L420–432)', () {
+  group('MotionCurves (globals.css L420–432)', () {
     test('--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1)', () {
-      expect(ElCurves.spring, const Cubic(0.34, 1.56, 0.64, 1));
+      expect(MotionCurves.emphasized, const Cubic(0.34, 1.56, 0.64, 1));
       expect(
         <double>[
-          ElCurves.spring.a,
-          ElCurves.spring.b,
-          ElCurves.spring.c,
-          ElCurves.spring.d,
+          MotionCurves.emphasized.a,
+          MotionCurves.emphasized.b,
+          MotionCurves.emphasized.c,
+          MotionCurves.emphasized.d,
         ],
         <double>[0.34, 1.56, 0.64, 1],
       );
     });
 
     test('--ease-out: cubic-bezier(0.22, 1, 0.36, 1)', () {
-      expect(ElCurves.out, const Cubic(0.22, 1, 0.36, 1));
+      expect(MotionCurves.enter, const Cubic(0.22, 1, 0.36, 1));
       expect(
         <double>[
-          ElCurves.out.a,
-          ElCurves.out.b,
-          ElCurves.out.c,
-          ElCurves.out.d,
+          MotionCurves.enter.a,
+          MotionCurves.enter.b,
+          MotionCurves.enter.c,
+          MotionCurves.enter.d,
         ],
         <double>[0.22, 1, 0.36, 1],
       );
     });
 
     test('--ease-in: cubic-bezier(0.7, 0, 0.84, 0) — not Tailwind\'s', () {
-      expect(ElCurves.curveIn, const Cubic(0.7, 0, 0.84, 0));
+      expect(MotionCurves.exit, const Cubic(0.7, 0, 0.84, 0));
       expect(
         <double>[
-          ElCurves.curveIn.a,
-          ElCurves.curveIn.b,
-          ElCurves.curveIn.c,
-          ElCurves.curveIn.d,
+          MotionCurves.exit.a,
+          MotionCurves.exit.b,
+          MotionCurves.exit.c,
+          MotionCurves.exit.d,
         ],
         <double>[0.7, 0, 0.84, 0],
       );
     });
 
     test('--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1)', () {
-      expect(ElCurves.inOut, const Cubic(0.65, 0, 0.35, 1));
+      expect(MotionCurves.move, const Cubic(0.65, 0, 0.35, 1));
       expect(
         <double>[
-          ElCurves.inOut.a,
-          ElCurves.inOut.b,
-          ElCurves.inOut.c,
-          ElCurves.inOut.d,
+          MotionCurves.move.a,
+          MotionCurves.move.b,
+          MotionCurves.move.c,
+          MotionCurves.move.d,
         ],
         <double>[0.65, 0, 0.35, 1],
       );
     });
 
     test('--ease-settle: cubic-bezier(0.16, 1, 0.3, 1)', () {
-      expect(ElCurves.settle, const Cubic(0.16, 1, 0.3, 1));
+      expect(MotionCurves.settle, const Cubic(0.16, 1, 0.3, 1));
       expect(
         <double>[
-          ElCurves.settle.a,
-          ElCurves.settle.b,
-          ElCurves.settle.c,
-          ElCurves.settle.d,
+          MotionCurves.settle.a,
+          MotionCurves.settle.b,
+          MotionCurves.settle.c,
+          MotionCurves.settle.d,
         ],
         <double>[0.16, 1, 0.3, 1],
       );
     });
 
     test('--ease-standard: cubic-bezier(0.4, 0, 0.2, 1)', () {
-      expect(ElCurves.standard, const Cubic(0.4, 0, 0.2, 1));
+      expect(MotionCurves.standard, const Cubic(0.4, 0, 0.2, 1));
       expect(
         <double>[
-          ElCurves.standard.a,
-          ElCurves.standard.b,
-          ElCurves.standard.c,
-          ElCurves.standard.d,
+          MotionCurves.standard.a,
+          MotionCurves.standard.b,
+          MotionCurves.standard.c,
+          MotionCurves.standard.d,
         ],
         <double>[0.4, 0, 0.2, 1],
       );
     });
 
     test('--ease-out-flex: cubic-bezier(0.05, 0.6, 0.4, 0.9)', () {
-      expect(ElCurves.outFlex, const Cubic(0.05, 0.6, 0.4, 0.9));
+      expect(MotionCurves.outFlex, const Cubic(0.05, 0.6, 0.4, 0.9));
       expect(
         <double>[
-          ElCurves.outFlex.a,
-          ElCurves.outFlex.b,
-          ElCurves.outFlex.c,
-          ElCurves.outFlex.d,
+          MotionCurves.outFlex.a,
+          MotionCurves.outFlex.b,
+          MotionCurves.outFlex.c,
+          MotionCurves.outFlex.d,
         ],
         <double>[0.05, 0.6, 0.4, 0.9],
       );
     });
 
     test('the spring overshoots past 1 and settles back', () {
-      expect(ElCurves.spring.transform(0.5), greaterThan(0.5));
-      expect(ElCurves.spring.transform(1), 1);
-      expect(ElCurves.spring.transform(0), 0);
+      expect(MotionCurves.emphasized.transform(0.5), greaterThan(0.5));
+      expect(MotionCurves.emphasized.transform(1), 1);
+      expect(MotionCurves.emphasized.transform(0), 0);
     });
 
     test('all seven easings are registered', () {
-      expect(ElCurves.all, hasLength(7));
+      expect(MotionCurves.all, hasLength(7));
     });
   });
 
   // --- shadows (appended by lead) ---
 
   group(
-    'ElShadows — geometry is fixed, ink is themed (globals.css L354–387)',
+    'Shadows — geometry is fixed, ink is themed (globals.css L354–387)',
     () {
       void expectLayer(
-        ElShadowLayer layer,
+        ShadowLayer layer,
         double dx,
         double dy,
         double blur,
@@ -905,190 +925,190 @@ void main() {
       }
 
       test('e1: 0 1px 1px ink-2, 0 1px 3px ink-1', () {
-        expect(ElShadows.e1.layers, hasLength(2));
-        expectLayer(ElShadows.e1.layers[0], 0, 1, 1, 0);
-        expectLayer(ElShadows.e1.layers[1], 0, 1, 3, 0);
+        expect(Shadows.sm.layers, hasLength(2));
+        expectLayer(Shadows.sm.layers[0], 0, 1, 1, 0);
+        expectLayer(Shadows.sm.layers[1], 0, 1, 3, 0);
         expect(
-          ElShadows.e1.layers[0].color(ElThemeData.dark),
-          ElThemeData.dark.ink2,
+          Shadows.sm.layers[0].color(ThemeTokens.dark),
+          ThemeTokens.dark.ink2,
         );
         expect(
-          ElShadows.e1.layers[1].color(ElThemeData.dark),
-          ElThemeData.dark.ink1,
+          Shadows.sm.layers[1].color(ThemeTokens.dark),
+          ThemeTokens.dark.ink1,
         );
-        expect(ElShadows.e1.hasInset, isFalse);
+        expect(Shadows.sm.hasInset, isFalse);
       });
 
       test('e2: 0 1px 2px ink-2, 0 4px 10px -2px ink-2', () {
-        expectLayer(ElShadows.e2.layers[0], 0, 1, 2, 0);
-        expectLayer(ElShadows.e2.layers[1], 0, 4, 10, -2);
+        expectLayer(Shadows.md.layers[0], 0, 1, 2, 0);
+        expectLayer(Shadows.md.layers[1], 0, 4, 10, -2);
         expect(
-          ElShadows.e2.layers.every(
-            (l) => l.color(ElThemeData.light) == ElThemeData.light.ink2,
+          Shadows.md.layers.every(
+            (l) => l.color(ThemeTokens.light) == ThemeTokens.light.ink2,
           ),
           isTrue,
         );
       });
 
       test('e3: 0 2px 4px ink-2, 0 14px 28px -8px ink-3', () {
-        expectLayer(ElShadows.e3.layers[0], 0, 2, 4, 0);
-        expectLayer(ElShadows.e3.layers[1], 0, 14, 28, -8);
+        expectLayer(Shadows.lg.layers[0], 0, 2, 4, 0);
+        expectLayer(Shadows.lg.layers[1], 0, 14, 28, -8);
         expect(
-          ElShadows.e3.layers[0].color(ElThemeData.dark),
-          ElThemeData.dark.ink2,
+          Shadows.lg.layers[0].color(ThemeTokens.dark),
+          ThemeTokens.dark.ink2,
         );
         expect(
-          ElShadows.e3.layers[1].color(ElThemeData.dark),
-          ElThemeData.dark.ink3,
+          Shadows.lg.layers[1].color(ThemeTokens.dark),
+          ThemeTokens.dark.ink3,
         );
-        expect(ElShadows.e3.hasInset, isFalse);
+        expect(Shadows.lg.hasInset, isFalse);
       });
 
       test('e4: 0 4px 8px ink-3, 0 28px 56px -14px ink-4', () {
-        expectLayer(ElShadows.e4.layers[0], 0, 4, 8, 0);
-        expectLayer(ElShadows.e4.layers[1], 0, 28, 56, -14);
+        expectLayer(Shadows.xl.layers[0], 0, 4, 8, 0);
+        expectLayer(Shadows.xl.layers[1], 0, 28, 56, -14);
         expect(
-          ElShadows.e4.layers[0].color(ElThemeData.light),
-          ElThemeData.light.ink3,
+          Shadows.xl.layers[0].color(ThemeTokens.light),
+          ThemeTokens.light.ink3,
         );
         expect(
-          ElShadows.e4.layers[1].color(ElThemeData.light),
-          ElThemeData.light.ink4,
+          Shadows.xl.layers[1].color(ThemeTokens.light),
+          ThemeTokens.light.ink4,
         );
       });
 
       test('key / key-down: the wall layer and its socket', () {
-        expectLayer(ElShadows.key.layers[0], 0, 4, 0, 0);
+        expectLayer(Shadows.keyRaised.layers[0], 0, 4, 0, 0);
         expect(
-          ElShadows.key.layers[0].color(ElThemeData.dark),
-          ElThemeData.dark.wall,
+          Shadows.keyRaised.layers[0].color(ThemeTokens.dark),
+          ThemeTokens.dark.wall,
         );
-        expectLayer(ElShadows.key.layers[1], 0, 7, 12, 0);
-        expect(ElShadows.key.hasInset, isFalse);
+        expectLayer(Shadows.keyRaised.layers[1], 0, 7, 12, 0);
+        expect(Shadows.keyRaised.hasInset, isFalse);
 
-        expectLayer(ElShadows.keyDown.layers[0], 0, 1, 0, 0);
-        expectLayer(ElShadows.keyDown.layers[1], 0, 2, 5, 0, inset: true);
-        expect(ElShadows.keyDown.hasInset, isTrue);
+        expectLayer(Shadows.keyPressed.layers[0], 0, 1, 0, 0);
+        expectLayer(Shadows.keyPressed.layers[1], 0, 2, 5, 0, inset: true);
+        expect(Shadows.keyPressed.hasInset, isTrue);
       });
 
       test('pressed: both layers inset', () {
-        expectLayer(ElShadows.pressed.layers[0], 0, 2, 5, 0, inset: true);
-        expectLayer(ElShadows.pressed.layers[1], 0, 1, 2, 0, inset: true);
-        expect(ElShadows.pressed.hasInset, isTrue);
-        expect(ElShadows.pressed.outerShadows(ElThemeData.dark), isEmpty);
+        expectLayer(Shadows.inset.layers[0], 0, 2, 5, 0, inset: true);
+        expectLayer(Shadows.inset.layers[1], 0, 1, 2, 0, inset: true);
+        expect(Shadows.inset.hasInset, isTrue);
+        expect(Shadows.inset.outerShadows(ThemeTokens.dark), isEmpty);
       });
 
       test('btn: rim highlight + inner bottom shade + two outer layers', () {
-        expect(ElShadows.btn.layers, hasLength(4));
-        expectLayer(ElShadows.btn.layers[0], 0, 1, 0, 0, inset: true);
+        expect(Shadows.control.layers, hasLength(4));
+        expectLayer(Shadows.control.layers[0], 0, 1, 0, 0, inset: true);
         expect(
-          ElShadows.btn.layers[0].color(ElThemeData.dark),
-          ElThemeData.dark.rim,
+          Shadows.control.layers[0].color(ThemeTokens.dark),
+          ThemeTokens.dark.rim,
         );
-        expectLayer(ElShadows.btn.layers[1], 0, -2, 4, 0, inset: true);
-        expectLayer(ElShadows.btn.layers[2], 0, 1, 2, 0);
-        expectLayer(ElShadows.btn.layers[3], 0, 3, 8, -2);
-        expect(ElShadows.btn.hasInset, isTrue);
-        expect(ElShadows.btn.insetLayers, hasLength(2));
-        expect(ElShadows.btn.outerShadows(ElThemeData.dark), hasLength(2));
+        expectLayer(Shadows.control.layers[1], 0, -2, 4, 0, inset: true);
+        expectLayer(Shadows.control.layers[2], 0, 1, 2, 0);
+        expectLayer(Shadows.control.layers[3], 0, 3, 8, -2);
+        expect(Shadows.control.hasInset, isTrue);
+        expect(Shadows.control.insetLayers, hasLength(2));
+        expect(Shadows.control.outerShadows(ThemeTokens.dark), hasLength(2));
       });
 
       test('btn-primary: rim-strong + action cast at 55%', () {
-        expectLayer(ElShadows.btnPrimary.layers[0], 0, 1, 0, 0, inset: true);
+        expectLayer(Shadows.controlPrimary.layers[0], 0, 1, 0, 0, inset: true);
         expect(
-          ElShadows.btnPrimary.layers[0].color(ElThemeData.light),
-          ElThemeData.light.rimStrong,
+          Shadows.controlPrimary.layers[0].color(ThemeTokens.light),
+          ThemeTokens.light.rimStrong,
         );
-        expectLayer(ElShadows.btnPrimary.layers[1], 0, -2, 5, 0, inset: true);
-        expectLayer(ElShadows.btnPrimary.layers[2], 0, 1, 2, 0);
-        expectLayer(ElShadows.btnPrimary.layers[3], 0, 4, 10, -2);
+        expectLayer(Shadows.controlPrimary.layers[1], 0, -2, 5, 0, inset: true);
+        expectLayer(Shadows.controlPrimary.layers[2], 0, 1, 2, 0);
+        expectLayer(Shadows.controlPrimary.layers[3], 0, 4, 10, -2);
         expect(
-          ElShadows.btnPrimary.layers[3].color(ElThemeData.dark),
-          ElPalette.action.withValues(alpha: 0.55),
+          Shadows.controlPrimary.layers[3].color(ThemeTokens.dark),
+          Palette.action.withValues(alpha: 0.55),
         );
       });
 
       test('btn-value: ink-1 inner shade + value cast at 45%', () {
-        expectLayer(ElShadows.btnValue.layers[1], 0, -2, 5, 0, inset: true);
+        expectLayer(Shadows.controlPremium.layers[1], 0, -2, 5, 0, inset: true);
         expect(
-          ElShadows.btnValue.layers[1].color(ElThemeData.dark),
-          ElThemeData.dark.ink1,
+          Shadows.controlPremium.layers[1].color(ThemeTokens.dark),
+          ThemeTokens.dark.ink1,
         );
         expect(
-          ElShadows.btnValue.layers[3].color(ElThemeData.dark),
-          ElPalette.value.withValues(alpha: 0.45),
+          Shadows.controlPremium.layers[3].color(ThemeTokens.dark),
+          Palette.value.withValues(alpha: 0.45),
         );
       });
 
       test('btn-down / chip', () {
-        expectLayer(ElShadows.btnDown.layers[0], 0, 2, 4, 0, inset: true);
-        expectLayer(ElShadows.btnDown.layers[1], 0, 1, 1, 0);
-        expectLayer(ElShadows.chip.layers[0], 0, 1, 0, 0, inset: true);
-        expectLayer(ElShadows.chip.layers[1], 0, -1, 2, 0, inset: true);
-        expectLayer(ElShadows.chip.layers[2], 0, 1, 2, 0);
+        expectLayer(Shadows.controlPressed.layers[0], 0, 2, 4, 0, inset: true);
+        expectLayer(Shadows.controlPressed.layers[1], 0, 1, 1, 0);
+        expectLayer(Shadows.compactControl.layers[0], 0, 1, 0, 0, inset: true);
+        expectLayer(Shadows.compactControl.layers[1], 0, -1, 2, 0, inset: true);
+        expectLayer(Shadows.compactControl.layers[2], 0, 1, 2, 0);
       });
 
       test(
         'glow-action: 0 0 0 1px action-bright@45% + 0 10 34 -8 action@60%',
         () {
-          expectLayer(ElShadows.glowAction.layers[0], 0, 0, 0, 1);
+          expectLayer(Shadows.glowAction.layers[0], 0, 0, 0, 1);
           expect(
-            ElShadows.glowAction.layers[0].color(ElThemeData.dark),
-            ElPalette.actionBright.withValues(alpha: 0.45),
+            Shadows.glowAction.layers[0].color(ThemeTokens.dark),
+            Palette.actionBright.withValues(alpha: 0.45),
           );
-          expectLayer(ElShadows.glowAction.layers[1], 0, 10, 34, -8);
+          expectLayer(Shadows.glowAction.layers[1], 0, 10, 34, -8);
           expect(
-            ElShadows.glowAction.layers[1].color(ElThemeData.dark),
-            ElPalette.action.withValues(alpha: 0.60),
+            Shadows.glowAction.layers[1].color(ThemeTokens.dark),
+            Palette.action.withValues(alpha: 0.60),
           );
-          expect(ElShadows.glowAction.hasInset, isFalse);
+          expect(Shadows.glowAction.hasInset, isFalse);
         },
       );
 
       test('glow-value: 0 0 0 1px value@45% + 0 10 34 -8 value@42%', () {
-        expectLayer(ElShadows.glowValue.layers[0], 0, 0, 0, 1);
+        expectLayer(Shadows.glowValue.layers[0], 0, 0, 0, 1);
         expect(
-          ElShadows.glowValue.layers[0].color(ElThemeData.light),
-          ElPalette.value.withValues(alpha: 0.45),
+          Shadows.glowValue.layers[0].color(ThemeTokens.light),
+          Palette.value.withValues(alpha: 0.45),
         );
-        expectLayer(ElShadows.glowValue.layers[1], 0, 10, 34, -8);
+        expectLayer(Shadows.glowValue.layers[1], 0, 10, 34, -8);
         expect(
-          ElShadows.glowValue.layers[1].color(ElThemeData.light),
-          ElPalette.value.withValues(alpha: 0.42),
+          Shadows.glowValue.layers[1].color(ThemeTokens.light),
+          Palette.value.withValues(alpha: 0.42),
         );
       });
 
       test('ink flips with the theme — same geometry, different colour', () {
-        final BoxShadow darkTop = ElShadows.e3
-            .outerShadows(ElThemeData.dark)
+        final BoxShadow darkTop = Shadows.lg
+            .outerShadows(ThemeTokens.dark)
             .last;
-        final BoxShadow lightTop = ElShadows.e3
-            .outerShadows(ElThemeData.light)
+        final BoxShadow lightTop = Shadows.lg
+            .outerShadows(ThemeTokens.light)
             .last;
         expect(darkTop.offset, lightTop.offset);
         expect(darkTop.blurRadius, lightTop.blurRadius);
         expect(darkTop.color, isNot(lightTop.color));
-        expect(darkTop.color, ElThemeData.dark.ink2);
-        expect(lightTop.color, ElThemeData.light.ink2);
+        expect(darkTop.color, ThemeTokens.dark.ink2);
+        expect(lightTop.color, ThemeTokens.light.ink2);
       });
 
       test('CSS blur maps to the CSS Gaussian sigma, not Flutter default', () {
         // CSS: sigma = blur / 2. Flutter: sigma = radius * 0.57735 + 0.5.
-        const ElShadowLayer layer = ElShadowLayer(0, 28, 56, -14, _dummyInk);
+        const ShadowLayer layer = ShadowLayer(0, 28, 56, -14, _dummyInk);
         expect(layer.blurRadius * 0.57735 + 0.5, closeTo(28.0, 0.001));
         // Known limit: sigmas below 0.5 are unreachable, so a 1px CSS blur
         // collapses to a hard edge.
-        const ElShadowLayer hairline = ElShadowLayer(0, 1, 1, 0, _dummyInk);
+        const ShadowLayer hairline = ShadowLayer(0, 1, 1, 0, _dummyInk);
         expect(hairline.blurRadius, 0);
-        const ElShadowLayer none = ElShadowLayer(0, 0, 0, 1, _dummyInk);
+        const ShadowLayer none = ShadowLayer(0, 0, 0, 1, _dummyInk);
         expect(none.blurRadius, 0);
       });
 
       test(
         'outerShadows reverses CSS order so the first layer paints on top',
         () {
-          final List<BoxShadow> shadows = ElShadows.e4.outerShadows(
-            ElThemeData.dark,
+          final List<BoxShadow> shadows = Shadows.xl.outerShadows(
+            ThemeTokens.dark,
           );
           expect(
             shadows.first.offset.dy,
@@ -1101,4 +1121,4 @@ void main() {
   );
 }
 
-Color _dummyInk(ElThemeData t) => t.ink2;
+Color _dummyInk(ThemeTokens t) => t.ink2;

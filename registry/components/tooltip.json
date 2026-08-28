@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/tooltip.dart",
+      "source": "lib/src/components/ui/tooltip.dart",
       "target": "@ui/tooltip.dart",
-      "sha256": "e5f23266cb2929623ad429bdb51338caac86ce18c6162c227bfce6c45473736b"
+      "sha256": "98e7c11481f3f23633f242497fc06bcbdbd62a33e9301d58e7f8b92ed90f6c61"
     }
   ],
   "registryDependencies": [
@@ -21,5 +21,10 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/tooltip",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/tooltip.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/tooltip.dart",
+  "exports": [
+    "Tooltip",
+    "TooltipContent",
+    "TooltipSide"
+  ]
 }

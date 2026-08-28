@@ -3,14 +3,14 @@
 ///
 /// Re-housed onto the kit alongside the page: the section-order test now
 /// reads `DocsSection.id` (the kit's own section widget) instead of
-/// `ElSection.anchorKey`, and the API-table / state-matrix tests open the
+/// `Section.anchorKey`, and the API-table / state-matrix tests open the
 /// relevant `DocsDisclosure` first — closed by default in the new kit.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage. No
+/// `ThemeController` is flipped in place for theme coverage. No
 /// `pumpAndSettle` against the doc page itself: `switch.dart` composes
-/// `ElSelectionControl`, whose colour tweens are finite, but a bare `pump()`
+/// `SelectionControl`, whose colour tweens are finite, but a bare `pump()`
 /// (plus an explicit duration where a tween needs to land) is enough and
 /// keeps this suite immune to any future control on the page that loops.
 library;
@@ -22,7 +22,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -50,7 +76,7 @@ const List<String> _expectedSectionIds = <String>[
   'source',
 ];
 
-/// Every public constructor parameter of `ElSwitch`, enumerated by reading
+/// Every public constructor parameter of `Switch`, enumerated by reading
 /// `lib/src/components/switch.dart` directly. The API table must cover all
 /// of these by name.
 const List<String> _switchParams = <String>[
@@ -64,11 +90,11 @@ const List<String> _switchParams = <String>[
   'hint',
 ];
 
-/// The `ElApiTable` this page must render titled "ElSwitchSize", and every
+/// The `ApiTable` this page must render titled "SwitchSize", and every
 /// enum rung it must document.
 const List<String> _switchSizeMembers = <String>[
-  'ElSwitchSize.sm',
-  'ElSwitchSize.md',
+  'SwitchSize.sm',
+  'SwitchSize.md',
 ];
 
 /// The single `DocsDisclosure` whose title is [title], matching
@@ -82,21 +108,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -155,8 +181,8 @@ void main() {
   );
 
   testWidgets(
-    'the API tables cover every ElSwitch constructor parameter and both '
-    'ElSwitchSize rungs',
+    'the API tables cover every Switch constructor parameter and both '
+    'SwitchSize rungs',
     (WidgetTester tester) async {
       await _pump(tester);
 
@@ -164,7 +190,7 @@ void main() {
       await tester.ensureVisible(apiTrigger);
       await tester.tap(apiTrigger);
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -180,46 +206,45 @@ void main() {
         expect(
           documented,
           contains(param),
-          reason: 'ElSwitch constructor parameter "$param" is undocumented',
+          reason: 'Switch constructor parameter "$param" is undocumented',
         );
       }
       for (final String member in _switchSizeMembers) {
         expect(
           documented,
           contains(member),
-          reason: 'ElSwitchSize member "$member" is undocumented',
+          reason: 'SwitchSize member "$member" is undocumented',
         );
       }
 
       expect(
-        tables.any((DocsApiTable t) => t.title == 'ElSwitchSize'),
+        tables.any((DocsApiTable t) => t.title == 'SwitchSize'),
         isTrue,
-        reason: 'no ElApiTable titled "ElSwitchSize" was rendered',
+        reason: 'no ApiTable titled "SwitchSize" was rendered',
       );
     },
   );
 
-  testWidgets(
-    'the live preview specimen mounts and actually toggles on tap',
-    (WidgetTester tester) async {
-      await _pump(tester);
+  testWidgets('the live preview specimen mounts and actually toggles on tap', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
 
-      final Finder specimen = find.byKey(
-        const ValueKey<String>('switch-doc-live-specimen'),
-      );
-      expect(specimen, findsOneWidget);
-      await tester.ensureVisible(specimen);
-      final bool before = tester.widget<ElSwitch>(specimen).value;
+    final Finder specimen = find.byKey(
+      const ValueKey<String>('switch-doc-live-specimen'),
+    );
+    expect(specimen, findsOneWidget);
+    await tester.ensureVisible(specimen);
+    final bool before = tester.widget<Switch>(specimen).value;
 
-      await tester.tap(specimen);
-      await tester.pump();
-      await tester.pump(ElDurations.transitionDefault);
+    await tester.tap(specimen);
+    await tester.pump();
+    await tester.pump(MotionDurations.normal);
 
-      final bool after = tester.widget<ElSwitch>(specimen).value;
-      expect(after, !before);
-      expect(tester.takeException(), isNull);
-    },
-  );
+    final bool after = tester.widget<Switch>(specimen).value;
+    expect(after, !before);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('the state matrix documents on, focus, invalid, disabled and '
       'reduced motion', (WidgetTester tester) async {
@@ -229,7 +254,7 @@ void main() {
     await tester.ensureVisible(statesTrigger);
     await tester.tap(statesTrigger);
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
       find.byType(DocsStateMatrix),
@@ -256,31 +281,27 @@ void main() {
   testWidgets(
     'both themes render the article with no exceptions when flipped in place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(switchDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(switchDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets(
-    'previous/next pager navigates through DocsLayout.onNavigate',
-    (WidgetTester tester) async {
-      String? destination;
-      await _pump(tester, onNavigate: (String route) => destination = route);
+  testWidgets('previous/next pager navigates through DocsLayout.onNavigate', (
+    WidgetTester tester,
+  ) async {
+    String? destination;
+    await _pump(tester, onNavigate: (String route) => destination = route);
 
-      final Finder selectLink = find.text('Select').first;
-      await tester.ensureVisible(selectLink);
-      await tester.tap(selectLink);
-      expect(destination, '/components/select');
-    },
-  );
+    final Finder selectLink = find.text('Select').first;
+    await tester.ensureVisible(selectLink);
+    await tester.tap(selectLink);
+    expect(destination, '/components/select');
+  });
 
   testWidgets('installation states that the component is installable', (
     WidgetTester tester,

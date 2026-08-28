@@ -1,14 +1,14 @@
 /// Tests for `components_docs/agent_launcher/page.dart`'s
 /// [AgentLauncherDocPage]: the agent-launcher component documentation page.
 ///
-/// `agent-launcher` is a brand-new page. `ElAgentLauncher`'s own
+/// `agent-launcher` is a brand-new page. `AgentLauncher`'s own
 /// constructor (`lib/src/components/agent_launcher.dart`) declares five
 /// named parameters excluding `key`: `label`, `title`, `description`,
 /// `child`, `avatar`. The API-completeness test below checks all five
-/// appear in the `ElAgentLauncher` API table.
+/// appear in the `AgentLauncher` API table.
 ///
 /// **No `pumpAndSettle` anywhere in this file.** The trigger's own face
-/// defaults to `ElCubeAvatar`, which runs a bare `Ticker`. Every test below
+/// defaults to `AgentAvatar`, which runs a bare `Ticker`. Every test below
 /// uses `tester.pump()` and `tester.pump(duration)` for the dialog's own
 /// jelly transition.
 library;
@@ -21,16 +21,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -39,7 +63,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every named constructor parameter `ElAgentLauncher`'s own class declares
+/// Every named constructor parameter `AgentLauncher`'s own class declares
 /// (`lib/src/components/agent_launcher.dart`), excluding `key`.
 const List<String> _launcherConstructorParams = <String>[
   'label',
@@ -66,7 +90,7 @@ const List<String> _expectedSectionTitles = <String>[
 void main() {
   group('agent-launcher docs page', () {
     testWidgets(
-      'renders the article, the full ElAgentLauncher API table, and opens '
+      'renders the article, the full AgentLauncher API table, and opens '
       'the dialog when the preview trigger is tapped',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 3000);
@@ -76,7 +100,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: AgentLauncherDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -89,19 +113,19 @@ void main() {
           findsOneWidget,
         );
 
-        // One live ElAgentLauncher instance, its avatar swapped by a
+        // One live AgentLauncher instance, its avatar swapped by a
         // toggle rather than by a second instance: two fixed-position
         // launchers would pin to the exact same corner.
-        expect(find.byType(ElAgentLauncher), findsOneWidget);
+        expect(find.byType(AgentLauncher), findsOneWidget);
 
-        ElAgentLauncher preview() => tester.widget<ElAgentLauncher>(
+        AgentLauncher preview() => tester.widget<AgentLauncher>(
           find.byKey(const ValueKey<String>('agent-launcher-preview')),
         );
         expect(preview().label, 'Ask the assistant');
         expect(preview().title, 'Vault');
         expect(preview().avatar, isNull);
 
-        // The custom-renderer toggle actually swaps ElAgentLauncher.avatar.
+        // The custom-renderer toggle actually swaps AgentLauncher.avatar.
         await tester.tap(
           find.byKey(
             const ValueKey<String>('agent-launcher-preview-toggle-custom'),
@@ -123,7 +147,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _launcherConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
@@ -145,7 +169,7 @@ void main() {
           expect(
             find.text(staticName),
             findsWidgets,
-            reason: 'ElAgentLauncher.$staticName missing from API table',
+            reason: 'AgentLauncher.$staticName missing from API table',
           );
         }
 
@@ -154,48 +178,45 @@ void main() {
         // the rest of the page, so nothing else can be tapped after it.
         final Finder previewButton = find.descendant(
           of: find.byKey(const ValueKey<String>('agent-launcher-preview')),
-          matching: find.byType(ElButton),
+          matching: find.byType(Button),
         );
         expect(previewButton, findsOneWidget);
         await tester.tap(previewButton);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         expect(
-          find.byKey(
-            const ValueKey<String>('agent-launcher-preview-child'),
-          ),
+          find.byKey(const ValueKey<String>('agent-launcher-preview-child')),
           findsOneWidget,
         );
 
         expect(agentLauncherDoc.name, 'agent_launcher');
-        expect(agentLauncherDoc.exports, <String>['ElAgentLauncher']);
+        expect(agentLauncherDoc.exports, <String>['AgentLauncher']);
         expect(agentLauncherDoc.command, 'elattar add agent-launcher');
         expect(destination, isNull);
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 3500);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 3500);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentLauncherDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentLauncherDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // One specimen stage: Preview.
-        expect(find.byType(DocsShowcase), findsNWidgets(1));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // One specimen stage: Preview.
+      expect(find.byType(DocsShowcase), findsNWidgets(1));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -206,32 +227,26 @@ void main() {
       );
     });
 
-    testWidgets(
-      'sections render in the declared order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 3500);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in the declared order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 3500);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
-        );
-        await tester.pumpWidget(
-          _harness(
-            controller: controller,
-            child: const AgentLauncherDocPage(),
-          ),
-        );
-        await tester.pump();
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
+      await tester.pumpWidget(
+        _harness(controller: controller, child: const AgentLauncherDocPage()),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, _expectedSectionTitles);
-      },
-    );
+      expect(titles, _expectedSectionTitles);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -242,7 +257,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const AgentLauncherDocPage(),
           ),
         );
@@ -271,27 +286,24 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
-          _harness(
-            controller: controller,
-            child: const AgentLauncherDocPage(),
-          ),
+          _harness(controller: controller, child: const AgentLauncherDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-launcher-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-launcher-doc-article')),
           ),

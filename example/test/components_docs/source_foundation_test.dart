@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -27,15 +51,15 @@ Finder _disclosureTrigger(String title) => find.descendant(
 /// The classes the API Reference documents, by row name — matching
 /// `_apiFacts` in `page.dart`.
 const List<String> _apiRowNames = <String>[
-  'el',
-  'ElWidths / ElRadii / ElContainers / ElBreakpoints / ElBlurs',
-  'ElTheme / ElThemeData / ElThemeController / ElThemeMode',
-  'ElPalette / ElOklab',
-  'ElType / ElComponentType / ElTypeSpec / ElText',
-  'ElDurations / ElCurves / ElTransforms / elAnimationDuration',
-  'ElShadows / ElShadowSpec / ElShadowLayer',
-  'ElSurfaceOpacity',
-  'ElDateFormat',
+  'space',
+  'LayoutWidths / Radii / Containers / Breakpoints / Blurs',
+  'ThemeScope / ThemeTokens / ThemeController / ColorMode',
+  'Palette / OklabColor',
+  'TextStyles / ComponentTextStyles / TextStyleToken / StyledText',
+  'MotionDurations / MotionCurves / MotionTransforms / effectiveMotionDuration',
+  'Shadows / ShadowStyle / ShadowLayer',
+  'SurfaceOpacity',
+  'DateFormat',
 ];
 
 const List<String> _exampleKeys = <String>[
@@ -60,58 +84,57 @@ const List<String> _exampleKeys = <String>[
 
 void main() {
   group('source-foundation docs page', () {
-    testWidgets(
-      'renders the article and the full API table',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('renders the article and the full API table', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        String? destination;
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: SourceFoundationDocPage(
-              onNavigate: (String route) => destination = route,
-            ),
+      String? destination;
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: SourceFoundationDocPage(
+            onNavigate: (String route) => destination = route,
           ),
-        );
-        await tester.pump();
+        ),
+      );
+      await tester.pump();
 
+      expect(
+        find.byKey(const ValueKey<String>('source-foundation-doc-article')),
+        findsOneWidget,
+      );
+
+      final Finder apiTrigger = _disclosureTrigger('API Reference');
+      await tester.ensureVisible(apiTrigger);
+      await tester.pump();
+      await tester.tap(apiTrigger);
+      await tester.pump();
+      await tester.pump(MotionDurations.open);
+
+      for (final String name in _apiRowNames) {
+        expect(find.text(name), findsWidgets, reason: 'missing $name');
+      }
+
+      for (final String key in _exampleKeys) {
         expect(
-          find.byKey(const ValueKey<String>('source-foundation-doc-article')),
+          find.byKey(ValueKey<String>(key)),
           findsOneWidget,
+          reason: 'missing example specimen $key',
         );
+      }
 
-        final Finder apiTrigger = _disclosureTrigger('API Reference');
-        await tester.ensureVisible(apiTrigger);
-        await tester.pump();
-        await tester.tap(apiTrigger);
-        await tester.pump();
-        await tester.pump(ElDurations.jelly);
-
-        for (final String name in _apiRowNames) {
-          expect(find.text(name), findsWidgets, reason: 'missing $name');
-        }
-
-        for (final String key in _exampleKeys) {
-          expect(
-            find.byKey(ValueKey<String>(key)),
-            findsOneWidget,
-            reason: 'missing example specimen $key',
-          );
-        }
-
-        expect(sourceFoundationDoc.name, 'source_foundation');
-        expect(
-          sourceFoundationDoc.exports,
-          containsAll(<String>['ElTheme', 'ElType', 'ElShadows', 'el']),
-        );
-        expect(sourceFoundationDoc.command, 'elattar add source-foundation');
-        expect(sourceFoundationDoc.dependencies, isEmpty);
-        expect(destination, isNull);
-      },
-    );
+      expect(sourceFoundationDoc.name, 'source_foundation');
+      expect(
+        sourceFoundationDoc.exports,
+        containsAll(<String>['ThemeScope', 'TextStyles', 'Shadows', 'space']),
+      );
+      expect(sourceFoundationDoc.command, 'elattar add source-foundation');
+      expect(sourceFoundationDoc.dependencies, isEmpty);
+      expect(destination, isNull);
+    });
 
     testWidgets('a Motion chip animates on tap, without pumpAndSettle', (
       WidgetTester tester,
@@ -122,7 +145,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const SourceFoundationDocPage(),
         ),
       );
@@ -136,34 +159,33 @@ void main() {
 
       await tester.tap(chip);
       await tester.pump();
-      await tester.pump(ElDurations.base);
+      await tester.pump(MotionDurations.normal);
 
       expect(tester.takeException(), isNull);
       expect(chip, findsOneWidget);
     });
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 6000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const SourceFoundationDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const SourceFoundationDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Six EffectSection stages: Preview, Semantic Color, Type Ramp,
-        // Spacing Rhythm, Motion, Shadow Elevation.
-        expect(find.byType(DocsShowcase), findsNWidgets(6));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Six EffectSection stages: Preview, Semantic Color, Type Ramp,
+      // Spacing Rhythm, Motion, Shadow Elevation.
+      expect(find.byType(DocsShowcase), findsNWidgets(6));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -200,7 +222,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const SourceFoundationDocPage(),
         ),
       );
@@ -240,7 +262,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const SourceFoundationDocPage(),
           ),
         );
@@ -268,13 +290,13 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      for (final ElThemeMode mode in <ElThemeMode>[
-        ElThemeMode.dark,
-        ElThemeMode.light,
+      for (final ColorMode mode in <ColorMode>[
+        ColorMode.dark,
+        ColorMode.light,
       ]) {
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: mode),
+            controller: ThemeController(mode: mode),
             child: const SourceFoundationDocPage(),
           ),
         );

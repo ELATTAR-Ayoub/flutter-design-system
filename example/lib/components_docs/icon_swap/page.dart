@@ -1,9 +1,9 @@
 /// Public documentation page for the `icon-swap` effect.
 ///
-/// **Why `EffectSection`, not `ShowcaseSection`.** `ElIconSwap` has no variant
+/// **Why `EffectSection`, not `ShowcaseSection`.** `IconSwap` has no variant
 /// enum and, per its own class doc, is never placed "beside" the control it
 /// belongs to: it is always the `child:` of some other pressable — an
-/// `ElButton` in both real corpus call sites this page cites
+/// `Button` in both real corpus call sites this page cites
 /// (`lib/src/components/attachment.dart`, `lib/src/components/sidebar.dart`).
 /// A `ShowcaseSection` stages a specimen on its own; `EffectSection` stages
 /// the **host it is applied to**, which is what a reader actually needs to
@@ -13,13 +13,25 @@
 /// **Section list.** Preview stages the roll beside a plain instant swap, the
 /// contrast the source's own docstring draws ("It is a carousel, not a
 /// fade"). Sidebar Trigger and Download Confirmation are the port's only two
-/// live call sites, reproduced faithfully — two icons each, ghost `ElButton`
+/// live call sites, reproduced faithfully — two icons each, ghost `Button`
 /// each, the exact glyphs and `window`/`cell` values the source uses. The
 /// eight disclosures close the page, in the fixed order every page uses.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -41,7 +53,7 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
       description:
           "The source's own claim: \"it is a carousel, not a fade.\" The "
           'left button rolls its glyph through the clip window on every tap '
-          '(ElIconSwap); the right one swaps its Icon child outright, no '
+          '(IconSwap); the right one swaps its Icon child outright, no '
           'transition of any kind, so the difference is legible mid-motion, '
           'not just at rest.',
       host: _PreviewSpecimen(),
@@ -73,7 +85,7 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElIconSwap is reachable the same way '
+              'Add the export line so IconSwap is reachable the same way '
               'the CLI path already makes it.',
           code: "export 'icon_swap.dart';",
         ),
@@ -83,7 +95,7 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'ElIconSwap is decorative by itself: put it inside a pressable as '
+          'IconSwap is decorative by itself: put it inside a pressable as '
           'the child, never beside one — the accessible name belongs on the '
           'control that contains it.',
       code: _usageCode,
@@ -92,8 +104,8 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
       id: 'sidebar-trigger',
       title: 'Sidebar Trigger',
       description:
-          "lib/src/components/sidebar.dart's ElSidebarTrigger: a ghost "
-          'iconSm ElButton whose glyph rolls between panelLeftClose and '
+          "lib/src/components/sidebar.dart's SidebarTrigger: a ghost "
+          'iconSm Button whose glyph rolls between panelLeftClose and '
           'panelLeft as the panel opens and closes. Tap it a few times: '
           'collapsing rolls one way through the strip, expanding rolls '
           'back — neither direction is special-cased, both fall out of the '
@@ -108,10 +120,10 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
       title: 'Download Confirmation',
       description:
           "lib/src/components/attachment.dart's download action: a ghost "
-          'iconXs ElButton rolling from a download glyph to a check on tap. '
+          'iconXs Button rolling from a download glyph to a check on tap. '
           'The real call site also auto-reverts the check back to download '
-          'after ElDurations.attachmentSaving, on a timer ElAttachmentAction '
-          'owns — outside ElIconSwap itself, so this specimen tap-toggles '
+          'after MotionDurations.attachmentSaving, on a timer AttachmentAction '
+          'owns — outside IconSwap itself, so this specimen tap-toggles '
           'both ways instead of replaying that timer.',
       host: _DownloadConfirmationSpecimen(),
       code: _downloadConfirmationCode,
@@ -121,7 +133,7 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElIconSwap declares, plus its one '
+          'Every constructor parameter IconSwap declares, plus its one '
           'public static helper.',
       child: _ApiReferenceContent(),
     ),
@@ -129,7 +141,7 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read straight off _ElIconSwapState: initState, '
+          'Read straight off _IconSwapState: initState, '
           'didChangeDependencies, didUpdateWidget and _readMotion, not '
           'inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
@@ -176,7 +188,7 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/components_test.dart',
             description:
-                'ElIconSwap is covered inside the shared base-components '
+                'IconSwap is covered inside the shared base-components '
                 'suite: there is no dedicated icon_swap_test.dart in the '
                 'package yet.',
           ),
@@ -211,9 +223,9 @@ class IconSwapDocPage extends StatelessWidget {
       title: iconSwapDoc.title,
       description: iconSwapDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Icon Swap'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Icon Swap'),
     ],
     toc: iconSwapDocSpec.toc,
     previous: null,
@@ -236,13 +248,13 @@ class _PreviewColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        ElText(label, ElType.caption, color: theme.mutedForeground),
-        SizedBox(height: el(3)),
+        StyledText(label, TextStyles.caption, color: theme.mutedForeground),
+        SizedBox(height: space(3)),
         child,
       ],
     );
@@ -264,7 +276,7 @@ class _PreviewSpecimen extends StatelessWidget {
           child: const _RollingToggleButton(),
         ),
       ),
-      SizedBox(width: el(10)),
+      SizedBox(width: space(10)),
       _PreviewColumn(
         label: 'Swaps instantly',
         child: KeyedSubtree(
@@ -278,30 +290,30 @@ class _PreviewSpecimen extends StatelessWidget {
 
 const String _previewCode =
     '// Rolls — the effect this page documents\n'
-    'ElButton(\n'
-    '  variant: ElButtonVariant.ghost,\n'
-    '  size: ElButtonSize.iconSm,\n'
+    'Button(\n'
+    '  variant: ButtonVariant.ghost,\n'
+    '  size: ButtonSize.iconSm,\n'
     "  label: 'Toggle panel',\n"
     '  onPressed: () => setState(() => open = !open),\n'
-    '  child: ElIconSwap(\n'
+    '  child: IconSwap(\n'
     '    activeIndex: open ? 0 : 1,\n'
-    '    window: ElIcon.pxFor(ElIconSize.md),\n'
-    '    cell: ElIcon.pxFor(ElIconSize.md),\n'
+    '    window: Icon.pxFor(IconSize.md),\n'
+    '    cell: Icon.pxFor(IconSize.md),\n'
     '    icons: const [\n'
-    '      ElIcon.lucide(ElLucide.panelLeftClose),\n'
-    '      ElIcon.lucide(ElLucide.panelLeft),\n'
+    '      Icon.lucide(Lucide.panelLeftClose),\n'
+    '      Icon.lucide(Lucide.panelLeft),\n'
     '    ],\n'
     '  ),\n'
     ')\n\n'
-    '// Swaps instantly — no ElIconSwap, the plain comparison\n'
-    'ElButton(\n'
-    '  variant: ElButtonVariant.ghost,\n'
-    '  size: ElButtonSize.iconSm,\n'
+    '// Swaps instantly — no IconSwap, the plain comparison\n'
+    'Button(\n'
+    '  variant: ButtonVariant.ghost,\n'
+    '  size: ButtonSize.iconSm,\n'
     "  label: 'Toggle panel',\n"
     '  onPressed: () => setState(() => open = !open),\n'
     '  child: open\n'
-    '      ? const ElIcon.lucide(ElLucide.panelLeftClose)\n'
-    '      : const ElIcon.lucide(ElLucide.panelLeft),\n'
+    '      ? const Icon.lucide(Lucide.panelLeftClose)\n'
+    '      : const Icon.lucide(Lucide.panelLeft),\n'
     ')';
 
 class _RollingToggleButton extends StatefulWidget {
@@ -316,19 +328,19 @@ class _RollingToggleButtonState extends State<_RollingToggleButton> {
 
   @override
   Widget build(BuildContext context) {
-    final double px = ElIcon.pxFor(ElIconSize.md);
-    return ElButton(
-      variant: ElButtonVariant.ghost,
-      size: ElButtonSize.iconSm,
+    final double px = Icon.pxFor(IconSize.md);
+    return Button(
+      variant: ButtonVariant.ghost,
+      size: ButtonSize.iconSm,
       label: 'Toggle panel',
       onPressed: () => setState(() => _open = !_open),
-      child: ElIconSwap(
+      child: IconSwap(
         activeIndex: _open ? 0 : 1,
         window: px,
         cell: px,
         icons: const <Widget>[
-          ElIcon.lucide(ElLucide.panelLeftClose),
-          ElIcon.lucide(ElLucide.panelLeft),
+          Icon.lucide(Lucide.panelLeftClose),
+          Icon.lucide(Lucide.panelLeft),
         ],
       ),
     );
@@ -346,14 +358,14 @@ class _InstantToggleButtonState extends State<_InstantToggleButton> {
   bool _open = true;
 
   @override
-  Widget build(BuildContext context) => ElButton(
-    variant: ElButtonVariant.ghost,
-    size: ElButtonSize.iconSm,
+  Widget build(BuildContext context) => Button(
+    variant: ButtonVariant.ghost,
+    size: ButtonSize.iconSm,
     label: 'Toggle panel',
     onPressed: () => setState(() => _open = !_open),
     child: _open
-        ? const ElIcon.lucide(ElLucide.panelLeftClose)
-        : const ElIcon.lucide(ElLucide.panelLeft),
+        ? const Icon.lucide(Lucide.panelLeftClose)
+        : const Icon.lucide(Lucide.panelLeft),
   );
 }
 
@@ -370,21 +382,21 @@ class _SidebarTriggerSpecimenState extends State<_SidebarTriggerSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final double px = ElIcon.pxFor(ElIconSize.md);
+    final double px = Icon.pxFor(IconSize.md);
     return KeyedSubtree(
       key: const ValueKey<String>('icon-swap-example:sidebar-trigger'),
-      child: ElButton(
-        variant: ElButtonVariant.ghost,
-        size: ElButtonSize.iconSm,
+      child: Button(
+        variant: ButtonVariant.ghost,
+        size: ButtonSize.iconSm,
         label: 'Toggle Sidebar',
         onPressed: () => setState(() => _open = !_open),
-        child: ElIconSwap(
+        child: IconSwap(
           activeIndex: _open ? 0 : 1,
           window: px,
           cell: px,
           icons: const <Widget>[
-            ElIcon.lucide(ElLucide.panelLeftClose),
-            ElIcon.lucide(ElLucide.panelLeft),
+            Icon.lucide(Lucide.panelLeftClose),
+            Icon.lucide(Lucide.panelLeft),
           ],
         ),
       ),
@@ -393,18 +405,18 @@ class _SidebarTriggerSpecimenState extends State<_SidebarTriggerSpecimen> {
 }
 
 const String _sidebarTriggerCode =
-    'ElButton(\n'
-    '  variant: ElButtonVariant.ghost,\n'
-    '  size: ElButtonSize.iconSm,\n'
+    'Button(\n'
+    '  variant: ButtonVariant.ghost,\n'
+    '  size: ButtonSize.iconSm,\n'
     "  label: 'Toggle Sidebar',\n"
     '  onPressed: () => scope.toggleSidebar(),\n'
-    '  child: ElIconSwap(\n'
+    '  child: IconSwap(\n'
     '    activeIndex: scope.open ? 0 : 1,\n'
-    '    window: ElIcon.pxFor(ElIconSize.md),\n'
-    '    cell: ElIcon.pxFor(ElIconSize.md),\n'
+    '    window: Icon.pxFor(IconSize.md),\n'
+    '    cell: Icon.pxFor(IconSize.md),\n'
     '    icons: const [\n'
-    '      ElIcon.lucide(ElLucide.panelLeftClose),\n'
-    '      ElIcon.lucide(ElLucide.panelLeft),\n'
+    '      Icon.lucide(Lucide.panelLeftClose),\n'
+    '      Icon.lucide(Lucide.panelLeft),\n'
     '    ],\n'
     '  ),\n'
     ')';
@@ -423,21 +435,21 @@ class _DownloadConfirmationSpecimenState
 
   @override
   Widget build(BuildContext context) {
-    final double px = ElButton.iconPxFor(ElButtonSize.iconXs);
+    final double px = Button.iconPxFor(ButtonSize.iconXs);
     return KeyedSubtree(
       key: const ValueKey<String>('icon-swap-example:download-confirmation'),
-      child: ElButton(
-        variant: ElButtonVariant.ghost,
-        size: ElButtonSize.iconXs,
+      child: Button(
+        variant: ButtonVariant.ghost,
+        size: ButtonSize.iconXs,
         label: _saving ? 'Downloaded' : 'Download file',
         onPressed: () => setState(() => _saving = !_saving),
-        child: ElIconSwap(
+        child: IconSwap(
           activeIndex: _saving ? 1 : 0,
           window: px,
           cell: px,
           icons: <Widget>[
-            ElIcon.lucide(ElLucide.download, sizePx: px),
-            ElIcon.lucide(ElLucide.check, sizePx: px),
+            Icon.lucide(Lucide.download, sizePx: px),
+            Icon.lucide(Lucide.check, sizePx: px),
           ],
         ),
       ),
@@ -446,19 +458,19 @@ class _DownloadConfirmationSpecimenState
 }
 
 const String _downloadConfirmationCode =
-    'final double px = ElButton.iconPxFor(ElButtonSize.iconXs);\n\n'
-    'ElButton(\n'
-    '  variant: ElButtonVariant.ghost,\n'
-    '  size: ElButtonSize.iconXs,\n'
+    'final double px = Button.iconPxFor(ButtonSize.iconXs);\n\n'
+    'Button(\n'
+    '  variant: ButtonVariant.ghost,\n'
+    '  size: ButtonSize.iconXs,\n'
     "  label: saving ? null : 'Download \$downloadName',\n"
     '  onPressed: press,\n'
-    '  child: ElIconSwap(\n'
+    '  child: IconSwap(\n'
     '    activeIndex: saving ? 1 : 0,\n'
     '    window: px,\n'
     '    cell: px,\n'
     '    icons: [\n'
-    '      ElIcon.lucide(ElLucide.download, sizePx: px),\n'
-    '      ElIcon.lucide(ElLucide.check, sizePx: px),\n'
+    '      Icon.lucide(Lucide.download, sizePx: px),\n'
+    '      Icon.lucide(Lucide.check, sizePx: px),\n'
     '    ],\n'
     '  ),\n'
     ')';
@@ -466,18 +478,18 @@ const String _downloadConfirmationCode =
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElButton(
-  variant: ElButtonVariant.ghost,
-  size: ElButtonSize.iconSm,
+Button(
+  variant: ButtonVariant.ghost,
+  size: ButtonSize.iconSm,
   label: 'Toggle',
   onPressed: () => setState(() => open = !open),
-  child: ElIconSwap(
+  child: IconSwap(
     activeIndex: open ? 0 : 1,
-    window: ElIcon.pxFor(ElIconSize.md),
-    cell: ElIcon.pxFor(ElIconSize.md),
+    window: Icon.pxFor(IconSize.md),
+    cell: Icon.pxFor(IconSize.md),
     icons: const [
-      ElIcon.lucide(ElLucide.panelLeftClose),
-      ElIcon.lucide(ElLucide.panelLeft),
+      Icon.lucide(Lucide.panelLeftClose),
+      Icon.lucide(Lucide.panelLeft),
     ],
   ),
 )''';
@@ -491,10 +503,10 @@ class _ApiReferenceContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const DocsApiTable(title: 'ElIconSwap', facts: _iconSwapApiFacts),
-      SizedBox(height: el(6)),
+      const DocsApiTable(title: 'IconSwap', facts: _iconSwapApiFacts),
+      SizedBox(height: space(6)),
       const DocsApiTable(
-        title: 'ElIconSwap static helpers',
+        title: 'IconSwap static helpers',
         facts: _iconSwapStaticFacts,
       ),
     ],
@@ -506,11 +518,11 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Decorative by itself: ElIconSwap sets no Semantics node and '
+      _bullets(ThemeScope.of(context), <String>[
+        'Decorative by itself: IconSwap sets no Semantics node and '
             'contributes no accessible name of its own. The name belongs '
             'on whatever pressable contains it — both real call sites put '
-            'it inside an ElButton and set that button\'s own label.',
+            'it inside an Button and set that button\'s own label.',
         'Inactive cells excluded: every strip cell but the active one is '
             'wrapped ExcludeSemantics(excluding: true), so a screen reader '
             'walking the tree only ever finds the glyph currently at '
@@ -518,7 +530,7 @@ class _AccessibilityContent extends StatelessWidget {
         'The active cell is not itself excluded — ExcludeSemantics.'
             'excluding resolves to i != _to, false for the active index — '
             'so whatever semantics the icon widget itself carries (usually '
-            'none, ElIcon sets no label by default) still reaches the '
+            'none, Icon sets no label by default) still reaches the '
             'tree, layered under the containing button\'s own label.',
         'No aria-hidden equivalent leaks the motion itself: a screen '
             'reader announces only the button\'s label and pressed state, '
@@ -532,12 +544,12 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElIconSwap takes no focus and handles no key: no Focus, no '
+      _bullets(ThemeScope.of(context), <String>[
+        'IconSwap takes no focus and handles no key: no Focus, no '
             'FocusNode, no onKeyEvent anywhere in icon_swap.dart. It is a '
             'SizedBox/ClipRect/Stack tree over AnimatedBuilder, nothing '
             'more.',
-        'Every keyboard story on this page belongs to the ElButton that '
+        'Every keyboard story on this page belongs to the Button that '
             'contains the glyph: Enter, NumpadEnter and Space activate it '
             'exactly as they would with a plain Icon child, and the roll '
             'plays because activeIndex changed, not because a key was '
@@ -550,13 +562,13 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in icon_swap.dart: BuildContext '
             'width is never read. window and cell are fixed px the caller '
-            'passes in — 16px (ElIconSize.md) on the sidebar trigger, '
-            'ElButton.iconPxFor(ElButtonSize.iconXs) on the attachment '
+            'passes in — 16px (IconSize.md) on the sidebar trigger, '
+            'Button.iconPxFor(ButtonSize.iconXs) on the attachment '
             'action — and neither changes with viewport.',
-        'ElIconSwap.resolveIndex clamps an out-of-range activeIndex to 0 '
+        'IconSwap.resolveIndex clamps an out-of-range activeIndex to 0 '
             'rather than throwing, mirroring the reference\'s '
             'Math.max(0, keys.indexOf(active)): the strip always shows '
             'something, even a caller error resolves to the first icon.',
@@ -573,13 +585,13 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/icon_swap.dart: one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/foundation.dart (clampDouble), '
             'package:flutter/widgets.dart.',
-        'Foundation imports: motion/keyframes.dart (ElJelly, the arrival '
-            'squash table), theme_scope.dart (elAnimationDuration).',
+        'Foundation imports: motion/keyframes.dart (StateChangeMotion, the arrival '
+            'squash table), theme_scope.dart (effectiveMotionDuration).',
         'registryDependencies, resolved automatically by `elattar add '
             'icon-swap`: keyframes, source-foundation — copied verbatim '
             'from registry/components/icon-swap.json.',
@@ -587,7 +599,7 @@ class _DependenciesContent extends StatelessWidget {
             'consumers in the corpus: Sidebar (the collapse trigger) and '
             'the attachment download action.',
       ]),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
@@ -603,32 +615,36 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'No colour of its own: icon_swap.dart never reads ElTheme.of'
+      _bullets(ThemeScope.of(context), <String>[
+        'No colour of its own: icon_swap.dart never reads ThemeScope.of'
             '(context) and paints nothing but the Widgets in icons. Colour '
             'comes entirely from whatever those widgets are — an '
-            'ElIcon.lucide\'s own tone, or the ambient icon colour of '
+            'Icon.lucide\'s own tone, or the ambient icon colour of '
             'whatever contains it.',
-        'Flipping ElThemeController changes nothing at this layer '
+        'Flipping ThemeController changes nothing at this layer '
             'directly: each icon re-resolves its own colour on the next '
-            'frame the same way it would with no ElIconSwap wrapping it '
+            'frame the same way it would with no IconSwap wrapping it '
             'at all.',
         'The one thing this file does read through the theme scope is '
-            'motion: elAnimationDuration(context, …) on both the roll and '
+            'motion: effectiveMotionDuration(context, …) on both the roll and '
             'the squash, so MediaQuery.disableAnimations (prefers-reduced-'
             'motion) collapses both to zero — see States above.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -648,7 +664,7 @@ const List<DocsApiFact> _iconSwapApiFacts = <DocsApiFact>[
     type: 'int',
     description:
         'Required. Which cell is at centre. Out of range clamps to 0 via '
-        'ElIconSwap.resolveIndex, mirroring Math.max(0, keys.indexOf'
+        'IconSwap.resolveIndex, mirroring Math.max(0, keys.indexOf'
         '(active)).',
   ),
   DocsApiFact(
@@ -666,7 +682,7 @@ const List<DocsApiFact> _iconSwapApiFacts = <DocsApiFact>[
     description:
         "Required. The strip cell's own height — the glyph's height, not "
         'window. One roll step is 160% of this value '
-        '(ElSwapRoll.travelFor). Passing a cell that disagrees with the '
+        '(ContentSwapMotion.travelFor). Passing a cell that disagrees with the '
         "glyph's real box changes the travel exactly as a differently-"
         'sized glyph would, uncorrected: there is nothing to correct it '
         'against.',
@@ -700,9 +716,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'activeIndex changes (advance or reverse)',
     treatment:
         '_from and _fromOpacity capture the current frame before '
-        're-aiming, then _roll.forward(from: 0) over ElSwapRoll.duration '
-        '(400ms, ElCurves.spring) and _squash.forward(from: 0) over the '
-        'delayed 750ms clock (150ms delay + ElJelly.duration 600ms).',
+        're-aiming, then _roll.forward(from: 0) over ContentSwapMotion.duration '
+        '(400ms, MotionCurves.emphasized) and _squash.forward(from: 0) over the '
+        'delayed 750ms clock (150ms delay + StateChangeMotion.duration 600ms).',
     userSignal:
         'The old glyph exits the direction the offset arithmetic implies '
         'and overshoots ≈9.8% of one step before settling; the arriving '
@@ -713,7 +729,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        '_readMotion routes both controllers through elAnimationDuration, '
+        '_readMotion routes both controllers through effectiveMotionDuration, '
         'collapsing them to Duration.zero. Flipping the OS switch mid-roll '
         'jumps both controllers to their upper bound on the same frame.',
     userSignal:

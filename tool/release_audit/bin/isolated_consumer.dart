@@ -76,8 +76,8 @@ import 'package:$_consumerName/components/ui/ui.dart';
 import 'package:$_consumerName/design_system/foundation.dart';
 
 void main() => runApp(
-  ElTheme(
-    controller: ElThemeController(mode: ElThemeMode.dark),
+  ThemeScope(
+    controller: ThemeController(mode: ColorMode.dark),
     child: WidgetsApp(
       color: const Color(0xFF000000),
       pageRouteBuilder: <T>(RouteSettings settings, WidgetBuilder builder) =>
@@ -91,7 +91,7 @@ void main() => runApp(
                 ) => builder(context),
           ),
       home: Center(
-        child: ElButton(onPressed: () {}, child: const Text('Install me')),
+        child: Button(onPressed: () {}, child: const Text('Install me')),
       ),
     ),
   ),
@@ -116,10 +116,10 @@ void main() {
         data: const MediaQueryData(size: Size(1440, 900)),
         child: Directionality(
           textDirection: TextDirection.ltr,
-          child: ElTheme(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+          child: ThemeScope(
+            controller: ThemeController(mode: ColorMode.dark),
             child: Center(
-              child: ElButton(
+              child: Button(
                 onPressed: () => presses++,
                 child: const Text('Install me'),
               ),
@@ -130,9 +130,9 @@ void main() {
     );
 
     expect(find.text('Install me'), findsOneWidget);
-    expect(tester.getSize(find.byType(ElButton)).height, el(10));
+    expect(tester.getSize(find.byType(Button)).height, space(10));
 
-    await tester.tap(find.byType(ElButton));
+    await tester.tap(find.byType(Button));
     await tester.pump();
     expect(presses, 1);
   });

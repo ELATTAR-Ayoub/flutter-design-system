@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/chart_cartesian.dart",
+      "source": "lib/src/components/ui/chart_cartesian.dart",
       "target": "@ui/chart_cartesian.dart",
-      "sha256": "b96c375d80f8c8fb2cedb56d4f708c8af778bb98119aaa6045658ea3e059569d"
+      "sha256": "ab497d7076d8904e7e58d2135e2fc0f6a9afdc4fca0b81ca259efe8d4b190f0c"
     }
   ],
   "registryDependencies": [
@@ -26,5 +26,22 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/chart-cartesian",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/chart_cartesian.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/chart_cartesian.dart",
+  "exports": [
+    "BarRect",
+    "BarSeriesPainter",
+    "CartesianChart",
+    "ChartAxis",
+    "ChartAxisType",
+    "ChartDot",
+    "ChartGrid",
+    "ChartLabelList",
+    "ChartLabelPosition",
+    "ChartLayout",
+    "ChartLegendSpec",
+    "ChartMargin",
+    "ChartSeriesKind",
+    "ChartSeriesSpec",
+    "ChartTooltipSpec"
+  ]
 }

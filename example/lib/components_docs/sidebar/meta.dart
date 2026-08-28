@@ -11,9 +11,9 @@
 ///    exports thirty-three public names: a provider, two inherited scopes,
 ///    the panel, a rail, a trigger, an inset, five regions, three group
 ///    parts, twelve menu parts and a field: and
-///    `lib/src/components/nav_user.dart` adds three more that only ever
+///    `lib/src/components/ui/user_menu.dart` adds three more that only ever
 ///    appear inside a sidebar footer. [exports] lists all of them, because a
-///    reader looking up `ElSidebarMenuSubButton` has no other page to find
+///    reader looking up `SidebarMenuSubButton` has no other page to find
 ///    it on.
 ///
 ///  * **It ships through the registry.** `elattar add sidebar` installs the
@@ -43,7 +43,7 @@ const ComponentDocEntry sidebarDoc = ComponentDocEntry(
     'icon-swap',
     'input',
     'keyframes',
-    'machine-surface',
+    'surface',
     'sheet',
     'skeleton',
     'source-foundation',
@@ -51,47 +51,47 @@ const ComponentDocEntry sidebarDoc = ComponentDocEntry(
   ],
   exports: <String>[
     // Enums.
-    'ElSidebarSide',
-    'ElSidebarVariant',
-    'ElSidebarCollapsible',
-    'ElSidebarMenuButtonSize',
-    'ElSidebarMenuSubButtonSize',
+    'SidebarSide',
+    'SidebarVariant',
+    'SidebarCollapsible',
+    'SidebarMenuButtonSize',
+    'SidebarMenuSubButtonSize',
     // Scopes.
-    'ElSidebarScope',
-    'ElSidebarChrome',
+    'SidebarScope',
+    'SidebarChrome',
     // Shell.
-    'ElSidebarProvider',
-    'ElSidebar',
-    'ElSidebarRail',
-    'ElSidebarTrigger',
-    'ElSidebarInset',
+    'SidebarProvider',
+    'Sidebar',
+    'SidebarRail',
+    'SidebarTrigger',
+    'SidebarInset',
     // Regions.
-    'ElSidebarHeader',
-    'ElSidebarFooter',
-    'ElSidebarContent',
-    'ElSidebarSeparator',
-    'ElSidebarGroup',
-    'ElSidebarGroupContent',
-    'ElSidebarGroupLabel',
-    'ElSidebarGroupAction',
-    'ElSidebarCollapsibleGroup',
+    'SidebarHeader',
+    'SidebarFooter',
+    'SidebarContent',
+    'SidebarSeparator',
+    'SidebarGroup',
+    'SidebarGroupContent',
+    'SidebarGroupLabel',
+    'SidebarGroupAction',
+    'SidebarCollapsibleGroup',
     // Menu.
-    'ElSidebarMenu',
-    'ElSidebarMenuItem',
-    'ElSidebarMenuButton',
-    'ElSidebarMenuRow',
-    'ElSidebarMenuLabel',
-    'ElSidebarMenuAction',
-    'ElSidebarMenuBadge',
-    'ElSidebarMenuSkeleton',
-    'ElSidebarMenuSub',
-    'ElSidebarMenuSubItem',
-    'ElSidebarMenuSubButton',
-    'ElSidebarInput',
-    // nav_user.dart: the same family, a second file.
-    'ElNavUser',
-    'ElNavUserAccount',
-    'ElNavUserItem',
+    'SidebarMenu',
+    'SidebarMenuItem',
+    'SidebarMenuButton',
+    'SidebarMenuRow',
+    'SidebarMenuLabel',
+    'SidebarMenuAction',
+    'SidebarMenuBadge',
+    'SidebarMenuSkeleton',
+    'SidebarMenuSub',
+    'SidebarMenuSubItem',
+    'SidebarMenuSubButton',
+    'SidebarInput',
+    // user_menu.dart: the same family, a second file.
+    'UserMenu',
+    'UserMenuAccount',
+    'UserMenuItem',
   ],
   sourcePath: 'lib/src/components/sidebar.dart',
 );
@@ -99,4 +99,4 @@ const ComponentDocEntry sidebarDoc = ComponentDocEntry(
 /// The family's second source file. [ComponentDocEntry] carries one
 /// [ComponentDocEntry.sourcePath], and the account block in a sidebar footer
 /// lives in its own library.
-const String sidebarNavUserSourcePath = 'lib/src/components/nav_user.dart';
+const String sidebarNavUserSourcePath = 'lib/src/components/ui/user_menu.dart';

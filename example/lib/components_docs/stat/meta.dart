@@ -26,13 +26,18 @@ const ComponentDocEntry statDoc = ComponentDocEntry(
       'A labelled metric figure with an optional delta and trailing hint, '
       'and an identical footprint across ready, loading, error, empty, and '
       'disabled.',
-  dependencies: <String>['icon', 'skeleton', 'source-foundation', 'swap-in'],
+  dependencies: <String>[
+    'icon',
+    'skeleton',
+    'source-foundation',
+    'content-change',
+  ],
   exports: <String>[
-    'ElStat',
-    'ElStatDelta',
-    'ElStatDirection',
-    'ElStatDeltaMark',
-    'ElStatState',
+    'Stat',
+    'StatDelta',
+    'StatDirection',
+    'StatDeltaMark',
+    'StatState',
   ],
   sourcePath: 'lib/src/components/stat.dart',
 );

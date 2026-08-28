@@ -7,22 +7,26 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/progress.dart",
+      "source": "lib/src/components/ui/progress.dart",
       "target": "@ui/progress.dart",
-      "sha256": "779108d9bbd3fe2426da98d8744a069cbab00b89eb8171cb6f67c58a9dac9588"
+      "sha256": "0d52209b066f2ef7c71ef49af3f5fde8e89d9ee26e1b4a06a6fd1d7498449590"
     }
   ],
   "registryDependencies": [
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "semanticDependencies": [
-    "machine-surface"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/progress",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/progress.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/progress.dart",
+  "exports": [
+    "Progress",
+    "ProgressTone"
+  ]
 }

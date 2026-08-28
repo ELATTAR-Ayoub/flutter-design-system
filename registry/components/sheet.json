@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/sheet.dart",
+      "source": "lib/src/components/ui/sheet.dart",
       "target": "@ui/sheet.dart",
-      "sha256": "4b7efefb2f520f387e312774e71f624364b4b2a67c89661c3241e8485e01bb1f"
+      "sha256": "4a33b0514a3a56c365f107add1d4cb19c11bdb60c754ab090dc7965a3d14acff"
     }
   ],
   "registryDependencies": [
@@ -30,5 +30,18 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/sheet",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/sheet.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/sheet.dart",
+  "exports": [
+    "Sheet",
+    "SheetContent",
+    "SheetContentGroup",
+    "SheetDescription",
+    "SheetFooter",
+    "SheetHeader",
+    "SheetOverlay",
+    "SheetPanel",
+    "SheetSide",
+    "SheetTitle",
+    "SheetTransition"
+  ]
 }

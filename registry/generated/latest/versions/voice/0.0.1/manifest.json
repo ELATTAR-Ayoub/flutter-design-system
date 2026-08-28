@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/voice.dart",
+      "source": "lib/src/components/ui/voice.dart",
       "target": "@ui/voice.dart",
-      "sha256": "08e2d13b0db7a2bae26f3cc1921f6c6b6a9e4104958ff1326131f4163528cec8"
+      "sha256": "74c8a206bbd85d77f79b8c114d7412318e4673103f544de6be925239e5d09168"
     }
   ],
   "registryDependencies": [
@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/voice",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/voice.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/voice.dart",
   "deprecated": false
 }

@@ -422,9 +422,9 @@ void main() {
     /// general claim scan below.
     const List<String> requiredThisRepoPaths = <String>[
       'lib/elattar_design_system.dart',
-      'lib/src/foundation/',
-      'lib/src/components/',
-      'lib/src/theme_scope.dart',
+      'lib/src/design_system/foundation/',
+      'lib/src/components/ui/',
+      'lib/src/design_system/foundation/theme_scope.dart',
       'test/token_guard_test.dart',
       'tool/verify/README.md',
     ];

@@ -2,9 +2,9 @@
 /// [AgentSlashPaletteDocPage]: the agent-slash-palette component
 /// documentation page.
 ///
-/// `agent_slash_palette.dart` declares one widget ([ElAgentSlashPalette]),
-/// one data class ([ElAgentCommand]), one enum ([ElAgentCommandGroup]), and
-/// two top-level functions ([elSlashQuery], [elFilterCommands]) — read
+/// `agent_slash_palette.dart` declares one widget ([AgentSlashPalette]),
+/// one data class ([AgentCommand]), one enum ([AgentCommandGroup]), and
+/// two top-level functions ([slashQuery], [filterCommands]) — read
 /// directly from `lib/src/components/agent_slash_palette.dart`. The
 /// API-completeness test below checks each `DocsApiTable` by its own title,
 /// not a flat merged set, so a table missing one field cannot hide behind
@@ -24,7 +24,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const List<String> _expectedSectionOrder = <String>[
@@ -48,13 +74,13 @@ const List<String> _expectedSectionOrder = <String>[
 /// constructor parameter / public field / public static / enum value found
 /// by reading `lib/src/components/agent_slash_palette.dart` directly.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElAgentSlashPalette': <String>[
+  'AgentSlashPalette': <String>[
     'commands',
     'activeIndex',
     'onSelect',
     'onHover',
   ],
-  'ElAgentSlashPalette static values': <String>[
+  'AgentSlashPalette static values': <String>[
     'maxHeight',
     'bottomGap',
     'entrance',
@@ -68,7 +94,7 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'lucideStroke',
     'scrollsGroupsNotRows',
   ],
-  'ElAgentCommand': <String>[
+  'AgentCommand': <String>[
     'id',
     'label',
     'hint',
@@ -77,10 +103,10 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'run',
     'directive',
   ],
-  'ElAgentCommandGroup': <String>['skill', 'command'],
+  'AgentCommandGroup': <String>['skill', 'command'],
   'Top-level functions': <String>[
-    'elSlashQuery(value, caret)',
-    'elFilterCommands(commands, query)',
+    'slashQuery(value, caret)',
+    'filterCommands(commands, query)',
   ],
 };
 
@@ -94,21 +120,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -158,19 +184,18 @@ void main() {
       },
     );
 
-    testWidgets(
-      'renders the house-shape section order, section for section',
-      (WidgetTester tester) async {
-        await _pump(tester);
+    testWidgets('renders the house-shape section order, section for section', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester);
 
-        final List<String> ids = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.id)
-            .toList();
+      final List<String> ids = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
+          .toList();
 
-        expect(ids, _expectedSectionOrder);
-      },
-    );
+      expect(ids, _expectedSectionOrder);
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -191,7 +216,7 @@ void main() {
         await tester.ensureVisible(apiTrigger);
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         final List<DocsApiTable> tables = tester
             .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -235,22 +260,16 @@ void main() {
         );
         await tester.ensureVisible(palette);
         expect(palette, findsOneWidget);
-        expect(
-          tester.widget<ElAgentSlashPalette>(palette).activeIndex,
-          0,
-        );
+        expect(tester.widget<AgentSlashPalette>(palette).activeIndex, 0);
 
         final Finder status = find.byKey(
           const ValueKey<String>('agent-slash-palette-preview:status'),
         );
-        expect(
-          tester.widget<ElText>(status).text,
-          'Hover or tap a row.',
-        );
+        expect(tester.widget<StyledText>(status).text, 'Hover or tap a row.');
 
         // Select the first row (find-comps) directly, since the row itself
         // is a Listener bound to onPointerDown, not a plain tap target. The
-        // row's id line is rendered as one ElRichText spanning '/' +
+        // row's id line is rendered as one RichText spanning '/' +
         // command.id, so its plain text is '/find-comps', not 'find-comps'.
         // Scoped to this specimen's own palette: the same sample command
         // list is reused by the Groups and Active row specimens further
@@ -262,10 +281,7 @@ void main() {
         );
         await tester.pump();
 
-        expect(
-          tester.widget<ElText>(status).text,
-          'Selected: /find-comps',
-        );
+        expect(tester.widget<StyledText>(status).text, 'Selected: /find-comps');
         expect(tester.takeException(), isNull);
       },
     );
@@ -303,26 +319,22 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the Active row specimen carries a fixed activeIndex of 2',
-      (WidgetTester tester) async {
-        await _pump(tester);
+    testWidgets('the Active row specimen carries a fixed activeIndex of 2', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester);
 
-        final Finder specimen = find.byKey(
-          const ValueKey<String>('agent-slash-palette-example:active-row'),
-        );
-        await tester.ensureVisible(specimen);
+      final Finder specimen = find.byKey(
+        const ValueKey<String>('agent-slash-palette-example:active-row'),
+      );
+      await tester.ensureVisible(specimen);
 
-        expect(
-          tester.widget<ElAgentSlashPalette>(specimen).activeIndex,
-          2,
-        );
-      },
-    );
+      expect(tester.widget<AgentSlashPalette>(specimen).activeIndex, 2);
+    });
 
     testWidgets(
       'the Filtering specimen narrows the palette to matching commands as '
-      'the field changes, through the real elSlashQuery/elFilterCommands',
+      'the field changes, through the real slashQuery/filterCommands',
       (WidgetTester tester) async {
         await _pump(tester);
 
@@ -336,7 +348,7 @@ void main() {
 
         // Unfiltered: all four sample commands are candidates.
         expect(
-          tester.widget<ElAgentSlashPalette>(filtered).commands,
+          tester.widget<AgentSlashPalette>(filtered).commands,
           hasLength(4),
         );
 
@@ -345,21 +357,18 @@ void main() {
 
         expect(
           tester
-              .widget<ElAgentSlashPalette>(filtered)
+              .widget<AgentSlashPalette>(filtered)
               .commands
-              .map((ElAgentCommand c) => c.id),
+              .map((AgentCommand c) => c.id),
           <String>['clear'],
         );
 
         // A slash query that is not a slash at all closes the candidate
-        // list down to nothing, per elSlashQuery's own contract.
+        // list down to nothing, per slashQuery's own contract.
         await tester.enterText(input, 'clear');
         await tester.pump();
 
-        expect(
-          tester.widget<ElAgentSlashPalette>(filtered).commands,
-          isEmpty,
-        );
+        expect(tester.widget<AgentSlashPalette>(filtered).commands, isEmpty);
 
         expect(tester.takeException(), isNull);
       },
@@ -369,13 +378,13 @@ void main() {
       'both themes render the article with no exceptions when flipped in '
       'place',
       (WidgetTester tester) async {
-        final ElThemeController theme = await _pump(
+        final ThemeController theme = await _pump(
           tester,
-          mode: ElThemeMode.light,
+          mode: ColorMode.light,
         );
         expect(find.text(agentSlashPaletteDoc.title), findsWidgets);
 
-        theme.setMode(ElThemeMode.dark);
+        theme.setMode(ColorMode.dark);
         await tester.pump();
         expect(find.text(agentSlashPaletteDoc.title), findsWidgets);
         expect(tester.takeException(), isNull);
@@ -392,10 +401,7 @@ void main() {
           findsWidgets,
         );
         expect(agentSlashPaletteDoc.command, 'elattar add agent-slash-palette');
-        expect(
-          agentSlashPaletteDoc.route,
-          '/components/agent_slash_palette',
-        );
+        expect(agentSlashPaletteDoc.route, '/components/agent_slash_palette');
       },
     );
 
@@ -408,11 +414,11 @@ void main() {
       expect(
         agentSlashPaletteDoc.exports,
         containsAll(<String>[
-          'ElAgentSlashPalette',
-          'ElAgentCommand',
-          'ElAgentCommandGroup',
-          'elSlashQuery',
-          'elFilterCommands',
+          'AgentSlashPalette',
+          'AgentCommand',
+          'AgentCommandGroup',
+          'slashQuery',
+          'filterCommands',
         ]),
       );
     });

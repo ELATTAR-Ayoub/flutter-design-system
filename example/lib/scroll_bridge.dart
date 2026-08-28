@@ -10,7 +10,7 @@
 ///
 /// The obvious substitute: infer the offset by matching the overlap between
 /// two shots: cannot work here, and the reason is a design decision three
-/// files away. `--body-glow` is `background-attachment: fixed`, so [ElPageGlow]
+/// files away. `--body-glow` is `background-attachment: fixed`, so [BackgroundEffect]
 /// sits at the bottom of the shell's [Stack], **outside both scroll views**.
 /// Scrolled content is therefore never a pure translation: every pass repaints
 /// the same fixed gradient behind different content, so the overlap at the

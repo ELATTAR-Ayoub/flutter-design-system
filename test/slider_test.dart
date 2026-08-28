@@ -3,12 +3,24 @@ import 'dart:ui' as ui show Image, ImageByteFormat;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
-import 'package:flutter/rendering.dart';
+import 'package:flutter/rendering.dart' hide ScrollDirection;
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
-/// `ElSlider` — the fourth control family, and the first genuinely new painter
+/// `Slider` — the fourth control family, and the first genuinely new painter
 /// since phase 3.
 ///
 /// Every number here was probed against the live reference at
@@ -24,7 +36,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 Widget host(
   Widget child, {
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   bool disableAnimations = false,
 }) {
   return MediaQuery(
@@ -34,8 +46,8 @@ Widget host(
     ),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Center(child: child),
       ),
     ),
@@ -49,10 +61,10 @@ const double _panel = 448;
 const double _cell = 160;
 
 /// `size-5` on a 20px knob, so the travel is the root less the knob.
-double get _travel => _panel - ElSlider.thumbSize;
+double get _travel => _panel - Slider.thumbSize;
 
 /// The track's content box: the root minus its 1px border on each side.
-double get _content => _panel - 2 * ElWidths.hairline;
+double get _content => _panel - 2 * BorderWidths.hairline;
 
 /// Half a logical pixel — the band the two coordinate spaces are pinned to.
 const double _tolerance = 0.5;
@@ -71,7 +83,7 @@ Widget slider({
 }) {
   return SizedBox(
     width: width,
-    child: ElSlider(
+    child: Slider(
       values: values,
       min: min,
       max: max,
@@ -113,7 +125,7 @@ class _LiveState extends State<_Live> {
   @override
   Widget build(BuildContext context) => SizedBox(
     width: _panel,
-    child: ElSlider(
+    child: Slider(
       values: values,
       max: widget.max,
       step: widget.step,
@@ -126,45 +138,41 @@ class _LiveState extends State<_Live> {
 List<double> valuesOf(WidgetTester t) =>
     (t.state(find.byType(_Live)) as _LiveState).values;
 
-/// Every [ElMachineSurface] the slider paints, in tree order: the track, then
+/// Every [Surface] the slider paints, in tree order: the track, then
 /// the range inside it, then one per thumb.
-List<ElMachineSurface> surfaces(WidgetTester t) => t
-    .widgetList<ElMachineSurface>(
-      find.descendant(
-        of: find.byType(ElSlider),
-        matching: find.byType(ElMachineSurface),
-      ),
+List<Surface> surfaces(WidgetTester t) => t
+    .widgetList<Surface>(
+      find.descendant(of: find.byType(Slider), matching: find.byType(Surface)),
     )
     .toList();
 
 /// The rect of the nth painted surface, in the slider's own coordinates.
 Rect surfaceRect(WidgetTester t, int index) {
   final Finder all = find.descendant(
-    of: find.byType(ElSlider),
-    matching: find.byType(ElMachineSurface),
+    of: find.byType(Slider),
+    matching: find.byType(Surface),
   );
   final RenderBox box = t.renderObject<RenderBox>(all.at(index));
-  final RenderBox root = t.renderObject<RenderBox>(find.byType(ElSlider));
+  final RenderBox root = t.renderObject<RenderBox>(find.byType(Slider));
   return box.localToGlobal(Offset.zero, ancestor: root) & box.size;
 }
 
-/// The `ring-3` layer [ElButton.withFocusRing] prepends: zero offset, zero
+/// The `ring-3` layer [Button.withFocusRing] prepends: zero offset, zero
 /// blur, 3px spread, in front of `--shadow-btn`'s own four.
-Color ringOf(ElMachineSurface surface, ElThemeData theme) =>
+Color ringOf(Surface surface, ThemeTokens theme) =>
     surface.spec.layers.first.color(theme);
 
-Color borderOf(ElMachineSurface surface) =>
-    (surface.border! as Border).top.color;
+Color borderOf(Surface surface) => (surface.border! as Border).top.color;
 
 /// One rasterised pixel ROW straight through the middle of [child].
 ///
 /// The channel and its fill are a [CustomPainter]'s output, so what a
-/// `ElShadowSpec` claims and what lands on the canvas are two different
+/// `ShadowStyle` claims and what lands on the canvas are two different
 /// assertions. This reads the canvas.
 Future<List<Color>> _row(
   WidgetTester t,
   Widget child, {
-  required ElThemeMode mode,
+  required ColorMode mode,
 }) async {
   await t.pumpWidget(
     host(
@@ -172,8 +180,8 @@ Future<List<Color>> _row(
       mode: mode,
     ),
   );
-  await t.pump(ElDurations.transitionDefault);
-  await t.pump(ElDurations.transitionDefault);
+  await t.pump(MotionDurations.normal);
+  await t.pump(MotionDurations.normal);
 
   final RenderRepaintBoundary box = t.renderObject(
     find.byKey(const Key('raster')),
@@ -207,7 +215,7 @@ Future<List<Color>> _row(
 Future<List<Color>> _column(
   WidgetTester t,
   Widget child, {
-  required ElThemeMode mode,
+  required ColorMode mode,
   required int x,
 }) async {
   await t.pumpWidget(
@@ -216,8 +224,8 @@ Future<List<Color>> _column(
       mode: mode,
     ),
   );
-  await t.pump(ElDurations.transitionDefault);
-  await t.pump(ElDurations.transitionDefault);
+  await t.pump(MotionDurations.normal);
+  await t.pump(MotionDurations.normal);
 
   final RenderRepaintBoundary box = t.renderObject(
     find.byKey(const Key('raster')),
@@ -267,7 +275,7 @@ Color _nearest(Color pixel, List<Color> candidates) => candidates.reduce(
 /// Flutter's traversal.
 List<FocusNode> thumbNodes(WidgetTester t) => t
     .widgetList<Focus>(
-      find.descendant(of: find.byType(ElSlider), matching: find.byType(Focus)),
+      find.descendant(of: find.byType(Slider), matching: find.byType(Focus)),
     )
     .map((Focus f) => f.focusNode!)
     .toList();
@@ -286,7 +294,7 @@ Future<void> focusThumb(WidgetTester t, int index) async {
 
 /// The centre of thumb [index], in global coordinates.
 Offset thumbCentre(WidgetTester t, int index) =>
-    t.getTopLeft(find.byType(ElSlider)) + surfaceRect(t, 2 + index).center;
+    t.getTopLeft(find.byType(Slider)) + surfaceRect(t, 2 + index).center;
 
 void main() {
   // ───────────────────────────────────────────────────────────────────────────
@@ -299,10 +307,10 @@ void main() {
     ) async {
       await t.pumpWidget(host(slider(values: <double>[40])));
 
-      final Size root = t.getSize(find.byType(ElSlider));
+      final Size root = t.getSize(find.byType(Slider));
       expect(
         root.height,
-        ElSlider.trackHeight,
+        Slider.trackHeight,
         reason: 'the root box is the channel; `h-2.5` is 10px',
       );
       expect(root.width, _panel);
@@ -310,14 +318,14 @@ void main() {
       // The track fills it; the knob stands 5px proud top and bottom.
       expect(
         surfaceRect(t, 0).height,
-        ElSlider.trackHeight,
+        Slider.trackHeight,
         reason: 'track `grow` + `data-horizontal:h-2.5`',
       );
       final Rect thumb = surfaceRect(t, 2);
-      expect(thumb.size, Size(ElSlider.thumbSize, ElSlider.thumbSize));
+      expect(thumb.size, Size(Slider.thumbSize, Slider.thumbSize));
       expect(
         thumb.top,
-        closeTo(-(ElSlider.thumbSize - ElSlider.trackHeight) / 2, 0.01),
+        closeTo(-(Slider.thumbSize - Slider.trackHeight) / 2, 0.01),
         reason: '`items-center` on a box shorter than the knob',
       );
     });
@@ -333,7 +341,7 @@ void main() {
       final Rect range = surfaceRect(t, 1);
       // Probed 8.90625 from the content edge, and 205.19 wide.
       expect(
-        range.left - ElWidths.hairline,
+        range.left - BorderWidths.hairline,
         closeTo(10 / 500 * _content, _tolerance),
         reason: 'left = 10/500 x 446 = 8.92, probed 8.90625',
       );
@@ -344,7 +352,7 @@ void main() {
       );
       expect(
         range.height,
-        ElSlider.trackHeight - 2 * ElWidths.hairline,
+        Slider.trackHeight - 2 * BorderWidths.hairline,
         reason: 'the range is the track content box tall — 8px',
       );
     });
@@ -357,7 +365,7 @@ void main() {
       final Rect range = surfaceRect(t, 1);
       expect(
         range.left,
-        closeTo(ElWidths.hairline, _tolerance),
+        closeTo(BorderWidths.hairline, _tolerance),
         reason: 'one thumb means the fill starts at the minimum',
       );
       expect(
@@ -407,13 +415,13 @@ void main() {
       await t.pumpWidget(host(slider(values: <double>[50])));
       expect(
         surfaceRect(t, 1).right,
-        closeTo(surfaceRect(t, 2).left + ElSlider.thumbSize / 2, _tolerance),
+        closeTo(surfaceRect(t, 2).left + Slider.thumbSize / 2, _tolerance),
         reason: 'at 50% the fill ends exactly under the knob\'s centre',
       );
 
       await t.pumpWidget(host(slider(values: <double>[25])));
       final double fillEnd = surfaceRect(t, 1).right;
-      final double knobCentre = surfaceRect(t, 2).left + ElSlider.thumbSize / 2;
+      final double knobCentre = surfaceRect(t, 2).left + Slider.thumbSize / 2;
       expect(
         (fillEnd - knobCentre).abs(),
         greaterThan(_tolerance),
@@ -427,13 +435,10 @@ void main() {
   // ───────────────────────────────────────────────────────────────────────────
 
   group('rasterised', () {
-    for (final ElThemeMode mode in <ElThemeMode>[
-      ElThemeMode.light,
-      ElThemeMode.dark,
-    ]) {
-      final ElThemeData theme = mode == ElThemeMode.light
-          ? ElThemeData.light
-          : ElThemeData.dark;
+    for (final ColorMode mode in <ColorMode>[ColorMode.light, ColorMode.dark]) {
+      final ThemeTokens theme = mode == ColorMode.light
+          ? ThemeTokens.light
+          : ThemeTokens.dark;
 
       testWidgets('$mode: the fill is --action-ink and the channel is --muted', (
         WidgetTester t,
@@ -450,12 +455,12 @@ void main() {
         // comment warns against: it measures 1.63:1 against `--muted` where
         // `--action-ink` measures 6.88:1.
         final List<Color> palette = <Color>[
-          theme.actionInk,
+          theme.actionText,
           theme.muted,
           theme.primary,
         ];
         expect(
-          theme.actionInk,
+          theme.actionText,
           isNot(theme.primary),
           reason: 'the anti-assertion has to be able to fail',
         );
@@ -463,7 +468,7 @@ void main() {
         // Left of the midpoint is the lit fill; right of it is the socket.
         expect(
           _nearest(row[80], palette),
-          theme.actionInk,
+          theme.actionText,
           reason: '$mode: `bg-action-ink`, NOT `bg-primary`',
         );
         expect(
@@ -492,7 +497,7 @@ void main() {
           mode: mode,
           x: 300,
         );
-        expect(column.length, ElSlider.trackHeight.round());
+        expect(column.length, Slider.trackHeight.round());
 
         // Inside the 1px `--input` border, the top band carries the inset and
         // the bottom does not — the hole is displaced DOWN by 2px, so the ring
@@ -520,23 +525,19 @@ void main() {
   group('the raised/recessed pair', () {
     testWidgets('sunken track, lit fill, raised knob', (WidgetTester t) async {
       await t.pumpWidget(host(slider(values: <double>[40])));
-      final ElThemeData theme = ElTheme.of(t.element(find.byType(ElSlider)));
-      final List<ElMachineSurface> painted = surfaces(t);
+      final ThemeTokens theme = ThemeScope.of(t.element(find.byType(Slider)));
+      final List<Surface> painted = surfaces(t);
 
-      expect(
-        painted[0].spec,
-        ElShadows.pressed,
-        reason: 'track `shadow-pressed`',
-      );
+      expect(painted[0].spec, Shadows.inset, reason: 'track `shadow-pressed`');
       expect(painted[0].fill, theme.muted);
       expect(borderOf(painted[0]), theme.input, reason: '`border-input`');
 
       expect(
         painted[1].spec,
-        ElShadows.btnPrimary,
+        Shadows.controlPrimary,
         reason: 'range `shadow-btn-primary` — the blue glow',
       );
-      expect(painted[1].fill, theme.actionInk);
+      expect(painted[1].fill, theme.actionText);
       expect(
         painted[1].radius,
         BorderRadius.zero,
@@ -551,7 +552,7 @@ void main() {
       expect(borderOf(painted[2]), theme.input);
       expect(
         painted[2].spec.layers.length,
-        ElShadows.btn.layers.length + 1,
+        Shadows.control.layers.length + 1,
         reason: 'the ring slot is always present, at zero alpha when at rest',
       );
     });
@@ -560,7 +561,7 @@ void main() {
       await t.pumpWidget(host(slider(values: <double>[40])));
       expect(
         find.descendant(
-          of: find.byType(ElSlider),
+          of: find.byType(Slider),
           matching: find.byType(ClipRRect),
         ),
         findsOneWidget,
@@ -578,7 +579,7 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(host(slider(values: <double>[40])));
-      final ElThemeData theme = ElTheme.of(t.element(find.byType(ElSlider)));
+      final ThemeTokens theme = ThemeScope.of(t.element(find.byType(Slider)));
 
       expect(
         ringOf(surfaces(t)[2], theme).a,
@@ -594,7 +595,7 @@ void main() {
             'the thumb has to actually hold focus for this to mean '
             'anything',
       );
-      await t.pump(ElDurations.transitionDefault);
+      await t.pump(MotionDurations.normal);
 
       final Color ring = ringOf(surfaces(t)[2], theme);
       expect(
@@ -611,13 +612,13 @@ void main() {
       'the ring TWEENS — it is in transition-[transform,box-shadow]',
       (WidgetTester t) async {
         await t.pumpWidget(host(slider(values: <double>[40])));
-        final ElThemeData theme = ElTheme.of(t.element(find.byType(ElSlider)));
+        final ThemeTokens theme = ThemeScope.of(t.element(find.byType(Slider)));
 
         await focusThumb(t, 0);
 
         // An eighth of the way in: still climbing, and the whole assertion is
         // that it is caught between its two ends rather than at one of them.
-        await t.pump(ElDurations.transitionDefault ~/ 8);
+        await t.pump(MotionDurations.normal ~/ 8);
         final double early = ringOf(surfaces(t)[2], theme).a;
         expect(early, greaterThan(0), reason: 'the ring has started');
         expect(
@@ -631,17 +632,14 @@ void main() {
         // `transition-timing-function`, and a control point above 1 is what
         // overshoot means. An `--ease-out` ring could never produce this, which
         // is what makes it a pin on the curve and not merely on the duration.
-        await t.pump(
-          ElDurations.transitionDefault ~/ 2 -
-              ElDurations.transitionDefault ~/ 8,
-        );
+        await t.pump(MotionDurations.normal ~/ 2 - MotionDurations.normal ~/ 8);
         expect(
           ringOf(surfaces(t)[2], theme).a,
           greaterThan(0.5),
           reason: 'the spring overshoots its target before settling back',
         );
 
-        await t.pump(ElDurations.transitionDefault);
+        await t.pump(MotionDurations.normal);
         expect(
           ringOf(surfaces(t)[2], theme).a,
           closeTo(0.5, 0.01),
@@ -662,7 +660,7 @@ void main() {
       double scaleNow() => t
           .widgetList<Transform>(
             find.descendant(
-              of: find.byType(ElSlider),
+              of: find.byType(Slider),
               matching: find.byType(Transform),
             ),
           )
@@ -681,14 +679,14 @@ void main() {
       // ONE frame after the pointer arrives it is already fully grown.
       expect(
         scaleNow(),
-        ElTransforms.sliderThumbHoverScale,
+        MotionTransforms.sliderThumbHoverScale,
         reason: 'hover:scale-110 arrives whole, in a single frame',
       );
 
-      await t.pump(ElDurations.transitionDefault ~/ 2);
+      await t.pump(MotionDurations.normal ~/ 2);
       expect(
         scaleNow(),
-        ElTransforms.sliderThumbHoverScale,
+        MotionTransforms.sliderThumbHoverScale,
         reason: 'and it never passes through an intermediate value',
       );
     });
@@ -703,7 +701,7 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(host(const _Live(initial: <double>[25])));
-      final Offset origin = t.getTopLeft(find.byType(ElSlider));
+      final Offset origin = t.getTopLeft(find.byType(Slider));
 
       // Probed: a pointer 131px into a 448-wide root reported 29, and
       // 131/448 x 100 = 29.24. Against the 428 travel it would read 30.6.
@@ -724,12 +722,12 @@ void main() {
       await t.pumpWidget(
         host(const _Live(initial: <double>[10, 240], max: 500, step: 5)),
       );
-      final Offset origin = t.getTopLeft(find.byType(ElSlider));
+      final Offset origin = t.getTopLeft(find.byType(Slider));
 
       // Probed: [10, 240], clicked 30% of the way between the knobs ->
       // [85, 240]. The low thumb moves; the high one is untouched.
-      final double lowCentre = 10 / 500 * _travel + ElSlider.thumbSize / 2;
-      final double highCentre = 240 / 500 * _travel + ElSlider.thumbSize / 2;
+      final double lowCentre = 10 / 500 * _travel + Slider.thumbSize / 2;
+      final double highCentre = 240 / 500 * _travel + Slider.thumbSize / 2;
       await t.tapAt(
         origin + Offset(lowCentre + (highCentre - lowCentre) * 0.3, 5),
       );
@@ -744,8 +742,8 @@ void main() {
     ) async {
       await t.pumpWidget(host(const _Live(initial: <double>[25])));
       final Offset start =
-          t.getTopLeft(find.byType(ElSlider)) +
-          Offset(25 / 100 * _travel + ElSlider.thumbSize / 2, 5);
+          t.getTopLeft(find.byType(Slider)) +
+          Offset(25 / 100 * _travel + Slider.thumbSize / 2, 5);
 
       final TestGesture gesture = await t.startGesture(start);
       await t.pump();
@@ -753,7 +751,7 @@ void main() {
       // ONE frame — the position is `left`, which nothing interpolates.
       await t.pump();
       final double afterOneFrame = valuesOf(t).single;
-      await t.pump(ElDurations.transitionDefault);
+      await t.pump(MotionDurations.normal);
       expect(
         valuesOf(t).single,
         afterOneFrame,
@@ -773,10 +771,10 @@ void main() {
       await t.pumpWidget(
         host(const _Live(initial: <double>[0, 500], max: 500, step: 5)),
       );
-      final Offset origin = t.getTopLeft(find.byType(ElSlider));
+      final Offset origin = t.getTopLeft(find.byType(Slider));
 
       final TestGesture gesture = await t.startGesture(
-        origin + Offset(ElSlider.thumbSize / 2, 5),
+        origin + Offset(Slider.thumbSize / 2, 5),
       );
       await t.pump();
       await gesture.moveTo(origin + const Offset(_panel + 60, 5));
@@ -797,7 +795,7 @@ void main() {
       await t.pumpWidget(
         host(const _Live(initial: <double>[10, 240], max: 500, step: 5)),
       );
-      final Offset origin = t.getTopLeft(find.byType(ElSlider));
+      final Offset origin = t.getTopLeft(find.byType(Slider));
       final TestGesture gesture = await t.startGesture(
         origin + const Offset(20, 5),
       );
@@ -898,7 +896,7 @@ void main() {
       final List<Opacity> dimmings = t
           .widgetList<Opacity>(
             find.descendant(
-              of: find.byType(ElSlider),
+              of: find.byType(Slider),
               matching: find.byType(Opacity),
             ),
           )
@@ -918,7 +916,7 @@ void main() {
         host(const _Live(initial: <double>[40], enabled: false)),
       );
       await t.tapAt(
-        t.getTopLeft(find.byType(ElSlider)) + const Offset(_panel * 0.9, 5),
+        t.getTopLeft(find.byType(Slider)) + const Offset(_panel * 0.9, 5),
       );
       await t.pump();
       expect(valuesOf(t).single, 40);
@@ -929,10 +927,7 @@ void main() {
         host(slider(values: <double>[40], enabled: false, live: false)),
       );
       final Focus focus = t.widget<Focus>(
-        find.descendant(
-          of: find.byType(ElSlider),
-          matching: find.byType(Focus),
-        ),
+        find.descendant(of: find.byType(Slider), matching: find.byType(Focus)),
       );
       expect(
         focus.canRequestFocus,
@@ -947,7 +942,7 @@ void main() {
       // `enabled` is still true, so nothing dims — only the handler is gone.
       final Opacity dimming = t.widget<Opacity>(
         find.descendant(
-          of: find.byType(ElSlider),
+          of: find.byType(Slider),
           matching: find.byType(Opacity),
         ),
       );
@@ -970,15 +965,15 @@ void main() {
       // the border box instead would give 36.
       //
       // Read as a rect rather than driven with a tap: every render object
-      // above [ElHitArea] bounds-checks itself first, so a snug parent rejects
+      // above [HitArea] bounds-checks itself first, so a snug parent rejects
       // a pointer in the margin before the expander is consulted. CSS has no
       // such gate. The rect is what the contract actually promises.
       await t.pumpWidget(host(slider(values: <double>[50])));
-      final Rect expander = ElHitArea.debugExpanded(
+      final Rect expander = HitArea.debugExpanded(
         t.renderObject(
           find.descendant(
-            of: find.byType(ElSlider),
-            matching: find.byType(ElHitArea),
+            of: find.byType(Slider),
+            matching: find.byType(HitArea),
           ),
         ),
       );
@@ -990,7 +985,7 @@ void main() {
         reason: 'the thumb expander is 34 tall, not 36',
       );
       expect(expander.top, -12);
-      expect(expander.bottom, ElSlider.trackHeight + 12);
+      expect(expander.bottom, Slider.trackHeight + 12);
 
       // Horizontally a knob at either end sits half its width in, so the
       // expander clears the root by 17 - 10 = 7.
@@ -1008,7 +1003,7 @@ void main() {
       double scaleNow() => t
           .widgetList<Transform>(
             find.descendant(
-              of: find.byType(ElSlider),
+              of: find.byType(Slider),
               matching: find.byType(Transform),
             ),
           )
@@ -1026,7 +1021,7 @@ void main() {
       await t.pump();
       expect(
         scaleNow(),
-        ElTransforms.sliderThumbHoverScale,
+        MotionTransforms.sliderThumbHoverScale,
         reason: 'still inside the 34-wide expander',
       );
 
@@ -1053,8 +1048,8 @@ void main() {
       await t.pumpWidget(host(const _Live(initial: <double>[40])));
       expect(
         find.descendant(
-          of: find.byType(ElSlider),
-          matching: find.byType(ElJellyReplay),
+          of: find.byType(Slider),
+          matching: find.byType(StateChangeFeedback),
         ),
         findsNothing,
       );
@@ -1080,9 +1075,9 @@ void main() {
     testWidgets('it paints in both themes without error', (
       WidgetTester t,
     ) async {
-      for (final ElThemeMode mode in <ElThemeMode>[
-        ElThemeMode.light,
-        ElThemeMode.dark,
+      for (final ColorMode mode in <ColorMode>[
+        ColorMode.light,
+        ColorMode.dark,
       ]) {
         await t.pumpWidget(
           host(
@@ -1090,7 +1085,7 @@ void main() {
             mode: mode,
           ),
         );
-        await t.pump(ElDurations.transitionDefault);
+        await t.pump(MotionDurations.normal);
         expect(t.takeException(), isNull, reason: '$mode');
       }
     });

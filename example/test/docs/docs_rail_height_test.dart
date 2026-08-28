@@ -7,7 +7,19 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/button/page.dart';
 import 'package:flutter/material.dart' show MaterialApp;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -19,14 +31,12 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
-    );
+    final ThemeController controller = ThemeController(mode: ColorMode.dark);
     addTearDown(controller.dispose);
 
     // The same harness every component-doc test uses.
     await tester.pumpWidget(
-      ElTheme(
+      ThemeScope(
         controller: controller,
         child: const MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -39,9 +49,10 @@ void main() {
     // The cap the implementation targets: the sticky header plus its own
     // bottom gutter, not just the header. A regression that drops the
     // gutter term but keeps the header term would still clear a bound of
-    // `viewportHeight - ElWidths.siteHeader` alone, so the full expression
+    // `viewportHeight - LayoutHeights.siteHeader` alone, so the full expression
     // is pinned here, not a looser approximation of it.
-    final double railMaxHeight = viewportHeight - ElWidths.siteHeader - el(4);
+    final double railMaxHeight =
+        viewportHeight - LayoutHeights.siteHeader - space(4);
 
     final Finder sidebarRail = find.byKey(
       const ValueKey<String>('docs-layout-sidebar'),
@@ -55,7 +66,7 @@ void main() {
     // The table-of-contents rail on the right shares the same
     // `railMaxHeight` expression (`docs_layout.dart`'s two
     // `ConstrainedBox.maxHeight` sites), so it is pinned the same way. It
-    // only renders at `ElBreakpoints.xl` and wider; this test's 1600-wide
+    // only renders at `Breakpoints.xl` and wider; this test's 1600-wide
     // view clears that.
     final Finder tocRail = find.byKey(
       const ValueKey<String>('docs-layout-toc'),
@@ -76,13 +87,11 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
-    );
+    final ThemeController controller = ThemeController(mode: ColorMode.dark);
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
-      ElTheme(
+      ThemeScope(
         controller: controller,
         child: const MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -126,21 +135,19 @@ void main() {
     WidgetTester tester,
   ) async {
     // The fraction is a desktop rule. It is desktop-only by construction —
-    // below `ElBreakpoints.lg` there is no rail at all, only the horizontal
+    // below `Breakpoints.lg` there is no rail at all, only the horizontal
     // anchor strip — and this is what pins that construction, so a later
     // change that started rendering a rail on a tablet would have to come
     // past this test and decide the question deliberately.
-    tester.view.physicalSize = const Size(ElBreakpoints.md, 900);
+    tester.view.physicalSize = const Size(Breakpoints.md, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
-    );
+    final ThemeController controller = ThemeController(mode: ColorMode.dark);
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
-      ElTheme(
+      ThemeScope(
         controller: controller,
         child: const MaterialApp(
           debugShowCheckedModeBanner: false,

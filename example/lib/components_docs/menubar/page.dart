@@ -1,6 +1,6 @@
 /// Public documentation page for the `menubar` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button`, `field`, `dropdown_menu` and
@@ -24,8 +24,8 @@
 /// is now about exactly one component.
 ///
 /// **API tables, verified.** Built from `lib/src/components/menubar.dart`'s
-/// real constructors and static getters: ElMenubar takes exactly one
-/// parameter, `menus`; ElMenubarMenu takes `label` and `children`.
+/// real constructors and static getters: Menubar takes exactly one
+/// parameter, `menus`; MenubarMenu takes `label` and `children`.
 ///
 /// **Installation and Dependencies, corrected.** The old page's own facts
 /// claimed "None: unregistered" / "has no manifest" — stale:
@@ -39,7 +39,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -85,7 +97,7 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElMenubar and ElMenubarMenu are '
+              'Add the export line so Menubar and MenubarMenu are '
               'reachable the same way the CLI path already makes them.',
           code: "export 'menubar.dart';",
         ),
@@ -103,17 +115,17 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          "What the constructor assembles internally. ElMenubar does "
+          "What the constructor assembles internally. Menubar does "
           "not take a caller-assembled tree of sub-widgets the way "
           "shadcn's MenubarMenu markup does: it takes a flat menus list, "
-          'and each menu a flat children list of ElMenuChild rows.',
+          'and each menu a flat children list of MenuChild rows.',
       code: _menubarCompositionCode,
     ),
     ShowcaseSection(
       id: 'checkbox',
       title: 'Checkbox',
       description:
-          'ElMenuCheckboxItem inside a ElMenubarMenu, for a toggleable '
+          'MenuCheckboxItem inside a MenubarMenu, for a toggleable '
           'option. checked is controlled: the caller owns the state and '
           'the row reports back through onSelect.',
       specimen: _MenubarCheckbox(),
@@ -124,7 +136,7 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
       id: 'radio',
       title: 'Radio',
       description:
-          'ElMenuRadioGroup and ElMenuRadioItem for a single-select '
+          'MenuRadioGroup and MenuRadioItem for a single-select '
           'group of rows. The group paints nothing: it exists so '
           'exactly one child row wears the tick.',
       specimen: _MenubarRadio(),
@@ -135,7 +147,7 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
       id: 'submenu',
       title: 'Submenu',
       description:
-          'ElMenuSub nests one level of rows behind a trigger row. '
+          'MenuSub nests one level of rows behind a trigger row. '
           'Allowed one level deep by editorial convention, not by a '
           'depth check the source enforces.',
       specimen: _MenubarSubmenu(),
@@ -146,8 +158,8 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
       id: 'with-icons',
       title: 'With Icons',
       description:
-          'ElMenuItem.icon puts a 16px leading glyph on a row, forced '
-          'to that size regardless of what ElIconSize the call site '
+          'MenuItem.icon puts a 16px leading glyph on a row, forced '
+          'to that size regardless of what IconSize the call site '
           'names.',
       specimen: _MenubarIcons(),
       code: _menubarIconsCode,
@@ -170,16 +182,16 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElMenubar and ElMenubarMenu '
+          'Every constructor parameter Menubar and MenubarMenu '
           'declare, plus the static layout helpers the strip is built '
           'from.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElMenubar', anchor: 'api-elmenubar'),
+        DocsTocEntry(title: 'Menubar', anchor: 'api-elmenubar'),
         DocsTocEntry(
-          title: 'ElMenubar static helpers',
+          title: 'Menubar static helpers',
           anchor: 'api-elmenubar-static',
         ),
-        DocsTocEntry(title: 'ElMenubarMenu', anchor: 'api-elmenubarmenu'),
+        DocsTocEntry(title: 'MenubarMenu', anchor: 'api-elmenubarmenu'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -194,8 +206,7 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
     DisclosureSection(
       id: 'accessibility',
       title: 'Accessibility',
-      description:
-          'Keyboard interactions have their own section below.',
+      description: 'Keyboard interactions have their own section below.',
       child: _AccessibilityContent(),
     ),
     DisclosureSection(
@@ -239,9 +250,9 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
             label: 'Row model source',
             value: 'lib/src/components/menu.dart',
             description:
-                'ElMenuChild and its variants (ElMenuItem, '
-                'ElMenuCheckboxItem, ElMenuRadioGroup/Item, ElMenuSub, '
-                'ElMenuLabel, ElMenuSeparator, ElMenuGroup): not '
+                'MenuChild and its variants (MenuItem, '
+                'MenuCheckboxItem, MenuRadioGroup/Item, MenuSub, '
+                'MenuLabel, MenuSeparator, MenuGroup): not '
                 'documented on this page. See the Dropdown Menu page '
                 'for the full row-model API tables.',
           ),
@@ -277,9 +288,9 @@ class MenubarDocPage extends StatelessWidget {
       title: menubarDocSpec.title,
       description: menubarDocSpec.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Menubar'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Menubar'),
     ],
     toc: menubarDocSpec.toc,
     previous: null,
@@ -300,21 +311,21 @@ class _MenubarSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElMenubar(
+    return Menubar(
       key: const ValueKey<String>('menubar-specimen'),
-      menus: <ElMenubarMenu>[
-        ElMenubarMenu(
+      menus: <MenubarMenu>[
+        MenubarMenu(
           label: 'File',
-          children: <ElMenuChild>[
-            ElMenuItem(label: 'New'),
-            ElMenuItem(label: 'Open'),
+          children: <MenuChild>[
+            MenuItem(label: 'New'),
+            MenuItem(label: 'Open'),
           ],
         ),
-        ElMenubarMenu(
+        MenubarMenu(
           label: 'Edit',
-          children: <ElMenuChild>[
-            ElMenuItem(label: 'Undo'),
-            ElMenuItem(label: 'Redo'),
+          children: <MenuChild>[
+            MenuItem(label: 'Undo'),
+            MenuItem(label: 'Redo'),
           ],
         ),
       ],
@@ -327,16 +338,13 @@ class _MenubarCheckbox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElMenubar(
-      menus: <ElMenubarMenu>[
-        ElMenubarMenu(
+    return Menubar(
+      menus: <MenubarMenu>[
+        MenubarMenu(
           label: 'View',
-          children: <ElMenuChild>[
-            ElMenuCheckboxItem(
-              label: 'Always Show Bookmarks Bar',
-              checked: true,
-            ),
-            ElMenuCheckboxItem(label: 'Always Show Full URLs', checked: false),
+          children: <MenuChild>[
+            MenuCheckboxItem(label: 'Always Show Bookmarks Bar', checked: true),
+            MenuCheckboxItem(label: 'Always Show Full URLs', checked: false),
           ],
         ),
       ],
@@ -349,17 +357,17 @@ class _MenubarRadio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElMenubar(
-      menus: <ElMenubarMenu>[
-        ElMenubarMenu(
+    return Menubar(
+      menus: <MenubarMenu>[
+        MenubarMenu(
           label: 'Profiles',
-          children: <ElMenuChild>[
-            ElMenuRadioGroup(
+          children: <MenuChild>[
+            MenuRadioGroup(
               value: 'benoit',
-              children: <ElMenuRadioItem>[
-                ElMenuRadioItem(value: 'andy', label: 'Andy'),
-                ElMenuRadioItem(value: 'benoit', label: 'Benoit'),
-                ElMenuRadioItem(value: 'luis', label: 'Luis'),
+              children: <MenuRadioItem>[
+                MenuRadioItem(value: 'andy', label: 'Andy'),
+                MenuRadioItem(value: 'benoit', label: 'Benoit'),
+                MenuRadioItem(value: 'luis', label: 'Luis'),
               ],
             ),
           ],
@@ -374,17 +382,17 @@ class _MenubarSubmenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElMenubar(
-      menus: <ElMenubarMenu>[
-        ElMenubarMenu(
+    return Menubar(
+      menus: <MenubarMenu>[
+        MenubarMenu(
           label: 'File',
-          children: <ElMenuChild>[
-            ElMenuItem(label: 'New Tab'),
-            ElMenuSub(
+          children: <MenuChild>[
+            MenuItem(label: 'New Tab'),
+            MenuSub(
               label: 'Share',
-              children: <ElMenuChild>[
-                ElMenuItem(label: 'Email link'),
-                ElMenuItem(label: 'Messages'),
+              children: <MenuChild>[
+                MenuItem(label: 'Email link'),
+                MenuItem(label: 'Messages'),
               ],
             ),
           ],
@@ -399,14 +407,14 @@ class _MenubarIcons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElMenubar(
-      menus: <ElMenubarMenu>[
-        ElMenubarMenu(
+    return Menubar(
+      menus: <MenubarMenu>[
+        MenubarMenu(
           label: 'File',
-          children: <ElMenuChild>[
-            ElMenuItem(label: 'New File', icon: ElIconGlyph.plus),
-            ElMenuItem(label: 'Open', icon: ElIconGlyph.packageOpen),
-            ElMenuItem(label: 'Download', icon: ElIconGlyph.download),
+          children: <MenuChild>[
+            MenuItem(label: 'New File', icon: IconGlyph.plus),
+            MenuItem(label: 'Open', icon: IconGlyph.packageOpen),
+            MenuItem(label: 'Download', icon: IconGlyph.download),
           ],
         ),
       ],
@@ -421,20 +429,20 @@ class _MenubarRtl extends StatelessWidget {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: ElMenubar(
-        menus: <ElMenubarMenu>[
-          ElMenubarMenu(
+      child: Menubar(
+        menus: <MenubarMenu>[
+          MenubarMenu(
             label: 'ملف',
-            children: <ElMenuChild>[
-              ElMenuItem(label: 'جديد'),
-              ElMenuItem(label: 'فتح'),
+            children: <MenuChild>[
+              MenuItem(label: 'جديد'),
+              MenuItem(label: 'فتح'),
             ],
           ),
-          ElMenubarMenu(
+          MenubarMenu(
             label: 'تحرير',
-            children: <ElMenuChild>[
-              ElMenuItem(label: 'تراجع'),
-              ElMenuItem(label: 'إعادة'),
+            children: <MenuChild>[
+              MenuItem(label: 'تراجع'),
+              MenuItem(label: 'إعادة'),
             ],
           ),
         ],
@@ -443,54 +451,54 @@ class _MenubarRtl extends StatelessWidget {
   }
 }
 
-const String _menubarCode = '''return ElMenubar(
-  menus: <ElMenubarMenu>[
-    ElMenubarMenu(
+const String _menubarCode = '''return Menubar(
+  menus: <MenubarMenu>[
+    MenubarMenu(
       label: 'File',
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'New'),
-        ElMenuItem(label: 'Open'),
-        ElMenuItemSeparator(),
-        ElMenuItem(label: 'Exit'),
+      children: <MenuChild>[
+        MenuItem(label: 'New'),
+        MenuItem(label: 'Open'),
+        MenuItemSeparator(),
+        MenuItem(label: 'Exit'),
       ],
     ),
-    ElMenubarMenu(
+    MenubarMenu(
       label: 'Edit',
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'Undo'),
-        ElMenuItem(label: 'Redo'),
+      children: <MenuChild>[
+        MenuItem(label: 'Undo'),
+        MenuItem(label: 'Redo'),
       ],
     ),
   ],
 );''';
 
-const String _menubarCompositionCode = '''ElMenubar(
-  menus: <ElMenubarMenu>[
-    ElMenubarMenu(
+const String _menubarCompositionCode = '''Menubar(
+  menus: <MenubarMenu>[
+    MenubarMenu(
       label: '...',          // the trigger text
-      children: <ElMenuChild>[
-        ElMenuItem(...),          // a plain row
-        ElMenuCheckboxItem(...),  // a toggleable row
-        ElMenuRadioGroup(children: <ElMenuRadioItem>[...]),
-        ElMenuSub(children: <ElMenuChild>[...]), // one nested level
-        ElMenuLabel(...),
-        ElMenuSeparator(),
-        ElMenuGroup(children: <ElMenuChild>[...]),
+      children: <MenuChild>[
+        MenuItem(...),          // a plain row
+        MenuCheckboxItem(...),  // a toggleable row
+        MenuRadioGroup(children: <MenuRadioItem>[...]),
+        MenuSub(children: <MenuChild>[...]), // one nested level
+        MenuLabel(...),
+        MenuSeparator(),
+        MenuGroup(children: <MenuChild>[...]),
       ],
     ),
   ],
 )''';
 
-const String _menubarCheckboxCode = '''return ElMenubar(
-  menus: <ElMenubarMenu>[
-    ElMenubarMenu(
+const String _menubarCheckboxCode = '''return Menubar(
+  menus: <MenubarMenu>[
+    MenubarMenu(
       label: 'View',
-      children: <ElMenuChild>[
-        ElMenuCheckboxItem(
+      children: <MenuChild>[
+        MenuCheckboxItem(
           label: 'Always Show Bookmarks Bar',
           checked: true,
         ),
-        ElMenuCheckboxItem(
+        MenuCheckboxItem(
           label: 'Always Show Full URLs',
           checked: false,
         ),
@@ -499,17 +507,17 @@ const String _menubarCheckboxCode = '''return ElMenubar(
   ],
 );''';
 
-const String _menubarRadioCode = '''return ElMenubar(
-  menus: <ElMenubarMenu>[
-    ElMenubarMenu(
+const String _menubarRadioCode = '''return Menubar(
+  menus: <MenubarMenu>[
+    MenubarMenu(
       label: 'Profiles',
-      children: <ElMenuChild>[
-        ElMenuRadioGroup(
+      children: <MenuChild>[
+        MenuRadioGroup(
           value: 'benoit',
-          children: <ElMenuRadioItem>[
-            ElMenuRadioItem(value: 'andy', label: 'Andy'),
-            ElMenuRadioItem(value: 'benoit', label: 'Benoit'),
-            ElMenuRadioItem(value: 'luis', label: 'Luis'),
+          children: <MenuRadioItem>[
+            MenuRadioItem(value: 'andy', label: 'Andy'),
+            MenuRadioItem(value: 'benoit', label: 'Benoit'),
+            MenuRadioItem(value: 'luis', label: 'Luis'),
           ],
         ),
       ],
@@ -517,17 +525,17 @@ const String _menubarRadioCode = '''return ElMenubar(
   ],
 );''';
 
-const String _menubarSubmenuCode = '''return ElMenubar(
-  menus: <ElMenubarMenu>[
-    ElMenubarMenu(
+const String _menubarSubmenuCode = '''return Menubar(
+  menus: <MenubarMenu>[
+    MenubarMenu(
       label: 'File',
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'New Tab'),
-        ElMenuSub(
+      children: <MenuChild>[
+        MenuItem(label: 'New Tab'),
+        MenuSub(
           label: 'Share',
-          children: <ElMenuChild>[
-            ElMenuItem(label: 'Email link'),
-            ElMenuItem(label: 'Messages'),
+          children: <MenuChild>[
+            MenuItem(label: 'Email link'),
+            MenuItem(label: 'Messages'),
           ],
         ),
       ],
@@ -535,14 +543,14 @@ const String _menubarSubmenuCode = '''return ElMenubar(
   ],
 );''';
 
-const String _menubarIconsCode = '''return ElMenubar(
-  menus: <ElMenubarMenu>[
-    ElMenubarMenu(
+const String _menubarIconsCode = '''return Menubar(
+  menus: <MenubarMenu>[
+    MenubarMenu(
       label: 'File',
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'New File', icon: ElIconGlyph.plus),
-        ElMenuItem(label: 'Open', icon: ElIconGlyph.packageOpen),
-        ElMenuItem(label: 'Download', icon: ElIconGlyph.download),
+      children: <MenuChild>[
+        MenuItem(label: 'New File', icon: IconGlyph.plus),
+        MenuItem(label: 'Open', icon: IconGlyph.packageOpen),
+        MenuItem(label: 'Download', icon: IconGlyph.download),
       ],
     ),
   ],
@@ -550,20 +558,20 @@ const String _menubarIconsCode = '''return ElMenubar(
 
 const String _menubarRtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElMenubar(
-    menus: <ElMenubarMenu>[
-      ElMenubarMenu(
+  child: Menubar(
+    menus: <MenubarMenu>[
+      MenubarMenu(
         label: 'ملف',
-        children: <ElMenuChild>[
-          ElMenuItem(label: 'جديد'),
-          ElMenuItem(label: 'فتح'),
+        children: <MenuChild>[
+          MenuItem(label: 'جديد'),
+          MenuItem(label: 'فتح'),
         ],
       ),
-      ElMenubarMenu(
+      MenubarMenu(
         label: 'تحرير',
-        children: <ElMenuChild>[
-          ElMenuItem(label: 'تراجع'),
-          ElMenuItem(label: 'إعادة'),
+        children: <MenuChild>[
+          MenuItem(label: 'تراجع'),
+          MenuItem(label: 'إعادة'),
         ],
       ),
     ],
@@ -581,23 +589,20 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elmenubar',
-        child: DocsApiTable(title: 'ElMenubar', facts: _menubarApiFacts),
+        child: DocsApiTable(title: 'Menubar', facts: _menubarApiFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elmenubar-static',
         child: DocsApiTable(
-          title: 'ElMenubar static helpers',
+          title: 'Menubar static helpers',
           facts: _menubarStaticFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elmenubarmenu',
-        child: DocsApiTable(
-          title: 'ElMenubarMenu',
-          facts: _menubarMenuApiFacts,
-        ),
+        child: DocsApiTable(title: 'MenubarMenu', facts: _menubarMenuApiFacts),
       ),
     ],
   );
@@ -608,7 +613,7 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The bar itself takes no tab stop (canRequestFocus: false): a '
             'keyboard-only user tabs straight past the strip. Opening a '
             'menu is a click/tap action; there is no keyboard route to '
@@ -624,7 +629,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'GAP: no keyboard route to open a menu. canRequestFocus: false '
             'means the strip never becomes a focus stop, and _step only '
             'fires when _open is already non-null: opening the first '
@@ -648,7 +653,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Click opens a menu on every platform. Hover swaps between '
             'menus on desktop once one is already open; on touch, tap '
             'toggles a menu with no multi-trigger hover handoff.',
@@ -660,7 +665,7 @@ class _ResponsiveContent extends StatelessWidget {
             'animation. Switching menus by hover, the outgoing content '
             'is gone the instant state flips; only the incoming '
             'content animates in.',
-        "The open menu relies on ElPopover's collision algorithm near "
+        "The open menu relies on Popover's collision algorithm near "
             'a viewport edge and snaps without transition when it '
             'flips.',
         'Platform parity: no dart:io Platform branch anywhere in the '
@@ -686,16 +691,16 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Primary dependency',
-            value: 'ElPopover',
+            value: 'Popover',
             description:
-                "Mounts each menu's content through ElPopover, "
-                'non-modal (ElPopoverBarrier.nonModal), which is what '
+                "Mounts each menu's content through Popover, "
+                'non-modal (PopoverBarrier.nonModal), which is what '
                 'lets a sibling trigger be hovered while a menu is '
                 'open.',
           ),
           const DocsInstallFact(
             label: 'Row model',
-            value: 'ElMenu, ElMenuChild (menu.dart)',
+            value: 'Menu, MenuChild (menu.dart)',
             description:
                 'The shared row model Menubar, Context Menu, and '
                 'Dropdown Menu all use for their content.',
@@ -714,7 +719,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Menu', route: '/components/menu'),
@@ -730,29 +735,33 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Trigger, rest: theme.foreground text, no fill. Trigger, hover '
             'or open: theme.muted fill — one fill for both states, and '
             'it does not transition (measured: transition-duration 0s '
             'on the reference).',
         'Root: a theme.border, 1px border around the whole strip.',
         'Menu content: theme.popover / theme.popoverForeground, via '
-            "ElMenuContent's own ElPopoverSurface, the same surface "
+            "MenuContent's own PopoverSurface, the same surface "
             'Context Menu and Dropdown Menu use.',
-        'Menu content animates in through ElDurations.overlay; there '
+        'Menu content animates in through MotionDurations.overlayEnter; there '
             'is no matching exit animation to time (drift 2, above).',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -760,7 +769,7 @@ Widget _bullets(ElThemeData theme, List<String> lines) => Column(
 const List<DocsApiFact> _menubarApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'menus',
-    type: 'List<ElMenubarMenu>',
+    type: 'List<MenubarMenu>',
     description:
         'Required. The triggers and their menu rows, in strip order: a '
         'strip of menu openers.',
@@ -769,7 +778,7 @@ const List<DocsApiFact> _menubarApiFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _menubarStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElMenubar.height',
+    name: 'Menubar.height',
     type: 'static double',
     description:
         'The root\'s (and every trigger\'s) fixed height: 32px. Documented '
@@ -777,27 +786,27 @@ const List<DocsApiFact> _menubarStaticFacts = <DocsApiFact>[
         '32px triggers overflow it top and bottom.',
   ),
   DocsApiFact(
-    name: 'ElMenubar.padding',
+    name: 'Menubar.padding',
     type: 'static double',
     description: 'Inset around the strip: 4px.',
   ),
   DocsApiFact(
-    name: 'ElMenubar.gap',
+    name: 'Menubar.gap',
     type: 'static double',
     description: 'Gap between triggers: 2px.',
   ),
   DocsApiFact(
-    name: 'ElMenubar.triggerPaddingX',
+    name: 'Menubar.triggerPaddingX',
     type: 'static double',
     description: 'A trigger\'s horizontal padding: 12px.',
   ),
   DocsApiFact(
-    name: 'ElMenubar.sideOffset',
+    name: 'Menubar.sideOffset',
     type: 'static double',
     description: 'Gap between a trigger and its open menu: 8px.',
   ),
   DocsApiFact(
-    name: 'ElMenubar.alignOffset',
+    name: 'Menubar.alignOffset',
     type: 'static double',
     description:
         'How far a menu starts left of its trigger: -4px, so its inner '
@@ -813,10 +822,10 @@ const List<DocsApiFact> _menubarMenuApiFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'children',
-    type: 'List<ElMenuChild>',
+    type: 'List<MenuChild>',
     description:
         'Required. The menu\'s rows: items, checkboxes, radios, '
-        'submenus, labels, separators, groups. Managed by ElMenu.',
+        'submenus, labels, separators, groups. Managed by Menu.',
   ),
 ];
 
@@ -838,7 +847,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Open',
     treatment:
         'Pointer-down toggles a menu open. Its content animates in with '
-        'zoom-in-95 and fade-in-0, over ElDurations.overlay. Documented '
+        'zoom-in-95 and fade-in-0, over MotionDurations.overlayEnter. Documented '
         'drift 2: there is no matching exit animation; the outgoing '
         'content disappears the instant state flips.',
     userSignal: 'A menu zooms and fades in; switching menus has no exit.',
@@ -860,14 +869,14 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        'ElMenubar and ElMenubarMenu carry no disabled parameter; '
-        'disabling is per-row through ElMenuChild.',
+        'Menubar and MenubarMenu carry no disabled parameter; '
+        'disabling is per-row through MenuChild.',
     userSignal: 'N/A at the trigger level.',
   ),
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        'The menu\'s open animation routes through elAnimationDuration, '
+        'The menu\'s open animation routes through effectiveMotionDuration, '
         'which is Duration.zero under reduced motion.',
     userSignal: 'The menu appears instantly instead of animating in.',
   ),

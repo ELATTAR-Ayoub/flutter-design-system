@@ -74,8 +74,8 @@
 /// **before you arm it**, which is also the only state the capture rig ever
 /// sees. The control still arms: the pill tints, the glyph goes agent-blue and
 /// the live ring pulses: and the waveform stays flat because there is
-/// genuinely nothing to draw. `ElLiveWaveform.samples` and
-/// `ElBarVisualizer.spectrum` are the seam a product with a real audio plugin
+/// genuinely nothing to draw. `LiveWaveform.samples` and
+/// `BarVisualizer.spectrum` are the seam a product with a real audio plugin
 /// feeds.
 ///
 /// ## Drift register: recorded, shipped as written
@@ -107,18 +107,31 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
 
 /// `AGENT_STATE` in `OrbStates`: the four the specimen draws, in its order.
-const List<(ElOrbState, String)> _orbStates = <(ElOrbState, String)>[
-  (ElOrbState.idle, 'idle'),
-  (ElOrbState.listening, 'listening'),
-  (ElOrbState.thinking, 'thinking'),
-  (ElOrbState.talking, 'talking'),
-];
+const List<(VoiceIndicatorState, String)> _orbStates =
+    <(VoiceIndicatorState, String)>[
+      (VoiceIndicatorState.idle, 'idle'),
+      (VoiceIndicatorState.listening, 'listening'),
+      (VoiceIndicatorState.thinking, 'thinking'),
+      (VoiceIndicatorState.talking, 'talking'),
+    ];
 
 /// A fixed phase per cell.
 ///
@@ -135,12 +148,12 @@ class AgentVoicePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('agent', 'voice');
+    final CategoryHit here = findCategory('agent', 'voice');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // DRIFT 1.
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
@@ -150,9 +163,9 @@ class AgentVoicePage extends StatelessWidget {
         // `className="mb-12"`, 48px, above the first section rather than
         // inside it.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: const ElNote(
-            tone: ElNoteTone.value,
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: const Note(
+            tone: NoteTone.value,
             title: 'This specimen opens your microphone',
             // DRIFT 2.
             child: _MicrophoneNote(),
@@ -162,7 +175,7 @@ class AgentVoicePage extends StatelessWidget {
         const _OrbSection(),
         const _DictationSection(),
         const _SpeechSection(),
-        const ElPageFootNav(groupId: 'agent', slug: 'voice'),
+        const PageFootNav(groupId: 'agent', slug: 'voice'),
       ],
     );
   }
@@ -172,14 +185,14 @@ class _MicrophoneNote extends StatelessWidget {
   const _MicrophoneNote();
 
   @override
-  Widget build(BuildContext context) => ElText(
+  Widget build(BuildContext context) => StyledText(
     'Arming the control below asks the browser for microphone access and '
     'reads the level from a live analyser. Nothing is recorded, stored or '
     'sent anywhere: the amplitude drives the waveform and the transcript '
     'is written into the box beside it, both in this tab. A waveform drawn '
     'from fake data would prove nothing about whether the waveform works, '
     'which is why this one is real.',
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -189,13 +202,13 @@ class _LiveSection extends StatelessWidget {
   const _LiveSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'live',
     title: 'The listening surface',
     description:
         'One pill, always. The border makes the two halves read '
         'as a single object; the fill is what changes when it goes live.',
-    child: ElPanel(
+    child: Panel(
       label: 'MicControl · LiveWaveform · BarVisualizer',
       child: _VoiceDemo(),
     ),
@@ -220,7 +233,7 @@ class _VoiceDemoState extends State<_VoiceDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -230,22 +243,22 @@ class _VoiceDemoState extends State<_VoiceDemo> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            ElMicControl(
+            MicControl(
               listening: _listening,
               onToggle: () => setState(() => _listening = !_listening),
             ),
-            SizedBox(width: el(6)),
+            SizedBox(width: space(6)),
             const Expanded(
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: ElLiveWaveform(width: 320, height: 48),
+                child: LiveWaveform(width: 320, height: 48),
               ),
             ),
-            SizedBox(width: el(6)),
-            const ElBarVisualizer(),
+            SizedBox(width: space(6)),
+            const BarVisualizer(),
           ],
         ),
-        SizedBox(height: el(6)),
+        SizedBox(height: space(6)),
         // `rounded-lg border border-border bg-background p-5`, 85 tall: 2 of
         // border, 40 of padding, 43 of content. A [DecoratedBox] paints its
         // border without reserving room for it and comes out 2px short —
@@ -254,18 +267,21 @@ class _VoiceDemoState extends State<_VoiceDemo> {
         Container(
           decoration: BoxDecoration(
             color: theme.background,
-            border: Border.all(color: theme.border, width: ElWidths.hairline),
-            borderRadius: BorderRadius.circular(ElRadii.lg),
+            border: Border.all(
+              color: theme.border,
+              width: BorderWidths.hairline,
+            ),
+            borderRadius: BorderRadius.circular(Radii.lg),
           ),
-          padding: EdgeInsets.all(el(5)),
+          padding: EdgeInsets.all(space(5)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.only(bottom: el(2)),
-                child: ElText(
+                padding: EdgeInsets.only(bottom: space(2)),
+                child: StyledText(
                   'Heard',
-                  ElType.label,
+                  TextStyles.eyebrow,
                   color: theme.mutedForeground,
                 ),
               ),
@@ -273,10 +289,10 @@ class _VoiceDemoState extends State<_VoiceDemo> {
               // filled (DRIFT 5). The placeholder is the supported branch:
               // probe 6.
               ConstrainedBox(
-                constraints: BoxConstraints(minHeight: el(6)),
-                child: ElText(
+                constraints: BoxConstraints(minHeight: space(6)),
+                child: StyledText(
                   'Arm the microphone and say something.',
-                  ElType.body,
+                  TextStyles.body,
                   color: theme.mutedForeground,
                 ),
               ),
@@ -294,7 +310,7 @@ class _OrbSection extends StatelessWidget {
   const _OrbSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'orb',
     title: 'Orb states',
     // DRIFT 3.
@@ -308,9 +324,9 @@ class _OrbSection extends StatelessWidget {
       children: <Widget>[
         // `grid grid-cols-2 gap-px … sm:grid-cols-4`: the kit's lattice
         // is the same frame, but the cell is the page's own: `p-6 gap-4`
-        // with the label UNDER the specimen, where [ElStateCell]'s block
+        // with the label UNDER the specimen, where [StateCell]'s block
         // is `p-5` with a well above a name.
-        ElStateGrid.columns(
+        StateGrid.columns(
           base: 2,
           sm: 4,
           children: <Widget>[
@@ -323,7 +339,7 @@ class _OrbSection extends StatelessWidget {
           ],
         ),
         Padding(
-          padding: EdgeInsets.only(top: el(6)),
+          padding: EdgeInsets.only(top: space(6)),
           child: const _OrbNote(),
         ),
       ],
@@ -340,7 +356,7 @@ class _OrbCell extends StatelessWidget {
     required this.seed,
   });
 
-  final ElOrbState state;
+  final VoiceIndicatorState state;
   final String label;
   final int seed;
 
@@ -349,20 +365,20 @@ class _OrbCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElStateCell.bare(
-      padding: EdgeInsets.all(el(6)),
+    final ThemeTokens theme = ThemeScope.of(context);
+    return StateCell.bare(
+      padding: EdgeInsets.all(space(6)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          ElVoiceOrb(state: state, size: orbSize, seed: seed),
-          SizedBox(height: el(4)),
+          VoiceIndicator(state: state, size: orbSize, seed: seed),
+          SizedBox(height: space(4)),
           // `.type-micro` carries everything but the transform: the call site
           // uppercases, because a Flutter TextStyle cannot.
-          ElText(
+          StyledText(
             label.toUpperCase(),
-            ElType.micro,
+            TextStyles.eyebrowSmall,
             color: theme.mutedForeground,
           ),
         ],
@@ -375,7 +391,7 @@ class _OrbNote extends StatelessWidget {
   const _OrbNote();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -383,7 +399,7 @@ class _OrbNote extends StatelessWidget {
               'Dictation and the orb share one analyser rather than '
               'opening two streams. Two ',
         ),
-        ElCode.span('getUserMedia'),
+        Code.span('getUserMedia'),
         const TextSpan(
           text:
               ' calls on the same device is a permission prompt the user '
@@ -394,7 +410,7 @@ class _OrbNote extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -404,7 +420,7 @@ class _DictationSection extends StatelessWidget {
   const _DictationSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'dictation',
     title: 'The dictation contract',
     description:
@@ -412,8 +428,8 @@ class _DictationSection extends StatelessWidget {
         'different support across engines, so the hook states what it can '
         'do rather than assuming.',
     // DRIFT 4.
-    child: ElMeta(
-      items: <ElMetaItem>[
+    child: Meta(
+      items: <MetaItem>[
         (
           k: 'isSupported',
           v: TextSpan(
@@ -458,14 +474,14 @@ class _SpeechSection extends StatelessWidget {
   const _SpeechSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'speech',
     title: 'Speaking back',
     description:
         'The fourth seam. useBrowserSpeech is one SpeechAdapter, '
         'not the only one: a product with its own voice implements the '
         'same interface and the controls do not move.',
-    child: ElNote(title: 'Markdown is not speakable', child: _SpeechNote()),
+    child: Note(title: 'Markdown is not speakable', child: _SpeechNote()),
   );
 }
 
@@ -473,7 +489,7 @@ class _SpeechNote extends StatelessWidget {
   const _SpeechNote();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -481,7 +497,7 @@ class _SpeechNote extends StatelessWidget {
               'Reading a raw answer aloud gets you asterisks, pipe '
               'characters and fenced code read as punctuation. ',
         ),
-        ElCode.span('speakableText'),
+        Code.span('speakableText'),
         const TextSpan(
           text:
               ' strips the markup, drops code blocks entirely and turns '
@@ -492,6 +508,6 @@ class _SpeechNote extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }

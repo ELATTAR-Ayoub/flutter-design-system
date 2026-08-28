@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
-import 'package:elattar_design_system/src/components/icon.dart';
-import 'package:elattar_design_system/src/components/icon_paths.dart';
+import 'package:elattar_design_system/src/components/ui/icon.dart';
+import 'package:elattar_design_system/src/components/ui/icon_paths.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Value-for-value transcript check of the embedded lucide glyphs, plus a unit
@@ -16,10 +16,10 @@ import 'package:flutter_test/flutter_test.dart';
 /// Imported through `src/` on purpose: the package barrel is owned elsewhere,
 /// and these assertions are about the geometry layer, not the public surface.
 
-/// Builds a path from one raw `d` string, the way [ElIconPaths.pathFor] does.
+/// Builds a path from one raw `d` string, the way [IconPaths.pathFor] does.
 Path _pathOf(String d) {
   final Path path = Path();
-  ElIconPathElement(d).addTo(path);
+  IconPathElement(d).addTo(path);
   return path;
 }
 
@@ -33,23 +33,23 @@ String _n(double v) =>
 /// Every attribute lucide writes appears here — including `fill` and `ry`,
 /// the two the element model only learned this batch — so an element that
 /// silently loses one fails rather than passing on the attributes that remain.
-String _signature(ElIconElement element) => switch (element) {
-  ElIconPathElement(:final String d) => 'path $d',
-  ElIconLineElement(
+String _signature(IconElement element) => switch (element) {
+  IconPathElement(:final String d) => 'path $d',
+  IconLineElement(
     :final double x1,
     :final double y1,
     :final double x2,
     :final double y2,
   ) =>
     'line ${_n(x1)} ${_n(y1)} ${_n(x2)} ${_n(y2)}',
-  ElIconCircleElement(
+  IconCircleElement(
     :final double cx,
     :final double cy,
     :final double r,
     :final bool filled,
   ) =>
     'circle ${_n(cx)} ${_n(cy)} ${_n(r)}${filled ? ' fill' : ''}',
-  ElIconRectElement(
+  IconRectElement(
     :final double x,
     :final double y,
     :final double width,
@@ -60,58 +60,55 @@ String _signature(ElIconElement element) => switch (element) {
     'rect ${_n(x)} ${_n(y)} ${_n(width)} ${_n(height)} '
         '${rx == null ? 'auto' : _n(rx)}'
         '${ry == null ? '' : ' ry ${_n(ry)}'}',
-  ElIconPolylineElement(:final List<Offset> points) =>
+  IconPolylineElement(:final List<Offset> points) =>
     'polyline '
         '${points.map((Offset p) => '${_n(p.dx)} ${_n(p.dy)}').join(' ')}',
   // Neither appears in the 78 transcribed here — both arrived with the
   // generated registry, and both are rendered anyway so that a glyph which
   // grew one would print it rather than crash the switch.
-  ElIconEllipseElement(
+  IconEllipseElement(
     :final double cx,
     :final double cy,
     :final double rx,
     :final double ry,
   ) =>
     'ellipse ${_n(cx)} ${_n(cy)} ${_n(rx)} ${_n(ry)}',
-  ElIconPolygonElement(:final List<Offset> points) =>
+  IconPolygonElement(:final List<Offset> points) =>
     'polygon '
         '${points.map((Offset p) => '${_n(p.dx)} ${_n(p.dy)}').join(' ')}',
 };
 
 /// How many contours a glyph's [Path] must have: one per `M`/`m` in each `d`,
 /// one per `circle`/`rect`/`line`/`polyline`.
-int _expectedContours(ElIconGlyph glyph) =>
-    ElIconPaths.elements[glyph]!.fold<int>(
-      0,
-      (int n, ElIconElement e) =>
-          n +
-          switch (e) {
-            ElIconPathElement(:final String d) => RegExp(
-              '[Mm]',
-            ).allMatches(d).length,
-            _ => 1,
-          },
-    );
+int _expectedContours(IconGlyph glyph) => IconPaths.elements[glyph]!.fold<int>(
+  0,
+  (int n, IconElement e) =>
+      n +
+      switch (e) {
+        IconPathElement(:final String d) => RegExp('[Mm]').allMatches(d).length,
+        _ => 1,
+      },
+);
 
 /// How many of them must come out **closed**: one per `z`/`Z`, plus every
 /// `circle`, `rect`, `ellipse` and `polygon`, which are closed subpaths by
 /// construction. `line` and `polyline` are always open — closing a polyline is
 /// exactly what `polygon` means, and the two of those lucide emits
 /// (`navigation`, `navigation-2`) are not among the glyphs embedded here.
-int _expectedClosedContours(ElIconGlyph glyph) =>
-    ElIconPaths.elements[glyph]!.fold<int>(
+int _expectedClosedContours(IconGlyph glyph) =>
+    IconPaths.elements[glyph]!.fold<int>(
       0,
-      (int n, ElIconElement e) =>
+      (int n, IconElement e) =>
           n +
           switch (e) {
-            ElIconPathElement(:final String d) => RegExp(
+            IconPathElement(:final String d) => RegExp(
               '[zZ]',
             ).allMatches(d).length,
-            ElIconCircleElement() ||
-            ElIconRectElement() ||
-            ElIconEllipseElement() ||
-            ElIconPolygonElement() => 1,
-            ElIconLineElement() || ElIconPolylineElement() => 0,
+            IconCircleElement() ||
+            IconRectElement() ||
+            IconEllipseElement() ||
+            IconPolygonElement() => 1,
+            IconLineElement() || IconPolylineElement() => 0,
           },
     );
 
@@ -156,70 +153,69 @@ void main() {
   // ─── printed keys ────────────────────────────────────────────────────────
 
   group('the keys icon.tsx prints', () {
-    test(
-      'ElIconSize.label is the ICON_SIZES key, not the Dart member name',
-      () {
-        expect(
-          ElIconSize.values.map((ElIconSize s) => s.label).toList(),
-          <String>['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'],
-        );
-        // The three that differ from `.name` are the reason the mapping exists.
-        expect(ElIconSize.xl2.name, 'xl2');
-        expect(ElIconSize.xl2.label, '2xl');
-        expect(ElIconSize.xl3.name, 'xl3');
-        expect(ElIconSize.xl3.label, '3xl');
-        // …and the other five must NOT have been renamed on the way past.
-        for (final ElIconSize size in <ElIconSize>[
-          ElIconSize.xs,
-          ElIconSize.sm,
-          ElIconSize.md,
-          ElIconSize.lg,
-          ElIconSize.xl,
-        ]) {
-          expect(size.label, size.name);
-        }
-        // Every rung on the ladder is labelled and every label is distinct.
-        expect(
-          ElIconSize.values.map((ElIconSize s) => s.label).toSet(),
-          hasLength(7),
-        );
-      },
-    );
+    test('IconSize.label is the ICON_SIZES key, not the Dart member name', () {
+      expect(IconSize.values.map((IconSize s) => s.label).toList(), <String>[
+        'xs',
+        'sm',
+        'md',
+        'lg',
+        'xl',
+        '2xl',
+        '3xl',
+      ]);
+      // The three that differ from `.name` are the reason the mapping exists.
+      expect(IconSize.xl2.name, 'xl2');
+      expect(IconSize.xl2.label, '2xl');
+      expect(IconSize.xl3.name, 'xl3');
+      expect(IconSize.xl3.label, '3xl');
+      // …and the other five must NOT have been renamed on the way past.
+      for (final IconSize size in <IconSize>[
+        IconSize.xs,
+        IconSize.sm,
+        IconSize.md,
+        IconSize.lg,
+        IconSize.xl,
+      ]) {
+        expect(size.label, size.name);
+      }
+      // Every rung on the ladder is labelled and every label is distinct.
+      expect(
+        IconSize.values.map((IconSize s) => s.label).toSet(),
+        hasLength(7),
+      );
+    });
 
-    test('ElIconTone.label is the ICON_TONES key, not the Dart member name', () {
+    test('IconTone.label is the ICON_TONES key, not the Dart member name', () {
       // Render order is `Object.keys(ICON_TONES)` — icon.tsx's order, which is
       // this enum's declaration order (icons-map.md §4).
-      expect(
-        ElIconTone.values.map((ElIconTone t) => t.label).toList(),
-        <String>[
-          'default',
-          'muted',
-          'subtle',
-          'action',
-          'value',
-          'success',
-          'warning',
-          'info',
-          'error',
-          'inherit',
-        ],
-      );
+      expect(IconTone.values.map((IconTone t) => t.label).toList(), <String>[
+        'default',
+        'muted',
+        'subtle',
+        'action',
+        'value',
+        'success',
+        'warning',
+        'info',
+        'error',
+        'inherit',
+      ]);
       // `default` is a Dart reserved word; `normal` is the only rename.
-      expect(ElIconTone.normal.name, 'normal');
-      expect(ElIconTone.normal.label, 'default');
-      for (final ElIconTone tone in ElIconTone.values.where(
-        (ElIconTone t) => t != ElIconTone.normal,
+      expect(IconTone.normal.name, 'normal');
+      expect(IconTone.normal.label, 'default');
+      for (final IconTone tone in IconTone.values.where(
+        (IconTone t) => t != IconTone.normal,
       )) {
         expect(tone.label, tone.name);
       }
       expect(
-        ElIconTone.values.map((ElIconTone t) => t.label).toSet(),
+        IconTone.values.map((IconTone t) => t.label).toSet(),
         hasLength(10),
       );
       // muted and subtle are two labels for one colour — the page ships both
       // swatches on purpose (icons-map.md §4, ruling I-Q6). The labels differ
       // even though the tokens do not.
-      expect(ElIconTone.muted.label, isNot(ElIconTone.subtle.label));
+      expect(IconTone.muted.label, isNot(IconTone.subtle.label));
     });
   });
 
@@ -227,98 +223,98 @@ void main() {
 
   group('transcription of lucide-react 1.28.0 __iconNode', () {
     test('the viewBox is the 24×24 grid lucide authors on', () {
-      expect(ElIconPaths.viewBox, 24);
+      expect(IconPaths.viewBox, 24);
     });
 
     test('every glyph is transcribed, element for element', () {
       // Element counts, per `__iconNode` in each .mjs file.
-      const Map<ElIconGlyph, int> counts = <ElIconGlyph, int>{
-        ElIconGlyph.menu: 3,
-        ElIconGlyph.x: 2,
-        ElIconGlyph.sun: 9,
-        ElIconGlyph.monitor: 3,
-        ElIconGlyph.moon: 1,
-        ElIconGlyph.arrowLeft: 2,
-        ElIconGlyph.arrowRight: 2,
-        ElIconGlyph.check: 1,
-        ElIconGlyph.package: 4,
-        ElIconGlyph.radio: 5,
-        ElIconGlyph.layers: 3,
-        ElIconGlyph.gift: 4,
-        ElIconGlyph.trophy: 6,
-        ElIconGlyph.wallet: 2,
-        ElIconGlyph.user: 2,
-        ElIconGlyph.search: 2,
-        ElIconGlyph.bell: 2,
-        ElIconGlyph.settings: 2,
-        ElIconGlyph.logOut: 3,
-        ElIconGlyph.layoutGrid: 4,
-        ElIconGlyph.rows3: 3,
-        ElIconGlyph.chevronDown: 1,
-        ElIconGlyph.chevronUp: 1,
-        ElIconGlyph.chevronLeft: 1,
-        ElIconGlyph.chevronRight: 1,
-        ElIconGlyph.ellipsis: 3,
-        ElIconGlyph.externalLink: 3,
-        ElIconGlyph.packageOpen: 4,
-        ElIconGlyph.shoppingCart: 3,
-        ElIconGlyph.heart: 1,
-        ElIconGlyph.eye: 2,
-        ElIconGlyph.eyeOff: 4,
-        ElIconGlyph.share2: 5,
-        ElIconGlyph.copy: 2,
-        ElIconGlyph.filter: 1,
-        ElIconGlyph.slidersHorizontal: 9,
-        ElIconGlyph.plus: 2,
-        ElIconGlyph.minus: 1,
-        ElIconGlyph.refreshCw: 4,
-        ElIconGlyph.download: 3,
-        ElIconGlyph.upload: 3,
-        ElIconGlyph.truck: 5,
-        ElIconGlyph.trash2: 5,
-        ElIconGlyph.ban: 2,
-        ElIconGlyph.sparkles: 4,
-        ElIconGlyph.crown: 2,
-        ElIconGlyph.flame: 1,
-        ElIconGlyph.zap: 1,
-        ElIconGlyph.star: 1,
-        ElIconGlyph.tag: 2,
-        ElIconGlyph.percent: 3,
-        ElIconGlyph.medal: 6,
-        ElIconGlyph.activity: 1,
-        ElIconGlyph.trendingUp: 2,
-        ElIconGlyph.trendingDown: 2,
-        ElIconGlyph.circleDollarSign: 3,
-        ElIconGlyph.creditCard: 2,
-        ElIconGlyph.arrowDownLeft: 2,
-        ElIconGlyph.arrowUpRight: 2,
-        ElIconGlyph.hourglass: 4,
-        ElIconGlyph.clock: 2,
-        ElIconGlyph.lock: 2,
-        ElIconGlyph.shield: 1,
-        ElIconGlyph.shieldCheck: 2,
-        ElIconGlyph.info: 3,
-        ElIconGlyph.helpCircle: 3,
-        ElIconGlyph.alertTriangle: 3,
-        ElIconGlyph.rotateCcw: 2,
-        ElIconGlyph.loaderCircle: 1,
-        ElIconGlyph.play: 1,
-        ElIconGlyph.pause: 2,
-        ElIconGlyph.volume2: 3,
-        ElIconGlyph.volumeX: 3,
-        ElIconGlyph.circleCheck: 2,
-        ElIconGlyph.octagonX: 3,
-        ElIconGlyph.circleX: 3,
-        ElIconGlyph.atSign: 2,
-        ElIconGlyph.ticket: 4,
-        ElIconGlyph.calendar: 4,
-        ElIconGlyph.shieldAlert: 3,
-        ElIconGlyph.gavel: 5,
+      const Map<IconGlyph, int> counts = <IconGlyph, int>{
+        IconGlyph.menu: 3,
+        IconGlyph.x: 2,
+        IconGlyph.sun: 9,
+        IconGlyph.monitor: 3,
+        IconGlyph.moon: 1,
+        IconGlyph.arrowLeft: 2,
+        IconGlyph.arrowRight: 2,
+        IconGlyph.check: 1,
+        IconGlyph.package: 4,
+        IconGlyph.radio: 5,
+        IconGlyph.layers: 3,
+        IconGlyph.gift: 4,
+        IconGlyph.trophy: 6,
+        IconGlyph.wallet: 2,
+        IconGlyph.user: 2,
+        IconGlyph.search: 2,
+        IconGlyph.bell: 2,
+        IconGlyph.settings: 2,
+        IconGlyph.logOut: 3,
+        IconGlyph.layoutGrid: 4,
+        IconGlyph.rows3: 3,
+        IconGlyph.chevronDown: 1,
+        IconGlyph.chevronUp: 1,
+        IconGlyph.chevronLeft: 1,
+        IconGlyph.chevronRight: 1,
+        IconGlyph.ellipsis: 3,
+        IconGlyph.externalLink: 3,
+        IconGlyph.packageOpen: 4,
+        IconGlyph.shoppingCart: 3,
+        IconGlyph.heart: 1,
+        IconGlyph.eye: 2,
+        IconGlyph.eyeOff: 4,
+        IconGlyph.share2: 5,
+        IconGlyph.copy: 2,
+        IconGlyph.filter: 1,
+        IconGlyph.slidersHorizontal: 9,
+        IconGlyph.plus: 2,
+        IconGlyph.minus: 1,
+        IconGlyph.refreshCw: 4,
+        IconGlyph.download: 3,
+        IconGlyph.upload: 3,
+        IconGlyph.truck: 5,
+        IconGlyph.trash2: 5,
+        IconGlyph.ban: 2,
+        IconGlyph.sparkles: 4,
+        IconGlyph.crown: 2,
+        IconGlyph.flame: 1,
+        IconGlyph.zap: 1,
+        IconGlyph.star: 1,
+        IconGlyph.tag: 2,
+        IconGlyph.percent: 3,
+        IconGlyph.medal: 6,
+        IconGlyph.activity: 1,
+        IconGlyph.trendingUp: 2,
+        IconGlyph.trendingDown: 2,
+        IconGlyph.circleDollarSign: 3,
+        IconGlyph.creditCard: 2,
+        IconGlyph.arrowDownLeft: 2,
+        IconGlyph.arrowUpRight: 2,
+        IconGlyph.hourglass: 4,
+        IconGlyph.clock: 2,
+        IconGlyph.lock: 2,
+        IconGlyph.shield: 1,
+        IconGlyph.shieldCheck: 2,
+        IconGlyph.info: 3,
+        IconGlyph.helpCircle: 3,
+        IconGlyph.alertTriangle: 3,
+        IconGlyph.rotateCcw: 2,
+        IconGlyph.loaderCircle: 1,
+        IconGlyph.play: 1,
+        IconGlyph.pause: 2,
+        IconGlyph.volume2: 3,
+        IconGlyph.volumeX: 3,
+        IconGlyph.circleCheck: 2,
+        IconGlyph.octagonX: 3,
+        IconGlyph.circleX: 3,
+        IconGlyph.atSign: 2,
+        IconGlyph.ticket: 4,
+        IconGlyph.calendar: 4,
+        IconGlyph.shieldAlert: 3,
+        IconGlyph.gavel: 5,
       };
-      expect(ElIconPaths.elements.keys, unorderedEquals(ElIconGlyph.values));
-      for (final ElIconGlyph glyph in ElIconGlyph.values) {
+      expect(IconPaths.elements.keys, unorderedEquals(IconGlyph.values));
+      for (final IconGlyph glyph in IconGlyph.values) {
         expect(
-          ElIconPaths.elements[glyph],
+          IconPaths.elements[glyph],
           hasLength(counts[glyph]),
           reason: '${glyph.name}.mjs element count',
         );
@@ -326,29 +322,29 @@ void main() {
     });
 
     test('path `d` strings are copied character for character', () {
-      String d(ElIconGlyph glyph, int index) =>
-          (ElIconPaths.elements[glyph]![index] as ElIconPathElement).d;
+      String d(IconGlyph glyph, int index) =>
+          (IconPaths.elements[glyph]![index] as IconPathElement).d;
 
       // menu.mjs — absolute moveto + relative horizontal lineto.
-      expect(d(ElIconGlyph.menu, 0), 'M4 5h16');
-      expect(d(ElIconGlyph.menu, 1), 'M4 12h16');
-      expect(d(ElIconGlyph.menu, 2), 'M4 19h16');
+      expect(d(IconGlyph.menu, 0), 'M4 5h16');
+      expect(d(IconGlyph.menu, 1), 'M4 12h16');
+      expect(d(IconGlyph.menu, 2), 'M4 19h16');
       // x.mjs — the two spellings lucide happens to use side by side.
-      expect(d(ElIconGlyph.x, 0), 'M18 6 6 18');
-      expect(d(ElIconGlyph.x, 1), 'm6 6 12 12');
+      expect(d(IconGlyph.x, 0), 'M18 6 6 18');
+      expect(d(IconGlyph.x, 1), 'm6 6 12 12');
       // check.mjs — implicit lineto then a relative one.
-      expect(d(ElIconGlyph.check, 0), 'M20 6 9 17l-5-5');
+      expect(d(IconGlyph.check, 0), 'M20 6 9 17l-5-5');
       // sun.mjs — a ray whose second coordinate packs its sign.
-      expect(d(ElIconGlyph.sun, 7), 'm6.34 17.66-1.41 1.41');
+      expect(d(IconGlyph.sun, 7), 'm6.34 17.66-1.41 1.41');
       // arrow-right.mjs / arrow-left.mjs.
-      expect(d(ElIconGlyph.arrowRight, 0), 'M5 12h14');
-      expect(d(ElIconGlyph.arrowRight, 1), 'm12 5 7 7-7 7');
-      expect(d(ElIconGlyph.arrowLeft, 0), 'm12 19-7-7 7-7');
-      expect(d(ElIconGlyph.arrowLeft, 1), 'M19 12H5');
+      expect(d(IconGlyph.arrowRight, 0), 'M5 12h14');
+      expect(d(IconGlyph.arrowRight, 1), 'm12 5 7 7-7 7');
+      expect(d(IconGlyph.arrowLeft, 0), 'm12 19-7-7 7-7');
+      expect(d(IconGlyph.arrowLeft, 1), 'M19 12H5');
       // moon.mjs — the one that carries arcs, leading-dot decimals and
       // no-space negatives all at once.
       expect(
-        d(ElIconGlyph.moon, 0),
+        d(IconGlyph.moon, 0),
         'M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803'
         'a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401',
       );
@@ -356,13 +352,13 @@ void main() {
 
     test('structured elements keep every lucide attribute', () {
       // sun.mjs: ["circle", { cx: 12, cy: 12, r: 4 }]
-      final ElIconCircleElement circle =
-          ElIconPaths.elements[ElIconGlyph.sun]!.first as ElIconCircleElement;
+      final IconCircleElement circle =
+          IconPaths.elements[IconGlyph.sun]!.first as IconCircleElement;
       expect(<double>[circle.cx, circle.cy, circle.r], <double>[12, 12, 4]);
 
       // monitor.mjs: ["rect", { width: 20, height: 14, x: 2, y: 3, rx: 2 }]
-      final ElIconRectElement rect =
-          ElIconPaths.elements[ElIconGlyph.monitor]!.first as ElIconRectElement;
+      final IconRectElement rect =
+          IconPaths.elements[IconGlyph.monitor]!.first as IconRectElement;
       // `rx` is nullable since the merge — lucide omits it on five nodes in
       // the full package — so it is asserted as a written value here, not
       // merely as a number.
@@ -373,14 +369,14 @@ void main() {
 
       // monitor.mjs: ["line", { x1: 8, x2: 16, y1: 21, y2: 21 }] and
       //              ["line", { x1: 12, x2: 12, y1: 17, y2: 21 }]
-      final ElIconLineElement foot =
-          ElIconPaths.elements[ElIconGlyph.monitor]![1] as ElIconLineElement;
+      final IconLineElement foot =
+          IconPaths.elements[IconGlyph.monitor]![1] as IconLineElement;
       expect(
         <double>[foot.x1, foot.y1, foot.x2, foot.y2],
         <double>[8, 21, 16, 21],
       );
-      final ElIconLineElement neck =
-          ElIconPaths.elements[ElIconGlyph.monitor]![2] as ElIconLineElement;
+      final IconLineElement neck =
+          IconPaths.elements[IconGlyph.monitor]![2] as IconLineElement;
       expect(
         <double>[neck.x1, neck.y1, neck.x2, neck.y2],
         <double>[12, 17, 12, 21],
@@ -393,12 +389,12 @@ void main() {
       // all 68 `__iconNode` lists independently of `icon_paths.dart`.
       expect(
         _transcript.keys,
-        unorderedEquals(ElIconGlyph.values),
+        unorderedEquals(IconGlyph.values),
         reason: 'the transcript table must cover every glyph',
       );
-      for (final ElIconGlyph glyph in ElIconGlyph.values) {
+      for (final IconGlyph glyph in IconGlyph.values) {
         expect(
-          ElIconPaths.elements[glyph]!.map(_signature).toList(),
+          IconPaths.elements[glyph]!.map(_signature).toList(),
           _transcript[glyph],
           reason: '${glyph.name} — element order and attributes',
         );
@@ -415,60 +411,60 @@ void main() {
       );
       // Everything in the enum is either curated or docs chrome; the two
       // off-set glyphs are the deliberate exceptions — `rotateCcw` for the
-      // motion page's replay control, `loaderCircle` for `ElSpinner`. Both are
+      // motion page's replay control, `loaderCircle` for `Spinner`. Both are
       // rendered by components, neither is in the legacy curated icon registry, and the icons
       // page's registry must keep excluding both.
-      const List<ElIconGlyph> chrome = <ElIconGlyph>[
-        ElIconGlyph.menu,
-        ElIconGlyph.x,
-        ElIconGlyph.sun,
-        ElIconGlyph.monitor,
-        ElIconGlyph.moon,
-        ElIconGlyph.arrowLeft,
-        ElIconGlyph.arrowRight,
-        ElIconGlyph.check,
+      const List<IconGlyph> chrome = <IconGlyph>[
+        IconGlyph.menu,
+        IconGlyph.x,
+        IconGlyph.sun,
+        IconGlyph.monitor,
+        IconGlyph.moon,
+        IconGlyph.arrowLeft,
+        IconGlyph.arrowRight,
+        IconGlyph.check,
       ];
       expect(
-        ElIconGlyph.values.where(
-          (ElIconGlyph g) => !_curated.contains(g) && !chrome.contains(g),
+        IconGlyph.values.where(
+          (IconGlyph g) => !_curated.contains(g) && !chrome.contains(g),
         ),
-        <ElIconGlyph>[
-          ElIconGlyph.rotateCcw,
-          ElIconGlyph.loaderCircle,
-          ElIconGlyph.play,
-          ElIconGlyph.pause,
-          ElIconGlyph.volume2,
-          ElIconGlyph.volumeX,
-          ElIconGlyph.circleCheck,
-          ElIconGlyph.octagonX,
-          ElIconGlyph.circleX,
-          ElIconGlyph.atSign,
-          ElIconGlyph.ticket,
+        <IconGlyph>[
+          IconGlyph.rotateCcw,
+          IconGlyph.loaderCircle,
+          IconGlyph.play,
+          IconGlyph.pause,
+          IconGlyph.volume2,
+          IconGlyph.volumeX,
+          IconGlyph.circleCheck,
+          IconGlyph.octagonX,
+          IconGlyph.circleX,
+          IconGlyph.atSign,
+          IconGlyph.ticket,
           // Wave C: the selects page's two `Icon Calendar` sites. Off-set on
           // the same test as the eleven above — the legacy curated icon registry does not
           // list it, so the icons page's registry must keep excluding it.
-          ElIconGlyph.calendar,
+          IconGlyph.calendar,
           // The dialogs family's `DangerZone` heading.
-          ElIconGlyph.shieldAlert,
+          IconGlyph.shieldAlert,
           // The navigation family: `MARKET_LINKS`' "Ending soon" row, inside
           // the navigation menu's Marketplace panel.
-          ElIconGlyph.gavel,
+          IconGlyph.gavel,
         ],
       );
       // 8 chrome + 59 new curated + 14 off-set.
-      expect(ElIconGlyph.values, hasLength(81));
+      expect(IconGlyph.values, hasLength(81));
     });
 
     test('the 59 new curated glyphs come to the ledger\'s 162 elements', () {
       // `icons-map.md` §12.3 counted these from the package: 162 elements —
       // 123 path, 25 circle, 9 rect, 4 line, 1 polyline.
-      final Iterable<ElIconGlyph> fresh = _curated.where(
-        (ElIconGlyph g) => !_curatedAlreadyPresent.contains(g),
+      final Iterable<IconGlyph> fresh = _curated.where(
+        (IconGlyph g) => !_curatedAlreadyPresent.contains(g),
       );
       expect(fresh, hasLength(59));
       final Map<Type, int> tally = <Type, int>{};
-      for (final ElIconGlyph glyph in fresh) {
-        for (final ElIconElement element in ElIconPaths.elements[glyph]!) {
+      for (final IconGlyph glyph in fresh) {
+        for (final IconElement element in IconPaths.elements[glyph]!) {
           tally.update(
             element.runtimeType,
             (int n) => n + 1,
@@ -476,11 +472,11 @@ void main() {
           );
         }
       }
-      expect(tally[ElIconPathElement], 123);
-      expect(tally[ElIconCircleElement], 25);
-      expect(tally[ElIconRectElement], 9);
-      expect(tally[ElIconLineElement], 4);
-      expect(tally[ElIconPolylineElement], 1);
+      expect(tally[IconPathElement], 123);
+      expect(tally[IconCircleElement], 25);
+      expect(tally[IconRectElement], 9);
+      expect(tally[IconLineElement], 4);
+      expect(tally[IconPolylineElement], 1);
       expect(tally.values.reduce((int a, int b) => a + b), 162);
     });
 
@@ -488,21 +484,20 @@ void main() {
       '`polyline` is transcribed as points, and package is the only one',
       () {
         // package.mjs: ["polyline", { points: "3.29 7 12 12 20.71 7" }]
-        final ElIconPolylineElement lid =
-            ElIconPaths.elements[ElIconGlyph.package]![2]
-                as ElIconPolylineElement;
+        final IconPolylineElement lid =
+            IconPaths.elements[IconGlyph.package]![2] as IconPolylineElement;
         expect(lid.points, <Offset>[
           const Offset(3.29, 7),
           const Offset(12, 12),
           const Offset(20.71, 7),
         ]);
         expect(
-          ElIconGlyph.values.where(
-            (ElIconGlyph g) => ElIconPaths.elements[g]!.any(
-              (ElIconElement e) => e is ElIconPolylineElement,
+          IconGlyph.values.where(
+            (IconGlyph g) => IconPaths.elements[g]!.any(
+              (IconElement e) => e is IconPolylineElement,
             ),
           ),
-          <ElIconGlyph>[ElIconGlyph.package],
+          <IconGlyph>[IconGlyph.package],
         );
       },
     );
@@ -510,16 +505,16 @@ void main() {
     test('`fill="currentColor"` is transcribed, and tag is the only one', () {
       // tag.mjs: ["circle", { cx: "7.5", cy: "7.5", r: ".5",
       //                       fill: "currentColor" }]
-      final ElIconCircleElement dot =
-          ElIconPaths.elements[ElIconGlyph.tag]![1] as ElIconCircleElement;
+      final IconCircleElement dot =
+          IconPaths.elements[IconGlyph.tag]![1] as IconCircleElement;
       expect(<double>[dot.cx, dot.cy, dot.r], <double>[7.5, 7.5, 0.5]);
       expect(dot.filled, isTrue);
       // Every other element in the package is unfilled — `filled` defaults
       // false on the sealed base, so this also proves nothing set it by
       // accident.
-      final List<ElIconElement> filled = <ElIconElement>[
-        for (final ElIconGlyph glyph in ElIconGlyph.values)
-          ...ElIconPaths.elements[glyph]!.where((ElIconElement e) => e.filled),
+      final List<IconElement> filled = <IconElement>[
+        for (final IconGlyph glyph in IconGlyph.values)
+          ...IconPaths.elements[glyph]!.where((IconElement e) => e.filled),
       ];
       expect(filled, hasLength(1));
       expect(identical(filled.single, dot), isTrue);
@@ -529,26 +524,26 @@ void main() {
       // §12.4.3: the old docstring claimed lucide never sets `ry`. copy.mjs and
       // lock.mjs both do — asserted equal here rather than assumed equal, which
       // is what made the claim safe to correct instead of just delete.
-      final List<ElIconRectElement> rects = <ElIconRectElement>[
-        for (final ElIconGlyph glyph in ElIconGlyph.values)
-          ...ElIconPaths.elements[glyph]!.whereType<ElIconRectElement>(),
+      final List<IconRectElement> rects = <IconRectElement>[
+        for (final IconGlyph glyph in IconGlyph.values)
+          ...IconPaths.elements[glyph]!.whereType<IconRectElement>(),
       ];
       // 9 curated + monitor's screen + pause's two bars + calendar's plate.
       expect(rects, hasLength(13));
-      final Iterable<ElIconRectElement> spelled = rects.where(
-        (ElIconRectElement r) => r.ry != null,
+      final Iterable<IconRectElement> spelled = rects.where(
+        (IconRectElement r) => r.ry != null,
       );
       expect(spelled, hasLength(2));
-      for (final ElIconRectElement rect in spelled) {
+      for (final IconRectElement rect in spelled) {
         expect(rect.ry, rect.rx);
       }
       expect(
-        ElIconGlyph.values.where(
-          (ElIconGlyph g) => ElIconPaths.elements[g]!
-              .whereType<ElIconRectElement>()
-              .any((ElIconRectElement r) => r.ry != null),
+        IconGlyph.values.where(
+          (IconGlyph g) => IconPaths.elements[g]!
+              .whereType<IconRectElement>()
+              .any((IconRectElement r) => r.ry != null),
         ),
-        <ElIconGlyph>[ElIconGlyph.copy, ElIconGlyph.lock],
+        <IconGlyph>[IconGlyph.copy, IconGlyph.lock],
       );
     });
 
@@ -561,25 +556,21 @@ void main() {
         // opens with `M10 20`, a question mark's ring is the shared 10-unit
         // circle, and a warning triangle opens with `m21.73 18`.
         expect(
-          (ElIconPaths.elements[ElIconGlyph.filter]!.single
-                  as ElIconPathElement)
-              .d
+          (IconPaths.elements[IconGlyph.filter]!.single as IconPathElement).d
               .startsWith('M10 20a1 1 0 0 0 .553.895'),
           isTrue,
         );
         expect(
-          ElIconPaths.elements[ElIconGlyph.helpCircle]!.first,
-          isA<ElIconCircleElement>(),
+          IconPaths.elements[IconGlyph.helpCircle]!.first,
+          isA<IconCircleElement>(),
         );
         expect(
-          (ElIconPaths.elements[ElIconGlyph.helpCircle]![1]
-                  as ElIconPathElement)
-              .d,
+          (IconPaths.elements[IconGlyph.helpCircle]![1] as IconPathElement).d,
           'M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3',
         );
         expect(
-          (ElIconPaths.elements[ElIconGlyph.alertTriangle]!.first
-                  as ElIconPathElement)
+          (IconPaths.elements[IconGlyph.alertTriangle]!.first
+                  as IconPathElement)
               .d
               .startsWith('m21.73 18-8-14'),
           isTrue,
@@ -590,10 +581,10 @@ void main() {
 
   // ─── pathFor ─────────────────────────────────────────────────────────────
 
-  group('ElIconPaths.pathFor', () {
+  group('IconPaths.pathFor', () {
     test('every glyph is drawn and stays on the 24×24 grid', () {
-      for (final ElIconGlyph glyph in ElIconGlyph.values) {
-        final Path path = ElIconPaths.pathFor(glyph);
+      for (final IconGlyph glyph in IconGlyph.values) {
+        final Path path = IconPaths.pathFor(glyph);
         final Rect bounds = path.getBounds();
         // NOT `bounds.isEmpty`: `Rect.isEmpty` is true when *either* side is
         // zero, and `minus` is the single rule `M5 12h14` — 14 wide, 0 tall,
@@ -623,12 +614,12 @@ void main() {
         );
         expect(
           bounds.right,
-          lessThanOrEqualTo(ElIconPaths.viewBox + 0.01),
+          lessThanOrEqualTo(IconPaths.viewBox + 0.01),
           reason: '${glyph.name} right',
         );
         expect(
           bounds.bottom,
-          lessThanOrEqualTo(ElIconPaths.viewBox + 0.01),
+          lessThanOrEqualTo(IconPaths.viewBox + 0.01),
           reason: '${glyph.name} bottom',
         );
       }
@@ -658,21 +649,21 @@ void main() {
       // remains the tightest *vertically* (control points at y = 1.8586 and
       // 22.1417 around geometry that stops at 2.0008 and 21.9992).
       double worst = double.negativeInfinity;
-      ElIconGlyph worstGlyph = ElIconGlyph.menu;
-      for (final ElIconGlyph glyph in ElIconGlyph.values) {
-        final Rect b = ElIconPaths.pathFor(glyph).getBounds();
+      IconGlyph worstGlyph = IconGlyph.menu;
+      for (final IconGlyph glyph in IconGlyph.values) {
+        final Rect b = IconPaths.pathFor(glyph).getBounds();
         final double excursion = <double>[
           -b.left,
           -b.top,
-          b.right - ElIconPaths.viewBox,
-          b.bottom - ElIconPaths.viewBox,
+          b.right - IconPaths.viewBox,
+          b.bottom - IconPaths.viewBox,
         ].reduce(math.max);
         if (excursion > worst) {
           worst = excursion;
           worstGlyph = glyph;
         }
       }
-      expect(worstGlyph, ElIconGlyph.atSign);
+      expect(worstGlyph, IconGlyph.atSign);
       expect(worst, closeTo(-0.9817, 0.001));
       expect(worst, lessThan(0));
     });
@@ -682,28 +673,28 @@ void main() {
       // for every glyph rather than a hand-picked few: `circle` and `rect` add
       // one closed contour each, `line` and `polyline` one open contour each,
       // and no lucide `d` in the set carries a second moveto.
-      for (final ElIconGlyph glyph in ElIconGlyph.values) {
+      for (final IconGlyph glyph in IconGlyph.values) {
         expect(
-          _contours(ElIconPaths.pathFor(glyph)),
+          _contours(IconPaths.pathFor(glyph)),
           hasLength(_expectedContours(glyph)),
           reason: '${glyph.name} contour count',
         );
       }
       // Spot values, so the invariant above cannot drift into vacuity.
-      expect(_contours(ElIconPaths.pathFor(ElIconGlyph.menu)), hasLength(3));
-      expect(_contours(ElIconPaths.pathFor(ElIconGlyph.sun)), hasLength(9));
-      expect(_contours(ElIconPaths.pathFor(ElIconGlyph.moon)), hasLength(1));
-      expect(_contours(ElIconPaths.pathFor(ElIconGlyph.package)), hasLength(4));
+      expect(_contours(IconPaths.pathFor(IconGlyph.menu)), hasLength(3));
+      expect(_contours(IconPaths.pathFor(IconGlyph.sun)), hasLength(9));
+      expect(_contours(IconPaths.pathFor(IconGlyph.moon)), hasLength(1));
+      expect(_contours(IconPaths.pathFor(IconGlyph.package)), hasLength(4));
       expect(
-        _contours(ElIconPaths.pathFor(ElIconGlyph.slidersHorizontal)),
+        _contours(IconPaths.pathFor(IconGlyph.slidersHorizontal)),
         hasLength(9),
       );
     });
 
     test('fillPathFor is null for every glyph but tag', () {
-      for (final ElIconGlyph glyph in ElIconGlyph.values) {
-        final Path? fill = ElIconPaths.fillPathFor(glyph);
-        if (glyph == ElIconGlyph.tag) {
+      for (final IconGlyph glyph in IconGlyph.values) {
+        final Path? fill = IconPaths.fillPathFor(glyph);
+        if (glyph == IconGlyph.tag) {
           expect(fill, isNotNull, reason: 'tag has the one filled node');
         } else {
           expect(fill, isNull, reason: '${glyph.name} has no filled node');
@@ -711,7 +702,7 @@ void main() {
       }
       // The dot itself: r = 0.5 about (7.5, 7.5), and the point at its centre
       // is inside the region — i.e. it is a disc, not a ring.
-      final Path dot = ElIconPaths.fillPathFor(ElIconGlyph.tag)!;
+      final Path dot = IconPaths.fillPathFor(IconGlyph.tag)!;
       expect(
         dot.getBounds(),
         _rectCloseTo(const Rect.fromLTRB(7, 7, 8, 8), 0.001),
@@ -721,20 +712,20 @@ void main() {
       // overrides `fill="none"` and nothing else — the inherited stroke stays.
       // So `pathFor` is still *every* element, and the tag path has both its
       // closed label outline and the dot's own contour.
-      expect(_contours(ElIconPaths.pathFor(ElIconGlyph.tag)), hasLength(2));
+      expect(_contours(IconPaths.pathFor(IconGlyph.tag)), hasLength(2));
     });
 
     test('menu is three 16-unit rules', () {
       // `M4 5h16` / `M4 12h16` / `M4 19h16` — the relative `h` must land on
       // x = 20, not x = 16.
       for (final PathMetric rule in _contours(
-        ElIconPaths.pathFor(ElIconGlyph.menu),
+        IconPaths.pathFor(IconGlyph.menu),
       )) {
         expect(rule.length, closeTo(16, 0.01));
         expect(rule.isClosed, isFalse);
       }
       expect(
-        ElIconPaths.pathFor(ElIconGlyph.menu).getBounds(),
+        IconPaths.pathFor(IconGlyph.menu).getBounds(),
         const Rect.fromLTRB(4, 5, 20, 19),
       );
     });
@@ -745,18 +736,18 @@ void main() {
       final double expected =
           math.sqrt(11 * 11 + 11 * 11) + math.sqrt(5 * 5 + 5 * 5); // 22.627
       expect(
-        _length(ElIconPaths.pathFor(ElIconGlyph.check)),
+        _length(IconPaths.pathFor(IconGlyph.check)),
         closeTo(expected, 0.05),
       );
       expect(
-        ElIconPaths.pathFor(ElIconGlyph.check).getBounds(),
+        IconPaths.pathFor(IconGlyph.check).getBounds(),
         const Rect.fromLTRB(4, 6, 20, 17),
       );
     });
 
     test('returns a fresh Path every call', () {
-      final Path first = ElIconPaths.pathFor(ElIconGlyph.check);
-      final Path second = ElIconPaths.pathFor(ElIconGlyph.check);
+      final Path first = IconPaths.pathFor(IconGlyph.check);
+      final Path second = IconPaths.pathFor(IconGlyph.check);
       expect(identical(first, second), isFalse);
       // …and they are genuinely independent: mutating one must not move the
       // other. Paths are mutable, which is the whole reason for the rule.
@@ -816,9 +807,9 @@ void main() {
       // package — so an allowlist would have stopped covering the majority
       // (icons-map.md §12.4.4).
       int totalClosed = 0;
-      for (final ElIconGlyph glyph in ElIconGlyph.values) {
+      for (final IconGlyph glyph in IconGlyph.values) {
         final int closed = _contours(
-          ElIconPaths.pathFor(glyph),
+          IconPaths.pathFor(glyph),
         ).where((PathMetric c) => c.isClosed).length;
         expect(
           closed,
@@ -839,37 +830,37 @@ void main() {
       // crest, and that crest closes. `gavel` adds none — five open strokes.
       expect(totalClosed, 61);
       expect(
-        ElIconGlyph.values.where(
-          (ElIconGlyph g) => ElIconPaths.elements[g]!
-              .whereType<ElIconPathElement>()
-              .any((ElIconPathElement e) => e.d.contains(RegExp('[zZ]'))),
+        IconGlyph.values.where(
+          (IconGlyph g) => IconPaths.elements[g]!
+              .whereType<IconPathElement>()
+              .any((IconPathElement e) => e.d.contains(RegExp('[zZ]'))),
         ),
-        <ElIconGlyph>[
-          ElIconGlyph.package,
-          ElIconGlyph.layers,
-          ElIconGlyph.trophy,
-          ElIconGlyph.packageOpen,
-          ElIconGlyph.filter,
-          ElIconGlyph.sparkles,
-          ElIconGlyph.crown,
-          ElIconGlyph.zap,
-          ElIconGlyph.star,
-          ElIconGlyph.tag,
-          ElIconGlyph.shield,
-          ElIconGlyph.shieldCheck,
+        <IconGlyph>[
+          IconGlyph.package,
+          IconGlyph.layers,
+          IconGlyph.trophy,
+          IconGlyph.packageOpen,
+          IconGlyph.filter,
+          IconGlyph.sparkles,
+          IconGlyph.crown,
+          IconGlyph.zap,
+          IconGlyph.star,
+          IconGlyph.tag,
+          IconGlyph.shield,
+          IconGlyph.shieldCheck,
           // The off-set glyphs that carry a `z`, in enum order. `circleCheck`
           // and `circleX` are absent on purpose: their rings close by being
           // `circle` nodes, not by a `z` command.
-          ElIconGlyph.play,
-          ElIconGlyph.volume2,
-          ElIconGlyph.volumeX,
-          ElIconGlyph.octagonX,
+          IconGlyph.play,
+          IconGlyph.volume2,
+          IconGlyph.volumeX,
+          IconGlyph.octagonX,
           // `ticket` closes with an uppercase `Z`; the regex takes both cases,
           // which is the point of writing it `[zZ]`.
-          ElIconGlyph.ticket,
+          IconGlyph.ticket,
           // `shieldAlert`'s crest IS `shield`'s, `z` included — key `oel41y`
           // on both. `gavel` is absent: none of its five strokes closes.
-          ElIconGlyph.shieldAlert,
+          IconGlyph.shieldAlert,
         ],
       );
     });
@@ -880,23 +871,22 @@ void main() {
       // borrows all three. Asserted as string equality against the *other two
       // glyphs* rather than against a literal, because that is the claim: not
       // "circleX contains this path" but "circleX's cross IS octagonX's cross".
-      String node(ElIconGlyph glyph, int i) =>
-          _signature(ElIconPaths.elements[glyph]![i]);
+      String node(IconGlyph glyph, int i) =>
+          _signature(IconPaths.elements[glyph]![i]);
 
       // The ring, shared with circleCheck (and five older glyphs) under 1mglay.
-      expect(node(ElIconGlyph.circleX, 0), node(ElIconGlyph.circleCheck, 0));
+      expect(node(IconGlyph.circleX, 0), node(IconGlyph.circleCheck, 0));
       // The two diagonals, shared with octagonX under 1uzhvr and z0biqf. Note
       // the index skip: octagonX declares its plate BETWEEN them.
-      expect(node(ElIconGlyph.circleX, 1), node(ElIconGlyph.octagonX, 0));
-      expect(node(ElIconGlyph.circleX, 2), node(ElIconGlyph.octagonX, 2));
+      expect(node(IconGlyph.circleX, 1), node(IconGlyph.octagonX, 0));
+      expect(node(IconGlyph.circleX, 2), node(IconGlyph.octagonX, 2));
 
       // Seven glyphs now carry the 10-unit ring; the library doc says so.
       expect(
-        ElIconGlyph.values.where(
-          (ElIconGlyph g) =>
-              ElIconPaths.elements[g]!.whereType<ElIconCircleElement>().any(
-                (ElIconCircleElement c) =>
-                    c.cx == 12 && c.cy == 12 && c.r == 10,
+        IconGlyph.values.where(
+          (IconGlyph g) =>
+              IconPaths.elements[g]!.whereType<IconCircleElement>().any(
+                (IconCircleElement c) => c.cx == 12 && c.cy == 12 && c.r == 10,
               ),
         ),
         hasLength(7),
@@ -1010,7 +1000,7 @@ void main() {
 
     test('is a single open subpath', () {
       final List<PathMetric> contours = _contours(
-        ElIconPaths.pathFor(ElIconGlyph.moon),
+        IconPaths.pathFor(IconGlyph.moon),
       );
       expect(contours, hasLength(1));
       expect(contours.single.isClosed, isFalse);
@@ -1021,7 +1011,7 @@ void main() {
       // checked against the analytic circle above. Left and bottom are the
       // arc's own extremes; top and right belong to the cubic hooks and are
       // recorded from the same sampling run.
-      final Rect tight = _tightBounds(ElIconPaths.pathFor(ElIconGlyph.moon));
+      final Rect tight = _tightBounds(IconPaths.pathFor(IconGlyph.moon));
       expect(tight.left, closeTo(cx - r, 0.005)); // 2.99788
       expect(tight.bottom, closeTo(cy + r, 0.005)); // 21.00107
       expect(tight.top, closeTo(3.0133, 0.005));
@@ -1035,7 +1025,7 @@ void main() {
       // the sampled geometry above (left 2.9121 vs 2.9979, bottom 21.0863 vs
       // 21.0009). Both are asserted on purpose: the tight bounds prove the arc
       // maths, these prove the emitted control polygon has not drifted.
-      final Rect bounds = ElIconPaths.pathFor(ElIconGlyph.moon).getBounds();
+      final Rect bounds = IconPaths.pathFor(IconGlyph.moon).getBounds();
       expect(bounds.left, closeTo(2.9121, 0.001));
       expect(bounds.top, closeTo(2.9920, 0.001));
       expect(bounds.right, closeTo(21.0070, 0.001));
@@ -1059,11 +1049,11 @@ void main() {
       // Every one of its 1.5-unit corner arcs lands on integers, which is the
       // clearest evidence the F.6.5 conversion is right on packed flags
       // (`a1.5 1.5 0 00-2.474-1.561` — two flags and a coordinate, no spaces).
-      final Rect tight = _tightBounds(ElIconPaths.pathFor(ElIconGlyph.zap));
+      final Rect tight = _tightBounds(IconPaths.pathFor(IconGlyph.zap));
       expect(tight, _rectCloseTo(const Rect.fromLTRB(4, 2, 20, 22), 0.002));
       // …and its control points are the set's widest excursion, still 1.85
       // units clear of the grid edge.
-      final Rect bounds = ElIconPaths.pathFor(ElIconGlyph.zap).getBounds();
+      final Rect bounds = IconPaths.pathFor(IconGlyph.zap).getBounds();
       expect(bounds.left, closeTo(3.8823, 0.001));
       expect(bounds.top, closeTo(1.8586, 0.001));
       expect(bounds.right, closeTo(20.1176, 0.001));
@@ -1071,12 +1061,12 @@ void main() {
     });
 
     test('star reaches its five points', () {
-      final Rect tight = _tightBounds(ElIconPaths.pathFor(ElIconGlyph.star));
+      final Rect tight = _tightBounds(IconPaths.pathFor(IconGlyph.star));
       expect(tight.left, closeTo(1.9982, 0.005));
       expect(tight.top, closeTo(2.0001, 0.005));
       expect(tight.right, closeTo(22.0000, 0.005));
       expect(tight.bottom, closeTo(21.0722, 0.005));
-      final Rect bounds = ElIconPaths.pathFor(ElIconGlyph.star).getBounds();
+      final Rect bounds = IconPaths.pathFor(IconGlyph.star).getBounds();
       expect(bounds.left, closeTo(1.9616, 0.001));
       expect(bounds.right, closeTo(22.0364, 0.001));
     });
@@ -1085,7 +1075,7 @@ void main() {
       // The four-point star's arcs are shallow enough that the control polygon
       // never leaves the drawn curve — tight bounds and `getBounds()` agree to
       // the last digit, which no other arc glyph in the set manages.
-      final Path path = ElIconPaths.pathFor(ElIconGlyph.sparkles);
+      final Path path = IconPaths.pathFor(IconGlyph.sparkles);
       final Rect tight = _tightBounds(path);
       expect(
         tight,
@@ -1098,7 +1088,7 @@ void main() {
     });
 
     test('crown sits on its base rule', () {
-      final Rect tight = _tightBounds(ElIconPaths.pathFor(ElIconGlyph.crown));
+      final Rect tight = _tightBounds(IconPaths.pathFor(IconGlyph.crown));
       expect(tight.left, closeTo(2.0025, 0.005));
       expect(tight.top, closeTo(3.0072, 0.005));
       expect(tight.right, closeTo(21.9985, 0.005));
@@ -1118,7 +1108,7 @@ void main() {
         'M12 0C12 6.6 17.4 12 24 12C17.4 12 12 17.4 12 24C12 17.4 6.6 12 0 12C6.6 12 12 6.6 12 0Z';
 
     test('the `d` is copied character for character', () {
-      expect(ElIconPaths.sparkleElement.d, css);
+      expect(IconPaths.sparkleElement.d, css);
       // Four cubic segments and a close, and nothing else: `C` five times would
       // be a different star and `Q` would be a different waist.
       expect('C'.allMatches(css), hasLength(4));
@@ -1126,11 +1116,11 @@ void main() {
     });
 
     test('it fills the 24-unit grid corner to corner', () {
-      final Path path = ElIconPaths.sparkle();
+      final Path path = IconPaths.sparkle();
       // The four points sit ON the grid's edges — (12,0), (24,12), (12,24),
-      // (0,12) — so the shape is exactly [ElIconPaths.viewBox] square, and the
+      // (0,12) — so the shape is exactly [IconPaths.viewBox] square, and the
       // control points at 6.6/17.4 are inside it. A sparkle's rendered box is
-      // therefore `24 × scale`, which is what `ElSparkle.box` claims.
+      // therefore `24 × scale`, which is what `Sparkle.box` claims.
       expect(
         path.getBounds(),
         _rectCloseTo(const Rect.fromLTRB(0, 0, 24, 24), 0.0005),
@@ -1144,7 +1134,7 @@ void main() {
     test('the waist is concave — it is a star, not a diamond', () {
       // The midpoint of the (12,0) → (24,12) arm. The four arms are congruent,
       // so an eighth of the contour's length is exactly that point.
-      final PathMetric arm = _contours(ElIconPaths.sparkle()).single;
+      final PathMetric arm = _contours(IconPaths.sparkle()).single;
       final Offset mid = arm.getTangentForOffset(arm.length / 8)!.position;
       const Offset centre = Offset(12, 12);
 
@@ -1167,11 +1157,11 @@ void main() {
     });
 
     test('it is one closed contour, and a fresh Path every call', () {
-      expect(_contours(ElIconPaths.sparkle()), hasLength(1));
-      expect(_contours(ElIconPaths.sparkle()).single.isClosed, isTrue);
+      expect(_contours(IconPaths.sparkle()), hasLength(1));
+      expect(_contours(IconPaths.sparkle()).single.isClosed, isTrue);
       // Thirteen instances share this shape; handing out one mutable [Path]
       // would let the first painter's transform corrupt the other twelve.
-      expect(identical(ElIconPaths.sparkle(), ElIconPaths.sparkle()), isFalse);
+      expect(identical(IconPaths.sparkle(), IconPaths.sparkle()), isFalse);
     });
 
     test('it stays out of the glyph registry', () {
@@ -1179,10 +1169,10 @@ void main() {
       // its registry from it by subtraction. A filled, stroke-less shape out of
       // the stylesheet belongs to neither, so the count must not have moved and
       // no member may carry this geometry.
-      expect(ElIconGlyph.values, hasLength(81));
-      for (final ElIconGlyph glyph in ElIconGlyph.values) {
-        for (final ElIconElement element in ElIconPaths.elements[glyph]!) {
-          if (element is ElIconPathElement) {
+      expect(IconGlyph.values, hasLength(81));
+      for (final IconGlyph glyph in IconGlyph.values) {
+        for (final IconElement element in IconPaths.elements[glyph]!) {
+          if (element is IconPathElement) {
             expect(element.d, isNot(css), reason: '${glyph.name} carries it');
           }
         }
@@ -1199,11 +1189,11 @@ void main() {
 /// in [_signature] form so one line covers one element and every attribute of
 /// it — a dropped `fill`, a swapped `x`/`y`, a `ry` that stopped being
 /// transcribed, or a `d` string that lost a character all fail here.
-const Map<ElIconGlyph, List<String>> _transcript = <ElIconGlyph, List<String>>{
+const Map<IconGlyph, List<String>> _transcript = <IconGlyph, List<String>>{
   // ─── docs chrome ───
-  ElIconGlyph.menu: <String>['path M4 5h16', 'path M4 12h16', 'path M4 19h16'],
-  ElIconGlyph.x: <String>['path M18 6 6 18', 'path m6 6 12 12'],
-  ElIconGlyph.sun: <String>[
+  IconGlyph.menu: <String>['path M4 5h16', 'path M4 12h16', 'path M4 19h16'],
+  IconGlyph.x: <String>['path M18 6 6 18', 'path m6 6 12 12'],
+  IconGlyph.sun: <String>[
     'circle 12 12 4',
     'path M12 2v2',
     'path M12 20v2',
@@ -1214,44 +1204,44 @@ const Map<ElIconGlyph, List<String>> _transcript = <ElIconGlyph, List<String>>{
     'path m6.34 17.66-1.41 1.41',
     'path m19.07 4.93-1.41 1.41',
   ],
-  ElIconGlyph.monitor: <String>[
+  IconGlyph.monitor: <String>[
     'rect 2 3 20 14 2',
     'line 8 21 16 21',
     'line 12 17 12 21',
   ],
-  ElIconGlyph.moon: <String>[
+  IconGlyph.moon: <String>[
     'path M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401',
   ],
-  ElIconGlyph.arrowLeft: <String>['path m12 19-7-7 7-7', 'path M19 12H5'],
-  ElIconGlyph.arrowRight: <String>['path M5 12h14', 'path m12 5 7 7-7 7'],
-  ElIconGlyph.check: <String>['path M20 6 9 17l-5-5'],
+  IconGlyph.arrowLeft: <String>['path m12 19-7-7 7-7', 'path M19 12H5'],
+  IconGlyph.arrowRight: <String>['path M5 12h14', 'path m12 5 7 7-7 7'],
+  IconGlyph.check: <String>['path M20 6 9 17l-5-5'],
 
   // ─── curated · "Navigation & structure" ───
-  ElIconGlyph.package: <String>[
+  IconGlyph.package: <String>[
     'path M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z',
     'path M12 22V12',
     'polyline 3.29 7 12 12 20.71 7',
     'path m7.5 4.27 9 5.15',
   ],
-  ElIconGlyph.radio: <String>[
+  IconGlyph.radio: <String>[
     'path M16.247 7.761a6 6 0 0 1 0 8.478',
     'path M19.075 4.933a10 10 0 0 1 0 14.134',
     'path M4.925 19.067a10 10 0 0 1 0-14.134',
     'path M7.753 16.239a6 6 0 0 1 0-8.478',
     'circle 12 12 2',
   ],
-  ElIconGlyph.layers: <String>[
+  IconGlyph.layers: <String>[
     'path M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z',
     'path M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12',
     'path M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17',
   ],
-  ElIconGlyph.gift: <String>[
+  IconGlyph.gift: <String>[
     'path M12 7v14',
     'path M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8',
     'path M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5',
     'rect 3 7 18 4 1',
   ],
-  ElIconGlyph.trophy: <String>[
+  IconGlyph.trophy: <String>[
     'path M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2',
     'path M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2',
     'path M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3',
@@ -1259,94 +1249,94 @@ const Map<ElIconGlyph, List<String>> _transcript = <ElIconGlyph, List<String>>{
     'path M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z',
     'path M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3',
   ],
-  ElIconGlyph.wallet: <String>[
+  IconGlyph.wallet: <String>[
     'path M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1',
     'path M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4',
   ],
-  ElIconGlyph.user: <String>[
+  IconGlyph.user: <String>[
     'path M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2',
     'circle 12 7 4',
   ],
-  ElIconGlyph.search: <String>['path m21 21-4.34-4.34', 'circle 11 11 8'],
-  ElIconGlyph.bell: <String>[
+  IconGlyph.search: <String>['path m21 21-4.34-4.34', 'circle 11 11 8'],
+  IconGlyph.bell: <String>[
     'path M10.268 21a2 2 0 0 0 3.464 0',
     'path M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326',
   ],
-  ElIconGlyph.settings: <String>[
+  IconGlyph.settings: <String>[
     'path M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915',
     'circle 12 12 3',
   ],
-  ElIconGlyph.logOut: <String>[
+  IconGlyph.logOut: <String>[
     'path m16 17 5-5-5-5',
     'path M21 12H9',
     'path M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4',
   ],
-  ElIconGlyph.layoutGrid: <String>[
+  IconGlyph.layoutGrid: <String>[
     'rect 3 3 7 7 1',
     'rect 14 3 7 7 1',
     'rect 14 14 7 7 1',
     'rect 3 14 7 7 1',
   ],
-  ElIconGlyph.rows3: <String>[
+  IconGlyph.rows3: <String>[
     'rect 3 3 18 18 2',
     'path M21 9H3',
     'path M21 15H3',
   ],
-  ElIconGlyph.chevronDown: <String>['path m6 9 6 6 6-6'],
-  ElIconGlyph.chevronUp: <String>['path m18 15-6-6-6 6'],
-  ElIconGlyph.chevronLeft: <String>['path m15 18-6-6 6-6'],
-  ElIconGlyph.chevronRight: <String>['path m9 18 6-6-6-6'],
-  ElIconGlyph.ellipsis: <String>[
+  IconGlyph.chevronDown: <String>['path m6 9 6 6 6-6'],
+  IconGlyph.chevronUp: <String>['path m18 15-6-6-6 6'],
+  IconGlyph.chevronLeft: <String>['path m15 18-6-6 6-6'],
+  IconGlyph.chevronRight: <String>['path m9 18 6-6-6-6'],
+  IconGlyph.ellipsis: <String>[
     'circle 12 12 1',
     'circle 19 12 1',
     'circle 5 12 1',
   ],
-  ElIconGlyph.externalLink: <String>[
+  IconGlyph.externalLink: <String>[
     'path M15 3h6v6',
     'path M10 14 21 3',
     'path M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6',
   ],
 
   // ─── curated · "Actions" ───
-  ElIconGlyph.packageOpen: <String>[
+  IconGlyph.packageOpen: <String>[
     'path M12 22v-9',
     'path M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.655 1.655 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z',
     'path M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13',
     'path M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.636 1.636 0 0 0 1.63 0z',
   ],
-  ElIconGlyph.shoppingCart: <String>[
+  IconGlyph.shoppingCart: <String>[
     'circle 8 21 1',
     'circle 19 21 1',
     'path M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12',
   ],
-  ElIconGlyph.heart: <String>[
+  IconGlyph.heart: <String>[
     'path M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5',
   ],
-  ElIconGlyph.eye: <String>[
+  IconGlyph.eye: <String>[
     'path M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0',
     'circle 12 12 3',
   ],
-  ElIconGlyph.eyeOff: <String>[
+  IconGlyph.eyeOff: <String>[
     'path M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49',
     'path M14.084 14.158a3 3 0 0 1-4.242-4.242',
     'path M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143',
     'path m2 2 20 20',
   ],
-  ElIconGlyph.share2: <String>[
+  IconGlyph.share2: <String>[
     'circle 18 5 3',
     'circle 6 12 3',
     'circle 18 19 3',
     'line 8.59 13.51 15.42 17.49',
     'line 15.41 6.51 8.59 10.49',
   ],
-  ElIconGlyph.copy: <String>[
+  IconGlyph.copy: <String>[
     'rect 8 8 14 14 2 ry 2',
     'path M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2',
   ],
-  ElIconGlyph.filter: <String>[
+  IconGlyph.filter: <String>[
     'path M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z',
   ],
-  ElIconGlyph.slidersHorizontal: <String>[
+  IconGlyph.slidersHorizontal: <String>[
     'path M10 5H3',
     'path M12 19H3',
     'path M14 3v4',
@@ -1357,73 +1347,70 @@ const Map<ElIconGlyph, List<String>> _transcript = <ElIconGlyph, List<String>>{
     'path M8 10v4',
     'path M8 12H3',
   ],
-  ElIconGlyph.plus: <String>['path M5 12h14', 'path M12 5v14'],
-  ElIconGlyph.minus: <String>['path M5 12h14'],
-  ElIconGlyph.refreshCw: <String>[
+  IconGlyph.plus: <String>['path M5 12h14', 'path M12 5v14'],
+  IconGlyph.minus: <String>['path M5 12h14'],
+  IconGlyph.refreshCw: <String>[
     'path M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8',
     'path M21 3v5h-5',
     'path M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16',
     'path M8 16H3v5',
   ],
-  ElIconGlyph.download: <String>[
+  IconGlyph.download: <String>[
     'path M12 15V3',
     'path M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4',
     'path m7 10 5 5 5-5',
   ],
-  ElIconGlyph.upload: <String>[
+  IconGlyph.upload: <String>[
     'path M12 3v12',
     'path m17 8-5-5-5 5',
     'path M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4',
   ],
-  ElIconGlyph.truck: <String>[
+  IconGlyph.truck: <String>[
     'path M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2',
     'path M15 18H9',
     'path M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14',
     'circle 17 18 2',
     'circle 7 18 2',
   ],
-  ElIconGlyph.trash2: <String>[
+  IconGlyph.trash2: <String>[
     'path M10 11v6',
     'path M14 11v6',
     'path M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6',
     'path M3 6h18',
     'path M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2',
   ],
-  ElIconGlyph.ban: <String>[
-    'circle 12 12 10',
-    'path M4.929 4.929 19.07 19.071',
-  ],
+  IconGlyph.ban: <String>['circle 12 12 10', 'path M4.929 4.929 19.07 19.071'],
 
   // ─── curated · "Collectible domain" ───
-  ElIconGlyph.sparkles: <String>[
+  IconGlyph.sparkles: <String>[
     'path M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z',
     'path M20 2v4',
     'path M22 4h-4',
     'circle 4 20 2',
   ],
-  ElIconGlyph.crown: <String>[
+  IconGlyph.crown: <String>[
     'path M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z',
     'path M5 21h14',
   ],
-  ElIconGlyph.flame: <String>[
+  IconGlyph.flame: <String>[
     'path M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4',
   ],
-  ElIconGlyph.zap: <String>[
+  IconGlyph.zap: <String>[
     'path M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z',
   ],
-  ElIconGlyph.star: <String>[
+  IconGlyph.star: <String>[
     'path M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z',
   ],
-  ElIconGlyph.tag: <String>[
+  IconGlyph.tag: <String>[
     'path M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z',
     'circle 7.5 7.5 0.5 fill',
   ],
-  ElIconGlyph.percent: <String>[
+  IconGlyph.percent: <String>[
     'line 19 5 5 19',
     'circle 6.5 6.5 2.5',
     'circle 17.5 17.5 2.5',
   ],
-  ElIconGlyph.medal: <String>[
+  IconGlyph.medal: <String>[
     'path M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15',
     'path M11 12 5.12 2.2',
     'path m13 12 5.88-9.8',
@@ -1431,103 +1418,103 @@ const Map<ElIconGlyph, List<String>> _transcript = <ElIconGlyph, List<String>>{
     'circle 12 17 5',
     'path M12 18v-2h-.5',
   ],
-  ElIconGlyph.activity: <String>[
+  IconGlyph.activity: <String>[
     'path M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2',
   ],
-  ElIconGlyph.trendingUp: <String>[
+  IconGlyph.trendingUp: <String>[
     'path M16 7h6v6',
     'path m22 7-8.5 8.5-5-5L2 17',
   ],
-  ElIconGlyph.trendingDown: <String>[
+  IconGlyph.trendingDown: <String>[
     'path M16 17h6v-6',
     'path m22 17-8.5-8.5-5 5L2 7',
   ],
 
   // ─── curated · "Money & status" ───
-  ElIconGlyph.circleDollarSign: <String>[
+  IconGlyph.circleDollarSign: <String>[
     'circle 12 12 10',
     'path M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8',
     'path M12 18V6',
   ],
-  ElIconGlyph.creditCard: <String>['rect 2 5 20 14 2', 'line 2 10 22 10'],
-  ElIconGlyph.arrowDownLeft: <String>['path M17 7 7 17', 'path M17 17H7V7'],
-  ElIconGlyph.arrowUpRight: <String>['path M7 7h10v10', 'path M7 17 17 7'],
-  ElIconGlyph.hourglass: <String>[
+  IconGlyph.creditCard: <String>['rect 2 5 20 14 2', 'line 2 10 22 10'],
+  IconGlyph.arrowDownLeft: <String>['path M17 7 7 17', 'path M17 17H7V7'],
+  IconGlyph.arrowUpRight: <String>['path M7 7h10v10', 'path M7 17 17 7'],
+  IconGlyph.hourglass: <String>[
     'path M5 22h14',
     'path M5 2h14',
     'path M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22',
     'path M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2',
   ],
-  ElIconGlyph.clock: <String>['circle 12 12 10', 'path M12 6v6l4 2'],
-  ElIconGlyph.lock: <String>[
+  IconGlyph.clock: <String>['circle 12 12 10', 'path M12 6v6l4 2'],
+  IconGlyph.lock: <String>[
     'rect 3 11 18 11 2 ry 2',
     'path M7 11V7a5 5 0 0 1 10 0v4',
   ],
-  ElIconGlyph.shield: <String>[
+  IconGlyph.shield: <String>[
     'path M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
   ],
-  ElIconGlyph.shieldCheck: <String>[
+  IconGlyph.shieldCheck: <String>[
     'path M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
     'path m9 12 2 2 4-4',
   ],
-  ElIconGlyph.info: <String>[
+  IconGlyph.info: <String>[
     'circle 12 12 10',
     'path M12 16v-4',
     'path M12 8h.01',
   ],
-  ElIconGlyph.helpCircle: <String>[
+  IconGlyph.helpCircle: <String>[
     'circle 12 12 10',
     'path M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3',
     'path M12 17h.01',
   ],
-  ElIconGlyph.alertTriangle: <String>[
+  IconGlyph.alertTriangle: <String>[
     'path m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3',
     'path M12 9v4',
     'path M12 17h.01',
   ],
 
   // ─── off-set ───
-  ElIconGlyph.rotateCcw: <String>[
+  IconGlyph.rotateCcw: <String>[
     'path M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8',
     'path M3 3v5h5',
   ],
   // `loader-circle.mjs`, imported in the reference as `Loader2Icon`.
-  ElIconGlyph.loaderCircle: <String>['path M21 12a9 9 0 1 1-6.219-8.56'],
-  ElIconGlyph.play: <String>[
+  IconGlyph.loaderCircle: <String>['path M21 12a9 9 0 1 1-6.219-8.56'],
+  IconGlyph.play: <String>[
     'path M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z',
   ],
   // The right-hand bar is declared first — order is paint order, so it is kept.
-  ElIconGlyph.pause: <String>['rect 14 3 5 18 1', 'rect 5 3 5 18 1'],
-  ElIconGlyph.volume2: <String>[
+  IconGlyph.pause: <String>['rect 14 3 5 18 1', 'rect 5 3 5 18 1'],
+  IconGlyph.volume2: <String>[
     'path M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z',
     'path M16 9a5 5 0 0 1 0 6',
     'path M19.364 18.364a9 9 0 0 0 0-12.728',
   ],
-  ElIconGlyph.volumeX: <String>[
+  IconGlyph.volumeX: <String>[
     'path M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z',
     'line 22 9 16 15',
     'line 16 9 22 15',
   ],
-  ElIconGlyph.circleCheck: <String>['circle 12 12 10', 'path m9 12 2 2 4-4'],
+  IconGlyph.circleCheck: <String>['circle 12 12 10', 'path m9 12 2 2 4-4'],
   // Stroke, plate, stroke — lucide declares the octagon BETWEEN its two
   // diagonals, and order is paint order.
-  ElIconGlyph.octagonX: <String>[
+  IconGlyph.octagonX: <String>[
     'path m15 9-6 6',
     'path M2.586 16.726A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2h6.624a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586z',
     'path m9 9 6 6',
   ],
-  ElIconGlyph.circleX: <String>[
+  IconGlyph.circleX: <String>[
     'circle 12 12 10',
     'path m15 9-6 6',
     'path m9 9 6 6',
   ],
   // A 4-unit bowl, not the 10-unit ring the status glyphs share.
-  ElIconGlyph.atSign: <String>[
+  IconGlyph.atSign: <String>[
     'circle 12 12 4',
     'path M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8',
   ],
   // The one `d` in the set that closes with an uppercase `Z`.
-  ElIconGlyph.ticket: <String>[
+  IconGlyph.ticket: <String>[
     'path M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z',
     'path M13 5v2',
     'path M13 17v2',
@@ -1536,7 +1523,7 @@ const Map<ElIconGlyph, List<String>> _transcript = <ElIconGlyph, List<String>>{
   // Tabs first, plate second — lucide's order, and order is paint order. The
   // only `rect` in the set with an `rx` and no `ry`, so the signature carries
   // no `ry` half.
-  ElIconGlyph.calendar: <String>[
+  IconGlyph.calendar: <String>[
     'path M8 2v3',
     'path M16 2v3',
     'rect 3 3 18 18 2',
@@ -1544,14 +1531,14 @@ const Map<ElIconGlyph, List<String>> _transcript = <ElIconGlyph, List<String>>{
   ],
   // The crest is `shield`'s, character for character (key `oel41y`), then the
   // stem and the dot `alert-triangle` and `info` also carry.
-  ElIconGlyph.shieldAlert: <String>[
+  IconGlyph.shieldAlert: <String>[
     'path M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
     'path M12 8v4',
     'path M12 16h.01',
   ],
   // Handle, block, then the head's two faces and its band. The only arc in the
   // glyph is the grip's rounded end, inside the first stroke.
-  ElIconGlyph.gavel: <String>[
+  IconGlyph.gavel: <String>[
     'path m14 13-8.381 8.38a1 1 0 0 1-3.001-3l8.384-8.381',
     'path m16 16 6-6',
     'path m21.5 10.5-8-8',
@@ -1564,41 +1551,53 @@ const Map<ElIconGlyph, List<String>> _transcript = <ElIconGlyph, List<String>>{
 /// the order the icons page renders them.
 ///
 /// `ICON_COUNT` there is a `reduce`, not a literal; 21 + 19 + 11 + 12 = 63.
-const List<ElIconGlyph> _curated = <ElIconGlyph>[
+const List<IconGlyph> _curated = <IconGlyph>[
   // navigation — 21
-  ElIconGlyph.package, ElIconGlyph.radio, ElIconGlyph.layers, ElIconGlyph.gift,
-  ElIconGlyph.trophy, ElIconGlyph.wallet, ElIconGlyph.user, ElIconGlyph.search,
-  ElIconGlyph.bell, ElIconGlyph.settings, ElIconGlyph.logOut,
-  ElIconGlyph.layoutGrid, ElIconGlyph.rows3, ElIconGlyph.chevronDown,
-  ElIconGlyph.chevronUp, ElIconGlyph.chevronLeft, ElIconGlyph.chevronRight,
-  ElIconGlyph.arrowLeft, ElIconGlyph.arrowRight, ElIconGlyph.ellipsis,
-  ElIconGlyph.externalLink,
+  IconGlyph.package,
+  IconGlyph.radio,
+  IconGlyph.layers,
+  IconGlyph.gift,
+  IconGlyph.trophy,
+  IconGlyph.wallet,
+  IconGlyph.user,
+  IconGlyph.search,
+  IconGlyph.bell, IconGlyph.settings, IconGlyph.logOut,
+  IconGlyph.layoutGrid, IconGlyph.rows3, IconGlyph.chevronDown,
+  IconGlyph.chevronUp, IconGlyph.chevronLeft, IconGlyph.chevronRight,
+  IconGlyph.arrowLeft, IconGlyph.arrowRight, IconGlyph.ellipsis,
+  IconGlyph.externalLink,
   // actions — 19
-  ElIconGlyph.packageOpen, ElIconGlyph.shoppingCart, ElIconGlyph.heart,
-  ElIconGlyph.eye, ElIconGlyph.eyeOff, ElIconGlyph.share2, ElIconGlyph.copy,
-  ElIconGlyph.filter, ElIconGlyph.slidersHorizontal, ElIconGlyph.plus,
-  ElIconGlyph.minus, ElIconGlyph.refreshCw, ElIconGlyph.download,
-  ElIconGlyph.upload, ElIconGlyph.truck, ElIconGlyph.trash2, ElIconGlyph.ban,
-  ElIconGlyph.x, ElIconGlyph.check,
+  IconGlyph.packageOpen, IconGlyph.shoppingCart, IconGlyph.heart,
+  IconGlyph.eye, IconGlyph.eyeOff, IconGlyph.share2, IconGlyph.copy,
+  IconGlyph.filter, IconGlyph.slidersHorizontal, IconGlyph.plus,
+  IconGlyph.minus, IconGlyph.refreshCw, IconGlyph.download,
+  IconGlyph.upload,
+  IconGlyph.truck,
+  IconGlyph.trash2,
+  IconGlyph.ban,
+  IconGlyph.x, IconGlyph.check,
   // domain — 11
-  ElIconGlyph.sparkles, ElIconGlyph.crown, ElIconGlyph.flame, ElIconGlyph.zap,
-  ElIconGlyph.star, ElIconGlyph.tag, ElIconGlyph.percent, ElIconGlyph.medal,
-  ElIconGlyph.activity, ElIconGlyph.trendingUp, ElIconGlyph.trendingDown,
+  IconGlyph.sparkles,
+  IconGlyph.crown,
+  IconGlyph.flame,
+  IconGlyph.zap,
+  IconGlyph.star, IconGlyph.tag, IconGlyph.percent, IconGlyph.medal,
+  IconGlyph.activity, IconGlyph.trendingUp, IconGlyph.trendingDown,
   // money & status — 12
-  ElIconGlyph.circleDollarSign, ElIconGlyph.creditCard,
-  ElIconGlyph.arrowDownLeft, ElIconGlyph.arrowUpRight, ElIconGlyph.hourglass,
-  ElIconGlyph.clock, ElIconGlyph.lock, ElIconGlyph.shield,
-  ElIconGlyph.shieldCheck, ElIconGlyph.info, ElIconGlyph.helpCircle,
-  ElIconGlyph.alertTriangle,
+  IconGlyph.circleDollarSign, IconGlyph.creditCard,
+  IconGlyph.arrowDownLeft, IconGlyph.arrowUpRight, IconGlyph.hourglass,
+  IconGlyph.clock, IconGlyph.lock, IconGlyph.shield,
+  IconGlyph.shieldCheck, IconGlyph.info, IconGlyph.helpCircle,
+  IconGlyph.alertTriangle,
 ];
 
 /// The four curated glyphs that were already embedded as docs chrome before
 /// this batch — so the batch itself transcribed 59, not 63.
-const List<ElIconGlyph> _curatedAlreadyPresent = <ElIconGlyph>[
-  ElIconGlyph.arrowLeft,
-  ElIconGlyph.arrowRight,
-  ElIconGlyph.x,
-  ElIconGlyph.check,
+const List<IconGlyph> _curatedAlreadyPresent = <IconGlyph>[
+  IconGlyph.arrowLeft,
+  IconGlyph.arrowRight,
+  IconGlyph.x,
+  IconGlyph.check,
 ];
 
 /// Matches a [Rect] edge by edge within [tolerance].

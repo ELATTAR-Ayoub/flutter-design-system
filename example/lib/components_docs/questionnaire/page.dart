@@ -10,15 +10,27 @@
 /// rather than invented, adapted only to drop the fake network-latency
 /// phase machinery a documentation preview does not need.
 ///
-/// **It is a wizard, not a stack.** One [ElQuestionnaireItem] is on
+/// **It is a wizard, not a stack.** One [QuestionnaireItem] is on
 /// screen at a time — every other one the caller passes is not laid out
-/// at all, `SizedBox.shrink()` — which is what [ElQuestionnaireProgress],
-/// [ElQuestionnairePrevious], [ElQuestionnaireSkip], [ElQuestionnaireNext]
-/// and [ElQuestionnaireSubmit] all exist to move.
+/// at all, `SizedBox.shrink()` — which is what [QuestionnaireProgress],
+/// [QuestionnairePrevious], [QuestionnaireSkip], [QuestionnaireNext]
+/// and [QuestionnaireSubmit] all exist to move.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -42,7 +54,7 @@ final ComponentDocSpec questionnaireDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(120),
+      minHeight: space(120),
     ),
     InstallSection(
       id: 'install',
@@ -69,7 +81,7 @@ final ComponentDocSpec questionnaireDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElQuestionnaire and every part it '
+              'Add the export line so Questionnaire and every part it '
               'composes are reachable the same way the CLI path already '
               'makes them.',
           code: "export 'questionnaire.dart';",
@@ -101,8 +113,8 @@ final ComponentDocSpec questionnaireDocSpec = ComponentDocSpec(
       id: 'text-item',
       title: 'Text item',
       description:
-          'ElQuestionnaireInput is a control, so §3 puts it on the pill '
-          'rather than the rounded-lg ladder ElQuestionnaireChoice uses. '
+          'QuestionnaireInput is a control, so §3 puts it on the pill '
+          'rather than the rounded-lg ladder QuestionnaireChoice uses. '
           'The right item is required and pre-invalidated to show the '
           'error line, which carries the source\'s own DRIFT: with no '
           'text child it renders exactly the primitive\'s default string.',
@@ -128,21 +140,21 @@ final ComponentDocSpec questionnaireDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every constructor parameter each exported class declares, '
-          'every ElQuestionnaireShortcuts value, and '
-          'ElQuestionnaireController\'s own public surface: one table '
+          'every QuestionnaireShortcuts value, and '
+          'QuestionnaireController\'s own public surface: one table '
           'per class or small family of classes.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElQuestionnaire', anchor: 'api-elquestionnaire'),
+        DocsTocEntry(title: 'Questionnaire', anchor: 'api-elquestionnaire'),
         DocsTocEntry(
-          title: 'ElQuestionnaireShortcuts',
+          title: 'QuestionnaireShortcuts',
           anchor: 'api-elquestionnaireshortcuts',
         ),
         DocsTocEntry(
-          title: 'ElQuestionnaireController',
+          title: 'QuestionnaireController',
           anchor: 'api-elquestionnairecontroller',
         ),
         DocsTocEntry(
-          title: 'ElQuestionnaireItem',
+          title: 'QuestionnaireItem',
           anchor: 'api-elquestionnaireitem',
         ),
         DocsTocEntry(
@@ -157,10 +169,7 @@ final ComponentDocSpec questionnaireDocSpec = ComponentDocSpec(
           title: 'Input · Error',
           anchor: 'api-elquestionnaire-input',
         ),
-        DocsTocEntry(
-          title: 'Actions',
-          anchor: 'api-elquestionnaire-actions',
-        ),
+        DocsTocEntry(title: 'Actions', anchor: 'api-elquestionnaire-actions'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -168,8 +177,8 @@ final ComponentDocSpec questionnaireDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off _ElQuestionnaireState, ElQuestionnaireController and '
-          '_ElQuestionnaireChoiceState directly, not inferred.',
+          'Read off _QuestionnaireState, QuestionnaireController and '
+          '_QuestionnaireChoiceState directly, not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
     DisclosureSection(
@@ -182,7 +191,7 @@ final ComponentDocSpec questionnaireDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'The one control family in this port with real keyboard '
-          'navigation of its own: read off ElQuestionnaire\'s _onKey, '
+          'navigation of its own: read off Questionnaire\'s _onKey, '
           'not inferred.',
       child: _KeyboardContent(),
     ),
@@ -218,7 +227,7 @@ final ComponentDocSpec questionnaireDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/agent_transcript_test.dart',
             description:
-                'Covers ElQuestionnaire live, composed inside the '
+                'Covers Questionnaire live, composed inside the '
                 'transcript page\'s own demo — there is no dedicated '
                 'questionnaire_test.dart in the package yet.',
           ),
@@ -253,9 +262,9 @@ class QuestionnaireDocPage extends StatelessWidget {
       title: questionnaireDoc.title,
       description: questionnaireDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Questionnaire'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Questionnaire'),
     ],
     toc: questionnaireDocSpec.toc,
     previous: null,
@@ -283,56 +292,56 @@ class _PreviewSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('questionnaire-preview:root'),
-    child: ElQuestionnaire(
-      shortcuts: ElQuestionnaireShortcuts.letters,
+    child: Questionnaire(
+      shortcuts: QuestionnaireShortcuts.letters,
       onSubmit: () {},
       children: <Widget>[
-        const ElQuestionnaireProgress(),
-        ElQuestionnaireItem(
+        const QuestionnaireProgress(),
+        QuestionnaireItem(
           name: 'style',
           required: true,
-          title: const ElQuestionnaireTitle('How do you usually pick a pack?'),
+          title: const QuestionnaireTitle('How do you usually pick a pack?'),
           children: <Widget>[
-            ElQuestionnaireChoices(
-              children: <ElQuestionnaireChoice>[
+            QuestionnaireChoices(
+              children: <QuestionnaireChoice>[
                 for (int i = 0; i < _packStyleValues.length; i += 1)
-                  ElQuestionnaireChoice(
+                  QuestionnaireChoice(
                     value: _packStyleValues[i],
                     label: _packStyleChoices[i],
                   ),
               ],
             ),
-            const ElQuestionnaireError(),
+            const QuestionnaireError(),
           ],
         ),
-        const ElQuestionnaireItem(
+        const QuestionnaireItem(
           name: 'goal',
-          title: ElQuestionnaireTitle('Chasing anything specific?'),
-          description: ElQuestionnaireDescription(
+          title: QuestionnaireTitle('Chasing anything specific?'),
+          description: QuestionnaireDescription(
             'Optional — Skip moves on without an answer.',
           ),
           children: <Widget>[
-            ElQuestionnaireInput(placeholder: 'A card, a set, a rarity…'),
+            QuestionnaireInput(placeholder: 'A card, a set, a rarity…'),
           ],
         ),
-        const ElQuestionnaireItem(
+        const QuestionnaireItem(
           name: 'budget',
           required: true,
-          title: ElQuestionnaireTitle("What's tonight's budget?"),
+          title: QuestionnaireTitle("What's tonight's budget?"),
           children: <Widget>[
-            ElQuestionnaireInput(
+            QuestionnaireInput(
               placeholder: r'$',
               keyboardType: TextInputType.number,
             ),
-            ElQuestionnaireError(text: 'Enter an amount before continuing.'),
+            QuestionnaireError(text: 'Enter an amount before continuing.'),
           ],
         ),
-        const ElQuestionnaireActions(
+        const QuestionnaireActions(
           children: <Widget>[
-            ElQuestionnairePrevious(),
-            ElQuestionnaireSkip(),
-            ElQuestionnaireNext(),
-            ElQuestionnaireSubmit(),
+            QuestionnairePrevious(),
+            QuestionnaireSkip(),
+            QuestionnaireNext(),
+            QuestionnaireSubmit(),
           ],
         ),
       ],
@@ -342,33 +351,33 @@ class _PreviewSpecimen extends StatelessWidget {
 
 const String _previewCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-    'ElQuestionnaire(\n'
-    '  shortcuts: ElQuestionnaireShortcuts.letters,\n'
+    'Questionnaire(\n'
+    '  shortcuts: QuestionnaireShortcuts.letters,\n'
     '  onSubmit: submit,\n'
     '  children: [\n'
-    '    const ElQuestionnaireProgress(),\n'
-    '    ElQuestionnaireItem(\n'
+    '    const QuestionnaireProgress(),\n'
+    '    QuestionnaireItem(\n'
     "      name: 'style',\n"
     '      required: true,\n'
-    "      title: const ElQuestionnaireTitle('How do you usually pick a pack?'),\n"
+    "      title: const QuestionnaireTitle('How do you usually pick a pack?'),\n"
     '      children: [\n'
-    '        ElQuestionnaireChoices(\n'
+    '        QuestionnaireChoices(\n'
     '          children: [\n'
-    "            ElQuestionnaireChoice(value: 'sealed', label: 'Sealed packs and boxes'),\n"
-    "            ElQuestionnaireChoice(value: 'singles', label: 'Singles off the wall'),\n"
-    "            ElQuestionnaireChoice(value: 'slabs', label: 'Graded slabs'),\n"
+    "            QuestionnaireChoice(value: 'sealed', label: 'Sealed packs and boxes'),\n"
+    "            QuestionnaireChoice(value: 'singles', label: 'Singles off the wall'),\n"
+    "            QuestionnaireChoice(value: 'slabs', label: 'Graded slabs'),\n"
     '          ],\n'
     '        ),\n'
-    '        const ElQuestionnaireError(),\n'
+    '        const QuestionnaireError(),\n'
     '      ],\n'
     '    ),\n'
     '    // …more items…\n'
-    '    const ElQuestionnaireActions(\n'
+    '    const QuestionnaireActions(\n'
     '      children: [\n'
-    '        ElQuestionnairePrevious(),\n'
-    '        ElQuestionnaireSkip(),\n'
-    '        ElQuestionnaireNext(),\n'
-    '        ElQuestionnaireSubmit(),\n'
+    '        QuestionnairePrevious(),\n'
+    '        QuestionnaireSkip(),\n'
+    '        QuestionnaireNext(),\n'
+    '        QuestionnaireSubmit(),\n'
     '      ],\n'
     '    ),\n'
     '  ],\n'
@@ -377,24 +386,24 @@ const String _previewCode =
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElQuestionnaire(
+Questionnaire(
   onSubmit: submit,
   children: const [
-    ElQuestionnaireItem(
+    QuestionnaireItem(
       name: 'answer',
       children: [
-        ElQuestionnaireChoices(
-          children: [ElQuestionnaireChoice(value: 'yes', label: 'Yes')],
+        QuestionnaireChoices(
+          children: [QuestionnaireChoice(value: 'yes', label: 'Yes')],
         ),
       ],
     ),
-    ElQuestionnaireActions(children: [ElQuestionnaireSubmit()]),
+    QuestionnaireActions(children: [QuestionnaireSubmit()]),
   ],
 )''';
 
 /// `_QuestionnaireCell` / `_QuestionnaireInvalidCell`, `transcript.dart`'s
 /// own state-matrix cells, reproduced: each root is isolated (its own
-/// `ElQuestionnaire`) and swallows `onSubmit`, since a single-item root
+/// `Questionnaire`) and swallows `onSubmit`, since a single-item root
 /// with a visible Submit or Skip would submit the instant it is pressed —
 /// these cells exist to be looked at.
 class _ChoiceStatesSpecimen extends StatelessWidget {
@@ -402,14 +411,18 @@ class _ChoiceStatesSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Wrap(
-      spacing: el(6),
-      runSpacing: el(4),
+      spacing: space(6),
+      runSpacing: space(4),
       children: <Widget>[
-        _cell(theme, 'Unanswered', const _ChoiceCell(
-          key: ValueKey<String>('questionnaire-example:choice-unanswered'),
-        )),
+        _cell(
+          theme,
+          'Unanswered',
+          const _ChoiceCell(
+            key: ValueKey<String>('questionnaire-example:choice-unanswered'),
+          ),
+        ),
         _cell(
           theme,
           'Answered',
@@ -437,39 +450,35 @@ class _ChoiceStatesSpecimen extends StatelessWidget {
     );
   }
 
-  Widget _cell(ElThemeData theme, String label, Widget child) => SizedBox(
-    width: el(56),
+  Widget _cell(ThemeTokens theme, String label, Widget child) => SizedBox(
+    width: space(56),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         child,
-        SizedBox(height: el(2)),
-        ElText(label, ElType.small, color: theme.mutedForeground),
+        SizedBox(height: space(2)),
+        StyledText(label, TextStyles.small, color: theme.mutedForeground),
       ],
     ),
   );
 }
 
 class _ChoiceCell extends StatelessWidget {
-  const _ChoiceCell({
-    super.key,
-    this.checked = false,
-    this.withSkip = false,
-  });
+  const _ChoiceCell({super.key, this.checked = false, this.withSkip = false});
 
   final bool checked;
   final bool withSkip;
 
   @override
-  Widget build(BuildContext context) => ElQuestionnaire(
-    gap: el(3),
+  Widget build(BuildContext context) => Questionnaire(
+    gap: space(3),
     children: <Widget>[
-      ElQuestionnaireItem(
+      QuestionnaireItem(
         name: 'demo',
         children: <Widget>[
-          ElQuestionnaireChoices(
-            children: <ElQuestionnaireChoice>[
-              ElQuestionnaireChoice(
+          QuestionnaireChoices(
+            children: <QuestionnaireChoice>[
+              QuestionnaireChoice(
                 value: 'a',
                 label: 'Option A',
                 defaultChecked: checked,
@@ -477,9 +486,7 @@ class _ChoiceCell extends StatelessWidget {
             ],
           ),
           if (withSkip)
-            const ElQuestionnaireActions(
-              children: <Widget>[ElQuestionnaireSkip()],
-            ),
+            const QuestionnaireActions(children: <Widget>[QuestionnaireSkip()]),
         ],
       ),
     ],
@@ -490,21 +497,21 @@ class _InvalidChoiceCell extends StatelessWidget {
   const _InvalidChoiceCell({super.key});
 
   @override
-  Widget build(BuildContext context) => const ElQuestionnaire(
-    gap: 12, // el(3) inline, kept a literal-free double via the call site.
+  Widget build(BuildContext context) => const Questionnaire(
+    gap: 12, // space(3) inline, kept a literal-free double via the call site.
     children: <Widget>[
-      ElQuestionnaireItem(
+      QuestionnaireItem(
         name: 'demo',
         required: true,
         invalid: true,
-        title: ElQuestionnaireTitle('Pick one'),
+        title: QuestionnaireTitle('Pick one'),
         children: <Widget>[
-          ElQuestionnaireChoices(
-            children: <ElQuestionnaireChoice>[
-              ElQuestionnaireChoice(value: 'a', label: 'Option A'),
+          QuestionnaireChoices(
+            children: <QuestionnaireChoice>[
+              QuestionnaireChoice(value: 'a', label: 'Option A'),
             ],
           ),
-          ElQuestionnaireError(),
+          QuestionnaireError(),
         ],
       ),
     ],
@@ -512,20 +519,20 @@ class _InvalidChoiceCell extends StatelessWidget {
 }
 
 const String _choiceStatesCode =
-    "ElQuestionnaireChoice(value: 'a', label: 'Option A') // unanswered\n"
-    "ElQuestionnaireChoice(value: 'a', label: 'Option A', defaultChecked: true) // answered\n"
-    '// Skip pressed: ElQuestionnaireController.skip(name) — see Skipped above\n\n'
+    "QuestionnaireChoice(value: 'a', label: 'Option A') // unanswered\n"
+    "QuestionnaireChoice(value: 'a', label: 'Option A', defaultChecked: true) // answered\n"
+    '// Skip pressed: QuestionnaireController.skip(name) — see Skipped above\n\n'
     '// invalid: true forces the state without validating.\n'
-    'const ElQuestionnaireItem(\n'
+    'const QuestionnaireItem(\n'
     "  name: 'demo',\n"
     '  required: true,\n'
     '  invalid: true,\n'
-    "  title: ElQuestionnaireTitle('Pick one'),\n"
+    "  title: QuestionnaireTitle('Pick one'),\n"
     '  children: [\n'
-    '    ElQuestionnaireChoices(\n'
-    "      children: [ElQuestionnaireChoice(value: 'a', label: 'Option A')],\n"
+    '    QuestionnaireChoices(\n'
+    "      children: [QuestionnaireChoice(value: 'a', label: 'Option A')],\n"
     '    ),\n'
-    '    ElQuestionnaireError(), // no text: the primitive\'s own default string\n'
+    '    QuestionnaireError(), // no text: the primitive\'s own default string\n'
     '  ],\n'
     ')';
 
@@ -534,45 +541,43 @@ class _TextItemSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(6),
-    runSpacing: el(4),
+    spacing: space(6),
+    runSpacing: space(4),
     children: <Widget>[
       SizedBox(
-        width: el(72),
-        child: const ElQuestionnaire(
+        width: space(72),
+        child: const Questionnaire(
           key: ValueKey<String>('questionnaire-example:text-optional'),
           children: <Widget>[
-            ElQuestionnaireItem(
+            QuestionnaireItem(
               name: 'goal',
-              title: ElQuestionnaireTitle('Chasing anything specific?'),
-              description: ElQuestionnaireDescription(
+              title: QuestionnaireTitle('Chasing anything specific?'),
+              description: QuestionnaireDescription(
                 'Optional — Skip moves on without an answer.',
               ),
               children: <Widget>[
-                ElQuestionnaireInput(placeholder: 'A card, a set, a rarity…'),
+                QuestionnaireInput(placeholder: 'A card, a set, a rarity…'),
               ],
             ),
           ],
         ),
       ),
       SizedBox(
-        width: el(72),
-        child: const ElQuestionnaire(
+        width: space(72),
+        child: const Questionnaire(
           key: ValueKey<String>('questionnaire-example:text-invalid'),
           children: <Widget>[
-            ElQuestionnaireItem(
+            QuestionnaireItem(
               name: 'budget',
               required: true,
               invalid: true,
-              title: ElQuestionnaireTitle("What's tonight's budget?"),
+              title: QuestionnaireTitle("What's tonight's budget?"),
               children: <Widget>[
-                ElQuestionnaireInput(
+                QuestionnaireInput(
                   placeholder: r'$',
                   keyboardType: TextInputType.number,
                 ),
-                ElQuestionnaireError(
-                  text: 'Enter an amount before continuing.',
-                ),
+                QuestionnaireError(text: 'Enter an amount before continuing.'),
               ],
             ),
           ],
@@ -583,37 +588,39 @@ class _TextItemSpecimen extends StatelessWidget {
 }
 
 const String _textItemCode =
-    'ElQuestionnaireInput(placeholder: \'A card, a set, a rarity…\')\n\n'
-    '// keyboardType routes the on-screen keyboard; ElQuestionnaireError\n'
+    'QuestionnaireInput(placeholder: \'A card, a set, a rarity…\')\n\n'
+    '// keyboardType routes the on-screen keyboard; QuestionnaireError\n'
     '// only mounts while its item is invalid.\n'
-    'ElQuestionnaireInput(\n'
+    'QuestionnaireInput(\n'
     '  placeholder: r\'\$\',\n'
     '  keyboardType: TextInputType.number,\n'
     ')\n'
-    'ElQuestionnaireError(text: \'Enter an amount before continuing.\')';
+    'QuestionnaireError(text: \'Enter an amount before continuing.\')';
 
 class _ShortcutsSpecimen extends StatelessWidget {
   const _ShortcutsSpecimen();
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(6),
-    runSpacing: el(4),
+    spacing: space(6),
+    runSpacing: space(4),
     children: <Widget>[
       SizedBox(
-        width: el(72),
+        width: space(72),
         child: KeyedSubtree(
-          key: const ValueKey<String>('questionnaire-example:shortcuts-letters'),
-          child: ElQuestionnaire(
-            shortcuts: ElQuestionnaireShortcuts.letters,
+          key: const ValueKey<String>(
+            'questionnaire-example:shortcuts-letters',
+          ),
+          child: Questionnaire(
+            shortcuts: QuestionnaireShortcuts.letters,
             children: <Widget>[
-              ElQuestionnaireItem(
+              QuestionnaireItem(
                 name: 'demo-letters',
                 children: <Widget>[
-                  ElQuestionnaireChoices(
-                    children: <ElQuestionnaireChoice>[
+                  QuestionnaireChoices(
+                    children: <QuestionnaireChoice>[
                       for (int i = 0; i < _packStyleValues.length; i += 1)
-                        ElQuestionnaireChoice(
+                        QuestionnaireChoice(
                           value: _packStyleValues[i],
                           label: _packStyleChoices[i],
                         ),
@@ -626,19 +633,21 @@ class _ShortcutsSpecimen extends StatelessWidget {
         ),
       ),
       SizedBox(
-        width: el(72),
+        width: space(72),
         child: KeyedSubtree(
-          key: const ValueKey<String>('questionnaire-example:shortcuts-numbers'),
-          child: ElQuestionnaire(
-            shortcuts: ElQuestionnaireShortcuts.numbers,
+          key: const ValueKey<String>(
+            'questionnaire-example:shortcuts-numbers',
+          ),
+          child: Questionnaire(
+            shortcuts: QuestionnaireShortcuts.numbers,
             children: <Widget>[
-              ElQuestionnaireItem(
+              QuestionnaireItem(
                 name: 'demo-numbers',
                 children: <Widget>[
-                  ElQuestionnaireChoices(
-                    children: <ElQuestionnaireChoice>[
+                  QuestionnaireChoices(
+                    children: <QuestionnaireChoice>[
                       for (int i = 0; i < _packStyleValues.length; i += 1)
-                        ElQuestionnaireChoice(
+                        QuestionnaireChoice(
                           value: _packStyleValues[i],
                           label: _packStyleChoices[i],
                         ),
@@ -655,11 +664,11 @@ class _ShortcutsSpecimen extends StatelessWidget {
 }
 
 const String _shortcutsCode =
-    '// ElQuestionnaireShortcuts.letters — A, B, C…\n'
-    'ElQuestionnaire(shortcuts: ElQuestionnaireShortcuts.letters, children: [...])\n\n'
-    '// ElQuestionnaireShortcuts.numbers — 1, 2, 3…\n'
-    'ElQuestionnaire(shortcuts: ElQuestionnaireShortcuts.numbers, children: [...])\n\n'
-    '// ElQuestionnaireShortcuts.none is the default: no binding, no badge.';
+    '// QuestionnaireShortcuts.letters — A, B, C…\n'
+    'Questionnaire(shortcuts: QuestionnaireShortcuts.letters, children: [...])\n\n'
+    '// QuestionnaireShortcuts.numbers — 1, 2, 3…\n'
+    'Questionnaire(shortcuts: QuestionnaireShortcuts.numbers, children: [...])\n\n'
+    '// QuestionnaireShortcuts.none is the default: no binding, no badge.';
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
 
@@ -672,36 +681,30 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elquestionnaire',
-        child: DocsApiTable(
-          title: 'ElQuestionnaire',
-          facts: _questionnaireFacts,
-        ),
+        child: DocsApiTable(title: 'Questionnaire', facts: _questionnaireFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elquestionnaireshortcuts',
         child: DocsApiTable(
-          title: 'ElQuestionnaireShortcuts',
+          title: 'QuestionnaireShortcuts',
           facts: _shortcutsFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elquestionnairecontroller',
         child: DocsApiTable(
-          title: 'ElQuestionnaireController',
+          title: 'QuestionnaireController',
           facts: _controllerFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elquestionnaireitem',
-        child: DocsApiTable(
-          title: 'ElQuestionnaireItem',
-          facts: _itemFacts,
-        ),
+        child: DocsApiTable(title: 'QuestionnaireItem', facts: _itemFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elquestionnaire-structure',
         child: DocsApiTable(
@@ -709,17 +712,17 @@ class _ApiReferenceContent extends StatelessWidget {
           facts: _structureFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elquestionnaire-choices',
         child: DocsApiTable(title: 'Choices · Choice', facts: _choicesFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elquestionnaire-input',
         child: DocsApiTable(title: 'Input · Error', facts: _inputFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elquestionnaire-actions',
         child: DocsApiTable(title: 'Actions', facts: _actionsFacts),
@@ -734,14 +737,14 @@ const List<DocsApiFact> _questionnaireFacts = <DocsApiFact>[
     type: 'List<Widget>',
     description:
         'Required. The item list plus Progress/Actions siblings, in '
-        'flow order. Every ElQuestionnaireItem but the active one lays '
+        'flow order. Every QuestionnaireItem but the active one lays '
         'out as SizedBox.shrink().',
   ),
   DocsApiFact(
     name: 'shortcuts',
-    type: 'ElQuestionnaireShortcuts',
+    type: 'QuestionnaireShortcuts',
     description:
-        'Optional. Defaults to ElQuestionnaireShortcuts.none. Which key '
+        'Optional. Defaults to QuestionnaireShortcuts.none. Which key '
         'set the active item\'s choices bind AND draw — see the table '
         'below.',
   ),
@@ -761,7 +764,7 @@ const List<DocsApiFact> _questionnaireFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'controller',
-    type: 'ElQuestionnaireController?',
+    type: 'QuestionnaireController?',
     description:
         'Optional. Defaults to null, which lets the widget own (and '
         'dispose) its own controller. Supply one to read or drive the '
@@ -821,7 +824,7 @@ const List<DocsApiFact> _controllerFacts = <DocsApiFact>[
     type: 'TextEditingController',
     description:
         'The field controller for a text item, created on first ask '
-        'and reused after — what ElQuestionnaireInput binds to.',
+        'and reused after — what QuestionnaireInput binds to.',
   ),
   DocsApiFact(
     name: 'setValue(name, value)',
@@ -899,7 +902,7 @@ const List<DocsApiFact> _itemFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _structureFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElQuestionnaireProgress()',
+    name: 'QuestionnaireProgress()',
     type: 'no constructor params',
     description:
         "Renders \"Question X of Y\" off the controller's own index and "
@@ -907,12 +910,12 @@ const List<DocsApiFact> _structureFacts = <DocsApiFact>[
         'the text streams in.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireTitle(text)',
+    name: 'QuestionnaireTitle(text)',
     type: 'String (positional, required)',
     description: 'The item\'s legend, font-heading text-base font-medium.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireDescription(text)',
+    name: 'QuestionnaireDescription(text)',
     type: 'String (positional, required)',
     description: 'A second line under the title, muted foreground.',
   ),
@@ -920,29 +923,29 @@ const List<DocsApiFact> _structureFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _choicesFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElQuestionnaireChoices.children',
-    type: 'List<ElQuestionnaireChoice> (required)',
+    name: 'QuestionnaireChoices.children',
+    type: 'List<QuestionnaireChoice> (required)',
     description:
         'Registers its values with the enclosing item, which is what '
         'lets a typed key answer to the right choice.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireChoice.value',
+    name: 'QuestionnaireChoice.value',
     type: 'String (required)',
     description: 'The recorded answer when this choice is picked.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireChoice.label',
+    name: 'QuestionnaireChoice.label',
     type: 'String (required)',
     description: 'The visible row text.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireChoice.description',
+    name: 'QuestionnaireChoice.description',
     type: 'String?',
     description: 'Optional. Defaults to null. A second, muted line.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireChoice.defaultChecked',
+    name: 'QuestionnaireChoice.defaultChecked',
     type: 'bool',
     description:
         'Optional. Defaults to false. Seeds the controller once on '
@@ -950,7 +953,7 @@ const List<DocsApiFact> _choicesFacts = <DocsApiFact>[
         'state.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireChoice.disabled',
+    name: 'QuestionnaireChoice.disabled',
     type: 'bool',
     description:
         'Optional. Defaults to false. Mutes the tap at 50% opacity '
@@ -960,19 +963,19 @@ const List<DocsApiFact> _choicesFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _inputFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElQuestionnaireInput.placeholder',
+    name: 'QuestionnaireInput.placeholder',
     type: 'String?',
     description: 'Optional. Defaults to null.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireInput.keyboardType',
+    name: 'QuestionnaireInput.keyboardType',
     type: 'TextInputType?',
     description:
         'Optional. Defaults to null. Passed straight through to the '
-        'ElInput underneath.',
+        'Input underneath.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireError.text',
+    name: 'QuestionnaireError.text',
     type: 'String?',
     description:
         'Optional. Defaults to null, which renders the primitive\'s '
@@ -985,7 +988,7 @@ const List<DocsApiFact> _inputFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _actionsFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElQuestionnaireActions.children',
+    name: 'QuestionnaireActions.children',
     type: 'List<Widget> (required)',
     description:
         'Lays the four controls out on a grid: leading content, Skip '
@@ -993,24 +996,24 @@ const List<DocsApiFact> _actionsFacts = <DocsApiFact>[
         'when a track has nothing in it.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnairePrevious.label',
+    name: 'QuestionnairePrevious.label',
     type: 'String, defaults to "Previous"',
     description: 'Visible when total > 1 && !first.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireSkip.label',
+    name: 'QuestionnaireSkip.label',
     type: 'String, defaults to "Skip"',
     description: 'Visible when the active item is NOT required.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireNext.label',
+    name: 'QuestionnaireNext.label',
     type: 'String, defaults to "Next"',
     description:
         'Visible when total > 1 && !last. Validates the active item '
         'before advancing.',
   ),
   DocsApiFact(
-    name: 'ElQuestionnaireSubmit.label',
+    name: 'QuestionnaireSubmit.label',
     type: 'String, defaults to "Submit"',
     description:
         'Visible when total > 0 && last. Validates the active item, '
@@ -1031,7 +1034,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'controller.valueOf(name) == choice.value. theme.muted fill, '
         'theme.primary 40%-alpha rim, a primary-filled dot that pops in '
-        'over ElDotPop\'s own curve.',
+        'over DotSelectionMotion\'s own curve.',
     userSignal: 'A filled indicator with a springing dot inside it.',
   ),
   DocsStateFact(
@@ -1054,25 +1057,25 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'validate() failed, or invalid: true forced it. The choice '
         'rim and the radio control both switch to theme.destructive; '
-        'ElQuestionnaireError mounts as a Semantics live region.',
+        'QuestionnaireError mounts as a Semantics live region.',
     userSignal: 'A red-rimmed row and an error line announced live.',
   ),
   DocsStateFact(
     state: 'Disabled (a choice)',
     treatment:
-        'ElQuestionnaireChoice.disabled: true. 50% opacity, cursor: '
+        'QuestionnaireChoice.disabled: true. 50% opacity, cursor: '
         'forbidden, the tap handler is null.',
     userSignal: 'Faded and inert, independent of checked.',
   ),
   DocsStateFact(
     state: 'Submitting / Complete',
     treatment:
-        'Not primitive states: ElQuestionnaireController tracks no '
+        'Not primitive states: QuestionnaireController tracks no '
         '"submitting" or "complete" flag at all. onSubmit fires once '
         'validation passes on the last item; whatever happens after — a '
         'spinner, a confirmation screen — is the call site\'s own state, '
-        'as transcript.dart\'s ElQuestionnaireSubmittingView / '
-        'ElQuestionnaireCompleteView demonstrate outside this file.',
+        'as transcript.dart\'s QuestionnaireSubmittingView / '
+        'QuestionnaireCompleteView demonstrate outside this file.',
     userSignal: 'Whatever the integration decides to show next.',
   ),
 ];
@@ -1082,21 +1085,21 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElQuestionnaireProgress carries Semantics(label: '
+      _bullets(ThemeScope.of(context), <String>[
+        'QuestionnaireProgress carries Semantics(label: '
             '"Questionnaire progress", value: "Question X of Y"), so an '
             'assistive technology hears the count even though the text '
             'itself is a plain paragraph.',
-        'ElQuestionnaireError is a Semantics(liveRegion: true) — a new '
+        'QuestionnaireError is a Semantics(liveRegion: true) — a new '
             'error is announced the moment it mounts, no focus move '
             'required.',
         'A choice row is not a native radio button: it is a plain '
             'GestureDetector with no Semantics node of its own layered '
             'on top of its visible content, so a screen reader reads '
-            'whatever ElText children expose and nothing that names it '
+            'whatever StyledText children expose and nothing that names it '
             'as "selected" or "radio button."',
         'Known gap: the shortcut key bound to a choice (A/B/C or 1/2/3) '
-            'is drawn in an ElKbd badge but carries no Semantics hint — '
+            'is drawn in an Kbd badge but carries no Semantics hint — '
             'a sighted keyboard user discovers it visually, a screen '
             'reader user is not told it exists.',
       ]);
@@ -1107,7 +1110,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Enter submits: calls the same validate-then-advance-or-submit '
             'path as pressing Submit, on the root form\'s Focus.onKeyEvent '
             '— scoped to this questionnaire, not the whole document.',
@@ -1133,12 +1136,12 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No MediaQuery.sizeOf breakpoint branch inside questionnaire.dart '
             'itself: every layout decision in this file is fixed.',
-        'ElQuestionnaireInput does read the viewport once, through the '
+        'QuestionnaireInput does read the viewport once, through the '
             'field it composes: sm and above drop the 44px touch floor '
-            'to a plain 32px height, the same rule ElField\'s own inputs '
+            'to a plain 32px height, the same rule Field\'s own inputs '
             'use elsewhere in this system.',
         'Actions\' own grid keeps min-h-11 below sm and min-h-8 at sm '
             'and above — a breakpoint change in row height, not in what '
@@ -1153,26 +1156,26 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/questionnaire.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
         'Flutter imports: package:flutter/services.dart '
             '(LogicalKeyboardKey, KeyEvent), package:flutter/widgets.dart.',
         'Foundation imports: foundation/colors.dart, foundation/motion.dart '
-            '(elAnimationDuration), foundation/shadows.dart, '
-            'foundation/spacing.dart (el()), foundation/theme.dart, '
+            '(effectiveMotionDuration), foundation/shadows.dart, '
+            'foundation/spacing.dart (space()), foundation/theme.dart, '
             'foundation/typography.dart, motion/keyframes.dart '
-            '(ElDotPop), theme_scope.dart.',
-        'Component imports: button.dart (ElButton, the four action '
-            'controls), input.dart (ElInput, what ElQuestionnaireInput '
-            'wraps), kbd.dart (ElKbd, the shortcut badge).',
+            '(DotSelectionMotion), theme_scope.dart.',
+        'Component imports: button.dart (Button, the four action '
+            'controls), input.dart (Input, what QuestionnaireInput '
+            'wraps), kbd.dart (Kbd, the shortcut badge).',
         'registryDependencies, resolved automatically by `elattar add '
             'questionnaire`: button, input, kbd, keyframes, '
             'source-foundation — copied verbatim from '
             'registry/components/questionnaire.json.',
       ]),
-      SizedBox(height: el(3)),
+      SizedBox(height: space(3)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
@@ -1193,34 +1196,39 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'A choice reads theme.muted, theme.input, theme.primary and '
-            'theme.destructive live off ElTheme.of(context) at every '
-            'build: unanswered, answered, hovered and invalid each pick '
-            'a different combination of the same four tokens.',
-        'ElQuestionnaireInput and ElQuestionnaireError both route their '
-            'colour through the same tokens ElField uses elsewhere: '
-            'theme.input for the pill border, theme.destructiveInk for '
-            'the error text.',
-        'The answered dot\'s pop-in (ElDotPop) and the row\'s own hover/'
-            'checked transitions both run on ElCurves and '
-            'elAnimationDuration, the same clock every other control in '
-            'this system shares — nothing here is a bespoke duration.',
-        'Flipping ElThemeController re-resolves every one of these on '
-            'the next frame: nothing is cached.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'A choice reads theme.muted, theme.input, theme.primary and '
+        'theme.destructive live off ThemeScope.of(context) at every '
+        'build: unanswered, answered, hovered and invalid each pick '
+        'a different combination of the same four tokens.',
+    'QuestionnaireInput and QuestionnaireError both route their '
+        'colour through the same tokens Field uses elsewhere: '
+        'theme.input for the pill border, theme.destructiveText for '
+        'the error text.',
+    'The answered dot\'s pop-in (DotSelectionMotion) and the row\'s own hover/'
+        'checked transitions both run on MotionCurves and '
+        'effectiveMotionDuration, the same clock every other control in '
+        'this system shares — nothing here is a bespoke duration.',
+    'Flipping ThemeController re-resolves every one of these on '
+        'the next frame: nothing is cached.',
+  ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

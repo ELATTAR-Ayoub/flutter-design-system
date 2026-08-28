@@ -22,7 +22,7 @@
 ///  * `elattar init --foundation source` -> wrote the foundation, the fonts,
 ///    `elattar.yaml`, `.elattar/manifest.json` and four license notices,
 ///    exit 0
-///  * `elattar add button voice-orb` -> wrote the dependency closure and two
+///  * `elattar add button voice-indicator` -> wrote the dependency closure and two
 ///    further notices, exit 0
 ///  * `elattar doctor` -> reported remote registry, 99 items, cache state,
 ///    exit 0
@@ -32,7 +32,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../docs/docs_code.dart';
 import '../docs/docs_facts.dart';
@@ -56,9 +68,9 @@ class InstallationDocsPage extends StatelessWidget {
           'Install the CLI, set up your project, add a component. Three '
           'commands, no clone, no dependency on this package.',
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Docs'),
-      ElBreadcrumbEntry.page('Installation'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Docs'),
+      BreadcrumbEntry.page('Installation'),
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'Quickstart', anchor: 'quickstart'),
@@ -84,7 +96,7 @@ class _InstallationArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       key: const ValueKey<String>('installation-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -92,15 +104,15 @@ class _InstallationArticle extends StatelessWidget {
         // The reference's own "Recommended for new projects" callout sits
         // directly under the intro paragraph, before its first heading. See
         // https://ui.shadcn.com/docs/installation. This is that same slot.
-        ElAlert(
-          variant: ElAlertVariant.success,
-          icon: const ElIcon(ElIconGlyph.circleCheck),
+        Alert(
+          variant: AlertVariant.success,
+          icon: const Icon(IconGlyph.circleCheck),
           title: 'Recommended: source foundation',
           description:
               '`elattar init --foundation source` copies the foundation into '
               'your project as files you own. It is the supported mode.',
         ),
-        SizedBox(height: el(8)),
+        SizedBox(height: space(8)),
         _quickstart(),
         _installCli(theme),
         _sourceFoundation(),
@@ -115,10 +127,10 @@ class _InstallationArticle extends StatelessWidget {
     );
   }
 
-  Widget _prose(String text, ElThemeData theme, {ElTypeSpec? spec}) =>
+  Widget _prose(String text, ThemeTokens theme, {TextStyleToken? spec}) =>
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText(text, spec ?? ElType.body),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(text, spec ?? TextStyles.body),
       );
 
   Widget _quickstart() => DocsSection(
@@ -137,7 +149,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _installCli(ElThemeData theme) => DocsSection(
+  Widget _installCli(ThemeTokens theme) => DocsSection(
     id: 'install-cli',
     title: 'Install the CLI',
     description:
@@ -149,14 +161,14 @@ class _InstallationArticle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const DocsSnippet(language: 'bash', code: 'dart install elattar_cli'),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         _prose(
           'On an older SDK, or if you prefer the long spelling, `dart pub '
           'global activate elattar_cli` does the same thing. Both put an '
           '`elattar` executable on your PATH.',
           theme,
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         const DocsInstallFacts(
           title: 'If `elattar` is not found',
           facts: <DocsInstallFact>[
@@ -217,9 +229,9 @@ class _InstallationArticle extends StatelessWidget {
           // Eight lines is enough to be worth collapsing on a page this
           // long — see the expansion-control test in
           // installation_docs_test.dart.
-          maxHeight: el(28),
+          maxHeight: space(28),
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'bash',
           code:
@@ -230,7 +242,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _registry(ElThemeData theme) => DocsSection(
+  Widget _registry(ThemeTokens theme) => DocsSection(
     id: 'registry',
     title: 'Where components come from',
     child: Column(
@@ -244,7 +256,7 @@ class _InstallationArticle extends StatelessWidget {
           'you install next year.',
           theme,
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'bash',
           code:
@@ -252,7 +264,7 @@ class _InstallationArticle extends StatelessWidget {
               'elattar add button --registry https://example.com/elattar/0.0.1/\n'
               'elattar add button --registry ../flutter-design-system/registry/generated/latest',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         _prose(
           'Every manifest and every payload is checked against the sha256 the '
           'registry declares, and everything is downloaded and verified '
@@ -265,7 +277,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _offline(ElThemeData theme) => DocsSection(
+  Widget _offline(ThemeTokens theme) => DocsSection(
     id: 'offline',
     title: 'Working offline',
     child: Column(
@@ -276,14 +288,14 @@ class _InstallationArticle extends StatelessWidget {
           'online can run again with no network at all.',
           theme,
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'bash',
           code:
               'elattar add button            # populates the cache\n'
               'elattar add card --offline    # reads only the cache',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         const DocsInstallFacts(
           title: 'Cache location',
           facts: <DocsInstallFact>[
@@ -357,7 +369,7 @@ class _InstallationArticle extends StatelessWidget {
           description:
               'Elattar\'s MIT notice always; the three font OFL notices with '
               'the foundation; lucide\'s ISC notice with icon, and so with '
-              'most components; the ElevenLabs UI notice with voice-orb. '
+              'most components; the ElevenLabs UI notice with voice-indicator. '
               'Keep them: carrying the notice is the condition all three '
               'licenses attach to the grant.',
         ),
@@ -374,27 +386,27 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _packageFoundation(ElThemeData theme) => DocsSection(
+  Widget _packageFoundation(ThemeTokens theme) => DocsSection(
     id: 'package-foundation',
     title: 'Package foundation',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElAlert(
-          variant: ElAlertVariant.destructive,
-          icon: const ElIcon(ElIconGlyph.circleX),
+        Alert(
+          variant: AlertVariant.destructive,
+          icon: const Icon(IconGlyph.circleX),
           title: 'Not available',
           description:
               '`elattar init --foundation package` is refused before it '
               'touches the project, with exit code 64.',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         _prose(
           'This is the exact message packages/elattar_cli/lib/src/commands/'
           'app.dart returns:',
           theme,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         const DocsSnippet(
           language: 'bash',
           code:
@@ -405,13 +417,13 @@ class _InstallationArticle extends StatelessWidget {
               'project it produces. Use `--foundation source`, which '
               'copies the foundation into your project.',
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         _prose(
           'An earlier build of this CLI did write that broken project; it '
           'was reverted for this reason and this mode is refused up front '
           'now rather than left undocumented.',
           theme,
-          spec: ElType.small,
+          spec: TextStyles.small,
         ),
       ],
     ),
@@ -461,7 +473,7 @@ class _InstallationArticle extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         const DocsSnippet(language: 'bash', code: 'flutter pub get'),
       ],
     ),
@@ -483,7 +495,7 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
-  Widget _troubleshooting(ElThemeData theme) => DocsSection(
+  Widget _troubleshooting(ThemeTokens theme) => DocsSection(
     id: 'troubleshooting',
     title: 'Troubleshooting',
     child: const DocsStateMatrix(

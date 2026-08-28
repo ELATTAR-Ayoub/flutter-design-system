@@ -5,11 +5,11 @@
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`: the
 /// discipline `skills_docs_test.dart` already carries. Theme coverage uses a
-/// live `ElThemeController` flipped in place rather than two independent
+/// live `ThemeController` flipped in place rather than two independent
 /// pumps.
 ///
 /// Re-housed onto the kit alongside the page: sections are now
-/// `DocsSection`s rather than `ElSection`s, and the eight disclosures (API
+/// `DocsSection`s rather than `Section`s, and the eight disclosures (API
 /// Reference, States, Accessibility, Keyboard, Responsive, Dependencies,
 /// Theming, Source) are collapsed `DocsDisclosure`s that mount no content
 /// until opened — see `_disclosureTrigger`, the same helper `button_test.dart`
@@ -23,27 +23,53 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-Future<ElThemeController> _pumpBreadcrumbDoc(
+Future<ThemeController> _pumpBreadcrumbDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -73,7 +99,7 @@ Future<void> _openDisclosure(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 void main() {
@@ -85,7 +111,7 @@ void main() {
       expect(breadcrumbDoc.sourcePath, 'lib/src/components/breadcrumb.dart');
       expect(
         breadcrumbDoc.exports,
-        containsAll(<String>['ElBreadcrumb', 'ElBreadcrumbEntry']),
+        containsAll(<String>['Breadcrumb', 'BreadcrumbEntry']),
       );
       // Short description: one sentence, no trailing dot-dot.
       expect(breadcrumbDoc.description, isNot(contains('..')));
@@ -94,52 +120,51 @@ void main() {
   });
 
   group('rendered page', () {
-    testWidgets(
-      'sections render in the house shape, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in the house shape, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await _pumpBreadcrumbDoc(tester, size: const Size(1440, 4000));
+      await _pumpBreadcrumbDoc(tester, size: const Size(1440, 4000));
 
-        // Immune to the duplicate-string hazard `find.text` carries here: a
-        // section heading and its own TOC link render the same string, so
-        // reading each mounted `DocsSection`'s own `title` field sidesteps
-        // that entirely.
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      // Immune to the duplicate-string hazard `find.text` carries here: a
+      // section heading and its own TOC link render the same string, so
+      // reading each mounted `DocsSection`'s own `title` field sidesteps
+      // that entirely.
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, <String>[
-          'Preview',
-          'Installation',
-          'Usage',
-          'Composition',
-          'Page header',
-          'Basic',
-          'Link component',
-          'RTL',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Keyboard',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
+      expect(titles, <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'Composition',
+        'Page header',
+        'Basic',
+        'Link component',
+        'RTL',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
 
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Five specimen stages: Preview, Page header, Basic, Link
-        // component, RTL.
-        expect(find.byType(DocsShowcase), findsNWidgets(5));
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Five specimen stages: Preview, Page header, Basic, Link
+      // component, RTL.
+      expect(find.byType(DocsShowcase), findsNWidgets(5));
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     testWidgets('renders the article and a live multi-crumb specimen', (
       WidgetTester tester,
@@ -150,12 +175,12 @@ void main() {
         find.byKey(const ValueKey<String>('breadcrumb-doc-article')),
         findsOneWidget,
       );
-      expect(find.byType(ElBreadcrumb), findsWidgets);
+      expect(find.byType(Breadcrumb), findsWidgets);
       // A real specimen renders at least one derived chevron separator.
       expect(
         tester
-            .widgetList<ElIcon>(find.byType(ElIcon))
-            .where((ElIcon icon) => icon.glyph == ElIconGlyph.chevronRight),
+            .widgetList<Icon>(find.byType(Icon))
+            .where((Icon icon) => icon.glyph == IconGlyph.chevronRight),
         isNotEmpty,
       );
       expect(tester.takeException(), isNull);
@@ -167,15 +192,15 @@ void main() {
         await _pumpBreadcrumbDoc(tester);
         await _openDisclosure(tester, 'API Reference');
 
-        // ElBreadcrumb.items
+        // Breadcrumb.items
         expect(find.text('items'), findsOneWidget);
-        expect(find.textContaining('List<ElBreadcrumbEntry>'), findsWidgets);
-        // ElBreadcrumbEntry.link(label, {onTap})
-        expect(find.textContaining('ElBreadcrumbEntry.link'), findsWidgets);
+        expect(find.textContaining('List<BreadcrumbEntry>'), findsWidgets);
+        // BreadcrumbEntry.link(label, {onTap})
+        expect(find.textContaining('BreadcrumbEntry.link'), findsWidgets);
         expect(find.text('label'), findsWidgets);
         expect(find.text('onTap'), findsOneWidget);
-        // ElBreadcrumbEntry.page(label)
-        expect(find.textContaining('ElBreadcrumbEntry.page'), findsWidgets);
+        // BreadcrumbEntry.page(label)
+        expect(find.textContaining('BreadcrumbEntry.page'), findsWidgets);
         // The derived, read-only isPage field.
         expect(find.text('isPage'), findsOneWidget);
         // The two static layout constants.
@@ -227,25 +252,24 @@ void main() {
     ) async {
       await _pumpBreadcrumbDoc(tester);
 
-      final ElBreadcrumb single = tester.widget<ElBreadcrumb>(
+      final Breadcrumb single = tester.widget<Breadcrumb>(
         find.byWidgetPredicate(
-          (Widget widget) => widget is ElBreadcrumb && widget.items.length == 1,
+          (Widget widget) => widget is Breadcrumb && widget.items.length == 1,
         ),
       );
       expect(single.items.single.isPage, isTrue);
     });
 
-    testWidgets(
-      'the RTL specimen composes ElBreadcrumb under a Directionality',
-      (WidgetTester tester) async {
-        await _pumpBreadcrumbDoc(tester);
+    testWidgets('the RTL specimen composes Breadcrumb under a Directionality', (
+      WidgetTester tester,
+    ) async {
+      await _pumpBreadcrumbDoc(tester);
 
-        final Iterable<Directionality> rtl = tester
-            .widgetList<Directionality>(find.byType(Directionality))
-            .where((Directionality d) => d.textDirection == TextDirection.rtl);
-        expect(rtl, isNotEmpty);
-      },
-    );
+      final Iterable<Directionality> rtl = tester
+          .widgetList<Directionality>(find.byType(Directionality))
+          .where((Directionality d) => d.textDirection == TextDirection.rtl);
+      expect(rtl, isNotEmpty);
+    });
 
     testWidgets(
       'the Link component specimen fires its onTap seam on a real tap',
@@ -258,7 +282,8 @@ void main() {
         // renders as a crumb in several other specimens on this page too,
         // and only this one is wired to update the state text below it.
         final Finder section = find.byWidgetPredicate(
-          (Widget widget) => widget is DocsSection && widget.id == 'link-component',
+          (Widget widget) =>
+              widget is DocsSection && widget.id == 'link-component',
         );
         final Finder projects = find.descendant(
           of: section,
@@ -351,30 +376,30 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpBreadcrumbDoc(tester, mode: ElThemeMode.light);
-      expect(find.byType(ElBreadcrumb), findsWidgets);
+      await _pumpBreadcrumbDoc(tester, mode: ColorMode.light);
+      expect(find.byType(Breadcrumb), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpBreadcrumbDoc(tester, mode: ElThemeMode.dark);
-      expect(find.byType(ElBreadcrumb), findsWidgets);
+      await _pumpBreadcrumbDoc(tester, mode: ColorMode.dark);
+      expect(find.byType(Breadcrumb), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpBreadcrumbDoc(
+      final ThemeController theme = await _pumpBreadcrumbDoc(
         tester,
-        mode: ElThemeMode.dark,
+        mode: ColorMode.dark,
       );
-      expect(find.byType(ElBreadcrumb), findsWidgets);
+      expect(find.byType(Breadcrumb), findsWidgets);
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
-      expect(find.byType(ElBreadcrumb), findsWidgets);
+      expect(find.byType(Breadcrumb), findsWidgets);
       expect(tester.takeException(), isNull);
     });
   });

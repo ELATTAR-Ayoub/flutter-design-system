@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('public surfaces reject the legacy prefix and keep el() public', () {
+  test('public surfaces reject the legacy prefix and keep space() public', () {
     final String legacyPrefix = String.fromCharCodes(<int>[68, 115]);
     final String legacyCallPrefix = legacyPrefix.toLowerCase();
     final RegExp legacyType = RegExp('\\b$legacyPrefix[A-Z]\\w*');
@@ -11,7 +11,7 @@ void main() {
     final RegExp legacySlug = RegExp('\\b$legacyCallPrefix[-_][a-z0-9_-]*');
     final List<String> publicFiles = <String>[
       'lib/elattar_design_system.dart',
-      'lib/src/foundation/spacing.dart',
+      'lib/src/design_system/foundation/spacing.dart',
       'registry/component_inventory.json',
       'registry/generated/latest/registry.json',
     ];
@@ -22,8 +22,8 @@ void main() {
       expect(text, isNot(contains(legacySlug)));
     }
     final String spacing = File(
-      'lib/src/foundation/spacing.dart',
+      'lib/src/design_system/foundation/spacing.dart',
     ).readAsStringSync();
-    expect(spacing, contains('double el(num n) =>'));
+    expect(spacing, contains('double space(num n) =>'));
   });
 }

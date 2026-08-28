@@ -12,7 +12,7 @@
 /// menu.dart`'s own library doc states that its "row model, the surface, the
 /// geometry, the keyboard" is the shared body of `dropdown-menu.tsx`,
 /// `context-menu.tsx` and `menubar.tsx`: it is not a component of its own to
-/// choose between, it is the engine [ElDropdownMenu] (and, elsewhere, a
+/// choose between, it is the engine [DropdownMenu] (and, elsewhere, a
 /// context menu and a menubar) mount identically. `sourcePath` names
 /// `dropdown_menu.dart`, the one root this worker was assigned; `menu.dart`'s
 /// own path is [menuSourcePath], a second top-level constant, for the same
@@ -22,7 +22,7 @@ library;
 import '../catalog.dart';
 
 /// `lib/src/components/menu.dart`: the shared row model, geometry, surface
-/// and keyboard behaviour [ElDropdownMenu] is built from. Read directly
+/// and keyboard behaviour [DropdownMenu] is built from. Read directly
 /// wherever the page cites the second source file [ComponentDocEntry] has no
 /// room for.
 const String menuSourcePath = 'lib/src/components/menu.dart';
@@ -45,28 +45,28 @@ const ComponentDocEntry dropdownMenuDoc = ComponentDocEntry(
   dependencies: <String>['button', 'menu', 'popover', 'source-foundation'],
   exports: <String>[
     // dropdown_menu.dart's own public surface.
-    'ElDropdownMenu',
-    'ElMenuTriggerScope',
+    'DropdownMenu',
+    'MenuTriggerScope',
     // menu.dart's row model.
-    'ElMenuChild',
-    'ElMenuItemVariant',
-    'ElMenuItem',
-    'ElMenuCheckboxItem',
-    'ElMenuRadioItem',
-    'ElMenuRadioGroup',
-    'ElMenuLabel',
-    'ElMenuSeparator',
-    'ElMenuGroup',
-    'ElMenuSub',
+    'MenuChild',
+    'MenuItemVariant',
+    'MenuItem',
+    'MenuCheckboxItem',
+    'MenuRadioItem',
+    'MenuRadioGroup',
+    'MenuLabel',
+    'MenuSeparator',
+    'MenuGroup',
+    'MenuSub',
     // menu.dart's geometry and surface.
-    'ElMenuIndicatorSide',
-    'ElMenu',
-    'ElMenuSurfaceKind',
-    'ElMenuSurface',
+    'MenuIndicatorSide',
+    'Menu',
+    'MenuSurfaceVariant',
+    'MenuSurface',
     // menu.dart's open content and shared motion/gesture primitives.
-    'ElMenuContent',
-    'ElMenuPointerDown',
-    'ElMenuMotion',
+    'MenuContent',
+    'MenuPointerDown',
+    'MenuMotion',
   ],
   sourcePath: 'lib/src/components/dropdown_menu.dart',
 );

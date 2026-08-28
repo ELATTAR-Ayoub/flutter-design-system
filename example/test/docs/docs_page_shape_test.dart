@@ -13,7 +13,19 @@ library;
 import 'package:example/components_docs/catalog.dart';
 import 'package:example/components_docs/specs.dart';
 import 'package:example/docs/component_doc_page.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The eight disclosures every component page carries, in order.
@@ -41,7 +53,7 @@ void main() {
       // before they are compared. `ComponentDocEntry.name` is spelled
       // inconsistently across the catalog — `alert-dialog` and
       // `dropdown-menu` carry a hyphen because that hyphen is their real
-      // route and command spelling, while `input_group` and `nav_user`
+      // route and command spelling, while `input_group` and `user_menu`
       // carry an underscore — and both are load bearing, since `route` is
       // `/components/$name`. Neither can be normalised in place without
       // moving a published URL.
@@ -124,8 +136,8 @@ void main() {
           title: 'API Reference',
           child: SizedBox.shrink(),
           children: <DocsTocEntry>[
-            DocsTocEntry(title: 'ElX', anchor: 'api-elx'),
-            DocsTocEntry(title: 'ElXSize', anchor: 'api-elx-size'),
+            DocsTocEntry(title: 'X', anchor: 'api-elx'),
+            DocsTocEntry(title: 'XSize', anchor: 'api-elx-size'),
           ],
         ),
       ],

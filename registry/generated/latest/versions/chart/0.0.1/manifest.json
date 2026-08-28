@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/chart.dart",
+      "source": "lib/src/components/ui/chart.dart",
       "target": "@ui/chart.dart",
-      "sha256": "7fd4d95b6be8dcfd576f188cb664340fe22a84d8124c0dd2ea47e3546676dc77"
+      "sha256": "3e9c7c089efa3175757a45b5e63b0b7496ceac39f53ae3104849da9f05c29873"
     }
   ],
   "registryDependencies": [
@@ -22,6 +22,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/chart",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/chart.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/chart.dart",
   "deprecated": false
 }

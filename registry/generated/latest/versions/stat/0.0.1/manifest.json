@@ -7,21 +7,21 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/stat.dart",
+      "source": "lib/src/components/ui/stat.dart",
       "target": "@ui/stat.dart",
-      "sha256": "2b50c7b1f6512f63af0ed46d6461ca574efb79a76e0fa15cd6efd8b0eba71ecd"
+      "sha256": "304221956bb3a09c574148248a39ca5cd0e9d6545154b17a757d8629309d4bc0"
     }
   ],
   "registryDependencies": [
     "icon",
     "skeleton",
     "source-foundation",
-    "swap-in"
+    "content-change"
   ],
   "semanticDependencies": [
     "icon",
     "skeleton",
-    "swap-in"
+    "content-change"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/stat",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/stat.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/stat.dart",
   "deprecated": false
 }

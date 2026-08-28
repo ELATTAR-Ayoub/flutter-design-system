@@ -1,7 +1,7 @@
 /// Tests for `components_docs/button_group/page.dart`'s [ButtonGroupDocPage].
 ///
 /// **Re-housed onto the documentation kit.** This suite used to read the old
-/// page's `ElSection`s directly; it now reads `DocsSection` (the kit's own
+/// page's `Section`s directly; it now reads `DocsSection` (the kit's own
 /// section widget) and opens each `DocsDisclosure` before reading what is
 /// inside it, closed by default, mounts no content at all — matching
 /// `button_test.dart`'s own pattern, the worked reference for this rollout.
@@ -12,7 +12,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage.
+/// `ThemeController` is flipped in place for theme coverage.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -22,7 +22,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const List<String> _expectedSectionOrder = <String>[
@@ -54,18 +80,18 @@ const Size _narrow = Size(390, 844);
 /// constructor parameter or static member of that class, read directly off
 /// `lib/src/components/button_group.dart`.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElButtonGroup': <String>[
+  'ButtonGroup': <String>[
     'children',
-    'ElButtonGroup.radiiOf',
-    'ElButtonGroup.hasLeftBorder',
+    'ButtonGroup.radiiOf',
+    'ButtonGroup.hasLeftBorder',
   ],
-  'ElButtonGroupText': <String>[
+  'ButtonGroupText': <String>[
     'text',
     'numeric',
-    'ElButtonGroupText.paddingX',
-    'ElButtonGroupText.gap',
+    'ButtonGroupText.paddingX',
+    'ButtonGroupText.gap',
   ],
-  'ElButtonGroupSeparator': <String>[],
+  'ButtonGroupSeparator': <String>[],
 };
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
@@ -85,24 +111,24 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.base);
+  await tester.pump(MotionDurations.normal);
 }
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -200,7 +226,7 @@ void main() {
   });
 
   testWidgets('the live specimen: a quantity stepper where the app, not '
-      'ElButtonGroup, owns the count: proving the group coordinates no state '
+      'ButtonGroup, owns the count: proving the group coordinates no state '
       'of its own', (WidgetTester tester) async {
     await _pump(tester);
 
@@ -209,58 +235,58 @@ void main() {
     const Key countKey = ValueKey<String>('button-group-doc-count');
 
     await tester.ensureVisible(find.byKey(countKey));
-    expect(tester.widget<ElButtonGroupText>(find.byKey(countKey)).text, '3');
+    expect(tester.widget<ButtonGroupText>(find.byKey(countKey)).text, '3');
 
     await tester.tap(find.byKey(increaseKey));
     await tester.pump();
-    expect(tester.widget<ElButtonGroupText>(find.byKey(countKey)).text, '4');
+    expect(tester.widget<ButtonGroupText>(find.byKey(countKey)).text, '4');
 
     await tester.tap(find.byKey(decreaseKey));
     await tester.tap(find.byKey(decreaseKey));
     await tester.pump();
-    expect(tester.widget<ElButtonGroupText>(find.byKey(countKey)).text, '2');
+    expect(tester.widget<ButtonGroupText>(find.byKey(countKey)).text, '2');
     expect(tester.takeException(), isNull);
   });
 
   testWidgets(
-    'ElButtonGroup.radiiOf and hasLeftBorder document the asymmetric join: '
+    'ButtonGroup.radiiOf and hasLeftBorder document the asymmetric join: '
     'only the first member keeps a left border, only the last keeps its own '
-    'right radius (forced to ElRadii.lg), every interior corner is squared',
+    'right radius (forced to Radii.lg), every interior corner is squared',
     (WidgetTester tester) async {
       final List<Widget> members = <Widget>[
-        ElButton(
-          variant: ElButtonVariant.outline,
+        Button(
+          variant: ButtonVariant.outline,
           onPressed: () {},
           child: const Text('A'),
         ),
-        ElButton(
-          variant: ElButtonVariant.outline,
+        Button(
+          variant: ButtonVariant.outline,
           onPressed: () {},
           child: const Text('B'),
         ),
-        ElButton(
-          variant: ElButtonVariant.outline,
+        Button(
+          variant: ButtonVariant.outline,
           onPressed: () {},
           child: const Text('C'),
         ),
       ];
 
-      final BorderRadius first = ElButtonGroup.radiiOf(members, 0);
-      final BorderRadius middle = ElButtonGroup.radiiOf(members, 1);
-      final BorderRadius last = ElButtonGroup.radiiOf(members, 2);
+      final BorderRadius first = ButtonGroup.radiiOf(members, 0);
+      final BorderRadius middle = ButtonGroup.radiiOf(members, 1);
+      final BorderRadius last = ButtonGroup.radiiOf(members, 2);
 
-      expect(first.topLeft, const Radius.circular(ElRadii.pill));
-      expect(first.bottomLeft, const Radius.circular(ElRadii.pill));
+      expect(first.topLeft, const Radius.circular(Radii.full));
+      expect(first.bottomLeft, const Radius.circular(Radii.full));
       expect(first.topRight, Radius.zero);
       expect(middle.topLeft, Radius.zero);
       expect(middle.topRight, Radius.zero);
-      expect(last.topRight, const Radius.circular(ElRadii.lg));
-      expect(last.bottomRight, const Radius.circular(ElRadii.lg));
+      expect(last.topRight, const Radius.circular(Radii.lg));
+      expect(last.bottomRight, const Radius.circular(Radii.lg));
       expect(last.topLeft, Radius.zero);
 
-      expect(ElButtonGroup.hasLeftBorder(members, 0), isTrue);
-      expect(ElButtonGroup.hasLeftBorder(members, 1), isFalse);
-      expect(ElButtonGroup.hasLeftBorder(members, 2), isFalse);
+      expect(ButtonGroup.hasLeftBorder(members, 0), isTrue);
+      expect(ButtonGroup.hasLeftBorder(members, 1), isFalse);
+      expect(ButtonGroup.hasLeftBorder(members, 2), isFalse);
     },
   );
 
@@ -268,13 +294,10 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(buttonGroupDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(buttonGroupDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

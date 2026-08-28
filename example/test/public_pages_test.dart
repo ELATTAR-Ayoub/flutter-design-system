@@ -8,7 +8,33 @@ import 'package:example/skills_docs/skills_page.dart';
 import 'package:example/site/pages/home_showcase.dart' show homeShowcaseCards;
 import 'package:example/site/pages/public_pages.dart';
 import 'package:example/site/site_routes.dart' show skillsRoute;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -20,8 +46,8 @@ final SkillDocEntry _skill = skillDocs.first;
 /// skill's real files live above it, at `skills/<slug>/…`.
 String _rooted(String relative) => '../$relative';
 
-Widget _harness(Widget child) => ElTheme(
-  controller: ElThemeController(mode: ElThemeMode.dark),
+Widget _harness(Widget child) => ThemeScope(
+  controller: ThemeController(mode: ColorMode.dark),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     home: SingleChildScrollView(child: child),
@@ -121,7 +147,7 @@ void main() {
     // the titles the rail echoes, and keep `findsOneWidget` for the ones it
     // does not.
     // The `elGroups` sections (Base Components, Agent, Site Pages) are gone
-    // from this index: every entry in them linked into the legacy `/el/...`
+    // from this index: every entry in them linked into the legacy `/space/...`
     // tree, which no longer exists, and an index must not list pages a reader
     // cannot open. What remains is the documented components, each of which
     // has a real `/components/<name>` page.
@@ -220,7 +246,7 @@ void main() {
       // Deleting it once is not enough: this is what stops it coming back.
       expect(find.textContaining('npx'), findsNothing);
 
-      // The old page asserted `find.byType(ElAgentCodeBlock), findsNothing`.
+      // The old page asserted `find.byType(AgentCodeBlock), findsNothing`.
       // That was a proxy for "prints no unverified command", available only
       // because the placeholder had no install section at all. `SkillsPage`
       // legitimately prints commands, so the proxy is replaced by the thing it

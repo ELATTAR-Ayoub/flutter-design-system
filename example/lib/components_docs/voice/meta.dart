@@ -5,8 +5,8 @@
 /// copied verbatim: `button`, `icon`, `source-foundation`.
 ///
 /// Three widgets from two reference files — `voice/visualisers.tsx`
-/// ([ElLiveWaveform], [ElBarVisualizer]) and `voice/pickers.tsx`
-/// ([ElMicControl]) — read end to end from `lib/src/components/voice.dart`
+/// ([LiveWaveform], [BarVisualizer]) and `voice/pickers.tsx`
+/// ([MicControl]) — read end to end from `lib/src/components/voice.dart`
 /// and from `test/agent_voice_test.dart`.
 library;
 
@@ -21,6 +21,6 @@ const ComponentDocEntry voiceDoc = ComponentDocEntry(
       'which ever invents a signal it was not given.',
   // registry/components/voice.json's own registryDependencies, verbatim.
   dependencies: <String>['button', 'icon', 'source-foundation'],
-  exports: <String>['ElLiveWaveform', 'ElBarVisualizer', 'ElMicControl'],
+  exports: <String>['LiveWaveform', 'BarVisualizer', 'MicControl'],
   sourcePath: 'lib/src/components/voice.dart',
 );

@@ -1,4 +1,4 @@
-/// `components/el/data-table-demo.tsx`: the Data Table recipe, live.
+/// `components/space/data-table-demo.tsx`: the Data Table recipe, live.
 ///
 /// The reference's own header says why it is not a component:
 ///
@@ -47,7 +47,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// One row of `SALES`.
 typedef _Sale = ({String id, String card, String set, String grade, int price});
@@ -132,23 +144,23 @@ class DataTableDemo extends StatefulWidget {
   final bool loading;
 
   /// `space-y-4`: between the filter row, the table and the pager.
-  static double get stackGap => el(4);
+  static double get stackGap => space(4);
 
   /// `max-w-xs` on the filter.
   // allow-hardcoded: framework container scale with no token to read it from.
   static const double filterWidth = 320;
 
   /// `pl-10`: the room the glyph needs.
-  static double get filterInset => el(10);
+  static double get filterInset => space(10);
 
   /// `left-4`: where the glyph sits.
-  static double get glyphInset => el(4);
+  static double get glyphInset => space(4);
 
   /// `rounded-lg border border-border overflow-hidden` around the table.
-  static double get frameRadius => ElRadii.lg;
+  static double get frameRadius => Radii.lg;
 
   /// `className="h-48"` on the empty state's cell.
-  static double get emptyCellHeight => el(48);
+  static double get emptyCellHeight => space(48);
 
   @override
   State<DataTableDemo> createState() => _DataTableDemoState();
@@ -249,21 +261,19 @@ class _DataTableDemoState extends State<DataTableDemo> {
   bool get _canNext => _page + 1 < _pageCount;
 
   /// `table.getIsAllPageRowsSelected()` / `getIsSomePageRowsSelected()`.
-  ElCheckboxState get _headerState {
+  CheckboxState get _headerState {
     final List<_Sale> page = _rows;
-    if (page.isEmpty) return ElCheckboxState.unchecked;
+    if (page.isEmpty) return CheckboxState.unchecked;
     final int ticked = page
         .where((_Sale row) => _selected.contains(row.id))
         .length;
-    if (ticked == page.length) return ElCheckboxState.checked;
-    return ticked == 0
-        ? ElCheckboxState.unchecked
-        : ElCheckboxState.indeterminate;
+    if (ticked == page.length) return CheckboxState.checked;
+    return ticked == 0 ? CheckboxState.unchecked : CheckboxState.indeterminate;
   }
 
-  void _toggleAll(ElCheckboxState next) {
+  void _toggleAll(CheckboxState next) {
     setState(() {
-      final bool on = next == ElCheckboxState.checked;
+      final bool on = next == CheckboxState.checked;
       for (final _Sale row in _rows) {
         if (on) {
           _selected.add(row.id);
@@ -274,9 +284,9 @@ class _DataTableDemoState extends State<DataTableDemo> {
     });
   }
 
-  void _toggleRow(_Sale row, ElCheckboxState next) {
+  void _toggleRow(_Sale row, CheckboxState next) {
     setState(() {
-      if (next == ElCheckboxState.checked) {
+      if (next == CheckboxState.checked) {
         _selected.add(row.id);
       } else {
         _selected.remove(row.id);
@@ -286,7 +296,7 @@ class _DataTableDemoState extends State<DataTableDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final bool loading = widget.loading;
     final List<_Sale> rows = _rows;
 
@@ -303,21 +313,24 @@ class _DataTableDemoState extends State<DataTableDemo> {
         DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(DataTableDemo.frameRadius),
-            border: Border.all(color: theme.border, width: ElWidths.hairline),
+            border: Border.all(
+              color: theme.border,
+              width: BorderWidths.hairline,
+            ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(ElWidths.hairline),
+            padding: const EdgeInsets.all(BorderWidths.hairline),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(
-                DataTableDemo.frameRadius - ElWidths.hairline,
+                DataTableDemo.frameRadius - BorderWidths.hairline,
               ),
-              child: ElTable(
-                header: <ElTableCellSpec>[
+              child: Table(
+                header: <TableCellSpec>[
                   for (final _Column column in _Column.values)
-                    ElTableCellSpec(
+                    TableCellSpec(
                       checkbox: column == _Column.select,
                       child: column == _Column.select
-                          ? ElCheckbox(
+                          ? Checkbox(
                               state: _headerState,
                               label: 'Select all rows on this page',
                               onChanged: loading ? null : _toggleAll,
@@ -333,21 +346,21 @@ class _DataTableDemoState extends State<DataTableDemo> {
                             ),
                     ),
                 ],
-                rows: <ElTableRowSpec>[
+                rows: <TableRowSpec>[
                   if (loading)
                     for (int i = 0; i < _skeletonRows; i++)
-                      ElTableRowSpec(
-                        cells: <ElTableCellSpec>[
+                      TableRowSpec(
+                        cells: <TableCellSpec>[
                           for (final _Column column in _Column.values)
-                            ElTableCellSpec(
+                            TableCellSpec(
                               checkbox: column == _Column.select,
                               // `<Skeleton className="h-4 w-full"/>`.
-                              child: ElSkeleton(height: el(4)),
+                              child: Skeleton(height: space(4)),
                             ),
                         ],
                       )
                   else if (rows.isEmpty)
-                    ElTableRowSpec.span(
+                    TableRowSpec.span(
                       _EmptyState(
                         query: _filter.text,
                         onClear: () => _filter.clear(),
@@ -356,37 +369,37 @@ class _DataTableDemoState extends State<DataTableDemo> {
                     )
                   else
                     for (final _Sale row in rows)
-                      ElTableRowSpec(
+                      TableRowSpec(
                         selected: _selected.contains(row.id),
-                        cells: <ElTableCellSpec>[
-                          ElTableCellSpec(
+                        cells: <TableCellSpec>[
+                          TableCellSpec(
                             checkbox: true,
-                            child: ElCheckbox(
+                            child: Checkbox(
                               state: _selected.contains(row.id)
-                                  ? ElCheckboxState.checked
-                                  : ElCheckboxState.unchecked,
+                                  ? CheckboxState.checked
+                                  : CheckboxState.unchecked,
                               label: 'Select ${row.card}',
-                              onChanged: (ElCheckboxState next) =>
+                              onChanged: (CheckboxState next) =>
                                   _toggleRow(row, next),
                             ),
                           ),
-                          ElTableCellSpec(child: Text(row.card)),
-                          ElTableCellSpec(child: Text(row.set)),
-                          ElTableCellSpec(
-                            child: ElBadge(
+                          TableCellSpec(child: Text(row.card)),
+                          TableCellSpec(child: Text(row.set)),
+                          TableCellSpec(
+                            child: Badge(
                               label: row.grade,
                               variant: row.grade == 'PSA 10'
-                                  ? ElBadgeVariant.premium
-                                  : ElBadgeVariant.outline,
+                                  ? BadgeVariant.premium
+                                  : BadgeVariant.outline,
                             ),
                           ),
-                          ElTableCellSpec(
+                          TableCellSpec(
                             // `block text-right` inside a cell that is not
                             // itself right-aligned.
-                            align: ElTableAlign.end,
-                            child: ElText(
+                            align: TableAlign.end,
+                            child: StyledText(
                               _money(row.price),
-                              ElType.numSm,
+                              TextStyles.numberSm,
                               color: theme.foreground,
                             ),
                           ),
@@ -429,7 +442,7 @@ class _FilterRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -439,7 +452,7 @@ class _FilterRow extends StatelessWidget {
           child: Stack(
             alignment: AlignmentDirectional.centerStart,
             children: <Widget>[
-              ElInput(
+              Input(
                 controller: controller,
                 placeholder: 'Filter by card',
                 label: 'Filter by card',
@@ -447,19 +460,19 @@ class _FilterRow extends StatelessWidget {
                 // `className="pl-10"` over the component's own `px-4`.
                 padding: EdgeInsetsDirectional.fromSTEB(
                   DataTableDemo.filterInset,
-                  el(1),
-                  el(4),
-                  el(1),
+                  space(1),
+                  space(4),
+                  space(1),
                 ),
               ),
               // `pointer-events-none absolute top-1/2 left-4 -translate-y-1/2`.
               PositionedDirectional(
                 start: DataTableDemo.glyphInset,
                 child: const IgnorePointer(
-                  child: ElIcon.lucide(
-                    ElLucide.search,
-                    size: ElIconSize.sm,
-                    tone: ElIconTone.muted,
+                  child: Icon.lucide(
+                    Lucide.search,
+                    size: IconSize.sm,
+                    tone: IconTone.muted,
                   ),
                 ),
               ),
@@ -468,10 +481,10 @@ class _FilterRow extends StatelessWidget {
         ),
         if (selected > 0) ...<Widget>[
           // `gap-3`.
-          SizedBox(width: el(3)),
-          ElText(
+          SizedBox(width: space(3)),
+          StyledText(
             '$selected selected',
-            ElType.caption,
+            TextStyles.caption,
             color: theme.mutedForeground,
           ),
         ],
@@ -505,11 +518,11 @@ class _SortHeader extends StatelessWidget {
   final VoidCallback? onPressed;
 
   /// `gap-1.5`.
-  static double get gap => el(1.5);
+  static double get gap => space(1.5);
 
   @override
-  Widget build(BuildContext context) => ElPress(
-    scale: ElTransforms.clickSpringScale,
+  Widget build(BuildContext context) => Press(
+    scale: MotionTransforms.clickSpringScale,
     onTap: onPressed,
     behavior: HitTestBehavior.opaque,
     child: Row(
@@ -518,14 +531,14 @@ class _SortHeader extends StatelessWidget {
       children: <Widget>[
         Text(label),
         SizedBox(width: gap),
-        ElIcon.lucide(
+        Icon.lucide(
           switch (sorted) {
-            _Sorted.asc => ElLucide.arrowUp,
-            _Sorted.desc => ElLucide.arrowDown,
-            _Sorted.none => ElLucide.arrowUpDown,
+            _Sorted.asc => Lucide.arrowUp,
+            _Sorted.desc => Lucide.arrowDown,
+            _Sorted.none => Lucide.arrowUpDown,
           },
-          size: ElIconSize.sm,
-          tone: sorted == _Sorted.none ? ElIconTone.muted : ElIconTone.action,
+          size: IconSize.sm,
+          tone: sorted == _Sorted.none ? IconTone.muted : IconTone.action,
         ),
       ],
     ),
@@ -540,18 +553,18 @@ class _EmptyState extends StatelessWidget {
   final VoidCallback onClear;
 
   @override
-  Widget build(BuildContext context) => ElEmpty(
+  Widget build(BuildContext context) => Empty(
     children: <Widget>[
-      ElEmptyTitle('No cards match “$query”'),
-      const ElEmptyDescription(
+      EmptyTitle('No cards match “$query”'),
+      const EmptyDescription(
         'Try a shorter search, or clear the filter to see all eight.',
       ),
       Padding(
         // `className="mt-4"`: on top of the `Empty`'s own `gap-4`.
-        padding: EdgeInsets.only(top: el(4)),
-        child: ElButton(
-          variant: ElButtonVariant.outline,
-          size: ElButtonSize.sm,
+        padding: EdgeInsets.only(top: space(4)),
+        child: Button(
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
           onPressed: onClear,
           child: const Text('Clear filter'),
         ),
@@ -574,29 +587,33 @@ class _PagerRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Flexible(
-          child: ElText(caption, ElType.caption, color: theme.mutedForeground),
+          child: StyledText(
+            caption,
+            TextStyles.caption,
+            color: theme.mutedForeground,
+          ),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ElButton(
-              variant: ElButtonVariant.outline,
-              size: ElButtonSize.sm,
+            Button(
+              variant: ButtonVariant.outline,
+              size: ButtonSize.sm,
               onPressed: onPrevious,
               child: const Text('Previous'),
             ),
             // `gap-2`.
-            SizedBox(width: el(2)),
-            ElButton(
-              variant: ElButtonVariant.outline,
-              size: ElButtonSize.sm,
+            SizedBox(width: space(2)),
+            Button(
+              variant: ButtonVariant.outline,
+              size: ButtonSize.sm,
               onPressed: onNext,
               child: const Text('Next'),
             ),

@@ -1,30 +1,30 @@
 {
   "name": "glass",
-  "type": "effect",
+  "type": "component",
   "version": "0.0.1",
   "description": "Glass — `app/globals.css` L1560–1617.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/effects/glass.dart",
-      "target": "@effects/glass.dart",
-      "sha256": "004590a21f45286e5fe19a71d546af239f8b84bf0c9557dfe1dde7f0d22b3994"
+      "source": "lib/src/components/ui/glass.dart",
+      "target": "@ui/glass.dart",
+      "sha256": "f81e3038279a37387ba05eeea1c1426ceaf8636870732d973a301baa3e71c9cc"
     }
   ],
   "registryDependencies": [
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "semanticDependencies": [
-    "machine-surface"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],
   "fonts": [],
   "shaders": [],
   "licenses": [],
-  "documentationRoute": "/docs/effects/glass",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/effects/glass.dart",
+  "documentationRoute": "/components/glass",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/glass.dart",
   "deprecated": false
 }

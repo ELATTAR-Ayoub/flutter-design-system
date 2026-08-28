@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/empty.dart",
+      "source": "lib/src/components/ui/empty.dart",
       "target": "@ui/empty.dart",
-      "sha256": "f4cd07b07a5b3a69bc616b29f65b9146d7a6e1182bc0b63b82d1359b165180b8"
+      "sha256": "88829ae944e14577f736f20b3af3bd5c0f564a74f8d5cf7f685980aae30a184c"
     }
   ],
   "registryDependencies": [
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/empty",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/empty.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/empty.dart",
   "deprecated": false
 }

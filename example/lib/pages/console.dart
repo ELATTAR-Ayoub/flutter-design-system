@@ -63,30 +63,42 @@
 ///     calls.** `AgentConsole` has no history control and reads no `restore`;
 ///     the mock transport implements it anyway and the `Meta` list documents it
 ///     as optional. Ported into the list as written: the port's
-///     [ElAgentTransport] does not declare it, so the row documents a member of
+///     [AgentTransport] does not declare it, so the row documents a member of
 ///     the reference's interface that this one does not have, which is itself
 ///     the honest reading of *"a transport with no history behind it omits it"*.
 ///  7. **The approval gate never reaches `awaiting_approval`.** Probed live: the
 ///     status line reads `Processing` while the card is up. See
-///     [ElAgentConsole]'s own register: one of the twenty states is unreachable
+///     [AgentConsole]'s own register: one of the twenty states is unreachable
 ///     through this transport.
 ///  8. **The launcher's label does not slide.** `translate-x-2` compiles to the
 ///     standalone `translate` property, which is not in the element's
 ///     `transition-property`; the 8px offset snaps on the first hover frame and
 ///     only the opacity fades. Traced with a real pointer: see
-///     [ElAgentLauncher].
+///     [AgentLauncher].
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/agent/mock_transport.dart';
 import 'package:example/kit.dart';
 import 'package:example/nav.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /* ── Shared fixtures ─────────────────────────────────────────────────────── */
 
-/// `PERSONA`, `components/el/agent-demo.tsx`.
-const ElAgentPersona kVaultPersona = ElAgentPersona(
+/// `PERSONA`, `components/space/agent-demo.tsx`.
+const AgentPersona kVaultPersona = AgentPersona(
   name: 'Vault',
   blurb: 'Ask about packs, pulls, prices and your wallet.',
   suggestions: <String>[
@@ -102,50 +114,50 @@ const ElAgentPersona kVaultPersona = ElAgentPersona(
 /// Supplied by the caller rather than guessed, because only the caller knows
 /// whether `export_activity` is reading, writing or running: and a status line
 /// that guesses is a status line that lies."*
-const ElToolStateMap kVaultToolStates = <String, ElAgentState>{
-  'search_inventory': ElAgentState.searching,
-  'read_wallet': ElAgentState.retrieving,
-  'export_activity': ElAgentState.writing,
-  'fetch_market_price': ElAgentState.retrieving,
+const ToolStateMap kVaultToolStates = <String, AgentState>{
+  'search_inventory': AgentState.searching,
+  'read_wallet': AgentState.retrieving,
+  'export_activity': AgentState.writing,
+  'fetch_market_price': AgentState.retrieving,
 };
 
 /// `COMMANDS`: three skills and one command, which is why the welcome card
 /// shows three chips (drift 5).
-const List<ElAgentCommand> kVaultCommands = <ElAgentCommand>[
-  ElAgentCommand(
+const List<AgentCommand> kVaultCommands = <AgentCommand>[
+  AgentCommand(
     id: 'inventory',
     label: 'inventory',
     hint: 'What is in stock',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.search,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.search,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'wallet',
     label: 'wallet',
     hint: 'Balance and recent movement',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.wallet,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.wallet,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'export',
     label: 'export',
     hint: 'Download activity as CSV',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.download,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.download,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'guide',
     label: 'guide',
     hint: 'How pack odds work',
-    group: ElAgentCommandGroup.command,
-    icon: ElLucide.bookOpen,
+    group: AgentCommandGroup.command,
+    icon: Lucide.bookOpen,
   ),
 ];
 
 /// `MODELS`.
-const List<ElAgentModel> kVaultModels = <ElAgentModel>[
-  ElAgentModel(id: 'fast', label: 'Fast', hint: 'Answers in a second'),
-  ElAgentModel(id: 'deep', label: 'Deep', hint: 'Slower, checks its work'),
+const List<AgentModel> kVaultModels = <AgentModel>[
+  AgentModel(id: 'fast', label: 'Fast', hint: 'Answers in a second'),
+  AgentModel(id: 'deep', label: 'Deep', hint: 'Slower, checks its work'),
 ];
 
 /// `describeApproval`, *"turns a held action into a sentence a human can decide
@@ -166,12 +178,12 @@ class ConsolePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('agent', 'console');
+    final CategoryHit here = findCategory('agent', 'console');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // DRIFT 1.
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
@@ -182,14 +194,14 @@ class ConsolePage extends StatelessWidget {
         // `className="mb-12"`, 48px, above the first section rather than
         // inside it.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: const ElNote(title: 'This is running', child: _OpeningNote()),
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: const Note(title: 'This is running', child: _OpeningNote()),
         ),
         const _LiveSection(),
         const _TransportSection(),
         const _FeaturesSection(),
         const _LauncherSection(),
-        const ElPageFootNav(groupId: 'agent', slug: 'console'),
+        const PageFootNav(groupId: 'agent', slug: 'console'),
       ],
     );
   }
@@ -199,7 +211,7 @@ class _OpeningNote extends StatelessWidget {
   const _OpeningNote();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -220,7 +232,7 @@ class _OpeningNote extends StatelessWidget {
         const TextSpan(text: ' and it fails, on purpose.'),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -236,14 +248,14 @@ class _LiveSection extends StatelessWidget {
   const _LiveSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'live',
     title: 'The console',
     description:
         'Transcript, composer, face and voice in one component. It '
         'owns the conversation and nothing else — the persona, the tools, '
         'the models and the agent itself all arrive as props.',
-    child: ElPanel(flush: true, child: LiveConsole()),
+    child: Panel(flush: true, child: LiveConsole()),
   );
 }
 
@@ -252,14 +264,14 @@ class LiveConsole extends StatefulWidget {
   const LiveConsole({super.key});
 
   /// `h-152`, 608px.
-  static double get height => el(152);
+  static double get height => space(152);
 
   @override
   State<LiveConsole> createState() => _LiveConsoleState();
 }
 
 class _LiveConsoleState extends State<LiveConsole> {
-  final ElMockTransport _transport = ElMockTransport();
+  final MockTransport _transport = MockTransport();
 
   @override
   void dispose() {
@@ -268,7 +280,7 @@ class _LiveConsoleState extends State<LiveConsole> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentConsole(
+  Widget build(BuildContext context) => AgentConsole(
     transport: _transport,
     persona: kVaultPersona,
     toolStates: kVaultToolStates,
@@ -285,7 +297,7 @@ class _TransportSection extends StatelessWidget {
   const _TransportSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'transport',
     title: 'The transport contract',
     description:
@@ -295,8 +307,8 @@ class _TransportSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElMeta(
-          items: <ElMetaItem>[
+        Meta(
+          items: <MetaItem>[
             (
               k: 'turns',
               v: const TextSpan(
@@ -358,11 +370,11 @@ class _TransportSection extends StatelessWidget {
           ],
         ),
         // `<p className="type-small mt-6">`.
-        SizedBox(height: el(6)),
-        ElRichText(
+        SizedBox(height: space(6)),
+        RichText(
           TextSpan(
             children: <InlineSpan>[
-              ElCode.span('lib/agent/mock-transport.ts'),
+              Code.span('lib/agent/mock-transport.ts'),
               const TextSpan(
                 text:
                     ' is a complete implementation of all of it, in about '
@@ -372,7 +384,7 @@ class _TransportSection extends StatelessWidget {
               ),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     ),
@@ -385,14 +397,14 @@ class _FeaturesSection extends StatelessWidget {
   const _FeaturesSection();
 
   @override
-  Widget build(BuildContext context) => const ElSection(
+  Widget build(BuildContext context) => const Section(
     id: 'features',
     title: 'Feature flags',
     description:
         'Nine switches, all on by default. A console with '
         'everything turned off is still a console — which is the test that '
         'the parts are genuinely separable rather than merely arranged.',
-    child: ElPanel(
+    child: Panel(
       label: 'features',
       // DRIFT 4: nine names listed, eight of them switched off below.
       note:
@@ -410,10 +422,10 @@ class MinimalConsole extends StatefulWidget {
   const MinimalConsole({super.key});
 
   /// `h-80`, 320px.
-  static double get height => el(80);
+  static double get height => space(80);
 
   /// The eight flags the demo turns off. `reset` is the ninth and stays on.
-  static const ElAgentFeatures features = ElAgentFeatures(
+  static const AgentFeatures features = AgentFeatures(
     avatar: false,
     suggestions: false,
     microphone: false,
@@ -429,7 +441,7 @@ class MinimalConsole extends StatefulWidget {
 }
 
 class _MinimalConsoleState extends State<MinimalConsole> {
-  final ElMockTransport _transport = ElMockTransport();
+  final MockTransport _transport = MockTransport();
 
   @override
   void dispose() {
@@ -438,12 +450,9 @@ class _MinimalConsoleState extends State<MinimalConsole> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentConsole(
+  Widget build(BuildContext context) => AgentConsole(
     transport: _transport,
-    persona: const ElAgentPersona(
-      name: 'Vault',
-      placeholder: 'Ask a question…',
-    ),
+    persona: const AgentPersona(name: 'Vault', placeholder: 'Ask a question…'),
     toolStates: kVaultToolStates,
     features: MinimalConsole.features,
     height: MinimalConsole.height,
@@ -456,7 +465,7 @@ class _LauncherSection extends StatelessWidget {
   const _LauncherSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'launcher',
     title: 'Launcher',
     description:
@@ -469,12 +478,12 @@ class _LauncherSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const LauncherDemo(),
-        SizedBox(height: el(6)),
-        ElRichText(
+        SizedBox(height: space(6)),
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(text: 'The launcher takes the console as '),
-              ElCode.span('children'),
+              Code.span('children'),
               const TextSpan(
                 text:
                     ' rather than building one. A launcher that '
@@ -486,7 +495,7 @@ class _LauncherSection extends StatelessWidget {
               ),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     ),
@@ -504,17 +513,17 @@ class LauncherDemo extends StatefulWidget {
   const LauncherDemo({super.key});
 
   /// `h-56`, 224px.
-  static double get height => el(56);
+  static double get height => space(56);
 
   /// `p-5` on the absolutely-positioned paragraph.
-  static double get padding => el(5);
+  static double get padding => space(5);
 
   @override
   State<LauncherDemo> createState() => _LauncherDemoState();
 }
 
 class _LauncherDemoState extends State<LauncherDemo> {
-  final ElMockTransport _transport = ElMockTransport();
+  final MockTransport _transport = MockTransport();
 
   @override
   void dispose() {
@@ -524,15 +533,15 @@ class _LauncherDemoState extends State<LauncherDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
       height: LauncherDemo.height,
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: theme.background,
-          borderRadius: BorderRadius.circular(ElRadii.lg),
-          border: Border.all(color: theme.border, width: ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.lg),
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
         child: Stack(
           children: <Widget>[
@@ -543,19 +552,19 @@ class _LauncherDemoState extends State<LauncherDemo> {
               top: 0,
               child: Padding(
                 padding: EdgeInsets.all(LauncherDemo.padding),
-                child: ElText(
+                child: StyledText(
                   'The launcher is fixed to the viewport, not to this panel — '
                   'it is sitting in the bottom-right corner of the page you are '
                   'reading. Click it.',
-                  ElType.small,
+                  TextStyles.small,
                 ),
               ),
             ),
-            ElAgentLauncher(
+            AgentLauncher(
               label: 'Ask the assistant',
               title: 'Vault',
               description: 'Ask about packs, pulls, prices and your wallet.',
-              child: ElAgentConsole(
+              child: AgentConsole(
                 transport: _transport,
                 persona: kVaultPersona,
                 toolStates: kVaultToolStates,

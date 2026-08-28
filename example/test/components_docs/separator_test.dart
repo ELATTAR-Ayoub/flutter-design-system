@@ -1,10 +1,10 @@
 /// Tests for `components_docs/separator/page.dart`'s [SeparatorDocPage]:
-/// the public documentation page for `ElSeparator`.
+/// the public documentation page for `Separator`.
 ///
 /// Re-housed onto the kit alongside the page: the section-order test now
 /// reads `DocsSection.id`, and the API-table reads open the `DocsDisclosure`
 /// first — closed by default, unlike the old page's always-visible
-/// `ElSection`.
+/// `Section`.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -14,16 +14,40 @@ import 'package:example/components_docs/separator/page.dart'
 import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title].
 Finder _disclosureTrigger(String title) => find.descendant(
@@ -46,7 +70,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: SeparatorDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -63,23 +87,23 @@ void main() {
         await tester.ensureVisible(apiTrigger);
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         expect(find.text('orientation'), findsWidgets);
 
         expect(
           find.byWidgetPredicate(
             (Widget w) =>
-                w is ElSeparator &&
-                w.orientation == ElSeparatorOrientation.horizontal,
+                w is Separator &&
+                w.orientation == SeparatorOrientation.horizontal,
           ),
           findsWidgets,
         );
         expect(
           find.byWidgetPredicate(
             (Widget w) =>
-                w is ElSeparator &&
-                w.orientation == ElSeparatorOrientation.vertical,
+                w is Separator &&
+                w.orientation == SeparatorOrientation.vertical,
           ),
           findsWidgets,
         );
@@ -87,7 +111,7 @@ void main() {
         expect(separatorDoc.name, 'separator');
         expect(
           separatorDoc.exports,
-          containsAll(<String>['ElSeparator', 'ElSeparatorOrientation']),
+          containsAll(<String>['Separator', 'SeparatorOrientation']),
         );
         expect(separatorDoc.command, 'elattar add separator');
         expect(destination, isNull);
@@ -103,7 +127,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const SeparatorDocPage(),
           ),
         );
@@ -132,8 +156,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const SeparatorDocPage()),
@@ -153,7 +177,7 @@ void main() {
 
         // Flip the SAME controller in place, not a fresh widget tree: the
         // same object every real theme toggle mutates.
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
         final ColoredBox lightBox = tester.widget<ColoredBox>(
@@ -173,74 +197,71 @@ void main() {
       },
     );
 
-    testWidgets(
-      'renders the house-shape section list, in order: Preview, '
-      'Installation, Usage, separator\'s own promoted sections, then the '
-      'eight disclosures',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('renders the house-shape section list, in order: Preview, '
+        'Installation, Usage, separator\'s own promoted sections, then the '
+        'eight disclosures', (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const SeparatorDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const SeparatorDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> sectionIds = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.id)
-            .toList();
+      final List<String> sectionIds = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.id)
+          .toList();
 
-        expect(sectionIds, <String>[
-          'preview',
-          'install',
-          'usage',
-          'vertical',
-          'menu',
-          'list',
-          'rtl',
-          'api',
-          'states',
-          'accessibility',
-          'keyboard',
-          'responsive',
-          'dependencies',
-          'theming',
-          'source',
-        ]);
+      expect(sectionIds, <String>[
+        'preview',
+        'install',
+        'usage',
+        'vertical',
+        'menu',
+        'list',
+        'rtl',
+        'api',
+        'states',
+        'accessibility',
+        'keyboard',
+        'responsive',
+        'dependencies',
+        'theming',
+        'source',
+      ]);
 
-        // No leftover "empty"/"kbd" content: those are their own pages now.
-        expect(find.text('Empty: Input group'), findsNothing);
-        expect(find.text('Kbd: Group'), findsNothing);
-        expect(find.byType(ElEmpty), findsNothing);
-        expect(find.byType(ElKbd), findsNothing);
+      // No leftover "empty"/"kbd" content: those are their own pages now.
+      expect(find.text('Empty: Input group'), findsNothing);
+      expect(find.text('Kbd: Group'), findsNothing);
+      expect(find.byType(Empty), findsNothing);
+      expect(find.byType(Kbd), findsNothing);
 
-        final Finder article = find.byKey(
-          const ValueKey<String>('separator-doc-article'),
-        );
-        for (final String title in <String>['Menu', 'List', 'RTL']) {
-          expect(
-            find.descendant(of: article, matching: find.text(title)),
-            findsOneWidget,
-            reason: 'missing $title',
-          );
-        }
-
-        // Once, and only once. The title lives on the `DocsDisclosure`'s
-        // trigger row — the control itself, with the chevron beside it —
-        // and `DocsSection` prints no heading above a disclosure, so the
-        // name is not stacked on itself. This used to expect two; that was
-        // the duplication, encoded.
+      final Finder article = find.byKey(
+        const ValueKey<String>('separator-doc-article'),
+      );
+      for (final String title in <String>['Menu', 'List', 'RTL']) {
         expect(
-          find.descendant(of: article, matching: find.text('API Reference')),
+          find.descendant(of: article, matching: find.text(title)),
           findsOneWidget,
+          reason: 'missing $title',
         );
-      },
-    );
+      }
+
+      // Once, and only once. The title lives on the `DocsDisclosure`'s
+      // trigger row — the control itself, with the chevron beside it —
+      // and `DocsSection` prints no heading above a disclosure, so the
+      // name is not stacked on itself. This used to expect two; that was
+      // the duplication, encoded.
+      expect(
+        find.descendant(of: article, matching: find.text('API Reference')),
+        findsOneWidget,
+      );
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(

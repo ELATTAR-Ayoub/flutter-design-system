@@ -1,8 +1,8 @@
 /// Public documentation page for the `agent-slash-palette` component.
 ///
-/// `agent_slash_palette.dart` declares one widget, [ElAgentSlashPalette], one
-/// data class, [ElAgentCommand], one enum, [ElAgentCommandGroup], and two
-/// top-level functions, [elSlashQuery] and [elFilterCommands]. API Reference
+/// `agent_slash_palette.dart` declares one widget, [AgentSlashPalette], one
+/// data class, [AgentCommand], one enum, [AgentCommandGroup], and two
+/// top-level functions, [slashQuery] and [filterCommands]. API Reference
 /// gives each its own [DocsApiTable], plus a fifth table for the widget's own
 /// public statics, with a rail sub-anchor per table.
 ///
@@ -10,22 +10,34 @@
 /// directly: "the open query, the matches and the highlight all belong to
 /// the composer, which is the one place the keyboard is routed." Nothing in
 /// `agent_slash_palette.dart` reads a [Focus] node or a [LogicalKeyboardKey]
-/// — [activeIndex], [ElAgentSlashPalette.onSelect] and
-/// [ElAgentSlashPalette.onHover] are the whole surface a caller drives. The
+/// — [activeIndex], [AgentSlashPalette.onSelect] and
+/// [AgentSlashPalette.onHover] are the whole surface a caller drives. The
 /// Keyboard disclosure below says exactly that, rather than assuming the
 /// conventional "arrow keys move, Enter selects" shape a menu usually gets:
 /// this file implements none of it, because the composer (out of scope for
 /// this page) does.
 ///
 /// The Filtering section below is the one live specimen built on
-/// [elSlashQuery] and [elFilterCommands] rather than on the widget directly:
+/// [slashQuery] and [filterCommands] rather than on the widget directly:
 /// both are plain functions a composer calls to decide what list to hand the
 /// palette, and a text field wired to them is the honest way to show what
 /// they actually do.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -81,8 +93,8 @@ final ComponentDocSpec agentSlashPaletteDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElAgentSlashPalette, ElAgentCommand '
-              'and ElAgentCommandGroup are reachable the same way the CLI '
+              'Add the export line so AgentSlashPalette, AgentCommand '
+              'and AgentCommandGroup are reachable the same way the CLI '
               'path already makes them.',
           code: "export 'agent_slash_palette.dart';",
         ),
@@ -121,15 +133,15 @@ final ComponentDocSpec agentSlashPaletteDocSpec = ComponentDocSpec(
       specimen: _ActiveRowSpecimen(),
       code: _activeRowCode,
       label: 'Active row specimen view',
-      minHeight: el(64),
+      minHeight: space(64),
     ),
     ShowcaseSection(
       id: 'filtering',
       title: 'Filtering',
       description:
-          'elSlashQuery(value, caret) returns null the instant the field '
+          'slashQuery(value, caret) returns null the instant the field '
           'does not start with "/", so typing "and/or" never opens '
-          'anything; elFilterCommands then keeps only the commands whose id '
+          'anything; filterCommands then keeps only the commands whose id '
           'or label contains the typed substring, case-insensitively. '
           'Clear the field down to just "/" to see the unfiltered list '
           'again.',
@@ -141,22 +153,22 @@ final ComponentDocSpec agentSlashPaletteDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElAgentSlashPalette declares, its '
-          'own public statics, every ElAgentCommand field, the '
-          'ElAgentCommandGroup values, and the two top-level functions the '
+          'Every constructor parameter AgentSlashPalette declares, its '
+          'own public statics, every AgentCommand field, the '
+          'AgentCommandGroup values, and the two top-level functions the '
           'file exports.',
       children: const <DocsTocEntry>[
         DocsTocEntry(
-          title: 'ElAgentSlashPalette',
+          title: 'AgentSlashPalette',
           anchor: 'api-elagentslashpalette',
         ),
         DocsTocEntry(
-          title: 'ElAgentSlashPalette static values',
+          title: 'AgentSlashPalette static values',
           anchor: 'api-elagentslashpalette-static',
         ),
-        DocsTocEntry(title: 'ElAgentCommand', anchor: 'api-elagentcommand'),
+        DocsTocEntry(title: 'AgentCommand', anchor: 'api-elagentcommand'),
         DocsTocEntry(
-          title: 'ElAgentCommandGroup',
+          title: 'AgentCommandGroup',
           anchor: 'api-elagentcommandgroup',
         ),
         DocsTocEntry(
@@ -170,7 +182,7 @@ final ComponentDocSpec agentSlashPaletteDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off ElAgentSlashPalette.build and _PaletteBoxState, not '
+          'Read off AgentSlashPalette.build and _PaletteBoxState, not '
           'inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -214,8 +226,7 @@ final ComponentDocSpec agentSlashPaletteDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value:
-                'example/test/components_docs/agent_slash_palette_test.dart',
+            value: 'example/test/components_docs/agent_slash_palette_test.dart',
             description:
                 'Covers this page: the article mounts, the full API table, '
                 'and every live specimen this page claims to show.',
@@ -244,9 +255,9 @@ class AgentSlashPaletteDocPage extends StatelessWidget {
       title: agentSlashPaletteDoc.title,
       description: agentSlashPaletteDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Agent Slash Palette'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Agent Slash Palette'),
     ],
     toc: agentSlashPaletteDocSpec.toc,
     previous: null,
@@ -264,34 +275,34 @@ class AgentSlashPaletteDocPage extends StatelessWidget {
 // consistently: two skills (the agent's own registered tools) and two
 // browser commands (never sent to the agent).
 
-const List<ElAgentCommand> _paletteCommands = <ElAgentCommand>[
-  ElAgentCommand(
+const List<AgentCommand> _paletteCommands = <AgentCommand>[
+  AgentCommand(
     id: 'find-comps',
     label: 'find-comps',
     hint: 'Find comparable sold listings for this card',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.search,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.search,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'summarize',
     label: 'summarize',
     hint: 'Summarize this conversation',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.sparkles,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.sparkles,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'clear',
     label: 'clear',
     hint: 'Clear this conversation',
-    group: ElAgentCommandGroup.command,
-    icon: ElLucide.trash2,
+    group: AgentCommandGroup.command,
+    icon: Lucide.trash2,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'voice',
     label: 'voice',
     hint: 'Switch to voice mode',
-    group: ElAgentCommandGroup.command,
-    icon: ElLucide.mic,
+    group: AgentCommandGroup.command,
+    icon: Lucide.mic,
   ),
 ];
 
@@ -310,28 +321,26 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         SizedBox(
-          width: el(90),
-          child: ElAgentSlashPalette(
-            key: const ValueKey<String>(
-              'agent-slash-palette-preview:palette',
-            ),
+          width: space(90),
+          child: AgentSlashPalette(
+            key: const ValueKey<String>('agent-slash-palette-preview:palette'),
             commands: _paletteCommands,
             activeIndex: _activeIndex,
             onHover: (int index) => setState(() => _activeIndex = index),
-            onSelect: (ElAgentCommand command) =>
+            onSelect: (AgentCommand command) =>
                 setState(() => _status = 'Selected: /${command.id}'),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElText(
+        SizedBox(height: space(3)),
+        StyledText(
           _status,
-          ElType.small,
+          TextStyles.small,
           key: const ValueKey<String>('agent-slash-palette-preview:status'),
           color: theme.mutedForeground,
         ),
@@ -341,7 +350,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 }
 
 const String _previewCode = '''
-ElAgentSlashPalette(
+AgentSlashPalette(
   commands: commands, // 2 skills, 2 commands
   activeIndex: activeIndex,
   onHover: (index) => setState(() => activeIndex = index),
@@ -353,39 +362,35 @@ class _GroupsSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(4),
-    runSpacing: el(4),
+    spacing: space(4),
+    runSpacing: space(4),
     children: <Widget>[
       SizedBox(
-        width: el(76),
-        child: ElAgentSlashPalette(
+        width: space(76),
+        child: AgentSlashPalette(
           key: const ValueKey<String>(
             'agent-slash-palette-example:skills-only',
           ),
           commands: _paletteCommands
-              .where(
-                (ElAgentCommand c) => c.group == ElAgentCommandGroup.skill,
-              )
+              .where((AgentCommand c) => c.group == AgentCommandGroup.skill)
               .toList(),
           activeIndex: -1,
           onHover: (int _) {},
-          onSelect: (ElAgentCommand _) {},
+          onSelect: (AgentCommand _) {},
         ),
       ),
       SizedBox(
-        width: el(76),
-        child: ElAgentSlashPalette(
+        width: space(76),
+        child: AgentSlashPalette(
           key: const ValueKey<String>(
             'agent-slash-palette-example:commands-only',
           ),
           commands: _paletteCommands
-              .where(
-                (ElAgentCommand c) => c.group == ElAgentCommandGroup.command,
-              )
+              .where((AgentCommand c) => c.group == AgentCommandGroup.command)
               .toList(),
           activeIndex: -1,
           onHover: (int _) {},
-          onSelect: (ElAgentCommand _) {},
+          onSelect: (AgentCommand _) {},
         ),
       ),
     ],
@@ -394,8 +399,8 @@ class _GroupsSpecimen extends StatelessWidget {
 
 const String _groupsCode = '''
 // Only the Skills group has rows: no "Commands" heading prints.
-ElAgentSlashPalette(
-  commands: commands.where((c) => c.group == ElAgentCommandGroup.skill).toList(),
+AgentSlashPalette(
+  commands: commands.where((c) => c.group == AgentCommandGroup.skill).toList(),
   activeIndex: -1,
   onHover: (index) {},
   onSelect: (command) {},
@@ -406,19 +411,19 @@ class _ActiveRowSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: el(90),
-    child: ElAgentSlashPalette(
+    width: space(90),
+    child: AgentSlashPalette(
       key: const ValueKey<String>('agent-slash-palette-example:active-row'),
       commands: _paletteCommands,
       activeIndex: 2,
       onHover: (int _) {},
-      onSelect: (ElAgentCommand _) {},
+      onSelect: (AgentCommand _) {},
     ),
   );
 }
 
 const String _activeRowCode = '''
-ElAgentSlashPalette(
+AgentSlashPalette(
   commands: commands,
   activeIndex: 2, // third row down, across both groups
   onHover: (index) {},
@@ -445,18 +450,18 @@ class _FilteringSpecimenState extends State<_FilteringSpecimen> {
   @override
   Widget build(BuildContext context) {
     final String value = _controller.text;
-    final String? query = elSlashQuery(value, value.length);
-    final List<ElAgentCommand> matches = query == null
-        ? const <ElAgentCommand>[]
-        : elFilterCommands(_paletteCommands, query);
+    final String? query = slashQuery(value, value.length);
+    final List<AgentCommand> matches = query == null
+        ? const <AgentCommand>[]
+        : filterCommands(_paletteCommands, query);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         SizedBox(
-          width: el(90),
-          child: ElInput(
+          width: space(90),
+          child: Input(
             key: const ValueKey<String>(
               'agent-slash-palette-example:filter-input',
             ),
@@ -464,17 +469,15 @@ class _FilteringSpecimenState extends State<_FilteringSpecimen> {
             onChanged: (String _) => setState(() {}),
           ),
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         SizedBox(
-          width: el(90),
-          child: ElAgentSlashPalette(
-            key: const ValueKey<String>(
-              'agent-slash-palette-example:filtered',
-            ),
+          width: space(90),
+          child: AgentSlashPalette(
+            key: const ValueKey<String>('agent-slash-palette-example:filtered'),
             commands: matches,
             activeIndex: _activeIndex,
             onHover: (int index) => setState(() => _activeIndex = index),
-            onSelect: (ElAgentCommand command) =>
+            onSelect: (AgentCommand command) =>
                 setState(() => _controller.text = '/${command.id} '),
           ),
         ),
@@ -484,12 +487,12 @@ class _FilteringSpecimenState extends State<_FilteringSpecimen> {
 }
 
 const String _filteringCode = '''
-final String? query = elSlashQuery(fieldValue, caretIndex);
-final List<ElAgentCommand> matches = query == null
+final String? query = slashQuery(fieldValue, caretIndex);
+final List<AgentCommand> matches = query == null
     ? const []
-    : elFilterCommands(allCommands, query);
+    : filterCommands(allCommands, query);
 
-ElAgentSlashPalette(
+AgentSlashPalette(
   commands: matches,
   activeIndex: activeIndex,
   onHover: (index) => setState(() => activeIndex = index),
@@ -501,7 +504,7 @@ ElAgentSlashPalette(
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElAgentSlashPalette(
+AgentSlashPalette(
   commands: commands,
   activeIndex: activeIndex,
   onSelect: (command) => runCommand(command),
@@ -517,33 +520,30 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elagentslashpalette',
-        child: DocsApiTable(
-          title: 'ElAgentSlashPalette',
-          facts: _paletteFacts,
-        ),
+        child: DocsApiTable(title: 'AgentSlashPalette', facts: _paletteFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentslashpalette-static',
         child: DocsApiTable(
-          title: 'ElAgentSlashPalette static values',
+          title: 'AgentSlashPalette static values',
           facts: _paletteStaticFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentcommand',
-        child: DocsApiTable(title: 'ElAgentCommand', facts: _commandFacts),
+        child: DocsApiTable(title: 'AgentCommand', facts: _commandFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagentcommandgroup',
         child: DocsApiTable(
-          title: 'ElAgentCommandGroup',
+          title: 'AgentCommandGroup',
           facts: _commandGroupFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-top-level-functions',
         child: DocsApiTable(
@@ -558,7 +558,7 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _paletteFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'commands',
-    type: 'List<ElAgentCommand>',
+    type: 'List<AgentCommand>',
     description:
         'Required. Already filtered by the caller — the palette does not '
         'filter, sort, or paginate what it is handed.',
@@ -573,7 +573,7 @@ const List<DocsApiFact> _paletteFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'onSelect',
-    type: 'ValueChanged<ElAgentCommand>',
+    type: 'ValueChanged<AgentCommand>',
     description:
         'Required. Fires from a row\'s PointerDownEvent (onMouseDown, not '
         'onClick — see Keyboard) or a tap.',
@@ -591,65 +591,64 @@ const List<DocsApiFact> _paletteStaticFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'maxHeight',
     type: 'double',
-    description: 'el(64) — 256. The scrolling box never grows past this.',
+    description: 'space(64) — 256. The scrolling box never grows past this.',
   ),
   DocsApiFact(
     name: 'bottomGap',
     type: 'double',
     description:
-        "el(2) — 8. The gap this widget's own layout reserves below "
+        "space(2) — 8. The gap this widget's own layout reserves below "
         'itself, for a caller stacking it over a composer.',
   ),
   DocsApiFact(
     name: 'entrance',
     type: 'Duration',
     description:
-        'ElDurations.slow — 400ms. The fade/rise-in tween duration, run '
+        'MotionDurations.slow — 400ms. The fade/rise-in tween duration, run '
         'once on mount and never again while the same element stays '
         'mounted.',
   ),
   DocsApiFact(
     name: 'rise',
     type: 'double',
-    description: "el(2.5) — 10. The entrance tween's own translateY start.",
+    description: "space(2.5) — 10. The entrance tween's own translateY start.",
   ),
   DocsApiFact(
     name: 'headingInsets',
     type: 'EdgeInsets',
-    description: 'fromLTRB(el(3), el(3), el(3), el(1)) on a group heading.',
+    description:
+        'fromLTRB(space(3), space(3), space(3), space(1)) on a group heading.',
   ),
   DocsApiFact(
     name: 'rowInsets',
     type: 'EdgeInsets',
-    description: 'symmetric(horizontal: el(3), vertical: el(2)) on a row.',
+    description:
+        'symmetric(horizontal: space(3), vertical: space(2)) on a row.',
   ),
   DocsApiFact(
     name: 'rowGap',
     type: 'double',
-    description: "el(3) — 12. Between a row's glyph and its text column.",
+    description: "space(3) — 12. Between a row's glyph and its text column.",
   ),
   DocsApiFact(
     name: 'lineGap',
     type: 'double',
-    description: 'el(1) — 4. Between the id line and the hint line.',
+    description: 'space(1) — 4. Between the id line and the hint line.',
   ),
   DocsApiFact(
     name: 'glyphTopInset',
     type: 'double',
-    description: "el(1) — 4. The glyph's own top offset against the first "
+    description:
+        "space(1) — 4. The glyph's own top offset against the first "
         'line.',
   ),
-  DocsApiFact(
-    name: 'glyphSize',
-    type: 'double',
-    description: 'el(4) — 16.',
-  ),
+  DocsApiFact(name: 'glyphSize', type: 'double', description: 'space(4) — 16.'),
   DocsApiFact(
     name: 'lucideStroke',
     type: 'double',
     description:
-        "ElIcon.strokeFor(ElIconPaths.viewBox) — lucide's own authored "
-        'stroke width, not the ElIcon wrapper\'s derived one. A row '
+        "Icon.strokeFor(IconPaths.viewBox) — lucide's own authored "
+        'stroke width, not the Icon wrapper\'s derived one. A row '
         'renders command.icon raw, which is why this glyph reads thinner '
         'than the plus menu\'s.',
   ),
@@ -674,12 +673,12 @@ const List<DocsApiFact> _commandFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'group',
-    type: 'ElAgentCommandGroup',
+    type: 'AgentCommandGroup',
     description: 'Required. Which section this command renders under.',
   ),
   DocsApiFact(
     name: 'icon',
-    type: 'ElLucideGlyph?',
+    type: 'LucideGlyph?',
     description:
         'Optional. Usually derived from the state the command\'s tool '
         'maps to, so one capability carries one mark everywhere it '
@@ -696,7 +695,8 @@ const List<DocsApiFact> _commandFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'directive',
     type: 'String?',
-    description: 'Optional. Text written into the composer for the user '
+    description:
+        'Optional. Text written into the composer for the user '
         'to send.',
   ),
 ];
@@ -718,7 +718,7 @@ const List<DocsApiFact> _commandGroupFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _functionFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'elSlashQuery(value, caret)',
+    name: 'slashQuery(value, caret)',
     type: 'String? Function(String, int)',
     description:
         'Null unless value starts with "/" AND the text up to caret '
@@ -727,8 +727,8 @@ const List<DocsApiFact> _functionFacts = <DocsApiFact>[
         'caret, empty string included.',
   ),
   DocsApiFact(
-    name: 'elFilterCommands(commands, query)',
-    type: 'List<ElAgentCommand> Function(List<ElAgentCommand>, String)',
+    name: 'filterCommands(commands, query)',
+    type: 'List<AgentCommand> Function(List<AgentCommand>, String)',
     description:
         'A plain, case-insensitive substring match over id and label. An '
         'empty query returns the input list unchanged. No fuzzy matching: '
@@ -742,7 +742,7 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Semantic role: every row wraps Semantics(button: true, selected: '
             'active) — active is activeIndex == this row\'s own position, '
             'nothing else.',
@@ -766,10 +766,10 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'This file binds no key at all. There is no Focus, no FocusNode, '
             'no onKeyEvent anywhere in agent_slash_palette.dart: '
-            'ElAgentSlashPalette cannot intercept a keystroke on its own.',
+            'AgentSlashPalette cannot intercept a keystroke on its own.',
         'ArrowDown/ArrowUp, Enter and Escape are entirely the composer\'s '
             'own job, out of scope for this page — the class doc says so '
             'directly: "the open query, the matches and the highlight all '
@@ -785,7 +785,7 @@ class _KeyboardContent extends StatelessWidget {
             'active ROW: keyboard-walking past the second row never '
             'brings the highlight back into view, because every index '
             'from 2 up resolves to nothing and scrolls nothing. See '
-            'ElAgentSlashPalette.scrollsGroupsNotRows above.',
+            'AgentSlashPalette.scrollsGroupsNotRows above.',
       ]);
 }
 
@@ -794,11 +794,11 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in agent_slash_palette.dart: '
             'BuildContext width is never read.',
         'The widget claims no width of its own — every measurement here '
-            'is el() height and inset, none of them horizontal sizing — so '
+            'is space() height and inset, none of them horizontal sizing — so '
             'the caller\'s own SizedBox or the composer\'s w-full decides '
             'how wide it renders. This page wraps every specimen in a '
             'fixed-width SizedBox to give it something to measure against.',
@@ -815,28 +815,28 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/agent_slash_palette.dart. No companion '
             'parts.',
         'Flutter imports: package:flutter/gestures.dart (PointerEnterEvent, '
             'PointerDownEvent), package:flutter/rendering.dart '
             '(RenderAbstractViewport, for the group-scroll-into-view), '
             'package:flutter/widgets.dart.',
-        'Foundation imports: colors.dart, motion.dart (ElDurations, '
-            'ElCurves), shadows.dart (ElShadows.e3), spacing.dart (el()), '
+        'Foundation imports: colors.dart, motion.dart (MotionDurations, '
+            'MotionCurves), shadows.dart (Shadows.lg), spacing.dart (space()), '
             'theme.dart, typography.dart, theme_scope.dart.',
-        'Component imports: icon.dart (ElIcon.lucide, ElIconTone), '
-            'icon_paths.dart and icon_paths.g.dart (ElLucideGlyph, '
-            'ElLucide, ElIconPaths.viewBox for lucideStroke).',
+        'Component imports: icon.dart (Icon.lucide, IconTone), '
+            'icon_paths.dart and icon_paths.g.dart (LucideGlyph, '
+            'Lucide, IconPaths.viewBox for lucideStroke).',
         'registryDependencies, resolved automatically by `elattar add '
             'agent-slash-palette`: icon, source-foundation — copied '
             'verbatim from registry/components/agent-slash-palette.json.',
         'semanticDependencies (the manifest\'s own, narrower field): '
             'icon.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: DocsLinkRow(
           links: <DocsLink>[DocsLink(label: 'Icon', route: '/components/icon')],
         ),
@@ -849,34 +849,39 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Every colour is read live off ElTheme.of(context) at build time: '
-            'theme.popover (the box fill), theme.border (the box border '
-            'and the 1px header-strip-equivalent rule this widget does '
-            'not have), theme.mutedForeground (group headings and hints), '
-            'theme.foreground (the id line), theme.accent (an active '
-            'row\'s fill), theme.agent (every glyph, via a DefaultTextStyle '
-            'merge). Flipping ElThemeController re-resolves every one on '
-            'the next frame.',
-        'Elevation: ElShadows.e3, the same token on every render — there '
-            'is no rest/hover/pressed shadow variation, because the box '
-            'itself never receives a pointer, only its rows do.',
-        'No override hatch: unlike ElButtonSurface on Button, this widget '
-            'takes no colour or shape parameters at all. Restyling it '
-            'means forking the file.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'Every colour is read live off ThemeScope.of(context) at build time: '
+        'theme.popover (the box fill), theme.border (the box border '
+        'and the 1px header-strip-equivalent rule this widget does '
+        'not have), theme.mutedForeground (group headings and hints), '
+        'theme.foreground (the id line), theme.accent (an active '
+        'row\'s fill), theme.agentAccent (every glyph, via a DefaultTextStyle '
+        'merge). Flipping ThemeController re-resolves every one on '
+        'the next frame.',
+    'Elevation: Shadows.lg, the same token on every render — there '
+        'is no rest/hover/pressed shadow variation, because the box '
+        'itself never receives a pointer, only its rows do.',
+    'No override hatch: unlike ButtonStyleRecipe on Button, this widget '
+        'takes no colour or shape parameters at all. Restyling it '
+        'means forking the file.',
+  ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -884,38 +889,46 @@ Widget _bullets(ElThemeData theme, List<String> lines) => Column(
 const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Empty',
-    treatment: 'commands.isEmpty short-circuits to SizedBox.shrink(): '
+    treatment:
+        'commands.isEmpty short-circuits to SizedBox.shrink(): '
         'nothing mounts at all, not an empty box.',
-    userSignal: 'The palette disappears entirely — a caller closes its own '
+    userSignal:
+        'The palette disappears entirely — a caller closes its own '
         'overlay, if any, on the same condition.',
   ),
   DocsStateFact(
     state: 'Populated',
-    treatment: 'One group heading per non-empty group, Skills before '
+    treatment:
+        'One group heading per non-empty group, Skills before '
         'Commands, in that fixed order regardless of how the caller\'s '
         'own list is ordered.',
     userSignal: 'The rows this specimen shows above.',
   ),
   DocsStateFact(
     state: 'Row highlighted',
-    treatment: "i == activeIndex paints theme.accent behind that row's "
-        'own Padding; every other row paints elTransparent.',
+    treatment:
+        "i == activeIndex paints theme.accent behind that row's "
+        'own Padding; every other row paints transparent.',
     userSignal: 'One row reads visually "current" — see Active row above.',
   ),
   DocsStateFact(
     state: 'Row hovered',
-    treatment: 'MouseRegion.onEnter calls onHover(i); the widget applies '
+    treatment:
+        'MouseRegion.onEnter calls onHover(i); the widget applies '
         'no fill of its own from hover — the caller decides whether '
         'hovering moves activeIndex.',
-    userSignal: "Whatever the caller's own onHover implementation does; "
+    userSignal:
+        "Whatever the caller's own onHover implementation does; "
         'in every specimen on this page, the same accent fill as an '
         'active row.',
   ),
   DocsStateFact(
     state: 'Mount / entrance',
-    treatment: 'A TweenAnimationBuilder runs once, opacity 0→1 and a '
-        '10px→0 translateY, over ElDurations.slow (400ms) on ElCurves.out.',
-    userSignal: 'A fade-and-rise on first paint; filtering the same '
+    treatment:
+        'A TweenAnimationBuilder runs once, opacity 0→1 and a '
+        '10px→0 translateY, over MotionDurations.slow (400ms) on MotionCurves.enter.',
+    userSignal:
+        'A fade-and-rise on first paint; filtering the same '
         'mounted instance does not replay it.',
   ),
 ];

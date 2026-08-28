@@ -1,7 +1,7 @@
 # Map — `/design-system/colors` (Colors foundation page)
 
 **Route file:** `D:\DESIGN\Design-System-2026-8\design-system\app\design-system\colors\page.tsx` (server component, no local components).
-**Imports that render:** `Code, ElPageHeader, ElSection, Note, PageFootNav, Panel` from `D:\DESIGN\Design-System-2026-8\design-system\components\el\kit.tsx`; `TokenSwatchList` from `D:\DESIGN\Design-System-2026-8\design-system\components\el\token-swatch.tsx` (client); `findCategory` from `D:\DESIGN\Design-System-2026-8\design-system\lib\el\nav.ts`; `Icon` from `D:\DESIGN\Design-System-2026-8\design-system\components\ui\icon.tsx` (via kit's `PageFootNav`). Token values: `D:\DESIGN\Design-System-2026-8\design-system\app\globals.css`. Shell: `app\design-system\layout.tsx`, `app\layout.tsx`.
+**Imports that render:** `Code, PageHeader, Section, Note, PageFootNav, Panel` from `D:\DESIGN\Design-System-2026-8\design-system\components\el\kit.tsx`; `TokenSwatchList` from `D:\DESIGN\Design-System-2026-8\design-system\components\el\token-swatch.tsx` (client); `findCategory` from `D:\DESIGN\Design-System-2026-8\design-system\lib\el\nav.ts`; `Icon` from `D:\DESIGN\Design-System-2026-8\design-system\components\ui\icon.tsx` (via kit's `PageFootNav`). Token values: `D:\DESIGN\Design-System-2026-8\design-system\app\globals.css`. Shell: `app\design-system\layout.tsx`, `app\layout.tsx`.
 
 ---
 
@@ -9,8 +9,8 @@
 
 - `app/layout.tsx`: `<html class="${GeistMono.variable} h-full antialiased" suppressHydrationWarning>`; `next-themes` `ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange`. **Default theme is dark.**
 - `app/design-system/layout.tsx`: sticky header `h-(--height-site-header)` = **4rem/64px**, `z-40 border-b border-border bg-background/85 backdrop-blur-xl px-6`, containing mobile-nav trigger (`lg:hidden`, sheet `w-72`), Logo link with `press`, pill `type-micro rounded-pill border border-border px-2.5 py-1` reading verbatim **"Design System v0.1"** (`hidden sm:block`), right-aligned `type-micro` verbatim **"Desktop-first · 1440 frame · Light & dark"** (`hidden md:block`), and the ThemeToggle (3-way radiogroup Light/System/Dark, sliding pill indicator `bg-card shadow-e1`, options `size-7` icons `size-3.5`, `press` on each).
-- Content frame: `mx-auto flex w-full max-w-(--width-shell)` = **1680px**; `ElSidebar` = `aside sticky top-16 hidden lg:block h-[calc(100dvh-4rem)] w-60 border-r border-border px-6 pt-10 overflow-y-auto` (nav items `type-nav`, group labels `type-label`, left-border active markers); `main min-w-0 flex-1 px-6 py-12 lg:px-12` → inner `mx-auto max-w-(--width-content)` = **1080px**.
-- Body backdrop (both themes): `radial-gradient(120% 90% at 62% 34%, var(--page-glow) 0%, transparent 64%)`, `background-attachment: fixed`, over `bg-background`. `--page-glow`: light `hsl(240 30% 98%)`, dark `hsl(240 8% 10%)`.
+- Content frame: `mx-auto flex w-full max-w-(--width-shell)` = **1680px**; `Sidebar` = `aside sticky top-16 hidden lg:block h-[calc(100dvh-4rem)] w-60 border-r border-border px-6 pt-10 overflow-y-auto` (nav items `type-nav`, group labels `type-label`, left-border active markers); `main min-w-0 flex-1 px-6 py-12 lg:px-12` → inner `mx-auto max-w-(--width-content)` = **1080px**.
+- Body backdrop (both themes): `radial-gradient(120% 90% at 62% 34%, var(--background-effect) 0%, transparent 64%)`, `background-attachment: fixed`, over `bg-background`. `--background-effect`: light `hsl(240 30% 98%)`, dark `hsl(240 8% 10%)`.
 - Global: `:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px }` (`--ring` = `--color-action` light, `--color-action-bright` dark). `::selection` = `color-mix(in oklab, var(--color-action) 35%, transparent)` with `color: var(--foreground)`. `html { scroll-behavior: smooth; scroll-padding-block-start: var(--scroll-offset) }` where `--scroll-offset = calc(4rem + var(--spacing)*8)` = **96px** — anchored sections land 96px below viewport top, animated smooth (disabled under `prefers-reduced-motion`).
 
 ---
@@ -37,7 +37,7 @@ This is the page's engine; port it faithfully or precompute per theme.
 
 ---
 
-## 2. Page header (`ElPageHeader`)
+## 2. Page header (`PageHeader`)
 
 `header.mb-14.border-b.border-border.pb-10`:
 - Eyebrow `p.type-label.text-action-ink` (11px/1/600, uppercase, tracking 0.16em): verbatim **"Foundations"** (from `findCategory("foundations","colors").group.title`).
@@ -53,7 +53,7 @@ This is the page's engine; port it faithfully or precompute per theme.
 
 ⚠ **Rendering fact for 1:1 port:** the `Note` title looks like it should take the tone ink, but `.type-label` declares `color: var(--muted-foreground)` on the element itself, which beats inheritance of the wrapper's `text-action-ink`. **Note titles render muted-foreground in every tone**; the tone shows only in the border + background wash. `Code` inline = `code.type-code.rounded-sm.border.border-border.bg-card.px-1.5.py-0.5.text-muted-foreground` (mono 12.5px/1.4, radius 6px).
 
-## 4. Section anatomy (`ElSection`, all five)
+## 4. Section anatomy (`Section`, all five)
 
 `section#<id>.mb-20` (80px stack gap); heading block `mb-6`: `h2.type-h3.text-foreground` (21px/1.3/600, tracking −0.01em — note it is **type-h3**, not h2 class) + description `p.type-small.mt-2.max-w-2xl` (muted). No `scroll-mt` (global scroll-padding handles the 96px offset).
 
@@ -175,9 +175,9 @@ Description verbatim: **"Two things this system refuses to express as a colour, 
 
 Layout: `div.grid.gap-4.sm:grid-cols-2` with two `Panel`s. Panel anatomy: `div.overflow-hidden.rounded-xl.border.border-border.bg-card`; header strip `flex items-baseline justify-between gap-4 border-b border-border bg-muted px-5 py-3` with `span.type-label.text-muted-foreground`; body `div.bg-background.p-6` (not flush).
 
-**Panel 1 — label "Texture"**, body `p.type-small` verbatim (with `<em>texture</em>` italic and `Code` chips `globals.css`, `foil-value`, `bloom-cosmic`, `sheen-action`):
+**Panel 1 — label "Texture"**, body `p.type-small` verbatim (with `<em>texture</em>` italic and `Code` chips `globals.css`, `premium-surface`, `feedback-surface`, `action-feedback`):
 
-> "A surface that has to feel rare, precious or alive is a *texture*, not a hue — a moving gradient, a foil ramp, an iridescent bloom. Those live in `globals.css` as utilities (`foil-value`, `bloom-cosmic`, `sheen-action`) and are built from the two ramps above, so they follow a rebrand without carrying colour tokens of their own."
+> "A surface that has to feel rare, precious or alive is a *texture*, not a hue — a moving gradient, a foil ramp, an iridescent bloom. Those live in `globals.css` as utilities (`premium-surface`, `feedback-surface`, `action-feedback`) and are built from the two ramps above, so they follow a rebrand without carrying colour tokens of their own."
 
 **Panel 2 — label "Meaning"**, body verbatim:
 
@@ -271,6 +271,6 @@ The **badge** columns in §5–8 are unaffected and were re-confirmed against th
 
 ### What the port does with it
 
-`ElTokenRegistry.printedValue` no longer carries a per-token string table. Shortest-hex is a pure function of the resolved colour, so the readout is **derived** from the same `ElThemeData` field the swatch paints (`elCssColorText` in `example/lib/token_swatch.dart`) — nothing is hardcoded, and a rebrand moves the swatch and its caption together. Verified against all 43 custom properties the compiled sheet actually emits, both themes, exact string match.
+`TokenRegistry.printedValue` no longer carries a per-token string table. Shortest-hex is a pure function of the resolved colour, so the readout is **derived** from the same `ThemeData` field the swatch paints (`elCssColorText` in `example/lib/token_swatch.dart`) — nothing is hardcoded, and a rebrand moves the swatch and its caption together. Verified against all 43 custom properties the compiled sheet actually emits, both themes, exact string match.
 
 Also observed while sweeping the full registry, and *not* acted on: `--color-success-ink`, `--color-warning-ink`, `--color-info-ink` and `--color-destructive-ink` return **empty** on the live page — Tailwind tree-shakes `@theme` variables no generated utility references. None is swatched on this page. The port keeps them registered, since their absence is a property of what the reference site happens to use rather than of the design system.

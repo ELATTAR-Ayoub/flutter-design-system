@@ -21,12 +21,12 @@ Build a coherent, useful interface from the existing Flutter design system. Trea
 ## Non-negotiable contract
 
 Paths in this section are repository-mode names. In consumer mode substitute
-`lib/design_system/foundation/` for `lib/src/foundation/` and
-`lib/components/ui/` for `lib/src/components/`, and import through the generated
+`lib/design_system/foundation/` for `lib/src/design_system/foundation/` and
+`lib/components/ui/` for `lib/src/components/ui/`, and import through the generated
 barrels instead of the package — see [system-map.md](references/system-map.md).
 
 - Import the design system through the entry point your mode provides: `package:elattar_design_system/elattar_design_system.dart` in repository mode, the generated `lib/components/ui/ui.dart` and `lib/design_system/foundation.dart` barrels in consumer mode. Do not reach past either into private internals.
-- Make geometry from `el(...)`, `ElWidths`, `ElContainers`, `ElBreakpoints`, component APIs, or derived constraints. Make color from `ElTheme.of(context)` / semantic variants; type from `ElText` and `ElType`; timing/curves from `ElDurations`, `ElCurves`, and motion widgets.
+- Make geometry from `space(...)`, `LayoutWidths`, `Containers`, `Breakpoints`, component APIs, or derived constraints. Make color from `ThemeScope.of(context)` / semantic variants; type from `StyledText` and `TextStyles`; timing/curves from `MotionDurations`, `MotionCurves`, and motion widgets.
 - Never add raw colors, font sizes/weights/tracking/leading, radii, shadows, stock Flutter curves, or `Duration` literals outside the foundation directory. Do not hide a visual literal behind a local constant; a guard escape hatch needs a proven external-integration reason. Repository mode enforces this with `test/token_guard_test.dart`; consumer mode has no guard, so apply the rule by review.
 - Prefer a semantic, stateful component over a styled `Container`, `Text`, `ElevatedButton`, or ad-hoc snackbar. Keep domain-specific composition outside the system component tree.
 - Use status variants only for their meaning. Keep one clear primary action. Do not change foundation tokens to solve a single screen or use `Theme.of(context)` as a parallel visual system.

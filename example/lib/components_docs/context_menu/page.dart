@@ -1,6 +1,6 @@
 /// Public documentation page for the `context_menu` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button`, `field` and `dropdown_menu`
@@ -18,8 +18,8 @@
 /// Installation, Usage, Composition, Basic, Submenu, Shortcuts, Groups,
 /// Icons, Checkboxes, Radio, Destructive, Sides, RTL, API Reference. Sides
 /// is skipped and named here instead: it configures `side`/`align` on
-/// `ContextMenuContent`, and ElContextMenu hardcodes `side:
-/// ElPopoverSide.right, align: ElPopoverAlign.start` without exposing
+/// `ContextMenuContent`, and ContextMenu hardcodes `side:
+/// PopoverSide.right, align: PopoverAlign.start` without exposing
 /// either, so there is nothing to demonstrate.
 ///
 /// **Split history.** This component used to be documented on the
@@ -45,7 +45,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -91,7 +103,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElContextMenu is reachable the '
+              'Add the export line so ContextMenu is reachable the '
               'same way the CLI path already makes it.',
           code: "export 'context_menu.dart';",
         ),
@@ -110,17 +122,17 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          "What the constructor assembles internally. ElContextMenu does "
+          "What the constructor assembles internally. ContextMenu does "
           "not take a caller-assembled tree of sub-widgets the way "
           "shadcn's ContextMenuSub markup does: it takes a flat children "
-          'list of ElMenuChild rows.',
+          'list of MenuChild rows.',
       code: _contextMenuCompositionCode,
     ),
     ShowcaseSection(
       id: 'basic',
       title: 'Basic',
       description:
-          'The simplest right-click menu: two plain ElMenuItem rows, no '
+          'The simplest right-click menu: two plain MenuItem rows, no '
           'checkboxes, radios, or submenus.',
       specimen: _ContextMenuBasic(),
       code: _contextMenuBasicCode,
@@ -130,7 +142,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       id: 'submenu',
       title: 'Submenu',
       description:
-          "A ElMenuSub row opens a second content anchored to its own "
+          "A MenuSub row opens a second content anchored to its own "
           'right edge, roughly 100ms after the pointer rests on it.',
       specimen: _ContextMenuSubmenu(),
       code: _contextMenuSubmenuCode,
@@ -140,7 +152,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       id: 'shortcuts',
       title: 'Shortcuts',
       description:
-          'ElMenuItem.shortcut right-aligns a key hint. It is display '
+          'MenuItem.shortcut right-aligns a key hint. It is display '
           'only: the source does not wire the shortcut to a real key '
           'handler.',
       specimen: _ContextMenuShortcuts(),
@@ -151,7 +163,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       id: 'groups',
       title: 'Groups',
       description:
-          'ElMenuGroup paints nothing: its rows sit flush with their '
+          'MenuGroup paints nothing: its rows sit flush with their '
           'neighbours. It exists to mark related actions and to give a '
           'future accessible label something to hang off.',
       specimen: _ContextMenuGroups(),
@@ -162,7 +174,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       id: 'icons',
       title: 'Icons',
       description:
-          "The same ElMenuItem.icon slot Menubar uses: a leading glyph "
+          "The same MenuItem.icon slot Menubar uses: a leading glyph "
           'for faster visual scanning.',
       specimen: _ContextMenuIcons(),
       code: _contextMenuIconsCode,
@@ -172,7 +184,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       id: 'checkboxes',
       title: 'Checkboxes',
       description:
-          'ElMenuCheckboxItem for a toggleable option, right-click '
+          'MenuCheckboxItem for a toggleable option, right-click '
           "style. Same indicator side as a dropdown menu: the right "
           "edge, not Menubar's left.",
       specimen: _ContextMenuCheckboxes(),
@@ -183,7 +195,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       id: 'radio',
       title: 'Radio',
       description:
-          'ElMenuRadioGroup for a mutually exclusive choice, right-click '
+          'MenuRadioGroup for a mutually exclusive choice, right-click '
           'style.',
       specimen: _ContextMenuRadio(),
       code: _contextMenuRadioCode,
@@ -193,7 +205,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       id: 'destructive',
       title: 'Destructive',
       description:
-          "ElMenuItemVariant.destructive tints a row's ink and, once "
+          "MenuItemVariant.destructive tints a row's ink and, once "
           'highlighted, its fill: 10% of theme.destructive in light, '
           '20% in dark. The same specimen shown at the top of this '
           'page, mounted again under its own key.',
@@ -208,7 +220,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       title: 'RTL',
       description:
           "The right-click position itself does not mirror: "
-          "ElContextMenu anchors to the pointer's literal client "
+          "ContextMenu anchors to the pointer's literal client "
           'coordinates, which have no reading direction. Only the menu '
           'content reads right-to-left.',
       specimen: _ContextMenuRtl(),
@@ -219,12 +231,12 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElContextMenu declares, plus the '
+          'Every constructor parameter ContextMenu declares, plus the '
           'one static layout constant the source names.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElContextMenu', anchor: 'api-elcontextmenu'),
+        DocsTocEntry(title: 'ContextMenu', anchor: 'api-elcontextmenu'),
         DocsTocEntry(
-          title: 'ElContextMenu static helpers',
+          title: 'ContextMenu static helpers',
           anchor: 'api-elcontextmenu-static',
         ),
       ],
@@ -233,14 +245,13 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
     DisclosureSection(
       id: 'states',
       title: 'States',
-      description: 'Read straight off _ElContextMenuState, not inferred.',
+      description: 'Read straight off _ContextMenuState, not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
     DisclosureSection(
       id: 'accessibility',
       title: 'Accessibility',
-      description:
-          'Keyboard interactions have their own section below.',
+      description: 'Keyboard interactions have their own section below.',
       child: _AccessibilityContent(),
     ),
     DisclosureSection(
@@ -283,7 +294,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
             label: 'Row model source',
             value: 'lib/src/components/menu.dart',
             description:
-                'ElMenuChild and its variants: not documented on this '
+                'MenuChild and its variants: not documented on this '
                 'page. See the Dropdown Menu page for the full row-model '
                 'API tables.',
           ),
@@ -319,9 +330,9 @@ class ContextMenuDocPage extends StatelessWidget {
       title: contextMenuDocSpec.title,
       description: contextMenuDocSpec.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Context Menu'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Context Menu'),
     ],
     toc: contextMenuDocSpec.toc,
     previous: null,
@@ -346,25 +357,25 @@ class _ContextMenuSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElContextMenu(
+    return ContextMenu(
       key: ValueKey<String>(specimenKey),
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'Copy'),
-        ElMenuItem(label: 'Paste'),
-        ElMenuItem(label: 'Delete', variant: ElMenuItemVariant.destructive),
+      children: <MenuChild>[
+        MenuItem(label: 'Copy'),
+        MenuItem(label: 'Paste'),
+        MenuItem(label: 'Delete', variant: MenuItemVariant.destructive),
       ],
       child: Container(
         width: 200,
         height: 100,
         decoration: BoxDecoration(
-          border: Border.all(color: ElTheme.of(context).border),
-          borderRadius: BorderRadius.circular(el(2)),
+          border: Border.all(color: ThemeScope.of(context).border),
+          borderRadius: BorderRadius.circular(space(2)),
         ),
         child: Center(
-          child: ElText(
+          child: StyledText(
             'Right-click here',
-            ElType.small,
-            color: ElTheme.of(context).mutedForeground,
+            TextStyles.small,
+            color: ThemeScope.of(context).mutedForeground,
           ),
         ),
       ),
@@ -376,14 +387,14 @@ Widget _contextMenuTarget(BuildContext context, String label) => Container(
   width: 200,
   height: 100,
   decoration: BoxDecoration(
-    border: Border.all(color: ElTheme.of(context).border),
-    borderRadius: BorderRadius.circular(el(2)),
+    border: Border.all(color: ThemeScope.of(context).border),
+    borderRadius: BorderRadius.circular(space(2)),
   ),
   child: Center(
-    child: ElText(
+    child: StyledText(
       label,
-      ElType.small,
-      color: ElTheme.of(context).mutedForeground,
+      TextStyles.small,
+      color: ThemeScope.of(context).mutedForeground,
     ),
   ),
 );
@@ -393,10 +404,10 @@ class _ContextMenuBasic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElContextMenu(
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'Copy'),
-        ElMenuItem(label: 'Paste'),
+    return ContextMenu(
+      children: <MenuChild>[
+        MenuItem(label: 'Copy'),
+        MenuItem(label: 'Paste'),
       ],
       child: _contextMenuTarget(context, 'Right-click here'),
     );
@@ -408,14 +419,14 @@ class _ContextMenuSubmenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElContextMenu(
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'Back'),
-        ElMenuSub(
+    return ContextMenu(
+      children: <MenuChild>[
+        MenuItem(label: 'Back'),
+        MenuSub(
           label: 'More Tools',
-          children: <ElMenuChild>[
-            ElMenuItem(label: 'Save Page As...'),
-            ElMenuItem(label: 'Create Shortcut...'),
+          children: <MenuChild>[
+            MenuItem(label: 'Save Page As...'),
+            MenuItem(label: 'Create Shortcut...'),
           ],
         ),
       ],
@@ -429,11 +440,11 @@ class _ContextMenuShortcuts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElContextMenu(
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'Back', shortcut: '⌘['),
-        ElMenuItem(label: 'Forward', shortcut: '⌘]'),
-        ElMenuItem(label: 'Reload', shortcut: '⌘R'),
+    return ContextMenu(
+      children: <MenuChild>[
+        MenuItem(label: 'Back', shortcut: '⌘['),
+        MenuItem(label: 'Forward', shortcut: '⌘]'),
+        MenuItem(label: 'Reload', shortcut: '⌘R'),
       ],
       child: _contextMenuTarget(context, 'Right-click here'),
     );
@@ -445,16 +456,16 @@ class _ContextMenuGroups extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElContextMenu(
-      children: <ElMenuChild>[
-        ElMenuGroup(
-          children: <ElMenuChild>[
-            ElMenuItem(label: 'Copy'),
-            ElMenuItem(label: 'Paste'),
+    return ContextMenu(
+      children: <MenuChild>[
+        MenuGroup(
+          children: <MenuChild>[
+            MenuItem(label: 'Copy'),
+            MenuItem(label: 'Paste'),
           ],
         ),
-        ElMenuSeparator(),
-        ElMenuGroup(children: <ElMenuChild>[ElMenuItem(label: 'Select All')]),
+        MenuSeparator(),
+        MenuGroup(children: <MenuChild>[MenuItem(label: 'Select All')]),
       ],
       child: _contextMenuTarget(context, 'Right-click here'),
     );
@@ -466,11 +477,11 @@ class _ContextMenuIcons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElContextMenu(
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'Copy', icon: ElIconGlyph.copy),
-        ElMenuItem(label: 'Share', icon: ElIconGlyph.share2),
-        ElMenuItem(label: 'Download', icon: ElIconGlyph.download),
+    return ContextMenu(
+      children: <MenuChild>[
+        MenuItem(label: 'Copy', icon: IconGlyph.copy),
+        MenuItem(label: 'Share', icon: IconGlyph.share2),
+        MenuItem(label: 'Download', icon: IconGlyph.download),
       ],
       child: _contextMenuTarget(context, 'Right-click here'),
     );
@@ -482,10 +493,10 @@ class _ContextMenuCheckboxes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElContextMenu(
-      children: <ElMenuChild>[
-        ElMenuCheckboxItem(label: 'Show Bookmarks', checked: true),
-        ElMenuCheckboxItem(label: 'Show Full URLs', checked: false),
+    return ContextMenu(
+      children: <MenuChild>[
+        MenuCheckboxItem(label: 'Show Bookmarks', checked: true),
+        MenuCheckboxItem(label: 'Show Full URLs', checked: false),
       ],
       child: _contextMenuTarget(context, 'Right-click here'),
     );
@@ -497,14 +508,14 @@ class _ContextMenuRadio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElContextMenu(
-      children: <ElMenuChild>[
-        ElMenuRadioGroup(
+    return ContextMenu(
+      children: <MenuChild>[
+        MenuRadioGroup(
           value: 'medium',
-          children: <ElMenuRadioItem>[
-            ElMenuRadioItem(value: 'small', label: 'Small'),
-            ElMenuRadioItem(value: 'medium', label: 'Medium'),
-            ElMenuRadioItem(value: 'large', label: 'Large'),
+          children: <MenuRadioItem>[
+            MenuRadioItem(value: 'small', label: 'Small'),
+            MenuRadioItem(value: 'medium', label: 'Medium'),
+            MenuRadioItem(value: 'large', label: 'Large'),
           ],
         ),
       ],
@@ -520,11 +531,11 @@ class _ContextMenuRtl extends StatelessWidget {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: ElContextMenu(
-        children: <ElMenuChild>[
-          ElMenuItem(label: 'نسخ'),
-          ElMenuItem(label: 'لصق'),
-          ElMenuItem(label: 'حذف', variant: ElMenuItemVariant.destructive),
+      child: ContextMenu(
+        children: <MenuChild>[
+          MenuItem(label: 'نسخ'),
+          MenuItem(label: 'لصق'),
+          MenuItem(label: 'حذف', variant: MenuItemVariant.destructive),
         ],
         child: _contextMenuTarget(context, 'انقر بزر الفأرة الأيمن هنا'),
       ),
@@ -532,104 +543,104 @@ class _ContextMenuRtl extends StatelessWidget {
   }
 }
 
-const String _contextMenuCode = '''return ElContextMenu(
+const String _contextMenuCode = '''return ContextMenu(
   child: const Text('Right-click here'),
-  children: <ElMenuChild>[
-    ElMenuItem(label: 'Copy'),
-    ElMenuItem(label: 'Paste'),
-    ElMenuItemSeparator(),
-    ElMenuItem(
+  children: <MenuChild>[
+    MenuItem(label: 'Copy'),
+    MenuItem(label: 'Paste'),
+    MenuItemSeparator(),
+    MenuItem(
       label: 'Delete',
-      variant: ElMenuItemVariant.destructive,
+      variant: MenuItemVariant.destructive,
     ),
   ],
 );''';
 
-const String _contextMenuCompositionCode = '''ElContextMenu(
+const String _contextMenuCompositionCode = '''ContextMenu(
   child: ...,             // right-click this to open the menu at the pointer
-  children: <ElMenuChild>[
-    ElMenuItem(...),
-    ElMenuCheckboxItem(...),
-    ElMenuRadioGroup(children: <ElMenuRadioItem>[...]),
-    ElMenuSub(children: <ElMenuChild>[...]),
-    ElMenuGroup(children: <ElMenuChild>[...]),
-    ElMenuSeparator(),
+  children: <MenuChild>[
+    MenuItem(...),
+    MenuCheckboxItem(...),
+    MenuRadioGroup(children: <MenuRadioItem>[...]),
+    MenuSub(children: <MenuChild>[...]),
+    MenuGroup(children: <MenuChild>[...]),
+    MenuSeparator(),
   ],
 )''';
 
-const String _contextMenuBasicCode = '''return ElContextMenu(
+const String _contextMenuBasicCode = '''return ContextMenu(
   child: const Text('Right-click here'),
-  children: <ElMenuChild>[
-    ElMenuItem(label: 'Copy'),
-    ElMenuItem(label: 'Paste'),
+  children: <MenuChild>[
+    MenuItem(label: 'Copy'),
+    MenuItem(label: 'Paste'),
   ],
 );''';
 
-const String _contextMenuSubmenuCode = '''return ElContextMenu(
+const String _contextMenuSubmenuCode = '''return ContextMenu(
   child: const Text('Right-click here'),
-  children: <ElMenuChild>[
-    ElMenuItem(label: 'Back'),
-    ElMenuSub(
+  children: <MenuChild>[
+    MenuItem(label: 'Back'),
+    MenuSub(
       label: 'More Tools',
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'Save Page As...'),
-        ElMenuItem(label: 'Create Shortcut...'),
+      children: <MenuChild>[
+        MenuItem(label: 'Save Page As...'),
+        MenuItem(label: 'Create Shortcut...'),
       ],
     ),
   ],
 );''';
 
-const String _contextMenuShortcutsCode = '''return ElContextMenu(
+const String _contextMenuShortcutsCode = '''return ContextMenu(
   child: const Text('Right-click here'),
-  children: <ElMenuChild>[
-    ElMenuItem(label: 'Back', shortcut: '⌘['),
-    ElMenuItem(label: 'Forward', shortcut: '⌘]'),
-    ElMenuItem(label: 'Reload', shortcut: '⌘R'),
+  children: <MenuChild>[
+    MenuItem(label: 'Back', shortcut: '⌘['),
+    MenuItem(label: 'Forward', shortcut: '⌘]'),
+    MenuItem(label: 'Reload', shortcut: '⌘R'),
   ],
 );''';
 
-const String _contextMenuGroupsCode = '''return ElContextMenu(
+const String _contextMenuGroupsCode = '''return ContextMenu(
   child: const Text('Right-click here'),
-  children: <ElMenuChild>[
-    ElMenuGroup(
-      children: <ElMenuChild>[
-        ElMenuItem(label: 'Copy'),
-        ElMenuItem(label: 'Paste'),
+  children: <MenuChild>[
+    MenuGroup(
+      children: <MenuChild>[
+        MenuItem(label: 'Copy'),
+        MenuItem(label: 'Paste'),
       ],
     ),
-    ElMenuSeparator(),
-    ElMenuGroup(
-      children: <ElMenuChild>[ElMenuItem(label: 'Select All')],
+    MenuSeparator(),
+    MenuGroup(
+      children: <MenuChild>[MenuItem(label: 'Select All')],
     ),
   ],
 );''';
 
-const String _contextMenuIconsCode = '''return ElContextMenu(
+const String _contextMenuIconsCode = '''return ContextMenu(
   child: const Text('Right-click here'),
-  children: <ElMenuChild>[
-    ElMenuItem(label: 'Copy', icon: ElIconGlyph.copy),
-    ElMenuItem(label: 'Share', icon: ElIconGlyph.share2),
-    ElMenuItem(label: 'Download', icon: ElIconGlyph.download),
+  children: <MenuChild>[
+    MenuItem(label: 'Copy', icon: IconGlyph.copy),
+    MenuItem(label: 'Share', icon: IconGlyph.share2),
+    MenuItem(label: 'Download', icon: IconGlyph.download),
   ],
 );''';
 
-const String _contextMenuCheckboxesCode = '''return ElContextMenu(
+const String _contextMenuCheckboxesCode = '''return ContextMenu(
   child: const Text('Right-click here'),
-  children: <ElMenuChild>[
-    ElMenuCheckboxItem(label: 'Show Bookmarks', checked: true),
-    ElMenuCheckboxItem(label: 'Show Full URLs', checked: false),
+  children: <MenuChild>[
+    MenuCheckboxItem(label: 'Show Bookmarks', checked: true),
+    MenuCheckboxItem(label: 'Show Full URLs', checked: false),
   ],
 );''';
 
-const String _contextMenuRadioCode = '''return ElContextMenu(
+const String _contextMenuRadioCode = '''return ContextMenu(
   child: const Text('Right-click here'),
-  children: <ElMenuChild>[
-    ElMenuRadioGroup(
+  children: <MenuChild>[
+    MenuRadioGroup(
       value: 'medium',
-      children: <ElMenuRadioItem>[
-        ElMenuRadioItem(value: 'small', label: 'Small'),
-        ElMenuRadioItem(value: 'medium', label: 'Medium'),
-        ElMenuRadioItem(value: 'large', label: 'Large'),
+      children: <MenuRadioItem>[
+        MenuRadioItem(value: 'small', label: 'Small'),
+        MenuRadioItem(value: 'medium', label: 'Medium'),
+        MenuRadioItem(value: 'large', label: 'Large'),
       ],
     ),
   ],
@@ -637,12 +648,12 @@ const String _contextMenuRadioCode = '''return ElContextMenu(
 
 const String _contextMenuRtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElContextMenu(
+  child: ContextMenu(
     child: const Text('انقر بزر الفأرة الأيمن هنا'),
-    children: <ElMenuChild>[
-      ElMenuItem(label: 'نسخ'),
-      ElMenuItem(label: 'لصق'),
-      ElMenuItem(label: 'حذف', variant: ElMenuItemVariant.destructive),
+    children: <MenuChild>[
+      MenuItem(label: 'نسخ'),
+      MenuItem(label: 'لصق'),
+      MenuItem(label: 'حذف', variant: MenuItemVariant.destructive),
     ],
   ),
 )''';
@@ -658,16 +669,13 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elcontextmenu',
-        child: DocsApiTable(
-          title: 'ElContextMenu',
-          facts: _contextMenuApiFacts,
-        ),
+        child: DocsApiTable(title: 'ContextMenu', facts: _contextMenuApiFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elcontextmenu-static',
         child: DocsApiTable(
-          title: 'ElContextMenu static helpers',
+          title: 'ContextMenu static helpers',
           facts: _contextMenuStaticFacts,
         ),
       ),
@@ -682,22 +690,22 @@ class _AccessibilityContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Right-click only: no left-click path, no long-press, no '
             'keyboard shortcut. Do not make it the only path to an '
             'action — the reference has a long-press-on-touch opener, '
             'this port does not reproduce it.',
         'Escape behavior: closes the menu if focus is inside it.',
       ]),
-      SizedBox(height: el(3)),
+      SizedBox(height: space(3)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText(
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
           'GAP: No touch path. The reference has long-press on touch; '
           'it is not ported here. Do not use a context menu as the '
           'only way to reach an action on a phone.',
-          ElType.small,
-          color: ElTheme.of(context).destructiveInk,
+          TextStyles.small,
+          color: ThemeScope.of(context).destructiveText,
         ),
       ),
     ],
@@ -709,7 +717,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'GAP: no keyboard route to open the menu at all. Opening '
             'requires a real secondary-button PointerDownEvent — a '
             "mouse right-click or a trackpad two-finger press — on "
@@ -738,14 +746,14 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Right-click only, on every platform. A trackpad two-finger '
             'click is a right-button pointer event and opens the menu '
             'the same way.',
         'No touch path in this port: onSecondaryTapDown-equivalent '
             'input only, via a raw Listener watching for '
             'kSecondaryButton.',
-        'The menu relies on ElPopover\'s collision algorithm near a '
+        'The menu relies on Popover\'s collision algorithm near a '
             'viewport edge and snaps without transition when it flips.',
         'No breakpoint branching, and no dart:io Platform branch, '
             'anywhere in context_menu.dart.',
@@ -770,15 +778,15 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Primary dependency',
-            value: 'ElPopover',
+            value: 'Popover',
             description:
-                'Mounts the menu through ElPopover, anchored to a '
+                'Mounts the menu through Popover, anchored to a '
                 'virtual point (anchorPoint) rather than a widget\'s '
                 'box.',
           ),
           const DocsInstallFact(
             label: 'Row model',
-            value: 'ElMenu, ElMenuChild (menu.dart)',
+            value: 'Menu, MenuChild (menu.dart)',
             description:
                 'The shared row model Menubar, Context Menu, and '
                 'Dropdown Menu all use for their content.',
@@ -797,7 +805,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Menu', route: '/components/menu'),
@@ -813,29 +821,33 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         "Menu content: theme.popover / theme.popoverForeground, via "
-            "ElMenuContent's own ElPopoverSurface.",
+            "MenuContent's own PopoverSurface.",
         'Destructive rows: a tint of theme.destructive (10% at rest, '
             '20% once highlighted), not a solid fill.',
         'Documented drift (menus drift 4): a submenu\'s content is the '
             'one overlay in the family that paints a real 1px border '
             'instead of the ring-foreground/10 rim its siblings use, '
             'costing its box 2px.',
-        'Animation: menu content animates in through ElDurations.'
+        'Animation: menu content animates in through MotionDurations.'
             'overlay.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -850,10 +862,10 @@ const List<DocsApiFact> _contextMenuApiFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'children',
-    type: 'List<ElMenuChild>',
+    type: 'List<MenuChild>',
     description:
         'Required. The menu rows: items, checkboxes, radios, submenus, '
-        'labels, separators, groups. Managed by ElMenu.',
+        'labels, separators, groups. Managed by Menu.',
   ),
   DocsApiFact(
     name: 'width',
@@ -871,7 +883,7 @@ const List<DocsApiFact> _contextMenuApiFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _contextMenuStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElContextMenu.sideOffset',
+    name: 'ContextMenu.sideOffset',
     type: 'static double',
     description:
         'The gap between the pointer and the menu\'s top-left corner: '
@@ -897,8 +909,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'A right-click (or a trackpad two-finger click) opens the menu at '
         'the pointer\'s client coordinates, 2px to the right and slightly '
         'up (side: right, align: start). The content animates in with '
-        'ElMenuMotion\'s slide-plus-zoom-plus-fade, over '
-        'ElDurations.overlay.',
+        'MenuMotion\'s slide-plus-zoom-plus-fade, over '
+        'MotionDurations.overlayEnter.',
     userSignal: 'The menu appears at the cursor, not at a fixed anchor.',
   ),
   DocsStateFact(
@@ -913,7 +925,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Pressed',
     treatment:
         'The child shows whatever press state it defines on its own; '
-        'ElContextMenu does not style the trigger.',
+        'ContextMenu does not style the trigger.',
     userSignal: 'Depends entirely on the wrapped child.',
   ),
   DocsStateFact(
@@ -924,7 +936,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        'The open animation routes through elAnimationDuration, which is '
+        'The open animation routes through effectiveMotionDuration, which is '
         'Duration.zero under reduced motion.',
     userSignal: 'The menu appears instantly instead of animating in.',
   ),

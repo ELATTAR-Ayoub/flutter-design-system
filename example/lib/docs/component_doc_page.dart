@@ -7,7 +7,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import 'docs_code.dart' show DocsCodeFile;
 import 'docs_disclosure.dart';
@@ -121,7 +133,7 @@ class DisclosureSection extends DocsPageSection {
 ///
 /// The fifth case, and the last. Fourteen registry items — nine effects,
 /// five motion items, one foundation item — have no variants and often no
-/// widget of their own: `starfield`, `page-glow`, `press-motion`,
+/// widget of their own: `starfield`, `background-effect`, `press`,
 /// `keyframes`, `safe-area`, `source-foundation` are applied *to* something
 /// rather than placed. A [ShowcaseSection] would stage an empty box and call
 /// it a preview, which is a lie about what the reader is looking at.
@@ -196,20 +208,20 @@ class DocsPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: el(10)),
+      padding: EdgeInsets.only(bottom: space(10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(
+          StyledText(
             title,
-            ElType.h1,
+            TextStyles.h1,
             color: theme.foreground,
-            fontSize: ElFluid.h1(context),
+            fontSize: Fluid.h1(context),
           ),
-          SizedBox(height: el(3)),
-          ElText(description, ElType.lead),
+          SizedBox(height: space(3)),
+          StyledText(description, TextStyles.lead),
         ],
       ),
     );
@@ -258,7 +270,10 @@ class ComponentDocPage extends StatelessWidget {
         minHeight: minHeight ?? DocsShowcase.shortMinHeight,
       ),
     SnippetSection(:final String code) => DocsSnippet(code: code),
-    InstallSection(:final String command, :final List<DocsCodeFile> manualFiles) =>
+    InstallSection(
+      :final String command,
+      :final List<DocsCodeFile> manualFiles,
+    ) =>
       DocsInstall(command: command, manualFiles: manualFiles),
     DisclosureSection(:final Widget child, :final String title) =>
       DocsDisclosure(title: title, child: child),
@@ -268,7 +283,8 @@ class ComponentDocPage extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      if (header) DocsPageHeader(title: spec.title, description: spec.description),
+      if (header)
+        DocsPageHeader(title: spec.title, description: spec.description),
       for (final DocsPageSection section in spec.sections)
         DocsSection(
           id: section.id,

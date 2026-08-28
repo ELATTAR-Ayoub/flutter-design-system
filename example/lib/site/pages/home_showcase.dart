@@ -14,7 +14,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import 'home_cards/analytics_card.dart';
 import 'home_cards/balance_card.dart';
@@ -50,7 +62,7 @@ List<Widget> homeShowcaseCards() => const <Widget>[
 
 /// A staggered card grid: [base] columns, widened at [sm] and [lg].
 ///
-/// Unlike `kit.dart`'s `ElGrid`, a row here never stretches every cell to its
+/// Unlike `kit.dart`'s `Grid`, a row here never stretches every cell to its
 /// tallest neighbour — each column runs its own height, which is what lets
 /// six differently sized live compositions sit together as a masonry wall
 /// instead of a uniform table.
@@ -72,14 +84,14 @@ class HomeMasonryGrid extends StatelessWidget {
 
   int _columns(double viewport) {
     int columns = base;
-    if (sm != null && viewport >= ElBreakpoints.sm) columns = sm!;
-    if (lg != null && viewport >= ElBreakpoints.lg) columns = lg!;
+    if (sm != null && viewport >= Breakpoints.sm) columns = sm!;
+    if (lg != null && viewport >= Breakpoints.lg) columns = lg!;
     return columns;
   }
 
   @override
   Widget build(BuildContext context) {
-    final double space = gap ?? el(4);
+    final double layoutGap = gap ?? space(4);
     final int columns = _columns(MediaQuery.sizeOf(context).width);
     final List<List<Widget>> buckets = List<List<Widget>>.generate(
       columns,
@@ -93,13 +105,13 @@ class HomeMasonryGrid extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         for (int c = 0; c < columns; c++) ...<Widget>[
-          if (c > 0) SizedBox(width: space),
+          if (c > 0) SizedBox(width: layoutGap),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 for (int i = 0; i < buckets[c].length; i++) ...<Widget>[
-                  if (i > 0) SizedBox(height: space),
+                  if (i > 0) SizedBox(height: layoutGap),
                   buckets[c][i],
                 ],
               ],
@@ -133,84 +145,84 @@ class _ComponentsCardState extends State<_ComponentsCard> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElCard(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Building blocks'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Building blocks'),
+          description: CardDescription(
             'Buttons, badges, an input and a toggle group, wired up.',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Wrap(
-                spacing: el(2),
-                runSpacing: el(2),
+                spacing: space(2),
+                runSpacing: space(2),
                 children: <Widget>[
-                  ElButton(
-                    size: ElButtonSize.sm,
+                  Button(
+                    size: ButtonSize.sm,
                     onPressed: () {},
                     child: const Text('Primary'),
                   ),
-                  ElButton(
-                    size: ElButtonSize.sm,
-                    variant: ElButtonVariant.outline,
+                  Button(
+                    size: ButtonSize.sm,
+                    variant: ButtonVariant.outline,
                     onPressed: () {},
                     child: const Text('Outline'),
                   ),
-                  ElButton(
-                    size: ElButtonSize.sm,
-                    variant: ElButtonVariant.ghost,
+                  Button(
+                    size: ButtonSize.sm,
+                    variant: ButtonVariant.ghost,
                     onPressed: () {},
                     child: const Text('Ghost'),
                   ),
                 ],
               ),
-              SizedBox(height: el(3)),
+              SizedBox(height: space(3)),
               Wrap(
-                spacing: el(2),
-                runSpacing: el(2),
+                spacing: space(2),
+                runSpacing: space(2),
                 children: const <Widget>[
-                  ElBadge(label: 'Stable'),
-                  ElBadge(label: 'New', variant: ElBadgeVariant.action),
-                  ElBadge(label: 'Shipped', variant: ElBadgeVariant.success),
-                  ElBadge(label: 'Beta', variant: ElBadgeVariant.outline),
+                  Badge(label: 'Stable'),
+                  Badge(label: 'New', variant: BadgeVariant.action),
+                  Badge(label: 'Shipped', variant: BadgeVariant.success),
+                  Badge(label: 'Beta', variant: BadgeVariant.outline),
                 ],
               ),
-              SizedBox(height: el(3)),
-              ElInput(
+              SizedBox(height: space(3)),
+              Input(
                 key: const ValueKey<String>('home-components-search'),
                 controller: _search,
                 placeholder: 'Search components',
               ),
-              SizedBox(height: el(3)),
+              SizedBox(height: space(3)),
               Row(
                 children: <Widget>[
-                  ElSwitch(
+                  Switch(
                     key: const ValueKey<String>('home-components-switch'),
                     value: _notify,
                     onChanged: (bool value) => setState(() => _notify = value),
                   ),
-                  SizedBox(width: el(2)),
+                  SizedBox(width: space(2)),
                   Flexible(
-                    child: ElText(
+                    child: StyledText(
                       'Notify on release',
-                      ElType.small,
+                      TextStyles.small,
                       color: theme.mutedForeground,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: el(3)),
-              ElToggleGroup(
+              SizedBox(height: space(3)),
+              ToggleGroup(
                 key: const ValueKey<String>('home-components-toggle'),
-                items: const <ElToggleGroupItem>[
-                  ElToggleGroupItem(label: 'Grid'),
-                  ElToggleGroupItem(label: 'List'),
+                items: const <ToggleGroupItem>[
+                  ToggleGroupItem(label: 'Grid'),
+                  ToggleGroupItem(label: 'List'),
                 ],
                 selectedIndex: _view,
                 onChanged: (int? next) => setState(() => _view = next ?? 0),
@@ -239,36 +251,36 @@ class _ChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElCard(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Sessions'),
-          description: ElCardDescription('Last 6 months, one real chart.'),
+        const CardHeader(
+          title: CardTitle('Sessions'),
+          description: CardDescription('Last 6 months, one real chart.'),
         ),
-        ElCardContent(
-          child: ElChartContainer(
-            height: el(48),
-            config: ElChartConfig(<String, ElChartSeries>{
-              'sessions': ElChartSeries(label: 'Sessions', color: theme.chart1),
+        CardContent(
+          child: ChartContainer(
+            height: space(48),
+            config: ChartConfig(<String, ChartSeries>{
+              'sessions': ChartSeries(label: 'Sessions', color: theme.chart1),
             }),
-            child: ElCartesianChart(
+            child: CartesianChart(
               data: _data,
-              grid: const ElChartGrid(vertical: false),
-              xAxis: const ElChartAxis(
+              grid: const ChartGrid(vertical: false),
+              xAxis: const ChartAxis(
                 dataKey: 'month',
                 tickLine: false,
                 axisLine: false,
               ),
-              tooltip: const ElChartTooltipSpec(
+              tooltip: const ChartTooltipSpec(
                 cursor: false,
-                indicator: ElChartIndicator.line,
+                indicator: ChartIndicator.line,
               ),
-              series: <ElChartSeriesSpec>[
-                ElChartSeriesSpec(
-                  kind: ElChartSeriesKind.area,
+              series: <ChartSeriesSpec>[
+                ChartSeriesSpec(
+                  kind: ChartSeriesKind.area,
                   dataKey: 'sessions',
-                  curve: ElCurveType.natural,
+                  curve: CurveType.natural,
                   fill: theme.chart1,
                   fillOpacity: 0.35,
                   stroke: theme.chart1,
@@ -312,34 +324,34 @@ class _ChatCardState extends State<_ChatCard> {
 
   @override
   Widget build(BuildContext context) {
-    return ElCard(
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Say something'),
-          description: ElCardDescription('A real ElMessageGroup, typed below.'),
+        const CardHeader(
+          title: CardTitle('Say something'),
+          description: CardDescription('A real MessageGroup, typed below.'),
         ),
-        ElCardContent(
-          child: ElMessageGroup(
+        CardContent(
+          child: MessageGroup(
             children: <Widget>[
-              const ElMessage(
-                content: ElMessageContent(
+              const Message(
+                content: MessageContent(
                   children: <Widget>[
-                    ElBubble(
-                      variant: ElBubbleVariant.muted,
-                      child: ElBubbleContent(
+                    Bubble(
+                      variant: BubbleVariant.muted,
+                      child: BubbleContent(
                         child: Text('What can this system do?'),
                       ),
                     ),
                   ],
                 ),
               ),
-              const ElMessage(
-                align: ElBubbleAlign.end,
-                content: ElMessageContent(
+              const Message(
+                align: BubbleAlign.end,
+                content: MessageContent(
                   children: <Widget>[
-                    ElBubble(
-                      align: ElBubbleAlign.end,
-                      child: ElBubbleContent(
+                    Bubble(
+                      align: BubbleAlign.end,
+                      child: BubbleContent(
                         child: Text('Copy a component in, keep every token.'),
                       ),
                     ),
@@ -347,13 +359,13 @@ class _ChatCardState extends State<_ChatCard> {
                 ),
               ),
               for (final String text in _sent)
-                ElMessage(
-                  align: ElBubbleAlign.end,
-                  content: ElMessageContent(
+                Message(
+                  align: BubbleAlign.end,
+                  content: MessageContent(
                     children: <Widget>[
-                      ElBubble(
-                        align: ElBubbleAlign.end,
-                        child: ElBubbleContent(child: Text(text)),
+                      Bubble(
+                        align: BubbleAlign.end,
+                        child: BubbleContent(child: Text(text)),
                       ),
                     ],
                   ),
@@ -361,24 +373,24 @@ class _ChatCardState extends State<_ChatCard> {
             ],
           ),
         ),
-        ElCardFooter(
+        CardFooter(
           child: Row(
             children: <Widget>[
               Expanded(
-                child: ElInput(
+                child: Input(
                   key: const ValueKey<String>('home-chat-input'),
                   controller: _draft,
                   placeholder: 'Type a message',
                   onSubmitted: (_) => _send(),
                 ),
               ),
-              SizedBox(width: el(2)),
-              ElButton(
+              SizedBox(width: space(2)),
+              Button(
                 key: const ValueKey<String>('home-chat-send'),
-                size: ElButtonSize.icon,
+                size: ButtonSize.icon,
                 label: 'Send message',
                 onPressed: _send,
-                child: const ElIcon.lucide(ElLucide.send, size: ElIconSize.sm),
+                child: const Icon.lucide(Lucide.send, size: IconSize.sm),
               ),
             ],
           ),
@@ -422,25 +434,23 @@ const _SettingsValues _settingsBaseline = _SettingsValues(
 class _SettingsCard extends StatefulWidget {
   const _SettingsCard();
 
-  static final List<ElRule<String>> _nameRules = <ElRule<String>>[
-    ElRule.minLength(2, 'Use at least 2 characters.'),
-  ];
-
-  static final List<ElRule<String>> _emailRules = <ElRule<String>>[
-    ElRule.minLength(1, 'An email address is required.'),
-    ElRule.email('That is not an email address.'),
-  ];
-
-  static const List<ElSelectOption<String>> _timezones =
-      <ElSelectOption<String>>[
-        ElSelectOption<String>(
-          value: 'america-los-angeles',
-          label: 'Los Angeles',
-        ),
-        ElSelectOption<String>(value: 'america-new-york', label: 'New York'),
-        ElSelectOption<String>(value: 'europe-lisbon', label: 'Lisbon'),
-        ElSelectOption<String>(value: 'asia-tokyo', label: 'Tokyo'),
+  static final List<ValidationRule<String>> _nameRules =
+      <ValidationRule<String>>[
+        ValidationRule.minLength(2, 'Use at least 2 characters.'),
       ];
+
+  static final List<ValidationRule<String>> _emailRules =
+      <ValidationRule<String>>[
+        ValidationRule.minLength(1, 'An email address is required.'),
+        ValidationRule.email('That is not an email address.'),
+      ];
+
+  static const List<SelectOption<String>> _timezones = <SelectOption<String>>[
+    SelectOption<String>(value: 'america-los-angeles', label: 'Los Angeles'),
+    SelectOption<String>(value: 'america-new-york', label: 'New York'),
+    SelectOption<String>(value: 'europe-lisbon', label: 'Lisbon'),
+    SelectOption<String>(value: 'asia-tokyo', label: 'Tokyo'),
+  ];
 
   @override
   State<_SettingsCard> createState() => _SettingsCardState();
@@ -477,9 +487,9 @@ class _SettingsCardState extends State<_SettingsCard> {
   bool get _dirty => _current != _saved;
 
   List<String> get _nameIssues =>
-      ElRules.check<String>(_name.text, _SettingsCard._nameRules);
+      Validators.check<String>(_name.text, _SettingsCard._nameRules);
   List<String> get _emailIssues =>
-      ElRules.check<String>(_email.text, _SettingsCard._emailRules);
+      Validators.check<String>(_email.text, _SettingsCard._emailRules);
   bool get _valid => _nameIssues.isEmpty && _emailIssues.isEmpty;
 
   void _restore() {
@@ -497,7 +507,7 @@ class _SettingsCardState extends State<_SettingsCard> {
     if (!_valid) return;
     final _SettingsValues pending = _current;
     setState(() => _saving = true);
-    await Future<void>.delayed(ElDurations.slow);
+    await Future<void>.delayed(MotionDurations.slow);
     if (!mounted) return;
     setState(() {
       _saving = false;
@@ -506,23 +516,23 @@ class _SettingsCardState extends State<_SettingsCard> {
     });
   }
 
-  Widget _cancel() => ElAlertDialog(
-    trigger: (BuildContext context, VoidCallback open) => ElButton(
+  Widget _cancel() => AlertDialog(
+    trigger: (BuildContext context, VoidCallback open) => Button(
       key: const ValueKey<String>('home-settings-cancel'),
-      variant: ElButtonVariant.ghost,
+      variant: ButtonVariant.ghost,
       onPressed: _dirty && !_saving ? open : null,
       child: const Text('Cancel'),
     ),
-    content: (BuildContext context, VoidCallback close) => ElAlertDialogContent(
-      header: const ElAlertDialogHeader(
-        title: ElAlertDialogTitle('Discard your changes?'),
-        description: ElAlertDialogDescription(
+    content: (BuildContext context, VoidCallback close) => AlertDialogContent(
+      header: const AlertDialogHeader(
+        title: AlertDialogTitle('Discard your changes?'),
+        description: AlertDialogDescription(
           'This restores the values this panel opened with.',
         ),
       ),
-      footer: ElAlertDialogFooter(
-        cancel: ElAlertDialogCancel(label: 'Keep editing', onPressed: close),
-        action: ElAlertDialogAction(
+      footer: AlertDialogFooter(
+        cancel: AlertDialogCancel(label: 'Keep editing', onPressed: close),
+        action: AlertDialogAction(
           label: 'Discard changes',
           onPressed: () {
             close();
@@ -535,7 +545,7 @@ class _SettingsCardState extends State<_SettingsCard> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final bool show = _submitted;
     final String status = _saving
         ? 'Saving…'
@@ -545,42 +555,42 @@ class _SettingsCardState extends State<_SettingsCard> {
         ? 'You have unsaved changes.'
         : 'Up to date.';
 
-    return ElCard(
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Profile'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Profile'),
+          description: CardDescription(
             'How this account is addressed, edited live.',
           ),
         ),
-        ElCardContent(
-          child: ElFieldSet(
+        CardContent(
+          child: FieldSet(
             children: <Widget>[
-              ElField(
+              Field(
                 label: 'Display name',
                 errors: show ? _nameIssues : const <String>[],
                 enabled: !_saving,
-                child: ElInput(
+                child: Input(
                   key: const ValueKey<String>('home-settings-name'),
                   controller: _name,
                   placeholder: 'Your name',
                 ),
               ),
-              ElField(
+              Field(
                 label: 'Email address',
                 errors: show ? _emailIssues : const <String>[],
                 enabled: !_saving,
-                child: ElInput(
+                child: Input(
                   key: const ValueKey<String>('home-settings-email'),
                   controller: _email,
                   placeholder: 'you@example.com',
                   keyboardType: TextInputType.emailAddress,
                 ),
               ),
-              ElField(
+              Field(
                 label: 'Time zone',
                 enabled: !_saving,
-                child: ElSelect<String>(
+                child: Select<String>(
                   key: const ValueKey<String>('home-settings-timezone'),
                   options: _SettingsCard._timezones,
                   value: _timezone,
@@ -595,19 +605,23 @@ class _SettingsCardState extends State<_SettingsCard> {
             ],
           ),
         ),
-        ElCardFooter(
+        CardFooter(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElText(status, ElType.small, color: theme.mutedForeground),
-              SizedBox(height: el(3)),
+              StyledText(
+                status,
+                TextStyles.small,
+                color: theme.mutedForeground,
+              ),
+              SizedBox(height: space(3)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   _cancel(),
-                  SizedBox(width: el(2)),
-                  ElButton(
+                  SizedBox(width: space(2)),
+                  Button(
                     key: const ValueKey<String>('home-settings-save'),
                     loading: _saving,
                     onPressed: _dirty && !_saving ? _save : null,
@@ -628,13 +642,15 @@ class _SettingsCardState extends State<_SettingsCard> {
 class _SignInCard extends StatefulWidget {
   const _SignInCard();
 
-  static final List<ElRule<String>> _emailRules = <ElRule<String>>[
-    ElRule.minLength(1, 'An email address is required.'),
-    ElRule.email('That is not an email address.'),
-  ];
-  static final List<ElRule<String>> _passwordRules = <ElRule<String>>[
-    ElRule.minLength(1, 'A password is required.'),
-  ];
+  static final List<ValidationRule<String>> _emailRules =
+      <ValidationRule<String>>[
+        ValidationRule.minLength(1, 'An email address is required.'),
+        ValidationRule.email('That is not an email address.'),
+      ];
+  static final List<ValidationRule<String>> _passwordRules =
+      <ValidationRule<String>>[
+        ValidationRule.minLength(1, 'A password is required.'),
+      ];
   static const String _refusal =
       'That email and password do not match an account.';
 
@@ -674,9 +690,9 @@ class _SignInCardState extends State<_SignInCard> {
   }
 
   List<String> get _emailIssues =>
-      ElRules.check<String>(_email.text, _SignInCard._emailRules);
+      Validators.check<String>(_email.text, _SignInCard._emailRules);
   List<String> get _passwordIssues =>
-      ElRules.check<String>(_password.text, _SignInCard._passwordRules);
+      Validators.check<String>(_password.text, _SignInCard._passwordRules);
   bool get _valid => _emailIssues.isEmpty && _passwordIssues.isEmpty;
 
   Future<void> _submit() async {
@@ -686,7 +702,7 @@ class _SignInCardState extends State<_SignInCard> {
     });
     if (!_valid) return;
     setState(() => _submitting = true);
-    await Future<void>.delayed(ElDurations.drawer);
+    await Future<void>.delayed(MotionDurations.drawerOpen);
     if (!mounted) return;
     setState(() {
       _submitting = false;
@@ -694,12 +710,12 @@ class _SignInCardState extends State<_SignInCard> {
     });
   }
 
-  Widget _passwordRow(BuildContext context) => ElFieldVisibility(
+  Widget _passwordRow(BuildContext context) => FieldVisibility(
     focusNode: _passwordFocus,
     child: Row(
       children: <Widget>[
         Expanded(
-          child: ElInput(
+          child: Input(
             key: const ValueKey<String>('home-signin-password'),
             controller: _password,
             placeholder: 'Your password',
@@ -707,18 +723,18 @@ class _SignInCardState extends State<_SignInCard> {
             enabled: !_submitting,
           ),
         ),
-        SizedBox(width: el(2)),
-        ElButton(
+        SizedBox(width: space(2)),
+        Button(
           key: const ValueKey<String>('home-signin-reveal'),
-          variant: ElButtonVariant.ghost,
-          size: ElButtonSize.icon,
+          variant: ButtonVariant.ghost,
+          size: ButtonSize.icon,
           label: _revealed ? 'Hide password' : 'Show password',
           onPressed: _submitting
               ? null
               : () => setState(() => _revealed = !_revealed),
-          child: ElIcon(
-            _revealed ? ElIconGlyph.eyeOff : ElIconGlyph.eye,
-            size: ElIconSize.sm,
+          child: Icon(
+            _revealed ? IconGlyph.eyeOff : IconGlyph.eye,
+            size: IconSize.sm,
           ),
         ),
       ],
@@ -727,19 +743,19 @@ class _SignInCardState extends State<_SignInCard> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final String? authError = _authError;
-    final double gap = ElFieldSet.gap;
+    final double gap = FieldSet.gap;
 
-    return ElCard(
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Sign in'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Sign in'),
+          description: CardDescription(
             'A real form: validated fields and a submit.',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
@@ -749,28 +765,28 @@ class _SignInCardState extends State<_SignInCard> {
                   key: const ValueKey<String>('home-signin-auth-error'),
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const ElIcon(
-                      ElIconGlyph.alertTriangle,
-                      size: ElIconSize.sm,
-                      tone: ElIconTone.error,
+                    const Icon(
+                      IconGlyph.alertTriangle,
+                      size: IconSize.sm,
+                      tone: IconTone.error,
                     ),
-                    SizedBox(width: el(2)),
+                    SizedBox(width: space(2)),
                     Expanded(
-                      child: ElText(
+                      child: StyledText(
                         authError,
-                        ElComponentType.textSm,
-                        color: theme.destructiveInk,
+                        TextStyles.bodySmall,
+                        color: theme.destructiveText,
                       ),
                     ),
                   ],
                 ),
                 SizedBox(height: gap),
               ],
-              ElField(
+              Field(
                 label: 'Email address',
                 errors: _submitted ? _emailIssues : const <String>[],
                 enabled: !_submitting,
-                child: ElInput(
+                child: Input(
                   key: const ValueKey<String>('home-signin-email'),
                   controller: _email,
                   placeholder: 'you@example.com',
@@ -778,7 +794,7 @@ class _SignInCardState extends State<_SignInCard> {
                 ),
               ),
               SizedBox(height: gap),
-              ElField(
+              Field(
                 label: 'Password',
                 errors: _submitted ? _passwordIssues : const <String>[],
                 enabled: !_submitting,
@@ -786,7 +802,7 @@ class _SignInCardState extends State<_SignInCard> {
                 child: _passwordRow(context),
               ),
               SizedBox(height: gap),
-              ElButton(
+              Button(
                 key: const ValueKey<String>('home-signin-submit'),
                 loading: _submitting,
                 contentAlignment: AlignmentDirectional.center,
@@ -830,7 +846,7 @@ class _DashActivity {
   final String title;
   final String meta;
   final String amount;
-  final ElIconGlyph glyph;
+  final IconGlyph glyph;
 }
 
 const List<_DashStat> _dashStats = <_DashStat>[
@@ -850,19 +866,19 @@ const List<_DashActivity> _dashActivity = <_DashActivity>[
     title: 'Plan upgraded',
     meta: 'Team workspace',
     amount: '+240',
-    glyph: ElIconGlyph.arrowUpRight,
+    glyph: IconGlyph.arrowUpRight,
   ),
   _DashActivity(
     title: 'Refund issued',
     meta: 'Order 4471',
     amount: '-96',
-    glyph: ElIconGlyph.arrowDownLeft,
+    glyph: IconGlyph.arrowDownLeft,
   ),
   _DashActivity(
     title: 'Invoice settled',
     meta: 'Annual contract',
     amount: '+1,880',
-    glyph: ElIconGlyph.creditCard,
+    glyph: IconGlyph.creditCard,
   ),
 ];
 
@@ -874,34 +890,38 @@ class _DashboardCard extends StatefulWidget {
 }
 
 class _DashboardCardState extends State<_DashboardCard> {
-  static const List<ElSelectOption<String>> _ranges = <ElSelectOption<String>>[
-    ElSelectOption<String>(value: 'last-7-days', label: 'Last 7 days'),
-    ElSelectOption<String>(value: 'last-30-days', label: 'Last 30 days'),
-    ElSelectOption<String>(value: 'last-90-days', label: 'Last 90 days'),
+  static const List<SelectOption<String>> _ranges = <SelectOption<String>>[
+    SelectOption<String>(value: 'last-7-days', label: 'Last 7 days'),
+    SelectOption<String>(value: 'last-30-days', label: 'Last 30 days'),
+    SelectOption<String>(value: 'last-90-days', label: 'Last 90 days'),
   ];
 
   String _range = 'last-30-days';
 
   Widget _tile(BuildContext context, _DashStat stat) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElCard(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Card(
       children: <Widget>[
-        ElCardHeader(
-          title: ElCardTitle(stat.label),
-          action: ElIcon(
-            stat.rising ? ElIconGlyph.trendingUp : ElIconGlyph.trendingDown,
-            size: ElIconSize.sm,
-            tone: stat.rising ? ElIconTone.success : ElIconTone.warning,
+        CardHeader(
+          title: CardTitle(stat.label),
+          action: Icon(
+            stat.rising ? IconGlyph.trendingUp : IconGlyph.trendingDown,
+            size: IconSize.sm,
+            tone: stat.rising ? IconTone.success : IconTone.warning,
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElText(stat.value, ElType.numLg),
-              SizedBox(height: el(1)),
-              ElText(stat.delta, ElType.caption, color: theme.mutedForeground),
+              StyledText(stat.value, TextStyles.numberLg),
+              SizedBox(height: space(1)),
+              StyledText(
+                stat.delta,
+                TextStyles.caption,
+                color: theme.mutedForeground,
+              ),
             ],
           ),
         ),
@@ -914,8 +934,8 @@ class _DashboardCardState extends State<_DashboardCard> {
   /// narrow on a wide screen just as easily as on a phone.
   Widget _tiles(BuildContext context) => LayoutBuilder(
     builder: (BuildContext context, BoxConstraints constraints) {
-      final int columns = constraints.maxWidth >= el(70) ? 2 : 1;
-      final double gap = ElCard.spacing;
+      final int columns = constraints.maxWidth >= space(70) ? 2 : 1;
+      final double gap = Card.spacing;
       final List<Widget> rows = <Widget>[];
       for (int start = 0; start < _dashStats.length; start += columns) {
         final List<Widget> cells = <Widget>[];
@@ -944,43 +964,43 @@ class _DashboardCardState extends State<_DashboardCard> {
   );
 
   Widget _activityRow(BuildContext context, _DashActivity entry) {
-    return ElDialog(
-      trigger: (BuildContext context, VoidCallback open) => ElButton(
-        variant: ElButtonVariant.ghost,
+    return Dialog(
+      trigger: (BuildContext context, VoidCallback open) => Button(
+        variant: ButtonVariant.ghost,
         autoHeight: true,
         contentAlignment: AlignmentDirectional.centerStart,
-        padding: EdgeInsets.symmetric(horizontal: el(2), vertical: el(1)),
+        padding: EdgeInsets.symmetric(horizontal: space(2), vertical: space(1)),
         onPressed: open,
         child: Row(
           children: <Widget>[
-            ElIcon(entry.glyph, size: ElIconSize.sm, tone: ElIconTone.muted),
-            SizedBox(width: el(2)),
+            Icon(entry.glyph, size: IconSize.sm, tone: IconTone.muted),
+            SizedBox(width: space(2)),
             Expanded(
-              child: ElText(
+              child: StyledText(
                 entry.title,
-                ElComponentType.textSm,
+                TextStyles.bodySmall,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(width: el(2)),
-            ElText(entry.amount, ElType.numSm),
+            SizedBox(width: space(2)),
+            StyledText(entry.amount, TextStyles.numberSm),
           ],
         ),
       ),
-      content: (BuildContext context, VoidCallback close) => ElDialogContent(
+      content: (BuildContext context, VoidCallback close) => DialogContent(
         onClose: close,
         children: <Widget>[
-          ElDialogHeader(
+          DialogHeader(
             children: <Widget>[
-              ElDialogTitle(entry.title),
-              ElDialogDescription('${entry.meta}. Net change ${entry.amount}.'),
+              DialogTitle(entry.title),
+              DialogDescription('${entry.meta}. Net change ${entry.amount}.'),
             ],
           ),
-          ElDialogFooter(
+          DialogFooter(
             children: <Widget>[
-              ElButton(
-                variant: ElButtonVariant.outline,
+              Button(
+                variant: ButtonVariant.outline,
                 onPressed: close,
                 child: const Text('Close'),
               ),
@@ -993,21 +1013,21 @@ class _DashboardCardState extends State<_DashboardCard> {
 
   @override
   Widget build(BuildContext context) {
-    final double gap = ElCard.spacing;
-    return ElCard(
+    final double gap = Card.spacing;
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Overview'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Overview'),
+          description: CardDescription(
             'How the account moved, with a drill-in on every row.',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElSelect<String>(
+              Select<String>(
                 key: const ValueKey<String>('home-dashboard-range'),
                 options: _ranges,
                 value: _range,
@@ -1017,8 +1037,8 @@ class _DashboardCardState extends State<_DashboardCard> {
               SizedBox(height: gap),
               _tiles(context),
               SizedBox(height: gap),
-              ElText('Recent activity', ElType.h4),
-              SizedBox(height: el(2)),
+              StyledText('Recent activity', TextStyles.h4),
+              SizedBox(height: space(2)),
               for (final _DashActivity entry in _dashActivity)
                 _activityRow(context, entry),
             ],

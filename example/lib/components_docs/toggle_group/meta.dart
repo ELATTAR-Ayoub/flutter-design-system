@@ -1,7 +1,7 @@
 /// Public documentation metadata for the `toggle-group` component.
 ///
-/// **Split from toggle.** `ElToggleGroup` and `ElToggleGroupItem` used to be
-/// documented on `components_docs/toggle/page.dart` alongside `ElToggle`.
+/// **Split from toggle.** `ToggleGroup` and `ToggleGroupItem` used to be
+/// documented on `components_docs/toggle/page.dart` alongside `Toggle`.
 /// They are their own barrel export (`lib/elattar_design_system.dart` L107
 /// exports `src/components/toggle_group.dart`, separately from L106's
 /// `src/components/toggle.dart`) with their own shadcn counterpart
@@ -9,8 +9,8 @@
 /// their own entry and their own page.
 ///
 /// [ComponentDocEntry.exports] names only what `toggle_group.dart` itself
-/// declares: `ElToggleGroup` and `ElToggleGroupItem`. `ElToggleVariant` and
-/// `ElToggleSize` are `toggle.dart`'s own enums, which the group merely
+/// declares: `ToggleGroup` and `ToggleGroupItem`. `ToggleVariant` and
+/// `ToggleSize` are `toggle.dart`'s own enums, which the group merely
 /// forwards to every item, so they stay claimed by `toggleDoc` and are not
 /// listed twice.
 ///
@@ -37,20 +37,21 @@ const ComponentDocEntry toggleGroupDoc = ComponentDocEntry(
       'A mutually exclusive segmented control: one selection at most, over a '
       'single travelling pill.',
   dependencies: <String>[
-    'machine-surface',
-    'sliding-pill',
+    'surface',
+    'active-indicator',
     'source-foundation',
     'toggle',
   ],
-  exports: <String>['ElToggleGroup', 'ElToggleGroupItem'],
+  exports: <String>['ToggleGroup', 'ToggleGroupItem'],
   sourcePath: 'lib/src/components/toggle_group.dart',
 );
 
-/// The sibling source file every `ElToggleGroupItem` is rendered through:
-/// `toggle_group.dart` builds one `ElToggle` per item. The single
+/// The sibling source file every `ToggleGroupItem` is rendered through:
+/// `toggle_group.dart` builds one `Toggle` per item. The single
 /// [ComponentDocEntry.sourcePath] field has no room for it.
 const String toggleItemSourcePath = 'lib/src/components/toggle.dart';
 
-/// The travelling-pill engine `ElToggleGroup` renders through, shared with
-/// `ElTabs`, `ElSidebar` and `IconSwap`. `ElToggle` does not import it.
-const String slidingPillSourcePath = 'lib/src/motion/sliding_pill.dart';
+/// The travelling-pill engine `ToggleGroup` renders through, shared with
+/// `Tabs`, `Sidebar` and `IconSwap`. `Toggle` does not import it.
+const String slidingPillSourcePath =
+    'lib/src/components/ui/active_indicator.dart';

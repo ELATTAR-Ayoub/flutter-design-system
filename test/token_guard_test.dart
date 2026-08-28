@@ -4,18 +4,18 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// The standing contract of this port: **literals live in exactly one place.**
 ///
-/// `lib/src/foundation/` is the token source of truth (colors, sizes, tracking,
+/// `lib/src/design_system/foundation/` is the token source of truth (colors, sizes, tracking,
 /// durations, curves, radii, shadow geometry). Every other file in `lib/` and
 /// `example/lib/` consumes those tokens and must not restate a number.
 ///
 /// Escape hatch: put `allow-hardcoded: <reason>` on the offending line.
-/// Bare `0` / `0.0` and `elTransparent` are always legal.
+/// Bare `0` / `0.0` and `transparent` are always legal.
 ///
 /// This is a raw text scan, comments included — a doc comment that spells out a
 /// literal takes the same `allow-hardcoded:` note as code would.
 
 /// Directories exempt from the scan (relative to the repo root, posix slashes).
-const List<String> _exemptDirs = <String>['lib/src/foundation/'];
+const List<String> _exemptDirs = <String>['lib/src/design_system/foundation/'];
 
 /// Roots scanned, relative to the repo root.
 const List<String> _roots = <String>['lib', 'example/lib'];
@@ -39,20 +39,20 @@ const List<_Rule> _rules = <_Rule>[
   _Rule('hardcoded tracking', r'letterSpacing:\s*-?\d', zeroIsLegal: true),
   _Rule('hardcoded font weight', r'FontWeight\.w\d'),
   // `\b` so the rule catches stock `Curves.easeOut` without also catching
-  // `ElCurves.out`, which is the thing it exists to push callers towards.
-  _Rule('stock Flutter curve (use ElCurves)', r'\bCurves\.'),
+  // `MotionCurves.enter`, which is the thing it exists to push callers towards.
+  _Rule('stock Flutter curve (use MotionCurves)', r'\bCurves\.'),
   _Rule(
     'hardcoded duration',
     r'Duration\((milli|micro)seconds:\s*\d',
     zeroIsLegal: true,
   ),
   _Rule('hardcoded radius', r'BorderRadius\.circular\(\d', zeroIsLegal: true),
-  _Rule('raw BoxShadow (use ElShadows/ElMachineSurface)', r'BoxShadow\('),
+  _Rule('raw BoxShadow (use Shadows/Surface)', r'BoxShadow\('),
   // Leading, not box height. A [TextStyle.height] is the unitless ratio CSS
   // calls `line-height`, so the scope is "the integer part is 0 or 1" — which
   // is every value the type scale declares and none of the pixel heights a box
   // takes (`h-9` is 36, a row is 40, an icon is 16, and all of them read off
-  // `el()` or a component spec already).
+  // `space()` or a component spec already).
   //
   // `\b` before `height` is what keeps `maxHeight:`/`minHeight:` out; the
   // camel-cased `lineHeight:` never matches at all, this rule being
@@ -119,7 +119,7 @@ Iterable<File> _dartFilesUnder(Directory root) sync* {
 void main() {
   final Directory repoRoot = Directory.current;
 
-  test('no literals outside lib/src/foundation/', () {
+  test('no literals outside lib/src/design_system/foundation/', () {
     final List<TokenViolation> violations = <TokenViolation>[];
     int scanned = 0;
 
@@ -144,7 +144,7 @@ void main() {
       violations,
       isEmpty,
       reason:
-          'Literals are allowed ONLY in lib/src/foundation/.\n'
+          'Literals are allowed ONLY in lib/src/design_system/foundation/.\n'
           'Add `// allow-hardcoded: <reason>` to the line if it is genuinely '
           'unavoidable.\n${violations.join('\n')}',
     );
@@ -158,11 +158,10 @@ void main() {
         'hardcoded font size': 'const s = TextStyle(fontSize: 15);',
         'hardcoded tracking': 'const s = TextStyle(letterSpacing: -0.01);',
         'hardcoded font weight': 'const w = FontWeight.w650;',
-        'stock Flutter curve (use ElCurves)': 'final c = Curves.easeOut;',
+        'stock Flutter curve (use MotionCurves)': 'final c = Curves.easeOut;',
         'hardcoded duration': 'const d = Duration(milliseconds: 250);',
         'hardcoded radius': 'final r = BorderRadius.circular(16);',
-        'raw BoxShadow (use ElShadows/ElMachineSurface)':
-            'const b = BoxShadow();',
+        'raw BoxShadow (use Shadows/Surface)': 'const b = BoxShadow();',
         'hardcoded line height': 'const s = TextStyle(height: 1.4);',
       };
       for (final MapEntry<String, String> sample in samples.entries) {
@@ -178,10 +177,16 @@ void main() {
       }
     });
 
-    test('ElCurves is the sanctioned spelling, not a violation', () {
-      expect(scanSource('lib/src/probe.dart', 'curve: ElCurves.out,'), isEmpty);
+    test('MotionCurves is the sanctioned spelling, not a violation', () {
       expect(
-        scanSource('lib/src/probe.dart', 'reverseCurve: ElCurves.out.flipped,'),
+        scanSource('lib/src/probe.dart', 'curve: MotionCurves.enter,'),
+        isEmpty,
+      );
+      expect(
+        scanSource(
+          'lib/src/probe.dart',
+          'reverseCurve: MotionCurves.enter.flipped,',
+        ),
         isEmpty,
       );
       // …while the stock curve it replaces still trips, wherever it appears.
@@ -238,10 +243,10 @@ void main() {
       );
     });
 
-    test('lib/src/foundation/ is exempt', () {
+    test('lib/src/design_system/foundation/ is exempt', () {
       expect(
         scanSource(
-          'lib/src/foundation/colors.dart',
+          'lib/src/design_system/foundation/colors.dart',
           'const c = Color(0xFF92C2FC);',
         ),
         isEmpty,
@@ -268,11 +273,8 @@ void main() {
       );
     });
 
-    test('elTransparent is legal anywhere', () {
-      expect(
-        scanSource('lib/src/probe.dart', 'color: elTransparent,'),
-        isEmpty,
-      );
+    test('transparent is legal anywhere', () {
+      expect(scanSource('lib/src/probe.dart', 'color: transparent,'), isEmpty);
     });
   });
 }

@@ -7,7 +7,7 @@
 /// reaches Flutter web, which reads `disableAnimations` off the platform's
 /// accessibility features rather than off a media query. This file pins the
 /// hand-plumbed equivalent: that the flag reaches the page, that it collapses
-/// the durations `elAnimationDuration` gates, and — the property the rig
+/// the durations `effectiveMotionDuration` gates, and — the property the rig
 /// actually needs — that nothing on the two pages carrying a looping effect
 /// asks to repaint once a frame has landed.
 library;
@@ -15,7 +15,33 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/main.dart';
 import 'package:example/components_docs/button/page.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The frame the design bar is set at (design spec §7).
@@ -59,8 +85,14 @@ void main() {
       final BuildContext page = tester.element(find.byType(ButtonDocPage));
       expect(MediaQuery.maybeDisableAnimationsOf(page), isTrue);
       // The gate every duration in the package is routed through.
-      expect(elAnimationDuration(page, ElDurations.ratchet), Duration.zero);
-      expect(elAnimationDuration(page, ElDurations.foilDrift), Duration.zero);
+      expect(
+        effectiveMotionDuration(page, MotionDurations.ratchet),
+        Duration.zero,
+      );
+      expect(
+        effectiveMotionDuration(page, MotionDurations.foilDrift),
+        Duration.zero,
+      );
     });
 
     testWidgets('is off by default, and the tree animates as it always did', (
@@ -71,8 +103,8 @@ void main() {
       final BuildContext page = tester.element(find.byType(ButtonDocPage));
       expect(MediaQuery.maybeDisableAnimationsOf(page), isFalse);
       expect(
-        elAnimationDuration(page, ElDurations.ratchet),
-        ElDurations.ratchet,
+        effectiveMotionDuration(page, MotionDurations.ratchet),
+        MotionDurations.ratchet,
       );
     });
   });
@@ -120,12 +152,12 @@ void main() {
       );
 
       final BuildContext page = tester.element(find.byType(ButtonDocPage));
-      expect(ElClock.nowOf(page), frozen);
-      expect(ElClock.maybeOf(page), isNotNull);
+      expect(Clock.nowOf(page), frozen);
+      expect(Clock.maybeOf(page), isNotNull);
       // And the seam a calendar actually reads: `getInitialMonth` resolves
       // against it, so a calendar mounted anywhere under the app opens on
       // August 2026 rather than on whatever month the suite happens to run in.
-      expect(ElDateFormat.monthYear(ElClock.nowOf(page)), 'August 2026');
+      expect(DateFormat.monthYear(Clock.nowOf(page)), 'August 2026');
     });
 
     testWidgets('with no parameter the app mounts no clock at all, and the '
@@ -133,10 +165,10 @@ void main() {
       await tester.pumpDocs(reduceMotion: true, route: '/components/button');
 
       final BuildContext page = tester.element(find.byType(ButtonDocPage));
-      expect(ElClock.maybeOf(page), isNull);
+      expect(Clock.maybeOf(page), isNull);
       expect(
-        ElDateFormat.monthYear(ElClock.nowOf(page)),
-        ElDateFormat.monthYear(DateTime.now()),
+        DateFormat.monthYear(Clock.nowOf(page)),
+        DateFormat.monthYear(DateTime.now()),
       );
     });
   });

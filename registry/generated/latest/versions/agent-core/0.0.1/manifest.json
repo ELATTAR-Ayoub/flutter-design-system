@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/agent_core.dart",
+      "source": "lib/src/components/ui/agent_core.dart",
       "target": "@ui/agent_core.dart",
-      "sha256": "d5b2f90d974b530909758b84a3e223f391b6847e7bc3e878565aafda333e1b13"
+      "sha256": "a598b28e30cebbfe13e6322b1f692fda0c51b2cc84df0fe91ff861bea9bdfa68"
     }
   ],
   "registryDependencies": [
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/agent-core",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/agent_core.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_core.dart",
   "deprecated": false
 }

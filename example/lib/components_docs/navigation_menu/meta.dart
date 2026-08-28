@@ -7,15 +7,15 @@
 /// carries `navigation-menu`, and `elattar add navigation-menu` is a
 /// genuine, working command. [dependencies] below already matches the
 /// manifest's own `registryDependencies` list, verbatim: `icon`, `popover`
-/// (the [ElPopover] positioner this component builds on), `press-motion`,
+/// (the [Popover] positioner this component builds on), `press`,
 /// and `source-foundation`.
 ///
 /// Phase F/J split: this file used to cover `navigation_menu`, `menubar`,
-/// `context_menu`, and `hover_card` together (they all build on ElPopover).
+/// `context_menu`, and `hover_card` together (they all build on Popover).
 /// Each now has its own `meta.dart`/`page.dart` under its own directory,
 /// shaped like `button/page.dart`. This entry keeps only what
-/// `ElNavigationMenu`, `ElNavigationMenuItem`, `ElNavigationMenuIndicator`,
-/// and `ElNavigationMenuLink` actually export.
+/// `NavigationMenu`, `NavigationMenuItem`, `NavigationMenuIndicator`,
+/// and `NavigationMenuLink` actually export.
 library;
 
 import '../catalog.dart';
@@ -25,18 +25,13 @@ const ComponentDocEntry navigationMenuDoc = ComponentDocEntry(
   title: 'Navigation Menu',
   description:
       'A top bar whose items can open a shared or per-item panel, built on '
-      'ElPopover: for a section with more than a link to offer.',
-  dependencies: <String>[
-    'icon',
-    'popover',
-    'press-motion',
-    'source-foundation',
-  ],
+      'Popover: for a section with more than a link to offer.',
+  dependencies: <String>['icon', 'popover', 'press', 'source-foundation'],
   exports: <String>[
-    'ElNavigationMenu',
-    'ElNavigationMenuItem',
-    'ElNavigationMenuIndicator',
-    'ElNavigationMenuLink',
+    'NavigationMenu',
+    'NavigationMenuItem',
+    'NavigationMenuIndicator',
+    'NavigationMenuLink',
   ],
   sourcePath: 'lib/src/components/navigation_menu.dart',
 );

@@ -21,13 +21,13 @@ const ComponentDocEntry messageDoc = ComponentDocEntry(
   // registry/components/message.json's own registryDependencies, verbatim.
   dependencies: <String>['bubble', 'source-foundation'],
   exports: <String>[
-    'ElMessageGroup',
-    'ElMessage',
-    'ElMessageScope',
-    'ElMessageAvatar',
-    'ElMessageContent',
-    'ElMessageHeader',
-    'ElMessageFooter',
+    'MessageGroup',
+    'Message',
+    'MessageScope',
+    'MessageAvatar',
+    'MessageContent',
+    'MessageHeader',
+    'MessageFooter',
   ],
   sourcePath: 'lib/src/components/message.dart',
 );

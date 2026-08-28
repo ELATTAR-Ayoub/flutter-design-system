@@ -13,11 +13,9 @@ import 'source.dart';
 const List<String> _logicalTargetPrefixes = <String>[
   '@ui/',
   '@foundation/',
-  '@effects/',
-  '@motion/',
+  '@block/',
   '@assets/',
   '@shaders/',
-  '@app/',
   // Third-party notices. Missing from this list, a notice's payload resolves
   // to `logical/@license/...` instead of `logical/license/...`, so integrity
   // verification looks for a file the generator never wrote and a consumer

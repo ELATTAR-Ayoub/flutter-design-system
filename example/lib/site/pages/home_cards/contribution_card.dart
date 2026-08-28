@@ -3,7 +3,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// One summary tile's content.
 class _ContributionTile {
@@ -52,23 +64,27 @@ class _ContributionCardState extends State<ContributionCard> {
       : _contributionData.sublist(_contributionData.length - 3);
 
   Widget _tile(BuildContext context, _ContributionTile tile) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElCard(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Card(
       children: <Widget>[
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElText(
+              StyledText(
                 tile.caption,
-                ElType.caption,
+                TextStyles.caption,
                 color: theme.mutedForeground,
               ),
-              SizedBox(height: el(1)),
-              ElText(tile.value, ElType.h4),
-              SizedBox(height: el(1)),
-              ElText(tile.sub, ElType.small, color: theme.mutedForeground),
+              SizedBox(height: space(1)),
+              StyledText(tile.value, TextStyles.h4),
+              SizedBox(height: space(1)),
+              StyledText(
+                tile.sub,
+                TextStyles.small,
+                color: theme.mutedForeground,
+              ),
             ],
           ),
         ),
@@ -81,8 +97,8 @@ class _ContributionCardState extends State<ContributionCard> {
   /// narrow on a wide screen just as easily as on a phone.
   Widget _tiles(BuildContext context) => LayoutBuilder(
     builder: (BuildContext context, BoxConstraints constraints) {
-      final int columns = constraints.maxWidth >= el(70) ? 2 : 1;
-      final double gap = ElCard.spacing;
+      final int columns = constraints.maxWidth >= space(70) ? 2 : 1;
+      final double gap = Card.spacing;
       final List<Widget> rows = <Widget>[];
       for (int start = 0; start < _contributionTiles.length; start += columns) {
         final List<Widget> cells = <Widget>[];
@@ -112,52 +128,47 @@ class _ContributionCardState extends State<ContributionCard> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final double gap = ElCard.spacing;
+    final ThemeTokens theme = ThemeScope.of(context);
+    final double gap = Card.spacing;
 
-    return ElCard(
+    return Card(
       children: <Widget>[
-        ElCardHeader(
-          title: const ElCardTitle('Contribution history'),
-          description: ElCardDescription(
+        CardHeader(
+          title: const CardTitle('Contribution history'),
+          description: CardDescription(
             'Last ${_data.length} months of activity',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElChartContainer(
-                height: el(48),
-                config: ElChartConfig(<String, ElChartSeries>{
-                  'amount': ElChartSeries(
+              ChartContainer(
+                height: space(48),
+                config: ChartConfig(<String, ChartSeries>{
+                  'amount': ChartSeries(
                     label: 'Contributions',
                     color: theme.chart1,
                   ),
                 }),
-                child: ElCartesianChart(
+                child: CartesianChart(
                   data: _data,
                   // `vertical: false`, not `horizontal: false`: the rules a
                   // bar chart wants run behind the bars, not between them.
-                  grid: const ElChartGrid(vertical: false),
-                  xAxis: const ElChartAxis(
+                  grid: const ChartGrid(vertical: false),
+                  xAxis: const ChartAxis(
                     dataKey: 'month',
                     tickLine: false,
                     axisLine: false,
                   ),
-                  tooltip: const ElChartTooltipSpec(),
-                  series: <ElChartSeriesSpec>[
-                    ElChartSeriesSpec(
-                      kind: ElChartSeriesKind.bar,
+                  tooltip: const ChartTooltipSpec(),
+                  series: <ChartSeriesSpec>[
+                    ChartSeriesSpec(
+                      kind: ChartSeriesKind.bar,
                       dataKey: 'amount',
                       fill: theme.chart1,
-                      radii: <double>[
-                        ElRadii.sm,
-                        ElRadii.sm,
-                        ElRadii.sm,
-                        ElRadii.sm,
-                      ],
+                      radii: <double>[Radii.sm, Radii.sm, Radii.sm, Radii.sm],
                     ),
                   ],
                 ),
@@ -167,8 +178,8 @@ class _ContributionCardState extends State<ContributionCard> {
             ],
           ),
         ),
-        ElCardFooter(
-          child: ElButton(
+        CardFooter(
+          child: Button(
             key: const ValueKey<String>('home-contribution-toggle'),
             contentAlignment: AlignmentDirectional.center,
             onPressed: () => setState(() => _fullRange = !_fullRange),

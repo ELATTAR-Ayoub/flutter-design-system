@@ -1,8 +1,8 @@
 /// Documentation metadata for the `resizable` component.
 ///
-/// **New route, split out of `scroll_area`.** `ElResizablePanelGroup` used
-/// to share `/components/scroll_area` with `ElScrollArea` and
-/// `ElAspectRatio` under one shared `ComponentDocEntry` (see
+/// **New route, split out of `scroll_area`.** `ResizablePanelGroup` used
+/// to share `/components/scroll_area` with `ScrollArea` and
+/// `AspectRatio` under one shared `ComponentDocEntry` (see
 /// `scroll_area/meta.dart`'s own note for the split). It now has its own
 /// [name], its own route (`/components/resizable`), and its own page class
 /// (`ResizableDocPage`).
@@ -28,6 +28,6 @@ const ComponentDocEntry resizableDoc = ComponentDocEntry(
       'A row of panels with a draggable separator between every pair, '
       'each with its own pixel floor.',
   dependencies: <String>['source-foundation'],
-  exports: <String>['ElResizablePanelGroup', 'ElResizablePanel'],
+  exports: <String>['ResizablePanelGroup', 'ResizablePanel'],
   sourcePath: 'lib/src/components/resizable.dart',
 );

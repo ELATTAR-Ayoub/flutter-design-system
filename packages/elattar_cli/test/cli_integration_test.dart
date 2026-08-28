@@ -88,7 +88,7 @@ flutter:
         '${fixture.path}/lib/components/ui/spinner.dart',
       );
       final File effectFile = File(
-        '${fixture.path}/lib/design_system/effects/machine_surface.dart',
+        '${fixture.path}/lib/components/ui/surface.dart',
       );
       final File foundationFile = File(
         '${fixture.path}/lib/design_system/foundation/colors.dart',
@@ -116,10 +116,7 @@ flutter:
         buttonText,
         contains("import '../../design_system/foundation/colors.dart'"),
       );
-      expect(
-        buttonText,
-        contains("import '../../design_system/effects/machine_surface.dart'"),
-      );
+      expect(buttonText, contains("import './surface.dart'"));
 
       final String uiBarrelText = await uiBarrel.readAsString();
       expect(uiBarrelText, contains("export 'button.dart';"));
@@ -164,9 +161,9 @@ flutter:
           'icon',
           'spinner',
           'source-foundation',
-          'machine-surface',
-          'foil-value',
-          'sheen-action',
+          'surface',
+          'premium-surface',
+          'action-feedback',
         ]),
       );
 

@@ -1,6 +1,6 @@
 /// Public documentation page for the `marker` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the shape `button` established. Every specimen
@@ -37,7 +37,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -56,7 +68,7 @@ final ComponentDocSpec markerDocSpec = ComponentDocSpec(
       description:
           'All three variants, top to bottom: a bare row, a rule-label-'
           'rule divider, and a label with a rule under it. Not a '
-          'highlight: ElMarker draws no background on any variant and '
+          'highlight: Marker draws no background on any variant and '
           'will not emphasise a matched substring.',
       specimen: const KeyedSubtree(
         key: ValueKey<String>('marker-preview'),
@@ -90,7 +102,7 @@ final ComponentDocSpec markerDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElMarker and ElMarkerVariant are '
+              'Add the export line so Marker and MarkerVariant are '
               'reachable the same way the CLI path already makes them.',
           code: "export 'marker.dart';",
         ),
@@ -150,7 +162,7 @@ final ComponentDocSpec markerDocSpec = ComponentDocSpec(
       title: 'Adding an icon',
       description:
           'icon is an optional widget, and the row forces it into a '
-          'square of el(4) with ElMarker.gap after it. It sits after the '
+          'square of space(4) with Marker.gap after it. It sits after the '
           'leading rule under the separator variant, so the glyph reads '
           'as part of the label rather than as part of the divider. Keep '
           'it decorative: the row carries no semantics of its own for it.',
@@ -180,12 +192,12 @@ final ComponentDocSpec markerDocSpec = ComponentDocSpec(
           'every enum value, read straight off lib/src/components/'
           'marker.dart.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElMarker', anchor: 'api-elmarker'),
+        DocsTocEntry(title: 'Marker', anchor: 'api-elmarker'),
         DocsTocEntry(
-          title: 'ElMarker measurements',
+          title: 'Marker measurements',
           anchor: 'api-elmarker-static',
         ),
-        DocsTocEntry(title: 'ElMarkerVariant', anchor: 'api-elmarkervariant'),
+        DocsTocEntry(title: 'MarkerVariant', anchor: 'api-elmarkervariant'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -193,7 +205,7 @@ final ComponentDocSpec markerDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElMarker is a StatelessWidget with no gesture detector, no '
+          'Marker is a StatelessWidget with no gesture detector, no '
           'focus node, and no animation. It has no interaction states at '
           'all, and this table says so rather than inventing some.',
       child: const DocsStateMatrix(facts: _stateFacts),
@@ -209,7 +221,7 @@ final ComponentDocSpec markerDocSpec = ComponentDocSpec(
       child: _OneSentence(
         'Nothing is focusable and nothing is tappable: there is no Focus '
         'widget, no FocusNode, and no gesture detector anywhere in '
-        'marker.dart, so ElMarker never enters the tab order and has no '
+        'marker.dart, so Marker never enters the tab order and has no '
         'keyboard interaction to describe.',
       ),
     ),
@@ -253,7 +265,7 @@ final ComponentDocSpec markerDocSpec = ComponentDocSpec(
             description:
                 'Covers this page: the article mounts, the section order, '
                 'all three API tables, a live specimen of every '
-                'ElMarkerVariant value, and a theme flip.',
+                'MarkerVariant value, and a theme flip.',
           ),
           const DocsInstallFact(
             label: 'Edit these docs',
@@ -285,9 +297,9 @@ class MarkerDocPage extends StatelessWidget {
       title: markerDoc.title,
       description: markerDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Marker'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Marker'),
     ],
     toc: markerDocSpec.toc,
     previous: const DocsPageLink(title: 'Kbd', route: '/components/kbd'),
@@ -311,11 +323,11 @@ class _OneSentence extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-    child: ElText(
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+    child: StyledText(
       text,
-      ElType.small,
-      color: ElTheme.of(context).mutedForeground,
+      TextStyles.small,
+      color: ThemeScope.of(context).mutedForeground,
     ),
   );
 }
@@ -329,20 +341,20 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elmarker',
-        child: DocsApiTable(title: 'ElMarker', facts: _markerFacts),
+        child: DocsApiTable(title: 'Marker', facts: _markerFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elmarker-static',
         child: DocsApiTable(
-          title: 'ElMarker measurements',
+          title: 'Marker measurements',
           facts: _markerStaticFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elmarkervariant',
-        child: DocsApiTable(title: 'ElMarkerVariant', facts: _variantFacts),
+        child: DocsApiTable(title: 'MarkerVariant', facts: _variantFacts),
       ),
     ],
   );
@@ -353,8 +365,8 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'The label is ordinary ElText, so a screen reader reads it as '
+      _bullets(ThemeScope.of(context), <String>[
+        'The label is ordinary StyledText, so a screen reader reads it as '
             'prose in document order, between the rows it sits between. '
             'That is the whole of the semantic behaviour.',
         'Known gap: no semantic boundary. The row is not a separator '
@@ -381,7 +393,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint is read anywhere in marker.dart, and no width is '
             'branched on. The same tree renders at 390px and at 1440px.',
         'Under separator the layout is intrinsically fluid: the two '
@@ -391,10 +403,10 @@ class _ResponsiveContent extends StatelessWidget {
             'zero rather than wrapping under them: the label is Flexible, '
             'so it takes what it needs first.',
         'Under normal and border the label is Expanded and wraps as '
-            'ordinary text would: ElMarker sets no maxLines and adds no '
+            'ordinary text would: Marker sets no maxLines and adds no '
             'ellipsis, so a long label grows the row taller.',
-        'Vertical rhythm is the caller\'s: ElMarker adds no margin above '
-            'or below itself, only ElMarker.borderPadding under the '
+        'Vertical rhythm is the caller\'s: Marker adds no margin above '
+            'or below itself, only Marker.borderPadding under the '
             'border variant. Spacing between a marker and its neighbours '
             'is the list\'s own.',
         'Platform parity: identical on Android, iOS, Web, macOS, '
@@ -406,14 +418,16 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) => _bullets(ElTheme.of(context), <String>[
-    'File: lib/src/components/marker.dart, one file, holding ElMarker '
-        'and ElMarkerVariant and nothing private at all.',
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'File: lib/src/components/marker.dart, one file, holding Marker '
+        'and MarkerVariant and nothing private at all.',
     'Flutter import: package:flutter/widgets.dart only.',
-    'Foundation imports: foundation/spacing.dart (el(), '
-        'ElWidths.hairline), foundation/theme.dart (ElThemeData), '
-        'foundation/typography.dart (ElComponentType), theme_scope.dart '
-        '(ElText, ElTheme).',
+    'Foundation imports: foundation/spacing.dart (space(), '
+        'BorderWidths.hairline), foundation/theme.dart (ThemeTokens), '
+        'foundation/typography.dart (ComponentTextStyles), theme_scope.dart '
+        '(StyledText, ThemeScope).',
     'Component imports: none. This is the only one of the three '
         'components split out of the old carousel page that depends on '
         'no other component.',
@@ -429,18 +443,18 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Two colours, both read live off ElTheme.of(context) at build '
+      _bullets(ThemeScope.of(context), <String>[
+        'Two colours, both read live off ThemeScope.of(context) at build '
             'time: theme.mutedForeground for the label, theme.border for '
             'the rules and for the bottom border of the border variant.',
         'No colour parameter exists. A caller cannot recolour the label '
             'or the rules without wrapping or forking the widget.',
-        'Type is ElComponentType.textSm, fixed. There is no spec '
+        'Type is TextStyles.bodySmall, fixed. There is no spec '
             'parameter, so a marker cannot be made larger or bolder from '
             'a call site.',
-        'Rule thickness is ElWidths.hairline in both places it appears, '
+        'Rule thickness is BorderWidths.hairline in both places it appears, '
             'so the divider and the bottom border always match.',
-        'Flipping ElThemeController re-resolves both colours on the '
+        'Flipping ThemeController re-resolves both colours on the '
             'next frame; nothing is cached.',
         'Geometry is not themeable: gap, minHeight, ruleGap, and '
             'borderPadding are static getters over the 4px grid, exposed '
@@ -448,15 +462,19 @@ class _ThemingContent extends StatelessWidget {
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -467,51 +485,51 @@ const List<DocsApiFact> _markerFacts = <DocsApiFact>[
     type: 'String',
     description:
         'Required, no default. The whole of the row\'s text, drawn at '
-        'ElComponentType.textSm in theme.mutedForeground. Centre-aligned '
+        'TextStyles.bodySmall in theme.mutedForeground. Centre-aligned '
         'under the separator variant, left-aligned under the other two.',
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElMarkerVariant',
+    type: 'MarkerVariant',
     description:
-        'Optional. Defaults to ElMarkerVariant.normal. Chooses the rule '
-        'work around the label: see the ElMarkerVariant table below.',
+        'Optional. Defaults to MarkerVariant.normal. Chooses the rule '
+        'work around the label: see the MarkerVariant table below.',
   ),
   DocsApiFact(
     name: 'icon',
     type: 'Widget?',
     description:
-        'Optional. Defaults to null. Forced into a square of el(4) with '
-        'ElMarker.gap after it, before the label and after the leading '
+        'Optional. Defaults to null. Forced into a square of space(4) with '
+        'Marker.gap after it, before the label and after the leading '
         'rule. Decorative: the row gives it no semantics.',
   ),
 ];
 
 const List<DocsApiFact> _markerStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElMarker.gap',
+    name: 'Marker.gap',
     type: 'static double',
-    description: 'el(2). Between the icon and the label.',
+    description: 'space(2). Between the icon and the label.',
   ),
   DocsApiFact(
-    name: 'ElMarker.minHeight',
+    name: 'Marker.minHeight',
     type: 'static double',
     description:
-        'el(4). The row\'s floor. No marker in the corpus reaches it, '
+        'space(4). The row\'s floor. No marker in the corpus reaches it, '
         "because the small text spec's own line box is already taller.",
   ),
   DocsApiFact(
-    name: 'ElMarker.ruleGap',
+    name: 'Marker.ruleGap',
     type: 'static double',
     description:
-        'el(1). The air between a rule and the label under the separator '
+        'space(1). The air between a rule and the label under the separator '
         "variant, on top of the row's own gap.",
   ),
   DocsApiFact(
-    name: 'ElMarker.borderPadding',
+    name: 'Marker.borderPadding',
     type: 'static double',
     description:
-        'el(2). The space between the label and the bottom border under '
+        'space(2). The space between the label and the bottom border under '
         'the border variant.',
   ),
 ];
@@ -539,7 +557,7 @@ const List<DocsApiFact> _variantFacts = <DocsApiFact>[
     type: 'enum value',
     description:
         'A left-aligned label with one hairline border under it and '
-        'ElMarker.borderPadding above that border. Heads what follows.',
+        'Marker.borderPadding above that border. Heads what follows.',
   ),
 ];
 
@@ -548,7 +566,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Rest',
     treatment:
         'The only state. A muted label, plus whichever rules the '
-        'variant draws, at ElWidths.hairline in theme.border.',
+        'variant draws, at BorderWidths.hairline in theme.border.',
     userSignal: 'A quiet row between louder ones.',
   ),
   DocsStateFact(
@@ -585,7 +603,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-/// One specimen of each [ElMarkerVariant] value, in enum order.
+/// One specimen of each [MarkerVariant] value, in enum order.
 class _AllVariants extends StatelessWidget {
   const _AllVariants();
 
@@ -594,14 +612,11 @@ class _AllVariants extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      const ElMarker(label: 'Bare row, inside a frame that already exists'),
-      SizedBox(height: el(6)),
-      const ElMarker(
-        variant: ElMarkerVariant.separator,
-        label: 'Context cleared',
-      ),
-      SizedBox(height: el(6)),
-      const ElMarker(variant: ElMarkerVariant.border, label: 'Today'),
+      const Marker(label: 'Bare row, inside a frame that already exists'),
+      SizedBox(height: space(6)),
+      const Marker(variant: MarkerVariant.separator, label: 'Context cleared'),
+      SizedBox(height: space(6)),
+      const Marker(variant: MarkerVariant.border, label: 'Today'),
     ],
   );
 }
@@ -617,16 +632,16 @@ class _InAList extends StatelessWidget {
     children: <Widget>[
       const _ListRow(text: 'Draft the release note'),
       const _ListRow(text: 'Check the token guard'),
-      SizedBox(height: el(3)),
-      const ElMarker(
-        variant: ElMarkerVariant.separator,
+      SizedBox(height: space(3)),
+      const Marker(
+        variant: MarkerVariant.separator,
         label: '3 messages hidden',
       ),
-      SizedBox(height: el(3)),
+      SizedBox(height: space(3)),
       const _ListRow(text: 'Split the carousel page'),
-      SizedBox(height: el(3)),
-      const ElMarker(variant: ElMarkerVariant.border, label: 'Yesterday'),
-      SizedBox(height: el(3)),
+      SizedBox(height: space(3)),
+      const Marker(variant: MarkerVariant.border, label: 'Yesterday'),
+      SizedBox(height: space(3)),
       const _ListRow(text: 'Measure the footer row'),
     ],
   );
@@ -639,8 +654,8 @@ class _ListRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.symmetric(vertical: el(2)),
-    child: ElText(text, ElType.body),
+    padding: EdgeInsets.symmetric(vertical: space(2)),
+    child: StyledText(text, TextStyles.body),
   );
 }
 
@@ -652,14 +667,11 @@ class _WithIcon extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      const ElMarker(
-        icon: ElIcon.lucide(ElLucide.clock),
-        label: 'Waiting on you',
-      ),
-      SizedBox(height: el(6)),
-      const ElMarker(
-        variant: ElMarkerVariant.separator,
-        icon: ElIcon.lucide(ElLucide.eyeOff),
+      const Marker(icon: Icon.lucide(Lucide.clock), label: 'Waiting on you'),
+      SizedBox(height: space(6)),
+      const Marker(
+        variant: MarkerVariant.separator,
+        icon: Icon.lucide(Lucide.eyeOff),
         label: 'Stopped by you',
       ),
     ],
@@ -671,13 +683,12 @@ class _WithIcon extends StatelessWidget {
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElMarker(
-  variant: ElMarkerVariant.separator,
+Marker(
+  variant: MarkerVariant.separator,
   label: 'Today',
 )''';
 
-const String _notAMarkCode =
-    '''// Not a highlight. The name misleads.
+const String _notAMarkCode = '''// Not a highlight. The name misleads.
 //
 // * It is not an HTML mark element and not a highlight. It draws no
 //   background of any kind, on any variant.
@@ -696,47 +707,47 @@ const String _notAMarkCode =
 //   document.
 //
 // Reach for instead, if you wanted a highlight: nothing on this page
-// will tint a run of text. ElMarker has no such capability.''';
+// will tint a run of text. Marker has no such capability.''';
 
 const String _variantsCode =
     '''// normal: a bare row, for a container that already frames it.
-const ElMarker(label: 'Bare row, inside a frame that already exists')
+const Marker(label: 'Bare row, inside a frame that already exists')
 
 // separator: rule, label, rule. Divides before from after.
-const ElMarker(
-  variant: ElMarkerVariant.separator,
+const Marker(
+  variant: MarkerVariant.separator,
   label: 'Context cleared',
 )
 
 // border: a label with a hairline under it. Heads what follows.
-const ElMarker(variant: ElMarkerVariant.border, label: 'Today')''';
+const Marker(variant: MarkerVariant.border, label: 'Today')''';
 
 const String _inAListCode = '''Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   children: <Widget>[
     ListRow(text: 'Draft the release note'),
     ListRow(text: 'Check the token guard'),
-    const ElMarker(
-      variant: ElMarkerVariant.separator,
+    const Marker(
+      variant: MarkerVariant.separator,
       label: '3 messages hidden',
     ),
     ListRow(text: 'Split the carousel page'),
-    const ElMarker(
-      variant: ElMarkerVariant.border,
+    const Marker(
+      variant: MarkerVariant.border,
       label: 'Yesterday',
     ),
     ListRow(text: 'Measure the footer row'),
   ],
 )''';
 
-const String _iconCode = '''const ElMarker(
-  icon: ElIcon.lucide(ElLucide.clock),
+const String _iconCode = '''const Marker(
+  icon: Icon.lucide(Lucide.clock),
   label: 'Waiting on you',
 )
 
-const ElMarker(
-  variant: ElMarkerVariant.separator,
-  icon: ElIcon.lucide(ElLucide.eyeOff),
+const Marker(
+  variant: MarkerVariant.separator,
+  icon: Icon.lucide(Lucide.eyeOff),
   label: 'Stopped by you',
 )''';
 
@@ -752,15 +763,15 @@ const String _rulesCode =
 // * The label is Flexible under separator (centred) and Expanded under
 //   the other two variants. That difference stops the label from
 //   eating both rules under separator.
-// * Between each rule and the label sits ElMarker.ruleGap (el(1)), on
-//   top of the row's own ElMarker.gap between icon and label: two
+// * Between each rule and the label sits Marker.ruleGap (space(1)), on
+//   top of the row's own Marker.gap between icon and label: two
 //   different gaps, not one.
-// * Each rule is ElWidths.hairline tall, painted in theme.border. The
+// * Each rule is BorderWidths.hairline tall, painted in theme.border. The
 //   two rules above differ by fifteen thousandths of a pixel because
 //   the label's own width is fractional.
 // * The border variant does none of this: a plain row with
-//   ElMarker.borderPadding underneath and one hairline bottom border,
+//   Marker.borderPadding underneath and one hairline bottom border,
 //   label left-aligned.
-// * ElMarker.minHeight (el(4)) is a floor no marker in the corpus
+// * Marker.minHeight (space(4)) is a floor no marker in the corpus
 //   actually reaches: the small text spec's own line box is already
 //   taller than 16px.''';

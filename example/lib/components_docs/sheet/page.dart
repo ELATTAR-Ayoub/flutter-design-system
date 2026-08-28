@@ -7,7 +7,7 @@
 /// `lib/src/components/drawer.dart` has its own page and its own directory,
 /// `../drawer/page.dart`, not this one.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels shaped to mirror shadcn's own sheet page section for section; it
 /// now declares a [ComponentDocSpec]
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
@@ -20,7 +20,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -37,7 +49,7 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'Every edge ElSheetOverlay supports. Open one, then dismiss it '
+          'Every edge SheetOverlay supports. Open one, then dismiss it '
           'by tapping the scrim, pressing Escape, or the close button.',
       specimen: _SheetSidesPreview(keyPrefix: 'sheet-preview'),
       code: _sheetUsageCode,
@@ -71,10 +83,10 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'Uncontrolled, like ElDialog: the open/close boolean lives '
-          'inside ElModalPortal and the trigger only ever gets a '
-          'callback. ElSheetOverlay exposes no onOpenChange callback the '
-          "way ElDialog does: a real gap against the dialog's own API, "
+          'Uncontrolled, like Dialog: the open/close boolean lives '
+          'inside OverlayPortal and the trigger only ever gets a '
+          'callback. SheetOverlay exposes no onOpenChange callback the '
+          "way Dialog does: a real gap against the dialog's own API, "
           'not an omission from this page.',
       code: _sheetUsageCode,
     ),
@@ -84,17 +96,17 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
       description:
           'children accepts any Widget, not just header/footer/title/'
           "description: the reference's own filter sheet on the dialogs "
-          'page (example/lib/pages/dialogs.dart) puts a live ElSlider '
-          'straight inside a ElSheetContent.',
+          'page (example/lib/pages/dialogs.dart) puts a live Slider '
+          'straight inside a SheetContent.',
       code: _compositionCode,
     ),
     ShowcaseSection(
       id: 'side',
       title: 'Side',
       description:
-          'ElSheetSide chooses which edge the panel anchors to and '
+          'SheetSide chooses which edge the panel anchors to and '
           "slides from: top, right (the component's own default), "
-          'bottom, or left. ElSheetSide.bottom is NOT the same component '
+          'bottom, or left. SheetSide.bottom is NOT the same component '
           'as Drawer: a bottom-side sheet has no grip handle and no drag '
           'gesture, and animates on the 320ms overlay ease-out curve, '
           "not the drawer's 500ms cubic-bezier. See the Drawer page for "
@@ -107,7 +119,7 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
       id: 'no-close-button',
       title: 'No close button',
       description:
-          'showCloseButton: false on ElSheetContent drops the labelled X '
+          'showCloseButton: false on SheetContent drops the labelled X '
           "in the corner entirely: no X mounts, and the header's own "
           'right padding collapses from 48px back down to 16px, the same '
           'padding it reserves on every other side. The caller becomes '
@@ -115,27 +127,27 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
       specimen: _NoCloseButtonPreview(),
       code: _noCloseButtonCode,
       label: 'No close button specimen view',
-      minHeight: el(64),
+      minHeight: space(64),
     ),
     ShowcaseSection(
       id: 'rtl',
       title: 'RTL',
       description:
           'DOCUMENTED DRIFT: side is a physical edge, not a logical '
-          'start/end. ElSheetSide.left always renders against the '
+          'start/end. SheetSide.left always renders against the '
           "screen's physical left, even under a right-to-left "
-          'Directionality, because ElSheetOverlay aligns with '
+          'Directionality, because SheetOverlay aligns with '
           'Alignment.centerLeft/centerRight rather than an '
           "AlignmentDirectional pair. Only the panel's own text (title, "
           'description, and any body content) picks up RTL reading order '
           'and cross-axis alignment automatically. A caller building a '
           'fully mirrored RTL layout has to flip left and right '
-          'explicitly at the call site; ElSheetOverlay does not do it '
+          'explicitly at the call site; SheetOverlay does not do it '
           'for them.',
       specimen: _RtlPreview(),
       code: _rtlCode,
       label: 'RTL specimen view',
-      minHeight: el(64),
+      minHeight: space(64),
     ),
     DisclosureSection(
       id: 'api',
@@ -145,33 +157,30 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
           'class or enum in lib/src/components/sheet.dart: one table '
           'each.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElSheetOverlay', anchor: 'api-elsheetoverlay'),
-        DocsTocEntry(title: 'ElSheetContent', anchor: 'api-elsheetcontent'),
+        DocsTocEntry(title: 'SheetOverlay', anchor: 'api-elsheetoverlay'),
+        DocsTocEntry(title: 'SheetContent', anchor: 'api-elsheetcontent'),
         DocsTocEntry(
-          title: 'ElSheetContent static helpers',
+          title: 'SheetContent static helpers',
           anchor: 'api-elsheetcontent-static',
         ),
-        DocsTocEntry(title: 'ElSheetHeader', anchor: 'api-elsheetheader'),
-        DocsTocEntry(title: 'ElSheetFooter', anchor: 'api-elsheetfooter'),
-        DocsTocEntry(title: 'ElSheetTitle', anchor: 'api-elsheettitle'),
+        DocsTocEntry(title: 'SheetHeader', anchor: 'api-elsheetheader'),
+        DocsTocEntry(title: 'SheetFooter', anchor: 'api-elsheetfooter'),
+        DocsTocEntry(title: 'SheetTitle', anchor: 'api-elsheettitle'),
         DocsTocEntry(
-          title: 'ElSheetDescription',
+          title: 'SheetDescription',
           anchor: 'api-elsheetdescription',
         ),
-        DocsTocEntry(title: 'ElSheetSide', anchor: 'api-elsheetside'),
+        DocsTocEntry(title: 'SheetSide', anchor: 'api-elsheetside'),
+        DocsTocEntry(title: 'SheetTransition', anchor: 'api-elsheettransition'),
         DocsTocEntry(
-          title: 'ElSheetTransition',
-          anchor: 'api-elsheettransition',
-        ),
-        DocsTocEntry(
-          title: 'ElSheetContentGroup',
+          title: 'SheetContentGroup',
           anchor: 'api-elsheetcontentgroup',
         ),
         DocsTocEntry(
-          title: 'ElSheet static helpers',
+          title: 'Sheet static helpers',
           anchor: 'api-elsheet-static',
         ),
-        DocsTocEntry(title: 'ElSheetPanel', anchor: 'api-elsheetpanel'),
+        DocsTocEntry(title: 'SheetPanel', anchor: 'api-elsheetpanel'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -179,8 +188,8 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read straight off ElSheetOverlay, ElSheetContent, and the '
-          'shared ElModalPortal both ride.',
+          'Read straight off SheetOverlay, SheetContent, and the '
+          'shared OverlayPortal both ride.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
     DisclosureSection(
@@ -193,7 +202,7 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'sheet.dart wires no key handling of its own: every fact here '
-          'belongs to the shared ElModalPortal it rides '
+          'belongs to the shared OverlayPortal it rides '
           '(lib/src/components/dialog.dart).',
       child: _KeyboardContent(),
     ),
@@ -229,7 +238,7 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/dialogs_test.dart, test/sidebar_test.dart',
             description:
-                'ElSheetOverlay and ElSheet.showLeft are covered inside '
+                'SheetOverlay and Sheet.showLeft are covered inside '
                 'these two suites; there is no dedicated sheet_test.dart '
                 'in the package itself.',
           ),
@@ -240,7 +249,7 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
                 'Covers this page: the article mounts, every documented '
                 'constructor parameter appears in an API table, the '
                 'section order matches this file, and a live '
-                'ElSheetOverlay actually opens and dismisses.',
+                'SheetOverlay actually opens and dismisses.',
           ),
           const DocsInstallFact(
             label: 'Edit these docs',
@@ -266,9 +275,9 @@ class SheetDocPage extends StatelessWidget {
       title: sheetDoc.title,
       description: sheetDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Sheet'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Sheet'),
     ],
     toc: sheetDocSpec.toc,
     previous: const DocsPageLink(title: 'Dialog', route: '/components/dialog'),
@@ -283,21 +292,21 @@ class SheetDocPage extends StatelessWidget {
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-const String _sheetUsageCode = '''ElSheetOverlay(
-  side: ElSheetSide.right,
-  trigger: (context, open) => ElButton(
+const String _sheetUsageCode = '''SheetOverlay(
+  side: SheetSide.right,
+  trigger: (context, open) => Button(
     onPressed: open,
     child: const Text('Open filters'),
   ),
-  content: (context, close) => ElSheetContent(
+  content: (context, close) => SheetContent(
     onClose: close,
     children: <Widget>[
-      ElSheetHeader(children: <Widget>[
-        ElSheetTitle('Filter packs'),
-        ElSheetDescription('184 packs match your current filters.'),
+      SheetHeader(children: <Widget>[
+        SheetTitle('Filter packs'),
+        SheetDescription('184 packs match your current filters.'),
       ]),
-      ElSheetFooter(children: <Widget>[
-        ElButton(onPressed: close, child: const Text('Apply filters')),
+      SheetFooter(children: <Widget>[
+        Button(onPressed: close, child: const Text('Apply filters')),
       ]),
     ],
   ),
@@ -306,23 +315,23 @@ const String _sheetUsageCode = '''ElSheetOverlay(
 /// A trimmed, real excerpt of `example/lib/pages/dialogs.dart`'s own filter
 /// sheet: proof that `children` takes live, stateful controls and not only
 /// the header/footer/title/description anatomy.
-const String _compositionCode = '''ElSheetContent(
+const String _compositionCode = '''SheetContent(
   side: side,
   onClose: close,
   children: <Widget>[
-    ElSheetHeader(children: <Widget>[
-      ElSheetTitle('Filter packs'),
-      ElSheetDescription('184 packs match your current filters.'),
+    SheetHeader(children: <Widget>[
+      SheetTitle('Filter packs'),
+      SheetDescription('184 packs match your current filters.'),
     ]),
     Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(4)),
+      padding: EdgeInsets.symmetric(horizontal: space(4)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElText('Price range', ElType.section),
-          SizedBox(height: el(4)),
-          ElSlider(
+          StyledText('Price range', TextStyles.section),
+          SizedBox(height: space(4)),
+          Slider(
             values: price,
             max: 500,
             step: 5,
@@ -331,52 +340,52 @@ const String _compositionCode = '''ElSheetContent(
         ],
       ),
     ),
-    ElSheetFooter(children: <Widget>[
-      ElButton(onPressed: () {}, child: const Text('Apply filters')),
+    SheetFooter(children: <Widget>[
+      Button(onPressed: () {}, child: const Text('Apply filters')),
     ]),
   ],
 )''';
 
-const String _sideCode = '''ElSheetOverlay(
-  side: ElSheetSide.left,
-  trigger: (context, open) => ElButton(
+const String _sideCode = '''SheetOverlay(
+  side: SheetSide.left,
+  trigger: (context, open) => Button(
     onPressed: open,
     child: const Text('Open left'),
   ),
-  content: (context, close) => ElSheetContent(
-    side: ElSheetSide.left,
+  content: (context, close) => SheetContent(
+    side: SheetSide.left,
     onClose: close,
     children: const <Widget>[
-      ElSheetHeader(children: <Widget>[
-        ElSheetTitle('Notification settings'),
+      SheetHeader(children: <Widget>[
+        SheetTitle('Notification settings'),
       ]),
     ],
   ),
 )''';
 
-const String _noCloseButtonCode = '''ElSheetContent(
+const String _noCloseButtonCode = '''SheetContent(
   showCloseButton: false,
   children: <Widget>[
-    ElSheetHeader(children: <Widget>[
-      ElSheetTitle('Share link'),
-      ElSheetDescription('Anyone with this link can view this document.'),
+    SheetHeader(children: <Widget>[
+      SheetTitle('Share link'),
+      SheetDescription('Anyone with this link can view this document.'),
     ]),
   ],
 )''';
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElSheetContent(
+  child: SheetContent(
     children: <Widget>[
-      ElSheetHeader(children: <Widget>[
-        ElSheetTitle('مشاركة الرابط'),
-        ElSheetDescription('يمكن لأي شخص لديه هذا الرابط عرض هذا المستند.'),
+      SheetHeader(children: <Widget>[
+        SheetTitle('مشاركة الرابط'),
+        SheetDescription('يمكن لأي شخص لديه هذا الرابط عرض هذا المستند.'),
       ]),
     ],
   ),
 )''';
 
-/// One [ElSheetOverlay] per [ElSheetSide] value, keyed by [keyPrefix] so the
+/// One [SheetOverlay] per [SheetSide] value, keyed by [keyPrefix] so the
 /// same specimen can mount twice on this page (the Preview hero and the
 /// Side section's own live example) without a duplicate-key collision.
 class _SheetSidesPreview extends StatelessWidget {
@@ -384,34 +393,34 @@ class _SheetSidesPreview extends StatelessWidget {
 
   final String keyPrefix;
 
-  Widget _specimen(ElSheetSide side) => ElSheetOverlay(
+  Widget _specimen(SheetSide side) => SheetOverlay(
     side: side,
-    trigger: (BuildContext context, VoidCallback open) => ElButton(
+    trigger: (BuildContext context, VoidCallback open) => Button(
       key: ValueKey<String>('$keyPrefix:${side.name}'),
-      variant: ElButtonVariant.outline,
+      variant: ButtonVariant.outline,
       onPressed: open,
       child: Text('Open ${side.name}'),
     ),
-    content: (BuildContext context, VoidCallback close) => ElSheetContent(
+    content: (BuildContext context, VoidCallback close) => SheetContent(
       side: side,
       onClose: close,
       children: <Widget>[
-        const ElSheetHeader(
+        const SheetHeader(
           children: <Widget>[
-            ElSheetTitle('Notification settings'),
-            ElSheetDescription('Choose what you want to hear about.'),
+            SheetTitle('Notification settings'),
+            SheetDescription('Choose what you want to hear about.'),
           ],
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: el(4)),
-          child: ElText(
+          padding: EdgeInsets.symmetric(horizontal: space(4)),
+          child: StyledText(
             'This panel opened from the ${side.name} edge.',
-            ElType.body,
+            TextStyles.body,
           ),
         ),
-        ElSheetFooter(
+        SheetFooter(
           children: <Widget>[
-            ElButton(onPressed: close, child: const Text('Save changes')),
+            Button(onPressed: close, child: const Text('Save changes')),
           ],
         ),
       ],
@@ -420,21 +429,21 @@ class _SheetSidesPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(3),
-    runSpacing: el(3),
+    spacing: space(3),
+    runSpacing: space(3),
     children: <Widget>[
-      for (final ElSheetSide side in ElSheetSide.values) _specimen(side),
+      for (final SheetSide side in SheetSide.values) _specimen(side),
     ],
   );
 }
 
 /// The No close button section's own live specimen: a static, unopened
-/// [ElSheetContent] (no [ElSheetOverlay]/[ElModalPortal] needed, since the
+/// [SheetContent] (no [SheetOverlay]/[OverlayPortal] needed, since the
 /// panel is presentational and does not require an [Overlay] ancestor) with
 /// showCloseButton: false. side: bottom so its width stays natural instead
-/// of ElSheetContent's own double.infinity height on a horizontal side.
+/// of SheetContent's own double.infinity height on a horizontal side.
 ///
-/// A bottom-side [ElSheetContent] still builds a `Column` with the default
+/// A bottom-side [SheetContent] still builds a `Column` with the default
 /// `mainAxisSize.max`, which asserts if the incoming height is unbounded —
 /// as it is here, one level inside the showcase stage's own scroll body — so
 /// this wraps it in a fixed-height [SizedBox] first, the same way a bounded
@@ -444,20 +453,18 @@ class _NoCloseButtonPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: el(64),
+    height: space(64),
     child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-      child: const ElSheetContent(
+      constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+      child: const SheetContent(
         key: ValueKey<String>('sheet-no-close-button'),
-        side: ElSheetSide.bottom,
+        side: SheetSide.bottom,
         showCloseButton: false,
         children: <Widget>[
-          ElSheetHeader(
+          SheetHeader(
             children: <Widget>[
-              ElSheetTitle('Share link'),
-              ElSheetDescription(
-                'Anyone with this link can view this document.',
-              ),
+              SheetTitle('Share link'),
+              SheetDescription('Anyone with this link can view this document.'),
             ],
           ),
         ],
@@ -470,26 +477,26 @@ class _NoCloseButtonPreview extends StatelessWidget {
 /// technique as [_NoCloseButtonPreview], wrapped in a right-to-left
 /// [Directionality] so the text-direction flip is real and live, not merely
 /// described. Arabic title/description prove the text itself reads RTL; the
-/// panel keeps its own physical [ElSheetSide.bottom] regardless,
+/// panel keeps its own physical [SheetSide.bottom] regardless,
 /// illustrating the documented-drift claim in this section's description.
 class _RtlPreview extends StatelessWidget {
   const _RtlPreview();
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: el(64),
+    height: space(64),
     child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+      constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
       child: const Directionality(
         textDirection: TextDirection.rtl,
-        child: ElSheetContent(
+        child: SheetContent(
           key: ValueKey<String>('sheet-rtl'),
-          side: ElSheetSide.bottom,
+          side: SheetSide.bottom,
           children: <Widget>[
-            ElSheetHeader(
+            SheetHeader(
               children: <Widget>[
-                ElSheetTitle('مشاركة الرابط'),
-                ElSheetDescription(
+                SheetTitle('مشاركة الرابط'),
+                SheetDescription(
                   'يمكن لأي شخص لديه هذا الرابط عرض هذا المستند.',
                 ),
               ],
@@ -512,77 +519,74 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elsheetoverlay',
-        child: DocsApiTable(title: 'ElSheetOverlay', facts: _overlayFacts),
+        child: DocsApiTable(title: 'SheetOverlay', facts: _overlayFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheetcontent',
-        child: DocsApiTable(title: 'ElSheetContent', facts: _contentFacts),
+        child: DocsApiTable(title: 'SheetContent', facts: _contentFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheetcontent-static',
         child: DocsApiTable(
-          title: 'ElSheetContent static helpers',
+          title: 'SheetContent static helpers',
           facts: _contentStaticFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheetheader',
-        child: DocsApiTable(title: 'ElSheetHeader', facts: _headerFacts),
+        child: DocsApiTable(title: 'SheetHeader', facts: _headerFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheetfooter',
-        child: DocsApiTable(title: 'ElSheetFooter', facts: _footerFacts),
+        child: DocsApiTable(title: 'SheetFooter', facts: _footerFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheettitle',
-        child: DocsApiTable(title: 'ElSheetTitle', facts: _titleFacts),
+        child: DocsApiTable(title: 'SheetTitle', facts: _titleFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheetdescription',
         child: DocsApiTable(
-          title: 'ElSheetDescription',
+          title: 'SheetDescription',
           facts: _descriptionFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheetside',
-        child: DocsApiTable(title: 'ElSheetSide (enum)', facts: _sideFacts),
+        child: DocsApiTable(title: 'SheetSide (enum)', facts: _sideFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheettransition',
-        child: DocsApiTable(
-          title: 'ElSheetTransition',
-          facts: _transitionFacts,
-        ),
+        child: DocsApiTable(title: 'SheetTransition', facts: _transitionFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheetcontentgroup',
         child: DocsApiTable(
-          title: 'ElSheetContentGroup',
+          title: 'SheetContentGroup',
           facts: _contentGroupFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheet-static',
         child: DocsApiTable(
-          title: 'ElSheet static helpers',
+          title: 'Sheet static helpers',
           facts: _dsSheetStaticFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elsheetpanel',
-        child: DocsApiTable(title: 'ElSheetPanel', facts: _panelFacts),
+        child: DocsApiTable(title: 'SheetPanel', facts: _panelFacts),
       ),
     ],
   );
@@ -591,19 +595,19 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _overlayFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'trigger',
-    type: 'ElModalTriggerBuilder',
+    type: 'ModalTriggerBuilder',
     description: 'Required. Builds the control that opens the portal.',
   ),
   DocsApiFact(
     name: 'content',
-    type: 'ElModalContentBuilder',
+    type: 'ModalContentBuilder',
     description: 'Required. Builds the panel and receives its close callback.',
   ),
   DocsApiFact(
     name: 'side',
-    type: 'ElSheetSide',
+    type: 'SheetSide',
     description:
-        'Optional. Defaults to ElSheetSide.right, the component\'s own '
+        'Optional. Defaults to SheetSide.right, the component\'s own '
         'default. Which edge the panel anchors to and slides from.',
   ),
 ];
@@ -613,14 +617,14 @@ const List<DocsApiFact> _contentFacts = <DocsApiFact>[
     name: 'children',
     type: 'List<Widget>',
     description:
-        'Required. The column\'s contents, in order. A ElSheetFooter '
+        'Required. The column\'s contents, in order. A SheetFooter '
         'among them is pushed to the bottom automatically (mt-auto).',
   ),
   DocsApiFact(
     name: 'side',
-    type: 'ElSheetSide',
+    type: 'SheetSide',
     description:
-        'Optional. Defaults to ElSheetSide.right. Which edge to render '
+        'Optional. Defaults to SheetSide.right. Which edge to render '
         'the panel against; also decides which side gets the hairline '
         'border and which safe-area edges are excluded.',
   ),
@@ -636,7 +640,7 @@ const List<DocsApiFact> _contentFacts = <DocsApiFact>[
     name: 'onClose',
     type: 'VoidCallback?',
     description:
-        'Optional. Defaults to null. Wired by ElSheetOverlay\'s portal; '
+        'Optional. Defaults to null. Wired by SheetOverlay\'s portal; '
         'the close button calls it.',
   ),
   DocsApiFact(
@@ -644,7 +648,7 @@ const List<DocsApiFact> _contentFacts = <DocsApiFact>[
     type: 'double?',
     description:
         'Optional. Defaults to null, which falls back to '
-        'ElSheetContent.maxWidth (384px), then ElSheetContent.widthFor\'s '
+        'SheetContent.maxWidth (384px), then SheetContent.widthFor\'s '
         'compact clamp. Overrides the panel\'s width on a horizontal '
         'side only.',
   ),
@@ -659,24 +663,24 @@ const List<DocsApiFact> _contentFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _contentStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSheetContent.maxWidth',
+    name: 'SheetContent.maxWidth',
     type: 'static double',
     description:
-        '384px (ElContainers.sm): the horizontal panel\'s default width '
+        '384px (Containers.sm): the horizontal panel\'s default width '
         'before the width override or the compact-viewport clamp.',
   ),
   DocsApiFact(
-    name: 'ElSheetContent.gap',
+    name: 'SheetContent.gap',
     type: 'static double',
-    description: '16px (el(4)) between children in the column.',
+    description: '16px (space(4)) between children in the column.',
   ),
   DocsApiFact(
-    name: 'ElSheetContent.widthFor(width, viewport)',
+    name: 'SheetContent.widthFor(width, viewport)',
     type: 'static double Function(double, Size)',
     description:
         'Clamps a horizontal panel to 90% of viewport width '
-        '(ElModalCompact.maxWidthFraction) at or below the 600px '
-        'compact breakpoint (ElModalCompact.breakpoint).',
+        '(CompactDialogLayout.maxWidthFraction) at or below the 600px '
+        'compact breakpoint (CompactDialogLayout.breakpoint).',
   ),
 ];
 
@@ -726,27 +730,27 @@ const List<DocsApiFact> _descriptionFacts = <DocsApiFact>[
 const List<DocsApiFact> _sideFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'top',
-    type: 'ElSheetSide',
+    type: 'SheetSide',
     description: 'Panel spans the top edge, sized by height.',
   ),
   DocsApiFact(
     name: 'right',
-    type: 'ElSheetSide',
+    type: 'SheetSide',
     description:
-        'The constructor default on both ElSheetOverlay and '
-        'ElSheetContent. Panel pins to the trailing edge, sized by '
+        'The constructor default on both SheetOverlay and '
+        'SheetContent. Panel pins to the trailing edge, sized by '
         'width.',
   ),
   DocsApiFact(
     name: 'bottom',
-    type: 'ElSheetSide',
+    type: 'SheetSide',
     description:
         'Panel spans the bottom edge, sized by height. Not the same '
         'component as Drawer: see the Drawer page.',
   ),
   DocsApiFact(
     name: 'left',
-    type: 'ElSheetSide',
+    type: 'SheetSide',
     description: 'Panel pins to the leading edge, sized by width.',
   ),
   DocsApiFact(
@@ -763,13 +767,13 @@ const List<DocsApiFact> _transitionFacts = <DocsApiFact>[
     name: 'animation',
     type: 'Animation<double>',
     description:
-        'Required. The enter/exit driver ElSheetOverlay wires in '
-        'through ElModalPortal\'s transition builder; not something a '
+        'Required. The enter/exit driver SheetOverlay wires in '
+        'through OverlayPortal\'s transition builder; not something a '
         'typical caller constructs directly.',
   ),
   DocsApiFact(
     name: 'side',
-    type: 'ElSheetSide',
+    type: 'SheetSide',
     description:
         'Required. Which axis and direction to translate the slide-in '
         'along.',
@@ -780,7 +784,7 @@ const List<DocsApiFact> _transitionFacts = <DocsApiFact>[
     description: 'Required. The content being animated (the panel).',
   ),
   DocsApiFact(
-    name: 'ElSheetTransition.fraction',
+    name: 'SheetTransition.fraction',
     type: 'static double',
     description:
         '0.1: the enter/exit travel, as a fraction of the panel\'s own '
@@ -794,9 +798,9 @@ const List<DocsApiFact> _contentGroupFacts = <DocsApiFact>[
     name: 'showCloseButton',
     type: 'bool',
     description:
-        'Required. The value ElSheetHeader reads (via '
-        'ElSheetContentGroup.maybeOf) to decide its own right-padding '
-        'reservation; set by ElSheetContent, not usually constructed '
+        'Required. The value SheetHeader reads (via '
+        'SheetContentGroup.maybeOf) to decide its own right-padding '
+        'reservation; set by SheetContent, not usually constructed '
         'directly.',
   ),
   DocsApiFact(
@@ -808,14 +812,14 @@ const List<DocsApiFact> _contentGroupFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _dsSheetStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSheet.showLeft(context, {...})',
+    name: 'Sheet.showLeft(context, {...})',
     type: 'static Future<void>',
     description:
         'Pushes a left-hand sheet as a real Navigator route (a '
         'PopupRoute) and completes when it closes: a different '
-        'mounting strategy from ElSheetOverlay\'s OverlayPortal. '
+        'mounting strategy from SheetOverlay\'s OverlayPortal. '
         'example/lib/shell.dart\'s mobile navigation calls this, not '
-        'ElSheetOverlay.',
+        'SheetOverlay.',
   ),
   DocsApiFact(
     name: 'builder',
@@ -826,7 +830,7 @@ const List<DocsApiFact> _dsSheetStaticFacts = <DocsApiFact>[
     name: 'width',
     type: 'double',
     description:
-        'Optional. Defaults to ElWidths.sidebarMobile (288px), '
+        'Optional. Defaults to LayoutWidths.sidebarMobile (288px), '
         'deliberately wider than the 256px docked sidebar.',
   ),
   DocsApiFact(
@@ -873,7 +877,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Escape / back',
     treatment:
-        'Dismisses on Escape (ElModalPortal\'s FocusScope) and on '
+        'Dismisses on Escape (OverlayPortal\'s FocusScope) and on '
         'Android back / predictive back (the shared PopScope stack).',
     userSignal: 'The page remains in place.',
   ),
@@ -881,27 +885,27 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Scrim tap',
     treatment:
         'Dismisses on a tap outside the panel: dismissOnOverlayTap is '
-        'not set to false, so ElModalPortal\'s true default applies.',
+        'not set to false, so OverlayPortal\'s true default applies.',
     userSignal: 'Any tap outside the panel closes it.',
   ),
   DocsStateFact(
     state: 'Long content',
     treatment:
-        'ElSheetContent does not wrap its body children in a Flexible '
-        '+ SingleChildScrollView the way ElDialogContent does. A '
+        'SheetContent does not wrap its body children in a Flexible '
+        '+ SingleChildScrollView the way DialogContent does. A '
         'caller with content taller than the panel needs to wrap the '
         'middle children in a Scrollable itself.',
     userSignal:
         'Overflow is a real risk on a short viewport unless the caller '
         'adds their own scroll region: a gap against '
-        'ElDialogContent\'s built-in scrolling body, not a designed '
+        'DialogContent\'s built-in scrolling body, not a designed '
         'behavior.',
   ),
   DocsStateFact(
     state: 'Disabled, N/A',
     treatment: 'Exposes no enabled/disabled parameter of its own.',
     userSignal:
-        'A caller wanting a disabled trigger gates ElButton\'s own '
+        'A caller wanting a disabled trigger gates Button\'s own '
         'onPressed outside this widget.',
   ),
   DocsStateFact(
@@ -912,8 +916,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
-        'Rides ElModalPortal, whose durations resolve through '
-        'elAnimationDuration(context, ...): collapsing to zero under '
+        'Rides OverlayPortal, whose durations resolve through '
+        'effectiveMotionDuration(context, ...): collapsing to zero under '
         'the platform\'s disable-animations flag.',
     userSignal: 'The transition still happens, instantly.',
   ),
@@ -924,50 +928,50 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Focus moves INTO the panel on open: ElModalPortal wraps the '
+      _bullets(ThemeScope.of(context), <String>[
+        'Focus moves INTO the panel on open: OverlayPortal wraps the '
             'content in FocusScope(autofocus: true), so the '
             'FocusScopeNode itself (not a leaf widget) claims primary '
             'focus the moment the overlay mounts.',
         'Closing DOES return focus to the trigger that opened the '
-            'overlay, even though ElModalPortal contains no explicit '
+            'overlay, even though OverlayPortal contains no explicit '
             '"restore focus" code of its own: Flutter\'s FocusManager '
             'falls back to the enclosing scope\'s previously-focused '
             'child once the overlay\'s own FocusScope is removed from '
             'the tree, as long as the trigger\'s FocusNode is still '
             'mounted when the overlay closes.',
         'The close button carries an explicit accessible label '
-            '("Close") via ElButton\'s own label parameter.',
-        'ElSheetContent does not wrap its body in a '
+            '("Close") via Button\'s own label parameter.',
+        'SheetContent does not wrap its body in a '
             'Semantics(scopesRoute: true) / named-route announcement '
-            'the way a platform sheet convention would; ElSheetTitle '
-            'and ElSheetDescription are plain ElText, not wired to the '
+            'the way a platform sheet convention would; SheetTitle '
+            'and SheetDescription are plain StyledText, not wired to the '
             'panel as an accessible name/description pair.',
-        'ElSheetContent insets its body from the device\'s safe areas '
-            'via ElSafeArea, excluding the edge the panel detaches '
+        'SheetContent insets its body from the device\'s safe areas '
+            'via SafeArea, excluding the edge the panel detaches '
             'from (top on a bottom sheet, bottom on a top sheet, both '
             'on left/right).',
       ]);
 }
 
 /// `sheet.dart` wires no key handling of its own — every fact here belongs
-/// to the shared `ElModalPortal` it rides (`lib/src/components/dialog.dart`).
+/// to the shared `OverlayPortal` it rides (`lib/src/components/dialog.dart`).
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Focus is trapped while open in the sense that matters for Tab '
             'traversal: once Tab moves focus to a real control inside '
             'the panel, further presses cycle inside the panel rather '
             'than reaching page content behind the scrim.',
         'Escape closes the topmost open overlay '
-            '(ElModalPortalState\'s static stack), matching dialog\'s '
+            '(OverlayPortalState\'s static stack), matching dialog\'s '
             'own Escape contract.',
         'Android back / predictive back dismisses the topmost overlay '
             'unconditionally, the same USER-ORDERED MOBILE ADAPTATION '
-            'dialog.dart documents, shared by every ElModalPortal '
+            'dialog.dart documents, shared by every OverlayPortal '
             'consumer.',
         'No custom ordering: sheet.dart declares no '
             'FocusTraversalPolicy of its own. Tab and Shift+Tab walk '
@@ -981,16 +985,16 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Opts OUT of ElModalPortal\'s compact viewport clamp '
+      _bullets(ThemeScope.of(context), <String>[
+        'Opts OUT of OverlayPortal\'s compact viewport clamp '
             '(clampToViewport: false): a centred dialog is capped to '
             '90vw x 75vh on a phone, but an edge-anchored panel is '
             'already viewport-relative by definition, so that cap '
             'would crop it instead of protecting it.',
         'Clamps its own horizontal width instead, through '
-            'ElSheetContent.widthFor: 384px everywhere above the 600px '
-            'compact breakpoint (ElModalCompact.breakpoint), 90% of '
-            'viewport width (ElModalCompact.maxWidthFraction) at or '
+            'SheetContent.widthFor: 384px everywhere above the 600px '
+            'compact breakpoint (CompactDialogLayout.breakpoint), 90% of '
+            'viewport width (CompactDialogLayout.maxWidthFraction) at or '
             'below it.',
         'A vertical sheet (top or bottom) has no analogous height '
             'clamp of its own: its content sizes the panel directly, '
@@ -1010,7 +1014,7 @@ class _DependenciesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -1020,15 +1024,15 @@ class _DependenciesContent extends StatelessWidget {
           'Flutter imports: dart:ui (ImageFilter, the mobile-nav '
               'backdrop blur only), package:flutter/widgets.dart.',
           'Foundation imports: foundation/motion.dart, '
-              'foundation/shadows.dart, foundation/spacing.dart (el(), '
-              'ElWidths, ElContainers), foundation/theme.dart, '
-              'foundation/typography.dart, theme_scope.dart (ElText, '
-              'ElTheme).',
-          'Component imports: button.dart (ElButton: the close '
-              'affordance), dialog.dart (ElModalPortal, '
-              'ElModalTriggerBuilder, ElModalContentBuilder, '
-              'ElModalCompact), el_safe_area.dart (ElSafeArea), '
-              'icon.dart and icon_paths.dart (ElIcon, the X glyph).',
+              'foundation/shadows.dart, foundation/spacing.dart (space(), '
+              'LayoutWidths, Containers), foundation/theme.dart, '
+              'foundation/typography.dart, theme_scope.dart (StyledText, '
+              'ThemeScope).',
+          'Component imports: button.dart (Button: the close '
+              'affordance), dialog.dart (OverlayPortal, '
+              'ModalTriggerBuilder, ModalContentBuilder, '
+              'CompactDialogLayout), el_safe_area.dart (SafeArea), '
+              'icon.dart and icon_paths.dart (Icon, the X glyph).',
           'registryDependencies, read directly from the shipped '
               'manifest: ${sheetDoc.dependencies.join(', ')}.',
           'Assets, fonts, shaders: none.',
@@ -1057,25 +1061,25 @@ class _ThemingContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
-        'theme.popover fills the panel by default; ElSheetContent\'s '
+      _bullets(ThemeScope.of(context), <String>[
+        'theme.popover fills the panel by default; SheetContent\'s '
             'fill parameter is the only override point.',
         'theme.border paints the single hairline seam on the edge the '
             'panel detaches from the page along: right sheet, left '
             'edge; left sheet, right edge; and so on.',
-        'ElShadows.tailwindLg is the panel\'s one elevation layer, the '
+        'Shadows.tailwindLg is the panel\'s one elevation layer, the '
             'same shadow spec dialog\'s content uses.',
         'theme.muted at the system\'s standard 0.5 alpha bands '
-            'ElSheetHeader and ElSheetFooter: the same muted-band '
-            'anatomy ElDialogHeader/ElDialogFooter use.',
+            'SheetHeader and SheetFooter: the same muted-band '
+            'anatomy DialogHeader/DialogFooter use.',
         'No radius at all: every side is a hard-edged rectangle flush '
             'with the viewport edge. (Drawer, the sibling component, '
             'rounds only its top corners: see the Drawer page.)',
-        'Every colour is read live off ElTheme.of(context) at build '
-            'time. Flipping ElThemeController re-resolves every one '
+        'Every colour is read live off ThemeScope.of(context) at build '
+            'time. Flipping ThemeController re-resolves every one '
             'on the next frame: nothing is cached.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Drawer', route: '/components/drawer'),
@@ -1085,15 +1089,19 @@ class _ThemingContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

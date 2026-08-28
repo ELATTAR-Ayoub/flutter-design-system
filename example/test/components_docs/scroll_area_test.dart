@@ -1,5 +1,5 @@
 /// Tests for `components_docs/scroll_area/page.dart`'s [ScrollAreaDocPage]:
-/// [ElScrollArea] only. `ElResizablePanelGroup` and `ElAspectRatio` were
+/// [ScrollArea] only. `ResizablePanelGroup` and `AspectRatio` were
 /// split off into their own routes and their own test files
 /// (`resizable_test.dart`, `aspect_ratio_test.dart`); see
 /// `scroll_area/meta.dart`'s library note for the split.
@@ -10,7 +10,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage.
+/// `ThemeController` is flipped in place for theme coverage.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -21,7 +21,33 @@ import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -47,37 +73,37 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
-/// Every `ElApiTable` this page must render, by title, and every public
+/// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class, read directly off
 /// `lib/src/components/scroll_area.dart`.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElScrollArea': <String>[
+  'ScrollArea': <String>[
     'child',
     'borderRadius',
     'horizontalBar',
     'controller',
   ],
-  'ElScrollAreaBehavior': <String>['ElScrollAreaBehavior'],
+  'ScrollAreaBehavior': <String>['ScrollAreaBehavior'],
 };
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -153,8 +179,8 @@ void main() {
   );
 
   testWidgets(
-    'each ElApiTable covers every public constructor parameter and static '
-    'of ElScrollArea',
+    'each ApiTable covers every public constructor parameter and static '
+    'of ScrollArea',
     (WidgetTester tester) async {
       await _pump(tester);
       await _open(tester, 'API Reference');
@@ -177,7 +203,7 @@ void main() {
         expect(
           documented,
           isNotNull,
-          reason: 'no ElApiTable titled "${expected.key}" was rendered',
+          reason: 'no ApiTable titled "${expected.key}" was rendered',
         );
         for (final String param in expected.value) {
           expect(
@@ -188,16 +214,16 @@ void main() {
         }
       }
 
-      // No leftover ElResizablePanelGroup/ElAspectRatio tables from the
+      // No leftover ResizablePanelGroup/AspectRatio tables from the
       // pre-split page.
-      expect(byTitle.containsKey('ElResizablePanelGroup'), isFalse);
-      expect(byTitle.containsKey('ElResizablePanel'), isFalse);
-      expect(byTitle.containsKey('ElAspectRatio'), isFalse);
+      expect(byTitle.containsKey('ResizablePanelGroup'), isFalse);
+      expect(byTitle.containsKey('ResizablePanel'), isFalse);
+      expect(byTitle.containsKey('AspectRatio'), isFalse);
     },
   );
 
   testWidgets(
-    'ElScrollArea renders the scroll container with content that can scroll',
+    'ScrollArea renders the scroll container with content that can scroll',
     (WidgetTester tester) async {
       await _pump(tester);
 
@@ -206,8 +232,8 @@ void main() {
       );
       expect(scrollArea, findsOneWidget);
       expect(tester.takeException(), isNull);
-      expect(find.byType(ElResizablePanelGroup), findsNothing);
-      expect(find.byType(ElAspectRatio), findsNothing);
+      expect(find.byType(ResizablePanelGroup), findsNothing);
+      expect(find.byType(AspectRatio), findsNothing);
     },
   );
 
@@ -215,13 +241,10 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(scrollAreaDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(scrollAreaDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);
@@ -281,7 +304,7 @@ void main() {
     expect(scrollAreaDoc.name, 'scroll_area');
     expect(
       scrollAreaDoc.exports,
-      containsAll(<String>['ElScrollArea', 'ElScrollAreaBehavior']),
+      containsAll(<String>['ScrollArea', 'ScrollAreaBehavior']),
     );
     expect(tester.takeException(), isNull);
   });

@@ -6,16 +6,42 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/kit.dart';
 import 'package:example/nav.dart';
 import 'package:example/shell.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _harness(
   Widget child, {
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   AppRouter? router,
 }) {
-  return ElTheme(
-    controller: ElThemeController(mode: mode),
+  return ThemeScope(
+    controller: ThemeController(mode: mode),
     child: AppRouterScope(
       router: router ?? AppRouter(),
       child: MaterialApp(
@@ -39,16 +65,16 @@ Widget _atWidth(Widget child, {double width = 400}) => _harness(
 );
 
 void main() {
-  group('ElNote', () {
+  group('Note', () {
     // The rendering fact colors-map §3 flags: `.type-label` declares its own
     // `color: var(--muted-foreground)`, which beats the wrapper's tone ink.
-    for (final ElNoteTone tone in ElNoteTone.values) {
+    for (final NoteTone tone in NoteTone.values) {
       testWidgets('$tone title renders muted-foreground, not the tone ink', (
         WidgetTester tester,
       ) async {
         await tester.pumpWidget(
           _harness(
-            ElNote(
+            Note(
               tone: tone,
               title: 'Measured, not asserted',
               child: const Text('body'),
@@ -58,10 +84,10 @@ void main() {
 
         // `.type-label` is uppercase, so this is the rendered string.
         final TextStyle title = _styleOf(tester, 'MEASURED, NOT ASSERTED');
-        expect(title.color, ElThemeData.dark.mutedForeground);
-        expect(title.color, isNot(ElThemeData.dark.actionInk));
-        expect(title.color, isNot(ElThemeData.dark.valueInk));
-        expect(title.color, isNot(ElThemeData.dark.destructiveInk));
+        expect(title.color, ThemeTokens.dark.mutedForeground);
+        expect(title.color, isNot(ThemeTokens.dark.actionText));
+        expect(title.color, isNot(ThemeTokens.dark.premiumText));
+        expect(title.color, isNot(ThemeTokens.dark.destructiveText));
       });
     }
 
@@ -70,8 +96,8 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _harness(
-          const ElNote(
-            tone: ElNoteTone.value,
+          const Note(
+            tone: NoteTone.value,
             title: 'The one step that is not a mirror',
             child: Text('body'),
           ),
@@ -91,21 +117,21 @@ void main() {
                   .decoration!
               as BoxDecoration;
 
-      expect(box.color, ElPalette.value.withValues(alpha: 0.08));
+      expect(box.color, Palette.value.withValues(alpha: 0.08));
       expect(
         (box.border! as Border).top.color,
-        ElPalette.value.withValues(alpha: 0.30),
+        Palette.value.withValues(alpha: 0.30),
       );
     });
   });
 
-  group('ElSection', () {
+  group('Section', () {
     testWidgets('the h2 wears .type-h3 and the description wears .type-small', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
         _harness(
-          const ElSection(
+          const Section(
             id: 'monochrome',
             title: 'Monochrome — zinc',
             description: 'Six steps on shadcn’s own token names.',
@@ -115,17 +141,17 @@ void main() {
       );
 
       final TextStyle heading = _styleOf(tester, 'Monochrome — zinc');
-      expect(heading.fontSize, ElType.h3.size);
-      expect(heading.color, ElThemeData.dark.foreground);
+      expect(heading.fontSize, TextStyles.h3.size);
+      expect(heading.color, ThemeTokens.dark.foreground);
       // …and not the class its element name would suggest.
-      expect(heading.fontSize, isNot(ElType.h2.size));
+      expect(heading.fontSize, isNot(TextStyles.h2.size));
 
       final TextStyle description = _styleOf(
         tester,
         'Six steps on shadcn’s own token names.',
       );
-      expect(description.fontSize, ElType.small.size);
-      expect(description.color, ElThemeData.dark.mutedForeground);
+      expect(description.fontSize, TextStyles.small.size);
+      expect(description.color, ThemeTokens.dark.mutedForeground);
     });
 
     testWidgets('registers an anchor for in-page links', (
@@ -133,21 +159,21 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _harness(
-          const ElSection(id: 'prose', title: 'Prose', child: Text('body')),
+          const Section(id: 'prose', title: 'Prose', child: Text('body')),
         ),
       );
-      expect(ElSection.anchorKey('prose').currentContext, isNotNull);
-      expect(ElSection.anchorKey('nothing-here').currentContext, isNull);
+      expect(Section.anchorKey('prose').currentContext, isNotNull);
+      expect(Section.anchorKey('nothing-here').currentContext, isNull);
     });
   });
 
-  group('ElPageHeader', () {
+  group('PageHeader', () {
     testWidgets('eyebrow takes action ink; chips render in order', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
         _harness(
-          const ElPageHeader(
+          const PageHeader(
             eyebrow: 'Foundations',
             title: 'Colors',
             blurb: 'Zinc for everything structural.',
@@ -156,12 +182,15 @@ void main() {
         ),
       );
 
-      expect(_styleOf(tester, 'FOUNDATIONS').color, ElThemeData.dark.actionInk);
+      expect(
+        _styleOf(tester, 'FOUNDATIONS').color,
+        ThemeTokens.dark.actionText,
+      );
       // `clamp(2rem, 2.8vw, 2.5rem)` against the test view's 800px width.
-      expect(_styleOf(tester, 'Colors').fontSize, ElType.h1Size(800));
+      expect(_styleOf(tester, 'Colors').fontSize, TextStyles.h1Size(800));
       expect(
         _styleOf(tester, 'Zinc for everything structural.').color,
-        ElThemeData.dark.mutedForeground,
+        ThemeTokens.dark.mutedForeground,
       );
       for (final String chip in <String>[
         'Monochrome',
@@ -173,42 +202,40 @@ void main() {
     });
   });
 
-  testWidgets('ElCode is a mono chip in muted ink', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(_harness(const ElCode('app/globals.css')));
+  testWidgets('Code is a mono chip in muted ink', (WidgetTester tester) async {
+    await tester.pumpWidget(_harness(const Code('app/globals.css')));
     final TextStyle style = _styleOf(tester, 'app/globals.css');
-    expect(style.fontSize, ElType.code.size);
-    expect(style.color, ElThemeData.dark.mutedForeground);
+    expect(style.fontSize, TextStyles.code.size);
+    expect(style.color, ThemeTokens.dark.mutedForeground);
   });
 
-  testWidgets('ElDoDont heads each column in its own ink', (
+  testWidgets('DoDont heads each column in its own ink', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
       _harness(
-        const ElDoDont(
+        const DoDont(
           dos: <String>['Use the scale.'],
           donts: <String>['Invent a value.'],
         ),
       ),
     );
 
-    expect(_styleOf(tester, 'DO').color, ElThemeData.dark.valueInk);
+    expect(_styleOf(tester, 'DO').color, ThemeTokens.dark.premiumText);
     // `Don&rsquo;t` — the right single quote, verbatim.
-    expect(_styleOf(tester, 'DON’T').color, ElThemeData.dark.destructiveInk);
+    expect(_styleOf(tester, 'DON’T').color, ThemeTokens.dark.destructiveText);
     expect(find.text('Use the scale.'), findsOneWidget);
     expect(find.text('Invent a value.'), findsOneWidget);
   });
 
-  group('ElPageFootNav', () {
+  group('PageFootNav', () {
     testWidgets('colors has no previous and points at Typography', (
       WidgetTester tester,
     ) async {
       final AppRouter router = AppRouter();
       await tester.pumpWidget(
         _harness(
-          const ElPageFootNav(groupId: 'foundations', slug: 'colors'),
+          const PageFootNav(groupId: 'foundations', slug: 'colors'),
           router: router,
         ),
       );
@@ -226,7 +253,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _harness(const ElPageFootNav(groupId: 'foundations', slug: 'spacing')),
+        _harness(const PageFootNav(groupId: 'foundations', slug: 'spacing')),
       );
       expect(find.text('PREVIOUS'), findsOneWidget);
       expect(find.text('Typography'), findsOneWidget);
@@ -235,21 +262,21 @@ void main() {
     });
   });
 
-  testWidgets('ElIndexCard links, and the group variant carries its label', (
+  testWidgets('IndexCard links, and the group variant carries its label', (
     WidgetTester tester,
   ) async {
     final AppRouter router = AppRouter();
     await tester.pumpWidget(
       _harness(
-        ElIndexGrid(
+        IndexGrid(
           children: <Widget>[
-            const ElIndexCard(
+            const IndexCard(
               href: '$elRoot/colors',
               title: 'Colors',
               blurb: 'Surfaces, the action and value ramps.',
               contents: <String>['Surfaces', 'Action ramp'],
             ),
-            const ElIndexCard.group(
+            const IndexCard.group(
               href: '$elRoot/components/base',
               label: '14 sets',
               title: 'Base Components',
@@ -262,22 +289,22 @@ void main() {
       ),
     );
 
-    expect(_styleOf(tester, 'Colors').fontSize, ElType.h4.size);
+    expect(_styleOf(tester, 'Colors').fontSize, TextStyles.h4.size);
     // The group card's title is a step larger, over an action-ink label.
-    expect(_styleOf(tester, 'Base Components').fontSize, ElType.h3.size);
-    expect(_styleOf(tester, '14 SETS').color, ElThemeData.dark.actionInk);
+    expect(_styleOf(tester, 'Base Components').fontSize, TextStyles.h3.size);
+    expect(_styleOf(tester, '14 SETS').color, ThemeTokens.dark.actionText);
 
     await tester.tap(find.text('Colors'));
     await tester.pumpAndSettle();
     expect(router.route, '$elRoot/colors');
   });
 
-  testWidgets('ElPanel strips its label and note across the header band', (
+  testWidgets('Panel strips its label and note across the header band', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
       _harness(
-        const ElPanel(
+        const Panel(
           label: 'Texture',
           note: 'max-w-(--width-prose) · 720px',
           child: Text('body'),
@@ -285,10 +312,10 @@ void main() {
       ),
     );
 
-    expect(_styleOf(tester, 'TEXTURE').color, ElThemeData.dark.mutedForeground);
+    expect(_styleOf(tester, 'TEXTURE').color, ThemeTokens.dark.mutedForeground);
     final TextStyle note = _styleOf(tester, 'max-w-(--width-prose) · 720px');
-    expect(note.fontSize, ElType.numSm.size);
-    expect(note.color, ElThemeData.dark.mutedForeground);
+    expect(note.fontSize, TextStyles.numberSm.size);
+    expect(note.color, ThemeTokens.dark.mutedForeground);
   });
 
   // `box-sizing: border-box` is global in Tailwind, so a framed box spends its
@@ -300,13 +327,13 @@ void main() {
   group('border-box', () {
     const Key body = Key('body');
 
-    testWidgets('ElPanel spends its frame on its own width', (
+    testWidgets('Panel spends its frame on its own width', (
       WidgetTester tester,
     ) async {
       const double outer = 400;
       await tester.pumpWidget(
         _atWidth(
-          const ElPanel(
+          const Panel(
             label: 'Seven steps',
             child: SizedBox(key: body, height: 40),
           ),
@@ -315,36 +342,36 @@ void main() {
 
       expect(
         tester.getSize(find.byKey(body)).width,
-        outer - 2 * el(6) - 2 * ElWidths.hairline,
+        outer - 2 * space(6) - 2 * BorderWidths.hairline,
       );
       // …and the strip above it starts at the border's inner edge, not on it.
       expect(
         tester.getTopLeft(find.text('SEVEN STEPS')).dx,
-        closeTo(el(5) + ElWidths.hairline, 0.01),
+        closeTo(space(5) + BorderWidths.hairline, 0.01),
       );
     });
 
-    testWidgets('a flush ElPanel body is still inset by the frame', (
+    testWidgets('a flush Panel body is still inset by the frame', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
         _atWidth(
-          const ElPanel(flush: true, child: SizedBox(key: body, height: 40)),
+          const Panel(flush: true, child: SizedBox(key: body, height: 40)),
         ),
       );
       expect(
         tester.getSize(find.byKey(body)).width,
-        400 - 2 * ElWidths.hairline,
+        400 - 2 * BorderWidths.hairline,
       );
     });
 
-    testWidgets('ElDividedList rows clear the frame, and each divider is a '
+    testWidgets('DividedList rows clear the frame, and each divider is a '
         'real pixel of row height', (WidgetTester tester) async {
       const Key first = Key('row-0');
       const Key second = Key('row-1');
       await tester.pumpWidget(
         _atWidth(
-          const ElDividedList(
+          const DividedList(
             children: <Widget>[
               SizedBox(key: first, height: 40),
               SizedBox(key: second, height: 40),
@@ -356,7 +383,7 @@ void main() {
       for (final Key key in <Key>[first, second]) {
         expect(
           tester.getSize(find.byKey(key)).width,
-          400 - 2 * ElWidths.hairline,
+          400 - 2 * BorderWidths.hairline,
           reason: '$key',
         );
       }
@@ -365,7 +392,7 @@ void main() {
       expect(
         tester.getTopLeft(find.byKey(second)).dy -
             tester.getBottomLeft(find.byKey(first)).dy,
-        ElWidths.hairline,
+        BorderWidths.hairline,
       );
     });
 
@@ -383,7 +410,7 @@ void main() {
             // A grid row is an `IntrinsicHeight`; on its own the card's `grow`
             // blurb needs a bounded height from somewhere.
             height: 240,
-            child: ElIndexCard(
+            child: IndexCard(
               href: '$elRoot/colors',
               title: 'Colors',
               blurb:
@@ -405,18 +432,18 @@ void main() {
       );
       expect(
         blurb.constraints.maxWidth,
-        closeTo(outer - 2 * el(5) - 2 * ElWidths.hairline, 0.01),
+        closeTo(outer - 2 * space(5) - 2 * BorderWidths.hairline, 0.01),
       );
     });
   });
 
-  testWidgets('ElMeta puts the key in mono action ink beside its value', (
+  testWidgets('Meta puts the key in mono action ink beside its value', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
       _harness(
-        ElMeta(
-          items: <ElMetaItem>[
+        Meta(
+          items: <MetaItem>[
             (k: '--width-prose', v: const TextSpan(text: '720px')),
           ],
         ),
@@ -424,8 +451,8 @@ void main() {
     );
 
     final TextStyle key = _styleOf(tester, '--width-prose');
-    expect(key.fontSize, ElType.numSm.size);
-    expect(key.color, ElThemeData.dark.actionInk);
+    expect(key.fontSize, TextStyles.numberSm.size);
+    expect(key.color, ThemeTokens.dark.actionText);
     expect(find.textContaining('720px', findRichText: true), findsOneWidget);
   });
 }

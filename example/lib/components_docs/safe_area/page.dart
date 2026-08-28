@@ -2,13 +2,13 @@
 ///
 /// **A user-ordered mobile adaptation, not a port.** Say so plainly: every
 /// other page in this rollout documents something the reference already
-/// had. `ElSafeArea` exists because screenshots on 2026-08-16 showed the
+/// had. `SafeArea` exists because screenshots on 2026-08-16 showed the
 /// docs header sitting behind a phone's clock and the reading column
 /// running under the gesture bar — a real bug report, not a translated
 /// spec. There is no `app/globals.css` line to cite; the class doc states
 /// the ruling itself and this page documents that ruling.
 ///
-/// **Why `EffectSection`, not `ShowcaseSection`.** `ElSafeArea` carries no
+/// **Why `EffectSection`, not `ShowcaseSection`.** `SafeArea` carries no
 /// variant enum and paints nothing of its own: it either inserts a
 /// [Padding] and a narrowed [MediaQuery] around `child`, or — the zero
 /// short-circuit the class doc calls out — returns `child` completely
@@ -17,20 +17,32 @@
 ///
 /// **Responsive is the disclosure that matters here.** Every other
 /// component's Responsive section is a paragraph about breakpoints;
-/// `ElSafeArea` has none — its entire reason to exist IS a device-class
+/// `SafeArea` has none — its entire reason to exist IS a device-class
 /// distinction, so that disclosure carries the real content and the
 /// States disclosure is comparatively thin.
 ///
 /// **The inset numbers on this page are illustrative, not measured.** A
 /// real iPhone's status bar and gesture-pill insets vary by model; this
 /// page simulates a representative top and bottom inset via a nested
-/// `MediaQuery`, sized off `el(...)` like everything else under
+/// `MediaQuery`, sized off `space(...)` like everything else under
 /// `example/lib/`, rather than a literal device measurement copied from a
 /// spec sheet.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -39,11 +51,11 @@ import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
 
 /// A representative status-bar inset for the mock phone stages on this
-/// page — not a measured device value, an `el()` step close to one.
-double get _mockTopInset => el(12);
+/// page — not a measured device value, an `space()` step close to one.
+double get _mockTopInset => space(12);
 
 /// A representative gesture-pill inset.
-double get _mockBottomInset => el(8);
+double get _mockBottomInset => space(8);
 
 final ComponentDocSpec safeAreaDocSpec = ComponentDocSpec(
   name: 'safe_area',
@@ -55,10 +67,10 @@ final ComponentDocSpec safeAreaDocSpec = ComponentDocSpec(
       title: 'Preview',
       description:
           'The same mock phone frame, under the same simulated system-bar '
-          'padding, twice. The left one has no ElSafeArea at all: its row '
+          'padding, twice. The left one has no SafeArea at all: its row '
           'of controls sits at the raw top-left and collides with the '
           'status-bar strip painted over it. The right one wraps only the '
-          'controls in ElSafeArea(bottom: false): the background keeps '
+          'controls in SafeArea(bottom: false): the background keeps '
           'painting edge-to-edge behind the strip, but the row itself '
           'moves down to clear it.',
       host: const _PreviewHost(),
@@ -90,7 +102,7 @@ final ComponentDocSpec safeAreaDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElSafeArea is reachable the same '
+              'Add the export line so SafeArea is reachable the same '
               'way the CLI path already makes it.',
           code: "export 'safe_area.dart';",
         ),
@@ -109,7 +121,7 @@ final ComponentDocSpec safeAreaDocSpec = ComponentDocSpec(
       id: 'scroll-content',
       title: 'Scroll Content',
       description:
-          'ElSafeArea.scrollPaddingOf adds the bottom and both horizontal '
+          'SafeArea.scrollPaddingOf adds the bottom and both horizontal '
           'insets to a scroll view\'s own padding — never the top, which '
           'belongs to the bar\'s own height instead. The left list uses '
           'plain EdgeInsets.zero and its last row sits under the '
@@ -119,7 +131,7 @@ final ComponentDocSpec safeAreaDocSpec = ComponentDocSpec(
       host: const _ScrollContentHost(),
       code: _scrollContentCode,
       label: 'Scroll content specimen view',
-      minHeight: el(80),
+      minHeight: space(80),
     ),
     EffectSection(
       id: 'desktop',
@@ -127,11 +139,11 @@ final ComponentDocSpec safeAreaDocSpec = ComponentDocSpec(
       description:
           'The same wrapped row under a MediaQuery carrying '
           'EdgeInsets.zero — a desktop window, a browser tab, or any test '
-          'that never sets view.padding. ElSafeArea\'s own build() '
+          'that never sets view.padding. SafeArea\'s own build() '
           'short-circuits when the insets it would spend are all zero and '
           'returns child completely unwrapped: no Padding, no narrowed '
           'MediaQuery, nothing joins the tree. The row below sits exactly '
-          'where it would with no ElSafeArea present at all.',
+          'where it would with no SafeArea present at all.',
       host: const _DesktopHost(),
       code: _desktopCode,
       label: 'Desktop specimen view',
@@ -140,15 +152,12 @@ final ComponentDocSpec safeAreaDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElSafeArea declares, plus its '
+          'Every constructor parameter SafeArea declares, plus its '
           'three static helpers, read off '
           'lib/src/components/safe_area.dart.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElSafeArea', anchor: 'api-elsafearea'),
-        DocsTocEntry(
-          title: 'ElSafeArea static',
-          anchor: 'api-elsafearea-static',
-        ),
+        DocsTocEntry(title: 'SafeArea', anchor: 'api-elsafearea'),
+        DocsTocEntry(title: 'SafeArea static', anchor: 'api-elsafearea-static'),
       ],
       child: const _ApiReferenceContent(),
     ),
@@ -235,9 +244,9 @@ class SafeAreaDocPage extends StatelessWidget {
       title: safeAreaDoc.title,
       description: safeAreaDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Safe Area'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Safe Area'),
     ],
     toc: safeAreaDocSpec.toc,
     previous: null,
@@ -264,8 +273,12 @@ class _Captioned extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       child,
-      SizedBox(height: el(2)),
-      ElText(caption, ElType.section, color: ElTheme.of(context).mutedForeground),
+      SizedBox(height: space(2)),
+      StyledText(
+        caption,
+        TextStyles.section,
+        color: ThemeScope.of(context).mutedForeground,
+      ),
     ],
   );
 }
@@ -279,13 +292,13 @@ class _Row extends StatelessWidget {
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
     child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(2)),
+      padding: EdgeInsets.symmetric(horizontal: space(2)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           for (int i = 0; i < children.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(width: el(6)),
+            if (i > 0) SizedBox(width: space(6)),
             children[i],
           ],
         ],
@@ -304,12 +317,12 @@ class _PhoneFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return ClipRRect(
-      borderRadius: BorderRadius.circular(ElRadii.xl2),
+      borderRadius: BorderRadius.circular(Radii.xl2),
       child: Container(
-        width: el(36),
-        height: el(60),
+        width: space(36),
+        height: space(60),
         color: theme.background,
         child: Stack(
           fit: StackFit.expand,
@@ -353,7 +366,7 @@ class _PhoneFrame extends StatelessWidget {
                 ),
               ),
             ),
-            Padding(padding: EdgeInsets.all(el(3)), child: child),
+            Padding(padding: EdgeInsets.all(space(3)), child: child),
           ],
         ),
       ),
@@ -366,29 +379,23 @@ class _ControlsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         DecoratedBox(
-          decoration: BoxDecoration(
-            color: theme.card,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: theme.card, shape: BoxShape.circle),
           child: Padding(
-            padding: EdgeInsets.all(el(1)),
-            child: const ElIcon(ElIconGlyph.menu, size: ElIconSize.sm),
+            padding: EdgeInsets.all(space(1)),
+            child: const Icon(IconGlyph.menu, size: IconSize.sm),
           ),
         ),
-        SizedBox(width: el(2)),
+        SizedBox(width: space(2)),
         DecoratedBox(
-          decoration: BoxDecoration(
-            color: theme.card,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: theme.card, shape: BoxShape.circle),
           child: Padding(
-            padding: EdgeInsets.all(el(1)),
-            child: const ElIcon(ElIconGlyph.search, size: ElIconSize.sm),
+            padding: EdgeInsets.all(space(1)),
+            child: const Icon(IconGlyph.search, size: IconSize.sm),
           ),
         ),
       ],
@@ -409,7 +416,7 @@ class _PreviewHost extends StatelessWidget {
     child: _Row(
       children: <Widget>[
         _Captioned(
-          caption: 'without ElSafeArea',
+          caption: 'without SafeArea',
           child: SizedBox(
             key: const ValueKey<String>('safe-area-example:without'),
             child: _PhoneFrame(
@@ -421,16 +428,13 @@ class _PreviewHost extends StatelessWidget {
           ),
         ),
         _Captioned(
-          caption: 'ElSafeArea(bottom: false, child: controls)',
+          caption: 'SafeArea(bottom: false, child: controls)',
           child: SizedBox(
             key: const ValueKey<String>('safe-area-example:with'),
             child: _PhoneFrame(
               child: Align(
                 alignment: Alignment.topLeft,
-                child: ElSafeArea(
-                  bottom: false,
-                  child: const _ControlsRow(),
-                ),
+                child: SafeArea(bottom: false, child: const _ControlsRow()),
               ),
             ),
           ),
@@ -448,7 +452,7 @@ const String _previewCode =
     '// With: only the row moves. The background is untouched.\n'
     'Align(\n'
     '  alignment: Alignment.topLeft,\n'
-    '  child: ElSafeArea(bottom: false, child: controls),\n'
+    '  child: SafeArea(bottom: false, child: controls),\n'
     ')';
 
 /* ── Scroll Content ──────────────────────────────────────────────────────── */
@@ -460,19 +464,26 @@ class _MockList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return ListView(
       padding: padding,
       children: <Widget>[
         for (int i = 1; i <= 6; i++)
           Container(
-            margin: EdgeInsets.only(bottom: el(2)),
-            padding: EdgeInsets.symmetric(horizontal: el(3), vertical: el(2)),
+            margin: EdgeInsets.only(bottom: space(2)),
+            padding: EdgeInsets.symmetric(
+              horizontal: space(3),
+              vertical: space(2),
+            ),
             decoration: BoxDecoration(
               color: theme.card,
-              borderRadius: BorderRadius.circular(ElRadii.sm),
+              borderRadius: BorderRadius.circular(Radii.sm),
             ),
-            child: ElText('Row $i', ElType.small, color: theme.foreground),
+            child: StyledText(
+              'Row $i',
+              TextStyles.small,
+              color: theme.foreground,
+            ),
           ),
       ],
     );
@@ -484,9 +495,9 @@ class _ScrollContentHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MediaQuery(
-    data: MediaQuery.of(context).copyWith(
-      padding: EdgeInsets.only(bottom: _mockBottomInset),
-    ),
+    data: MediaQuery.of(
+      context,
+    ).copyWith(padding: EdgeInsets.only(bottom: _mockBottomInset)),
     child: Builder(
       builder: (BuildContext context) => _Row(
         children: <Widget>[
@@ -500,13 +511,11 @@ class _ScrollContentHost extends StatelessWidget {
             ),
           ),
           _Captioned(
-            caption: 'ElSafeArea.scrollPaddingOf(context)',
+            caption: 'SafeArea.scrollPaddingOf(context)',
             child: SizedBox(
               key: const ValueKey<String>('safe-area-example:scroll-padded'),
               child: _PhoneFrame(
-                child: _MockList(
-                  padding: ElSafeArea.scrollPaddingOf(context),
-                ),
+                child: _MockList(padding: SafeArea.scrollPaddingOf(context)),
               ),
             ),
           ),
@@ -518,7 +527,7 @@ class _ScrollContentHost extends StatelessWidget {
 
 const String _scrollContentCode =
     'ListView(\n'
-    '  padding: ElSafeArea.scrollPaddingOf(context),\n'
+    '  padding: SafeArea.scrollPaddingOf(context),\n'
     '  children: rows,\n'
     ')';
 
@@ -535,7 +544,7 @@ class _DesktopHost extends StatelessWidget {
       child: _PhoneFrame(
         child: Align(
           alignment: Alignment.topLeft,
-          child: ElSafeArea(bottom: false, child: const _ControlsRow()),
+          child: SafeArea(bottom: false, child: const _ControlsRow()),
         ),
       ),
     ),
@@ -544,9 +553,9 @@ class _DesktopHost extends StatelessWidget {
 
 const String _desktopCode =
     '// MediaQueryData.padding is EdgeInsets.zero on a desktop window:\n'
-    "// ElSafeArea's build() returns child unwrapped, and this line and\n"
+    "// SafeArea's build() returns child unwrapped, and this line and\n"
     '// the one above it render byte-identical trees.\n'
-    'ElSafeArea(bottom: false, child: controls)';
+    'SafeArea(bottom: false, child: controls)';
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
 
@@ -555,7 +564,7 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 
 DecoratedBox(
   decoration: const BoxDecoration(/* paints to the screen edge */),
-  child: ElSafeArea(bottom: false, child: headerControls),
+  child: SafeArea(bottom: false, child: headerControls),
 )''';
 
 class _ApiReferenceContent extends StatelessWidget {
@@ -567,13 +576,13 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       DocsAnchor(
         id: 'api-elsafearea',
-        child: const DocsApiTable(title: 'ElSafeArea', facts: _apiFacts),
+        child: const DocsApiTable(title: 'SafeArea', facts: _apiFacts),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       DocsAnchor(
         id: 'api-elsafearea-static',
         child: const DocsApiTable(
-          title: 'ElSafeArea static',
+          title: 'SafeArea static',
           facts: _staticFacts,
         ),
       ),
@@ -592,7 +601,8 @@ const List<DocsApiFact> _apiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'top',
     type: 'bool',
-    description: 'Optional. Defaults to true. Pay the top inset — the '
+    description:
+        'Optional. Defaults to true. Pay the top inset — the '
         'status bar.',
   ),
   DocsApiFact(
@@ -648,8 +658,8 @@ class _StatesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElSafeArea carries no internal state of its own: build() reads '
+      _bullets(ThemeScope.of(context), <String>[
+        'SafeArea carries no internal state of its own: build() reads '
             'MediaQuery.paddingOf(context) fresh on every rebuild and '
             'either wraps child in a Padding plus a narrowed MediaQuery, '
             'or returns it unwrapped when every inset it would spend is '
@@ -657,7 +667,7 @@ class _StatesContent extends StatelessWidget {
         'The one real variable is the ambient MediaQueryData.padding '
             'itself, which this widget never sets — only reads. A caller '
             'rotating a device, or a test that changes tester.view.'
-            'padding, changes what ElSafeArea spends on the next frame; '
+            'padding, changes what SafeArea spends on the next frame; '
             'nothing here animates the transition.',
       ]);
 }
@@ -667,8 +677,8 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElSafeArea renders no Semantics node of its own: build() '
+      _bullets(ThemeScope.of(context), <String>[
+        'SafeArea renders no Semantics node of its own: build() '
             'returns either child directly or a Padding wrapping it, '
             'neither of which declares accessibility metadata. Whatever '
             'semantics child carries pass through untouched.',
@@ -685,7 +695,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Takes no focus and handles no key: safe_area.dart declares no '
             'Focus, no FocusNode and no onKeyEvent. It reads '
             'MediaQueryData.padding, never viewInsets — the library note '
@@ -700,9 +710,9 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'This is the disclosure the whole component exists for. '
-            'ElSafeArea is not a breakpoint switch — it reads no width at '
+            'SafeArea is not a breakpoint switch — it reads no width at '
             'all — but it is the one thing on this kit that is entirely a '
             'device-class distinction: a phone with a notch and a gesture '
             'bar behaves one way, and a desktop window behaves as if the '
@@ -717,7 +727,7 @@ class _ResponsiveContent extends StatelessWidget {
             '(Zero Insets) section above.',
         'Nesting is safe by construction: whatever insets a wrapper '
             'spends are removed from the MediaQuery it hands its child '
-            'via MediaQuery.removePadding, so a ElSafeArea inside a sheet '
+            'via MediaQuery.removePadding, so a SafeArea inside a sheet '
             'that already paid the bottom bar reads zero there and adds '
             'nothing — never a double margin.',
         'Three insets exist on MediaQueryData and this file reads '
@@ -736,11 +746,11 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/safe_area.dart: one file, no '
             'companions.',
         'Flutter imports: package:flutter/widgets.dart only.',
-        'No foundation import at all: ElSafeArea reads MediaQuery, not a '
+        'No foundation import at all: SafeArea reads MediaQuery, not a '
             'design token — the one component page in this rollout whose '
             'registryDependencies list is genuinely empty.',
         'registryDependencies, per `elattar add safe-area`: none — '
@@ -751,7 +761,7 @@ class _DependenciesContent extends StatelessWidget {
             'scrollPaddingOf — the drawer, the sheet and the toaster '
             'pages reach for it the same way.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Sheet', route: '/components/sheet'),
@@ -767,8 +777,8 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElSafeArea reads no Color and no ElTheme at all: it is pure '
+      _bullets(ThemeScope.of(context), <String>[
+        'SafeArea reads no Color and no ThemeScope at all: it is pure '
             'geometry, MediaQuery in and Padding out. Every colour on '
             'this page\'s specimens — the mock status-bar strip, the '
             'phone frame\'s own background — comes from the demo host '
@@ -781,15 +791,19 @@ class _ThemingContent extends StatelessWidget {
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

@@ -1,11 +1,11 @@
 /// Tests for the avatar documentation page.
 ///
-/// Two of these tests feed [ElAvatar] bytes that never touch the network: a
+/// Two of these tests feed [Avatar] bytes that never touch the network: a
 /// tiny valid PNG (so the "image loads" state is real, not asserted on
 /// faith) and four bytes that are not a decodable image at all (so the
 /// "decode fails" state is exercised the same way: locally, deterministically,
 /// and without an `errorBuilder` to paper over what actually happens). Both
-/// byte arrays were verified against the live [ElAvatar] widget before this
+/// byte arrays were verified against the live [Avatar] widget before this
 /// file was written: the valid PNG mounts an [Image] with no exception, and
 /// the corrupt bytes still leave the fallback initials on screen while
 /// [WidgetTester.takeException] reports the decode failure: which is why the
@@ -24,7 +24,33 @@ import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The 1x1 transparent PNG the `transparent_image` package ships as
@@ -65,16 +91,14 @@ const List<String> _avatarSectionOrder = <String>[
   'Source',
 ];
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: SingleChildScrollView(child: child),
-  ),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: SingleChildScrollView(child: child),
+      ),
+    );
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
 /// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
@@ -97,8 +121,8 @@ void main() {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
 
         await tester.pumpWidget(
@@ -109,7 +133,7 @@ void main() {
         await tester.pump();
 
         // The Preview specimen deliberately includes a corrupt-bytes
-        // ElAvatar: that specimen reports exactly the decode failure this
+        // Avatar: that specimen reports exactly the decode failure this
         // page's state matrix describes, so it must be drained here rather
         // than read as a real test failure.
         expect(tester.takeException(), isNotNull);
@@ -118,7 +142,7 @@ void main() {
           find.byKey(const ValueKey<String>('avatar-doc-article')),
           findsOneWidget,
         );
-        expect(find.byType(ElAvatar), findsAtLeastNWidgets(1));
+        expect(find.byType(Avatar), findsAtLeastNWidgets(1));
         expect(
           find.byKey(const ValueKey<String>('docs-layout-sidebar')),
           findsOneWidget,
@@ -132,11 +156,11 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         final DocsApiTable elAvatarTable = tester.widget<DocsApiTable>(
           find.byWidgetPredicate(
-            (Widget w) => w is DocsApiTable && w.title == 'ElAvatar',
+            (Widget w) => w is DocsApiTable && w.title == 'Avatar',
           ),
         );
         final Set<String> documented = elAvatarTable.facts
@@ -156,18 +180,17 @@ void main() {
             'fallbackInk',
           ]),
         );
-        // The other two API tables this page claims (ElAvatarSize,
+        // The other two API tables this page claims (AvatarSize,
         // Supporting types) are both mounted too, not just named.
         expect(
           find.byWidgetPredicate(
-            (Widget w) => w is DocsApiTable && w.title == 'ElAvatarSize',
+            (Widget w) => w is DocsApiTable && w.title == 'AvatarSize',
           ),
           findsOneWidget,
         );
         expect(
           find.byWidgetPredicate(
-            (Widget w) =>
-                w is DocsApiTable && w.title == 'Supporting types',
+            (Widget w) => w is DocsApiTable && w.title == 'Supporting types',
           ),
           findsOneWidget,
         );
@@ -178,22 +201,22 @@ void main() {
         // The new component-specific specimens actually mount real widgets,
         // not just section prose: badge-with-icon, the dropdown trigger,
         // and the overflow count.
-        expect(find.byType(ElDropdownMenu), findsOneWidget);
-        expect(find.byType(ElIcon), findsWidgets);
+        expect(find.byType(DropdownMenu), findsOneWidget);
+        expect(find.byType(Icon), findsWidgets);
         expect(find.text('+248'), findsOneWidget);
 
         expect(avatarDoc.name, 'avatar');
         expect(
           avatarDoc.exports,
           containsAll(<String>[
-            'ElAvatar',
-            'ElAvatarSize',
-            'ElAvatarRing',
-            'elAvatarRingWidth',
-            'ElAvatarBadge',
-            'ElAvatarGroup',
-            'ElAvatarGroupCount',
-            'ElAvatarRimPainter',
+            'Avatar',
+            'AvatarSize',
+            'AvatarRing',
+            'avatarRingWidth',
+            'AvatarBadge',
+            'AvatarGroup',
+            'AvatarGroupCount',
+            'AvatarRimPainter',
           ]),
         );
         expect(avatarDoc.command, 'elattar add avatar');
@@ -203,7 +226,7 @@ void main() {
         expect(avatarDoc.dependencies, <String>['source-foundation']);
 
         // The theme controller flips in place: no second widget tree.
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
         expect(tester.takeException(), isNull);
       },
@@ -219,12 +242,12 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const AvatarDocPage(),
           ),
         );
         await tester.pump();
-        // The corrupt-bytes ElAvatar only reports its decode failure the
+        // The corrupt-bytes Avatar only reports its decode failure the
         // first time anything resolves it: Flutter's global ImageCache
         // caches the resolved (failed) ImageStream keyed by image bytes,
         // so every later mount within this same test run replays the
@@ -266,8 +289,8 @@ void main() {
         tester.view.physicalSize = const Size(390, 844);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
 
         await tester.pumpWidget(
@@ -295,7 +318,7 @@ void main() {
         addTearDown(tester.view.reset);
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.light),
+            controller: ThemeController(mode: ColorMode.light),
             child: const AvatarDocPage(),
           ),
         );
@@ -313,7 +336,7 @@ void main() {
         addTearDown(tester.view.reset);
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.light),
+            controller: ThemeController(mode: ColorMode.light),
             child: const AvatarDocPage(),
           ),
         );
@@ -324,36 +347,35 @@ void main() {
     );
   });
 
+  testWidgets('a Avatar with no image renders its fallback initials outright', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      _harness(
+        controller: ThemeController(mode: ColorMode.dark),
+        child: const Center(child: Avatar(fallback: 'ZZ')),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('ZZ'), findsOneWidget);
+    expect(find.byType(Image), findsNothing);
+  });
+
   testWidgets(
-    'a ElAvatar with no image renders its fallback initials outright',
+    'a Avatar with a locally decodable image swaps the fallback for the image',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(800, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
-          child: const Center(child: ElAvatar(fallback: 'ZZ')),
-        ),
-      );
-      await tester.pump();
-
-      expect(find.text('ZZ'), findsOneWidget);
-      expect(find.byType(Image), findsNothing);
-    },
-  );
-
-  testWidgets(
-    'a ElAvatar with a locally decodable image swaps the fallback for the image',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(800, 800);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      await tester.pumpWidget(
-        _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: Center(
-            child: ElAvatar(fallback: 'ZZ', image: MemoryImage(_validPng)),
+            child: Avatar(fallback: 'ZZ', image: MemoryImage(_validPng)),
           ),
         ),
       );
@@ -365,16 +387,16 @@ void main() {
   );
 
   testWidgets(
-    'a ElAvatar whose image fails to decode still leaves readable fallback text on screen',
+    'a Avatar whose image fails to decode still leaves readable fallback text on screen',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(800, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: Center(
-            child: ElAvatar(fallback: 'ZZ', image: MemoryImage(_corruptBytes)),
+            child: Avatar(fallback: 'ZZ', image: MemoryImage(_corruptBytes)),
           ),
         ),
       );

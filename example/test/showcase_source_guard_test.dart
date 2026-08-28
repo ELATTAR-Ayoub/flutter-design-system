@@ -21,7 +21,7 @@ void main() {
         'raw color constructor': RegExp(r'\bColor(?:\.from\w+)?\('),
         'raw text widget': RegExp(r'(^|[^A-Za-z])Text\('),
         'raw text style': RegExp(r'\bTextStyle\('),
-        'raw icon widget': RegExp(r'(^|[^A-Za-z])Icon\('),
+        'raw icon widget': RegExp(r'\b(?:material|flutter)\.Icon\('),
         'Material feedback': RegExp(r'\b(?:SnackBar|ScaffoldMessenger)\b'),
         'Material progress': RegExp(r'\bCircularProgressIndicator\b'),
         'Material page surface': RegExp(r'\b(?:Scaffold|Material)\('),
@@ -56,7 +56,7 @@ void main() {
         violations,
         isEmpty,
         reason:
-            'Signal Studio must use public El* components and tokens.\n'
+            'Signal Studio must use public design-system components and tokens.\n'
             '${violations.join('\n')}',
       );
     },

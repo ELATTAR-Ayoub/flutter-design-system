@@ -1,6 +1,6 @@
 /// Public documentation page for the `calendar` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button`, `field`, `table` and `stat`
@@ -18,18 +18,18 @@
 /// picker, Selected date (with timezone), Range calendar, Presets, and the
 /// eight required disclosures. Persian / Hijri / Jalali Calendar, Month and
 /// Year Selector, Date and Time Picker, and Booked dates have no
-/// counterpart here: ElCalendar has no locale parameter, no month/year
+/// counterpart here: Calendar has no locale parameter, no month/year
 /// dropdown or year jump, no time-of-day input, and no per-day disabled
 /// predicate (the last two are named again in Accessibility's known gaps).
-/// Presets, unlike those four, is buildable: ElCalendar's controlled
+/// Presets, unlike those four, is buildable: Calendar's controlled
 /// `month` / `selected` pair is exactly the seam the reference's own preset
 /// buttons drive, so this page builds a specimen for it rather than
 /// skipping it. Basic folds into the Preview specimen rather than
 /// repeating it, because this port has only one single-date calendar shape
 /// to show, not a richer dropdown-driven default plus a plain fallback.
 ///
-/// The reference's selects page has three calendars, `ElCalendar.single` in
-/// a Panel, `ElCalendar.range` in another Panel, and a `ElDatePicker`
+/// The reference's selects page has three calendars, `Calendar.single` in
+/// a Panel, `Calendar.range` in another Panel, and a `DatePicker`
 /// inside a Popover. This page mounts those three as interactive specimens
 /// with live readouts of what the reader picked, plus a fourth, the Presets
 /// specimen, built new for this reshape because the reference has no
@@ -37,19 +37,19 @@
 ///
 /// Two things make calendar peculiar:
 ///
-/// 1. **The clock must be frozen.** `ElCalendar` opens on `month ?? defaultMonth
+/// 1. **The clock must be frozen.** `Calendar` opens on `month ?? defaultMonth
 ///    ?? today`. The single and range specimens pass neither month nor
 ///    defaultMonth intentionally: that is what the reference does. The
 ///    presets specimen is the one exception, its whole point is a
 ///    controlled `month`, seeded from the same clock rather than left null.
 ///    A test that let the wall clock through would pass in August 2026 and
-///    fail in September. The test harness pins a [ElClock] to a fixed date
+///    fail in September. The test harness pins a [Clock] to a fixed date
 ///    and time, the same instant the capture rig freezes, so rendered
 ///    months are reproducible. The three seeded specimens below read that
-///    same clock through [ElClock.nowOf] rather than `DateTime.now()`, so
+///    same clock through [Clock.nowOf] rather than `DateTime.now()`, so
 ///    the seed and the opening month can never disagree.
-/// 2. **The date picker needs a real Overlay.** `ElDatePicker` mounts its
-///    calendar through a `ElPopover`, which uses an `OverlayPortal`, which
+/// 2. **The date picker needs a real Overlay.** `DatePicker` mounts its
+///    calendar through a `Popover`, which uses an `OverlayPortal`, which
 ///    needs a real Material `Overlay` to work. The test wraps the page in a
 ///    `MaterialApp` for that reason.
 ///
@@ -58,7 +58,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -75,7 +87,7 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'ElCalendar.single, live: pick a day and the readout below '
+          'Calendar.single, live: pick a day and the readout below '
           'prints both the human label and the day key. Range selection '
           'and the date picker each get their own section further down. '
           'Basic folds into this same demo rather than repeating it '
@@ -85,7 +97,7 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
       specimen: const _SingleCalendarSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     InstallSection(
       id: 'install',
@@ -112,7 +124,7 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElCalendar, ElDatePicker, and the '
+              'Add the export line so Calendar, DatePicker, and the '
               'rest of the family are reachable the same way the CLI '
               'path already makes them.',
           code: "export 'calendar.dart';",
@@ -132,10 +144,10 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          "ElDatePicker is itself the composition: a ElButton trigger, a "
-          'ElPopover, and a popover-surfaced ElCalendar that autofocuses '
+          "DatePicker is itself the composition: a Button trigger, a "
+          'Popover, and a popover-surfaced Calendar that autofocuses '
           'so Escape has a path back out. Illustrative — `_open`, `value` '
-          'and `onChanged` are the state ElDatePicker\'s own State class '
+          'and `onChanged` are the state DatePicker\'s own State class '
           'owns, not defined here; see Date picker below for the live '
           'version.',
       code: _compositionCode,
@@ -144,7 +156,7 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
       id: 'about',
       title: 'About',
       description:
-          'ElCalendar and ElDatePicker are native Flutter widgets built '
+          'Calendar and DatePicker are native Flutter widgets built '
           'directly on this system\'s own foundation tokens: neither '
           'wraps a third-party date-picking package. The reference is '
           'different: it is built on top of React DayPicker, and its own '
@@ -166,7 +178,7 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
       specimen: const _DatePickerSpecimen(),
       code: _datePickerCode,
       label: 'Date picker specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     const SnippetSection(
       id: 'selected-date-timezone',
@@ -175,7 +187,7 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
           'The reference demonstrates hydration-safe timezone handling '
           'for a controlled Calendar. Flutter has no hydration step, but '
           'the same underlying trap is real here too: a calendar date is '
-          'not an instant. ElDateFormat.dayKey builds "2026-08-16" out of '
+          'not an instant. DateFormat.dayKey builds "2026-08-16" out of '
           'the local year, month, and day fields. It never calls '
           'toIso8601String() and never converts to UTC, because both of '
           'those turn a day into a moment and a moment reads back as a '
@@ -193,8 +205,8 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
           'back as the 15th. The day the reader tapped is gone, and it '
           'is gone only for some readers, which is why this class of bug '
           'survives review. So: report and store '
-          'ElDateFormat.dayKey(date). Compare with '
-          'ElCalendarDay.isSameDay, never with DateTime equality. The '
+          'DateFormat.dayKey(date). Compare with '
+          'CalendarDay.isSameDay, never with DateTime equality. The '
           'Preview specimen at the top of this page prints both halves: '
           'the human label and the key: so the difference is visible '
           'rather than asserted, which is why this section stays '
@@ -206,14 +218,14 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
       id: 'range-calendar',
       title: 'Range calendar',
       description:
-          'ElCalendar.range: two taps set a from/to pair, and a third '
+          'Calendar.range: two taps set a from/to pair, and a third '
           're-homes it. One month renders at a time; the reference\'s own '
           'Range Calendar demo spans two months side by side, which this '
           'port does not do, there is no numberOfMonths parameter.',
       specimen: const _RangeCalendarSpecimen(),
       code: _rangeCode,
       label: 'Range calendar specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     ShowcaseSection(
       id: 'presets',
@@ -221,14 +233,14 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
       description:
           'The reference pairs its calendar with quick-pick buttons that '
           'set the selected day without the reader touching the grid at '
-          'all. ElCalendar has no built-in preset row, but the same '
+          'all. Calendar has no built-in preset row, but the same '
           'controlled month/selected API the date picker composition '
           'already uses covers it: this specimen owns the state, and '
           'each button just calls onSelected with a computed day.',
       specimen: const _PresetsSpecimen(),
       code: _presetsCode,
       label: 'Presets specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     DisclosureSection(
       id: 'api',
@@ -238,33 +250,39 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
           'the source declares: plus the half of source-foundation this '
           'component cannot be understood without. The reference has no '
           'formal props table on this page and defers to the React '
-          'DayPicker docs instead; ElCalendar owns every one of its props '
+          'DayPicker docs instead; Calendar owns every one of its props '
           'outright, so this table stays in full, including the two '
           'enums, mode and surface, that an earlier draft gave their own '
           'Variants heading.',
       children: const <DocsTocEntry>[
         DocsTocEntry(
-          title: 'ElCalendar.single / .range: parameters',
+          title: 'Calendar.single / .range: parameters',
           anchor: 'api-elcalendar-ctor',
         ),
-        DocsTocEntry(title: 'ElCalendar: resolved fields', anchor: 'api-elcalendar'),
-        DocsTocEntry(title: 'ElCalendar: statics', anchor: 'api-elcalendar-static'),
-        DocsTocEntry(title: 'ElDateRange', anchor: 'api-eldaterange'),
-        DocsTocEntry(title: 'ElCalendarDay', anchor: 'api-elcalendarday'),
-        DocsTocEntry(title: 'ElCalendarMonth', anchor: 'api-elcalendarmonth'),
         DocsTocEntry(
-          title: 'ElCalendarBandPainter',
+          title: 'Calendar: resolved fields',
+          anchor: 'api-elcalendar',
+        ),
+        DocsTocEntry(
+          title: 'Calendar: statics',
+          anchor: 'api-elcalendar-static',
+        ),
+        DocsTocEntry(title: 'DateRange', anchor: 'api-eldaterange'),
+        DocsTocEntry(title: 'CalendarDay', anchor: 'api-elcalendarday'),
+        DocsTocEntry(title: 'CalendarMonth', anchor: 'api-elcalendarmonth'),
+        DocsTocEntry(
+          title: 'CalendarBandPainter',
           anchor: 'api-elcalendarbandpainter',
         ),
-        DocsTocEntry(title: 'ElDatePicker', anchor: 'api-eldatepicker'),
-        DocsTocEntry(title: 'ElDateFormat', anchor: 'api-eldateformat'),
+        DocsTocEntry(title: 'DatePicker', anchor: 'api-eldatepicker'),
+        DocsTocEntry(title: 'DateFormat', anchor: 'api-eldateformat'),
         DocsTocEntry(
-          title: 'ElClock and ElCalendarType',
+          title: 'Clock and CalendarTextStyles',
           anchor: 'api-elclock',
         ),
-        DocsTocEntry(title: 'ElCalendarMode', anchor: 'api-elcalendarmode'),
+        DocsTocEntry(title: 'CalendarMode', anchor: 'api-elcalendarmode'),
         DocsTocEntry(
-          title: 'ElCalendarSurface',
+          title: 'CalendarPresentation',
           anchor: 'api-elcalendarsurface',
         ),
       ],
@@ -290,7 +308,7 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           "Every key the grid's single FocusNode answers, driven on the "
-          'live reference and reproduced in `_ElCalendarState._onKey`.',
+          'live reference and reproduced in `_CalendarState._onKey`.',
       child: _KeyboardContent(),
     ),
     DisclosureSection(
@@ -358,9 +376,9 @@ class CalendarDocPage extends StatelessWidget {
       title: calendarDoc.title,
       description: calendarDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Calendar'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Calendar'),
     ],
     toc: calendarDocSpec.toc,
     previous: const DocsPageLink(title: 'Select', route: '/components/select'),
@@ -374,51 +392,51 @@ class CalendarDocPage extends StatelessWidget {
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-const String _previewCode = '''ElCalendar.single(
+const String _previewCode = '''Calendar.single(
   selected: selectedDate,
   onSelected: (DateTime? day) => setState(() => selectedDate = day),
 )''';
 
 const String _usageCode = '''
-ElCalendar.single(
+Calendar.single(
   selected: selectedDate,
   onSelected: (DateTime? day) => setState(() => selectedDate = day),
 )
 
-ElCalendar.range(
+Calendar.range(
   selected: selectedRange,
-  onSelected: (ElDateRange? range) => setState(() => selectedRange = range),
+  onSelected: (DateRange? range) => setState(() => selectedRange = range),
 )
 
-ElDatePicker(
+DatePicker(
   value: pickedDate,
   onChanged: (DateTime? day) => setState(() => pickedDate = day),
 )
 
 // Store the day the reader tapped, not the moment your process was in.
-final String key = ElDateFormat.dayKey(picked);   // '2026-08-16'
+final String key = DateFormat.dayKey(picked);   // '2026-08-16'
 
 // NOT this: a UTC conversion moves the day for half the planet:
 // final String wrong = picked.toUtc().toIso8601String().substring(0, 10);
 
 // Compare on fields, never on DateTime equality:
-if (ElCalendarDay.isSameDay(picked, other)) { /* ... */ }
+if (CalendarDay.isSameDay(picked, other)) { /* ... */ }
 ''';
 
 const String _compositionCode = '''
-ElPopover(
+Popover(
   open: _open,
-  side: ElPopoverSide.bottom,
-  align: ElPopoverAlign.start,
-  sideOffset: el(1),
+  side: PopoverSide.bottom,
+  align: PopoverAlign.start,
+  sideOffset: space(1),
   onDismiss: () => setState(() => _open = false),
-  anchor: ElButton(/* trigger */),
-  content: (BuildContext context, ElPopoverAnchorMetrics metrics) =>
-      ElPopoverSurface(
-        child: ElCalendar.single(
+  anchor: Button(/* trigger */),
+  content: (BuildContext context, PopoverAnchorMetrics metrics) =>
+      PopoverSurface(
+        child: Calendar.single(
           selected: value,
           autoFocus: true,
-          surface: ElCalendarSurface.popover,
+          surface: CalendarPresentation.popover,
           onSelected: (DateTime? day) {
             onChanged?.call(day);
             setState(() => _open = false);
@@ -429,7 +447,7 @@ ElPopover(
 ''';
 
 const String _aboutCode = '''
-// ElCalendar and ElDatePicker are native Flutter widgets built directly on
+// Calendar and DatePicker are native Flutter widgets built directly on
 // this system's own foundation tokens: neither wraps a third-party
 // date-picking package.
 //
@@ -437,7 +455,7 @@ const String _aboutCode = '''
 // its own About section says so.
 ''';
 
-/// Single-selection specimen, seeded from the ambient [ElClock] so the picked
+/// Single-selection specimen, seeded from the ambient [Clock] so the picked
 /// day is on the month the grid opens on rather than in some other month.
 ///
 /// The readout prints the two halves of the timezone ruling as two separate
@@ -462,12 +480,12 @@ class _SingleCalendarSpecimenState extends State<_SingleCalendarSpecimen> {
     super.didChangeDependencies();
     if (_seeded) return;
     _seeded = true;
-    _selected = ElCalendarDay.of(ElClock.nowOf(context));
+    _selected = CalendarDay.of(Clock.nowOf(context));
   }
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final DateTime? selected = _selected;
     return KeyedSubtree(
       key: const ValueKey<String>('calendar-doc-single-specimen'),
@@ -475,23 +493,23 @@ class _SingleCalendarSpecimenState extends State<_SingleCalendarSpecimen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElCalendar.single(
+          Calendar.single(
             selected: selected,
             onSelected: (DateTime? day) => setState(() => _selected = day),
           ),
-          SizedBox(height: el(3)),
+          SizedBox(height: space(3)),
           if (selected == null)
-            ElText(
+            StyledText(
               'Nothing selected',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             )
           else ...<Widget>[
-            ElText(ElDateFormat.dayMonthYear(selected), ElType.small),
-            SizedBox(height: el(1)),
-            ElText(
-              ElDateFormat.dayKey(selected),
-              ElType.small,
+            StyledText(DateFormat.dayMonthYear(selected), TextStyles.small),
+            SizedBox(height: space(1)),
+            StyledText(
+              DateFormat.dayKey(selected),
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -511,7 +529,7 @@ class _RangeCalendarSpecimen extends StatefulWidget {
 }
 
 class _RangeCalendarSpecimenState extends State<_RangeCalendarSpecimen> {
-  ElDateRange? _selected;
+  DateRange? _selected;
   bool _seeded = false;
 
   @override
@@ -519,23 +537,23 @@ class _RangeCalendarSpecimenState extends State<_RangeCalendarSpecimen> {
     super.didChangeDependencies();
     if (_seeded) return;
     _seeded = true;
-    final DateTime today = ElCalendarDay.of(ElClock.nowOf(context));
-    _selected = ElDateRange(from: today, to: ElCalendarDay.addDays(today, 8));
+    final DateTime today = CalendarDay.of(Clock.nowOf(context));
+    _selected = DateRange(from: today, to: CalendarDay.addDays(today, 8));
   }
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final ElDateRange? range = _selected;
+    final ThemeTokens theme = ThemeScope.of(context);
+    final DateRange? range = _selected;
     final DateTime? from = range?.from;
     final DateTime? to = range?.to;
     final String label;
     if (from == null) {
       label = 'Nothing selected';
     } else if (to == null) {
-      label = '${ElDateFormat.dayMonth(from)} – …';
+      label = '${DateFormat.dayMonth(from)} – …';
     } else {
-      label = '${ElDateFormat.dayMonth(from)} – ${ElDateFormat.dayMonth(to)}';
+      label = '${DateFormat.dayMonth(from)} – ${DateFormat.dayMonth(to)}';
     }
     return KeyedSubtree(
       key: const ValueKey<String>('calendar-doc-range-specimen'),
@@ -543,17 +561,17 @@ class _RangeCalendarSpecimenState extends State<_RangeCalendarSpecimen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElCalendar.range(
+          Calendar.range(
             selected: range,
-            onSelected: (ElDateRange? next) => setState(() => _selected = next),
+            onSelected: (DateRange? next) => setState(() => _selected = next),
           ),
-          SizedBox(height: el(3)),
-          ElText(label, ElType.small),
+          SizedBox(height: space(3)),
+          StyledText(label, TextStyles.small),
           if (from != null && to != null) ...<Widget>[
-            SizedBox(height: el(1)),
-            ElText(
-              '${ElDateFormat.dayKey(from)} … ${ElDateFormat.dayKey(to)}',
-              ElType.small,
+            SizedBox(height: space(1)),
+            StyledText(
+              '${DateFormat.dayKey(from)} … ${DateFormat.dayKey(to)}',
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -563,9 +581,9 @@ class _RangeCalendarSpecimenState extends State<_RangeCalendarSpecimen> {
   }
 }
 
-const String _rangeCode = '''ElCalendar.range(
+const String _rangeCode = '''Calendar.range(
   selected: selectedRange,
-  onSelected: (ElDateRange? range) => setState(() => selectedRange = range),
+  onSelected: (DateRange? range) => setState(() => selectedRange = range),
 )''';
 
 /// Preset specimen: five buttons each set the selected day directly,
@@ -591,22 +609,22 @@ class _PresetsSpecimenState extends State<_PresetsSpecimen> {
     super.didChangeDependencies();
     if (_seeded) return;
     _seeded = true;
-    _selected = ElCalendarDay.of(ElClock.nowOf(context));
-    _month = ElCalendarDay.startOfMonth(_selected!);
+    _selected = CalendarDay.of(Clock.nowOf(context));
+    _month = CalendarDay.startOfMonth(_selected!);
   }
 
   void _pick(int daysAhead) {
-    final DateTime today = ElCalendarDay.of(ElClock.nowOf(context));
-    final DateTime day = ElCalendarDay.addDays(today, daysAhead);
+    final DateTime today = CalendarDay.of(Clock.nowOf(context));
+    final DateTime day = CalendarDay.addDays(today, daysAhead);
     setState(() {
       _selected = day;
-      _month = ElCalendarDay.startOfMonth(day);
+      _month = CalendarDay.startOfMonth(day);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final DateTime? selected = _selected;
     return KeyedSubtree(
       key: const ValueKey<String>('calendar-doc-presets-specimen'),
@@ -614,86 +632,86 @@ class _PresetsSpecimenState extends State<_PresetsSpecimen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElCalendar.single(
+          Calendar.single(
             selected: selected,
             month: _month,
             onSelected: (DateTime? day) => setState(() {
               _selected = day;
-              if (day != null) _month = ElCalendarDay.startOfMonth(day);
+              if (day != null) _month = CalendarDay.startOfMonth(day);
             }),
             onMonthChanged: (DateTime next) => setState(() => _month = next),
           ),
-          SizedBox(height: el(3)),
+          SizedBox(height: space(3)),
           Wrap(
-            spacing: el(2),
-            runSpacing: el(2),
+            spacing: space(2),
+            runSpacing: space(2),
             children: <Widget>[
-              ElButton(
-                variant: ElButtonVariant.outline,
-                size: ElButtonSize.sm,
+              Button(
+                variant: ButtonVariant.outline,
+                size: ButtonSize.sm,
                 onPressed: () => _pick(0),
                 child: const Text('Today'),
               ),
-              ElButton(
-                variant: ElButtonVariant.outline,
-                size: ElButtonSize.sm,
+              Button(
+                variant: ButtonVariant.outline,
+                size: ButtonSize.sm,
                 onPressed: () => _pick(1),
                 child: const Text('Tomorrow'),
               ),
-              ElButton(
-                variant: ElButtonVariant.outline,
-                size: ElButtonSize.sm,
+              Button(
+                variant: ButtonVariant.outline,
+                size: ButtonSize.sm,
                 onPressed: () => _pick(3),
                 child: const Text('In 3 days'),
               ),
-              ElButton(
-                variant: ElButtonVariant.outline,
-                size: ElButtonSize.sm,
+              Button(
+                variant: ButtonVariant.outline,
+                size: ButtonSize.sm,
                 onPressed: () => _pick(7),
                 child: const Text('In a week'),
               ),
-              ElButton(
-                variant: ElButtonVariant.outline,
-                size: ElButtonSize.sm,
+              Button(
+                variant: ButtonVariant.outline,
+                size: ButtonSize.sm,
                 onPressed: () => _pick(14),
                 child: const Text('In 2 weeks'),
               ),
             ],
           ),
-          SizedBox(height: el(3)),
+          SizedBox(height: space(3)),
           if (selected == null)
-            ElText(
+            StyledText(
               'Nothing selected',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             )
           else
-            ElText(ElDateFormat.dayMonthYear(selected), ElType.small),
+            StyledText(DateFormat.dayMonthYear(selected), TextStyles.small),
         ],
       ),
     );
   }
 }
 
-const String _presetsCode = '''ElCalendar.single(
+const String _presetsCode = '''Calendar.single(
   selected: selected,
   month: month,
   onSelected: (DateTime? day) => setState(() {
     selected = day;
-    if (day != null) month = ElCalendarDay.startOfMonth(day);
+    if (day != null) month = CalendarDay.startOfMonth(day);
   }),
   onMonthChanged: (DateTime next) => setState(() => month = next),
 )
 
-ElButton(
-  variant: ElButtonVariant.outline,
-  size: ElButtonSize.sm,
+Button(
+  variant: ButtonVariant.outline,
+  size: ButtonSize.sm,
   onPressed: () {
-    final DateTime today = ElCalendarDay.of(ElClock.nowOf(context));
-    final DateTime day = ElCalendarDay.addDays(today, 7); // 'In a week'
+    final DateTime today = CalendarDay.of(Clock.nowOf(context));
+    final DateTime day = CalendarDay.addDays(today, 7); // 'In a week'
     setState(() {
       selected = day;
-      month = ElCalendarDay.startOfMonth(day);
+      month = CalendarDay.startOfMonth(day);
     });
   },
   child: const Text('In a week'),
@@ -718,21 +736,21 @@ class _DatePickerSpecimenState extends State<_DatePickerSpecimen> {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElText('Enabled', ElType.section),
-      SizedBox(height: el(2)),
+      StyledText('Enabled', TextStyles.section),
+      SizedBox(height: space(2)),
       KeyedSubtree(
         key: const ValueKey<String>('calendar-doc-picker'),
         child: Align(
           alignment: Alignment.centerLeft,
-          child: ElDatePicker(
+          child: DatePicker(
             value: _value,
             onChanged: (DateTime? day) => setState(() => _value = day),
           ),
         ),
       ),
-      SizedBox(height: el(5)),
-      ElText('Disabled', ElType.section),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(5)),
+      StyledText('Disabled', TextStyles.section),
+      SizedBox(height: space(2)),
       const KeyedSubtree(
         key: ValueKey<String>('calendar-doc-picker-disabled'),
         child: Align(
@@ -740,7 +758,7 @@ class _DatePickerSpecimenState extends State<_DatePickerSpecimen> {
           // The placeholder is deliberately short: the trigger sizes to its
           // label, and a long one overflows the 390px viewport the docs
           // test renders at.
-          child: ElDatePicker(
+          child: DatePicker(
             value: null,
             onChanged: null,
             placeholder: 'Locked',
@@ -751,26 +769,27 @@ class _DatePickerSpecimenState extends State<_DatePickerSpecimen> {
   );
 }
 
-const String _datePickerCode = '''ElDatePicker(
+const String _datePickerCode = '''DatePicker(
   value: pickedDate,
   onChanged: (DateTime? day) => setState(() => pickedDate = day),
 )
 
 // Disabled: the only per-instance disabling the family offers.
-const ElDatePicker(
+const DatePicker(
   value: null,
   onChanged: null,
   placeholder: 'Locked',
 )''';
 
-const String _dayKeyCode = '''// Store the day the reader tapped, not the moment your process was in.
-final String key = ElDateFormat.dayKey(picked);   // '2026-08-16'
+const String _dayKeyCode =
+    '''// Store the day the reader tapped, not the moment your process was in.
+final String key = DateFormat.dayKey(picked);   // '2026-08-16'
 
 // NOT this: a UTC conversion moves the day for half the planet:
 // final String wrong = picked.toUtc().toIso8601String().substring(0, 10);
 
 // Compare on fields, never on DateTime equality:
-if (ElCalendarDay.isSameDay(picked, other)) { /* ... */ }''';
+if (CalendarDay.isSameDay(picked, other)) { /* ... */ }''';
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
 
@@ -784,19 +803,18 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-elcalendar-ctor',
         child: DocsApiTable(
-          title: 'ElCalendar.single / ElCalendar.range: parameters',
+          title: 'Calendar.single / Calendar.range: parameters',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'selected',
-              type: 'DateTime? / ElDateRange?',
+              type: 'DateTime? / DateRange?',
               description:
                   'The picked value. DateTime? on the single constructor, '
-                  'ElDateRange? on the range constructor.',
+                  'DateRange? on the range constructor.',
             ),
             DocsApiFact(
               name: 'onSelected',
-              type:
-                  'ValueChanged<DateTime?>? / ValueChanged<ElDateRange?>?',
+              type: 'ValueChanged<DateTime?>? / ValueChanged<DateRange?>?',
               description:
                   'Called on every pick. Null makes the grid read-only, '
                   'there is no separate enabled flag.',
@@ -825,31 +843,31 @@ class _ApiReferenceContent extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'surface',
-              type: 'ElCalendarSurface',
+              type: 'CalendarPresentation',
               description:
                   'Defaults to card. Selects fill, border, and padding: '
-                  'see the ElCalendarSurface table below.',
+                  'see the CalendarPresentation table below.',
             ),
             DocsApiFact(
               name: 'autoFocus',
               type: 'bool',
               description:
-                  'Defaults to false. True is what ElDatePicker passes '
+                  'Defaults to false. True is what DatePicker passes '
                   'so the popover calendar takes focus and Escape has '
                   'somewhere to travel up from.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elcalendar',
         child: DocsApiTable(
-          title: 'ElCalendar: the fields the two constructors resolve onto',
+          title: 'Calendar: the fields the two constructors resolve onto',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'mode',
-              type: 'ElCalendarMode',
+              type: 'CalendarMode',
               description:
                   'single or range, fixed by which constructor was used. '
                   'Not a parameter: it cannot be passed or changed.',
@@ -870,14 +888,14 @@ class _ApiReferenceContent extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'selectedRange',
-              type: 'ElDateRange?',
+              type: 'DateRange?',
               description:
                   "The range constructor's selected. Always null in "
                   'single mode.',
             ),
             DocsApiFact(
               name: 'onRangeSelected',
-              type: 'ValueChanged<ElDateRange?>?',
+              type: 'ValueChanged<DateRange?>?',
               description:
                   "The range constructor's onSelected. Always null in "
                   'single mode.',
@@ -885,11 +903,11 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elcalendar-static',
         child: DocsApiTable(
-          title: 'ElCalendar: statics',
+          title: 'Calendar: statics',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'cellSize',
@@ -913,11 +931,11 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldaterange',
         child: DocsApiTable(
-          title: 'ElDateRange',
+          title: 'DateRange',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'from',
@@ -957,7 +975,7 @@ class _ApiReferenceContent extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'addToRange',
-              type: 'static ElDateRange?',
+              type: 'static DateRange?',
               description:
                   'The whole selection rule, in one function: it decides '
                   'whether a tap opens a new range, closes the open one, '
@@ -966,11 +984,11 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elcalendarday',
         child: DocsApiTable(
-          title: 'ElCalendarDay: date arithmetic on local fields',
+          title: 'CalendarDay: date arithmetic on local fields',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'of',
@@ -1015,11 +1033,11 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elcalendarmonth',
         child: DocsApiTable(
-          title: 'ElCalendarMonth: the grid geometry',
+          title: 'CalendarMonth: the grid geometry',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'leadingDays',
@@ -1060,21 +1078,21 @@ class _ApiReferenceContent extends StatelessWidget {
             DocsApiFact(
               name: 'paddingFor',
               type: 'static double',
-              description: 'The padding a given ElCalendarSurface adds.',
+              description: 'The padding a given CalendarPresentation adds.',
             ),
             DocsApiFact(
               name: 'borderWidthFor',
               type: 'static double',
-              description: 'The border a given ElCalendarSurface draws.',
+              description: 'The border a given CalendarPresentation draws.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elcalendarbandpainter',
         child: DocsApiTable(
-          title: 'ElCalendarBandPainter: the range band and today marker',
+          title: 'CalendarBandPainter: the range band and today marker',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'muted',
@@ -1116,7 +1134,7 @@ class _ApiReferenceContent extends StatelessWidget {
               name: 'bleed',
               type: 'double',
               description:
-                  'ElCalendar.rangeBleed: the square drawn past the cap '
+                  'Calendar.rangeBleed: the square drawn past the cap '
                   'so the band meets its neighbour.',
             ),
             DocsApiFact(
@@ -1129,11 +1147,11 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldatepicker',
         child: DocsApiTable(
-          title: 'ElDatePicker',
+          title: 'DatePicker',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'value',
@@ -1172,18 +1190,18 @@ class _ApiReferenceContent extends StatelessWidget {
               type: 'static bool (get)',
               description:
                   'Always true, and exported so the drift is assertable: '
-                  "the trigger passes ElButton.suppressPressScale because "
+                  "the trigger passes Button.suppressPressScale because "
                   "the reference's own aria-haspopup trigger does not "
                   'squish.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eldateformat',
         child: DocsApiTable(
-          title: 'ElDateFormat: source-foundation, hardcoded en-US',
+          title: 'DateFormat: source-foundation, hardcoded en-US',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'monthsShort',
@@ -1255,11 +1273,11 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elclock',
         child: DocsApiTable(
-          title: 'ElClock and ElCalendarType: source-foundation',
+          title: 'Clock and CalendarTextStyles: source-foundation',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'now',
@@ -1273,45 +1291,45 @@ class _ApiReferenceContent extends StatelessWidget {
               name: 'nowOf',
               type: 'static DateTime',
               description:
-                  "The nearest ElClock's now, or DateTime.now() when no "
+                  "The nearest Clock's now, or DateTime.now() when no "
                   'clock is mounted. What the grid and both seeded '
                   'specimens read.',
             ),
             DocsApiFact(
               name: 'maybeOf',
-              type: 'static ElClock?',
+              type: 'static Clock?',
               description:
                   'The scope itself, or null: for callers that need to '
                   'know whether a clock was pinned at all.',
             ),
             DocsApiFact(
               name: 'dayNumber',
-              type: 'static ElTypeSpec',
+              type: 'static TextStyleToken',
               description:
-                  "ElCalendarType's type spec for the digits in a day "
+                  "CalendarTextStyles's type spec for the digits in a day "
                   'cell.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elcalendarmode',
         child: DocsApiTable(
           title:
-              'ElCalendarMode: fixed by the constructor, cannot change '
+              'CalendarMode: fixed by the constructor, cannot change '
               "over an instance's life",
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'single',
-              type: 'ElCalendarMode',
+              type: 'CalendarMode',
               description:
                   'One date. Re-picking the selected day clears it: '
                   'there is no required flag to prevent that.',
             ),
             DocsApiFact(
               name: 'range',
-              type: 'ElCalendarMode',
+              type: 'CalendarMode',
               description:
                   'A from/to pair. One month is rendered, matching the '
                   "reference's numberOfMonths of 1.",
@@ -1319,31 +1337,31 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elcalendarsurface',
         child: DocsApiTable(
           title:
-              'ElCalendarSurface: an ordinary parameter, the surface field',
+              'CalendarPresentation: an ordinary parameter, the surface field',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'card',
-              type: 'ElCalendarSurface',
+              type: 'CalendarPresentation',
               description:
                   'The default. Fills with theme.card, adds a border and '
                   'the surface padding.',
             ),
             DocsApiFact(
               name: 'background',
-              type: 'ElCalendarSurface',
+              type: 'CalendarPresentation',
               description: 'Fills with theme.background; no border.',
             ),
             DocsApiFact(
               name: 'popover',
-              type: 'ElCalendarSurface',
+              type: 'CalendarPresentation',
               description:
-                  'Transparent: the ElPopoverSurface around it already '
-                  'paints the fill, ring, and shadow. What ElDatePicker '
+                  'Transparent: the PopoverSurface around it already '
+                  'paints the fill, ring, and shadow. What DatePicker '
                   'passes.',
             ),
           ],
@@ -1412,7 +1430,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'Month changes swap the grid without animated travel; the '
         "picker's popover transition collapses through "
-        'elAnimationDuration.',
+        'effectiveMotionDuration.',
     userSignal: 'Navigation is instant.',
   ),
 ];
@@ -1424,89 +1442,89 @@ class _AccessibilityContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      ElText('What the semantics tree carries', ElType.section),
-      SizedBox(height: el(2)),
-      ElText(
+      StyledText('What the semantics tree carries', TextStyles.section),
+      SizedBox(height: space(2)),
+      StyledText(
         'Every day cell is a button whose accessible name is the whole '
-        'date, "Sunday, August 16th, 2026", from ElDateFormat.dayLabel: '
+        'date, "Sunday, August 16th, 2026", from DateFormat.dayLabel: '
         'not the bare number, so a screen reader user never has to '
         'infer the month from context. The two chevrons are named "Go '
         'to the previous month" and "Go to the next month". The grid '
         'carries one FocusNode for all forty-two cells rather than '
         'forty-two nodes, so tabbing moves past the calendar in one '
         'press.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(5)),
-      ElText('Known gaps', ElType.section),
-      SizedBox(height: el(2)),
-      ElText(
+      SizedBox(height: space(5)),
+      StyledText('Known gaps', TextStyles.section),
+      SizedBox(height: space(2)),
+      StyledText(
         'No grid role. The cells are buttons in a Column of Rows, not a '
         'semantic grid, so assistive tech announces forty-two buttons '
         'and never announces a row or column position.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElText(
+      SizedBox(height: space(3)),
+      StyledText(
         'No disabled date support. There is no per-day predicate and no '
         'disabled date list of any kind: a rule such as "no dates in '
         'the past" or "weekdays only" has to be enforced by the caller '
         'after the pick, or by disabling the whole control.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElText(
+      SizedBox(height: space(3)),
+      StyledText(
         'No bounds. There is no minimum and no maximum date parameter, '
         'so every day of every reachable month is selectable. Combined '
         'with one-month-per-click navigation and no year jump, a date '
         'far from today is genuinely faster to type into a text field.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElText(
+      SizedBox(height: space(3)),
+      StyledText(
         'Touch target. A day cell is 28 by 28 logical pixels: under the '
         '44 and 48 pixel minimum that iOS and Android respectively ask '
         'for. This is a faithful port of the reference\'s own cell size, '
         'and it is a real accessibility cost on touch: it is listed '
         'here rather than quietly fixed, because changing it would put '
         'this grid out of step with the design it reproduces.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElText(
+      SizedBox(height: space(3)),
+      StyledText(
         'No non-visual selected or today signal. Selection and today '
         'are communicated by fill and by the band alone; neither adds a '
         'semantic selected flag or a spoken hint, so a screen reader '
         'user hears the same name for a picked day as for any other.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(5)),
-      ElText('Locale and the first day of the week', ElType.section),
-      SizedBox(height: el(2)),
-      ElText(
+      SizedBox(height: space(5)),
+      StyledText('Locale and the first day of the week', TextStyles.section),
+      SizedBox(height: space(2)),
+      StyledText(
         'Every string this component prints is hardcoded en-US, in '
-        'ElDateFormat: the month names, the weekday names, the "16 Aug '
+        'DateFormat: the month names, the weekday names, the "16 Aug '
         '2026" ordering, and the 1st/2nd/3rd ordinals. There is no '
         'locale parameter and no intl dependency: this package does not '
         'depend on intl at all, and adding it is the real work behind '
         'localising this grid, not a switch to flip.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElText(
+      SizedBox(height: space(3)),
+      StyledText(
         'The week always starts on Sunday. weekIndex is date.weekday % '
         '7 and the header row is a fixed list, so there is no '
         'weekStartsOn parameter to move it to Monday, which is what '
         'most of Europe, and the ISO week itself, expects. A caller '
         'needing a Monday-first grid or non-English month names cannot '
         'get either from this component today.',
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );
 }
 
-/// Read directly off `_ElCalendarState._onKey` (`lib/src/components/
+/// Read directly off `_CalendarState._onKey` (`lib/src/components/
 /// calendar.dart`): every branch that function actually takes, driven on
 /// the live reference before being ported.
 class _KeyboardContent extends StatelessWidget {
@@ -1526,19 +1544,20 @@ class _KeyboardContent extends StatelessWidget {
       _KeyRow('PageDown', 'Move to the same day of the next month.'),
       _KeyRow('Home', 'Jump to the first day of the week row.'),
       _KeyRow('End', 'Jump to the last day of the week row.'),
+      _KeyRow('Enter', 'Select the focused day: the same path a tap takes.'),
       _KeyRow(
-        'Enter',
-        'Select the focused day: the same path a tap takes.',
+        'Space',
+        'Select the focused day; identical to Enter.',
+        last: true,
       ),
-      _KeyRow('Space', 'Select the focused day; identical to Enter.', last: true),
     ],
   );
 }
 
 /// One keyboard row: the key on its own line, then what it does.
 ///
-/// The key name is deliberately **not** [ElType.label]: that spec is
-/// `uppercase`, and `ElText` performs the transform on the string itself
+/// The key name is deliberately **not** [TextStyles.eyebrow]: that spec is
+/// `uppercase`, and `StyledText` performs the transform on the string itself
 /// (`theme_scope.dart`), so `PageUp` would reach the tree as `PAGEUP`. Key
 /// names are case-carrying identifiers, not decorative eyebrows: they are
 /// rendered at small size in the action ink instead, which keeps the same
@@ -1552,15 +1571,15 @@ class _KeyRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : el(3)),
+      padding: EdgeInsets.only(bottom: last ? 0 : space(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(keys, ElType.small, color: theme.actionInk),
-          SizedBox(height: el(1)),
-          ElText(body, ElType.small),
+          StyledText(keys, TextStyles.small, color: theme.actionText),
+          SizedBox(height: space(1)),
+          StyledText(body, TextStyles.small),
         ],
       ),
     );
@@ -1574,36 +1593,36 @@ class _ResponsiveContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElText(
+      StyledText(
         'No responsive branching: the grid reads no breakpoint and '
         'renders identically at 390 and 1440 logical pixels. Its width '
         'is intrinsic: seven 28px columns, 196px of content, about '
         '222px once the card surface adds its padding and border: which '
         'is why it fits a phone viewport without any special case.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElText(
+      SizedBox(height: space(3)),
+      StyledText(
         'Height is the only thing that moves, by one 28px row between a '
         'five-week and a six-week month. A caller reserving space for a '
         'calendar should reserve the six-row height, or accept the '
         'reflow when navigation crosses into a longer month.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElText(
+      SizedBox(height: space(3)),
+      StyledText(
         'Inside the date picker, the popover positions itself against '
         'the trigger and is clamped to the viewport by '
-        'elPopoverPlacement: the calendar itself does not shrink, so on '
+        'popoverPlacement: the calendar itself does not shrink, so on '
         'a very narrow screen the popup shifts rather than reflows.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElText(
+      SizedBox(height: space(3)),
+      StyledText(
         'Platform parity: Android, iOS, Web, macOS, Windows, and Linux '
         'all render the same widget tree; nothing in calendar.dart '
         'branches on platform.',
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );
@@ -1668,7 +1687,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
@@ -1687,29 +1706,29 @@ class _ThemingContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElText(
+      StyledText(
         'Every colour comes from the live theme: primary and '
         'primaryForeground for a selected cell, muted for the today '
         'marker and the range band, mutedForeground for outside days '
         'and the weekday header, card or background for the surface. '
-        'Flipping ElThemeController re-resolves all of them; nothing is '
+        'Flipping ThemeController re-resolves all of them; nothing is '
         'cached and no colour is hardcoded.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElText(
+      SizedBox(height: space(3)),
+      StyledText(
         'The band painter takes its one colour as a parameter rather '
         'than reading the theme itself, so the same painter draws '
         'correctly in both themes and can be reused against any '
         'surface.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElText(
-        'Type comes from ElCalendarType: dayNumber for the digits, and '
+      SizedBox(height: space(3)),
+      StyledText(
+        'Type comes from CalendarTextStyles: dayNumber for the digits, and '
         'the caption and weekday specs beside it: so a type-scale '
         'change moves the calendar with the rest of the system.',
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );

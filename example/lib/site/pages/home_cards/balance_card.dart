@@ -4,7 +4,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 @immutable
 class _BalanceLine {
@@ -37,7 +49,7 @@ class _BalanceCardState extends State<BalanceCard> {
 
   Future<void> _claim() async {
     setState(() => _claiming = true);
-    await Future<void>.delayed(ElDurations.slow);
+    await Future<void>.delayed(MotionDurations.slow);
     if (!mounted) return;
     setState(() {
       _claiming = false;
@@ -52,61 +64,53 @@ class _BalanceCardState extends State<BalanceCard> {
     final String figure = _claimed ? _claimedFigure : _unclaimedFigure;
     final String total = _claimed ? _claimedTotal : _unclaimedTotal;
 
-    return ElCard(
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Claimable balance'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Claimable balance'),
+          description: CardDescription(
             'Royalties cleared and ready to withdraw.',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElText(figure, ElType.numLg),
-              SizedBox(height: el(2)),
+              StyledText(figure, TextStyles.numberLg),
+              SizedBox(height: space(2)),
               // The Column stretches, and a stretched badge is a full-width
               // lozenge; Align gives it back its own intrinsic width.
               Align(
                 alignment: AlignmentDirectional.centerStart,
-                child: ElBadge(
+                child: Badge(
                   label: _claimed ? 'Claimed' : 'Pending setup',
                   variant: _claimed
-                      ? ElBadgeVariant.success
-                      : ElBadgeVariant.primary,
+                      ? BadgeVariant.success
+                      : BadgeVariant.primary,
                 ),
               ),
-              SizedBox(height: el(4)),
-              ElTable(
-                header: const <ElTableCellSpec>[
-                  ElTableCellSpec(child: Text('Line item')),
-                  ElTableCellSpec(
-                    child: Text('Amount'),
-                    align: ElTableAlign.end,
-                  ),
+              SizedBox(height: space(4)),
+              Table(
+                header: const <TableCellSpec>[
+                  TableCellSpec(child: Text('Line item')),
+                  TableCellSpec(child: Text('Amount'), align: TableAlign.end),
                 ],
-                rows: <ElTableRowSpec>[
+                rows: <TableRowSpec>[
                   for (final _BalanceLine line in _balanceLines)
-                    ElTableRowSpec(
-                      cells: <ElTableCellSpec>[
-                        ElTableCellSpec(child: Text(line.label)),
-                        ElTableCellSpec(
+                    TableRowSpec(
+                      cells: <TableCellSpec>[
+                        TableCellSpec(child: Text(line.label)),
+                        TableCellSpec(
                           child: Text(line.amount),
-                          align: ElTableAlign.end,
+                          align: TableAlign.end,
                         ),
                       ],
                     ),
-                  ElTableRowSpec(
-                    cells: <ElTableCellSpec>[
-                      const ElTableCellSpec(
-                        child: Text('Total ready to claim'),
-                      ),
-                      ElTableCellSpec(
-                        child: Text(total),
-                        align: ElTableAlign.end,
-                      ),
+                  TableRowSpec(
+                    cells: <TableCellSpec>[
+                      const TableCellSpec(child: Text('Total ready to claim')),
+                      TableCellSpec(child: Text(total), align: TableAlign.end),
                     ],
                   ),
                 ],
@@ -114,16 +118,16 @@ class _BalanceCardState extends State<BalanceCard> {
             ],
           ),
         ),
-        ElCardFooter(
+        CardFooter(
           child: _claimed
-              ? ElButton(
+              ? Button(
                   key: const ValueKey<String>('home-balance-restart'),
-                  variant: ElButtonVariant.ghost,
+                  variant: ButtonVariant.ghost,
                   contentAlignment: AlignmentDirectional.center,
                   onPressed: _reset,
                   child: const Text('Start another claim'),
                 )
-              : ElButton(
+              : Button(
                   key: const ValueKey<String>('home-balance-claim'),
                   loading: _claiming,
                   contentAlignment: AlignmentDirectional.center,

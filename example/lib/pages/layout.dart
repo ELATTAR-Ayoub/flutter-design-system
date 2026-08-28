@@ -2,9 +2,9 @@
 /// page where three of them are quietly broken on the reference.
 ///
 /// The four `components/ui/` files this page imports all land in the package
-/// this phase: `aspect-ratio.tsx` → [ElAspectRatio], `scroll-area.tsx` →
-/// [ElScrollArea], `carousel.tsx` → [ElCarousel], `resizable.tsx` →
-/// [ElResizablePanelGroup]. `badge.tsx` was already here.
+/// this phase: `aspect-ratio.tsx` → [AspectRatio], `scroll-area.tsx` →
+/// [ScrollArea], `carousel.tsx` → [Carousel], `resizable.tsx` →
+/// [ResizablePanelGroup]. `badge.tsx` was already here.
 ///
 /// **The fidelity bar is that it moves: and that it does not move where the
 /// reference does not.** A reader can hover the rail into existence and drag
@@ -31,7 +31,7 @@
 ///     drag or keyboard, and only `scrollLeft = n` from a console moves it.
 ///     The page's own API row, *"Add ScrollBar for a horizontal bar"*: is
 ///     the instruction the specimen above it does not follow. Reproduced
-///     ([ElScrollArea.horizontalBar] left false).
+///     ([ScrollArea.horizontalBar] left false).
 ///  3. **`minSize={25}` is 25 pixels.** `react-resizable-panels@4` writes
 ///     `defaultSize` into `flex-grow`: where 40 and 60 survive only as a
 ///     ratio, and so *look* like percentages: while `minSize` stays in
@@ -56,7 +56,7 @@
 ///  7. **`AspectRatio`'s `mb-4` shrinks the box instead of spacing it.** The
 ///     carousel card's ratio box is absolutely positioned to its slot's four
 ///     edges, so a bottom margin comes out of its own height: a 398.203px slot
-///     with a 382.203px box in it. Reproduced by [ElAspectRatio.margin].
+///     with a 382.203px box in it. Reproduced by [AspectRatio.margin].
 ///  8. **Five chips, seven sections.** `contents` is `[Aspect Ratio, Scroll
 ///     Area, Browser Scrollbar, Carousel, Resizable]`; `API` and `Rules` get
 ///     no chip. The same shape `selection` records as its drift 1.
@@ -71,7 +71,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -95,22 +107,22 @@ const List<(String, String)> _packs = <(String, String)>[
 const double _actionTint = 0.12;
 
 /// `h-64`: the vertical `ScrollArea`'s frame.
-double get _scrollAreaHeight => el(64);
+double get _scrollAreaHeight => space(64);
 
 /// `h-52`: the vertical browser-scrollbar frame.
-double get _nativeScrollHeight => el(52);
+double get _nativeScrollHeight => space(52);
 
 /// `min-h-56` on the resizable group.
-double get _splitMinHeight => el(56);
+double get _splitMinHeight => space(56);
 
 /// `scrollbar-gutter: stable` under `scrollbar-width: thin`, measured at 10px
-///: the same reservation `ElMessageScrollerViewport.gutter` names.
-double get _scrollbarGutter => ElMessageScrollerViewport.gutter;
+///: the same reservation `MessageScrollerViewport.gutter` names.
+double get _scrollbarGutter => MessageScrollerViewport.gutter;
 
 /// `size-28` on the ScrollArea rail's cards, `h-28 w-36` on the browser
 /// scrollbar's.
-double get _railCard => el(28);
-double get _shelfCardWidth => el(36);
+double get _railCard => space(28);
+double get _shelfCardWidth => space(36);
 
 /* ── Page ────────────────────────────────────────────────────────────────── */
 
@@ -119,12 +131,12 @@ class LayoutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('base', 'layout');
+    final CategoryHit here = findCategory('base', 'layout');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
           blurb: here.category.blurb,
@@ -137,7 +149,7 @@ class LayoutPage extends StatelessWidget {
         const _ResizableSection(),
         const _ApiSection(),
         const _RulesSection(),
-        const ElPageFootNav(groupId: 'base', slug: 'layout'),
+        const PageFootNav(groupId: 'base', slug: 'layout'),
       ],
     );
   }
@@ -150,18 +162,18 @@ class _AspectRatioSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'aspect-ratio',
       title: 'Aspect Ratio',
       description:
           'Locks a box to a ratio so a grid of packs or cards never shifts as '
           'images load. This is the single most effective defence against '
           'layout jump.',
-      child: ElPanel(
+      child: Panel(
         label: "The product's three ratios",
-        child: ElGrid(
+        child: Grid(
           sm: 3,
-          gap: el(6),
+          gap: space(6),
           children: const <Widget>[
             _RatioCell(
               ratio: 5 / 7,
@@ -208,32 +220,39 @@ class _RatioCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElAspectRatio(
+        AspectRatio(
           ratio: ratio,
           // `grid place-items-center rounded-lg border border-border bg-muted`.
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: theme.muted,
-              borderRadius: BorderRadius.circular(ElRadii.lg),
-              border: Border.all(color: theme.border, width: ElWidths.hairline),
+              borderRadius: BorderRadius.circular(Radii.lg),
+              border: Border.all(
+                color: theme.border,
+                width: BorderWidths.hairline,
+              ),
             ),
             child: Center(
-              child: ElText(label, ElType.numSm, color: theme.mutedForeground),
+              child: StyledText(
+                label,
+                TextStyles.numberSm,
+                color: theme.mutedForeground,
+              ),
             ),
           ),
         ),
         // `mt-3`.
-        SizedBox(height: el(3)),
-        ElText(title, ElType.label),
+        SizedBox(height: space(3)),
+        StyledText(title, TextStyles.eyebrow),
         // `mt-1`.
-        SizedBox(height: el(1)),
-        ElText(blurb, ElType.small),
+        SizedBox(height: space(1)),
+        StyledText(blurb, TextStyles.small),
       ],
     );
   }
@@ -246,7 +265,7 @@ class _ScrollAreaSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'scroll-area',
       title: 'Scroll Area',
       description:
@@ -256,31 +275,25 @@ class _ScrollAreaSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElGrid(
+          Grid(
             lg: 2,
             children: const <Widget>[
-              ElPanel(
-                label: 'Vertical — possible hits',
-                child: _PossibleHits(),
-              ),
-              ElPanel(
-                label: 'Horizontal — card set rail',
-                child: _CardSetRail(),
-              ),
+              Panel(label: 'Vertical — possible hits', child: _PossibleHits()),
+              Panel(label: 'Horizontal — card set rail', child: _CardSetRail()),
             ],
           ),
           // `<Note className="mt-4">`.
-          SizedBox(height: el(4)),
-          ElNote(
-            // `ElRichText`, not a bare `Text.rich`: the chips are
+          SizedBox(height: space(4)),
+          Note(
+            // `RichText`, not a bare `Text.rich`: the chips are
             // [WidgetSpan]s 23px tall inside a 19.5px line, and only the
             // spec's own strut keeps the line box at `.type-small`'s height
             // instead of letting the tallest chip set it. Measured: half a
             // pixel per line, twice over, before this.
-            child: ElRichText(
+            child: RichText(
               TextSpan(
                 children: <InlineSpan>[
-                  ElCode.span('ScrollArea'),
+                  Code.span('ScrollArea'),
                   const TextSpan(
                     text:
                         ' replaces the browser scrollbar with a composed '
@@ -290,7 +303,7 @@ class _ScrollAreaSection extends StatelessWidget {
                   ),
                 ],
               ),
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ],
@@ -306,20 +319,22 @@ class _PossibleHits extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       height: _scrollAreaHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(ElRadii.lg),
-          border: Border.all(color: theme.border, width: ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.lg),
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(ElWidths.hairline),
-          child: ElScrollArea(
+          padding: const EdgeInsets.all(BorderWidths.hairline),
+          child: ScrollArea(
             // `rounded-[inherit]`, on the frame's inner curve.
-            borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
+            borderRadius: BorderRadius.circular(
+              Radii.lg - BorderWidths.hairline,
+            ),
             child: _SeamedColumn(
               colour: theme.border,
               children: <Widget>[
@@ -346,15 +361,15 @@ class _HitRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
+      padding: EdgeInsets.symmetric(horizontal: space(4), vertical: space(3)),
       child: Row(
         children: <Widget>[
-          ElText(name, ElType.small, color: theme.foreground),
+          StyledText(name, TextStyles.small, color: theme.foreground),
           const Spacer(),
-          ElText(price, ElType.numSm, color: theme.valueInk),
+          StyledText(price, TextStyles.numberSm, color: theme.premiumText),
         ],
       ),
     );
@@ -368,42 +383,42 @@ class _CardSetRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(ElWidths.hairline),
-        child: ElScrollArea(
-          borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
+        padding: const EdgeInsets.all(BorderWidths.hairline),
+        child: ScrollArea(
+          borderRadius: BorderRadius.circular(Radii.lg - BorderWidths.hairline),
           child: Padding(
             // `p-4`.
-            padding: EdgeInsets.all(el(4)),
+            padding: EdgeInsets.all(space(4)),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 for (int i = 0; i < _packs.length; i++) ...<Widget>[
                   // `gap-3`.
-                  if (i > 0) SizedBox(width: el(3)),
+                  if (i > 0) SizedBox(width: space(3)),
                   SizedBox(
                     width: _railCard,
                     height: _railCard,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: theme.muted,
-                        borderRadius: BorderRadius.circular(ElRadii.md),
+                        borderRadius: BorderRadius.circular(Radii.md),
                         border: Border.all(
                           color: theme.border,
-                          width: ElWidths.hairline,
+                          width: BorderWidths.hairline,
                         ),
                       ),
                       child: Center(
-                        child: ElText(
+                        child: StyledText(
                           _packs[i].$1,
-                          ElType.micro,
+                          TextStyles.eyebrowSmall,
                           align: TextAlign.center,
                         ),
                       ),
@@ -426,7 +441,7 @@ class _BrowserScrollbarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'browser-scrollbar',
       title: 'Browser Scrollbar',
       description:
@@ -437,26 +452,26 @@ class _BrowserScrollbarSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElGrid(
+          Grid(
             lg: 2,
             children: const <Widget>[
-              ElPanel(label: 'Vertical — long list', child: _ActivityList()),
-              ElPanel(label: 'Horizontal — wide shelf', child: _WideShelf()),
+              Panel(label: 'Vertical — long list', child: _ActivityList()),
+              Panel(label: 'Horizontal — wide shelf', child: _WideShelf()),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElNote(
-            child: ElRichText(
+          SizedBox(height: space(4)),
+          Note(
+            child: RichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(
                     text: 'The page-level scrollbar needs no class. Add ',
                   ),
-                  ElCode.span('scrollbar-thin'),
+                  Code.span('scrollbar-thin'),
                   const TextSpan(text: ' only to nested elements with '),
-                  ElCode.span('overflow-x-*'),
+                  Code.span('overflow-x-*'),
                   const TextSpan(text: ' or '),
-                  ElCode.span('overflow-y-*'),
+                  Code.span('overflow-y-*'),
                   const TextSpan(
                     text:
                         '. Operating systems may render native rails as '
@@ -464,7 +479,7 @@ class _BrowserScrollbarSection extends StatelessWidget {
                   ),
                 ],
               ),
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ],
@@ -493,21 +508,23 @@ class _ActivityListState extends State<_ActivityList> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       height: _nativeScrollHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: theme.background,
-          borderRadius: BorderRadius.circular(ElRadii.lg),
-          border: Border.all(color: theme.border, width: ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.lg),
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(ElWidths.hairline),
+          padding: const EdgeInsets.all(BorderWidths.hairline),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
-            child: ElThinScrollbar(
+            borderRadius: BorderRadius.circular(
+              Radii.lg - BorderWidths.hairline,
+            ),
+            child: ThinScrollbar(
               controller: _controller,
               child: SingleChildScrollView(
                 controller: _controller,
@@ -541,15 +558,15 @@ class _ActivityRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
+      padding: EdgeInsets.symmetric(horizontal: space(4), vertical: space(3)),
       child: Row(
         children: <Widget>[
-          ElText(name, ElType.small, color: theme.foreground),
+          StyledText(name, TextStyles.small, color: theme.foreground),
           const Spacer(),
-          ElText('Ready', ElType.caption, color: theme.mutedForeground),
+          StyledText('Ready', TextStyles.caption, color: theme.mutedForeground),
         ],
       ),
     );
@@ -576,53 +593,53 @@ class _WideShelfState extends State<_WideShelf> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.background,
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(ElWidths.hairline),
+        padding: const EdgeInsets.all(BorderWidths.hairline),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
-          child: ElThinScrollbar(
+          borderRadius: BorderRadius.circular(Radii.lg - BorderWidths.hairline),
+          child: ThinScrollbar(
             controller: _controller,
             child: SingleChildScrollView(
               controller: _controller,
               scrollDirection: Axis.horizontal,
               // `p-4` on the scroll container itself, so it travels with the
               // content rather than framing the viewport.
-              padding: EdgeInsets.all(el(4)),
+              padding: EdgeInsets.all(space(4)),
               child: Padding(
                 // `pb-2` on the flex row inside.
-                padding: EdgeInsets.only(bottom: el(2)),
+                padding: EdgeInsets.only(bottom: space(2)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     for (int i = 0; i < _packs.length; i++) ...<Widget>[
-                      if (i > 0) SizedBox(width: el(3)),
+                      if (i > 0) SizedBox(width: space(3)),
                       SizedBox(
                         width: _shelfCardWidth,
                         height: _railCard,
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: theme.muted,
-                            borderRadius: BorderRadius.circular(ElRadii.md),
+                            borderRadius: BorderRadius.circular(Radii.md),
                             border: Border.all(
                               color: theme.border,
-                              width: ElWidths.hairline,
+                              width: BorderWidths.hairline,
                             ),
                           ),
                           child: Padding(
                             // `px-3`.
-                            padding: EdgeInsets.symmetric(horizontal: el(3)),
+                            padding: EdgeInsets.symmetric(horizontal: space(3)),
                             child: Center(
-                              child: ElText(
+                              child: StyledText(
                                 _packs[i].$1,
-                                ElType.micro,
+                                TextStyles.eyebrowSmall,
                                 align: TextAlign.center,
                                 color: theme.foreground,
                               ),
@@ -649,21 +666,21 @@ class _CarouselSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'carousel',
       title: 'Carousel',
       description:
           'The featured pack carousel on the landing page. Arrows are always '
           'visible and it is fully keyboard navigable — a carousel you can '
           'only swipe is inaccessible.',
-      child: ElPanel(
+      child: Panel(
         label: 'Featured packs',
         // The `p-6` moves inside so the arrows can hang out of it and be
         // clipped by this panel's own frame: drift 1, and the whole reason
-        // [ElCarousel] takes a padding of its own.
+        // [Carousel] takes a padding of its own.
         flush: true,
-        child: ElCarousel(
-          padding: EdgeInsets.all(el(6)),
+        child: Carousel(
+          padding: EdgeInsets.all(space(6)),
           // `basis-1/2 lg:basis-1/3` at the port's 1440 frame.
           basis: 1 / 3,
           items: <Widget>[
@@ -683,45 +700,46 @@ class _PackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElLiftCard(
-      radius: BorderRadius.circular(ElRadii.lg),
-      padding: EdgeInsets.all(el(4)),
+    return InteractiveCard(
+      radius: BorderRadius.circular(Radii.lg),
+      padding: EdgeInsets.all(space(4)),
       cursor: MouseCursor.defer,
       builder: (BuildContext context, bool hovered) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElAspectRatio(
+          AspectRatio(
             ratio: 3 / 4,
             // `mb-4`: drift 7: it shortens the box, it does not space it.
-            margin: EdgeInsets.only(bottom: el(4)),
+            margin: EdgeInsets.only(bottom: space(4)),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: ElPalette.action.withValues(alpha: _actionTint),
-                borderRadius: BorderRadius.circular(ElRadii.md),
+                color: Palette.action.withValues(alpha: _actionTint),
+                borderRadius: BorderRadius.circular(Radii.md),
                 border: Border.all(
                   color: theme.border,
-                  width: ElWidths.hairline,
+                  width: BorderWidths.hairline,
                 ),
               ),
             ),
           ),
-          ElText('Eclipse series', ElType.label),
+          StyledText('Eclipse series', TextStyles.eyebrow),
           // `mt-1.5`.
-          SizedBox(height: el(1.5)),
-          ElText(pack.$1, ElType.h4, color: theme.foreground),
+          SizedBox(height: space(1.5)),
+          StyledText(pack.$1, TextStyles.h4, color: theme.foreground),
           // `mt-3`.
-          SizedBox(height: el(3)),
+          SizedBox(height: space(3)),
           Row(
             children: <Widget>[
-              ElText(pack.$2, ElType.numMd, color: theme.valueInk),
-              const Spacer(),
-              const ElBadge(
-                label: '6 Cards',
-                variant: ElBadgeVariant.secondary,
+              StyledText(
+                pack.$2,
+                TextStyles.numberMd,
+                color: theme.premiumText,
               ),
+              const Spacer(),
+              const Badge(label: '6 Cards', variant: BadgeVariant.secondary),
             ],
           ),
         ],
@@ -737,14 +755,14 @@ class _ResizableSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'resizable',
       title: 'Resizable',
       description:
           'Not used in the collector-facing product. Reserved for the admin '
           'surface, where a card table beside a detail pane needs an '
           'adjustable split.',
-      child: ElPanel(
+      child: Panel(
         label: 'Admin split view',
         note: 'Future admin surface',
         child: _AdminSplit(),
@@ -758,21 +776,21 @@ class _AdminSplit extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(ElWidths.hairline),
+        padding: const EdgeInsets.all(BorderWidths.hairline),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
-          child: ElResizablePanelGroup(
-            minHeight: _splitMinHeight - ElWidths.hairline * 2,
-            panels: <ElResizablePanel>[
-              ElResizablePanel(
+          borderRadius: BorderRadius.circular(Radii.lg - BorderWidths.hairline),
+          child: ResizablePanelGroup(
+            minHeight: _splitMinHeight - BorderWidths.hairline * 2,
+            panels: <ResizablePanel>[
+              ResizablePanel(
                 defaultSize: 40,
                 // DRIFT 3: pixels, however much it reads as a percentage.
                 minSize: 25,
@@ -784,7 +802,7 @@ class _AdminSplit extends StatelessWidget {
                       'session lasts.',
                 ),
               ),
-              ElResizablePanel(
+              ResizablePanel(
                 defaultSize: 60,
                 child: _SplitPane(
                   fill: theme.card,
@@ -819,15 +837,15 @@ class _SplitPane extends StatelessWidget {
     return ColoredBox(
       color: fill,
       child: Padding(
-        padding: EdgeInsets.all(el(5)),
+        padding: EdgeInsets.all(space(5)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ElText(title, ElType.label),
+            StyledText(title, TextStyles.eyebrow),
             // `mb-3`.
-            SizedBox(height: el(3)),
-            ElText(body, ElType.small),
+            SizedBox(height: space(3)),
+            StyledText(body, TextStyles.small),
           ],
         ),
       ),
@@ -842,11 +860,11 @@ class _ApiSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'api',
       title: 'API',
-      child: ElMeta(
-        items: <ElMetaItem>[
+      child: Meta(
+        items: <MetaItem>[
           (
             k: 'AspectRatio',
             v: const TextSpan(
@@ -901,10 +919,10 @@ class _RulesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ElSection(
+    return const Section(
       id: 'rules',
       title: 'Rules',
-      child: ElDoDont(
+      child: DoDont(
         dos: <String>[
           'Wrap every pack and card image in an AspectRatio so grids never '
               'jump.',
@@ -934,7 +952,7 @@ class _RulesSection extends StatelessWidget {
 /// `divide-y divide-border`: a hairline **between** rows, drawn as a row of
 /// its own so no child has to know it is not the first.
 ///
-/// Deliberately not [ElDividedList]: that fills with `--card` and rounds
+/// Deliberately not [DividedList]: that fills with `--card` and rounds
 /// itself, and both of these lists declare no background at all.
 class _SeamedColumn extends StatelessWidget {
   const _SeamedColumn({required this.colour, required this.children});
@@ -951,7 +969,7 @@ class _SeamedColumn extends StatelessWidget {
         for (int i = 0; i < children.length; i++) ...<Widget>[
           if (i > 0)
             SizedBox(
-              height: ElWidths.hairline,
+              height: BorderWidths.hairline,
               child: ColoredBox(color: colour),
             ),
           children[i],

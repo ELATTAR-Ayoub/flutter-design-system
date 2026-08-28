@@ -5,7 +5,19 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_facts.dart' show DocsApiFact;
 import 'package:example/docs/docs_table.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 // `pumpWidget`'s root gets tight constraints equal to the test view's size
@@ -20,8 +32,8 @@ Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: ThemeScope(
+      controller: ThemeController(mode: ColorMode.dark),
       child: Center(child: child),
     ),
   ),
@@ -42,7 +54,7 @@ void main() {
               DocsTableColumn(header: 'Purpose', flex: 0.4),
             ],
             rows: <List<String>>[
-              <String>['variant', 'ElButtonVariant', 'Which of the seven.'],
+              <String>['variant', 'ButtonVariant', 'Which of the seven.'],
             ],
           ),
         ),
@@ -50,7 +62,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.byType(ElTable), findsOneWidget);
+    expect(find.byType(Table), findsOneWidget);
   });
 
   testWidgets('it fills its column with no trailing gap', (
@@ -78,14 +90,14 @@ void main() {
     );
     await tester.pump();
 
-    expect(tester.getSize(find.byType(ElTable)).width, 640);
+    expect(tester.getSize(find.byType(Table)).width, 640);
 
-    // The table-width assertion above is satisfied by `ElTable`'s own
+    // The table-width assertion above is satisfied by `Table`'s own
     // `Column(crossAxisAlignment: CrossAxisAlignment.stretch)` wrapper
     // regardless of whether the gutter/flex arithmetic underneath is right —
     // it proves the outer box fills its bound, not that the columns split
     // it correctly. Pin a cell too: two 0.5 columns over 640, less
-    // `2 columns × ElTable.cellPadding(8) × 2 == 32` of gutters, is 608 of
+    // `2 columns × Table.cellPadding(8) × 2 == 32` of gutters, is 608 of
     // content, 304 a column — so the header cell built around 'A' must
     // measure exactly that.
     final Iterable<SizedBox> headerAncestors = tester.widgetList<SizedBox>(
@@ -101,44 +113,43 @@ void main() {
     expect(headerCellBox.width, 304);
   });
 
-  testWidgets(
-    'a column narrower than the floor scrolls instead of cramming',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
+  testWidgets('a column narrower than the floor scrolls instead of cramming', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
 
-      // Narrower than `_minContentWidth` (`el(132)` == 528, the same floor
-      // `_FactScroll` uses for `DocsStateMatrix`), so the table should hold
-      // at the floor and let a horizontal scroller carry the overflow
-      // rather than compressing every cell to fit.
-      await tester.pumpWidget(
-        _host(
-          const SizedBox(
-            width: 200,
-            child: DocsTable(
-              columns: <DocsTableColumn>[
-                DocsTableColumn(header: 'A', flex: 0.5),
-                DocsTableColumn(header: 'B', flex: 0.5),
-              ],
-              rows: <List<String>>[
-                <String>['one', 'two'],
-              ],
-            ),
+    // Narrower than `_minContentWidth` (`space(132)` == 528, the same floor
+    // `_FactScroll` uses for `DocsStateMatrix`), so the table should hold
+    // at the floor and let a horizontal scroller carry the overflow
+    // rather than compressing every cell to fit.
+    await tester.pumpWidget(
+      _host(
+        const SizedBox(
+          width: 200,
+          child: DocsTable(
+            columns: <DocsTableColumn>[
+              DocsTableColumn(header: 'A', flex: 0.5),
+              DocsTableColumn(header: 'B', flex: 0.5),
+            ],
+            rows: <List<String>>[
+              <String>['one', 'two'],
+            ],
           ),
         ),
-      );
-      await tester.pump();
+      ),
+    );
+    await tester.pump();
 
-      final Finder scroller = find.byType(SingleChildScrollView);
-      expect(scroller, findsOneWidget);
-      expect(
-        tester.widget<SingleChildScrollView>(scroller).scrollDirection,
-        Axis.horizontal,
-      );
-      expect(tester.getSize(find.byType(ElTable)).width, 528);
-    },
-  );
+    final Finder scroller = find.byType(SingleChildScrollView);
+    expect(scroller, findsOneWidget);
+    expect(
+      tester.widget<SingleChildScrollView>(scroller).scrollDirection,
+      Axis.horizontal,
+    );
+    expect(tester.getSize(find.byType(Table)).width, 528);
+  });
 
   testWidgets('the API table renders one row per fact', (
     WidgetTester tester,
@@ -151,12 +162,12 @@ void main() {
             facts: <DocsApiFact>[
               DocsApiFact(
                 name: 'variant',
-                type: 'ElButtonVariant',
+                type: 'ButtonVariant',
                 description: 'Which of the seven.',
               ),
               DocsApiFact(
                 name: 'size',
-                type: 'ElButtonSize',
+                type: 'ButtonSize',
                 description: 'Which of the nine.',
               ),
             ],
@@ -187,7 +198,9 @@ void main() {
     );
     await tester.pump();
 
-    for (final ElText text in tester.widgetList<ElText>(find.byType(ElText))) {
+    for (final StyledText text in tester.widgetList<StyledText>(
+      find.byType(StyledText),
+    )) {
       expect(text.spec.uppercase, isFalse, reason: text.text);
     }
   });

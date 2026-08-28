@@ -18,7 +18,33 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 
 /// One page in the left rail.
 class DocsSidebarEntry {
@@ -75,7 +101,7 @@ class DocsSidebar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           for (int i = 0; i < groups.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: el(6)),
+            if (i > 0) SizedBox(height: space(6)),
             _SidebarGroup(group: groups[i], onNavigate: onNavigate),
           ],
         ],
@@ -92,15 +118,19 @@ class _SidebarGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       key: ValueKey<String>('docs-sidebar-group:${group.label}'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElText(group.label, ElType.section, color: theme.mutedForeground),
-        SizedBox(height: el(3)),
+        StyledText(
+          group.label,
+          TextStyles.section,
+          color: theme.mutedForeground,
+        ),
+        SizedBox(height: space(3)),
         for (int i = 0; i < group.items.length; i++) ...<Widget>[
-          if (i > 0) SizedBox(height: el(1)),
+          if (i > 0) SizedBox(height: space(1)),
           _SidebarRow(entry: group.items[i], onNavigate: onNavigate),
         ],
       ],
@@ -116,7 +146,7 @@ class _SidebarGroup extends StatelessWidget {
 ///
 /// The ink cross-fade follows `_DsCrumbState` in `breadcrumb.dart`, a
 /// `MouseRegion` flipping a bool into a `TweenAnimationBuilder<Color?>` that
-/// rides [ElDurations.transitionDefault] on [ElCurves.out]. The pill itself
+/// rides [MotionDurations.normal] on [MotionCurves.enter]. The pill itself
 /// is not put through the same builder, since `TweenAnimationBuilder` asserts
 /// its `tween.end` is non-null, and the resting pill has to be a literal
 /// `null` fill, not a zero-alpha colour, for the decoration to read as "no
@@ -142,12 +172,12 @@ class _SidebarRowState extends State<_SidebarRow> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final DocsSidebarEntry entry = widget.entry;
     final bool filled = entry.selected || _hovered;
-    final Duration duration = elAnimationDuration(
+    final Duration duration = effectiveMotionDuration(
       context,
-      ElDurations.transitionDefault,
+      MotionDurations.normal,
     );
 
     return Semantics(
@@ -163,10 +193,13 @@ class _SidebarRowState extends State<_SidebarRow> {
           child: SelectionContainer.disabled(
             child: Container(
               key: ValueKey<String>('docs-sidebar:${entry.route}'),
-              padding: EdgeInsets.symmetric(horizontal: el(3), vertical: el(2)),
+              padding: EdgeInsets.symmetric(
+                horizontal: space(3),
+                vertical: space(2),
+              ),
               decoration: BoxDecoration(
                 color: filled ? theme.sidebarAccent : null,
-                borderRadius: BorderRadius.circular(ElRadii.md),
+                borderRadius: BorderRadius.circular(Radii.md),
               ),
               child: TweenAnimationBuilder<Color?>(
                 tween: ColorTween(
@@ -175,11 +208,11 @@ class _SidebarRowState extends State<_SidebarRow> {
                       : theme.sidebarForeground,
                 ),
                 duration: duration,
-                curve: ElCurves.out,
+                curve: MotionCurves.enter,
                 builder: (BuildContext context, Color? ink, Widget? _) =>
-                    ElText(
+                    StyledText(
                       entry.title,
-                      ElType.small,
+                      TextStyles.small,
                       color: ink ?? theme.sidebarForeground,
                     ),
               ),

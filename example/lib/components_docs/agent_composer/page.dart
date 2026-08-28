@@ -3,7 +3,7 @@
 /// **Written from nothing**, per the rollout's per-item brief:
 /// `agent-composer` has no page today. Everything on it is read off
 /// `lib/src/components/agent_composer.dart` directly, and every specimen is
-/// a real, functioning `ElAgentComposer` — typing, sending, removing an
+/// a real, functioning `AgentComposer` — typing, sending, removing an
 /// attachment, and stopping a busy turn all genuinely run the widget's own
 /// callbacks, not a screenshot standing in for them.
 ///
@@ -17,13 +17,25 @@
 /// *"Photos & files"* row (`_pickFiles`) is a deliberate no-op — a widget
 /// layer cannot open an OS file dialog — and the refusal message under the
 /// shell only fires from inside `_takeFiles`, which nothing on this page can
-/// reach without a real drag-and-drop payload over `kElMaxFileBytes`. Both
+/// reach without a real drag-and-drop payload over `maxFileBytes`. Both
 /// are named in the Dependencies and States disclosures instead of staged
 /// with an invented trigger.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -47,7 +59,7 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(64),
+      minHeight: space(64),
     ),
     InstallSection(
       id: 'install',
@@ -56,7 +68,7 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
           'agent-composer has a real registry manifest: elattar add '
           'agent-composer installs lib/src/components/agent_composer.dart '
           'and resolves agent-attach-menu, agent-attachments, agent-core, '
-          'agent-slash-palette, button, icon, input, machine-surface and '
+          'agent-slash-palette, button, icon, input, surface and '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: agentComposerDoc.command,
@@ -76,7 +88,7 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElAgentComposer is reachable the '
+              'Add the export line so AgentComposer is reachable the '
               'same way the CLI path already makes it.',
           code: "export 'agent_composer.dart';",
         ),
@@ -96,16 +108,16 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
       title: 'Attachments',
       description:
           'attachments != null mounts the file tray above the input, one '
-          'border-b panel of ElAgentAttachmentList in compact mode. Remove '
+          'border-b panel of AgentAttachmentList in compact mode. Remove '
           'is real here: onRemoveAttachment actually drops the row. Adding '
           'a new one is not demonstrated: onAttach is wired to a real '
-          'callback, but nothing can produce a real ElAgentAttachment on '
+          'callback, but nothing can produce a real AgentAttachment on '
           'this page without a file picker, which onPickFiles cannot open '
           '(the widget layer has no such API — see Dependencies).',
       specimen: _AttachmentsSpecimen(),
       code: _attachmentsCode,
       label: 'Attachments specimen view',
-      minHeight: el(64),
+      minHeight: space(64),
     ),
     ShowcaseSection(
       id: 'commands',
@@ -122,7 +134,7 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
       specimen: _CommandsSpecimen(),
       code: _commandsCode,
       label: 'Commands specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     ShowcaseSection(
       id: 'busy',
@@ -153,7 +165,7 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
       description:
           'accessory is a bare slot rendered on the left of the control '
           'row, beside the plus menu. agent_composer.dart builds no model '
-          'picker of its own — ElAgentConsole is the real caller, and '
+          'picker of its own — AgentConsole is the real caller, and '
           'fills this slot with its own ModelPicker. The plain outline '
           'button below stands in for that, to show where the slot sits '
           'without documenting a widget this file does not declare.',
@@ -178,14 +190,14 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every named constructor parameter ElAgentComposer declares, '
+          'Every named constructor parameter AgentComposer declares, '
           'plus the fifteen static geometry getters that give a consumer '
           '(agent-console, principally) the composer\'s own measurements '
           'rather than restating them.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElAgentComposer', anchor: 'api-elagentcomposer'),
+        DocsTocEntry(title: 'AgentComposer', anchor: 'api-elagentcomposer'),
         DocsTocEntry(
-          title: 'ElAgentComposer statics',
+          title: 'AgentComposer statics',
           anchor: 'api-elagentcomposer-static',
         ),
       ],
@@ -195,7 +207,7 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off _ElAgentComposerState.build and the class doc\'s own '
+          'Read off _AgentComposerState.build and the class doc\'s own '
           'drift register, not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -276,9 +288,9 @@ class AgentComposerDocPage extends StatelessWidget {
       title: agentComposerDoc.title,
       description: agentComposerDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Agent Composer'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Agent Composer'),
     ],
     toc: agentComposerDocSpec.toc,
     previous: const DocsPageLink(
@@ -329,23 +341,23 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElAgentComposer(
+        AgentComposer(
           key: const ValueKey<String>('agent-composer-preview'),
           controller: _controller,
           focusNode: _focus,
           onSubmit: _submit,
         ),
         if (_sent.isNotEmpty) ...<Widget>[
-          SizedBox(height: el(3)),
-          ElText('Sent', ElType.section, color: theme.mutedForeground),
-          SizedBox(height: el(1)),
+          SizedBox(height: space(3)),
+          StyledText('Sent', TextStyles.section, color: theme.mutedForeground),
+          SizedBox(height: space(1)),
           for (final String message in _sent)
-            ElText(message, ElType.small, color: theme.foreground),
+            StyledText(message, TextStyles.small, color: theme.foreground),
         ],
       ],
     );
@@ -354,7 +366,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
 const String _previewCode = '''final controller = TextEditingController();
 
-ElAgentComposer(
+AgentComposer(
   controller: controller,
   onSubmit: () {
     send(controller.text.trim());
@@ -367,7 +379,7 @@ const String _usageCode =
 
 final TextEditingController controller = TextEditingController();
 
-ElAgentComposer(
+AgentComposer(
   controller: controller,
   onSubmit: () => send(controller.text),
 )''';
@@ -382,19 +394,19 @@ class _AttachmentsSpecimen extends StatefulWidget {
 class _AttachmentsSpecimenState extends State<_AttachmentsSpecimen> {
   final TextEditingController _controller = TextEditingController();
 
-  List<ElAgentAttachment> _attachments = const <ElAgentAttachment>[
-    ElAgentAttachment(
+  List<AgentAttachment> _attachments = const <AgentAttachment>[
+    AgentAttachment(
       id: 'a1',
       name: 'roadmap.md',
       mime: 'text/markdown',
-      kind: ElAgentAttachmentKind.other,
+      kind: AgentAttachmentKind.other,
       size: 1892,
     ),
-    ElAgentAttachment(
+    AgentAttachment(
       id: 'a2',
       name: 'cover.png',
       mime: 'image/png',
-      kind: ElAgentAttachmentKind.image,
+      kind: AgentAttachmentKind.image,
       size: 204800,
     ),
   ];
@@ -406,26 +418,26 @@ class _AttachmentsSpecimenState extends State<_AttachmentsSpecimen> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentComposer(
+  Widget build(BuildContext context) => AgentComposer(
     key: const ValueKey<String>('agent-composer-attachments'),
     controller: _controller,
     onSubmit: () {},
     attachments: _attachments,
-    onAttach: (List<ElAgentAttachment> files) => setState(
-      () => _attachments = <ElAgentAttachment>[..._attachments, ...files],
+    onAttach: (List<AgentAttachment> files) => setState(
+      () => _attachments = <AgentAttachment>[..._attachments, ...files],
     ),
     onRemoveAttachment: (String id) => setState(
       () => _attachments = _attachments
-          .where((ElAgentAttachment a) => a.id != id)
+          .where((AgentAttachment a) => a.id != id)
           .toList(),
     ),
   );
 }
 
-const String _attachmentsCode = '''ElAgentComposer(
+const String _attachmentsCode = '''AgentComposer(
   controller: controller,
   onSubmit: send,
-  attachments: attachments, // List<ElAgentAttachment>
+  attachments: attachments, // List<AgentAttachment>
   onAttach: (files) => setState(() => attachments = [...attachments, ...files]),
   onRemoveAttachment: (id) => setState(
     () => attachments = attachments.where((a) => a.id != id).toList(),
@@ -442,20 +454,20 @@ class _CommandsSpecimen extends StatefulWidget {
 class _CommandsSpecimenState extends State<_CommandsSpecimen> {
   final TextEditingController _controller = TextEditingController(text: '/');
 
-  static const List<ElAgentCommand> _commands = <ElAgentCommand>[
-    ElAgentCommand(
+  static const List<AgentCommand> _commands = <AgentCommand>[
+    AgentCommand(
       id: 'summarize',
       label: 'Summarize',
       hint: 'Summarize the conversation so far',
-      group: ElAgentCommandGroup.skill,
-      icon: ElLucide.scrollText,
+      group: AgentCommandGroup.skill,
+      icon: Lucide.scrollText,
     ),
-    ElAgentCommand(
+    AgentCommand(
       id: 'clear',
       label: 'Clear',
       hint: 'Start a new conversation',
-      group: ElAgentCommandGroup.command,
-      icon: ElLucide.rotateCcw,
+      group: AgentCommandGroup.command,
+      icon: Lucide.rotateCcw,
     ),
   ];
 
@@ -466,7 +478,7 @@ class _CommandsSpecimenState extends State<_CommandsSpecimen> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentComposer(
+  Widget build(BuildContext context) => AgentComposer(
     key: const ValueKey<String>('agent-composer-commands'),
     controller: _controller,
     onSubmit: () {},
@@ -474,23 +486,23 @@ class _CommandsSpecimenState extends State<_CommandsSpecimen> {
   );
 }
 
-const String _commandsCode = '''ElAgentComposer(
+const String _commandsCode = '''AgentComposer(
   controller: controller, // starts with '/' to show the palette open
   onSubmit: send,
   commands: const [
-    ElAgentCommand(
+    AgentCommand(
       id: 'summarize',
       label: 'Summarize',
       hint: 'Summarize the conversation so far',
-      group: ElAgentCommandGroup.skill,
-      icon: ElLucide.scrollText,
+      group: AgentCommandGroup.skill,
+      icon: Lucide.scrollText,
     ),
-    ElAgentCommand(
+    AgentCommand(
       id: 'clear',
       label: 'Clear',
       hint: 'Start a new conversation',
-      group: ElAgentCommandGroup.command,
-      icon: ElLucide.rotateCcw,
+      group: AgentCommandGroup.command,
+      icon: Lucide.rotateCcw,
     ),
   ],
 )''';
@@ -513,7 +525,7 @@ class _BusySpecimenState extends State<_BusySpecimen> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentComposer(
+  Widget build(BuildContext context) => AgentComposer(
     key: const ValueKey<String>('agent-composer-busy'),
     controller: _controller,
     onSubmit: () {},
@@ -522,7 +534,7 @@ class _BusySpecimenState extends State<_BusySpecimen> {
   );
 }
 
-const String _busyCode = '''ElAgentComposer(
+const String _busyCode = '''AgentComposer(
   controller: controller,
   onSubmit: send,
   busy: isAnswering,
@@ -548,7 +560,7 @@ class _DisabledSpecimenState extends State<_DisabledSpecimen> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentComposer(
+  Widget build(BuildContext context) => AgentComposer(
     key: const ValueKey<String>('agent-composer-disabled'),
     controller: _controller,
     onSubmit: () {},
@@ -556,7 +568,7 @@ class _DisabledSpecimenState extends State<_DisabledSpecimen> {
   );
 }
 
-const String _disabledCode = '''ElAgentComposer(
+const String _disabledCode = '''AgentComposer(
   controller: controller,
   onSubmit: send,
   disabled: !transport.isReady,
@@ -579,28 +591,29 @@ class _AccessorySpecimenState extends State<_AccessorySpecimen> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentComposer(
+  Widget build(BuildContext context) => AgentComposer(
     key: const ValueKey<String>('agent-composer-accessory'),
     controller: _controller,
     onSubmit: () {},
-    accessory: ElButton(
+    accessory: Button(
       key: const ValueKey<String>('agent-composer-accessory-slot'),
-      variant: ElButtonVariant.ghost,
-      size: ElButtonSize.sm,
+      variant: ButtonVariant.ghost,
+      size: ButtonSize.sm,
       onPressed: () {},
       child: const Text('Model'),
     ),
   );
 }
 
-const String _accessoryCode = '''// A caller's own slot content — ElAgentConsole fills this with its
+const String _accessoryCode =
+    '''// A caller's own slot content — AgentConsole fills this with its
 // ModelPicker; agent_composer.dart declares neither.
-ElAgentComposer(
+AgentComposer(
   controller: controller,
   onSubmit: send,
-  accessory: ElButton(
-    variant: ElButtonVariant.ghost,
-    size: ElButtonSize.sm,
+  accessory: Button(
+    variant: ButtonVariant.ghost,
+    size: ButtonSize.sm,
     onPressed: openModelMenu,
     child: const Text('Model'),
   ),
@@ -624,7 +637,7 @@ class _DictationErrorSpecimenState extends State<_DictationErrorSpecimen> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentComposer(
+  Widget build(BuildContext context) => AgentComposer(
     key: const ValueKey<String>('agent-composer-dictation-error'),
     controller: _controller,
     onSubmit: () {},
@@ -632,7 +645,7 @@ class _DictationErrorSpecimenState extends State<_DictationErrorSpecimen> {
   );
 }
 
-const String _dictationErrorCode = '''ElAgentComposer(
+const String _dictationErrorCode = '''AgentComposer(
   controller: controller,
   onSubmit: send,
   dictationError: dictation?.error, // 'The microphone could not be reached.'
@@ -649,16 +662,13 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elagentcomposer',
-        child: DocsApiTable(
-          title: 'ElAgentComposer',
-          facts: _composerFacts,
-        ),
+        child: DocsApiTable(title: 'AgentComposer', facts: _composerFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elagentcomposer-static',
         child: DocsApiTable(
-          title: 'ElAgentComposer statics',
+          title: 'AgentComposer statics',
           facts: _composerStaticFacts,
         ),
       ),
@@ -704,29 +714,30 @@ const List<DocsApiFact> _composerFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'busy',
     type: 'bool',
-    description: 'Defaults to false. "The agent is answering" — send '
+    description:
+        'Defaults to false. "The agent is answering" — send '
         'becomes stop.',
   ),
   DocsApiFact(
     name: 'placeholder',
     type: 'String?',
-    description: 'Optional. Defaults to ElAgentComposer.defaultPlaceholder.',
+    description: 'Optional. Defaults to AgentComposer.defaultPlaceholder.',
   ),
   DocsApiFact(
     name: 'commands',
-    type: 'List<ElAgentCommand>?',
+    type: 'List<AgentCommand>?',
     description:
         'Optional. Skills and browser commands offered under "/" — see '
-        'the Agent Slash Palette page for ElAgentCommand itself.',
+        'the Agent Slash Palette page for AgentCommand itself.',
   ),
   DocsApiFact(
     name: 'attachments',
-    type: 'List<ElAgentAttachment>?',
+    type: 'List<AgentAttachment>?',
     description: 'Optional. Non-null mounts the file tray above the input.',
   ),
   DocsApiFact(
     name: 'onAttach',
-    type: 'ValueChanged<List<ElAgentAttachment>>?',
+    type: 'ValueChanged<List<AgentAttachment>>?',
     description:
         'Optional. Non-null is the composer\'s own condition for '
         'mounting the plus menu\'s "Photos & files" row and for accepting '
@@ -742,7 +753,7 @@ const List<DocsApiFact> _composerFacts = <DocsApiFact>[
     type: 'Widget?',
     description:
         'Optional. Slot for the model picker, rendered on the left of '
-        'the control row. ElAgentConsole is the real caller that fills '
+        'the control row. AgentConsole is the real caller that fills '
         'it; this file declares no picker of its own.',
   ),
   DocsApiFact(
@@ -764,84 +775,83 @@ const List<DocsApiFact> _composerFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _composerStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElAgentComposer.defaultPlaceholder',
+    name: 'AgentComposer.defaultPlaceholder',
     type: 'static const String',
     description: '"Ask anything…" — a real horizontal ellipsis.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.dropPlaceholder',
+    name: 'AgentComposer.dropPlaceholder',
     type: 'static const String',
     description: '"Drop files here" — shown while dragging.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.inputLabel',
+    name: 'AgentComposer.inputLabel',
     type: 'static const String',
     description: '"Message" — the input\'s accessible name.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.maxRowsPx',
+    name: 'AgentComposer.maxRowsPx',
     type: 'static double (get)',
-    description:
-        '200px. The input grows to fit, up to this cap, then scrolls.',
+    description: '200px. The input grows to fit, up to this cap, then scrolls.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.inputInsets',
+    name: 'AgentComposer.inputInsets',
     type: 'static EdgeInsets (get)',
     description: '16px horizontal, 12px vertical, on the input.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.controlInsets',
+    name: 'AgentComposer.controlInsets',
     type: 'static EdgeInsets (get)',
     description: '8px left/right, 8px bottom, on the control row.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.controlGap',
+    name: 'AgentComposer.controlGap',
     type: 'static double (get)',
     description: '4px between the controls in the row.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.trayPadding',
+    name: 'AgentComposer.trayPadding',
     type: 'static double (get)',
     description: '12px on the file tray.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.inlineGap',
+    name: 'AgentComposer.inlineGap',
     type: 'static double (get)',
     description:
         '6px. The inline-block descent under the input the reference\'s '
         'own line box leaves — reproduced as real geometry, not a bug.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.controlSize',
-    type: 'static ElButtonSize (get)',
+    name: 'AgentComposer.controlSize',
+    type: 'static ButtonSize (get)',
     description:
-        'ElButtonSize.iconSm — the send, stop and plus controls are all '
+        'ButtonSize.iconSm — the send, stop and plus controls are all '
         'one rung, 32px.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.sendGlyphSize',
+    name: 'AgentComposer.sendGlyphSize',
     type: 'static double (get)',
     description: '16px, the base class list\'s own icon size at this rung.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.stopGlyphSize',
+    name: 'AgentComposer.stopGlyphSize',
     type: 'static double (get)',
     description: '14px, written explicitly at the call site.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.dragFillAlpha',
+    name: 'AgentComposer.dragFillAlpha',
     type: 'static const double',
     description: '0.08 — the agent-tinted fill while a file is dragged over.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.disabledInputOpacity',
+    name: 'AgentComposer.disabledInputOpacity',
     type: 'static const double',
     description:
         '0.60 — the input alone, deliberately not the 45% the button '
         'family dims to.',
   ),
   DocsApiFact(
-    name: 'ElAgentComposer.messageTopGap',
+    name: 'AgentComposer.messageTopGap',
     type: 'static double (get)',
     description: '8px above the refusal and dictation-error lines.',
   ),
@@ -851,7 +861,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest',
     treatment:
-        'ElMachineSurface at ElShadows.pressed, theme.card fill, '
+        'Surface at Shadows.inset, theme.card fill, '
         'theme.border rim, rounded-xl.',
     userSignal: 'A neutral, slightly recessed shell.',
   ),
@@ -867,7 +877,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Palette open',
     treatment:
         'A leading "/" with no space or newline before the caret opens '
-        'ElAgentSlashPalette, painted above the shell without adding to '
+        'AgentSlashPalette, painted above the shell without adding to '
         'its layout height (a MultiChildRenderObjectWidget, not a Stack): '
         'see Commands above.',
     userSignal: 'A floating list of commands appears above the composer.',
@@ -876,14 +886,16 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Dragging a file over',
     treatment:
         'onAttach != null makes the shell a DragTarget: fill and border '
-        'both swap to theme.agent (8% and solid), and the placeholder '
+        'both swap to theme.agentAccent (8% and solid), and the placeholder '
         'reads "Drop files here".',
-    userSignal: 'The shell tints and the placeholder changes while '
+    userSignal:
+        'The shell tints and the placeholder changes while '
         'something is dragged over it.',
   ),
   DocsStateFact(
     state: 'Busy',
-    treatment: 'busy: true swaps the send button for a stop square, '
+    treatment:
+        'busy: true swaps the send button for a stop square, '
         'onStop permitting.',
     userSignal: 'Send becomes stop while the agent is answering.',
   ),
@@ -898,8 +910,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Refused attachment',
     treatment:
-        'A file over kElMaxFileBytes (25 MiB) is dropped from the '
-        'accepted list and named in a type-caption destructiveInk line '
+        'A file over maxFileBytes (25 MiB) is dropped from the '
+        'accepted list and named in a type-caption destructiveText line '
         'below the shell, via _takeFiles — not reachable from outside on '
         'this page, see the section note above.',
     userSignal: 'A red line names the file and the byte limit.',
@@ -908,8 +920,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         'The rotation-transform chevron the composer shares with '
-        'ElToolChip and the palette\'s own fade-up both route through '
-        'elAnimationDuration, which is Duration.zero under '
+        'ToolChip and the palette\'s own fade-up both route through '
+        'effectiveMotionDuration, which is Duration.zero under '
         'MediaQuery.disableAnimations.',
     userSignal: 'The palette appears instantly instead of fading up.',
   ),
@@ -920,20 +932,20 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The input is Semantics(textField: true, multiline: true, label: '
             "'Message', enabled: widget.enabled) — a stable accessible "
             'name regardless of the live placeholder text swapping to '
             '"Drop files here" while dragging.',
         'Send and stop both carry label: (\'Send\' / \'Stop\'): '
-            'ElButton.label replaces the icon-only child\'s name, so an '
+            'Button.label replaces the icon-only child\'s name, so an '
             'icon button never announces as unlabelled.',
-        'The plus menu (ElAgentAttachMenu) and the file tray '
-            '(ElAgentAttachmentList) each carry their own Semantics, '
+        'The plus menu (AgentAttachMenu) and the file tray '
+            '(AgentAttachmentList) each carry their own Semantics, '
             'documented on their own pages, not repeated here.',
         'Known gap: the refusal message and the dictation-error message '
             'are plain type-caption text with no Semantics(liveRegion: '
-            'true) of their own — unlike ElFieldError\'s live region '
+            'true) of their own — unlike FieldError\'s live region '
             '(see the Field page), a screen reader is not proactively '
             'told a file was refused.',
       ]);
@@ -944,7 +956,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'A Focus wraps the whole composer (canRequestFocus: false, '
             'skipTraversal: true) above the field\'s own node, so a key '
             'reaches it before DefaultTextEditingShortcuts.',
@@ -967,16 +979,16 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching of its own: the same widget tree '
             'renders at 390px and 1440px.',
         'USER-ORDERED MOBILE ADAPTATION: the composer wears '
-            'ElFieldVisibility directly (it holds a bare EditableText, '
-            'not a ElInput), so focusing it inside a scroller on a phone '
+            'FieldVisibility directly (it holds a bare EditableText, '
+            'not a Input), so focusing it inside a scroller on a phone '
             'scrolls the whole shell clear of the software keyboard. '
             'Inert on every desktop frame.',
         'The shell has no fixed width: it fills whatever its parent '
-            'gives it (ElAgentConsole passes it the console\'s own '
+            'gives it (AgentConsole passes it the console\'s own '
             'measure).',
       ]);
 }
@@ -999,18 +1011,19 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Component imports',
-            value: 'agent_attachments.dart, agent_attach_menu.dart, '
+            value:
+                'agent_attachments.dart, agent_attach_menu.dart, '
                 'agent_core.dart, agent_slash_palette.dart, button.dart, '
                 'icon.dart, icon_paths.g.dart, input.dart',
             description:
-                'input.dart is imported for ElFieldVisibility and '
-                'ElFieldSurface.selectionAlpha only — the composer holds '
-                'its own EditableText, never a ElInput itself.',
+                'input.dart is imported for FieldVisibility and '
+                'FieldSurfaceRecipe.selectionAlpha only — the composer holds '
+                'its own EditableText, never a Input itself.',
           ),
           const DocsInstallFact(
             label: 'Effect import',
-            value: 'effects/machine_surface.dart',
-            description: 'ElMachineSurface paints the shell.',
+            value: 'effects/surface.dart',
+            description: 'Surface paints the shell.',
           ),
           DocsInstallFact(
             label: 'registryDependencies',
@@ -1031,7 +1044,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(
@@ -1051,10 +1064,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Input', route: '/components/input'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
         ],
       ),
     ],
@@ -1071,29 +1081,30 @@ class _ThemingContent extends StatelessWidget {
       DocsInstallFact(
         label: 'theme.card / theme.border',
         value: 'the shell, at rest',
-        description: 'ElMachineSurface\'s fill and rim.',
+        description: 'Surface\'s fill and rim.',
       ),
       DocsInstallFact(
-        label: 'theme.agent',
+        label: 'theme.agentAccent',
         value: 'the shell, while dragging',
         description:
-            'Both fill (8% alpha) and border (solid) swap to theme.agent — '
+            'Both fill (8% alpha) and border (solid) swap to theme.agentAccent — '
             'twMerge drops the resting pair outright rather than layering '
             'on top of them.',
       ),
       DocsInstallFact(
         label: 'theme.foreground / theme.mutedForeground',
         value: 'input text and placeholder',
-        description: 'The EditableText\'s cursor and text colour, and the '
+        description:
+            'The EditableText\'s cursor and text colour, and the '
             'placeholder\'s own ink.',
       ),
       DocsInstallFact(
         label: 'theme.primary',
         value: 'text selection',
-        description: 'ElFieldSurface.selectionAlpha over theme.primary.',
+        description: 'FieldSurfaceRecipe.selectionAlpha over theme.primary.',
       ),
       DocsInstallFact(
-        label: 'theme.destructiveInk',
+        label: 'theme.destructiveText',
         value: 'the refusal and dictation-error lines',
         description: 'Both share the same _Message widget and colour.',
       ),
@@ -1101,15 +1112,19 @@ class _ThemingContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

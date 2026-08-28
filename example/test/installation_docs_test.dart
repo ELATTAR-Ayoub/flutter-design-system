@@ -12,11 +12,37 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_snippet.dart';
 import 'package:example/docs_pages/installation_page.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _host(Widget child) => ElTheme(
-  controller: ElThemeController(mode: ElThemeMode.dark),
+Widget _host(Widget child) => ThemeScope(
+  controller: ThemeController(mode: ColorMode.dark),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     home: SingleChildScrollView(child: child),
@@ -68,7 +94,7 @@ void main() {
       await tester.pump();
       await tester.tap(find.text('Show more'));
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
       expect(find.text('Show less'), findsOneWidget);
       expect(find.text('Show more'), findsNothing);
@@ -79,7 +105,7 @@ void main() {
       await tester.pump();
       await tester.tap(find.text('Show less'));
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
       expect(find.text('Show more'), findsOneWidget);
       expect(tester.getSize(overflow).height, collapsedHeight);

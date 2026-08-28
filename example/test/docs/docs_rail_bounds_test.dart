@@ -26,20 +26,32 @@ import 'package:flutter/gestures.dart' show HitTestEntry, HitTestResult;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/button/page.dart';
 import 'package:flutter/material.dart' show MaterialApp, SelectionArea;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// Replicates `_SiteBody` (site_shell.dart) EXACTLY, because an
 /// approximation of it does not reproduce the defect.
 ///
 /// The first version of this test used a bare `Center` +
-/// `ConstrainedBox(maxWidth: ElWidths.page)` — the shape
+/// `ConstrainedBox(maxWidth: LayoutWidths.page)` — the shape
 /// `docs_rail_scroll_test.dart` uses — and passed at every width while the
 /// real site was visibly broken at 1909. The shell's own
-/// `Padding(horizontal: el(12))` before the `Align` is the piece that
+/// `Padding(horizontal: space(12))` before the `Align` is the piece that
 /// matters, so it is reproduced here rather than summarised.
-Widget _host({required Widget child, required bool desktop}) => ElTheme(
-  controller: ElThemeController(mode: ElThemeMode.dark),
+Widget _host({required Widget child, required bool desktop}) => ThemeScope(
+  controller: ThemeController(mode: ColorMode.dark),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     home: Center(
@@ -48,26 +60,26 @@ Widget _host({required Widget child, required bool desktop}) => ElTheme(
       // which is why 1440 and 1600 looked clean. Above it, the rails escape
       // past a boundary that does clip, and lose the difference.
       child: SizedBox(
-        width: ElWidths.shell,
+        width: LayoutWidths.shell,
         child: SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: desktop ? el(12) : el(6),
-          vertical: el(12),
-        ),
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: ElWidths.page),
-            child: SelectionArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[child],
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: desktop ? space(12) : space(6),
+              vertical: space(12),
+            ),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: LayoutWidths.page),
+                child: SelectionArea(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[child],
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
         ),
       ),
     ),
@@ -88,10 +100,7 @@ void main() {
 
       final List<String> routed = <String>[];
       await tester.pumpWidget(
-        _host(
-          child: ButtonDocPage(onNavigate: routed.add),
-          desktop: true,
-        ),
+        _host(child: ButtonDocPage(onNavigate: routed.add), desktop: true),
       );
       await tester.pump();
 
@@ -104,12 +113,12 @@ void main() {
 
       // The paintable region, which is the SHELL, not the viewport.
       // `SiteShell` centres everything in a hard `SizedBox(width:
-      // ElWidths.shell)`; a rail positioned outside that box still has a full
+      // LayoutWidths.shell)`; a rail positioned outside that box still has a full
       // width in the widget tree — a `SizedBox` does not clip — and is cut at
       // paint time. So this measures escape past the shell, which layout can
       // see, rather than the clipped width, which only the browser's
       // semantics rects report.
-      final double shellLeft = math.max(0, (width - ElWidths.shell) / 2);
+      final double shellLeft = math.max(0, (width - LayoutWidths.shell) / 2);
       final double shellRight = width - shellLeft;
 
       final Rect sidebarRect = tester.getRect(sidebar);

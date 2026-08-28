@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
 /// own trigger key ([DocsDisclosure.triggerKey]) is one constant shared by
@@ -29,9 +53,9 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every named constructor parameter `ElButton`'s own class declares
+/// Every named constructor parameter `Button`'s own class declares
 /// (`lib/src/components/button.dart`), excluding `key`: the same set the
-/// page's `ElButton` [DocsApiTable] claims to cover.
+/// page's `Button` [DocsApiTable] claims to cover.
 const List<String> _buttonConstructorParams = <String>[
   'child',
   'variant',
@@ -54,7 +78,7 @@ void main() {
   group('button docs page', () {
     testWidgets(
       'renders the article, the full API table, and a live specimen of '
-      'every ElButtonVariant and ElButtonSize this page claims to show',
+      'every ButtonVariant and ButtonSize this page claims to show',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -63,7 +87,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: ButtonDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -89,48 +113,48 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
-        // Every ElButton constructor parameter is named in the ElButton
+        // Every Button constructor parameter is named in the Button
         // API table.
         for (final String param in _buttonConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
 
-        // Every ElButtonVariant enum value is named in the ElButtonVariant
-        // table, and every ElButtonSize value in the ElButtonSize table.
-        for (final ElButtonVariant variant in ElButtonVariant.values) {
+        // Every ButtonVariant enum value is named in the ButtonVariant
+        // table, and every ButtonSize value in the ButtonSize table.
+        for (final ButtonVariant variant in ButtonVariant.values) {
           expect(
             find.text(variant.name),
             findsWidgets,
-            reason: 'ElButtonVariant.${variant.name} missing from API table',
+            reason: 'ButtonVariant.${variant.name} missing from API table',
           );
         }
-        for (final ElButtonSize size in ElButtonSize.values) {
+        for (final ButtonSize size in ButtonSize.values) {
           expect(
             find.text(size.name),
             findsWidgets,
-            reason: 'ElButtonSize.${size.name} missing from API table',
+            reason: 'ButtonSize.${size.name} missing from API table',
           );
         }
 
-        // A live ElButton specimen of every variant mounts somewhere on
+        // A live Button specimen of every variant mounts somewhere on
         // the page, this page's own promise, not just the API table's
         // prose.
-        final Set<ElButtonVariant> mountedVariants = tester
-            .widgetList<ElButton>(find.byType(ElButton))
-            .map((ElButton button) => button.variant)
+        final Set<ButtonVariant> mountedVariants = tester
+            .widgetList<Button>(find.byType(Button))
+            .map((Button button) => button.variant)
             .toSet();
-        expect(mountedVariants, containsAll(ElButtonVariant.values));
+        expect(mountedVariants, containsAll(ButtonVariant.values));
 
-        // A live specimen of every ElButtonSize rung mounts too. The
+        // A live specimen of every ButtonSize rung mounts too. The
         // Icon example covers the four squares, the Size example covers
         // the five text rungs.
-        final Set<ElButtonSize> mountedSizes = tester
-            .widgetList<ElButton>(find.byType(ElButton))
-            .map((ElButton button) => button.size)
+        final Set<ButtonSize> mountedSizes = tester
+            .widgetList<Button>(find.byType(Button))
+            .map((Button button) => button.size)
             .toSet();
-        expect(mountedSizes, containsAll(ElButtonSize.values));
+        expect(mountedSizes, containsAll(ButtonSize.values));
 
         // Every example specimen this page's own source keys carries its
         // key on the page.
@@ -178,40 +202,40 @@ void main() {
         // The Loading example specimen actually carries loading: true, and
         // the Disabled example actually carries a null onPressed: the two
         // states are not just labelled, they are real.
-        final ElButton loadingButton = tester.widget<ElButton>(
+        final Button loadingButton = tester.widget<Button>(
           find.descendant(
             of: find.byKey(const ValueKey<String>('button-example:loading')),
-            matching: find.byType(ElButton),
+            matching: find.byType(Button),
           ),
         );
         expect(loadingButton.loading, isTrue);
 
-        final ElButton disabledButton = tester.widget<ElButton>(
+        final Button disabledButton = tester.widget<Button>(
           find.descendant(
             of: find.byKey(const ValueKey<String>('button-example:disabled')),
-            matching: find.byType(ElButton),
+            matching: find.byType(Button),
           ),
         );
         expect(disabledButton.onPressed, isNull);
 
-        // The Emphasis example actually carries ElButtonEmphasis.caps.
-        final ElButton capsButton = tester.widget<ElButton>(
+        // The Emphasis example actually carries ButtonEmphasis.caps.
+        final Button capsButton = tester.widget<Button>(
           find.descendant(
             of: find.byKey(const ValueKey<String>('button-example:emphasis')),
-            matching: find.byType(ElButton),
+            matching: find.byType(Button),
           ),
         );
-        expect(capsButton.emphasis, ElButtonEmphasis.caps);
+        expect(capsButton.emphasis, ButtonEmphasis.caps);
 
         expect(buttonDoc.name, 'button');
         expect(
           buttonDoc.exports,
           containsAll(<String>[
-            'ElButton',
-            'ElButtonVariant',
-            'ElButtonSize',
-            'ElButtonEmphasis',
-            'ElButtonSurface',
+            'Button',
+            'ButtonVariant',
+            'ButtonSize',
+            'ButtonEmphasis',
+            'ButtonStyleRecipe',
           ]),
         );
         expect(buttonDoc.command, 'elattar add button');
@@ -219,31 +243,30 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const ButtonDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const ButtonDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Sixteen specimen stages: the Preview hero, Size, the seven
-        // variants, Icon, With Icon, Rounded, Spinner, Disabled, Emphasis,
-        // and Button Group.
-        expect(find.byType(DocsShowcase), findsNWidgets(16));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Sixteen specimen stages: the Preview hero, Size, the seven
+      // variants, Icon, With Icon, Rounded, Spinner, Disabled, Emphasis,
+      // and Button Group.
+      expect(find.byType(DocsShowcase), findsNWidgets(16));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -286,8 +309,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const ButtonDocPage()),
@@ -298,7 +321,7 @@ void main() {
         // section heading and its own TOC link render the same string, so
         // `find.text('States')` finds two widgets, not one. Reading each
         // mounted `DocsSection`'s own `title` field sidesteps that
-        // entirely — the same fix the old `ElSection` version of this test
+        // entirely — the same fix the old `Section` version of this test
         // made, updated for the kit's own section widget.
         final List<String> titles = tester
             .widgetList<DocsSection>(find.byType(DocsSection))
@@ -345,7 +368,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const ButtonDocPage(),
           ),
         );
@@ -374,15 +397,15 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const ButtonDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('button-doc-article')),
           ),
@@ -392,10 +415,10 @@ void main() {
         // the same object every real theme toggle mutates. A single
         // `pump()`, never `pumpAndSettle()`: the premium example's foil
         // shimmer is a genuinely looping animation and would hang it.
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('button-doc-article')),
           ),
@@ -426,11 +449,11 @@ void main() {
           expect(find.byKey(ValueKey<String>(key)), findsOneWidget);
         }
 
-        final Set<ElButtonVariant> mountedVariants = tester
-            .widgetList<ElButton>(find.byType(ElButton))
-            .map((ElButton button) => button.variant)
+        final Set<ButtonVariant> mountedVariants = tester
+            .widgetList<Button>(find.byType(Button))
+            .map((Button button) => button.variant)
             .toSet();
-        expect(mountedVariants, containsAll(ElButtonVariant.values));
+        expect(mountedVariants, containsAll(ButtonVariant.values));
       },
     );
   });

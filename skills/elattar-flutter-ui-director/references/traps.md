@@ -2,7 +2,7 @@
 
 | Trap | Correction |
 | --- | --- |
-| Styled local `Container`/`Text` | Use `ElCard`, `ElText`, variants, and foundation tokens. |
+| Styled local `Container`/`Text` | Use `Card`, `StyledText`, variants, and foundation tokens. |
 | Page-only color/radius/duration constant | Use semantic contracts; promote a foundation token only with cross-system evidence. |
 | Rebuilding from memory | Search barrel, source, tests, and example first. |
 | Assuming the repository layout in a consumer app | Resolve the mode in `system-map.md` Step 0 before naming a path. |

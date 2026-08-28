@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/textarea.dart",
+      "source": "lib/src/components/ui/textarea.dart",
       "target": "@ui/textarea.dart",
-      "sha256": "98693354f74091478f7ca34c89647191432f0592656ab11802883564e33db4ab"
+      "sha256": "9b537b6850056121b60373492ba1e21c34fa971bff93c963d1c8df6a189784ea"
     }
   ],
   "registryDependencies": [
@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/textarea",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/textarea.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/textarea.dart",
   "deprecated": false
 }

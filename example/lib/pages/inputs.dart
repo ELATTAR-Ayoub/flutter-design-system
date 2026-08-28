@@ -22,9 +22,9 @@
 /// 13px at an 18.5714px line box: the utility takes the size **and** the
 /// leading.)* What survives is the family, the tabular figures, the 600 weight
 /// and the −0.01em tracking, which is why "the shared mono foundation" is
-/// two-thirds true and drift 8 records the third. [ElComponentType.inputNum] and
-/// [ElComponentType.inputSerial] are that collapse already resolved in the
-/// foundation layer: passing `ElType.numBase` to any field on this page renders
+/// two-thirds true and drift 8 records the third. [TextStyles.inputNumber] and
+/// [TextStyles.inputSerial] are that collapse already resolved in the
+/// foundation layer: passing `TextStyles.numberBase` to any field on this page renders
 /// two pixels large.
 ///
 /// **What is not ported, and why.**
@@ -73,8 +73,8 @@
 ///    presentational attributes; the addon's `[&>svg:not([class*='size-'])]
 ///    :size-4` overrides them with a class while `strokeWidth` stays computed
 ///    from 14. Seven icons here. In this port it collapses to an identity —
-///    `ElIcon.strokeFor` snaps 48/16 and 48/14 to the same 2.4 rung: so the
-///    cell is `ElIconSize.md` and nothing else.
+///    `Icon.strokeFor` snaps 48/16 and 48/14 to the same 2.4 rung: so the
+///    cell is `IconSize.md` and nothing else.
 /// 10. **The password field has a visible label bound to nothing.** Its
 ///    `FieldLabel` carries no `htmlFor`; the control is named by `aria-label`
 ///    instead, so clicking the label does nothing: while Do #1 on the same
@@ -84,7 +84,7 @@
 ///    `data-[invalid=true]`, which this page never sets: it marks the control
 ///    with `aria-invalid` instead. No label on this page turns red, despite the
 ///    `#api` row claiming Field *"handles the invalid colouring for the whole
-///    group"*. Every [ElField] here therefore passes `invalid: false`.
+///    group"*. Every [Field] here therefore passes `invalid: false`.
 /// 12. **The textarea error is not linked.** `#textarea` field 2 has
 ///    `aria-invalid` and a `FieldError`, and neither an `id` on the error nor
 ///    an `aria-describedby` on the control: the three-signal contract the
@@ -109,7 +109,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -125,7 +137,7 @@ const double _measureLg = 512;
 
 /// `max-w-40`: the Quantity and Referral groups. This one *is* the spacing
 /// scale, so it reads off it.
-final double _measure40 = el(40);
+final double _measure40 = space(40);
 
 /// `#api`: six rows.
 ///
@@ -193,12 +205,12 @@ class InputsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('base', 'inputs');
+    final CategoryHit here = findCategory('base', 'inputs');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // DRIFT 1. The foundations pages pass `group.title` alone; this one
           // interpolates a second literal after a U+00B7, and the group is
           // already called "Base Components".
@@ -210,8 +222,8 @@ class InputsPage extends StatelessWidget {
         // `<Note … className="mb-12">`: page level, between the header and the
         // first section, exactly where the shadows page puts its own.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: const ElNote(
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: const Note(
             title: 'Restyled from stock',
             child: _RestyledNoteBody(),
           ),
@@ -224,7 +236,7 @@ class InputsPage extends StatelessWidget {
         const _FormSection(),
         const _ApiSection(),
         const _RulesSection(),
-        const ElPageFootNav(groupId: 'base', slug: 'inputs'),
+        const PageFootNav(groupId: 'base', slug: 'inputs'),
       ],
     );
   }
@@ -237,7 +249,7 @@ class _RestyledNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -246,11 +258,11 @@ class _RestyledNoteBody extends StatelessWidget {
                 'Both were changed: 40px and 10px, so a field sits level with '
                 'a default ',
           ),
-          ElCode.span('Button'),
+          Code.span('Button'),
           const TextSpan(
             text: ' in the same row. Fields are also filled with ',
           ),
-          ElCode.span('bg-muted'),
+          Code.span('bg-muted'),
           const TextSpan(
             text:
                 ' rather than transparent, so they read as editable against '
@@ -258,7 +270,7 @@ class _RestyledNoteBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -268,7 +280,7 @@ class _RestyledNoteBody extends StatelessWidget {
 /// The eight appearances, in a `cols={4}` lattice: two full rows at this
 /// frame, no orphan cell.
 ///
-/// Six of the eight are a bare [ElInput] and nothing else. The two that are not
+/// Six of the eight are a bare [Input] and nothing else. The two that are not
 /// carry `className` overrides the component has no property for, which is what
 /// ruling I3 means by page-local paint: [_FocusStill] and [_SuccessStill]
 /// rebuild the pill around a stripped field rather than adding a "pretend to be
@@ -278,62 +290,62 @@ class _StatesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'states',
       title: 'States',
       description:
           'The full matrix. Every input in the product must be able '
           'to show all eight — a form that cannot express an error is not '
           'finished.',
-      child: ElStateGrid(
+      child: StateGrid(
         children: <Widget>[
-          const ElStateCell(
+          const StateCell(
             label: 'Default',
-            child: ElInput(placeholder: 'Search packs', label: 'Default'),
+            child: Input(placeholder: 'Search packs', label: 'Default'),
           ),
           // DRIFT 4. `className="border-input"` repeats a class the base list
           // already carries, and no input primitive declares a `hover:` rule —
           // so this cell is literally the cell above it, and its note describes
           // nothing.
-          const ElStateCell(
+          const StateCell(
             label: 'Hover',
             note: 'Border strengthens',
-            child: ElInput(placeholder: 'Search packs', label: 'Hover'),
+            child: Input(placeholder: 'Search packs', label: 'Hover'),
           ),
-          const ElStateCell(
+          const StateCell(
             label: 'Focus',
             note: 'Blue ring',
             child: _FocusStill(),
           ),
-          const ElStateCell(
+          const StateCell(
             label: 'Filled',
-            child: ElInput(initialValue: 'Eclipse Vault', label: 'Filled'),
+            child: Input(initialValue: 'Eclipse Vault', label: 'Filled'),
           ),
-          const ElStateCell(
+          const StateCell(
             label: 'Error',
             note: 'aria-invalid',
-            child: ElInput(
+            child: Input(
               initialValue: 'not-an-email',
               invalid: true,
               label: 'Error',
             ),
           ),
-          const ElStateCell(
+          const StateCell(
             label: 'Success',
             child: _SuccessStill(label: 'Success'),
           ),
-          const ElStateCell(
+          const StateCell(
             label: 'Disabled',
             note: '45% opacity',
-            child: ElInput(
+            child: Input(
               placeholder: 'Unavailable',
               enabled: false,
               label: 'Disabled',
             ),
           ),
-          ElStateCell(
+          StateCell(
             label: 'Read only',
             note: 'Value, not editable',
             // `readOnly` alone changes nothing visually, `input.tsx` has no
@@ -344,7 +356,7 @@ class _StatesSection extends StatelessWidget {
             child: DefaultTextStyle.merge(
               style: TextStyle(color: theme.mutedForeground),
               // A U+2026 horizontal ellipsis, not three full stops.
-              child: const ElInput(
+              child: const Input(
                 initialValue: '0xA71c…4F2b',
                 readOnly: true,
                 label: 'Read only',
@@ -359,9 +371,9 @@ class _StatesSection extends StatelessWidget {
 
 /// A live field wearing a pill this page painted itself.
 ///
-/// [ElInput.bare] is `InputGroupInput`'s strip list: no surface at all: so
+/// [Input.bare] is `InputGroupInput`'s strip list: no surface at all: so
 /// what is left is a padded editable line, and the caller supplies the border,
-/// the fill and the socket. That is the same split `ElInputGroup` uses, reached
+/// the fill and the socket. That is the same split `InputGroup` uses, reached
 /// for here because two state cells override the border through `className` and
 /// a component property for "look focused without being focused" would exist
 /// only to reproduce a mistake (ruling I3).
@@ -382,18 +394,18 @@ class _PaintedField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
-      height: ElInput.height,
-      child: ElMachineSurface(
+      height: Input.height,
+      child: Surface(
         // Every specimen in this grid carries `shadow-pressed` permanently; a
         // ring is *added* to it and never replaces it.
         spec: ring == null
-            ? ElShadows.pressed
-            : ElButton.withFocusRing(ElShadows.pressed, ring!),
-        radius: BorderRadius.circular(ElRadii.pill),
+            ? Shadows.inset
+            : Button.withFocusRing(Shadows.inset, ring!),
+        radius: BorderRadius.circular(Radii.full),
         fill: theme.card,
-        border: Border.all(color: border, width: ElWidths.hairline),
+        border: Border.all(color: border, width: BorderWidths.hairline),
         child: child,
       ),
     );
@@ -415,11 +427,11 @@ class _FocusStill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return _PaintedField(
       border: theme.ring,
       ring: theme.ring.withValues(alpha: _ringAlpha),
-      child: const ElInput(
+      child: const Input(
         placeholder: 'Search packs',
         label: 'Focus',
         bare: true,
@@ -446,9 +458,9 @@ class _SuccessStill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _PaintedField(
-      border: ElPalette.value.withValues(alpha: _borderAlpha),
+      border: Palette.value.withValues(alpha: _borderAlpha),
       ring: null,
-      child: ElInput(initialValue: value, label: label, bare: true),
+      child: Input(initialValue: value, label: label, bare: true),
     );
   }
 }
@@ -459,7 +471,7 @@ class _SuccessStill extends StatelessWidget {
 ///
 /// `<label for=id>` has no Flutter counterpart; what it *buys* is a click on
 /// the words focusing the control, and that needs one node both the label and
-/// the field can name. [ElField] threads it down through [ElFieldScope], so the
+/// the field can name. [Field] threads it down through [FieldScope], so the
 /// page's only job is to own the nodes and outlive the build.
 ///
 /// Withholding a node is therefore how drift 10 ships: the password field is
@@ -508,12 +520,12 @@ class _Measure extends StatelessWidget {
 ///
 /// The reference marks the control and never the field (drift 11), and the two
 /// are separate attributes on the web: `aria-invalid` paints and announces,
-/// `data-invalid` only colours the group. [ElField] spends one switch on both,
+/// `data-invalid` only colours the group. [Field] spends one switch on both,
 /// so a page that wants the first without the second restates the field's own
 /// scope with that one flag flipped. Every string in it comes back out of the
 /// scope, so nothing is duplicated.
 ///
-/// It is also the only way to reach `ElInputGroupInput`, which takes no
+/// It is also the only way to reach `InputGroupInput`, which takes no
 /// `invalid` of its own: the wrapper paints every pixel of the error state, so
 /// the prop would have had nothing left to do but announce.
 class _InvalidControl extends StatelessWidget {
@@ -523,8 +535,8 @@ class _InvalidControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElFieldScope? scope = ElFieldScope.maybeOf(context);
-    return ElFieldScope(
+    final FieldScope? scope = FieldScope.maybeOf(context);
+    return FieldScope(
       label: scope?.label,
       describedBy: scope?.describedBy,
       invalid: true,
@@ -559,43 +571,43 @@ class _TypesSectionState extends State<_TypesSection> {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'types',
       title: 'Input types',
       description:
           'Every text-entry shape the product needs. The type '
           'attribute is not cosmetic — it drives the mobile keyboard, autofill '
           'and validation.',
-      child: ElPanel(
+      child: Panel(
         label: 'Types',
         child: _Measure(
-          child: ElFieldGroup(
+          child: FieldGroup(
             children: <Widget>[
               // 1 · Username. A bare `Input`: 16px of padding on both sides,
               // because a pill's corner eats about 20 of a 40px control.
-              ElField(
+              Field(
                 label: 'Username',
                 description: 'Shown on live pulls and the leaderboard.',
                 invalid: false,
                 focusNode: _nodes['i-text'],
-                child: const ElInput(placeholder: 'voidwing'),
+                child: const Input(placeholder: 'voidwing'),
               ),
 
               // 2 · Email. One leading addon, so the value's left padding drops
               // from 16 to 8: the gap to the glyph, not to the curve.
-              ElField(
+              Field(
                 label: 'Email',
                 invalid: false,
                 focusNode: _nodes['i-email'],
-                child: ElInputGroup(
-                  startAddon: const ElInputGroupAddon(
-                    child: ElIcon(
-                      ElIconGlyph.atSign,
-                      size: ElIconSize.md,
-                      tone: ElIconTone.subtle,
+                child: InputGroup(
+                  startAddon: const InputGroupAddon(
+                    child: Icon(
+                      IconGlyph.atSign,
+                      size: IconSize.md,
+                      tone: IconTone.subtle,
                     ),
                   ),
-                  child: const ElInputGroupInput(
+                  child: const InputGroupInput(
                     placeholder: 'collector@pulls.xyz',
                     keyboardType: TextInputType.emailAddress,
                     autofillHints: <String>[AutofillHints.email],
@@ -605,7 +617,7 @@ class _TypesSectionState extends State<_TypesSection> {
 
               // 3 · Password. DRIFT 10: no `htmlFor`, so no focus node, so the
               // visible label is bound to nothing and clicking it does nothing.
-              const ElField(
+              const Field(
                 label: 'Password',
                 description:
                     'Visibility toggle is a real control with an '
@@ -615,19 +627,19 @@ class _TypesSectionState extends State<_TypesSection> {
               ),
 
               // 4 · Search.
-              ElField(
+              Field(
                 label: 'Search',
                 invalid: false,
                 focusNode: _nodes['i-search'],
-                child: ElInputGroup(
-                  startAddon: const ElInputGroupAddon(
-                    child: ElIcon(
-                      ElIconGlyph.search,
-                      size: ElIconSize.md,
-                      tone: ElIconTone.subtle,
+                child: InputGroup(
+                  startAddon: const InputGroupAddon(
+                    child: Icon(
+                      IconGlyph.search,
+                      size: IconSize.md,
+                      tone: IconTone.subtle,
                     ),
                   ),
-                  child: const ElInputGroupInput(
+                  child: const InputGroupInput(
                     placeholder: 'Search packs, cards and sets',
                   ),
                 ),
@@ -635,7 +647,7 @@ class _TypesSectionState extends State<_TypesSection> {
 
               // 5 · Quantity. `max-w-40`, a trailing text addon, and the first
               // of six `type-num` values on the page, 13px, not 15.
-              ElField(
+              Field(
                 label: 'Quantity',
                 description:
                     'Numerical values use the shared mono foundation, '
@@ -644,15 +656,15 @@ class _TypesSectionState extends State<_TypesSection> {
                 focusNode: _nodes['i-num'],
                 child: _Measure(
                   width: _measure40,
-                  child: ElInputGroup(
-                    endAddon: const ElInputGroupAddon(
-                      align: ElInputGroupAlign.end,
-                      child: ElInputGroupText('packs'),
+                  child: InputGroup(
+                    endAddon: const InputGroupAddon(
+                      align: InputGroupAlign.end,
+                      child: InputGroupText('packs'),
                     ),
-                    child: ElInputGroupInput(
+                    child: InputGroupInput(
                       initialValue: '3',
                       keyboardType: TextInputType.number,
-                      textSpec: ElComponentType.inputNum,
+                      textSpec: TextStyles.inputNumber,
                     ),
                   ),
                 ),
@@ -661,27 +673,24 @@ class _TypesSectionState extends State<_TypesSection> {
               // 6 · Phone number. The `+1` addon is `type-num-sm`, which under
               // `text-sm` collapses to the same 13px the value uses: the class
               // loses its size *and* its leading, and keeps everything else.
-              ElField(
+              Field(
                 label: 'Phone number',
                 description:
                     'Country code is a separate addon so it never '
                     'gets validated as part of the number.',
                 invalid: false,
                 focusNode: _nodes['i-phone'],
-                child: ElInputGroup(
-                  startAddon: ElInputGroupAddon(
-                    child: ElInputGroupText(
-                      '+1',
-                      spec: ElComponentType.inputNum,
-                    ),
+                child: InputGroup(
+                  startAddon: InputGroupAddon(
+                    child: InputGroupText('+1', spec: TextStyles.inputNumber),
                   ),
-                  child: ElInputGroupInput(
+                  child: InputGroupInput(
                     placeholder: '555 0134 908',
                     keyboardType: TextInputType.phone,
                     autofillHints: const <String>[
                       AutofillHints.telephoneNumber,
                     ],
-                    textSpec: ElComponentType.inputNum,
+                    textSpec: TextStyles.inputNumber,
                   ),
                 ),
               ),
@@ -690,48 +699,45 @@ class _TypesSectionState extends State<_TypesSection> {
               // drop to 8. Of the two addons only `$` carries a `.type-*`
               // class; `USD` sits on the bare `text-sm` rung, at the same 13px
               // by a different route.
-              ElField(
+              Field(
                 label: 'Deposit amount',
                 invalid: false,
                 focusNode: _nodes['i-amount'],
-                child: ElInputGroup(
-                  startAddon: ElInputGroupAddon(
-                    child: ElInputGroupText(
-                      r'$',
-                      spec: ElComponentType.inputNum,
-                    ),
+                child: InputGroup(
+                  startAddon: InputGroupAddon(
+                    child: InputGroupText(r'$', spec: TextStyles.inputNumber),
                   ),
-                  endAddon: const ElInputGroupAddon(
-                    align: ElInputGroupAlign.end,
-                    child: ElInputGroupText('USD'),
+                  endAddon: const InputGroupAddon(
+                    align: InputGroupAlign.end,
+                    child: InputGroupText('USD'),
                   ),
-                  child: ElInputGroupInput(
+                  child: InputGroupInput(
                     placeholder: '0.00',
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    textSpec: ElComponentType.inputNum,
+                    textSpec: TextStyles.inputNumber,
                   ),
                 ),
               ),
 
               // 8 · Invite code. A trailing addon holding a button, which pulls
               // its own clearance back 2px, 14, not 16.
-              ElField(
+              Field(
                 label: 'Invite code',
                 invalid: false,
                 focusNode: _nodes['i-invite'],
-                child: ElInputGroup(
-                  startAddon: const ElInputGroupAddon(
-                    child: ElIcon(
-                      ElIconGlyph.ticket,
-                      size: ElIconSize.md,
-                      tone: ElIconTone.subtle,
+                child: InputGroup(
+                  startAddon: const InputGroupAddon(
+                    child: Icon(
+                      IconGlyph.ticket,
+                      size: IconSize.md,
+                      tone: IconTone.subtle,
                     ),
                   ),
-                  endAddon: ElInputGroupAddon(
-                    align: ElInputGroupAlign.end,
-                    child: ElInputGroupButton(
+                  endAddon: InputGroupAddon(
+                    align: InputGroupAlign.end,
+                    child: InputGroupButton(
                       // No `onClick` in the reference either: it is an enabled
                       // `type="button"` that does nothing. `null` would disable
                       // it and fade it to 45%.
@@ -739,34 +745,34 @@ class _TypesSectionState extends State<_TypesSection> {
                       child: const Text('Apply'),
                     ),
                   ),
-                  child: ElInputGroupInput(
+                  child: InputGroupInput(
                     placeholder: 'ECLIPSE-2K4A',
-                    textSpec: ElComponentType.inputSerial,
+                    textSpec: TextStyles.inputSerial,
                   ),
                 ),
               ),
 
               // 9 · Referral percentage. `max-w-40`, and the only addon on the
               // page that is a glyph on the trailing side.
-              ElField(
+              Field(
                 label: 'Referral percentage',
                 invalid: false,
                 focusNode: _nodes['i-referral'],
                 child: _Measure(
                   width: _measure40,
-                  child: ElInputGroup(
-                    endAddon: const ElInputGroupAddon(
-                      align: ElInputGroupAlign.end,
-                      child: ElIcon(
-                        ElIconGlyph.percent,
-                        size: ElIconSize.md,
-                        tone: ElIconTone.subtle,
+                  child: InputGroup(
+                    endAddon: const InputGroupAddon(
+                      align: InputGroupAlign.end,
+                      child: Icon(
+                        IconGlyph.percent,
+                        size: IconSize.md,
+                        tone: IconTone.subtle,
                       ),
                     ),
-                    child: ElInputGroupInput(
+                    child: InputGroupInput(
                       initialValue: '5',
                       keyboardType: TextInputType.number,
-                      textSpec: ElComponentType.inputNum,
+                      textSpec: TextStyles.inputNumber,
                     ),
                   ),
                 ),
@@ -797,30 +803,26 @@ class _PasswordFieldState extends State<_PasswordField> {
 
   @override
   Widget build(BuildContext context) {
-    return ElInputGroup(
-      startAddon: const ElInputGroupAddon(
-        child: ElIcon(
-          ElIconGlyph.lock,
-          size: ElIconSize.md,
-          tone: ElIconTone.subtle,
-        ),
+    return InputGroup(
+      startAddon: const InputGroupAddon(
+        child: Icon(IconGlyph.lock, size: IconSize.md, tone: IconTone.subtle),
       ),
-      endAddon: ElInputGroupAddon(
-        align: ElInputGroupAlign.end,
-        child: ElInputGroupButton(
+      endAddon: InputGroupAddon(
+        align: InputGroupAlign.end,
+        child: InputGroupButton(
           onPressed: () => setState(() => _visible = !_visible),
           label: _visible ? 'Hide password' : 'Show password',
           toggled: _visible,
           // `size="xs"`'s own `size-3.5` beats the Button base's `size-4`
           // *(measured)*, so a button icon is 14px where an addon icon is 16.
-          child: ElIcon(
-            _visible ? ElIconGlyph.eyeOff : ElIconGlyph.eye,
-            size: ElIconSize.sm,
-            tone: ElIconTone.subtle,
+          child: Icon(
+            _visible ? IconGlyph.eyeOff : IconGlyph.eye,
+            size: IconSize.sm,
+            tone: IconTone.subtle,
           ),
         ),
       ),
-      child: ElInputGroupInput(
+      child: InputGroupInput(
         initialValue: 'correct-horse-battery',
         obscureText: !_visible,
         keyboardType: TextInputType.visiblePassword,
@@ -851,23 +853,23 @@ class _TextareaSectionState extends State<_TextareaSection> {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'textarea',
       title: 'Textarea',
       description:
           'Auto-grows with content via field-sizing. Used for '
           'shipping notes and support messages.',
-      child: ElPanel(
+      child: Panel(
         label: 'Textarea',
         child: _Measure(
-          child: ElFieldGroup(
+          child: FieldGroup(
             children: <Widget>[
-              ElField(
+              Field(
                 label: 'Shipping note',
                 description: 'Grows as you type. Minimum height is 80px.',
                 invalid: false,
                 focusNode: _nodes['ta'],
-                child: const ElTextarea(
+                child: const Textarea(
                   placeholder: 'Anything the packing team should know',
                 ),
               ),
@@ -876,7 +878,7 @@ class _TextareaSectionState extends State<_TextareaSection> {
               // three-signal contract the `#validation` Note insists on, two
               // sections before it is stated, missing its third signal. The
               // port links it; see the library note.
-              ElField(
+              Field(
                 label: 'With an error',
                 errors: const <String>[
                   'Please provide at least 20 characters.',
@@ -886,7 +888,7 @@ class _TextareaSectionState extends State<_TextareaSection> {
                 invalid: false,
                 focusNode: _nodes['ta-err'],
                 child: const _InvalidControl(
-                  child: ElTextarea(initialValue: 'Too short'),
+                  child: Textarea(initialValue: 'Too short'),
                 ),
               ),
             ],
@@ -910,14 +912,14 @@ class _OtpSection extends StatelessWidget {
   const _OtpSection();
 
   /// `space-y-8`, 32px between the two demos.
-  static double get _demoGap => el(8);
+  static double get _demoGap => space(8);
 
   /// `<p className="type-label mb-4">`, 16px under each demo's own label.
-  static double get _labelGap => el(4);
+  static double get _labelGap => space(4);
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'otp',
       title: 'Verification code',
       // DRIFT 13 lives in this sentence: the slots are `text-sm` Inter, and the
@@ -926,12 +928,12 @@ class _OtpSection extends StatelessWidget {
           'Email verification and two-factor authentication. Six '
           'digits, grouped three and three, using the numerical mono '
           'foundation.',
-      child: ElPanel(
+      child: Panel(
         label: 'Verification code',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            _OtpDemo(label: 'Empty', child: ElInputOtp()),
+            _OtpDemo(label: 'Empty', child: InputOtp()),
             SizedBox(height: _demoGap),
             // Controlled on the reference only because `InputOTP` manages
             // `value` itself and a `defaultValue` beside it makes React warn
@@ -939,7 +941,7 @@ class _OtpSection extends StatelessWidget {
             // (`page.tsx:80–81`). Flutter has no such hazard: a seed is a seed.
             _OtpDemo(
               label: 'Partially filled',
-              child: ElInputOtp(initialValue: '4082'),
+              child: InputOtp(initialValue: '4082'),
             ),
           ],
         ),
@@ -962,7 +964,7 @@ class _OtpDemo extends StatelessWidget {
       children: <Widget>[
         // `.type-label` uppercases at paint and brings its own
         // `--muted-foreground`; the element states no colour of its own.
-        ElText(label, ElType.label),
+        StyledText(label, TextStyles.eyebrow),
         SizedBox(height: _OtpSection._labelGap),
         child,
       ],
@@ -990,7 +992,7 @@ class _ValidationSectionState extends State<_ValidationSection> {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'validation',
       title: 'Validation messages',
       description:
@@ -1002,14 +1004,14 @@ class _ValidationSectionState extends State<_ValidationSection> {
         children: <Widget>[
           // The page's Field & Label chapter. There is no section by that name;
           // the header chip that promises one lands here.
-          ElPanel(
+          Panel(
             label: 'Field anatomy',
             child: _Measure(
-              child: ElFieldGroup(
+              child: FieldGroup(
                 children: <Widget>[
                   // 1 · A bare invalid field: destructive border, ring at 20%
                   // in **both** themes.
-                  ElField(
+                  Field(
                     label: 'Email',
                     errors: const <String>[
                       'That address is missing a domain. Try '
@@ -1018,14 +1020,14 @@ class _ValidationSectionState extends State<_ValidationSection> {
                     invalid: false,
                     focusNode: _nodes['v1'],
                     child: const _InvalidControl(
-                      child: ElInput(initialValue: 'collector@pulls'),
+                      child: Input(initialValue: 'collector@pulls'),
                     ),
                   ),
                   // 2 · The same error state inside a group, DRIFT 6, visible
                   // one field below drift 6's other half: this one rings at 40%
                   // on dark, the field above it at 20%, and the only difference
                   // between them is that an addon happens to be present.
-                  ElField(
+                  Field(
                     label: 'Withdrawal amount',
                     errors: const <String>[
                       'Exceeds your available balance of \$1,204.80. Bonus '
@@ -1034,16 +1036,16 @@ class _ValidationSectionState extends State<_ValidationSection> {
                     invalid: false,
                     focusNode: _nodes['v2'],
                     child: _InvalidControl(
-                      child: ElInputGroup(
-                        startAddon: ElInputGroupAddon(
-                          child: ElInputGroupText(
+                      child: InputGroup(
+                        startAddon: InputGroupAddon(
+                          child: InputGroupText(
                             r'$',
-                            spec: ElComponentType.inputNum,
+                            spec: TextStyles.inputNumber,
                           ),
                         ),
-                        child: ElInputGroupInput(
+                        child: InputGroupInput(
                           initialValue: '2,400.00',
-                          textSpec: ElComponentType.inputNum,
+                          textSpec: TextStyles.inputNumber,
                         ),
                       ),
                     ),
@@ -1055,9 +1057,9 @@ class _ValidationSectionState extends State<_ValidationSection> {
             ),
           ),
           // `className="mt-4"`.
-          SizedBox(height: el(4)),
-          const ElNote(
-            tone: ElNoteTone.error,
+          SizedBox(height: space(4)),
+          const Note(
+            tone: NoteTone.error,
             title: 'Never colour alone',
             child: _NeverColourAloneBody(),
           ),
@@ -1069,10 +1071,10 @@ class _ValidationSectionState extends State<_ValidationSection> {
 
 /// `#validation` field 3: a green border and a `text-value-ink` description.
 ///
-/// Hand-composed rather than a [ElField], because `FieldDescription` states its
+/// Hand-composed rather than a [Field], because `FieldDescription` states its
 /// own `--muted-foreground` and this is the corpus's only instance that
 /// overrides it with a `text-*` class. Everything else about the stack is
-/// [ElField]'s: an 8px gap above and below the control, `w-fit` on the label,
+/// [Field]'s: an 8px gap above and below the control, `w-fit` on the label,
 /// and one merged semantics node for the three parts.
 class _AvailableField extends StatelessWidget {
   const _AvailableField({required this.node});
@@ -1084,7 +1086,7 @@ class _AvailableField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Semantics(
       container: true,
@@ -1092,9 +1094,9 @@ class _AvailableField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElFieldLabel(_label, focusNode: node),
-          SizedBox(height: ElField.gap),
-          ElFieldScope(
+          FieldLabel(_label, focusNode: node),
+          SizedBox(height: Field.gap),
+          FieldScope(
             label: _label,
             // `aria-describedby="v3-ok"`, folded into the control's hint the
             // way every other description on this page is.
@@ -1102,15 +1104,15 @@ class _AvailableField extends StatelessWidget {
             focusNode: node,
             child: const _SuccessStill(value: 'voidwing'),
           ),
-          SizedBox(height: ElField.gap),
+          SizedBox(height: Field.gap),
           // Already the control's hint; announcing it here would read it twice.
           ExcludeSemantics(
             child: Align(
               alignment: AlignmentDirectional.centerStart,
-              child: ElText(
+              child: StyledText(
                 _description,
-                ElType.small,
-                color: theme.valueInk,
+                TextStyles.small,
+                color: theme.premiumText,
                 align: TextAlign.start,
               ),
             ),
@@ -1129,7 +1131,7 @@ class _NeverColourAloneBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -1137,15 +1139,15 @@ class _NeverColourAloneBody extends StatelessWidget {
                 'A red border on its own is invisible to a colour-blind '
                 'user. Errors always ship three signals: ',
           ),
-          ElCode.span('aria-invalid'),
+          Code.span('aria-invalid'),
           const TextSpan(
             text: ', the destructive border, and a written message linked by ',
           ),
-          ElCode.span('aria-describedby'),
+          Code.span('aria-describedby'),
           const TextSpan(text: '.'),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -1176,16 +1178,16 @@ class _FormSectionState extends State<_FormSection> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'form',
       title: 'A complete form',
       description:
           'Everything assembled: labels above fields, 20px between '
           'fields, description under the field it describes, and the primary '
           'action separated by a rule.',
-      child: ElPanel(
+      child: Panel(
         label: 'Deposit funds',
         // `max-w-lg` sits on the `<form>`; the `FieldGroup` inside carries none.
         child: _Measure(
@@ -1193,64 +1195,64 @@ class _FormSectionState extends State<_FormSection> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElFieldGroup(
+              FieldGroup(
                 children: <Widget>[
-                  ElField(
+                  Field(
                     label: 'Amount',
                     description: 'Minimum \$10.00. Deposits clear instantly.',
                     invalid: false,
                     focusNode: _nodes['f-amount'],
-                    child: ElInputGroup(
-                      startAddon: ElInputGroupAddon(
-                        child: ElInputGroupText(
+                    child: InputGroup(
+                      startAddon: InputGroupAddon(
+                        child: InputGroupText(
                           r'$',
-                          spec: ElComponentType.inputNum,
+                          spec: TextStyles.inputNumber,
                         ),
                       ),
-                      endAddon: const ElInputGroupAddon(
-                        align: ElInputGroupAlign.end,
-                        child: ElInputGroupText('USD'),
+                      endAddon: const InputGroupAddon(
+                        align: InputGroupAlign.end,
+                        child: InputGroupText('USD'),
                       ),
-                      child: ElInputGroupInput(
+                      child: InputGroupInput(
                         placeholder: '0.00',
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        textSpec: ElComponentType.inputNum,
+                        textSpec: TextStyles.inputNumber,
                       ),
                     ),
                   ),
-                  ElField(
+                  Field(
                     label: 'Promo code',
                     invalid: false,
                     focusNode: _nodes['f-promo'],
-                    child: const ElInput(placeholder: 'Optional'),
+                    child: const Input(placeholder: 'Optional'),
                   ),
                 ],
               ),
               // `<div className="mt-8 flex gap-3 border-t border-border pt-6">`
               //, 32px above the rule, 24 below it, 12 between the buttons.
-              SizedBox(height: el(8)),
+              SizedBox(height: space(8)),
               Container(
-                padding: EdgeInsets.only(top: el(6)),
+                padding: EdgeInsets.only(top: space(6)),
                 decoration: BoxDecoration(
                   border: Border(
                     top: BorderSide(
                       color: theme.border,
-                      width: ElWidths.hairline,
+                      width: BorderWidths.hairline,
                     ),
                   ),
                 ),
                 child: Row(
                   children: <Widget>[
-                    ElButton(
-                      variant: ElButtonVariant.premium,
+                    Button(
+                      variant: ButtonVariant.premium,
                       onPressed: () {},
                       child: const Text('Deposit Funds'),
                     ),
-                    SizedBox(width: el(3)),
-                    ElButton(
-                      variant: ElButtonVariant.ghost,
+                    SizedBox(width: space(3)),
+                    Button(
+                      variant: ButtonVariant.ghost,
                       onPressed: () {},
                       child: const Text('Cancel'),
                     ),
@@ -1272,11 +1274,11 @@ class _ApiSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'api',
       title: 'API',
-      child: ElMeta(
-        items: <ElMetaItem>[
+      child: Meta(
+        items: <MetaItem>[
           for (final (String, String) row in _apiRows)
             (k: row.$1, v: TextSpan(text: row.$2)),
         ],
@@ -1295,10 +1297,10 @@ class _RulesSection extends StatelessWidget {
     // Do #1 is contradicted by the password field two sections up (drift 10);
     // Do #2 is contradicted by the 13px every `type-num` on the page renders at
     // (drift 8). Both ship.
-    return const ElSection(
+    return const Section(
       id: 'rules',
       title: 'Rules',
-      child: ElDoDont(dos: _dos, donts: _donts),
+      child: DoDont(dos: _dos, donts: _donts),
     );
   }
 }

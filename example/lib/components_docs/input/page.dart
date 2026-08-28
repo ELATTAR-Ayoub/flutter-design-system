@@ -1,7 +1,7 @@
 /// Public documentation page for the `input` component.
 ///
 /// **Re-housed onto the kit.** This page used to be `InputDocPage`,
-/// hand-composing `ElSection` panels inside
+/// hand-composing `Section` panels inside
 /// `example/lib/components_docs/input_select_pages.dart` and living outside
 /// `componentDocs`. It now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
@@ -22,7 +22,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -41,7 +53,7 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
       description:
           'Toggle Invalid, Disabled, Read only, and Seeded value to see '
           'the socket, focus ring, and helper copy behave together. The '
-          'label is visible external ElField label; the placeholder '
+          'label is visible external Field label; the placeholder '
           'disappears as soon as the field has a value.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
@@ -53,7 +65,7 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
       description:
           'input has a real registry manifest: elattar add input '
           'installs lib/src/components/input.dart and resolves button, '
-          'field, machine-surface, and source-foundation automatically. '
+          'field, surface, and source-foundation automatically. '
           'The Manual tab is for a project not using the CLI.',
       command: inputDoc.command,
       manualFiles: <DocsCodeFile>[
@@ -72,8 +84,8 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElInput, ElFieldSurface, and '
-              'ElFieldVisibility are reachable the same way the CLI path '
+              'Add the export line so Input, FieldSurfaceRecipe, and '
+              'FieldVisibility are reachable the same way the CLI path '
               'already makes them.',
           code: "export 'input.dart';",
         ),
@@ -83,7 +95,7 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'The smallest correct composition: ElField supplies the visible '
+          'The smallest correct composition: Field supplies the visible '
           'label, description, and error copy around the socket.',
       code: _usageCode,
     ),
@@ -91,8 +103,8 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
       id: 'field-companion',
       title: 'Field companion',
       description:
-          'The default pattern for forms and settings pages: ElField '
-          'supplies the label and description, ElInput is the socket.',
+          'The default pattern for forms and settings pages: Field '
+          'supplies the label and description, Input is the socket.',
       specimen: _FieldCompanionPreview(),
       code: _fieldCompanionCode,
       label: 'Field companion specimen view',
@@ -103,7 +115,7 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
       description:
           'readOnly is mostly semantic: the value stays selectable. bare '
           'removes the socket surface entirely, for a grouped or '
-          'wrapper-owned layout such as ElInputGroup.',
+          'wrapper-owned layout such as InputGroup.',
       specimen: _ReadOnlyBareSpecimen(),
       code: _readOnlyBareCode,
       label: 'Read-only and bare specimen view',
@@ -112,18 +124,15 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElInput declares, plus the two '
-          'supporting classes it exports: ElFieldSurface (the pill, its '
-          'socket, and the one ring it ever draws) and ElFieldVisibility '
+          'Every constructor parameter Input declares, plus the two '
+          'supporting classes it exports: FieldSurfaceRecipe (the pill, its '
+          'socket, and the one ring it ever draws) and FieldVisibility '
           '(the keyboard-avoidance wrapper every field in the family '
           'uses).',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElInput', anchor: 'api-elinput'),
-        DocsTocEntry(title: 'ElFieldSurface', anchor: 'api-elfieldsurface'),
-        DocsTocEntry(
-          title: 'ElFieldVisibility',
-          anchor: 'api-elfieldvisibility',
-        ),
+        DocsTocEntry(title: 'Input', anchor: 'api-elinput'),
+        DocsTocEntry(title: 'FieldSurfaceRecipe', anchor: 'api-elfieldsurface'),
+        DocsTocEntry(title: 'FieldVisibility', anchor: 'api-elfieldvisibility'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -131,7 +140,7 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off _ElInputState.build and ElFieldSurface.build, not '
+          'Read off _InputState.build and FieldSurfaceRecipe.build, not '
           'inferred: the socket carries no hover state at all — it is a '
           'sunken field you type into, never a control that rises.',
       child: DocsStateMatrix(facts: _stateFacts),
@@ -146,7 +155,7 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'input.dart wires no key handling of its own: every fact here '
-          'is about what does NOT happen, read off _ElInputState.build '
+          'is about what does NOT happen, read off _InputState.build '
           'directly.',
       child: _KeyboardContent(),
     ),
@@ -182,14 +191,14 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/inputs_test.dart',
             description:
-                'ElInput is covered there (112 ElInput references at the '
+                'Input is covered there (112 Input references at the '
                 'time this page was written).',
           ),
           const DocsInstallFact(
             label: 'Docs test',
             value: 'example/test/components_docs/input_test.dart',
             description:
-                'Covers this page: the article mounts, every ElInput '
+                'Covers this page: the article mounts, every Input '
                 'constructor parameter this page claims to document, and '
                 'both themes at two viewport widths.',
           ),
@@ -217,9 +226,9 @@ class InputDocPage extends StatelessWidget {
       title: inputDoc.title,
       description: inputDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Input'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Input'),
     ],
     toc: inputDocSpec.toc,
     previous: const DocsPageLink(title: 'Icon', route: '/components/icon'),
@@ -260,8 +269,8 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Wrap(
-          spacing: el(2),
-          runSpacing: el(2),
+          spacing: space(2),
+          runSpacing: space(2),
           children: <Widget>[
             _TogglePill(
               selected: _invalid,
@@ -285,8 +294,8 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
             ),
           ],
         ),
-        SizedBox(height: el(5)),
-        ElField(
+        SizedBox(height: space(5)),
+        Field(
           label: 'Email',
           description:
               'Visible labels carry the durable meaning. Placeholders only '
@@ -294,7 +303,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           errors: _invalid
               ? const <String>['That address is missing a valid domain.']
               : const <String>[],
-          child: ElInput(
+          child: Input(
             key: ValueKey<String>(
               'input-preview:$_invalid:$_disabled:$_readOnly:$_showValue',
             ),
@@ -312,11 +321,11 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   }
 }
 
-const String _previewCode = '''ElField(
+const String _previewCode = '''Field(
   label: 'Email',
   description: 'Visible labels carry the durable meaning.',
   errors: invalid ? ['That address is missing a valid domain.'] : [],
-  child: ElInput(
+  child: Input(
     label: 'Email',
     placeholder: 'you@example.com',
     initialValue: seeded ? 'collector@pulls.xyz' : null,
@@ -326,10 +335,10 @@ const String _previewCode = '''ElField(
   ),
 )''';
 
-const String _usageCode = '''ElField(
+const String _usageCode = '''Field(
   label: 'Email',
   description: 'We will send updates only when something changes.',
-  child: ElInput(
+  child: Input(
     label: 'Email',
     placeholder: 'you@example.com',
   ),
@@ -340,18 +349,18 @@ class _FieldCompanionPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElField(
+    return Field(
       label: 'Display name',
       description: 'Shown publicly on your profile.',
-      child: const ElInput(label: 'Display name', initialValue: 'Astra Vale'),
+      child: const Input(label: 'Display name', initialValue: 'Astra Vale'),
     );
   }
 }
 
-const String _fieldCompanionCode = '''ElField(
+const String _fieldCompanionCode = '''Field(
   label: 'Display name',
   description: 'Shown publicly on your profile.',
-  child: ElInput(
+  child: Input(
     label: 'Display name',
     initialValue: 'Astra Vale',
   ),
@@ -365,27 +374,30 @@ class _ReadOnlyBareSpecimen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElField(
+        const Field(
           label: 'Wallet address',
           description: 'Copyable, but not editable.',
-          child: ElInput(
+          child: Input(
             label: 'Wallet address',
             initialValue: '0xA71c…4F2b',
             readOnly: true,
           ),
         ),
-        SizedBox(height: el(5)),
+        SizedBox(height: space(5)),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(2)),
+          padding: EdgeInsets.symmetric(
+            horizontal: space(4),
+            vertical: space(2),
+          ),
           decoration: BoxDecoration(
-            color: ElTheme.of(context).muted,
-            borderRadius: BorderRadius.circular(ElRadii.lg),
+            color: ThemeScope.of(context).muted,
+            borderRadius: BorderRadius.circular(Radii.lg),
             border: Border.all(
-              color: ElTheme.of(context).border,
-              width: ElWidths.hairline,
+              color: ThemeScope.of(context).border,
+              width: BorderWidths.hairline,
             ),
           ),
-          child: const ElInput(
+          child: const Input(
             placeholder: 'Search packs',
             label: 'Search packs',
             bare: true,
@@ -396,10 +408,10 @@ class _ReadOnlyBareSpecimen extends StatelessWidget {
   }
 }
 
-const String _readOnlyBareCode = '''const ElField(
+const String _readOnlyBareCode = '''const Field(
   label: 'Wallet address',
   description: 'Copyable, but not editable.',
-  child: ElInput(
+  child: Input(
     label: 'Wallet address',
     initialValue: '0xA71c… 4F2b',
     readOnly: true,
@@ -407,7 +419,7 @@ const String _readOnlyBareCode = '''const ElField(
 )
 
 // Inside a grouped or wrapper-owned surface:
-const ElInput(
+const Input(
   placeholder: 'Search packs',
   label: 'Search packs',
   bare: true,
@@ -426,12 +438,12 @@ class _TogglePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElButton(
-      variant: selected ? ElButtonVariant.primary : ElButtonVariant.secondary,
-      size: ElButtonSize.sm,
+    return Button(
+      variant: selected ? ButtonVariant.primary : ButtonVariant.secondary,
+      size: ButtonSize.sm,
       label: label,
       onPressed: onPressed,
-      child: ElText(label, ElComponentType.buttonLabel),
+      child: StyledText(label, TextStyles.buttonLabel),
     );
   }
 }
@@ -447,21 +459,21 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elinput',
-        child: DocsApiTable(title: 'ElInput', facts: _inputFacts),
+        child: DocsApiTable(title: 'Input', facts: _inputFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfieldsurface',
         child: DocsApiTable(
-          title: 'ElFieldSurface',
+          title: 'FieldSurfaceRecipe',
           facts: _fieldSurfaceFacts,
         ),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfieldvisibility',
         child: DocsApiTable(
-          title: 'ElFieldVisibility',
+          title: 'FieldVisibility',
           facts: _fieldVisibilityFacts,
         ),
       ),
@@ -490,13 +502,12 @@ const List<DocsApiFact> _inputFacts = <DocsApiFact>[
     type: 'FocusNode?',
     description:
         'Optional. Supply one to drive focus from outside. A '
-        'ElFieldScope\'s node wins over the owned one and loses to this.',
+        'FieldScope\'s node wins over the owned one and loses to this.',
   ),
   DocsApiFact(
     name: 'placeholder',
     type: 'String?',
-    description:
-        'Optional. Shown whenever the value is empty, focused or not.',
+    description: 'Optional. Shown whenever the value is empty, focused or not.',
   ),
   DocsApiFact(
     name: 'onChanged',
@@ -513,7 +524,7 @@ const List<DocsApiFact> _inputFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to true. ANDed with the enclosing '
-        'ElFieldScope\'s. Opacity drops to 45% and input is ignored '
+        'FieldScope\'s. Opacity drops to 45% and input is ignored '
         'when false.',
   ),
   DocsApiFact(
@@ -528,7 +539,7 @@ const List<DocsApiFact> _inputFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to false. ORed with the enclosing '
-        'ElFieldScope\'s. The single switch for the destructive border, '
+        'FieldScope\'s. The single switch for the destructive border, '
         'ring, and SemanticsValidationResult.invalid — and it beats '
         'focus at equal specificity.',
   ),
@@ -549,9 +560,9 @@ const List<DocsApiFact> _inputFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'textSpec',
-    type: 'ElTypeSpec?',
+    type: 'TextStyleToken?',
     description:
-        'Optional. Defaults to ElComponentType.sheetBody. The .type-* '
+        'Optional. Defaults to TextStyles.bodyCompact. The .type-* '
         'class stacked on the field\'s own text-sm.',
   ),
   DocsApiFact(
@@ -559,7 +570,7 @@ const List<DocsApiFact> _inputFacts = <DocsApiFact>[
     type: 'String?',
     description:
         'Optional. The accessible name for a field with no visible '
-        'external ElField label.',
+        'external Field label.',
   ),
   DocsApiFact(
     name: 'hint',
@@ -574,14 +585,14 @@ const List<DocsApiFact> _inputFacts = <DocsApiFact>[
     description:
         'Optional. Defaults to false. Removes the socket surface '
         'entirely, for a grouped or wrapper-owned layout such as '
-        'ElInputGroup.',
+        'InputGroup.',
   ),
   DocsApiFact(
     name: 'padding',
     type: 'EdgeInsetsGeometry?',
     description:
         "Optional. Overrides the socket's own 16/4px padding. "
-        'ElInputGroupInput computes it; nothing else should need to.',
+        'InputGroupInput computes it; nothing else should need to.',
   ),
   DocsApiFact(
     name: 'boxHeight',
@@ -612,12 +623,12 @@ const List<DocsApiFact> _inputFacts = <DocsApiFact>[
         'history card\'s inline rename field is the one real caller.',
   ),
   DocsApiFact(
-    name: 'ElInput.height',
+    name: 'Input.height',
     type: 'static double',
     description: 'The fixed 40px socket height, before boxHeight overrides.',
   ),
   DocsApiFact(
-    name: 'ElInput.insets',
+    name: 'Input.insets',
     type: 'static EdgeInsets',
     description: "The field's own 16/4px padding, before padding overrides.",
   ),
@@ -659,7 +670,7 @@ const List<DocsApiFact> _fieldSurfaceFacts = <DocsApiFact>[
         'shadow, keeping the ring.',
   ),
   DocsApiFact(
-    name: 'ElFieldSurface.selectionAlpha',
+    name: 'FieldSurfaceRecipe.selectionAlpha',
     type: 'static const double',
     description:
         '0.35 — the text-selection wash every field in the family '
@@ -678,16 +689,17 @@ const List<DocsApiFact> _fieldVisibilityFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'child',
     type: 'Widget',
-    description: 'Required. Returned unchanged: this widget owns no '
+    description:
+        'Required. Returned unchanged: this widget owns no '
         'render object of its own.',
   ),
   DocsApiFact(
-    name: 'ElFieldVisibility.margin',
+    name: 'FieldVisibility.margin',
     type: 'static double',
     description: 'The clearance left between the field and the keyboard.',
   ),
   DocsApiFact(
-    name: 'ElFieldVisibility.travel',
+    name: 'FieldVisibility.travel',
     type: 'static Duration',
     description: 'How long the reveal scroll takes.',
   ),
@@ -715,7 +727,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'Destructive border and a destructive-tinted ring replace the '
         'focus styling outright — invalid beats focus even when both '
         'are true.',
-    userSignal: 'The field needs correction, announced as '
+    userSignal:
+        'The field needs correction, announced as '
         'SemanticsValidationResult.invalid.',
   ),
   DocsStateFact(
@@ -735,8 +748,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'The socket surface is not built at all: no border, no shadow, '
         'no ring, no fixed height.',
-    userSignal: 'Use only inside a higher-level composition such as '
-        'ElInputGroup.',
+    userSignal:
+        'Use only inside a higher-level composition such as '
+        'InputGroup.',
   ),
 ];
 
@@ -745,12 +759,12 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'A Semantics(textField: true) node mounts whenever label, hint, '
             'or invalid is set, merging the accessible name, description, '
             'and validation result into one node a screen reader hears '
             'as one thing.',
-        'Use a visible ElFieldLabel for production forms; placeholders '
+        'Use a visible FieldLabel for production forms; placeholders '
             'disappear as soon as the user types and never substitute '
             'for a label.',
         'invalid publishes SemanticsValidationResult.invalid, never '
@@ -759,7 +773,7 @@ class _AccessibilityContent extends StatelessWidget {
             'nothing, and this port matches that silence.',
         'readOnly is semantic first (Semantics.readOnly): users can '
             'still select and copy the value.',
-        'ElFieldVisibility keeps a focused field above the software '
+        'FieldVisibility keeps a focused field above the software '
             'keyboard on every platform that has one — a USER-ORDERED '
             'mobile adaptation with no reference precedent.',
       ]);
@@ -770,7 +784,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No custom key handling: EditableText supplies the platform\'s '
             'normal caret, selection, and IME behaviour, and input.dart '
             'adds nothing on top of it.',
@@ -791,12 +805,12 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching anywhere in input.dart: the field '
             'fills whatever width the caller allows (SizedBox(width: '
             'double.infinity)), the same widget tree at 390px and '
             '1440px.',
-        'ElFieldVisibility is the one adaptation that reads the '
+        'FieldVisibility is the one adaptation that reads the '
             'viewport: MediaQuery.viewInsets.bottom, gated to only ever '
             'run while a software keyboard is actually on screen. A '
             'desktop frame with no keyboard is byte-identical.',
@@ -831,29 +845,26 @@ class _DependenciesContent extends StatelessWidget {
             value: inputDoc.dependencies.join(', '),
             description:
                 "The manifest's registryDependencies, resolved "
-                'automatically. button supplies ElButton.withFocusRing, '
+                'automatically. button supplies Button.withFocusRing, '
                 'the shared focus-ring compositor this file and '
                 'button.dart both reach for.',
           ),
           const DocsInstallFact(
             label: 'Best companion',
-            value: 'ElField',
+            value: 'Field',
             description:
                 'Supplies the visible label, description, and error '
                 'copy around the socket; input.dart reads its scope '
-                'directly (ElFieldScope.maybeOf).',
+                'directly (FieldScope.maybeOf).',
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Button', route: '/components/button'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
         ],
       ),
     ],
@@ -892,29 +903,34 @@ class _ThemingContent extends StatelessWidget {
       DocsInstallFact(
         label: 'theme.mutedForeground',
         value: 'Placeholder ink',
-        description: 'Full opacity, not the 60% the source docstring once '
+        description:
+            'Full opacity, not the 60% the source docstring once '
             'claimed — a documented drift.',
       ),
       DocsInstallFact(
         label: 'theme.foreground',
         value: 'Typed text and caret',
         description:
-            'input { color: inherit } on the web; ElText.styleOf(context, '
+            'input { color: inherit } on the web; StyledText.styleOf(context, '
             'spec) with no explicit colour is how this port spells that.',
       ),
     ],
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

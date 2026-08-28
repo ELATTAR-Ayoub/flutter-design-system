@@ -1,0 +1,30 @@
+{
+  "name": "ambient-pattern",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "`.starfield` — thirteen hand-placed sparkles and two slow sways",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/ambient_pattern.dart",
+      "target": "@ui/ambient_pattern.dart",
+      "sha256": "d9551c8bf11ef481fa5c769ccb41d518e9e36635d845f17845711a5a85ed5008"
+    }
+  ],
+  "registryDependencies": [
+    "icon",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "icon"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/ambient-pattern",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/ambient_pattern.dart",
+  "deprecated": false
+}

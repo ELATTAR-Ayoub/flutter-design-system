@@ -3,8 +3,8 @@
 /// Two families, and the page exists to make the difference physical. Ambient
 /// depth says how far a surface floats; machine depth says whether it can be
 /// pressed. Nothing here is a drawing of a shadow: every specimen is the real
-/// `--shadow-*` token painted by [ElMachineSurface], and `#in-use` is five live
-/// [ElButton]s and one genuinely editable [ElInput]: so "press the buttons and
+/// `--shadow-*` token painted by [Surface], and `#in-use` is five live
+/// [Button]s and one genuinely editable [Input]: so "press the buttons and
 /// focus the field" is a thing the reader can do rather than a thing the page
 /// claims.
 ///
@@ -12,7 +12,7 @@
 ///
 /// 1. **`--shadow-btn`'s use copy against the buttons.** The specimen says
 ///    *"Secondary, outline and destructive buttons."* Only
-///    [ElButtonVariant.outline] carries `shadow-btn`; `secondary` and
+///    [ButtonVariant.outline] carries `shadow-btn`; `secondary` and
 ///    `destructive` declare no shadow class at all. Visible in `#in-use` on
 ///    this very page: "View Hits" is flat, "Filters" is a machine surface.
 /// 2. **The `#in-use` caption against its own specimens.** *"Buttons carry
@@ -23,7 +23,7 @@
 ///    comment and the utility's own rationale all say 44; the render is 48.
 ///    Supervisor ruling S8: print 44, render 48, [_glassControlHeight].
 /// 4. **"Two utilities, one material": there are three.** `glass-panel`,
-///    `glass-panel-deep` and `glass-control` all exist ([ElGlassPanelDeep] has
+///    `glass-panel-deep` and `glass-control` all exist ([GlassVariant.prominent] has
 ///    a home in the package). The Panel label narrows honestly to
 ///    "glass-panel and glass-control"; the section description does not.
 /// 5. **The glow cells' rim classes differ from the spacing page's.** Here
@@ -36,14 +36,14 @@
 ///    action". Same two glows, two copies.
 /// 7. **The Input's own JSDoc claims "a placeholder at 60% muted".** The class
 ///    is `placeholder:text-muted-foreground` at full opacity: prose describing
-///    an intent the class never carried. [ElInput] renders the class.
+///    an intent the class never carried. [Input] renders the class.
 /// 8. **`--shadow-key` / `--shadow-key-down` name the `press-key` utility**,
 ///    which exists in globals.css and is never demonstrated. The two tokens
 ///    render as unrelated stills side by side rather than as one key in two
 ///    positions, so this page ships them as stills too.
 /// 9. **`--radius-4xl` renders here (32px) while the spacing page's ladder is
 ///    labelled "Seven steps" and stops at `3xl`.** This is the page where the
-///    undocumented rung actually appears, [ElRadii.xl4], on both glass cells.
+///    undocumented rung actually appears, [Radii.xl4], on both glass cells.
 /// 10. **Fonts.** The globals prose and the nav blurbs say Space Grotesk;
 ///    `--font-sans` / `--font-heading` are "Inter Local". Per the project
 ///    decision, fonts follow tokens, not prose.
@@ -55,7 +55,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -80,22 +92,22 @@ const double _bolder = 700;
 
 /// `max-w-sm`, 24rem. Tailwind's **container** scale, which `globals.css` does
 /// not override (shadows-map §0); it is not the spacing scale, so it is not
-/// `el(96)` even though the two coincide here.
+/// `space(96)` even though the two coincide here.
 // allow-hardcoded: framework default with no token to read it from.
 const double _measureSm = 384;
 
 /// `h-24`: the height every specimen box on this page shares.
-final double _specimenHeight = el(24);
+final double _specimenHeight = space(24);
 
 /// `h-12`: the `glass-control` specimen. **Drift 3:** the caption beside it
 /// says 44px. Ruling S8 is to print the copy and render the class.
-final double _glassControlHeight = el(12);
+final double _glassControlHeight = space(12);
 
 /* ── Page data (the reference's two module-level arrays) ─────────────────── */
 
 /// One shadow specimen: the class the box wears, the token it prints, the spec
 /// that paints it, and what it is for.
-typedef _Specimen = ({String token, String cls, ElShadowSpec spec, String use});
+typedef _Specimen = ({String token, String cls, ShadowStyle spec, String use});
 
 /// `const ambient`: four ambient steps. The four `use` strings are
 /// **character-identical** to the spacing page's Elevation panel; only the
@@ -104,37 +116,37 @@ final List<_Specimen> _ambient = <_Specimen>[
   (
     token: '--shadow-e1',
     cls: 'shadow-e1',
-    spec: ElShadows.e1,
+    spec: Shadows.sm,
     use: 'Resting rows, chips, table headers. Barely there.',
   ),
   (
     token: '--shadow-e2',
     cls: 'shadow-e2',
-    spec: ElShadows.e2,
+    spec: Shadows.md,
     use: 'Cards and pack cards at rest.',
   ),
   (
     token: '--shadow-e3',
     cls: 'shadow-e3',
-    spec: ElShadows.e3,
+    spec: Shadows.lg,
     use: 'Hovered cards, popovers, dropdowns, sticky bars.',
   ),
   (
     token: '--shadow-e4',
     cls: 'shadow-e4',
-    spec: ElShadows.e4,
+    spec: Shadows.xl,
     use: 'Dialogs, drawers, the pack-opening stage.',
   ),
 ];
 
 /// `const machine`: the eight machine surfaces. Every one of these carries at
 /// least one `inset` layer, which is why the cells go through
-/// [ElMachineSurface] rather than a plain decoration.
+/// [Surface] rather than a plain decoration.
 final List<_Specimen> _machine = <_Specimen>[
   (
     token: '--shadow-btn',
     cls: 'shadow-btn',
-    spec: ElShadows.btn,
+    spec: Shadows.control,
     // DRIFT 1, kept: only `outline` carries this class.
     use:
         'Secondary, outline and destructive buttons. An inner top highlight '
@@ -143,19 +155,19 @@ final List<_Specimen> _machine = <_Specimen>[
   (
     token: '--shadow-btn-primary',
     cls: 'shadow-btn-primary',
-    spec: ElShadows.btnPrimary,
+    spec: Shadows.controlPrimary,
     use: 'The primary button. Same depth plus a blue cast beneath it.',
   ),
   (
     token: '--shadow-btn-value',
     cls: 'shadow-btn-value',
-    spec: ElShadows.btnValue,
+    spec: Shadows.controlPremium,
     use: 'The premium button. Lime cast, for money and reward actions.',
   ),
   (
     token: '--shadow-btn-down',
     cls: 'shadow-btn-down',
-    spec: ElShadows.btnDown,
+    spec: Shadows.controlPressed,
     use:
         'Any button while pressed. The surface sinks into its socket instead '
         'of merely dimming.',
@@ -163,7 +175,7 @@ final List<_Specimen> _machine = <_Specimen>[
   (
     token: '--shadow-key',
     cls: 'shadow-key',
-    spec: ElShadows.key,
+    spec: Shadows.keyRaised,
     // DRIFT 8, kept: `press-key` exists and is never demonstrated.
     use:
         'A raised key with a visible side wall. Used by the press-key '
@@ -172,19 +184,19 @@ final List<_Specimen> _machine = <_Specimen>[
   (
     token: '--shadow-key-down',
     cls: 'shadow-key-down',
-    spec: ElShadows.keyDown,
+    spec: Shadows.keyPressed,
     use: 'The same key, travelled 3px down into its socket.',
   ),
   (
     token: '--shadow-pressed',
     cls: 'shadow-pressed',
-    spec: ElShadows.pressed,
+    spec: Shadows.inset,
     use: 'A sunken socket. Every input, textarea and input group sits in one.',
   ),
   (
     token: '--shadow-chip',
     cls: 'shadow-chip',
-    spec: ElShadows.chip,
+    spec: Shadows.compactControl,
     use: 'Badge and chip depth. Lighter than a button, but not flat.',
   ),
 ];
@@ -198,12 +210,12 @@ class ShadowsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // The header reads its own copy out of the nav registry, exactly as
     // `findCategory("foundations", "shadows")` does in the reference.
-    final ElCategoryHit here = findCategory('foundations', 'shadows');
+    final CategoryHit here = findCategory('foundations', 'shadows');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           eyebrow: here.group.title,
           title: here.category.title,
           blurb: here.category.blurb,
@@ -213,8 +225,8 @@ class ShadowsPage extends StatelessWidget {
         // foundations set that carries a margin of its own. It sits between the
         // header and the first section, at page level.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: const ElNote(
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: const Note(
             title: 'Two families, one idea',
             child: _PageNoteBody(),
           ),
@@ -224,10 +236,10 @@ class ShadowsPage extends StatelessWidget {
         const _InUseSection(),
         const _GlowSection(),
         const _GlassSection(),
-        const ElSection(
+        const Section(
           id: 'rules',
           title: 'Rules',
-          child: ElDoDont(
+          child: DoDont(
             dos: <String>[
               'Use the surface ladder plus a hairline for depth first; add a '
                   'shadow only to confirm it.',
@@ -237,7 +249,7 @@ class ShadowsPage extends StatelessWidget {
               'Reserve the two glows for selection and reward.',
             ],
             // Straight apostrophes, as the source array has them: only the
-            // panel heading uses the curly `&rsquo;`, and [ElDoDont] owns that.
+            // panel heading uses the curly `&rsquo;`, and [DoDont] owns that.
             donts: <String>[
               "Don't put an ambient shadow on a control — it will read as "
                   'floating rather than pressable.',
@@ -248,7 +260,7 @@ class ShadowsPage extends StatelessWidget {
             ],
           ),
         ),
-        const ElPageFootNav(groupId: 'foundations', slug: 'shadows'),
+        const PageFootNav(groupId: 'foundations', slug: 'shadows'),
       ],
     );
   }
@@ -265,9 +277,9 @@ class _PageNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle base = ElText.styleOf(context, ElType.small);
+    final TextStyle base = StyledText.styleOf(context, TextStyles.small);
 
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -288,7 +300,7 @@ class _PageNoteBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -316,9 +328,9 @@ class _AmbientSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'ambient',
       title: 'Ambient depth',
       description:
@@ -326,22 +338,22 @@ class _AmbientSection extends StatelessWidget {
           'darkening, so depth mostly comes from the surface ladder — these '
           'only confirm it.',
       // An actual U+2192 arrow, not `->`.
-      child: ElPanel(
+      child: Panel(
         label: 'e1 → e4',
-        child: ElGrid(
+        child: Grid(
           sm: 2,
           lg: 4,
-          gap: el(6),
+          gap: space(6),
           children: <Widget>[
             for (final _Specimen specimen in _ambient)
               _SpecimenCell(
                 specimen: specimen,
-                radius: ElRadii.lg,
+                radius: Radii.lg,
                 // `border border-border`: the ambient cells have one and the
                 // machine cells do not.
                 border: Border.all(
                   color: theme.border,
-                  width: ElWidths.hairline,
+                  width: BorderWidths.hairline,
                 ),
               ),
           ],
@@ -358,25 +370,25 @@ class _MachineSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'machine',
       title: 'Machine surfaces',
       description:
           'Depth that implies a mechanism. These carry inset '
           'highlights and shades, so a control looks like it has a top face '
           'and a side wall.',
-      child: ElPanel(
+      child: Panel(
         label: 'The machine set',
         // Three columns at `lg`, so the last row of eight holds two.
-        child: ElGrid(
+        child: Grid(
           sm: 2,
           lg: 3,
-          gap: el(6),
+          gap: space(6),
           children: <Widget>[
             for (final _Specimen specimen in _machine)
               // `rounded-pill bg-card` and **no border**: the two ways a
               // machine cell differs from an ambient one.
-              _SpecimenCell(specimen: specimen, radius: ElRadii.pill),
+              _SpecimenCell(specimen: specimen, radius: Radii.full),
           ],
         ),
       ),
@@ -391,32 +403,32 @@ class _InUseSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'in-use',
       title: 'Raised against recessed',
       description:
           'The rule in one panel. Press the buttons and focus the '
           'field — the button sinks, the field is already sunken and only its '
           'ring changes.',
-      child: ElPanel(
+      child: Panel(
         label: 'Press and focus these',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // `flex flex-wrap items-center gap-4`.
             Wrap(
-              spacing: el(4),
-              runSpacing: el(4),
+              spacing: space(4),
+              runSpacing: space(4),
               crossAxisAlignment: WrapCrossAlignment.center,
               children: const <Widget>[
-                _LiveButton(ElButtonVariant.primary, 'Open Pack'),
-                _LiveButton(ElButtonVariant.premium, 'Deposit Funds'),
-                _LiveButton(ElButtonVariant.secondary, 'View Hits'),
-                _LiveButton(ElButtonVariant.outline, 'Filters'),
-                _LiveButton(ElButtonVariant.ghost, 'Skip'),
+                _LiveButton(ButtonVariant.primary, 'Open Pack'),
+                _LiveButton(ButtonVariant.premium, 'Deposit Funds'),
+                _LiveButton(ButtonVariant.secondary, 'View Hits'),
+                _LiveButton(ButtonVariant.outline, 'Filters'),
+                _LiveButton(ButtonVariant.ghost, 'Skip'),
               ],
             ),
-            SizedBox(height: el(6)),
+            SizedBox(height: space(6)),
             // `<div class="mt-6 max-w-sm">` around a `w-full` Input: a block
             // box that fills the panel and stops at 384px. [Align] hands the
             // cap a loose constraint, which is what makes it a *max*.
@@ -428,13 +440,13 @@ class _InUseSection extends StatelessWidget {
                 // the reference's `<input>` carries no `aria-label` either, and
                 // an unlabelled field's accessible name in HTML *is* its
                 // placeholder. Same string announced, one less thing invented.
-                child: const ElInput(
+                child: const Input(
                   placeholder: 'Search packs, cards and sets',
                   label: 'Search packs, cards and sets',
                 ),
               ),
             ),
-            SizedBox(height: el(6)),
+            SizedBox(height: space(6)),
             const _InUseCaption(),
           ],
         ),
@@ -452,18 +464,18 @@ class _InUseSection extends StatelessWidget {
 class _LiveButton extends StatelessWidget {
   const _LiveButton(this.variant, this.label);
 
-  final ElButtonVariant variant;
+  final ButtonVariant variant;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return ElButton(
+    return Button(
       variant: variant,
       onPressed: () {},
       // A bare [Text]: the button installs its own `DefaultTextStyle`, which
       // already carries the resolved class, `btn-spring`'s animated ink and —
       // on premium: the `font-semibold` override. Re-resolving the class
-      // through [ElText] here would silently drop both.
+      // through [StyledText] here would silently drop both.
       child: Text(label),
     );
   }
@@ -476,25 +488,25 @@ class _InUseCaption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Buttons carry '),
-          ElCode.span('shadow-btn'),
+          Code.span('shadow-btn'),
           const TextSpan(text: ' or '),
-          ElCode.span('shadow-btn-primary'),
+          Code.span('shadow-btn-primary'),
           const TextSpan(text: ' and drop to '),
-          ElCode.span('shadow-btn-down'),
+          Code.span('shadow-btn-down'),
           const TextSpan(text: ' on '),
-          ElCode.span(':active'),
+          Code.span(':active'),
           const TextSpan(text: '. The input carries '),
-          ElCode.span('shadow-pressed'),
+          Code.span('shadow-pressed'),
           const TextSpan(
             text: ' permanently — it is a socket, and it never rises.',
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -506,29 +518,29 @@ class _GlowSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'glow',
       title: 'Rationed glow',
       description:
           'Two glows, and they are the scarcest thing in the system. '
           'Both derive from the accent tokens, so they follow the palette '
           'automatically.',
-      child: ElPanel(
+      child: Panel(
         label: 'Selected and celebrated',
-        child: ElGrid(
+        child: Grid(
           sm: 2,
-          gap: el(6),
+          gap: space(6),
           children: <Widget>[
             // DRIFT 5: `border-primary/40` here, `border-action/40` on the
             // spacing page. `--primary` *is* `var(--color-action)`, so the two
             // rims are the same pixels cut from two different class names.
             _GlowCell(
-              spec: ElShadows.glowAction,
+              spec: Shadows.glowAction,
               rim: theme.primary,
               label: 'glow-action',
-              ink: theme.actionInk,
+              ink: theme.actionText,
               // DRIFT 6: the spacing page says "Signals" and names different
               // occasions for the same two glows.
               lead:
@@ -537,10 +549,10 @@ class _GlowSection extends StatelessWidget {
               emphasis: 'this is the thing you chose',
             ),
             _GlowCell(
-              spec: ElShadows.glowValue,
-              rim: ElPalette.value,
+              spec: Shadows.glowValue,
+              rim: Palette.value,
               label: 'glow-value',
-              ink: theme.valueInk,
+              ink: theme.premiumText,
               lead: 'Celebrated tiers, reward unlocks, premium actions. Says ',
               emphasis: 'this is worth something',
             ),
@@ -561,7 +573,7 @@ class _GlowCell extends StatelessWidget {
     required this.emphasis,
   });
 
-  final ElShadowSpec spec;
+  final ShadowStyle spec;
 
   /// The ramp the `border-<ramp>/40` rim is cut from.
   final Color rim;
@@ -582,17 +594,17 @@ class _GlowCell extends StatelessWidget {
       children: <Widget>[
         _SpecimenBox(
           spec: spec,
-          radius: ElRadii.lg,
+          radius: Radii.lg,
           border: Border.all(
             color: rim.withValues(alpha: _glowBorderAlpha),
-            width: ElWidths.hairline,
+            width: BorderWidths.hairline,
           ),
-          child: ElText(label, ElType.numSm, color: ink),
+          child: StyledText(label, TextStyles.numberSm, color: ink),
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         // `.type-small` at its own 1.5 leading: the glow captions carry no
         // `leading-snug`, unlike the twelve specimen captions above.
-        ElRichText(
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               TextSpan(text: lead),
@@ -603,7 +615,7 @@ class _GlowCell extends StatelessWidget {
               const TextSpan(text: '.'),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     );
@@ -617,26 +629,26 @@ class _GlassSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'glass',
       title: 'Glass',
       // DRIFT 4: "Two utilities": there are three.
       description:
           'A surface in front of the page rather than cut out of it. '
           'Two utilities, one material — the split is scale, not taste.',
-      child: ElPanel(
+      child: Panel(
         // …which the label, unlike the description, narrows honestly.
         label: 'glass-panel and glass-control',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            ElGrid(
+            Grid(
               sm: 2,
-              gap: el(6),
+              gap: space(6),
               children: const <Widget>[_GlassPanelCell(), _GlassControlCell()],
             ),
-            SizedBox(height: el(6)),
-            const ElNote(
+            SizedBox(height: space(6)),
+            const Note(
               title: 'Neither needs a dark: variant',
               child: _GlassNoteBody(),
             ),
@@ -654,50 +666,51 @@ class _GlassPanelCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(
           height: _specimenHeight,
-          child: ElGlassPanel(
+          child: Glass(
+            variant: GlassVariant.panel,
             // DRIFT 9: `--radius-4xl`, the rung the spacing page's ladder does
             // not document, renders here.
-            radius: BorderRadius.circular(ElRadii.xl4),
+            radius: BorderRadius.circular(Radii.xl4),
             // `text-foreground`, not `text-muted-foreground`: the one
             // specimen label on the page that is not muted.
             child: Center(
-              child: ElText(
+              child: StyledText(
                 'glass-panel',
-                ElType.numSm,
+                TextStyles.numberSm,
                 color: theme.foreground,
               ),
             ),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElRichText(
+        SizedBox(height: space(3)),
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(text: 'Card scale. Translucent '),
-              ElCode.span('--card'),
+              Code.span('--card'),
               const TextSpan(
                 text:
                     ', a backdrop blur, a hairline rim of the ink colour '
                     'and ',
               ),
-              ElCode.span('--shadow-e2'),
+              Code.span('--shadow-e2'),
               const TextSpan(
                 text:
                     ' beneath. The page’s own light shows through it, which '
                     'is the whole reason to reach for this over ',
               ),
-              ElCode.span('bg-card'),
+              Code.span('bg-card'),
               const TextSpan(text: '.'),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     );
@@ -715,7 +728,7 @@ class _GlassControlCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -725,22 +738,23 @@ class _GlassControlCell extends StatelessWidget {
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: theme.card,
-              borderRadius: BorderRadius.circular(ElRadii.xl4),
+              borderRadius: BorderRadius.circular(Radii.xl4),
             ),
             child: Center(
               child: SizedBox(
                 height: _glassControlHeight,
-                child: ElGlassControl(
-                  radius: BorderRadius.circular(ElRadii.pill),
-                  padding: EdgeInsets.symmetric(horizontal: el(4)),
+                child: Glass(
+                  variant: GlassVariant.control,
+                  radius: BorderRadius.circular(Radii.full),
+                  padding: EdgeInsets.symmetric(horizontal: space(4)),
                   // `inline-flex`: the box is as wide as its content plus its
                   // padding, so the width factor shrink-wraps while the
                   // 48px height stays tight.
                   child: Center(
                     widthFactor: 1,
-                    child: ElText(
+                    child: StyledText(
                       'glass-control',
-                      ElType.numSm,
+                      TextStyles.numberSm,
                       color: theme.foreground,
                     ),
                   ),
@@ -749,8 +763,8 @@ class _GlassControlCell extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: el(3)),
-        ElRichText(
+        SizedBox(height: space(3)),
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               // DRIFT 3, printed as written against a 48px render.
@@ -759,7 +773,7 @@ class _GlassControlCell extends StatelessWidget {
                     'Control scale. No blur and no ambient shadow: at 44px '
                     'there is nothing behind it worth blurring, and ',
               ),
-              ElCode.span('e2'),
+              Code.span('e2'),
               const TextSpan(
                 text:
                     ' under something that small reads as grime rather than '
@@ -767,7 +781,7 @@ class _GlassControlCell extends StatelessWidget {
               ),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     );
@@ -781,19 +795,19 @@ class _GlassNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Both mix from '),
-          ElCode.span('--card'),
+          Code.span('--card'),
           const TextSpan(text: ' and '),
-          ElCode.span('--foreground'),
+          Code.span('--foreground'),
           const TextSpan(
             text:
                 ', so a light edge on dark and a dark edge on light fall out '
                 'of the same expression. The top highlight is ',
           ),
-          ElCode.span('--rim-strong'),
+          Code.span('--rim-strong'),
           const TextSpan(
             text:
                 ' — the same token every raised control carries, which is '
@@ -801,7 +815,7 @@ class _GlassNoteBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -828,7 +842,7 @@ class _SpecimenCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -837,15 +851,19 @@ class _SpecimenCell extends StatelessWidget {
           spec: specimen.spec,
           radius: radius,
           border: border,
-          child: ElText(
+          child: StyledText(
             specimen.cls,
-            ElType.numSm,
+            TextStyles.numberSm,
             color: theme.mutedForeground,
           ),
         ),
-        SizedBox(height: el(3)),
-        ElText(specimen.token, ElType.numSm, color: theme.actionInk),
-        SizedBox(height: el(1)),
+        SizedBox(height: space(3)),
+        StyledText(
+          specimen.token,
+          TextStyles.numberSm,
+          color: theme.actionText,
+        ),
+        SizedBox(height: space(1)),
         _UseCopy(specimen.use),
       ],
     );
@@ -854,7 +872,7 @@ class _SpecimenCell extends StatelessWidget {
 
 /// `grid h-24 place-items-center … bg-card ${cls}`: the specimen itself.
 ///
-/// Every box on this page goes through [ElMachineSurface], the ambient four
+/// Every box on this page goes through [Surface], the ambient four
 /// included. Half of these tokens carry `inset` layers that a [BoxDecoration]
 /// cannot paint at all, and the other half would need a second code path to say
 /// the same thing: so there is one path, and the difference between the two
@@ -867,7 +885,7 @@ class _SpecimenBox extends StatelessWidget {
     required this.child,
   });
 
-  final ElShadowSpec spec;
+  final ShadowStyle spec;
   final double radius;
   final BoxBorder? border;
   final Widget child;
@@ -876,10 +894,10 @@ class _SpecimenBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: _specimenHeight,
-      child: ElMachineSurface(
+      child: Surface(
         spec: spec,
         radius: BorderRadius.circular(radius),
-        fill: ElTheme.of(context).card,
+        fill: ThemeScope.of(context).card,
         border: border,
         // `place-items-center`.
         child: Center(child: child),
@@ -901,13 +919,13 @@ class _UseCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle style = ElText.styleOf(
+    final TextStyle style = StyledText.styleOf(
       context,
-      ElType.small,
+      TextStyles.small,
     ).copyWith(height: _leadingSnug);
-    // Not a `.type-*` class, so it cannot go through [ElText]: but the line
+    // Not a `.type-*` class, so it cannot go through [StyledText]: but the line
     // box still has to be the one CSS lays out.
-    return ElLineBox(
+    return LineBox(
       style: style,
       child: Text(text, style: style),
     );

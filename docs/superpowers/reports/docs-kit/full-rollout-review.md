@@ -38,7 +38,7 @@ inherits them.
 **The rails rest at four fifths of the window.** They used to run the full
 height. Both bounds are kept — the fold bound is a correctness rule, since a
 row below the fold cannot be clicked, and on a short window it is the tighter
-of the two. Applied on the `wide` branch only: below `ElBreakpoints.lg` there
+of the two. Applied on the `wide` branch only: below `Breakpoints.lg` there
 is no rail at all, only the horizontal anchor strip, and a test now pins that
 so a later change has to decide the tablet question deliberately rather than
 inherit an answer.
@@ -48,7 +48,7 @@ inherit an answer.
 replaced — moves the full notch on the frame the event lands. Next to the
 article underneath, whose scroll is a real physics simulation, the two
 surfaces visibly disagreed about what scrolling is. `_SmoothRailScroll`
-animates to the same destination over `ElDurations.fast`, accumulating the
+animates to the same destination over `Durations.fast`, accumulating the
 target so a second notch mid-glide extends the movement rather than
 restarting it. It is mounted twice per rail: on the overlay catcher that
 answers the escaped band, and *inside* each rail's own `SingleChildScrollView`
@@ -133,7 +133,7 @@ hand-typed path is a coin flip. Every link now reads the catalog entry.
 `registry/location.dart` supports `http(s)://` and the CLI falls back to the
 public registry over HTTP by default. Its exit-code table claimed to list
 every code `ElattarCli.run` can return and was missing 70. The introduction
-listed `press-motion` among button's registry dependencies; it is not one.
+listed `press` among button's registry dependencies; it is not one.
 The installation page called `path: ../flutter-design-system` "the exact form
 `example/pubspec.yaml` uses"; that file says `path: ../`.
 
@@ -148,8 +148,8 @@ as it reads:
   for one.
 * Nothing in the corpus consumes `glass` or `media-scrim`.
 * Reduced motion differs per effect: the starfield stills to 0°,
-  bloom-cosmic's two layers still 4% apart, sheen-action freezes invisible at
-  frame 0, page-glow never animated.
+  feedback-surface's two layers still 4% apart, action-feedback freezes invisible at
+  frame 0, background-effect never animated.
 * Every submenu renders `subBordered` regardless of parent, contradicting
   `menu.dart`'s own comment table.
 
@@ -221,7 +221,7 @@ Flutter app reads `?theme=light`, and it has to be in the URL alongside
 misleading filename — which is what the first attempt produced.
 
 The glass capture is the one to look at: it shows the effect-page shape
-working — an opaque `theme.card` rectangle beside an `ElGlassPanel` over the
+working — an opaque `theme.card` rectangle beside an `GlassVariant.panel` over the
 same backdrop — the rails resting short of the fold, the nested API
 sub-anchors in the rail, and a real `elattar add glass` where the page used to
 say the component had no manifest.
@@ -255,7 +255,7 @@ is broken; it is missing.
 prev/next pager, which `component_docs_button_card_test.dart` used to
 exercise, is not covered anywhere now that that file is deleted.
 
-**`ElType.micro` is banned under `example/lib/docs/` and
+**`Type.micro` is banned under `example/lib/docs/` and
 `example/lib/components_docs/` but still in use in `example/lib/pages/`**,
 which the guard does not scan. A worker reusing a specimen from there tripped
 the guard. Whether the ban is meant to be repo-wide is undecided.

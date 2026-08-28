@@ -1,6 +1,18 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The composer family — `composer.tsx`, `slash-palette.tsx`,
@@ -31,11 +43,11 @@ const double _tolerance = 0.5;
 /// `selects_test.dart` uses, for the same reason.
 Widget _hosted = const SizedBox.shrink();
 
-/// The composer needs a real [Overlay]: the plus menu is a [ElPopover], and a
+/// The composer needs a real [Overlay]: the plus menu is a [Popover], and a
 /// popover with nowhere to portal to renders nothing at all.
 Widget _host(
   Widget child, {
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   bool disableAnimations = false,
   double width = _width,
 }) {
@@ -47,8 +59,8 @@ Widget _host(
     ),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Overlay(
           initialEntries: <OverlayEntry>[
             OverlayEntry(
@@ -83,7 +95,7 @@ extension on WidgetTester {
   }
 }
 
-/// Opens (or closes) a [ElPopover]: one frame for the prop to flip, one more
+/// Opens (or closes) a [Popover]: one frame for the prop to flip, one more
 /// for the portal the frame boundary brings in.
 Future<void> _settleOverlay(WidgetTester tester) async {
   await tester.pump();
@@ -91,45 +103,45 @@ Future<void> _settleOverlay(WidgetTester tester) async {
 }
 
 /// `COMMANDS` from `agent-demo.tsx`, verbatim — three skills and one command.
-List<ElAgentCommand> get _commands => <ElAgentCommand>[
-  const ElAgentCommand(
+List<AgentCommand> get _commands => <AgentCommand>[
+  const AgentCommand(
     id: 'inventory',
     label: 'inventory',
     hint: 'What is in stock',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.search,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.search,
   ),
-  const ElAgentCommand(
+  const AgentCommand(
     id: 'wallet',
     label: 'wallet',
     hint: 'Balance and recent movement',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.wallet,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.wallet,
   ),
-  const ElAgentCommand(
+  const AgentCommand(
     id: 'export',
     label: 'export',
     hint: 'Download activity as CSV',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.download,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.download,
   ),
-  const ElAgentCommand(
+  const AgentCommand(
     id: 'guide',
     label: 'guide',
     hint: 'How pack odds work',
-    group: ElAgentCommandGroup.command,
-    icon: ElLucide.bookOpen,
+    group: AgentCommandGroup.command,
+    icon: Lucide.bookOpen,
   ),
 ];
 
 /// The specimen's one attachment — `collection-export.csv`, content delivered.
-ElAgentAttachment get _csv => const ElAgentAttachment(
+AgentAttachment get _csv => const AgentAttachment(
   id: 'spec-upload',
   name: 'collection-export.csv',
   mime: 'text/csv',
-  kind: ElAgentAttachmentKind.data,
+  kind: AgentAttachmentKind.data,
   size: 18422,
-  delivery: ElAgentDelivery.content(),
+  delivery: AgentDelivery.content(),
 );
 
 /// A composer driven by a real controller, with everything the specimen wires.
@@ -148,7 +160,7 @@ class _Specimen extends StatefulWidget {
   final bool busy;
   final bool disabled;
   final bool withAttachment;
-  final List<ElAgentCommand>? commands;
+  final List<AgentCommand>? commands;
   final VoidCallback? onSubmit;
   final Widget? accessory;
   final Widget? micControl;
@@ -160,9 +172,9 @@ class _Specimen extends StatefulWidget {
 
 class _SpecimenState extends State<_Specimen> {
   final TextEditingController controller = TextEditingController();
-  late List<ElAgentAttachment> attachments = widget.withAttachment
-      ? <ElAgentAttachment>[_csv]
-      : <ElAgentAttachment>[];
+  late List<AgentAttachment> attachments = widget.withAttachment
+      ? <AgentAttachment>[_csv]
+      : <AgentAttachment>[];
 
   @override
   void dispose() {
@@ -171,7 +183,7 @@ class _SpecimenState extends State<_Specimen> {
   }
 
   @override
-  Widget build(BuildContext context) => ElAgentComposer(
+  Widget build(BuildContext context) => AgentComposer(
     controller: controller,
     onSubmit: () {
       widget.onSubmit?.call();
@@ -183,12 +195,12 @@ class _SpecimenState extends State<_Specimen> {
     placeholder: 'Ask about a pack, a pull or your balance…',
     commands: widget.commands ?? _commands,
     attachments: attachments,
-    onAttach: (List<ElAgentAttachment> files) => setState(
-      () => attachments = <ElAgentAttachment>[...attachments, ...files],
+    onAttach: (List<AgentAttachment> files) => setState(
+      () => attachments = <AgentAttachment>[...attachments, ...files],
     ),
     onRemoveAttachment: (String id) => setState(
       () => attachments = attachments
-          .where((ElAgentAttachment a) => a.id != id)
+          .where((AgentAttachment a) => a.id != id)
           .toList(),
     ),
     accessory: widget.accessory,
@@ -197,9 +209,9 @@ class _SpecimenState extends State<_Specimen> {
   );
 }
 
-Finder get _shell => find.byType(ElMachineSurface).first;
+Finder get _shell => find.byType(Surface).first;
 Finder get _input => find.byType(EditableText);
-Finder get _palette => find.byType(ElAgentSlashPalette);
+Finder get _palette => find.byType(AgentSlashPalette);
 
 double _heightOf(WidgetTester tester, Finder finder) =>
     tester.getSize(finder).height;
@@ -214,59 +226,59 @@ Future<void> _type(WidgetTester tester, String text) async {
 void main() {
   /* ── slashQuery / filterCommands — pure ────────────────────────────────── */
 
-  group('elSlashQuery', () {
+  group('slashQuery', () {
     test('only a slash that opens the message counts', () {
-      expect(elSlashQuery('/inv', 4), 'inv');
+      expect(slashQuery('/inv', 4), 'inv');
       // *"Mid-sentence, a slash is a slash — 'and/or' must not open a menu."*
-      expect(elSlashQuery('and/or', 6), isNull);
-      expect(elSlashQuery('', 0), isNull);
-      expect(elSlashQuery('hello', 5), isNull);
+      expect(slashQuery('and/or', 6), isNull);
+      expect(slashQuery('', 0), isNull);
+      expect(slashQuery('hello', 5), isNull);
     });
 
     test('a space or a newline before the caret closes it', () {
-      expect(elSlashQuery('/inv now', 8), isNull);
-      expect(elSlashQuery('/inv\nmore', 9), isNull);
+      expect(slashQuery('/inv now', 8), isNull);
+      expect(slashQuery('/inv\nmore', 9), isNull);
       // …but only *before* the caret. The tail is not read.
-      expect(elSlashQuery('/inv now', 4), 'inv');
+      expect(slashQuery('/inv now', 4), 'inv');
     });
 
     test('the bare slash is an empty query, not a closed palette', () {
-      expect(elSlashQuery('/', 1), '');
+      expect(slashQuery('/', 1), '');
     });
 
     test('a caret past the end clamps, exactly as String.slice does', () {
-      expect(elSlashQuery('/inv', 99), 'inv');
+      expect(slashQuery('/inv', 99), 'inv');
     });
 
     test('DRIFT 2 — a caret of −1 counts from the END and still opens', () {
       // This is the Escape handler's whole mechanism: `setCaret(-1)` was meant
       // to close the palette and instead drops the last character off the
       // query, which is a valid query.
-      expect(elSlashQuery('/', -1), '');
-      expect(elSlashQuery('/inv', -1), 'in');
-      expect(elSlashQuery('/i', -1), '');
+      expect(slashQuery('/', -1), '');
+      expect(slashQuery('/inv', -1), 'in');
+      expect(slashQuery('/i', -1), '');
     });
   });
 
-  group('elFilterCommands', () {
+  group('filterCommands', () {
     test('an empty query returns the list untouched', () {
-      final List<ElAgentCommand> all = _commands;
-      expect(elFilterCommands(all, ''), same(all));
-      expect(elFilterCommands(all, '   '), same(all));
+      final List<AgentCommand> all = _commands;
+      expect(filterCommands(all, ''), same(all));
+      expect(filterCommands(all, '   '), same(all));
     });
 
     test('a plain substring match over the id and the label', () {
       expect(
-        elFilterCommands(_commands, 'w').map((ElAgentCommand c) => c.id),
+        filterCommands(_commands, 'w').map((AgentCommand c) => c.id),
         <String>['wallet'],
       );
       expect(
-        elFilterCommands(_commands, 'e').map((ElAgentCommand c) => c.id),
+        filterCommands(_commands, 'e').map((AgentCommand c) => c.id),
         <String>['inventory', 'wallet', 'export', 'guide'],
       );
       // Case-insensitive, and trimmed.
       expect(
-        elFilterCommands(_commands, '  GUIDE ').map((ElAgentCommand c) => c.id),
+        filterCommands(_commands, '  GUIDE ').map((AgentCommand c) => c.id),
         <String>['guide'],
       );
     });
@@ -274,20 +286,20 @@ void main() {
     test(
       'no fuzzy matching — the letters of clear do not find recalculate',
       () {
-        const List<ElAgentCommand> pair = <ElAgentCommand>[
-          ElAgentCommand(
+        const List<AgentCommand> pair = <AgentCommand>[
+          AgentCommand(
             id: 'clear',
             label: 'clear',
-            group: ElAgentCommandGroup.command,
+            group: AgentCommandGroup.command,
           ),
-          ElAgentCommand(
+          AgentCommand(
             id: 'recalculate',
             label: 'recalculate',
-            group: ElAgentCommandGroup.command,
+            group: AgentCommandGroup.command,
           ),
         ];
         expect(
-          elFilterCommands(pair, 'clear').map((ElAgentCommand c) => c.id),
+          filterCommands(pair, 'clear').map((AgentCommand c) => c.id),
           <String>['clear'],
         );
       },
@@ -313,9 +325,9 @@ void main() {
         closeTo(24, _tolerance),
         reason: 'one `.type-body` line box inside the input\'s `py-3`',
       );
-      expect(ElAgentComposer.inputInsets.vertical, 24);
-      expect(ElAgentComposer.controlInsets.bottom, 8);
-      expect(ElAgentComposer.controlInsets.top, 0);
+      expect(AgentComposer.inputInsets.vertical, 24);
+      expect(AgentComposer.controlInsets.bottom, 8);
+      expect(AgentComposer.controlInsets.top, 0);
     });
 
     testWidgets('the send button is a 32px square carrying a 16px arrow', (
@@ -325,12 +337,12 @@ void main() {
       await tester.pump();
 
       final Finder send = find.ancestor(
-        of: find.byType(ElIcon),
-        matching: find.byType(ElButton),
+        of: find.byType(Icon),
+        matching: find.byType(Button),
       );
-      expect(tester.getSize(find.byType(ElButton).last), const Size(32, 32));
-      expect(ElAgentComposer.sendGlyphSize, 16);
-      expect(ElAgentComposer.stopGlyphSize, 14);
+      expect(tester.getSize(find.byType(Button).last), const Size(32, 32));
+      expect(AgentComposer.sendGlyphSize, 16);
+      expect(AgentComposer.stopGlyphSize, 14);
       expect(send, findsWidgets);
     });
 
@@ -339,14 +351,11 @@ void main() {
     ) async {
       await tester.pumpComposer(const _Specimen());
       await tester.pump();
-      expect(
-        tester.widget<ElButton>(find.byType(ElButton).last).onPressed,
-        isNull,
-      );
+      expect(tester.widget<Button>(find.byType(Button).last).onPressed, isNull);
 
       await _type(tester, 'hello');
       expect(
-        tester.widget<ElButton>(find.byType(ElButton).last).onPressed,
+        tester.widget<Button>(find.byType(Button).last).onPressed,
         isNotNull,
       );
     });
@@ -355,7 +364,7 @@ void main() {
       await tester.pumpComposer(const _Specimen(withAttachment: true));
       await tester.pump();
       expect(
-        tester.widget<ElButton>(find.byType(ElButton).last).onPressed,
+        tester.widget<Button>(find.byType(Button).last).onPressed,
         isNotNull,
       );
     });
@@ -367,7 +376,7 @@ void main() {
       await tester.pump();
       // Nothing declares it: the `<textarea>` is `inline-block` and the
       // parent's strut adds its descent. 1 + 48 + 6 + 40 + 1 = 96.
-      expect(ElAgentComposer.inlineGap, 6);
+      expect(AgentComposer.inlineGap, 6);
       expect(_heightOf(tester, _shell), closeTo(96, _tolerance));
     });
   });
@@ -391,7 +400,7 @@ void main() {
 
       // Twelve lines would want 312; the cap holds the box at 200.
       await _type(tester, 'a\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl');
-      expect(ElAgentComposer.maxRowsPx, 200);
+      expect(AgentComposer.maxRowsPx, 200);
       expect(_heightOf(tester, _shell), closeTo(248, _tolerance));
     });
 
@@ -433,12 +442,12 @@ void main() {
       await tester.pumpComposer(const _Specimen(busy: true));
       await tester.pump();
 
-      final ElButton last = tester.widget<ElButton>(find.byType(ElButton).last);
+      final Button last = tester.widget<Button>(find.byType(Button).last);
       expect(last.label, 'Stop');
-      expect(last.variant, ElButtonVariant.outline);
+      expect(last.variant, ButtonVariant.outline);
       // A stop is always pressable — that is the point of it.
       expect(last.onPressed, isNotNull);
-      expect(tester.getSize(find.byType(ElButton).last), const Size(32, 32));
+      expect(tester.getSize(find.byType(Button).last), const Size(32, 32));
     });
 
     testWidgets('disabled dims the input alone and refuses send', (
@@ -447,16 +456,13 @@ void main() {
       await tester.pumpComposer(const _Specimen(disabled: true));
       await tester.pump();
 
-      expect(ElAgentComposer.disabledInputOpacity, 0.60);
+      expect(AgentComposer.disabledInputOpacity, 0.60);
       final Iterable<double> opacities = tester
           .widgetList<Opacity>(find.byType(Opacity))
           .map((Opacity o) => o.opacity);
-      expect(opacities, contains(ElAgentComposer.disabledInputOpacity));
+      expect(opacities, contains(AgentComposer.disabledInputOpacity));
 
-      expect(
-        tester.widget<ElButton>(find.byType(ElButton).last).onPressed,
-        isNull,
-      );
+      expect(tester.widget<Button>(find.byType(Button).last).onPressed, isNull);
       // The geometry does not move: a disabled composer is 96 too.
       expect(_heightOf(tester, _shell), closeTo(96, _tolerance));
     });
@@ -508,8 +514,7 @@ void main() {
       await tester.pump();
 
       final Finder remove = find.byWidgetPredicate(
-        (Widget w) =>
-            w is ElButton && w.label == 'Remove collection-export.csv',
+        (Widget w) => w is Button && w.label == 'Remove collection-export.csv',
       );
       expect(remove, findsOneWidget);
       await tester.tap(remove);
@@ -552,9 +557,9 @@ void main() {
       final double closed = _heightOf(tester, _shell);
 
       await _type(tester, '/');
-      await tester.pump(ElDurations.slow);
+      await tester.pump(MotionDurations.slow);
       expect(
-        tester.getSize(find.byType(ElAgentComposer)).height,
+        tester.getSize(find.byType(AgentComposer)).height,
         closeTo(closed, _tolerance),
         reason: '`absolute bottom-full` is out of flow',
       );
@@ -595,7 +600,7 @@ void main() {
       expect(row, closeTo(53.675, _tolerance));
 
       // The box caps at `max-h-64`.
-      expect(ElAgentSlashPalette.maxHeight, 256);
+      expect(AgentSlashPalette.maxHeight, 256);
       expect(tester.getSize(_palette).height, closeTo(256, _tolerance));
       expect(tester.getSize(_palette).width, _width);
     });
@@ -607,9 +612,9 @@ void main() {
       await tester.pump();
       await _type(tester, '/');
 
-      expect(ElAgentSlashPalette.entrance, ElDurations.slow);
-      expect(ElAgentSlashPalette.entrance.inMilliseconds, 400);
-      expect(ElAgentSlashPalette.rise, 10);
+      expect(AgentSlashPalette.entrance, MotionDurations.slow);
+      expect(AgentSlashPalette.entrance.inMilliseconds, 400);
+      expect(AgentSlashPalette.rise, 10);
 
       double opacityNow() => tester
           .widgetList<Opacity>(
@@ -660,7 +665,7 @@ void main() {
 
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.pump();
-      expect(tester.widget<ElAgentSlashPalette>(_palette).activeIndex, 1);
+      expect(tester.widget<AgentSlashPalette>(_palette).activeIndex, 1);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pump();
@@ -679,10 +684,10 @@ void main() {
 
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
       await tester.pump();
-      expect(tester.widget<ElAgentSlashPalette>(_palette).activeIndex, 3);
+      expect(tester.widget<AgentSlashPalette>(_palette).activeIndex, 3);
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.pump();
-      expect(tester.widget<ElAgentSlashPalette>(_palette).activeIndex, 0);
+      expect(tester.widget<AgentSlashPalette>(_palette).activeIndex, 0);
     });
 
     testWidgets('Tab commits exactly as Enter does', (
@@ -705,11 +710,11 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.pump();
-      expect(tester.widget<ElAgentSlashPalette>(_palette).activeIndex, 2);
+      expect(tester.widget<AgentSlashPalette>(_palette).activeIndex, 2);
 
       await _type(tester, '/g');
       expect(
-        tester.widget<ElAgentSlashPalette>(_palette).activeIndex,
+        tester.widget<AgentSlashPalette>(_palette).activeIndex,
         0,
         reason: 'an index past the end of a shorter list is never painted',
       );
@@ -720,11 +725,11 @@ void main() {
     ) async {
       await tester.pumpComposer(
         const _Specimen(
-          commands: <ElAgentCommand>[
-            ElAgentCommand(
+          commands: <AgentCommand>[
+            AgentCommand(
               id: 'brief',
               label: 'brief',
-              group: ElAgentCommandGroup.skill,
+              group: AgentCommandGroup.skill,
               directive: 'Summarise the last week',
             ),
           ],
@@ -747,11 +752,11 @@ void main() {
       int ran = 0;
       await tester.pumpComposer(
         _Specimen(
-          commands: <ElAgentCommand>[
-            ElAgentCommand(
+          commands: <AgentCommand>[
+            AgentCommand(
               id: 'clear',
               label: 'clear',
-              group: ElAgentCommandGroup.command,
+              group: AgentCommandGroup.command,
               run: () => ran += 1,
             ),
           ],
@@ -799,12 +804,12 @@ void main() {
       await tester.pump();
 
       final Finder plus = find.byWidgetPredicate(
-        (Widget w) => w is ElButton && w.label == 'Add files or use a skill',
+        (Widget w) => w is Button && w.label == 'Add files or use a skill',
       );
       expect(plus, findsOneWidget);
       expect(tester.getSize(plus), const Size(32, 32));
       // `aria-haspopup="menu"` cancels the press scale on every menu trigger.
-      expect(tester.widget<ElButton>(plus).suppressPressScale, isTrue);
+      expect(tester.widget<Button>(plus).suppressPressScale, isTrue);
     });
 
     testWidgets('it lists Photos & files, a separator, Skills and the skills '
@@ -814,7 +819,7 @@ void main() {
 
       await tester.tap(
         find.byWidgetPredicate(
-          (Widget w) => w is ElButton && w.label == 'Add files or use a skill',
+          (Widget w) => w is Button && w.label == 'Add files or use a skill',
         ),
       );
       await _settleOverlay(tester);
@@ -837,14 +842,14 @@ void main() {
       await tester.pump();
       await tester.tap(
         find.byWidgetPredicate(
-          (Widget w) => w is ElButton && w.label == 'Add files or use a skill',
+          (Widget w) => w is Button && w.label == 'Add files or use a skill',
         ),
       );
       await _settleOverlay(tester);
 
-      expect(ElAgentAttachMenu.width, 320);
-      expect(ElAgentAttachMenu.maxHeight, 384);
-      expect(ElAgentAttachMenu.rowLinesHaveNoGap, isTrue);
+      expect(AgentAttachMenu.width, 320);
+      expect(AgentAttachMenu.maxHeight, 384);
+      expect(AgentAttachMenu.rowLinesHaveNoGap, isTrue);
     });
 
     testWidgets('DRIFT 5 — the menu row is 4px shorter than the palette row '
@@ -858,12 +863,12 @@ void main() {
       // the absolutes are pinned in `example/test/composer_page_test.dart`,
       // which does load them. A one-word hint cannot wrap under any face, so
       // the difference is stable here.
-      const List<ElAgentCommand> one = <ElAgentCommand>[
-        ElAgentCommand(
+      const List<AgentCommand> one = <AgentCommand>[
+        AgentCommand(
           id: 'stock',
           label: 'stock',
           hint: 'Stock',
-          group: ElAgentCommandGroup.skill,
+          group: AgentCommandGroup.skill,
         ),
       ];
       await tester.pumpComposer(
@@ -889,7 +894,7 @@ void main() {
       await _type(tester, '');
       await tester.tap(
         find.byWidgetPredicate(
-          (Widget w) => w is ElButton && w.label == 'Add files or use a skill',
+          (Widget w) => w is Button && w.label == 'Add files or use a skill',
         ),
       );
       await _settleOverlay(tester);
@@ -905,7 +910,7 @@ void main() {
           .height;
       // `py-2` around 19.5 + 14.175, and no gap at all.
       expect(menuRow, closeTo(49.675, _tolerance));
-      expect(paletteRow - menuRow, closeTo(el(1), 0.01));
+      expect(paletteRow - menuRow, closeTo(space(1), 0.01));
     });
 
     testWidgets('choosing a skill writes it in and closes the menu', (
@@ -915,7 +920,7 @@ void main() {
       await tester.pump();
       await tester.tap(
         find.byWidgetPredicate(
-          (Widget w) => w is ElButton && w.label == 'Add files or use a skill',
+          (Widget w) => w is Button && w.label == 'Add files or use a skill',
         ),
       );
       await _settleOverlay(tester);
@@ -929,11 +934,11 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpComposer(
-        const ElAgentAttachMenu(onRunCommand: _noop),
+        const AgentAttachMenu(onRunCommand: _noop),
         disableAnimations: true,
       );
       await tester.pump();
-      expect(find.byType(ElButton), findsNothing);
+      expect(find.byType(Button), findsNothing);
     });
   });
 
@@ -946,11 +951,10 @@ void main() {
       await tester.pumpComposer(const _DragHarness(), disableAnimations: true);
       await tester.pump();
 
-      final ElThemeData theme = ElTheme.of(
-        tester.element(find.byType(ElAgentComposer)),
+      final ThemeTokens theme = ThemeScope.of(
+        tester.element(find.byType(AgentComposer)),
       );
-      ElMachineSurface surface() =>
-          tester.widget<ElMachineSurface>(find.byType(ElMachineSurface).first);
+      Surface surface() => tester.widget<Surface>(find.byType(Surface).first);
 
       expect(surface().fill, theme.card);
 
@@ -959,14 +963,14 @@ void main() {
       );
       final TestGesture gesture = await tester.startGesture(start);
       await tester.pump();
-      await gesture.moveTo(tester.getCenter(find.byType(ElAgentComposer)));
+      await gesture.moveTo(tester.getCenter(find.byType(AgentComposer)));
       await tester.pump();
 
       expect(
         surface().fill,
-        theme.agent.withValues(alpha: ElAgentComposer.dragFillAlpha),
+        theme.agentAccent.withValues(alpha: AgentComposer.dragFillAlpha),
       );
-      expect(find.text(ElAgentComposer.dropPlaceholder), findsOneWidget);
+      expect(find.text(AgentComposer.dropPlaceholder), findsOneWidget);
 
       await gesture.up();
       await tester.pump();
@@ -989,14 +993,14 @@ void main() {
       );
       final TestGesture gesture = await tester.startGesture(start);
       await tester.pump();
-      await gesture.moveTo(tester.getCenter(find.byType(ElAgentComposer)));
+      await gesture.moveTo(tester.getCenter(find.byType(AgentComposer)));
       await tester.pump();
       await gesture.up();
       await tester.pump();
 
       expect(
         find.text(
-          'huge.bin — over the ${elFormatBytes(kElMaxFileBytes)} '
+          'huge.bin — over the ${formatBytes(maxFileBytes)} '
           'limit',
         ),
         findsOneWidget,
@@ -1032,7 +1036,7 @@ void main() {
           .getTopLeft(
             find.byWidgetPredicate(
               (Widget w) =>
-                  w is ElButton && w.label == 'Add files or use a skill',
+                  w is Button && w.label == 'Add files or use a skill',
             ),
           )
           .dx;
@@ -1042,18 +1046,15 @@ void main() {
       final double mic = tester
           .getTopLeft(find.byKey(const ValueKey<String>('mic')))
           .dx;
-      final double send = tester.getTopLeft(find.byType(ElButton).last).dx;
+      final double send = tester.getTopLeft(find.byType(Button).last).dx;
 
       expect(plus < accessory, isTrue);
       expect(accessory < mic, isTrue);
       expect(mic < send, isTrue);
       // `gap-1` between the plus and the accessory.
-      expect(
-        accessory - (plus + 32),
-        closeTo(ElAgentComposer.controlGap, 0.01),
-      );
+      expect(accessory - (plus + 32), closeTo(AgentComposer.controlGap, 0.01));
       // …and between the mic and send.
-      expect(send - (mic + 32), closeTo(ElAgentComposer.controlGap, 0.01));
+      expect(send - (mic + 32), closeTo(AgentComposer.controlGap, 0.01));
     });
 
     testWidgets('a dictation error prints under the shell at mt-2', (
@@ -1066,8 +1067,8 @@ void main() {
       await tester.pump();
       expect(find.text('Microphone blocked'), findsOneWidget);
       expect(
-        tester.getSize(find.byType(ElAgentComposer)).height,
-        closeTo(96 + ElAgentComposer.messageTopGap + 14.175, 1),
+        tester.getSize(find.byType(AgentComposer)).height,
+        closeTo(96 + AgentComposer.messageTopGap + 14.175, 1),
       );
     });
   });
@@ -1104,7 +1105,7 @@ void main() {
     testWidgets('DRIFT 4 — scrollIntoView indexes groups, not rows', (
       WidgetTester tester,
     ) async {
-      expect(ElAgentSlashPalette.scrollsGroupsNotRows, isTrue);
+      expect(AgentSlashPalette.scrollsGroupsNotRows, isTrue);
       await tester.pumpComposer(const _Specimen(), disableAnimations: true);
       await tester.pump();
       await _type(tester, '/');
@@ -1115,7 +1116,7 @@ void main() {
         await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       }
       await tester.pump();
-      expect(tester.widget<ElAgentSlashPalette>(_palette).activeIndex, 3);
+      expect(tester.widget<AgentSlashPalette>(_palette).activeIndex, 3);
       final ScrollableState scroller = tester.state<ScrollableState>(
         find.descendant(of: _palette, matching: find.byType(Scrollable)),
       );
@@ -1133,11 +1134,11 @@ void main() {
       await tester.pump();
       await _type(tester, '/');
 
-      final Rect composer = tester.getRect(find.byType(ElAgentComposer));
+      final Rect composer = tester.getRect(find.byType(AgentComposer));
       final Rect palette = tester.getRect(_palette);
       expect(
         palette.bottom,
-        closeTo(composer.top - el(2), _tolerance),
+        closeTo(composer.top - space(2), _tolerance),
         reason: '`bottom-full mb-2`',
       );
       expect(
@@ -1152,7 +1153,7 @@ void main() {
   });
 }
 
-void _noop(ElAgentCommand command) {}
+void _noop(AgentCommand command) {}
 
 /// A `Draggable` beside a composer, so the drop target can be driven.
 class _DragHarness extends StatefulWidget {
@@ -1166,7 +1167,7 @@ class _DragHarness extends StatefulWidget {
 
 class _DragHarnessState extends State<_DragHarness> {
   final TextEditingController controller = TextEditingController();
-  List<ElAgentAttachment> attachments = <ElAgentAttachment>[];
+  List<AgentAttachment> attachments = <AgentAttachment>[];
 
   @override
   void dispose() {
@@ -1174,19 +1175,19 @@ class _DragHarnessState extends State<_DragHarness> {
     super.dispose();
   }
 
-  ElAgentAttachment get _payload => widget.oversize
-      ? ElAgentAttachment(
+  AgentAttachment get _payload => widget.oversize
+      ? AgentAttachment(
           id: 'huge',
           name: 'huge.bin',
           mime: 'application/octet-stream',
-          kind: ElAgentAttachmentKind.other,
-          size: kElMaxFileBytes + 1,
+          kind: AgentAttachmentKind.other,
+          size: maxFileBytes + 1,
         )
-      : const ElAgentAttachment(
+      : const AgentAttachment(
           id: 'dropped',
           name: 'dropped.csv',
           mime: 'text/csv',
-          kind: ElAgentAttachmentKind.data,
+          kind: AgentAttachmentKind.data,
           size: 2048,
         );
 
@@ -1194,9 +1195,9 @@ class _DragHarnessState extends State<_DragHarness> {
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      Draggable<List<ElAgentAttachment>>(
+      Draggable<List<AgentAttachment>>(
         key: const ValueKey<String>('drag-source'),
-        data: <ElAgentAttachment>[_payload],
+        data: <AgentAttachment>[_payload],
         feedback: const SizedBox(width: 10, height: 10),
         // A bare SizedBox has nothing to hit-test; the drag would never
         // start.
@@ -1205,16 +1206,16 @@ class _DragHarnessState extends State<_DragHarness> {
           child: SizedBox(width: 40, height: 40),
         ),
       ),
-      ElAgentComposer(
+      AgentComposer(
         controller: controller,
         onSubmit: () {},
         attachments: attachments,
-        onAttach: (List<ElAgentAttachment> files) => setState(
-          () => attachments = <ElAgentAttachment>[...attachments, ...files],
+        onAttach: (List<AgentAttachment> files) => setState(
+          () => attachments = <AgentAttachment>[...attachments, ...files],
         ),
         onRemoveAttachment: (String id) => setState(
           () => attachments = attachments
-              .where((ElAgentAttachment a) => a.id != id)
+              .where((AgentAttachment a) => a.id != id)
               .toList(),
         ),
       ),

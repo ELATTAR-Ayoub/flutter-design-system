@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/carousel.dart",
+      "source": "lib/src/components/ui/carousel.dart",
       "target": "@ui/carousel.dart",
-      "sha256": "8884161aaad1297b5341d245d529d6687dfdfa74e70d419f3c8d11eb5ddb7407"
+      "sha256": "d6c2c051bac1cba92d8d568934210c0f915a3f65b6e0c164c1ed1747daf5267c"
     }
   ],
   "registryDependencies": [
@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/carousel",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/carousel.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/carousel.dart",
   "deprecated": false
 }

@@ -26,7 +26,33 @@ import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_file_tree.dart';
 import 'package:example/skills_docs/catalog.dart';
 import 'package:example/skills_docs/skills_page.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -42,23 +68,23 @@ Directory get _skillDirectory =>
 
 final SkillDocEntry _entry = skillDoc('elattar-flutter-ui-director');
 
-Future<ElThemeController> _pumpSkills(
+Future<ThemeController> _pumpSkills(
   WidgetTester tester, {
   SkillDocEntry? entry,
   Map<String, String> fileSource = const <String, String>{},
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -298,8 +324,8 @@ void main() {
           );
           expect(card, findsOneWidget, reason: route.id);
 
-          final ElBadge rendered = tester.widget<ElBadge>(
-            find.descendant(of: card, matching: find.byType(ElBadge)),
+          final Badge rendered = tester.widget<Badge>(
+            find.descendant(of: card, matching: find.byType(Badge)),
           );
           expect(
             rendered.label,
@@ -412,7 +438,7 @@ void main() {
     testWidgets('renders the same structure on light', (
       WidgetTester tester,
     ) async {
-      await _pumpSkills(tester, mode: ElThemeMode.light);
+      await _pumpSkills(tester, mode: ColorMode.light);
 
       expect(find.text(_entry.title), findsWidgets);
       expect(find.byType(DocsFileTree), findsOneWidget);
@@ -422,7 +448,7 @@ void main() {
     testWidgets('renders the same structure on dark', (
       WidgetTester tester,
     ) async {
-      await _pumpSkills(tester, mode: ElThemeMode.dark);
+      await _pumpSkills(tester, mode: ColorMode.dark);
 
       expect(find.text(_entry.title), findsWidgets);
       expect(find.byType(DocsFileTree), findsOneWidget);
@@ -432,14 +458,14 @@ void main() {
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpSkills(
+      final ThemeController theme = await _pumpSkills(
         tester,
-        mode: ElThemeMode.dark,
+        mode: ColorMode.dark,
       );
 
       expect(find.text(_entry.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
       expect(find.text(_entry.title), findsWidgets);

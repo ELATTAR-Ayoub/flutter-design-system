@@ -23,10 +23,10 @@ const ComponentDocEntry sliderDoc = ComponentDocEntry(
   // dependencies rather than claimed as CLI-resolvable ones.
   dependencies: <String>[
     'button',
-    'machine-surface',
+    'surface',
     'selection-control',
     'source-foundation',
   ],
-  exports: <String>['ElSlider'],
+  exports: <String>['Slider'],
   sourcePath: 'lib/src/components/slider.dart',
 );

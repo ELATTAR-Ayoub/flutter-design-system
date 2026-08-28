@@ -7,22 +7,34 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/bubble.dart",
+      "source": "lib/src/components/ui/bubble.dart",
       "target": "@ui/bubble.dart",
-      "sha256": "b4594444c7f475560276c4ee679feb5e4ef76e9b7274009dc9dddd59d18eb72f"
+      "sha256": "0741d815a987e9acafe20e52bff4014629a2289e5873110d1b15722af69a52c4"
     }
   ],
   "registryDependencies": [
-    "press-motion",
+    "press",
     "source-foundation"
   ],
   "semanticDependencies": [
-    "press-motion"
+    "press"
   ],
   "pubDependencies": {},
   "assets": [],
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/bubble",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/bubble.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/bubble.dart",
+  "exports": [
+    "Bubble",
+    "BubbleAlign",
+    "BubbleAlignScope",
+    "BubbleContent",
+    "BubbleGroup",
+    "BubbleReaction",
+    "BubbleReactions",
+    "BubbleSide",
+    "BubbleVariant",
+    "ShowCount"
+  ]
 }

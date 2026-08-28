@@ -8,7 +8,7 @@ library;
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart' show ScrollController, ScrollPosition;
 
 /// The one attached position, or null before the reading column has laid out.
 ///

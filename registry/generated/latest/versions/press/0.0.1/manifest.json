@@ -1,0 +1,27 @@
+{
+  "name": "press",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "Reusable press interaction wrapper for token-backed scale and feedback behavior.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/press.dart",
+      "target": "@ui/press.dart",
+      "sha256": "addebeda95e3e1e9b3b5159d676b43f113d929f02bc9241321cb59a6ba848220"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/press",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/press.dart",
+  "deprecated": false
+}

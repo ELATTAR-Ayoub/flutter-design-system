@@ -55,7 +55,7 @@ The first public release. Elattar becomes something a stranger can install.
 
 * **The public API is `El*` throughout.** All maintained package, example,
   registry, CLI, test, documentation and skill surfaces use the `El*` prefix
-  and the `el(...)` spacing helper. A hard rename with no compatibility
+  and the `space(...)` spacing helper. A hard rename with no compatibility
   aliases, because `0.0.1` had not been published.
 * **The registry covers the full component surface**: 99 items — 84
   components, 9 effects, 5 motion, 1 foundation — at schema v1.
@@ -112,7 +112,7 @@ running reference at 1440×900 in both themes.
 
 * Foundation: colors (OKLab/OKLCH with chroma-reduction gamut mapping, ink
   contract), typography (reference font binaries, variable axes), spacing,
-  radii, shadows (CSS-blur-exact), motion tokens (`elAnimationDuration`
+  radii, shadows (CSS-blur-exact), motion tokens (`effectiveMotionDuration`
   reduced-motion resolver), path-drawn icon registry.
 * Effects: machine surface (inset shadows), page glow, sheen, foil, glass.
 * Motion: lift/press, sliding pill, keyframe player (linear-t, per-gap
@@ -138,7 +138,7 @@ running reference at 1440×900 in both themes.
 * Base families complete (2026-08-16): selects/pickers, selection, dialogs & overlays, menus, navigation, feedback, chat, data display, charts, layout primitives, sidebar - 21 gallery pages at rig-verified height parity, 1074 package + 624 example tests, full generated Lucide registry.
 
 * Toaster, compact anchor (2026-08-16) - **the one deliberate departure from
-  the reference.** `ElToaster` is now width-responsive: at or below sonner's own
+  the reference.** `Toaster` is now width-responsive: at or below sonner's own
   `@media (max-width: 600px)` breakpoint the stack anchors to the TOP of the
   screen, grows downward, enters from the top edge and takes its swipe-dismiss
   direction from that anchor. Top placement on small screens was ordered;
@@ -156,14 +156,14 @@ running reference at 1440×900 in both themes.
   reading-column parity inside the probe's half-pixel band and none of them
   needing a named residual (largest, transcript, +0.14). 1398 package + 779
   example tests. Three primitives grew the slot their agent call site had been
-  reporting rather than forking: `ElButtonSurface.hoverBorder` (the fifth
+  reporting rather than forking: `ButtonStyleRecipe.hoverBorder` (the fifth
   class-list override - `hover:border-agent/50` on the launcher pill and on the
   welcome card's capability chips, springing on `btn-spring`'s own clock because
-  the border colour was already carried there), `ElMenuItem.subtitle` (the model
-  picker's `flex-col items-start gap-1`, on `ElCommandItem.subtitle`'s terms and
+  the border colour was already carried there), `MenuItem.subtitle` (the model
+  picker's `flex-col items-start gap-1`, on `CommandItem.subtitle`'s terms and
   4px taller for the gap a command row does not write), and the twelve
   `--agent-cube-*` tokens, which moved out of `agent_avatar.dart` into
-  `foundation/theme.dart` as `ElThemeData.cube` - the same follow-up
+  `foundation/theme.dart` as `ThemeTokens.cube` - the same follow-up
   `bloom_cosmic.dart` closed, one family over. Foundations, Base and Agent are
   all built; the placeholder is now reachable only from Site.
 

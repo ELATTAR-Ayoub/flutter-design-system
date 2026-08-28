@@ -1,8 +1,8 @@
 /// `/design-system/components/base/selection`: four control families, and
 /// seventeen of the twenty specimens answer a pointer.
 ///
-/// The page the fourth family arrives on. `ElCheckbox`, `ElRadioGroup` and
-/// `ElSwitch` all shipped with `forms`; `ElSlider` is new here, and so are the
+/// The page the fourth family arrives on. `Checkbox`, `RadioGroup` and
+/// `Switch` all shipped with `forms`; `Slider` is new here, and so are the
 /// three matrix states none of the shipped controls could spell (ruling S4).
 ///
 /// **The fidelity bar is that it moves.** A reader can tick a filter, flip a
@@ -15,7 +15,7 @@
 /// The bulk header and the option card are compositions the reference builds
 /// inline out of `div`s and a raw `Label`; neither is exported from
 /// `components/ui/`. They stay here until a second page wants them: the B10
-/// precedent. [_BulkList] in particular **cannot** reuse `ElDividedList`:
+/// precedent. [_BulkList] in particular **cannot** reuse `DividedList`:
 /// that fills with `theme.card` and draws each seam as a border on the row,
 /// which is `divide-y`. This container declares no background at all, so its
 /// `space-y-px` seams are the *parent* showing through, and every row supplies
@@ -30,7 +30,7 @@
 ///     panel: and `API` and `Rules` get no chip. On `forms` the two lists were
 ///     identical. Both render as written.
 ///  2. **The page calls a 20px control "16px", twice**, §2's trailing
-///     paragraph and §6's second do. Both `ElCheckbox` and `ElRadioGroupItem`
+///     paragraph and §6's second do. Both `Checkbox` and `RadioGroupItem`
 ///     are `size-5` = 20px, and `checkbox.tsx`'s own docstring gives *"16px is
 ///     a fiddly target"* as the reason they are not. The copy quotes the number
 ///     the component was built to escape.
@@ -46,7 +46,7 @@
 ///     selector can reach them. Flutter has no id graph, so this one is
 ///     recorded and not reproducible.
 ///  5. **`duration-fast` / `duration-base` are inert system-wide**: closed by
-///     the sweep; every transition here runs [ElDurations.transitionDefault].
+///     the sweep; every transition here runs [MotionDurations.normal].
 ///  6. **The Focus cells are painted, not focused.** `cn()` is
 ///     `extendTailwindMerge` and `border-input` / `border-ring` are one
 ///     border-colour group, so tw-merge deletes `border-input` outright.
@@ -55,7 +55,7 @@
 ///     `forceFocusRing` is for. The note still says *"Tab to it"*.
 ///  7. **The Indeterminate cell is inert and undimmed**: controlled with no
 ///     handler, carrying no `disabled`. It looks operable, is not, and gives no
-///     signal. `ElCheckbox.inert` is that state.
+///     signal. `Checkbox.inert` is that state.
 ///  8. **The slider's range and thumb use different coordinate spaces**, and so
 ///     does its own drag mapping. Carried by `slider.dart`.
 ///  9. **The slider's hit expander disagrees with its three siblings** —
@@ -78,7 +78,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -123,11 +135,11 @@ Widget _measured(double maxWidth, Widget child) => Align(
 );
 
 /// `w-40`: the three slider matrix cells.
-final double _matrixSlider = el(40);
+final double _matrixSlider = space(40);
 
 /// `bg-action/12`: the selected tint, on a bulk row and on a chosen card.
 ///
-/// Read off [ElPalette.action] rather than `theme.primary` (ruling S3). The two
+/// Read off [Palette.action] rather than `theme.primary` (ruling S3). The two
 /// are numerically identical today, `--primary` is `var(--color-action)` in
 /// **both** theme blocks: but they are different names for different jobs, and
 /// `--ring` already proves the aliases can diverge per theme. The page says
@@ -165,12 +177,12 @@ class SelectionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('base', 'selection');
+    final CategoryHit here = findCategory('base', 'selection');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // DRIFT 1 of the forms register, carried on all fourteen base pages:
           // the group is already called "Base Components" and the page
           // interpolates a second literal after a U+00B7 anyway.
@@ -182,8 +194,8 @@ class SelectionPage extends StatelessWidget {
         // `className="mb-12"`, 48px, and the only ported page that opens with
         // a Note above its first section.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: const ElNote(
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: const Note(
             title: 'Which control for which job',
             child: _WhichControlBody(),
           ),
@@ -194,7 +206,7 @@ class SelectionPage extends StatelessWidget {
         const _SliderSection(),
         const _ApiSection(),
         const _RulesSection(),
-        const ElPageFootNav(groupId: 'base', slug: 'selection'),
+        const PageFootNav(groupId: 'base', slug: 'selection'),
       ],
     );
   }
@@ -207,11 +219,11 @@ class _WhichControlBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final TextStyle base = ElText.styleOf(context, ElType.small);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final TextStyle base = StyledText.styleOf(context, TextStyles.small);
     final TextStyle strong = _strong(base).copyWith(color: theme.foreground);
 
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           TextSpan(text: 'Checkbox', style: strong),
@@ -232,7 +244,7 @@ class _WhichControlBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -249,9 +261,9 @@ class _CheckboxSection extends StatefulWidget {
 class _CheckboxSectionState extends State<_CheckboxSection> {
   /// Matrix cells 1, 2 and 4 are uncontrolled on the reference, so a click
   /// really does toggle them. Cell 4 additionally paints a permanent ring.
-  ElCheckboxState _unchecked = ElCheckboxState.unchecked;
-  ElCheckboxState _checked = ElCheckboxState.checked;
-  ElCheckboxState _focus = ElCheckboxState.unchecked;
+  CheckboxState _unchecked = CheckboxState.unchecked;
+  CheckboxState _checked = CheckboxState.checked;
+  CheckboxState _focus = CheckboxState.unchecked;
 
   /// `defaultChecked` on the first two rows of the filter list.
   final List<bool> _filters = <bool>[true, true, false, false];
@@ -280,9 +292,9 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'checkbox',
       title: 'Checkbox',
       description:
@@ -291,76 +303,76 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElStateGrid(
+          StateGrid(
             cols: 6,
             children: <Widget>[
-              ElStateCell(
+              StateCell(
                 label: 'Unchecked',
-                child: ElCheckbox(
+                child: Checkbox(
                   state: _unchecked,
                   label: 'Unchecked',
-                  onChanged: (ElCheckboxState next) =>
+                  onChanged: (CheckboxState next) =>
                       setState(() => _unchecked = next),
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'Checked',
-                child: ElCheckbox(
+                child: Checkbox(
                   state: _checked,
                   label: 'Checked',
-                  onChanged: (ElCheckboxState next) =>
+                  onChanged: (CheckboxState next) =>
                       setState(() => _checked = next),
                 ),
               ),
-              const ElStateCell(
+              const StateCell(
                 label: 'Indeterminate',
                 note: 'Partial bulk selection',
                 // DRIFT 7. `checked="indeterminate"` with no
                 // `onCheckedChange` and no `disabled`: Radix holds it here
                 // forever, at full opacity, still focusable, and a click does
                 // nothing at all.
-                child: ElCheckbox(
-                  state: ElCheckboxState.indeterminate,
+                child: Checkbox(
+                  state: CheckboxState.indeterminate,
                   inert: true,
                   label: 'Indeterminate',
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'Focus',
                 note: 'Tab to it',
                 // DRIFT 6. The ring is painted, not focused: and the box is
                 // still a live, uncontrolled checkbox underneath it.
-                child: ElCheckbox(
+                child: Checkbox(
                   state: _focus,
                   forceFocusRing: true,
                   label: 'Focus',
-                  onChanged: (ElCheckboxState next) =>
+                  onChanged: (CheckboxState next) =>
                       setState(() => _focus = next),
                 ),
               ),
-              const ElStateCell(
+              const StateCell(
                 label: 'Disabled',
-                child: ElCheckbox(enabled: false, label: 'Disabled'),
+                child: Checkbox(enabled: false, label: 'Disabled'),
               ),
-              const ElStateCell(
+              const StateCell(
                 label: 'Disabled checked',
-                child: ElCheckbox(
-                  state: ElCheckboxState.checked,
+                child: Checkbox(
+                  state: CheckboxState.checked,
                   enabled: false,
                   label: 'Disabled checked',
                 ),
               ),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'In a filter list',
             child: _measured(
               _measureSm,
-              ElFieldSet(
+              FieldSet(
                 children: <Widget>[
-                  const ElFieldLegend('Availability'),
-                  ElFieldGroup(
+                  const FieldLegend('Availability'),
+                  FieldGroup(
                     children: <Widget>[
                       for (int i = 0; i < _filterRows.length; i++)
                         _FilterRow(
@@ -376,8 +388,8 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
               ),
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Bulk selection header',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -388,31 +400,31 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
                     children: <Widget>[
                       _BulkRow(
                         fill: theme.muted,
-                        checkbox: const ElCheckbox(
-                          state: ElCheckboxState.indeterminate,
+                        checkbox: const Checkbox(
+                          state: CheckboxState.indeterminate,
                           inert: true,
                           label: 'Select all cards',
                         ),
                         title: '3 of 12 cards selected',
                         titleColor: theme.foreground,
-                        trailing: ElText(
+                        trailing: StyledText(
                           r'$2,481.00',
-                          ElType.numSm,
-                          color: theme.valueInk,
+                          TextStyles.numberSm,
+                          color: theme.premiumText,
                         ),
                       ),
                       for (int i = 0; i < _selectedCards.length; i++)
                         _BulkRow(
                           // DRIFT 3. A frozen literal, never a function of
                           // the checkbox beside it.
-                          fill: ElPalette.action.withValues(alpha: _actionTint),
-                          checkbox: ElCheckbox(
+                          fill: Palette.action.withValues(alpha: _actionTint),
+                          checkbox: Checkbox(
                             state: _bulk[i]
-                                ? ElCheckboxState.checked
-                                : ElCheckboxState.unchecked,
+                                ? CheckboxState.checked
+                                : CheckboxState.unchecked,
                             label: _selectedCards[i],
-                            onChanged: (ElCheckboxState next) => setState(
-                              () => _bulk[i] = next == ElCheckboxState.checked,
+                            onChanged: (CheckboxState next) => setState(
+                              () => _bulk[i] = next == CheckboxState.checked,
                             ),
                           ),
                           title: _selectedCards[i],
@@ -421,14 +433,14 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
                       for (int i = 0; i < _plainCards.length; i++)
                         _BulkRow(
                           fill: theme.background,
-                          checkbox: ElCheckbox(
+                          checkbox: Checkbox(
                             state: _bulk[_selectedCards.length + i]
-                                ? ElCheckboxState.checked
-                                : ElCheckboxState.unchecked,
+                                ? CheckboxState.checked
+                                : CheckboxState.unchecked,
                             label: _plainCards[i],
-                            onChanged: (ElCheckboxState next) => setState(
+                            onChanged: (CheckboxState next) => setState(
                               () => _bulk[_selectedCards.length + i] =
-                                  next == ElCheckboxState.checked,
+                                  next == CheckboxState.checked,
                             ),
                           ),
                           title: _plainCards[i],
@@ -438,13 +450,13 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
                   ),
                 ),
                 // `className="mt-5"`, 20px.
-                SizedBox(height: el(5)),
-                ElText(
+                SizedBox(height: space(5)),
+                StyledText(
                   'The indeterminate state is what makes a bulk header honest '
                   '— it says “some” rather than lying with checked '
                   'or unchecked. Selected rows also take the blue tint, so '
                   'selection reads without inspecting the box.',
-                  ElType.small,
+                  TextStyles.small,
                 ),
               ],
             ),
@@ -458,10 +470,10 @@ class _CheckboxSectionState extends State<_CheckboxSection> {
 /// One row of "In a filter list": a checkbox, a 400-weight label that grows
 /// into the slack, and a right-aligned count.
 ///
-/// Composed here rather than through `ElField(orientation: horizontal)`
-/// because the reference's `Field` holds **three** children and `ElField`
+/// Composed here rather than through `Field(orientation: horizontal)`
+/// because the reference's `Field` holds **three** children and `Field`
 /// holds a control and a label. The label takes the top rung of
-/// [ElFieldLabel]'s activation ladder: an explicit `onTap`: which is what
+/// [FieldLabel]'s activation ladder: an explicit `onTap`: which is what
 /// `<label for>` buys: clicking the words ticks the box.
 class _FilterRow extends StatelessWidget {
   const _FilterRow({
@@ -483,26 +495,26 @@ class _FilterRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        ElCheckbox(
-          state: checked ? ElCheckboxState.checked : ElCheckboxState.unchecked,
+        Checkbox(
+          state: checked ? CheckboxState.checked : CheckboxState.unchecked,
           label: label,
-          onChanged: (ElCheckboxState next) =>
-              onChanged(next == ElCheckboxState.checked),
+          onChanged: (CheckboxState next) =>
+              onChanged(next == CheckboxState.checked),
         ),
-        SizedBox(width: ElField.gap),
+        SizedBox(width: Field.gap),
         // `*:data-[slot=field-label]:flex-auto`: the label grows, which is
         // what makes the rest of the row a target.
         Expanded(
-          child: ElFieldLabel(
+          child: FieldLabel(
             label,
             // `className="font-normal"`, probed at weight 400 with the
             // label's own 1.375 leading intact.
-            spec: ElFieldLabel.normal,
+            spec: FieldLabel.normal,
             onTap: toggle,
           ),
         ),
         // `type-num-sm ml-auto text-muted-foreground`.
-        ElText(count, ElType.numSm),
+        StyledText(count, TextStyles.numberSm),
       ],
     );
   }
@@ -511,7 +523,7 @@ class _FilterRow extends StatelessWidget {
 /// `div.max-w-lg.space-y-px.overflow-hidden.rounded-lg.border.border-border`.
 ///
 /// **The seams are not a fill.** The container declares no background, so what
-/// shows in each `space-y-px` gap is whatever is behind it: the `ElPanel`'s
+/// shows in each `space-y-px` gap is whatever is behind it: the `Panel`'s
 /// own `--background`. `space-y-px` is a bottom **margin** on every child but
 /// the last, not a gap, and the measured height confirms it:
 /// 6 × 44 + 5 × 1 + 2 × 1 border = 271.
@@ -522,29 +534,29 @@ class _BulkList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       // The border's own pixel, top and bottom. [DecoratedBox] paints a border
       // without reserving space for it, and the reference's height only works
       // out with it: 6 × 44 + 5 × 1 + **2 × 1** = 271. Two pixels here move
       // every section below this one.
       child: Padding(
-        padding: EdgeInsets.all(ElWidths.hairline),
+        padding: EdgeInsets.all(BorderWidths.hairline),
         child: ClipRRect(
           // `overflow-hidden` against the border's inner edge, so the first and
           // last rows take the container's corners.
-          borderRadius: BorderRadius.circular(ElRadii.lg - ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.lg - BorderWidths.hairline),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               for (int i = 0; i < children.length; i++) ...<Widget>[
-                if (i > 0) SizedBox(height: ElWidths.hairline),
+                if (i > 0) SizedBox(height: BorderWidths.hairline),
                 children[i],
               ],
             ],
@@ -579,13 +591,15 @@ class _BulkRow extends StatelessWidget {
     return ColoredBox(
       color: fill,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
+        padding: EdgeInsets.symmetric(horizontal: space(4), vertical: space(3)),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             checkbox,
-            SizedBox(width: el(3)),
-            Expanded(child: ElText(title, ElType.small, color: titleColor)),
+            SizedBox(width: space(3)),
+            Expanded(
+              child: StyledText(title, TextStyles.small, color: titleColor),
+            ),
             ?trailing,
           ],
         ),
@@ -626,7 +640,7 @@ class _RadioSectionState extends State<_RadioSection> {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'radio',
       title: 'Radio Group',
       description:
@@ -636,37 +650,37 @@ class _RadioSectionState extends State<_RadioSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElStateGrid(
+          StateGrid(
             children: <Widget>[
-              ElStateCell(
+              StateCell(
                 label: 'Unselected',
-                child: ElRadioGroup<String>(
+                child: RadioGroup<String>(
                   value: _unselected,
                   onChanged: (String next) =>
                       setState(() => _unselected = next),
                   children: const <Widget>[
-                    ElRadioGroupItem<String>(value: 'a', label: 'Unselected'),
+                    RadioGroupItem<String>(value: 'a', label: 'Unselected'),
                   ],
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'Selected',
-                child: ElRadioGroup<String>(
+                child: RadioGroup<String>(
                   value: _selected,
                   onChanged: (String next) => setState(() => _selected = next),
                   children: const <Widget>[
-                    ElRadioGroupItem<String>(value: 'a', label: 'Selected'),
+                    RadioGroupItem<String>(value: 'a', label: 'Selected'),
                   ],
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'Focus',
                 // DRIFT 6 again: the second painted ring on the page.
-                child: ElRadioGroup<String>(
+                child: RadioGroup<String>(
                   value: _focus,
                   onChanged: (String next) => setState(() => _focus = next),
                   children: const <Widget>[
-                    ElRadioGroupItem<String>(
+                    RadioGroupItem<String>(
                       value: 'a',
                       forceFocusRing: true,
                       label: 'Focus',
@@ -674,13 +688,13 @@ class _RadioSectionState extends State<_RadioSection> {
                   ],
                 ),
               ),
-              const ElStateCell(
+              const StateCell(
                 label: 'Disabled',
-                child: ElRadioGroup<String>(
+                child: RadioGroup<String>(
                   value: null,
                   onChanged: null,
                   children: <Widget>[
-                    ElRadioGroupItem<String>(
+                    RadioGroupItem<String>(
                       value: 'a',
                       enabled: false,
                       label: 'Disabled',
@@ -690,19 +704,19 @@ class _RadioSectionState extends State<_RadioSection> {
               ),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Withdrawal method',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 _measured(
                   _measureLg,
-                  ElRadioGroup<String>(
+                  RadioGroup<String>(
                     value: _method,
                     // `className="max-w-lg gap-3"`: tw-merges over the Root's
                     // own `gap-2`.
-                    gap: el(3),
+                    gap: space(3),
                     onChanged: (String next) => setState(() => _method = next),
                     children: <Widget>[
                       for (final (
@@ -723,12 +737,12 @@ class _RadioSectionState extends State<_RadioSection> {
                     ],
                   ),
                 ),
-                SizedBox(height: el(5)),
+                SizedBox(height: space(5)),
                 // DRIFT 2. The circle is 20px.
-                ElText(
+                StyledText(
                   'The whole card is the target, not just the 16px circle. '
                   'Selected takes a blue border plus the blue tint.',
-                  ElType.small,
+                  TextStyles.small,
                 ),
               ],
             ),
@@ -742,10 +756,10 @@ class _RadioSectionState extends State<_RadioSection> {
 /// A withdrawal option: a raw `<Label>` wrapping a radio, and **the first
 /// hover state in this family**.
 ///
-/// `ElSelectionControl`'s own doc records that no control on the forms page
+/// `SelectionControl`'s own doc records that no control on the forms page
 /// authors a hover. That is still true of the *controls*; the card around one
 /// does. `hover:border-input` runs `transition-colors`: probed at
-/// [ElDurations.transitionDefault] on `--ease-out`, and confirmed by driving a
+/// [MotionDurations.normal] on `--ease-out`, and confirmed by driving a
 /// real pointer onto the card and sampling every frame: the border walks
 /// `--border` → `--input` across roughly fifteen frames rather than cutting.
 ///
@@ -784,18 +798,18 @@ class _OptionCardState extends State<_OptionCard> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     // `has-[[data-state=checked]]:border-action/50` beats `hover:border-input`
     //: it is emitted later at equal specificity, so a selected card does not
     // lose its rim to a pointer.
     final Color border = widget.selected
-        ? ElPalette.action.withValues(alpha: _actionRim)
+        ? Palette.action.withValues(alpha: _actionRim)
         : _hovered
         ? theme.input
         : theme.border;
     final Color fill = widget.selected
-        ? ElPalette.action.withValues(alpha: _actionTint)
+        ? Palette.action.withValues(alpha: _actionTint)
         : theme.card;
 
     return MouseRegion(
@@ -807,24 +821,24 @@ class _OptionCardState extends State<_OptionCard> {
         onTap: widget.onTap,
         child: TweenAnimationBuilder<Color?>(
           tween: ColorTween(end: border),
-          duration: elAnimationDuration(context, ElDurations.transitionDefault),
-          curve: ElCurves.out,
+          duration: effectiveMotionDuration(context, MotionDurations.normal),
+          curve: MotionCurves.enter,
           builder: (BuildContext context, Color? rim, Widget? child) =>
               TweenAnimationBuilder<Color?>(
                 tween: ColorTween(end: fill),
-                duration: elAnimationDuration(
+                duration: effectiveMotionDuration(
                   context,
-                  ElDurations.transitionDefault,
+                  MotionDurations.normal,
                 ),
-                curve: ElCurves.out,
+                curve: MotionCurves.enter,
                 builder: (BuildContext context, Color? wash, Widget? child) =>
                     DecoratedBox(
                       decoration: BoxDecoration(
                         color: wash ?? fill,
-                        borderRadius: BorderRadius.circular(ElRadii.lg),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                         border: Border.all(
                           color: rim ?? border,
-                          width: ElWidths.hairline,
+                          width: BorderWidths.hairline,
                         ),
                       ),
                       child: child,
@@ -839,7 +853,7 @@ class _OptionCardState extends State<_OptionCard> {
             // reserving space for it, [Container] adds `decoration.padding`
             // for its callers and this does not: so the hairline is added
             // here. Three cards deep, forgetting it costs the section 6px.
-            padding: EdgeInsets.all(el(4) + ElWidths.hairline),
+            padding: EdgeInsets.all(space(4) + BorderWidths.hairline),
             child: Row(
               // `items-start`: the card is the one row on the page that does
               // not centre.
@@ -847,26 +861,30 @@ class _OptionCardState extends State<_OptionCard> {
               children: <Widget>[
                 Padding(
                   // `className="mt-0.5"` on the item, 2px.
-                  padding: EdgeInsets.only(top: el(0.5)),
-                  child: ElRadioGroupItem<String>(
+                  padding: EdgeInsets.only(top: space(0.5)),
+                  child: RadioGroupItem<String>(
                     value: widget.value,
                     label: widget.title,
                   ),
                 ),
-                SizedBox(width: el(3)),
+                SizedBox(width: space(3)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      ElText(widget.title, ElType.h4, color: theme.foreground),
-                      SizedBox(height: el(1)),
-                      ElText(widget.description, ElType.small),
+                      StyledText(
+                        widget.title,
+                        TextStyles.h4,
+                        color: theme.foreground,
+                      ),
+                      SizedBox(height: space(1)),
+                      StyledText(widget.description, TextStyles.small),
                     ],
                   ),
                 ),
-                SizedBox(width: el(3)),
-                ElText(widget.fee, ElType.numSm),
+                SizedBox(width: space(3)),
+                StyledText(widget.fee, TextStyles.numberSm),
               ],
             ),
           ),
@@ -903,7 +921,7 @@ class _SwitchSectionState extends State<_SwitchSection> {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'switch',
       title: 'Switch',
       description:
@@ -913,35 +931,35 @@ class _SwitchSectionState extends State<_SwitchSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElStateGrid(
+          StateGrid(
             children: <Widget>[
-              ElStateCell(
+              StateCell(
                 label: 'Off',
-                child: ElSwitch(
+                child: Switch(
                   value: _off,
                   label: 'Off',
                   onChanged: (bool next) => setState(() => _off = next),
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'On',
-                child: ElSwitch(
+                child: Switch(
                   value: _on,
                   label: 'On',
                   onChanged: (bool next) => setState(() => _on = next),
                 ),
               ),
-              const ElStateCell(
+              const StateCell(
                 label: 'Disabled off',
-                child: ElSwitch(
+                child: Switch(
                   value: false,
                   enabled: false,
                   label: 'Disabled off',
                 ),
               ),
-              const ElStateCell(
+              const StateCell(
                 label: 'Disabled on',
-                child: ElSwitch(
+                child: Switch(
                   value: true,
                   enabled: false,
                   label: 'Disabled on',
@@ -949,12 +967,12 @@ class _SwitchSectionState extends State<_SwitchSection> {
               ),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Notification preferences',
             child: _measured(
               _measureLg,
-              ElFieldGroup(
+              FieldGroup(
                 children: <Widget>[
                   for (int i = 0; i < _preferences.length; i++)
                     _PreferenceRow(
@@ -977,7 +995,7 @@ class _SwitchSectionState extends State<_SwitchSection> {
 /// One preferences row: label and description on the left, switch on the
 /// right.
 ///
-/// The **opposite** order to `ElField`'s horizontal branch, which puts the
+/// The **opposite** order to `Field`'s horizontal branch, which puts the
 /// control first because all three horizontal fields on the `forms` page do.
 /// Here the reference writes `<span class="min-w-0 flex-1">` before the
 /// `<Switch/>`, so the control is last. Composed by hand for that reason.
@@ -1008,13 +1026,13 @@ class _PreferenceRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElFieldLabel(title, onTap: () => onChanged(!value)),
-              ElFieldDescription(description),
+              FieldLabel(title, onTap: () => onChanged(!value)),
+              FieldDescription(description),
             ],
           ),
         ),
-        SizedBox(width: ElField.gap),
-        ElSwitch(value: value, label: title, onChanged: onChanged),
+        SizedBox(width: Field.gap),
+        Switch(value: value, label: title, onChanged: onChanged),
       ],
     );
   }
@@ -1045,7 +1063,7 @@ class _SliderSectionState extends State<_SliderSection> {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'slider',
       title: 'Slider',
       description:
@@ -1055,7 +1073,7 @@ class _SliderSectionState extends State<_SliderSection> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           // The one Panel on the page with no `mt`.
-          ElPanel(
+          Panel(
             label: 'Price range filter',
             child: _measured(
               _measureMd,
@@ -1063,7 +1081,7 @@ class _SliderSectionState extends State<_SliderSection> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   _Readout(label: 'Price range', value: _priceReadout),
-                  ElSlider(
+                  Slider(
                     values: _price,
                     min: 0,
                     max: 500,
@@ -1073,20 +1091,20 @@ class _SliderSectionState extends State<_SliderSection> {
                         setState(() => _price = next),
                   ),
                   // `className="mt-3"`, 12px.
-                  SizedBox(height: el(3)),
+                  SizedBox(height: space(3)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      ElText(r'$0', ElType.numSm),
-                      ElText(r'$500', ElType.numSm),
+                      StyledText(r'$0', TextStyles.numberSm),
+                      StyledText(r'$500', TextStyles.numberSm),
                     ],
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Single value',
             child: _measured(
               _measureMd,
@@ -1098,7 +1116,7 @@ class _SliderSectionState extends State<_SliderSection> {
                     value: '${_odds.single.toInt()}%',
                   ),
                   // No `min`: the component defaults it to 0: and no footer.
-                  ElSlider(
+                  Slider(
                     values: _odds,
                     label: 'Auto-sell threshold',
                     onChanged: (List<double> next) =>
@@ -1108,15 +1126,15 @@ class _SliderSectionState extends State<_SliderSection> {
               ),
             ),
           ),
-          SizedBox(height: el(4)),
-          ElStateGrid(
+          SizedBox(height: space(4)),
+          StateGrid(
             cols: 3,
             children: <Widget>[
-              ElStateCell(
+              StateCell(
                 label: 'Default',
                 child: SizedBox(
                   width: _matrixSlider,
-                  child: ElSlider(
+                  child: Slider(
                     values: _default,
                     label: 'Default',
                     onChanged: (List<double> next) =>
@@ -1124,11 +1142,11 @@ class _SliderSectionState extends State<_SliderSection> {
                   ),
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'Range',
                 child: SizedBox(
                   width: _matrixSlider,
-                  child: ElSlider(
+                  child: Slider(
                     values: _range,
                     label: 'Range',
                     onChanged: (List<double> next) =>
@@ -1136,11 +1154,11 @@ class _SliderSectionState extends State<_SliderSection> {
                   ),
                 ),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'Disabled',
                 child: SizedBox(
                   width: _matrixSlider,
-                  child: ElSlider(
+                  child: Slider(
                     values: const <double>[40],
                     enabled: false,
                     label: 'Disabled',
@@ -1164,18 +1182,18 @@ class _Readout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Padding(
       // `mb-4`, 16px.
-      padding: EdgeInsets.only(bottom: el(4)),
+      padding: EdgeInsets.only(bottom: space(4)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          ElText(label, ElType.label),
-          ElText(value, ElType.numBase, color: theme.foreground),
+          StyledText(label, TextStyles.eyebrow),
+          StyledText(value, TextStyles.numberBase, color: theme.foreground),
         ],
       ),
     );
@@ -1189,11 +1207,11 @@ class _ApiSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ElSection(
+    return const Section(
       id: 'api',
       title: 'API',
-      child: ElMeta(
-        items: <ElMetaItem>[
+      child: Meta(
+        items: <MetaItem>[
           (
             k: 'Checkbox',
             v: TextSpan(
@@ -1247,7 +1265,7 @@ class _RulesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'rules',
       title: 'Rules',
       child: Column(
@@ -1255,7 +1273,7 @@ class _RulesSection extends StatelessWidget {
         children: <Widget>[
           // DRIFT 12. Five against four: the first `DoDont` in the corpus
           // whose columns are different lengths.
-          const ElDoDont(
+          const DoDont(
             dos: <String>[
               'Use indeterminate on a bulk-select header whenever some but '
                   'not all rows are selected.',
@@ -1276,8 +1294,8 @@ class _RulesSection extends StatelessWidget {
                   'change background too.',
             ],
           ),
-          SizedBox(height: el(4)),
-          const ElNote(child: _RulesNoteBody()),
+          SizedBox(height: space(4)),
+          const Note(child: _RulesNoteBody()),
         ],
       ),
     );
@@ -1289,11 +1307,11 @@ class _RulesNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Indeterminate is set with '),
-          ElCode.span('checked="indeterminate"'),
+          Code.span('checked="indeterminate"'),
           const TextSpan(
             text:
                 ', not a separate prop. Getting this wrong is the most '
@@ -1301,7 +1319,7 @@ class _RulesNoteBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }

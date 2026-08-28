@@ -12,15 +12,15 @@
 /// — this page had none before, only a merged "Accessibility and keyboard
 /// behavior" heading whose bullets, read closely, never actually named a key.
 /// The keyboard facts below are new prose, read directly off
-/// `lib/src/components/input_group.dart`, not inferred: `ElInputGroupButton`
-/// wires no `onKeyEvent` of its own (its `ElPress` wraps a bare
+/// `lib/src/components/input_group.dart`, not inferred: `InputGroupButton`
+/// wires no `onKeyEvent` of its own (its `Press` wraps a bare
 /// `GestureDetector.onTap`), so a focused addon button does not activate on
 /// Enter or Space — a real, documented gap, not a claim this page invents.
 ///
 /// **Split from a merged page.** Phase F/J's original `input_group` route
-/// documented three unrelated components on one page: `ElInputGroup`,
-/// `ElButtonGroup`, and `ElInputOtp`. This page covers `ElInputGroup` alone;
-/// `ElButtonGroup` moved to `../button_group/page.dart` and `ElInputOtp` to
+/// documented three unrelated components on one page: `InputGroup`,
+/// `ButtonGroup`, and `InputOtp`. This page covers `InputGroup` alone;
+/// `ButtonGroup` moved to `../button_group/page.dart` and `InputOtp` to
 /// `../input_otp/page.dart`, each its own route.
 ///
 /// **Against shadcn's own page**
@@ -30,23 +30,35 @@
 /// Text, Button, Kbd, Dropdown, Spinner, Textarea, Custom Input, RTL, API
 /// Reference (five nested tables). This page keeps Composition, Custom
 /// Input, and RTL under their own names. Align becomes Addon Position: only
-/// the two inline values are built (`ElInputGroupAlign` has no
-/// block-start/block-end; `ElInputGroupInput` is single-line, so a block
+/// the two inline values are built (`InputGroupAlign` has no
+/// block-start/block-end; `InputGroupInput` is single-line, so a block
 /// addon does not apply). Icon, Text, Button, Kbd, and Spinner are one
 /// shadcn addon TYPE each, but this port has no separate widget per type:
-/// they are all the same `ElInputGroupAddon.child` slot with different
+/// they are all the same `InputGroupAddon.child` slot with different
 /// content, so they stay merged under Addon Content rather than five
 /// near-duplicate sections. Dropdown gets its own small section, Dropdown
 /// Addon, as a manual code panel rather than a live specimen:
-/// `ElDropdownMenu` needs a real overlay ancestor this page's plain preview
+/// `DropdownMenu` needs a real overlay ancestor this page's plain preview
 /// column does not provide (see the dropdown_menu docs for the interactive
-/// version). Textarea is skipped honestly: there is no `ElInputGroupTextarea`
-/// in this port — `ElInput` gained a `bare` mode instead of a second
+/// version). Textarea is skipped honestly: there is no `InputGroupTextarea`
+/// in this port — `Input` gained a `bare` mode instead of a second
 /// addon-aware control being built.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -62,8 +74,7 @@ final ComponentDocSpec inputGroupDocSpec = ComponentDocSpec(
     ShowcaseSection(
       id: 'preview',
       title: 'Preview',
-      description:
-          'A password field whose trailing addon toggles obscureText.',
+      description: 'A password field whose trailing addon toggles obscureText.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
@@ -100,7 +111,7 @@ final ComponentDocSpec inputGroupDocSpec = ComponentDocSpec(
     SnippetSection(
       id: 'composition',
       title: 'Composition',
-      description: 'The widget hierarchy ElInputGroup builds on.',
+      description: 'The widget hierarchy InputGroup builds on.',
       code: _compositionCode,
     ),
     ShowcaseSection(
@@ -109,7 +120,7 @@ final ComponentDocSpec inputGroupDocSpec = ComponentDocSpec(
       description:
           'align selects which side the addon sits on: start (their '
           'inline-start) or end (their inline-end). There is no '
-          'block-start or block-end: ElInputGroupInput is single-line, so '
+          'block-start or block-end: InputGroupInput is single-line, so '
           'an addon above or below the control does not apply here.',
       specimen: _PositionSpecimen(),
       code: _positionCode,
@@ -130,7 +141,7 @@ final ComponentDocSpec inputGroupDocSpec = ComponentDocSpec(
       id: 'dropdown-addon',
       title: 'Dropdown addon',
       description:
-          'A ElDropdownMenu trigger fits the same addon slot. It is not '
+          'A DropdownMenu trigger fits the same addon slot. It is not '
           'rendered live on this page because it needs a real Overlay '
           'ancestor (see the dropdown_menu docs for the interactive '
           'version).',
@@ -140,10 +151,10 @@ final ComponentDocSpec inputGroupDocSpec = ComponentDocSpec(
       id: 'custom-input',
       title: 'Custom input',
       description:
-          'ElInputGroup.child accepts any widget, not only '
-          'ElInputGroupInput. There is no data-slot equivalent, though: a '
+          'InputGroup.child accepts any widget, not only '
+          'InputGroupInput. There is no data-slot equivalent, though: a '
           'custom control has to match the group\'s own 40px height and '
-          'padding tokens itself, ElInputGroup does not measure or resize '
+          'padding tokens itself, InputGroup does not measure or resize '
           'an unrecognised child for it.',
       code: _customInputCode,
     ),
@@ -162,29 +173,17 @@ final ComponentDocSpec inputGroupDocSpec = ComponentDocSpec(
           'directly off lib/src/components/input_group.dart: one table per '
           'class or enum.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElInputGroup', anchor: 'api-elinputgroup'),
+        DocsTocEntry(title: 'InputGroup', anchor: 'api-elinputgroup'),
+        DocsTocEntry(title: 'InputGroupInput', anchor: 'api-elinputgroupinput'),
+        DocsTocEntry(title: 'InputGroupAddon', anchor: 'api-elinputgroupaddon'),
+        DocsTocEntry(title: 'InputGroupText', anchor: 'api-elinputgrouptext'),
         DocsTocEntry(
-          title: 'ElInputGroupInput',
-          anchor: 'api-elinputgroupinput',
-        ),
-        DocsTocEntry(
-          title: 'ElInputGroupAddon',
-          anchor: 'api-elinputgroupaddon',
-        ),
-        DocsTocEntry(
-          title: 'ElInputGroupText',
-          anchor: 'api-elinputgrouptext',
-        ),
-        DocsTocEntry(
-          title: 'ElInputGroupButton',
+          title: 'InputGroupButton',
           anchor: 'api-elinputgroupbutton',
         ),
+        DocsTocEntry(title: 'InputGroupAlign', anchor: 'api-elinputgroupalign'),
         DocsTocEntry(
-          title: 'ElInputGroupAlign',
-          anchor: 'api-elinputgroupalign',
-        ),
-        DocsTocEntry(
-          title: 'ElInputGroupButtonSize',
+          title: 'InputGroupButtonSize',
           anchor: 'api-elinputgroupbuttonsize',
         ),
       ],
@@ -276,9 +275,9 @@ class InputGroupDocPage extends StatelessWidget {
       title: inputGroupDoc.title,
       description: inputGroupDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Input group'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Input group'),
     ],
     toc: inputGroupDocSpec.toc,
     previous: const DocsPageLink(title: 'Field', route: '/components/field'),
@@ -309,26 +308,26 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   @override
   Widget build(BuildContext context) => Center(
     child: SizedBox(
-      width: el(72),
+      width: space(72),
       key: const ValueKey<String>('input-group-doc-password-field'),
-      child: ElInputGroup(
-        endAddon: ElInputGroupAddon(
-          align: ElInputGroupAlign.end,
+      child: InputGroup(
+        endAddon: InputGroupAddon(
+          align: InputGroupAlign.end,
           holdsButton: true,
-          child: ElInputGroupButton(
+          child: InputGroupButton(
             key: const ValueKey<String>('input-group-doc-password-toggle'),
             label: _passwordVisible ? 'Hide password' : 'Show password',
             toggled: _passwordVisible,
             onPressed: () =>
                 setState(() => _passwordVisible = !_passwordVisible),
-            child: ElIcon(
-              _passwordVisible ? ElIconGlyph.eyeOff : ElIconGlyph.eye,
-              size: ElIconSize.sm,
-              tone: ElIconTone.inherit,
+            child: Icon(
+              _passwordVisible ? IconGlyph.eyeOff : IconGlyph.eye,
+              size: IconSize.sm,
+              tone: IconTone.inherit,
             ),
           ),
         ),
-        child: ElInputGroupInput(
+        child: InputGroupInput(
           placeholder: 'Enter password',
           obscureText: !_passwordVisible,
         ),
@@ -348,29 +347,29 @@ class _PositionSpecimen extends StatelessWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText('start', ElType.small),
-          SizedBox(height: el(2)),
-          ElInputGroup(
-            startAddon: ElInputGroupAddon(
-              align: ElInputGroupAlign.start,
-              child: ElInputGroupText('https://'),
+          StyledText('start', TextStyles.small),
+          SizedBox(height: space(2)),
+          InputGroup(
+            startAddon: InputGroupAddon(
+              align: InputGroupAlign.start,
+              child: InputGroupText('https://'),
             ),
-            child: ElInputGroupInput(placeholder: 'example.com'),
+            child: InputGroupInput(placeholder: 'example.com'),
           ),
         ],
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText('end', ElType.small),
-          SizedBox(height: el(2)),
-          ElInputGroup(
-            endAddon: ElInputGroupAddon(
-              align: ElInputGroupAlign.end,
-              child: ElInputGroupText('.com'),
+          StyledText('end', TextStyles.small),
+          SizedBox(height: space(2)),
+          InputGroup(
+            endAddon: InputGroupAddon(
+              align: InputGroupAlign.end,
+              child: InputGroupText('.com'),
             ),
-            child: ElInputGroupInput(placeholder: 'example'),
+            child: InputGroupInput(placeholder: 'example'),
           ),
         ],
       ),
@@ -386,62 +385,62 @@ class _ContentSpecimen extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElText('Search with leading icon and button', ElType.section),
-      SizedBox(height: el(2)),
-      ElInputGroup(
-        startAddon: ElInputGroupAddon(
-          align: ElInputGroupAlign.start,
-          child: ElIcon(
-            ElIconGlyph.search,
-            size: ElIconSize.md,
-            tone: ElIconTone.inherit,
+      StyledText('Search with leading icon and button', TextStyles.section),
+      SizedBox(height: space(2)),
+      InputGroup(
+        startAddon: InputGroupAddon(
+          align: InputGroupAlign.start,
+          child: Icon(
+            IconGlyph.search,
+            size: IconSize.md,
+            tone: IconTone.inherit,
           ),
         ),
-        endAddon: ElInputGroupAddon(
-          align: ElInputGroupAlign.end,
+        endAddon: InputGroupAddon(
+          align: InputGroupAlign.end,
           holdsButton: true,
-          child: ElInputGroupButton(
+          child: InputGroupButton(
             label: 'Clear',
             onPressed: () {},
-            child: const ElIcon(
-              ElIconGlyph.x,
-              size: ElIconSize.sm,
-              tone: ElIconTone.inherit,
+            child: const Icon(
+              IconGlyph.x,
+              size: IconSize.sm,
+              tone: IconTone.inherit,
             ),
           ),
         ),
-        child: ElInputGroupInput(placeholder: 'Search...'),
+        child: InputGroupInput(placeholder: 'Search...'),
       ),
-      SizedBox(height: el(4)),
-      ElText('Text addon: currency prefix', ElType.section),
-      SizedBox(height: el(2)),
-      ElInputGroup(
-        startAddon: ElInputGroupAddon(
-          align: ElInputGroupAlign.start,
-          child: ElInputGroupText('USD'),
+      SizedBox(height: space(4)),
+      StyledText('Text addon: currency prefix', TextStyles.section),
+      SizedBox(height: space(2)),
+      InputGroup(
+        startAddon: InputGroupAddon(
+          align: InputGroupAlign.start,
+          child: InputGroupText('USD'),
         ),
-        child: ElInputGroupInput(placeholder: '0.00'),
+        child: InputGroupInput(placeholder: '0.00'),
       ),
-      SizedBox(height: el(4)),
-      ElText('Kbd addon: keyboard shortcut', ElType.section),
-      SizedBox(height: el(2)),
-      ElInputGroup(
-        endAddon: ElInputGroupAddon(
-          align: ElInputGroupAlign.end,
-          child: const ElKbd('⌘K'),
+      SizedBox(height: space(4)),
+      StyledText('Kbd addon: keyboard shortcut', TextStyles.section),
+      SizedBox(height: space(2)),
+      InputGroup(
+        endAddon: InputGroupAddon(
+          align: InputGroupAlign.end,
+          child: const Kbd('⌘K'),
         ),
-        child: ElInputGroupInput(placeholder: 'Quick search'),
+        child: InputGroupInput(placeholder: 'Quick search'),
       ),
-      SizedBox(height: el(4)),
-      ElText('Spinner addon: loading state', ElType.section),
-      SizedBox(height: el(2)),
-      ElInputGroup(
-        endAddon: ElInputGroupAddon(
-          align: ElInputGroupAlign.end,
-          child: ElSpinner(size: ElIcon.pxFor(ElIconSize.sm)),
+      SizedBox(height: space(4)),
+      StyledText('Spinner addon: loading state', TextStyles.section),
+      SizedBox(height: space(2)),
+      InputGroup(
+        endAddon: InputGroupAddon(
+          align: InputGroupAlign.end,
+          child: Spinner(size: Icon.pxFor(IconSize.sm)),
         ),
         enabled: false,
-        child: ElInputGroupInput(placeholder: 'Checking availability...'),
+        child: InputGroupInput(placeholder: 'Checking availability...'),
       ),
     ],
   );
@@ -455,12 +454,12 @@ class _RtlSpecimen extends StatelessWidget {
     textDirection: TextDirection.rtl,
     child: SizedBox(
       width: 260,
-      child: ElInputGroup(
-        startAddon: ElInputGroupAddon(
-          align: ElInputGroupAlign.start,
-          child: ElInputGroupText('بحث'),
+      child: InputGroup(
+        startAddon: InputGroupAddon(
+          align: InputGroupAlign.start,
+          child: InputGroupText('بحث'),
         ),
-        child: ElInputGroupInput(placeholder: 'ابحث هنا'),
+        child: InputGroupInput(placeholder: 'ابحث هنا'),
       ),
     ),
   );
@@ -468,89 +467,89 @@ class _RtlSpecimen extends StatelessWidget {
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
 
-const String _previewCode = '''ElInputGroup(
-  endAddon: ElInputGroupAddon(
-    align: ElInputGroupAlign.end,
+const String _previewCode = '''InputGroup(
+  endAddon: InputGroupAddon(
+    align: InputGroupAlign.end,
     holdsButton: true,
-    child: ElInputGroupButton(
+    child: InputGroupButton(
       label: 'Show password',
       onPressed: () {},
-      child: const ElIcon(ElIconGlyph.eye, size: ElIconSize.sm),
+      child: const Icon(IconGlyph.eye, size: IconSize.sm),
     ),
   ),
-  child: ElInputGroupInput(
+  child: InputGroupInput(
     placeholder: 'Enter password',
     obscureText: true,
   ),
 )''';
 
-const String _usageCode = '''ElInputGroup(
-  child: ElInputGroupInput(
+const String _usageCode = '''InputGroup(
+  child: InputGroupInput(
     placeholder: 'https://',
   ),
-  startAddon: ElInputGroupAddon(
-    align: ElInputGroupAlign.start,
-    child: ElInputGroupText('https://'),
+  startAddon: InputGroupAddon(
+    align: InputGroupAlign.start,
+    child: InputGroupText('https://'),
   ),
 )''';
 
-const String _compositionCode = '''ElInputGroup
-├── startAddon: ElInputGroupAddon (align: start)
-│   └── ElIcon / ElInputGroupText / ElInputGroupButton
-├── child: ElInputGroupInput
-└── endAddon: ElInputGroupAddon (align: end)
-    └── ElIcon / ElInputGroupText / ElInputGroupButton''';
+const String _compositionCode = '''InputGroup
+├── startAddon: InputGroupAddon (align: start)
+│   └── Icon / InputGroupText / InputGroupButton
+├── child: InputGroupInput
+└── endAddon: InputGroupAddon (align: end)
+    └── Icon / InputGroupText / InputGroupButton''';
 
-const String _positionCode = '''ElInputGroup(
-  startAddon: ElInputGroupAddon(
-    align: ElInputGroupAlign.start,
-    child: ElInputGroupText('https://'),
+const String _positionCode = '''InputGroup(
+  startAddon: InputGroupAddon(
+    align: InputGroupAlign.start,
+    child: InputGroupText('https://'),
   ),
-  child: ElInputGroupInput(placeholder: 'example.com'),
+  child: InputGroupInput(placeholder: 'example.com'),
 )''';
 
-const String _contentCode = '''ElInputGroup(
-  startAddon: ElInputGroupAddon(
-    align: ElInputGroupAlign.start,
-    child: const ElIcon(ElIconGlyph.search, size: ElIconSize.md),
+const String _contentCode = '''InputGroup(
+  startAddon: InputGroupAddon(
+    align: InputGroupAlign.start,
+    child: const Icon(IconGlyph.search, size: IconSize.md),
   ),
-  endAddon: ElInputGroupAddon(
-    align: ElInputGroupAlign.end,
+  endAddon: InputGroupAddon(
+    align: InputGroupAlign.end,
     holdsButton: true,
-    child: ElInputGroupButton(
+    child: InputGroupButton(
       label: 'Clear',
       onPressed: () {},
-      child: const ElIcon(ElIconGlyph.x, size: ElIconSize.sm),
+      child: const Icon(IconGlyph.x, size: IconSize.sm),
     ),
   ),
-  child: ElInputGroupInput(placeholder: 'Search...'),
+  child: InputGroupInput(placeholder: 'Search...'),
 )''';
 
-const String _dropdownAddonCode = '''ElInputGroup(
-  endAddon: ElInputGroupAddon(
-    align: ElInputGroupAlign.end,
+const String _dropdownAddonCode = '''InputGroup(
+  endAddon: InputGroupAddon(
+    align: InputGroupAlign.end,
     holdsButton: true,
-    child: ElDropdownMenu(
+    child: DropdownMenu(
       // ...trigger and items
     ),
   ),
-  child: ElInputGroupInput(placeholder: 'Filter...'),
+  child: InputGroupInput(placeholder: 'Filter...'),
 )''';
 
-const String _customInputCode = '''ElInputGroup(
-  // Any widget is legal here, not only ElInputGroupInput. It must match
+const String _customInputCode = '''InputGroup(
+  // Any widget is legal here, not only InputGroupInput. It must match
   // the group's own 40px height and padding tokens itself.
   child: MyCustomControl(),
 )''';
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElInputGroup(
-    startAddon: ElInputGroupAddon(
-      align: ElInputGroupAlign.start,
-      child: ElInputGroupText('بحث'),
+  child: InputGroup(
+    startAddon: InputGroupAddon(
+      align: InputGroupAlign.start,
+      child: InputGroupText('بحث'),
     ),
-    child: ElInputGroupInput(placeholder: 'ابحث هنا'),
+    child: InputGroupInput(placeholder: 'ابحث هنا'),
   ),
 )''';
 
@@ -563,56 +562,44 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       DocsAnchor(
         id: 'api-elinputgroup',
-        child: const DocsApiTable(
-          title: 'ElInputGroup',
-          facts: _inputGroupFacts,
-        ),
+        child: const DocsApiTable(title: 'InputGroup', facts: _inputGroupFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elinputgroupinput',
         child: const DocsApiTable(
-          title: 'ElInputGroupInput',
+          title: 'InputGroupInput',
           facts: _inputGroupInputFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elinputgroupaddon',
-        child: const DocsApiTable(
-          title: 'ElInputGroupAddon',
-          facts: _addonFacts,
-        ),
+        child: const DocsApiTable(title: 'InputGroupAddon', facts: _addonFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elinputgrouptext',
-        child: const DocsApiTable(
-          title: 'ElInputGroupText',
-          facts: _textFacts,
-        ),
+        child: const DocsApiTable(title: 'InputGroupText', facts: _textFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elinputgroupbutton',
         child: const DocsApiTable(
-          title: 'ElInputGroupButton',
+          title: 'InputGroupButton',
           facts: _buttonFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elinputgroupalign',
-        child: const DocsApiTable(
-          title: 'ElInputGroupAlign',
-          facts: _alignFacts,
-        ),
+        child: const DocsApiTable(title: 'InputGroupAlign', facts: _alignFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elinputgroupbuttonsize',
         child: const DocsApiTable(
-          title: 'ElInputGroupButtonSize',
+          title: 'InputGroupButtonSize',
           facts: _buttonSizeFacts,
         ),
       ),
@@ -625,19 +612,19 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Semantic role: Semantics(container: true) wraps the whole pill '
             '(role="group"). The control inside reads its own label through '
-            'ElFieldScope, or its own label/placeholder when standalone.',
-        'ElInputGroupAddon is itself Semantics(container: true) '
+            'FieldScope, or its own label/placeholder when standalone.',
+        'InputGroupAddon is itself Semantics(container: true) '
             '(role="group"). Tapping anywhere in an addon that is not a '
             'button focuses the control: a click handler on the addon\'s own '
             'padding, not just its glyph.',
-        'ElInputGroupButton: with label given, it REPLACES the child\'s '
+        'InputGroupButton: with label given, it REPLACES the child\'s '
             'name (button: true, label:); toggled maps to Semantics.toggled '
             '(aria-pressed) for a real stateful control like the password '
             'toggle above, not a decorative icon.',
-        'Focus behavior: focusNode defaults to the enclosing ElFieldScope\'s '
+        'Focus behavior: focusNode defaults to the enclosing FieldScope\'s '
             'node, so a form\'s focus-on-error lands inside the group; only '
             'owns a node of its own when there is no field above it. '
             '_focusWithin tracks descendant focus (a non-focusable Focus '
@@ -645,7 +632,7 @@ class _AccessibilityContent extends StatelessWidget {
             'same way :focus-within does in CSS. See Keyboard below for how '
             'a caller actually moves focus into and out of the pill.',
         'Touch target: the group is 40px tall, 16px horizontally padded on '
-            'a side with no addon. ElInputGroupButton is 24px tall: below '
+            'a side with no addon. InputGroupButton is 24px tall: below '
             'the platform\'s usual 44px recommendation, matching the '
             'reference\'s own dense affordance.',
         'Non-colour signals: invalid is shown as a destructive border AND '
@@ -658,19 +645,19 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElInputGroupInput is a ElInput(bare: true) underneath: it accepts '
+      _bullets(ThemeScope.of(context), <String>[
+        'InputGroupInput is a Input(bare: true) underneath: it accepts '
             'the same native EditableText keyboard behaviour as a bare '
-            'ElInput does, typing, arrow-key caret movement, Home/End, '
+            'Input does, typing, arrow-key caret movement, Home/End, '
             'Backspace/Delete, and Enter fires onSubmitted.',
         'Tab order: input_group.dart wires no FocusTraversalPolicy of its '
             'own. Tab and Shift+Tab walk whatever order the enclosing page '
             'already declares; the group\'s control participates through '
-            'its own (or the enclosing ElFieldScope\'s) focus node.',
-        'DOCUMENTED GAP: ElInputGroupButton wires no onKeyEvent handler. '
-            'Its press feedback comes from ElPress, which wraps a bare '
+            'its own (or the enclosing FieldScope\'s) focus node.',
+        'DOCUMENTED GAP: InputGroupButton wires no onKeyEvent handler. '
+            'Its press feedback comes from Press, which wraps a bare '
             'GestureDetector.onTap and reacts to no key at all — unlike '
-            'ElButton, whose own _onKey answers Enter, NumpadEnter, and '
+            'Button, whose own _onKey answers Enter, NumpadEnter, and '
             'Space. A focused addon button (the password-visibility toggle '
             'above, for instance) is reachable by Tab, because '
             'canRequestFocus tracks _enabled, but pressing Enter or Space '
@@ -687,7 +674,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching in input_group.dart: BuildContext width is '
             'never read for a layout decision. The pill renders the same at '
             '390px and 1440px.',
@@ -710,33 +697,30 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/input_group.dart. No companion parts.',
         'Foundation imports: colors.dart, motion.dart, shadows.dart, '
-            'spacing.dart (el()), theme.dart, typography.dart.',
-        'Effect imports: effects/machine_surface.dart (ElMachineSurface: '
+            'spacing.dart (space()), theme.dart, typography.dart.',
+        'Effect imports: effects/surface.dart (Surface: '
             'the pill\'s fill, border, and focus/invalid ring on both '
-            'ElInputGroup and ElInputGroupButton).',
-        'Component imports: button.dart (ElButton.withFocusRing, the '
-            'shared ring-compositing helper), field.dart (ElFieldScope, for '
-            'the enclosing-field fallback), input.dart (ElInput: '
-            'ElInputGroupInput is a ElInput with bare: true and its own '
+            'InputGroup and InputGroupButton).',
+        'Component imports: button.dart (Button.withFocusRing, the '
+            'shared ring-compositing helper), field.dart (FieldScope, for '
+            'the enclosing-field fallback), input.dart (Input: '
+            'InputGroupInput is a Input with bare: true and its own '
             'padding).',
         'Registry dependencies are resolved automatically by `elattar add '
-            'input-group`: button, field, input, machine-surface, '
-            'press-motion, source-foundation.',
+            'input-group`: button, field, input, surface, '
+            'press, source-foundation.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       DocsLinkRow(
         links: const <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Input', route: '/components/input'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
-          DocsLink(label: 'Press Motion', route: '/components/press_motion'),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Press Motion', route: '/components/press'),
         ],
       ),
     ],
@@ -748,35 +732,35 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Border: theme.input at rest, theme.ring while any descendant has '
             'focus. Invalid overrides both to theme.destructive, ORed with '
-            'the enclosing ElFieldScope\'s own invalid flag.',
+            'the enclosing FieldScope\'s own invalid flag.',
         'Ring: transparent at rest; theme.ring at 50% alpha on '
             'focus-within; theme.destructive at 20% (light) or 40% (dark) '
-            'when invalid, matching ElInputOtp\'s own theme-split.',
+            'when invalid, matching InputOtp\'s own theme-split.',
         'Fill: always theme.card, never theme.background.',
         'Addons inherit text colour from theme.mutedForeground '
-            '(DefaultTextStyle.merge), which a ElIcon at ElIconTone.inherit '
+            '(DefaultTextStyle.merge), which a Icon at IconTone.inherit '
             'reads too.',
         'Disabled: opacity to 50% (has-disabled:opacity-50), five points '
-            'weaker than a bare ElInput\'s own 45%: an addon button inside a '
+            'weaker than a bare Input\'s own 45%: an addon button inside a '
             'disabled group still fades at the button\'s own 45%, so the two '
             'opacities multiply.',
-        'No colour overrides on ElInputGroup itself: every value comes from '
-            'ElTheme.of(context). ElInputGroupButton.cancelPressFill is a '
+        'No colour overrides on InputGroup itself: every value comes from '
+            'ThemeScope.of(context). InputGroupButton.cancelPressFill is a '
             'behaviour flag, not a colour override.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => ConstrainedBox(
-  constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+Widget _bullets(ThemeTokens theme, List<String> lines) => ConstrainedBox(
+  constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       for (final String line in lines) ...<Widget>[
-        ElText('•  $line', ElType.small, color: theme.mutedForeground),
-        SizedBox(height: el(2)),
+        StyledText('•  $line', TextStyles.small, color: theme.mutedForeground),
+        SizedBox(height: space(2)),
       ],
     ],
   ),
@@ -787,7 +771,7 @@ const List<DocsApiFact> _inputGroupFacts = <DocsApiFact>[
     name: 'child',
     type: 'Widget',
     description:
-        'Required. The control, typically ElInputGroupInput. Takes '
+        'Required. The control, typically InputGroupInput. Takes '
         'whatever width the addons leave (Expanded).',
   ),
   DocsApiFact(
@@ -809,7 +793,7 @@ const List<DocsApiFact> _inputGroupFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to false. ORed with the enclosing '
-        'ElFieldScope\'s own invalid flag. Colors the border and ring '
+        'FieldScope\'s own invalid flag. Colors the border and ring '
         'theme.destructive.',
   ),
   DocsApiFact(
@@ -817,7 +801,7 @@ const List<DocsApiFact> _inputGroupFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to true. ANDed with the enclosing '
-        'ElFieldScope\'s own enabled flag. Drops opacity to 50% and '
+        'FieldScope\'s own enabled flag. Drops opacity to 50% and '
         'ignores pointer input when false.',
   ),
   DocsApiFact(
@@ -825,27 +809,27 @@ const List<DocsApiFact> _inputGroupFacts = <DocsApiFact>[
     type: 'FocusNode?',
     description:
         'Optional. Defaults to null, which falls back to the enclosing '
-        'ElFieldScope\'s node, or an owned node if there is neither.',
+        'FieldScope\'s node, or an owned node if there is neither.',
   ),
   DocsApiFact(
-    name: 'ElInputGroup.height',
+    name: 'InputGroup.height',
     type: 'static double',
-    description: '40px (ElInput.height): the hard border-box height.',
+    description: '40px (Input.height): the hard border-box height.',
   ),
   DocsApiFact(
-    name: 'ElInputGroup.addonInset',
+    name: 'InputGroup.addonInset',
     type: 'static double',
     description: '16px: the addon\'s own horizontal padding on its side.',
   ),
   DocsApiFact(
-    name: 'ElInputGroup.addonButtonPull',
+    name: 'InputGroup.addonButtonPull',
     type: 'static double',
     description:
         '2px: negative margin subtracted from addonInset when the addon '
         'holds a button, clearing at 14px instead of 16.',
   ),
   DocsApiFact(
-    name: 'ElInputGroup.clearance',
+    name: 'InputGroup.clearance',
     type: 'static double',
     description:
         '8px: the control\'s own padding on a side an addon occupies, '
@@ -905,7 +889,7 @@ const List<DocsApiFact> _inputGroupInputFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'textSpec',
-    type: 'ElTypeSpec?',
+    type: 'TextStyleToken?',
     description: 'Optional. Overrides the type spec: defaults to body.',
   ),
   DocsApiFact(
@@ -922,13 +906,13 @@ const List<DocsApiFact> _addonFacts = <DocsApiFact>[
     name: 'child',
     type: 'Widget',
     description:
-        'Required. The content: ElText, ElIcon, or ElInputGroupButton.',
+        'Required. The content: StyledText, Icon, or InputGroupButton.',
   ),
   DocsApiFact(
     name: 'align',
-    type: 'ElInputGroupAlign',
+    type: 'InputGroupAlign',
     description:
-        'Optional. Defaults to ElInputGroupAlign.start. Which side the '
+        'Optional. Defaults to InputGroupAlign.start. Which side the '
         'addon occupies.',
   ),
   DocsApiFact(
@@ -936,11 +920,11 @@ const List<DocsApiFact> _addonFacts = <DocsApiFact>[
     type: 'bool?',
     description:
         'Optional. Defaults to null, which infers true only when child '
-        'is a ElInputGroupButton. State it explicitly to override the '
+        'is a InputGroupButton. State it explicitly to override the '
         'inference.',
   ),
   DocsApiFact(
-    name: 'ElInputGroupAddon.insetY',
+    name: 'InputGroupAddon.insetY',
     type: 'static double',
     description:
         '6px: vertical padding inside the addon (h-auto inside a '
@@ -948,7 +932,7 @@ const List<DocsApiFact> _addonFacts = <DocsApiFact>[
         'than the pill\'s inner height).',
   ),
   DocsApiFact(
-    name: 'ElInputGroupAddon.gap',
+    name: 'InputGroupAddon.gap',
     type: 'static double',
     description:
         '8px: gap between an addon\'s own children, when it has more '
@@ -964,7 +948,7 @@ const List<DocsApiFact> _textFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'spec',
-    type: 'ElTypeSpec?',
+    type: 'TextStyleToken?',
     description: 'Optional. Overrides the type spec: defaults to body.',
   ),
 ];
@@ -1005,10 +989,10 @@ const List<DocsApiFact> _buttonFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'size',
-    type: 'ElInputGroupButtonSize',
+    type: 'InputGroupButtonSize',
     description:
-        'Optional. Defaults to ElInputGroupButtonSize.xs. See the '
-        'ElInputGroupButtonSize table below.',
+        'Optional. Defaults to InputGroupButtonSize.xs. See the '
+        'InputGroupButtonSize table below.',
   ),
   DocsApiFact(
     name: 'cancelPressFill',
@@ -1020,24 +1004,24 @@ const List<DocsApiFact> _buttonFacts = <DocsApiFact>[
         'behaviour), and only the press-scale still moves.',
   ),
   DocsApiFact(
-    name: 'ElInputGroupButton.height',
+    name: 'InputGroupButton.height',
     type: 'static double',
     description: '24px: the hard border-box height, both size rungs.',
   ),
   DocsApiFact(
-    name: 'ElInputGroupButton.paddingX',
+    name: 'InputGroupButton.paddingX',
     type: 'static double',
     description: '6px: horizontal padding on the xs rung.',
   ),
   DocsApiFact(
-    name: 'ElInputGroupButton.paddingXFor',
-    type: 'static double Function(ElInputGroupButtonSize)',
+    name: 'InputGroupButton.paddingXFor',
+    type: 'static double Function(InputGroupButtonSize)',
     description:
         'The rung\'s horizontal padding: 6px for xs, 0 for iconXs '
         '(which centres the glyph in a square instead).',
   ),
   DocsApiFact(
-    name: 'ElInputGroupButton.gap',
+    name: 'InputGroupButton.gap',
     type: 'static double',
     description:
         '4px. Exposed rather than applied: this widget takes one child, '
@@ -1110,18 +1094,18 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Addon button: hover / pressed / focus',
     treatment:
-        'ElInputGroupButton is its own ghost surface: transparent at '
+        'InputGroupButton is its own ghost surface: transparent at '
         'rest, theme.secondary on hover, theme.muted while pressed '
         '(pressed outranks hover), theme.ring border on focus. Colours '
         'spring over the framework\'s spring curve; press/focus timing '
-        'uses ElDurations.tick.',
+        'uses MotionDurations.tick.',
     userSignal: 'A lit 24px chip under the pointer or keyboard focus.',
   ),
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
         'Every TweenAnimationBuilder duration routes through '
-        'elAnimationDuration, which is Duration.zero under '
+        'effectiveMotionDuration, which is Duration.zero under '
         'MediaQuery.disableAnimations.',
     userSignal: 'Border and ring hard-cut instead of springing.',
   ),

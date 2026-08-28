@@ -68,7 +68,7 @@ final List<SiteNavGroup> footerSiteNavigation = List<SiteNavGroup>.unmodifiable(
           keywords: <String>['overview', 'foundations'],
           section: SiteSection.docs,
         ),
-        for (final ElGroup group in elGroups.skip(1))
+        for (final Group group in elGroups.skip(1))
           SiteNavEntry(
             title: group.title,
             path: group.href,
@@ -124,7 +124,7 @@ String _sectionLabel(SiteSection section) => switch (section) {
   SiteSection.skills => 'Skills',
 };
 
-double _searchScore(SearchRoute route, String query) => elCommandScore(
+double _searchScore(SearchRoute route, String query) => commandScore(
   route.title,
   query,
   <String>[route.path, route.description, ...route.keywords],

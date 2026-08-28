@@ -1,9 +1,9 @@
 /// Public documentation metadata for the `native_select` component.
 ///
-/// This page documents exactly one component: [ElNativeSelect] and its
-/// [ElNativeSelectSize] rungs — the operating system's own picker, as far as
+/// This page documents exactly one component: [NativeSelect] and its
+/// [NativeSelectSize] rungs — the operating system's own picker, as far as
 /// Flutter can carry it. `selection_control` (the shared socket primitive
-/// ElCheckbox/ElRadioGroup/ElSwitch build on) and `form` (the non-visual
+/// Checkbox/RadioGroup/Switch build on) and `form` (the non-visual
 /// form state container) used to be documented on this same page; they now
 /// have their own pages at `../selection_control/` and `../form/`, one
 /// component per page.
@@ -25,11 +25,11 @@ const ComponentDocEntry nativeSelectDoc = ComponentDocEntry(
     'button',
     'field',
     'icon',
-    'machine-surface',
+    'surface',
     'popover',
     'select',
     'source-foundation',
   ],
-  exports: <String>['ElNativeSelect', 'ElNativeSelectSize'],
+  exports: <String>['NativeSelect', 'NativeSelectSize'],
   sourcePath: 'lib/src/components/native_select.dart',
 );

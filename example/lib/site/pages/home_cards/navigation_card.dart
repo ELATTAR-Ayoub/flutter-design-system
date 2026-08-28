@@ -1,35 +1,47 @@
-/// A workspace-navigation card: two `ElSidebarGroup`s of menu rows with one
+/// A workspace-navigation card: two `SidebarGroup`s of menu rows with one
 /// active row shared between them.
 ///
 /// The sidebar's group and menu pieces resolve their chrome through
-/// `ElSidebarChrome.maybeOf`, so they render outside a `ElSidebarProvider`;
-/// `ElSidebar` itself does not, and would paint a fixed-width panel here.
+/// `SidebarChrome.maybeOf`, so they render outside a `SidebarProvider`;
+/// `Sidebar` itself does not, and would paint a fixed-width panel here.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// One nav row: its label, glyph, and (for the badged one) a count.
 class _NavRow {
   const _NavRow(this.label, this.glyph, {this.badge});
 
   final String label;
-  final ElIconGlyph glyph;
+  final IconGlyph glyph;
   final String? badge;
 }
 
 const List<_NavRow> _overviewRows = <_NavRow>[
-  _NavRow('Analytics', ElIconGlyph.activity),
-  _NavRow('Transactions', ElIconGlyph.creditCard),
-  _NavRow('Investments', ElIconGlyph.trendingUp),
-  _NavRow('Accounts', ElIconGlyph.wallet),
+  _NavRow('Analytics', IconGlyph.activity),
+  _NavRow('Transactions', IconGlyph.creditCard),
+  _NavRow('Investments', IconGlyph.trendingUp),
+  _NavRow('Accounts', IconGlyph.wallet),
 ];
 
 const List<_NavRow> _accountRows = <_NavRow>[
-  _NavRow('Profile', ElIconGlyph.user),
-  _NavRow('Billing', ElIconGlyph.circleDollarSign, badge: '3'),
-  _NavRow('Notifications', ElIconGlyph.bell),
-  _NavRow('Security', ElIconGlyph.shield),
+  _NavRow('Profile', IconGlyph.user),
+  _NavRow('Billing', IconGlyph.circleDollarSign, badge: '3'),
+  _NavRow('Notifications', IconGlyph.bell),
+  _NavRow('Security', IconGlyph.shield),
 ];
 
 class NavigationCard extends StatefulWidget {
@@ -42,41 +54,41 @@ class NavigationCard extends StatefulWidget {
 class _NavigationCardState extends State<NavigationCard> {
   String _active = 'Analytics';
 
-  Widget _row(_NavRow row) => ElSidebarMenuItem(
-    button: ElSidebarMenuButton(
+  Widget _row(_NavRow row) => SidebarMenuItem(
+    button: SidebarMenuButton(
       key: ValueKey<String>('home-navigation-${row.label}'),
       isActive: _active == row.label,
       tooltip: row.label,
       onPressed: () => setState(() => _active = row.label),
-      child: ElSidebarMenuRow(
-        leading: ElIcon(row.glyph, sizePx: ElButton.iconPxFor(ElButtonSize.sm)),
-        label: ElSidebarMenuLabel(row.label),
+      child: SidebarMenuRow(
+        leading: Icon(row.glyph, sizePx: Button.iconPxFor(ButtonSize.sm)),
+        label: SidebarMenuLabel(row.label),
       ),
     ),
-    badge: row.badge == null ? null : ElSidebarMenuBadge(row.badge!),
+    badge: row.badge == null ? null : SidebarMenuBadge(row.badge!),
   );
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElCard(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Workspace navigation'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Workspace navigation'),
+          description: CardDescription(
             'A sidebar menu, active row and all, outside a sidebar.',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElSidebarGroup(
+              SidebarGroup(
                 children: <Widget>[
-                  const ElSidebarGroupLabel('Overview'),
-                  ElSidebarGroupContent(
-                    child: ElSidebarMenu(
+                  const SidebarGroupLabel('Overview'),
+                  SidebarGroupContent(
+                    child: SidebarMenu(
                       children: <Widget>[
                         for (final _NavRow row in _overviewRows) _row(row),
                       ],
@@ -84,11 +96,11 @@ class _NavigationCardState extends State<NavigationCard> {
                   ),
                 ],
               ),
-              ElSidebarGroup(
+              SidebarGroup(
                 children: <Widget>[
-                  const ElSidebarGroupLabel('Account'),
-                  ElSidebarGroupContent(
-                    child: ElSidebarMenu(
+                  const SidebarGroupLabel('Account'),
+                  SidebarGroupContent(
+                    child: SidebarMenu(
                       children: <Widget>[
                         for (final _NavRow row in _accountRows) _row(row),
                       ],
@@ -96,10 +108,10 @@ class _NavigationCardState extends State<NavigationCard> {
                   ),
                 ],
               ),
-              SizedBox(height: el(3)),
-              ElText(
+              SizedBox(height: space(3)),
+              StyledText(
                 'Showing $_active.',
-                ElType.small,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
             ],

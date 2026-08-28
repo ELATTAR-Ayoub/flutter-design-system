@@ -11,7 +11,19 @@ library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../docs/docs_layout.dart';
 import '../docs/docs_section.dart';
@@ -65,9 +77,9 @@ class _ChangelogDocsPageState extends State<ChangelogDocsPage> {
           'Every release, newest first, rendered from the repository\'s own '
           'CHANGELOG.md.',
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Docs'),
-      ElBreadcrumbEntry.page('Changelog'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Docs'),
+      BreadcrumbEntry.page('Changelog'),
     ],
     previous: const DocsPageLink(title: 'Registry', route: docsRegistryRoute),
     next: const DocsPageLink(title: 'Skills', route: '/skills'),
@@ -160,7 +172,7 @@ class _Blocks extends StatelessWidget {
     children: <Widget>[
       for (final ChangelogBlock block in blocks) ...<Widget>[
         _Block(block: block, onOpenLink: onOpenLink),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
       ],
     ],
   );
@@ -174,7 +186,7 @@ class _Block extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     switch (block.kind) {
       case ChangelogBlockKind.code:
         return DocsSnippet(code: block.code);
@@ -186,7 +198,7 @@ class _Block extends StatelessWidget {
         return Semantics(
           header: true,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+            constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
             child: _RichBlock(
               block: block,
               base: _headingSpec(block.level),
@@ -197,10 +209,10 @@ class _Block extends StatelessWidget {
 
       case ChangelogBlockKind.paragraph:
         return ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+          constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
           child: _RichBlock(
             block: block,
-            base: ElType.body,
+            base: TextStyles.body,
             onOpenLink: onOpenLink,
           ),
         );
@@ -208,21 +220,21 @@ class _Block extends StatelessWidget {
       case ChangelogBlockKind.bullet:
         return Padding(
           // Indent by nesting level, from the spacing scale.
-          padding: EdgeInsets.only(left: el(4) * (block.indent + 1)),
+          padding: EdgeInsets.only(left: space(4) * (block.indent + 1)),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+            constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 // A rendered marker rather than a literal bullet character in
                 // the text: the text is the changelog's, and prefixing it
                 // would put a glyph into content that is meant to be copied.
-                ElText('•', ElType.body, color: theme.mutedForeground),
-                SizedBox(width: el(3)),
+                StyledText('•', TextStyles.body, color: theme.mutedForeground),
+                SizedBox(width: space(3)),
                 Expanded(
                   child: _RichBlock(
                     block: block,
-                    base: ElType.body,
+                    base: TextStyles.body,
                     onOpenLink: onOpenLink,
                   ),
                 ),
@@ -233,25 +245,25 @@ class _Block extends StatelessWidget {
     }
   }
 
-  static ElTypeSpec _headingSpec(int level) => switch (level) {
-    1 => ElType.h1,
-    2 => ElType.h2,
-    3 => ElType.h3,
-    _ => ElType.h4,
+  static TextStyleToken _headingSpec(int level) => switch (level) {
+    1 => TextStyles.h1,
+    2 => TextStyles.h2,
+    3 => TextStyles.h3,
+    _ => TextStyles.h4,
   };
 }
 
 /// One block's spans, as a single selectable rich-text run.
 ///
-/// A `Row` of separate `ElText`s would break selection at every mark and wrap
+/// A `Row` of separate `StyledText`s would break selection at every mark and wrap
 /// badly mid-sentence, so the marks become `TextSpan`s inside one paragraph.
-/// The styles still come from `ElType` — this is a composition of tokens, not
+/// The styles still come from `TextStyles` — this is a composition of tokens, not
 /// a place where a font size gets written down.
 class _RichBlock extends StatefulWidget {
   const _RichBlock({required this.block, required this.base, this.onOpenLink});
 
   final ChangelogBlock block;
-  final ElTypeSpec base;
+  final TextStyleToken base;
   final ChangelogLinkHandler? onOpenLink;
 
   @override
@@ -273,13 +285,13 @@ class _RichBlockState extends State<_RichBlock> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     for (final TapGestureRecognizer recognizer in _recognizers) {
       recognizer.dispose();
     }
     _recognizers.clear();
 
-    final double size = widget.base.size ?? ElType.body.size!;
+    final double size = widget.base.size ?? TextStyles.body.size!;
     final TextStyle baseStyle = widget.base.resolve(size, theme.foreground);
 
     // No `SelectionArea` here: `shell.dart` already wraps the whole docs
@@ -299,7 +311,7 @@ class _RichBlockState extends State<_RichBlock> {
 
   InlineSpan _span(
     ChangelogSpan span,
-    ElThemeData theme,
+    ThemeTokens theme,
     double size,
     TextStyle base,
   ) {
@@ -313,9 +325,9 @@ class _RichBlockState extends State<_RichBlock> {
       return TextSpan(
         text: span.text,
         style: base.copyWith(
-          color: theme.actionInk,
+          color: theme.actionText,
           decoration: TextDecoration.underline,
-          decorationColor: theme.actionInk,
+          decorationColor: theme.actionText,
         ),
         recognizer: recognizer,
         // The label a screen reader reads. Without it a bare URL is read
@@ -328,7 +340,10 @@ class _RichBlockState extends State<_RichBlock> {
     if (span.code) {
       return TextSpan(
         text: span.text,
-        style: ElType.code.resolveInline(ElType.code.size!, theme.foreground),
+        style: TextStyles.code.resolveInline(
+          TextStyles.code.size!,
+          theme.foreground,
+        ),
       );
     }
     if (span.strong) {
@@ -337,8 +352,8 @@ class _RichBlockState extends State<_RichBlock> {
         // The weight comes from the heading scale rather than a literal:
         // `h4` is the system's own "this is emphasised prose" weight.
         style: base.copyWith(
-          fontWeight: ElType.h4.weight,
-          fontVariations: ElType.h4.variations,
+          fontWeight: TextStyles.h4.weight,
+          fontVariations: TextStyles.h4.variations,
         ),
       );
     }
@@ -366,13 +381,13 @@ class _Loading extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         for (int release = 0; release < 2; release++) ...<Widget>[
-          ElSkeleton(width: el(40), height: el(8)),
-          SizedBox(height: el(4)),
+          Skeleton(width: space(40), height: space(8)),
+          SizedBox(height: space(4)),
           for (int line = 0; line < 3; line++) ...<Widget>[
-            ElSkeleton(height: el(5)),
-            SizedBox(height: el(2)),
+            Skeleton(height: space(5)),
+            SizedBox(height: space(2)),
           ],
-          SizedBox(height: el(6)),
+          SizedBox(height: space(6)),
         ],
       ],
     ),
@@ -383,14 +398,14 @@ class _Empty extends StatelessWidget {
   const _Empty();
 
   @override
-  Widget build(BuildContext context) => const ElEmpty(
+  Widget build(BuildContext context) => const Empty(
     key: ValueKey<String>('changelog-empty'),
     children: <Widget>[
-      ElEmptyHeader(
+      EmptyHeader(
         children: <Widget>[
-          ElEmptyMedia(glyph: ElIconGlyph.clock),
-          ElEmptyTitle('No releases yet'),
-          ElEmptyDescription(
+          EmptyMedia(glyph: IconGlyph.clock),
+          EmptyTitle('No releases yet'),
+          EmptyDescription(
             'CHANGELOG.md parsed and declares no versions. The first release '
             'will appear here.',
           ),
@@ -411,18 +426,18 @@ class _Failed extends StatelessWidget {
     key: const ValueKey<String>('changelog-error'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      ElAlert(
-        variant: ElAlertVariant.destructive,
-        icon: const ElIcon(ElIconGlyph.circleX),
+      Alert(
+        variant: AlertVariant.destructive,
+        icon: const Icon(IconGlyph.circleX),
         title: 'The changelog could not be read',
         description: error is ChangelogDocumentException
             ? '$error'
             : 'CHANGELOG.md could not be rendered: $error',
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       Align(
         alignment: Alignment.centerLeft,
-        child: ElButton(onPressed: onRetry, child: const Text('Try again')),
+        child: Button(onPressed: onRetry, child: const Text('Try again')),
       ),
     ],
   );

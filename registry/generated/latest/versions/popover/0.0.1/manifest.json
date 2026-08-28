@@ -7,17 +7,17 @@
   "minFlutter": ">=3.12.2",
   "files": [
     {
-      "source": "lib/src/components/popover.dart",
+      "source": "lib/src/components/ui/popover.dart",
       "target": "@ui/popover.dart",
-      "sha256": "5872f328851c1a77ed6b8f0fad76e0621b7eacfa3964a3fc3f1f100eced5de8f"
+      "sha256": "1b83670b105867e7b44b8ceadcb1ae87d2bdd68ba72770262b81316e4a462846"
     }
   ],
   "registryDependencies": [
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "semanticDependencies": [
-    "machine-surface"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/popover",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/popover.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/popover.dart",
   "deprecated": false
 }

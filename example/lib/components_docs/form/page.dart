@@ -1,14 +1,14 @@
 /// Public documentation page for the `form` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` established. Every specimen
 /// widget and every code string below is the same one the hand-composed page
 /// carried; only where it lives changed.
 ///
-/// **form** documents [ElForm], [ElFormFieldBase], [ElFormField],
-/// [ElTextFormField], and [ElValidateMode].
+/// **form** documents [Form], [FormFieldBase], [FormField],
+/// [TextFormField], and [ValidateMode].
 /// `https://ui.shadcn.com/docs/components/form` is a "pick your framework"
 /// gateway page with no props, no API, and no component sections at all, so
 /// this page's own sections are named for the reader problems `form.dart`'s
@@ -18,15 +18,27 @@
 /// **Section order**, matching `button`'s own house shape: Preview,
 /// Installation, Usage, then the four reader-problem sections above (each
 /// its own live `ShowcaseSection`, not a code-only panel — every one of
-/// them already had a real, bound `ElForm` behind it), then the eight
+/// them already had a real, bound `Form` behind it), then the eight
 /// disclosures. New: a Keyboard disclosure, between Accessibility and
-/// Responsive — `ElForm` owns no widget tree and wires no key handler of
+/// Responsive — `Form` owns no widget tree and wires no key handler of
 /// its own, so this section is mostly about what does NOT happen, same as
 /// `field`'s.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -43,9 +55,9 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'A ElForm with one field and a submit button, bound with '
-          'ListenableBuilder. ElForm paints nothing itself: every pixel '
-          'here comes from ElField and ElInput reading the form\'s state '
+          'A Form with one field and a submit button, bound with '
+          'ListenableBuilder. Form paints nothing itself: every pixel '
+          'here comes from Field and Input reading the form\'s state '
           'on each rebuild.',
       specimen: _PreviewSpecimen(),
       code: _usageCode,
@@ -74,7 +86,7 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElForm and its field types are '
+              'Add the export line so Form and its field types are '
               'reachable the same way the CLI path already makes them.',
           code: "export 'form.dart';",
         ),
@@ -84,9 +96,9 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'ElForm is not a widget: it is a ChangeNotifier a page listens '
+          'Form is not a widget: it is a ChangeNotifier a page listens '
           'to with ListenableBuilder, passing each field\'s own state into '
-          'a ElField.',
+          'a Field.',
       code: _usageCode,
     ),
     ShowcaseSection(
@@ -98,7 +110,7 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
           'once). reValidateMode takes over after that first submit '
           '(default onChange: every keystroke re-validates once the form '
           'has failed once). Nothing here validates on blur — '
-          'ElValidateMode has two members and not four.',
+          'ValidateMode has two members and not four.',
       specimen: _ValidationTimingSpecimen(),
       code: _validationTimingCode,
       label: 'Validation timing specimen view',
@@ -112,7 +124,7 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
           'is. This is a deliberate behavioural fix over the reference '
           '(ruling F4): react-hook-form\'s shouldFocusError only reaches a '
           'field whose ref exposes .focus(), which is a no-op for a '
-          'hand-wired control; ElForm.focusFirstError has no such gap.',
+          'hand-wired control; Form.focusFirstError has no such gap.',
       specimen: _FocusOnErrorSpecimen(),
       code: _focusOnErrorCode,
       label: 'Focus on error specimen view',
@@ -147,21 +159,15 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter and public member ElForm, '
-          'ElFormFieldBase, ElFormField, ElTextFormField, and '
-          'ElValidateMode each declare.',
+          'Every constructor parameter and public member Form, '
+          'FormFieldBase, FormField, TextFormField, and '
+          'ValidateMode each declare.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElForm', anchor: 'api-elform'),
-        DocsTocEntry(
-          title: 'ElFormFieldBase',
-          anchor: 'api-elformfieldbase',
-        ),
-        DocsTocEntry(title: 'ElFormField', anchor: 'api-elformfield'),
-        DocsTocEntry(
-          title: 'ElTextFormField',
-          anchor: 'api-eltextformfield',
-        ),
-        DocsTocEntry(title: 'ElValidateMode', anchor: 'api-elvalidatemode'),
+        DocsTocEntry(title: 'Form', anchor: 'api-elform'),
+        DocsTocEntry(title: 'FormFieldBase', anchor: 'api-elformfieldbase'),
+        DocsTocEntry(title: 'FormField', anchor: 'api-elformfield'),
+        DocsTocEntry(title: 'TextFormField', anchor: 'api-eltextformfield'),
+        DocsTocEntry(title: 'ValidateMode', anchor: 'api-elvalidatemode'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -169,7 +175,7 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElForm has no paint of its own, so its "states" are the '
+          'Form has no paint of its own, so its "states" are the '
           'observable properties a bound page reads on each rebuild.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -183,7 +189,7 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          'ElForm owns no widget tree and wires no Focus.onKeyEvent of '
+          'Form owns no widget tree and wires no Focus.onKeyEvent of '
           'its own: the one keyboard-relevant behaviour it owns is '
           'programmatic, not a key listener.',
       child: _KeyboardContent(),
@@ -207,10 +213,10 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
         facts: const <DocsInstallFact>[
           DocsInstallFact(
             label: 'None',
-            value: 'ElForm paints nothing',
+            value: 'Form paints nothing',
             description:
                 'It reads no theme. Every colour on this page comes from '
-                'the ElField/ElInput/ElButton controls a bound page '
+                'the Field/Input/Button controls a bound page '
                 'composes around it.',
           ),
         ],
@@ -258,9 +264,9 @@ class FormDocPage extends StatelessWidget {
       title: formDocSpec.title,
       description: formDocSpec.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Form'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Form'),
     ],
     toc: formDocSpec.toc,
     onNavigate: onNavigate,
@@ -272,16 +278,16 @@ class FormDocPage extends StatelessWidget {
 }
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
-// Every one of these five holds a real, bound `ElForm`, so each is a
+// Every one of these five holds a real, bound `Form`, so each is a
 // `StatefulWidget` that owns and disposes it — the same shape the original
 // hand-composed page used, unchanged.
 
-const String _usageCode = '''final ElForm form = ElForm(
-  fields: <ElFormFieldBase>[
-    ElTextFormField(
+const String _usageCode = '''final Form form = Form(
+  fields: <FormFieldBase>[
+    TextFormField(
       name: 'email',
-      rules: <ElRule<String>>[
-        ElRule.email('That is not a valid email address.'),
+      rules: <ValidationRule<String>>[
+        ValidationRule.email('That is not a valid email address.'),
       ],
     ),
   ],
@@ -291,13 +297,13 @@ ListenableBuilder(
   listenable: form,
   builder: (BuildContext context, Widget? _) => Column(
     children: <Widget>[
-      ElField(
+      Field(
         label: 'Email',
         errors: form.field<String>('email').errors,
         focusNode: form['email'].focusNode,
-        child: ElInput(controller: form.text('email').controller),
+        child: Input(controller: form.text('email').controller),
       ),
-      ElButton(
+      Button(
         onPressed: form.isSubmitting ? null : () => form.submit(),
         child: const Text('Submit'),
       ),
@@ -313,17 +319,17 @@ class _PreviewSpecimen extends StatefulWidget {
 }
 
 class _PreviewSpecimenState extends State<_PreviewSpecimen> {
-  late final ElForm _form;
+  late final Form _form;
 
   @override
   void initState() {
     super.initState();
-    _form = ElForm(
-      fields: <ElFormFieldBase>[
-        ElTextFormField(
+    _form = Form(
+      fields: <FormFieldBase>[
+        TextFormField(
           name: 'handle',
-          rules: <ElRule<String>>[
-            ElRule.minLength(3, 'At least 3 characters.'),
+          rules: <ValidationRule<String>>[
+            ValidationRule.minLength(3, 'At least 3 characters.'),
           ],
         ),
       ],
@@ -338,37 +344,37 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return ListenableBuilder(
       listenable: _form,
       builder: (BuildContext context, Widget? _) => ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElContainers.sm),
+        constraints: const BoxConstraints(maxWidth: Containers.sm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            ElField(
+            Field(
               key: const ValueKey<String>('form-preview-field'),
               label: 'Handle',
               errors: _form.field<String>('handle').errors,
               focusNode: _form['handle'].focusNode,
-              child: ElInput(
+              child: Input(
                 controller: _form.text('handle').controller,
                 placeholder: 'yourname',
               ),
             ),
-            SizedBox(height: el(3)),
-            ElText(
+            SizedBox(height: space(3)),
+            StyledText(
               'isValid: ${_form.isValid}, isSubmitting: '
               '${_form.isSubmitting}, submitCount: ${_form.submitCount}',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
-            SizedBox(height: el(3)),
-            ElButton(
+            SizedBox(height: space(3)),
+            Button(
               key: const ValueKey<String>('form-preview-submit'),
               onPressed: _form.isSubmitting ? null : () => _form.submit(),
               loading: _form.isSubmitting,
-              child: ElText('Submit', ElComponentType.buttonLabel),
+              child: StyledText('Submit', TextStyles.buttonLabel),
             ),
           ],
         ),
@@ -377,16 +383,16 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   }
 }
 
-const String _validationTimingCode = '''ElForm(
-  fields: <ElFormFieldBase>[
-    ElTextFormField(
+const String _validationTimingCode = '''Form(
+  fields: <FormFieldBase>[
+    TextFormField(
       name: 'handle',
-      rules: <ElRule<String>>[ElRule.minLength(3, 'At least 3 characters.')],
+      rules: <ValidationRule<String>>[ValidationRule.minLength(3, 'At least 3 characters.')],
     ),
   ],
   // The defaults, spelled out:
-  mode: ElValidateMode.onSubmit,
-  reValidateMode: ElValidateMode.onChange,
+  mode: ValidateMode.onSubmit,
+  reValidateMode: ValidateMode.onChange,
 )''';
 
 class _ValidationTimingSpecimen extends StatefulWidget {
@@ -397,19 +403,18 @@ class _ValidationTimingSpecimen extends StatefulWidget {
       _ValidationTimingSpecimenState();
 }
 
-class _ValidationTimingSpecimenState
-    extends State<_ValidationTimingSpecimen> {
-  late final ElForm _form;
+class _ValidationTimingSpecimenState extends State<_ValidationTimingSpecimen> {
+  late final Form _form;
 
   @override
   void initState() {
     super.initState();
-    _form = ElForm(
-      fields: <ElFormFieldBase>[
-        ElTextFormField(
+    _form = Form(
+      fields: <FormFieldBase>[
+        TextFormField(
           name: 'handle',
-          rules: <ElRule<String>>[
-            ElRule.minLength(3, 'At least 3 characters.'),
+          rules: <ValidationRule<String>>[
+            ValidationRule.minLength(3, 'At least 3 characters.'),
           ],
         ),
       ],
@@ -424,35 +429,35 @@ class _ValidationTimingSpecimenState
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return ListenableBuilder(
       listenable: _form,
       builder: (BuildContext context, Widget? _) => ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElContainers.sm),
+        constraints: const BoxConstraints(maxWidth: Containers.sm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            ElField(
+            Field(
               key: const ValueKey<String>('form-validation-timing-field'),
               label: 'Handle',
               errors: _form.field<String>('handle').errors,
               focusNode: _form['handle'].focusNode,
-              child: ElInput(controller: _form.text('handle').controller),
+              child: Input(controller: _form.text('handle').controller),
             ),
-            SizedBox(height: el(3)),
-            ElText(
+            SizedBox(height: space(3)),
+            StyledText(
               _form.submitCount == 0
                   ? 'submitCount: 0 — edits are not validated yet.'
                   : 'submitCount: ${_form.submitCount} — every edit now '
                         're-validates.',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
-            SizedBox(height: el(3)),
-            ElButton(
+            SizedBox(height: space(3)),
+            Button(
               key: const ValueKey<String>('form-validation-timing-submit'),
               onPressed: () => _form.submit(),
-              child: ElText('Submit', ElComponentType.buttonLabel),
+              child: StyledText('Submit', TextStyles.buttonLabel),
             ),
           ],
         ),
@@ -461,13 +466,13 @@ class _ValidationTimingSpecimenState
   }
 }
 
-const String _focusOnErrorCode = '''final ElForm form = ElForm(
-  fields: <ElFormFieldBase>[
-    ElTextFormField(name: 'name', rules: <ElRule<String>>[
-      ElRule.minLength(1, 'Required.'),
+const String _focusOnErrorCode = '''final Form form = Form(
+  fields: <FormFieldBase>[
+    TextFormField(name: 'name', rules: <ValidationRule<String>>[
+      ValidationRule.minLength(1, 'Required.'),
     ]),
-    ElTextFormField(name: 'email', rules: <ElRule<String>>[
-      ElRule.email('That is not a valid email address.'),
+    TextFormField(name: 'email', rules: <ValidationRule<String>>[
+      ValidationRule.email('That is not a valid email address.'),
     ]),
   ],
 );
@@ -483,22 +488,24 @@ class _FocusOnErrorSpecimen extends StatefulWidget {
 }
 
 class _FocusOnErrorSpecimenState extends State<_FocusOnErrorSpecimen> {
-  late final ElForm _form;
+  late final Form _form;
   String _focused = 'none';
 
   @override
   void initState() {
     super.initState();
-    _form = ElForm(
-      fields: <ElFormFieldBase>[
-        ElTextFormField(
+    _form = Form(
+      fields: <FormFieldBase>[
+        TextFormField(
           name: 'name',
-          rules: <ElRule<String>>[ElRule.minLength(1, 'Required.')],
+          rules: <ValidationRule<String>>[
+            ValidationRule.minLength(1, 'Required.'),
+          ],
         ),
-        ElTextFormField(
+        TextFormField(
           name: 'email',
-          rules: <ElRule<String>>[
-            ElRule.email('That is not a valid email address.'),
+          rules: <ValidationRule<String>>[
+            ValidationRule.email('That is not a valid email address.'),
           ],
         ),
       ],
@@ -520,40 +527,40 @@ class _FocusOnErrorSpecimenState extends State<_FocusOnErrorSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return ListenableBuilder(
       listenable: _form,
       builder: (BuildContext context, Widget? _) => ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElContainers.sm),
+        constraints: const BoxConstraints(maxWidth: Containers.sm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            ElField(
+            Field(
               key: const ValueKey<String>('form-focus-name-field'),
               label: 'Name',
               errors: _form.field<String>('name').errors,
               focusNode: _form['name'].focusNode,
-              child: ElInput(controller: _form.text('name').controller),
+              child: Input(controller: _form.text('name').controller),
             ),
-            SizedBox(height: el(3)),
-            ElField(
+            SizedBox(height: space(3)),
+            Field(
               key: const ValueKey<String>('form-focus-email-field'),
               label: 'Email',
               errors: _form.field<String>('email').errors,
               focusNode: _form['email'].focusNode,
-              child: ElInput(controller: _form.text('email').controller),
+              child: Input(controller: _form.text('email').controller),
             ),
-            SizedBox(height: el(3)),
-            ElText(
+            SizedBox(height: space(3)),
+            StyledText(
               'Focused field: $_focused',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
-            SizedBox(height: el(3)),
-            ElButton(
+            SizedBox(height: space(3)),
+            Button(
               key: const ValueKey<String>('form-focus-submit'),
               onPressed: () => _form.submit(),
-              child: ElText('Submit empty', ElComponentType.buttonLabel),
+              child: StyledText('Submit empty', TextStyles.buttonLabel),
             ),
           ],
         ),
@@ -575,14 +582,14 @@ class _ServerErrorSpecimen extends StatefulWidget {
 }
 
 class _ServerErrorSpecimenState extends State<_ServerErrorSpecimen> {
-  late final ElForm _form;
+  late final Form _form;
 
   @override
   void initState() {
     super.initState();
-    _form = ElForm(
-      fields: <ElFormFieldBase>[
-        ElTextFormField(name: 'handle', initialValue: 'shadcn'),
+    _form = Form(
+      fields: <FormFieldBase>[
+        TextFormField(name: 'handle', initialValue: 'shadcn'),
       ],
     );
   }
@@ -597,27 +604,24 @@ class _ServerErrorSpecimenState extends State<_ServerErrorSpecimen> {
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: _form,
     builder: (BuildContext context, Widget? _) => ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: ElContainers.sm),
+      constraints: const BoxConstraints(maxWidth: Containers.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElField(
+          Field(
             key: const ValueKey<String>('form-server-error-field'),
             label: 'Handle',
             errors: _form.field<String>('handle').errors,
             focusNode: _form['handle'].focusNode,
-            child: ElInput(controller: _form.text('handle').controller),
+            child: Input(controller: _form.text('handle').controller),
           ),
-          SizedBox(height: el(3)),
-          ElButton(
+          SizedBox(height: space(3)),
+          Button(
             key: const ValueKey<String>('form-server-error-trigger'),
-            variant: ElButtonVariant.destructive,
+            variant: ButtonVariant.destructive,
             onPressed: () =>
                 _form.setError('handle', 'This handle is already taken.'),
-            child: ElText(
-              'Simulate server error',
-              ElComponentType.buttonLabel,
-            ),
+            child: StyledText('Simulate server error', TextStyles.buttonLabel),
           ),
         ],
       ),
@@ -637,18 +641,18 @@ class _ResetSpecimen extends StatefulWidget {
 }
 
 class _ResetSpecimenState extends State<_ResetSpecimen> {
-  late final ElForm _form;
+  late final Form _form;
 
   @override
   void initState() {
     super.initState();
-    _form = ElForm(
-      fields: <ElFormFieldBase>[
-        ElTextFormField(
+    _form = Form(
+      fields: <FormFieldBase>[
+        TextFormField(
           name: 'handle',
           initialValue: 'shadcn',
-          rules: <ElRule<String>>[
-            ElRule.minLength(3, 'At least 3 characters.'),
+          rules: <ValidationRule<String>>[
+            ValidationRule.minLength(3, 'At least 3 characters.'),
           ],
         ),
       ],
@@ -665,31 +669,31 @@ class _ResetSpecimenState extends State<_ResetSpecimen> {
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: _form,
     builder: (BuildContext context, Widget? _) => ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: ElContainers.sm),
+      constraints: const BoxConstraints(maxWidth: Containers.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElField(
+          Field(
             key: const ValueKey<String>('form-reset-field'),
             label: 'Handle',
             errors: _form.field<String>('handle').errors,
             focusNode: _form['handle'].focusNode,
-            child: ElInput(controller: _form.text('handle').controller),
+            child: Input(controller: _form.text('handle').controller),
           ),
-          SizedBox(height: el(3)),
+          SizedBox(height: space(3)),
           Wrap(
-            spacing: el(2),
+            spacing: space(2),
             children: <Widget>[
-              ElButton(
+              Button(
                 key: const ValueKey<String>('form-reset-submit'),
                 onPressed: () => _form.submit(),
-                child: ElText('Submit', ElComponentType.buttonLabel),
+                child: StyledText('Submit', TextStyles.buttonLabel),
               ),
-              ElButton(
+              Button(
                 key: const ValueKey<String>('form-reset-trigger'),
-                variant: ElButtonVariant.outline,
+                variant: ButtonVariant.outline,
                 onPressed: _form.reset,
-                child: ElText('Reset', ElComponentType.buttonLabel),
+                child: StyledText('Reset', TextStyles.buttonLabel),
               ),
             ],
           ),
@@ -710,36 +714,33 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elform',
-        child: DocsApiTable(title: 'ElForm', facts: _elFormFacts),
+        child: DocsApiTable(title: 'Form', facts: _elFormFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elformfieldbase',
         child: DocsApiTable(
-          title: 'ElFormFieldBase',
+          title: 'FormFieldBase',
           facts: _elFormFieldBaseFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elformfield',
-        child: DocsApiTable(title: 'ElFormField<T>', facts: _elFormFieldFacts),
+        child: DocsApiTable(title: 'FormField<T>', facts: _elFormFieldFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eltextformfield',
         child: DocsApiTable(
-          title: 'ElTextFormField',
+          title: 'TextFormField',
           facts: _elTextFormFieldFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elvalidatemode',
-        child: DocsApiTable(
-          title: 'ElValidateMode',
-          facts: _elValidateModeFacts,
-        ),
+        child: DocsApiTable(title: 'ValidateMode', facts: _elValidateModeFacts),
       ),
     ],
   );
@@ -748,39 +749,39 @@ class _ApiReferenceContent extends StatelessWidget {
 const List<DocsApiFact> _elFormFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'fields',
-    type: 'List<ElFormFieldBase>',
+    type: 'List<FormFieldBase>',
     description:
         'Required. Registration order — the order focusFirstError walks.',
   ),
   DocsApiFact(
     name: 'mode',
-    type: 'ElValidateMode',
+    type: 'ValidateMode',
     description:
-        'Optional. Defaults to ElValidateMode.onSubmit. When the first '
+        'Optional. Defaults to ValidateMode.onSubmit. When the first '
         'validation ask happens.',
   ),
   DocsApiFact(
     name: 'reValidateMode',
-    type: 'ElValidateMode',
+    type: 'ValidateMode',
     description:
-        'Optional. Defaults to ElValidateMode.onChange. Asked again '
+        'Optional. Defaults to ValidateMode.onChange. Asked again '
         'after the first failed submit.',
   ),
   DocsApiFact(
     name: 'operator [](name)',
-    type: 'ElFormFieldBase',
+    type: 'FormFieldBase',
     description:
         'The field named name, or a thrown StateError naming what is '
         'declared.',
   ),
   DocsApiFact(
     name: 'field<T>(name)',
-    type: 'ElFormField<T>',
+    type: 'FormField<T>',
     description: 'name as its typed self.',
   ),
   DocsApiFact(
     name: 'text(name)',
-    type: 'ElTextFormField',
+    type: 'TextFormField',
     description: 'The text field named name, for its controller.',
   ),
   DocsApiFact(
@@ -856,7 +857,7 @@ const List<DocsApiFact> _elFormFieldBaseFacts = <DocsApiFact>[
     type: 'FocusNode (get)',
     description:
         'Owned and disposed by the field itself: the node a failed '
-        'submit lands on, and the one a ElFieldLabel focuses.',
+        'submit lands on, and the one a FieldLabel focuses.',
   ),
   DocsApiFact(
     name: 'errors',
@@ -871,8 +872,7 @@ const List<DocsApiFact> _elFormFieldBaseFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'rawValue',
     type: 'Object? (get)',
-    description:
-        'The value, for the map a successful submit hands back.',
+    description: 'The value, for the map a successful submit hands back.',
   ),
   DocsApiFact(
     name: 'issues()',
@@ -884,7 +884,8 @@ const List<DocsApiFact> _elFormFieldBaseFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'validate()',
     type: 'bool',
-    description: 'Runs issues() and stores the result. Returns whether '
+    description:
+        'Runs issues() and stores the result. Returns whether '
         'the field passed.',
   ),
   DocsApiFact(
@@ -914,16 +915,16 @@ const List<DocsApiFact> _elFormFieldFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'rules',
-    type: 'List<ElRule<T>>?',
+    type: 'List<ValidationRule<T>>?',
     description:
         'Optional. Defaults to an empty list. Evaluated in declaration '
         'order, every check run without aborting early.',
   ),
   DocsApiFact(
     name: 'issueMode',
-    type: 'ElIssueMode',
+    type: 'IssueMode',
     description:
-        'Optional. Defaults to ElIssueMode.first. first truncates to '
+        'Optional. Defaults to IssueMode.first. first truncates to '
         'one message; all keeps every one.',
   ),
   DocsApiFact(
@@ -931,7 +932,7 @@ const List<DocsApiFact> _elFormFieldFacts = <DocsApiFact>[
     type: 'T (get/set)',
     description:
         "The current value. Setting it notifies listeners and the "
-        "enclosing ElForm's re-validation hook.",
+        "enclosing Form's re-validation hook.",
   ),
 ];
 
@@ -948,12 +949,12 @@ const List<DocsApiFact> _elTextFormFieldFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'rules',
-    type: 'List<ElRule<String>>?',
+    type: 'List<ValidationRule<String>>?',
     description: 'Optional (inherited).',
   ),
   DocsApiFact(
     name: 'issueMode',
-    type: 'ElIssueMode',
+    type: 'IssueMode',
     description: 'Optional (inherited).',
   ),
   DocsApiFact(
@@ -961,7 +962,7 @@ const List<DocsApiFact> _elTextFormFieldFacts = <DocsApiFact>[
     type: 'TextEditingController (get)',
     description:
         'Owned by the field, kept in step with value: hand this to '
-        'ElInput.controller / ElTextarea.controller.',
+        'Input.controller / Textarea.controller.',
   ),
 ];
 
@@ -990,7 +991,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Submitting',
     treatment:
         'isSubmitting is true for the duration of submit\'s onValid '
-        'callback; what ElButton.loading reads.',
+        'callback; what Button.loading reads.',
     userSignal: 'A submit button shows its spinner and disables.',
   ),
   DocsStateFact(
@@ -1023,14 +1024,14 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DocsInstallFacts(
-    title: 'ElForm contract',
+    title: 'Form contract',
     facts: const <DocsInstallFact>[
       DocsInstallFact(
         label: 'Non-visual',
-        value: 'ElForm paints nothing',
+        value: 'Form paints nothing',
         description:
             'Bind it with ListenableBuilder and read field.invalid and '
-            'field.errors to drive your own UI.',
+            'field.errors to drive your own ',
       ),
       DocsInstallFact(
         label: 'Field focus',
@@ -1042,16 +1043,16 @@ class _AccessibilityContent extends StatelessWidget {
       ),
       DocsInstallFact(
         label: 'Announcements',
-        value: 'Delegated to ElField and ElFieldError',
+        value: 'Delegated to Field and FieldError',
         description:
-            'Managed by the controls around it; ElForm itself neither '
+            'Managed by the controls around it; Form itself neither '
             'reads nor announces.',
       ),
     ],
   );
 }
 
-/// `ElForm` owns no widget tree, so this section is entirely about the one
+/// `Form` owns no widget tree, so this section is entirely about the one
 /// keyboard-relevant behaviour it does own — `focusFirstError()`, called
 /// from `submit()` — read off `lib/src/components/form.dart` directly.
 class _KeyboardContent extends StatelessWidget {
@@ -1059,10 +1060,10 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No key handling of its own: form.dart wires no '
             'Focus.onKeyEvent and owns no FocusNode of its own — every '
-            'FocusNode belongs to a field (ElFormFieldBase.focusNode), '
+            'FocusNode belongs to a field (FormFieldBase.focusNode), '
             'not to the form.',
         'focusFirstError() is programmatic, not a key listener: submit() '
             'calls it on a failed validate(), and it walks fields in '
@@ -1075,7 +1076,7 @@ class _KeyboardContent extends StatelessWidget {
             'since that is also each field\'s registration order, but '
             'form.dart itself reads no FocusTraversalPolicy and enforces '
             'no ordering.',
-        'Submit and Reset are ordinary ElButtons in every specimen on '
+        'Submit and Reset are ordinary Buttons in every specimen on '
             'this page: their own Enter/Space activation (see the Button '
             'page\'s Keyboard section) is what triggers submit() or '
             'reset(), not something form.dart adds.',
@@ -1087,8 +1088,8 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElForm reads no MediaQuery and responds identically at 390px '
+      _bullets(ThemeScope.of(context), <String>[
+        'Form reads no MediaQuery and responds identically at 390px '
             'and 1440px: the form state machine is viewport-agnostic.',
         'Keyboard activation (Tab, Enter) and pointer activation (tap) '
             'reach the same submit() call on every Flutter target.',
@@ -1120,8 +1121,8 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Dependencies',
             value: formDoc.dependencies.join(', '),
             description:
-                'ElFormField.rules is a List<ElRule<T>>, checked by '
-                'ElRules.check (rule.dart) — dependency-free, no schema '
+                'FormField.rules is a List<ValidationRule<T>>, checked by '
+                'Validators.check (validation_rule.dart) — dependency-free, no schema '
                 'library.',
           ),
           const DocsInstallFact(
@@ -1138,7 +1139,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
@@ -1150,15 +1151,19 @@ class _DependenciesContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

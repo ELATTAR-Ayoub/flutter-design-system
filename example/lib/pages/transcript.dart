@@ -18,8 +18,8 @@
 ///     COMPLETE_SAMPLE` ends a sentence with `https://example.com.`; the
 ///     `[^\s<>()]+` class does not exclude `.`, so the link label: measured
 ///     149.22px wide: is `https://example.com.` including the period.
-///  3. **`markdown-not-supported` is a `ElSection` nested inside a
-///     `ElSection`.** Its 701.8px is part of `#markdown`'s 4706.3, and its own
+///  3. **`markdown-not-supported` is a `Section` nested inside a
+///     `Section`.** Its 701.8px is part of `#markdown`'s 4706.3, and its own
 ///     `mb-20` collapses with the outer section's rather than adding to it.
 ///     [_MarginCollapse] is that collapse, spelled in Flutter.
 ///  4. **The state grid's six cells are two different heights.** A CSS grid row
@@ -42,13 +42,25 @@
 ///  8. **The image arrives as a painter rather than as bytes.** The reference
 ///     inlines an `image/svg+xml` data URI; Flutter has no SVG decoder and no
 ///     third-party dependency may be added, so the page hands
-///     [ElAgentAttachmentList] the same drawing through its `imageBuilder`
+///     [AgentAttachmentList] the same drawing through its `imageBuilder`
 ///     seam. Same 640×360 box, same three colours, same caption.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/rendering.dart' hide ScrollDirection;
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -71,33 +83,33 @@ const List<String> _suggestions = <String>[
 /// Supplied by the caller rather than guessed, because only the caller knows
 /// whether `export_activity` is reading, writing or running: and a status line
 /// that guesses is a status line that lies.
-const ElToolStateMap _toolStates = <String, ElAgentState>{
-  'search_inventory': ElAgentState.searching,
-  'read_wallet': ElAgentState.retrieving,
-  'export_activity': ElAgentState.writing,
-  'fetch_market_price': ElAgentState.retrieving,
+const ToolStateMap _toolStates = <String, AgentState>{
+  'search_inventory': AgentState.searching,
+  'read_wallet': AgentState.retrieving,
+  'export_activity': AgentState.writing,
+  'fetch_market_price': AgentState.retrieving,
 };
 
 /// `COMMANDS.filter(c => c.group === "skill")`: the three the welcome card
 /// advertises.
-const List<ElAgentCapability> _skills = <ElAgentCapability>[
-  ElAgentCapability(
+const List<AgentCapability> _skills = <AgentCapability>[
+  AgentCapability(
     id: 'inventory',
     label: 'inventory',
     hint: 'What is in stock',
-    glyph: ElLucide.search,
+    glyph: Lucide.search,
   ),
-  ElAgentCapability(
+  AgentCapability(
     id: 'wallet',
     label: 'wallet',
     hint: 'Balance and recent movement',
-    glyph: ElLucide.wallet,
+    glyph: Lucide.wallet,
   ),
-  ElAgentCapability(
+  AgentCapability(
     id: 'export',
     label: 'export',
     hint: 'Download activity as CSV',
-    glyph: ElLucide.download,
+    glyph: Lucide.download,
   ),
 ];
 
@@ -113,12 +125,12 @@ String _describeApproval(String action, Map<String, Object?> params) {
   return 'Run $action.';
 }
 
-const ElUserTurn _userTurn = ElUserTurn(
+const UserTurn _userTurn = UserTurn(
   id: 'spec-user',
   text: 'What sealed boxes are left, and what is the best one?',
 );
 
-const ElTextTurn _agentTurn = ElTextTurn(
+const TextTurn _agentTurn = TextTurn(
   id: 'spec-agent',
   text:
       'Three sealed boxes match. The strongest is '
@@ -126,25 +138,25 @@ const ElTextTurn _agentTurn = ElTextTurn(
       '250.\n\nWant me to put one on hold?',
 );
 
-const ElTextTurn _streamingTurn = ElTextTurn(
+const TextTurn _streamingTurn = TextTurn(
   id: 'spec-streaming',
   text: 'Checking the vault',
   streaming: true,
 );
 
-const ElToolTurn _toolRunning = ElToolTurn(
+const ToolTurn _toolRunning = ToolTurn(
   id: 'spec-tool-running',
   name: 'search_inventory',
   params: <String, Object?>{'query': 'sealed booster boxes', 'limit': 3},
-  status: ElAgentTurnStatus.running,
+  status: AgentTurnStatus.running,
   attempt: 1,
 );
 
-const ElToolTurn _toolOk = ElToolTurn(
+const ToolTurn _toolOk = ToolTurn(
   id: 'spec-tool-ok',
   name: 'search_inventory',
   params: <String, Object?>{'query': 'sealed booster boxes', 'limit': 3},
-  status: ElAgentTurnStatus.ok,
+  status: AgentTurnStatus.ok,
   result: <String, Object?>{
     'matches': 3,
     'topResult': 'Eclipse Vault — 1st Edition',
@@ -153,32 +165,32 @@ const ElToolTurn _toolOk = ElToolTurn(
   attempt: 1,
 );
 
-const ElToolTurn _toolError = ElToolTurn(
+const ToolTurn _toolError = ToolTurn(
   id: 'spec-tool-error',
   name: 'fetch_market_price',
   params: <String, Object?>{'item': 'Eclipse Vault'},
-  status: ElAgentTurnStatus.error,
+  status: AgentTurnStatus.error,
   error: 'The pricing service did not respond in time.',
   ms: 8004,
   attempt: 2,
 );
 
-const ElAgentAttachment _produced = ElAgentAttachment(
+const AgentAttachment _produced = AgentAttachment(
   id: 'spec-csv',
   name: 'activity-30d.csv',
   mime: 'text/csv',
-  kind: ElAgentAttachmentKind.data,
+  kind: AgentAttachmentKind.data,
   size: 4821,
-  delivery: ElAgentDelivery.produced(),
+  delivery: AgentDelivery.produced(),
 );
 
-const ElToolTurn _toolWithFile = ElToolTurn(
+const ToolTurn _toolWithFile = ToolTurn(
   id: 'spec-tool-file',
   name: 'export_activity',
   params: <String, Object?>{'window': '30d', 'format': 'csv'},
-  status: ElAgentTurnStatus.ok,
+  status: AgentTurnStatus.ok,
   result: <String, Object?>{'rows': 148},
-  attachments: <ElAgentAttachment>[_produced],
+  attachments: <AgentAttachment>[_produced],
   ms: 1204,
   attempt: 1,
 );
@@ -190,32 +202,32 @@ const ElToolTurn _toolWithFile = ElToolTurn(
 /// name travels. `produced` is the shape `extractProduced` stamps on a tool's
 /// own output. No `error` or `uploading` example lives here: the domain type
 /// cannot express either.
-const List<ElAgentAttachment> _deliverySpecimens = <ElAgentAttachment>[
-  ElAgentAttachment(
+const List<AgentAttachment> _deliverySpecimens = <AgentAttachment>[
+  AgentAttachment(
     id: 'spec-delivery-content',
     name: 'collection-export.csv',
     mime: 'text/csv',
-    kind: ElAgentAttachmentKind.data,
+    kind: AgentAttachmentKind.data,
     size: 18422,
-    delivery: ElAgentDelivery.content(),
+    delivery: AgentDelivery.content(),
   ),
-  ElAgentAttachment(
+  AgentAttachment(
     id: 'spec-delivery-reference',
     name: 'grading-report.pdf',
     mime: 'application/pdf',
-    kind: ElAgentAttachmentKind.document,
+    kind: AgentAttachmentKind.document,
     size: 2620000,
-    delivery: ElAgentDelivery.reference(
+    delivery: AgentDelivery.reference(
       'This file is not text, so its contents could not be inlined.',
     ),
   ),
-  ElAgentAttachment(
+  AgentAttachment(
     id: 'spec-delivery-produced',
     name: 'activity-30d.csv',
     mime: 'text/csv',
-    kind: ElAgentAttachmentKind.data,
+    kind: AgentAttachmentKind.data,
     size: 4821,
-    delivery: ElAgentDelivery.produced(),
+    delivery: AgentDelivery.produced(),
   ),
 ];
 
@@ -224,30 +236,30 @@ const List<ElAgentAttachment> _deliverySpecimens = <ElAgentAttachment>[
 /// unlocks both behaviours this panel exists to prove.
 const String _specImageUrl = 'data:image/svg+xml;utf8,pull-of-the-week';
 
-const List<ElAgentAttachment> _openableSpecimens = <ElAgentAttachment>[
-  ElAgentAttachment(
+const List<AgentAttachment> _openableSpecimens = <AgentAttachment>[
+  AgentAttachment(
     id: 'spec-openable-image',
     name: 'pull-of-the-week.png',
     mime: 'image/png',
-    kind: ElAgentAttachmentKind.image,
+    kind: AgentAttachmentKind.image,
     size: 184220,
     url: _specImageUrl,
-    delivery: ElAgentDelivery.content(),
+    delivery: AgentDelivery.content(),
   ),
-  ElAgentAttachment(
+  AgentAttachment(
     id: 'spec-openable-doc',
     name: 'grading-report.pdf',
     mime: 'application/pdf',
-    kind: ElAgentAttachmentKind.document,
+    kind: AgentAttachmentKind.document,
     size: 2620000,
     url: _specImageUrl,
-    delivery: ElAgentDelivery.reference(
+    delivery: AgentDelivery.reference(
       'This file is not text, so its contents could not be inlined.',
     ),
   ),
 ];
 
-const ElPendingApproval _heldAction = ElPendingApproval(
+const PendingApproval _heldAction = PendingApproval(
   turnId: 'spec-action',
   action: 'purchase_pack',
   params: <String, Object?>{
@@ -356,12 +368,12 @@ const List<(String, String)> _markdownLimits = <(String, String)>[
 /* ── Page-local geometry ─────────────────────────────────────────────────── */
 
 Widget _mt(double steps, Widget child) => Padding(
-  padding: EdgeInsets.only(top: el(steps)),
+  padding: EdgeInsets.only(top: space(steps)),
   child: child,
 );
 
 /// `p-6` inside a flush panel.
-double get _panelInset => el(6);
+double get _panelInset => space(6);
 
 /* ── The page ────────────────────────────────────────────────────────────── */
 
@@ -370,12 +382,12 @@ class TranscriptPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('agent', 'transcript');
+    final CategoryHit here = findCategory('agent', 'transcript');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
           blurb: here.category.blurb,
@@ -388,7 +400,7 @@ class TranscriptPage extends StatelessWidget {
         const _MarkdownSection(),
         const _WelcomeSection(),
         const _AttachmentsSection(),
-        const ElPageFootNav(groupId: 'agent', slug: 'transcript'),
+        const PageFootNav(groupId: 'agent', slug: 'transcript'),
       ],
     );
   }
@@ -400,7 +412,7 @@ class _TurnsSection extends StatelessWidget {
   const _TurnsSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'turns',
     title: 'Turns',
     description:
@@ -411,7 +423,7 @@ class _TurnsSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(
+        const Panel(
           label: 'Message',
           note: 'user · agent · streaming',
           child: _TranscriptTurns(),
@@ -426,17 +438,17 @@ class _TranscriptTurns extends StatelessWidget {
   const _TranscriptTurns();
 
   /// `gap-4`.
-  static double get gap => el(4);
+  static double get gap => space(4);
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      const ElUserMessage(turn: _userTurn),
+      const UserMessage(turn: _userTurn),
       SizedBox(height: gap),
-      const ElAgentMessage(turn: _agentTurn),
+      const AgentMessage(turn: _agentTurn),
       SizedBox(height: gap),
-      const ElAgentMessage(turn: _streamingTurn),
+      const AgentMessage(turn: _streamingTurn),
     ],
   );
 }
@@ -445,25 +457,25 @@ class _TurnsNote extends StatelessWidget {
   const _TurnsNote();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
           text: 'The third turn is mid-stream. The caret is the one place ',
         ),
-        ElCode.span('--agent'),
+        Code.span('--agent'),
         const TextSpan(
           text:
               ' is used as a solid fill rather than as a foreground — a '
               'mark a pixel and a half wide, pulsing on ',
         ),
-        ElCode.span('anim-pulse-live'),
+        Code.span('anim-pulse-live'),
         const TextSpan(
           text: '. It is what tells a reader the agent has not stalled.',
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -473,7 +485,7 @@ class _ToolsSection extends StatelessWidget {
   const _ToolsSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'tools',
     title: 'Tool chips',
     description:
@@ -484,15 +496,15 @@ class _ToolsSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(
+        const Panel(
           label: 'ToolChip',
           note: 'running · ok · produced a file · failed',
           child: _ToolChips(),
         ),
         _mt(
           6,
-          const ElNote(
-            tone: ElNoteTone.value,
+          const Note(
+            tone: NoteTone.value,
             title: 'The failed chip is not decoration',
             child: _FailedChipNote(),
           ),
@@ -506,11 +518,11 @@ class _FailedChipNote extends StatelessWidget {
   const _FailedChipNote();
 
   @override
-  Widget build(BuildContext context) => ElText(
+  Widget build(BuildContext context) => StyledText(
     'It carries the attempt count. A tool that succeeded on its second try '
     'is a different fact from one that succeeded outright, and hiding the '
     'retry makes an agent look more reliable than it is.',
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -518,19 +530,19 @@ class _ToolChips extends StatelessWidget {
   const _ToolChips();
 
   /// `flex flex-col items-start gap-3`.
-  static double get gap => el(3);
+  static double get gap => space(3);
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      const ElToolChip(turn: _toolRunning, toolStates: _toolStates),
+      const ToolChip(turn: _toolRunning, toolStates: _toolStates),
       SizedBox(height: gap),
-      const ElToolChip(turn: _toolOk, toolStates: _toolStates),
+      const ToolChip(turn: _toolOk, toolStates: _toolStates),
       SizedBox(height: gap),
-      const ElToolChip(turn: _toolWithFile, toolStates: _toolStates),
+      const ToolChip(turn: _toolWithFile, toolStates: _toolStates),
       SizedBox(height: gap),
-      const ElToolChip(turn: _toolError, toolStates: _toolStates),
+      const ToolChip(turn: _toolError, toolStates: _toolStates),
     ],
   );
 }
@@ -541,7 +553,7 @@ class _ApprovalSection extends StatelessWidget {
   const _ApprovalSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'approval',
     title: 'Approval card',
     description:
@@ -551,17 +563,17 @@ class _ApprovalSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(
+        const Panel(
           label: 'ApprovalCard',
           note: 'purchase_pack — held',
-          child: ElApprovalCard(
+          child: ApprovalCard(
             approval: _heldAction,
             describe: _describeApproval,
           ),
         ),
         _mt(
           6,
-          const ElDoDont(
+          const DoDont(
             dos: <String>[
               "Describe the consequence in the user's language — what it "
                   'costs, what it changes, whether it can be undone.',
@@ -590,7 +602,7 @@ class _QuestionnaireSection extends StatelessWidget {
   const _QuestionnaireSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'questionnaire',
     title: 'Questionnaire',
     description:
@@ -601,7 +613,7 @@ class _QuestionnaireSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(
+        const Panel(
           label: 'Questionnaire',
           note:
               'unanswered · answered · skipped · invalid · submitting · complete',
@@ -609,34 +621,31 @@ class _QuestionnaireSection extends StatelessWidget {
         ),
         _mt(
           6,
-          const ElStateGrid(
+          const StateGrid(
             cols: 3,
             children: <Widget>[
-              ElStateCell(label: 'Unanswered', child: _QuestionnaireCell()),
-              ElStateCell(
+              StateCell(label: 'Unanswered', child: _QuestionnaireCell()),
+              StateCell(
                 label: 'Answered',
                 child: _QuestionnaireCell(checked: true),
               ),
-              ElStateCell(
+              StateCell(
                 label: 'Skipped',
                 note: 'optional questions only',
                 child: _QuestionnaireCell(withSkip: true),
               ),
-              ElStateCell(label: 'Invalid', child: _QuestionnaireInvalidCell()),
-              ElStateCell(
+              StateCell(label: 'Invalid', child: _QuestionnaireInvalidCell()),
+              StateCell(
                 label: 'Submitting',
-                child: ElQuestionnaireSubmittingView(),
+                child: QuestionnaireSubmittingView(),
               ),
-              ElStateCell(
-                label: 'Complete',
-                child: ElQuestionnaireCompleteView(),
-              ),
+              StateCell(label: 'Complete', child: QuestionnaireCompleteView()),
             ],
           ),
         ),
         _mt(
           6,
-          const ElNote(
+          const Note(
             title: 'Shortcuts are drawn, not just bound',
             child: _ShortcutsNoteBody(),
           ),
@@ -650,22 +659,22 @@ class _ShortcutsNoteBody extends StatelessWidget {
   const _ShortcutsNoteBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
-        ElCode.span('Questionnaire'),
+        Code.span('Questionnaire'),
         const TextSpan(text: ' can bind '),
-        ElCode.span('A'),
+        Code.span('A'),
         const TextSpan(text: '/'),
-        ElCode.span('B'),
+        Code.span('B'),
         const TextSpan(text: '/'),
-        ElCode.span('C'),
+        Code.span('C'),
         const TextSpan(text: ' (or '),
-        ElCode.span('1'),
+        Code.span('1'),
         const TextSpan(text: '/'),
-        ElCode.span('2'),
+        Code.span('2'),
         const TextSpan(text: '/'),
-        ElCode.span('3'),
+        Code.span('3'),
         const TextSpan(
           text:
               ') to each choice without showing anything for it — the key '
@@ -674,11 +683,11 @@ class _ShortcutsNoteBody extends StatelessWidget {
               'shortcut nobody can see is a shortcut nobody uses. Every '
               'choice above renders its key in a ',
         ),
-        ElCode.span('Kbd'),
+        Code.span('Kbd'),
         const TextSpan(text: '.'),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -720,64 +729,64 @@ class _QuestionnaireDemoState extends State<_QuestionnaireDemo> {
   @override
   Widget build(BuildContext context) {
     if (_phase == _Phase.complete) {
-      return ElQuestionnaireCompleteView(
+      return QuestionnaireCompleteView(
         onRestart: () => setState(() => _phase = _Phase.form),
       );
     }
     if (_phase == _Phase.submitting) {
-      return const ElQuestionnaireSubmittingView();
+      return const QuestionnaireSubmittingView();
     }
 
-    return ElQuestionnaire(
-      shortcuts: ElQuestionnaireShortcuts.letters,
+    return Questionnaire(
+      shortcuts: QuestionnaireShortcuts.letters,
       onSubmit: _submit,
       children: <Widget>[
-        const ElQuestionnaireProgress(),
-        ElQuestionnaireItem(
+        const QuestionnaireProgress(),
+        QuestionnaireItem(
           name: 'style',
           required: true,
-          title: const ElQuestionnaireTitle('How do you usually pick a pack?'),
+          title: const QuestionnaireTitle('How do you usually pick a pack?'),
           children: <Widget>[
-            ElQuestionnaireChoices(
-              children: <ElQuestionnaireChoice>[
+            QuestionnaireChoices(
+              children: <QuestionnaireChoice>[
                 for (int i = 0; i < _packStyleValues.length; i += 1)
-                  ElQuestionnaireChoice(
+                  QuestionnaireChoice(
                     value: _packStyleValues[i],
                     label: _packStyleChoices[i],
                   ),
               ],
             ),
-            const ElQuestionnaireError(),
+            const QuestionnaireError(),
           ],
         ),
-        const ElQuestionnaireItem(
+        const QuestionnaireItem(
           name: 'goal',
-          title: ElQuestionnaireTitle('Chasing anything specific?'),
-          description: ElQuestionnaireDescription(
+          title: QuestionnaireTitle('Chasing anything specific?'),
+          description: QuestionnaireDescription(
             'Optional — Skip moves on without an answer.',
           ),
           children: <Widget>[
-            ElQuestionnaireInput(placeholder: 'A card, a set, a rarity…'),
+            QuestionnaireInput(placeholder: 'A card, a set, a rarity…'),
           ],
         ),
-        const ElQuestionnaireItem(
+        const QuestionnaireItem(
           name: 'budget',
           required: true,
-          title: ElQuestionnaireTitle("What's tonight's budget?"),
+          title: QuestionnaireTitle("What's tonight's budget?"),
           children: <Widget>[
-            ElQuestionnaireInput(
+            QuestionnaireInput(
               placeholder: r'$',
               keyboardType: TextInputType.number,
             ),
-            ElQuestionnaireError(text: 'Enter an amount before continuing.'),
+            QuestionnaireError(text: 'Enter an amount before continuing.'),
           ],
         ),
-        const ElQuestionnaireActions(
+        const QuestionnaireActions(
           children: <Widget>[
-            ElQuestionnairePrevious(),
-            ElQuestionnaireSkip(),
-            ElQuestionnaireNext(),
-            ElQuestionnaireSubmit(),
+            QuestionnairePrevious(),
+            QuestionnaireSkip(),
+            QuestionnaireNext(),
+            QuestionnaireSubmit(),
           ],
         ),
       ],
@@ -793,21 +802,21 @@ class _QuestionnaireCell extends StatelessWidget {
   const _QuestionnaireCell({this.checked = false, this.withSkip = false});
 
   /// `className="w-full gap-3"`.
-  static double get gap => el(3);
+  static double get gap => space(3);
 
   final bool checked;
   final bool withSkip;
 
   @override
-  Widget build(BuildContext context) => ElQuestionnaire(
+  Widget build(BuildContext context) => Questionnaire(
     gap: gap,
     children: <Widget>[
-      ElQuestionnaireItem(
+      QuestionnaireItem(
         name: 'demo',
         children: <Widget>[
-          ElQuestionnaireChoices(
-            children: <ElQuestionnaireChoice>[
-              ElQuestionnaireChoice(
+          QuestionnaireChoices(
+            children: <QuestionnaireChoice>[
+              QuestionnaireChoice(
                 value: 'a',
                 label: 'Option A',
                 defaultChecked: checked,
@@ -815,9 +824,7 @@ class _QuestionnaireCell extends StatelessWidget {
             ],
           ),
           if (withSkip)
-            const ElQuestionnaireActions(
-              children: <Widget>[ElQuestionnaireSkip()],
-            ),
+            const QuestionnaireActions(children: <Widget>[QuestionnaireSkip()]),
         ],
       ),
     ],
@@ -828,17 +835,17 @@ class _QuestionnaireInvalidCell extends StatelessWidget {
   const _QuestionnaireInvalidCell();
 
   @override
-  Widget build(BuildContext context) => ElQuestionnaire(
+  Widget build(BuildContext context) => Questionnaire(
     gap: _QuestionnaireCell.gap,
     children: const <Widget>[
-      ElQuestionnaireItem(
+      QuestionnaireItem(
         name: 'demo',
         required: true,
         invalid: true,
-        title: ElQuestionnaireTitle('Budget'),
+        title: QuestionnaireTitle('Budget'),
         children: <Widget>[
-          ElQuestionnaireInput(placeholder: r'$'),
-          ElQuestionnaireError(text: 'Enter an amount before continuing.'),
+          QuestionnaireInput(placeholder: r'$'),
+          QuestionnaireError(text: 'Enter an amount before continuing.'),
         ],
       ),
     ],
@@ -849,30 +856,34 @@ class _QuestionnaireInvalidCell extends StatelessWidget {
 /// tracks. It is the shape a transport's round trip actually takes once the
 /// form validates, so this specimen owns it the same way a real integration
 /// would.
-class ElQuestionnaireSubmittingView extends StatelessWidget {
-  const ElQuestionnaireSubmittingView({super.key});
+class QuestionnaireSubmittingView extends StatelessWidget {
+  const QuestionnaireSubmittingView({super.key});
 
   /// `flex flex-col items-center gap-3 py-6 text-center`.
-  static double get gap => el(3);
-  static double get padY => el(6);
+  static double get gap => space(3);
+  static double get padY => space(6);
 
   /// `size-6`.
-  static double get spinnerPx => el(6);
+  static double get spinnerPx => space(6);
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
       padding: EdgeInsets.symmetric(vertical: padY),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           DefaultTextStyle.merge(
-            style: TextStyle(color: theme.actionInk),
-            child: ElSpinner(size: spinnerPx),
+            style: TextStyle(color: theme.actionText),
+            child: Spinner(size: spinnerPx),
           ),
           SizedBox(height: gap),
-          ElText('Saving your answers…', ElType.small, align: TextAlign.center),
+          StyledText(
+            'Saving your answers…',
+            TextStyles.small,
+            align: TextAlign.center,
+          ),
         ],
       ),
     );
@@ -882,47 +893,45 @@ class ElQuestionnaireSubmittingView extends StatelessWidget {
 /// `QuestionnaireCompleteView`. The blurb and the restart control appear only
 /// when a caller supplies [onRestart]: which is why the state-grid cell shows
 /// the icon and the headline alone.
-class ElQuestionnaireCompleteView extends StatelessWidget {
-  const ElQuestionnaireCompleteView({super.key, this.onRestart});
+class QuestionnaireCompleteView extends StatelessWidget {
+  const QuestionnaireCompleteView({super.key, this.onRestart});
 
   final VoidCallback? onRestart;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: ElQuestionnaireSubmittingView.padY,
-      ),
+      padding: EdgeInsets.symmetric(vertical: QuestionnaireSubmittingView.padY),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const ElIcon.lucide(
-            ElLucide.circleCheck,
-            size: ElIconSize.xl,
-            tone: ElIconTone.success,
+          const Icon.lucide(
+            Lucide.circleCheck,
+            size: IconSize.xl,
+            tone: IconTone.success,
           ),
-          SizedBox(height: ElQuestionnaireSubmittingView.gap),
-          ElText(
+          SizedBox(height: QuestionnaireSubmittingView.gap),
+          StyledText(
             'That’s everything.',
-            ElType.h4,
+            TextStyles.h4,
             color: theme.foreground,
             align: TextAlign.center,
           ),
           if (onRestart != null) ...<Widget>[
-            SizedBox(height: ElQuestionnaireSubmittingView.gap),
+            SizedBox(height: QuestionnaireSubmittingView.gap),
             ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: ElContainers.xs),
-              child: ElText(
+              constraints: BoxConstraints(maxWidth: Containers.xs),
+              child: StyledText(
                 'Vault will use this to surface packs you’d actually open.',
-                ElType.small,
+                TextStyles.small,
                 align: TextAlign.center,
               ),
             ),
-            SizedBox(height: ElQuestionnaireSubmittingView.gap),
-            ElButton(
-              size: ElButtonSize.sm,
-              variant: ElButtonVariant.outline,
+            SizedBox(height: QuestionnaireSubmittingView.gap),
+            Button(
+              size: ButtonSize.sm,
+              variant: ButtonVariant.outline,
               onPressed: onRestart,
               child: const Text('Answer again'),
             ),
@@ -939,7 +948,7 @@ class _MarkdownSection extends StatelessWidget {
   const _MarkdownSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'markdown',
     title: 'Markdown',
     description:
@@ -950,23 +959,23 @@ class _MarkdownSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElPanel(
+        const Panel(
           label: 'Transcript example',
           note: 'table · code · ordered list',
-          child: ElAgentMarkdown(text: _markdownSample),
+          child: AgentMarkdown(text: _markdownSample),
         ),
         _mt(
           4,
-          const ElNote(title: 'A deliberate subset', child: _SubsetNoteBody()),
+          const Note(title: 'A deliberate subset', child: _SubsetNoteBody()),
         ),
         _mt(8, const _MarkdownCaseList(_blockCases)),
         _mt(8, const _MarkdownCaseList(_inlineCases)),
         _mt(8, const _TablesPanel()),
         _mt(
           8,
-          const ElPanel(
+          const Panel(
             label: 'Everything together',
-            child: ElAgentMarkdown(text: _markdownComplete),
+            child: AgentMarkdown(text: _markdownComplete),
           ),
         ),
         // `mt-12` on a section already inside a section: its own `mb-20`
@@ -981,7 +990,7 @@ class _SubsetNoteBody extends StatelessWidget {
   const _SubsetNoteBody();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -992,11 +1001,11 @@ class _SubsetNoteBody extends StatelessWidget {
               'as visible text. That smaller contract is what makes raw '
               'model output safe without',
         ),
-        ElCode.span('dangerouslySetInnerHTML'),
+        Code.span('dangerouslySetInnerHTML'),
         const TextSpan(text: ' or an HTML sanitizer.'),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -1100,17 +1109,17 @@ class _MarkdownCaseList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(ElRadii.xl),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.xl),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(ElWidths.hairline),
+        padding: const EdgeInsets.all(BorderWidths.hairline),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(ElRadii.xl - ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.xl - BorderWidths.hairline),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -1126,7 +1135,7 @@ class _MarkdownCaseList extends StatelessWidget {
                         : Border(
                             bottom: BorderSide(
                               color: theme.border,
-                              width: ElWidths.hairline,
+                              width: BorderWidths.hairline,
                             ),
                           ),
                   ),
@@ -1145,36 +1154,36 @@ class _MarkdownCaseList extends StatelessWidget {
 class _MarkdownCase extends StatelessWidget {
   const _MarkdownCase(this.data);
 
-  static double get padX => el(6);
-  static double get padY => el(7);
-  static double get gapNarrow => el(4);
-  static double get gapWide => el(8);
+  static double get padX => space(6);
+  static double get padY => space(7);
+  static double get gapNarrow => space(4);
+  static double get gapWide => space(8);
 
   final _Case data;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final bool wide = MediaQuery.sizeOf(context).width >= ElBreakpoints.lg;
+    final ThemeTokens theme = ThemeScope.of(context);
+    final bool wide = MediaQuery.sizeOf(context).width >= Breakpoints.lg;
 
     final Widget left = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElText(data.syntax, ElType.code, color: theme.actionInk),
-        _mt(2, ElText(data.use, ElType.small)),
+        StyledText(data.syntax, TextStyles.code, color: theme.actionText),
+        _mt(2, StyledText(data.use, TextStyles.small)),
         _mt(4, _SourceBlock(data.source)),
       ],
     );
 
     final Widget right = Container(
-      padding: EdgeInsets.all(el(5)),
+      padding: EdgeInsets.all(space(5)),
       decoration: BoxDecoration(
         color: theme.background,
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
-      child: ElAgentMarkdown(text: data.source),
+      child: AgentMarkdown(text: data.source),
     );
 
     return Padding(
@@ -1216,20 +1225,20 @@ class _SourceBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Container(
-      padding: EdgeInsets.all(el(3)),
+      padding: EdgeInsets.all(space(3)),
       decoration: BoxDecoration(
         color: theme.muted,
-        borderRadius: BorderRadius.circular(ElRadii.md),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.md),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         // The `pre` keeps the page's own 16px/24px strut, `.type-code` is on
         // the `<code>` inside it, not on the block. Measured 122 for four
         // lines, which is 24 + 2 + 4 × 24.
-        child: ElPreformattedCode(code: source, color: theme.foreground),
+        child: PreformattedCode(code: source, color: theme.foreground),
       ),
     );
   }
@@ -1240,11 +1249,11 @@ class _TablesPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool wide = MediaQuery.sizeOf(context).width >= ElBreakpoints.lg;
+    final bool wide = MediaQuery.sizeOf(context).width >= Breakpoints.lg;
     final Widget source = const _SourceBlock(_tableSource);
-    const Widget rendered = ElAgentMarkdown(text: _tableSource);
+    const Widget rendered = AgentMarkdown(text: _tableSource);
 
-    return ElPanel(
+    return Panel(
       label: 'Tables',
       note: 'header · delimiter · rows · alignment · escaped pipes',
       child: Column(
@@ -1255,7 +1264,7 @@ class _TablesPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Expanded(child: source),
-                SizedBox(width: el(6)),
+                SizedBox(width: space(6)),
                 const Expanded(child: rendered),
               ],
             )
@@ -1264,20 +1273,20 @@ class _TablesPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 source,
-                SizedBox(height: el(6)),
+                SizedBox(height: space(6)),
                 rendered,
               ],
             ),
           _mt(
             5,
-            ElText(
+            StyledText(
               'A table requires a header followed immediately by a delimiter '
               'row. Colons set left, center or right alignment; right-aligned '
               'cells use tabular figures. Escaped pipes stay inside a cell. '
               'Ragged streaming rows are padded to the header width, and wide '
               'tables scroll inside their own border instead of widening the '
               'transcript.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ],
@@ -1290,7 +1299,7 @@ class _NotSupportedSection extends StatelessWidget {
   const _NotSupportedSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'markdown-not-supported',
     title: 'Markdown not supported',
     description:
@@ -1300,13 +1309,13 @@ class _NotSupportedSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElMeta(
-          items: <ElMetaItem>[
+        Meta(
+          items: <MetaItem>[
             for (final (String k, String v) in _markdownLimits)
               (k: k, v: TextSpan(text: v)),
           ],
         ),
-        const ElDoDont(
+        const DoDont(
           dos: <String>[
             'Use headings one through four, flat lists, quotes, fenced code '
                 'and delimiter-row tables.',
@@ -1341,11 +1350,11 @@ class _MarginCollapse extends SingleChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _RenderMarginCollapse(el(20));
+      _RenderMarginCollapse(space(20));
 
   @override
   void updateRenderObject(BuildContext context, RenderObject renderObject) {
-    (renderObject as _RenderMarginCollapse).amount = el(20);
+    (renderObject as _RenderMarginCollapse).amount = space(20);
   }
 }
 
@@ -1397,7 +1406,7 @@ class _WelcomeSection extends StatelessWidget {
   const _WelcomeSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'welcome',
     title: 'Welcome card',
     description:
@@ -1406,18 +1415,18 @@ class _WelcomeSection extends StatelessWidget {
         'the composer, because a skill on its own is not a question and '
         "firing 'search the catalogue' with nothing to search for wastes a "
         'turn.',
-    child: ElPanel(
+    child: Panel(
       label: 'WelcomeCard',
       flush: true,
       child: Padding(
         padding: EdgeInsets.all(_panelInset),
-        child: ElWelcomeCard(
+        child: WelcomeCard(
           name: _personaName,
           blurb: _personaBlurb,
           suggestions: _suggestions,
           capabilities: _skills,
           onPick: (String _) {},
-          onUseCapability: (ElAgentCapability _) {},
+          onUseCapability: (AgentCapability _) {},
         ),
       ),
     ),
@@ -1429,21 +1438,21 @@ class _WelcomeSection extends StatelessWidget {
 class _AttachmentsSection extends StatelessWidget {
   const _AttachmentsSection();
 
-  static Widget _photograph(BuildContext context, ElAgentAttachment a) =>
+  static Widget _photograph(BuildContext context, AgentAttachment a) =>
       const _StandInPhotograph();
 
   /// **`Saving`, never `Saved`.** A plain `download` anchor gives the page no
   /// completion event, so claiming the bytes reached the disk would assert a
   /// capability this component does not have.
   static void _saving(String name) => docsToasts.show(
-    ElToastMessage(
+    ToastMessage(
       title: 'Saving $name',
       description: 'Your browser is handling the download.',
     ),
   );
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'attachments',
     title: 'Attachments travel in both directions',
     description:
@@ -1453,24 +1462,24 @@ class _AttachmentsSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElNote(
+        const Note(
           title: 'Delivery is stated, never implied',
           child: _DeliveryNoteBody(),
         ),
         _mt(
           4,
-          const ElPanel(
+          const Panel(
             label: 'AttachmentList',
             note: 'content · reference · produced',
-            child: ElAgentAttachmentList(attachments: _deliverySpecimens),
+            child: AgentAttachmentList(attachments: _deliverySpecimens),
           ),
         ),
         _mt(
           4,
-          ElPanel(
+          Panel(
             label: 'Openable — media expands, documents download',
             note: 'both need a url',
-            child: ElAgentAttachmentList(
+            child: AgentAttachmentList(
               attachments: _openableSpecimens,
               imageBuilder: _photograph,
               onDownload: _saving,
@@ -1479,23 +1488,23 @@ class _AttachmentsSection extends StatelessWidget {
         ),
         _mt(
           4,
-          const ElNote(
+          const Note(
             title: 'A url changes what an attachment can do',
             child: _UrlNoteBody(),
           ),
         ),
         _mt(
           4,
-          const ElNote(
-            tone: ElNoteTone.value,
+          const Note(
+            tone: NoteTone.value,
             title: 'Built on ui/attachment.tsx, not beside it',
             child: _BuiltOnNoteBody(),
           ),
         ),
         _mt(
           4,
-          ElMeta(
-            items: <ElMetaItem>[
+          Meta(
+            items: <MetaItem>[
               (
                 k: 'AttachmentCard',
                 v: const TextSpan(
@@ -1542,11 +1551,11 @@ class _DeliveryNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle italic = ElText.styleOf(
+    final TextStyle italic = StyledText.styleOf(
       context,
-      ElType.small,
+      TextStyles.small,
     ).copyWith(fontStyle: FontStyle.italic);
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -1559,13 +1568,13 @@ class _DeliveryNoteBody extends StatelessWidget {
           const TextSpan(text: ' looks exactly like one that means '),
           TextSpan(text: 'we sent the file', style: italic),
           const TextSpan(text: '. So an attachment carries a '),
-          ElCode.span('delivery'),
+          Code.span('delivery'),
           const TextSpan(text: ' field — '),
-          ElCode.span('content'),
+          Code.span('content'),
           const TextSpan(text: ', '),
-          ElCode.span('reference'),
+          Code.span('reference'),
           const TextSpan(text: ' with a reason, or '),
-          ElCode.span('produced'),
+          Code.span('produced'),
           const TextSpan(
             text:
                 ' — and the transcript renders it. A 40MB PDF that only '
@@ -1573,7 +1582,7 @@ class _DeliveryNoteBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -1583,20 +1592,20 @@ class _UrlNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle italic = ElText.styleOf(
+    final TextStyle italic = StyledText.styleOf(
       context,
-      ElType.small,
+      TextStyles.small,
     ).copyWith(fontStyle: FontStyle.italic);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElRichText(
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(text: 'Media opens '),
               TextSpan(text: 'in place', style: italic),
               const TextSpan(text: ', in a '),
-              ElCode.span('Dialog'),
+              Code.span('Dialog'),
               const TextSpan(
                 text:
                     ' over a dimmed page — §5’s table calls a dialog the '
@@ -1605,7 +1614,7 @@ class _UrlNoteBody extends StatelessWidget {
                     'browser’s own viewer and lose the conversation. The '
                     'close control is a ',
               ),
-              ElCode.span('secondary'),
+              Code.span('secondary'),
               const TextSpan(
                 text:
                     ' Button rather than the stock ghost ✕: this panel has no '
@@ -1615,11 +1624,11 @@ class _UrlNoteBody extends StatelessWidget {
               ),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
         _mt(
           3,
-          ElRichText(
+          RichText(
             TextSpan(
               children: <InlineSpan>[
                 const TextSpan(
@@ -1628,7 +1637,7 @@ class _UrlNoteBody extends StatelessWidget {
                       'gets a download control with both signals §5 demands. '
                       'The glyph rolls to a check through ',
                 ),
-                ElCode.span('IconSwap'),
+                Code.span('IconSwap'),
                 const TextSpan(
                   text:
                       ' so the control confirms it heard you, and a toast '
@@ -1638,7 +1647,7 @@ class _UrlNoteBody extends StatelessWidget {
                 const TextSpan(text: ', not '),
                 TextSpan(text: 'Saved', style: italic),
                 const TextSpan(text: ': a plain '),
-                ElCode.span('download'),
+                Code.span('download'),
                 const TextSpan(
                   text:
                       ' anchor gives the page no completion event, so claiming '
@@ -1648,7 +1657,7 @@ class _UrlNoteBody extends StatelessWidget {
                 ),
               ],
             ),
-            ElType.small,
+            TextStyles.small,
           ),
         ),
       ],
@@ -1661,31 +1670,31 @@ class _BuiltOnNoteBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle italic = ElText.styleOf(
+    final TextStyle italic = StyledText.styleOf(
       context,
-      ElType.small,
+      TextStyles.small,
     ).copyWith(fontStyle: FontStyle.italic);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElRichText(
+        RichText(
           TextSpan(
             children: <InlineSpan>[
-              ElCode.span('components/agent/parts/attachments.tsx'),
+              Code.span('components/agent/parts/attachments.tsx'),
               const TextSpan(
                 text:
                     ' is a thin wrapper over the vendored primitive documented '
                     'on ',
               ),
-              ElCode.span('/design-system/components/base/chat#attachment'),
+              Code.span('/design-system/components/base/chat#attachment'),
               const TextSpan(text: ' — '),
-              ElCode.span('AttachmentCard'),
+              Code.span('AttachmentCard'),
               const TextSpan(text: ' composes '),
-              ElCode.span('Attachment'),
+              Code.span('Attachment'),
               const TextSpan(text: ', '),
-              ElCode.span('AttachmentMedia'),
+              Code.span('AttachmentMedia'),
               const TextSpan(text: ' and '),
-              ElCode.span('AttachmentContent'),
+              Code.span('AttachmentContent'),
               const TextSpan(
                 text:
                     ' directly rather than drawing its own row. The one '
@@ -1699,9 +1708,9 @@ class _BuiltOnNoteBody extends StatelessWidget {
               const TextSpan(
                 text: ' (reference — hover it, the tooltip carries ',
               ),
-              ElCode.span('delivery.reason'),
+              Code.span('delivery.reason'),
               const TextSpan(text: '), and nothing at all for '),
-              ElCode.span('produced'),
+              Code.span('produced'),
               const TextSpan(
                 text:
                     ', since delivery does not apply to a file the agent made '
@@ -1709,34 +1718,34 @@ class _BuiltOnNoteBody extends StatelessWidget {
               ),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
         _mt(
           3,
-          ElRichText(
+          RichText(
             TextSpan(
               children: <InlineSpan>[
                 const TextSpan(text: 'There is no '),
-                ElCode.span('error'),
+                Code.span('error'),
                 const TextSpan(text: ' or '),
-                ElCode.span('uploading'),
+                Code.span('uploading'),
                 const TextSpan(text: ' specimen on this page. '),
-                ElCode.span('core/types.ts'),
+                Code.span('core/types.ts'),
                 const TextSpan(text: '’s '),
-                ElCode.span('Attachment'),
+                Code.span('Attachment'),
                 const TextSpan(
                   text:
                       ' carries no upload lifecycle at all — every attachment '
                       'this console can construct has already arrived by the '
                       'time it renders, so the wrapper always passes ',
                 ),
-                ElCode.span('state="done"'),
+                Code.span('state="done"'),
                 const TextSpan(
                   text:
                       '. Those two states are real on the primitive and shown '
                       'honestly on the ',
                 ),
-                ElCode.span('base/chat'),
+                Code.span('base/chat'),
                 const TextSpan(
                   text:
                       ' page, against data this domain type cannot produce — '
@@ -1745,7 +1754,7 @@ class _BuiltOnNoteBody extends StatelessWidget {
                 ),
               ],
             ),
-            ElType.small,
+            TextStyles.small,
           ),
         ),
       ],
@@ -1792,9 +1801,9 @@ class _StandInPhotograph extends StatelessWidget {
     size: viewBox,
     child: CustomPaint(
       painter: _PhotoPainter(
-        caption: ElText.styleOf(
+        caption: StyledText.styleOf(
           context,
-          ElType.body,
+          TextStyles.body,
           color: _photoCaption,
           // `font-size="22"` on the SVG's own text node.
           fontSize: 22, // allow-hardcoded: the stand-in photograph's own SVG

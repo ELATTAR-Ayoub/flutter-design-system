@@ -9,10 +9,10 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
-/// coverage uses a live `ElThemeController` flipped in place rather than two
+/// coverage uses a live `ThemeController` flipped in place rather than two
 /// independent pumps.
 ///
-/// `ElPopover` mounts its content through an `OverlayPortal`, so the live
+/// `Popover` mounts its content through an `OverlayPortal`, so the live
 /// specimen needs a real `Overlay`: the harness wraps the page in a
 /// `MaterialApp`. No `pumpAndSettle` is used anywhere on this page: the
 /// `DocsDisclosure` chevron and the popover's own open/close transition are
@@ -25,7 +25,33 @@ import 'package:example/components_docs/popover/meta.dart';
 import 'package:example/components_docs/popover/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -55,21 +81,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pumpPopoverDoc(
+Future<ThemeController> _pumpPopoverDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -96,26 +122,23 @@ void main() {
       expect(
         popoverDoc.exports,
         containsAll(<String>[
-          'ElPopover',
-          'ElPopoverSide',
-          'ElPopoverAlign',
-          'ElPopoverOriginModel',
-          'ElPopoverBarrier',
-          'ElPopoverPlacement',
-          'ElPopoverAnchorMetrics',
-          'ElPopoverContentBuilder',
-          'ElPopoverSurface',
-          'elPopoverPlacement',
+          'Popover',
+          'PopoverSide',
+          'PopoverAlign',
+          'PopoverAnchorMode',
+          'PopoverBarrier',
+          'PopoverPlacement',
+          'PopoverAnchorMetrics',
+          'PopoverContentBuilder',
+          'PopoverSurface',
+          'popoverPlacement',
         ]),
       );
       // Matches registry/components/popover.json's registryDependencies
       // verbatim: popover already has a real manifest, so a worker that
       // invented a dependency name here would be the exact failure mode the
       // Phase J supervisor notes warn about.
-      expect(popoverDoc.dependencies, <String>[
-        'machine-surface',
-        'source-foundation',
-      ]);
+      expect(popoverDoc.dependencies, <String>['surface', 'source-foundation']);
       // Short description: one sentence, no trailing ellipsis.
       expect(popoverDoc.description, isNot(contains('..')));
       expect(popoverDoc.description.trim(), popoverDoc.description);
@@ -168,9 +191,9 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
-        // ElPopover's own constructor.
+        // Popover's own constructor.
         expect(find.text('open'), findsWidgets);
         expect(find.text('anchor'), findsWidgets);
         expect(find.text('content'), findsWidgets);
@@ -186,13 +209,13 @@ void main() {
         expect(find.text('barrier'), findsWidgets);
         expect(find.text('onDismiss'), findsOneWidget);
 
-        // ElPopoverSurface's constructor.
+        // PopoverSurface's constructor.
         expect(find.text('radius'), findsOneWidget);
         expect(find.text('shadow'), findsOneWidget);
         expect(find.text('ring'), findsOneWidget);
         expect(find.text('border'), findsOneWidget);
 
-        // ElPopoverPlacement / ElPopoverAnchorMetrics fields.
+        // PopoverPlacement / PopoverAnchorMetrics fields.
         expect(find.text('offset'), findsOneWidget);
         expect(find.text('rect'), findsOneWidget);
         expect(find.text('viewport'), findsWidgets);
@@ -240,7 +263,7 @@ void main() {
       await tester.pump();
       await tester.tap(keyboardTrigger);
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
       expect(find.textContaining('Escape'), findsWidgets);
       expect(find.textContaining('canRequestFocus'), findsWidgets);
@@ -256,7 +279,7 @@ void main() {
         await tester.pump();
         await tester.tap(responsiveTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         expect(find.textContaining('flip'), findsWidgets);
         expect(find.textContaining('collision'), findsWidgets);
@@ -298,7 +321,7 @@ void main() {
 
       await tester.tap(trigger);
       await tester.pump();
-      await tester.pump(ElDurations.overlay);
+      await tester.pump(MotionDurations.overlayEnter);
       await tester.pump();
 
       expect(
@@ -321,7 +344,7 @@ void main() {
 
       await tester.tap(trigger);
       await tester.pump();
-      await tester.pump(ElDurations.overlay);
+      await tester.pump(MotionDurations.overlayEnter);
       await tester.pump();
       expect(
         find.byKey(const ValueKey<String>('popover-doc-specimen-content')),
@@ -329,10 +352,10 @@ void main() {
       );
 
       // Far from both the trigger and the open popup: lands on the modal
-      // barrier `ElPopover` lays under its content by default.
+      // barrier `Popover` lays under its content by default.
       await tester.tapAt(const Offset(4, 4));
       await tester.pump();
-      await tester.pump(ElDurations.overlay);
+      await tester.pump(MotionDurations.overlayEnter);
       await tester.pump();
 
       expect(
@@ -388,7 +411,7 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpPopoverDoc(tester, mode: ElThemeMode.light);
+      await _pumpPopoverDoc(tester, mode: ColorMode.light);
       expect(
         find.byKey(const ValueKey<String>('popover-doc-specimen-trigger')),
         findsOneWidget,
@@ -397,7 +420,7 @@ void main() {
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpPopoverDoc(tester, mode: ElThemeMode.dark);
+      await _pumpPopoverDoc(tester, mode: ColorMode.dark);
       expect(
         find.byKey(const ValueKey<String>('popover-doc-specimen-trigger')),
         findsOneWidget,
@@ -408,16 +431,16 @@ void main() {
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpPopoverDoc(
+      final ThemeController theme = await _pumpPopoverDoc(
         tester,
-        mode: ElThemeMode.dark,
+        mode: ColorMode.dark,
       );
       expect(
         find.byKey(const ValueKey<String>('popover-doc-specimen-trigger')),
         findsOneWidget,
       );
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
       expect(

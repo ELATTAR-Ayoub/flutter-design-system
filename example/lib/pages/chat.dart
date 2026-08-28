@@ -105,7 +105,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -114,16 +126,15 @@ import '../shell.dart';
 /* ── Specimen data ───────────────────────────────────────────────────────── */
 
 /// `BUBBLE_VARIANTS`: the seven, with the reference's own notes.
-const List<(ElBubbleVariant, String)> _bubbleVariants =
-    <(ElBubbleVariant, String)>[
-      (ElBubbleVariant.normal, "the sender's own turn"),
-      (ElBubbleVariant.secondary, 'the other party'),
-      (ElBubbleVariant.muted, 'quieter, on a card'),
-      (ElBubbleVariant.tinted, 'brand wash, per theme'),
-      (ElBubbleVariant.outline, 'hairline, no fill'),
-      (ElBubbleVariant.ghost, 'no bubble at all'),
-      (ElBubbleVariant.destructive, 'failed to send'),
-    ];
+const List<(BubbleVariant, String)> _bubbleVariants = <(BubbleVariant, String)>[
+  (BubbleVariant.normal, "the sender's own turn"),
+  (BubbleVariant.secondary, 'the other party'),
+  (BubbleVariant.muted, 'quieter, on a card'),
+  (BubbleVariant.tinted, 'brand wash, per theme'),
+  (BubbleVariant.outline, 'hairline, no fill'),
+  (BubbleVariant.ghost, 'no bubble at all'),
+  (BubbleVariant.destructive, 'failed to send'),
+];
 
 /// One turn of `TRANSCRIPT`.
 typedef _Turn = ({String id, bool user, String text});
@@ -179,13 +190,13 @@ const List<_Turn> _transcript = <_Turn>[
 ];
 
 /// `ATTACHMENT_STATES`.
-const List<(ElAttachmentState, String, String)> _attachmentStates =
-    <(ElAttachmentState, String, String)>[
-      (ElAttachmentState.idle, 'idle', 'dashed: nothing chosen yet'),
-      (ElAttachmentState.uploading, 'uploading', 'spinner + shimmer'),
-      (ElAttachmentState.processing, 'processing', 'sent, being read'),
-      (ElAttachmentState.error, 'error', 'border and media turn'),
-      (ElAttachmentState.done, 'done', 'the resting state'),
+const List<(AttachmentState, String, String)> _attachmentStates =
+    <(AttachmentState, String, String)>[
+      (AttachmentState.idle, 'idle', 'dashed: nothing chosen yet'),
+      (AttachmentState.uploading, 'uploading', 'spinner + shimmer'),
+      (AttachmentState.processing, 'processing', 'sent, being read'),
+      (AttachmentState.error, 'error', 'border and media turn'),
+      (AttachmentState.done, 'done', 'the resting state'),
     ];
 
 /// `WHY`: the fifth section, as data.
@@ -279,12 +290,12 @@ class ChatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('base', 'chat');
+    final CategoryHit here = findCategory('base', 'chat');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // DRIFT 1.
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
@@ -294,8 +305,8 @@ class ChatPage extends StatelessWidget {
         // `className="mb-12"`, 48px, above the first section rather than
         // inside it.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: const ElNote(
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: const Note(
             title: 'Read the last section first',
             child: _OpeningNote(),
           ),
@@ -305,7 +316,7 @@ class ChatPage extends StatelessWidget {
         const _ScrollerSection(),
         const _AttachmentSection(),
         const _WhySection(),
-        const ElPageFootNav(groupId: 'base', slug: 'chat'),
+        const PageFootNav(groupId: 'base', slug: 'chat'),
       ],
     );
   }
@@ -318,7 +329,7 @@ class _OpeningNote extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElRichText(
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(
@@ -329,7 +340,7 @@ class _OpeningNote extends StatelessWidget {
                   'logic, for reasons that are specific and documented '
                   'below. They stay because ',
             ),
-            ElCode.span('components/ui'),
+            Code.span('components/ui'),
             const TextSpan(
               text:
                   ' is the chassis that travels into the next project, '
@@ -338,27 +349,25 @@ class _OpeningNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
       // `<span className="mt-3 block">`.
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(text: 'Attachment is the one exception: '),
-            ElCode.span('components/agent/parts/attachments.tsx'),
+            Code.span('components/agent/parts/attachments.tsx'),
             const TextSpan(
               text:
                   ' composes it directly, and that row below says what '
                   'it adds on top: see ',
             ),
-            ElCode.span(
-              '/design-system/components/agent/transcript#attachments',
-            ),
+            Code.span('/design-system/components/agent/transcript#attachments'),
             const TextSpan(text: ' for the wrapper itself.'),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );
@@ -371,7 +380,7 @@ class _MessageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'message',
       title: 'Message',
       description:
@@ -381,28 +390,28 @@ class _MessageSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'A two-turn exchange',
             note: 'align: start, then end',
-            child: ElMessageGroup(
+            child: MessageGroup(
               children: <Widget>[
-                ElMessage(
-                  avatar: ElMessageAvatar(
-                    size: el(8),
+                Message(
+                  avatar: MessageAvatar(
+                    size: space(8),
                     lifted: true,
-                    child: const ElIcon.lucide(
-                      ElLucide.bot,
-                      size: ElIconSize.sm,
-                      tone: ElIconTone.action,
+                    child: const Icon.lucide(
+                      Lucide.bot,
+                      size: IconSize.sm,
+                      tone: IconTone.action,
                     ),
                   ),
-                  content: const ElMessageContent(
-                    header: ElMessageHeader(text: 'Atlas'),
-                    footer: ElMessageFooter(text: '09:41'),
+                  content: const MessageContent(
+                    header: MessageHeader(text: 'Atlas'),
+                    footer: MessageFooter(text: '09:41'),
                     children: <Widget>[
-                      ElBubble(
-                        variant: ElBubbleVariant.muted,
-                        child: ElBubbleContent(
+                      Bubble(
+                        variant: BubbleVariant.muted,
+                        child: BubbleContent(
                           child: Text(
                             'Eclipse Vault is up 14% overnight, on twice the '
                             'usual volume.',
@@ -412,24 +421,24 @@ class _MessageSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                ElMessage(
-                  align: ElBubbleAlign.end,
-                  avatar: ElMessageAvatar(
-                    size: el(8),
+                Message(
+                  align: BubbleAlign.end,
+                  avatar: MessageAvatar(
+                    size: space(8),
                     lifted: true,
-                    child: const ElIcon.lucide(
-                      ElLucide.user,
-                      size: ElIconSize.sm,
-                      tone: ElIconTone.muted,
+                    child: const Icon.lucide(
+                      Lucide.user,
+                      size: IconSize.sm,
+                      tone: IconTone.muted,
                     ),
                   ),
-                  content: const ElMessageContent(
-                    header: ElMessageHeader(text: 'You'),
-                    footer: ElMessageFooter(text: '09:42'),
+                  content: const MessageContent(
+                    header: MessageHeader(text: 'You'),
+                    footer: MessageFooter(text: '09:42'),
                     children: <Widget>[
-                      ElBubble(
-                        align: ElBubbleAlign.end,
-                        child: ElBubbleContent(
+                      Bubble(
+                        align: BubbleAlign.end,
+                        child: BubbleContent(
                           child: Text('Show me what I hold in that set.'),
                         ),
                       ),
@@ -440,18 +449,18 @@ class _MessageSection extends StatelessWidget {
             ),
           ),
           // `className="mt-4"`.
-          SizedBox(height: el(4)),
-          const ElPanel(
+          SizedBox(height: space(4)),
+          const Panel(
             label: 'No avatar, no header, no footer',
             note: 'the parts are all optional',
-            child: ElMessageGroup(
+            child: MessageGroup(
               children: <Widget>[
-                ElMessage(
-                  content: ElMessageContent(
+                Message(
+                  content: MessageContent(
                     children: <Widget>[
-                      ElBubble(
-                        variant: ElBubbleVariant.outline,
-                        child: ElBubbleContent(
+                      Bubble(
+                        variant: BubbleVariant.outline,
+                        child: BubbleContent(
                           child: Text(
                             'Six cards, two of them graded. \$2,481.00 at this '
                             'morning’s mark.',
@@ -461,14 +470,14 @@ class _MessageSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                ElMessage(
-                  align: ElBubbleAlign.end,
-                  content: ElMessageContent(
+                Message(
+                  align: BubbleAlign.end,
+                  content: MessageContent(
                     children: <Widget>[
-                      ElBubble(
-                        variant: ElBubbleVariant.secondary,
-                        align: ElBubbleAlign.end,
-                        child: ElBubbleContent(child: Text('Leave it.')),
+                      Bubble(
+                        variant: BubbleVariant.secondary,
+                        align: BubbleAlign.end,
+                        child: BubbleContent(child: Text('Leave it.')),
                       ),
                     ],
                   ),
@@ -476,9 +485,9 @@ class _MessageSection extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          const ElMeta(
-            items: <ElMetaItem>[
+          SizedBox(height: space(4)),
+          const Meta(
+            items: <MetaItem>[
               (
                 k: 'MessageGroup',
                 v: TextSpan(
@@ -542,9 +551,9 @@ class _BubbleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'bubble',
       title: 'Bubble',
       description:
@@ -555,24 +564,22 @@ class _BubbleSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElStateGrid(
+          StateGrid(
             children: <Widget>[
-              for (final (ElBubbleVariant v, String note) in _bubbleVariants)
-                ElStateCell(
+              for (final (BubbleVariant v, String note) in _bubbleVariants)
+                StateCell(
                   label: v.label,
                   note: note,
-                  child: ElBubble(
+                  child: Bubble(
                     variant: v,
-                    child: const ElBubbleContent(
-                      child: Text('Up 14% overnight'),
-                    ),
+                    child: const BubbleContent(child: Text('Up 14% overnight')),
                   ),
                 ),
-              ElStateCell(
+              StateCell(
                 label: 'asChild',
                 note: 'hover: the whole bubble is the control',
-                child: ElBubble(
-                  child: ElBubbleContent(
+                child: Bubble(
+                  child: BubbleContent(
                     onPressed: () {},
                     child: const Text('Open the set'),
                   ),
@@ -580,61 +587,61 @@ class _BubbleSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: el(4)),
-          const ElNote(
+          SizedBox(height: space(4)),
+          const Note(
             title: 'tinted is a token now, not a dark: variant',
             child: _TintedNote(),
           ),
-          SizedBox(height: el(4)),
-          const ElNote(
-            tone: ElNoteTone.error,
+          SizedBox(height: space(4)),
+          const Note(
+            tone: NoteTone.error,
             title: 'Two of the seven fail AA: known, and not yet fixed',
             child: _ContrastNote(),
           ),
-          SizedBox(height: el(4)),
-          const ElPanel(
+          SizedBox(height: space(4)),
+          const Panel(
             label: 'Alignment',
             note: 'align is set on the Bubble, or inherited from the Message',
-            child: ElBubbleGroup(
+            child: BubbleGroup(
               children: <Widget>[
-                ElBubble(
-                  variant: ElBubbleVariant.secondary,
-                  child: ElBubbleContent(child: Text('Which three?')),
+                Bubble(
+                  variant: BubbleVariant.secondary,
+                  child: BubbleContent(child: Text('Which three?')),
                 ),
-                ElBubble(
-                  align: ElBubbleAlign.end,
-                  child: ElBubbleContent(
+                Bubble(
+                  align: BubbleAlign.end,
+                  child: BubbleContent(
                     child: Text('Eclipse, Origin Pulse and Nightfall.'),
                   ),
                 ),
-                ElBubble(
-                  variant: ElBubbleVariant.secondary,
-                  child: ElBubbleContent(child: Text('Watch the last one.')),
+                Bubble(
+                  variant: BubbleVariant.secondary,
+                  child: BubbleContent(child: Text('Watch the last one.')),
                 ),
               ],
             ),
           ),
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
           // DRIFT 3. `BubbleReactions` rings in `--card` to punch itself out of
           // the bubble edge, so this specimen has to sit on a card surface for
           // the ring to be invisible. On `--background` in dark mode it reads
           // as a halo.
-          ElPanel(
+          Panel(
             label: 'Reactions',
             note: 'side × align: on a card, which is what the ring assumes',
             bodyFill: theme.card,
             child: const _ReactionRails(),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Reactions with counts',
             note: 'reactions + showCount: hover or focus a pill',
             bodyFill: theme.card,
             child: const _ReactionCounts(),
           ),
-          SizedBox(height: el(4)),
-          const ElMeta(
-            items: <ElMetaItem>[
+          SizedBox(height: space(4)),
+          const Meta(
+            items: <MetaItem>[
               (
                 k: 'Bubble variant',
                 v: TextSpan(
@@ -694,15 +701,15 @@ class _TintedNote extends StatelessWidget {
   const _TintedNote();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(text: 'It used to be four inline '),
-        ElCode.span('oklch(from …)'),
+        Code.span('oklch(from …)'),
         const TextSpan(text: ' values with a '),
-        ElCode.span('dark:'),
+        Code.span('dark:'),
         const TextSpan(text: ' twin for two of them. A colour that needs a '),
-        ElCode.span('dark:'),
+        Code.span('dark:'),
         const TextSpan(
           text: ' variant is a token that has not been written yet, §1, ',
         ),
@@ -710,17 +717,17 @@ class _TintedNote extends StatelessWidget {
         const TextSpan(
           text: ', which is explicit that no component carries a ',
         ),
-        ElCode.span('dark:'),
+        Code.span('dark:'),
         const TextSpan(
           text:
               ' variant for any of the three things that genuinely '
               'change between the themes. So the wash is ',
         ),
-        ElCode.span('--bubble-tinted'),
+        Code.span('--bubble-tinted'),
         const TextSpan(
           text: ', declared once in each theme block and derived from ',
         ),
-        ElCode.span('--primary'),
+        Code.span('--primary'),
         const TextSpan(
           text:
               ' so it follows a rebrand. Light lands at lightness 0.93, '
@@ -729,7 +736,7 @@ class _TintedNote extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -740,7 +747,7 @@ class _ContrastNote extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElRichText(
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(
@@ -748,21 +755,21 @@ class _ContrastNote extends StatelessWidget {
                   'Rasterised into a 1×1 canvas and measured against the '
                   'surface each one actually paints. ',
             ),
-            ElCode.span('default'),
+            Code.span('default'),
             const TextSpan(
               text:
                   ' is 4.39:1 in both themes: it is the system’s '
                   'standard ',
             ),
-            ElCode.span('--primary'),
+            Code.span('--primary'),
             const TextSpan(text: ' fill under '),
-            ElCode.span('--primary-foreground'),
+            Code.span('--primary-foreground'),
             const TextSpan(
               text:
                   ', so the gap is inherited rather than local to this '
                   'component, and every primary button shares the figure. ',
             ),
-            ElCode.span('destructive'),
+            Code.span('destructive'),
             const TextSpan(
               text:
                   ' is 6.24:1 on dark but 4.12:1 on light, where the ink '
@@ -771,10 +778,10 @@ class _ContrastNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         const TextSpan(
           text:
               '§7 asks every text colour to clear AA and exempts only '
@@ -785,7 +792,7 @@ class _ContrastNote extends StatelessWidget {
               'owner’s call and not this page’s. The other five variants '
               'run from 13:1 to 19:1.',
         ),
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );
@@ -796,39 +803,39 @@ class _ReactionRails extends StatelessWidget {
   const _ReactionRails();
 
   /// `grid grid-cols-2 gap-8 sm:grid-cols-4`.
-  static const List<(ElBubbleSide, ElBubbleAlign)> _corners =
-      <(ElBubbleSide, ElBubbleAlign)>[
-        (ElBubbleSide.bottom, ElBubbleAlign.end),
-        (ElBubbleSide.bottom, ElBubbleAlign.start),
-        (ElBubbleSide.top, ElBubbleAlign.end),
-        (ElBubbleSide.top, ElBubbleAlign.start),
+  static const List<(BubbleSide, BubbleAlign)> _corners =
+      <(BubbleSide, BubbleAlign)>[
+        (BubbleSide.bottom, BubbleAlign.end),
+        (BubbleSide.bottom, BubbleAlign.start),
+        (BubbleSide.top, BubbleAlign.end),
+        (BubbleSide.top, BubbleAlign.start),
       ];
 
   @override
-  Widget build(BuildContext context) => ElGrid(
+  Widget build(BuildContext context) => Grid(
     base: 2,
     sm: 4,
-    gap: el(8),
+    gap: space(8),
     children: <Widget>[
-      for (final (ElBubbleSide side, ElBubbleAlign align) in _corners)
+      for (final (BubbleSide side, BubbleAlign align) in _corners)
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ElBubble(
-              variant: ElBubbleVariant.muted,
-              reactions: ElBubbleReactions(
+            Bubble(
+              variant: BubbleVariant.muted,
+              reactions: BubbleReactions(
                 side: side,
                 align: align,
                 children: const <Widget>[Text('🔥'), Text('❤️'), Text('👏')],
               ),
-              child: const ElBubbleContent(child: Text('Nice pull')),
+              child: const BubbleContent(child: Text('Nice pull')),
             ),
             // `gap-6`.
-            SizedBox(height: el(6)),
-            ElText(
+            SizedBox(height: space(6)),
+            StyledText(
               '${side.name} · ${align.name}',
-              ElType.micro,
+              TextStyles.eyebrowSmall,
               align: TextAlign.center,
             ),
           ],
@@ -841,46 +848,46 @@ class _ReactionRails extends StatelessWidget {
 class _ReactionCounts extends StatelessWidget {
   const _ReactionCounts();
 
-  static const List<ElBubbleReaction> _reactions = <ElBubbleReaction>[
-    ElBubbleReaction(emoji: '🔥', count: 12, label: 'fire', mine: true),
-    ElBubbleReaction(emoji: '❤️', count: 8, label: 'a heart'),
-    ElBubbleReaction(emoji: '👏', count: 3, label: 'applause'),
+  static const List<BubbleReaction> _reactions = <BubbleReaction>[
+    BubbleReaction(emoji: '🔥', count: 12, label: 'fire', mine: true),
+    BubbleReaction(emoji: '❤️', count: 8, label: 'a heart'),
+    BubbleReaction(emoji: '👏', count: 3, label: 'applause'),
   ];
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      ElGrid(
+      Grid(
         sm: 2,
-        gap: el(10),
+        gap: space(10),
         children: <Widget>[
           _CountRail(
-            showCount: ElShowCount.hover,
+            showCount: ShowCount.hover,
             caption: 'showCount="hover": the default',
           ),
           _CountRail(
-            showCount: ElShowCount.always,
+            showCount: ShowCount.always,
             caption: 'showCount="always"',
           ),
         ],
       ),
       // `Note className="mt-8"`.
-      SizedBox(height: el(8)),
-      const ElNote(
+      SizedBox(height: space(8)),
+      const Note(
         title: 'The count is never only on hover',
         child: _CountNote(),
       ),
     ],
   );
 
-  static List<ElBubbleReaction> get reactions => _reactions;
+  static List<BubbleReaction> get reactions => _reactions;
 }
 
 class _CountRail extends StatelessWidget {
   const _CountRail({required this.showCount, required this.caption});
 
-  final ElShowCount showCount;
+  final ShowCount showCount;
   final String caption;
 
   @override
@@ -888,16 +895,16 @@ class _CountRail extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElBubble(
-        variant: ElBubbleVariant.muted,
-        reactions: ElBubbleReactions(
+      Bubble(
+        variant: BubbleVariant.muted,
+        reactions: BubbleReactions(
           showCount: showCount,
           reactions: _ReactionCounts.reactions,
         ),
-        child: const ElBubbleContent(child: Text('Nice pull')),
+        child: const BubbleContent(child: Text('Nice pull')),
       ),
-      SizedBox(height: el(6)),
-      ElText(caption, ElType.micro, align: TextAlign.center),
+      SizedBox(height: space(6)),
+      StyledText(caption, TextStyles.eyebrowSmall, align: TextAlign.center),
     ],
   );
 }
@@ -909,7 +916,7 @@ class _CountNote extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElRichText(
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(
@@ -918,7 +925,7 @@ class _CountNote extends StatelessWidget {
                   'density decision: a rail can hold six of these. It is '
                   'not where the information lives. Every pill carries ',
             ),
-            ElCode.span('8 reacted with a heart'),
+            Code.span('8 reacted with a heart'),
             const TextSpan(
               text:
                   ' in the accessibility tree at rest, so a screen '
@@ -929,20 +936,20 @@ class _CountNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(text: 'The first pill is '),
-            ElCode.span('mine'),
+            Code.span('mine'),
             const TextSpan(
               text:
                   ': the reader already reacted that way. It carries a '
                   'border, a fill and ',
             ),
-            ElCode.span('aria-pressed'),
+            Code.span('aria-pressed'),
             const TextSpan(
               text:
                   ', because trap 11 and §7 both rule out a hue as the '
@@ -950,25 +957,25 @@ class _CountNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
-            ElCode.span('reactions'),
+            Code.span('reactions'),
             const TextSpan(
               text:
                   ' is a parameter on the rail that already existed, not '
                   'a new component. Pass ',
             ),
-            ElCode.span('children'),
+            Code.span('children'),
             const TextSpan(
               text: ' instead and it stays the bare rail shown above.',
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );
@@ -985,14 +992,14 @@ class _ScrollerSection extends StatefulWidget {
 
 class _ScrollerSectionState extends State<_ScrollerSection> {
   /// `<MessageScrollerProvider autoScroll defaultScrollPosition="start">`.
-  final ElMessageScrollerController _controller = ElMessageScrollerController(
+  final MessageScrollerController _controller = MessageScrollerController(
     autoScroll: true,
-    defaultScrollPosition: ElScrollPosition.start,
+    defaultScrollPosition: ScrollPosition.start,
   );
 
   /// `bodyClassName="h-80"`, 320px, and the number every measured fact in
   /// `message_scroller.dart` is relative to.
-  static double get viewportHeight => el(80);
+  static double get viewportHeight => space(80);
 
   @override
   void dispose() {
@@ -1002,7 +1009,7 @@ class _ScrollerSectionState extends State<_ScrollerSection> {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'message-scroller',
       title: 'Message Scroller',
       description:
@@ -1013,7 +1020,7 @@ class _ScrollerSectionState extends State<_ScrollerSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElPanel(
+          Panel(
             label: 'Eleven turns in a 320px viewport',
             note:
                 'starts at the top, so both the fade and the button are '
@@ -1021,32 +1028,32 @@ class _ScrollerSectionState extends State<_ScrollerSection> {
             flush: true,
             child: SizedBox(
               height: viewportHeight,
-              child: ElMessageScrollerProvider(
+              child: MessageScrollerProvider(
                 controller: _controller,
-                child: ElMessageScroller(
-                  viewport: ElMessageScrollerViewport(
-                    child: ElMessageScrollerContent(
-                      padding: EdgeInsets.all(el(6)),
+                child: MessageScroller(
+                  viewport: MessageScrollerViewport(
+                    child: MessageScrollerContent(
+                      padding: EdgeInsets.all(space(6)),
                       children: <Widget>[
                         for (final _Turn t in _transcript)
-                          ElMessageScrollerItem(
+                          MessageScrollerItem(
                             messageId: t.id,
-                            child: ElMessage(
+                            child: Message(
                               // DRIFT 6: the align is set here and again on
                               // the bubble below.
                               align: t.user
-                                  ? ElBubbleAlign.end
-                                  : ElBubbleAlign.start,
-                              content: ElMessageContent(
+                                  ? BubbleAlign.end
+                                  : BubbleAlign.start,
+                              content: MessageContent(
                                 children: <Widget>[
-                                  ElBubble(
+                                  Bubble(
                                     variant: t.user
-                                        ? ElBubbleVariant.normal
-                                        : ElBubbleVariant.muted,
+                                        ? BubbleVariant.normal
+                                        : BubbleVariant.muted,
                                     align: t.user
-                                        ? ElBubbleAlign.end
-                                        : ElBubbleAlign.start,
-                                    child: ElBubbleContent(child: Text(t.text)),
+                                        ? BubbleAlign.end
+                                        : BubbleAlign.start,
+                                    child: BubbleContent(child: Text(t.text)),
                                   ),
                                 ],
                               ),
@@ -1055,20 +1062,20 @@ class _ScrollerSectionState extends State<_ScrollerSection> {
                       ],
                     ),
                   ),
-                  button: const ElMessageScrollerButton(),
+                  button: const MessageScrollerButton(),
                 ),
               ),
             ),
           ),
-          SizedBox(height: el(4)),
-          const ElNote(
-            tone: ElNoteTone.value,
+          SizedBox(height: space(4)),
+          const Note(
+            tone: NoteTone.value,
             title: 'The fade is not defined in globals.css: do not delete it',
             child: _FadeNote(),
           ),
-          SizedBox(height: el(4)),
-          const ElMeta(
-            items: <ElMetaItem>[
+          SizedBox(height: space(4)),
+          const Meta(
+            items: <MetaItem>[
               (
                 k: 'MessageScrollerProvider',
                 v: TextSpan(
@@ -1142,52 +1149,52 @@ class _FadeNote extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElRichText(
+      RichText(
         TextSpan(
           children: <InlineSpan>[
-            ElCode.span('scroll-fade-b'),
+            Code.span('scroll-fade-b'),
             const TextSpan(text: ' on the viewport is an '),
-            ElCode.span('@utility'),
+            Code.span('@utility'),
             const TextSpan(text: ' from '),
-            ElCode.span('shadcn/tailwind.css'),
+            Code.span('shadcn/tailwind.css'),
             const TextSpan(text: ', which '),
-            ElCode.span('app/globals.css'),
+            Code.span('app/globals.css'),
             const TextSpan(text: ' imports on its third line. So is '),
-            ElCode.span('shimmer'),
+            Code.span('shimmer'),
             const TextSpan(text: '. '),
-            ElCode.span('scrollbar-gutter-stable'),
+            Code.span('scrollbar-gutter-stable'),
             const TextSpan(text: ', '),
-            ElCode.span('scrollbar-thumb-transparent'),
+            Code.span('scrollbar-thumb-transparent'),
             const TextSpan(text: ' and '),
-            ElCode.span('scrollbar-track-transparent'),
+            Code.span('scrollbar-track-transparent'),
             const TextSpan(text: ' come from Tailwind v4 itself. '),
-            ElCode.span('scrollbar-thin'),
+            Code.span('scrollbar-thin'),
             const TextSpan(
               text: ' is the one that is both: Tailwind v4 emits ',
             ),
-            ElCode.span('scrollbar-width: thin'),
+            Code.span('scrollbar-width: thin'),
             const TextSpan(text: ' for it, and '),
-            ElCode.span('globals.css'),
+            Code.span('globals.css'),
             const TextSpan(text: ' layers a second rule on top in an '),
-            ElCode.span('@layer utilities'),
+            Code.span('@layer utilities'),
             const TextSpan(text: ' block to paint the thumb.'),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(text: 'So grepping '),
-            ElCode.span('globals.css'),
+            Code.span('globals.css'),
             const TextSpan(
               text:
                   ' answers only “is it defined here”: of these six it '
                   'finds one and misses five. The only authority on '
                   'whether a class resolves is the built stylesheet, or ',
             ),
-            ElCode.span('getComputedStyle'),
+            Code.span('getComputedStyle'),
             const TextSpan(
               text:
                   ' in the browser. An audit of this page once declared '
@@ -1196,7 +1203,7 @@ class _FadeNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );
@@ -1214,7 +1221,7 @@ class _AttachmentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'attachment',
       title: 'Attachment',
       description:
@@ -1224,77 +1231,73 @@ class _AttachmentSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElStateGrid(
+          StateGrid(
             cols: 5,
             children: <Widget>[
-              for (final (ElAttachmentState s, String label, String note)
+              for (final (AttachmentState s, String label, String note)
                   in _attachmentStates)
-                ElStateCell(
+                StateCell(
                   label: label,
                   note: note,
-                  child: ElAttachment(
+                  child: Attachment(
                     state: s,
-                    size: ElAttachmentSize.sm,
-                    orientation: ElAttachmentOrientation.vertical,
-                    media: ElAttachmentMedia(
+                    size: AttachmentSize.sm,
+                    orientation: AttachmentOrientation.vertical,
+                    media: AttachmentMedia(
                       child: switch (s) {
                         // PROBE CORRECTION 5: the spinner comes out 16px here
                         // while its three sibling glyphs come out 24, because
                         // the `size-6!` override keys off a `data-slot` the
                         // Icon component drops.
-                        ElAttachmentState.uploading ||
-                        ElAttachmentState.processing => const ElSpinner(),
-                        ElAttachmentState.error => const ElIcon.lucide(
-                          ElLucide.circleAlert,
+                        AttachmentState.uploading ||
+                        AttachmentState.processing => const Spinner(),
+                        AttachmentState.error => const Icon.lucide(
+                          Lucide.circleAlert,
                           sizePx: 24,
                         ),
-                        _ => const ElIcon.lucide(ElLucide.sheet, sizePx: 24),
+                        _ => const Icon.lucide(Lucide.sheet, sizePx: 24),
                       },
                     ),
-                    content: ElAttachmentContent(
-                      title: const ElAttachmentTitle('rarity-table.csv'),
-                      description: ElAttachmentDescription(
-                        s == ElAttachmentState.error
-                            ? 'Upload failed'
-                            : '18 KB',
+                    content: AttachmentContent(
+                      title: const AttachmentTitle('rarity-table.csv'),
+                      description: AttachmentDescription(
+                        s == AttachmentState.error ? 'Upload failed' : '18 KB',
                       ),
                     ),
                   ),
                 ),
             ],
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'Horizontal, at all three sizes',
-            child: ElRow(
-              align: ElRowAlign.start,
+            child: SpecimenRow(
+              align: SpecimenRowAlign.start,
               children: <Widget>[
-                for (final ElAttachmentSize size in ElAttachmentSize.values)
-                  ElAttachment(
+                for (final AttachmentSize size in AttachmentSize.values)
+                  Attachment(
                     size: size,
-                    media: ElAttachmentMedia(
-                      child: ElIcon.lucide(
-                        ElLucide.fileText,
-                        sizePx: ElAttachmentMedia.glyphFor(
+                    media: AttachmentMedia(
+                      child: Icon.lucide(
+                        Lucide.fileText,
+                        sizePx: AttachmentMedia.glyphFor(
                           size,
-                          ElAttachmentOrientation.horizontal,
+                          AttachmentOrientation.horizontal,
                         ),
                       ),
                     ),
-                    content: ElAttachmentContent(
-                      title: const ElAttachmentTitle('eclipse-vault-notes.pdf'),
-                      description: ElAttachmentDescription(
-                        'size=${size.label}',
-                      ),
+                    content: AttachmentContent(
+                      title: const AttachmentTitle('eclipse-vault-notes.pdf'),
+                      description: AttachmentDescription('size=${size.label}'),
                     ),
-                    actions: ElAttachmentActions(
+                    actions: AttachmentActions(
                       children: <Widget>[
-                        ElAttachmentAction(
+                        AttachmentAction(
                           label: 'Remove eclipse-vault-notes.pdf',
                           onPressed: () {},
-                          child: ElIcon.lucide(
-                            ElLucide.x,
-                            sizePx: ElButton.iconPxFor(ElButtonSize.iconXs),
+                          child: Icon.lucide(
+                            Lucide.x,
+                            sizePx: Button.iconPxFor(ButtonSize.iconXs),
                           ),
                         ),
                       ],
@@ -1303,78 +1306,78 @@ class _AttachmentSection extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          const ElPanel(
+          SizedBox(height: space(4)),
+          const Panel(
             label: 'Media: icon and image',
             note: 'the image variant dims itself until the file is done',
-            child: ElRow(
-              align: ElRowAlign.start,
+            child: SpecimenRow(
+              align: SpecimenRowAlign.start,
               children: <Widget>[
-                ElAttachment(
-                  orientation: ElAttachmentOrientation.vertical,
-                  media: ElAttachmentMedia(
-                    variant: ElAttachmentMediaVariant.image,
+                Attachment(
+                  orientation: AttachmentOrientation.vertical,
+                  media: AttachmentMedia(
+                    variant: AttachmentMediaVariant.image,
                     child: Image(image: _sampleCard, fit: BoxFit.cover),
                   ),
-                  content: ElAttachmentContent(
-                    title: ElAttachmentTitle('sample-card.png'),
-                    description: ElAttachmentDescription('412 KB'),
+                  content: AttachmentContent(
+                    title: AttachmentTitle('sample-card.png'),
+                    description: AttachmentDescription('412 KB'),
                   ),
                 ),
-                ElAttachment(
-                  orientation: ElAttachmentOrientation.vertical,
-                  media: ElAttachmentMedia(
-                    child: ElIcon.lucide(ElLucide.image, sizePx: 24),
+                Attachment(
+                  orientation: AttachmentOrientation.vertical,
+                  media: AttachmentMedia(
+                    child: Icon.lucide(Lucide.image, sizePx: 24),
                   ),
-                  content: ElAttachmentContent(
-                    title: ElAttachmentTitle('slab-front.heic'),
-                    description: ElAttachmentDescription('No preview'),
+                  content: AttachmentContent(
+                    title: AttachmentTitle('slab-front.heic'),
+                    description: AttachmentDescription('No preview'),
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          ElPanel(
+          SizedBox(height: space(4)),
+          Panel(
             label: 'preview and download',
             note: 'two props, not two components',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ElRow(
-                  align: ElRowAlign.start,
+                SpecimenRow(
+                  align: SpecimenRowAlign.start,
                   children: <Widget>[
-                    const ElAttachment(
-                      orientation: ElAttachmentOrientation.vertical,
-                      media: ElAttachmentMedia(
-                        variant: ElAttachmentMediaVariant.image,
+                    const Attachment(
+                      orientation: AttachmentOrientation.vertical,
+                      media: AttachmentMedia(
+                        variant: AttachmentMediaVariant.image,
                         previewName: 'sample-card.png',
                         previewDescription: '412 KB',
                         preview: Image(image: _sampleCard, fit: BoxFit.contain),
                         child: Image(image: _sampleCard, fit: BoxFit.cover),
                       ),
-                      content: ElAttachmentContent(
-                        title: ElAttachmentTitle('sample-card.png'),
-                        description: ElAttachmentDescription(
+                      content: AttachmentContent(
+                        title: AttachmentTitle('sample-card.png'),
+                        description: AttachmentDescription(
                           '412 KB · press to expand',
                         ),
                       ),
                     ),
-                    ElAttachment(
-                      media: ElIcon.lucide(
-                        ElLucide.fileText,
+                    Attachment(
+                      media: Icon.lucide(
+                        Lucide.fileText,
                         sizePx: 16,
-                      ).let((Widget glyph) => ElAttachmentMedia(child: glyph)),
-                      content: const ElAttachmentContent(
-                        title: ElAttachmentTitle('grading-report.pdf'),
-                        description: ElAttachmentDescription('2.6 MB'),
+                      ).let((Widget glyph) => AttachmentMedia(child: glyph)),
+                      content: const AttachmentContent(
+                        title: AttachmentTitle('grading-report.pdf'),
+                        description: AttachmentDescription('2.6 MB'),
                       ),
-                      actions: ElAttachmentActions(
+                      actions: AttachmentActions(
                         children: <Widget>[
-                          ElAttachmentAction(
+                          AttachmentAction(
                             downloadName: 'grading-report.pdf',
                             onDownload: (String name) => docsToasts.show(
-                              ElToastMessage(
+                              ToastMessage(
                                 title: 'Saving $name',
                                 description:
                                     'Your browser is handling the download.',
@@ -1387,8 +1390,8 @@ class _AttachmentSection extends StatelessWidget {
                   ],
                 ),
                 // `Note className="mt-5"`.
-                SizedBox(height: el(5)),
-                const ElNote(
+                SizedBox(height: space(5)),
+                const Note(
                   title:
                       'Both are parameters on components that already existed',
                   child: _PreviewNote(),
@@ -1396,15 +1399,15 @@ class _AttachmentSection extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: el(4)),
-          const ElPanel(
+          SizedBox(height: space(4)),
+          const Panel(
             label: 'AttachmentGroup',
             note: 'scrolls sideways, snaps, and fades its edge',
             child: _Tray(),
           ),
-          SizedBox(height: el(4)),
-          const ElMeta(
-            items: <ElMetaItem>[
+          SizedBox(height: space(4)),
+          const Meta(
+            items: <MetaItem>[
               (
                 k: 'Attachment state',
                 v: TextSpan(
@@ -1486,23 +1489,23 @@ class _Tray extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) => ElAttachmentGroup(
+  Widget build(BuildContext context) => AttachmentGroup(
     children: <Widget>[
       for (final String name in _names)
-        ElAttachment(
-          size: ElAttachmentSize.sm,
-          media: ElAttachmentMedia(
-            child: ElIcon.lucide(
-              ElLucide.fileText,
-              sizePx: ElAttachmentMedia.glyphFor(
-                ElAttachmentSize.sm,
-                ElAttachmentOrientation.horizontal,
+        Attachment(
+          size: AttachmentSize.sm,
+          media: AttachmentMedia(
+            child: Icon.lucide(
+              Lucide.fileText,
+              sizePx: AttachmentMedia.glyphFor(
+                AttachmentSize.sm,
+                AttachmentOrientation.horizontal,
               ),
             ),
           ),
-          content: ElAttachmentContent(
-            title: ElAttachmentTitle(name),
-            description: const ElAttachmentDescription('Ready'),
+          content: AttachmentContent(
+            title: AttachmentTitle(name),
+            description: const AttachmentDescription('Ready'),
           ),
         ),
     ],
@@ -1516,20 +1519,20 @@ class _PreviewNote extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElRichText(
+      RichText(
         TextSpan(
           children: <InlineSpan>[
-            ElCode.span('AttachmentMedia'),
+            Code.span('AttachmentMedia'),
             const TextSpan(text: ' takes '),
-            ElCode.span('src'),
+            Code.span('src'),
             const TextSpan(text: ' and previews it by default; pass '),
-            ElCode.span('preview={false}'),
+            Code.span('preview={false}'),
             const TextSpan(
               text:
                   ' only when the well must remain static. The media '
                   'opens in a ',
             ),
-            ElCode.span('Dialog'),
+            Code.span('Dialog'),
             const TextSpan(
               text:
                   ' over the dimmed page rather than a new tab, which '
@@ -1538,7 +1541,7 @@ class _PreviewNote extends StatelessWidget {
                   'dialog the reversible one, and there is nothing here to '
                   'decide. The close control is a ',
             ),
-            ElCode.span('secondary'),
+            Code.span('secondary'),
             const TextSpan(
               text:
                   ' Button, not the stock ghost ✕: this panel has no '
@@ -1546,7 +1549,7 @@ class _PreviewNote extends StatelessWidget {
                   'disappears into whatever pixel of the photograph it '
                   'lands on. The trigger is ',
             ),
-            ElCode.span('AttachmentTrigger'),
+            Code.span('AttachmentTrigger'),
             const TextSpan(
               text:
                   ', the overlay control this component already had, so '
@@ -1555,31 +1558,31 @@ class _PreviewNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
-            ElCode.span('AttachmentAction'),
+            Code.span('AttachmentAction'),
             const TextSpan(text: ' takes '),
-            ElCode.span('href'),
+            Code.span('href'),
             const TextSpan(text: ' and downloads by default; pass '),
-            ElCode.span('download={false}'),
+            Code.span('download={false}'),
             const TextSpan(
               text:
                   ' only when it should navigate instead. The save '
                   'control carries both signals §5 demands: the glyph '
                   'rolls to a check through ',
             ),
-            ElCode.span('IconSwap'),
+            Code.span('IconSwap'),
             const TextSpan(
               text:
                   ' so the control confirms it heard you, and a toast '
                   'reports the outcome. It says Saving, never Saved: a '
                   'plain ',
             ),
-            ElCode.span('download'),
+            Code.span('download'),
             const TextSpan(
               text:
                   ' anchor gives the page no completion event, so '
@@ -1588,10 +1591,10 @@ class _PreviewNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(
@@ -1600,11 +1603,11 @@ class _PreviewNote extends StatelessWidget {
                   'folded back. §5 grows a base component with a variant '
                   'or a parameter: that is how ',
             ),
-            ElCode.span('Button'),
+            Code.span('Button'),
             const TextSpan(text: ', '),
-            ElCode.span('Badge'),
+            Code.span('Badge'),
             const TextSpan(text: ' and '),
-            ElCode.span('Alert'),
+            Code.span('Alert'),
             const TextSpan(
               text:
                   ' already work: and a new component for one more '
@@ -1612,7 +1615,7 @@ class _PreviewNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );
@@ -1625,9 +1628,9 @@ class _WhySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'why',
       title: 'Why the agent console uses only one of them',
       description:
@@ -1645,41 +1648,44 @@ class _WhySection extends StatelessWidget {
           for (final (String name, String what, String instead) in _why)
             Padding(
               padding: EdgeInsets.only(
-                bottom: name == _why.last.$1 ? 0 : el(4),
+                bottom: name == _why.last.$1 ? 0 : space(4),
               ),
-              child: ElPanel(
+              child: Panel(
                 label: name,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    ElText(
+                    StyledText(
                       'What it is for',
-                      ElType.label,
-                      color: theme.actionInk,
+                      TextStyles.eyebrow,
+                      color: theme.actionText,
                     ),
-                    SizedBox(height: el(2)),
-                    ElText(what, ElType.small),
+                    SizedBox(height: space(2)),
+                    StyledText(what, TextStyles.small),
                     // `div.space-y-5`.
-                    SizedBox(height: el(5)),
-                    ElText('What the console does instead', ElType.label),
-                    SizedBox(height: el(2)),
-                    ElText(instead, ElType.small),
+                    SizedBox(height: space(5)),
+                    StyledText(
+                      'What the console does instead',
+                      TextStyles.eyebrow,
+                    ),
+                    SizedBox(height: space(2)),
+                    StyledText(instead, TextStyles.small),
                   ],
                 ),
               ),
             ),
           // `Note className="mt-6"`.
-          SizedBox(height: el(6)),
-          const ElNote(
+          SizedBox(height: space(6)),
+          const Note(
             title: 'They stay because ui/ travels',
             child: _TravelNote(),
           ),
           // No gap: `<DoDont>` follows the Note with no margin of its own,
           // measured at 7770.03 + 190 = 7960.03 exactly.
-          const ElDoDont(
+          const DoDont(
             dos: <String>[
               'Reach for these when you need a chat surface that is not the '
-                  'agent: a support thread, a comment column, two humans '
+                  'agentAccent: a support thread, a comment column, two humans '
                   'talking.',
               'Read parts/message.tsx and agent-console.tsx before concluding '
                   'the console could just use these. The differences are '
@@ -1715,7 +1721,7 @@ class _TravelNote extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElRichText(
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(
@@ -1723,9 +1729,9 @@ class _TravelNote extends StatelessWidget {
                   '§10 is explicit that this system is meant to be '
                   'lifted, and that ',
             ),
-            ElCode.span('components/ui'),
+            Code.span('components/ui'),
             const TextSpan(text: ', '),
-            ElCode.span('components/agent'),
+            Code.span('components/agent'),
             const TextSpan(
               text:
                   ' and the foundations all travel as-is. The next '
@@ -1734,7 +1740,7 @@ class _TravelNote extends StatelessWidget {
                   'every one of those, these four are the right starting '
                   'point and ',
             ),
-            ElCode.span('parts/message.tsx'),
+            Code.span('parts/message.tsx'),
             const TextSpan(
               text:
                   ' is not, because it is bound to a transport, a '
@@ -1742,14 +1748,14 @@ class _TravelNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(text: 'Yes, each of these is one '),
-            ElCode.span('npx shadcn add'),
+            Code.span('npx shadcn add'),
             const TextSpan(
               text:
                   ' from coming back. That is not a reason to delete '
@@ -1758,11 +1764,11 @@ class _TravelNote extends StatelessWidget {
                   'onto these tokens: a regenerated file arrives on stock '
                   'shadcn’s spacing, type and motion scales and fails ',
             ),
-            ElCode.span('check:tokens'),
+            Code.span('check:tokens'),
             const TextSpan(text: ' on arrival, exactly as §10 warns.'),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );

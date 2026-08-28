@@ -3,7 +3,7 @@
 /// Split out of the old merged `separator/page.dart` (and the content
 /// `stat/page.dart` also carried, since both former pages documented `empty`
 /// independently, with different emphasis). This is the one page that owns
-/// it now: `separator/` and `stat/` no longer render any `ElEmpty*` content.
+/// it now: `separator/` and `stat/` no longer render any `Empty*` content.
 ///
 /// Not wired into `catalog.dart`'s `componentDocs` list: that file is
 /// supervisor-owned. `page.dart` reads [emptyDoc] directly rather than going
@@ -24,12 +24,12 @@ const ComponentDocEntry emptyDoc = ComponentDocEntry(
       'description, and one clear way out.',
   dependencies: <String>['icon', 'source-foundation'],
   exports: <String>[
-    'ElEmpty',
-    'ElEmptyHeader',
-    'ElEmptyMedia',
-    'ElEmptyTitle',
-    'ElEmptyDescription',
-    'ElEmptyContent',
+    'Empty',
+    'EmptyHeader',
+    'EmptyMedia',
+    'EmptyTitle',
+    'EmptyDescription',
+    'EmptyContent',
   ],
   sourcePath: 'lib/src/components/empty.dart',
 );

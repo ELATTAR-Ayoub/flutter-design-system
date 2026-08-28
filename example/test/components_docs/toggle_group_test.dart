@@ -2,7 +2,7 @@
 /// [ToggleGroupDocPage].
 ///
 /// **Re-housed onto the documentation kit.** This suite used to read the old
-/// page's `ElSection`s directly; it now reads `DocsSection` (the kit's own
+/// page's `Section`s directly; it now reads `DocsSection` (the kit's own
 /// section widget) and opens each `DocsDisclosure` before reading what is
 /// inside it — closed by default, it mounts no content at all — matching
 /// `button_test.dart`'s own pattern, the worked reference for this rollout.
@@ -22,7 +22,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage rather than
+/// `ThemeController` is flipped in place for theme coverage rather than
 /// re-pumped under a new controller.
 library;
 
@@ -34,7 +34,33 @@ import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_install.dart' show DocsInstall;
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -64,7 +90,7 @@ const List<String> _sectionTitles = <String>[
   'Source',
 ];
 
-/// Every named constructor parameter `ElToggleGroup` declares, excluding
+/// Every named constructor parameter `ToggleGroup` declares, excluding
 /// `key`, read directly from `lib/src/components/toggle_group.dart`
 /// (L144-L152).
 const List<String> _groupParams = <String>[
@@ -76,15 +102,15 @@ const List<String> _groupParams = <String>[
   'label',
 ];
 
-/// Every named constructor parameter `ElToggleGroupItem` declares, excluding
+/// Every named constructor parameter `ToggleGroupItem` declares, excluding
 /// `key` (`toggle_group.dart` L81-L85).
 const List<String> _itemParams = <String>['label', 'child', 'enabled'];
 
-/// `ElToggleGroup`'s one static, named exactly as the API table names it
+/// `ToggleGroup`'s one static, named exactly as the API table names it
 /// (`toggle_group.dart` L178).
-const String _groupStatic = 'ElToggleGroup.gap';
+const String _groupStatic = 'ToggleGroup.gap';
 
-/// Every live `ElToggleGroup` specimen this page's own source keys. Each one
+/// Every live `ToggleGroup` specimen this page's own source keys. Each one
 /// must carry the horizontal-scroll mitigation: see the dedicated test.
 const List<String> _specimenKeys = <String>[
   'toggle-group-live-specimen',
@@ -114,24 +140,24 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.base);
+  await tester.pump(MotionDurations.normal);
 }
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -182,7 +208,7 @@ void main() {
         );
         expect(tester.takeException(), isNull);
 
-        // 390px is where ElSlidingPillGroup's Row overflowed before the
+        // 390px is where ActiveIndicator's Row overflowed before the
         // mitigation landed: the whole page must still render clean here.
         await _pump(tester, size: _narrow);
         await tester.pump();
@@ -213,7 +239,7 @@ void main() {
 
     testWidgets(
       'every live group specimen keeps its horizontal-scroll mitigation: '
-      'ElSlidingPillGroup\'s Row neither wraps nor scrolls on its own',
+      'ActiveIndicator\'s Row neither wraps nor scrolls on its own',
       (WidgetTester tester) async {
         await _pump(tester);
 
@@ -241,13 +267,13 @@ void main() {
         }
 
         // One mitigation per live group, and no live group without one.
-        // Not a bare `findsNWidgets` on ElToggleGroup: the kit's own
+        // Not a bare `findsNWidgets` on ToggleGroup: the kit's own
         // Preview/Code (DocsShowcase) and CLI/Manual (DocsInstall) chrome is
-        // itself built from ElToggleGroup, unkeyed. Scope to the keyed,
+        // itself built from ToggleGroup, unkeyed. Scope to the keyed,
         // component-level specimens only.
-        final List<ElToggleGroup> keyedGroups = tester
-            .widgetList<ElToggleGroup>(find.byType(ElToggleGroup))
-            .where((ElToggleGroup g) => g.key is ValueKey<String>)
+        final List<ToggleGroup> keyedGroups = tester
+            .widgetList<ToggleGroup>(find.byType(ToggleGroup))
+            .where((ToggleGroup g) => g.key is ValueKey<String>)
             .toList();
         expect(keyedGroups, hasLength(_specimenKeys.length));
 
@@ -255,65 +281,64 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the API tables cover every ElToggleGroup and ElToggleGroupItem '
-      'constructor parameter, plus the one static, one table per class',
-      (WidgetTester tester) async {
-        await _pump(tester);
-        await _open(tester, 'API Reference');
+    testWidgets('the API tables cover every ToggleGroup and ToggleGroupItem '
+        'constructor parameter, plus the one static, one table per class', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester);
+      await _open(tester, 'API Reference');
 
-        final List<DocsApiTable> tables = tester
-            .widgetList<DocsApiTable>(find.byType(DocsApiTable))
-            .toList();
-        expect(tables.map((DocsApiTable t) => t.title), <String>[
-          'ElToggleGroup',
-          'ElToggleGroup static helpers',
-          'ElToggleGroupItem',
-        ]);
+      final List<DocsApiTable> tables = tester
+          .widgetList<DocsApiTable>(find.byType(DocsApiTable))
+          .toList();
+      expect(tables.map((DocsApiTable t) => t.title), <String>[
+        'ToggleGroup',
+        'ToggleGroup static helpers',
+        'ToggleGroupItem',
+      ]);
 
-        // Each table covers its own class, not a merged pile: the group's
-        // constructor table carries no static and no item field.
-        final DocsApiTable groupTable = tables.first;
+      // Each table covers its own class, not a merged pile: the group's
+      // constructor table carries no static and no item field.
+      final DocsApiTable groupTable = tables.first;
+      expect(
+        groupTable.facts.map((DocsApiFact f) => f.name),
+        _groupParams,
+        reason:
+            'the ToggleGroup table must be exactly its constructor '
+            'parameters, in declaration order',
+      );
+      expect(tables[1].facts.map((DocsApiFact f) => f.name), <String>[
+        _groupStatic,
+      ]);
+      expect(tables[2].facts.map((DocsApiFact f) => f.name), _itemParams);
+
+      final Set<String> documented = _documentedNames(tester);
+      for (final String name in <String>[
+        ..._groupParams,
+        ..._itemParams,
+        _groupStatic,
+      ]) {
+        expect(documented, contains(name), reason: '"$name" is undocumented');
+      }
+
+      // toggle.dart's own members stay on the toggle page: this page names
+      // the two enums as types, never as its own rows.
+      for (final String toggleOnly in <String>[
+        'pressed',
+        'inExclusiveGroup',
+        'pressedFill',
+        'pressedInk',
+        'Toggle.gap',
+      ]) {
         expect(
-          groupTable.facts.map((DocsApiFact f) => f.name),
-          _groupParams,
+          documented,
+          isNot(contains(toggleOnly)),
           reason:
-              'the ElToggleGroup table must be exactly its constructor '
-              'parameters, in declaration order',
+              '"$toggleOnly" is a Toggle member and belongs on the '
+              'toggle page',
         );
-        expect(tables[1].facts.map((DocsApiFact f) => f.name), <String>[
-          _groupStatic,
-        ]);
-        expect(tables[2].facts.map((DocsApiFact f) => f.name), _itemParams);
-
-        final Set<String> documented = _documentedNames(tester);
-        for (final String name in <String>[
-          ..._groupParams,
-          ..._itemParams,
-          _groupStatic,
-        ]) {
-          expect(documented, contains(name), reason: '"$name" is undocumented');
-        }
-
-        // toggle.dart's own members stay on the toggle page: this page names
-        // the two enums as types, never as its own rows.
-        for (final String toggleOnly in <String>[
-          'pressed',
-          'inExclusiveGroup',
-          'pressedFill',
-          'pressedInk',
-          'ElToggle.gap',
-        ]) {
-          expect(
-            documented,
-            isNot(contains(toggleOnly)),
-            reason:
-                '"$toggleOnly" is a ElToggle member and belongs on the '
-                'toggle page',
-          );
-        }
-      },
-    );
+      }
+    });
 
     testWidgets(
       'the API tables report the real types the constructors declare',
@@ -328,14 +353,14 @@ void main() {
             for (final DocsApiFact fact in table.facts) fact.name: fact.type,
         };
 
-        expect(types['items'], 'List<ElToggleGroupItem>');
+        expect(types['items'], 'List<ToggleGroupItem>');
         expect(types['selectedIndex'], 'int?');
         expect(types['onChanged'], 'ValueChanged<int?>');
-        expect(types['variant'], 'ElToggleVariant');
-        expect(types['size'], 'ElToggleSize');
+        expect(types['variant'], 'ToggleVariant');
+        expect(types['size'], 'ToggleSize');
         expect(types[_groupStatic], 'static double');
-        // ElToggleGroupItem.child is the last 'child' row on the page, and
-        // ElToggleGroupItem is the only class here with one.
+        // ToggleGroupItem.child is the last 'child' row on the page, and
+        // ToggleGroupItem is the only class here with one.
         expect(types['child'], 'Widget?');
         expect(types['enabled'], 'bool');
       },
@@ -344,7 +369,7 @@ void main() {
     testWidgets(
       'the hero specimen selects a new option on tap and deselects to null '
       'when the already-selected option is tapped again, the single-select '
-      'deselect semantics ElToggleGroup reproduces',
+      'deselect semantics ToggleGroup reproduces',
       (WidgetTester tester) async {
         await _pump(tester);
 
@@ -352,9 +377,9 @@ void main() {
         expect(find.byKey(key), findsOneWidget);
         await tester.ensureVisible(find.byKey(key));
 
-        ElToggleGroup group = tester.widget<ElToggleGroup>(find.byKey(key));
+        ToggleGroup group = tester.widget<ToggleGroup>(find.byKey(key));
         expect(group.selectedIndex, 0);
-        expect(group.items.map((ElToggleGroupItem i) => i.label), <String>[
+        expect(group.items.map((ToggleGroupItem i) => i.label), <String>[
           'Newest',
           'Price',
           'Popular',
@@ -370,12 +395,12 @@ void main() {
 
         await tester.tap(priceInSpecimen, warnIfMissed: false);
         await tester.pump();
-        group = tester.widget<ElToggleGroup>(find.byKey(key));
+        group = tester.widget<ToggleGroup>(find.byKey(key));
         expect(group.selectedIndex, 1);
 
         await tester.tap(priceInSpecimen, warnIfMissed: false);
         await tester.pump();
-        group = tester.widget<ElToggleGroup>(find.byKey(key));
+        group = tester.widget<ToggleGroup>(find.byKey(key));
         expect(group.selectedIndex, isNull);
 
         expect(tester.takeException(), isNull);
@@ -393,8 +418,8 @@ void main() {
         );
         await tester.ensureVisible(outlineGroup);
         expect(
-          tester.widget<ElToggleGroup>(outlineGroup).variant,
-          ElToggleVariant.outline,
+          tester.widget<ToggleGroup>(outlineGroup).variant,
+          ToggleVariant.outline,
         );
 
         final Finder smGroup = find.byKey(
@@ -404,16 +429,14 @@ void main() {
           const ValueKey<String>('toggle-group-sizes-lg-specimen'),
         );
         await tester.ensureVisible(smGroup);
-        expect(tester.widget<ElToggleGroup>(smGroup).size, ElToggleSize.sm);
-        expect(tester.widget<ElToggleGroup>(lgGroup).size, ElToggleSize.lg);
+        expect(tester.widget<ToggleGroup>(smGroup).size, ToggleSize.sm);
+        expect(tester.widget<ToggleGroup>(lgGroup).size, ToggleSize.lg);
 
         final Finder disabledGroup = find.byKey(
           const ValueKey<String>('toggle-group-disabled-specimen'),
         );
         await tester.ensureVisible(disabledGroup);
-        final ElToggleGroup disabled = tester.widget<ElToggleGroup>(
-          disabledGroup,
-        );
+        final ToggleGroup disabled = tester.widget<ToggleGroup>(disabledGroup);
         expect(disabled.items[1].enabled, isFalse);
         expect(disabled.items[0].enabled, isTrue);
 
@@ -423,7 +446,7 @@ void main() {
           const ValueKey<String>('toggle-group-custom-specimen'),
         );
         await tester.ensureVisible(customGroup);
-        final ElToggleGroup custom = tester.widget<ElToggleGroup>(customGroup);
+        final ToggleGroup custom = tester.widget<ToggleGroup>(customGroup);
         expect(custom.items[0].child, isNotNull);
         expect(custom.items[1].child, isNotNull);
         expect(custom.items[2].child, isNull);
@@ -456,9 +479,9 @@ void main() {
         );
         expect(
           tester
-              .widget<ElToggleGroup>(rtl)
+              .widget<ToggleGroup>(rtl)
               .items
-              .map((ElToggleGroupItem i) => i.label)
+              .map((ToggleGroupItem i) => i.label)
               .first,
           'الأحدث',
         );
@@ -540,22 +563,22 @@ void main() {
       'both themes render the article with no exceptions when flipped in '
       'place, losing no specimen',
       (WidgetTester tester) async {
-        final ElThemeController theme = await _pump(
+        final ThemeController theme = await _pump(
           tester,
-          mode: ElThemeMode.light,
+          mode: ColorMode.light,
         );
         expect(find.text(toggleGroupDoc.title), findsWidgets);
 
-        final ElThemeData light = ElTheme.of(
+        final ThemeTokens light = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('toggle-group-doc-article')),
           ),
         );
 
-        theme.setMode(ElThemeMode.dark);
+        theme.setMode(ColorMode.dark);
         await tester.pump();
 
-        final ElThemeData dark = ElTheme.of(
+        final ThemeTokens dark = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('toggle-group-doc-article')),
           ),
@@ -591,7 +614,7 @@ void main() {
       await tester.ensureVisible(manualTab);
       await tester.tap(manualTab);
       await tester.pump();
-      expect(find.textContaining('sliding_pill.dart'), findsWidgets);
+      expect(find.textContaining('active_indicator.dart'), findsWidgets);
     });
 
     testWidgets('the meta entry describes the group alone', (
@@ -602,15 +625,18 @@ void main() {
       expect(toggleGroupDoc.command, 'elattar add toggle-group');
       expect(toggleGroupDoc.sourcePath, 'lib/src/components/toggle_group.dart');
       expect(toggleGroupDoc.exports, <String>[
-        'ElToggleGroup',
-        'ElToggleGroupItem',
+        'ToggleGroup',
+        'ToggleGroupItem',
       ]);
       // The enums stay claimed by toggleDoc: the group declares neither.
-      expect(toggleGroupDoc.exports, isNot(contains('ElToggle')));
-      expect(toggleGroupDoc.exports, isNot(contains('ElToggleVariant')));
-      expect(toggleGroupDoc.exports, isNot(contains('ElToggleSize')));
+      expect(toggleGroupDoc.exports, isNot(contains('Toggle')));
+      expect(toggleGroupDoc.exports, isNot(contains('ToggleVariant')));
+      expect(toggleGroupDoc.exports, isNot(contains('ToggleSize')));
       expect(toggleItemSourcePath, 'lib/src/components/toggle.dart');
-      expect(slidingPillSourcePath, 'lib/src/motion/sliding_pill.dart');
+      expect(
+        slidingPillSourcePath,
+        'lib/src/components/ui/active_indicator.dart',
+      );
     });
   });
 }

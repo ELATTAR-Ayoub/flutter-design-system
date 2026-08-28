@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/card.dart",
+      "source": "lib/src/components/ui/card.dart",
       "target": "@ui/card.dart",
-      "sha256": "8b22d8d0fddb6bbf8cbb21c3f27010cd59578121a3422f6c332f12dcfcf51a80"
+      "sha256": "d652f6b43dd524a923759ff6ddd6d092ba7a7b27daebc71abc3ae18c5043c0e7"
     }
   ],
   "registryDependencies": [
@@ -22,6 +22,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/card",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/card.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/card.dart",
   "deprecated": false
 }

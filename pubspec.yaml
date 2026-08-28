@@ -29,7 +29,7 @@ flutter:
   # These are declared in the PACKAGE pubspec, so flutter_tools bundles them
   # automatically for every dependent app and registers them under the prefixed
   # family name `packages/elattar_design_system/<Family>`. Call sites never see
-  # that: `ElFonts.package` is threaded through `TextStyle(package: ...)` inside
+  # that: `Fonts.package` is threaded through `TextStyle(package: ...)` inside
   # foundation/typography.dart, which performs the same prefixing.
   fonts:
     - family: InterLocal

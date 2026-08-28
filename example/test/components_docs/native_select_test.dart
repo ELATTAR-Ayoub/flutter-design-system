@@ -1,19 +1,19 @@
 /// Tests for `components_docs/native_select/page.dart`'s [NativeSelectDocPage].
 ///
-/// This page documents exactly one component: [ElNativeSelect] and
-/// [ElNativeSelectSize]. `selection_control` and `form` — previously
+/// This page documents exactly one component: [NativeSelect] and
+/// [NativeSelectSize]. `selection_control` and `form` — previously
 /// documented on this same page — now have their own pages, and their own
 /// tests: `selection_control_test.dart` and `form_test.dart`.
 ///
 /// Re-housed onto the documentation kit (`ComponentDocSpec` +
 /// `ComponentDocPage`): sections now render as `DocsSection` (from
-/// `docs_section.dart`), not the old `kit.dart` `ElSection`, and the live
+/// `docs_section.dart`), not the old `kit.dart` `Section`, and the live
 /// demo is a real `Preview` section with its own rail entry rather than an
 /// unheaded `DocsCodeExample` above the first heading.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage rather than
+/// `ThemeController` is flipped in place for theme coverage rather than
 /// re-pumped under a new controller.
 ///
 /// `pumpAndSettle` is forbidden in a documentation-page test (several
@@ -33,7 +33,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
@@ -56,17 +82,17 @@ Future<void> _openDisclosure(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every `ElApiTable` this page must render, by title, and every public
+/// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of each documented class found by
 /// reading `lib/src/components/native_select.dart` directly.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElNativeSelect': <String>[
+  'NativeSelect': <String>[
     'options',
     'value',
     'onChanged',
@@ -78,9 +104,9 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'focusNode',
     'label',
     'hint',
-    'ElNativeSelect.menuOffset',
+    'NativeSelect.menuOffset',
   ],
-  'ElNativeSelectSize': <String>[
+  'NativeSelectSize': <String>[
     'sm',
     'md',
     'label',
@@ -90,21 +116,21 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   ],
 };
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -201,7 +227,7 @@ void main() {
   );
 
   testWidgets(
-    'each ElApiTable covers every public constructor parameter and static '
+    'each ApiTable covers every public constructor parameter and static '
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -225,7 +251,7 @@ void main() {
         expect(
           documented,
           isNotNull,
-          reason: 'no ElApiTable titled "${expected.key}" was rendered',
+          reason: 'no ApiTable titled "${expected.key}" was rendered',
         );
         for (final String param in expected.value) {
           expect(
@@ -239,7 +265,7 @@ void main() {
   );
 
   testWidgets(
-    'the live ElNativeSelect specimen is accessible and can be opened',
+    'the live NativeSelect specimen is accessible and can be opened',
     (WidgetTester tester) async {
       await _pump(tester);
 
@@ -285,13 +311,10 @@ void main() {
   testWidgets(
     'both themes render the article with no exceptions when flipped in place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(nativeSelectDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(nativeSelectDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

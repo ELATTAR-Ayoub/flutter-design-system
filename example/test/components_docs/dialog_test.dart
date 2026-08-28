@@ -8,8 +8,8 @@
 /// table (inside a `DocsDisclosure`, closed by default) is opened before
 /// its rows are read.
 ///
-/// `ElDialog` mounts its content through an `OverlayPortal` (via
-/// `ElModalPortal`), so the live specimens need a real `Overlay`: the
+/// `Dialog` mounts its content through an `OverlayPortal` (via
+/// `OverlayPortal`), so the live specimens need a real `Overlay`: the
 /// harness wraps the page in a `MaterialApp`. No `pumpAndSettle` is used
 /// anywhere a dialog is open — every open/close step advances with an
 /// explicit `pump()`/`pump(duration)` pair instead, the same shape
@@ -22,7 +22,33 @@ import 'package:example/components_docs/dialog/page.dart';
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_link.dart' show DocsLink, DocsLinkRow;
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -40,23 +66,25 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pumpDialogDoc(
+Future<ThemeController> _pumpDialogDoc(
   WidgetTester tester, {
   ValueChanged<String>? onNavigate,
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: SingleChildScrollView(child: DialogDocPage(onNavigate: onNavigate)),
+        home: SingleChildScrollView(
+          child: DialogDocPage(onNavigate: onNavigate),
+        ),
       ),
     ),
   );
@@ -69,14 +97,14 @@ Future<void> _open(WidgetTester tester, Finder trigger) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 /// Runs the exit and lets the portal's post-completion `setState` land — the
 /// same two-pump shape `alert_dialog_test.dart`'s own `_settleExit` uses.
 Future<void> _settleExit(WidgetTester tester) async {
   await tester.pump();
-  await tester.pump(ElDurations.overlay);
+  await tester.pump(MotionDurations.overlayEnter);
   await tester.pump();
 }
 
@@ -92,24 +120,24 @@ void main() {
       expect(dialogDoc.dependencies, <String>[
         'button',
         'icon',
-        'machine-surface',
+        'surface',
         'source-foundation',
       ]);
       expect(
         dialogDoc.exports,
         containsAll(<String>[
-          'ElModalPortal',
-          'ElDialogOverlay',
-          'ElJellyTransition',
-          'ElDialog',
-          'ElDialogVariant',
-          'ElDialogContent',
-          'ElDialogContentGroup',
-          'ElDialogHeader',
-          'ElDialogFooter',
-          'ElDialogTitle',
-          'ElDialogDescription',
-          'ElDialogMedia',
+          'OverlayPortal',
+          'DialogOverlay',
+          'OpenTransition',
+          'Dialog',
+          'DialogVariant',
+          'DialogContent',
+          'DialogContentGroup',
+          'DialogHeader',
+          'DialogFooter',
+          'DialogTitle',
+          'DialogDescription',
+          'DialogMedia',
         ]),
       );
       expect(dialogDoc.description, isNot(contains('..')));
@@ -136,7 +164,7 @@ void main() {
         findsOneWidget,
       );
       // Neither overlay is mounted before anything opens it.
-      expect(find.byType(ElDialogContent), findsNothing);
+      expect(find.byType(DialogContent), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
@@ -178,27 +206,27 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
-        // ElDialog.
+        // Dialog.
         expect(find.text('trigger'), findsWidgets);
         expect(find.text('content'), findsWidgets);
         expect(find.text('onOpenChange'), findsWidgets);
-        // ElDialogContent.
+        // DialogContent.
         expect(find.text('children'), findsWidgets);
         expect(find.text('variant'), findsWidgets);
-        // ElDialogContent AND ElDialogContentGroup both declare
+        // DialogContent AND DialogContentGroup both declare
         // showCloseButton, so two rows carry the string.
         expect(find.text('showCloseButton'), findsNWidgets(2));
         expect(find.text('onClose'), findsOneWidget);
-        // ElDialogHeader / ElDialogFooter.
-        expect(find.text('ElDialogHeader.closeButtonLane'), findsOneWidget);
-        // ElDialogTitle / ElDialogDescription share `text (positional)`.
+        // DialogHeader / DialogFooter.
+        expect(find.text('DialogHeader.closeButtonLane'), findsOneWidget);
+        // DialogTitle / DialogDescription share `text (positional)`.
         expect(find.text('text (positional)'), findsWidgets);
-        // ElDialogMedia.
+        // DialogMedia.
         expect(find.text('child'), findsWidgets);
-        expect(find.text('ElDialogMedia.aspect'), findsOneWidget);
-        // ElModalPortal.
+        expect(find.text('DialogMedia.aspect'), findsOneWidget);
+        // OverlayPortal.
         expect(find.text('transition'), findsOneWidget);
         expect(find.text('alignment'), findsOneWidget);
         expect(find.text('enterDuration'), findsOneWidget);
@@ -207,27 +235,31 @@ void main() {
         expect(find.text('overlayCurve'), findsOneWidget);
         expect(find.text('dismissOnOverlayTap'), findsOneWidget);
         expect(find.text('clampToViewport'), findsOneWidget);
-        // ElJellyTransition.
+        // OpenTransition.
         expect(find.text('animation'), findsOneWidget);
         expect(
-          find.text('ElJellyTransition.sample(progress, {entering})'),
+          find.text('OpenTransition.sample(progress, {entering})'),
           findsOneWidget,
         );
         for (final String table in <String>[
-          'ElDialog',
-          'ElDialogVariant',
-          'ElDialogContent',
-          'ElDialogContentGroup',
-          'ElDialogHeader',
-          'ElDialogFooter',
-          'ElDialogTitle',
-          'ElDialogDescription',
-          'ElDialogMedia',
-          'ElModalPortal',
-          'ElDialogOverlay',
-          'ElJellyTransition',
+          'Dialog',
+          'DialogVariant',
+          'DialogContent',
+          'DialogContentGroup',
+          'DialogHeader',
+          'DialogFooter',
+          'DialogTitle',
+          'DialogDescription',
+          'DialogMedia',
+          'OverlayPortal',
+          'DialogOverlay',
+          'OpenTransition',
         ]) {
-          expect(find.textContaining(table), findsWidgets, reason: 'missing $table');
+          expect(
+            find.textContaining(table),
+            findsWidgets,
+            reason: 'missing $table',
+          );
         }
       },
     );
@@ -239,7 +271,7 @@ void main() {
 
       expect(find.text('elattar add dialog'), findsWidgets);
       expect(find.textContaining('button'), findsWidgets);
-      expect(find.textContaining('machine-surface'), findsWidgets);
+      expect(find.textContaining('surface'), findsWidgets);
     });
 
     testWidgets(
@@ -253,7 +285,7 @@ void main() {
         await tester.pump();
         await tester.tap(depsTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         // Scoped to the DocsLinkRow itself: the sidebar's own component nav
         // renders a link named "Sheet" too, and a bare find.text('Sheet')
@@ -270,21 +302,22 @@ void main() {
       },
     );
 
-    testWidgets('keyboard documents that Escape and back are not the same contract', (
-      WidgetTester tester,
-    ) async {
-      await _pumpDialogDoc(tester, size: const Size(1440, 4000));
+    testWidgets(
+      'keyboard documents that Escape and back are not the same contract',
+      (WidgetTester tester) async {
+        await _pumpDialogDoc(tester, size: const Size(1440, 4000));
 
-      final Finder keyboardTrigger = _disclosureTrigger('Keyboard');
-      await tester.ensureVisible(keyboardTrigger);
-      await tester.pump();
-      await tester.tap(keyboardTrigger);
-      await tester.pump();
-      await tester.pump(ElDurations.jelly);
+        final Finder keyboardTrigger = _disclosureTrigger('Keyboard');
+        await tester.ensureVisible(keyboardTrigger);
+        await tester.pump();
+        await tester.tap(keyboardTrigger);
+        await tester.pump();
+        await tester.pump(MotionDurations.open);
 
-      expect(find.textContaining('Escape'), findsWidgets);
-      expect(find.textContaining('NOT the same contract'), findsWidgets);
-    });
+        expect(find.textContaining('Escape'), findsWidgets);
+        expect(find.textContaining('NOT the same contract'), findsWidgets);
+      },
+    );
 
     testWidgets('navigating next fires onNavigate with the linked page', (
       WidgetTester tester,
@@ -295,9 +328,7 @@ void main() {
         onNavigate: (String route) => destination = route,
       );
 
-      final Finder nextLink = find
-          .widgetWithText(ElButton, 'Dropdown Menu')
-          .last;
+      final Finder nextLink = find.widgetWithText(Button, 'Dropdown Menu').last;
       await tester.ensureVisible(nextLink);
       await tester.tap(nextLink);
       expect(destination, '/components/dropdown-menu');
@@ -365,18 +396,18 @@ void main() {
         find.byKey(const ValueKey<String>('dialog-example:media-content')),
         findsOneWidget,
       );
-      expect(find.byType(ElDialogMedia), findsOneWidget);
+      expect(find.byType(DialogMedia), findsOneWidget);
       expect(find.text('A visual lead'), findsOneWidget);
 
-      final ElDialogContent content = tester.widget<ElDialogContent>(
+      final DialogContent content = tester.widget<DialogContent>(
         find.byKey(const ValueKey<String>('dialog-example:media-content')),
       );
-      expect(content.variant, ElDialogVariant.media);
+      expect(content.variant, DialogVariant.media);
       expect(content.showCloseButton, isFalse);
 
       await tester.tap(find.text('Continue'));
       await _settleExit(tester);
-      expect(find.byType(ElDialogMedia), findsNothing);
+      expect(find.byType(DialogMedia), findsNothing);
     });
   });
 
@@ -425,30 +456,30 @@ void main() {
 
   group('both themes', () {
     testWidgets('renders on light', (WidgetTester tester) async {
-      await _pumpDialogDoc(tester, mode: ElThemeMode.light);
-      expect(find.byType(ElDialog), findsWidgets);
+      await _pumpDialogDoc(tester, mode: ColorMode.light);
+      expect(find.byType(Dialog), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders on dark', (WidgetTester tester) async {
-      await _pumpDialogDoc(tester, mode: ElThemeMode.dark);
-      expect(find.byType(ElDialog), findsWidgets);
+      await _pumpDialogDoc(tester, mode: ColorMode.dark);
+      expect(find.byType(Dialog), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('flipping the theme in place keeps the page intact', (
       WidgetTester tester,
     ) async {
-      final ElThemeController theme = await _pumpDialogDoc(
+      final ThemeController theme = await _pumpDialogDoc(
         tester,
-        mode: ElThemeMode.dark,
+        mode: ColorMode.dark,
       );
-      expect(find.byType(ElDialog), findsWidgets);
+      expect(find.byType(Dialog), findsWidgets);
 
-      theme.setMode(ElThemeMode.light);
+      theme.setMode(ColorMode.light);
       await tester.pump();
 
-      expect(find.byType(ElDialog), findsWidgets);
+      expect(find.byType(Dialog), findsWidgets);
       expect(tester.takeException(), isNull);
     });
   });

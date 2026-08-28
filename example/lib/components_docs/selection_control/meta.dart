@@ -1,8 +1,8 @@
 /// Public documentation metadata for the `selection_control` component.
 ///
-/// [ElSelectionControl] is the shared socket, focus ring, hit-area expander
-/// and jelly squash that [ElHitArea] and [ElJellyReplay] (also documented
-/// here) compose, and that ElCheckbox, ElRadioGroup, and ElSwitch each build
+/// [SelectionControl] is the shared socket, focus ring, hit-area expander
+/// and jelly squash that [HitArea] and [StateChangeFeedback] (also documented
+/// here) compose, and that Checkbox, RadioGroup, and Switch each build
 /// their own skin on top of. It carries no shadcn/Base UI counterpart page of
 /// any kind — it is an invented internal primitive — so it has none of the
 /// "Checked state"/"Group"/"Table" sections a real checkbox page would; its
@@ -21,14 +21,9 @@ const ComponentDocEntry selectionControlDoc = ComponentDocEntry(
   title: 'Selection Control',
   description:
       'The shared socket, focus ring, hit-area expander, and jelly squash '
-      'that ElCheckbox, ElRadioGroup, and ElSwitch each wear.',
+      'that Checkbox, RadioGroup, and Switch each wear.',
   // Registry dependencies are resolved by `elattar add selection-control`.
-  dependencies: <String>[
-    'button',
-    'keyframes',
-    'machine-surface',
-    'source-foundation',
-  ],
-  exports: <String>['ElSelectionControl', 'ElHitArea', 'ElJellyReplay'],
+  dependencies: <String>['button', 'keyframes', 'surface', 'source-foundation'],
+  exports: <String>['SelectionControl', 'HitArea', 'StateChangeFeedback'],
   sourcePath: 'lib/src/components/selection_control.dart',
 );

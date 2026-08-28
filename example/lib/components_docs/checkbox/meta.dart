@@ -27,6 +27,6 @@ const ComponentDocEntry checkboxDoc = ComponentDocEntry(
     'selection-control',
     'source-foundation',
   ],
-  exports: <String>['ElCheckbox', 'ElCheckboxState'],
+  exports: <String>['Checkbox', 'CheckboxState'],
   sourcePath: 'lib/src/components/checkbox.dart',
 );

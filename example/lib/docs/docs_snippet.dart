@@ -2,28 +2,40 @@
 /// The only code renderer in the documentation.
 ///
 /// The docs used to carry their own tokenizer. The agent family already
-/// shipped the real VS Code Dark Plus palette — `ElAgentCodeBlock` over
-/// `ElPrismPalette` — so there is one syntax theme on the site and it is that
+/// shipped the real VS Code Dark Plus palette — `AgentCodeBlock` over
+/// `PrismPalette` — so there is one syntax theme on the site and it is that
 /// one. A second one is a second thing to keep true.
 ///
 /// DEVIATION from the task-2 brief, ruled by the repository owner: the brief
-/// had this widget render through `ElAgentCodeBlock` itself. That widget's
-/// `normalise` looks the language up in `elLanguageAliases`
+/// had this widget render through `AgentCodeBlock` itself. That widget's
+/// `normalise` looks the language up in `languageAliases`
 /// (`lib/src/components/agent_markdown.dart`), which registers bash, css,
 /// js/javascript, json, jsx, md/markdown, py/python, sh/shell, sql, ts/tsx/
 /// typescript — and no `dart`. Since `dart` is the default language and
-/// nearly all documentation code, routing through `ElAgentCodeBlock` would
+/// nearly all documentation code, routing through `AgentCodeBlock` would
 /// render every Dart snippet flat and unhighlighted. This widget instead
-/// paints its own header strip and body — mirroring `ElAgentCodeBlock.build`
+/// paints its own header strip and body — mirroring `AgentCodeBlock.build`
 /// structurally — over tokens from `docsTokenise` (`docs_syntax.dart`), which
 /// adds the missing Dart grammar and still routes every other language
-/// through the package's own `elTokenise`. The palette is unchanged:
-/// `ElPrismPalette`, the same VS Code Dark Plus colours `ElAgentCodeBlock`
+/// through the package's own `tokenise`. The palette is unchanged:
+/// `PrismPalette`, the same VS Code Dark Plus colours `AgentCodeBlock`
 /// uses, so the site still carries exactly one syntax theme.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import 'docs_copy_button.dart';
 import 'docs_syntax.dart';
@@ -59,9 +71,9 @@ class DocsSnippet extends StatelessWidget {
 }
 
 /// The header strip plus the highlighted body, mirroring
-/// `ElAgentCodeBlock.build`'s known-language branch structurally: a
+/// `AgentCodeBlock.build`'s known-language branch structurally: a
 /// [ColoredBox] on `theme.muted`, a bottom-bordered language strip, then the
-/// body on [ElPrismPalette.ground].
+/// body on [PrismPalette.ground].
 class _DocsSnippetBody extends StatelessWidget {
   const _DocsSnippetBody({required this.code, required this.language});
 
@@ -70,13 +82,13 @@ class _DocsSnippetBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final String label = ElAgentCodeBlock.normalise(language) ?? language;
-    final List<List<ElCodeToken>> lines = docsTokenise(code, language);
-    final TextStyle base = ElText.styleOf(
+    final ThemeTokens theme = ThemeScope.of(context);
+    final String label = AgentCodeBlock.normalise(language) ?? language;
+    final List<List<CodeToken>> lines = docsTokenise(code, language);
+    final TextStyle base = StyledText.styleOf(
       context,
-      ElType.code,
-      color: ElPrismPalette.plain,
+      TextStyles.code,
+      color: PrismPalette.plain,
     );
 
     return ColoredBox(
@@ -88,14 +100,14 @@ class _DocsSnippetBody extends StatelessWidget {
           Container(
             key: const ValueKey<String>('docs-snippet-strip'),
             padding: EdgeInsets.symmetric(
-              horizontal: ElAgentCodeBlock.stripPadX,
-              vertical: ElAgentCodeBlock.stripPadY,
+              horizontal: AgentCodeBlock.stripPadX,
+              vertical: AgentCodeBlock.stripPadY,
             ),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
                   color: theme.border,
-                  width: ElWidths.hairline,
+                  width: BorderWidths.hairline,
                 ),
               ),
             ),
@@ -111,16 +123,16 @@ class _DocsSnippetBody extends StatelessWidget {
               children: <Widget>[
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: ElText(
+                  child: StyledText(
                     label,
-                    ElType.caption,
+                    TextStyles.caption,
                     color: theme.mutedForeground,
                   ),
                 ),
                 Positioned(
-                  top: el(0),
-                  bottom: el(0),
-                  right: el(0),
+                  top: space(0),
+                  bottom: space(0),
+                  right: space(0),
                   child: Center(child: DocsCopyButton(text: code)),
                 ),
               ],
@@ -128,26 +140,24 @@ class _DocsSnippetBody extends StatelessWidget {
           ),
           Container(
             key: const ValueKey<String>('docs-snippet-code-body'),
-            color: ElPrismPalette.ground,
-            margin: const EdgeInsets.symmetric(
-              vertical: ElPrismPalette.margin,
-            ),
-            padding: const EdgeInsets.all(ElPrismPalette.padding),
+            color: PrismPalette.ground,
+            margin: const EdgeInsets.symmetric(vertical: PrismPalette.margin),
+            padding: const EdgeInsets.all(PrismPalette.padding),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  for (final List<ElCodeToken> line in lines)
+                  for (final List<CodeToken> line in lines)
                     SizedBox(
-                      height: ElPrismPalette.lineHeight,
+                      height: PrismPalette.lineHeight,
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text.rich(
                           TextSpan(
                             children: <InlineSpan>[
-                              for (final ElCodeToken token in line)
+                              for (final CodeToken token in line)
                                 TextSpan(
                                   text: token.text,
                                   style: base.copyWith(color: token.color),
@@ -215,16 +225,14 @@ class _DocsSnippetOverflowState extends State<DocsSnippetOverflow> {
             ),
           ),
         Padding(
-          padding: EdgeInsets.only(top: el(2)),
+          padding: EdgeInsets.only(top: space(2)),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: ElButton(
-              variant: ElButtonVariant.ghost,
-              size: ElButtonSize.sm,
+            child: Button(
+              variant: ButtonVariant.ghost,
+              size: ButtonSize.sm,
               onPressed: () => setState(() => _open = !_open),
-              child: Text(
-                _open ? widget.showLessLabel : widget.showMoreLabel,
-              ),
+              child: Text(_open ? widget.showLessLabel : widget.showMoreLabel),
             ),
           ),
         ),

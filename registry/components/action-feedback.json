@@ -1,0 +1,31 @@
+{
+  "name": "action-feedback",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "Action sheen effect for primary interactive surfaces.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/action_feedback.dart",
+      "target": "@ui/action_feedback.dart",
+      "sha256": "b8148be32023959904e0fe32ce4d5a10c3fdf16338b3e7f92ed9dc2d0ccc3612"
+    }
+  ],
+  "registryDependencies": [
+    "surface",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "surface"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "documentationRoute": "/components/action-feedback",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/action_feedback.dart",
+  "exports": [
+    "ActionFeedback"
+  ]
+}

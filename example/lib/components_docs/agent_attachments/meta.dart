@@ -30,11 +30,11 @@ const ComponentDocEntry agentAttachmentsDoc = ComponentDocEntry(
     'tooltip',
   ],
   exports: <String>[
-    'ElAgentAttachmentCard',
-    'ElAgentAttachmentList',
-    'ElAgentDeliveryBadge',
-    'elAgentAttachmentGlyph',
-    'elAgentAttachmentIsVideo',
+    'AgentAttachmentCard',
+    'AgentAttachmentList',
+    'AgentDeliveryBadge',
+    'agentAttachmentGlyph',
+    'agentAttachmentIsVideo',
   ],
   sourcePath: 'lib/src/components/agent_attachments.dart',
 );

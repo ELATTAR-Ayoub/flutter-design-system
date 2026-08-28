@@ -11,7 +11,33 @@ import 'dart:typed_data';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart' show FontLoader;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -29,14 +55,14 @@ Future<void> _loadFont(String family, String file) async {
 
 Widget host(
   Widget child, {
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   Size size = const Size(1440, 900),
 }) => MediaQuery(
   data: MediaQueryData(size: size),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: mode),
+    child: ThemeScope(
+      controller: ThemeController(mode: mode),
       child: Center(child: child),
     ),
   ),
@@ -45,7 +71,7 @@ Widget host(
 /// A cell whose intrinsic width is exactly [width] — the browser's max-content
 /// number, handed to the layout as a fact so the distribution can be checked
 /// without depending on a font.
-ElTableCellSpec _rigid(double width, {double height = 20}) => ElTableCellSpec(
+TableCellSpec _rigid(double width, {double height = 20}) => TableCellSpec(
   child: SizedBox(width: width, height: height),
 );
 
@@ -63,7 +89,7 @@ void main() {
     await _loadFont('GeistMono', 'GeistMono-Variable.ttf');
   });
 
-  group('ElTable — the column model', () {
+  group('Table — the column model', () {
     testWidgets(
       'slack is distributed in proportion to max-content, exactly as Chrome '
       'does',
@@ -92,15 +118,15 @@ void main() {
             SizedBox(
               // The table's own box inside its 1px frame.
               width: 1028,
-              child: ElTable(
-                header: <ElTableCellSpec>[
-                  ElTableCellSpec(
+              child: Table(
+                header: <TableCellSpec>[
+                  TableCellSpec(
                     checkbox: true,
                     child: SizedBox(width: content[0], height: 20),
                   ),
                   for (int i = 1; i < content.length; i++) _rigid(content[i]),
                 ],
-                rows: const <ElTableRowSpec>[],
+                rows: const <TableRowSpec>[],
               ),
             ),
           ),
@@ -135,16 +161,16 @@ void main() {
         host(
           SizedBox(
             width: 600,
-            child: ElTable(
-              header: <ElTableCellSpec>[_rigid(100), _rigid(100)],
-              rows: const <ElTableRowSpec>[],
+            child: Table(
+              header: <TableCellSpec>[_rigid(100), _rigid(100)],
+              rows: const <TableRowSpec>[],
             ),
           ),
         ),
       );
       expect(
-        tester.getSize(find.byType(ElTable)).height,
-        closeTo(ElTable.headerHeight, _fine),
+        tester.getSize(find.byType(Table)).height,
+        closeTo(Table.headerHeight, _fine),
       );
     });
 
@@ -157,20 +183,19 @@ void main() {
             host(
               SizedBox(
                 width: 600,
-                child: ElTable(
-                  header: <ElTableCellSpec>[_rigid(100), _rigid(100)],
-                  rows: <ElTableRowSpec>[
+                child: Table(
+                  header: <TableCellSpec>[_rigid(100), _rigid(100)],
+                  rows: <TableRowSpec>[
                     for (int i = 0; i < rows; i++)
-                      ElTableRowSpec(
-                        cells: <ElTableCellSpec>[_rigid(100), _rigid(100)],
+                      TableRowSpec(
+                        cells: <TableCellSpec>[_rigid(100), _rigid(100)],
                       ),
                   ],
                 ),
               ),
             ),
           );
-          return tester.getSize(find.byType(ElTable)).height -
-              ElTable.headerHeight;
+          return tester.getSize(find.byType(Table)).height - Table.headerHeight;
         }
 
         // A 20px cell in `p-2`: 36 of content box, plus the rule.
@@ -195,12 +220,12 @@ void main() {
           host(
             SizedBox(
               width: 600,
-              child: ElTable(
-                header: <ElTableCellSpec>[_rigid(100), _rigid(100)],
-                rows: <ElTableRowSpec>[
-                  ElTableRowSpec.span(
+              child: Table(
+                header: <TableCellSpec>[_rigid(100), _rigid(100)],
+                rows: <TableRowSpec>[
+                  TableRowSpec.span(
                     const SizedBox(height: 40),
-                    spanHeight: el(48),
+                    spanHeight: space(48),
                   ),
                 ],
               ),
@@ -209,8 +234,8 @@ void main() {
         );
         // `h-48` — 192, and the head above it.
         expect(
-          tester.getSize(find.byType(ElTable)).height,
-          closeTo(ElTable.headerHeight + el(48), _fine),
+          tester.getSize(find.byType(Table)).height,
+          closeTo(Table.headerHeight + space(48), _fine),
         );
       },
     );
@@ -222,30 +247,28 @@ void main() {
         host(
           SizedBox(
             width: 600,
-            child: ElTable(
+            child: Table(
               caption: 'Showing the 5 most recent transactions of 248.',
-              header: <ElTableCellSpec>[_rigid(100), _rigid(100)],
-              rows: <ElTableRowSpec>[
-                ElTableRowSpec(
-                  cells: <ElTableCellSpec>[_rigid(100), _rigid(100)],
-                ),
+              header: <TableCellSpec>[_rigid(100), _rigid(100)],
+              rows: <TableRowSpec>[
+                TableRowSpec(cells: <TableCellSpec>[_rigid(100), _rigid(100)]),
               ],
             ),
           ),
         ),
       );
 
-      final ElText caption = tester.widget<ElText>(
+      final StyledText caption = tester.widget<StyledText>(
         find.byWidgetPredicate(
-          (Widget w) => w is ElText && w.text.startsWith('Showing'),
+          (Widget w) => w is StyledText && w.text.startsWith('Showing'),
         ),
       );
       expect(caption.align, TextAlign.center);
-      expect(caption.spec, ElComponentType.textSm);
+      expect(caption.spec, TextStyles.bodySmall);
 
       // head 40 + one row 36 + mt-4 16 + an 18.5714 line box.
       expect(
-        tester.getSize(find.byType(ElTable)).height,
+        tester.getSize(find.byType(Table)).height,
         closeTo(40 + 36 + 16 + 13 * (1.25 / 0.875), _fine),
       );
     });
@@ -257,13 +280,13 @@ void main() {
           host(
             SizedBox(
               width: 600,
-              child: ElTable(
-                header: <ElTableCellSpec>[_rigid(100)],
-                rows: <ElTableRowSpec>[
-                  ElTableRowSpec(cells: <ElTableCellSpec>[_rigid(100)]),
-                  ElTableRowSpec(
+              child: Table(
+                header: <TableCellSpec>[_rigid(100)],
+                rows: <TableRowSpec>[
+                  TableRowSpec(cells: <TableCellSpec>[_rigid(100)]),
+                  TableRowSpec(
                     selected: true,
-                    cells: <ElTableCellSpec>[_rigid(100)],
+                    cells: <TableCellSpec>[_rigid(100)],
                   ),
                 ],
               ),
@@ -271,8 +294,8 @@ void main() {
           ),
         );
 
-        final ElThemeData theme = ElTheme.of(
-          tester.element(find.byType(ElTable)),
+        final ThemeTokens theme = ThemeScope.of(
+          tester.element(find.byType(Table)),
         );
         List<Color?> fills() => tester
             .widgetList<Container>(
@@ -296,16 +319,16 @@ void main() {
         // The first body row's middle: past the 40px head, half a 37px row in.
         await gesture.moveTo(
           tester.getTopLeft(find.byType(Table)) +
-              Offset(50, ElTable.headerHeight + 18),
+              Offset(50, Table.headerHeight + 18),
         );
         await tester.pump();
-        await tester.pump(ElDurations.transitionDefault);
+        await tester.pump(MotionDurations.normal);
         expect(fills()[1]!.a, closeTo(0.5, 0.02));
       },
     );
   });
 
-  group('ElCard', () {
+  group('Card', () {
     testWidgets('a footer cancels the bottom padding and nothing else does', (
       WidgetTester tester,
     ) async {
@@ -314,16 +337,16 @@ void main() {
           host(
             SizedBox(
               width: 482,
-              child: ElCard(
+              child: Card(
                 children: <Widget>[
-                  const ElCardContent(child: SizedBox(height: 20)),
-                  if (footer) const ElCardFooter(child: SizedBox(height: 40)),
+                  const CardContent(child: SizedBox(height: 20)),
+                  if (footer) const CardFooter(child: SizedBox(height: 40)),
                 ],
               ),
             ),
           ),
         );
-        return tester.getSize(find.byType(ElCard)).height;
+        return tester.getSize(find.byType(Card)).height;
       }
 
       // 16 + 20 + 16 = 52 without, and 16 + 20 + 16 + (16 + 40 + 16 + 1)
@@ -339,19 +362,21 @@ void main() {
         host(
           SizedBox(
             width: 482,
-            child: ElCard(
+            child: Card(
               children: <Widget>[
-                const ElCardContent(child: SizedBox(height: 20)),
+                const CardContent(child: SizedBox(height: 20)),
               ],
             ),
           ),
         ),
       );
-      expect(tester.getSize(find.byType(ElCard)).width, 482);
+      expect(tester.getSize(find.byType(Card)).width, 482);
 
-      final ElThemeData theme = ElTheme.of(tester.element(find.byType(ElCard)));
-      expect(ElCard.ringOf(theme).a, closeTo(0.1, 0.001));
-      expect(ElCard.ringWidth, ElWidths.hairline);
+      final ThemeTokens theme = ThemeScope.of(
+        tester.element(find.byType(Card)),
+      );
+      expect(Card.ringOf(theme).a, closeTo(0.1, 0.001));
+      expect(Card.ringWidth, BorderWidths.hairline);
     });
 
     testWidgets('a header with an action is two columns, 4px apart', (
@@ -361,11 +386,11 @@ void main() {
         host(
           SizedBox(
             width: 482,
-            child: ElCard(
+            child: Card(
               children: <Widget>[
-                const ElCardHeader(
-                  title: ElCardTitle('Weekly competition'),
-                  description: ElCardDescription('Ends in 2 days.'),
+                const CardHeader(
+                  title: CardTitle('Weekly competition'),
+                  description: CardDescription('Ends in 2 days.'),
                   action: SizedBox(width: 41.53, height: 20),
                 ),
               ],
@@ -377,31 +402,31 @@ void main() {
       final Rect action = tester.getRect(
         find.byWidgetPredicate((Widget w) => w is SizedBox && w.width == 41.53),
       );
-      final Rect header = tester.getRect(find.byType(ElCardHeader));
-      final Rect title = tester.getRect(find.byType(ElCardTitle));
+      final Rect header = tester.getRect(find.byType(CardHeader));
+      final Rect title = tester.getRect(find.byType(CardTitle));
       // `justify-self-end`, inside the header's own `px-(--card-spacing)`.
-      expect(action.right, closeTo(header.right - ElCard.spacing, _fine));
+      expect(action.right, closeTo(header.right - Card.spacing, _fine));
       // `self-start` — the action shares the title's top edge.
       expect(action.top, closeTo(title.top, _fine));
       // `gap-1` is the COLUMN gap too.
-      expect(action.left - title.right, closeTo(ElCardHeader.gap, _fine));
+      expect(action.left - title.right, closeTo(CardHeader.gap, _fine));
     });
   });
 
-  group('ElItem', () {
+  group('Item', () {
     testWidgets('the group\'s gap is 10, not 16', (WidgetTester tester) async {
-      expect(ElItemGroup.gap, el(2.5));
+      expect(ItemGroup.gap, space(2.5));
 
       await tester.pumpWidget(
         host(
           SizedBox(
             width: 600,
-            child: ElItemGroup(
+            child: ItemGroup(
               children: <Widget>[
                 for (int i = 0; i < 2; i++)
-                  ElItem(
-                    content: ElItemContent(
-                      children: <Widget>[ElItemTitle('Row $i')],
+                  Item(
+                    content: ItemContent(
+                      children: <Widget>[ItemTitle('Row $i')],
                     ),
                   ),
               ],
@@ -411,7 +436,7 @@ void main() {
       );
 
       final List<Rect> rows = tester
-          .renderObjectList<RenderBox>(find.byType(ElItem))
+          .renderObjectList<RenderBox>(find.byType(Item))
           .map((RenderBox b) => b.localToGlobal(Offset.zero) & b.size)
           .toList();
       expect(rows[1].top - rows[0].bottom, closeTo(10, _fine));
@@ -424,21 +449,19 @@ void main() {
         host(
           SizedBox(
             width: 1078,
-            child: ElItem(
-              media: const ElItemMedia(
-                child: ElIcon.lucide(ElLucide.arrowUpRight),
-              ),
-              content: const ElItemContent(
+            child: Item(
+              media: const ItemMedia(child: Icon.lucide(Lucide.arrowUpRight)),
+              content: const ItemContent(
                 children: <Widget>[
-                  ElItemTitle('Visa ···· 6411'),
-                  ElItemDescription('Expires 04/29 · Default'),
+                  ItemTitle('Visa ···· 6411'),
+                  ItemDescription('Expires 04/29 · Default'),
                 ],
               ),
-              actions: ElItemActions(
+              actions: ItemActions(
                 children: <Widget>[
-                  ElButton(
-                    variant: ElButtonVariant.ghost,
-                    size: ElButtonSize.sm,
+                  Button(
+                    variant: ButtonVariant.ghost,
+                    size: ButtonSize.sm,
                     onPressed: () {},
                     child: const Text('Manage'),
                   ),
@@ -450,10 +473,7 @@ void main() {
       );
 
       // 1 + 10 + (17.875 + 4 + 19.5) + 10 + 1.
-      expect(
-        tester.getSize(find.byType(ElItem)).height,
-        closeTo(63.375, _fine),
-      );
+      expect(tester.getSize(find.byType(Item)).height, closeTo(63.375, _fine));
     });
 
     testWidgets('the media pins to the top and drops 2px', (
@@ -463,14 +483,12 @@ void main() {
         host(
           SizedBox(
             width: 600,
-            child: ElItem(
-              media: const ElItemMedia(
-                child: ElIcon.lucide(ElLucide.arrowUpRight),
-              ),
-              content: const ElItemContent(
+            child: Item(
+              media: const ItemMedia(child: Icon.lucide(Lucide.arrowUpRight)),
+              content: const ItemContent(
                 children: <Widget>[
-                  ElItemTitle('Visa'),
-                  ElItemDescription('Expires 04/29'),
+                  ItemTitle('Visa'),
+                  ItemDescription('Expires 04/29'),
                 ],
               ),
             ),
@@ -480,36 +498,37 @@ void main() {
 
       // The media slot is stretched to the row; the GLYPH inside it is what
       // `self-start` plus `translate-y-0.5` places.
-      final Rect glyph = tester.getRect(find.byType(ElIcon));
-      final Rect content = tester.getRect(find.byType(ElItemContent));
-      expect(glyph.top - content.top, closeTo(ElItemMedia.nudge, _fine));
-      expect(glyph.height, ElItemMedia.size);
+      final Rect glyph = tester.getRect(find.byType(Icon));
+      final Rect content = tester.getRect(find.byType(ItemContent));
+      expect(glyph.top - content.top, closeTo(ItemMedia.nudge, _fine));
+      expect(glyph.height, ItemMedia.size);
     });
   });
 
-  group('ElAvatar', () {
+  group('Avatar', () {
     testWidgets(
       'the class beats the attribute for the box and not for the dot',
       (WidgetTester tester) async {
         await tester.pumpWidget(
           host(
-            ElAvatar(
+            Avatar(
               fallback: 'VW',
-              sizePx: el(10),
-              badge: ElAvatarBadge(fill: ElPalette.value),
+              sizePx: space(10),
+              badge: AvatarBadge(fill: Palette.value),
             ),
           ),
         );
 
-        expect(tester.getSize(find.byType(ElAvatar)), Size(el(10), el(10)));
+        expect(tester.getSize(find.byType(Avatar)), Size(space(10), space(10)));
         // `data-size` is still `md`, so the dot is `size-2.5`.
         final Rect dot = tester.getRect(
           find.byWidgetPredicate(
-            (Widget w) => w is Container && w.constraints?.maxWidth == el(2.5),
+            (Widget w) =>
+                w is Container && w.constraints?.maxWidth == space(2.5),
           ),
         );
-        expect(dot.width, el(2.5));
-        final Rect circle = tester.getRect(find.byType(ElAvatar));
+        expect(dot.width, space(2.5));
+        final Rect circle = tester.getRect(find.byType(Avatar));
         expect(dot.right, closeTo(circle.right, _fine));
         expect(dot.bottom, closeTo(circle.bottom, _fine));
       },
@@ -520,14 +539,14 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          ElAvatar(
+          Avatar(
             fallback: '#1',
-            sizePx: el(10),
-            ring: (color: ElPalette.value, width: elAvatarRingWidth),
+            sizePx: space(10),
+            ring: (color: Palette.value, width: avatarRingWidth),
           ),
         ),
       );
-      expect(tester.getSize(find.byType(ElAvatar)), Size(el(10), el(10)));
+      expect(tester.getSize(find.byType(Avatar)), Size(space(10), space(10)));
     });
 
     testWidgets('a group overlaps at 8px a neighbour', (
@@ -537,11 +556,11 @@ void main() {
         host(
           SizedBox(
             width: 600,
-            child: ElAvatarGroup(
+            child: AvatarGroup(
               children: <Widget>[
                 for (final String i in <String>['VW', 'EM', 'TC'])
-                  ElAvatar(fallback: i, sizePx: el(8)),
-                const ElAvatarGroupCount('+248'),
+                  Avatar(fallback: i, sizePx: space(8)),
+                const AvatarGroupCount('+248'),
               ],
             ),
           ),
@@ -550,24 +569,24 @@ void main() {
 
       final List<double> lefts = <double>[
         ...tester
-            .renderObjectList<RenderBox>(find.byType(ElAvatar))
+            .renderObjectList<RenderBox>(find.byType(Avatar))
             .map((RenderBox b) => b.localToGlobal(Offset.zero).dx),
         tester
-            .renderObject<RenderBox>(find.byType(ElAvatarGroupCount))
+            .renderObject<RenderBox>(find.byType(AvatarGroupCount))
             .localToGlobal(Offset.zero)
             .dx,
       ];
       for (int i = 1; i < lefts.length; i++) {
         expect(
           lefts[i] - lefts[i - 1],
-          closeTo(el(8) - ElAvatarGroup.overlap, _fine),
+          closeTo(space(8) - AvatarGroup.overlap, _fine),
           reason: 'a 32px circle at a 24px pitch',
         );
       }
     });
   });
 
-  group('ElMarker and ElSeparator', () {
+  group('Marker and Separator', () {
     testWidgets('the separator variant puts a rule on each side of the label', (
       WidgetTester tester,
     ) async {
@@ -575,8 +594,8 @@ void main() {
         host(
           const SizedBox(
             width: 1030,
-            child: ElMarker(
-              variant: ElMarkerVariant.separator,
+            child: Marker(
+              variant: MarkerVariant.separator,
               label: 'separator — divides before from after',
             ),
           ),
@@ -588,8 +607,8 @@ void main() {
           .map((RenderBox b) => b.localToGlobal(Offset.zero) & b.size)
           .toList();
       expect(rules.length, 2);
-      expect(rules[0].height, ElWidths.hairline);
-      expect(rules[1].height, ElWidths.hairline);
+      expect(rules[0].height, BorderWidths.hairline);
+      expect(rules[1].height, BorderWidths.hairline);
       // The two rules split the leftovers evenly, to within the label's own
       // fractional width.
       expect(rules[0].width, closeTo(rules[1].width, 0.05));
@@ -602,8 +621,8 @@ void main() {
         host(
           const SizedBox(
             width: 1030,
-            child: ElMarker(
-              variant: ElMarkerVariant.border,
+            child: Marker(
+              variant: MarkerVariant.border,
               label: 'border — heads what follows',
             ),
           ),
@@ -611,8 +630,8 @@ void main() {
       );
       // 18.5714 + pb-2 + the 1px rule.
       expect(
-        tester.getSize(find.byType(ElMarker)).height,
-        closeTo(13 * (1.25 / 0.875) + el(2) + ElWidths.hairline, _fine),
+        tester.getSize(find.byType(Marker)).height,
+        closeTo(13 * (1.25 / 0.875) + space(2) + BorderWidths.hairline, _fine),
       );
     });
 
@@ -623,12 +642,12 @@ void main() {
         host(
           SizedBox(
             width: 448,
-            height: el(6),
+            height: space(6),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: const <Widget>[
                 Expanded(child: SizedBox.shrink()),
-                ElSeparator.vertical(),
+                Separator.vertical(),
                 Expanded(child: SizedBox.shrink()),
               ],
             ),
@@ -636,69 +655,69 @@ void main() {
         ),
       );
       expect(
-        tester.getSize(find.byType(ElSeparator)),
-        Size(ElWidths.hairline, el(6)),
+        tester.getSize(find.byType(Separator)),
+        Size(BorderWidths.hairline, space(6)),
         reason: '`self-stretch` fills the line, `w-px` does not',
       );
 
       await tester.pumpWidget(
-        host(const SizedBox(width: 448, child: ElSeparator())),
+        host(const SizedBox(width: 448, child: Separator())),
       );
       expect(
-        tester.getSize(find.byType(ElSeparator)),
-        Size(448, ElWidths.hairline),
+        tester.getSize(find.byType(Separator)),
+        Size(448, BorderWidths.hairline),
       );
     });
   });
 
-  group('ElStat', () {
-    Widget statHost(ElStat stat) => host(SizedBox(width: 322, child: stat));
+  group('Stat', () {
+    Widget statHost(Stat stat) => host(SizedBox(width: 322, child: stat));
 
     testWidgets('the footprint is 75.89 in every state', (
       WidgetTester tester,
     ) async {
-      const List<ElStat> states = <ElStat>[
-        ElStat(
+      const List<Stat> states = <Stat>[
+        Stat(
           label: 'Revenue',
           value: r'$12,480',
-          delta: (value: '8.2%', direction: ElStatDirection.up),
+          delta: (value: '8.2%', direction: StatDirection.up),
           hint: 'vs last month',
         ),
-        ElStat(
+        Stat(
           label: 'Revenue',
           value: r'$12,480',
-          delta: (value: '8.2%', direction: ElStatDirection.up),
+          delta: (value: '8.2%', direction: StatDirection.up),
           hint: 'vs last month',
-          state: ElStatState.loading,
+          state: StatState.loading,
         ),
-        ElStat(
+        Stat(
           label: 'Revenue',
           value: r'$12,480',
-          delta: (value: '8.2%', direction: ElStatDirection.up),
-          state: ElStatState.error,
+          delta: (value: '8.2%', direction: StatDirection.up),
+          state: StatState.error,
           message: 'Could not load',
         ),
-        ElStat(
+        Stat(
           label: 'Revenue',
           value: r'$12,480',
-          delta: (value: '8.2%', direction: ElStatDirection.up),
-          state: ElStatState.empty,
+          delta: (value: '8.2%', direction: StatDirection.up),
+          state: StatState.empty,
           message: 'No sales this period',
         ),
-        ElStat(
+        Stat(
           label: 'Revenue',
           value: r'$12,480',
-          delta: (value: '8.2%', direction: ElStatDirection.up),
+          delta: (value: '8.2%', direction: StatDirection.up),
           hint: 'vs last month',
           disabled: true,
         ),
       ];
 
-      for (final ElStat stat in states) {
+      for (final Stat stat in states) {
         await tester.pumpWidget(statHost(stat));
-        await tester.pump(ElDurations.base);
+        await tester.pump(MotionDurations.normal);
         expect(
-          tester.getSize(find.byType(ElStat)).height,
+          tester.getSize(find.byType(Stat)).height,
           closeTo(75.89, _fine),
           reason: '${stat.state} / disabled=${stat.disabled}',
         );
@@ -708,15 +727,15 @@ void main() {
     testWidgets('the component writes the sign, and it is U+2212 for a fall', (
       WidgetTester tester,
     ) async {
-      expect(ElStatDirection.up.sign, '+');
-      expect(ElStatDirection.down.sign, '−');
-      expect(ElStatDirection.flat.sign, '');
+      expect(StatDirection.up.sign, '+');
+      expect(StatDirection.down.sign, '−');
+      expect(StatDirection.flat.sign, '');
 
       await tester.pumpWidget(
         host(
-          const ElStatDeltaMark(
-            delta: (value: '4.1%', direction: ElStatDirection.down),
-            betterWhen: ElStatDirection.up,
+          const StatDeltaMark(
+            delta: (value: '4.1%', direction: StatDirection.down),
+            betterWhen: StatDirection.up,
           ),
         ),
       );
@@ -727,47 +746,47 @@ void main() {
         'earns plain foreground', (WidgetTester tester) async {
       await tester.pumpWidget(
         host(
-          const ElStatDeltaMark(
-            delta: (value: '0.3%', direction: ElStatDirection.up),
-            betterWhen: ElStatDirection.down,
+          const StatDeltaMark(
+            delta: (value: '0.3%', direction: StatDirection.up),
+            betterWhen: StatDirection.down,
           ),
         ),
       );
-      final ElThemeData theme = ElTheme.of(
-        tester.element(find.byType(ElStatDeltaMark)),
+      final ThemeTokens theme = ThemeScope.of(
+        tester.element(find.byType(StatDeltaMark)),
       );
-      final ElStatDeltaMark mark = tester.widget<ElStatDeltaMark>(
-        find.byType(ElStatDeltaMark),
+      final StatDeltaMark mark = tester.widget<StatDeltaMark>(
+        find.byType(StatDeltaMark),
       );
       expect(mark.ink(theme).toARGB32(), theme.foreground.toARGB32());
 
       await tester.pumpWidget(
         host(
-          const ElStatDeltaMark(
-            delta: (value: '8.2%', direction: ElStatDirection.up),
-            betterWhen: ElStatDirection.up,
+          const StatDeltaMark(
+            delta: (value: '8.2%', direction: StatDirection.up),
+            betterWhen: StatDirection.up,
           ),
         ),
       );
       expect(
         tester
-            .widget<ElStatDeltaMark>(find.byType(ElStatDeltaMark))
+            .widget<StatDeltaMark>(find.byType(StatDeltaMark))
             .ink(theme)
             .toARGB32(),
-        theme.successInk.toARGB32(),
+        theme.successText.toARGB32(),
       );
 
       await tester.pumpWidget(
         host(
-          const ElStatDeltaMark(
-            delta: (value: '0.0%', direction: ElStatDirection.flat),
-            betterWhen: ElStatDirection.up,
+          const StatDeltaMark(
+            delta: (value: '0.0%', direction: StatDirection.flat),
+            betterWhen: StatDirection.up,
           ),
         ),
       );
       expect(
         tester
-            .widget<ElStatDeltaMark>(find.byType(ElStatDeltaMark))
+            .widget<StatDeltaMark>(find.byType(StatDeltaMark))
             .ink(theme)
             .toARGB32(),
         theme.mutedForeground.toARGB32(),
@@ -779,10 +798,10 @@ void main() {
     ) async {
       await tester.pumpWidget(
         statHost(
-          const ElStat(
+          const Stat(
             label: 'Revenue',
             value: r'$12,480',
-            state: ElStatState.empty,
+            state: StatState.empty,
             message: 'No sales this period',
           ),
         ),
@@ -797,7 +816,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         statHost(
-          const ElStat(
+          const Stat(
             label: 'Revenue',
             value: r'$12,480',
             hint: 'vs last month',
@@ -813,43 +832,43 @@ void main() {
     });
   });
 
-  group('ElBadge with a glyph', () {
+  group('Badge with a glyph', () {
     testWidgets('the chip forces 12px and keeps the full px-2', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
         host(
-          const ElBadge(
+          const Badge(
             label: 'Featured',
-            variant: ElBadgeVariant.premium,
-            glyph: ElIcon.lucide(ElLucide.star, size: ElIconSize.xs),
+            variant: BadgeVariant.premium,
+            glyph: Icon.lucide(Lucide.star, size: IconSize.xs),
           ),
         ),
       );
 
-      expect(ElBadge.glyphSize, el(3));
-      expect(ElBadge.glyphGap, el(1));
-      final Rect chip = tester.getRect(find.byType(ElBadge));
-      final Rect glyph = tester.getRect(find.byType(ElIcon));
-      expect(glyph.width, el(3));
+      expect(Badge.glyphSize, space(3));
+      expect(Badge.glyphGap, space(1));
+      final Rect chip = tester.getRect(find.byType(Badge));
+      final Rect glyph = tester.getRect(find.byType(Icon));
+      expect(glyph.width, space(3));
       // 8px of padding plus the 1px transparent border.
       expect(
         glyph.left - chip.left,
-        closeTo(ElBadge.horizontalPadding + ElWidths.hairline, _fine),
+        closeTo(Badge.horizontalPadding + BorderWidths.hairline, _fine),
       );
-      expect(chip.height, ElBadge.height);
+      expect(chip.height, Badge.height);
     });
   });
 
-  group('ElSwapIn', () {
+  group('ContentChange', () {
     testWidgets('it lands on opacity 1 and scale 1', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        host(const ElSwapIn(child: SizedBox(width: 100, height: 20))),
+        host(const ContentChange(child: SizedBox(width: 100, height: 20))),
       );
-      await tester.pump(ElSwapIn.duration);
-      await tester.pump(ElSwapIn.duration);
+      await tester.pump(ContentChange.duration);
+      await tester.pump(ContentChange.duration);
 
       expect(
         tester.widget<Opacity>(find.byType(Opacity)).opacity,
@@ -861,13 +880,13 @@ void main() {
     testWidgets('a changed replayKey restarts it', (WidgetTester tester) async {
       await tester.pumpWidget(
         host(
-          const ElSwapIn(
-            replayKey: ElStatState.loading,
+          const ContentChange(
+            replayKey: StatState.loading,
             child: SizedBox(width: 100, height: 20),
           ),
         ),
       );
-      await tester.pump(ElSwapIn.duration);
+      await tester.pump(ContentChange.duration);
       expect(
         tester.widget<Opacity>(find.byType(Opacity)).opacity,
         closeTo(1, 0.001),
@@ -875,8 +894,8 @@ void main() {
 
       await tester.pumpWidget(
         host(
-          const ElSwapIn(
-            replayKey: ElStatState.ready,
+          const ContentChange(
+            replayKey: StatState.ready,
             child: SizedBox(width: 100, height: 20),
           ),
         ),

@@ -20,20 +20,32 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/rendering.dart' hide ScrollDirection;
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 Widget host(
   Widget child, {
-  ElThemeMode mode = ElThemeMode.light,
+  ColorMode mode = ColorMode.light,
   bool reduced = false,
 }) => MediaQuery(
   data: MediaQueryData(size: const Size(1440, 900), disableAnimations: reduced),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: mode),
+    child: ThemeScope(
+      controller: ThemeController(mode: mode),
       child: Center(child: child),
     ),
   ),
@@ -51,50 +63,50 @@ const double _exact = 1e-9;
 /// §states matrix. Not declared anywhere in the reference — `CubeScene` measures
 /// them from the cubes, so these are the *output* of the geometry and the
 /// tightest single check on it.
-const Map<ElAgentState, (double, double, double, double)> _viewBoxes =
-    <ElAgentState, (double, double, double, double)>{
-      ElAgentState.queued: (-23, -10, 98, 72),
-      ElAgentState.planning: (-36, -29.5, 98, 91.5),
-      ElAgentState.retrieving: (-49, -10, 98, 72),
-      ElAgentState.ingesting: (-36, -23, 72, 72),
-      ElAgentState.running: (-62, -10, 124, 85),
-      ElAgentState.delegating: (-36, -16.5, 124, 91.5),
-      ElAgentState.awaitingApproval: (-49, -10, 98, 72),
-      ElAgentState.validating: (-49, -10, 98, 72),
-      ElAgentState.retrying: (-36, -23, 72, 72),
-      ElAgentState.error: (-49, -10, 98, 72),
-      ElAgentState.summarizing: (-49, -10, 98, 72),
-      ElAgentState.thinking: (-49, -10, 98, 72),
-      ElAgentState.processing: (-62, -10, 124, 85),
-      ElAgentState.callingTools: (-36, -10, 124, 85),
-      ElAgentState.searching: (-62, -23, 111, 98),
-      ElAgentState.reading: (-36, -36, 85, 91.5),
-      ElAgentState.recalling: (-49, -10, 111, 78.5),
-      ElAgentState.writing: (-49, -10, 111, 78.5),
-      ElAgentState.done: (-36, -23, 72, 72),
+const Map<AgentState, (double, double, double, double)> _viewBoxes =
+    <AgentState, (double, double, double, double)>{
+      AgentState.queued: (-23, -10, 98, 72),
+      AgentState.planning: (-36, -29.5, 98, 91.5),
+      AgentState.retrieving: (-49, -10, 98, 72),
+      AgentState.ingesting: (-36, -23, 72, 72),
+      AgentState.running: (-62, -10, 124, 85),
+      AgentState.delegating: (-36, -16.5, 124, 91.5),
+      AgentState.awaitingApproval: (-49, -10, 98, 72),
+      AgentState.validating: (-49, -10, 98, 72),
+      AgentState.retrying: (-36, -23, 72, 72),
+      AgentState.error: (-49, -10, 98, 72),
+      AgentState.summarizing: (-49, -10, 98, 72),
+      AgentState.thinking: (-49, -10, 98, 72),
+      AgentState.processing: (-62, -10, 124, 85),
+      AgentState.callingTools: (-36, -10, 124, 85),
+      AgentState.searching: (-62, -23, 111, 98),
+      AgentState.reading: (-36, -36, 85, 91.5),
+      AgentState.recalling: (-49, -10, 111, 78.5),
+      AgentState.writing: (-49, -10, 111, 78.5),
+      AgentState.done: (-36, -23, 72, 72),
     };
 
 /// `svg[width]` at `lg`, as the browser resolved it. `scene.width × 0.48`.
-const Map<ElAgentState, double> _svgWidths = <ElAgentState, double>{
-  ElAgentState.queued: 91.2,
-  ElAgentState.planning: 76.8,
-  ElAgentState.retrieving: 80.64,
-  ElAgentState.ingesting: 57.6,
-  ElAgentState.running: 80.64,
-  ElAgentState.delegating: 91.2,
-  ElAgentState.awaitingApproval: 80.64,
-  ElAgentState.validating: 80.64,
-  ElAgentState.retrying: 57.6,
-  ElAgentState.error: 80.64,
-  ElAgentState.summarizing: 80.64,
-  ElAgentState.thinking: 80.64,
-  ElAgentState.processing: 80.64,
-  ElAgentState.callingTools: 94.08,
-  ElAgentState.searching: 80.64,
-  ElAgentState.reading: 72,
-  ElAgentState.recalling: 80.64,
-  ElAgentState.writing: 80.64,
-  ElAgentState.done: 52.8,
+const Map<AgentState, double> _svgWidths = <AgentState, double>{
+  AgentState.queued: 91.2,
+  AgentState.planning: 76.8,
+  AgentState.retrieving: 80.64,
+  AgentState.ingesting: 57.6,
+  AgentState.running: 80.64,
+  AgentState.delegating: 91.2,
+  AgentState.awaitingApproval: 80.64,
+  AgentState.validating: 80.64,
+  AgentState.retrying: 57.6,
+  AgentState.error: 80.64,
+  AgentState.summarizing: 80.64,
+  AgentState.thinking: 80.64,
+  AgentState.processing: 80.64,
+  AgentState.callingTools: 94.08,
+  AgentState.searching: 80.64,
+  AgentState.reading: 72,
+  AgentState.recalling: 80.64,
+  AgentState.writing: 80.64,
+  AgentState.done: 52.8,
 };
 
 /// `<g>` count per state, straight off the probe.
@@ -102,26 +114,26 @@ const Map<ElAgentState, double> _svgWidths = <ElAgentState, double>{
 /// One group per cube, **plus one** for each cube that carries an `outer`
 /// wrapper — which is why `delegating` and `searching` report one more than
 /// their cube counts and the other seventeen report exactly their own.
-const Map<ElAgentState, int> _groupCounts = <ElAgentState, int>{
-  ElAgentState.queued: 5,
-  ElAgentState.planning: 20,
-  ElAgentState.retrieving: 9,
-  ElAgentState.ingesting: 8,
-  ElAgentState.running: 16,
-  ElAgentState.delegating: 10,
-  ElAgentState.awaitingApproval: 9,
-  ElAgentState.validating: 9,
-  ElAgentState.retrying: 5,
-  ElAgentState.error: 9,
-  ElAgentState.summarizing: 9,
-  ElAgentState.thinking: 9,
-  ElAgentState.processing: 16,
-  ElAgentState.callingTools: 12,
-  ElAgentState.searching: 16,
-  ElAgentState.reading: 18,
-  ElAgentState.recalling: 12,
-  ElAgentState.writing: 12,
-  ElAgentState.done: 8,
+const Map<AgentState, int> _groupCounts = <AgentState, int>{
+  AgentState.queued: 5,
+  AgentState.planning: 20,
+  AgentState.retrieving: 9,
+  AgentState.ingesting: 8,
+  AgentState.running: 16,
+  AgentState.delegating: 10,
+  AgentState.awaitingApproval: 9,
+  AgentState.validating: 9,
+  AgentState.retrying: 5,
+  AgentState.error: 9,
+  AgentState.summarizing: 9,
+  AgentState.thinking: 9,
+  AgentState.processing: 16,
+  AgentState.callingTools: 12,
+  AgentState.searching: 16,
+  AgentState.reading: 18,
+  AgentState.recalling: 12,
+  AgentState.writing: 12,
+  AgentState.done: 8,
 };
 
 /* ── Raster helpers ──────────────────────────────────────────────────────── */
@@ -130,7 +142,7 @@ const Map<ElAgentState, int> _groupCounts = <ElAgentState, int>{
 Future<Color Function(int, int)> _raster(
   WidgetTester t,
   Widget child, {
-  ElThemeMode mode = ElThemeMode.light,
+  ColorMode mode = ColorMode.light,
   bool reduced = false,
 }) async {
   await t.pumpWidget(
@@ -172,7 +184,7 @@ Widget _stage(Widget child) => SizedBox(
   height: 100,
   child: Builder(
     builder: (BuildContext context) => ColoredBox(
-      color: ElTheme.of(context).background,
+      color: ThemeScope.of(context).background,
       child: Center(child: child),
     ),
   ),
@@ -196,31 +208,31 @@ void main() {
 
   group('the isometric unit', () {
     test('screenX = (x − y) · 13, screenY = (x + y) · 6.5 − z · 13', () {
-      expect(ElAgentCube.iso(0, 0), Offset.zero);
-      expect(ElAgentCube.iso(1, 0), const Offset(13, 6.5));
-      expect(ElAgentCube.iso(0, 1), const Offset(-13, 6.5));
-      expect(ElAgentCube.iso(1, 1), const Offset(0, 13));
-      expect(ElAgentCube.iso(0, 0, 1), const Offset(0, -13));
-      expect(ElAgentCube.iso(2, 0, 1.5), const Offset(26, -6.5));
+      expect(AgentCube.iso(0, 0), Offset.zero);
+      expect(AgentCube.iso(1, 0), const Offset(13, 6.5));
+      expect(AgentCube.iso(0, 1), const Offset(-13, 6.5));
+      expect(AgentCube.iso(1, 1), const Offset(0, 13));
+      expect(AgentCube.iso(0, 0, 1), const Offset(0, -13));
+      expect(AgentCube.iso(2, 0, 1.5), const Offset(26, -6.5));
     });
 
     test('the three faces are the reference\'s polygon strings', () {
       // "0,0 13,6.5 0,13 -13,6.5"
-      expect(ElAgentCube.topFace, const <Offset>[
+      expect(AgentCube.topFace, const <Offset>[
         Offset(0, 0),
         Offset(13, 6.5),
         Offset(0, 13),
         Offset(-13, 6.5),
       ]);
       // "-13,6.5 0,13 0,26 -13,19.5"
-      expect(ElAgentCube.leftFace, const <Offset>[
+      expect(AgentCube.leftFace, const <Offset>[
         Offset(-13, 6.5),
         Offset(0, 13),
         Offset(0, 26),
         Offset(-13, 19.5),
       ]);
       // "13,6.5 0,13 0,26 13,19.5"
-      expect(ElAgentCube.rightFace, const <Offset>[
+      expect(AgentCube.rightFace, const <Offset>[
         Offset(13, 6.5),
         Offset(0, 13),
         Offset(0, 26),
@@ -229,14 +241,14 @@ void main() {
     });
 
     test('stroke is 0.8 on every polygon, dash is "3 2.5"', () {
-      expect(ElAgentCube.strokeWidth, 0.8);
-      expect(ElAgentCube.dash, <double>[3, 2.5]);
+      expect(AgentCube.strokeWidth, 0.8);
+      expect(AgentCube.dash, <double>[3, 2.5]);
     });
 
     test('the painter\'s sort puts a boosted cube last', () {
       // `retrieving` — a 3×3 with the centre boosted out of the ordering.
-      final ElAgentCubeScene scene = elAgentCubeScene(ElAgentState.retrieving);
-      final List<ElAgentCubeSpec> order = ElAgentCube.sorted(scene.cubes);
+      final AgentCubeScene scene = agentCubeScene(AgentState.retrieving);
+      final List<AgentCubeSpec> order = AgentCube.sorted(scene.cubes);
       expect(order.last.boost, 100);
       expect(order.last.x, 1);
       expect(order.last.y, 1);
@@ -251,8 +263,8 @@ void main() {
 
     test('z breaks a tie within one grid cell, bottom-up', () {
       // `done` — four columns of two, so every cell ties on x + y.
-      final List<ElAgentCubeSpec> order = ElAgentCube.sorted(
-        elAgentCubeScene(ElAgentState.done).cubes,
+      final List<AgentCubeSpec> order = AgentCube.sorted(
+        agentCubeScene(AgentState.done).cubes,
       );
       for (int i = 1; i < order.length; i += 1) {
         final double a = order[i - 1].x + order[i - 1].y;
@@ -266,17 +278,17 @@ void main() {
 
   group('the twenty scenes', () {
     test('idle is the one state with no recipe', () {
-      expect(ElAgentState.values.length, 20);
+      expect(AgentState.values.length, 20);
       expect(
-        () => elAgentCubeScene(ElAgentState.idle),
+        () => agentCubeScene(AgentState.idle),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('every viewBox is the one the browser resolved', () {
-      for (final MapEntry<ElAgentState, (double, double, double, double)> e
+      for (final MapEntry<AgentState, (double, double, double, double)> e
           in _viewBoxes.entries) {
-        final Rect box = ElAgentCube.viewBoxOf(elAgentCubeScene(e.key).cubes);
+        final Rect box = AgentCube.viewBoxOf(agentCubeScene(e.key).cubes);
         expect(
           <double>[box.left, box.top, box.width, box.height],
           <Matcher>[
@@ -292,9 +304,9 @@ void main() {
     });
 
     test('scene.width × 0.48 is the rendered svg width at lg', () {
-      for (final MapEntry<ElAgentState, double> e in _svgWidths.entries) {
+      for (final MapEntry<AgentState, double> e in _svgWidths.entries) {
         expect(
-          elAgentCubeScene(e.key).width * _lg,
+          agentCubeScene(e.key).width * _lg,
           closeTo(e.value, 1e-9),
           reason: e.key.wire,
         );
@@ -302,54 +314,54 @@ void main() {
     });
 
     test('the cube counts are the probe\'s group counts', () {
-      for (final MapEntry<ElAgentState, int> e in _groupCounts.entries) {
-        final ElAgentCubeScene scene = elAgentCubeScene(e.key);
+      for (final MapEntry<AgentState, int> e in _groupCounts.entries) {
+        final AgentCubeScene scene = agentCubeScene(e.key);
         final int wrappers = scene.cubes
-            .where((ElAgentCubeSpec c) => c.outer != null)
+            .where((AgentCubeSpec c) => c.outer != null)
             .length;
         expect(scene.cubes.length + wrappers, e.value, reason: e.key.wire);
       }
       // Only the two composed scenes carry an outer wrapper.
       expect(
-        <ElAgentState>[
-          for (final ElAgentState s in ElAgentState.values)
-            if (s != ElAgentState.idle &&
-                elAgentCubeScene(
+        <AgentState>[
+          for (final AgentState s in AgentState.values)
+            if (s != AgentState.idle &&
+                agentCubeScene(
                   s,
-                ).cubes.any((ElAgentCubeSpec c) => c.outer != null))
+                ).cubes.any((AgentCubeSpec c) => c.outer != null))
               s,
         ],
-        <ElAgentState>[ElAgentState.delegating, ElAgentState.searching],
+        <AgentState>[AgentState.delegating, AgentState.searching],
       );
     });
 
     test('error is the only scene that leaves the accent', () {
-      for (final ElAgentState s in ElAgentState.values) {
-        if (s == ElAgentState.idle) continue;
-        final bool red = elAgentCubeScene(
+      for (final AgentState s in AgentState.values) {
+        if (s == AgentState.idle) continue;
+        final bool red = agentCubeScene(
           s,
-        ).cubes.any((ElAgentCubeSpec c) => c.red);
-        expect(red, s == ElAgentState.error, reason: s.wire);
+        ).cubes.any((AgentCubeSpec c) => c.red);
+        expect(red, s == AgentState.error, reason: s.wire);
       }
     });
 
     test('two scenes hold a dashed cube — the slot and the hole', () {
       expect(
-        <ElAgentState>[
-          for (final ElAgentState s in ElAgentState.values)
-            if (s != ElAgentState.idle &&
-                elAgentCubeScene(s).cubes.any((ElAgentCubeSpec c) => c.dashed))
+        <AgentState>[
+          for (final AgentState s in AgentState.values)
+            if (s != AgentState.idle &&
+                agentCubeScene(s).cubes.any((AgentCubeSpec c) => c.dashed))
               s,
         ],
-        <ElAgentState>[ElAgentState.awaitingApproval, ElAgentState.searching],
+        <AgentState>[AgentState.awaitingApproval, AgentState.searching],
       );
     });
 
     test('queued: five cubes, the middle one accented, 0.22s apart', () {
-      final ElAgentCubeScene scene = elAgentCubeScene(ElAgentState.queued);
+      final AgentCubeScene scene = agentCubeScene(AgentState.queued);
       expect(scene.width, 190);
       expect(scene.cubes.length, 5);
-      expect(scene.cubes.map((ElAgentCubeSpec c) => c.accent).toList(), <bool>[
+      expect(scene.cubes.map((AgentCubeSpec c) => c.accent).toList(), <bool>[
         false,
         false,
         true,
@@ -357,35 +369,35 @@ void main() {
         false,
       ]);
       expect(
-        scene.cubes.map((ElAgentCubeSpec c) => c.motion!.delay).toList(),
+        scene.cubes.map((AgentCubeSpec c) => c.motion!.delay).toList(),
         <double>[0, 0.22, 0.44, 0.66, 0.88],
       );
-      expect(scene.cubes.first.motion!.name, ElAgentCubeKeyframe.bob);
+      expect(scene.cubes.first.motion!.name, AgentCubeKeyframe.bob);
       expect(scene.cubes.first.motion!.seconds, 2.2);
     });
 
     test('searching drops two cells and dashes a third', () {
-      final ElAgentCubeScene scene = elAgentCubeScene(ElAgentState.searching);
+      final AgentCubeScene scene = agentCubeScene(AgentState.searching);
       // 16 grid cells, two "gone", plus the scanner.
       expect(scene.cubes.length, 15);
-      final ElAgentCubeSpec scanner = scene.cubes.last;
+      final AgentCubeSpec scanner = scene.cubes.last;
       expect(scanner.z, 1.5);
       expect(scanner.boost, 100);
-      expect(scanner.outer!.name, ElAgentCubeKeyframe.glide);
+      expect(scanner.outer!.name, AgentCubeKeyframe.glide);
       expect(scanner.outer!.alternate, isTrue);
       expect(scanner.outer!.seconds, 2.6);
-      expect(scanner.motion!.name, ElAgentCubeKeyframe.bob);
+      expect(scanner.motion!.name, AgentCubeKeyframe.bob);
       expect(scanner.motion!.seconds, 1.3);
     });
 
     test('reading lifts the two upper layers together', () {
-      final ElAgentCubeScene scene = elAgentCubeScene(ElAgentState.reading);
+      final AgentCubeScene scene = agentCubeScene(AgentState.reading);
       expect(scene.cubes.length, 18);
-      for (final ElAgentCubeSpec c in scene.cubes) {
+      for (final AgentCubeSpec c in scene.cubes) {
         expect(c.motion?.name, switch (c.z) {
           0 => null,
-          1 => ElAgentCubeKeyframe.lift,
-          _ => ElAgentCubeKeyframe.lift2,
+          1 => AgentCubeKeyframe.lift,
+          _ => AgentCubeKeyframe.lift2,
         });
         // Same duration and phase on both lifted layers.
         if (c.motion != null) {
@@ -399,17 +411,14 @@ void main() {
     test('speed divides every duration and delay, at two decimals', () {
       // `(seconds / speed).toFixed(2)` — the reference formats the shorthand
       // and the browser parses that string, so 2.2 / 3 is 0.73 and not 0.7333.
-      final ElAgentCubeScene fast = elAgentCubeScene(
-        ElAgentState.queued,
-        speed: 3,
-      );
+      final AgentCubeScene fast = agentCubeScene(AgentState.queued, speed: 3);
       expect(fast.cubes.first.motion!.seconds, 0.73);
       expect(fast.cubes[1].motion!.delay, 0.07);
       // The geometry does not move.
       expect(fast.width, 190);
       expect(
-        ElAgentCube.viewBoxOf(fast.cubes),
-        ElAgentCube.viewBoxOf(elAgentCubeScene(ElAgentState.queued).cubes),
+        AgentCube.viewBoxOf(fast.cubes),
+        AgentCube.viewBoxOf(agentCubeScene(AgentState.queued).cubes),
       );
     });
   });
@@ -425,98 +434,98 @@ void main() {
     /// the number: 1e-4 of a pixel is four decimal places below anything the
     /// rasteriser can express.
     Matcher at(double value) => closeTo(value, 1e-4);
-    double y(ElAgentCubeKeyframe k, double percent) =>
-        ElAgentCubeKeyframes.translateAt(k, percent / 100).dy;
+    double y(AgentCubeKeyframe k, double percent) =>
+        AgentCubeKeyframes.translateAt(k, percent / 100).dy;
 
     test('the enum is the fourteen globals.css declares', () {
-      expect(ElAgentCubeKeyframe.values.length, 14);
+      expect(AgentCubeKeyframe.values.length, 14);
     });
 
     test('bob, settle, lift, lift2, pull, rise land on their stops', () {
-      expect(y(ElAgentCubeKeyframe.bob, 0), at(0));
-      expect(y(ElAgentCubeKeyframe.bob, 50), at(-5));
-      expect(y(ElAgentCubeKeyframe.settle, 50), at(-3));
-      expect(y(ElAgentCubeKeyframe.lift, 45), at(-6.5));
-      expect(y(ElAgentCubeKeyframe.lift, 60), at(-6.5));
-      expect(y(ElAgentCubeKeyframe.lift2, 45), at(-13));
-      expect(y(ElAgentCubeKeyframe.pull, 25), at(-20));
-      expect(y(ElAgentCubeKeyframe.pull, 40), at(-20));
-      expect(y(ElAgentCubeKeyframe.pull, 60), at(0));
-      expect(y(ElAgentCubeKeyframe.rise, 20), at(-11));
-      expect(y(ElAgentCubeKeyframe.rise, 35), at(-11));
-      expect(y(ElAgentCubeKeyframe.rise, 55), at(0));
+      expect(y(AgentCubeKeyframe.bob, 0), at(0));
+      expect(y(AgentCubeKeyframe.bob, 50), at(-5));
+      expect(y(AgentCubeKeyframe.settle, 50), at(-3));
+      expect(y(AgentCubeKeyframe.lift, 45), at(-6.5));
+      expect(y(AgentCubeKeyframe.lift, 60), at(-6.5));
+      expect(y(AgentCubeKeyframe.lift2, 45), at(-13));
+      expect(y(AgentCubeKeyframe.pull, 25), at(-20));
+      expect(y(AgentCubeKeyframe.pull, 40), at(-20));
+      expect(y(AgentCubeKeyframe.pull, 60), at(0));
+      expect(y(AgentCubeKeyframe.rise, 20), at(-11));
+      expect(y(AgentCubeKeyframe.rise, 35), at(-11));
+      expect(y(AgentCubeKeyframe.rise, 55), at(0));
     });
 
     test('shake crosses zero and bounce lands twice', () {
-      expect(y(ElAgentCubeKeyframe.shake, 20), at(-2.5));
-      expect(y(ElAgentCubeKeyframe.shake, 40), at(2.5));
-      expect(y(ElAgentCubeKeyframe.shake, 60), at(-2));
-      expect(y(ElAgentCubeKeyframe.shake, 80), at(2));
-      expect(y(ElAgentCubeKeyframe.bounce, 35), at(-16));
-      expect(y(ElAgentCubeKeyframe.bounce, 55), at(0));
-      expect(y(ElAgentCubeKeyframe.bounce, 70), at(-6));
-      expect(y(ElAgentCubeKeyframe.bounce, 82), at(0));
+      expect(y(AgentCubeKeyframe.shake, 20), at(-2.5));
+      expect(y(AgentCubeKeyframe.shake, 40), at(2.5));
+      expect(y(AgentCubeKeyframe.shake, 60), at(-2));
+      expect(y(AgentCubeKeyframe.shake, 80), at(2));
+      expect(y(AgentCubeKeyframe.bounce, 35), at(-16));
+      expect(y(AgentCubeKeyframe.bounce, 55), at(0));
+      expect(y(AgentCubeKeyframe.bounce, 70), at(-6));
+      expect(y(AgentCubeKeyframe.bounce, 82), at(0));
     });
 
     test(
       'glide travels three half-widths across and three half-heights down',
       () {
-        expect(ElAgentCubeKeyframes.glideTravel, const Offset(39, 19.5));
+        expect(AgentCubeKeyframes.glideTravel, const Offset(39, 19.5));
         expect(
-          ElAgentCubeKeyframes.translateAt(ElAgentCubeKeyframe.glide, 1),
+          AgentCubeKeyframes.translateAt(AgentCubeKeyframe.glide, 1),
           const Offset(39, 19.5),
         );
         expect(
-          ElAgentCubeKeyframes.translateAt(ElAgentCubeKeyframe.glide, 0),
+          AgentCubeKeyframes.translateAt(AgentCubeKeyframe.glide, 0),
           Offset.zero,
         );
-        expect(ElAgentCubeKeyframes.glideTravel.dx, ElAgentCube.halfWidth * 3);
-        expect(ElAgentCubeKeyframes.glideTravel.dy, ElAgentCube.halfHeight * 3);
+        expect(AgentCubeKeyframes.glideTravel.dx, AgentCube.halfWidth * 3);
+        expect(AgentCubeKeyframes.glideTravel.dy, AgentCube.halfHeight * 3);
       },
     );
 
     test('appear and drop END at opacity 0 — the Game Boy cut', () {
-      double a(ElAgentCubeKeyframe k, double p) =>
-          ElAgentCubeKeyframes.opacityAt(k, p / 100);
-      expect(a(ElAgentCubeKeyframe.appear, 0), at(0));
-      expect(a(ElAgentCubeKeyframe.appear, 10), at(1));
-      expect(a(ElAgentCubeKeyframe.appear, 93), at(1));
-      expect(a(ElAgentCubeKeyframe.appear, 95), at(0));
-      expect(a(ElAgentCubeKeyframe.appear, 100), at(0));
-      expect(a(ElAgentCubeKeyframe.drop, 0), at(0));
-      expect(a(ElAgentCubeKeyframe.drop, 18), at(1));
-      expect(a(ElAgentCubeKeyframe.drop, 100), at(0));
+      double a(AgentCubeKeyframe k, double p) =>
+          AgentCubeKeyframes.opacityAt(k, p / 100);
+      expect(a(AgentCubeKeyframe.appear, 0), at(0));
+      expect(a(AgentCubeKeyframe.appear, 10), at(1));
+      expect(a(AgentCubeKeyframe.appear, 93), at(1));
+      expect(a(AgentCubeKeyframe.appear, 95), at(0));
+      expect(a(AgentCubeKeyframe.appear, 100), at(0));
+      expect(a(AgentCubeKeyframe.drop, 0), at(0));
+      expect(a(AgentCubeKeyframe.drop, 18), at(1));
+      expect(a(AgentCubeKeyframe.drop, 100), at(0));
       // Their transforms are declared only at the head of the table and HOLD.
-      expect(y(ElAgentCubeKeyframe.appear, 0), at(8));
-      expect(y(ElAgentCubeKeyframe.appear, 10), at(0));
-      expect(y(ElAgentCubeKeyframe.appear, 99), at(0));
-      expect(y(ElAgentCubeKeyframe.drop, 0), at(-24));
-      expect(y(ElAgentCubeKeyframe.drop, 18), at(0));
+      expect(y(AgentCubeKeyframe.appear, 0), at(8));
+      expect(y(AgentCubeKeyframe.appear, 10), at(0));
+      expect(y(AgentCubeKeyframe.appear, 99), at(0));
+      expect(y(AgentCubeKeyframe.drop, 0), at(-24));
+      expect(y(AgentCubeKeyframe.drop, 18), at(0));
     });
 
     test('the two blinks are opacity only', () {
-      double a(ElAgentCubeKeyframe k, double p) =>
-          ElAgentCubeKeyframes.opacityAt(k, p / 100);
-      expect(a(ElAgentCubeKeyframe.blinkfade, 0), at(0.15));
-      expect(a(ElAgentCubeKeyframe.blinkfade, 50), at(0.95));
-      expect(a(ElAgentCubeKeyframe.blinkslow, 0), at(1));
-      expect(a(ElAgentCubeKeyframe.blinkslow, 50), at(0.25));
-      expect(y(ElAgentCubeKeyframe.blinkfade, 50), at(0));
-      expect(y(ElAgentCubeKeyframe.blinkslow, 50), at(0));
+      double a(AgentCubeKeyframe k, double p) =>
+          AgentCubeKeyframes.opacityAt(k, p / 100);
+      expect(a(AgentCubeKeyframe.blinkfade, 0), at(0.15));
+      expect(a(AgentCubeKeyframe.blinkfade, 50), at(0.95));
+      expect(a(AgentCubeKeyframe.blinkslow, 0), at(1));
+      expect(a(AgentCubeKeyframe.blinkslow, 50), at(0.25));
+      expect(y(AgentCubeKeyframe.blinkfade, 50), at(0));
+      expect(y(AgentCubeKeyframe.blinkslow, 50), at(0));
     });
 
     test('every table eases on var(--ease-in-out), between adjacent stops', () {
-      expect(ElAgentCubeKeyframes.curve, ElCurves.inOut);
+      expect(AgentCubeKeyframes.curve, MotionCurves.move);
       // A CSS timing function eases between stops, not across the run: `bob`
       // at 25% is the curve a quarter of the way to −5, not −2.5.
       expect(
-        y(ElAgentCubeKeyframe.bob, 25),
-        closeTo(-5 * ElCurves.inOut.transform(0.5), 1e-9),
+        y(AgentCubeKeyframe.bob, 25),
+        closeTo(-5 * MotionCurves.move.transform(0.5), 1e-9),
       );
     });
 
     test('nothing declares a fill mode, so nothing holds', () {
-      expect(ElAgentCubeKeyframes.fill, ElKeyframeFill.none);
+      expect(AgentCubeKeyframes.fill, KeyframeFill.none);
     });
   });
 
@@ -526,15 +535,15 @@ void main() {
     test(
       'a delayed animation shows the element\'s own style until it starts',
       () {
-        const ElAgentCubeMotion plain = ElAgentCubeMotion(
-          ElAgentCubeKeyframe.bob,
+        const AgentCubeMotion plain = AgentCubeMotion(
+          AgentCubeKeyframe.bob,
           2,
           delay: 1,
         );
         expect(plain.sampleAt(0.5).opacity, 1);
         expect(plain.sampleAt(0.5).translate, Offset.zero);
         // `appear` sets an inline `opacity: 0`, which is what the delay shows.
-        const ElAgentCubeMotion appearing = ElAgentCubeMotion.appear(4, 2.1);
+        const AgentCubeMotion appearing = AgentCubeMotion.appear(4, 2.1);
         expect(appearing.startsHidden, isTrue);
         expect(appearing.sampleAt(1).opacity, 0);
         expect(appearing.sampleAt(2.5).opacity, greaterThan(0));
@@ -542,18 +551,15 @@ void main() {
     );
 
     test('the clock wraps rather than stopping', () {
-      const ElAgentCubeMotion bob = ElAgentCubeMotion(
-        ElAgentCubeKeyframe.bob,
-        2,
-      );
+      const AgentCubeMotion bob = AgentCubeMotion(AgentCubeKeyframe.bob, 2);
       expect(bob.sampleAt(1).translate.dy, -5);
       expect(bob.sampleAt(3).translate.dy, -5);
       expect(bob.sampleAt(101).translate.dy, -5);
     });
 
     test('alternate runs the second cycle backwards', () {
-      const ElAgentCubeMotion glide = ElAgentCubeMotion(
-        ElAgentCubeKeyframe.glide,
+      const AgentCubeMotion glide = AgentCubeMotion(
+        AgentCubeKeyframe.glide,
         2,
         alternate: true,
       );
@@ -568,24 +574,24 @@ void main() {
   /* ── The tokens ────────────────────────────────────────────────────────── */
 
   group('the face palettes', () {
-    final ElAgentCubeTokens light = ElAgentCubeTokens.light;
+    final AgentCubeTokens light = AgentCubeTokens.light;
 
     test('the neutral trio and its stroke, light', () {
-      final ElAgentCubeFaces n = ElAgentCubeFaces.neutral(light);
-      _expectColor(n.top, elHsl(240, 20, 99)); // rgb(252,252,253)
-      _expectColor(n.left, elHsl(240, 15, 94)); // rgb(237,237,242)
-      _expectColor(n.right, elHsl(240, 14, 90)); // rgb(226,226,233)
-      _expectColor(n.stroke, elHsl(240, 10, 79)); // rgb(196,196,207)
+      final AgentCubeFaces n = AgentCubeFaces.neutral(light);
+      _expectColor(n.top, hslColor(240, 20, 99)); // rgb(252,252,253)
+      _expectColor(n.left, hslColor(240, 15, 94)); // rgb(237,237,242)
+      _expectColor(n.right, hslColor(240, 14, 90)); // rgb(226,226,233)
+      _expectColor(n.stroke, hslColor(240, 10, 79)); // rgb(196,196,207)
       expect(n.dash, isNull);
     });
 
     test('the accent is one value lit three ways, in oklab', () {
-      final ElAgentCubeFaces a = ElAgentCubeFaces.accent(light, light.accent);
+      final AgentCubeFaces a = AgentCubeFaces.accent(light, light.accent);
       // The left face IS the accent — `rgb(26, 110, 244)` on the live page.
-      expect(a.left, ElPalette.action);
+      expect(a.left, Palette.action);
       // Measured `oklab(0.761057 −0.0199977 −0.117387)` / `oklab(0.608586
       // −0.0316453 −0.182568)` / `oklab(0.710687 −0.0141747 −0.103635)`. Read
-      // back through [ElOklab] the port lands within 2e-5 of all three, which
+      // back through [OklabColor] the port lands within 2e-5 of all three, which
       // is the 8-bit round trip and not a difference in the mix.
       for (final (Color got, double l, double aa, double bb) sample
           in <(Color, double, double, double)>[
@@ -593,7 +599,9 @@ void main() {
             (a.right, 0.608586, -0.0316453, -0.182568),
             (a.stroke, 0.710687, -0.0141747, -0.103635),
           ]) {
-        final ({double l, double c, double h}) o = ElOklab.toOklch(sample.$1);
+        final ({double l, double c, double h}) o = OklabColor.toOklch(
+          sample.$1,
+        );
         expect(o.l, closeTo(sample.$2, 5e-5));
         expect(
           o.c,
@@ -606,8 +614,8 @@ void main() {
     });
 
     test('the ghost is that trio at 45% alpha, plus a dash', () {
-      final ElAgentCubeFaces a = ElAgentCubeFaces.accent(light, light.accent);
-      final ElAgentCubeFaces g = ElAgentCubeFaces.ghost(light, light.accent);
+      final AgentCubeFaces a = AgentCubeFaces.accent(light, light.accent);
+      final AgentCubeFaces g = AgentCubeFaces.ghost(light, light.accent);
       // `color(srgb 0.101961 0.431373 0.956863 / 0.45)` — the same colour, not
       // a pre-composited one.
       for (final (Color ghost, Color lit) pair in <(Color, Color)>[
@@ -623,66 +631,66 @@ void main() {
       // The stroke is NOT at 45% — it is a separate oklab mix toward the ink.
       expect(g.stroke.a, 1);
       expect(g.dash, <double>[3, 2.5]);
-      final ({double l, double c, double h}) o = ElOklab.toOklch(g.stroke);
+      final ({double l, double c, double h}) o = OklabColor.toOklch(g.stroke);
       expect(o.l, closeTo(0.586043, 5e-5)); // oklab(0.586043 …)
     });
 
     test('the error trio, light', () {
-      final ElAgentCubeFaces e = ElAgentCubeFaces.error(light);
-      _expectColor(e.top, elHsl(0, 70, 88)); // rgb(246,203,203)
-      _expectColor(e.left, elHsl(0, 65, 82)); // rgb(239,179,179)
-      _expectColor(e.stroke, elHsl(0, 55, 69)); // rgb(219,132,132)
+      final AgentCubeFaces e = AgentCubeFaces.error(light);
+      _expectColor(e.top, hslColor(0, 70, 88)); // rgb(246,203,203)
+      _expectColor(e.left, hslColor(0, 65, 82)); // rgb(239,179,179)
+      _expectColor(e.stroke, hslColor(0, 55, 69)); // rgb(219,132,132)
       // PROBE CORRECTION. `--agent-cube-error-right: hsl(0 60% 75%)`
       // rasterises `rgb(230, 153, 153)` in Chrome and `rgb(229, 153, 153)`
       // here: the red channel lands on 0.9 × 255 = 229.5 exactly, and the two
       // implementations break that tie in opposite directions. One 8-bit step
-      // on one channel of one token, in `elHsl` rather than in this family.
-      _expectColor(e.right, elHsl(0, 60, 75), within: 1);
+      // on one channel of one token, in `hslColor` rather than in this family.
+      _expectColor(e.right, hslColor(0, 60, 75), within: 1);
     });
 
     test('faces(cube): red beats dashed beats accent beats neutral', () {
-      ElAgentCubeFaces of(ElAgentCubeSpec c) =>
-          ElAgentCubeFaces.forCube(c, light, light.accent);
+      AgentCubeFaces of(AgentCubeSpec c) =>
+          AgentCubeFaces.forCube(c, light, light.accent);
       expect(
-        of(const ElAgentCubeSpec(x: 0, y: 0, red: true, accent: true)).left,
-        ElAgentCubeFaces.error(light).left,
+        of(const AgentCubeSpec(x: 0, y: 0, red: true, accent: true)).left,
+        AgentCubeFaces.error(light).left,
       );
       expect(
-        of(const ElAgentCubeSpec(x: 0, y: 0, dashed: true, accent: true)).dash,
+        of(const AgentCubeSpec(x: 0, y: 0, dashed: true, accent: true)).dash,
         isNotNull,
       );
       expect(
-        of(const ElAgentCubeSpec(x: 0, y: 0)).left,
-        ElAgentCubeFaces.neutral(light).left,
+        of(const AgentCubeSpec(x: 0, y: 0)).left,
+        AgentCubeFaces.neutral(light).left,
       );
     });
 
     test('FOLLOW-UP CLOSED: the twelve are theme tokens and ride the theme', () {
       // They used to be declared in `agent_avatar.dart` with a note saying they
-      // should not be, and resolved by a `ElAgentCubeTokens.of(context)` that
-      // did what `ElTheme.of` already does. They are `theme.dart`'s now, and
+      // should not be, and resolved by a `AgentCubeTokens.of(context)` that
+      // did what `ThemeScope.of` already does. They are `theme.dart`'s now, and
       // each block carries its own set — so a themed subtree resolves cubes the
       // way it resolves every other colour, and the two statics that every test
       // above spends are the same two objects.
-      expect(ElThemeData.light.cube, same(ElAgentCubeTokens.light));
-      expect(ElThemeData.dark.cube, same(ElAgentCubeTokens.dark));
+      expect(ThemeTokens.light.cube, same(AgentCubeTokens.light));
+      expect(ThemeTokens.dark.cube, same(AgentCubeTokens.dark));
       // The bite: the two sets must not be interchangeable, or the field could
       // be wired to either block and pass.
-      expect(ElThemeData.light.cube.top, isNot(ElThemeData.dark.cube.top));
+      expect(ThemeTokens.light.cube.top, isNot(ThemeTokens.dark.cube.top));
     });
 
     test('dark is the inversion, not a recolour of light', () {
-      expect(ElAgentCubeTokens.dark.accent, ElPalette.actionBright);
-      expect(ElAgentCubeTokens.light.accent, ElPalette.action);
+      expect(AgentCubeTokens.dark.accent, Palette.actionBright);
+      expect(AgentCubeTokens.light.accent, Palette.action);
       // The dark top face is darker than its own stroke; on light it is
       // lighter — which is the inversion stated in globals.css.
       expect(
-        ElOklab.toOklch(ElAgentCubeTokens.dark.top).l,
-        lessThan(ElOklab.toOklch(ElAgentCubeTokens.dark.stroke).l),
+        OklabColor.toOklch(AgentCubeTokens.dark.top).l,
+        lessThan(OklabColor.toOklch(AgentCubeTokens.dark.stroke).l),
       );
       expect(
-        ElOklab.toOklch(ElAgentCubeTokens.light.top).l,
-        greaterThan(ElOklab.toOklch(ElAgentCubeTokens.light.stroke).l),
+        OklabColor.toOklch(AgentCubeTokens.light.top).l,
+        greaterThan(OklabColor.toOklch(AgentCubeTokens.light.stroke).l),
       );
     });
   });
@@ -694,10 +702,10 @@ void main() {
     // 91.2 so scale = 91.2 / 98 = 0.930612, box at (14.4, 16.49). A scene point
     // (vx, vy) lands at (14.4 + (vx + 23)·s, 16.49 + (vy + 10)·s).
     Widget queued() => _stage(
-      ElCubeScene(
-        scene: elAgentCubeScene(ElAgentState.queued),
-        width: elAgentCubeScene(ElAgentState.queued).width * _lg,
-        accent: ElAgentCubeTokens.light.accent,
+      CubeScene(
+        scene: agentCubeScene(AgentState.queued),
+        width: agentCubeScene(AgentState.queued).width * _lg,
+        accent: AgentCubeTokens.light.accent,
         frozen: true,
       ),
     );
@@ -712,11 +720,11 @@ void main() {
     }) => Builder(
       builder: (BuildContext context) {
         return ColoredBox(
-          color: ElTheme.of(context).background,
-          child: ElCubeScene(
-            scene: ElAgentCubeScene(
-              cubes: <ElAgentCubeSpec>[
-                ElAgentCubeSpec(
+          color: ThemeScope.of(context).background,
+          child: CubeScene(
+            scene: AgentCubeScene(
+              cubes: <AgentCubeSpec>[
+                AgentCubeSpec(
                   x: 0,
                   y: 0,
                   dashed: dashed,
@@ -727,7 +735,7 @@ void main() {
               width: 460,
             ),
             width: 460,
-            accent: ElAgentCubeTokens.light.accent,
+            accent: AgentCubeTokens.light.accent,
             frozen: true,
           ),
         );
@@ -741,9 +749,9 @@ void main() {
         tester,
         alone(accent: true),
       );
-      final ElAgentCubeFaces a = ElAgentCubeFaces.accent(
-        ElAgentCubeTokens.light,
-        ElAgentCubeTokens.light.accent,
+      final AgentCubeFaces a = AgentCubeFaces.accent(
+        AgentCubeTokens.light,
+        AgentCubeTokens.light.accent,
       );
       _expectColor(at(230, 165), a.top); // top centre (0, 6.5)
       _expectColor(at(165, 262), a.left); // left centre (−6.5, 16.25)
@@ -754,9 +762,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final Color Function(int, int) at = await _raster(tester, alone());
-      final ElAgentCubeFaces n = ElAgentCubeFaces.neutral(
-        ElAgentCubeTokens.light,
-      );
+      final AgentCubeFaces n = AgentCubeFaces.neutral(AgentCubeTokens.light);
       _expectColor(at(230, 165), n.top);
       _expectColor(at(165, 262), n.left);
       _expectColor(at(295, 262), n.right);
@@ -769,9 +775,7 @@ void main() {
         tester,
         alone(red: true),
       );
-      final ElAgentCubeFaces e = ElAgentCubeFaces.error(
-        ElAgentCubeTokens.light,
-      );
+      final AgentCubeFaces e = AgentCubeFaces.error(AgentCubeTokens.light);
       _expectColor(at(230, 165), e.top);
       _expectColor(at(165, 262), e.left);
       _expectColor(at(295, 262), e.right);
@@ -781,12 +785,10 @@ void main() {
       'the painter\'s sort hides a cube behind its nearer neighbour',
       (WidgetTester tester) async {
         final Color Function(int, int) at = await _raster(tester, queued());
-        final ElAgentCubeFaces n = ElAgentCubeFaces.neutral(
-          ElAgentCubeTokens.light,
-        );
-        final ElAgentCubeFaces a = ElAgentCubeFaces.accent(
-          ElAgentCubeTokens.light,
-          ElAgentCubeTokens.light.accent,
+        final AgentCubeFaces n = AgentCubeFaces.neutral(AgentCubeTokens.light);
+        final AgentCubeFaces a = AgentCubeFaces.accent(
+          AgentCubeTokens.light,
+          AgentCubeTokens.light.accent,
         );
         // Scene point (30, 32) is inside the accented cube's RIGHT face and
         // inside its neighbour's LEFT face; the neighbour has the larger x + y,
@@ -806,19 +808,19 @@ void main() {
       // `validating`'s ring runs `blinkfade`, whose stop 0 is opacity 0.15.
       // globals.css L3195–3215 says the freeze is `opacity: 1`, so a frozen
       // ring cube is the FULL accent and a running one at t = 0 is not.
-      final ElAgentCubeScene scene = elAgentCubeScene(ElAgentState.validating);
+      final AgentCubeScene scene = agentCubeScene(AgentState.validating);
       Widget stage({required bool frozen}) => _stage(
-        ElCubeScene(
+        CubeScene(
           scene: scene,
           width: scene.width * _lg,
-          accent: ElAgentCubeTokens.light.accent,
+          accent: AgentCubeTokens.light.accent,
           frozen: frozen,
         ),
       );
 
-      final ElAgentCubeFaces a = ElAgentCubeFaces.accent(
-        ElAgentCubeTokens.light,
-        ElAgentCubeTokens.light.accent,
+      final AgentCubeFaces a = AgentCubeFaces.accent(
+        AgentCubeTokens.light,
+        AgentCubeTokens.light.accent,
       );
       // viewBox (−49, −10, 98, 72), width 80.64, scale 0.822857, box at
       // (19.68, 20.37). Ring cube (0, 0): top centre (0, 6.5) → (60, 34).
@@ -842,8 +844,8 @@ void main() {
     ) async {
       // One dashed cube alone: viewBox (−23, −10, 46, 46), so a width of 460
       // is a scale of exactly 10 and the stage is the box.
-      const ElAgentCubeScene one = ElAgentCubeScene(
-        cubes: <ElAgentCubeSpec>[ElAgentCubeSpec(x: 0, y: 0, dashed: true)],
+      const AgentCubeScene one = AgentCubeScene(
+        cubes: <AgentCubeSpec>[AgentCubeSpec(x: 0, y: 0, dashed: true)],
         width: 460,
       );
       late Color background;
@@ -851,22 +853,22 @@ void main() {
         tester,
         Builder(
           builder: (BuildContext context) {
-            background = ElTheme.of(context).background;
+            background = ThemeScope.of(context).background;
             return ColoredBox(
               color: background,
-              child: ElCubeScene(
+              child: CubeScene(
                 scene: one,
                 width: 460,
-                accent: ElAgentCubeTokens.light.accent,
+                accent: AgentCubeTokens.light.accent,
                 frozen: true,
               ),
             );
           },
         ),
       );
-      final ElAgentCubeFaces g = ElAgentCubeFaces.ghost(
-        ElAgentCubeTokens.light,
-        ElAgentCubeTokens.light.accent,
+      final AgentCubeFaces g = AgentCubeFaces.ghost(
+        AgentCubeTokens.light,
+        AgentCubeTokens.light.accent,
       );
       // Left face centre (−6.5, 16.25) → ((−6.5 + 23)·10, (16.25 + 10)·10).
       final Color painted = at(165, 262);
@@ -882,9 +884,9 @@ void main() {
       // 3 / 5.5 = 0.545 of the same outline. Counted rather than sampled,
       // because a per-pixel pin on a 0.8-unit stroke is an antialiasing pin.
       Future<int> strokePixels({required bool dashed}) async {
-        final ElAgentCubeScene one = ElAgentCubeScene(
-          cubes: <ElAgentCubeSpec>[
-            ElAgentCubeSpec(x: 0, y: 0, dashed: dashed, accent: !dashed),
+        final AgentCubeScene one = AgentCubeScene(
+          cubes: <AgentCubeSpec>[
+            AgentCubeSpec(x: 0, y: 0, dashed: dashed, accent: !dashed),
           ],
           width: 460,
         );
@@ -893,11 +895,11 @@ void main() {
           Builder(
             builder: (BuildContext context) {
               return ColoredBox(
-                color: ElTheme.of(context).background,
-                child: ElCubeScene(
+                color: ThemeScope.of(context).background,
+                child: CubeScene(
                   scene: one,
                   width: 460,
-                  accent: ElAgentCubeTokens.light.accent,
+                  accent: AgentCubeTokens.light.accent,
                   frozen: true,
                 ),
               );
@@ -905,13 +907,13 @@ void main() {
           ),
         );
         final Color want = dashed
-            ? ElAgentCubeFaces.ghost(
-                ElAgentCubeTokens.light,
-                ElAgentCubeTokens.light.accent,
+            ? AgentCubeFaces.ghost(
+                AgentCubeTokens.light,
+                AgentCubeTokens.light.accent,
               ).stroke
-            : ElAgentCubeFaces.accent(
-                ElAgentCubeTokens.light,
-                ElAgentCubeTokens.light.accent,
+            : AgentCubeFaces.accent(
+                AgentCubeTokens.light,
+                AgentCubeTokens.light.accent,
               ).stroke;
         int count = 0;
         for (int y = 0; y < 460; y += 1) {
@@ -940,11 +942,11 @@ void main() {
   group('idle, a real cube', () {
     test('the measured geometry at lg', () {
       // `perspective: 172.8px`, `face: 28.5px`, `translateZ: 14.256px`.
-      expect(ElAgentCube.idlePerspective(_lg), closeTo(172.8, 1e-9));
-      expect(ElAgentCube.idleFace(_lg), closeTo(28.512, 1e-9));
-      expect(ElAgentCube.idleTranslateZ(_lg), closeTo(14.256, 1e-9));
-      expect(ElCubeAvatar.spin.name, ElAgentCubeKeyframe.spin3d);
-      expect(ElCubeAvatar.spin.seconds, 9);
+      expect(AgentCube.idlePerspective(_lg), closeTo(172.8, 1e-9));
+      expect(AgentCube.idleFace(_lg), closeTo(28.512, 1e-9));
+      expect(AgentCube.idleTranslateZ(_lg), closeTo(14.256, 1e-9));
+      expect(AgentAvatar.spin.name, AgentCubeKeyframe.spin3d);
+      expect(AgentAvatar.spin.seconds, 9);
     });
 
     testWidgets('at rest the accent face is square on to the viewer', (
@@ -952,12 +954,12 @@ void main() {
     ) async {
       final Color Function(int, int) at = await _raster(
         tester,
-        _stage(const ElCubeAvatar(size: ElAgentAvatarSize.xl)),
+        _stage(const AgentAvatar(size: AgentAvatarSize.xl)),
         reduced: true,
       );
       // `translateZ(+half)` puts the accent face nearest the viewer, so the
       // centre pixel is the accent itself and not a mix.
-      _expectColor(at(60, 50), ElPalette.action);
+      _expectColor(at(60, 50), Palette.action);
     });
   });
 
@@ -965,26 +967,26 @@ void main() {
 
   group('CubeAvatar', () {
     test('the four sizes are the page\'s own captions', () {
-      expect(ElAgentAvatarSize.sm.box, 32);
-      expect(ElAgentAvatarSize.md.box, 48);
-      expect(ElAgentAvatarSize.lg.box, 80);
-      expect(ElAgentAvatarSize.xl.box, 128);
-      expect(ElAgentAvatarSize.sm.scale, 0.19);
-      expect(ElAgentAvatarSize.md.scale, 0.29);
-      expect(ElAgentAvatarSize.lg.scale, _lg);
-      expect(ElAgentAvatarSize.xl.scale, 0.78);
+      expect(AgentAvatarSize.sm.box, 32);
+      expect(AgentAvatarSize.md.box, 48);
+      expect(AgentAvatarSize.lg.box, 80);
+      expect(AgentAvatarSize.xl.box, 128);
+      expect(AgentAvatarSize.sm.scale, 0.19);
+      expect(AgentAvatarSize.md.scale, 0.29);
+      expect(AgentAvatarSize.lg.scale, _lg);
+      expect(AgentAvatarSize.xl.scale, 0.78);
     });
 
     testWidgets('the box is the size class, whatever the scene', (
       WidgetTester tester,
     ) async {
-      for (final ElAgentAvatarSize size in ElAgentAvatarSize.values) {
+      for (final AgentAvatarSize size in AgentAvatarSize.values) {
         await tester.pumpWidget(
-          host(ElCubeAvatar(state: ElAgentState.callingTools, size: size)),
+          host(AgentAvatar(state: AgentState.callingTools, size: size)),
         );
         await tester.pump();
         expect(
-          tester.getSize(find.byType(ElCubeAvatar)),
+          tester.getSize(find.byType(AgentAvatar)),
           Size(size.box, size.box),
         );
       }
@@ -995,43 +997,43 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const ElCubeAvatar(
-            state: ElAgentState.thinking,
-            size: ElAgentAvatarSize.lg,
+          const AgentAvatar(
+            state: AgentState.thinking,
+            size: AgentAvatarSize.lg,
           ),
         ),
       );
       await tester.pump();
       expect(
-        tester.getSize(find.byType(ElCubeScene)).width,
+        tester.getSize(find.byType(CubeScene)).width,
         closeTo(80.64, 1e-9),
       );
       // xl thinking measured 131.04 = 168 × 0.78.
       await tester.pumpWidget(
         host(
-          const ElCubeAvatar(
-            state: ElAgentState.thinking,
-            size: ElAgentAvatarSize.xl,
+          const AgentAvatar(
+            state: AgentState.thinking,
+            size: AgentAvatarSize.xl,
           ),
         ),
       );
       await tester.pump();
       expect(
-        tester.getSize(find.byType(ElCubeScene)).width,
+        tester.getSize(find.byType(CubeScene)).width,
         closeTo(131.04, 1e-9),
       );
       // sm thinking measured 31.92.
       await tester.pumpWidget(
         host(
-          const ElCubeAvatar(
-            state: ElAgentState.thinking,
-            size: ElAgentAvatarSize.sm,
+          const AgentAvatar(
+            state: AgentState.thinking,
+            size: AgentAvatarSize.sm,
           ),
         ),
       );
       await tester.pump();
       expect(
-        tester.getSize(find.byType(ElCubeScene)).width,
+        tester.getSize(find.byType(CubeScene)).width,
         closeTo(31.92, 1e-9),
       );
     });
@@ -1041,44 +1043,44 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const ElCubeAvatar(
-            state: ElAgentState.thinking,
-            size: ElAgentAvatarSize.lg,
+          const AgentAvatar(
+            state: AgentState.thinking,
+            size: AgentAvatarSize.lg,
           ),
         ),
       );
       await tester.pump();
-      expect(find.byType(ElCubeScene), findsOneWidget);
+      expect(find.byType(CubeScene), findsOneWidget);
 
       await tester.pumpWidget(
         host(
-          const ElCubeAvatar(
-            state: ElAgentState.writing,
-            size: ElAgentAvatarSize.lg,
+          const AgentAvatar(
+            state: AgentState.writing,
+            size: AgentAvatarSize.lg,
           ),
         ),
       );
       await tester.pump();
       // Both scenes are mounted for the length of the crossfade.
-      expect(find.byType(ElCubeScene), findsNWidgets(2));
+      expect(find.byType(CubeScene), findsNWidgets(2));
 
-      await tester.pump(ElCubeAvatar.crossfade);
-      await tester.pump(ElCubeAvatar.crossfade);
-      expect(find.byType(ElCubeScene), findsOneWidget);
+      await tester.pump(AgentAvatar.crossfade);
+      await tester.pump(AgentAvatar.crossfade);
+      expect(find.byType(CubeScene), findsOneWidget);
     });
 
     test('the crossfade is --duration-fast', () {
-      expect(ElCubeAvatar.crossfade, ElDurations.fast);
-      expect(ElCubeAvatar.crossfade.inMilliseconds, 150);
+      expect(AgentAvatar.crossfade, MotionDurations.fast);
+      expect(AgentAvatar.crossfade.inMilliseconds, 150);
     });
 
     testWidgets('idle gets its own branch, not a scene', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(host(const ElCubeAvatar()));
+      await tester.pumpWidget(host(const AgentAvatar()));
       await tester.pump();
-      expect(find.byType(ElCubeScene), findsNothing);
-      expect(tester.getSize(find.byType(ElCubeAvatar)), const Size(48, 48));
+      expect(find.byType(CubeScene), findsNothing);
+      expect(tester.getSize(find.byType(AgentAvatar)), const Size(48, 48));
     });
 
     testWidgets('the accessible name is the state label', (
@@ -1086,11 +1088,11 @@ void main() {
     ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(
-        host(const ElCubeAvatar(state: ElAgentState.awaitingApproval)),
+        host(const AgentAvatar(state: AgentState.awaitingApproval)),
       );
       await tester.pump();
       expect(
-        tester.getSemantics(find.byType(ElCubeAvatar)).label,
+        tester.getSemantics(find.byType(AgentAvatar)).label,
         'Awaiting approval',
       );
       handle.dispose();
@@ -1101,9 +1103,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const ElCubeAvatar(
-            state: ElAgentState.summarizing,
-            size: ElAgentAvatarSize.lg,
+          const AgentAvatar(
+            state: AgentState.summarizing,
+            size: AgentAvatarSize.lg,
           ),
           reduced: true,
         ),

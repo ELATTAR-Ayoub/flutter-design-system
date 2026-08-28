@@ -16,16 +16,16 @@ Audited pages: `app/design-system/page.tsx` (home), `app/design-system/colors/pa
 
 ### Docs shell — `app/design-system/layout.tsx` (all 4 pages)
 - **Header**: `sticky top-0 z-40 flex h-(--height-site-header) shrink-0 items-center gap-4 border-b border-border bg-background/85 px-6 backdrop-blur-xl`. `--height-site-header: 4rem` (64px).
-  - Children in order: `ElMobileNav` → `Link href="/design-system" class="press"` wrapping `Logo` → version pill `<span class="type-micro hidden rounded-pill border border-border px-2.5 py-1 sm:block">Design System v0.1</span>` → `<span class="ml-auto type-micro hidden md:block">Desktop-first · 1440 frame · Light & dark</span>` → `ThemeToggle class="ml-auto md:ml-4"`.
-- **Body row**: `mx-auto flex w-full max-w-(--width-shell) flex-1 items-start` (`--width-shell: 1680px`) → `ElSidebar` + `<main class="min-w-0 flex-1 px-6 py-12 lg:px-12">` → inner `<div class="mx-auto max-w-(--width-content)">` (`--width-content: 1080px`).
+  - Children in order: `MobileNav` → `Link href="/design-system" class="press"` wrapping `Logo` → version pill `<span class="type-micro hidden rounded-pill border border-border px-2.5 py-1 sm:block">Design System v0.1</span>` → `<span class="ml-auto type-micro hidden md:block">Desktop-first · 1440 frame · Light & dark</span>` → `ThemeToggle class="ml-auto md:ml-4"`.
+- **Body row**: `mx-auto flex w-full max-w-(--width-shell) flex-1 items-start` (`--width-shell: 1680px`) → `Sidebar` + `<main class="min-w-0 flex-1 px-6 py-12 lg:px-12">` → inner `<div class="mx-auto max-w-(--width-content)">` (`--width-content: 1080px`).
 - Anchor offset: no `scroll-mt-*` anywhere; `html` carries `scroll-padding-block-start: var(--scroll-offset)` where `--scroll-offset: calc(var(--height-site-header) + var(--spacing) * 8)` = 64 + 32 = **96px**.
 
-### `ElSidebar` / `ElMobileNav` / `NavTree` — `components/el/el-nav.tsx` (all 4 pages; client component)
-- **ElSidebar** (no props): `<aside class="sticky top-(--height-site-header) hidden h-[calc(100dvh-var(--height-site-header))] w-60 shrink-0 overflow-y-auto border-r border-border px-6 pt-10 scrollbar-thin lg:block">` — 240px wide, desktop-only (`lg:`), thin scrollbar.
+### `Sidebar` / `MobileNav` / `NavTree` — `components/el/el-nav.tsx` (all 4 pages; client component)
+- **Sidebar** (no props): `<aside class="sticky top-(--height-site-header) hidden h-[calc(100dvh-var(--height-site-header))] w-60 shrink-0 overflow-y-auto border-r border-border px-6 pt-10 scrollbar-thin lg:block">` — 240px wide, desktop-only (`lg:`), thin scrollbar.
 - **NavTree** (`onNavigate?: () => void`): `<nav aria-label="Design system" class="pb-16">`. Per group (`div.mb-8`):
   - Group link: `type-label mb-3 block transition-colors duration-fast hover:text-muted-foreground`; active (pathname === group.href) → `text-action-ink`, else `text-muted-foreground`.
   - Category list: `<ul class="space-y-px border-l border-border">`; each link: `type-nav -ml-px block border-l py-2 pl-4 transition-colors duration-fast` + `aria-current="page"` when active. Active: `border-action bg-action/12 text-foreground` (1px blue rule replacing the hairline — deliberately no glow, no extra `font-medium`; `.type-nav` already carries 500). Inactive: `border-transparent text-muted-foreground hover:border-input hover:text-foreground`.
-- **ElMobileNav** (no props): `Sheet` (Radix Dialog) with trigger `Button variant="outline" size="icon" class="lg:hidden"` containing `Icon icon={Menu}` + `sr-only` "Open design system navigation". `SheetContent side="left" class="w-72 overflow-y-auto px-6"` (288px, overrides default `w-3/4 sm:max-w-sm`); `SheetHeader class="px-0"` with `SheetTitle asChild` → `Link` → `Logo`; then `NavTree`.
+- **MobileNav** (no props): `Sheet` (Radix Dialog) with trigger `Button variant="outline" size="icon" class="lg:hidden"` containing `Icon icon={Menu}` + `sr-only` "Open design system navigation". `SheetContent side="left" class="w-72 overflow-y-auto px-6"` (288px, overrides default `w-3/4 sm:max-w-sm`); `SheetHeader class="px-0"` with `SheetTitle asChild` → `Link` → `Logo`; then `NavTree`.
 
 ### `Logo` / `LogoMark` — `components/el/logo.tsx`
 - `LogoMark({className})`: `<span aria-hidden class="relative grid size-7 shrink-0 place-items-center rounded-md bg-action">` containing a `size-4` SVG (viewBox 0 0 24 24, fill none): chevron `d="M6 15.5 12 6l6 9.5"` stroke `var(--primary-foreground)` width 2.4 `strokeLinecap="square"`, plus underline `d="M6 19h12"` stroke `var(--color-value-bright)` width 2.4.
@@ -35,7 +35,7 @@ Audited pages: `app/design-system/page.tsx` (home), `app/design-system/colors/pa
 ### `ThemeToggle` — `components/el/theme-toggle.tsx` (all 4 pages; client)
 - Props: `{className?}`. Three-way segmented control Light · System · Dark (`SunIcon`/`MonitorIcon`/`MoonIcon`), `role="radiogroup" aria-label="Colour theme"`.
 - Container: `relative inline-flex items-center gap-px rounded-pill border border-border bg-muted p-0.5`.
-- One travelling `SlidingIndicator` pill: `block size-full rounded-pill bg-card shadow-e1` — options paint **no** background of their own (RULES §4: selection travels, never blinks).
+- One travelling `SlidingIndicator` indicator: `block size-full rounded-pill bg-card shadow-e1` — options paint **no** background of their own (RULES §4: selection travels, never blinks).
 - Options: `<button role="radio" data-state="on"|"off" aria-checked title label>`; classes `press relative z-10 grid size-7 place-items-center rounded-pill transition-colors duration-fast ease-out`; active `text-foreground`, inactive `text-muted-foreground hover:text-foreground`; icon `size-3.5` (14px).
 - Hydration: `useSyncExternalStore` (server=false/client=true); before mount nothing is checked → pill `opacity: 0`, then appears in place (no fly-in) because the hook suppresses transition on first move.
 
@@ -49,12 +49,12 @@ Audited pages: `app/design-system/page.tsx` (home), `app/design-system/colors/pa
 
 ## 2. Kit — `components/el/kit.tsx` (the docs component library)
 
-### `ElPageHeader({eyebrow, title, blurb, contents?})` — all 4 pages
+### `PageHeader({eyebrow, title, blurb, contents?})` — all 4 pages
 - `<header class="mb-14 border-b border-border pb-10">`
 - Eyebrow: `type-label text-action-ink`. Title: `<h1 class="type-h1 mt-4 text-foreground">`. Blurb: `type-lead mt-4 max-w-2xl`.
 - Contents chips (optional): `<ul class="mt-7 flex flex-wrap gap-2">`; each `<li class="type-chip rounded-pill border border-border bg-card px-3 py-1.5 text-muted-foreground">`.
 
-### `ElSection({id, title, description?, children, className?})` — all 4 pages
+### `Section({id, title, description?, children, className?})` — all 4 pages
 - `<section id class="mb-20">`; heading block `mb-6`; **`<h2 class="type-h3 text-foreground">`** (h2 element, h3 class — intentional); description `type-small mt-2 max-w-2xl`. No scroll-margin (see `--scroll-offset` above).
 
 ### `Panel({label?, note?, children, className?, bodyClassName?, flush=false})` — colors, typography, spacing
@@ -115,7 +115,7 @@ Reads tokens from the **live stylesheet** — nothing hand-typed. `useSyncExtern
 
 ## 4. Nav data source — `lib/el/nav.ts`
 
-- Types: `ElCategory {slug, title, blurb, contents[]}`, `ElGroup {id: "foundations"|"base"|"agent"|"site", title, href, blurb, categories}`. `EL_ROOT = "/design-system"`.
+- Types: `Category {slug, title, blurb, contents[]}`, `Group {id: "foundations"|"base"|"agent"|"site", title, href, blurb, categories}`. `EL_ROOT = "/design-system"`.
 - Foundations categories in order: **colors, typography, spacing, shadows, motion, icons** (drives sidebar order, home index cards, and PageFootNav prev/next: colors → typography → spacing → shadows…).
 - Group hrefs: foundations → `/design-system`; base → `/design-system/components/base`; agent → `…/agent`; site → `…/site`. `categoryHref`: foundations pages live at `/design-system/{slug}`, others at `{group.href}/{slug}`.
 - Helpers: `findCategory(groupId, slug)` (throws on unknown), `siblings(groupId, slug)` → `{prev, next}` as `{title, href}`.
@@ -134,7 +134,7 @@ Reads tokens from the **live stylesheet** — nothing hand-typed. `useSyncExtern
 
 ### `Button` — `components/ui/button.tsx` (docs chrome: mobile-nav trigger, sheet close)
 - Base (cva): `group/button relative isolate inline-flex min-w-0 max-w-full shrink-0 items-center justify-center overflow-hidden rounded-pill border border-transparent bg-clip-padding font-medium whitespace-nowrap outline-none select-none btn-spring active:not-aria-[haspopup]:scale-95 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-45 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4`.
-- Variants: **default** `sheen-action bg-primary text-primary-foreground shadow-btn-primary active:shadow-btn-down`; **premium** `foil-value font-semibold text-value-foreground shadow-btn-value hover:shadow-glow-value active:shadow-btn-down`; **secondary** `bg-secondary text-secondary-foreground hover:bg-accent aria-expanded:bg-accent`; **outline** `border-input bg-card text-foreground shadow-btn hover:bg-muted active:shadow-btn-down aria-expanded:bg-muted`; **ghost** `text-muted-foreground hover:bg-secondary hover:text-foreground active:bg-muted aria-expanded:bg-secondary aria-expanded:text-foreground`; **destructive** (tint, not solid) `border-destructive/25 bg-destructive/10 text-destructive-ink hover:border-destructive/40 hover:bg-destructive/20 focus-visible:border-destructive/50 focus-visible:ring-destructive/25`; **link** `text-action-ink underline-offset-4 hover:underline`.
+- Variants: **default** `action-feedback bg-primary text-primary-foreground shadow-btn-primary active:shadow-btn-down`; **premium** `premium-surface font-semibold text-value-foreground shadow-btn-value hover:shadow-glow-value active:shadow-btn-down`; **secondary** `bg-secondary text-secondary-foreground hover:bg-accent aria-expanded:bg-accent`; **outline** `border-input bg-card text-foreground shadow-btn hover:bg-muted active:shadow-btn-down aria-expanded:bg-muted`; **ghost** `text-muted-foreground hover:bg-secondary hover:text-foreground active:bg-muted aria-expanded:bg-secondary aria-expanded:text-foreground`; **destructive** (tint, not solid) `border-destructive/25 bg-destructive/10 text-destructive-ink hover:border-destructive/40 hover:bg-destructive/20 focus-visible:border-destructive/50 focus-visible:ring-destructive/25`; **link** `text-action-ink underline-offset-4 hover:underline`.
 - Sizes: xs `h-6 gap-1 px-2.5 text-xs` (svg size-3); sm `h-8 gap-1.5 px-3.5 text-small` (svg 3.5); default `h-10 gap-2 px-4 text-sm`; lg `h-12 gap-2.5 px-6 text-body`; xl `h-14 gap-2.5 px-8 text-base` (svg size-5); icon-xs `size-6`; icon-sm `size-8`; icon `size-10`; icon-lg `size-12`.
 - Emphasis: none | caps `text-num-sm font-semibold tracking-cta uppercase` (`--tracking-cta: 0.09em`).
 - `loading` swaps in `Spinner` (Loader2Icon + `anim-spin`, linear) and disables; `asChild` via Radix Slot; data attrs `data-slot/variant/size/loading`, `aria-busy`.
@@ -200,8 +200,8 @@ Reads tokens from the **live stylesheet** — nothing hand-typed. `useSyncExtern
 
 | Component | home | colors | typography | spacing |
 |---|---|---|---|---|
-| ElPageHeader | ✓ (no contents) | ✓ (inline contents) | ✓ (nav contents) | ✓ (nav contents) |
-| ElSection | ✓ ×3 | ✓ ×5 | ✓ ×6 | ✓ ×6 |
+| PageHeader | ✓ (no contents) | ✓ (inline contents) | ✓ (nav contents) | ✓ (nav contents) |
+| Section | ✓ ×3 | ✓ ×5 | ✓ ×6 | ✓ ×6 |
 | Panel | — | ✓ ×2 | ✓ ×5 | ✓ ×4 |
 | Note | ✓ (value) | ✓ ×4 (action×2, value×2) | ✓ ×2 (action, error) | ✓ ×3 (error×1, default action ×2) |
 | Meta | — | — | ✓ ×1 (6 items) | ✓ ×2 (8+5 items) |

@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/marker.dart",
+      "source": "lib/src/components/ui/marker.dart",
       "target": "@ui/marker.dart",
-      "sha256": "ba139c17a0fbe337da3894acebe768a997d3b0e253a238ba70c9b5c6ea88536b"
+      "sha256": "171fb32aa1399863369a7bc9d1aa05b49fe01c4f59fea86e70f3c0f1391c5863"
     }
   ],
   "registryDependencies": [
@@ -22,6 +22,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/marker",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/marker.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/marker.dart",
   "deprecated": false
 }

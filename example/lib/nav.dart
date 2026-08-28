@@ -1,5 +1,5 @@
 /// Single source of truth for the design-system tree: a verbatim port of the
-/// reference's `lib/el/nav.ts` (615 lines).
+/// reference's `lib/space/nav.ts` (615 lines).
 ///
 /// That file's own header states the contract, which this port inherits
 /// unchanged:
@@ -18,8 +18,8 @@ library;
 ///
 /// `slug` plus the owning group decide the route (see [categoryHref]); `blurb`
 /// and `contents` are what the page header and the index cards render.
-class ElCategory {
-  const ElCategory({
+class Category {
+  const Category({
     required this.slug,
     required this.title,
     required this.blurb,
@@ -44,8 +44,8 @@ class ElCategory {
 
 /// One family of pages: a labelled block in the sidebar and one card on the
 /// overview page.
-class ElGroup {
-  const ElGroup({
+class Group {
+  const Group({
     required this.id,
     required this.title,
     required this.href,
@@ -67,7 +67,7 @@ class ElGroup {
 
   final String blurb;
 
-  final List<ElCategory> categories;
+  final List<Category> categories;
 }
 
 /// `EL_ROOT`: every route in the tree hangs off this one segment.
@@ -80,19 +80,19 @@ const String elRoot = '/design-system';
 const String showcaseRoute = '/signal-studio';
 
 /// A page-foot / sidebar link: what [siblings] hands back for prev and next.
-typedef ElNavLink = ({String title, String href});
+typedef NavLink = ({String title, String href});
 
 /// The pair [siblings] returns. Both sides are null-able because the ends of a
 /// group have nothing beyond them.
-typedef ElSiblings = ({ElNavLink? prev, ElNavLink? next});
+typedef Siblings = ({NavLink? prev, NavLink? next});
 
 /// The group + category pair [findCategory] resolves.
-typedef ElCategoryHit = ({ElGroup group, ElCategory category});
+typedef CategoryHit = ({Group group, Category category});
 
 /* ── Foundations ─────────────────────────────────────────────────────────── */
 
-const List<ElCategory> _foundations = <ElCategory>[
-  ElCategory(
+const List<Category> _foundations = <Category>[
+  Category(
     slug: 'colors',
     title: 'Colors',
     blurb:
@@ -116,7 +116,7 @@ const List<ElCategory> _foundations = <ElCategory>[
   // from render Inter, not Space Grotesk. The blurb still says Space Grotesk,
   // so the blurb still says Space Grotesk here. Fonts follow tokens; copy
   // follows the reference.
-  ElCategory(
+  Category(
     slug: 'typography',
     title: 'Typography',
     blurb:
@@ -135,7 +135,7 @@ const List<ElCategory> _foundations = <ElCategory>[
       'Rules',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'spacing',
     title: 'Spacing & Layout',
     blurb:
@@ -149,7 +149,7 @@ const List<ElCategory> _foundations = <ElCategory>[
       'Content width',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'shadows',
     title: 'Shadows',
     blurb:
@@ -163,7 +163,7 @@ const List<ElCategory> _foundations = <ElCategory>[
       'Glass',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'motion',
     title: 'Motion',
     blurb:
@@ -177,7 +177,7 @@ const List<ElCategory> _foundations = <ElCategory>[
       'Reduced motion',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'icons',
     title: 'Icons',
     blurb:
@@ -195,8 +195,8 @@ const List<ElCategory> _foundations = <ElCategory>[
 
 /* ── Base components: the shadcn chassis, restyled ──────────────────────── */
 
-const List<ElCategory> _base = <ElCategory>[
-  ElCategory(
+const List<Category> _base = <Category>[
+  Category(
     slug: 'buttons',
     title: 'Buttons',
     blurb:
@@ -210,7 +210,7 @@ const List<ElCategory> _base = <ElCategory>[
       'Kbd',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'inputs',
     title: 'Inputs',
     blurb:
@@ -228,7 +228,7 @@ const List<ElCategory> _base = <ElCategory>[
       'Field & Label',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'forms',
     title: 'Forms',
     blurb:
@@ -242,7 +242,7 @@ const List<ElCategory> _base = <ElCategory>[
       'Composed fields',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'selects',
     title: 'Selects & Pickers',
     blurb:
@@ -259,7 +259,7 @@ const List<ElCategory> _base = <ElCategory>[
       'Date Picker',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'selection',
     title: 'Selection Controls',
     blurb: 'Binary and ranged controls: checkbox, radio, switch and slider.',
@@ -271,7 +271,7 @@ const List<ElCategory> _base = <ElCategory>[
       'Range Slider',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'dialogs',
     title: 'Dialogs & Overlays',
     blurb:
@@ -288,13 +288,13 @@ const List<ElCategory> _base = <ElCategory>[
       'Tooltip',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'menus',
     title: 'Menus',
     blurb: 'Account dropdown, right-click menus and the application menubar.',
     contents: <String>['Dropdown Menu', 'Context Menu', 'Menubar'],
   ),
-  ElCategory(
+  Category(
     slug: 'navigation',
     title: 'Navigation',
     blurb:
@@ -308,7 +308,7 @@ const List<ElCategory> _base = <ElCategory>[
       'Collapsible',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'feedback',
     title: 'Feedback',
     blurb:
@@ -323,7 +323,7 @@ const List<ElCategory> _base = <ElCategory>[
       'Empty',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'chat',
     title: 'Chat',
     blurb:
@@ -346,7 +346,7 @@ const List<ElCategory> _base = <ElCategory>[
   // the other way round: by building the range calendar the entry had been
   // promising. Nothing checks this direction, so it is worth saying twice:
   // adding a string here is a commitment, not a label.
-  ElCategory(
+  Category(
     slug: 'data',
     title: 'Data Display',
     blurb: 'Tables, data tables, badges, avatars, cards, stats and list items.',
@@ -362,7 +362,7 @@ const List<ElCategory> _base = <ElCategory>[
       'Separator',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'charts',
     title: 'Charts',
     blurb:
@@ -386,7 +386,7 @@ const List<ElCategory> _base = <ElCategory>[
   // it has its own category below; leaving the entry here would have been a
   // second home for one component and a chip pointing at a section that had
   // moved.
-  ElCategory(
+  Category(
     slug: 'layout',
     title: 'Layout Primitives',
     blurb:
@@ -403,7 +403,7 @@ const List<ElCategory> _base = <ElCategory>[
   // convention `buttons` uses, where `contents` is what is shown rather than
   // what the headings are called. On this page it doubles as the export
   // inventory: every name below has a specimen you can design against.
-  ElCategory(
+  Category(
     slug: 'sidebar',
     title: 'Sidebar',
     blurb:
@@ -445,8 +445,8 @@ const List<ElCategory> _base = <ElCategory>[
  * it is a comment, so it renders nowhere — but it is left as found.)
  */
 
-const List<ElCategory> _agent = <ElCategory>[
-  ElCategory(
+const List<Category> _agent = <Category>[
+  Category(
     slug: 'console',
     title: 'Console',
     blurb:
@@ -460,7 +460,7 @@ const List<ElCategory> _agent = <ElCategory>[
       'Transport contract',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'avatar',
     title: 'Avatar',
     blurb:
@@ -473,7 +473,7 @@ const List<ElCategory> _agent = <ElCategory>[
       'Reduced motion',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'composer',
     title: 'Composer',
     blurb:
@@ -493,7 +493,7 @@ const List<ElCategory> _agent = <ElCategory>[
   // and Questionnaire are deliberately adjacent (the same interaction shape:
   // the agent speaks, the user answers inline) and Attachments closes the page
   // as the one object that travels in both directions.
-  ElCategory(
+  Category(
     slug: 'transcript',
     title: 'Transcript',
     blurb:
@@ -509,7 +509,7 @@ const List<ElCategory> _agent = <ElCategory>[
       'Attachments',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'history',
     title: 'History',
     blurb:
@@ -523,7 +523,7 @@ const List<ElCategory> _agent = <ElCategory>[
       'Blur switch',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'voice',
     title: 'Voice',
     blurb:
@@ -551,8 +551,8 @@ const List<ElCategory> _agent = <ElCategory>[
  * plan up front would ship five links to nothing.
  */
 
-const List<ElCategory> _site = <ElCategory>[
-  ElCategory(
+const List<Category> _site = <Category>[
+  Category(
     slug: 'structure',
     title: 'Page Structure',
     blurb:
@@ -567,7 +567,7 @@ const List<ElCategory> _site = <ElCategory>[
       'Prose',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'intro',
     title: 'Page Introductions',
     blurb:
@@ -581,7 +581,7 @@ const List<ElCategory> _site = <ElCategory>[
       'Dates without a locale',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'landing',
     title: 'Landing Hero',
     blurb:
@@ -595,7 +595,7 @@ const List<ElCategory> _site = <ElCategory>[
       'The whole section',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'navigation',
     title: 'Reading Navigation',
     blurb:
@@ -609,7 +609,7 @@ const List<ElCategory> _site = <ElCategory>[
       'Reduced motion',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'sections',
     title: 'Content Sections',
     blurb:
@@ -626,7 +626,7 @@ const List<ElCategory> _site = <ElCategory>[
       'What is not a component',
     ],
   ),
-  ElCategory(
+  Category(
     slug: 'chrome',
     title: 'Site Chrome',
     blurb:
@@ -643,15 +643,15 @@ const List<ElCategory> _site = <ElCategory>[
 ];
 
 /// `EL_GROUPS`: the whole tree, in the order the sidebar renders it.
-const List<ElGroup> elGroups = <ElGroup>[
-  ElGroup(
+const List<Group> elGroups = <Group>[
+  Group(
     id: 'foundations',
     title: 'Foundations',
     href: elRoot,
     blurb: 'The decisions everything else inherits.',
     categories: _foundations,
   ),
-  ElGroup(
+  Group(
     id: 'base',
     title: 'Base Components',
     href: '$elRoot/components/base',
@@ -659,7 +659,7 @@ const List<ElGroup> elGroups = <ElGroup>[
         "The shadcn chassis, restyled onto this system's tokens. Generic, reusable, product-agnostic.",
     categories: _base,
   ),
-  ElGroup(
+  Group(
     id: 'agent',
     title: 'Agent',
     href: '$elRoot/components/agent',
@@ -667,7 +667,7 @@ const List<ElGroup> elGroups = <ElGroup>[
         'A complete AI console — transcript, composer, avatar and voice — pointed at a transport you supply. Written from scratch, and product-agnostic by construction.',
     categories: _agent,
   ),
-  ElGroup(
+  Group(
     id: 'site',
     title: 'Site Pages',
     href: '$elRoot/components/site',
@@ -682,15 +682,14 @@ const List<ElGroup> elGroups = <ElGroup>[
 /// Foundations pages sit directly under the root, `/design-system/colors`, not
 /// `/design-system/foundations/colors`: because Foundations *is* the index of
 /// the design system. Every other group nests under its own index.
-String categoryHref(ElGroup group, ElCategory category) =>
-    group.id == 'foundations'
+String categoryHref(Group group, Category category) => group.id == 'foundations'
     ? '$elRoot/${category.slug}'
     : '${group.href}/${category.slug}';
 
 /// The group with this id, or null. The reference inlines `EL_GROUPS.find`
 /// three times; the port names it once.
-ElGroup? _groupOrNull(String id) {
-  for (final ElGroup group in elGroups) {
+Group? _groupOrNull(String id) {
+  for (final Group group in elGroups) {
     if (group.id == id) return group;
   }
   return null;
@@ -701,8 +700,8 @@ ElGroup? _groupOrNull(String id) {
 /// Not in the reference (which has no caller that needs a group alone), but the
 /// shell keys its sidebar off group ids and a typo there should fail loudly for
 /// the same reason [findCategory] throws.
-ElGroup elGroupById(String id) {
-  final ElGroup? group = _groupOrNull(id);
+Group elGroupById(String id) {
+  final Group? group = _groupOrNull(id);
   if (group == null) {
     throw ArgumentError.value(id, 'id', 'Unknown design-system group');
   }
@@ -714,9 +713,9 @@ ElGroup elGroupById(String id) {
 /// Throws on either half being unknown, as the reference does: a page header
 /// that cannot find itself in the nav is the exact drift this file exists to
 /// prevent, so it fails rather than rendering an empty heading.
-ElCategoryHit findCategory(String groupId, String slug) {
-  final ElGroup group = elGroupById(groupId);
-  for (final ElCategory category in group.categories) {
+CategoryHit findCategory(String groupId, String slug) {
+  final Group group = elGroupById(groupId);
+  for (final Category category in group.categories) {
     if (category.slug == slug) {
       return (group: group, category: category);
     }
@@ -734,16 +733,16 @@ ElCategoryHit findCategory(String groupId, String slug) {
 /// * an unknown *slug* leaves `findIndex` at −1, so `prev` is null and `next`
 ///   resolves to index 0: the group's first category. A foot nav on a page
 ///   that is not in the tree therefore points at the top of the group.
-ElSiblings siblings(String groupId, String slug) {
-  final ElGroup? found = _groupOrNull(groupId);
+Siblings siblings(String groupId, String slug) {
+  final Group? found = _groupOrNull(groupId);
   if (found == null) return (prev: null, next: null);
-  final ElGroup group = found;
+  final Group group = found;
 
-  final int i = group.categories.indexWhere((ElCategory c) => c.slug == slug);
+  final int i = group.categories.indexWhere((Category c) => c.slug == slug);
 
-  ElNavLink? at(int n) {
+  NavLink? at(int n) {
     if (n < 0 || n >= group.categories.length) return null;
-    final ElCategory c = group.categories[n];
+    final Category c = group.categories[n];
     return (title: c.title, href: categoryHref(group, c));
   }
 

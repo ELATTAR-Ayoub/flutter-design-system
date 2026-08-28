@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/menubar.dart",
+      "source": "lib/src/components/ui/menubar.dart",
       "target": "@ui/menubar.dart",
-      "sha256": "b1764cecd80b00dae8f027b5efd60e62c9b9dfe2944474a73022998291d0729c"
+      "sha256": "16fee8e6e3350608b9530c3bf96bbfd07521c4e528957b599125b724e5c7925e"
     }
   ],
   "registryDependencies": [
@@ -26,5 +26,9 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/menubar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/menubar.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/menubar.dart",
+  "exports": [
+    "Menubar",
+    "MenubarMenu"
+  ]
 }

@@ -1,18 +1,30 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The effects layer: the two things CSS does that Flutter has no primitive
 /// for — an inset box-shadow, and a background gradient whose radii are
 /// percentages of the box rather than of its shortest side.
 
-Widget host(Widget child, {ElThemeMode mode = ElThemeMode.dark}) {
+Widget host(Widget child, {ColorMode mode = ColorMode.dark}) {
   return MediaQuery(
     data: const MediaQueryData(size: Size(1440, 900)),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ElTheme(
-        controller: ElThemeController(mode: mode),
+      child: ThemeScope(
+        controller: ThemeController(mode: mode),
         child: Center(child: child),
       ),
     ),
@@ -20,24 +32,24 @@ Widget host(Widget child, {ElThemeMode mode = ElThemeMode.dark}) {
 }
 
 /// The 100×40 pill the plan names — a button-shaped surface.
-Widget surface(ElShadowSpec spec, {Color? fill}) => SizedBox(
+Widget surface(ShadowStyle spec, {Color? fill}) => SizedBox(
   width: 100,
   height: 40,
-  child: ElMachineSurface(
+  child: Surface(
     spec: spec,
-    radius: BorderRadius.circular(ElRadii.pill),
+    radius: BorderRadius.circular(Radii.full),
     fill: fill,
     child: const SizedBox.expand(),
   ),
 );
 
 void main() {
-  group('ElMachineSurface', () {
+  group('Surface', () {
     testWidgets('paints an inset spec inside a 100×40 pill without error', (
       WidgetTester t,
     ) async {
-      expect(ElShadows.btn.hasInset, isTrue);
-      await t.pumpWidget(host(surface(ElShadows.btn)));
+      expect(Shadows.control.hasInset, isTrue);
+      await t.pumpWidget(host(surface(Shadows.control)));
       expect(t.takeException(), isNull);
       expect(find.byType(CustomPaint), findsWidgets);
     });
@@ -45,14 +57,14 @@ void main() {
     testWidgets('paints an outer-only spec without error', (
       WidgetTester t,
     ) async {
-      expect(ElShadows.e3.hasInset, isFalse);
-      await t.pumpWidget(host(surface(ElShadows.e3)));
+      expect(Shadows.lg.hasInset, isFalse);
+      await t.pumpWidget(host(surface(Shadows.lg)));
       expect(t.takeException(), isNull);
     });
 
     testWidgets('paints both themes without error', (WidgetTester t) async {
-      for (final ElThemeMode mode in ElThemeMode.values) {
-        await t.pumpWidget(host(surface(ElShadows.pressed), mode: mode));
+      for (final ColorMode mode in ColorMode.values) {
+        await t.pumpWidget(host(surface(Shadows.inset), mode: mode));
         expect(t.takeException(), isNull, reason: 'mode $mode');
       }
     });
@@ -60,14 +72,14 @@ void main() {
     testWidgets('hands the outer layers to the decoration, in CSS order', (
       WidgetTester t,
     ) async {
-      await t.pumpWidget(host(surface(ElShadows.btn)));
+      await t.pumpWidget(host(surface(Shadows.control)));
 
       final BoxDecoration decoration =
           t
                   .widget<DecoratedBox>(
                     find
                         .descendant(
-                          of: find.byType(ElMachineSurface),
+                          of: find.byType(Surface),
                           matching: find.byType(DecoratedBox),
                         )
                         .first,
@@ -75,8 +87,8 @@ void main() {
                   .decoration
               as BoxDecoration;
 
-      final List<BoxShadow> expected = ElShadows.btn.outerShadows(
-        ElThemeData.dark,
+      final List<BoxShadow> expected = Shadows.control.outerShadows(
+        ThemeTokens.dark,
       );
       expect(decoration.boxShadow, hasLength(expected.length));
       expect(decoration.boxShadow, hasLength(2)); // btn has 2 outer, 2 inset
@@ -100,12 +112,12 @@ void main() {
           SizedBox(
             width: 100,
             height: 40,
-            child: ElMachineSurface(
-              spec: ElShadows.btn,
-              radius: BorderRadius.circular(ElRadii.pill),
+            child: Surface(
+              spec: Shadows.control,
+              radius: BorderRadius.circular(Radii.full),
               border: Border.all(
-                color: ElThemeData.dark.input,
-                width: ElWidths.hairline,
+                color: ThemeTokens.dark.input,
+                width: BorderWidths.hairline,
               ),
               child: const SizedBox.expand(key: content),
             ),
@@ -115,7 +127,7 @@ void main() {
 
       expect(
         t.getSize(find.byKey(content)),
-        Size(100 - 2 * ElWidths.hairline, 40 - 2 * ElWidths.hairline),
+        Size(100 - 2 * BorderWidths.hairline, 40 - 2 * BorderWidths.hairline),
       );
     });
 
@@ -128,9 +140,9 @@ void main() {
           SizedBox(
             width: 100,
             height: 40,
-            child: ElMachineSurface(
-              spec: ElShadows.e1,
-              radius: BorderRadius.circular(ElRadii.pill),
+            child: Surface(
+              spec: Shadows.sm,
+              radius: BorderRadius.circular(Radii.full),
               child: const SizedBox.expand(key: content),
             ),
           ),
@@ -143,14 +155,14 @@ void main() {
     testWidgets('re-resolves its ink when the theme flips', (
       WidgetTester t,
     ) async {
-      final ElThemeController controller = ElThemeController();
+      final ThemeController controller = ThemeController();
       Widget tree() => MediaQuery(
         data: const MediaQueryData(size: Size(1440, 900)),
         child: Directionality(
           textDirection: TextDirection.ltr,
-          child: ElTheme(
+          child: ThemeScope(
             controller: controller,
-            child: Center(child: surface(ElShadows.e3)),
+            child: Center(child: surface(Shadows.lg)),
           ),
         ),
       );
@@ -161,7 +173,7 @@ void main() {
                   .widget<DecoratedBox>(
                     find
                         .descendant(
-                          of: find.byType(ElMachineSurface),
+                          of: find.byType(Surface),
                           matching: find.byType(DecoratedBox),
                         )
                         .first,
@@ -171,15 +183,15 @@ void main() {
 
       expect(
         decorationNow().boxShadow!.first.color,
-        ElShadows.e3.outerShadows(ElThemeData.dark).first.color,
+        Shadows.lg.outerShadows(ThemeTokens.dark).first.color,
       );
 
-      controller.setMode(ElThemeMode.light);
+      controller.setMode(ColorMode.light);
       await t.pump();
 
       expect(
         decorationNow().boxShadow!.first.color,
-        ElShadows.e3.outerShadows(ElThemeData.light).first.color,
+        Shadows.lg.outerShadows(ThemeTokens.light).first.color,
       );
     });
 
@@ -189,15 +201,15 @@ void main() {
       // from the bottom inside edge.
       final RRect shape = RRect.fromRectAndRadius(
         const Rect.fromLTWH(0, 0, 100, 40),
-        const Radius.circular(ElRadii.pill),
+        const Radius.circular(Radii.full),
       );
 
       test('a positive dy pushes the hole down, lighting the top edge', () {
         // `inset 0 1px 0 var(--rim)` — the hole sits 1px lower than the shape,
         // so the ring covers a sliver along the TOP and nothing at the bottom.
-        final Path ring = ElMachineSurface.debugInsetRing(
+        final Path ring = Surface.debugInsetRing(
           shape,
-          const ElShadowLayer(0, 1, 0, 0, _rim, inset: true),
+          const ShadowLayer(0, 1, 0, 0, _rim, inset: true),
         );
 
         expect(ring.contains(const Offset(50, 0.5)), isTrue, reason: 'top rim');
@@ -211,9 +223,9 @@ void main() {
 
       test('a negative dy pushes the hole up, shading the bottom edge', () {
         // `inset 0 -2px 4px var(--ink-2)`.
-        final Path ring = ElMachineSurface.debugInsetRing(
+        final Path ring = Surface.debugInsetRing(
           shape,
-          const ElShadowLayer(0, -2, 4, 0, _ink2, inset: true),
+          const ShadowLayer(0, -2, 4, 0, _ink2, inset: true),
         );
 
         expect(ring.contains(const Offset(50, 39)), isTrue, reason: 'bottom');
@@ -222,9 +234,9 @@ void main() {
       });
 
       test('spread thickens the ring on every side', () {
-        final Path ring = ElMachineSurface.debugInsetRing(
+        final Path ring = Surface.debugInsetRing(
           shape,
-          const ElShadowLayer(0, 0, 0, 3, _ink2, inset: true),
+          const ShadowLayer(0, 0, 0, 3, _ink2, inset: true),
         );
 
         expect(ring.contains(const Offset(50, 1)), isTrue);
@@ -233,9 +245,9 @@ void main() {
       });
 
       test('reaches well outside the shape so the blur has no far edge', () {
-        final Path ring = ElMachineSurface.debugInsetRing(
+        final Path ring = Surface.debugInsetRing(
           shape,
-          const ElShadowLayer(0, -2, 4, 0, _ink2, inset: true),
+          const ShadowLayer(0, -2, 4, 0, _ink2, inset: true),
         );
         // The clip hides everything beyond the shape; what matters is that the
         // ring's outer boundary is far enough out that its own blurred edge
@@ -246,15 +258,15 @@ void main() {
     });
   });
 
-  group('ElPageGlow', () {
+  group('BackgroundEffect', () {
     testWidgets('paints in both themes without error', (WidgetTester t) async {
-      for (final ElThemeMode mode in <ElThemeMode>[
-        ElThemeMode.dark,
-        ElThemeMode.light,
+      for (final ColorMode mode in <ColorMode>[
+        ColorMode.dark,
+        ColorMode.light,
       ]) {
         await t.pumpWidget(
           host(
-            const SizedBox(width: 800, height: 600, child: ElPageGlow()),
+            const SizedBox(width: 800, height: 600, child: BackgroundEffect()),
             mode: mode,
           ),
         );
@@ -267,7 +279,7 @@ void main() {
       // against the box's own width and height, which is exactly what Flutter's
       // shortest-side `RadialGradient.radius` cannot express.
       const Size box = Size(1000, 500);
-      final Rect ellipse = ElPageGlow.debugEllipse(box);
+      final Rect ellipse = BackgroundEffect.debugEllipse(box);
 
       expect(ellipse.center, const Offset(620, 170));
       expect(ellipse.width, 2 * 1.2 * 1000);
@@ -280,7 +292,9 @@ void main() {
           SizedBox(
             width: 800,
             height: 600,
-            child: ElPageGlow(child: ElText('Design System', ElType.h2)),
+            child: BackgroundEffect(
+              child: StyledText('Design System', TextStyles.h2),
+            ),
           ),
         ),
       );
@@ -289,5 +303,5 @@ void main() {
   });
 }
 
-Color _rim(ElThemeData t) => t.rim;
-Color _ink2(ElThemeData t) => t.ink2;
+Color _rim(ThemeTokens t) => t.rim;
+Color _ink2(ThemeTokens t) => t.ink2;

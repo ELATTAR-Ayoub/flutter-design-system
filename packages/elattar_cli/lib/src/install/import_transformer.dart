@@ -108,7 +108,7 @@ class DartImportTransformer {
     if (path == '$designSystemPackage.dart') {
       // The umbrella barrel has no single counterpart: the installer emits one
       // barrel per family, so one directive fans out to several. That is only
-      // sound for a plain directive — a prefix (`as el`) or a combinator
+      // sound for a plain directive — a prefix (`as space`) or a combinator
       // (`show`/`hide`) cannot be distributed across barrels without silently
       // changing what resolves, so refuse rather than emit broken code.
       if (trailing.isNotEmpty) {
@@ -163,14 +163,14 @@ class DartImportTransformer {
   /// Maps a path relative to the package's `lib/src/` onto a logical target,
   /// or `null` when the path is not distributed through the registry.
   String? _logicalForSourceSuffix(String suffix) {
-    if (suffix.startsWith('components/')) return '@ui/${suffix.substring(11)}';
-    if (suffix.startsWith('foundation/')) {
-      return '@foundation/${suffix.substring(11)}';
+    if (suffix.startsWith('components/ui/')) {
+      return '@ui/${suffix.substring('components/ui/'.length)}';
     }
-    if (suffix.startsWith('effects/')) return '@effects/${suffix.substring(8)}';
-    if (suffix.startsWith('motion/')) return '@motion/${suffix.substring(7)}';
-    if (suffix == 'theme_scope.dart' || suffix == 'text_layout.dart') {
-      return '@foundation/$suffix';
+    if (suffix.startsWith('design_system/foundation/')) {
+      return '@foundation/${suffix.substring('design_system/foundation/'.length)}';
+    }
+    if (suffix.startsWith('blocks/')) {
+      return '@block/${suffix.substring('blocks/'.length)}';
     }
     return null;
   }
@@ -217,7 +217,7 @@ class _Directive {
   /// The URI as written, without its quotes.
   final String uri;
 
-  /// Everything between the URI and the `;` — a prefix (`as el`), a combinator
+  /// Everything between the URI and the `;` — a prefix (`as space`), a combinator
   /// (`show X`, `hide Y`), a configuration clause — trimmed. Empty for a plain
   /// directive.
   final String trailing;

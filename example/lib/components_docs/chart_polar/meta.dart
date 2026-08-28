@@ -5,7 +5,7 @@
 /// copied verbatim: `chart`, `chart-cartesian`, `chart-geometry`,
 /// `source-foundation`. Three widgets share one convention: degrees,
 /// counter-clockwise from three o'clock, negated on the way into screen
-/// space — `elPolarToCartesian` from `chart-geometry`.
+/// space — `polarToCartesian` from `chart-geometry`.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
@@ -26,17 +26,17 @@ const ComponentDocEntry chartPolarDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>[
-    'ElPolarGridType',
-    'ElPolarGrid',
-    'ElPolarAngleAxis',
-    'ElPolarRadiusAxis',
-    'ElPieSpec',
-    'ElPieChart',
-    'ElRadarSpec',
-    'ElChartDotSpec',
-    'ElRadarChart',
-    'ElRadialBarSpec',
-    'ElRadialBarChart',
+    'PolarGridType',
+    'PolarGrid',
+    'PolarAngleAxis',
+    'PolarRadiusAxis',
+    'PieSpec',
+    'PieChart',
+    'RadarSpec',
+    'ChartDotSpec',
+    'RadarChart',
+    'RadialBarSpec',
+    'RadialBarChart',
   ],
   sourcePath: 'lib/src/components/chart_polar.dart',
 );

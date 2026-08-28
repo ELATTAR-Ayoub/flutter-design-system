@@ -1,6 +1,6 @@
 /// Public documentation page for the `aspect_ratio` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels reshaped to mirror shadcn's own flat section list (Installation,
 /// Usage, Square, Portrait, RTL, API Reference — fetched fresh from
 /// https://ui.shadcn.com/docs/components/base/aspect-ratio); it now
@@ -32,7 +32,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -70,7 +82,7 @@ final ComponentDocSpec aspectRatioDocSpec = ComponentDocSpec(
               "Copy lib/src/components/aspect_ratio.dart's generated "
               '@ui/aspect_ratio.dart payload into components/ui.',
           code:
-              "import 'package:flutter/widgets.dart';\n\n"
+              "import 'package:flutter/widgets.dart' hide AspectRatio, Form, FormField, Icon, OverlayPortal, RadioGroup, RichText, SafeArea, ScrollPosition, Table, TableColumnWidth;\n\n"
               '// Copy the generated aspect_ratio source here when using '
               'manual mode.',
         ),
@@ -78,7 +90,7 @@ final ComponentDocSpec aspectRatioDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElAspectRatio is reachable the '
+              'Add the export line so AspectRatio is reachable the '
               'same way the CLI path already makes it.',
           code: "export 'aspect_ratio.dart';",
         ),
@@ -87,7 +99,7 @@ final ComponentDocSpec aspectRatioDocSpec = ComponentDocSpec(
     SnippetSection(
       id: 'usage',
       title: 'Usage',
-      description: 'ElAspectRatio for a locked box.',
+      description: 'AspectRatio for a locked box.',
       code: _usageCode,
     ),
     SnippetSection(
@@ -121,7 +133,7 @@ final ComponentDocSpec aspectRatioDocSpec = ComponentDocSpec(
       id: 'rtl',
       title: 'RTL',
       description:
-          'ElAspectRatio has no observable difference under a '
+          'AspectRatio has no observable difference under a '
           'Directionality.rtl ambient direction: the ratio box is centered '
           'in flow with no reading-direction-sensitive offset of its own. '
           'Content inside the child still reads in whichever direction its '
@@ -133,13 +145,13 @@ final ComponentDocSpec aspectRatioDocSpec = ComponentDocSpec(
     DisclosureSection(
       id: 'api',
       title: 'API Reference',
-      child: const DocsApiTable(title: 'ElAspectRatio', facts: _apiFacts),
+      child: const DocsApiTable(title: 'AspectRatio', facts: _apiFacts),
     ),
     DisclosureSection(
       id: 'states',
       title: 'States',
       description:
-          'One honest sentence: ElAspectRatio is static and carries no '
+          'One honest sentence: AspectRatio is static and carries no '
           'interactive state of its own, so every row below but Rest is '
           'N/A.',
       child: const DocsStateMatrix(facts: _stateFacts),
@@ -159,7 +171,7 @@ final ComponentDocSpec aspectRatioDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'One honest sentence: aspect_ratio.dart wires no Focus node and '
-          'no key handling at all, so ElAspectRatio is never in the tab '
+          'no key handling at all, so AspectRatio is never in the tab '
           'order.',
       child: _KeyboardContent(),
     ),
@@ -230,9 +242,9 @@ class AspectRatioDocPage extends StatelessWidget {
       title: aspectRatioDoc.title,
       description: aspectRatioDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Aspect ratio'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Aspect ratio'),
     ],
     sidebar: _sidebar,
     toc: aspectRatioDocSpec.toc,
@@ -271,18 +283,18 @@ class _PreviewSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
-      width: el(40),
-      child: ElAspectRatio(
+      width: space(40),
+      child: AspectRatio(
         ratio: 4 / 3,
         child: DecoratedBox(
           decoration: BoxDecoration(
             border: Border.all(color: theme.border),
             color: theme.muted.withAlpha(32),
-            borderRadius: BorderRadius.circular(ElRadii.lg),
+            borderRadius: BorderRadius.circular(Radii.lg),
           ),
-          child: Center(child: ElText('4:3 ratio', ElType.small)),
+          child: Center(child: StyledText('4:3 ratio', TextStyles.small)),
         ),
       ),
     );
@@ -294,18 +306,18 @@ class _SquareSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
-      width: el(30),
-      child: ElAspectRatio(
+      width: space(30),
+      child: AspectRatio(
         ratio: 1 / 1,
         child: DecoratedBox(
           decoration: BoxDecoration(
             border: Border.all(color: theme.border),
             color: theme.muted.withAlpha(32),
-            borderRadius: BorderRadius.circular(ElRadii.lg),
+            borderRadius: BorderRadius.circular(Radii.lg),
           ),
-          child: Center(child: ElText('1:1 ratio', ElType.small)),
+          child: Center(child: StyledText('1:1 ratio', TextStyles.small)),
         ),
       ),
     );
@@ -317,18 +329,18 @@ class _PortraitSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
-      width: el(20),
-      child: ElAspectRatio(
+      width: space(20),
+      child: AspectRatio(
         ratio: 9 / 16,
         child: DecoratedBox(
           decoration: BoxDecoration(
             border: Border.all(color: theme.border),
             color: theme.muted.withAlpha(32),
-            borderRadius: BorderRadius.circular(ElRadii.lg),
+            borderRadius: BorderRadius.circular(Radii.lg),
           ),
-          child: Center(child: ElText('9:16 ratio', ElType.small)),
+          child: Center(child: StyledText('9:16 ratio', TextStyles.small)),
         ),
       ),
     );
@@ -340,20 +352,20 @@ class _RtlSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: SizedBox(
-        width: el(30),
-        child: ElAspectRatio(
+        width: space(30),
+        child: AspectRatio(
           ratio: 4 / 3,
           child: DecoratedBox(
             decoration: BoxDecoration(
               border: Border.all(color: theme.border),
               color: theme.muted.withAlpha(32),
-              borderRadius: BorderRadius.circular(ElRadii.lg),
+              borderRadius: BorderRadius.circular(Radii.lg),
             ),
-            child: Center(child: ElText('نسبة 4:3', ElType.small)),
+            child: Center(child: StyledText('نسبة 4:3', TextStyles.small)),
           ),
         ),
       ),
@@ -368,8 +380,8 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Purely structural: ElAspectRatio builds no Semantics node of its '
+      _bullets(ThemeScope.of(context), <String>[
+        'Purely structural: AspectRatio builds no Semantics node of its '
             'own. Used to frame content that manages its own accessibility.',
       ]);
 }
@@ -379,9 +391,9 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No key handling of its own: aspect_ratio.dart wires no Focus '
-            'node anywhere, so ElAspectRatio is never in the tab order, '
+            'node anywhere, so AspectRatio is never in the tab order, '
             'consistent with it not being interactive content.',
       ]);
 }
@@ -391,7 +403,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Locks to the ratio on every viewport. A 390px-wide box at 16:9 is '
             '390 × 219. The ratio is device-agnostic.',
         'Never overflows: it locks the box to the ratio rather than '
@@ -456,45 +468,45 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Purely structural, no colours of its own: the child paints '
             'everything visible.',
-        'ElAspectRatio declares no colour parameter at all, consistent '
+        'AspectRatio declares no colour parameter at all, consistent '
             'with it being layout only.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => ConstrainedBox(
-  constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+Widget _bullets(ThemeTokens theme, List<String> lines) => ConstrainedBox(
+  constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       for (final String line in lines) ...<Widget>[
-        ElText('•  $line', ElType.small, color: theme.mutedForeground),
-        SizedBox(height: el(2)),
+        StyledText('•  $line', TextStyles.small, color: theme.mutedForeground),
+        SizedBox(height: space(2)),
       ],
     ],
   ),
 );
 
-const String _previewCode = '''ElAspectRatio(
+const String _previewCode = '''AspectRatio(
   ratio: 4 / 3,
   child: DecoratedBox(
     decoration: BoxDecoration(
       border: Border.all(),
-      borderRadius: BorderRadius.circular(ElRadii.lg),
+      borderRadius: BorderRadius.circular(Radii.lg),
     ),
     child: const Center(child: Text('4:3 ratio')),
   ),
 )''';
 
-const String _usageCode = '''ElAspectRatio(
+const String _usageCode = '''AspectRatio(
   ratio: 5 / 7,
-  margin: EdgeInsets.all(el(2)),
+  margin: EdgeInsets.all(space(2)),
   child: DecoratedBox(
     decoration: BoxDecoration(
       border: Border.all(),
-      borderRadius: BorderRadius.circular(ElRadii.lg),
+      borderRadius: BorderRadius.circular(Radii.lg),
     ),
   ),
 )''';
@@ -503,34 +515,34 @@ const String _compositionCode = '''// AspectRatio(aspectRatio: ratio)
 //  Padding(margin) -- only when margin is non-zero
 //   child: the caller's own box''';
 
-const String _squareCode = '''ElAspectRatio(
+const String _squareCode = '''AspectRatio(
   ratio: 1 / 1,
   child: DecoratedBox(
     decoration: BoxDecoration(
       border: Border.all(),
-      borderRadius: BorderRadius.circular(ElRadii.lg),
+      borderRadius: BorderRadius.circular(Radii.lg),
     ),
   ),
 )''';
 
-const String _portraitCode = '''ElAspectRatio(
+const String _portraitCode = '''AspectRatio(
   ratio: 9 / 16,
   child: DecoratedBox(
     decoration: BoxDecoration(
       border: Border.all(),
-      borderRadius: BorderRadius.circular(ElRadii.lg),
+      borderRadius: BorderRadius.circular(Radii.lg),
     ),
   ),
 )''';
 
 const String _rtlAspectCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElAspectRatio(
+  child: AspectRatio(
     ratio: 4 / 3,
     child: DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(),
-        borderRadius: BorderRadius.circular(ElRadii.lg),
+        borderRadius: BorderRadius.circular(Radii.lg),
       ),
     ),
   ),

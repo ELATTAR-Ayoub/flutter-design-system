@@ -259,11 +259,9 @@ RegistrySnapshot parseRegistrySnapshot({
 const Map<String, String> registryTargetDestinations = <String, String>{
   '@ui/': 'lib/components/ui/',
   '@foundation/': 'lib/design_system/foundation/',
-  '@effects/': 'lib/design_system/effects/',
-  '@motion/': 'lib/design_system/motion/',
-  '@assets/': 'assets/',
-  '@shaders/': 'shaders/',
-  '@app/': 'lib/',
+  '@block/': 'lib/blocks/',
+  '@assets/': 'assets/ui/',
+  '@shaders/': 'shaders/ui/',
   '@license/': 'LICENSES/',
 };
 

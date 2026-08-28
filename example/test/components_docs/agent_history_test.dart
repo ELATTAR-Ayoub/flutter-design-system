@@ -2,14 +2,14 @@
 /// [AgentHistoryDocPage]: the agent-history component documentation page.
 ///
 /// `agent-history` is a brand-new page covering three real widgets
-/// (`lib/src/components/agent_history.dart`): `ElHistoryCard` (11 named
-/// constructor parameters excluding `key`), `ElHistorySearch` (6), and
-/// `ElChatHistory` (5). The API-completeness test below checks all three
+/// (`lib/src/components/agent_history.dart`): `HistoryCard` (11 named
+/// constructor parameters excluding `key`), `HistorySearch` (6), and
+/// `ChatHistory` (5). The API-completeness test below checks all three
 /// tables, matching `field_test.dart`'s own precedent of checking several
 /// tables individually rather than one flat merged set.
 ///
-/// **No `pumpAndSettle` anywhere in this file.** `ElRowMotion`'s own
-/// entrance/exit and `ElBlurSwitch` run `AnimationController`s that this
+/// **No `pumpAndSettle` anywhere in this file.** `RowMotion`'s own
+/// entrance/exit and `BlurSwitch` run `AnimationController`s that this
 /// page's live specimens can trigger (pin, delete, rename); every test
 /// below uses `tester.pump()`.
 library;
@@ -22,17 +22,41 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -41,7 +65,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every named constructor parameter `ElHistoryCard`'s own class declares,
+/// Every named constructor parameter `HistoryCard`'s own class declares,
 /// excluding `key`.
 const List<String> _historyCardParams = <String>[
   'conversation',
@@ -57,7 +81,7 @@ const List<String> _historyCardParams = <String>[
   'entranceGeneration',
 ];
 
-/// Every named constructor parameter `ElHistorySearch`'s own class
+/// Every named constructor parameter `HistorySearch`'s own class
 /// declares, excluding `key`.
 const List<String> _historySearchParams = <String>[
   'conversations',
@@ -68,7 +92,7 @@ const List<String> _historySearchParams = <String>[
   'onQueryChange',
 ];
 
-/// Every named constructor parameter `ElChatHistory`'s own class declares,
+/// Every named constructor parameter `ChatHistory`'s own class declares,
 /// excluding `key`.
 const List<String> _chatHistoryParams = <String>[
   'store',
@@ -111,7 +135,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: AgentHistoryDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -124,10 +148,10 @@ void main() {
           findsOneWidget,
         );
 
-        // Preview: a live ElHistoryCard per seeded conversation, pinned
+        // Preview: a live HistoryCard per seeded conversation, pinned
         // first then newest.
-        final List<ElHistoryCard> previewCards = tester
-            .widgetList<ElHistoryCard>(find.byType(ElHistoryCard))
+        final List<HistoryCard> previewCards = tester
+            .widgetList<HistoryCard>(find.byType(HistoryCard))
             .toList();
         expect(previewCards.length, greaterThanOrEqualTo(4));
         expect(
@@ -139,23 +163,23 @@ void main() {
         // Pinning a card in Preview actually calls through to the store
         // (mounted pin buttons exist because the store supplies pin).
         final Finder pinButtons = find.descendant(
-          of: find.byWidgetPredicate((Widget w) => w is ElHistoryCard),
-          matching: find.byType(ElButton),
+          of: find.byWidgetPredicate((Widget w) => w is HistoryCard),
+          matching: find.byType(Button),
         );
         expect(pinButtons, findsWidgets);
 
         // Rename: both shapes mount.
         expect(
           tester
-              .widgetList<ElHistoryCard>(find.byType(ElHistoryCard))
-              .where((ElHistoryCard c) => c.rename == ElHistoryRename.inline)
+              .widgetList<HistoryCard>(find.byType(HistoryCard))
+              .where((HistoryCard c) => c.rename == HistoryRename.inline)
               .isNotEmpty,
           isTrue,
         );
         expect(
           tester
-              .widgetList<ElHistoryCard>(find.byType(ElHistoryCard))
-              .where((ElHistoryCard c) => c.rename == ElHistoryRename.dialog)
+              .widgetList<HistoryCard>(find.byType(HistoryCard))
+              .where((HistoryCard c) => c.rename == HistoryRename.dialog)
               .isNotEmpty,
           isTrue,
         );
@@ -163,8 +187,8 @@ void main() {
         // Delete: both shapes mount.
         expect(
           tester
-              .widgetList<ElHistoryCard>(find.byType(ElHistoryCard))
-              .where((ElHistoryCard c) => c.confirm == ElHistoryConfirm.dialog)
+              .widgetList<HistoryCard>(find.byType(HistoryCard))
+              .where((HistoryCard c) => c.confirm == HistoryConfirm.dialog)
               .isNotEmpty,
           isTrue,
         );
@@ -172,21 +196,21 @@ void main() {
         // Pin section: a pinned specimen and an active specimen both mount.
         expect(
           tester
-              .widgetList<ElHistoryCard>(find.byType(ElHistoryCard))
-              .where((ElHistoryCard c) => c.active)
+              .widgetList<HistoryCard>(find.byType(HistoryCard))
+              .where((HistoryCard c) => c.active)
               .isNotEmpty,
           isTrue,
         );
 
         // Capabilities: the degraded list's cards carry no onPin / onShare.
-        final Iterable<ElHistoryCard> degraded = tester
-            .widgetList<ElHistoryCard>(find.byType(ElHistoryCard))
-            .where((ElHistoryCard c) => c.onPin == null);
+        final Iterable<HistoryCard> degraded = tester
+            .widgetList<HistoryCard>(find.byType(HistoryCard))
+            .where((HistoryCard c) => c.onPin == null);
         expect(degraded, isNotEmpty);
 
         // Search: opening the trigger mounts the palette content. Closed
         // again with Escape (every modal on the page closes on it,
-        // unconditionally — dialog.dart's own ElModalPortal) before moving
+        // unconditionally — dialog.dart's own OverlayPortal) before moving
         // on: an open overlay's scrim blocks every tap elsewhere on the
         // page, including the drawer trigger below.
         await tester.tap(
@@ -197,17 +221,17 @@ void main() {
         expect(find.text('Sealed inventory check'), findsWidgets);
         await tester.sendKeyEvent(LogicalKeyboardKey.escape);
         await tester.pump();
-        await tester.pump(ElDurations.overlay);
+        await tester.pump(MotionDurations.overlayEnter);
 
         // Drawer: opening the trigger mounts the drawer's own cards.
         final Finder drawerTrigger = find.descendant(
           of: find.byKey(const ValueKey<String>('agent-history-drawer')),
-          matching: find.byType(ElButton),
+          matching: find.byType(Button),
         );
         expect(drawerTrigger, findsOneWidget);
         await tester.tap(drawerTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.overlay);
+        await tester.pump(MotionDurations.overlayEnter);
         expect(find.text('Conversations'), findsOneWidget);
 
         final Finder apiTrigger = _disclosureTrigger('API Reference');
@@ -215,34 +239,34 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _historyCardParams) {
           expect(
             find.text(param),
             findsWidgets,
-            reason: 'ElHistoryCard.$param missing from API table',
+            reason: 'HistoryCard.$param missing from API table',
           );
         }
         for (final String param in _historySearchParams) {
           expect(
             find.text(param),
             findsWidgets,
-            reason: 'ElHistorySearch.$param missing from API table',
+            reason: 'HistorySearch.$param missing from API table',
           );
         }
         for (final String param in _chatHistoryParams) {
           expect(
             find.text(param),
             findsWidgets,
-            reason: 'ElChatHistory.$param missing from API table',
+            reason: 'ChatHistory.$param missing from API table',
           );
         }
         for (final String name in <String>[
-          'ElHistoryConfirm.inline',
-          'ElHistoryConfirm.dialog',
-          'ElHistoryRename.inline',
-          'ElHistoryRename.dialog',
+          'HistoryConfirm.inline',
+          'HistoryConfirm.dialog',
+          'HistoryRename.inline',
+          'HistoryRename.dialog',
         ]) {
           expect(
             find.text(name),
@@ -265,39 +289,34 @@ void main() {
         expect(agentHistoryDoc.name, 'agent_history');
         expect(
           agentHistoryDoc.exports,
-          containsAll(<String>[
-            'ElHistoryCard',
-            'ElHistorySearch',
-            'ElChatHistory',
-          ]),
+          containsAll(<String>['HistoryCard', 'HistorySearch', 'ChatHistory']),
         );
         expect(agentHistoryDoc.command, 'elattar add agent-history');
         expect(destination, isNull);
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 14000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 14000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentHistoryDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentHistoryDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Seven specimen stages: Preview, Rename, Delete, Pin,
-        // Capabilities, Search, Chat History Drawer.
-        expect(find.byType(DocsShowcase), findsNWidgets(7));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Seven specimen stages: Preview, Rename, Delete, Pin,
+      // Capabilities, Search, Chat History Drawer.
+      expect(find.byType(DocsShowcase), findsNWidgets(7));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -308,32 +327,26 @@ void main() {
       );
     });
 
-    testWidgets(
-      'sections render in the declared order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 14000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in the declared order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 14000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
-        );
-        await tester.pumpWidget(
-          _harness(
-            controller: controller,
-            child: const AgentHistoryDocPage(),
-          ),
-        );
-        await tester.pump();
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
+      await tester.pumpWidget(
+        _harness(controller: controller, child: const AgentHistoryDocPage()),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, _expectedSectionTitles);
-      },
-    );
+      expect(titles, _expectedSectionTitles);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -344,7 +357,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const AgentHistoryDocPage(),
           ),
         );
@@ -373,27 +386,24 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
-          _harness(
-            controller: controller,
-            child: const AgentHistoryDocPage(),
-          ),
+          _harness(controller: controller, child: const AgentHistoryDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-history-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-history-doc-article')),
           ),
@@ -412,7 +422,7 @@ void main() {
         ]) {
           expect(find.byKey(ValueKey<String>(key)), findsOneWidget);
         }
-        expect(find.byType(ElHistoryCard), findsWidgets);
+        expect(find.byType(HistoryCard), findsWidgets);
       },
     );
   });

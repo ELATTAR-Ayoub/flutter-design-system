@@ -1,8 +1,8 @@
 /// Documentation metadata for the `aspect_ratio` component.
 ///
-/// **New route, split out of `scroll_area`.** `ElAspectRatio` used to share
-/// `/components/scroll_area` with `ElScrollArea` and
-/// `ElResizablePanelGroup` under one shared `ComponentDocEntry` (see
+/// **New route, split out of `scroll_area`.** `AspectRatio` used to share
+/// `/components/scroll_area` with `ScrollArea` and
+/// `ResizablePanelGroup` under one shared `ComponentDocEntry` (see
 /// `scroll_area/meta.dart`'s own note for the split). It now has its own
 /// [name], its own route (`/components/aspect_ratio`), and its own page
 /// class (`AspectRatioDocPage`).
@@ -28,6 +28,6 @@ const ComponentDocEntry aspectRatioDoc = ComponentDocEntry(
       'A box locked to a width-to-height ratio, whatever width it is '
       'given.',
   dependencies: <String>[],
-  exports: <String>['ElAspectRatio'],
+  exports: <String>['AspectRatio'],
   sourcePath: 'lib/src/components/aspect_ratio.dart',
 );

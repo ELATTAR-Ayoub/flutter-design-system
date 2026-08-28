@@ -1,13 +1,13 @@
 /// Tests for `components_docs/input_otp/page.dart`'s [InputOtpDocPage].
 ///
-/// Split off the merged test that used to cover [ElInputGroup],
-/// [ElButtonGroup], and [ElInputOtp] together on one page. This file now
-/// covers [ElInputOtp] and its slot/separator parts only: see
+/// Split off the merged test that used to cover [InputGroup],
+/// [ButtonGroup], and [InputOtp] together on one page. This file now
+/// covers [InputOtp] and its slot/separator parts only: see
 /// `input_group_test.dart` and `button_group_test.dart` for the other two.
 ///
 /// Re-housed onto the documentation kit (`ComponentDocSpec` +
 /// `ComponentDocPage`): sections now render as `DocsSection` (from
-/// `docs_section.dart`), not the old `kit.dart` `ElSection`, and the live
+/// `docs_section.dart`), not the old `kit.dart` `Section`, and the live
 /// preview is a real `Preview` section with its own rail entry rather than
 /// an unheaded `DocsCodeExample` above the first heading. The API Reference
 /// and States sections are now `DocsDisclosure`s, closed by default (a
@@ -21,7 +21,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage.
+/// `ThemeController` is flipped in place for theme coverage.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -31,8 +31,34 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
+import 'package:flutter/rendering.dart' hide ScrollDirection;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
@@ -55,7 +81,7 @@ Future<void> _openDisclosure(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 const List<String> _expectedSectionOrder = <String>[
@@ -83,11 +109,11 @@ const List<String> _expectedSectionOrder = <String>[
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every `ElApiTable` this page must render, by title, and every public
+/// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class, read directly off
 /// `lib/src/components/input_otp.dart`.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElInputOtp': <String>[
+  'InputOtp': <String>[
     'maxLength',
     'groups',
     'controller',
@@ -97,29 +123,29 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'enabled',
     'invalid',
     'label',
-    'ElInputOtp.slotSize',
-    'ElInputOtp.separatorWidth',
-    'ElInputOtp.widthFor',
+    'InputOtp.slotSize',
+    'InputOtp.separatorWidth',
+    'InputOtp.widthFor',
   ],
-  'ElInputOtpSlot': <String>['char', 'active', 'invalid', 'first', 'last'],
-  'ElInputOtpSeparator': <String>[],
+  'InputOtpSlot': <String>['char', 'active', 'invalid', 'first', 'last'],
+  'InputOtpSeparator': <String>[],
 };
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -165,7 +191,7 @@ void main() {
   );
 
   testWidgets(
-    'each ElApiTable covers every public constructor parameter and static '
+    'each ApiTable covers every public constructor parameter and static '
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -189,7 +215,7 @@ void main() {
         expect(
           documented,
           isNotNull,
-          reason: 'no ElApiTable titled "${expected.key}" was rendered',
+          reason: 'no ApiTable titled "${expected.key}" was rendered',
         );
         for (final String param in expected.value) {
           expect(
@@ -228,7 +254,7 @@ void main() {
       await tester.ensureVisible(find.byKey(otpKey));
 
       expect(
-        tester.widget<ElText>(find.byKey(statusKey)).text,
+        tester.widget<StyledText>(find.byKey(statusKey)).text,
         contains('Waiting'),
       );
 
@@ -247,14 +273,14 @@ void main() {
         );
       }
       expect(
-        tester.widget<ElText>(find.byKey(statusKey)).text,
+        tester.widget<StyledText>(find.byKey(statusKey)).text,
         contains('Complete: 408215'),
       );
 
       await tester.enterText(editable, '40821');
       await tester.pump();
       expect(
-        tester.widget<ElText>(find.byKey(statusKey)).text,
+        tester.widget<StyledText>(find.byKey(statusKey)).text,
         contains('Waiting'),
       );
 
@@ -263,7 +289,7 @@ void main() {
   );
 
   testWidgets(
-    'ElInputOtp disables paste by setting enableInteractiveSelection: false '
+    'InputOtp disables paste by setting enableInteractiveSelection: false '
     '— a documented accessibility gap when entering a code via clipboard',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -287,42 +313,39 @@ void main() {
     },
   );
 
-  testWidgets(
-    'ElInputOtp publishes TWO textField semantics nodes over the whole '
-    'strip — the documented double-announcement defect, not six unlabelled '
-    'boxes',
-    (WidgetTester tester) async {
-      final SemanticsHandle handle = tester.ensureSemantics();
-      await _pump(tester);
+  testWidgets('InputOtp publishes TWO textField semantics nodes over the whole '
+      'strip — the documented double-announcement defect, not six unlabelled '
+      'boxes', (WidgetTester tester) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    await _pump(tester);
 
-      const Key otpKey = ValueKey<String>('input-otp-doc-live');
-      await tester.ensureVisible(find.byKey(otpKey));
+    const Key otpKey = ValueKey<String>('input-otp-doc-live');
+    await tester.ensureVisible(find.byKey(otpKey));
 
-      final SemanticsNode node = tester.getSemantics(find.byKey(otpKey));
-      expect(node.flagsCollection.isTextField, isTrue);
+    final SemanticsNode node = tester.getSemantics(find.byKey(otpKey));
+    expect(node.flagsCollection.isTextField, isTrue);
 
-      int textFieldNodes = 0;
-      void count(SemanticsNode n) {
-        if (n.flagsCollection.isTextField) textFieldNodes++;
-        n.visitChildren((SemanticsNode child) {
-          count(child);
-          return true;
-        });
-      }
+    int textFieldNodes = 0;
+    void count(SemanticsNode n) {
+      if (n.flagsCollection.isTextField) textFieldNodes++;
+      n.visitChildren((SemanticsNode child) {
+        count(child);
+        return true;
+      });
+    }
 
-      count(node);
-      expect(
-        textFieldNodes,
-        2,
-        reason:
-            'the strip publishes two textField nodes: one from the outer '
-            'Semantics(textField: true) wrapper and one from the hidden '
-            'EditableText inside, which does not exclude its own semantics.',
-      );
+    count(node);
+    expect(
+      textFieldNodes,
+      2,
+      reason:
+          'the strip publishes two textField nodes: one from the outer '
+          'Semantics(textField: true) wrapper and one from the hidden '
+          'EditableText inside, which does not exclude its own semantics.',
+    );
 
-      handle.dispose();
-    },
-  );
+    handle.dispose();
+  });
 
   testWidgets('the state matrix documents rest, active, invalid, disabled and '
       'complete', (WidgetTester tester) async {
@@ -354,13 +377,10 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(inputOtpDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(inputOtpDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

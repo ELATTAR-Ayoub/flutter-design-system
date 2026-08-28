@@ -13,7 +13,7 @@ body:
     attributes:
       label: Summary
       description: What is broken, and what did you expect instead?
-      placeholder: ElButton focus ring disappears after keyboard navigation in dark mode...
+      placeholder: Button focus ring disappears after keyboard navigation in dark mode...
     validations:
       required: true
   - type: dropdown

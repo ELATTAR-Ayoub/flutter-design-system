@@ -1,6 +1,6 @@
 /// Public documentation page for the `scroll_area` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels reshaped to mirror shadcn's own flat section list (Installation,
 /// Usage, Composition, Horizontal, RTL, API Reference — fetched fresh from
 /// https://ui.shadcn.com/docs/components/base/scroll-area); it now declares
@@ -20,10 +20,10 @@
 /// which [dependencies] already named. See `meta.dart` for the correction.
 ///
 /// **Split off `resizable` and `aspect_ratio`.** This route used to carry
-/// `ElScrollArea`, `ElResizablePanelGroup`, and `ElAspectRatio` on one page;
+/// `ScrollArea`, `ResizablePanelGroup`, and `AspectRatio` on one page;
 /// both siblings now have their own routes:
 /// `example/lib/components_docs/resizable/` and `.../aspect_ratio/`. This
-/// page documents `ElScrollArea` and `ElScrollAreaBehavior` only. The three
+/// page documents `ScrollArea` and `ScrollAreaBehavior` only. The three
 /// still share one small sidebar family (`_sidebar` below), unchanged by
 /// the kit re-housing.
 ///
@@ -35,7 +35,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -55,7 +67,7 @@ final ComponentDocSpec scrollAreaDocSpec = ComponentDocSpec(
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(160),
+      minHeight: space(160),
     ),
     InstallSection(
       id: 'install',
@@ -82,8 +94,8 @@ final ComponentDocSpec scrollAreaDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElScrollArea and '
-              'ElScrollAreaBehavior are reachable the same way the CLI '
+              'Add the export line so ScrollArea and '
+              'ScrollAreaBehavior are reachable the same way the CLI '
               'path already makes them.',
           code: "export 'scroll_area.dart';",
         ),
@@ -92,7 +104,7 @@ final ComponentDocSpec scrollAreaDocSpec = ComponentDocSpec(
     SnippetSection(
       id: 'usage',
       title: 'Usage',
-      description: 'ElScrollArea wrapping a list of items.',
+      description: 'ScrollArea wrapping a list of items.',
       code: _usageScrollCode,
     ),
     SnippetSection(
@@ -111,7 +123,7 @@ final ComponentDocSpec scrollAreaDocSpec = ComponentDocSpec(
       description:
           'horizontalBar: true enables the horizontal axis. Without it, '
           'horizontal overflow is clipped (overflow-x: hidden), which is '
-          'ElScrollArea\'s default: the wrapper only ever renders one '
+          'ScrollArea\'s default: the wrapper only ever renders one '
           'vertical rail unless asked for the other.',
       specimen: _HorizontalSpecimen(),
       code: _horizontalScrollCode,
@@ -135,9 +147,9 @@ final ComponentDocSpec scrollAreaDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElScrollArea', anchor: 'api-elscrollarea'),
+        DocsTocEntry(title: 'ScrollArea', anchor: 'api-elscrollarea'),
         DocsTocEntry(
-          title: 'ElScrollAreaBehavior',
+          title: 'ScrollAreaBehavior',
           anchor: 'api-elscrollareabehavior',
         ),
       ],
@@ -147,7 +159,7 @@ final ComponentDocSpec scrollAreaDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElScrollArea shows and hides the scrollbar; nothing else '
+          'ScrollArea shows and hides the scrollbar; nothing else '
           'about it changes state.',
       child: const DocsStateMatrix(facts: _stateFacts),
     ),
@@ -163,7 +175,7 @@ final ComponentDocSpec scrollAreaDocSpec = ComponentDocSpec(
           'scroll_area.dart wires no Focus node and no key handling of '
           'its own anywhere — every fact here is about what the '
           'enclosing Scrollable does instead, read off '
-          '_ElScrollAreaState.build directly.',
+          '_ScrollAreaState.build directly.',
       child: _KeyboardContent(),
     ),
     DisclosureSection(
@@ -233,9 +245,9 @@ class ScrollAreaDocPage extends StatelessWidget {
       title: scrollAreaDoc.title,
       description: scrollAreaDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Scroll area'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Scroll area'),
     ],
     sidebar: _sidebar,
     toc: scrollAreaDocSpec.toc,
@@ -271,26 +283,26 @@ class _PreviewSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
-      height: el(40),
+      height: space(40),
       child: DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(color: theme.border),
-          borderRadius: BorderRadius.circular(ElRadii.lg),
+          borderRadius: BorderRadius.circular(Radii.lg),
         ),
-        child: ElScrollArea(
+        child: ScrollArea(
           key: const ValueKey<String>('scroll-area-doc-preview'),
-          borderRadius: BorderRadius.circular(ElRadii.lg),
+          borderRadius: BorderRadius.circular(Radii.lg),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               for (int i = 0; i < 20; i++)
                 Padding(
-                  padding: EdgeInsets.all(el(2)),
-                  child: ElText(
+                  padding: EdgeInsets.all(space(2)),
+                  child: StyledText(
                     'Item $i: scroll to reveal the scrollbar',
-                    ElType.body,
+                    TextStyles.body,
                   ),
                 ),
             ],
@@ -306,32 +318,34 @@ class _HorizontalSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
-      height: el(24),
+      height: space(24),
       child: DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(color: theme.border),
-          borderRadius: BorderRadius.circular(ElRadii.lg),
+          borderRadius: BorderRadius.circular(Radii.lg),
         ),
-        child: ElScrollArea(
-          borderRadius: BorderRadius.circular(ElRadii.lg),
+        child: ScrollArea(
+          borderRadius: BorderRadius.circular(Radii.lg),
           horizontalBar: true,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               for (int i = 0; i < 6; i++)
                 Padding(
-                  padding: EdgeInsets.all(el(2)),
+                  padding: EdgeInsets.all(space(2)),
                   child: SizedBox(
-                    width: el(20),
-                    height: el(16),
+                    width: space(20),
+                    height: space(16),
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         border: Border.all(color: theme.border),
-                        borderRadius: BorderRadius.circular(ElRadii.lg),
+                        borderRadius: BorderRadius.circular(Radii.lg),
                       ),
-                      child: Center(child: ElText('Card $i', ElType.small)),
+                      child: Center(
+                        child: StyledText('Card $i', TextStyles.small),
+                      ),
                     ),
                   ),
                 ),
@@ -348,25 +362,25 @@ class _RtlSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: SizedBox(
-        height: el(24),
+        height: space(24),
         child: DecoratedBox(
           decoration: BoxDecoration(
             border: Border.all(color: theme.border),
-            borderRadius: BorderRadius.circular(ElRadii.lg),
+            borderRadius: BorderRadius.circular(Radii.lg),
           ),
-          child: ElScrollArea(
-            borderRadius: BorderRadius.circular(ElRadii.lg),
+          child: ScrollArea(
+            borderRadius: BorderRadius.circular(Radii.lg),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 for (int i = 0; i < 8; i++)
                   Padding(
-                    padding: EdgeInsets.all(el(2)),
-                    child: ElText('عنصر $i', ElType.body),
+                    padding: EdgeInsets.all(space(2)),
+                    child: StyledText('عنصر $i', TextStyles.body),
                   ),
               ],
             ),
@@ -388,15 +402,12 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elscrollarea',
-        child: DocsApiTable(title: 'ElScrollArea', facts: _scrollAreaFacts),
+        child: DocsApiTable(title: 'ScrollArea', facts: _scrollAreaFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elscrollareabehavior',
-        child: DocsApiTable(
-          title: 'ElScrollAreaBehavior',
-          facts: _behaviorFacts,
-        ),
+        child: DocsApiTable(title: 'ScrollAreaBehavior', facts: _behaviorFacts),
       ),
     ],
   );
@@ -407,7 +418,7 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The scrollbar is not a focusable element. Scroll is available '
             'through standard wheel/trackpad gestures. Content inside '
             'maintains its own semantics and focus order.',
@@ -421,14 +432,14 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No key handling of its own: scroll_area.dart wires no '
             'Focus.onKeyEvent anywhere, and the scrollbar rail '
             '(_RailState.build) is built from a bare GestureDetector, '
             'never a Focus node.',
         'The enclosing Scrollable still answers: PageUp/PageDown and the '
             'arrow keys scroll normally whenever focus lands inside an '
-            'ElScrollArea, because that behaviour belongs to Flutter\'s '
+            'ScrollArea, because that behaviour belongs to Flutter\'s '
             'own Scrollable, not to anything scroll_area.dart adds or '
             'removes.',
         'Tab order: scroll_area.dart declares no FocusTraversalPolicy of '
@@ -442,7 +453,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Renders the same scroll container at 390px and 1440px. Width '
             'and height are driven by the surrounding layout. The '
             'scrollbar is always 10px wide (the rail) with a 7px thumb.',
@@ -481,8 +492,8 @@ class _DependenciesContent extends StatelessWidget {
             description:
                 "The manifest's registryDependencies, resolved "
                 'automatically by the registry client: '
-                'foundation/spacing.dart (el()) and foundation/theme.dart '
-                '(ElThemeData). No effects, no colors, no shadows: just '
+                'foundation/spacing.dart (space()) and foundation/theme.dart '
+                '(ThemeTokens). No effects, no colors, no shadows: just '
                 'layout and theming.',
           ),
           const DocsInstallFact(
@@ -507,7 +518,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       DocsLinkRow(
         links: <DocsLink>[
           DocsLink(
@@ -525,49 +536,49 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'The scrollbar thumb is theme.border at rest. No hover state: '
             'the rail is always present when visible, the thumb just '
             'moves.',
-        'Reads from the live theme: flipping ElThemeController updates '
+        'Reads from the live theme: flipping ThemeController updates '
             'the scrollbar colour immediately.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => ConstrainedBox(
-  constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+Widget _bullets(ThemeTokens theme, List<String> lines) => ConstrainedBox(
+  constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       for (final String line in lines) ...<Widget>[
-        ElText('•  $line', ElType.small, color: theme.mutedForeground),
-        SizedBox(height: el(2)),
+        StyledText('•  $line', TextStyles.small, color: theme.mutedForeground),
+        SizedBox(height: space(2)),
       ],
     ],
   ),
 );
 
-const String _previewCode = '''ElScrollArea(
-  borderRadius: BorderRadius.circular(ElRadii.lg),
+const String _previewCode = '''ScrollArea(
+  borderRadius: BorderRadius.circular(Radii.lg),
   child: Column(
     mainAxisSize: MainAxisSize.min,
     children: [
       for (var i = 0; i < 20; i++)
         Padding(
-          padding: EdgeInsets.all(el(2)),
+          padding: EdgeInsets.all(space(2)),
           child: Text('Item \$i: scroll to reveal the scrollbar'),
         ),
     ],
   ),
 )''';
 
-const String _usageScrollCode = '''ElScrollArea(
-  borderRadius: BorderRadius.circular(ElRadii.lg),
+const String _usageScrollCode = '''ScrollArea(
+  borderRadius: BorderRadius.circular(Radii.lg),
   child: Column(
     mainAxisSize: MainAxisSize.min,
     children: items.map((item) {
       return Padding(
-        padding: EdgeInsets.all(el(2)),
+        padding: EdgeInsets.all(space(2)),
         child: Text(item),
       );
     }).toList(),
@@ -584,8 +595,8 @@ const String _scrollAreaCompositionCode =
 //    _Rail (only while visible): the 10px lane, 7px thumb, drag and
 //           tap-to-centre wired directly on it''';
 
-const String _horizontalScrollCode = '''ElScrollArea(
-  borderRadius: BorderRadius.circular(ElRadii.lg),
+const String _horizontalScrollCode = '''ScrollArea(
+  borderRadius: BorderRadius.circular(Radii.lg),
   horizontalBar: true,
   child: Row(
     mainAxisSize: MainAxisSize.min,
@@ -595,7 +606,7 @@ const String _horizontalScrollCode = '''ElScrollArea(
 
 const String _rtlScrollCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElScrollArea(
+  child: ScrollArea(
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: items,
@@ -632,12 +643,12 @@ const List<DocsApiFact> _scrollAreaFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _behaviorFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElScrollAreaBehavior',
+    name: 'ScrollAreaBehavior',
     type: 'class',
     description:
         'A ScrollBehavior for nested scroll views. Suppresses overscroll '
         'and platform scrollbars. Use `ScrollConfiguration(behavior: '
-        'ElScrollAreaBehavior(), child: ElScrollArea(...))` when nesting.',
+        'ScrollAreaBehavior(), child: ScrollArea(...))` when nesting.',
   ),
 ];
 

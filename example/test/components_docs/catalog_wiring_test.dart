@@ -2,7 +2,19 @@ import 'package:example/components_docs/catalog.dart';
 import 'package:example/main.dart';
 import 'package:example/site/pages/public_pages.dart';
 import 'package:example/site/site_routes.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// Proves every entry in [componentDocs] is actually reachable.

@@ -7,20 +7,20 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/slider.dart",
+      "source": "lib/src/components/ui/slider.dart",
       "target": "@ui/slider.dart",
-      "sha256": "cb4040409020e626755fb0a16216b10eca80358f92ebee344a3600b16b269435"
+      "sha256": "c01447424fda29ceca465cee978fac9668252a6cf2a50b511d96f6b90e2092ec"
     }
   ],
   "registryDependencies": [
     "button",
-    "machine-surface",
+    "surface",
     "selection-control",
     "source-foundation"
   ],
   "semanticDependencies": [
     "button",
-    "machine-surface",
+    "surface",
     "selection-control"
   ],
   "pubDependencies": {},
@@ -29,6 +29,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/slider",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/slider.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/slider.dart",
   "deprecated": false
 }

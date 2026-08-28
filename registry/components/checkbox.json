@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/checkbox.dart",
+      "source": "lib/src/components/ui/checkbox.dart",
       "target": "@ui/checkbox.dart",
-      "sha256": "06ed10982dd67e7f38f121dd32c695cc5f6813c508457f9b26c62edc2320eb28"
+      "sha256": "7ebed80a059ddf2c78f1005cc4de01d44b230325c2ce3397a12d572801b3c0c2"
     }
   ],
   "registryDependencies": [
@@ -30,5 +30,9 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/checkbox",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/checkbox.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/checkbox.dart",
+  "exports": [
+    "Checkbox",
+    "CheckboxState"
+  ]
 }

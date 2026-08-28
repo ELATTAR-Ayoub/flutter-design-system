@@ -22,16 +22,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title] — see
 /// `button_test.dart`'s own copy of this helper for why a bare
@@ -46,16 +70,16 @@ Finder _disclosureTrigger(String title) => find.descendant(
 /// Every named constructor parameter each of `card.dart`'s six exported
 /// classes declares, excluding `key`: the same set the page's six
 /// `DocsApiTable`s claim to cover. `text` and `child` each cover two classes
-/// (`ElCardTitle`/`ElCardDescription`, `ElCardContent`/`ElCardFooter`); a
+/// (`CardTitle`/`CardDescription`, `CardContent`/`CardFooter`); a
 /// duplicate entry would only double-count, so each name appears once.
 const List<String> _cardConstructorParams = <String>[
-  // ElCard
+  // Card
   'children', 'fill', 'ringColor',
-  // ElCardHeader
+  // CardHeader
   'title', 'description', 'action',
-  // ElCardTitle / ElCardDescription
+  // CardTitle / CardDescription
   'text',
-  // ElCardContent / ElCardFooter
+  // CardContent / CardFooter
   'child',
 ];
 
@@ -72,7 +96,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: CardDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -93,7 +117,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _cardConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
@@ -138,12 +162,12 @@ void main() {
         expect(
           cardDoc.exports,
           containsAll(<String>[
-            'ElCard',
-            'ElCardHeader',
-            'ElCardTitle',
-            'ElCardDescription',
-            'ElCardContent',
-            'ElCardFooter',
+            'Card',
+            'CardHeader',
+            'CardTitle',
+            'CardDescription',
+            'CardContent',
+            'CardFooter',
           ]),
         );
         expect(cardDoc.command, 'elattar add card');
@@ -159,30 +183,29 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const CardDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const CardDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Six specimen stages: Preview, Header, Header with Action, Content,
-        // Footer, Custom Fill and Ring.
-        expect(find.byType(DocsShowcase), findsNWidgets(6));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Six specimen stages: Preview, Header, Header with Action, Content,
+      // Footer, Custom Fill and Ring.
+      expect(find.byType(DocsShowcase), findsNWidgets(6));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -210,59 +233,55 @@ void main() {
       final DocsTocEntry api = cardDocSpec.toc.firstWhere(
         (DocsTocEntry e) => e.anchor == 'api',
       );
-      expect(
-        api.children.map((DocsTocEntry e) => e.anchor).toList(),
-        <String>[
-          'api-elcard',
-          'api-elcardheader',
-          'api-elcardtitle',
-          'api-elcarddescription',
-          'api-elcardcontent',
-          'api-elcardfooter',
-        ],
-      );
+      expect(api.children.map((DocsTocEntry e) => e.anchor).toList(), <String>[
+        'api-elcard',
+        'api-elcardheader',
+        'api-elcardtitle',
+        'api-elcarddescription',
+        'api-elcardcontent',
+        'api-elcardfooter',
+      ]);
     });
 
-    testWidgets(
-      'sections render in declaration order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const CardDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const CardDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, <String>[
-          'Preview',
-          'Installation',
-          'Usage',
-          'Header',
-          'Header with Action',
-          'Content',
-          'Footer',
-          'Custom Fill and Ring',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Keyboard',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
-      },
-    );
+      expect(titles, <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'Header',
+        'Header with Action',
+        'Content',
+        'Footer',
+        'Custom Fill and Ring',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip, every live region '
@@ -274,7 +293,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const CardDocPage(),
           ),
         );
@@ -291,48 +310,45 @@ void main() {
 
         // Retargeted from the retired test's `findsOneWidget` for each: this
         // page composes every region several times over rather than once.
-        // Preview mounts two ElCards (action + footer style); Header,
+        // Preview mounts two Cards (action + footer style); Header,
         // Header with Action, Content and Footer each mount one more; Custom
         // Fill and Ring mounts a sixth via its own TweenAnimationBuilder.
-        expect(find.byType(ElCard), findsNWidgets(7));
-        // ElCardHeader: Preview's two cards, Header, Header with Action,
+        expect(find.byType(Card), findsNWidgets(7));
+        // CardHeader: Preview's two cards, Header, Header with Action,
         // Footer — Content and Custom Fill and Ring carry none.
-        expect(find.byType(ElCardHeader), findsNWidgets(6));
-        // ElCardContent: Preview's two cards, Header, Content, Footer,
+        expect(find.byType(CardHeader), findsNWidgets(6));
+        // CardContent: Preview's two cards, Header, Content, Footer,
         // Custom Fill and Ring's own child — Header with Action carries
         // none.
-        expect(find.byType(ElCardContent), findsNWidgets(6));
-        // ElCardFooter: Preview's footer-style card, and the Footer
+        expect(find.byType(CardContent), findsNWidgets(6));
+        // CardFooter: Preview's footer-style card, and the Footer
         // section's own specimen.
-        expect(find.byType(ElCardFooter), findsNWidgets(2));
+        expect(find.byType(CardFooter), findsNWidgets(2));
       },
     );
 
-    testWidgets(
-      'renders in both themes without throwing',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('renders in both themes without throwing', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
-        );
-        await tester.pumpWidget(
-          _harness(controller: controller, child: const CardDocPage()),
-        );
-        await tester.pump();
-        expect(tester.takeException(), isNull);
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
+      await tester.pumpWidget(
+        _harness(controller: controller, child: const CardDocPage()),
+      );
+      await tester.pump();
+      expect(tester.takeException(), isNull);
 
-        controller.setMode(ElThemeMode.light);
-        await tester.pump();
-        expect(tester.takeException(), isNull);
+      controller.setMode(ColorMode.light);
+      await tester.pump();
+      expect(tester.takeException(), isNull);
 
-        expect(
-          find.byKey(const ValueKey<String>('card-doc-article')),
-          findsOneWidget,
-        );
-      },
-    );
+      expect(
+        find.byKey(const ValueKey<String>('card-doc-article')),
+        findsOneWidget,
+      );
+    });
   });
 }

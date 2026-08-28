@@ -1,6 +1,6 @@
 /// Public documentation page for the `skeleton` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the shape `button` established. Every specimen widget
@@ -11,8 +11,8 @@
 /// unheaded top-of-page demo to a real `Preview` section with its own rail
 /// entry, and a Keyboard disclosure between Accessibility and Responsive.
 ///
-/// **New route, split out of `progress`.** `ElSkeleton` used to share the
-/// `/components/progress` route with `ElProgress`, its sections prefixed
+/// **New route, split out of `progress`.** `Skeleton` used to share the
+/// `/components/progress` route with `Progress`, its sections prefixed
 /// `Skeleton: ` to tell them apart from the sibling component's own. This
 /// page still mirrors ONLY `https://ui.shadcn.com/docs/components/base/
 /// skeleton`'s own section list: Installation, Usage, Avatar, Card, Text,
@@ -28,9 +28,9 @@
 /// and resolves `keyframes` and `source-foundation` automatically. The
 /// Manual tab below is for a project not using the CLI.
 ///
-/// **Motion.** `ElSkeleton`'s shimmer is a genuinely infinite
-/// `AnimationController.repeat()` (`ElKeyframePlayer` with `repeat: true`),
-/// gated through `elAnimationDuration` (`theme_scope.dart`) to a fully
+/// **Motion.** `Skeleton`'s shimmer is a genuinely infinite
+/// `AnimationController.repeat()` (`KeyframePlayer` with `repeat: true`),
+/// gated through `effectiveMotionDuration` (`theme_scope.dart`) to a fully
 /// stopped controller under `MediaQuery.disableAnimations`: confirmed by the
 /// package's own `test/feedback_effects_test.dart` rasterised reduced-motion
 /// case, and re-confirmed by this page's own docs test.
@@ -43,7 +43,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -60,7 +72,7 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'A ElSkeleton avatar plus two text lines standing in for content '
+          'A Skeleton avatar plus two text lines standing in for content '
           'that has not arrived yet: the same shape the reference\'s own '
           'top-of-page demo uses.',
       specimen: _TopDemo(),
@@ -92,7 +104,7 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElSkeleton is reachable the same way '
+              'Add the export line so Skeleton is reachable the same way '
               'the CLI path already makes it.',
           code: "export 'skeleton.dart';",
         ),
@@ -109,11 +121,11 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
       title: 'Avatar',
       description:
           'A circular placeholder sized like the avatar it stands in for: '
-          'radius: ElRadii.pill turns the box into a circle the moment '
+          'radius: Radii.full turns the box into a circle the moment '
           'width and height are equal.',
       specimen: const KeyedSubtree(
         key: ValueKey<String>('skeleton-preview:avatar'),
-        child: ElSkeleton(width: 40, height: 40, radius: ElRadii.pill),
+        child: Skeleton(width: 40, height: 40, radius: Radii.full),
       ),
       code: _avatarCode,
       label: 'Avatar specimen view',
@@ -123,11 +135,11 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
       title: 'Card',
       description:
           'A block placeholder sized like the card it precedes: the '
-          'caller picks the exact width and height, ElSkeleton has no '
+          'caller picks the exact width and height, Skeleton has no '
           'card-shaped default of its own.',
       specimen: const KeyedSubtree(
         key: ValueKey<String>('skeleton-preview:card'),
-        child: ElSkeleton(width: 320, height: 128),
+        child: Skeleton(width: 320, height: 128),
       ),
       code: _cardCode,
       label: 'Card specimen view',
@@ -137,7 +149,7 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
       title: 'Text',
       description:
           'Two block lines for a paragraph placeholder, rounded-md (the '
-          'default radius), and one inline ElSkeleton.span standing in for '
+          'default radius), and one inline Skeleton.span standing in for '
           'a run of text inside a sentence rather than a block: the only '
           'way to exercise that factory.',
       specimen: _TextSpecimen(),
@@ -171,12 +183,12 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
       id: 'rtl',
       title: 'RTL',
       description:
-          'ElSkeleton carries no text of its own, so nothing inside it '
+          'Skeleton carries no text of its own, so nothing inside it '
           'mirrors on its own account: the surrounding Row does, because '
           'Row asks the ambient Directionality which edge is "start". The '
           'avatar sits on the visual right and the two lines run right to '
           'left here, purely from the parent Row, not from anything '
-          'ElSkeleton itself does.',
+          'Skeleton itself does.',
       specimen: _SkeletonRtlDemo(),
       code: _rtlCode,
       label: 'RTL specimen view',
@@ -202,9 +214,9 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
           'width, height and radius the caller passes, because it must '
           'match the exact footprint of the content it stands in for.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElSkeleton', anchor: 'api-elskeleton'),
+        DocsTocEntry(title: 'Skeleton', anchor: 'api-elskeleton'),
         DocsTocEntry(
-          title: 'ElSkeleton static members',
+          title: 'Skeleton static members',
           anchor: 'api-elskeleton-static',
         ),
       ],
@@ -229,7 +241,7 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       child: _OneSentence(
-        'ElSkeleton is never in the tab order: no Focus widget, no '
+        'Skeleton is never in the tab order: no Focus widget, no '
         'FocusNode, and no key handling exist anywhere in skeleton.dart, '
         'consistent with it not being interactive content.',
       ),
@@ -266,7 +278,7 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
             label: 'Package tests',
             value: 'test/feedback_effects_test.dart',
             description:
-                'group(\'ElSkeleton\'): the rasterised sweep, and the '
+                'group(\'Skeleton\'): the rasterised sweep, and the '
                 'rasterised reduced-motion case that proves a still frame.',
           ),
           const DocsInstallFact(
@@ -300,9 +312,9 @@ class SkeletonDocPage extends StatelessWidget {
       title: skeletonDoc.title,
       description: skeletonDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Skeleton'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Skeleton'),
     ],
     toc: skeletonDocSpec.toc,
     previous: const DocsPageLink(
@@ -332,11 +344,11 @@ class _OneSentence extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-    child: ElText(
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+    child: StyledText(
       text,
-      ElType.small,
-      color: ElTheme.of(context).mutedForeground,
+      TextStyles.small,
+      color: ThemeScope.of(context).mutedForeground,
     ),
   );
 }
@@ -346,14 +358,14 @@ class _ApiReferenceContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const DocsAnchor(
           id: 'api-elskeleton',
           child: DocsApiTable(
-            title: 'ElSkeleton',
+            title: 'Skeleton',
             facts: <DocsApiFact>[
               DocsApiFact(
                 name: 'width',
@@ -374,31 +386,31 @@ class _ApiReferenceContent extends StatelessWidget {
                 name: 'radius',
                 type: 'double?',
                 description:
-                    'Overrides ElSkeleton.defaultRadius (10px). Set to '
-                    'ElRadii.pill for an avatar circle or a pill-shaped '
+                    'Overrides Skeleton.defaultRadius (10px). Set to '
+                    'Radii.full for an avatar circle or a pill-shaped '
                     'placeholder.',
               ),
             ],
           ),
         ),
-        SizedBox(height: el(6)),
+        SizedBox(height: space(6)),
         const DocsAnchor(
           id: 'api-elskeleton-static',
           child: DocsApiTable(
-            title: 'ElSkeleton static members',
+            title: 'Skeleton static members',
             facts: <DocsApiFact>[
               DocsApiFact(
-                name: 'ElSkeleton.defaultRadius',
+                name: 'Skeleton.defaultRadius',
                 type: 'static double',
-                description: 'ElRadii.md (10px): the box\'s resting corner.',
+                description: 'Radii.md (10px): the box\'s resting corner.',
               ),
               DocsApiFact(
-                name: 'ElSkeleton.span',
+                name: 'Skeleton.span',
                 type:
                     'static InlineSpan Function({double? width, double? '
                     'height, double? radius})',
                 description:
-                    'Returns a WidgetSpan wrapping a ElSkeleton, aligned '
+                    'Returns a WidgetSpan wrapping a Skeleton, aligned '
                     'to PlaceholderAlignment.middle, for a placeholder '
                     'standing in for a run of text inside a paragraph '
                     'rather than a block. See Text\'s inline specimen.',
@@ -406,12 +418,12 @@ class _ApiReferenceContent extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: el(3)),
-        ElText(
-          'radius is Skeleton\'s only real choice: ElSkeleton.defaultRadius '
+        SizedBox(height: space(3)),
+        StyledText(
+          'radius is Skeleton\'s only real choice: Skeleton.defaultRadius '
           '(10px) fits a block or a text-line placeholder; radius: '
-          'ElRadii.pill turns the same widget into a circle or a pill.',
-          ElType.small,
+          'Radii.full turns the same widget into a circle or a pill.',
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
       ],
@@ -424,8 +436,8 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Semantic role: NONE. ElSkeleton builds no Semantics node, no '
+      _bullets(ThemeScope.of(context), <String>[
+        'Semantic role: NONE. Skeleton builds no Semantics node, no '
             'ExcludeSemantics, and no liveRegion announcement anywhere in '
             'its source. This is a real gap, not a documented design '
             'choice: a placeholder standing in for content a user is '
@@ -435,7 +447,7 @@ class _AccessibilityContent extends StatelessWidget {
             'no semantic information for it by default, so in practice it '
             'is silently skipped, which is closer to "hidden" than '
             '"announced as busy", but that is an accident of how empty '
-            'render objects are treated, not something ElSkeleton '
+            'render objects are treated, not something Skeleton '
             'declares.',
         'Recommended mitigation at the call site until this grows its own '
             'semantics: wrap a loading region in Semantics(label: '
@@ -450,15 +462,15 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint reads from BuildContext, and no platform branch: '
             'the same widget tree renders at 390px and 1440px and on '
             'every target platform.',
-        'ElSkeleton\'s geometry is entirely the caller\'s: width and '
+        'Skeleton\'s geometry is entirely the caller\'s: width and '
             'height default to null, which takes the incoming constraint '
             'exactly the way an unconstrained Container would. Responsive '
             'behavior for a skeleton composition is a property of the '
-            'layout around it, not of ElSkeleton itself.',
+            'layout around it, not of Skeleton itself.',
         'Platform parity: Android, iOS, Web, macOS, Windows and Linux all '
             'render the same widget tree.',
       ]);
@@ -481,12 +493,13 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Imports',
-            value: 'foundation/spacing.dart (el(), ElRadii), '
-                'foundation/theme.dart (ElThemeData), '
-                'motion/keyframes.dart (ElKeyframePlayer, ElShimmer), '
-                'theme_scope.dart (ElTheme)',
+            value:
+                'foundation/spacing.dart (space(), Radii), '
+                'foundation/theme.dart (ThemeTokens), '
+                'motion/keyframes.dart (KeyframePlayer, LoadingShimmerMotion), '
+                'theme_scope.dart (ThemeScope)',
             description:
-                'ElKeyframePlayer and ElShimmer are the same '
+                'KeyframePlayer and LoadingShimmerMotion are the same '
                 'looping-animation engine every "pulls-*" motion in this '
                 'system reuses. No other component dependency.',
           ),
@@ -514,7 +527,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Verified',
             value: 'package tests + docs specimen',
             description:
-                'test/feedback_effects_test.dart\'s group(\'ElSkeleton\') '
+                'test/feedback_effects_test.dart\'s group(\'Skeleton\') '
                 'rasterises the sweep and proves reduced motion holds a '
                 'fully static frame; this page\'s own skeleton_test.dart '
                 're-proves the settle without rasterising, by pumping '
@@ -522,7 +535,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
@@ -540,27 +553,32 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'The shimmer gradient is theme.popover → theme.accent → '
-            'theme.popover (ElShimmer.gradient(theme)): both stops resolve '
-            'from the live theme, so light and dark each get their own '
-            'correctly contrasted sweep with no override needed.',
-        'ElSkeleton declares no colour parameter of its own: the gradient '
-            'is entirely theme-derived, consistent with every other '
-            'primitive on this page.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'The shimmer gradient is theme.popover → theme.accent → '
+        'theme.popover (LoadingShimmerMotion.gradient(theme)): both stops resolve '
+        'from the live theme, so light and dark each get their own '
+        'correctly contrasted sweep with no override needed.',
+    'Skeleton declares no colour parameter of its own: the gradient '
+        'is entirely theme-derived, consistent with every other '
+        'primitive on this page.',
+  ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -569,19 +587,19 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Loading (its only state)',
     treatment:
-        'The shimmer runs forever via ElKeyframePlayer(repeat: true) until '
+        'The shimmer runs forever via KeyframePlayer(repeat: true) until '
         'the caller stops rendering the skeleton and renders real content '
-        'instead: ElSkeleton has no "done" flag of its own.',
+        'instead: Skeleton has no "done" flag of its own.',
     userSignal:
         'A continuously sweeping highlight signals "still working" for as '
         'long as the widget is on screen; the caller\'s own state (not a '
-        'ElSkeleton parameter) decides when that ends.',
+        'Skeleton parameter) decides when that ends.',
   ),
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
         'MediaQuery.disableAnimations collapses the animation to '
-        'Duration.zero via elAnimationDuration: ElKeyframePlayer stops its '
+        'Duration.zero via effectiveMotionDuration: KeyframePlayer stops its '
         'controller outright (fill: none reverts it to t=0, its resting '
         'frame) rather than merely animating fast.',
     userSignal:
@@ -603,7 +621,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
 
 /* ── Showcase specimens ─────────────────────────────────────────────────── */
 
-/// The unheaded top-of-page demo: one representative [ElSkeleton] group (an
+/// The unheaded top-of-page demo: one representative [Skeleton] group (an
 /// avatar plus two text lines, the same shape the reference's own default
 /// demo uses).
 class _TopDemo extends StatelessWidget {
@@ -613,15 +631,15 @@ class _TopDemo extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: <Widget>[
-      const ElSkeleton(width: 48, height: 48, radius: ElRadii.pill),
-      SizedBox(width: el(3)),
+      const Skeleton(width: 48, height: 48, radius: Radii.full),
+      SizedBox(width: space(3)),
       Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const ElSkeleton(height: 16),
-            SizedBox(height: el(2)),
-            const ElSkeleton(height: 16, width: 200),
+            const Skeleton(height: 16),
+            SizedBox(height: space(2)),
+            const Skeleton(height: 16, width: 200),
           ],
         ),
       ),
@@ -629,17 +647,17 @@ class _TopDemo extends StatelessWidget {
   );
 }
 
-/// The inline [ElSkeleton.span] specimen, standing in for a run of text
+/// The inline [Skeleton.span] specimen, standing in for a run of text
 /// inside a sentence rather than a block.
 class _SkeletonInlineDemo extends StatelessWidget {
   const _SkeletonInlineDemo();
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final TextStyle bodyStyle = ElText.styleOf(
+    final ThemeTokens theme = ThemeScope.of(context);
+    final TextStyle bodyStyle = StyledText.styleOf(
       context,
-      ElType.body,
+      TextStyles.body,
       color: theme.foreground,
     );
     return Text.rich(
@@ -647,7 +665,7 @@ class _SkeletonInlineDemo extends StatelessWidget {
         style: bodyStyle,
         children: <InlineSpan>[
           const TextSpan(text: 'The next release ships in '),
-          ElSkeleton.span(width: 64, height: 14),
+          Skeleton.span(width: 64, height: 14),
           const TextSpan(text: ' weeks, after code freeze.'),
         ],
       ),
@@ -668,14 +686,14 @@ class _TextSpecimen extends StatelessWidget {
     children: <Widget>[
       const KeyedSubtree(
         key: ValueKey<String>('skeleton-preview:line-1'),
-        child: ElSkeleton(width: 220, height: 14),
+        child: Skeleton(width: 220, height: 14),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       const KeyedSubtree(
         key: ValueKey<String>('skeleton-preview:line-2'),
-        child: ElSkeleton(width: 160, height: 14),
+        child: Skeleton(width: 160, height: 14),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const _SkeletonInlineDemo(),
     ],
   );
@@ -693,27 +711,27 @@ class _SkeletonFormDemo extends StatelessWidget {
     children: <Widget>[
       const KeyedSubtree(
         key: ValueKey<String>('skeleton-preview:form-name-label'),
-        child: ElSkeleton(width: 90, height: 12),
+        child: Skeleton(width: 90, height: 12),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       const KeyedSubtree(
         key: ValueKey<String>('skeleton-preview:form-name-input'),
-        child: ElSkeleton(width: 280, height: 36),
+        child: Skeleton(width: 280, height: 36),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const KeyedSubtree(
         key: ValueKey<String>('skeleton-preview:form-email-label'),
-        child: ElSkeleton(width: 90, height: 12),
+        child: Skeleton(width: 90, height: 12),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       const KeyedSubtree(
         key: ValueKey<String>('skeleton-preview:form-email-input'),
-        child: ElSkeleton(width: 280, height: 36),
+        child: Skeleton(width: 280, height: 36),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const KeyedSubtree(
         key: ValueKey<String>('skeleton-preview:form-submit'),
-        child: ElSkeleton(width: 110, height: 36, radius: ElRadii.pill),
+        child: Skeleton(width: 110, height: 36, radius: Radii.full),
       ),
     ],
   );
@@ -732,17 +750,17 @@ class _SkeletonTableDemo extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       for (int row = 0; row < 3; row++) ...<Widget>[
-        if (row > 0) SizedBox(height: el(3)),
+        if (row > 0) SizedBox(height: space(3)),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             key: ValueKey<String>('skeleton-preview:table-row-$row'),
             children: <Widget>[
-              const ElSkeleton(width: 140, height: 14),
-              SizedBox(width: el(4)),
-              const ElSkeleton(width: 90, height: 14),
-              SizedBox(width: el(4)),
-              const ElSkeleton(width: 60, height: 14),
+              const Skeleton(width: 140, height: 14),
+              SizedBox(width: space(4)),
+              const Skeleton(width: 90, height: 14),
+              SizedBox(width: space(4)),
+              const Skeleton(width: 60, height: 14),
             ],
           ),
         ),
@@ -762,15 +780,15 @@ class _SkeletonRtlDemo extends StatelessWidget {
     textDirection: TextDirection.rtl,
     child: Row(
       children: <Widget>[
-        const ElSkeleton(width: 40, height: 40, radius: ElRadii.pill),
-        SizedBox(width: el(3)),
+        const Skeleton(width: 40, height: 40, radius: Radii.full),
+        SizedBox(width: space(3)),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const ElSkeleton(height: 14),
-              SizedBox(height: el(2)),
-              const ElSkeleton(height: 14, width: 160),
+              const Skeleton(height: 14),
+              SizedBox(height: space(2)),
+              const Skeleton(height: 14, width: 160),
             ],
           ),
         ),
@@ -779,7 +797,7 @@ class _SkeletonRtlDemo extends StatelessWidget {
   );
 }
 
-/// A settings-row shape that swaps a [ElSkeleton] avatar and two text-line
+/// A settings-row shape that swaps a [Skeleton] avatar and two text-line
 /// skeletons for real content, without the row changing size: the reason
 /// `skeleton.dart`'s own class doc gives for why the geometry is always the
 /// caller's.
@@ -796,7 +814,7 @@ class _LoadingCardCompositionState extends State<_LoadingCardComposition> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
@@ -814,56 +832,52 @@ class _LoadingCardCompositionState extends State<_LoadingCardComposition> {
                         shape: BoxShape.circle,
                       ),
                       child: Center(
-                        child: ElIcon(
-                          ElIconGlyph.user,
-                          size: ElIconSize.sm,
-                          tone: ElIconTone.muted,
+                        child: Icon(
+                          IconGlyph.user,
+                          size: IconSize.sm,
+                          tone: IconTone.muted,
                         ),
                       ),
                     )
-                  : const ElSkeleton(
-                      width: 40,
-                      height: 40,
-                      radius: ElRadii.pill,
-                    ),
+                  : const Skeleton(width: 40, height: 40, radius: Radii.full),
             ),
-            SizedBox(width: el(3)),
+            SizedBox(width: space(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: _loaded
                     ? <Widget>[
-                        ElText(
+                        StyledText(
                           'Amara Chen',
-                          ElType.section,
+                          TextStyles.section,
                           color: theme.foreground,
                         ),
-                        SizedBox(height: el(1)),
-                        ElText(
+                        SizedBox(height: space(1)),
+                        StyledText(
                           'Design lead: active 2 minutes ago',
-                          ElType.small,
+                          TextStyles.small,
                           color: theme.mutedForeground,
                         ),
                       ]
                     : const <Widget>[
-                        ElSkeleton(width: 140, height: 14),
+                        Skeleton(width: 140, height: 14),
                         SizedBox(height: 8),
-                        ElSkeleton(width: 200, height: 12),
+                        Skeleton(width: 200, height: 12),
                       ],
               ),
             ),
           ],
         ),
-        SizedBox(height: el(4)),
-        ElButton(
+        SizedBox(height: space(4)),
+        Button(
           key: const ValueKey<String>('skeleton-doc-toggle-loaded'),
-          variant: ElButtonVariant.outline,
-          size: ElButtonSize.sm,
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
           label: _loaded ? 'Show skeleton again' : 'Show loaded content',
           onPressed: () => setState(() => _loaded = !_loaded),
-          child: ElText(
+          child: StyledText(
             _loaded ? 'Show skeleton again' : 'Show loaded content',
-            ElComponentType.buttonLabel,
+            TextStyles.buttonLabel,
           ),
         ),
       ],
@@ -875,18 +889,18 @@ class _LoadingCardCompositionState extends State<_LoadingCardComposition> {
 
 const String _usageCode = '''
 // A block the exact size of the card that will replace it.
-ElSkeleton(width: 320, height: 128)
+Skeleton(width: 320, height: 128)
 
 // A circular avatar placeholder.
-ElSkeleton(width: 40, height: 40, radius: ElRadii.pill)
+Skeleton(width: 40, height: 40, radius: Radii.full)
 
 // Inline, standing in for a run of text.
 Text.rich(
   TextSpan(
-    style: ElText.styleOf(context, ElType.body),
+    style: StyledText.styleOf(context, TextStyles.body),
     children: <InlineSpan>[
       const TextSpan(text: 'Ready in '),
-      ElSkeleton.span(width: 64, height: 14),
+      Skeleton.span(width: 64, height: 14),
     ],
   ),
 )''';
@@ -894,41 +908,42 @@ Text.rich(
 const String _previewCode = '''Row(
   crossAxisAlignment: CrossAxisAlignment.center,
   children: [
-    ElSkeleton(width: 48, height: 48, radius: ElRadii.pill),
+    Skeleton(width: 48, height: 48, radius: Radii.full),
     SizedBox(width: 12),
     Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ElSkeleton(height: 16),
+          Skeleton(height: 16),
           SizedBox(height: 8),
-          ElSkeleton(height: 16, width: 200),
+          Skeleton(height: 16, width: 200),
         ],
       ),
     ),
   ],
 )''';
 
-const String _avatarCode = 'ElSkeleton(width: 40, height: 40, radius: ElRadii.pill)';
+const String _avatarCode =
+    'Skeleton(width: 40, height: 40, radius: Radii.full)';
 
-const String _cardCode = 'ElSkeleton(width: 320, height: 128)';
+const String _cardCode = 'Skeleton(width: 320, height: 128)';
 
 const String _textCode = '''Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
-    ElSkeleton(width: 220, height: 14),
+    Skeleton(width: 220, height: 14),
     SizedBox(height: 8),
-    ElSkeleton(width: 160, height: 14),
+    Skeleton(width: 160, height: 14),
   ],
 )
 
 // Inline, standing in for a run of text inside a sentence.
 Text.rich(
   TextSpan(
-    style: ElText.styleOf(context, ElType.body),
+    style: StyledText.styleOf(context, TextStyles.body),
     children: [
       TextSpan(text: 'The next release ships in '),
-      ElSkeleton.span(width: 64, height: 14),
+      Skeleton.span(width: 64, height: 14),
       TextSpan(text: ' weeks, after code freeze.'),
     ],
   ),
@@ -937,15 +952,15 @@ Text.rich(
 const String _formCode = '''Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
-    ElSkeleton(width: 90, height: 12),
+    Skeleton(width: 90, height: 12),
     SizedBox(height: 8),
-    ElSkeleton(width: 280, height: 36),
+    Skeleton(width: 280, height: 36),
     SizedBox(height: 16),
-    ElSkeleton(width: 90, height: 12),
+    Skeleton(width: 90, height: 12),
     SizedBox(height: 8),
-    ElSkeleton(width: 280, height: 36),
+    Skeleton(width: 280, height: 36),
     SizedBox(height: 16),
-    ElSkeleton(width: 110, height: 36, radius: ElRadii.pill),
+    Skeleton(width: 110, height: 36, radius: Radii.full),
   ],
 )''';
 
@@ -955,11 +970,11 @@ const String _tableCode = '''Column(
     for (int row = 0; row < 3; row++)
       Row(
         children: [
-          ElSkeleton(width: 140, height: 14),
+          Skeleton(width: 140, height: 14),
           SizedBox(width: 16),
-          ElSkeleton(width: 90, height: 14),
+          Skeleton(width: 90, height: 14),
           SizedBox(width: 16),
-          ElSkeleton(width: 60, height: 14),
+          Skeleton(width: 60, height: 14),
         ],
       ),
   ],
@@ -969,15 +984,15 @@ const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
   child: Row(
     children: [
-      ElSkeleton(width: 40, height: 40, radius: ElRadii.pill),
+      Skeleton(width: 40, height: 40, radius: Radii.full),
       SizedBox(width: 12),
       Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ElSkeleton(height: 14),
+            Skeleton(height: 14),
             SizedBox(height: 8),
-            ElSkeleton(height: 14, width: 160),
+            Skeleton(height: 14, width: 160),
           ],
         ),
       ),
@@ -1000,17 +1015,17 @@ class _LoadingCardState extends State<_LoadingCard> {
         children: [
           _loaded
               ? CircleAvatar(child: Icon(Icons.person))
-              : ElSkeleton(width: 40, height: 40, radius: ElRadii.pill),
+              : Skeleton(width: 40, height: 40, radius: Radii.full),
           if (!_loaded) ...[
-            ElSkeleton(width: 140, height: 14),
-            ElSkeleton(width: 200, height: 12),
+            Skeleton(width: 140, height: 14),
+            Skeleton(width: 200, height: 12),
           ] else ...[
             Text('Amara Chen'),
             Text('Design lead: active 2 minutes ago'),
           ],
         ],
       ),
-      ElButton(
+      Button(
         onPressed: () => setState(() => _loaded = !_loaded),
         child: Text(_loaded ? 'Show skeleton again' : 'Show loaded content'),
       ),

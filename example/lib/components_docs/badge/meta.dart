@@ -12,13 +12,13 @@ import '../catalog.dart' show ComponentDocEntry;
 /// installation section for the shipped command and registry dependencies. [dependencies] is left
 /// empty rather than naming items a manifest does not yet resolve; the page
 /// states in prose what the component would need once registered
-/// (`source-foundation`, the machine-surface shadow effect).
+/// (`source-foundation`, the surface shadow effect).
 const ComponentDocEntry badgeDoc = ComponentDocEntry(
   name: 'badge',
   title: 'Badge',
   description:
       'A small pill-shaped label for status, counts, or metadata: not a control.',
-  dependencies: <String>['machine-surface', 'source-foundation'],
-  exports: <String>['ElBadge', 'ElBadgeVariant'],
+  dependencies: <String>['surface', 'source-foundation'],
+  exports: <String>['Badge', 'BadgeVariant'],
   sourcePath: 'lib/src/components/badge.dart',
 );

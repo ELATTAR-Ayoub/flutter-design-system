@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -28,49 +52,49 @@ Finder _disclosureTrigger(String title) => find.descendant(
 /// ten tables — extracted mechanically from `page.dart` so this list cannot
 /// silently drift from what the page actually renders.
 const List<String> _agentTranscriptApiFactNames = <String>[
-  'ElActionChip.padX / padY / gap',
-  'ElActionChip.rimAlpha',
-  'ElAgentMessage.gap',
-  'ElApprovalCard.actionGap',
-  'ElApprovalCard.declineReason',
-  'ElApprovalCard.defaultSentence(approval)',
-  'ElApprovalCard.glyphPx / glyphTop',
-  'ElApprovalCard.headGap / headLineGap',
-  'ElApprovalCard.pad / gap',
-  'ElApprovalCard.paramsMaxHeight / paramsPad',
-  'ElApprovalCard.rimAlpha / washAlpha',
-  'ElFadeUp.rise',
-  'ElRowIn.delayFor(index)',
-  'ElRowIn.slide',
-  'ElToolChip.chevronAlpha',
-  'ElToolChip.chevronPx',
-  'ElToolChip.contentGap',
-  'ElToolChip.detailGap',
-  'ElToolChip.errorRimAlpha',
-  'ElToolChip.gap',
-  'ElToolChip.padX / padY',
-  'ElToolChip.panelFillAlpha',
-  'ElToolChip.panelPad / panelGap',
-  'ElToolChip.valueMaxHeight',
-  'ElTypingCursor.inset',
-  'ElTypingCursor.markHeight',
-  'ElTypingCursor.markWidth',
-  'ElUserMessage.gap',
-  'ElUserMessage.maxWidthFraction',
-  'ElUserMessage.padX / padY',
-  'ElUserMessage.radius',
-  'ElUserMessage.rimAlpha',
-  'ElWelcomeCard.avatarPx',
-  'ElWelcomeCard.capabilityGlyphPx',
-  'ElWelcomeCard.capabilityHoverRimAlpha',
-  'ElWelcomeCard.capabilityLabel',
-  'ElWelcomeCard.columnWidth',
-  'ElWelcomeCard.gridGap',
-  'ElWelcomeCard.maxCapabilities',
-  'ElWelcomeCard.nameTop / blurbTop / listTop',
-  'ElWelcomeCard.outerPadY',
-  'ElWelcomeCard.suggestionGap',
-  'ElWelcomeCard.suggestionLabel',
+  'ActionChip.padX / padY / gap',
+  'ActionChip.rimAlpha',
+  'AgentMessage.gap',
+  'ApprovalCard.actionGap',
+  'ApprovalCard.declineReason',
+  'ApprovalCard.defaultSentence(approval)',
+  'ApprovalCard.glyphPx / glyphTop',
+  'ApprovalCard.headGap / headLineGap',
+  'ApprovalCard.pad / gap',
+  'ApprovalCard.paramsMaxHeight / paramsPad',
+  'ApprovalCard.rimAlpha / washAlpha',
+  'FadeUp.rise',
+  'RowIn.delayFor(index)',
+  'RowIn.slide',
+  'ToolChip.chevronAlpha',
+  'ToolChip.chevronPx',
+  'ToolChip.contentGap',
+  'ToolChip.detailGap',
+  'ToolChip.errorRimAlpha',
+  'ToolChip.gap',
+  'ToolChip.padX / padY',
+  'ToolChip.panelFillAlpha',
+  'ToolChip.panelPad / panelGap',
+  'ToolChip.valueMaxHeight',
+  'TypingCursor.inset',
+  'TypingCursor.markHeight',
+  'TypingCursor.markWidth',
+  'UserMessage.gap',
+  'UserMessage.maxWidthFraction',
+  'UserMessage.padX / padY',
+  'UserMessage.radius',
+  'UserMessage.rimAlpha',
+  'WelcomeCard.avatarPx',
+  'WelcomeCard.capabilityGlyphPx',
+  'WelcomeCard.capabilityHoverRimAlpha',
+  'WelcomeCard.capabilityLabel',
+  'WelcomeCard.columnWidth',
+  'WelcomeCard.gridGap',
+  'WelcomeCard.maxCapabilities',
+  'WelcomeCard.nameTop / blurbTop / listTop',
+  'WelcomeCard.outerPadY',
+  'WelcomeCard.suggestionGap',
+  'WelcomeCard.suggestionLabel',
   'approval',
   'avatar',
   'blurb',
@@ -107,7 +131,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: AgentTranscriptDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -125,7 +149,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String name in _agentTranscriptApiFactNames) {
           expect(find.text(name), findsWidgets, reason: 'missing $name');
@@ -136,15 +160,12 @@ void main() {
           find.byKey(const ValueKey<String>('agent-transcript-preview')),
           findsOneWidget,
         );
-        expect(find.byType(ElUserMessage), findsWidgets);
-        expect(find.byType(ElToolChip), findsWidgets);
-        expect(find.byType(ElAgentMessage), findsWidgets);
+        expect(find.byType(UserMessage), findsWidgets);
+        expect(find.byType(ToolChip), findsWidgets);
+        expect(find.byType(AgentMessage), findsWidgets);
 
         // User message: the bubble text and its attachment both render.
-        expect(
-          find.text('Here is the export you asked for.'),
-          findsOneWidget,
-        );
+        expect(find.text('Here is the export you asked for.'), findsOneWidget);
         expect(find.textContaining('export.csv'), findsOneWidget);
 
         // Agent message: a streaming turn really mounts a typing cursor,
@@ -155,7 +176,7 @@ void main() {
         expect(
           find.descendant(
             of: streamingMessage,
-            matching: find.byType(ElTypingCursor),
+            matching: find.byType(TypingCursor),
           ),
           findsOneWidget,
         );
@@ -169,7 +190,7 @@ void main() {
         expect(find.text('Tool'), findsNothing);
         final Finder toolChipTrigger = find.descendant(
           of: toolChip,
-          matching: find.byType(ElButton),
+          matching: find.byType(Button),
         );
         await tester.ensureVisible(toolChipTrigger);
         await tester.pump();
@@ -184,9 +205,7 @@ void main() {
           findsOneWidget,
         );
         expect(
-          find.byKey(
-            const ValueKey<String>('agent-transcript-action-error'),
-          ),
+          find.byKey(const ValueKey<String>('agent-transcript-action-error')),
           findsOneWidget,
         );
         expect(
@@ -198,7 +217,7 @@ void main() {
         expect(find.textContaining('Declined:'), findsOneWidget);
 
         // Approval card: a real gate. Pressing Approve genuinely calls the
-        // ElPendingApproval's own callback and the card is replaced.
+        // PendingApproval's own callback and the card is replaced.
         final Finder approvalCard = find.byKey(
           const ValueKey<String>('agent-transcript-approval-card'),
         );
@@ -231,14 +250,20 @@ void main() {
           const ValueKey<String>('agent-transcript-welcome-card'),
         );
         // 'Search inventory' also appears as the Tool chip specimen's own
-        // humanised label (elHumaniseToolName('search_inventory')) — scoped
+        // humanised label (humaniseToolName('search_inventory')) — scoped
         // to the welcome card to avoid that collision.
         expect(
-          find.descendant(of: welcomeCard, matching: find.text('Search inventory')),
+          find.descendant(
+            of: welcomeCard,
+            matching: find.text('Search inventory'),
+          ),
           findsOneWidget,
         );
         expect(
-          find.descendant(of: welcomeCard, matching: find.text('Export activity')),
+          find.descendant(
+            of: welcomeCard,
+            matching: find.text('Export activity'),
+          ),
           findsOneWidget,
         );
         expect(
@@ -250,12 +275,12 @@ void main() {
         expect(
           agentTranscriptDoc.exports,
           containsAll(<String>[
-            'ElUserMessage',
-            'ElAgentMessage',
-            'ElToolChip',
-            'ElActionChip',
-            'ElApprovalCard',
-            'ElWelcomeCard',
+            'UserMessage',
+            'AgentMessage',
+            'ToolChip',
+            'ActionChip',
+            'ApprovalCard',
+            'WelcomeCard',
           ]),
         );
         expect(agentTranscriptDoc.command, 'elattar add agent-transcript');
@@ -263,28 +288,27 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 6000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentTranscriptDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentTranscriptDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Seven specimen stages: Preview, User message, Agent message,
-        // Tool chip, Action chip, Approval card, Welcome card.
-        expect(find.byType(DocsShowcase), findsNWidgets(7));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Seven specimen stages: Preview, User message, Agent message,
+      // Tool chip, Action chip, Approval card, Welcome card.
+      expect(find.byType(DocsShowcase), findsNWidgets(7));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -319,47 +343,46 @@ void main() {
       );
     });
 
-    testWidgets(
-      'sections render in declaration order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentTranscriptDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentTranscriptDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, <String>[
-          'Preview',
-          'Installation',
-          'Usage',
-          'User message',
-          'Agent message',
-          'Tool chip',
-          'Action chip',
-          'Approval card',
-          'Welcome card',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Keyboard',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
-      },
-    );
+      expect(titles, <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'User message',
+        'Agent message',
+        'Tool chip',
+        'Action chip',
+        'Approval card',
+        'Welcome card',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -370,7 +393,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const AgentTranscriptDocPage(),
           ),
         );
@@ -399,8 +422,8 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(
@@ -410,22 +433,18 @@ void main() {
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
-            find.byKey(
-              const ValueKey<String>('agent-transcript-doc-article'),
-            ),
+            find.byKey(const ValueKey<String>('agent-transcript-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
-            find.byKey(
-              const ValueKey<String>('agent-transcript-doc-article'),
-            ),
+            find.byKey(const ValueKey<String>('agent-transcript-doc-article')),
           ),
         );
 

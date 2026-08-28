@@ -1,0 +1,25 @@
+{
+  "name": "validation-rule",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "Small validation rule and issue-mode support used by composed fields and forms.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/validation_rule.dart",
+      "target": "@ui/validation_rule.dart",
+      "sha256": "2e8736f3dca590c4eb0550a3529257e954caaeded1d94d9ed81e1e1e5608dad8"
+    }
+  ],
+  "registryDependencies": [],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/docs/foundations/rules",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/validation_rule.dart",
+  "deprecated": false
+}

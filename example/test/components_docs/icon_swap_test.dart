@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s own
 /// trigger key is one constant shared by every instance on the page, so a
@@ -28,9 +52,9 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every named constructor parameter `ElIconSwap`'s own class declares
+/// Every named constructor parameter `IconSwap`'s own class declares
 /// (`lib/src/components/icon_swap.dart`), excluding `key`: the same set the
-/// page's `ElIconSwap` `DocsApiTable` claims to cover.
+/// page's `IconSwap` `DocsApiTable` claims to cover.
 const List<String> _iconSwapConstructorParams = <String>[
   'icons',
   'activeIndex',
@@ -51,7 +75,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: IconSwapDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -72,19 +96,19 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _iconSwapConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
         expect(find.text('resolveIndex(index, count)'), findsOneWidget);
 
-        // A live ElIconSwap specimen mounts on Preview's "Rolls" column,
+        // A live IconSwap specimen mounts on Preview's "Rolls" column,
         // Sidebar Trigger, and Download Confirmation — three, since
         // Preview's "Swaps instantly" column deliberately carries none.
         // Not asserted as a page-wide `findsNWidgets`: `DocsCopyButton`
         // (`example/lib/docs/docs_copy_button.dart`) is itself built on
-        // ElIconSwap and mounts on every always-visible code pane — Usage's
+        // IconSwap and mounts on every always-visible code pane — Usage's
         // DocsSnippet and Installation's default CLI pane — so the page-wide
         // total is 5, not 3. The per-key checks below are the real
         // assertion: each of this page's own three specimens exists,
@@ -103,7 +127,7 @@ void main() {
         }
 
         expect(iconSwapDoc.name, 'icon_swap');
-        expect(iconSwapDoc.exports, containsAll(<String>['ElIconSwap']));
+        expect(iconSwapDoc.exports, containsAll(<String>['IconSwap']));
         expect(iconSwapDoc.command, 'elattar add icon-swap');
         expect(destination, isNull);
       },
@@ -119,7 +143,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const IconSwapDocPage(),
           ),
         );
@@ -129,46 +153,45 @@ void main() {
           of: find.byKey(
             const ValueKey<String>('icon-swap-example:sidebar-trigger'),
           ),
-          matching: find.byType(ElIconSwap),
+          matching: find.byType(IconSwap),
         );
-        final int before = tester.widget<ElIconSwap>(specimen).activeIndex;
+        final int before = tester.widget<IconSwap>(specimen).activeIndex;
 
         await tester.ensureVisible(specimen);
         await tester.pump();
         await tester.tap(specimen);
-        // A fraction of the roll's own 400ms (ElDurations.slow): enough to
+        // A fraction of the roll's own 400ms (MotionDurations.slow): enough to
         // prove the state actually flipped, never `pumpAndSettle`.
         await tester.pump(const Duration(milliseconds: 50));
 
-        final int after = tester.widget<ElIconSwap>(specimen).activeIndex;
+        final int after = tester.widget<IconSwap>(specimen).activeIndex;
         expect(after, isNot(before));
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const IconSwapDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const IconSwapDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Three EffectSection stages: Preview, Sidebar Trigger, Download
-        // Confirmation.
-        expect(find.byType(DocsShowcase), findsNWidgets(3));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Three EffectSection stages: Preview, Sidebar Trigger, Download
+      // Confirmation.
+      expect(find.byType(DocsShowcase), findsNWidgets(3));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -191,43 +214,42 @@ void main() {
       );
     });
 
-    testWidgets(
-      'sections render in declaration order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const IconSwapDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const IconSwapDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, <String>[
-          'Preview',
-          'Installation',
-          'Usage',
-          'Sidebar Trigger',
-          'Download Confirmation',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Keyboard',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
-      },
-    );
+      expect(titles, <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'Sidebar Trigger',
+        'Download Confirmation',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -238,7 +260,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const IconSwapDocPage(),
           ),
         );
@@ -267,24 +289,24 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const IconSwapDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('icon-swap-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('icon-swap-doc-article')),
           ),

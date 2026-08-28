@@ -13,7 +13,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
@@ -36,9 +48,9 @@ class CliDocsPage extends StatelessWidget {
           'The real elattar command surface: six commands, their flags, '
           'and the exit code each failure path returns.',
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Docs'),
-      ElBreadcrumbEntry.page('CLI'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Docs'),
+      BreadcrumbEntry.page('CLI'),
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'Synopsis', anchor: 'synopsis'),
@@ -63,7 +75,7 @@ class _CliArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       key: const ValueKey<String>('cli-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -81,10 +93,10 @@ class _CliArticle extends StatelessWidget {
     );
   }
 
-  Widget _prose(String text, ElThemeData theme, {ElTypeSpec? spec}) =>
+  Widget _prose(String text, ThemeTokens theme, {TextStyleToken? spec}) =>
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText(text, spec ?? ElType.body),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(text, spec ?? TextStyles.body),
       );
 
   Widget _synopsis() => DocsSection(
@@ -106,15 +118,15 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _running(ElThemeData theme) => DocsSection(
+  Widget _running(ThemeTokens theme) => DocsSection(
     id: 'running',
     title: 'Running it',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const ElAlert(
-          variant: ElAlertVariant.info,
-          icon: ElIcon(ElIconGlyph.info),
+        const Alert(
+          variant: AlertVariant.info,
+          icon: Icon(IconGlyph.info),
           title: 'Getting the command',
           description:
               '`dart install elattar_cli` puts `elattar` on your PATH, and '
@@ -124,24 +136,24 @@ class _CliArticle extends StatelessWidget {
               '`dart run packages/elattar_cli/bin/elattar.dart <command>` '
               'without installing anything.',
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
-            ElText('See ', ElType.small, color: theme.mutedForeground),
+            StyledText('See ', TextStyles.small, color: theme.mutedForeground),
             const DocsLink(
               label: 'Installation',
               route: docsInstallationRoute,
               underline: true,
             ),
-            ElText('.', ElType.small, color: theme.mutedForeground),
+            StyledText('.', TextStyles.small, color: theme.mutedForeground),
           ],
         ),
       ],
     ),
   );
 
-  Widget _globalOptions(ElThemeData theme) => DocsSection(
+  Widget _globalOptions(ThemeTokens theme) => DocsSection(
     id: 'global-options',
     title: 'Global options',
     child: const DocsApiTable(
@@ -172,7 +184,7 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _commands(ElThemeData theme) => DocsSection(
+  Widget _commands(ThemeTokens theme) => DocsSection(
     id: 'commands',
     title: 'Commands',
     child: Column(
@@ -251,7 +263,7 @@ class _CliArticle extends StatelessWidget {
               'elattar init --foundation source --registry registry/generated/latest\n'
               'elattar add button --registry registry/generated/latest',
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'bash',
           code:
@@ -330,7 +342,7 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _output(ElThemeData theme) => DocsSection(
+  Widget _output(ThemeTokens theme) => DocsSection(
     id: 'output',
     title: 'Output format',
     child: _prose(
@@ -345,7 +357,7 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _offline(ElThemeData theme) => DocsSection(
+  Widget _offline(ThemeTokens theme) => DocsSection(
     id: 'offline',
     title: 'Offline and CI usage',
     child: Column(
@@ -361,7 +373,7 @@ class _CliArticle extends StatelessWidget {
           'request by default.',
           theme,
         ),
-        SizedBox(height: el(4)),
+        SizedBox(height: space(4)),
         _prose(
           '--offline is what makes a run deterministic without one: every '
           'command above restricts itself to whatever is already cached and '
@@ -371,20 +383,20 @@ class _CliArticle extends StatelessWidget {
           'remote registry in the first place.',
           theme,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
-            ElText('See ', ElType.small, color: theme.mutedForeground),
+            StyledText('See ', TextStyles.small, color: theme.mutedForeground),
             const DocsLink(
               label: 'Registry',
               route: docsRegistryRoute,
               underline: true,
             ),
-            ElText(
+            StyledText(
               ' for how a registry location resolves and how the cache '
               'works.',
-              ElType.small,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ],
@@ -393,7 +405,7 @@ class _CliArticle extends StatelessWidget {
     ),
   );
 
-  Widget _conflicts(ElThemeData theme) => DocsSection(
+  Widget _conflicts(ThemeTokens theme) => DocsSection(
     id: 'conflicts',
     title: 'Conflicts and recovery',
     child: Column(
@@ -407,7 +419,7 @@ class _CliArticle extends StatelessWidget {
           '--dry-run first to preview a plan without writing anything.',
           theme,
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         _prose(
           'doctor is the recovery entry point: it separately checks the '
           'Flutter project, elattar.yaml, whether pubspec.yaml\'s declared '

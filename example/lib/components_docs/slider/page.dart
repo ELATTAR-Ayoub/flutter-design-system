@@ -1,6 +1,6 @@
 /// Public documentation page for the `slider` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose `ElSection`
+/// **Re-housed onto the kit.** This page used to hand-compose `Section`
 /// panels; it now declares a `ComponentDocSpec`
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// `ComponentDocPage`, the same shape `button` established. Every specimen
@@ -15,10 +15,10 @@
 /// four-cell specimen grid, promoted to a real section), Installation,
 /// Usage, then one section per shadcn example this port can back up
 /// (Variants and sizes — a SnippetSection recording the deliberate absence,
-/// matching `field`'s own Anatomy section's shape, since ElSlider fixes one
+/// matching `field`'s own Anatomy section's shape, since Slider fixes one
 /// geometry and has nothing to show — Range, Multiple thumbs, Controlled,
 /// Disabled, Composition), then the eight disclosures. Vertical and RTL are
-/// still skipped: ElSlider exposes no orientation parameter and no
+/// still skipped: Slider exposes no orientation parameter and no
 /// directionality-aware layout. Three section titles are corrected to their
 /// exact required spelling: "States and feedback" -> "States", "Responsive
 /// and platform behavior" -> "Responsive", "Dependencies, files, assets,
@@ -30,12 +30,24 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
-import '../../kit.dart' show ElStateCell;
+import '../../kit.dart' show StateCell;
 import 'meta.dart';
 
 final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
@@ -47,7 +59,7 @@ final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'Four live specimens, all built from the same ElSlider '
+          'Four live specimens, all built from the same Slider '
           'constructor. Single value, Range and Custom range are operable: '
           'drag a knob, or focus it (tap and Tab, or see Accessibility) '
           'and use the arrow, Page and Home/End keys. Disabled is '
@@ -81,7 +93,7 @@ final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElSlider is reachable the same way '
+              'Add the export line so Slider is reachable the same way '
               'the CLI path already makes it.',
           code: "export 'slider.dart';",
         ),
@@ -90,8 +102,7 @@ final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
     SnippetSection(
       id: 'usage',
       title: 'Usage',
-      description:
-          'Import ElSlider and construct the smallest correct example.',
+      description: 'Import Slider and construct the smallest correct example.',
       code: _smallestUsageCode,
     ),
     SnippetSection(
@@ -106,7 +117,7 @@ final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
       id: 'range',
       title: 'Range',
       description:
-          'Pass two entries in values and ElSlider renders a range '
+          'Pass two entries in values and Slider renders a range '
           'slider: one thumb per entry, each stopping at its neighbour '
           'rather than crossing it.',
       specimen: _RangeSpecimen(),
@@ -128,9 +139,9 @@ final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
       id: 'controlled',
       title: 'Controlled',
       description:
-          'ElSlider renders no visible numeric readout of its own, label '
+          'Slider renders no visible numeric readout of its own, label '
           'only supplies the accessible name, never on-screen text. Pair '
-          'it with a ElText showing the current value(s) when the user '
+          'it with a StyledText showing the current value(s) when the user '
           'needs to see the number, not just feel the position.',
       specimen: _VolumeExample(),
       code: _controlledCode,
@@ -158,7 +169,7 @@ final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElSlider declares, and both static '
+          'Every constructor parameter Slider declares, and both static '
           'geometry getters.',
       child: _ApiReferenceContent(),
     ),
@@ -216,7 +227,7 @@ final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
             label: 'Shared machinery',
             value: 'lib/src/components/selection_control.dart',
             description:
-                'ElHitArea: shared with the checkbox, switch and radio '
+                'HitArea: shared with the checkbox, switch and radio '
                 'families and documented on their own component pages.',
           ),
           const DocsInstallFact(
@@ -261,9 +272,9 @@ class SliderDocPage extends StatelessWidget {
       title: sliderDoc.title,
       description: sliderDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Slider'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Slider'),
     ],
     toc: sliderDocSpec.toc,
     previous: const DocsPageLink(
@@ -283,7 +294,7 @@ class SliderDocPage extends StatelessWidget {
 
 const String _smallestUsageCode = '''double volume = 50;
 
-ElSlider(
+Slider(
   values: <double>[volume],
   min: 0,
   max: 100,
@@ -292,20 +303,20 @@ ElSlider(
 )''';
 
 const String _variantsCode =
-    '''// ElSlider fixes one geometry, like its checkbox/switch/radio
+    '''// Slider fixes one geometry, like its checkbox/switch/radio
 // siblings: no size or style variant to choose between.
-ElSlider.trackHeight; // 10px
-ElSlider.thumbSize;   // 20px
+Slider.trackHeight; // 10px
+Slider.thumbSize;   // 20px
 
 // The source also carries dormant data-vertical classes for a vertical
-// orientation, but no orientation parameter is exposed on ElSlider and no
+// orientation, but no orientation parameter is exposed on Slider and no
 // call site in the corpus used it: recorded as unbuilt rather than
 // shipped, the same ruling the source's own docstring states for the
 // reference's vertical branch.''';
 
 const String _rangeUsageCode = '''List<double> priceRange = <double>[10, 240];
 
-ElSlider(
+Slider(
   values: priceRange,
   min: 0,
   max: 500,
@@ -326,8 +337,8 @@ class _RangeSpecimenState extends State<_RangeSpecimen> {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: el(80),
-    child: ElSlider(
+    width: space(80),
+    child: Slider(
       key: const ValueKey<String>('slider-example:range'),
       values: _priceRange,
       min: 0,
@@ -341,7 +352,7 @@ class _RangeSpecimenState extends State<_RangeSpecimen> {
 
 const String _multipleThumbsCode = '''List<double> tiers = <double>[20, 50, 80];
 
-ElSlider(
+Slider(
   values: tiers,
   min: 0,
   max: 100,
@@ -362,8 +373,8 @@ class _MultipleThumbsSpecimenState extends State<_MultipleThumbsSpecimen> {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: el(80),
-    child: ElSlider(
+    width: space(80),
+    child: Slider(
       key: const ValueKey<String>('slider-example:multiple-thumbs'),
       values: _tiers,
       min: 0,
@@ -389,22 +400,22 @@ class _VolumeExampleState extends State<_VolumeExample> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
-      width: el(80),
+      width: space(80),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElSlider(
+          Slider(
             key: const ValueKey<String>('slider-example:controlled'),
             values: _volume,
             label: 'Volume',
             onChanged: (List<double> next) => setState(() => _volume = next),
           ),
-          SizedBox(height: el(2)),
-          ElText(
+          SizedBox(height: space(2)),
+          StyledText(
             'Volume: ${_volume.single.round()}',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ],
@@ -418,16 +429,16 @@ const String _controlledCode = '''double volume = 50;
 Column(
   crossAxisAlignment: CrossAxisAlignment.stretch,
   children: [
-    ElSlider(
+    Slider(
       values: [volume],
       label: 'Volume',
       onChanged: (List<double> next) => setState(() => volume = next.single),
     ),
-    ElText('Volume: \${volume.round()}', ElType.small),
+    StyledText('Volume: \${volume.round()}', TextStyles.small),
   ],
 )''';
 
-const String _disabledUsageCode = '''const ElSlider(
+const String _disabledUsageCode = '''const Slider(
   values: <double>[40],
   enabled: false,
   label: 'Disabled',
@@ -438,8 +449,8 @@ class _DisabledSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: el(80),
-    child: const ElSlider(
+    width: space(80),
+    child: const Slider(
       key: ValueKey<String>('slider-example:disabled'),
       values: <double>[40],
       enabled: false,
@@ -450,7 +461,7 @@ class _DisabledSpecimen extends StatelessWidget {
 
 const String _priceFilterCode =
     '// priceRange holds the two thumb values, ascending.\n'
-    'ElSlider(\n'
+    'Slider(\n'
     '  values: priceRange,\n'
     '  min: 0,\n'
     '  max: 500,\n'
@@ -458,13 +469,13 @@ const String _priceFilterCode =
     "  label: 'Price range',\n"
     '  onChanged: (List<double> next) => setState(() => priceRange = next),\n'
     ')\n\n'
-    '// ElSlider draws no numeric readout of its own: the caller states it.\n'
-    'ElText(\n'
+    '// Slider draws no numeric readout of its own: the caller states it.\n'
+    'StyledText(\n'
     "  '\${priceRange.first.round()} - \${priceRange.last.round()}',\n"
-    '  ElType.small,\n'
+    '  TextStyles.small,\n'
     ')';
 
-const String _ratingCode = '''ElSlider(
+const String _ratingCode = '''Slider(
   values: <double>[rating],
   min: 0,
   max: 5,
@@ -489,16 +500,16 @@ class _SliderPreviewState extends State<_SliderPreview> {
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      spacing: el(5),
-      runSpacing: el(5),
+      spacing: space(5),
+      runSpacing: space(5),
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
-        ElStateCell(
+        StateCell(
           label: 'Single value',
           note: 'Drag or use the arrow keys',
           child: SizedBox(
-            width: el(60),
-            child: ElSlider(
+            width: space(60),
+            child: Slider(
               key: const ValueKey<String>('slider-live-specimen'),
               values: _single,
               label: 'Single value',
@@ -506,12 +517,12 @@ class _SliderPreviewState extends State<_SliderPreview> {
             ),
           ),
         ),
-        ElStateCell(
+        StateCell(
           label: 'Range',
           note: 'Two independent thumbs',
           child: SizedBox(
-            width: el(60),
-            child: ElSlider(
+            width: space(60),
+            child: Slider(
               key: const ValueKey<String>('slider-live-range-specimen'),
               values: _range,
               label: 'Range',
@@ -519,12 +530,12 @@ class _SliderPreviewState extends State<_SliderPreview> {
             ),
           ),
         ),
-        ElStateCell(
+        StateCell(
           label: 'Custom range and step',
           note: 'min: 0, max: 500, step: 5',
           child: SizedBox(
-            width: el(60),
-            child: ElSlider(
+            width: space(60),
+            child: Slider(
               values: _custom,
               min: 0,
               max: 500,
@@ -534,11 +545,11 @@ class _SliderPreviewState extends State<_SliderPreview> {
             ),
           ),
         ),
-        ElStateCell(
+        StateCell(
           label: 'Disabled',
           child: SizedBox(
-            width: el(60),
-            child: const ElSlider(
+            width: space(60),
+            child: const Slider(
               values: <double>[40],
               enabled: false,
               label: 'Disabled',
@@ -554,17 +565,17 @@ const String _previewCode = '''Wrap(
   spacing: 20,
   runSpacing: 20,
   children: [
-    ElSlider(
+    Slider(
       values: single,
       label: 'Single value',
       onChanged: (List<double> next) => setState(() => single = next),
     ),
-    ElSlider(
+    Slider(
       values: range,
       label: 'Range',
       onChanged: (List<double> next) => setState(() => range = next),
     ),
-    ElSlider(
+    Slider(
       values: custom,
       min: 0,
       max: 500,
@@ -572,7 +583,7 @@ const String _previewCode = '''Wrap(
       label: 'Custom range and step',
       onChanged: (List<double> next) => setState(() => custom = next),
     ),
-    const ElSlider(values: [40], enabled: false, label: 'Disabled'),
+    const Slider(values: [40], enabled: false, label: 'Disabled'),
   ],
 )''';
 
@@ -583,18 +594,18 @@ class _ApiReferenceContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const DocsApiTable(title: 'ElSlider', facts: _sliderApiFacts),
-        SizedBox(height: el(5)),
-        const DocsApiTable(title: 'ElSlider statics', facts: _sliderStaticFacts),
-        SizedBox(height: el(5)),
+        const DocsApiTable(title: 'Slider', facts: _sliderApiFacts),
+        SizedBox(height: space(5)),
+        const DocsApiTable(title: 'Slider statics', facts: _sliderStaticFacts),
+        SizedBox(height: space(5)),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-          child: ElText(
-            'What happens with an out-of-range value: ElSlider does not '
+          constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+          child: StyledText(
+            'What happens with an out-of-range value: Slider does not '
             'clamp the List<double> you pass into values. A number below '
             'min or above max still renders: pinned to the near edge of '
             'the track, because the fraction used to position the thumb '
@@ -607,7 +618,7 @@ class _ApiReferenceContent extends StatelessWidget {
             'corrected on the very first interaction and can never be '
             'produced by dragging or the keyboard: only by a caller '
             'supplying it directly.',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ),
@@ -633,7 +644,7 @@ const List<DocsApiFact> _sliderApiFacts = <DocsApiFact>[
     description:
         'Called with the full next values list (same length) after a '
         'legal move. Null makes the control inoperable: the same "no '
-        'handler, no operation" rule ElButton follows.',
+        'handler, no operation" rule Button follows.',
   ),
   DocsApiFact(name: 'min', type: 'double', description: 'Defaults to 0.'),
   DocsApiFact(
@@ -675,14 +686,14 @@ const List<DocsApiFact> _sliderApiFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _sliderStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElSlider.trackHeight',
+    name: 'Slider.trackHeight',
     type: 'static double',
     description:
         "10px: the height of the whole control, since the root box IS "
         'the track.',
   ),
   DocsApiFact(
-    name: 'ElSlider.thumbSize',
+    name: 'Slider.thumbSize',
     type: 'static double',
     description:
         '20px: each thumb overflows the 10px track by 5px top and '
@@ -698,23 +709,23 @@ class _StatesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsStateMatrix(facts: _stateFacts),
-      SizedBox(height: el(4)),
-      ElText(
+      SizedBox(height: space(4)),
+      StyledText(
         'Omitted: Selected: a slider has no boolean "on" state to select; '
         'its whole value IS the state, covered above and in API. Error, '
-        'ElSlider defines no invalid parameter and no ElFieldScope '
+        'Slider defines no invalid parameter and no FieldScope '
         'participation at all; it is, in the source\'s own words, the one '
         'control in this family with "no field participation ... no '
         'aria-invalid, no data-invalid, no FieldScope": so there is no '
         'destructive-ring row to show, and this page will not invent one. '
-        'Loading and Empty, ElSlider is a synchronous primitive with no '
+        'Loading and Empty, Slider is a synchronous primitive with no '
         'async operation and nothing to list. Success: the component '
         'defines no success semantics of its own. Also unlike its '
-        'checkbox/switch/radio siblings, ElSlider never imports '
-        'ElJellyReplay: there is no post-change squash animation anywhere '
+        'checkbox/switch/radio siblings, Slider never imports '
+        'StateChangeFeedback: there is no post-change squash animation anywhere '
         'in this control.',
-        ElType.small,
-        color: ElTheme.of(context).mutedForeground,
+        TextStyles.small,
+        color: ThemeScope.of(context).mutedForeground,
       ),
     ],
   );
@@ -724,11 +735,11 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest',
     treatment:
-        'Track: theme.muted fill, theme.input border, ElShadows.pressed. '
-        'Thumb: theme.foreground, bordered theme.input, ElShadows.btn, '
+        'Track: theme.muted fill, theme.input border, Shadows.inset. '
+        'Thumb: theme.foreground, bordered theme.input, Shadows.control, '
         'with a zero-alpha ring slot already reserved.',
     userSignal:
-        'A recessed 10px channel with the fill (theme.actionInk) showing '
+        'A recessed 10px channel with the fill (theme.actionText) showing '
         'how far the value has travelled, and a raised knob resting on '
         'top of it.',
   ),
@@ -737,7 +748,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         "Entering the thumb's 34x34 hit area (not the painted 20px knob) "
         'fades a theme.ring ring in at 50% alpha over 250ms on '
-        'ElCurves.spring, and the knob SNAPS: not tweens: to 1.10x scale '
+        'MotionCurves.emphasized, and the knob SNAPS: not tweens: to 1.10x scale '
         'in a single frame.',
     userSignal:
         'A visible ring plus a knob that instantly looks 10% larger the '
@@ -757,7 +768,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Focus-visible',
     treatment:
         'Focusing a thumb lights the identical ring the hover and active '
-        'states use, ElSlider has no separate focus-only ring.',
+        'states use, Slider has no separate focus-only ring.',
     userSignal:
         'A visible ring with no scale change, since focus alone does not '
         'touch the transform.',
@@ -777,7 +788,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         "The ring's colour tween collapses to zero via "
-        'elAnimationDuration; the scale snap was never animated in the '
+        'effectiveMotionDuration; the scale snap was never animated in the '
         'first place, so reduced motion changes only the ring.',
     userSignal:
         'The ring appears or disappears instantly instead of springing; '
@@ -788,13 +799,12 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
 const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
   DocsInstallFact(
     label: 'Semantic role',
-    value:
-        'Semantics(slider: true, value:, increasedValue:, decreasedValue:)',
+    value: 'Semantics(slider: true, value:, increasedValue:, decreasedValue:)',
     description:
         'Each thumb gets its own Semantics node with slider: true, '
         'container: true and enabled: reflecting whether the control is '
         'actually operable (enabled && onChanged != null): not '
-        'ElSlider.enabled alone.',
+        'Slider.enabled alone.',
   ),
   DocsInstallFact(
     label: 'Label association',
@@ -812,7 +822,7 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
     label: 'Value announcement',
     value: 'Semantics.value, recomputed on every rebuild',
     description:
-        'ElSlider does supply a live value announcement that updates as '
+        'Slider does supply a live value announcement that updates as '
         'the thumb moves: printed as a bare integer ("40") when the '
         "value lands on a whole number and as Dart's default decimal "
         'string otherwise, with no percentage sign, no unit and no '
@@ -840,7 +850,7 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
     label: 'Touch target',
     value: '34 x 34, centred on each 20 x 20 thumb',
     description:
-        'ElHitArea grows the pointer AND hover target past the painted '
+        'HitArea grows the pointer AND hover target past the painted '
         "knob, 8px past its 18px padding box on every side, per "
         "selection_control.dart's own measured table. The track itself "
         'carries no extra inset of its own.',
@@ -856,8 +866,8 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
     label: 'Error wiring',
     value: 'None',
     description:
-        'ElSlider has no invalid parameter and does not read or fold in '
-        'an enclosing ElFieldScope\'s invalid flag at all: the one '
+        'Slider has no invalid parameter and does not read or fold in '
+        'an enclosing FieldScope\'s invalid flag at all: the one '
         "control in this family with no field participation, stated in "
         "the source's own docstring. A caller who needs an error state "
         'around a slider has to build one outside the control, not '
@@ -890,7 +900,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Right and Up add one step; Left and Down take one away; Page Up '
             'moves ten steps forward and Page Down ten steps back; Home '
             'and End jump straight to min and max. Every one of them '
@@ -920,15 +930,15 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Unlike its checkbox/switch/radio siblings, ElSlider is not a '
-            'fixed-size atom: ElSlider.trackHeight (10px) and '
-            'ElSlider.thumbSize (20px) are fixed, but the control\'s '
+      _bullets(ThemeScope.of(context), <String>[
+        'Unlike its checkbox/switch/radio siblings, Slider is not a '
+            'fixed-size atom: Slider.trackHeight (10px) and '
+            'Slider.thumbSize (20px) are fixed, but the control\'s '
             'WIDTH is fluid: a LayoutBuilder measures whatever width its '
             'parent constrains it to, and every fraction (thumb '
             'position, fill length) is computed against that measured '
             'width on every layout pass.',
-        'The same ElSlider genuinely stretches from a narrow mobile '
+        'The same Slider genuinely stretches from a narrow mobile '
             'column to a wide desktop panel with no breakpoint logic of '
             'its own; what changes with layout belongs entirely to '
             'whatever composes it.',
@@ -962,22 +972,22 @@ class _DependenciesContent extends StatelessWidget {
             description:
                 'slider.dart imports these directly from '
                 'lib/src/components: button.dart for '
-                'ElButton.withFocusRing (the ring-prepending shadow '
+                'Button.withFocusRing (the ring-prepending shadow '
                 "helper the thumb uses) and selection_control.dart for "
-                'ElHitArea, the shared hit-area/expander machinery every '
+                'HitArea, the shared hit-area/expander machinery every '
                 'control in this family relies on. Neither is copyable '
                 'in isolation: see Installation.',
           ),
           const DocsInstallFact(
             label: 'Foundation dependencies',
             value:
-                'effects/machine_surface.dart, foundation/motion.dart, '
+                'effects/surface.dart, foundation/motion.dart, '
                 'foundation/shadows.dart, foundation/spacing.dart, '
                 'foundation/theme.dart, theme_scope.dart',
             description:
-                'ElMachineSurface for the track/fill/thumb painting, the '
+                'Surface for the track/fill/thumb painting, the '
                 'sliderThumbHoverScale/sliderThumbActiveScale transform '
-                'tokens, ElShadows.pressed/btn/btnPrimary, the el() '
+                'tokens, Shadows.inset/btn/btnPrimary, the space() '
                 'spacing scale, and the live theme.',
           ),
           DocsInstallFact(
@@ -992,13 +1002,13 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Assets',
             value: 'none',
             description:
-                'The track, fill and thumb are ElMachineSurface fills, '
+                'The track, fill and thumb are Surface fills, '
                 'not an image or an icon-font glyph.',
           ),
           const DocsInstallFact(
             label: 'Fonts',
             value: 'none',
-            description: 'No text is rendered by ElSlider itself.',
+            description: 'No text is rendered by Slider itself.',
           ),
           const DocsInstallFact(
             label: 'Shaders',
@@ -1007,7 +1017,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
@@ -1015,10 +1025,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Selection control',
             route: '/components/selection_control',
           ),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',
@@ -1040,10 +1047,10 @@ const List<DocsInstallFact> _themingFacts = <DocsInstallFact>[
   ),
   DocsInstallFact(
     label: 'Filled range',
-    value: 'theme.actionInk: never theme.primary',
+    value: 'theme.actionText: never theme.primary',
     description:
         'The source measures theme.primary at 1.63:1 contrast against '
-        'theme.muted on this palette and theme.actionInk at 6.88:1, so '
+        'theme.muted on this palette and theme.actionText at 6.88:1, so '
         'the fill deliberately uses the theme-split action-ink token '
         'instead.',
   ),
@@ -1056,21 +1063,21 @@ const List<DocsInstallFact> _themingFacts = <DocsInstallFact>[
     label: 'Ring colour',
     value: 'theme.ring, at 50% alpha when hovered, dragged or focused',
     description:
-        "Prepended in front of ElShadows.btn's own four layers via "
-        'ElButton.withFocusRing: never replacing them.',
+        "Prepended in front of Shadows.control's own four layers via "
+        'Button.withFocusRing: never replacing them.',
   ),
   DocsInstallFact(
     label: 'Shadow',
     value:
-        'ElShadows.pressed (track) / ElShadows.btnPrimary (range) / '
-        'ElShadows.btn (thumb)',
+        'Shadows.inset (track) / Shadows.controlPrimary (range) / '
+        'Shadows.control (thumb)',
     description:
         'The raised/recessed vocabulary this control shares with '
         'checkbox, switch and radio.',
   ),
   DocsInstallFact(
     label: 'Radius',
-    value: 'ElRadii.pill (track ends) / full circle (thumb)',
+    value: 'Radii.full (track ends) / full circle (thumb)',
     description:
         "The range itself paints no radius of its own: the track's "
         "ClipRRect gives it its corners.",
@@ -1078,26 +1085,30 @@ const List<DocsInstallFact> _themingFacts = <DocsInstallFact>[
   DocsInstallFact(
     label: 'Motion',
     value:
-        'ElDurations.transitionDefault on ElCurves.spring (ring only); '
+        'MotionDurations.normal on MotionCurves.emphasized (ring only); '
         'the scale change is unanimated',
     description:
         "The ring tweens and can overshoot before settling; the "
         "hover/active scale snaps to its target in a single frame, since "
         "Tailwind's scale utility on the reference is not part of its "
-        'transition list. elAnimationDuration collapses the ring\'s '
+        'transition list. effectiveMotionDuration collapses the ring\'s '
         'duration to zero under reduced motion.',
   ),
 ];
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

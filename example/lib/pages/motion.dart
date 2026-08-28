@@ -9,18 +9,18 @@
 /// three buttons, all calling the same `replay`. React remounts any element
 /// whose `key` changes and a freshly mounted element starts its CSS animation
 /// at t=0; [KeyedSubtree] with a `ValueKey('$name-$run')` reproduces that
-/// exactly, because [ElKeyframePlayer] creates its controller in `initState`.
+/// exactly, because [KeyframePlayer] creates its controller in `initState`.
 /// Sixteen elements are keyed: six duration bars, four easing chips, six of
 /// the nine named demos: and the three infinite demos (ratchet, shimmer,
 /// pulse-live) are deliberately not: a loop has nothing to replay. There is no
 /// `replay()` API to call instead, on purpose; a broadcast `forward(from: 0)`
-/// cannot express `el-sweep`'s `both` fill on a demo that has not been built.
+/// cannot express `space-sweep`'s `both` fill on a demo that has not been built.
 ///
 /// Two mechanisms are worth naming before reading the code:
 ///
 /// * **The player's `t` is linear.** A CSS `animation-timing-function` eases
 ///   between adjacent keyframes, not across the run, so the easing lives in
-///   the tables ([ElKeyframes.track]) and never in the clock. Wrapping a
+///   the tables ([Keyframes.track]) and never in the clock. Wrapping a
 ///   player in a `CurvedAnimation` would ease twice.
 /// * **`animation-fill-mode` decides every reduced-motion freeze frame.** The
 ///   blanket `prefers-reduced-motion` rule collapses durations and iteration
@@ -30,19 +30,19 @@
 ///
 /// ## The seventeen drifts, all shipped as written (motion-map §13)
 ///
-/// 1. **D1: the easing chips do not move.** `el-travel` animates
+/// 1. **D1: the easing chips do not move.** `space-travel` animates
 ///    `translateX(calc(100% − 1.5rem))`, and a percentage inside `translateX`
 ///    resolves against the transformed element's **own** border box. The chip
 ///    is `size-6` = 24px, so `100%` is 24px and the `calc` is 0px. Verified
 ///    live by the supervisor (ruling M1): all four chips hold
 ///    `matrix(1,0,0,1,0,0)` across the run on a 482px track. [_TravelChip]
 ///    ships the no-op by passing the *chip's* width to
-///    [ElTravel.translationAt]; if upstream ever fixes it, the intended
+///    [TravelMotion.translationAt]; if upstream ever fixes it, the intended
 ///    reading: travel the track, less the chip's own width: is that one
 ///    argument changed to the track's width.
 /// 2. **D2, "40ms down, 250ms spring back" is true of two of six.** The
 ///    `#interaction` description promises it for the family; `press-spring`
-///    releases in 220ms ([ElDurations.pressSpringUp], a raw `0.22s` off the
+///    releases in 220ms ([MotionDurations.pressSpringUp], a raw `0.22s` off the
 ///    scale entirely) and `press-key` is 80ms linear both ways. The
 ///    description ships verbatim, the panel notes print the real numbers, and
 ///    the demos run at their real numbers.
@@ -90,7 +90,7 @@
 ///    draws both in source order: dead ink, not a missing feature.
 /// 16. **D16: six of the nine named animations set raw time literals**, not
 ///    tokens; only `anim-jelly-in` and `anim-reveal` read one. The port keeps
-///    the literals in the foundation layer ([ElDurations.popIn], `.springUp`,
+///    the literals in the foundation layer ([MotionDurations.popIn], `.springUp`,
 ///    `.signOn`, `.ratchet`, `.shimmer`, `.pulseLive`) rather than inlining
 ///    them here, which is the guard's rule, not a correction of the drift.
 /// 17. **D17: the prose says Space Grotesk; `--font-sans` is Inter.** Tokens
@@ -101,7 +101,7 @@
 ///
 /// * **M4, `pulls-reveal` is orthographic.** The element carries no
 ///   `perspective` and neither does any ancestor, so the Y rotation is a flat
-///   horizontal squash with no foreshortening. [ElReveal.transformAt] never
+///   horizontal squash with no foreshortening. [RevealMotion.transformAt] never
 ///   sets the perspective entry; adding it would look better and be wrong.
 /// * **M5: the press buttons inherit 16px.** They carry no `.type-*` class,
 ///   so their label is the browser default at `font-semibold`.
@@ -112,7 +112,19 @@ library;
 import 'dart:math' as math;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -120,33 +132,33 @@ import '../nav.dart';
 /* ── Measures ────────────────────────────────────────────────────────────── */
 
 /// `h-24`: every demo stage on this page, and the three press buttons.
-final double _demoHeight = el(24);
+final double _demoHeight = space(24);
 
 /// `h-8`: a duration bar's track.
-final double _sweepTrackHeight = el(8);
+final double _sweepTrackHeight = space(8);
 
 /// `h-6`: the easing panels' travel track, and `size-6` the chip on it.
-final double _travelTrackHeight = el(6);
-final double _chipSize = el(6);
+final double _travelTrackHeight = space(6);
+final double _chipSize = space(6);
 
 /// `h-28`: the `<svg>` box a [_CurveGraph] is drawn inside.
-final double _graphHeight = el(28);
+final double _graphHeight = space(28);
 
 /// `sm:grid-cols-[13rem_4rem_1fr]`: a duration row's two fixed columns.
-final double _tokenColumn = el(52);
-final double _msColumn = el(16);
+final double _tokenColumn = space(52);
+final double _msColumn = space(16);
 
 /// `max-w-sm`: the `.lift` card's cap.
-final double _liftMaxWidth = el(96);
+final double _liftMaxWidth = space(96);
 
 /// `size-10` and its `h-4 w-0.5` needle: the ratchet.
-final double _ratchetSquare = el(10);
-final double _needleHeight = el(4);
-final double _needleWidth = el(0.5);
+final double _ratchetSquare = space(10);
+final double _needleHeight = space(4);
+final double _needleWidth = space(0.5);
 
 /// `mt-2 size-1.5`: a reduced-motion bullet's dot.
-final double _bulletSize = el(1.5);
-final double _bulletTop = el(2);
+final double _bulletSize = space(1.5);
+final double _bulletTop = space(2);
 
 /// The three press buttons, and the `.lift` card, carry **no** `.type-*`
 /// class: `font-semibold` over whatever `<body>` inherits. `html` sets only
@@ -162,8 +174,8 @@ const double _inheritedFontSize = 16;
 const double _semiboldWght = 600;
 
 /// `font-semibold` at the inherited size: see [_inheritedFontSize].
-final ElTypeSpec _inheritedSemibold = ElTypeSpec(
-  family: ElFonts.sans,
+final TextStyleToken _inheritedSemibold = TextStyleToken(
+  family: Fonts.sans,
   size: _inheritedFontSize,
   wght: _semiboldWght,
 );
@@ -194,36 +206,36 @@ typedef _Duration = ({String token, Duration duration, String use});
 final List<_Duration> _durations = <_Duration>[
   (
     token: '--duration-tick',
-    duration: ElDurations.tick,
+    duration: MotionDurations.tick,
     use:
         'The machine beat. A press registers in this long, and nothing else '
         'uses it.',
   ),
   (
     token: '--duration-fast',
-    duration: ElDurations.fast,
+    duration: MotionDurations.fast,
     use: 'Button press and release, checkbox tick, chip select.',
   ),
   (
     token: '--duration-base',
-    duration: ElDurations.base,
+    duration: MotionDurations.normal,
     use:
         'The default. Spring release, card hover lift, tab underline, focus '
         'fade.',
   ),
   (
     token: '--duration-slow',
-    duration: ElDurations.slow,
+    duration: MotionDurations.slow,
     use: 'Content entering: rows springing up, feed items arriving.',
   ),
   (
     token: '--duration-overlay',
-    duration: ElDurations.overlay,
+    duration: MotionDurations.overlayEnter,
     use: 'Dialogs, drawers, sheets, popovers opening and closing.',
   ),
   (
     token: '--duration-reward',
-    duration: ElDurations.reward,
+    duration: MotionDurations.reward,
     use: 'Card reveal, rare pull, XP fill, reward unlock. The only long one.',
   ),
 ];
@@ -240,7 +252,7 @@ final List<_Easing> _easings = <_Easing>[
   (
     token: '--ease-spring',
     curve: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-    cubic: ElCurves.spring,
+    cubic: MotionCurves.emphasized,
     use:
         'THE curve. Overshoots then settles. Every press release, every jelly '
         'entrance.',
@@ -248,7 +260,7 @@ final List<_Easing> _easings = <_Easing>[
   (
     token: '--ease-out',
     curve: 'cubic-bezier(0.22, 1, 0.36, 1)',
-    cubic: ElCurves.out,
+    cubic: MotionCurves.enter,
     use:
         'Anything that arrives. Cards, rows, overlays. Fast start, long '
         'settle.',
@@ -256,13 +268,13 @@ final List<_Easing> _easings = <_Easing>[
   (
     token: '--ease-in-out',
     curve: 'cubic-bezier(0.65, 0, 0.35, 1)',
-    cubic: ElCurves.inOut,
+    cubic: MotionCurves.move,
     use: 'Anything that loops. Live pulse, breathing glow, shimmer.',
   ),
   (
     token: '--ease-out-flex',
     curve: 'cubic-bezier(0.05, 0.6, 0.4, 0.9)',
-    cubic: ElCurves.outFlex,
+    cubic: MotionCurves.outFlex,
     use: 'Long travel that must not overshoot — drawers, sheets, scroll rails.',
   ),
 ];
@@ -275,7 +287,7 @@ class MotionPage extends StatefulWidget {
   /// The rect the easing graphs' 100×100 unit box occupies inside an `<svg>`
   /// viewport of [size].
   ///
-  /// Exposed for tests, the way [ElMachineSurface.debugInsetRing] is: the
+  /// Exposed for tests, the way [Surface.debugInsetRing] is: the
   /// letterbox is the single detail of this page most likely to be got wrong,
   /// and "the painter fills its box" is a bug no copy assertion can catch. At
   /// the reference's 482 × 112 panel this returns
@@ -309,12 +321,12 @@ class _MotionPageState extends State<MotionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('foundations', 'motion');
+    final CategoryHit here = findCategory('foundations', 'motion');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           eyebrow: here.group.title,
           title: here.category.title,
           blurb: here.category.blurb,
@@ -323,27 +335,27 @@ class _MotionPageState extends State<MotionPage> {
           contents: here.category.contents,
         ),
         // `className="mb-12"`.
-        ElNote(
+        Note(
           title: 'Everything on this page is live',
-          child: ElText(
+          child: StyledText(
             'Timings are judged, not read. Hover the interaction demos and use '
             'the replay buttons to re-run the entrances. If your system is set '
             'to reduce motion, every animation here collapses to near-zero — '
             'which is the correct behaviour, not a bug.',
-            ElType.small,
+            TextStyles.small,
           ),
         ),
-        SizedBox(height: el(12)),
+        SizedBox(height: space(12)),
         _DurationsSection(run: _run, onReplay: _replay),
         _EasingSection(run: _run, onReplay: _replay),
         const _InteractionSection(),
         _NamedSection(run: _run, onReplay: _replay),
         const _ChoreographySection(),
         const _ReducedSection(),
-        const ElSection(
+        const Section(
           id: 'rules',
           title: 'Rules',
-          child: ElDoDont(
+          child: DoDont(
             dos: <String>[
               // D7: 100 and 200 are not tokens; 80 and 400 are, and are tabled
               // three sections above. Verbatim.
@@ -369,7 +381,7 @@ class _MotionPageState extends State<MotionPage> {
             ],
           ),
         ),
-        const ElPageFootNav(groupId: 'foundations', slug: 'motion'),
+        const PageFootNav(groupId: 'foundations', slug: 'motion'),
       ],
     );
   }
@@ -389,20 +401,20 @@ class _ReplayButton extends StatelessWidget {
     return Align(
       // `flex justify-end`.
       alignment: Alignment.centerRight,
-      child: ElButton(
-        variant: ElButtonVariant.outline,
-        size: ElButtonSize.sm,
+      child: Button(
+        variant: ButtonVariant.outline,
+        size: ButtonSize.sm,
         onPressed: onReplay,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const ElIcon(
-              ElIconGlyph.rotateCcw,
-              size: ElIconSize.sm,
-              tone: ElIconTone.inherit,
+            const Icon(
+              IconGlyph.rotateCcw,
+              size: IconSize.sm,
+              tone: IconTone.inherit,
             ),
             // `gap-1.5`, asked of the component rather than restated.
-            SizedBox(width: ElButton.gapFor(ElButtonSize.sm)),
+            SizedBox(width: Button.gapFor(ButtonSize.sm)),
             // Bare [Text]: the button installs its own `text-sm font-medium`
             // as the ambient style, which is exactly what the label inherits
             // in the reference.
@@ -424,9 +436,9 @@ class _DurationsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'durations',
       title: 'Durations',
       // D3: `--duration-overlay` is 320ms, and there is no 350ms token.
@@ -434,7 +446,7 @@ class _DurationsSection extends StatelessWidget {
           'Six steps. Standard interface motion sits between 150 and '
           '250ms, overlays get up to 350ms, and only reward moments are '
           'allowed past 400ms.',
-      child: ElPanel(
+      child: Panel(
         label: 'Same distance, six speeds',
         // The panel's note is live: the visible read-out of the replay
         // counter, `type-num-sm text-muted-foreground`.
@@ -443,21 +455,21 @@ class _DurationsSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             _ReplayButton(label: 'Replay', onReplay: onReplay),
-            SizedBox(height: el(5)),
+            SizedBox(height: space(5)),
             // `space-y-4`.
             for (int i = 0; i < _durations.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(height: el(4)),
+              if (i > 0) SizedBox(height: space(4)),
               _DurationRow(row: _durations[i], run: run),
             ],
             // `mt-6 … border-t border-border pt-5`.
-            SizedBox(height: el(6)),
+            SizedBox(height: space(6)),
             Container(
-              padding: EdgeInsets.only(top: el(5)),
+              padding: EdgeInsets.only(top: space(5)),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
                     color: theme.border,
-                    width: ElWidths.hairline,
+                    width: BorderWidths.hairline,
                   ),
                 ),
               ),
@@ -466,7 +478,7 @@ class _DurationsSection extends StatelessWidget {
                 children: <Widget>[
                   // `space-y-2`.
                   for (int i = 0; i < _durations.length; i++) ...<Widget>[
-                    if (i > 0) SizedBox(height: el(2)),
+                    if (i > 0) SizedBox(height: space(2)),
                     _DurationUse(row: _durations[i]),
                   ],
                 ],
@@ -488,20 +500,20 @@ class _DurationRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final bool wide = MediaQuery.sizeOf(context).width >= ElBreakpoints.sm;
+    final ThemeTokens theme = ThemeScope.of(context);
+    final bool wide = MediaQuery.sizeOf(context).width >= Breakpoints.sm;
 
-    final Widget token = ElText(
+    final Widget token = StyledText(
       row.token,
-      ElType.numSm,
-      color: theme.actionInk,
+      TextStyles.numberSm,
+      color: theme.actionText,
     );
-    final Widget ms = ElText(
+    final Widget ms = StyledText(
       '${row.duration.inMilliseconds}ms',
-      ElType.numSm,
+      TextStyles.numberSm,
       color: theme.mutedForeground,
     );
-    // `el-sweep {ms}ms var(--ease-out) both`, keyed on the run counter so the
+    // `space-sweep {ms}ms var(--ease-out) both`, keyed on the run counter so the
     // replay buttons remount it and it starts again from `from`.
     final Widget track = KeyedSubtree(
       key: ValueKey<String>('${row.token}-$run'),
@@ -513,9 +525,9 @@ class _DurationRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               SizedBox(width: _tokenColumn, child: token),
-              SizedBox(width: el(4)),
+              SizedBox(width: space(4)),
               SizedBox(width: _msColumn, child: ms),
-              SizedBox(width: el(4)),
+              SizedBox(width: space(4)),
               Expanded(child: track),
             ],
           )
@@ -523,9 +535,9 @@ class _DurationRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Align(alignment: Alignment.centerLeft, child: token),
-              SizedBox(height: el(4)),
+              SizedBox(height: space(4)),
               Align(alignment: Alignment.centerLeft, child: ms),
-              SizedBox(height: el(4)),
+              SizedBox(height: space(4)),
               track,
             ],
           );
@@ -552,28 +564,28 @@ class _SweepBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       height: _sweepTrackHeight,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(ElRadii.sm),
+        borderRadius: BorderRadius.circular(Radii.sm),
         child: ColoredBox(
           color: theme.muted,
-          child: ElKeyframePlayer(
+          child: KeyframePlayer(
             duration: duration,
-            fill: ElSweep.fill,
+            fill: SweepMotion.fill,
             builder: (BuildContext context, double t, Widget? child) =>
                 FractionallySizedBox(
                   alignment: Alignment.centerLeft,
-                  widthFactor: ElSweep.widthFactor.transform(t),
+                  widthFactor: SweepMotion.widthFactor.transform(t),
                   heightFactor: 1,
                   child: child,
                 ),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: ElPalette.action,
-                borderRadius: BorderRadius.circular(ElRadii.sm),
+                color: Palette.action,
+                borderRadius: BorderRadius.circular(Radii.sm),
               ),
             ),
           ),
@@ -591,23 +603,23 @@ class _DurationUse extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           TextSpan(
             text: '${row.duration.inMilliseconds}ms',
-            style: ElText.styleOf(
+            style: StyledText.styleOf(
               context,
-              ElType.numSm,
+              TextStyles.numberSm,
               color: theme.mutedForeground,
             ),
           ),
           TextSpan(text: ' — ${row.use}'),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -622,7 +634,7 @@ class _EasingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'easing',
       title: 'Easing',
       // D4: `--ease-standard` is not one of the four panels, and the controls
@@ -634,14 +646,14 @@ class _EasingSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElGrid(
+          Grid(
             sm: 2,
             children: <Widget>[
               for (final _Easing easing in _easings)
                 _EasingPanel(easing: easing, run: run),
             ],
           ),
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
           _ReplayButton(label: 'Replay curves', onReplay: onReplay),
         ],
       ),
@@ -657,23 +669,27 @@ class _EasingPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElPanel(
+    return Panel(
       label: easing.token,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           _CurveGraph(cubic: easing.cubic),
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
           KeyedSubtree(
             key: ValueKey<String>('${easing.token}-$run'),
             child: _TravelChip(curve: easing.cubic),
           ),
-          SizedBox(height: el(4)),
-          ElText(easing.curve, ElType.numSm, color: theme.mutedForeground),
-          SizedBox(height: el(2)),
-          ElText(easing.use, ElType.small),
+          SizedBox(height: space(4)),
+          StyledText(
+            easing.curve,
+            TextStyles.numberSm,
+            color: theme.mutedForeground,
+          ),
+          SizedBox(height: space(2)),
+          StyledText(easing.use, TextStyles.small),
         ],
       ),
     );
@@ -748,7 +764,7 @@ class _CurveGraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Semantics(
       image: true,
@@ -760,7 +776,7 @@ class _CurveGraph extends StatelessWidget {
           painter: _CurveGraphPainter(
             cubic: cubic,
             frame: theme.border,
-            curve: ElPalette.action,
+            curve: Palette.action,
           ),
         ),
       ),
@@ -832,7 +848,7 @@ class _CurveGraphPainter extends CustomPainter {
         ..color = curve
         ..style = PaintingStyle.stroke
         // SVG defaults are `butt` caps and `miter` joins, which Flutter also
-        // defaults to: unlike `ElIcon`'s glyph painter, which sets round caps
+        // defaults to: unlike `Icon`'s glyph painter, which sets round caps
         // for lucide.
         ..strokeWidth = _curveStrokeUnits,
     );
@@ -847,7 +863,7 @@ class _CurveGraphPainter extends CustomPainter {
 
 /* ── #easing · the travel chip ───────────────────────────────────────────── */
 
-/// `el-travel var(--duration-bloom) {curve} both` on a `size-6` chip, **and a
+/// `space-travel var(--duration-bloom) {curve} both` on a `size-6` chip, **and a
 /// verified no-op** (drift D1, ruling M1).
 ///
 /// The chip is handed its **own** width, because that is what a percentage
@@ -867,7 +883,7 @@ class _TravelChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       // `h-6 rounded-sm bg-muted`, and no `overflow-hidden`.
@@ -875,17 +891,17 @@ class _TravelChip extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: theme.muted,
-          borderRadius: BorderRadius.circular(ElRadii.sm),
+          borderRadius: BorderRadius.circular(Radii.sm),
         ),
         child: Align(
           alignment: Alignment.centerLeft,
-          child: ElKeyframePlayer(
-            duration: ElTravel.duration,
-            fill: ElTravel.fill,
+          child: KeyframePlayer(
+            duration: TravelMotion.duration,
+            fill: TravelMotion.fill,
             builder: (BuildContext context, double t, Widget? child) =>
                 Transform.translate(
                   offset: Offset(
-                    ElTravel.translationAt(t, _chipSize, curve: curve),
+                    TravelMotion.translationAt(t, _chipSize, curve: curve),
                     0,
                   ),
                   child: child,
@@ -895,8 +911,8 @@ class _TravelChip extends StatelessWidget {
               height: _chipSize,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: ElPalette.value,
-                  borderRadius: BorderRadius.circular(ElRadii.sm),
+                  color: Palette.value,
+                  borderRadius: BorderRadius.circular(Radii.sm),
                 ),
               ),
             ),
@@ -914,7 +930,7 @@ class _InteractionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'interaction',
       title: 'The click feel',
       // D2: true of `press` and `click-spring` only. `press-spring` releases
@@ -928,7 +944,7 @@ class _InteractionSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElGrid(
+          Grid(
             sm: 3,
             children: const <Widget>[
               _ClickSpringPanel(),
@@ -936,18 +952,18 @@ class _InteractionSection extends StatelessWidget {
               _PressKeyPanel(),
             ],
           ),
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
           const _LiftPanel(),
-          SizedBox(height: el(4)),
-          ElNote(
+          SizedBox(height: space(4)),
+          Note(
             title: 'Content bounces; controls click',
-            child: ElText(
+            child: StyledText(
               // `Yuki&rsquo;s`: a real right single quotation mark.
               'Yuki’s governing rule, and ours now. Springy motion for things '
               'that appear, react or reward. Machine motion for things you '
               'operate. Never mix them — a button that jellies feels broken, '
               'and a reward that clicks feels cheap.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ],
@@ -973,14 +989,14 @@ class _PressPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElPanel(
+    return Panel(
       label: label,
       note: note,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElText(copy, ElType.small),
-          SizedBox(height: el(5)),
+          StyledText(copy, TextStyles.small),
+          SizedBox(height: space(5)),
           button,
         ],
       ),
@@ -994,7 +1010,7 @@ class _ClickSpringPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return _PressPanel(
       label: '.click-spring',
@@ -1002,12 +1018,12 @@ class _ClickSpringPanel extends StatelessWidget {
       copy:
           'The global click feel. Goes on anything clickable that is not a '
           'Button — avatars, chips, badges, rows, nav items.',
-      button: ElPress(
-        scale: ElTransforms.clickSpringScale,
-        upDuration: ElDurations.base,
+      button: Press(
+        scale: MotionTransforms.clickSpringScale,
+        upDuration: MotionDurations.normal,
         child: _PressSurface(
           // `shadow-btn-primary` carries two inset layers.
-          spec: ElShadows.btnPrimary,
+          spec: Shadows.controlPrimary,
           fill: theme.primary,
           ink: theme.primaryForeground,
         ),
@@ -1023,7 +1039,7 @@ class _PressSpringPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return _PressPanel(
       label: '.press-spring',
@@ -1031,14 +1047,14 @@ class _PressSpringPanel extends StatelessWidget {
       copy:
           'Same feel, less travel. For larger surfaces where 0.9 would look '
           'comical.',
-      button: ElPress(
-        scale: ElTransforms.pressSpringScale,
-        upDuration: ElDurations.pressSpringUp,
+      button: Press(
+        scale: MotionTransforms.pressSpringScale,
+        upDuration: MotionDurations.pressSpringUp,
         child: _PressSurface(
-          spec: ElShadows.btn,
+          spec: Shadows.control,
           fill: theme.card,
           ink: theme.foreground,
-          border: Border.all(color: theme.border, width: ElWidths.hairline),
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
       ),
     );
@@ -1073,7 +1089,7 @@ class _PressSurface extends StatelessWidget {
     this.border,
   });
 
-  final ElShadowSpec spec;
+  final ShadowStyle spec;
   final Color fill;
   final Color ink;
   final BoxBorder? border;
@@ -1082,13 +1098,13 @@ class _PressSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: _demoHeight,
-      child: ElMachineSurface(
+      child: Surface(
         spec: spec,
-        radius: BorderRadius.circular(ElRadii.lg),
+        radius: BorderRadius.circular(Radii.lg),
         fill: fill,
         border: border,
         child: Center(
-          child: ElText('Press and hold', _inheritedSemibold, color: ink),
+          child: StyledText('Press and hold', _inheritedSemibold, color: ink),
         ),
       ),
     );
@@ -1097,7 +1113,7 @@ class _PressSurface extends StatelessWidget {
 
 /// `press-key`'s own clock.
 ///
-/// Not [ElPress]: this utility springs nothing. `transition: transform
+/// Not [Press]: this utility springs nothing. `transition: transform
 /// var(--duration-tick) linear, box-shadow var(--duration-tick) linear`: so
 /// the controller's raw value **is** the progress, with no curve applied in
 /// either direction, and the same 80ms governs press and release.
@@ -1123,8 +1139,8 @@ class _PressKeyButtonState extends State<_PressKeyButton>
 
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: ElDurations.tick,
-    reverseDuration: ElDurations.tick,
+    duration: MotionDurations.tick,
+    reverseDuration: MotionDurations.tick,
   );
 
   @override
@@ -1135,8 +1151,11 @@ class _PressKeyButtonState extends State<_PressKeyButton>
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final Duration tick = elAnimationDuration(context, ElDurations.tick);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final Duration tick = effectiveMotionDuration(
+      context,
+      MotionDurations.tick,
+    );
     _controller
       ..duration = tick
       ..reverseDuration = tick;
@@ -1154,10 +1173,12 @@ class _PressKeyButtonState extends State<_PressKeyButton>
             // Linear: the controller's own value, uncurved.
             final double t = _controller.value;
             return Transform.translate(
-              offset: Offset(0, ElTransforms.keyDownY * t),
-              child: ElMachineSurface(
-                spec: t < _discreteFlip ? ElShadows.key : ElShadows.keyDown,
-                radius: BorderRadius.circular(ElRadii.lg),
+              offset: Offset(0, MotionTransforms.keyDownY * t),
+              child: Surface(
+                spec: t < _discreteFlip
+                    ? Shadows.keyRaised
+                    : Shadows.keyPressed,
+                radius: BorderRadius.circular(Radii.lg),
                 // `bg-card` and no border class: the raised-key look is
                 // entirely the shadow's.
                 fill: theme.card,
@@ -1166,7 +1187,7 @@ class _PressKeyButtonState extends State<_PressKeyButton>
             );
           },
           child: Center(
-            child: ElText(
+            child: StyledText(
               'Press and hold',
               _inheritedSemibold,
               color: theme.foreground,
@@ -1185,9 +1206,9 @@ class _LiftPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElPanel(
+    return Panel(
       label: '.lift — cards and packs',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1201,10 +1222,10 @@ class _LiftPanel extends StatelessWidget {
                     // cap.
                     width: math.min(constraints.maxWidth, _liftMaxWidth),
                     height: _demoHeight,
-                    child: ElLiftCard(
-                      radius: BorderRadius.circular(ElRadii.lg),
+                    child: InteractiveCard(
+                      radius: BorderRadius.circular(Radii.lg),
                       builder: (BuildContext context, bool hovered) => Center(
-                        child: ElText(
+                        child: StyledText(
                           'Hover me',
                           _inheritedSemibold,
                           color: theme.foreground,
@@ -1214,11 +1235,11 @@ class _LiftPanel extends StatelessWidget {
                   ),
             ),
           ),
-          SizedBox(height: el(5)),
-          ElText(
+          SizedBox(height: space(5)),
+          StyledText(
             'Rises three pixels and gains a shadow — enough to read as '
             'interactive without the grid feeling unstable.',
-            ElType.small,
+            TextStyles.small,
           ),
         ],
       ),
@@ -1236,7 +1257,7 @@ class _NamedSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'named',
       title: 'Named animations',
       description:
@@ -1247,8 +1268,8 @@ class _NamedSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           _ReplayButton(label: 'Replay all', onReplay: onReplay),
-          SizedBox(height: el(5)),
-          ElGrid(
+          SizedBox(height: space(5)),
+          Grid(
             sm: 2,
             lg: 3,
             children: <Widget>[
@@ -1367,15 +1388,15 @@ class _NamedPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElPanel(
+    return Panel(
       label: label,
       note: note,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           demo,
-          SizedBox(height: el(4)),
-          ElText(copy, ElType.small),
+          SizedBox(height: space(4)),
+          StyledText(copy, TextStyles.small),
         ],
       ),
     );
@@ -1402,17 +1423,17 @@ class _DemoStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       height: _demoHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: fill ?? theme.card,
-          borderRadius: BorderRadius.circular(ElRadii.lg),
+          borderRadius: BorderRadius.circular(Radii.lg),
           border: Border.all(
             color: border ?? theme.border,
-            width: ElWidths.hairline,
+            width: BorderWidths.hairline,
           ),
         ),
         child: Center(child: child),
@@ -1428,15 +1449,15 @@ class _PopInDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElKeyframePlayer(
-      duration: ElPopIn.duration,
-      fill: ElPopIn.fill,
+    return KeyframePlayer(
+      duration: EntranceMotion.duration,
+      fill: EntranceMotion.fill,
       builder: (BuildContext context, double t, Widget? child) {
-        final Offset scale = ElPopIn.scale.transform(t);
+        final Offset scale = EntranceMotion.scale.transform(t);
         return Opacity(
-          opacity: _opacity(ElPopIn.opacity.transform(t)),
+          opacity: _opacity(EntranceMotion.opacity.transform(t)),
           child: Transform.scale(
             scaleX: scale.dx,
             scaleY: scale.dy,
@@ -1445,7 +1466,11 @@ class _PopInDemo extends StatelessWidget {
         );
       },
       child: _DemoStage(
-        child: ElText('Jelly pop', ElType.small, color: theme.foreground),
+        child: StyledText(
+          'Jelly pop',
+          TextStyles.small,
+          color: theme.foreground,
+        ),
       ),
     );
   }
@@ -1457,13 +1482,13 @@ class _JellyDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElKeyframePlayer(
-      duration: ElJelly.duration,
-      fill: ElJelly.fill,
+    return KeyframePlayer(
+      duration: StateChangeMotion.duration,
+      fill: StateChangeMotion.fill,
       builder: (BuildContext context, double t, Widget? child) {
-        final Offset scale = ElJelly.scale.transform(t);
+        final Offset scale = StateChangeMotion.scale.transform(t);
         return Transform.scale(
           scaleX: scale.dx,
           scaleY: scale.dy,
@@ -1471,9 +1496,13 @@ class _JellyDemo extends StatelessWidget {
         );
       },
       child: _DemoStage(
-        border: ElPalette.value.withValues(alpha: _valueBorderAlpha),
-        fill: ElPalette.value.withValues(alpha: _valueWashAlpha),
-        child: ElText('+\$1,240', ElType.numMd, color: theme.valueInk),
+        border: Palette.value.withValues(alpha: _valueBorderAlpha),
+        fill: Palette.value.withValues(alpha: _valueWashAlpha),
+        child: StyledText(
+          '+\$1,240',
+          TextStyles.numberMd,
+          color: theme.premiumText,
+        ),
       ),
     );
   }
@@ -1486,22 +1515,22 @@ class _SpringUpDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElKeyframePlayer(
-      duration: ElSpringUp.duration,
-      fill: ElSpringUp.fill,
+    return KeyframePlayer(
+      duration: SpringEntranceMotion.duration,
+      fill: SpringEntranceMotion.fill,
       builder: (BuildContext context, double t, Widget? child) => Opacity(
-        opacity: _opacity(ElSpringUp.opacity.transform(t)),
+        opacity: _opacity(SpringEntranceMotion.opacity.transform(t)),
         child: Transform.translate(
-          offset: Offset(0, ElSpringUp.translateY.transform(t)),
+          offset: Offset(0, SpringEntranceMotion.translateY.transform(t)),
           child: child,
         ),
       ),
       child: _DemoStage(
-        child: ElText(
+        child: StyledText(
           'Section entering',
-          ElType.small,
+          TextStyles.small,
           color: theme.foreground,
         ),
       ),
@@ -1519,24 +1548,28 @@ class _JellyInDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElKeyframePlayer(
-      duration: ElJellyIn.duration,
-      fill: ElJellyIn.fill,
+    return KeyframePlayer(
+      duration: OpenMotion.duration,
+      fill: OpenMotion.fill,
       builder: (BuildContext context, double t, Widget? child) => Opacity(
-        opacity: _opacity(ElJellyIn.opacity.transform(t)),
+        opacity: _opacity(OpenMotion.opacity.transform(t)),
         child: Transform.scale(
-          scale: ElJellyIn.scale.transform(t),
+          scale: OpenMotion.scale.transform(t),
           child: Transform.translate(
-            offset: Offset(0, ElJellyIn.translateY.transform(t)),
+            offset: Offset(0, OpenMotion.translateY.transform(t)),
             child: child,
           ),
         ),
       ),
       child: _DemoStage(
         border: theme.primary.withValues(alpha: _primaryBorderAlpha),
-        child: ElText('Screen entering', ElType.small, color: theme.foreground),
+        child: StyledText(
+          'Screen entering',
+          TextStyles.small,
+          color: theme.foreground,
+        ),
       ),
     );
   }
@@ -1545,7 +1578,7 @@ class _JellyInDemo extends StatelessWidget {
 /// `.anim-ratchet`: eight held 45° positions of 175ms each. 360° is never
 /// displayed; the cycle wraps to 0°.
 ///
-/// Driven through [ElRatchet.radiansAt] rather than a `CurvedAnimation`,
+/// Driven through [DiscreteProgressMotion.radiansAt] rather than a `CurvedAnimation`,
 /// deliberately: `CurvedAnimation` short-circuits `t == 1.0` to itself, which
 /// would paint the one frame `steps(8, jump-end)` exists to skip.
 ///
@@ -1557,17 +1590,20 @@ class _RatchetDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       height: _demoHeight,
       child: Center(
-        child: ElKeyframePlayer(
-          duration: ElRatchet.duration,
-          fill: ElRatchet.fill,
-          repeat: ElRatchet.loops,
+        child: KeyframePlayer(
+          duration: DiscreteProgressMotion.duration,
+          fill: DiscreteProgressMotion.fill,
+          repeat: DiscreteProgressMotion.loops,
           builder: (BuildContext context, double t, Widget? child) =>
-              Transform.rotate(angle: ElRatchet.radiansAt(t), child: child),
+              Transform.rotate(
+                angle: DiscreteProgressMotion.radiansAt(t),
+                child: child,
+              ),
           // The **square** rotates, needle included.
           child: Container(
             width: _ratchetSquare,
@@ -1575,13 +1611,16 @@ class _RatchetDemo extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: theme.card,
-              borderRadius: BorderRadius.circular(ElRadii.sm),
-              border: Border.all(color: theme.input, width: ElWidths.hairline),
+              borderRadius: BorderRadius.circular(Radii.sm),
+              border: Border.all(
+                color: theme.input,
+                width: BorderWidths.hairline,
+              ),
             ),
             child: SizedBox(
               width: _needleWidth,
               height: _needleHeight,
-              child: ColoredBox(color: ElPalette.actionBright),
+              child: ColoredBox(color: Palette.actionBright),
             ),
           ),
         ),
@@ -1593,7 +1632,7 @@ class _RatchetDemo extends StatelessWidget {
 /// `.anim-sign-on`: six hard cuts, no tweening.
 ///
 /// `steps(1, end)` applied between every pair of stops means no interpolation
-/// at all, so this reads [ElSignOn.frameAt] rather than a tween. Render order
+/// at all, so this reads [TextRevealMotion.frameAt] rather than a tween. Render order
 /// is the filter spec's: draw the text **and its shadows**, apply
 /// `brightness()`, then apply `opacity`.
 ///
@@ -1605,28 +1644,28 @@ class _SignOnDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       height: _demoHeight,
       child: Center(
-        child: ElKeyframePlayer(
-          duration: ElSignOn.duration,
-          fill: ElSignOn.fill,
+        child: KeyframePlayer(
+          duration: TextRevealMotion.duration,
+          fill: TextRevealMotion.fill,
           builder: (BuildContext context, double t, Widget? child) {
-            final ElSignOnFrame frame = ElSignOn.frameAt(t);
+            final TextRevealFrame frame = TextRevealMotion.frameAt(t);
             // `currentColor` is `text-value-ink`.
-            final TextStyle style = ElText.styleOf(
+            final TextStyle style = StyledText.styleOf(
               context,
-              ElType.h3,
-              color: theme.valueInk,
-            ).copyWith(shadows: frame.shadows(theme.valueInk));
+              TextStyles.h3,
+              color: theme.premiumText,
+            ).copyWith(shadows: frame.shadows(theme.premiumText));
 
             return Opacity(
               opacity: frame.opacity,
               child: ColorFiltered(
                 colorFilter: frame.brightnessFilter,
-                child: ElLineBox(
+                child: LineBox(
                   style: style,
                   // Literal uppercase in the source; no `text-transform`.
                   child: Text('LEGENDARY', style: style),
@@ -1646,15 +1685,15 @@ class _RevealDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElKeyframePlayer(
-      duration: ElReveal.duration,
-      fill: ElReveal.fill,
+    return KeyframePlayer(
+      duration: RevealMotion.duration,
+      fill: RevealMotion.fill,
       builder: (BuildContext context, double t, Widget? child) => Opacity(
-        opacity: _opacity(ElReveal.opacity.transform(t)),
+        opacity: _opacity(RevealMotion.opacity.transform(t)),
         child: Transform(
-          transform: ElReveal.transformAt(t),
+          transform: RevealMotion.transformAt(t),
           // `transform-origin: 50% 50%`, the CSS default.
           alignment: Alignment.center,
           child: child,
@@ -1662,10 +1701,10 @@ class _RevealDemo extends StatelessWidget {
       ),
       child: _DemoStage(
         border: theme.primary.withValues(alpha: _primaryBorderAlpha),
-        child: const ElIcon(
-          ElIconGlyph.sparkles,
-          size: ElIconSize.xl,
-          tone: ElIconTone.action,
+        child: const Icon(
+          IconGlyph.sparkles,
+          size: IconSize.xl,
+          tone: IconTone.action,
         ),
       ),
     );
@@ -1683,16 +1722,16 @@ class _ShimmerDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       height: _demoHeight,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(ElRadii.lg),
-        child: ElKeyframePlayer(
-          duration: ElShimmer.duration,
-          fill: ElShimmer.fill,
-          repeat: ElShimmer.loops,
+        borderRadius: BorderRadius.circular(Radii.lg),
+        child: KeyframePlayer(
+          duration: LoadingShimmerMotion.duration,
+          fill: LoadingShimmerMotion.fill,
+          repeat: LoadingShimmerMotion.loops,
           // No child: a childless [CustomPaint] takes `constraints.smallest`,
           // and the constraints here are tight on both axes: the stretched
           // panel column for width, the `h-24` above for height.
@@ -1700,7 +1739,7 @@ class _ShimmerDemo extends StatelessWidget {
               CustomPaint(
                 painter: _ShimmerPainter(
                   t: t,
-                  gradient: ElShimmer.gradient(theme),
+                  gradient: LoadingShimmerMotion.gradient(theme),
                 ),
               ),
         ),
@@ -1718,9 +1757,9 @@ class _ShimmerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Rect tile = Rect.fromLTWH(
-      ElShimmer.offsetAt(t, size.width),
+      LoadingShimmerMotion.offsetAt(t, size.width),
       0,
-      ElShimmer.tileWidth(size.width),
+      LoadingShimmerMotion.tileWidth(size.width),
       size.height,
     );
     canvas.drawRect(
@@ -1744,43 +1783,50 @@ class _PulseLiveDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return SizedBox(
       height: _demoHeight,
       child: Center(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: el(3), vertical: el(1.5)),
+          padding: EdgeInsets.symmetric(
+            horizontal: space(3),
+            vertical: space(1.5),
+          ),
           decoration: BoxDecoration(
-            color: ElPalette.success.withValues(alpha: _successWashAlpha),
-            borderRadius: BorderRadius.circular(ElRadii.pill),
+            color: Palette.success.withValues(alpha: _successWashAlpha),
+            borderRadius: BorderRadius.circular(Radii.full),
             border: Border.all(
-              color: ElPalette.success.withValues(alpha: _successBorderAlpha),
-              width: ElWidths.hairline,
+              color: Palette.success.withValues(alpha: _successBorderAlpha),
+              width: BorderWidths.hairline,
             ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              ElKeyframePlayer(
-                duration: ElPulseLive.duration,
-                fill: ElPulseLive.fill,
-                repeat: ElPulseLive.loops,
+              KeyframePlayer(
+                duration: LivePulseMotion.duration,
+                fill: LivePulseMotion.fill,
+                repeat: LivePulseMotion.loops,
                 builder: (BuildContext context, double t, Widget? child) =>
                     CustomPaint(
                       painter: _PulseRingPainter(t: t),
                       child: child,
                     ),
                 child: SizedBox(
-                  width: ElPulseLive.dotDiameter,
-                  height: ElPulseLive.dotDiameter,
+                  width: LivePulseMotion.dotDiameter,
+                  height: LivePulseMotion.dotDiameter,
                 ),
               ),
-              SizedBox(width: el(2.5)),
+              SizedBox(width: space(2.5)),
               // `text-success-ink` is a utility, so it beats `.type-micro`'s
               // own muted colour.
-              ElText('Live', ElType.micro, color: theme.successInk),
+              StyledText(
+                'Live',
+                TextStyles.eyebrowSmall,
+                color: theme.successText,
+              ),
             ],
           ),
         ),
@@ -1800,15 +1846,15 @@ class _PulseRingPainter extends CustomPainter {
     // The ring first: a `box-shadow` paints behind its element.
     canvas.drawCircle(
       centre,
-      ElPulseLive.ringRadiusAt(t),
-      Paint()..color = ElPulseLive.ringColorAt(t),
+      LivePulseMotion.ringRadiusAt(t),
+      Paint()..color = LivePulseMotion.ringColorAt(t),
     );
     canvas.drawCircle(
       centre,
-      ElPulseLive.dotRadius,
+      LivePulseMotion.dotRadius,
       Paint()
-        ..color = ElPulseLive.dotColor.withValues(
-          alpha: ElPulseLive.dotOpacityAt(t),
+        ..color = LivePulseMotion.dotColor.withValues(
+          alpha: LivePulseMotion.dotOpacityAt(t),
         ),
     );
   }
@@ -1826,14 +1872,14 @@ class _ChoreographySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ElSection(
+    return const Section(
       id: 'choreography',
       title: 'Pack-opening choreography',
       description:
           'The one sequence allowed to take real time. It is built '
           'from the same tokens, and every stage is skippable.',
-      child: ElMeta(
-        items: <ElMetaItem>[
+      child: Meta(
+        items: <MetaItem>[
           (
             k: '1 · Pack selected',
             v: TextSpan(
@@ -1903,7 +1949,7 @@ class _ChoreographySection extends StatelessWidget {
 /* ── #reduced ────────────────────────────────────────────────────────────── */
 
 /// The section describes the flag; it does not read it. Every demo above
-/// already honours it through `elAnimationDuration`, which is this port's
+/// already honours it through `effectiveMotionDuration`, which is this port's
 /// blanket `prefers-reduced-motion` rule.
 class _ReducedSection extends StatelessWidget {
   const _ReducedSection();
@@ -1922,41 +1968,41 @@ class _ReducedSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'reduced',
       title: 'Reduced motion',
       description:
           'A required behaviour, not a nicety. The product must stay '
           'fully usable and every value must stay legible with motion switched '
           'off.',
-      child: ElPanel(
+      child: Panel(
         label: 'What prefers-reduced-motion: reduce does',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // `space-y-3`.
             for (int i = 0; i < _bullets.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(height: el(3)),
+              if (i > 0) SizedBox(height: space(3)),
               _ReducedBullet(text: _bullets[i]),
             ],
-            SizedBox(height: el(5)),
+            SizedBox(height: space(5)),
             Container(
-              padding: EdgeInsets.only(top: el(5)),
+              padding: EdgeInsets.only(top: space(5)),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
                     color: theme.border,
-                    width: ElWidths.hairline,
+                    width: BorderWidths.hairline,
                   ),
                 ),
               ),
-              child: ElRichText(
+              child: RichText(
                 TextSpan(
                   children: <InlineSpan>[
                     const TextSpan(text: 'Implemented globally in '),
-                    ElCode.span('app/globals.css'),
+                    Code.span('app/globals.css'),
                     const TextSpan(
                       text:
                           ', so a new component inherits it without opting '
@@ -1964,7 +2010,7 @@ class _ReducedSection extends StatelessWidget {
                     ),
                   ],
                 ),
-                ElType.small,
+                TextStyles.small,
               ),
             ),
           ],
@@ -1993,14 +2039,14 @@ class _ReducedBullet extends StatelessWidget {
             height: _bulletSize,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: ElPalette.action,
+                color: Palette.action,
                 shape: BoxShape.circle,
               ),
             ),
           ),
         ),
-        SizedBox(width: el(2.5)),
-        Expanded(child: ElText(text, ElType.small)),
+        SizedBox(width: space(2.5)),
+        Expanded(child: StyledText(text, TextStyles.small)),
       ],
     );
   }

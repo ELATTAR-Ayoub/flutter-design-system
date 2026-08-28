@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -24,7 +48,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every named constructor parameter `ElAttachment` itself declares
+/// Every named constructor parameter `Attachment` itself declares
 /// (`lib/src/components/attachment.dart`), excluding `key`.
 const List<String> _attachmentParams = <String>[
   'media',
@@ -67,7 +91,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: AttachmentDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -85,39 +109,39 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _attachmentParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
-        for (final ElAttachmentState state in ElAttachmentState.values) {
+        for (final AttachmentState state in AttachmentState.values) {
           expect(
             find.text(state.name),
             findsWidgets,
-            reason: 'ElAttachmentState.${state.name} missing',
+            reason: 'AttachmentState.${state.name} missing',
           );
         }
-        for (final ElAttachmentSize size in ElAttachmentSize.values) {
+        for (final AttachmentSize size in AttachmentSize.values) {
           expect(
-            find.text('ElAttachmentSize.${size.name}'),
+            find.text('AttachmentSize.${size.name}'),
             findsWidgets,
-            reason: 'ElAttachmentSize.${size.name} missing',
+            reason: 'AttachmentSize.${size.name} missing',
           );
         }
-        for (final ElAttachmentOrientation orientation
-            in ElAttachmentOrientation.values) {
+        for (final AttachmentOrientation orientation
+            in AttachmentOrientation.values) {
           expect(
-            find.text('ElAttachmentOrientation.${orientation.name}'),
+            find.text('AttachmentOrientation.${orientation.name}'),
             findsWidgets,
-            reason: 'ElAttachmentOrientation.${orientation.name} missing',
+            reason: 'AttachmentOrientation.${orientation.name} missing',
           );
         }
-        for (final ElAttachmentMediaVariant variant
-            in ElAttachmentMediaVariant.values) {
+        for (final AttachmentMediaVariant variant
+            in AttachmentMediaVariant.values) {
           expect(
-            find.text('ElAttachmentMediaVariant.${variant.name}'),
+            find.text('AttachmentMediaVariant.${variant.name}'),
             findsWidgets,
-            reason: 'ElAttachmentMediaVariant.${variant.name} missing',
+            reason: 'AttachmentMediaVariant.${variant.name} missing',
           );
         }
 
@@ -129,35 +153,35 @@ void main() {
           );
         }
 
-        // A live ElAttachment of every ElAttachmentState mounts somewhere
+        // A live Attachment of every AttachmentState mounts somewhere
         // on the page, this page's own promise, not just the API table's
         // prose.
-        final Set<ElAttachmentState> mountedStates = tester
-            .widgetList<ElAttachment>(find.byType(ElAttachment))
-            .map((ElAttachment a) => a.state)
+        final Set<AttachmentState> mountedStates = tester
+            .widgetList<Attachment>(find.byType(Attachment))
+            .map((Attachment a) => a.state)
             .toSet();
-        expect(mountedStates, containsAll(ElAttachmentState.values));
+        expect(mountedStates, containsAll(AttachmentState.values));
 
-        final Set<ElAttachmentSize> mountedSizes = tester
-            .widgetList<ElAttachment>(find.byType(ElAttachment))
-            .map((ElAttachment a) => a.size)
+        final Set<AttachmentSize> mountedSizes = tester
+            .widgetList<Attachment>(find.byType(Attachment))
+            .map((Attachment a) => a.size)
             .toSet();
-        expect(mountedSizes, containsAll(ElAttachmentSize.values));
+        expect(mountedSizes, containsAll(AttachmentSize.values));
 
-        final Set<ElAttachmentMediaVariant> mountedVariants = tester
-            .widgetList<ElAttachmentMedia>(find.byType(ElAttachmentMedia))
-            .map((ElAttachmentMedia m) => m.variant)
+        final Set<AttachmentMediaVariant> mountedVariants = tester
+            .widgetList<AttachmentMedia>(find.byType(AttachmentMedia))
+            .map((AttachmentMedia m) => m.variant)
             .toSet();
-        expect(mountedVariants, containsAll(ElAttachmentMediaVariant.values));
+        expect(mountedVariants, containsAll(AttachmentMediaVariant.values));
 
         // The download example actually carries a downloadName, and the
         // preview example actually carries a non-null preview.
-        final ElAttachmentMedia downloadMedia = tester.widget<ElAttachmentMedia>(
+        final AttachmentMedia downloadMedia = tester.widget<AttachmentMedia>(
           find.descendant(
             of: find.byKey(
               const ValueKey<String>('attachment-example:preview'),
             ),
-            matching: find.byType(ElAttachmentMedia),
+            matching: find.byType(AttachmentMedia),
           ),
         );
         expect(downloadMedia.preview, isNotNull);
@@ -166,15 +190,15 @@ void main() {
         expect(
           attachmentDoc.exports,
           containsAll(<String>[
-            'ElAttachment',
-            'ElAttachmentMedia',
-            'ElAttachmentContent',
-            'ElAttachmentTitle',
-            'ElAttachmentDescription',
-            'ElAttachmentActions',
-            'ElAttachmentAction',
-            'ElAttachmentTrigger',
-            'ElAttachmentGroup',
+            'Attachment',
+            'AttachmentMedia',
+            'AttachmentContent',
+            'AttachmentTitle',
+            'AttachmentDescription',
+            'AttachmentActions',
+            'AttachmentAction',
+            'AttachmentTrigger',
+            'AttachmentGroup',
           ]),
         );
         expect(attachmentDoc.command, 'elattar add attachment');
@@ -182,28 +206,27 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 5000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 5000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AttachmentDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AttachmentDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Five specimen stages: Preview, Orientation & size, Media,
-        // Preview and download, Group.
-        expect(find.byType(DocsShowcase), findsNWidgets(5));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Five specimen stages: Preview, Orientation & size, Media,
+      // Preview and download, Group.
+      expect(find.byType(DocsShowcase), findsNWidgets(5));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -237,7 +260,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const AttachmentDocPage(),
         ),
       );
@@ -276,7 +299,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const AttachmentDocPage(),
           ),
         );
@@ -305,24 +328,24 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const AttachmentDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('attachment-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('attachment-doc-article')),
           ),

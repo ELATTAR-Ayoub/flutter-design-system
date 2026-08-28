@@ -2,7 +2,33 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 
 import '../theme_toggle.dart';
 import 'showcase_dashboard.dart';
@@ -37,7 +63,7 @@ class SignalStudioApp extends StatefulWidget {
 }
 
 class _SignalStudioAppState extends State<SignalStudioApp> {
-  final ElThemeController _theme = ElThemeController();
+  final ThemeController _theme = ThemeController();
 
   @override
   void dispose() {
@@ -47,7 +73,7 @@ class _SignalStudioAppState extends State<SignalStudioApp> {
 
   @override
   Widget build(BuildContext context) {
-    Widget app = ElTheme(
+    Widget app = ThemeScope(
       controller: _theme,
       child: MaterialApp(
         title: 'Signal Studio',
@@ -97,7 +123,7 @@ class SignalStudioShowcase extends StatefulWidget {
 }
 
 class _SignalStudioShowcaseState extends State<SignalStudioShowcase> {
-  final ElToastController _toasts = ElToastController();
+  final ToastController _toasts = ToastController();
   ShowcaseDestination _destination = ShowcaseDestination.profile;
 
   @override
@@ -135,13 +161,13 @@ class _SignalStudioShell extends StatelessWidget {
   final ValueChanged<ShowcaseDestination> onDestinationChanged;
   final WidgetBuilder? profileBuilder;
   final WidgetBuilder? reelsBuilder;
-  final ElToastController toaster;
+  final ToastController toaster;
   final VoidCallback? onOpenDesignSystem;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    final bool compact = MediaQuery.sizeOf(context).width < ElBreakpoints.lg;
+    final ThemeTokens theme = ThemeScope.of(context);
+    final bool compact = MediaQuery.sizeOf(context).width < Breakpoints.lg;
     final List<Widget> pages = <Widget>[
       profileBuilder?.call(context) ?? SignalStudioProfilePage(toasts: toaster),
       const ShowcaseDashboard(),
@@ -149,25 +175,29 @@ class _SignalStudioShell extends StatelessWidget {
     ];
 
     return DefaultTextStyle(
-      style: ElText.styleOf(context, ElType.body, color: theme.foreground),
+      style: StyledText.styleOf(
+        context,
+        TextStyles.body,
+        color: theme.foreground,
+      ),
       child: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          const ElPageGlow(),
-          ElSafeArea(
+          const BackgroundEffect(),
+          SafeArea(
             child: Column(
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.fromLTRB(
-                    compact ? el(4) : el(5),
-                    el(3),
-                    compact ? el(4) : el(5),
-                    el(3),
+                    compact ? space(4) : space(5),
+                    space(3),
+                    compact ? space(4) : space(5),
+                    space(3),
                   ),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
-                        maxWidth: compact ? ElContainers.md : ElWidths.page,
+                        maxWidth: compact ? Containers.md : LayoutWidths.page,
                       ),
                       child: _StudioHeader(
                         compact: compact,
@@ -183,7 +213,7 @@ class _SignalStudioShell extends StatelessWidget {
                     compact: compact,
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(
-                        maxWidth: ElWidths.page,
+                        maxWidth: LayoutWidths.page,
                       ),
                       child: IndexedStack(
                         index: destination.index,
@@ -197,13 +227,13 @@ class _SignalStudioShell extends StatelessWidget {
           ),
           if (compact)
             Positioned(
-              left: el(0),
-              right: el(0),
-              bottom: el(0),
-              child: ElSafeArea(
+              left: space(0),
+              right: space(0),
+              bottom: space(0),
+              child: SafeArea(
                 top: false,
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(el(5), 0, el(5), el(3)),
+                  padding: EdgeInsets.fromLTRB(space(5), 0, space(5), space(3)),
                   child: _DestinationNavigation(
                     compact: true,
                     destination: destination,
@@ -212,7 +242,7 @@ class _SignalStudioShell extends StatelessWidget {
                 ),
               ),
             ),
-          Positioned.fill(child: ElToaster(controller: toaster)),
+          Positioned.fill(child: Toaster(controller: toaster)),
         ],
       ),
     );
@@ -234,14 +264,14 @@ class _StudioHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget identity = ElButton(
+    final Widget identity = Button(
       key: const Key('showcase-header-profile'),
-      variant: ElButtonVariant.ghost,
-      size: ElButtonSize.sm,
+      variant: ButtonVariant.ghost,
+      size: ButtonSize.sm,
       padding: compact
           ? EdgeInsets.only(
-              left: el(4) - ElWidths.hairline,
-              right: ElButton.paddingXFor(ElButtonSize.sm),
+              left: space(4) - BorderWidths.hairline,
+              right: Button.paddingXFor(ButtonSize.sm),
             )
           : null,
       label: 'Open Ari Rocha profile',
@@ -249,14 +279,14 @@ class _StudioHeader extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const ElAvatar(
+          const Avatar(
             key: Key('showcase-header-avatar'),
             fallback: 'AR',
             image: AssetImage('assets/imgs/sample-card.png'),
-            size: ElAvatarSize.sm,
+            size: AvatarSize.sm,
           ),
-          SizedBox(width: el(2)),
-          ElText('Ari Rocha', ElType.nav),
+          SizedBox(width: space(2)),
+          StyledText('Ari Rocha', TextStyles.nav),
         ],
       ),
     );
@@ -265,23 +295,23 @@ class _StudioHeader extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (onOpenDesignSystem case final VoidCallback openDocs) ...<Widget>[
-          ElButton(
-            variant: ElButtonVariant.outline,
-            size: compact ? ElButtonSize.icon : ElButtonSize.sm,
+          Button(
+            variant: ButtonVariant.outline,
+            size: compact ? ButtonSize.icon : ButtonSize.sm,
             label: 'Back to design system',
             onPressed: openDocs,
             child: compact
-                ? ElIcon.lucide(ElLucide.arrowLeft, size: ElIconSize.sm)
+                ? Icon.lucide(Lucide.arrowLeft, size: IconSize.sm)
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      ElIcon.lucide(ElLucide.arrowLeft, size: ElIconSize.sm),
-                      SizedBox(width: ElButton.gapFor(ElButtonSize.sm)),
-                      ElText('System', ElComponentType.buttonLabel),
+                      Icon.lucide(Lucide.arrowLeft, size: IconSize.sm),
+                      SizedBox(width: Button.gapFor(ButtonSize.sm)),
+                      StyledText('System', TextStyles.buttonLabel),
                     ],
                   ),
           ),
-          SizedBox(width: el(2)),
+          SizedBox(width: space(2)),
         ],
         const ThemeToggle(),
       ],
@@ -293,7 +323,7 @@ class _StudioHeader extends StatelessWidget {
           Expanded(
             child: Align(alignment: Alignment.centerLeft, child: identity),
           ),
-          SizedBox(width: el(2)),
+          SizedBox(width: space(2)),
           controls,
         ],
       );
@@ -302,7 +332,7 @@ class _StudioHeader extends StatelessWidget {
     return Row(
       children: <Widget>[
         identity,
-        SizedBox(width: el(2)),
+        SizedBox(width: space(2)),
         Expanded(
           child: _DestinationNavigation(
             compact: false,
@@ -310,7 +340,7 @@ class _StudioHeader extends StatelessWidget {
             onChanged: onDestinationChanged,
           ),
         ),
-        SizedBox(width: el(3)),
+        SizedBox(width: space(3)),
         controls,
       ],
     );
@@ -329,47 +359,48 @@ class _DestinationNavigation extends StatelessWidget {
   final ValueChanged<ShowcaseDestination> onChanged;
 
   static const List<
-    ({ShowcaseDestination destination, String label, ElLucideGlyph glyph})
+    ({ShowcaseDestination destination, String label, LucideGlyph glyph})
   >
   _items =
-      <({ShowcaseDestination destination, String label, ElLucideGlyph glyph})>[
+      <({ShowcaseDestination destination, String label, LucideGlyph glyph})>[
         (
           destination: ShowcaseDestination.profile,
           label: 'Profile',
-          glyph: ElLucide.userRound,
+          glyph: Lucide.userRound,
         ),
         (
           destination: ShowcaseDestination.dashboard,
           label: 'Dashboard',
-          glyph: ElLucide.layoutDashboard,
+          glyph: Lucide.layoutDashboard,
         ),
         (
           destination: ShowcaseDestination.reels,
           label: 'Reels',
-          glyph: ElLucide.clapperboard,
+          glyph: Lucide.clapperboard,
         ),
       ];
 
   @override
   Widget build(BuildContext context) {
     if (compact) {
-      return ElGlassPanelClear(
+      return Glass(
+        variant: GlassVariant.navigation,
         key: const Key('showcase-compact-dock'),
-        radius: BorderRadius.circular(ElRadii.xl3),
-        padding: EdgeInsets.all(el(2)),
+        radius: BorderRadius.circular(Radii.xl3),
+        padding: EdgeInsets.all(space(2)),
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            final ElThemeData theme = ElTheme.of(context);
+            final ThemeTokens theme = ThemeScope.of(context);
             final double slotWidth = constraints.maxWidth / _items.length;
             return FocusTraversalGroup(
               policy: WidgetOrderTraversalPolicy(),
-              child: ElSlidingPillGroup(
+              child: ActiveIndicator(
                 key: const Key('showcase-destination-pill-group'),
                 activeIndex: destination.index,
-                pill: ElMachineSurface(
+                indicator: Surface(
                   key: const Key('showcase-destination-pill'),
-                  spec: ElShadows.chip,
-                  radius: BorderRadius.circular(ElRadii.lg),
+                  spec: Shadows.compactControl,
+                  radius: BorderRadius.circular(Radii.lg),
                   fill: theme.secondary,
                   child: const SizedBox.expand(),
                 ),
@@ -377,7 +408,7 @@ class _DestinationNavigation extends StatelessWidget {
                   for (final ({
                         ShowcaseDestination destination,
                         String label,
-                        ElLucideGlyph glyph,
+                        LucideGlyph glyph,
                       })
                       item
                       in _items)
@@ -397,7 +428,7 @@ class _DestinationNavigation extends StatelessWidget {
           for (final ({
                 ShowcaseDestination destination,
                 String label,
-                ElLucideGlyph glyph,
+                LucideGlyph glyph,
               })
               item
               in _items)
@@ -405,26 +436,26 @@ class _DestinationNavigation extends StatelessWidget {
         ],
       ),
     );
-    return ElCard(children: <Widget>[ElCardContent(child: destinations)]);
+    return Card(children: <Widget>[CardContent(child: destinations)]);
   }
 
   Widget _destinationButton(
-    ({ShowcaseDestination destination, String label, ElLucideGlyph glyph}) item,
+    ({ShowcaseDestination destination, String label, LucideGlyph glyph}) item,
   ) {
     final bool selected = item.destination == destination;
     return Semantics(
       selected: selected,
-      child: ElButton(
+      child: Button(
         variant: compact
-            ? ElButtonVariant.ghost
+            ? ButtonVariant.ghost
             : selected
-            ? ElButtonVariant.secondary
-            : ElButtonVariant.ghost,
-        size: ElButtonSize.md,
+            ? ButtonVariant.secondary
+            : ButtonVariant.ghost,
+        size: ButtonSize.md,
         autoHeight: compact,
-        radius: compact ? BorderRadius.circular(ElRadii.lg) : null,
+        radius: compact ? BorderRadius.circular(Radii.lg) : null,
         padding: compact
-            ? EdgeInsets.symmetric(horizontal: el(2), vertical: el(2))
+            ? EdgeInsets.symmetric(horizontal: space(2), vertical: space(2))
             : null,
         label: item.label,
         onPressed: () => onChanged(item.destination),
@@ -432,18 +463,18 @@ class _DestinationNavigation extends StatelessWidget {
             ? Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  ElIcon.lucide(item.glyph, size: ElIconSize.lg),
-                  SizedBox(height: el(1)),
-                  ElText(item.label, ElComponentType.buttonLabelSm),
+                  Icon.lucide(item.glyph, size: IconSize.lg),
+                  SizedBox(height: space(1)),
+                  StyledText(item.label, TextStyles.buttonLabelSm),
                 ],
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  ElIcon.lucide(item.glyph, size: ElIconSize.sm),
-                  SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
-                  ElText(item.label, ElComponentType.buttonLabel),
+                  Icon.lucide(item.glyph, size: IconSize.sm),
+                  SizedBox(width: Button.gapFor(ButtonSize.md)),
+                  StyledText(item.label, TextStyles.buttonLabel),
                 ],
               ),
       ),

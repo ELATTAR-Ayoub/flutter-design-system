@@ -7,7 +7,20 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
+import 'package:flutter/widgets.dart' as flutter show ScrollPosition;
 
 /// Registers [child] under [id] so [scrollTo] can find it later.
 class DocsAnchor extends StatelessWidget {
@@ -28,7 +41,7 @@ class DocsAnchor extends StatelessWidget {
       _keys.putIfAbsent(id, () => GlobalKey<State<StatefulWidget>>());
 
   /// Scrolls to the section registered under [id], resting
-  /// `ElWidths.scrollOffset` below the viewport top.
+  /// `ScrollOffsets.anchoredHeading` below the viewport top.
   static Future<void> scrollTo(String id) async {
     final BuildContext? target = keyFor(id).currentContext;
     if (target == null) return;
@@ -41,15 +54,15 @@ class DocsAnchor extends StatelessWidget {
 
     final double delta =
         box.localToGlobal(Offset.zero, ancestor: viewport).dy -
-        ElWidths.scrollOffset;
-    final ScrollPosition position = scrollable.position;
+        ScrollOffsets.anchoredHeading;
+    final flutter.ScrollPosition position = scrollable.position;
     await position.animateTo(
       (position.pixels + delta).clamp(
         position.minScrollExtent,
         position.maxScrollExtent,
       ),
-      duration: elAnimationDuration(target, ElDurations.slow),
-      curve: ElCurves.inOut,
+      duration: effectiveMotionDuration(target, MotionDurations.slow),
+      curve: MotionCurves.move,
     );
   }
 
@@ -90,14 +103,14 @@ class DocsSection extends StatelessWidget {
   final bool heading;
 
   /// The gap under the whole section.
-  static double get spacing => el(20);
+  static double get spacing => space(20);
 
   /// The gap between the heading block and the section's body.
-  static double get headingGap => el(6);
+  static double get headingGap => space(6);
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return DocsAnchor(
       id: id,
       child: Padding(
@@ -113,12 +126,12 @@ class DocsSection extends StatelessWidget {
                   children: <Widget>[
                     // An `h2` wearing `.type-h3`, intentionally.
                     if (heading)
-                      ElText(title, ElType.h3, color: theme.foreground),
+                      StyledText(title, TextStyles.h3, color: theme.foreground),
                     if (description != null) ...<Widget>[
-                      if (heading) SizedBox(height: el(2)),
+                      if (heading) SizedBox(height: space(2)),
                       // Full width. The old private measure cap left a gap on
                       // the right of every section.
-                      ElText(description!, ElType.small),
+                      StyledText(description!, TextStyles.small),
                     ],
                   ],
                 ),

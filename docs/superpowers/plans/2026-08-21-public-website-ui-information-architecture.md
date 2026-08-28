@@ -164,7 +164,7 @@ The mobile header contains:
 - Search trigger.
 - Theme selector.
 
-GitHub moves into the navigation sheet so the header remains calm. The menu opens a full-height `ElSheet` with Docs, Components, Shots, Skills, version, and GitHub. It preserves safe areas and logical focus return.
+GitHub moves into the navigation sheet so the header remains calm. The menu opens a full-height `Sheet` with Docs, Components, Shots, Skills, version, and GitHub. It preserves safe areas and logical focus return.
 
 ### 4.3 Search and command palette
 
@@ -210,13 +210,13 @@ The first three reading steps are:
 - Action color marks links, active navigation, focus, and primary commands.
 - Value color is reserved for valuable outcomes and brand moments, not generic navigation.
 - Status colors appear only for status.
-- `ElPageGlow` may provide the site-wide light source.
+- `PageGlow` may provide the site-wide light source.
 - Use at most one supporting material effect per page region; do not combine glow, starfield, glass, bloom, foil, and machine surfaces as decoration.
 - Component specimens show their own intended material without the docs frame competing.
 
 ### 5.4 Typography
 
-- `ElText` and `ElType` own all interface and article typography.
+- `Text` and `Type` own all interface and article typography.
 - Display type appears on the Home hero only.
 - Documentation page titles use the page-title role, not display type.
 - Code and commands use the system mono role.
@@ -229,7 +229,7 @@ The first three reading steps are:
 - Preview/code switching preserves the specimen frame and swaps content without reflow shock.
 - Copy success is immediate and short.
 - Sidebar/TOC scroll tracking must not produce constant decorative motion.
-- All motion resolves through `ElDurations`, `ElCurves`, and existing motion widgets.
+- All motion resolves through `Durations`, `Curves`, and existing motion widgets.
 - Reduced motion produces an equally legible static result.
 
 ## 6. Home page
@@ -627,7 +627,7 @@ Begin with the smallest correct Dart example:
 ```dart
 import 'package:my_app/components/ui/ui.dart';
 
-ElButton(
+Button(
   label: 'Continue',
   onPressed: () {},
 )
@@ -688,7 +688,7 @@ Every component page shows an installation facts panel:
 Registry item        button
 Destination          lib/components/ui/button.dart
 Foundation           source or package compatible
-Dependencies         icon, press-motion
+Dependencies         icon, press
 Assets               none
 Shaders              none
 Platforms            Android, iOS, Web, macOS, Windows, Linux
@@ -924,21 +924,21 @@ The actual Dart examples and live specimens remain authored code because generat
 
 The repository already supplies suitable foundations or components for:
 
-- `ElPageGlow`.
-- `ElSafeArea`.
-- `ElSidebar` family.
-- `ElNavigationMenu`.
-- `ElBreadcrumb`.
-- `ElTabs`.
-- `ElCommand`.
-- `ElCard` family.
-- `ElButton` and `ElButtonGroup`.
-- `ElInput` and input groups.
-- `ElSkeleton`.
-- `ElEmpty`.
-- `ElToaster`.
+- `PageGlow`.
+- `SafeArea`.
+- `Sidebar` family.
+- `NavigationMenu`.
+- `Breadcrumb`.
+- `Tabs`.
+- `Command`.
+- `Card` family.
+- `Button` and `ButtonGroup`.
+- `Input` and input groups.
+- `Skeleton`.
+- `Empty`.
+- `Toaster`.
 - Alerts, dialogs, sheets, drawers, popovers, and tooltips.
-- Existing documentation `ElCode` and `ElCodeBlock` in `example/lib/kit.dart`.
+- Existing documentation `Code` and `CodeBlock` in `example/lib/kit.dart`.
 - Existing site-page primitives and reading-navigation contracts documented by the Site group.
 
 Inspect constructors, tests, and examples before using any of them. The plan does not assume an unverified API shape.
@@ -1014,7 +1014,7 @@ GitHub, pub.dev, and raw source failures cannot be controlled by the site; label
 - API tables become horizontal scroll regions or labeled property cards.
 - Shot file tree becomes a file selector above code.
 - Specimens use mobile-native structure rather than a scaled desktop frame.
-- `ElSafeArea` is applied once at page boundaries.
+- `SafeArea` is applied once at page boundaries.
 
 ## 17. Accessibility requirements
 

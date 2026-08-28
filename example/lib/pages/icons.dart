@@ -1,9 +1,9 @@
 /// `/design-system/icons`: the Icons foundation page.
 ///
 /// The page's subject is the component the whole site is drawn with, so almost
-/// every specimen here is the real thing: the ladder is seven live [ElIcon]s at
+/// every specimen here is the real thing: the ladder is seven live [Icon]s at
 /// seven sizes, the tones grid is ten live glyphs resolving ten tokens, the
-/// pairings are five live [ElButton]s, and the registry is all 63 curated
+/// pairings are five live [Button]s, and the registry is all 63 curated
 /// glyphs stroked from their own transcribed geometry. Nothing on it is a
 /// picture of an icon.
 ///
@@ -51,18 +51,18 @@
 /// 5. The reference's usage snippet imports `PackageOpen` and then uses
 ///    `Heart`. See the translation note above: this is the one that does not
 ///    ship.
-/// 6. A [ElNote] title renders muted-foreground in **every** tone; the tone
+/// 6. A [Note] title renders muted-foreground in **every** tone; the tone
 ///    shows only in the border and the wash. The header *eyebrow* is the
 ///    reverse case and does take action-ink. (Recorded once, in `kit.dart`.)
 /// 7. `.type-code` declares no `font-weight`, so both the `<pre>` and the
 ///    inline chip render at 400: the only mono classes on the site that are
-///    not 600. Carried by [ElCodeBlock].
+///    not 600. Carried by [CodeBlock].
 /// 8. `leading-relaxed` (1.625) overrides `.type-code`'s 1.4 in the `<pre>`.
-///    Also carried by [ElCodeBlock].
+///    Also carried by [CodeBlock].
 /// 9. **`subtle` and `muted` are the same colour.** The tones grid ships two
 ///    identical swatches on purpose: see [_TonesSection] (ruling I-Q6).
 /// 10. Button labels are **13px**: `--text-sm` is aliased to `--text-small`.
-///     Stated once, in `ElComponentType.buttonLabel`.
+///     Stated once, in `TextStyles.buttonLabel`.
 /// 11. Fonts: the prose says Space Grotesk, the tokens say Inter Local. Tokens
 ///     win, per the project's standing decision.
 /// 12. Three curated names, `Filter`, `HelpCircle`, `AlertTriangle`: are
@@ -73,7 +73,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -85,11 +97,11 @@ import '../nav.dart';
 const double _leadingSnug = 1.375;
 
 /// `size-9`: the plinth every 20px specimen glyph is mounted on.
-final double _tileSize = el(9);
+final double _tileSize = space(9);
 
 /// `h-14`: the box the seven ladder glyphs share, so they hang from one
 /// vertical midpoint.
-final double _ladderBox = el(14);
+final double _ladderBox = space(14);
 
 /* ── Page data ───────────────────────────────────────────────────────────── */
 
@@ -102,7 +114,7 @@ final double _ladderBox = el(14);
 /// The last line is **104 characters**, half again the TSX block's longest at
 /// 71. Measured rather than assumed (ruling I-Q8): at 12.5px Geist Mono that
 /// is roughly 784px against a text box near 1000px, so like the reference's
-/// TSX it does **not** actually scroll at the 1440 frame, [ElCodeBlock]'s
+/// TSX it does **not** actually scroll at the 1440 frame, [CodeBlock]'s
 /// scroller ships because `overflow-x-auto scrollbar-thin` is in the class
 /// list, and this is the sample that reaches the edge of a narrower column
 /// where the TSX never would. `icons_page_test.dart` pins both halves.
@@ -111,34 +123,34 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 
 // Decorative — adjacent text already says "Open Pack",
 // so the glyph is hidden from screen readers.
-const ElIcon(ElIconGlyph.packageOpen, size: ElIconSize.md, tone: ElIconTone.inherit)
+const Icon(IconGlyph.packageOpen, size: IconSize.md, tone: IconTone.inherit)
 
 // Meaningful — icon-only control, so it must be named.
-const ElIcon(ElIconGlyph.heart, size: ElIconSize.lg, tone: ElIconTone.value, label: 'Add to favourites')''';
+const Icon(IconGlyph.heart, size: IconSize.lg, tone: IconTone.value, label: 'Add to favourites')''';
 
 /// `sizeUse`: one line of §3's use list per rung of the ladder.
 ///
 /// Keyed by the enum rather than by its printed key, so the ladder, the
 /// specimen row and this list cannot drift apart.
-const Map<ElIconSize, String> _sizeUse = <ElIconSize, String>{
-  ElIconSize.xs: 'Pips and inline markers inside badges.',
-  ElIconSize.sm: 'Beside 13px text. Inside badges and chips. Small buttons.',
-  ElIconSize.md: 'The default. Inside standard buttons, rows, inputs.',
-  ElIconSize.lg: 'Navigation items, large buttons, stat tiles.',
-  ElIconSize.xl: 'Empty states, feature panels, section headers.',
-  ElIconSize.xl2: 'Reveal moments, rarity glyphs on cards.',
-  ElIconSize.xl3: 'Hero and error illustrations.',
+const Map<IconSize, String> _sizeUse = <IconSize, String>{
+  IconSize.xs: 'Pips and inline markers inside badges.',
+  IconSize.sm: 'Beside 13px text. Inside badges and chips. Small buttons.',
+  IconSize.md: 'The default. Inside standard buttons, rows, inputs.',
+  IconSize.lg: 'Navigation items, large buttons, stat tiles.',
+  IconSize.xl: 'Empty states, feature panels, section headers.',
+  IconSize.xl2: 'Reveal moments, rarity glyphs on cards.',
+  IconSize.xl3: 'Hero and error illustrations.',
 };
 
 /// The `size` prop's Meta value: the whole ladder, printed off the ladder.
 ///
 /// The separators are U+00B7, matching the use list in `#sizes`, and the two
-/// top rungs come out **`2xl`** and **`3xl`** through [ElIconSize.label]: the
+/// top rungs come out **`2xl`** and **`3xl`** through [IconSize.label]: the
 /// enum spells them `xl2`/`xl3` because a Dart identifier cannot start with a
 /// digit, and that rename must not reach rendered copy.
 String get _sizeRow {
-  final Iterable<String> rungs = ElIconSize.values.map(
-    (ElIconSize size) => '${size.label} ${ElIcon.pxFor(size).toInt()}',
+  final Iterable<String> rungs = IconSize.values.map(
+    (IconSize size) => '${size.label} ${Icon.pxFor(size).toInt()}',
   );
   return '${rungs.join(' · ')}. Default md.';
 }
@@ -147,24 +159,24 @@ String get _sizeRow {
 ///
 /// The reference's own `toneUse` literal declares `error` before `info`; the
 /// grid renders `Object.keys(ICON_TONES)` instead, so the declaration order
-/// never reaches the screen. [ElIconTone.values] **is** that key order, which
+/// never reaches the screen. [IconTone.values] **is** that key order, which
 /// is what the grid iterates.
-const Map<ElIconTone, String> _toneUse = <ElIconTone, String>{
-  ElIconTone.normal: 'Primary text weight.',
-  ElIconTone.muted: 'Beside body copy. Most common.',
-  ElIconTone.subtle: 'Metadata and decorative affordances.',
-  ElIconTone.action: 'Interactive, selected, active.',
-  ElIconTone.value: 'Reward, premium, ranking — worth.',
-  ElIconTone.success: 'Confirmed, cleared, live, gained.',
-  ElIconTone.warning: 'Pending, needs attention.',
-  ElIconTone.info: 'Neutral notice, explainer.',
-  ElIconTone.error: 'Failed, destructive.',
-  ElIconTone.inherit: 'Takes the parent colour — the default inside buttons.',
+const Map<IconTone, String> _toneUse = <IconTone, String>{
+  IconTone.normal: 'Primary text weight.',
+  IconTone.muted: 'Beside body copy. Most common.',
+  IconTone.subtle: 'Metadata and decorative affordances.',
+  IconTone.action: 'Interactive, selected, active.',
+  IconTone.value: 'Reward, premium, ranking — worth.',
+  IconTone.success: 'Confirmed, cleared, live, gained.',
+  IconTone.warning: 'Pending, needs attention.',
+  IconTone.info: 'Neutral notice, explainer.',
+  IconTone.error: 'Failed, destructive.',
+  IconTone.inherit: 'Takes the parent colour — the default inside buttons.',
 };
 
 /// One entry of `ICON_GROUPS`: the glyph, the name `icons.ts` whitelists it
 /// under, and the single meaning it is pinned to.
-typedef _Entry = ({ElIconGlyph glyph, String name, String use});
+typedef _Entry = ({IconGlyph glyph, String name, String use});
 
 /// One of the four groups the curated set is filed in.
 typedef _IconGroup = ({String title, String blurb, List<_Entry> icons});
@@ -185,63 +197,59 @@ const List<_IconGroup> _groups = <_IconGroup>[
         'way they move.',
     icons: <_Entry>[
       (
-        glyph: ElIconGlyph.package,
+        glyph: IconGlyph.package,
         name: 'Package',
         use: 'Packs — marketplace nav',
       ),
       (
-        glyph: ElIconGlyph.radio,
+        glyph: IconGlyph.radio,
         name: 'Radio',
         use: 'Live Pulls — nav, live state',
       ),
-      (glyph: ElIconGlyph.layers, name: 'Layers', use: 'Stash — inventory nav'),
-      (glyph: ElIconGlyph.gift, name: 'Gift', use: 'Rewards nav'),
-      (glyph: ElIconGlyph.trophy, name: 'Trophy', use: 'Leaderboard nav'),
-      (glyph: ElIconGlyph.wallet, name: 'Wallet', use: 'Wallet nav'),
+      (glyph: IconGlyph.layers, name: 'Layers', use: 'Stash — inventory nav'),
+      (glyph: IconGlyph.gift, name: 'Gift', use: 'Rewards nav'),
+      (glyph: IconGlyph.trophy, name: 'Trophy', use: 'Leaderboard nav'),
+      (glyph: IconGlyph.wallet, name: 'Wallet', use: 'Wallet nav'),
       (
-        glyph: ElIconGlyph.user,
+        glyph: IconGlyph.user,
         name: 'User',
         use: 'Account nav, avatar fallback',
       ),
       (
-        glyph: ElIconGlyph.search,
+        glyph: IconGlyph.search,
         name: 'Search',
         use: 'Search input and trigger',
       ),
-      (glyph: ElIconGlyph.bell, name: 'Bell', use: 'Notifications'),
-      (glyph: ElIconGlyph.settings, name: 'Settings', use: 'Preferences'),
-      (glyph: ElIconGlyph.logOut, name: 'LogOut', use: 'Sign out'),
+      (glyph: IconGlyph.bell, name: 'Bell', use: 'Notifications'),
+      (glyph: IconGlyph.settings, name: 'Settings', use: 'Preferences'),
+      (glyph: IconGlyph.logOut, name: 'LogOut', use: 'Sign out'),
       (
-        glyph: ElIconGlyph.layoutGrid,
+        glyph: IconGlyph.layoutGrid,
         name: 'LayoutGrid',
         use: 'Grid view toggle',
       ),
-      (glyph: ElIconGlyph.rows3, name: 'Rows3', use: 'List view toggle'),
+      (glyph: IconGlyph.rows3, name: 'Rows3', use: 'List view toggle'),
       (
-        glyph: ElIconGlyph.chevronDown,
+        glyph: IconGlyph.chevronDown,
         name: 'ChevronDown',
         use: 'Disclosure, select',
       ),
-      (glyph: ElIconGlyph.chevronUp, name: 'ChevronUp', use: 'Disclosure open'),
+      (glyph: IconGlyph.chevronUp, name: 'ChevronUp', use: 'Disclosure open'),
+      (glyph: IconGlyph.chevronLeft, name: 'ChevronLeft', use: 'Carousel back'),
       (
-        glyph: ElIconGlyph.chevronLeft,
-        name: 'ChevronLeft',
-        use: 'Carousel back',
-      ),
-      (
-        glyph: ElIconGlyph.chevronRight,
+        glyph: IconGlyph.chevronRight,
         name: 'ChevronRight',
         use: 'Carousel forward, breadcrumb',
       ),
-      (glyph: ElIconGlyph.arrowLeft, name: 'ArrowLeft', use: 'Back'),
+      (glyph: IconGlyph.arrowLeft, name: 'ArrowLeft', use: 'Back'),
       (
-        glyph: ElIconGlyph.arrowRight,
+        glyph: IconGlyph.arrowRight,
         name: 'ArrowRight',
         use: 'Forward, see all',
       ),
-      (glyph: ElIconGlyph.ellipsis, name: 'Ellipsis', use: 'Overflow menu'),
+      (glyph: IconGlyph.ellipsis, name: 'Ellipsis', use: 'Overflow menu'),
       (
-        glyph: ElIconGlyph.externalLink,
+        glyph: IconGlyph.externalLink,
         name: 'ExternalLink',
         use: 'Leaves the product',
       ),
@@ -252,52 +260,48 @@ const List<_IconGroup> _groups = <_IconGroup>[
     blurb: 'Things the user does. Destructive actions use only Trash2 and Ban.',
     icons: <_Entry>[
       (
-        glyph: ElIconGlyph.packageOpen,
+        glyph: IconGlyph.packageOpen,
         name: 'PackageOpen',
         use: 'Open Pack — the primary action',
       ),
       (
-        glyph: ElIconGlyph.shoppingCart,
+        glyph: IconGlyph.shoppingCart,
         name: 'ShoppingCart',
         use: 'Buy, add to cart',
       ),
-      (glyph: ElIconGlyph.heart, name: 'Heart', use: 'Favourite'),
-      (glyph: ElIconGlyph.eye, name: 'Eye', use: 'Inspect card, show password'),
-      (glyph: ElIconGlyph.eyeOff, name: 'EyeOff', use: 'Hide password'),
-      (glyph: ElIconGlyph.share2, name: 'Share2', use: 'Share pull'),
-      (glyph: ElIconGlyph.copy, name: 'Copy', use: 'Copy referral or address'),
-      (glyph: ElIconGlyph.filter, name: 'Filter', use: 'Filter drawer trigger'),
+      (glyph: IconGlyph.heart, name: 'Heart', use: 'Favourite'),
+      (glyph: IconGlyph.eye, name: 'Eye', use: 'Inspect card, show password'),
+      (glyph: IconGlyph.eyeOff, name: 'EyeOff', use: 'Hide password'),
+      (glyph: IconGlyph.share2, name: 'Share2', use: 'Share pull'),
+      (glyph: IconGlyph.copy, name: 'Copy', use: 'Copy referral or address'),
+      (glyph: IconGlyph.filter, name: 'Filter', use: 'Filter drawer trigger'),
       (
-        glyph: ElIconGlyph.slidersHorizontal,
+        glyph: IconGlyph.slidersHorizontal,
         name: 'SlidersHorizontal',
         use: 'Sort and advanced filters',
       ),
+      (glyph: IconGlyph.plus, name: 'Plus', use: 'Increase quantity, deposit'),
+      (glyph: IconGlyph.minus, name: 'Minus', use: 'Decrease quantity'),
       (
-        glyph: ElIconGlyph.plus,
-        name: 'Plus',
-        use: 'Increase quantity, deposit',
-      ),
-      (glyph: ElIconGlyph.minus, name: 'Minus', use: 'Decrease quantity'),
-      (
-        glyph: ElIconGlyph.refreshCw,
+        glyph: IconGlyph.refreshCw,
         name: 'RefreshCw',
         use: 'Retry, refresh feed',
       ),
-      (glyph: ElIconGlyph.download, name: 'Download', use: 'Withdraw, export'),
-      (glyph: ElIconGlyph.upload, name: 'Upload', use: 'Deposit'),
-      (glyph: ElIconGlyph.truck, name: 'Truck', use: 'Ship card'),
+      (glyph: IconGlyph.download, name: 'Download', use: 'Withdraw, export'),
+      (glyph: IconGlyph.upload, name: 'Upload', use: 'Deposit'),
+      (glyph: IconGlyph.truck, name: 'Truck', use: 'Ship card'),
       (
-        glyph: ElIconGlyph.trash2,
+        glyph: IconGlyph.trash2,
         name: 'Trash2',
         use: 'Delete — destructive only',
       ),
       (
-        glyph: ElIconGlyph.ban,
+        glyph: IconGlyph.ban,
         name: 'Ban',
         use: 'Cancel, blocked — destructive only',
       ),
-      (glyph: ElIconGlyph.x, name: 'X', use: 'Close, dismiss, clear'),
-      (glyph: ElIconGlyph.check, name: 'Check', use: 'Confirm, selected'),
+      (glyph: IconGlyph.x, name: 'X', use: 'Close, dismiss, clear'),
+      (glyph: IconGlyph.check, name: 'Check', use: 'Confirm, selected'),
     ],
   ),
   (
@@ -311,33 +315,33 @@ const List<_IconGroup> _groups = <_IconGroup>[
         'components/pulls/rarity-symbol.tsx, never a Lucide glyph.',
     icons: <_Entry>[
       (
-        glyph: ElIconGlyph.sparkles,
+        glyph: IconGlyph.sparkles,
         name: 'Sparkles',
         use: 'Reveal and reward moments',
       ),
       (
-        glyph: ElIconGlyph.crown,
+        glyph: IconGlyph.crown,
         name: 'Crown',
         use: 'Leaderboard leader, top hit',
       ),
-      (glyph: ElIconGlyph.flame, name: 'Flame', use: 'Hot pack badge'),
-      (glyph: ElIconGlyph.zap, name: 'Zap', use: 'New, turbo open'),
-      (glyph: ElIconGlyph.star, name: 'Star', use: 'Featured'),
-      (glyph: ElIconGlyph.tag, name: 'Tag', use: 'Card set, category'),
-      (glyph: ElIconGlyph.percent, name: 'Percent', use: 'Rarity odds'),
-      (glyph: ElIconGlyph.medal, name: 'Medal', use: 'Rank badge'),
+      (glyph: IconGlyph.flame, name: 'Flame', use: 'Hot pack badge'),
+      (glyph: IconGlyph.zap, name: 'Zap', use: 'New, turbo open'),
+      (glyph: IconGlyph.star, name: 'Star', use: 'Featured'),
+      (glyph: IconGlyph.tag, name: 'Tag', use: 'Card set, category'),
+      (glyph: IconGlyph.percent, name: 'Percent', use: 'Rarity odds'),
+      (glyph: IconGlyph.medal, name: 'Medal', use: 'Rank badge'),
       (
-        glyph: ElIconGlyph.activity,
+        glyph: IconGlyph.activity,
         name: 'Activity',
         use: 'Popularity, volatility',
       ),
       (
-        glyph: ElIconGlyph.trendingUp,
+        glyph: IconGlyph.trendingUp,
         name: 'TrendingUp',
         use: 'Rank up, value gain',
       ),
       (
-        glyph: ElIconGlyph.trendingDown,
+        glyph: IconGlyph.trendingDown,
         name: 'TrendingDown',
         use: 'Rank down, value loss',
       ),
@@ -350,58 +354,46 @@ const List<_IconGroup> _groups = <_IconGroup>[
         'as by colour, so bonus never reads as real money.',
     icons: <_Entry>[
       (
-        glyph: ElIconGlyph.circleDollarSign,
+        glyph: IconGlyph.circleDollarSign,
         name: 'CircleDollarSign',
         use: 'Available balance',
       ),
+      (glyph: IconGlyph.creditCard, name: 'CreditCard', use: 'Payment method'),
       (
-        glyph: ElIconGlyph.creditCard,
-        name: 'CreditCard',
-        use: 'Payment method',
-      ),
-      (
-        glyph: ElIconGlyph.arrowDownLeft,
+        glyph: IconGlyph.arrowDownLeft,
         name: 'ArrowDownLeft',
         use: 'Money in — deposit, sale, refund',
       ),
       (
-        glyph: ElIconGlyph.arrowUpRight,
+        glyph: IconGlyph.arrowUpRight,
         name: 'ArrowUpRight',
         use: 'Money out — purchase, withdrawal',
       ),
       (
-        glyph: ElIconGlyph.hourglass,
+        glyph: IconGlyph.hourglass,
         name: 'Hourglass',
         use: 'Pending balance, pending withdrawal',
       ),
+      (glyph: IconGlyph.clock, name: 'Clock', use: 'Timestamp, time remaining'),
       (
-        glyph: ElIconGlyph.clock,
-        name: 'Clock',
-        use: 'Timestamp, time remaining',
-      ),
-      (
-        glyph: ElIconGlyph.lock,
+        glyph: IconGlyph.lock,
         name: 'Lock',
         use: 'Locked reward, security setting',
       ),
+      (glyph: IconGlyph.shield, name: 'Shield', use: 'Security, provably fair'),
       (
-        glyph: ElIconGlyph.shield,
-        name: 'Shield',
-        use: 'Security, provably fair',
-      ),
-      (
-        glyph: ElIconGlyph.shieldCheck,
+        glyph: IconGlyph.shieldCheck,
         name: 'ShieldCheck',
         use: 'Verified account',
       ),
-      (glyph: ElIconGlyph.info, name: 'Info', use: 'Information state'),
+      (glyph: IconGlyph.info, name: 'Info', use: 'Information state'),
       (
-        glyph: ElIconGlyph.helpCircle,
+        glyph: IconGlyph.helpCircle,
         name: 'HelpCircle',
         use: 'Help, odds explainer',
       ),
       (
-        glyph: ElIconGlyph.alertTriangle,
+        glyph: IconGlyph.alertTriangle,
         name: 'AlertTriangle',
         use: 'Warning state',
       ),
@@ -426,12 +418,12 @@ class IconsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Every one of the four header props comes from the registry: this page
     // overrides none of them, unlike the colors page.
-    final ElCategoryHit here = findCategory('foundations', 'icons');
+    final CategoryHit here = findCategory('foundations', 'icons');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           eyebrow: here.group.title,
           title: here.category.title,
           blurb: here.category.blurb,
@@ -448,7 +440,7 @@ class IconsPage extends StatelessWidget {
         // resolves `next` to null and the kit renders the bare `flex-1` spacer
         // beside the Previous card, which keeps that card at exactly half the
         // row rather than letting it stretch.
-        const ElPageFootNav(groupId: 'foundations', slug: 'icons'),
+        const PageFootNav(groupId: 'foundations', slug: 'icons'),
       ],
     );
   }
@@ -461,7 +453,7 @@ class _ComponentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'component',
       title: 'The Icon component',
       description:
@@ -472,10 +464,10 @@ class _ComponentSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const ElPanel(label: 'Usage', child: ElCodeBlock(_usage)),
-          SizedBox(height: el(4)),
-          ElMeta(
-            items: <ElMetaItem>[
+          const Panel(label: 'Usage', child: CodeBlock(_usage)),
+          SizedBox(height: space(4)),
+          Meta(
+            items: <MetaItem>[
               const (
                 k: 'icon',
                 v: TextSpan(text: 'A Lucide icon component. Required.'),
@@ -499,7 +491,7 @@ class _ComponentSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
           // The copy ships verbatim, and it is approximate rather than exact.
           // `strokeFor` is a three-rung snap (2.4 / 2 / 1.6), not a clamp, so
           // the rendered stroke still climbs 1.20 → 1.40 → 1.60 → 1.67 → 2.00
@@ -507,14 +499,14 @@ class _ComponentSection extends StatelessWidget {
           // icon do not in fact carry the same optical weight. The port ships
           // the ternary, not the claim, `icon.dart:198` transcribes it and
           // `test/components_test.dart` pins all seven rungs.
-          ElNote(
+          Note(
             title: 'Stroke scales with the box',
-            child: ElText(
+            child: StyledText(
               'Lucide is drawn on a 24px grid for a 2px stroke. Rendered at '
               '12px that stroke reads twice as heavy, and at 40px it reads '
               'thin. The component compensates automatically, so a 12px icon '
               'and a 40px icon carry the same optical weight.',
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ],
@@ -530,51 +522,47 @@ class _SizesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElSection(
+    return Section(
       id: 'sizes',
       title: 'Sizes',
       description:
           'Seven steps. Icons pair with text, so each size exists to '
           'sit beside a specific type class.',
-      child: ElPanel(
+      child: Panel(
         label: 'The ladder',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // `flex flex-wrap items-end gap-8`.
             Wrap(
-              spacing: el(8),
-              runSpacing: el(8),
+              spacing: space(8),
+              runSpacing: space(8),
               crossAxisAlignment: WrapCrossAlignment.end,
               children: <Widget>[
-                for (final ElIconSize size in ElIconSize.values)
+                for (final IconSize size in IconSize.values)
                   _LadderCell(size: size),
               ],
             ),
             // `mt-6 space-y-2 border-t border-border pt-5`.
             Container(
-              margin: EdgeInsets.only(top: el(6)),
-              padding: EdgeInsets.only(top: el(5)),
+              margin: EdgeInsets.only(top: space(6)),
+              padding: EdgeInsets.only(top: space(5)),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
                     color: theme.border,
-                    width: ElWidths.hairline,
+                    width: BorderWidths.hairline,
                   ),
                 ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  for (
-                    int i = 0;
-                    i < ElIconSize.values.length;
-                    i++
-                  ) ...<Widget>[
-                    if (i > 0) SizedBox(height: el(2)),
-                    _LadderUseLine(size: ElIconSize.values[i]),
+                  for (int i = 0; i < IconSize.values.length; i++) ...<Widget>[
+                    if (i > 0) SizedBox(height: space(2)),
+                    _LadderUseLine(size: IconSize.values[i]),
                   ],
                 ],
               ),
@@ -590,11 +578,11 @@ class _SizesSection extends StatelessWidget {
 class _LadderCell extends StatelessWidget {
   const _LadderCell({required this.size});
 
-  final ElIconSize size;
+  final IconSize size;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -615,20 +603,20 @@ class _LadderCell extends StatelessWidget {
           height: _ladderBox,
           child: Center(
             widthFactor: 1,
-            child: ElIcon(
-              ElIconGlyph.packageOpen,
+            child: Icon(
+              IconGlyph.packageOpen,
               size: size,
-              tone: ElIconTone.muted,
+              tone: IconTone.muted,
             ),
           ),
         ),
-        SizedBox(height: el(2)),
+        SizedBox(height: space(2)),
         // The **key**, not `.name`: `2xl` and `3xl`, which Dart spells `xl2`
         // and `xl3`.
-        ElText(size.label, ElType.numSm, color: theme.actionInk),
-        SizedBox(height: el(1)),
+        StyledText(size.label, TextStyles.numberSm, color: theme.actionText),
+        SizedBox(height: space(1)),
         // `.type-micro` uppercases, which leaves digits and `px` untouched.
-        ElText('${ElIcon.pxFor(size).toInt()}px', ElType.micro),
+        StyledText('${Icon.pxFor(size).toInt()}px', TextStyles.eyebrowSmall),
       ],
     );
   }
@@ -643,27 +631,27 @@ class _LadderCell extends StatelessWidget {
 class _LadderUseLine extends StatelessWidget {
   const _LadderUseLine({required this.size});
 
-  final ElIconSize size;
+  final IconSize size;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           TextSpan(
-            text: '${size.label} · ${ElIcon.pxFor(size).toInt()}px',
-            style: ElText.styleOf(
+            text: '${size.label} · ${Icon.pxFor(size).toInt()}px',
+            style: StyledText.styleOf(
               context,
-              ElType.numSm,
+              TextStyles.numberSm,
               color: theme.mutedForeground,
             ),
           ),
           TextSpan(text: ' — ${_sizeUse[size]!}'),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -675,13 +663,13 @@ class _TonesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'tones',
       title: 'Tones',
       description:
           'Icons never carry a raw hex. Every tone maps to a token, '
           'which keeps icon colour inside the 70/20/10 balance automatically.',
-      child: ElPanel(
+      child: Panel(
         label: 'Ten tones',
         // `grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3`: ten cells in
         // a 3×4 grid at the desktop frame, with two empty cells on the last
@@ -689,8 +677,8 @@ class _TonesSection extends StatelessWidget {
         child: _Grid(
           sm: 2,
           lg: 3,
-          gapX: el(8),
-          gapY: el(5),
+          gapX: space(8),
+          gapY: space(5),
           children: <Widget>[
             // Two things this grid reproduces rather than tidies. `muted` and
             // `subtle` are the **same colour** (ruling I-Q6): `subtle` is a
@@ -700,8 +688,7 @@ class _TonesSection extends StatelessWidget {
             // And `inherit` renders as plain `--foreground`, because nothing
             // here sets a text colour on the panel body, so `text-current`
             // resolves to what `<body>` set.
-            for (final ElIconTone tone in ElIconTone.values)
-              _ToneCell(tone: tone),
+            for (final IconTone tone in IconTone.values) _ToneCell(tone: tone),
           ],
         ),
       ),
@@ -712,23 +699,27 @@ class _TonesSection extends StatelessWidget {
 class _ToneCell extends StatelessWidget {
   const _ToneCell({required this.tone});
 
-  final ElIconTone tone;
+  final IconTone tone;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Row(
       children: <Widget>[
-        _GlyphTile(glyph: ElIconGlyph.search, tone: tone),
-        SizedBox(width: el(3)),
+        _GlyphTile(glyph: IconGlyph.search, tone: tone),
+        SizedBox(width: space(3)),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               // The **key**: `default`, which Dart spells `normal`.
-              ElText(tone.label, ElType.numSm, color: theme.actionInk),
+              StyledText(
+                tone.label,
+                TextStyles.numberSm,
+                color: theme.actionText,
+              ),
               _UseCopy(_toneUse[tone]!),
             ],
           ),
@@ -745,38 +736,38 @@ class _InContextSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'in-context',
       title: 'Icons in controls',
       description:
           "Inside a button an icon should inherit the button's "
           'colour, not assert its own. The one exception is a destructive '
           'action, where the error tone is the point.',
-      child: ElPanel(
+      child: Panel(
         label: 'Correct pairings',
         // `flex flex-wrap gap-3`.
         child: Wrap(
-          spacing: el(3),
-          runSpacing: el(3),
+          spacing: space(3),
+          runSpacing: space(3),
           children: <Widget>[
             _PairedButton(
-              variant: ElButtonVariant.primary,
-              glyph: ElIconGlyph.packageOpen,
+              variant: ButtonVariant.primary,
+              glyph: IconGlyph.packageOpen,
               label: 'Open Pack',
             ),
             _PairedButton(
-              variant: ElButtonVariant.secondary,
-              glyph: ElIconGlyph.heart,
+              variant: ButtonVariant.secondary,
+              glyph: IconGlyph.heart,
               label: 'Favourite',
             ),
             _PairedButton(
-              variant: ElButtonVariant.outline,
-              glyph: ElIconGlyph.search,
+              variant: ButtonVariant.outline,
+              glyph: IconGlyph.search,
               label: 'Search',
             ),
             _PairedButton(
-              variant: ElButtonVariant.destructive,
-              glyph: ElIconGlyph.trash2,
+              variant: ButtonVariant.destructive,
+              glyph: IconGlyph.trash2,
               label: 'Remove',
             ),
             const _IconOnlyButton(),
@@ -796,7 +787,7 @@ class _InContextSection extends StatelessWidget {
 /// `[&_svg:not([class*='size-'])]:size-4` matches, and a CSS rule beats an SVG
 /// presentation attribute. `strokeWidth` is not CSS, so it keeps the value
 /// computed for 14px, 2.4: and `strokeFor(16)` is also 2.4, so the two
-/// coincide and no stroke drift is visible. [ElIcon.sizePx] is therefore not
+/// coincide and no stroke drift is visible. [Icon.sizePx] is therefore not
 /// needed here; 16px is written directly and the override is recorded in this
 /// comment.
 class _PairedButton extends StatelessWidget {
@@ -806,13 +797,13 @@ class _PairedButton extends StatelessWidget {
     required this.label,
   });
 
-  final ElButtonVariant variant;
-  final ElIconGlyph glyph;
+  final ButtonVariant variant;
+  final IconGlyph glyph;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return ElButton(
+    return Button(
       variant: variant,
       // Live, and deliberately inert: these are specimens on a docs page, and
       // a null callback would disable them down to `opacity-45`.
@@ -820,10 +811,10 @@ class _PairedButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElIcon(glyph, size: ElIconSize.md, tone: ElIconTone.inherit),
+          Icon(glyph, size: IconSize.md, tone: IconTone.inherit),
           // `gap-2` on the `default` size, asked of the component rather than
           // restated.
-          SizedBox(width: ElButton.gapFor(ElButtonSize.md)),
+          SizedBox(width: Button.gapFor(ButtonSize.md)),
           // A bare text node inside the button, exactly as
           // `<Button>…Open Pack</Button>` is: it inherits the button's own
           // `text-sm font-medium` and its animated ink from the
@@ -854,15 +845,15 @@ class _IconOnlyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElButton(
-      variant: ElButtonVariant.ghost,
-      size: ElButtonSize.icon,
+    return Button(
+      variant: ButtonVariant.ghost,
+      size: ButtonSize.icon,
       label: 'Add to favourites',
       onPressed: () {},
-      child: const ElIcon(
-        ElIconGlyph.heart,
-        size: ElIconSize.md,
-        tone: ElIconTone.value,
+      child: const Icon(
+        IconGlyph.heart,
+        size: IconSize.md,
+        tone: IconTone.value,
       ),
     );
   }
@@ -875,7 +866,7 @@ class _SetSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'set',
       title: 'The curated set — $_iconCount glyphs',
       description:
@@ -888,7 +879,7 @@ class _SetSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           for (int i = 0; i < _groups.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(height: el(4)),
+            if (i > 0) SizedBox(height: space(4)),
             _GroupPanel(group: _groups[i]),
           ],
         ],
@@ -904,19 +895,19 @@ class _GroupPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElPanel(
+    return Panel(
       label: group.title,
       note: '${group.icons.length} glyphs',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           // `p.type-small.mb-6`.
-          ElText(group.blurb, ElType.small),
-          SizedBox(height: el(6)),
+          StyledText(group.blurb, TextStyles.small),
+          SizedBox(height: space(6)),
           // `grid gap-px … sm:grid-cols-2 lg:grid-cols-3`: the kit's lattice
           // with this page's own column map, which is none of `StateGrid`'s
           // five. The frame is shared; the map is not.
-          ElStateGrid.columns(
+          StateGrid.columns(
             sm: 2,
             lg: 3,
             children: <Widget>[
@@ -931,7 +922,7 @@ class _GroupPanel extends StatelessWidget {
 
 /// `div.flex.items-center.gap-3.bg-background.p-4`.
 ///
-/// The tile itself is the kit's [ElStateCell]; what is page-local is what
+/// The tile itself is the kit's [StateCell]; what is page-local is what
 /// stands in it: a glyph beside its name and its single meaning, where the
 /// kit's own cell holds a demo well over a label.
 class _EntryCell extends StatelessWidget {
@@ -941,14 +932,14 @@ class _EntryCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
-    return ElStateCell.bare(
-      padding: EdgeInsets.all(el(4)),
+    return StateCell.bare(
+      padding: EdgeInsets.all(space(4)),
       child: Row(
         children: <Widget>[
-          _GlyphTile(glyph: entry.glyph, tone: ElIconTone.muted),
-          SizedBox(width: el(3)),
+          _GlyphTile(glyph: entry.glyph, tone: IconTone.muted),
+          SizedBox(width: space(3)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -959,9 +950,9 @@ class _EntryCell extends StatelessWidget {
                 // a text column of roughly 208px at the 1440 frame. It is
                 // transcribed anyway, because the reference declares it and a
                 // narrower column is exactly where it would start to matter.
-                ElText(
+                StyledText(
                   entry.name,
-                  ElType.numSm,
+                  TextStyles.numberSm,
                   color: theme.foreground,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -983,13 +974,13 @@ class _RulesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'rules',
       title: 'Rules',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const ElDoDont(
+          const DoDont(
             dos: <String>[
               'Import Lucide glyphs through the Icon component so size, tone '
                   'and labelling are enforced.',
@@ -1011,22 +1002,22 @@ class _RulesSection extends StatelessWidget {
               "Don't render a raw <Icon icon={Search} /> from lucide-react in "
                   'a screen; go through Icon.',
               "Don't mix icon sets — Lucide only, no Heroicons, no Font "
-                  'Awesome, no emoji as UI.',
+                  'Awesome, no emoji as ',
               "Don't label a decorative icon; doubling the adjacent text makes "
                   'screen readers repeat it.',
               "Don't reuse Trash2 or Ban for anything non-destructive.",
             ],
           ),
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
           // Default tone, therefore `action`, and **no title**: so the whole
           // note is one `.type-small text-muted-foreground` line carrying an
           // inline `Code` chip.
-          ElNote(
-            child: ElRichText(
+          Note(
+            child: RichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(text: 'The set is defined in '),
-                  ElCode.span('lib/el/icons.ts'),
+                  Code.span('lib/space/icons.ts'),
                   const TextSpan(
                     text:
                         '. Adding a glyph means adding it there with its '
@@ -1034,7 +1025,7 @@ class _RulesSection extends StatelessWidget {
                   ),
                 ],
               ),
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ],
@@ -1054,12 +1045,12 @@ class _RulesSection extends StatelessWidget {
 class _GlyphTile extends StatelessWidget {
   const _GlyphTile({required this.glyph, required this.tone});
 
-  final ElIconGlyph glyph;
-  final ElIconTone tone;
+  final IconGlyph glyph;
+  final IconTone tone;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
 
     return Container(
       width: _tileSize,
@@ -1067,12 +1058,12 @@ class _GlyphTile extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(ElRadii.md),
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
+        borderRadius: BorderRadius.circular(Radii.md),
+        border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
       // 20px, stroke 2.0: the one rung of the ladder where `48/px` lands in
       // the ternary's middle branch and the authored stroke survives.
-      child: ElIcon(glyph, size: ElIconSize.lg, tone: tone),
+      child: Icon(glyph, size: IconSize.lg, tone: tone),
     );
   }
 }
@@ -1089,20 +1080,20 @@ class _UseCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle style = ElText.styleOf(
+    final TextStyle style = StyledText.styleOf(
       context,
-      ElType.small,
+      TextStyles.small,
     ).copyWith(height: _leadingSnug);
-    // Not a `.type-*` class any more, so it cannot go through [ElText]: but
+    // Not a `.type-*` class any more, so it cannot go through [StyledText]: but
     // the line box still has to be the one CSS lays out.
-    return ElLineBox(
+    return LineBox(
       style: style,
       child: Text(text, style: style),
     );
   }
 }
 
-/// [ElGrid] with the two axes' gaps stated separately.
+/// [Grid] with the two axes' gaps stated separately.
 ///
 /// The kit's own grid takes one `gap`, which is right for the `gap-4` and
 /// `gap-6` grids every other page uses. Both grids on this page need two:
@@ -1134,8 +1125,8 @@ class _Grid extends StatelessWidget {
 
   int _columns(double viewport) {
     int columns = _base;
-    if (sm != null && viewport >= ElBreakpoints.sm) columns = sm!;
-    if (lg != null && viewport >= ElBreakpoints.lg) columns = lg!;
+    if (sm != null && viewport >= Breakpoints.sm) columns = sm!;
+    if (lg != null && viewport >= Breakpoints.lg) columns = lg!;
     return columns;
   }
 

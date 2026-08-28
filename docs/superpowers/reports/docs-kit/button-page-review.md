@@ -26,7 +26,7 @@ them. Nothing under `lib/src/` changed; no foundation token was added or edited.
 | `DocsInstall` | `docs_install.dart` |
 | sealed section model, `ComponentDocSpec`, `DocsPageHeader`, `ComponentDocPage` | `component_doc_page.dart` |
 
-`ElSection` in `example/lib/kit.dart` became `DocsAnchor` + `DocsSection`
+`Section` in `example/lib/kit.dart` became `DocsAnchor` + `DocsSection`
 composed, so its 92 call sites were not edited.
 
 ## Measured counts
@@ -38,7 +38,7 @@ composed, so its 92 call sites were not edited.
   Responsive, Dependencies, Theming, Source.
 - **26** table-of-contents entries, derived from the section list via
   `ComponentDocSpec.toc`, wired as `toc: buttonDocSpec.toc`.
-- **60** `ElType.label` references replaced with `ElType.section` across 30 files.
+- **60** `Type.label` references replaced with `Type.section` across 30 files.
 - `button/page.dart`: **1,638 -> 1,661 lines** (+23). The page did not shrink.
 
 ## Commands actually run, with results
@@ -71,7 +71,7 @@ fixed, not suppressed:
 
 1. `docs_facts_test.dart` — the reference tables lost text selectability.
    `DocsApiTable` used to render cells through a private `_SelectableFactText`
-   wrapping `SelectableText`; the move onto `ElTable` rendered plain `ElText`.
+   wrapping `SelectableText`; the move onto `Table` rendered plain `Text`.
    A reader could no longer select a property name to copy it. Fixed in
    `70f1499`.
 2. `button_route_integration_test.dart` — depended on the six nested
@@ -129,12 +129,12 @@ predicted.
   is dead.
 - `ComponentDocSpec.toc` is flat. A page wanting a grouped rail needs a change
   to the model.
-- `ElTable` exposes no semantics for its header row, so "the header is a header
+- `Table` exposes no semantics for its header row, so "the header is a header
   to semantics" is asserted nowhere. Adding it would mean editing `lib/src/`.
 - `initiallyOpen: true` on `DocsDisclosure` is correct by code trace but
   untested.
-- The plan named `ElType.textSm` as a substitution target in two places. It does
-  not exist — `textSm` belongs to `ElComponentType`. `ElType.section` was used.
+- The plan named `Type.textSm` as a substitution target in two places. It does
+  not exist — `textSm` belongs to `ComponentType`. `Type.section` was used.
 
 ## Scope
 

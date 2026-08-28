@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -24,7 +48,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every named constructor parameter `ElAgentComposer`'s own class
+/// Every named constructor parameter `AgentComposer`'s own class
 /// declares (`lib/src/components/agent_composer.dart`), excluding `key`.
 const List<String> _composerConstructorParams = <String>[
   'controller',
@@ -43,31 +67,31 @@ const List<String> _composerConstructorParams = <String>[
   'dictationError',
 ];
 
-/// Every static geometry getter `ElAgentComposer` declares.
+/// Every static geometry getter `AgentComposer` declares.
 const List<String> _composerStaticNames = <String>[
-  'ElAgentComposer.defaultPlaceholder',
-  'ElAgentComposer.dropPlaceholder',
-  'ElAgentComposer.inputLabel',
-  'ElAgentComposer.maxRowsPx',
-  'ElAgentComposer.inputInsets',
-  'ElAgentComposer.controlInsets',
-  'ElAgentComposer.controlGap',
-  'ElAgentComposer.trayPadding',
-  'ElAgentComposer.inlineGap',
-  'ElAgentComposer.controlSize',
-  'ElAgentComposer.sendGlyphSize',
-  'ElAgentComposer.stopGlyphSize',
-  'ElAgentComposer.dragFillAlpha',
-  'ElAgentComposer.disabledInputOpacity',
-  'ElAgentComposer.messageTopGap',
+  'AgentComposer.defaultPlaceholder',
+  'AgentComposer.dropPlaceholder',
+  'AgentComposer.inputLabel',
+  'AgentComposer.maxRowsPx',
+  'AgentComposer.inputInsets',
+  'AgentComposer.controlInsets',
+  'AgentComposer.controlGap',
+  'AgentComposer.trayPadding',
+  'AgentComposer.inlineGap',
+  'AgentComposer.controlSize',
+  'AgentComposer.sendGlyphSize',
+  'AgentComposer.stopGlyphSize',
+  'AgentComposer.dragFillAlpha',
+  'AgentComposer.disabledInputOpacity',
+  'AgentComposer.messageTopGap',
 ];
 
 Finder _sendButton() => find.byWidgetPredicate(
-  (Widget widget) => widget is ElButton && widget.label == 'Send',
+  (Widget widget) => widget is Button && widget.label == 'Send',
 );
 
 Finder _stopButton() => find.byWidgetPredicate(
-  (Widget widget) => widget is ElButton && widget.label == 'Stop',
+  (Widget widget) => widget is Button && widget.label == 'Stop',
 );
 
 void main() {
@@ -83,7 +107,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: AgentComposerDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -101,7 +125,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _composerConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
@@ -122,7 +146,7 @@ void main() {
           matching: _sendButton(),
         );
         expect(
-          tester.widget<ElButton>(previewSend).onPressed,
+          tester.widget<Button>(previewSend).onPressed,
           isNull,
           reason: 'send must start disabled with nothing to send',
         );
@@ -136,7 +160,7 @@ void main() {
         await tester.enterText(previewInput, 'Hello there');
         await tester.pump();
         expect(
-          tester.widget<ElButton>(previewSend).onPressed,
+          tester.widget<Button>(previewSend).onPressed,
           isNotNull,
           reason: 'send must enable once there is text',
         );
@@ -160,14 +184,11 @@ void main() {
           find.byKey(const ValueKey<String>('agent-composer-commands')),
           findsOneWidget,
         );
-        // The row renders '/' + command.id (an ElRichText), with hint as a
+        // The row renders '/' + command.id (an RichText), with hint as a
         // plain caption line beneath it — not command.label, which this
         // particular row never reads. The hint is what a plain find.text
         // can safely match.
-        expect(
-          find.text('Summarize the conversation so far'),
-          findsOneWidget,
-        );
+        expect(find.text('Summarize the conversation so far'), findsOneWidget);
         expect(find.text('Start a new conversation'), findsOneWidget);
 
         // Busy: a real stop button, and pressing it really flips busy off.
@@ -199,7 +220,7 @@ void main() {
         expect(find.text('Waiting on the transport…'), findsOneWidget);
         expect(
           tester
-              .widget<ElButton>(
+              .widget<Button>(
                 find.descendant(of: disabledComposer, matching: _sendButton()),
               )
               .onPressed,
@@ -219,34 +240,33 @@ void main() {
         );
 
         expect(agentComposerDoc.name, 'agent-composer');
-        expect(agentComposerDoc.exports, <String>['ElAgentComposer']);
+        expect(agentComposerDoc.exports, <String>['AgentComposer']);
         expect(agentComposerDoc.command, 'elattar add agent-composer');
         expect(destination, isNull);
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 6000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentComposerDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentComposerDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Seven specimen stages: Preview, Attachments, Commands, Busy,
-        // Disabled, Accessory, Dictation error.
-        expect(find.byType(DocsShowcase), findsNWidgets(7));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Seven specimen stages: Preview, Attachments, Commands, Busy,
+      // Disabled, Accessory, Dictation error.
+      expect(find.byType(DocsShowcase), findsNWidgets(7));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -275,47 +295,46 @@ void main() {
       );
     });
 
-    testWidgets(
-      'sections render in declaration order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentComposerDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentComposerDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, <String>[
-          'Preview',
-          'Installation',
-          'Usage',
-          'Attachments',
-          'Commands',
-          'Busy',
-          'Disabled',
-          'Accessory',
-          'Dictation error',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Keyboard',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
-      },
-    );
+      expect(titles, <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'Attachments',
+        'Commands',
+        'Busy',
+        'Disabled',
+        'Accessory',
+        'Dictation error',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -326,7 +345,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const AgentComposerDocPage(),
           ),
         );
@@ -355,24 +374,24 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const AgentComposerDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-composer-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-composer-doc-article')),
           ),

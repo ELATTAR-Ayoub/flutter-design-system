@@ -170,7 +170,7 @@ void main() {
       expect(header.getUint32(20), textureSize);
       expect(png[24], 8, reason: 'bit depth');
       // Colour type 6 is what the replaced file used; keeping it makes this a
-      // drop-in for `voice_orb.dart`'s decode path.
+      // drop-in for `voice_indicator.dart`'s decode path.
       expect(png[25], 6, reason: 'colour type');
       expect(png[28], 0, reason: 'interlace');
     });

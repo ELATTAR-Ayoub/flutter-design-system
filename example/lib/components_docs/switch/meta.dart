@@ -21,10 +21,10 @@ const ComponentDocEntry switchDoc = ComponentDocEntry(
   // dependencies rather than claimed as CLI-resolvable ones.
   dependencies: <String>[
     'field',
-    'machine-surface',
+    'surface',
     'selection-control',
     'source-foundation',
   ],
-  exports: <String>['ElSwitch', 'ElSwitchSize'],
+  exports: <String>['Switch', 'SwitchSize'],
   sourcePath: 'lib/src/components/switch.dart',
 );

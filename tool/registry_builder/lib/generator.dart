@@ -173,11 +173,8 @@ class RegistryGenerator {
     for (final String folder in <String>[
       'foundations',
       'components',
-      'effects',
-      'motion',
       'blocks',
       'presets',
-      'shots',
     ]) {
       final Directory directory = Directory(_join(_registry.path, folder));
       if (!directory.existsSync()) continue;
@@ -299,13 +296,9 @@ ImportTransformationPlan planImportTransformations(
   String foundationMode = 'source',
   String componentsPath = 'lib/components/ui',
   String foundationPath = 'lib/design_system/foundation',
-  String effectsPath = 'lib/design_system/effects',
-  String motionPath = 'lib/design_system/motion',
-  String appPath = 'lib',
+  String blocksPath = 'lib/blocks',
 }) {
-  final RegExp imports = RegExp(
-    r'''(['"])@(foundation|ui|effects|motion|app)/([^'"]+)\1''',
-  );
+  final RegExp imports = RegExp(r'''(['"])@(foundation|ui|block)/([^'"]+)\1''');
   final List<ImportTransformation> result = <ImportTransformation>[];
   for (final RegExpMatch match in imports.allMatches(source)) {
     final String original = match.group(0)!;
@@ -314,15 +307,11 @@ ImportTransformationPlan planImportTransformations(
     final String destination = switch (family) {
       'foundation' => foundationPath,
       'ui' => componentsPath,
-      'effects' => effectsPath,
-      'motion' => motionPath,
-      'app' => appPath,
+      'block' => blocksPath,
       _ => throw StateError('unreachable'),
     };
-    // `@app/` is product code and never moves into the core package, so it
-    // stays relative in both foundation modes, exactly like `@ui/`.
     final String replacementPath =
-        foundationMode == 'package' && family != 'ui' && family != 'app'
+        foundationMode == 'package' && family == 'foundation'
         ? 'package:elattar_core/${destination.split('/').skip(1).join('/')}/$leaf'
         : _relativePath(fromTarget, '$destination/$leaf');
     result.add(

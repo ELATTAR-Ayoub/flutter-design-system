@@ -17,16 +17,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -41,14 +65,14 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 void main() {
   group('kbd docs page', () {
     testWidgets(
-      'renders the article, the API tables, and live specimens of ElKbd '
-      'and ElKbdGroup',
+      'renders the article, the API tables, and live specimens of Kbd '
+      'and KbdGroup',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -57,7 +81,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: KbdDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -75,39 +99,38 @@ void main() {
         expect(find.text('text'), findsWidgets);
         expect(find.text('children'), findsWidgets);
 
-        expect(find.byType(ElKbd), findsWidgets);
-        expect(find.byType(ElKbdGroup), findsWidgets);
+        expect(find.byType(Kbd), findsWidgets);
+        expect(find.byType(KbdGroup), findsWidgets);
 
         expect(kbdDoc.name, 'kbd');
-        expect(kbdDoc.exports, containsAll(<String>['ElKbd', 'ElKbdGroup']));
+        expect(kbdDoc.exports, containsAll(<String>['Kbd', 'KbdGroup']));
         expect(kbdDoc.command, 'elattar add kbd');
         expect(destination, isNull);
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const KbdDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const KbdDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Five specimen stages: Preview, Group, Button, Input group, RTL.
-        expect(find.byType(DocsShowcase), findsNWidgets(5));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Five specimen stages: Preview, Group, Button, Input group, RTL.
+      expect(find.byType(DocsShowcase), findsNWidgets(5));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -118,7 +141,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const KbdDocPage(),
           ),
         );
@@ -148,7 +171,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const KbdDocPage(),
           ),
         );
@@ -186,7 +209,7 @@ void main() {
       },
     );
 
-    testWidgets('ElKbdGroup merges its children\'s semantics into one node', (
+    testWidgets('KbdGroup merges its children\'s semantics into one node', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(1440, 900);
@@ -195,7 +218,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const KbdDocPage(),
         ),
       );
@@ -203,7 +226,7 @@ void main() {
       expect(find.byType(MergeSemantics), findsWidgets);
     });
 
-    testWidgets('keyboard section documents that ElKbd is never focusable', (
+    testWidgets('keyboard section documents that Kbd is never focusable', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(1440, 900);
@@ -212,7 +235,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const KbdDocPage(),
         ),
       );
@@ -229,15 +252,15 @@ void main() {
           const Size(390, 844),
           const Size(1440, 900),
         ]) {
-          for (final ElThemeMode mode in <ElThemeMode>[
-            ElThemeMode.light,
-            ElThemeMode.dark,
+          for (final ColorMode mode in <ColorMode>[
+            ColorMode.light,
+            ColorMode.dark,
           ]) {
             tester.view.physicalSize = size;
             tester.view.devicePixelRatio = 1;
             addTearDown(tester.view.reset);
 
-            final ElThemeController controller = ElThemeController(mode: mode);
+            final ThemeController controller = ThemeController(mode: mode);
             await tester.pumpWidget(
               _harness(controller: controller, child: const KbdDocPage()),
             );
@@ -247,7 +270,7 @@ void main() {
               findsOneWidget,
               reason: 'at $size in $mode',
             );
-            expect(find.byType(ElKbd), findsWidgets);
+            expect(find.byType(Kbd), findsWidgets);
           }
         }
       },

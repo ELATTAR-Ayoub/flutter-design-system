@@ -1,12 +1,12 @@
 /// Public documentation page for the `toggle` component.
 ///
 /// **Re-housed onto the documentation kit.** This page used to be a
-/// hand-composed `_ToggleArticle` built from `kit.dart`'s `ElSection` (see
+/// hand-composed `_ToggleArticle` built from `kit.dart`'s `Section` (see
 /// `example/lib/components_docs/button/page.dart`'s own library doc for the
 /// house shape every page is being moved onto). Every specimen and every
 /// code string below is the same one the old page rendered; what moved is
 /// only where the content lives: a `ComponentDocSpec` declaration plus a
-/// ten-line widget, `DocsSection`/`DocsDisclosure` instead of `ElSection`,
+/// ten-line widget, `DocsSection`/`DocsDisclosure` instead of `Section`,
 /// and the eight fixed disclosures in the house order (API Reference,
 /// States, Accessibility, Keyboard, Responsive, Dependencies, Theming,
 /// Source) instead of the old page's own six.
@@ -18,12 +18,12 @@
 /// code block with no interactive demo at all). Every `ShowcaseSection`
 /// requires both halves of the Preview↔Code toggle, so `Preview` gets an
 /// honest code sample of the composition already on screen, and
-/// `Independent toggles` gets a live pair of `ElToggle`s built from the
+/// `Independent toggles` gets a live pair of `Toggle`s built from the
 /// exact code the old page already showed, rather than dropping either half.
 ///
 /// **Split from toggle-group**, unchanged by this pass: see the sibling
-/// `components_docs/toggle_group/page.dart` for `ElToggleGroup` and
-/// `ElToggleGroupItem`.
+/// `components_docs/toggle_group/page.dart` for `ToggleGroup` and
+/// `ToggleGroupItem`.
 ///
 /// **One real addition: Keyboard.** The old page's Accessibility panel
 /// already named the activation keys and the focus-visible predicate; the
@@ -37,13 +37,25 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
-import '../../kit.dart' show ElStateCell;
+import '../../kit.dart' show StateCell;
 import 'meta.dart';
 
 /// The declaration: every section this page shows, in TOC order. `final`,
@@ -79,11 +91,11 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
               'Copying this file will not compile on its own: it needs '
               'sibling files with it (see Dependencies below), and no '
               'manifest exists yet to resolve them for you. Package mode — '
-              'depending on the package and using ElToggle directly, exactly '
+              'depending on the package and using Toggle directly, exactly '
               'as this page does — is supported today.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// Package mode: depend on the package and use ElToggle\n'
+              '// Package mode: depend on the package and use Toggle\n'
               '// directly. Source mode has no manifest yet.',
         ),
       ],
@@ -92,13 +104,13 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
       id: 'usage',
       title: 'Usage',
       description:
-          'The smallest correct example. ElToggle never holds its own '
+          'The smallest correct example. Toggle never holds its own '
           'state: pressed comes in, onChanged goes out. onChanged is always '
           'called with !pressed, because a toggle has exactly one other '
           'state. The control is fully governed by the caller: it holds no '
           'internal value, so nothing changes on screen until the state you '
           'pass back in changes. For a mutually exclusive row of options, '
-          'where selecting one must clear the rest, reach for ElToggleGroup '
+          'where selecting one must clear the rest, reach for ToggleGroup '
           'instead: it has its own page.',
       code: _smallestUsageCode,
     ),
@@ -106,7 +118,7 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
       id: 'outline',
       title: 'Outline',
       description:
-          'variant: ElToggleVariant.outline adds a 1px theme.input border; '
+          'variant: ToggleVariant.outline adds a 1px theme.input border; '
           'the fill and ink stay the same as standard.',
       specimen: _OutlineSpecimen(),
       code: _outlineCode,
@@ -118,7 +130,7 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
       description:
           'A toggle is not limited to a bare icon: child accepts any '
           'widget, so an icon and a label can share one Row, spaced by '
-          'ElToggle.gap.',
+          'Toggle.gap.',
       specimen: _WithTextSpecimen(),
       code: _withTextCode,
       label: 'With text specimen view',
@@ -128,8 +140,8 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
       title: 'Independent toggles',
       description:
           'Not on the counterpart page, added in its per-example style: '
-          'the question a reader arrives with now that ElToggleGroup has '
-          'its own page. Two ElToggles, not a ElToggleGroup: Bold and '
+          'the question a reader arrives with now that ToggleGroup has '
+          'its own page. Two Toggles, not a ToggleGroup: Bold and '
           'Italic can both be on, both be off, or any mix. There is no '
           'mutual exclusivity between them, so a group (which always has at '
           'most one selection) would be the wrong tool.',
@@ -142,7 +154,7 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
       title: 'Sizes',
       description:
           'Three rungs, and each one changes height, minimum width, corner '
-          'radius, and the icon rung a child ElIcon should render at. Two '
+          'radius, and the icon rung a child Icon should render at. Two '
           'variants times three sizes: all six combinations are real and '
           'tappable below.',
       specimen: _SizesSpecimen(),
@@ -164,7 +176,7 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
       id: 'rtl',
       title: 'RTL',
       description:
-          'ElToggle paints no direction-dependent geometry of its own '
+          'Toggle paints no direction-dependent geometry of its own '
           '(EdgeInsets.symmetric, Center), so the same composition reads '
           'correctly under Directionality.rtl with no extra wiring.',
       specimen: _RtlSpecimen(),
@@ -175,18 +187,18 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElToggle declares, its six static '
+          'Every constructor parameter Toggle declares, its six static '
           'helpers, and both enums it owns: one table each, read off '
           'lib/src/components/toggle.dart.',
       child: _ApiReferenceContent(),
       children: <DocsTocEntry>[
-        DocsTocEntry(title: 'ElToggle', anchor: 'api-eltoggle'),
+        DocsTocEntry(title: 'Toggle', anchor: 'api-eltoggle'),
         DocsTocEntry(
-          title: 'ElToggle static helpers',
+          title: 'Toggle static helpers',
           anchor: 'api-eltoggle-static',
         ),
-        DocsTocEntry(title: 'ElToggleVariant', anchor: 'api-eltoggle-variant'),
-        DocsTocEntry(title: 'ElToggleSize', anchor: 'api-eltoggle-size'),
+        DocsTocEntry(title: 'ToggleVariant', anchor: 'api-eltoggle-variant'),
+        DocsTocEntry(title: 'ToggleSize', anchor: 'api-eltoggle-size'),
       ],
     ),
     DisclosureSection(
@@ -232,14 +244,14 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
             label: 'Source',
             value: toggleDoc.sourcePath,
             description:
-                'Authoritative implementation of ElToggle, ElToggleVariant '
-                'and ElToggleSize: the truth this page was written from.',
+                'Authoritative implementation of Toggle, ToggleVariant '
+                'and ToggleSize: the truth this page was written from.',
           ),
           const DocsInstallFact(
             label: 'Package tests',
             value: 'test/components_test.dart',
             description:
-                'The ElToggle group within that file covers geometry, '
+                'The Toggle group within that file covers geometry, '
                 'statics and state behaviour in the package itself; there '
                 'is no dedicated toggle_test.dart in the package yet.',
           ),
@@ -248,7 +260,7 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
             value: 'example/test/components_docs/toggle_test.dart',
             description:
                 'Covers this page: the section order, API completeness for '
-                'ElToggle and both its enums, every live specimen, and both '
+                'Toggle and both its enums, every live specimen, and both '
                 'themes at two viewport widths.',
           ),
           const DocsInstallFact(
@@ -275,9 +287,9 @@ class ToggleDocPage extends StatelessWidget {
       title: toggleDoc.title,
       description: toggleDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Toggle'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Toggle'),
     ],
     toc: toggleDocSpec.toc,
     previous: const DocsPageLink(title: 'Switch', route: '/components/switch'),
@@ -309,69 +321,60 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: el(3),
-    runSpacing: el(3),
+    spacing: space(3),
+    runSpacing: space(3),
     children: <Widget>[
-      ElStateCell(
+      StateCell(
         label: 'Rest',
         note: 'Tap to toggle',
-        child: ElToggle(
+        child: Toggle(
           key: const ValueKey<String>('toggle-live-specimen'),
           pressed: _rest,
           label: 'Favorite',
           onChanged: (bool next) => setState(() => _rest = next),
-          child: ElIcon(
-            ElIconGlyph.heart,
-            size: ElToggle.iconSizeFor(ElToggleSize.md),
-          ),
+          child: Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.md)),
         ),
       ),
-      ElStateCell(
+      StateCell(
         label: 'Selected (on)',
         note: 'Tap to toggle',
-        child: ElToggle(
+        child: Toggle(
           pressed: _selected,
           label: 'Favorite',
           onChanged: (bool next) => setState(() => _selected = next),
-          child: ElIcon(
-            ElIconGlyph.heart,
-            size: ElToggle.iconSizeFor(ElToggleSize.md),
-          ),
+          child: Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.md)),
         ),
       ),
-      ElStateCell(
+      StateCell(
         label: 'Outline variant',
         note: 'Tap to toggle',
-        child: ElToggle(
-          variant: ElToggleVariant.outline,
+        child: Toggle(
+          variant: ToggleVariant.outline,
           pressed: _outline,
           label: 'Bold',
           onChanged: (bool next) => setState(() => _outline = next),
           child: const Text('B'),
         ),
       ),
-      const ElStateCell(
+      const StateCell(
         label: 'Focus-visible',
         note: 'Real keyboard focus, not a forced prop',
         child: _ToggleFocusDemo(),
       ),
-      ElStateCell(
+      StateCell(
         label: 'Disabled',
-        child: ElToggle(
+        child: Toggle(
           pressed: false,
           label: 'Favorite',
-          child: ElIcon(
-            ElIconGlyph.heart,
-            size: ElToggle.iconSizeFor(ElToggleSize.md),
-          ),
+          child: Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.md)),
         ),
       ),
     ],
   );
 }
 
-/// A [ElToggle] that requests real keyboard focus on mount, rather than a
-/// forced prop: ElToggle exposes no `forceFocusRing`, so this is what
+/// A [Toggle] that requests real keyboard focus on mount, rather than a
+/// forced prop: Toggle exposes no `forceFocusRing`, so this is what
 /// showing focus-visible genuinely means for this control.
 class _ToggleFocusDemo extends StatefulWidget {
   const _ToggleFocusDemo();
@@ -399,44 +402,41 @@ class _ToggleFocusDemoState extends State<_ToggleFocusDemo> {
   }
 
   @override
-  Widget build(BuildContext context) => ElToggle(
+  Widget build(BuildContext context) => Toggle(
     focusNode: _node,
     pressed: _pressed,
     label: 'Favorite',
     onChanged: (bool next) => setState(() => _pressed = next),
-    child: ElIcon(
-      ElIconGlyph.heart,
-      size: ElToggle.iconSizeFor(ElToggleSize.md),
-    ),
+    child: Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.md)),
   );
 }
 
-const String _previewCode = '''ElToggle(
+const String _previewCode = '''Toggle(
   pressed: favorite,
   label: 'Favorite',
   onChanged: (bool next) => setState(() => favorite = next),
-  child: ElIcon(ElIconGlyph.heart, size: ElToggle.iconSizeFor(ElToggleSize.md)),
+  child: Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.md)),
 )
 
 // Outline variant
-ElToggle(
-  variant: ElToggleVariant.outline,
+Toggle(
+  variant: ToggleVariant.outline,
   pressed: bold,
   label: 'Bold',
   onChanged: (bool next) => setState(() => bold = next),
   child: const Text('B'),
 )
 
-// Disabled: a null onChanged is the only disabled switch ElToggle has.
-ElToggle(
+// Disabled: a null onChanged is the only disabled switch Toggle has.
+Toggle(
   pressed: false,
   label: 'Favorite',
-  child: ElIcon(ElIconGlyph.heart, size: ElToggle.iconSizeFor(ElToggleSize.md)),
+  child: Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.md)),
 )''';
 
 const String _smallestUsageCode = '''bool bold = false;
 
-ElToggle(
+Toggle(
   pressed: bold,
   label: 'Bold',
   onChanged: (bool next) => setState(() => bold = next),
@@ -458,17 +458,17 @@ class _OutlineSpecimenState extends State<_OutlineSpecimen> {
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElToggle(
+      Toggle(
         key: const ValueKey<String>('toggle-outline-bold-specimen'),
-        variant: ElToggleVariant.outline,
+        variant: ToggleVariant.outline,
         pressed: _bold,
         label: 'Bold',
         onChanged: (bool next) => setState(() => _bold = next),
         child: const Text('B'),
       ),
-      SizedBox(width: ElToggle.gap),
-      ElToggle(
-        variant: ElToggleVariant.outline,
+      SizedBox(width: Toggle.gap),
+      Toggle(
+        variant: ToggleVariant.outline,
         pressed: _italic,
         label: 'Italic',
         onChanged: (bool next) => setState(() => _italic = next),
@@ -478,8 +478,8 @@ class _OutlineSpecimenState extends State<_OutlineSpecimen> {
   );
 }
 
-const String _outlineCode = '''ElToggle(
-  variant: ElToggleVariant.outline,
+const String _outlineCode = '''Toggle(
+  variant: ToggleVariant.outline,
   pressed: bold,
   label: 'Bold',
   onChanged: (bool next) => setState(() => bold = next),
@@ -497,29 +497,29 @@ class _WithTextSpecimenState extends State<_WithTextSpecimen> {
   bool _favorite = false;
 
   @override
-  Widget build(BuildContext context) => ElToggle(
+  Widget build(BuildContext context) => Toggle(
     key: const ValueKey<String>('toggle-with-text-specimen'),
     pressed: _favorite,
     onChanged: (bool next) => setState(() => _favorite = next),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElIcon(ElIconGlyph.heart, size: ElToggle.iconSizeFor(ElToggleSize.md)),
-        SizedBox(width: ElToggle.gap),
+        Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.md)),
+        SizedBox(width: Toggle.gap),
         const Text('Favorite'),
       ],
     ),
   );
 }
 
-const String _withTextCode = '''ElToggle(
+const String _withTextCode = '''Toggle(
   pressed: favorite,
   onChanged: (bool next) => setState(() => favorite = next),
   child: Row(
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElIcon(ElIconGlyph.heart, size: ElToggle.iconSizeFor(ElToggleSize.md)),
-      SizedBox(width: ElToggle.gap),
+      Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.md)),
+      SizedBox(width: Toggle.gap),
       const Text('Favorite'),
     ],
   ),
@@ -540,15 +540,15 @@ class _IndependentSpecimenState extends State<_IndependentSpecimen> {
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElToggle(
+      Toggle(
         key: const ValueKey<String>('toggle-independent-bold-specimen'),
         pressed: _bold,
         label: 'Bold',
         onChanged: (bool next) => setState(() => _bold = next),
         child: const Text('B'),
       ),
-      SizedBox(width: ElToggle.gap),
-      ElToggle(
+      SizedBox(width: Toggle.gap),
+      Toggle(
         key: const ValueKey<String>('toggle-independent-italic-specimen'),
         pressed: _italic,
         label: 'Italic',
@@ -565,14 +565,14 @@ bool italic = false;
 Row(
   mainAxisSize: MainAxisSize.min,
   children: <Widget>[
-    ElToggle(
+    Toggle(
       pressed: bold,
       label: 'Bold',
       onChanged: (bool next) => setState(() => bold = next),
       child: const Text('B'),
     ),
-    SizedBox(width: ElToggle.gap),
-    ElToggle(
+    SizedBox(width: Toggle.gap),
+    Toggle(
       pressed: italic,
       label: 'Italic',
       onChanged: (bool next) => setState(() => italic = next),
@@ -589,14 +589,14 @@ class _SizesSpecimen extends StatefulWidget {
 }
 
 class _SizesSpecimenState extends State<_SizesSpecimen> {
-  static const List<ElToggleVariant> _variants = <ElToggleVariant>[
-    ElToggleVariant.standard,
-    ElToggleVariant.outline,
+  static const List<ToggleVariant> _variants = <ToggleVariant>[
+    ToggleVariant.standard,
+    ToggleVariant.outline,
   ];
-  static const List<ElToggleSize> _sizes = <ElToggleSize>[
-    ElToggleSize.sm,
-    ElToggleSize.md,
-    ElToggleSize.lg,
+  static const List<ToggleSize> _sizes = <ToggleSize>[
+    ToggleSize.sm,
+    ToggleSize.md,
+    ToggleSize.lg,
   ];
 
   final List<bool> _pressed = List<bool>.filled(
@@ -608,14 +608,14 @@ class _SizesSpecimenState extends State<_SizesSpecimen> {
   Widget build(BuildContext context) {
     final List<Widget> cells = <Widget>[];
     int index = 0;
-    for (final ElToggleVariant variant in _variants) {
-      for (final ElToggleSize size in _sizes) {
+    for (final ToggleVariant variant in _variants) {
+      for (final ToggleSize size in _sizes) {
         final int cellIndex = index;
         cells.add(
-          ElStateCell(
+          StateCell(
             label: '${variant.name} · ${size.name}',
             note: 'Tap to toggle',
-            child: ElToggle(
+            child: Toggle(
               key: ValueKey<String>(
                 'toggle-sizes-${variant.name}-${size.name}-specimen',
               ),
@@ -625,22 +625,23 @@ class _SizesSpecimenState extends State<_SizesSpecimen> {
               label: 'Favorite',
               onChanged: (bool next) =>
                   setState(() => _pressed[cellIndex] = next),
-              child: ElIcon(ElIconGlyph.heart, size: ElToggle.iconSizeFor(size)),
+              child: Icon(IconGlyph.heart, size: Toggle.iconSizeFor(size)),
             ),
           ),
         );
         index++;
       }
     }
-    return Wrap(spacing: el(3), runSpacing: el(3), children: cells);
+    return Wrap(spacing: space(3), runSpacing: space(3), children: cells);
   }
 }
 
-const String _sizesCode = '''ElToggle(size: ElToggleSize.sm, pressed: on, label: 'Favorite', onChanged: (bool next) => setState(() => on = next), child: ElIcon(ElIconGlyph.heart, size: ElToggle.iconSizeFor(ElToggleSize.sm)))
-ElToggle(size: ElToggleSize.md, pressed: on, label: 'Favorite', onChanged: (bool next) => setState(() => on = next), child: ElIcon(ElIconGlyph.heart, size: ElToggle.iconSizeFor(ElToggleSize.md)))
-ElToggle(size: ElToggleSize.lg, pressed: on, label: 'Favorite', onChanged: (bool next) => setState(() => on = next), child: ElIcon(ElIconGlyph.heart, size: ElToggle.iconSizeFor(ElToggleSize.lg)))
+const String _sizesCode =
+    '''Toggle(size: ToggleSize.sm, pressed: on, label: 'Favorite', onChanged: (bool next) => setState(() => on = next), child: Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.sm)))
+Toggle(size: ToggleSize.md, pressed: on, label: 'Favorite', onChanged: (bool next) => setState(() => on = next), child: Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.md)))
+Toggle(size: ToggleSize.lg, pressed: on, label: 'Favorite', onChanged: (bool next) => setState(() => on = next), child: Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.lg)))
 
-// Each rung shown at both variant: ElToggleVariant.standard and .outline.''';
+// Each rung shown at both variant: ToggleVariant.standard and .outline.''';
 
 class _DisabledSpecimen extends StatelessWidget {
   const _DisabledSpecimen();
@@ -649,14 +650,14 @@ class _DisabledSpecimen extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      const ElToggle(
+      const Toggle(
         key: ValueKey<String>('toggle-disabled-off-specimen'),
         pressed: false,
         label: 'Bold',
         child: Text('B'),
       ),
-      SizedBox(width: ElToggle.gap),
-      const ElToggle(
+      SizedBox(width: Toggle.gap),
+      const Toggle(
         key: ValueKey<String>('toggle-disabled-on-specimen'),
         pressed: true,
         label: 'Bold',
@@ -667,9 +668,9 @@ class _DisabledSpecimen extends StatelessWidget {
 }
 
 const String _disabledCode =
-    '''ElToggle(pressed: false, label: 'Bold', child: const Text('B'))
+    '''Toggle(pressed: false, label: 'Bold', child: const Text('B'))
 
-ElToggle(pressed: true, label: 'Bold', child: const Text('B'))''';
+Toggle(pressed: true, label: 'Bold', child: const Text('B'))''';
 
 class _RtlSpecimen extends StatefulWidget {
   const _RtlSpecimen();
@@ -684,7 +685,7 @@ class _RtlSpecimenState extends State<_RtlSpecimen> {
   @override
   Widget build(BuildContext context) => Directionality(
     textDirection: TextDirection.rtl,
-    child: ElToggle(
+    child: Toggle(
       key: const ValueKey<String>('toggle-rtl-specimen'),
       pressed: _bold,
       label: 'غامق',
@@ -696,7 +697,7 @@ class _RtlSpecimenState extends State<_RtlSpecimen> {
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElToggle(
+  child: Toggle(
     pressed: bold,
     label: 'غامق',
     onChanged: (bool next) => setState(() => bold = next),
@@ -715,25 +716,25 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-eltoggle',
-        child: DocsApiTable(title: 'ElToggle', facts: _toggleApiFacts),
+        child: DocsApiTable(title: 'Toggle', facts: _toggleApiFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eltoggle-static',
         child: DocsApiTable(
-          title: 'ElToggle static helpers',
+          title: 'Toggle static helpers',
           facts: _toggleStaticFacts,
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eltoggle-variant',
-        child: DocsApiTable(title: 'ElToggleVariant', facts: _variantFacts),
+        child: DocsApiTable(title: 'ToggleVariant', facts: _variantFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-eltoggle-size',
-        child: DocsApiTable(title: 'ElToggleSize', facts: _sizeFacts),
+        child: DocsApiTable(title: 'ToggleSize', facts: _sizeFacts),
       ),
     ],
   );
@@ -745,7 +746,7 @@ const List<DocsApiFact> _toggleApiFacts = <DocsApiFact>[
     type: 'Widget',
     description:
         'Required. The content: a label, an icon, or a row of both spaced '
-        'by ElToggle.gap. This widget installs the resolved text style as a '
+        'by Toggle.gap. This widget installs the resolved text style as a '
         'DefaultTextStyle, so a bare Text child is the right choice for a '
         'labelled toggle.',
   ),
@@ -769,18 +770,18 @@ const List<DocsApiFact> _toggleApiFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'variant',
-    type: 'ElToggleVariant',
+    type: 'ToggleVariant',
     description:
-        'Optional. Defaults to ElToggleVariant.standard (no border box at '
-        'all). See the ElToggleVariant table below.',
+        'Optional. Defaults to ToggleVariant.standard (no border box at '
+        'all). See the ToggleVariant table below.',
   ),
   DocsApiFact(
     name: 'size',
-    type: 'ElToggleSize',
+    type: 'ToggleSize',
     description:
-        'Optional. Defaults to ElToggleSize.md. Selects height, minimum '
+        'Optional. Defaults to ToggleSize.md. Selects height, minimum '
         'width, corner radius, and the icon rung a child should render at. '
-        'See the ElToggleSize table below.',
+        'See the ToggleSize table below.',
   ),
   DocsApiFact(
     name: 'label',
@@ -805,7 +806,7 @@ const List<DocsApiFact> _toggleApiFacts = <DocsApiFact>[
     description:
         'Optional. Defaults to null, which keeps the default on-fill, '
         'theme.muted. The fill painted while pressed is true. Exists for '
-        'ElToggleGroup alone, which overrides it to a transparent fill so '
+        'ToggleGroup alone, which overrides it to a transparent fill so '
         'its travelling pill shows through.',
   ),
   DocsApiFact(
@@ -814,7 +815,7 @@ const List<DocsApiFact> _toggleApiFacts = <DocsApiFact>[
     description:
         'Optional. Defaults to null, which keeps the inherited '
         'theme.foreground. The ink painted while pressed is true. '
-        'ElToggleGroup overrides it to theme.primaryForeground for the '
+        'ToggleGroup overrides it to theme.primaryForeground for the '
         'selected item.',
   ),
   DocsApiFact(
@@ -825,52 +826,52 @@ const List<DocsApiFact> _toggleApiFacts = <DocsApiFact>[
         'node: a standalone toggle announces as a button with an on/off '
         'state; one option of a single-select group announces as a choice '
         'among others instead (selected + inMutuallyExclusiveGroup). '
-        'ElToggleGroup sets it for every item it builds.',
+        'ToggleGroup sets it for every item it builds.',
   ),
 ];
 
 const List<DocsApiFact> _toggleStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElToggle.heightFor(size)',
+    name: 'Toggle.heightFor(size)',
     type: 'static double',
     description: "The rung's fixed height: 28 / 32 / 36 for sm / md / lg.",
   ),
   DocsApiFact(
-    name: 'ElToggle.minWidthFor(size)',
+    name: 'Toggle.minWidthFor(size)',
     type: 'static double',
     description:
         'The same 28 / 32 / 36 floor, so an icon-only toggle does not '
         'collapse onto its glyph.',
   ),
   DocsApiFact(
-    name: 'ElToggle.paddingX',
+    name: 'Toggle.paddingX',
     type: 'static double',
     description:
         'A getter, not a per-size function: the same 10px of horizontal '
         'padding on every rung.',
   ),
   DocsApiFact(
-    name: 'ElToggle.gap',
+    name: 'Toggle.gap',
     type: 'static double',
     description:
         'A getter too: 4px between an icon and a label, when a caller '
         'composes both into one child Row. Exposed, not applied.',
   ),
   DocsApiFact(
-    name: 'ElToggle.radiusFor(size)',
+    name: 'Toggle.radiusFor(size)',
     type: 'static double',
     description:
-        "The rung's corner: ElRadii.lg (12px) on md and lg, and exactly "
-        'ElRadii.md (10px) on sm, which the source writes as '
-        'math.min(ElRadii.md, ElRadii.lg). Never a pill: only '
-        "ElToggleGroup's own travelling pill is a stadium.",
+        "The rung's corner: Radii.lg (12px) on md and lg, and exactly "
+        'Radii.md (10px) on sm, which the source writes as '
+        'math.min(Radii.md, Radii.lg). Never a indicator: only '
+        "ToggleGroup's own travelling pill is a stadium.",
   ),
   DocsApiFact(
-    name: 'ElToggle.iconSizeFor(size)',
-    type: 'static ElIconSize',
+    name: 'Toggle.iconSizeFor(size)',
+    type: 'static IconSize',
     description:
-        'The icon rung a child ElIcon should render at to match this '
-        "control's size: ElIconSize.sm on ElToggleSize.sm, ElIconSize.md "
+        'The icon rung a child Icon should render at to match this '
+        "control's size: IconSize.sm on ToggleSize.sm, IconSize.md "
         'on md and lg. The caller passes it; a Flutter parent cannot '
         'resize its child the way a CSS descendant selector can.',
   ),
@@ -897,21 +898,21 @@ const List<DocsApiFact> _variantFacts = <DocsApiFact>[
 const List<DocsApiFact> _sizeFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'sm',
-    type: '28px · ElRadii.md',
+    type: '28px · Radii.md',
     description:
         'The dense rung, and the only one that steps its icon child down '
-        'to ElIconSize.sm.',
+        'to IconSize.sm.',
   ),
   DocsApiFact(
     name: 'md',
-    type: '32px · ElRadii.lg',
+    type: '32px · Radii.lg',
     description: 'The constructor default.',
   ),
   DocsApiFact(
     name: 'lg',
-    type: '36px · ElRadii.lg',
+    type: '36px · Radii.lg',
     description:
-        'Taller and wider, but the same corner and the same ElIconSize.md '
+        'Taller and wider, but the same corner and the same IconSize.md '
         'child as md.',
   ),
 ];
@@ -921,26 +922,26 @@ class _StatesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const DocsStateMatrix(facts: _stateFacts),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-          child: ElText(
+          constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+          child: StyledText(
             'Pressed is not a row: the class list carries no active-state '
-            'rule and no press-motion utility, a toggle does nothing at all '
-            "between pointer-down and pointer-up, unlike ElButton's spring "
+            'rule and no press utility, a toggle does nothing at all '
+            "between pointer-down and pointer-up, unlike Button's spring "
             "squash (a documented drift in toggle.dart's own header). "
             'Loading and Empty are not rows either: this is a synchronous '
             'primitive with no async operation and nothing to list. Error '
             'is not a row: aria-invalid is never set on this control '
-            'anywhere in the reference, and ElToggle exposes no invalid '
+            'anywhere in the reference, and Toggle exposes no invalid '
             'parameter at all. Success is not a row: the component defines '
             'no success semantics of its own.',
-            ElType.small,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ),
@@ -974,9 +975,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Selected (on)',
     treatment:
         'theme.muted fill (the class hover also paints), theme.foreground '
-        'ink. Unlike ElSwitch and ElCheckbox, the on-state is not the '
+        'ink. Unlike Switch and Checkbox, the on-state is not the '
         'brand colour here. pressedFill and pressedInk are the two hooks '
-        'that change that, and ElToggleGroup is the one caller in the '
+        'that change that, and ToggleGroup is the one caller in the '
         'corpus that uses them.',
     userSignal:
         'A filled control that stays filled after the pointer leaves: the '
@@ -1002,13 +1003,13 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'from the tab order.',
     userSignal:
         'Dimmed and inert: the one state that visibly dims, matching '
-        "ElButton's own disabled treatment.",
+        "Button's own disabled treatment.",
   ),
   DocsStateFact(
     state: 'Reduced motion',
     treatment:
         'The fill/ink/border/ring tween chain resolves through '
-        'elAnimationDuration, which reduced motion shortens toward zero.',
+        'effectiveMotionDuration, which reduced motion shortens toward zero.',
     userSignal:
         'State changes land on their finished colours immediately, with '
         'no transition to sit through.',
@@ -1030,7 +1031,7 @@ class _AccessibilityContent extends StatelessWidget {
             'exposes toggled: pressed. Set inExclusiveGroup: true and it '
             'exposes selected: pressed and inMutuallyExclusiveGroup: true '
             'instead, with toggled left null: a choice among others, not '
-            'an independent on/off switch. ElToggleGroup is what sets it '
+            'an independent on/off switch. ToggleGroup is what sets it '
             'in practice.',
       ),
       const DocsInstallFact(
@@ -1046,8 +1047,8 @@ class _AccessibilityContent extends StatelessWidget {
         label: 'Keyboard activation',
         value: 'Enter, numpad Enter, Space',
         description:
-            'Hand-wired through Focus.onKeyEvent, the same wiring ElButton '
-            'and ElCheckbox use: the control is not a native button, so '
+            'Hand-wired through Focus.onKeyEvent, the same wiring Button '
+            'and Checkbox use: the control is not a native button, so '
             'nothing arrives for free — see Keyboard below.',
       ),
       const DocsInstallFact(
@@ -1063,8 +1064,8 @@ class _AccessibilityContent extends StatelessWidget {
         label: 'Touch target',
         value: 'Exactly the visual box: no cushion',
         description:
-            '28x28 / 32x32 / 36x36 depending on size. Unlike ElCheckbox\'s '
-            'ElHitArea, ElToggle wraps its GestureDetector directly around '
+            '28x28 / 32x32 / 36x36 depending on size. Unlike Checkbox\'s '
+            'HitArea, Toggle wraps its GestureDetector directly around '
             'the sized box with no extra hit-test padding. Every size sits '
             "below the system's 44px touch-target floor: recorded rather "
             'than corrected, because it is what the source renders.',
@@ -1075,7 +1076,7 @@ class _AccessibilityContent extends StatelessWidget {
         description:
             'Visually, the only change between Rest and Selected is a '
             'fill colour; a sighted user who cannot rely on that has no '
-            "drawn glyph to fall back on the way ElCheckbox's tick "
+            "drawn glyph to fall back on the way Checkbox's tick "
             'provides. A screen reader is told regardless, through the '
             'toggled or selected flag.',
       ),
@@ -1083,7 +1084,7 @@ class _AccessibilityContent extends StatelessWidget {
         label: 'Error wiring',
         value: 'N/A: no invalid parameter exists',
         description:
-            'ElToggle declares no invalid/aria-invalid path; the source '
+            'Toggle declares no invalid/aria-invalid path; the source '
             'states aria-invalid is never set on this control anywhere in '
             'the reference. There is nothing to wire.',
       ),
@@ -1107,7 +1108,7 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Activation: Enter, NumpadEnter, and Space activate a focused, '
             'enabled toggle. _onKey only inspects these three '
             'LogicalKeyboardKey values; any other key returns '
@@ -1132,9 +1133,9 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-    child: ElText(
-      'ElToggle has no breakpoints of its own: it is a fixed-size atomic '
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+    child: StyledText(
+      'Toggle has no breakpoints of its own: it is a fixed-size atomic '
       'control (28 / 32 / 36px tall, and at least that wide), and nothing '
       'in toggle.dart reads a viewport width to decide anything. What '
       'changes with layout belongs to whatever composes it: a toolbar of '
@@ -1146,7 +1147,7 @@ class _ResponsiveContent extends StatelessWidget {
       'activation and pointer activation behave identically on every '
       'Flutter target this package supports; there is no platform channel '
       'and nothing here is web-only or desktop-only.',
-      ElType.small,
+      TextStyles.small,
     ),
   );
 }
@@ -1181,14 +1182,14 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Local file dependencies',
-            value: 'button.dart, icon.dart, effects/machine_surface.dart',
+            value: 'button.dart, icon.dart, effects/surface.dart',
             description:
                 'toggle.dart imports button.dart for '
-                'ElButton.withFocusRing, icon.dart for the ElIconSize '
+                'Button.withFocusRing, icon.dart for the IconSize '
                 'return type of iconSizeFor, and effects/'
-                'machine_surface.dart for ElMachineSurface. It does NOT '
-                'import motion/sliding_pill.dart: the travelling pill '
-                'belongs to ElToggleGroup, on its own page. None of these '
+                'surface.dart for Surface. It does NOT '
+                'import motion/active_indicator.dart: the travelling pill '
+                'belongs to ToggleGroup, on its own page. None of these '
                 'are copyable in isolation: see Installation.',
           ),
           const DocsInstallFact(
@@ -1200,8 +1201,8 @@ class _DependenciesContent extends StatelessWidget {
                 'theme_scope.dart',
             description:
                 'Token sources: the transparent-colour constant, '
-                'durations and curves, shadow specs, the el() spacing '
-                'scale and ElRadii, the live theme, and the resolved '
+                'durations and curves, shadow specs, the space() spacing '
+                'scale and Radii, the live theme, and the resolved '
                 'toggle-label text style.',
           ),
           DocsInstallFact(
@@ -1209,7 +1210,7 @@ class _DependenciesContent extends StatelessWidget {
             value: toggleDoc.exports.join(', '),
             description:
                 'The public symbols this component makes available. '
-                'ElToggleGroup and ElToggleGroupItem are a separate '
+                'ToggleGroup and ToggleGroupItem are a separate '
                 'export, documented on their own page.',
           ),
           const DocsInstallFact(
@@ -1236,21 +1237,15 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: DocsLinkRow(
           links: <DocsLink>[
             DocsLink(label: 'Button', route: '/components/button'),
             DocsLink(label: 'Icon', route: '/components/icon'),
-            DocsLink(
-              label: 'Toggle group',
-              route: '/components/toggle-group',
-            ),
-            DocsLink(
-              label: 'Machine Surface',
-              route: '/components/machine_surface',
-            ),
+            DocsLink(label: 'Toggle group', route: '/components/toggle-group'),
+            DocsLink(label: 'Machine Surface', route: '/components/surface'),
             DocsLink(
               label: 'Source Foundation',
               route: '/components/source_foundation',
@@ -1282,7 +1277,7 @@ class _ThemingContent extends StatelessWidget {
             'theme.input (outline, rest) / theme.ring (outline, '
             'focus-visible)',
         description:
-            'Only painted on ElToggleVariant.outline: standard has no '
+            'Only painted on ToggleVariant.outline: standard has no '
             'border box at all.',
       ),
       const DocsInstallFact(
@@ -1297,32 +1292,32 @@ class _ThemingContent extends StatelessWidget {
         value: 'theme.ring at 50% alpha',
         description:
             'The focus-visible ring, composited in front of the surface '
-            'through ElButton.withFocusRing, the shared helper ElInput '
+            'through Button.withFocusRing, the shared helper Input '
             'reaches for too.',
       ),
       const DocsInstallFact(
         label: 'Radius',
-        value: 'ElRadii.lg on md and lg / ElRadii.md on sm',
+        value: 'Radii.lg on md and lg / Radii.md on sm',
         description:
-            'math.min(ElRadii.md, ElRadii.lg) on sm, which resolves to '
-            'ElRadii.md exactly. Never ElRadii.pill: this control is a '
+            'math.min(Radii.md, Radii.lg) on sm, which resolves to '
+            'Radii.md exactly. Never Radii.full: this control is a '
             'rounded rect at every size.',
       ),
       const DocsInstallFact(
         label: 'Shadow',
-        value: 'ElShadows.none, plus the focus ring',
+        value: 'Shadows.none, plus the focus ring',
         description:
             'The surface carries no resting elevation. The only thing '
-            'ElMachineSurface ever paints here is the focus-visible ring, '
+            'Surface ever paints here is the focus-visible ring, '
             'faded up from a fully transparent copy of itself so the '
             'layer counts match and the colour can interpolate.',
       ),
       const DocsInstallFact(
         label: 'Motion',
-        value: 'ElDurations.transitionDefault, ElCurves.out',
+        value: 'MotionDurations.normal, MotionCurves.enter',
         description:
             'The fill/ink/border/ring tween chain, resolved through '
-            'elAnimationDuration, so reduced motion shortens or removes '
+            'effectiveMotionDuration, so reduced motion shortens or removes '
             'it automatically. There is no press animation to reduce: '
             'the class list declares none.',
       ),
@@ -1330,14 +1325,14 @@ class _ThemingContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => ConstrainedBox(
-  constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+Widget _bullets(ThemeTokens theme, List<String> lines) => ConstrainedBox(
+  constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       for (final String line in lines) ...<Widget>[
-        ElText('•  $line', ElType.small, color: theme.mutedForeground),
-        SizedBox(height: el(2)),
+        StyledText('•  $line', TextStyles.small, color: theme.mutedForeground),
+        SizedBox(height: space(2)),
       ],
     ],
   ),

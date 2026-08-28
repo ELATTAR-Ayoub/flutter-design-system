@@ -16,7 +16,7 @@ const Set<String> _inventoryClassifications = <String>{
 
 Map<String, Object?> _file({String target = '@ui/button.dart'}) =>
     <String, Object?>{
-      'source': 'lib/src/components/button.dart',
+      'source': 'lib/src/components/ui/button.dart',
       'target': target,
       'sha256': _hash,
     };
@@ -58,7 +58,7 @@ Map<String, Object?> _jsonFile(String path) =>
 Set<String> _exportedSources(String folder) {
   final File barrel = File('lib/elattar_design_system.dart');
   final RegExp pattern = RegExp(
-    "^export 'src/$folder/(.+)';"
+    "^export '(?:\\./)?src/$folder/(.+)';"
     r'$',
   );
   return <String>{
@@ -114,7 +114,7 @@ List<String> _componentInventoryProblems(Map<String, Object?> inventory) {
     problems.add('components must be an array.');
     return problems;
   }
-  final Set<String> exportedSources = _exportedSources('components');
+  final Set<String> exportedSources = _exportedSources('components/ui');
   final Map<String, Set<String>> manifestSources = _manifestSourcesByOwner(
     'components',
   );
@@ -217,15 +217,15 @@ bool _listsEqual(List<String> a, List<String> b) {
 void main() {
   test('public barrel exports are fully covered by registry manifests', () {
     final Set<String> exportedSources = <String>{
-      ..._exportedSources('components'),
-      ..._exportedSources('effects'),
-      ..._exportedSources('motion'),
+      ..._exportedSources('components/ui'),
+      ..._exportedSources('blocks'),
+      ..._exportedSources('design_system/foundation'),
     };
     final Set<String> manifestSources = <String>{};
     for (final String folder in <String>[
       'registry/components',
-      'registry/effects',
-      'registry/motion',
+      'registry/blocks',
+      'registry/foundations',
     ]) {
       for (final File file in Directory(folder).listSync().whereType<File>()) {
         final Map<String, Object?> json =
@@ -237,9 +237,10 @@ void main() {
       }
     }
     expect(
-      manifestSources.contains('lib/src/components/rule.dart'),
+      manifestSources.contains('lib/src/components/ui/validation_rule.dart'),
       isTrue,
-      reason: 'rule.dart must be distributed under the new rule item.',
+      reason:
+          'validation_rule.dart must be distributed under the new rule item.',
     );
     expect(
       Directory('registry/components')
@@ -248,8 +249,8 @@ void main() {
           .map((File file) => file.uri.pathSegments.last)
           .where((String name) => name.endsWith('rule.json'))
           .toList(),
-      <String>['rule.json'],
-      reason: 'only the new rule manifest should remain.',
+      <String>['validation-rule.json'],
+      reason: 'only the semantic validation-rule manifest should remain.',
     );
     expect(exportedSources.difference(manifestSources), isEmpty);
   });
@@ -394,11 +395,11 @@ void main() {
     expect(result.errors, contains(contains('semanticDependencies')));
   });
 
-  test('shot is a parsable item kind installing under @app/', () {
+  test('block is a parsable item kind installing under @block/', () {
     final Map<String, Object?> shot = _item(
-      name: 'console-shot',
-      target: '@app/shots/console/console_shot.dart',
-    )..['type'] = 'shot';
+      name: 'agent-console',
+      target: '@block/agent_console/agent_console.dart',
+    )..['type'] = 'block';
     final RegistryDocument document = RegistryDocument.fromJsonString(
       jsonEncode(<String, Object?>{
         'schemaVersion': 1,
@@ -406,7 +407,7 @@ void main() {
         'items': <Object?>[shot],
       }),
     );
-    expect(document.items.single.type, RegistryItemType.shot);
+    expect(document.items.single.type, RegistryItemType.block);
     expect(validateRegistry(document).isValid, isTrue);
   });
 
@@ -427,28 +428,29 @@ void main() {
     expect(result.errors, contains(contains('logical target')));
   });
 
-  test('the generator picks up manifests under registry/shots/', () {
+  test('the generator picks up manifests under registry/blocks/', () {
     final Directory root = Directory.systemTemp.createTempSync(
       'elattar-shots-scan-',
     );
     addTearDown(() => root.deleteSync(recursive: true));
-    final File source = File('${root.path}/lib/shots/console/console_shot.dart')
-      ..createSync(recursive: true)
-      ..writeAsStringSync('const consoleShot = true;\n');
-    File('${root.path}/registry/shots/console-shot.json')
+    final File source =
+        File('${root.path}/lib/blocks/agent_console/agent_console.dart')
+          ..createSync(recursive: true)
+          ..writeAsStringSync('const consoleShot = true;\n');
+    File('${root.path}/registry/blocks/agent-console.json')
       ..createSync(recursive: true)
       ..writeAsStringSync(
         jsonEncode(<String, Object?>{
-          'name': 'console-shot',
-          'type': 'shot',
+          'name': 'agent-console',
+          'type': 'block',
           'version': '0.0.1',
           'description': 'Console shot fixture.',
           'minDart': '3.12.2',
           'minFlutter': '3.44.8',
           'files': <Object?>[
             <String, Object?>{
-              'source': 'lib/shots/console/console_shot.dart',
-              'target': '@app/shots/console/console_shot.dart',
+              'source': 'lib/blocks/agent_console/agent_console.dart',
+              'target': '@block/agent_console/agent_console.dart',
               'sha256': sha256Hex(source.readAsBytesSync()),
             },
           ],
@@ -466,12 +468,12 @@ void main() {
     final GenerationSummary summary = RegistryGenerator(
       repositoryRoot: root,
     ).build();
-    expect(summary.document.items.single.name, 'console-shot');
-    expect(summary.document.items.single.type, RegistryItemType.shot);
+    expect(summary.document.items.single.name, 'agent-console');
+    expect(summary.document.items.single.type, RegistryItemType.block);
     expect(
       File(
-        '${root.path}/registry/generated/latest/versions/console-shot/0.0.1/'
-        'logical/app/shots/console/console_shot.dart',
+        '${root.path}/registry/generated/latest/versions/agent-console/0.0.1/'
+        'logical/block/agent_console/agent_console.dart',
       ).existsSync(),
       isTrue,
     );

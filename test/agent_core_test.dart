@@ -1,5 +1,17 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 /// `components/agent/core/*` — the transport-agnostic model, pinned.
@@ -19,18 +31,18 @@ import 'package:flutter_test/flutter_test.dart';
 /// precedence pairs wherever two branches are simultaneously true. Testing each
 /// branch in isolation would pass against a resolver with the ladder shuffled.
 
-ElAgentAttachment _file({
+AgentAttachment _file({
   String id = 'a1',
   required String name,
   required String mime,
   int size = 1024,
   String? text,
 }) {
-  return ElAgentAttachment(
+  return AgentAttachment(
     id: id,
     name: name,
     mime: mime,
-    kind: elAttachmentKind(mime, name),
+    kind: attachmentKind(mime, name),
     size: size,
     text: text,
   );
@@ -40,12 +52,12 @@ void main() {
   group('attachmentKind — MIME first, extension second', () {
     test('MIME wins for image and audio', () {
       expect(
-        elAttachmentKind('image/png', 'whatever.txt'),
-        ElAgentAttachmentKind.image,
+        attachmentKind('image/png', 'whatever.txt'),
+        AgentAttachmentKind.image,
       );
       expect(
-        elAttachmentKind('audio/mpeg', 'whatever.txt'),
-        ElAgentAttachmentKind.audio,
+        attachmentKind('audio/mpeg', 'whatever.txt'),
+        AgentAttachmentKind.audio,
       );
     });
 
@@ -53,39 +65,36 @@ void main() {
       // The reason the reference checks both: browsers report
       // `application/octet-stream` for ordinary files depending on the OS.
       expect(
-        elAttachmentKind('application/octet-stream', 'export.csv'),
-        ElAgentAttachmentKind.data,
+        attachmentKind('application/octet-stream', 'export.csv'),
+        AgentAttachmentKind.data,
       );
       expect(
-        elAttachmentKind('application/octet-stream', 'report.pdf'),
-        ElAgentAttachmentKind.document,
+        attachmentKind('application/octet-stream', 'report.pdf'),
+        AgentAttachmentKind.document,
       );
       expect(
-        elAttachmentKind('application/octet-stream', 'main.dart'),
-        ElAgentAttachmentKind.other,
+        attachmentKind('application/octet-stream', 'main.dart'),
+        AgentAttachmentKind.other,
       );
       expect(
-        elAttachmentKind('application/octet-stream', 'main.ts'),
-        ElAgentAttachmentKind.code,
+        attachmentKind('application/octet-stream', 'main.ts'),
+        AgentAttachmentKind.code,
       );
     });
 
     test('the two MIME shortcuts for data', () {
       expect(
-        elAttachmentKind('application/json', 'blob'),
-        ElAgentAttachmentKind.data,
+        attachmentKind('application/json', 'blob'),
+        AgentAttachmentKind.data,
       );
-      expect(elAttachmentKind('text/csv', 'blob'), ElAgentAttachmentKind.data);
+      expect(attachmentKind('text/csv', 'blob'), AgentAttachmentKind.data);
     });
 
     test('anything else lands on other', () {
+      expect(attachmentKind('text/plain', 'notes'), AgentAttachmentKind.other);
       expect(
-        elAttachmentKind('text/plain', 'notes'),
-        ElAgentAttachmentKind.other,
-      );
-      expect(
-        elAttachmentKind('application/x-tar', 'bundle'),
-        ElAgentAttachmentKind.other,
+        attachmentKind('application/x-tar', 'bundle'),
+        AgentAttachmentKind.other,
       );
     });
 
@@ -96,117 +105,111 @@ void main() {
       // classifies as data. Reproduced rather than corrected: the port matches
       // the reference's arithmetic, not its intent.
       expect(
-        elAttachmentKind('application/octet-stream', 'pdf'),
-        ElAgentAttachmentKind.document,
+        attachmentKind('application/octet-stream', 'pdf'),
+        AgentAttachmentKind.document,
       );
       expect(
-        elAttachmentKind('application/octet-stream', 'csv'),
-        ElAgentAttachmentKind.data,
+        attachmentKind('application/octet-stream', 'csv'),
+        AgentAttachmentKind.data,
       );
       // A dotless name that matches no extension pattern still lands on other,
       // and nothing throws on the -1.
       expect(
-        elAttachmentKind('application/octet-stream', 'README'),
-        ElAgentAttachmentKind.other,
+        attachmentKind('application/octet-stream', 'README'),
+        AgentAttachmentKind.other,
       );
     });
 
     test('the transcript build\'s alias resolves to the same function', () {
       expect(
-        elAgentAttachmentKind('text/csv', 'a.csv'),
-        elAttachmentKind('text/csv', 'a.csv'),
+        agentAttachmentKind('text/csv', 'a.csv'),
+        attachmentKind('text/csv', 'a.csv'),
       );
     });
   });
 
   group('formatBytes — the reference ladder', () {
     test('bytes below 1 KiB', () {
-      expect(elFormatBytes(0), '0 B');
-      expect(elFormatBytes(1023), '1023 B');
+      expect(formatBytes(0), '0 B');
+      expect(formatBytes(1023), '1023 B');
     });
 
     test('rounded KB below 1 MiB', () {
-      expect(elFormatBytes(1024), '1 KB');
-      expect(elFormatBytes(18422), '18 KB');
-      expect(elFormatBytes(184220), '180 KB');
-      expect(elFormatBytes(4821), '5 KB');
+      expect(formatBytes(1024), '1 KB');
+      expect(formatBytes(18422), '18 KB');
+      expect(formatBytes(184220), '180 KB');
+      expect(formatBytes(4821), '5 KB');
     });
 
     test('MB to one decimal above', () {
-      expect(elFormatBytes(2620000), '2.5 MB');
-      expect(elFormatBytes(kElMaxFileBytes), '25.0 MB');
+      expect(formatBytes(2620000), '2.5 MB');
+      expect(formatBytes(maxFileBytes), '25.0 MB');
     });
   });
 
   group('formatMs', () {
     test('milliseconds under a second, one decimal above', () {
       // The tool-chip fixtures on the transcript page.
-      expect(elFormatMs(912), '912ms');
-      expect(elFormatMs(1204), '1.2s');
-      expect(elFormatMs(8004), '8.0s');
-      expect(elFormatMs(999), '999ms');
-      expect(elFormatMs(1000), '1.0s');
+      expect(formatMs(912), '912ms');
+      expect(formatMs(1204), '1.2s');
+      expect(formatMs(8004), '8.0s');
+      expect(formatMs(999), '999ms');
+      expect(formatMs(1000), '1.0s');
     });
   });
 
   group('humanise', () {
     test('underscores, dots and camelCase all become one sentence case', () {
-      expect(elHumaniseToolName('search_inventory'), 'Search inventory');
-      expect(elHumaniseToolName('fetch_market_price'), 'Fetch market price');
-      expect(elHumaniseToolName('browser.navigate'), 'Browser navigate');
-      expect(elHumaniseToolName('readWallet'), 'Read wallet');
-      expect(elHumaniseToolName(''), '');
+      expect(humaniseToolName('search_inventory'), 'Search inventory');
+      expect(humaniseToolName('fetch_market_price'), 'Fetch market price');
+      expect(humaniseToolName('browser.navigate'), 'Browser navigate');
+      expect(humaniseToolName('readWallet'), 'Read wallet');
+      expect(humaniseToolName(''), '');
     });
   });
 
   group('isTextual', () {
     test('any text/* MIME, and JSON, regardless of kind', () {
-      expect(elIsTextual(_file(name: 'a.png', mime: 'text/plain')), isTrue);
-      expect(
-        elIsTextual(_file(name: 'a.bin', mime: 'application/json')),
-        isTrue,
-      );
+      expect(isTextual(_file(name: 'a.png', mime: 'text/plain')), isTrue);
+      expect(isTextual(_file(name: 'a.bin', mime: 'application/json')), isTrue);
     });
 
     test(
       'data, code and other are textual; image, document, audio are not',
       () {
-        expect(elIsTextual(_file(name: 'a.csv', mime: 'text/csv')), isTrue);
+        expect(isTextual(_file(name: 'a.csv', mime: 'text/csv')), isTrue);
         expect(
-          elIsTextual(_file(name: 'a.ts', mime: 'application/octet-stream')),
+          isTextual(_file(name: 'a.ts', mime: 'application/octet-stream')),
           isTrue,
         );
         expect(
-          elIsTextual(_file(name: 'a.pdf', mime: 'application/pdf')),
+          isTextual(_file(name: 'a.pdf', mime: 'application/pdf')),
           isFalse,
         );
-        expect(elIsTextual(_file(name: 'a.png', mime: 'image/png')), isFalse);
-        expect(elIsTextual(_file(name: 'a.mp3', mime: 'audio/mpeg')), isFalse);
+        expect(isTextual(_file(name: 'a.png', mime: 'image/png')), isFalse);
+        expect(isTextual(_file(name: 'a.mp3', mime: 'audio/mpeg')), isFalse);
       },
     );
   });
 
   group('serialiseAttachments', () {
     test('no attachments is the identity', () {
-      final ElSerialisedMessage out = elSerialiseAttachments(
+      final SerialisedMessage out = serialiseAttachments(
         'hello',
-        const <ElAgentAttachment>[],
+        const <AgentAttachment>[],
       );
       expect(out.text, 'hello');
       expect(out.attachments, isEmpty);
     });
 
     test('a textual file is fenced and stamped content', () {
-      final ElSerialisedMessage out = elSerialiseAttachments(
+      final SerialisedMessage out = serialiseAttachments(
         'what is in here?',
-        <ElAgentAttachment>[
+        <AgentAttachment>[
           _file(name: 'export.csv', mime: 'text/csv', text: 'a,b\n1,2'),
         ],
       );
-      expect(
-        out.attachments.single.delivery!.sent,
-        ElAgentDeliverySent.content,
-      );
+      expect(out.attachments.single.delivery!.sent, AgentDeliverySent.content);
       expect(
         out.text,
         'what is in here?\n\n'
@@ -217,14 +220,14 @@ void main() {
     });
 
     test('a binary travels as a name and says why', () {
-      final ElSerialisedMessage out = elSerialiseAttachments(
+      final SerialisedMessage out = serialiseAttachments(
         'read this',
-        <ElAgentAttachment>[
+        <AgentAttachment>[
           _file(name: 'report.pdf', mime: 'application/pdf', size: 2620000),
         ],
       );
-      final ElAgentDelivery delivery = out.attachments.single.delivery!;
-      expect(delivery.sent, ElAgentDeliverySent.reference);
+      final AgentDelivery delivery = out.attachments.single.delivery!;
+      expect(delivery.sent, AgentDeliverySent.reference);
       expect(
         delivery.reason,
         'This file is not text, so its contents could not be inlined.',
@@ -242,9 +245,9 @@ void main() {
     });
 
     test('an image with no reading gets its own reason', () {
-      final ElSerialisedMessage out = elSerialiseAttachments(
+      final SerialisedMessage out = serialiseAttachments(
         'look',
-        <ElAgentAttachment>[_file(name: 'shot.png', mime: 'image/png')],
+        <AgentAttachment>[_file(name: 'shot.png', mime: 'image/png')],
       );
       expect(
         out.attachments.single.delivery!.reason,
@@ -253,16 +256,13 @@ void main() {
     });
 
     test('an image WITH a reading is fenced as <image>, not <file>', () {
-      final ElSerialisedMessage out = elSerialiseAttachments(
+      final SerialisedMessage out = serialiseAttachments(
         'look',
-        <ElAgentAttachment>[
+        <AgentAttachment>[
           _file(name: 'shot.png', mime: 'image/png', text: 'A blue circle.'),
         ],
       );
-      expect(
-        out.attachments.single.delivery!.sent,
-        ElAgentDeliverySent.content,
-      );
+      expect(out.attachments.single.delivery!.sent, AgentDeliverySent.content);
       expect(
         out.text,
         contains(
@@ -275,34 +275,31 @@ void main() {
     });
 
     test('over the inline cap the fence declares the truncation', () {
-      final String long = 'x' * (kElMaxInlineChars + 10);
-      final ElSerialisedMessage out = elSerialiseAttachments(
+      final String long = 'x' * (maxInlineChars + 10);
+      final SerialisedMessage out = serialiseAttachments(
         'summarise',
-        <ElAgentAttachment>[
+        <AgentAttachment>[
           _file(name: 'big.csv', mime: 'text/csv', size: 999, text: long),
         ],
       );
       expect(out.text, contains('truncated="true" of-bytes="999"'));
       // Announced rather than done silently — and cut at exactly the cap.
-      expect(out.text, contains('x' * kElMaxInlineChars));
-      expect(out.text.contains('x' * (kElMaxInlineChars + 1)), isFalse);
+      expect(out.text, contains('x' * maxInlineChars));
+      expect(out.text.contains('x' * (maxInlineChars + 1)), isFalse);
     });
 
     test('attribute values are escaped', () {
-      final ElSerialisedMessage out = elSerialiseAttachments(
-        '',
-        <ElAgentAttachment>[
-          _file(name: 'a&"b<c.csv', mime: 'text/csv', text: 'x'),
-        ],
-      );
+      final SerialisedMessage out = serialiseAttachments('', <AgentAttachment>[
+        _file(name: 'a&"b<c.csv', mime: 'text/csv', text: 'x'),
+      ]);
       expect(out.text, contains('name="a&amp;&quot;b&lt;c.csv"'));
     });
 
     test(
       'mixed: readable and unreadable both appear, in the reference order',
       () {
-        final ElSerialisedMessage out =
-            elSerialiseAttachments('both', <ElAgentAttachment>[
+        final SerialisedMessage out =
+            serialiseAttachments('both', <AgentAttachment>[
               _file(id: '1', name: 'a.csv', mime: 'text/csv', text: 'x'),
               _file(id: '2', name: 'b.pdf', mime: 'application/pdf'),
             ]);
@@ -311,10 +308,10 @@ void main() {
           lessThan(out.text.indexOf('<attached-but-not-readable>')),
         );
         expect(
-          out.attachments.map((ElAgentAttachment a) => a.delivery!.sent),
-          <ElAgentDeliverySent>[
-            ElAgentDeliverySent.content,
-            ElAgentDeliverySent.reference,
+          out.attachments.map((AgentAttachment a) => a.delivery!.sent),
+          <AgentDeliverySent>[
+            AgentDeliverySent.content,
+            AgentDeliverySent.reference,
           ],
         );
       },
@@ -323,19 +320,19 @@ void main() {
 
   group('stripProtocol', () {
     test('closed complete tags go, anywhere', () {
-      expect(elStripProtocol('<complete>done</complete>'), 'done');
-      expect(elStripProtocol('a<complete>b</complete>c'), 'abc');
+      expect(stripProtocol('<complete>done</complete>'), 'done');
+      expect(stripProtocol('a<complete>b</complete>c'), 'abc');
     });
 
     test('a half-written tag at the very end goes', () {
-      expect(elStripProtocol('Checking the vault<comp'), 'Checking the vault');
-      expect(elStripProtocol('Checking<'), 'Checking');
+      expect(stripProtocol('Checking the vault<comp'), 'Checking the vault');
+      expect(stripProtocol('Checking<'), 'Checking');
     });
 
     test('a tag-like fragment mid-string stays', () {
       // The trailing anchor is the whole point: only the buffer's tail is a
       // partially-arrived tag.
-      expect(elStripProtocol('a < b and c'), 'a < b and c');
+      expect(stripProtocol('a < b and c'), 'a < b and c');
     });
   });
 
@@ -344,13 +341,13 @@ void main() {
     // output, which is what a reader of the reference actually sees. `auto` is
     // why one day is "yesterday" rather than "1 day ago".
     final DateTime now = DateTime(2026, 8, 16, 12);
-    String at(Duration ago) => elRelativeTime(now.subtract(ago), now: now);
+    String at(Duration ago) => relativeTime(now.subtract(ago), now: now);
 
     test('under a minute is "just now", in both directions', () {
       expect(at(const Duration(seconds: 12)), 'just now');
       expect(at(const Duration(seconds: 59)), 'just now');
       expect(
-        elRelativeTime(now.add(const Duration(seconds: 30)), now: now),
+        relativeTime(now.add(const Duration(seconds: 30)), now: now),
         'just now',
       );
     });
@@ -373,66 +370,66 @@ void main() {
     });
   });
 
-  group('ElAgentState', () {
+  group('AgentState', () {
     test('twenty states, in the source\'s order', () {
-      expect(ElAgentState.values.length, 20);
-      expect(ElAgentState.values.first, ElAgentState.idle);
-      expect(ElAgentState.values.last, ElAgentState.done);
+      expect(AgentState.values.length, 20);
+      expect(AgentState.values.first, AgentState.idle);
+      expect(AgentState.values.last, AgentState.done);
     });
 
     test('the two snake_case wire spellings survive the Dart rename', () {
-      expect(ElAgentState.awaitingApproval.wire, 'awaiting_approval');
-      expect(ElAgentState.callingTools.wire, 'calling_tools');
-      expect(ElAgentState.searching.wire, 'searching');
+      expect(AgentState.awaitingApproval.wire, 'awaiting_approval');
+      expect(AgentState.callingTools.wire, 'calling_tools');
+      expect(AgentState.searching.wire, 'searching');
     });
 
     test('AGENT_STATE_LABEL, where the label is not the name', () {
-      expect(ElAgentState.idle.label, 'Ready');
-      expect(ElAgentState.retrieving.label, 'Retrieving knowledge');
-      expect(ElAgentState.ingesting.label, 'Ingesting data');
-      expect(ElAgentState.running.label, 'Running code');
-      expect(ElAgentState.delegating.label, 'Delegating to agent');
-      expect(ElAgentState.awaitingApproval.label, 'Awaiting approval');
-      expect(ElAgentState.error.label, 'Something went wrong');
-      expect(ElAgentState.callingTools.label, 'Calling tools');
-      expect(ElAgentState.reading.label, 'Reading files');
-      expect(ElAgentState.recalling.label, 'Recalling context');
+      expect(AgentState.idle.label, 'Ready');
+      expect(AgentState.retrieving.label, 'Retrieving knowledge');
+      expect(AgentState.ingesting.label, 'Ingesting data');
+      expect(AgentState.running.label, 'Running code');
+      expect(AgentState.delegating.label, 'Delegating to agent');
+      expect(AgentState.awaitingApproval.label, 'Awaiting approval');
+      expect(AgentState.error.label, 'Something went wrong');
+      expect(AgentState.callingTools.label, 'Calling tools');
+      expect(AgentState.reading.label, 'Reading files');
+      expect(AgentState.recalling.label, 'Recalling context');
     });
 
     test(
       'isBusy: the three resting states, and awaiting_approval is not one',
       () {
-        expect(ElAgentState.idle.isBusy, isFalse);
-        expect(ElAgentState.done.isBusy, isFalse);
-        expect(ElAgentState.error.isBusy, isFalse);
-        expect(ElAgentState.awaitingApproval.isBusy, isTrue);
-        expect(ElAgentState.thinking.isBusy, isTrue);
+        expect(AgentState.idle.isBusy, isFalse);
+        expect(AgentState.done.isBusy, isFalse);
+        expect(AgentState.error.isBusy, isFalse);
+        expect(AgentState.awaitingApproval.isBusy, isTrue);
+        expect(AgentState.thinking.isBusy, isTrue);
       },
     );
 
     test('isNarrating: the three the model is emitting prose in', () {
       expect(
-        ElAgentState.values.where((ElAgentState s) => s.isNarrating).toSet(),
-        <ElAgentState>{
-          ElAgentState.planning,
-          ElAgentState.summarizing,
-          ElAgentState.writing,
+        AgentState.values.where((AgentState s) => s.isNarrating).toSet(),
+        <AgentState>{
+          AgentState.planning,
+          AgentState.summarizing,
+          AgentState.writing,
         },
       );
     });
 
     test('STATE_ICON: retrieving and reading deliberately share a glyph', () {
-      expect(ElAgentState.retrieving.glyph, ElAgentState.reading.glyph);
+      expect(AgentState.retrieving.glyph, AgentState.reading.glyph);
     });
 
     test('the console build\'s top-level aliases agree with the members', () {
-      for (final ElAgentState state in ElAgentState.values) {
-        expect(kElAgentStateLabel[state], state.label, reason: '$state');
-        expect(kElAgentStateId[state], state.wire, reason: '$state');
-        expect(elAgentIsBusy(state), state.isBusy, reason: '$state');
-        expect(elAgentIsNarrating(state), state.isNarrating, reason: '$state');
+      for (final AgentState state in AgentState.values) {
+        expect(agentStateLabel[state], state.label, reason: '$state');
+        expect(agentStateId[state], state.wire, reason: '$state');
+        expect(agentIsBusy(state), state.isBusy, reason: '$state');
+        expect(agentIsNarrating(state), state.isNarrating, reason: '$state');
       }
-      expect(kElAgentStateLabel.length, ElAgentState.values.length);
+      expect(agentStateLabel.length, AgentState.values.length);
     });
 
     test(
@@ -440,7 +437,7 @@ void main() {
       () {
         // `states.ts` L43: "Present participles with an ellipsis for anything
         // ongoing". Not one label has one. Reproduced as written.
-        for (final ElAgentState state in ElAgentState.values) {
+        for (final AgentState state in AgentState.values) {
           expect(state.label.contains('…'), isFalse, reason: state.label);
         }
       },
@@ -448,67 +445,67 @@ void main() {
   });
 
   group('stateForTool — exact, then longest prefix', () {
-    const ElToolStateMap map = <String, ElAgentState>{
-      'search_inventory': ElAgentState.searching,
-      'finance.': ElAgentState.retrieving,
-      'finance.forecast.': ElAgentState.writing,
+    const ToolStateMap map = <String, AgentState>{
+      'search_inventory': AgentState.searching,
+      'finance.': AgentState.retrieving,
+      'finance.forecast.': AgentState.writing,
     };
 
     test('no map is no answer', () {
-      expect(elStateForTool('anything', null), isNull);
+      expect(stateForTool('anything', null), isNull);
     });
 
     test('exact beats everything', () {
-      expect(elStateForTool('search_inventory', map), ElAgentState.searching);
+      expect(stateForTool('search_inventory', map), AgentState.searching);
     });
 
     test('longest prefix wins regardless of declaration order', () {
-      expect(elStateForTool('finance.forecast.q3', map), ElAgentState.writing);
-      expect(elStateForTool('finance.ledger', map), ElAgentState.retrieving);
+      expect(stateForTool('finance.forecast.q3', map), AgentState.writing);
+      expect(stateForTool('finance.ledger', map), AgentState.retrieving);
     });
 
     test('a prefix key must end on a . or _ boundary', () {
       // `finance` without the dot is not a prefix key at all.
       expect(
-        elStateForTool('financials', const <String, ElAgentState>{
-          'finance': ElAgentState.retrieving,
+        stateForTool('financials', const <String, AgentState>{
+          'finance': AgentState.retrieving,
         }),
         isNull,
       );
     });
 
     test('an unmapped name is null, never a guess', () {
-      expect(elStateForTool('format_hard_drive', map), isNull);
+      expect(stateForTool('format_hard_drive', map), isNull);
     });
 
     test('the console build\'s alias resolves to the same function', () {
       expect(
-        elAgentStateForTool('finance.ledger', map),
-        elStateForTool('finance.ledger', map),
+        agentStateForTool('finance.ledger', map),
+        stateForTool('finance.ledger', map),
       );
     });
   });
 
   group('resolveState — the ladder, in order', () {
-    ElAgentState resolve(
-      List<ElAgentTurn> turns, {
-      ElAgentSignals signals = const ElAgentSignals(),
-      ElToolStateMap? toolStates,
+    AgentState resolve(
+      List<AgentTurn> turns, {
+      AgentSignals signals = const AgentSignals(),
+      ToolStateMap? toolStates,
     }) {
-      return elResolveAgentState(
+      return resolveAgentState(
         turns: turns,
         signals: signals,
         toolStates: toolStates,
       );
     }
 
-    ElToolTurn tool(
+    ToolTurn tool(
       String name, {
-      ElAgentTurnStatus status = ElAgentTurnStatus.running,
+      AgentTurnStatus status = AgentTurnStatus.running,
       int attempt = 1,
       String id = 't',
     }) {
-      return ElToolTurn(
+      return ToolTurn(
         id: id,
         name: name,
         params: const <String, Object?>{},
@@ -519,112 +516,109 @@ void main() {
 
     test('0. a declared state short-circuits the whole ladder', () {
       expect(
-        resolve(<ElAgentTurn>[
-          const ElErrorTurn(id: 'e', message: 'x', fatal: true),
-        ], signals: const ElAgentSignals(declared: ElAgentState.recalling)),
-        ElAgentState.recalling,
+        resolve(<AgentTurn>[
+          const ErrorTurn(id: 'e', message: 'x', fatal: true),
+        ], signals: const AgentSignals(declared: AgentState.recalling)),
+        AgentState.recalling,
       );
     });
 
     test('1. a FATAL error outranks a running tool', () {
       // Order proof: the tool branch is #3 and would otherwise win.
       expect(
-        resolve(<ElAgentTurn>[
+        resolve(<AgentTurn>[
           tool('search_inventory'),
-          const ElErrorTurn(id: 'e', message: 'x', fatal: true),
+          const ErrorTurn(id: 'e', message: 'x', fatal: true),
         ]),
-        ElAgentState.error,
+        AgentState.error,
       );
     });
 
     test('1b. a NON-fatal error does not — the agent recovers from those', () {
       expect(
-        resolve(<ElAgentTurn>[
-          const ElErrorTurn(id: 'e', message: 'x', fatal: false),
+        resolve(<AgentTurn>[
+          const ErrorTurn(id: 'e', message: 'x', fatal: false),
         ]),
-        ElAgentState.done,
+        AgentState.done,
       );
     });
 
     test('2. a pending approval outranks a running tool', () {
       expect(
-        resolve(<ElAgentTurn>[
-          const ElActionTurn(
+        resolve(<AgentTurn>[
+          const ActionTurn(
             id: 'a',
             action: 'purchase_pack',
             params: <String, Object?>{},
-            status: ElAgentTurnStatus.running,
-            approval: ElApprovalOutcome.pending,
+            status: AgentTurnStatus.running,
+            approval: ApprovalOutcome.pending,
           ),
           tool('search_inventory'),
         ]),
-        ElAgentState.awaitingApproval,
+        AgentState.awaitingApproval,
       );
     });
 
     test('3. a running tool resolves through the caller map', () {
       expect(
         resolve(
-          <ElAgentTurn>[tool('search_inventory')],
-          toolStates: const <String, ElAgentState>{
-            'search_inventory': ElAgentState.searching,
+          <AgentTurn>[tool('search_inventory')],
+          toolStates: const <String, AgentState>{
+            'search_inventory': AgentState.searching,
           },
         ),
-        ElAgentState.searching,
+        AgentState.searching,
       );
     });
 
     test('3b. an unmapped running tool is the honest fallback', () {
-      expect(
-        resolve(<ElAgentTurn>[tool('mystery')]),
-        ElAgentState.callingTools,
-      );
+      expect(resolve(<AgentTurn>[tool('mystery')]), AgentState.callingTools);
     });
 
     test('3c. a retry is a retry FIRST and whatever it does second', () {
       expect(
         resolve(
-          <ElAgentTurn>[tool('search_inventory', attempt: 2)],
-          toolStates: const <String, ElAgentState>{
-            'search_inventory': ElAgentState.searching,
+          <AgentTurn>[tool('search_inventory', attempt: 2)],
+          toolStates: const <String, AgentState>{
+            'search_inventory': AgentState.searching,
           },
         ),
-        ElAgentState.retrying,
+        AgentState.retrying,
       );
     });
 
     test('4. a running action is processing', () {
       expect(
-        resolve(<ElAgentTurn>[
-          const ElActionTurn(
+        resolve(<AgentTurn>[
+          const ActionTurn(
             id: 'a',
             action: 'click',
             params: <String, Object?>{},
-            status: ElAgentTurnStatus.running,
+            status: AgentTurnStatus.running,
           ),
         ]),
-        ElAgentState.processing,
+        AgentState.processing,
       );
     });
 
     test('5. prose before any work in this turn is planning', () {
       expect(
-        resolve(<ElAgentTurn>[
-          const ElUserTurn(id: 'u', text: 'hi'),
-          const ElTextTurn(id: 't', text: 'Let me look', streaming: true),
+        resolve(<AgentTurn>[
+          const UserTurn(id: 'u', text: 'hi'),
+          const TextTurn(id: 't', text: 'Let me look', streaming: true),
         ]),
-        ElAgentState.planning,
+        AgentState.planning,
       );
     });
 
     test('5b. prose after a settled tool in this turn is summarizing', () {
       expect(
-        resolve(<ElAgentTurn>[
-          const ElUserTurn(id: 'u', text: 'hi'),
-          tool('search_inventory', status: ElAgentTurnStatus.ok),
-          const ElTextTurn(id: 't', text: 'I found', streaming: true),
+        resolve(<AgentTurn>[
+          const UserTurn(id: 'u', text: 'hi'),
+          tool('search_inventory', status: AgentTurnStatus.ok),
+          const TextTurn(id: 't', text: 'I found', streaming: true),
         ]),
-        ElAgentState.summarizing,
+        AgentState.summarizing,
       );
     });
 
@@ -632,12 +626,12 @@ void main() {
       '5c. the scan stops at the user turn — prior turns do not leak in',
       () {
         expect(
-          resolve(<ElAgentTurn>[
-            tool('search_inventory', status: ElAgentTurnStatus.ok, id: 'old'),
-            const ElUserTurn(id: 'u', text: 'again'),
-            const ElTextTurn(id: 't', text: 'Let me look', streaming: true),
+          resolve(<AgentTurn>[
+            tool('search_inventory', status: AgentTurnStatus.ok, id: 'old'),
+            const UserTurn(id: 'u', text: 'again'),
+            const TextTurn(id: 't', text: 'Let me look', streaming: true),
           ]),
-          ElAgentState.planning,
+          AgentState.planning,
         );
       },
     );
@@ -645,30 +639,30 @@ void main() {
     test('6. sent, nothing back yet is queued — not thinking', () {
       expect(
         resolve(
-          const <ElAgentTurn>[],
-          signals: const ElAgentSignals(
+          const <AgentTurn>[],
+          signals: const AgentSignals(
             awaitingFirstEvent: true,
             isLoading: true,
           ),
         ),
-        ElAgentState.queued,
+        AgentState.queued,
       );
     });
 
     test('7. loading with nothing else to say is thinking', () {
       expect(
         resolve(
-          const <ElAgentTurn>[],
-          signals: const ElAgentSignals(isLoading: true),
+          const <AgentTurn>[],
+          signals: const AgentSignals(isLoading: true),
         ),
-        ElAgentState.thinking,
+        AgentState.thinking,
       );
     });
 
     test('8. a settled last turn is done', () {
       expect(
-        resolve(<ElAgentTurn>[const ElTextTurn(id: 't', text: 'Here you are')]),
-        ElAgentState.done,
+        resolve(<AgentTurn>[const TextTurn(id: 't', text: 'Here you are')]),
+        AgentState.done,
       );
     });
 
@@ -676,55 +670,55 @@ void main() {
       '8b. a user turn is not settled work — an empty-handed send is idle',
       () {
         expect(
-          resolve(<ElAgentTurn>[const ElUserTurn(id: 'u', text: 'hi')]),
-          ElAgentState.idle,
+          resolve(<AgentTurn>[const UserTurn(id: 'u', text: 'hi')]),
+          AgentState.idle,
         );
       },
     );
 
     test('an empty transcript with no signals is idle', () {
-      expect(resolve(const <ElAgentTurn>[]), ElAgentState.idle);
+      expect(resolve(const <AgentTurn>[]), AgentState.idle);
     });
   });
 
-  group('ElBlurSwitchController', () {
+  group('BlurSwitchController', () {
     test('the two measured legs, and the store call in the middle', () {
-      expect(ElBlurSwitchController.outDuration, ElDurations.fast);
-      expect(ElBlurSwitchController.inDuration, ElDurations.base);
-      expect(ElBlurSwitchController.outDuration.inMilliseconds, 150);
-      expect(ElBlurSwitchController.inDuration.inMilliseconds, 250);
+      expect(BlurSwitchController.outDuration, MotionDurations.fast);
+      expect(BlurSwitchController.inDuration, MotionDurations.normal);
+      expect(BlurSwitchController.outDuration.inMilliseconds, 150);
+      expect(BlurSwitchController.inDuration.inMilliseconds, 250);
     });
 
     testWidgets('blurs out, swaps at the darkest point, blurs in', (
       WidgetTester tester,
     ) async {
       final List<String> opened = <String>[];
-      final ElBlurSwitchController controller = ElBlurSwitchController(
+      final BlurSwitchController controller = BlurSwitchController(
         open: opened.add,
       );
       addTearDown(controller.dispose);
 
-      expect(controller.phase, ElSwitchPhase.idle);
+      expect(controller.phase, SwitchPhase.idle);
 
       controller.switchTo('c-export');
-      expect(controller.phase, ElSwitchPhase.out);
+      expect(controller.phase, SwitchPhase.out);
       // THE point of the hook: the store has not been called yet. Calling it
       // now would blur the *new* conversation out and then back in.
       expect(opened, isEmpty);
 
-      await tester.pump(ElBlurSwitchController.outDuration);
+      await tester.pump(BlurSwitchController.outDuration);
       expect(opened, <String>['c-export']);
-      expect(controller.phase, ElSwitchPhase.blurIn);
+      expect(controller.phase, SwitchPhase.blurIn);
 
-      await tester.pump(ElBlurSwitchController.inDuration);
-      expect(controller.phase, ElSwitchPhase.idle);
+      await tester.pump(BlurSwitchController.inDuration);
+      expect(controller.phase, SwitchPhase.idle);
     });
 
     testWidgets('a second switch supersedes the first', (
       WidgetTester tester,
     ) async {
       final List<String> opened = <String>[];
-      final ElBlurSwitchController controller = ElBlurSwitchController(
+      final BlurSwitchController controller = BlurSwitchController(
         open: opened.add,
       );
       addTearDown(controller.dispose);
@@ -732,22 +726,22 @@ void main() {
       controller.switchTo('a');
       await tester.pump(const Duration(milliseconds: 100));
       controller.switchTo('b');
-      await tester.pump(ElBlurSwitchController.outDuration);
+      await tester.pump(BlurSwitchController.outDuration);
       // The first sequence's deferred `open` is dropped, not replayed.
       expect(opened, <String>['b']);
-      await tester.pump(ElBlurSwitchController.inDuration);
-      expect(controller.phase, ElSwitchPhase.idle);
+      await tester.pump(BlurSwitchController.inDuration);
+      expect(controller.phase, SwitchPhase.idle);
       expect(opened, <String>['b']);
     });
 
     test('blurClass maps each phase to its utility', () {
-      expect(ElSwitchPhase.out.className, 'anim-blur-out');
-      expect(ElSwitchPhase.blurIn.className, 'anim-blur-in');
-      expect(ElSwitchPhase.idle.className, '');
+      expect(SwitchPhase.out.className, 'anim-blur-out');
+      expect(SwitchPhase.blurIn.className, 'anim-blur-in');
+      expect(SwitchPhase.idle.className, '');
     });
   });
 
-  group('ElClock seam', () {
+  group('Clock seam', () {
     testWidgets('relativeTime reads the injected instant, not the wall clock', (
       WidgetTester tester,
     ) async {
@@ -757,11 +751,11 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: ElClock(
+          child: Clock(
             now: frozen,
             child: Builder(
               builder: (BuildContext context) {
-                rendered = elRelativeTimeOf(
+                rendered = relativeTimeOf(
                   context,
                   frozen.subtract(const Duration(minutes: 14)),
                 );
@@ -780,14 +774,14 @@ void main() {
     test('copyWith moves only title and pinned', () {
       final DateTime stamp = DateTime(2026, 8, 16, 12);
       const String preview = 'What sealed boxes are left?';
-      final ElConversationSummary base = ElConversationSummary(
+      final ConversationSummary base = ConversationSummary(
         id: 'c1',
         title: 'Sealed inventory check',
         updatedAt: stamp,
         preview: preview,
       );
 
-      final ElConversationSummary renamed = base.copyWith(title: 'Renamed');
+      final ConversationSummary renamed = base.copyWith(title: 'Renamed');
       expect(renamed.title, 'Renamed');
       expect(renamed.id, 'c1');
       expect(renamed.updatedAt, stamp);

@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:elattar_design_system/src/components/icon.dart';
-import 'package:elattar_design_system/src/components/icon_paths.dart';
-import 'package:elattar_design_system/src/components/icon_paths.g.dart';
-import 'package:elattar_design_system/src/components/icon_paths.g.index.dart';
+import 'package:elattar_design_system/src/components/ui/icon.dart';
+import 'package:elattar_design_system/src/components/ui/icon_paths.dart';
+import 'package:elattar_design_system/src/components/ui/icon_paths.g.dart';
+import 'package:elattar_design_system/src/components/ui/icon_paths.g.index.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The generated lucide registry, judged against the hand transcription.
@@ -41,15 +41,14 @@ String _kebab(String camel) => camel
 ///
 /// `filter.mjs`, `help-circle.mjs` and `alert-triangle.mjs` are one-line
 /// re-exports in 1.28.0; the enum keeps the curated name because that is the
-/// string the icons page prints. See [ElIconGlyph.filter]'s own doc.
-const Map<ElIconGlyph, String> _aliasedNames = <ElIconGlyph, String>{
-  ElIconGlyph.filter: 'funnel',
-  ElIconGlyph.helpCircle: 'circle-question-mark',
-  ElIconGlyph.alertTriangle: 'triangle-alert',
+/// string the icons page prints. See [IconGlyph.filter]'s own doc.
+const Map<IconGlyph, String> _aliasedNames = <IconGlyph, String>{
+  IconGlyph.filter: 'funnel',
+  IconGlyph.helpCircle: 'circle-question-mark',
+  IconGlyph.alertTriangle: 'triangle-alert',
 };
 
-String _moduleOf(ElIconGlyph glyph) =>
-    _aliasedNames[glyph] ?? _kebab(glyph.name);
+String _moduleOf(IconGlyph glyph) => _aliasedNames[glyph] ?? _kebab(glyph.name);
 
 // ─── signatures ─────────────────────────────────────────────────────────────
 
@@ -63,8 +62,8 @@ String _points(List<Offset> points) =>
 /// One element as `tag attr attr …`.
 ///
 /// **One function, both halves.** Before the merge this file carried two — one
-/// over the hand file's `ElIconElement`, one over the generator's own
-/// `ElLucideNode` shim — because the two sets were held in two models. They are
+/// over the hand file's `IconElement`, one over the generator's own
+/// `LucideNode` shim — because the two sets were held in two models. They are
 /// now one sealed model, so the identity check below compares the same
 /// rendering of the same types, and what is left to disagree is the only thing
 /// that ever mattered: the data.
@@ -74,23 +73,23 @@ String _points(List<Offset> points) =>
 /// attributes that remain. An absent radius prints as `auto` — the word, not a
 /// resolved number — so "lucide omitted `rx`" and "lucide wrote `rx: 0`" can
 /// never render the same string.
-String _signature(ElIconElement element) => switch (element) {
-  ElIconPathElement(:final String d) => 'path $d',
-  ElIconLineElement(
+String _signature(IconElement element) => switch (element) {
+  IconPathElement(:final String d) => 'path $d',
+  IconLineElement(
     :final double x1,
     :final double y1,
     :final double x2,
     :final double y2,
   ) =>
     'line ${_n(x1)} ${_n(y1)} ${_n(x2)} ${_n(y2)}',
-  ElIconCircleElement(
+  IconCircleElement(
     :final double cx,
     :final double cy,
     :final double r,
     :final bool filled,
   ) =>
     'circle ${_n(cx)} ${_n(cy)} ${_n(r)}${filled ? ' fill' : ''}',
-  ElIconRectElement(
+  IconRectElement(
     :final double x,
     :final double y,
     :final double width,
@@ -101,16 +100,16 @@ String _signature(ElIconElement element) => switch (element) {
     'rect ${_n(x)} ${_n(y)} ${_n(width)} ${_n(height)} '
         '${rx == null ? 'auto' : _n(rx)}'
         '${ry == null ? '' : ' ry ${_n(ry)}'}',
-  ElIconEllipseElement(
+  IconEllipseElement(
     :final double cx,
     :final double cy,
     :final double rx,
     :final double ry,
   ) =>
     'ellipse ${_n(cx)} ${_n(cy)} ${_n(rx)} ${_n(ry)}',
-  ElIconPolylineElement(:final List<Offset> points) =>
+  IconPolylineElement(:final List<Offset> points) =>
     'polyline ${_points(points)}',
-  ElIconPolygonElement(:final List<Offset> points) =>
+  IconPolygonElement(:final List<Offset> points) =>
     'polygon ${_points(points)}',
 };
 
@@ -136,7 +135,7 @@ Future<ByteData> _raster(WidgetTester t, void Function(Canvas) draw) async {
   ))!;
 }
 
-/// [ElIcon.paintGlyph] with the clip removed, and nothing else changed.
+/// [Icon.paintGlyph] with the clip removed, and nothing else changed.
 ///
 /// The control is written out by hand rather than driven by a flag so the two
 /// renderings differ in exactly one canvas operation — which is what makes the
@@ -157,9 +156,9 @@ void _paintUnclipped(Canvas canvas, Path path) {
 
 Future<ByteData> _clipped(WidgetTester t, Path path) => _raster(
   t,
-  (Canvas canvas) => ElIcon.paintGlyph(
+  (Canvas canvas) => Icon.paintGlyph(
     canvas,
-    const Size(ElIconPaths.viewBox, ElIconPaths.viewBox),
+    const Size(IconPaths.viewBox, IconPaths.viewBox),
     path: path,
     color: _ink,
     strokeWidth: 2,
@@ -194,7 +193,7 @@ int _rightmostInkedColumn(ByteData image) {
 int _inkedOutsideGrid(ByteData image) {
   int n = 0;
   for (int y = 0; y < _surfaceHeight; y++) {
-    for (int x = ElIconPaths.viewBox.toInt(); x < _surfaceWidth; x++) {
+    for (int x = IconPaths.viewBox.toInt(); x < _surfaceWidth; x++) {
       if (_pixel(image, x, y) != 0) n++;
     }
   }
@@ -211,7 +210,7 @@ int _inkedOutsideGrid(ByteData image) {
 int _maxAlphaDeltaInsideGrid(ByteData a, ByteData b) {
   int max = 0;
   for (int y = 0; y < _surfaceHeight; y++) {
-    for (int x = 0; x < ElIconPaths.viewBox.toInt(); x++) {
+    for (int x = 0; x < IconPaths.viewBox.toInt(); x++) {
       final int delta = ((_pixel(a, x, y) & 0xFF) - (_pixel(b, x, y) & 0xFF))
           .abs();
       if (delta > max) max = delta;
@@ -225,9 +224,9 @@ void main() {
 
   group('the generated set reproduces the hand transcription', () {
     test('every one of the 78 resolves to a generated module', () {
-      for (final ElIconGlyph glyph in ElIconGlyph.values) {
+      for (final IconGlyph glyph in IconGlyph.values) {
         expect(
-          elLucideByName[_moduleOf(glyph)],
+          lucideByName[_moduleOf(glyph)],
           isNotNull,
           reason:
               '${glyph.name} → ${_moduleOf(glyph)}.mjs is not in the '
@@ -248,9 +247,9 @@ void main() {
 
     test('element for element, character for character', () {
       final List<String> mismatches = <String>[];
-      for (final ElIconGlyph glyph in ElIconGlyph.values) {
-        final ElLucideGlyph generated = elLucideByName[_moduleOf(glyph)]!;
-        final List<String> hand = ElIconPaths.elements[glyph]!
+      for (final IconGlyph glyph in IconGlyph.values) {
+        final LucideGlyph generated = lucideByName[_moduleOf(glyph)]!;
+        final List<String> hand = IconPaths.elements[glyph]!
             .map(_signature)
             .toList();
         final List<String> mechanical = generated.nodes
@@ -285,7 +284,7 @@ void main() {
 
     test('the details the hand transcription was written to catch survive', () {
       String d(String module, int i) =>
-          (elLucideByName[module]!.nodes[i] as ElIconPathElement).d;
+          (lucideByName[module]!.nodes[i] as IconPathElement).d;
 
       // `ticket` is the one glyph in the curated set whose `d` closes with an
       // UPPERCASE `Z`. The parser treats the two spellings identically, so a
@@ -311,15 +310,15 @@ void main() {
       expect(d('shield', 0), d('shield-check', 0));
       // …and `circle-x` borrows every node it has.
       expect(
-        _signature(elLucideByName['circle-x']!.nodes[0]),
-        _signature(elLucideByName['circle-check']!.nodes[0]),
+        _signature(lucideByName['circle-x']!.nodes[0]),
+        _signature(lucideByName['circle-check']!.nodes[0]),
       );
       expect(d('circle-x', 1), d('octagon-x', 0));
       expect(d('circle-x', 2), d('octagon-x', 2));
 
       // `tag`'s 0.5-unit dot is the curated set's only `fill="currentColor"`.
-      final ElIconCircleElement dot =
-          elLucideByName['tag']!.nodes[1] as ElIconCircleElement;
+      final IconCircleElement dot =
+          lucideByName['tag']!.nodes[1] as IconCircleElement;
       expect(<double>[dot.cx, dot.cy, dot.r], <double>[7.5, 7.5, 0.5]);
       expect(dot.filled, isTrue);
     });
@@ -331,20 +330,20 @@ void main() {
     test('is the version the header pins', () {
       // 1756 modules that export `__iconNode`, plus 250 that are nothing but a
       // re-export, is lucide-react 1.28.0's `dist/esm/icons/` exactly.
-      expect(elLucideByName, hasLength(1756));
-      expect(elLucideAliases, hasLength(250));
+      expect(lucideByName, hasLength(1756));
+      expect(lucideAliases, hasLength(250));
       // Every alias resolves to a real module — no dangling re-exports.
-      for (final MapEntry<String, String> alias in elLucideAliases.entries) {
+      for (final MapEntry<String, String> alias in lucideAliases.entries) {
         expect(
-          elLucideByName[alias.value],
+          lucideByName[alias.value],
           isNotNull,
           reason: '${alias.key} → ${alias.value} does not exist',
         );
       }
       // …and no alias shadows a real module.
-      for (final String alias in elLucideAliases.keys) {
+      for (final String alias in lucideAliases.keys) {
         expect(
-          elLucideByName.containsKey(alias),
+          lucideByName.containsKey(alias),
           isFalse,
           reason: '$alias is both an alias and a module',
         );
@@ -352,8 +351,7 @@ void main() {
     });
 
     test('every glyph knows its own name', () {
-      for (final MapEntry<String, ElLucideGlyph> entry
-          in elLucideByName.entries) {
+      for (final MapEntry<String, LucideGlyph> entry in lucideByName.entries) {
         expect(entry.value.name, entry.key);
         expect(entry.value.nodes, isNotEmpty);
       }
@@ -373,7 +371,7 @@ void main() {
       // value is positive.
       int nodes = 0;
       final Map<String, double> excursions = <String, double>{};
-      for (final ElLucideGlyph glyph in elLucideByName.values) {
+      for (final LucideGlyph glyph in lucideByName.values) {
         nodes += glyph.nodes.length;
         final Rect b = glyph.toPath().getBounds();
         expect(
@@ -384,8 +382,8 @@ void main() {
         excursions[glyph.name] = <double>[
           -b.left,
           -b.top,
-          b.right - ElLucide.viewBox,
-          b.bottom - ElLucide.viewBox,
+          b.right - Lucide.viewBox,
+          b.bottom - Lucide.viewBox,
         ].reduce((double a, double c) => a > c ? a : c);
       }
       expect(nodes, 7032);
@@ -421,13 +419,13 @@ void main() {
       // for a transcript — silently dropping or "fixing" a node would make the
       // registry disagree with its source and hide the defect. The consequence
       // for the port was a renderer decision, not a data one, and it has since
-      // been taken: `ElIcon.paintGlyph` clips to the 24-grid exactly as the
+      // been taken: `Icon.paintGlyph` clips to the 24-grid exactly as the
       // outermost `<svg>` does, so this data stays wrong in the same way its
       // source is wrong and the port still renders what the browser renders.
       // The group at the bottom of this file pins that in rendered pixels.
-      final ElLucideGlyph glyph = ElLucide.saveOff;
+      final LucideGlyph glyph = Lucide.saveOff;
       expect(glyph.nodes, hasLength(7));
-      expect((glyph.nodes[5] as ElIconPathElement).d, 'M29.5 11.5s5 5 4 5');
+      expect((glyph.nodes[5] as IconPathElement).d, 'M29.5 11.5s5 5 4 5');
       expect(glyph.toPath().getBounds().right, 34.5);
 
       // The other six nodes are all on the grid, so the glyph is one bad node
@@ -437,7 +435,7 @@ void main() {
         if (i == 5) continue;
         glyph.nodes[i].addTo(good);
       }
-      expect(good.getBounds().right, lessThanOrEqualTo(ElLucide.viewBox));
+      expect(good.getBounds().right, lessThanOrEqualTo(Lucide.viewBox));
     });
   });
 
@@ -447,8 +445,8 @@ void main() {
     test('ellipse is a real ellipse, not a circle', () {
       // 16 nodes across 15 glyphs. `database`'s lid is the canonical one:
       // ["ellipse", { cx: 12, cy: 5, rx: 9, ry: 3 }].
-      final ElIconEllipseElement lid =
-          elLucideByName['database']!.nodes.first as ElIconEllipseElement;
+      final IconEllipseElement lid =
+          lucideByName['database']!.nodes.first as IconEllipseElement;
       expect(<double>[lid.cx, lid.cy, lid.rx, lid.ry], <double>[12, 5, 9, 3]);
       // The distinguishing property: 18 wide and 6 tall, which a
       // single-radius circle element could not have expressed.
@@ -459,12 +457,12 @@ void main() {
 
       // Every ellipse in the package, and every one is genuinely non-circular
       // — so none of them could have been demoted to a circle.
-      final List<ElIconEllipseElement> all = <ElIconEllipseElement>[
-        for (final ElLucideGlyph g in elLucideByName.values)
-          ...g.nodes.whereType<ElIconEllipseElement>(),
+      final List<IconEllipseElement> all = <IconEllipseElement>[
+        for (final LucideGlyph g in lucideByName.values)
+          ...g.nodes.whereType<IconEllipseElement>(),
       ];
       expect(all, hasLength(16));
-      for (final ElIconEllipseElement e in all) {
+      for (final IconEllipseElement e in all) {
         expect(e.rx, isNot(e.ry));
       }
     });
@@ -473,27 +471,26 @@ void main() {
       // The two polygons are `navigation` and `navigation-2`; the six
       // polylines include `package`'s lid ridge, the one the curated set has.
       final List<String> polygons = <String>[
-        for (final MapEntry<String, ElLucideGlyph> e in elLucideByName.entries)
-          if (e.value.nodes.any((ElIconElement n) => n is ElIconPolygonElement))
+        for (final MapEntry<String, LucideGlyph> e in lucideByName.entries)
+          if (e.value.nodes.any((IconElement n) => n is IconPolygonElement))
             e.key,
       ];
       expect(polygons, unorderedEquals(<String>['navigation', 'navigation-2']));
 
       final Path closed = Path();
-      (elLucideByName['navigation']!.nodes.single as ElIconPolygonElement)
-          .addTo(closed);
+      (lucideByName['navigation']!.nodes.single as IconPolygonElement).addTo(
+        closed,
+      );
       expect(closed.computeMetrics().single.isClosed, isTrue);
 
       final Path open = Path();
-      (elLucideByName['package']!.nodes[2] as ElIconPolylineElement).addTo(
-        open,
-      );
+      (lucideByName['package']!.nodes[2] as IconPolylineElement).addTo(open);
       expect(open.computeMetrics().single.isClosed, isFalse);
 
       // `mailbox` is the one module whose `points` are comma-separated
       // (`"15,9 18,9 18,11"`), so it proves the generator splits on both.
-      final ElIconPolylineElement mailbox = elLucideByName['mailbox']!.nodes
-          .whereType<ElIconPolylineElement>()
+      final IconPolylineElement mailbox = lucideByName['mailbox']!.nodes
+          .whereType<IconPolylineElement>()
           .single;
       expect(mailbox.points, <Offset>[
         const Offset(15, 9),
@@ -506,8 +503,8 @@ void main() {
       // Four nodes in the package spell `ry` WITHOUT `rx` — which the curated
       // 78 never do, and which `icon_paths.dart` states as "lucide sets `ry`
       // only where it equals `rx`". True of the 78, not of the package.
-      final ElIconRectElement rounded = elLucideByName['arrow-down-0-1']!.nodes
-          .whereType<ElIconRectElement>()
+      final IconRectElement rounded = lucideByName['arrow-down-0-1']!.nodes
+          .whereType<IconRectElement>()
           .single;
       expect(
         <double>[rounded.x, rounded.y, rounded.width, rounded.height],
@@ -518,8 +515,8 @@ void main() {
       expect(rounded.ry, 2);
 
       // `spray-can` writes neither, so the corners are square.
-      final ElIconRectElement square = elLucideByName['spray-can']!.nodes
-          .whereType<ElIconRectElement>()
+      final IconRectElement square = lucideByName['spray-can']!.nodes
+          .whereType<IconRectElement>()
           .single;
       expect(
         <double>[square.x, square.y, square.width, square.height],
@@ -534,7 +531,7 @@ void main() {
 
     test('19 nodes carry `fill="currentColor"`, and toFillPath finds them', () {
       final List<String> filled = <String>[
-        for (final MapEntry<String, ElLucideGlyph> e in elLucideByName.entries)
+        for (final MapEntry<String, LucideGlyph> e in lucideByName.entries)
           if (e.value.toFillPath() != null) e.key,
       ];
       // 9 glyphs, 19 nodes — `chart-scatter` carries five and `vault` four,
@@ -545,14 +542,12 @@ void main() {
       expect(filled, contains('vault'));
       final int nodes = <int>[
         for (final String name in filled)
-          elLucideByName[name]!.nodes
-              .where((ElIconElement n) => n.filled)
-              .length,
+          lucideByName[name]!.nodes.where((IconElement n) => n.filled).length,
       ].reduce((int a, int b) => a + b);
       expect(nodes, 19);
       // A glyph with no filled node returns null rather than an empty Path, so
       // the painter can skip the second `drawPath` outright.
-      expect(elLucideByName['menu']!.toFillPath(), isNull);
+      expect(lucideByName['menu']!.toFillPath(), isNull);
     });
   });
 
@@ -563,17 +558,17 @@ void main() {
       'resolves deprecated aliases to the module that holds the geometry',
       () {
         // The three the curated set renames, checked through the public lookup.
-        expect(elLucideAliases['filter'], 'funnel');
-        expect(elLucideAliases['help-circle'], 'circle-question-mark');
-        expect(elLucideAliases['alert-triangle'], 'triangle-alert');
-        expect(elLucideLookup('filter')!.name, 'funnel');
-        expect(elLucideLookup('loader-2')!.name, 'loader-circle');
-        expect(elLucideLookup('x-circle')!.name, 'circle-x');
+        expect(lucideAliases['filter'], 'funnel');
+        expect(lucideAliases['help-circle'], 'circle-question-mark');
+        expect(lucideAliases['alert-triangle'], 'triangle-alert');
+        expect(lucideLookup('filter')!.name, 'funnel');
+        expect(lucideLookup('loader-2')!.name, 'loader-circle');
+        expect(lucideLookup('x-circle')!.name, 'circle-x');
         // A name lucide does not ship.
-        expect(elLucideLookup('not-an-icon'), isNull);
+        expect(lucideLookup('not-an-icon'), isNull);
         // A real module resolves to itself.
-        expect(elLucideLookup('zap')!.name, 'zap');
-        expect(identical(elLucideLookup('zap'), ElLucide.zap), isTrue);
+        expect(lucideLookup('zap')!.name, 'zap');
+        expect(identical(lucideLookup('zap'), Lucide.zap), isTrue);
       },
     );
 
@@ -584,26 +579,26 @@ void main() {
       // so the length check above already proves it. This pins the convention
       // itself against a few shapes that could go wrong.
       expect(
-        identical(elLucideByName['a-arrow-down'], ElLucide.aArrowDown),
+        identical(lucideByName['a-arrow-down'], Lucide.aArrowDown),
         isTrue,
       );
       expect(
-        identical(elLucideByName['arrow-down-0-1'], ElLucide.arrowDown01),
+        identical(lucideByName['arrow-down-0-1'], Lucide.arrowDown01),
         isTrue,
       );
       expect(
-        identical(elLucideByName['arrow-down-1-0'], ElLucide.arrowDown10),
+        identical(lucideByName['arrow-down-1-0'], Lucide.arrowDown10),
         isTrue,
       );
-      expect(identical(elLucideByName['rows-3'], ElLucide.rows3), isTrue);
-      expect(identical(elLucideByName['volume-x'], ElLucide.volumeX), isTrue);
+      expect(identical(lucideByName['rows-3'], Lucide.rows3), isTrue);
+      expect(identical(lucideByName['volume-x'], Lucide.volumeX), isTrue);
       // Four module names collide with Dart built-in identifiers. They are
       // legal as member names, so they need no mangling — asserted because a
       // future generator "fix" that renames them would break call sites.
-      expect(ElLucide.factory.name, 'factory');
-      expect(ElLucide.import.name, 'import');
-      expect(ElLucide.library.name, 'library');
-      expect(ElLucide.type.name, 'type');
+      expect(Lucide.factory.name, 'factory');
+      expect(Lucide.import.name, 'import');
+      expect(Lucide.library.name, 'library');
+      expect(Lucide.type.name, 'type');
     });
   });
 
@@ -615,7 +610,7 @@ void main() {
     testWidgets('save-off\'s escaping stroke is clipped away', (
       WidgetTester t,
     ) async {
-      final Path glyph = ElLucide.saveOff.toPath();
+      final Path glyph = Lucide.saveOff.toPath();
 
       // The control first, so the pin cannot pass vacuously: WITHOUT the clip
       // the defective node paints as far as pixel column 34 — nine columns
@@ -658,11 +653,11 @@ void main() {
       // byte for byte identical over the whole surface.
       expect(
         _differingColumns(
-          await _clipped(t, ElIconPaths.pathFor(ElIconGlyph.atSign)),
+          await _clipped(t, IconPaths.pathFor(IconGlyph.atSign)),
           await _raster(
             t,
             (Canvas c) =>
-                _paintUnclipped(c, ElIconPaths.pathFor(ElIconGlyph.atSign)),
+                _paintUnclipped(c, IconPaths.pathFor(IconGlyph.atSign)),
           ),
         ),
         isEmpty,
@@ -671,7 +666,7 @@ void main() {
       // `line-squiggle` is the whole package's runner-up: it touches x = 24
       // exactly and no further. Same result — the cliff between it and
       // `save-off` is real on the canvas, not only in `getBounds`.
-      final Path squiggle = ElLucide.lineSquiggle.toPath();
+      final Path squiggle = Lucide.lineSquiggle.toPath();
       expect(
         _differingColumns(
           await _clipped(t, squiggle),
@@ -685,8 +680,8 @@ void main() {
   test('toPath returns a fresh Path every call', () {
     // The hand file's rule, restated for the generated model: [Path] is
     // mutable, so a shared instance would let one painter corrupt every icon.
-    final Path first = ElLucide.zap.toPath();
-    final Path second = ElLucide.zap.toPath();
+    final Path first = Lucide.zap.toPath();
+    final Path second = Lucide.zap.toPath();
     expect(identical(first, second), isFalse);
     first.lineTo(0, 0);
     expect(first.getBounds(), isNot(second.getBounds()));

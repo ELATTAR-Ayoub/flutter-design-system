@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title], matching the kit's own
 /// convention (`DocsDisclosure.triggerKey` is one constant shared by every
@@ -40,7 +64,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: ChartDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -59,7 +83,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         // Every exported class, enum, and function chart.dart's own barrel
         // carries is named somewhere in the API Reference disclosure.
@@ -67,36 +91,34 @@ void main() {
           expect(find.text(export), findsWidgets, reason: 'missing $export');
         }
 
-        // Every ElChartIndicator and ElChartLegendAlign enum value the
-        // ElChartIndicator / ElChartLegendAlign tables claim to document.
-        for (final ElChartIndicator value in ElChartIndicator.values) {
+        // Every ChartIndicator and ChartLegendAlign enum value the
+        // ChartIndicator / ChartLegendAlign tables claim to document.
+        for (final ChartIndicator value in ChartIndicator.values) {
           expect(
             find.text(value.name),
             findsWidgets,
-            reason: 'ElChartIndicator.${value.name} missing from API table',
+            reason: 'ChartIndicator.${value.name} missing from API table',
           );
         }
-        for (final ElChartLegendAlign value in ElChartLegendAlign.values) {
+        for (final ChartLegendAlign value in ChartLegendAlign.values) {
           expect(
             find.text(value.name),
             findsWidgets,
-            reason: 'ElChartLegendAlign.${value.name} missing from API table',
+            reason: 'ChartLegendAlign.${value.name} missing from API table',
           );
         }
 
-        // Live specimens actually mount: ElChartTooltipContent in all three
-        // ElChartIndicator styles, and both wrap: false / wrap: true legends.
-        final Set<ElChartIndicator> mountedIndicators = tester
-            .widgetList<ElChartTooltipContent>(
-              find.byType(ElChartTooltipContent),
-            )
-            .map((ElChartTooltipContent w) => w.indicator)
+        // Live specimens actually mount: ChartTooltipContent in all three
+        // ChartIndicator styles, and both wrap: false / wrap: true legends.
+        final Set<ChartIndicator> mountedIndicators = tester
+            .widgetList<ChartTooltipContent>(find.byType(ChartTooltipContent))
+            .map((ChartTooltipContent w) => w.indicator)
             .toSet();
-        expect(mountedIndicators, containsAll(ElChartIndicator.values));
+        expect(mountedIndicators, containsAll(ChartIndicator.values));
 
         final Set<bool> mountedWrap = tester
-            .widgetList<ElChartLegendContent>(find.byType(ElChartLegendContent))
-            .map((ElChartLegendContent w) => w.wrap)
+            .widgetList<ChartLegendContent>(find.byType(ChartLegendContent))
+            .map((ChartLegendContent w) => w.wrap)
             .toSet();
         expect(mountedWrap, containsAll(<bool>[true, false]));
 
@@ -126,30 +148,29 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const ChartDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const ChartDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Five specimen stages: Preview, Container, Tooltip, Legend, Number
-        // formatting.
-        expect(find.byType(DocsShowcase), findsNWidgets(5));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Five specimen stages: Preview, Container, Tooltip, Legend, Number
+      // formatting.
+      expect(find.byType(DocsShowcase), findsNWidgets(5));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -174,45 +195,42 @@ void main() {
       );
     });
 
-    testWidgets(
-      'sections render in declaration order',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in declaration order', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
-        );
-        await tester.pumpWidget(
-          _harness(controller: controller, child: const ChartDocPage()),
-        );
-        await tester.pump();
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
+      await tester.pumpWidget(
+        _harness(controller: controller, child: const ChartDocPage()),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, <String>[
-          'Preview',
-          'Installation',
-          'Usage',
-          'Container',
-          'Tooltip',
-          'Legend',
-          'Number formatting',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Keyboard',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ]);
-      },
-    );
+      expect(titles, <String>[
+        'Preview',
+        'Installation',
+        'Usage',
+        'Container',
+        'Tooltip',
+        'Legend',
+        'Number formatting',
+        'API Reference',
+        'States',
+        'Accessibility',
+        'Keyboard',
+        'Responsive',
+        'Dependencies',
+        'Theming',
+        'Source',
+      ]);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -223,7 +241,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const ChartDocPage(),
           ),
         );
@@ -252,24 +270,24 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const ChartDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('chart-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('chart-doc-article')),
           ),

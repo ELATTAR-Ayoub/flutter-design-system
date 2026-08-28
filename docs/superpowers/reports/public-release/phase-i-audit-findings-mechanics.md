@@ -45,7 +45,7 @@ string.
 
 ## BLOCKER F2 — the package prefix survives installation
 
-Installed `typography.dart:47` keeps `ElFonts.package = 'elattar_design_system'`
+Installed `typography.dart:47` keeps `Fonts.package = 'elattar_design_system'`
 and `:185` threads it into every TextStyle. The import transformer rewrites
 import and export URIs only, never this string.
 

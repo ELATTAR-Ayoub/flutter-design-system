@@ -2,13 +2,13 @@
 /// the agent-avatar component documentation page.
 ///
 /// `agent-avatar` is a brand-new page — no `page.dart` existed for this
-/// registry item before this file's counterpart. `ElCubeAvatar`'s own
+/// registry item before this file's counterpart. `AgentAvatar`'s own
 /// constructor (`lib/src/components/agent_avatar.dart`) declares four named
 /// parameters excluding `key`: `state`, `size`, `accent`, `speed`. The
 /// API-completeness test below checks all four, plus every
-/// `ElAgentAvatarSize` rung, appear in the `ElCubeAvatar` API table.
+/// `AgentAvatarSize` rung, appear in the `AgentAvatar` API table.
 ///
-/// **No `pumpAndSettle` anywhere in this file.** `ElCubeAvatar` runs a bare
+/// **No `pumpAndSettle` anywhere in this file.** `AgentAvatar` runs a bare
 /// `Ticker` off a state's own scene recipe and the idle cube spins on a 9s
 /// `repeat`-shaped clock forever; settling on either would time out rather
 /// than fail. Every test below uses `tester.pump()` (and, where a widget's
@@ -26,16 +26,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title] — see
 /// `button_test.dart`'s own note on why this narrows past
@@ -47,7 +71,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every named constructor parameter `ElCubeAvatar`'s own class declares
+/// Every named constructor parameter `AgentAvatar`'s own class declares
 /// (`lib/src/components/agent_avatar.dart`), excluding `key`.
 const List<String> _cubeAvatarConstructorParams = <String>[
   'state',
@@ -77,8 +101,8 @@ const List<String> _expectedSectionTitles = <String>[
 void main() {
   group('agent-avatar docs page', () {
     testWidgets(
-      'renders the article, the full ElCubeAvatar API table, and a live '
-      'specimen of every ElAgentState and ElAgentAvatarSize this page '
+      'renders the article, the full AgentAvatar API table, and a live '
+      'specimen of every AgentState and AgentAvatarSize this page '
       'claims to show',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 4000);
@@ -88,7 +112,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: AgentAvatarDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -109,19 +133,19 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _cubeAvatarConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
-        for (final ElAgentAvatarSize size in ElAgentAvatarSize.values) {
+        for (final AgentAvatarSize size in AgentAvatarSize.values) {
           expect(
             find.text(size.name),
             findsWidgets,
-            reason: 'ElAgentAvatarSize.${size.name} missing from API table',
+            reason: 'AgentAvatarSize.${size.name} missing from API table',
           );
         }
-        // ElCubeScene's own table.
+        // CubeScene's own table.
         for (final String param in <String>[
           'scene',
           'width',
@@ -131,27 +155,27 @@ void main() {
           expect(
             find.text(param),
             findsWidgets,
-            reason: 'ElCubeScene.$param missing from API table',
+            reason: 'CubeScene.$param missing from API table',
           );
         }
 
-        // A live ElCubeAvatar specimen of every ElAgentState value mounts
+        // A live AgentAvatar specimen of every AgentState value mounts
         // in the State Set section — this page's own promise, not just
         // prose.
-        final Set<ElAgentState> mountedStates = tester
-            .widgetList<ElCubeAvatar>(find.byType(ElCubeAvatar))
-            .map((ElCubeAvatar avatar) => avatar.state)
+        final Set<AgentState> mountedStates = tester
+            .widgetList<AgentAvatar>(find.byType(AgentAvatar))
+            .map((AgentAvatar avatar) => avatar.state)
             .toSet();
-        expect(mountedStates, containsAll(ElAgentState.values));
+        expect(mountedStates, containsAll(AgentState.values));
 
-        final Set<ElAgentAvatarSize> mountedSizes = tester
-            .widgetList<ElCubeAvatar>(find.byType(ElCubeAvatar))
-            .map((ElCubeAvatar avatar) => avatar.size)
+        final Set<AgentAvatarSize> mountedSizes = tester
+            .widgetList<AgentAvatar>(find.byType(AgentAvatar))
+            .map((AgentAvatar avatar) => avatar.size)
             .toSet();
-        expect(mountedSizes, containsAll(ElAgentAvatarSize.values));
+        expect(mountedSizes, containsAll(AgentAvatarSize.values));
 
         // Every state-set tile carries its own key.
-        for (final ElAgentState state in ElAgentState.values) {
+        for (final AgentState state in AgentState.values) {
           expect(
             find.byKey(
               ValueKey<String>('agent-avatar-example:state-${state.name}'),
@@ -163,34 +187,34 @@ void main() {
 
         // The Accent example actually carries a non-null override on the
         // second tile and the default (null) on the first.
-        final ElCubeAvatar defaultAccent = tester.widget<ElCubeAvatar>(
+        final AgentAvatar defaultAccent = tester.widget<AgentAvatar>(
           find.descendant(
             of: find.byKey(
               const ValueKey<String>('agent-avatar-example:accent-default'),
             ),
-            matching: find.byType(ElCubeAvatar),
+            matching: find.byType(AgentAvatar),
           ),
         );
         expect(defaultAccent.accent, isNull);
 
-        final ElCubeAvatar customAccent = tester.widget<ElCubeAvatar>(
+        final AgentAvatar customAccent = tester.widget<AgentAvatar>(
           find.descendant(
             of: find.byKey(
               const ValueKey<String>('agent-avatar-example:accent-custom'),
             ),
-            matching: find.byType(ElCubeAvatar),
+            matching: find.byType(AgentAvatar),
           ),
         );
-        expect(customAccent.accent, ElPalette.action);
+        expect(customAccent.accent, Palette.action);
 
         // The Speed example actually carries a non-default speed on the
         // second tile.
-        final ElCubeAvatar fastSpeed = tester.widget<ElCubeAvatar>(
+        final AgentAvatar fastSpeed = tester.widget<AgentAvatar>(
           find.descendant(
             of: find.byKey(
               const ValueKey<String>('agent-avatar-example:speed-fast'),
             ),
-            matching: find.byType(ElCubeAvatar),
+            matching: find.byType(AgentAvatar),
           ),
         );
         expect(fastSpeed.speed, 2.5);
@@ -198,67 +222,65 @@ void main() {
         expect(agentAvatarDoc.name, 'agent_avatar');
         expect(
           agentAvatarDoc.exports,
-          containsAll(<String>['ElCubeAvatar', 'ElAgentAvatarSize']),
+          containsAll(<String>['AgentAvatar', 'AgentAvatarSize']),
         );
         expect(agentAvatarDoc.command, 'elattar add agent-avatar');
         expect(destination, isNull);
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 6000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const AgentAvatarDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const AgentAvatarDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Five specimen stages: Preview, State Set, Sizes, Accent, Speed.
-        expect(find.byType(DocsShowcase), findsNWidgets(5));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Five specimen stages: Preview, State Set, Sizes, Accent, Speed.
+      expect(find.byType(DocsShowcase), findsNWidgets(5));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
-        agentAvatarDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        agentAvatarDocSpec.toc
+            .map((DocsTocEntry entry) => entry.title)
+            .toList(),
         _expectedSectionTitles,
       );
     });
 
-    testWidgets(
-      'sections render in the declared order, section for section',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 6000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('sections render in the declared order, section for section', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
-        );
-        await tester.pumpWidget(
-          _harness(controller: controller, child: const AgentAvatarDocPage()),
-        );
-        await tester.pump();
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
+      await tester.pumpWidget(
+        _harness(controller: controller, child: const AgentAvatarDocPage()),
+      );
+      await tester.pump();
 
-        final List<String> titles = tester
-            .widgetList<DocsSection>(find.byType(DocsSection))
-            .map((DocsSection section) => section.title)
-            .toList();
+      final List<String> titles = tester
+          .widgetList<DocsSection>(find.byType(DocsSection))
+          .map((DocsSection section) => section.title)
+          .toList();
 
-        expect(titles, _expectedSectionTitles);
-      },
-    );
+      expect(titles, _expectedSectionTitles);
+    });
 
     testWidgets(
       'renders at narrow width with the anchor strip instead of a rail',
@@ -269,7 +291,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const AgentAvatarDocPage(),
           ),
         );
@@ -298,15 +320,15 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const AgentAvatarDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-avatar-doc-article')),
           ),
@@ -314,10 +336,10 @@ void main() {
 
         // Flip the SAME controller in place, never `pumpAndSettle`: the
         // idle cube's spin and every busy scene are genuinely looping.
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('agent-avatar-doc-article')),
           ),
@@ -339,11 +361,11 @@ void main() {
           expect(find.byKey(ValueKey<String>(key)), findsOneWidget);
         }
 
-        final Set<ElAgentState> mountedStates = tester
-            .widgetList<ElCubeAvatar>(find.byType(ElCubeAvatar))
-            .map((ElCubeAvatar avatar) => avatar.state)
+        final Set<AgentState> mountedStates = tester
+            .widgetList<AgentAvatar>(find.byType(AgentAvatar))
+            .map((AgentAvatar avatar) => avatar.state)
             .toSet();
-        expect(mountedStates, containsAll(ElAgentState.values));
+        expect(mountedStates, containsAll(AgentState.values));
       },
     );
   });

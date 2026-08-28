@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
@@ -24,7 +48,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every named constructor parameter `ElQuestionnaire` itself declares
+/// Every named constructor parameter `Questionnaire` itself declares
 /// (`lib/src/components/questionnaire.dart`), excluding `key`.
 const List<String> _questionnaireParams = <String>[
   'children',
@@ -60,7 +84,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: QuestionnaireDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -78,17 +102,17 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _questionnaireParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
-        for (final ElQuestionnaireShortcuts value
-            in ElQuestionnaireShortcuts.values) {
+        for (final QuestionnaireShortcuts value
+            in QuestionnaireShortcuts.values) {
           expect(
             find.text(value.name),
             findsWidgets,
-            reason: 'ElQuestionnaireShortcuts.${value.name} missing',
+            reason: 'QuestionnaireShortcuts.${value.name} missing',
           );
         }
 
@@ -100,29 +124,26 @@ void main() {
           );
         }
 
-        // A live ElQuestionnaire mounts somewhere on the page for every
+        // A live Questionnaire mounts somewhere on the page for every
         // one of the specimen roots above.
-        expect(
-          find.byType(ElQuestionnaire),
-          findsNWidgets(_specimenKeys.length),
-        );
+        expect(find.byType(Questionnaire), findsNWidgets(_specimenKeys.length));
 
         expect(questionnaireDoc.name, 'questionnaire');
         expect(
           questionnaireDoc.exports,
           containsAll(<String>[
-            'ElQuestionnaire',
-            'ElQuestionnaireShortcuts',
-            'ElQuestionnaireController',
-            'ElQuestionnaireItem',
-            'ElQuestionnaireChoice',
-            'ElQuestionnaireInput',
-            'ElQuestionnaireError',
-            'ElQuestionnaireActions',
-            'ElQuestionnairePrevious',
-            'ElQuestionnaireSkip',
-            'ElQuestionnaireNext',
-            'ElQuestionnaireSubmit',
+            'Questionnaire',
+            'QuestionnaireShortcuts',
+            'QuestionnaireController',
+            'QuestionnaireItem',
+            'QuestionnaireChoice',
+            'QuestionnaireInput',
+            'QuestionnaireError',
+            'QuestionnaireActions',
+            'QuestionnairePrevious',
+            'QuestionnaireSkip',
+            'QuestionnaireNext',
+            'QuestionnaireSubmit',
           ]),
         );
         expect(questionnaireDoc.command, 'elattar add questionnaire');
@@ -130,56 +151,54 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the preview wizard answers a choice and advances on Next',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 1200);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the preview wizard answers a choice and advances on Next', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const QuestionnaireDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const QuestionnaireDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // "Question 1 of 3" before anything is answered.
-        expect(find.textContaining('Question 1 of 3'), findsWidgets);
+      // "Question 1 of 3" before anything is answered.
+      expect(find.textContaining('Question 1 of 3'), findsWidgets);
 
-        await tester.tap(find.text('Sealed packs and boxes').first);
-        await tester.pump();
-        await tester.pump(ElDurations.jelly);
+      await tester.tap(find.text('Sealed packs and boxes').first);
+      await tester.pump();
+      await tester.pump(MotionDurations.open);
 
-        await tester.tap(find.text('Next').first);
-        await tester.pump();
+      await tester.tap(find.text('Next').first);
+      await tester.pump();
 
-        expect(find.textContaining('Question 2 of 3'), findsWidgets);
-      },
-    );
+      expect(find.textContaining('Question 2 of 3'), findsWidgets);
+    });
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4200);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const QuestionnaireDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const QuestionnaireDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Four specimen stages: Preview, Choice states, Text item, Shortcuts.
-        expect(find.byType(DocsShowcase), findsNWidgets(4));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Four specimen stages: Preview, Choice states, Text item, Shortcuts.
+      expect(find.byType(DocsShowcase), findsNWidgets(4));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -214,7 +233,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const QuestionnaireDocPage(),
         ),
       );
@@ -252,7 +271,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const QuestionnaireDocPage(),
           ),
         );
@@ -281,24 +300,24 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const QuestionnaireDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('questionnaire-doc-article')),
           ),
         );
 
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('questionnaire-doc-article')),
           ),

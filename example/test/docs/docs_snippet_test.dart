@@ -2,19 +2,19 @@
 /// The one code renderer.
 ///
 /// DEVIATION from the task-2 brief, ruled by the repository owner: the brief
-/// had `DocsSnippet` render through `ElAgentCodeBlock`. That widget's
-/// `normalise` looks the language up in `elLanguageAliases`
+/// had `DocsSnippet` render through `AgentCodeBlock`. That widget's
+/// `normalise` looks the language up in `languageAliases`
 /// (`lib/src/components/agent_markdown.dart`), which registers bash, css,
 /// js/javascript, json, jsx, md/markdown, py/python, sh/shell, sql, ts/tsx/
 /// typescript — and no `dart`. Since `dart` is the default language and
-/// nearly all documentation code, routing through `ElAgentCodeBlock` would
+/// nearly all documentation code, routing through `AgentCodeBlock` would
 /// render every Dart snippet flat and unhighlighted. Instead `DocsSnippet`
-/// paints its own body through `ElPrismPalette` — the same VS Code Dark Plus
-/// palette `ElAgentCodeBlock` uses — so the site still carries exactly one
+/// paints its own body through `PrismPalette` — the same VS Code Dark Plus
+/// palette `AgentCodeBlock` uses — so the site still carries exactly one
 /// syntax theme.
 ///
 /// This is why the brief's first test ("it renders through the agent code
-/// block, not a second theme", pinning `find.byType(ElAgentCodeBlock)`) is
+/// block, not a second theme", pinning `find.byType(AgentCodeBlock)`) is
 /// replaced by the two tests below: one that pins the real contract — a Dart
 /// snippet is actually tokenised and coloured through the Prism palette — and
 /// one that pins the header strip's language label and its uppercase-free
@@ -24,15 +24,27 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_copy_button.dart';
 import 'package:example/docs/docs_snippet.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: ThemeScope(
+      controller: ThemeController(mode: ColorMode.dark),
       child: Center(child: child),
     ),
   ),
@@ -55,7 +67,9 @@ const String _long =
 bool _hasColoredSpan(InlineSpan span, String text, Color color) {
   bool found = false;
   span.visitChildren((InlineSpan child) {
-    if (child is TextSpan && child.text == text && child.style?.color == color) {
+    if (child is TextSpan &&
+        child.text == text &&
+        child.style?.color == color) {
       found = true;
     }
     return true;
@@ -82,20 +96,19 @@ void main() {
           .where((Text t) => t.textSpan != null);
 
       final bool hasKeyword = richTexts.any(
-        (Text t) =>
-            _hasColoredSpan(t.textSpan!, 'final', ElPrismPalette.keyword),
+        (Text t) => _hasColoredSpan(t.textSpan!, 'final', PrismPalette.keyword),
       );
       final bool hasNumber = richTexts.any(
-        (Text t) => _hasColoredSpan(t.textSpan!, '1', ElPrismPalette.number),
+        (Text t) => _hasColoredSpan(t.textSpan!, '1', PrismPalette.number),
       );
 
       expect(
         hasKeyword,
         isTrue,
         reason:
-            'a Dart keyword must be coloured ElPrismPalette.keyword — this '
+            'a Dart keyword must be coloured PrismPalette.keyword — this '
             'is the assertion that would have caught routing Dart through '
-            'ElAgentCodeBlock, which does not know the language at all',
+            'AgentCodeBlock, which does not know the language at all',
       );
       expect(hasNumber, isTrue);
     },
@@ -111,8 +124,8 @@ void main() {
 
       expect(find.text('dart'), findsOneWidget);
 
-      for (final ElText widget in tester.widgetList<ElText>(
-        find.byType(ElText),
+      for (final StyledText widget in tester.widgetList<StyledText>(
+        find.byType(StyledText),
       )) {
         expect(widget.spec.uppercase, isFalse);
       }
@@ -123,7 +136,9 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      _host(const SizedBox(width: 640, child: DocsSnippet(code: 'final a = 1;'))),
+      _host(
+        const SizedBox(width: 640, child: DocsSnippet(code: 'final a = 1;')),
+      ),
     );
     await tester.pump();
 
@@ -138,7 +153,9 @@ void main() {
     'the copy control sits inside the header strip, clear of the code body',
     (WidgetTester tester) async {
       await tester.pumpWidget(
-        _host(const SizedBox(width: 640, child: DocsSnippet(code: 'final a = 1;'))),
+        _host(
+          const SizedBox(width: 640, child: DocsSnippet(code: 'final a = 1;')),
+        ),
       );
       await tester.pump();
 
@@ -154,13 +171,13 @@ void main() {
       // block's outer corner.
       expect(
         control.right,
-        closeTo(strip.right - ElAgentCodeBlock.stripPadX, el(1)),
+        closeTo(strip.right - AgentCodeBlock.stripPadX, space(1)),
       );
       // Clear of the language label sitting at the strip's left edge.
       expect(control.left, greaterThan(strip.left));
       // Vertically centred against the strip -- not floating over it from
       // the block's own top-right corner.
-      expect(control.center.dy, closeTo(strip.center.dy, el(1)));
+      expect(control.center.dy, closeTo(strip.center.dy, space(1)));
       // Never reaching down into the code body below the strip.
       expect(control.bottom, lessThanOrEqualTo(codeBody.top));
     },
@@ -188,7 +205,7 @@ void main() {
       _host(
         SizedBox(
           width: 640,
-          child: DocsSnippet(code: _long, maxHeight: el(20)),
+          child: DocsSnippet(code: _long, maxHeight: space(20)),
         ),
       ),
     );
@@ -199,7 +216,7 @@ void main() {
 
     await tester.tap(find.text('Show more'));
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(MotionDurations.open);
 
     expect(find.text('Show less'), findsOneWidget);
     expect(

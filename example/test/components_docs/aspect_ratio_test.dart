@@ -1,5 +1,5 @@
 /// Tests for `components_docs/aspect_ratio/page.dart`'s
-/// [AspectRatioDocPage]: [ElAspectRatio]. New route, split off from the
+/// [AspectRatioDocPage]: [AspectRatio]. New route, split off from the
 /// former shared `scroll_area` route; see `aspect_ratio/meta.dart`'s
 /// library note.
 ///
@@ -9,7 +9,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage.
+/// `ThemeController` is flipped in place for theme coverage.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -20,7 +20,33 @@ import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -46,24 +72,24 @@ Future<void> _open(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -138,8 +164,8 @@ void main() {
     },
   );
 
-  testWidgets('the ElApiTable covers every public constructor parameter of '
-      'ElAspectRatio', (WidgetTester tester) async {
+  testWidgets('the ApiTable covers every public constructor parameter of '
+      'AspectRatio', (WidgetTester tester) async {
     await _pump(tester);
     await _open(tester, 'API Reference');
 
@@ -149,7 +175,7 @@ void main() {
     expect(tables, isNotEmpty);
 
     final DocsApiTable table = tables.singleWhere(
-      (DocsApiTable t) => t.title == 'ElAspectRatio',
+      (DocsApiTable t) => t.title == 'AspectRatio',
     );
     final Set<String> documented = <String>{
       for (final DocsApiFact fact in table.facts) fact.name,
@@ -158,18 +184,18 @@ void main() {
       expect(
         documented,
         contains(param),
-        reason: 'ElAspectRatio table is missing parameter "$param"',
+        reason: 'AspectRatio table is missing parameter "$param"',
       );
     }
   });
 
   testWidgets(
-    'ElAspectRatio locks a box to the specified ratio, in the live demo, '
+    'AspectRatio locks a box to the specified ratio, in the live demo, '
     'Square, Portrait, and RTL specimens',
     (WidgetTester tester) async {
       await _pump(tester);
 
-      final Finder aspectRatio = find.byType(ElAspectRatio);
+      final Finder aspectRatio = find.byType(AspectRatio);
       expect(aspectRatio, findsAtLeastNWidgets(4));
       expect(tester.takeException(), isNull);
     },
@@ -179,13 +205,10 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(aspectRatioDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(aspectRatioDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);
@@ -243,7 +266,7 @@ void main() {
     await _pump(tester);
 
     expect(aspectRatioDoc.name, 'aspect_ratio');
-    expect(aspectRatioDoc.exports, containsAll(<String>['ElAspectRatio']));
+    expect(aspectRatioDoc.exports, containsAll(<String>['AspectRatio']));
     expect(tester.takeException(), isNull);
   });
 }

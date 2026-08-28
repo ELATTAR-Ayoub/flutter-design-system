@@ -1,13 +1,13 @@
 /// Public documentation page for the `item` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels; it now declares a [ComponentDocSpec]
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// [ComponentDocPage], the same shape `button`, `field`, `popover`,
 /// `hover_card`, and `kbd` established. Every specimen widget is the one
 /// the hand-composed page carried; new in this pass: real Dart `code:`
 /// strings for Variant, Icon, Avatar, Group, and RTL, all of which were
-/// live-only panels before (a `ElPanel` around a specimen, no quoted
+/// live-only panels before (a `Panel` around a specimen, no quoted
 /// source) — a `ShowcaseSection` is a specimen AND its source, so each now
 /// carries both. Item vs Field, which was prose with nothing live to show,
 /// becomes a `SnippetSection` illustrating the two constructions side by
@@ -31,10 +31,10 @@
 /// `item.dart`'s own "Not ported" note:
 /// * **Size**: the reference ships three rungs (default/sm/xs). The port's
 ///   own doc comment says the two smaller rungs "are byte-identical to
-///   `default`" and were never built: there is no ElItemSize to demonstrate,
+///   `default`" and were never built: there is no ItemSize to demonstrate,
 ///   so a "Size" section would show the same row three times under three
 ///   names.
-/// * **Image**: `ElItemMedia`'s only forced shape is the icon variant
+/// * **Image**: `ItemMedia`'s only forced shape is the icon variant
 ///   (`size-4`, 16px). There is no separate, larger `variant="image"` slot:
 ///   passing an `Image` widget as `child` still renders it in the same 16px
 ///   box an icon gets, not the reference's larger album-art treatment.
@@ -58,7 +58,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -78,13 +90,13 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'ElItem is a structured list row: optional media (usually an '
+          'Item is a structured list row: optional media (usually an '
           'icon), required content (usually a title and description), and '
           'optional actions. The row carries a border option (normal, '
           'outline, muted) and an alignment override (center or top). Reach '
           'for it over a bare Row when the content has a standard shape and '
           'the container needs semantic consistency across several rows. '
-          'ElItemGroup is the list wrapper: it enforces a vertical gap and '
+          'ItemGroup is the list wrapper: it enforces a vertical gap and '
           'stretches all children to the column width.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
@@ -115,7 +127,7 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElItem and the rest of the item '
+              'Add the export line so Item and the rest of the item '
               'family are reachable the same way the CLI path already '
               'makes them.',
           code: "export 'item.dart';",
@@ -132,8 +144,8 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          'ElItemGroup is a list wrapper, not a variant switch. Item\'s '
-          'only real axis is ElItemVariant (see Variant below); '
+          'ItemGroup is a list wrapper, not a variant switch. Item\'s '
+          'only real axis is ItemVariant (see Variant below); '
           'alignStart is a bool, not an enum. A part tree, not a runnable '
           'snippet: there is nothing to stage live beyond the Preview '
           'specimen above.',
@@ -144,15 +156,15 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       title: 'Item vs Field',
       description:
           'Both stack a label-like part over supporting text, and it is '
-          'easy to reach for the wrong one. ElItem is a display row: '
+          'easy to reach for the wrong one. Item is a display row: '
           'media, a title, a description, and actions, with no form '
-          'semantics and no validation state. ElField (documented on its '
+          'semantics and no validation state. Field (documented on its '
           'own page) is a form control wrapper: it owns a label, a '
           'control, a description, and an error, wired so a screen reader '
           'announces them as one field with Semantics(hint:) and '
-          'Semantics(validationResult:). Reach for ElItem for a '
+          'Semantics(validationResult:). Reach for Item for a '
           'notification, a search result, or a list row a user reads. '
-          'Reach for ElField the moment the row holds something the user '
+          'Reach for Field the moment the row holds something the user '
           'types into, checks, or submits. Nothing live to stage: this is '
           'a choice between two different widgets, not a state of one.',
       code: _itemVsFieldCode,
@@ -161,7 +173,7 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       id: 'variant',
       title: 'Variant',
       description:
-          'ElItemVariant is Item\'s only enum: no separate size axis '
+          'ItemVariant is Item\'s only enum: no separate size axis '
           'exists (sm and xs are byte-identical to the default and were '
           'never built; see API Reference).',
       specimen: const _VariantSpecimen(),
@@ -172,7 +184,7 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       id: 'icon',
       title: 'Icon',
       description:
-          'ElItemMedia forces its child into a 16px square and, whenever '
+          'ItemMedia forces its child into a 16px square and, whenever '
           'the row carries a description, nudges it 2px down so it lines '
           "up with the title's cap height instead of the row's centre.",
       specimen: const _IconSpecimen(),
@@ -183,10 +195,10 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       id: 'avatar',
       title: 'Avatar',
       description:
-          'ElItemMedia takes any widget, including ElAvatar: passing '
-          'sizePx: ElItemMedia.size keeps the fallback initials centred in '
+          'ItemMedia takes any widget, including Avatar: passing '
+          'sizePx: ItemMedia.size keeps the fallback initials centred in '
           'the same 16px square an icon would occupy, instead of relying '
-          'on the forced square to squash a larger default. (ElEmptyMedia, '
+          'on the forced square to squash a larger default. (EmptyMedia, '
           'on the empty page, cannot do this: it only takes a glyph.)',
       specimen: const _AvatarSpecimen(),
       code: _avatarCode,
@@ -196,7 +208,7 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       id: 'group',
       title: 'Group',
       description:
-          'ElItemGroup is the list wrapper: it enforces a vertical gap and '
+          'ItemGroup is the list wrapper: it enforces a vertical gap and '
           'stretches every row to the column width. The gap tightens from '
           '10px to a hidden 2.5px when the rows contain size=sm buttons, a '
           'CSS descendant-selector quirk reproduced as measured (see '
@@ -209,7 +221,7 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       id: 'rtl',
       title: 'RTL',
       description:
-          'ElItem paints no direction-specific layout of its own: it '
+          'Item paints no direction-specific layout of its own: it '
           'sizes to its content and reads right-to-left under a plain '
           'Directionality, the same composition either way.',
       specimen: const _RtlSpecimen(),
@@ -225,17 +237,14 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
           'parameter, verified against lib/src/components/item.dart '
           'directly.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElItemGroup', anchor: 'api-elitemgroup'),
-        DocsTocEntry(title: 'ElItem', anchor: 'api-elitem'),
-        DocsTocEntry(title: 'ElItemVariant', anchor: 'api-elitemvariant'),
-        DocsTocEntry(title: 'ElItemMedia', anchor: 'api-elitemmedia'),
-        DocsTocEntry(title: 'ElItemContent', anchor: 'api-elitemcontent'),
-        DocsTocEntry(title: 'ElItemTitle', anchor: 'api-elitemtitle'),
-        DocsTocEntry(
-          title: 'ElItemDescription',
-          anchor: 'api-elitemdescription',
-        ),
-        DocsTocEntry(title: 'ElItemActions', anchor: 'api-elitemactions'),
+        DocsTocEntry(title: 'ItemGroup', anchor: 'api-elitemgroup'),
+        DocsTocEntry(title: 'Item', anchor: 'api-elitem'),
+        DocsTocEntry(title: 'ItemVariant', anchor: 'api-elitemvariant'),
+        DocsTocEntry(title: 'ItemMedia', anchor: 'api-elitemmedia'),
+        DocsTocEntry(title: 'ItemContent', anchor: 'api-elitemcontent'),
+        DocsTocEntry(title: 'ItemTitle', anchor: 'api-elitemtitle'),
+        DocsTocEntry(title: 'ItemDescription', anchor: 'api-elitemdescription'),
+        DocsTocEntry(title: 'ItemActions', anchor: 'api-elitemactions'),
       ],
       child: const _ApiReferenceContent(),
     ),
@@ -243,16 +252,36 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElItem and every part are static, presentational '
+          'Item and every part are static, presentational '
           'StatelessWidgets: none owns onPressed/enabled, a '
           'GestureDetector, a FocusNode, or an async flag.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
-    DisclosureSection(id: 'accessibility', title: 'Accessibility', child: const _AccessibilityContent()),
-    DisclosureSection(id: 'keyboard', title: 'Keyboard', child: const _KeyboardContent()),
-    DisclosureSection(id: 'responsive', title: 'Responsive', child: const _ResponsiveContent()),
-    DisclosureSection(id: 'dependencies', title: 'Dependencies', child: const _DependenciesContent()),
-    DisclosureSection(id: 'theming', title: 'Theming', child: const _ThemingContent()),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      child: const _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      child: const _KeyboardContent(),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      child: const _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      child: const _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: const _ThemingContent(),
+    ),
     DisclosureSection(
       id: 'source',
       title: 'Source',
@@ -304,9 +333,9 @@ class ItemDocPage extends StatelessWidget {
       title: itemDoc.title,
       description: itemDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Item'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Item'),
     ],
     toc: itemDocSpec.toc,
     onNavigate: onNavigate,
@@ -325,27 +354,27 @@ class _PreviewSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('item-preview'),
-    child: ElItem(
-      media: ElItemMedia(
-        child: ElIcon.lucide(
-          ElLucide.messageSquare,
-          size: ElIconSize.sm,
-          tone: ElIconTone.normal,
+    child: Item(
+      media: ItemMedia(
+        child: Icon.lucide(
+          Lucide.messageSquare,
+          size: IconSize.sm,
+          tone: IconTone.normal,
         ),
       ),
-      content: ElItemContent(
+      content: ItemContent(
         children: <Widget>[
-          const ElItemTitle('Draft response'),
-          ElItemDescription('You started typing something here on August 14'),
+          const ItemTitle('Draft response'),
+          ItemDescription('You started typing something here on August 14'),
         ],
       ),
-      actions: ElItemActions(
+      actions: ItemActions(
         children: <Widget>[
-          ElButton(
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.sm,
+          Button(
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.sm,
             onPressed: () {},
-            child: ElText('Edit', ElComponentType.buttonLabel),
+            child: StyledText('Edit', TextStyles.buttonLabel),
           ),
         ],
       ),
@@ -357,39 +386,39 @@ class _VariantSpecimen extends StatelessWidget {
   const _VariantSpecimen();
 
   @override
-  Widget build(BuildContext context) => ElItemGroup(
+  Widget build(BuildContext context) => ItemGroup(
     children: <Widget>[
       KeyedSubtree(
         key: const ValueKey<String>('item-example:variant-normal'),
-        child: const ElItem(
-          content: ElItemContent(
+        child: const Item(
+          content: ItemContent(
             children: <Widget>[
-              ElItemTitle('Normal'),
-              ElItemDescription('border-transparent: no border, no fill.'),
+              ItemTitle('Normal'),
+              ItemDescription('border-transparent: no border, no fill.'),
             ],
           ),
         ),
       ),
       KeyedSubtree(
         key: const ValueKey<String>('item-example:variant-outline'),
-        child: const ElItem(
-          variant: ElItemVariant.outline,
-          content: ElItemContent(
+        child: const Item(
+          variant: ItemVariant.outline,
+          content: ItemContent(
             children: <Widget>[
-              ElItemTitle('Outline'),
-              ElItemDescription('A 1px border in theme.border.'),
+              ItemTitle('Outline'),
+              ItemDescription('A 1px border in theme.border.'),
             ],
           ),
         ),
       ),
       KeyedSubtree(
         key: const ValueKey<String>('item-example:variant-muted'),
-        child: const ElItem(
-          variant: ElItemVariant.muted,
-          content: ElItemContent(
+        child: const Item(
+          variant: ItemVariant.muted,
+          content: ItemContent(
             children: <Widget>[
-              ElItemTitle('Muted'),
-              ElItemDescription('A semi-transparent muted fill.'),
+              ItemTitle('Muted'),
+              ItemDescription('A semi-transparent muted fill.'),
             ],
           ),
         ),
@@ -404,18 +433,18 @@ class _IconSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('item-example:icon'),
-    child: ElItem(
-      media: ElItemMedia(
-        child: ElIcon.lucide(
-          ElLucide.bell,
-          size: ElIconSize.sm,
-          tone: ElIconTone.normal,
+    child: Item(
+      media: ItemMedia(
+        child: Icon.lucide(
+          Lucide.bell,
+          size: IconSize.sm,
+          tone: IconTone.normal,
         ),
       ),
-      content: const ElItemContent(
+      content: const ItemContent(
         children: <Widget>[
-          ElItemTitle('New comment'),
-          ElItemDescription('Sarah replied to your thread'),
+          ItemTitle('New comment'),
+          ItemDescription('Sarah replied to your thread'),
         ],
       ),
     ),
@@ -428,14 +457,14 @@ class _AvatarSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('item-example:avatar'),
-    child: ElItem(
-      media: ElItemMedia(
-        child: ElAvatar(fallback: 'JD', sizePx: ElItemMedia.size),
+    child: Item(
+      media: ItemMedia(
+        child: Avatar(fallback: 'JD', sizePx: ItemMedia.size),
       ),
-      content: const ElItemContent(
+      content: const ItemContent(
         children: <Widget>[
-          ElItemTitle('Jordan Diaz'),
-          ElItemDescription('Commented 2 hours ago'),
+          ItemTitle('Jordan Diaz'),
+          ItemDescription('Commented 2 hours ago'),
         ],
       ),
     ),
@@ -448,33 +477,33 @@ class _GroupSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('item-example:group'),
-    child: ElItemGroup(
+    child: ItemGroup(
       children: <Widget>[
-        ElItem(
-          media: ElItemMedia(
-            child: ElIcon.lucide(ElLucide.fileText, size: ElIconSize.sm),
+        Item(
+          media: ItemMedia(
+            child: Icon.lucide(Lucide.fileText, size: IconSize.sm),
           ),
-          content: const ElItemContent(
+          content: const ItemContent(
             children: <Widget>[
-              ElItemTitle('Quarterly report'),
-              ElItemDescription('Jan 1 – Mar 31, 2026'),
+              ItemTitle('Quarterly report'),
+              ItemDescription('Jan 1 – Mar 31, 2026'),
             ],
           ),
         ),
-        ElItem(
-          media: ElItemMedia(
-            child: ElIcon.lucide(ElLucide.download, size: ElIconSize.sm),
+        Item(
+          media: ItemMedia(
+            child: Icon.lucide(Lucide.download, size: IconSize.sm),
           ),
-          content: const ElItemContent(
-            children: <Widget>[ElItemTitle('Download Q4 data')],
+          content: const ItemContent(
+            children: <Widget>[ItemTitle('Download Q4 data')],
           ),
-          actions: ElItemActions(
+          actions: ItemActions(
             children: <Widget>[
-              ElButton(
-                variant: ElButtonVariant.ghost,
-                size: ElButtonSize.sm,
+              Button(
+                variant: ButtonVariant.ghost,
+                size: ButtonSize.sm,
                 onPressed: () {},
-                child: ElText('Manage', ElComponentType.buttonLabel),
+                child: StyledText('Manage', TextStyles.buttonLabel),
               ),
             ],
           ),
@@ -492,11 +521,11 @@ class _RtlSpecimen extends StatelessWidget {
     textDirection: TextDirection.rtl,
     child: const KeyedSubtree(
       key: ValueKey<String>('rtl-example:item'),
-      child: ElItem(
-        content: ElItemContent(
+      child: Item(
+        content: ItemContent(
           children: <Widget>[
-            ElItemTitle('المستند النهائي'),
-            ElItemDescription('تم التحديث اليوم'),
+            ItemTitle('المستند النهائي'),
+            ItemDescription('تم التحديث اليوم'),
           ],
         ),
       ),
@@ -504,23 +533,23 @@ class _RtlSpecimen extends StatelessWidget {
   );
 }
 
-const String _previewCode = '''ElItem(
-  media: ElItemMedia(
-    child: ElIcon.lucide(ElLucide.messageSquare, size: ElIconSize.sm),
+const String _previewCode = '''Item(
+  media: ItemMedia(
+    child: Icon.lucide(Lucide.messageSquare, size: IconSize.sm),
   ),
-  content: ElItemContent(
+  content: ItemContent(
     children: [
-      ElItemTitle('Draft response'),
-      ElItemDescription('You started typing something here on August 14'),
+      ItemTitle('Draft response'),
+      ItemDescription('You started typing something here on August 14'),
     ],
   ),
-  actions: ElItemActions(
+  actions: ItemActions(
     children: [
-      ElButton(
-        variant: ElButtonVariant.ghost,
-        size: ElButtonSize.sm,
+      Button(
+        variant: ButtonVariant.ghost,
+        size: ButtonSize.sm,
         onPressed: () {},
-        child: ElText('Edit', ElComponentType.buttonLabel),
+        child: StyledText('Edit', TextStyles.buttonLabel),
       ),
     ],
   ),
@@ -529,23 +558,23 @@ const String _previewCode = '''ElItem(
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElItemGroup(
+ItemGroup(
   children: [
-    ElItem(
-      media: ElItemMedia(child: ElIcon.lucide(ElLucide.mail, size: ElIconSize.sm)),
-      content: ElItemContent(
+    Item(
+      media: ItemMedia(child: Icon.lucide(Lucide.mail, size: IconSize.sm)),
+      content: ItemContent(
         children: [
-          ElItemTitle('Inbox'),
-          ElItemDescription('12 unread messages'),
+          ItemTitle('Inbox'),
+          ItemDescription('12 unread messages'),
         ],
       ),
-      actions: ElItemActions(
+      actions: ItemActions(
         children: [
-          ElButton(
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.sm,
+          Button(
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.sm,
             onPressed: () {},
-            child: ElText('Mark read', ElComponentType.buttonLabel),
+            child: StyledText('Mark read', TextStyles.buttonLabel),
           ),
         ],
       ),
@@ -553,108 +582,109 @@ ElItemGroup(
   ],
 )''';
 
-const String _compositionTreeCode = '''ElItemGroup
-└─ ElItem
-   ├─ ElItemMedia      (optional)
-   ├─ ElItemContent
-   │  ├─ ElItemTitle
-   │  └─ ElItemDescription
-   └─ ElItemActions    (optional)''';
+const String _compositionTreeCode = '''ItemGroup
+└─ Item
+   ├─ ItemMedia      (optional)
+   ├─ ItemContent
+   │  ├─ ItemTitle
+   │  └─ ItemDescription
+   └─ ItemActions    (optional)''';
 
-const String _itemVsFieldCode = '''// A display row: no form semantics, no validation state.
-ElItem(
-  media: ElItemMedia(child: ElIcon.lucide(ElLucide.bell, size: ElIconSize.sm)),
-  content: ElItemContent(
+const String _itemVsFieldCode =
+    '''// A display row: no form semantics, no validation state.
+Item(
+  media: ItemMedia(child: Icon.lucide(Lucide.bell, size: IconSize.sm)),
+  content: ItemContent(
     children: [
-      ElItemTitle('New comment'),
-      ElItemDescription('Sarah replied to your thread'),
+      ItemTitle('New comment'),
+      ItemDescription('Sarah replied to your thread'),
     ],
   ),
 )
 
 // A form control wrapper: owns label, description, and error semantics.
-ElField(
+Field(
   label: 'Email',
   description: 'We will never share your email.',
-  child: ElInput(controller: emailController),
+  child: Input(controller: emailController),
 )''';
 
-const String _variantCode = '''ElItemGroup(
+const String _variantCode = '''ItemGroup(
   children: [
-    ElItem(
-      content: ElItemContent(
+    Item(
+      content: ItemContent(
         children: [
-          ElItemTitle('Normal'),
-          ElItemDescription('border-transparent: no border, no fill.'),
+          ItemTitle('Normal'),
+          ItemDescription('border-transparent: no border, no fill.'),
         ],
       ),
     ),
-    ElItem(
-      variant: ElItemVariant.outline,
-      content: ElItemContent(
+    Item(
+      variant: ItemVariant.outline,
+      content: ItemContent(
         children: [
-          ElItemTitle('Outline'),
-          ElItemDescription('A 1px border in theme.border.'),
+          ItemTitle('Outline'),
+          ItemDescription('A 1px border in theme.border.'),
         ],
       ),
     ),
-    ElItem(
-      variant: ElItemVariant.muted,
-      content: ElItemContent(
+    Item(
+      variant: ItemVariant.muted,
+      content: ItemContent(
         children: [
-          ElItemTitle('Muted'),
-          ElItemDescription('A semi-transparent muted fill.'),
+          ItemTitle('Muted'),
+          ItemDescription('A semi-transparent muted fill.'),
         ],
       ),
     ),
   ],
 )''';
 
-const String _iconCode = '''ElItem(
-  media: ElItemMedia(
-    child: ElIcon.lucide(ElLucide.bell, size: ElIconSize.sm),
+const String _iconCode = '''Item(
+  media: ItemMedia(
+    child: Icon.lucide(Lucide.bell, size: IconSize.sm),
   ),
-  content: ElItemContent(
+  content: ItemContent(
     children: [
-      ElItemTitle('New comment'),
-      ElItemDescription('Sarah replied to your thread'),
+      ItemTitle('New comment'),
+      ItemDescription('Sarah replied to your thread'),
     ],
   ),
 )''';
 
-const String _avatarCode = '''ElItem(
-  media: ElItemMedia(
-    child: ElAvatar(fallback: 'JD', sizePx: ElItemMedia.size),
+const String _avatarCode = '''Item(
+  media: ItemMedia(
+    child: Avatar(fallback: 'JD', sizePx: ItemMedia.size),
   ),
-  content: ElItemContent(
+  content: ItemContent(
     children: [
-      ElItemTitle('Jordan Diaz'),
-      ElItemDescription('Commented 2 hours ago'),
+      ItemTitle('Jordan Diaz'),
+      ItemDescription('Commented 2 hours ago'),
     ],
   ),
 )''';
 
-const String _groupCode = '''ElItemGroup(
+const String _groupCode = '''ItemGroup(
   children: [
-    ElItem(
-      media: ElItemMedia(child: ElIcon.lucide(ElLucide.fileText, size: ElIconSize.sm)),
-      content: ElItemContent(
+    Item(
+      media: ItemMedia(child: Icon.lucide(Lucide.fileText, size: IconSize.sm)),
+      content: ItemContent(
         children: [
-          ElItemTitle('Quarterly report'),
-          ElItemDescription('Jan 1 – Mar 31, 2026'),
+          ItemTitle('Quarterly report'),
+          ItemDescription('Jan 1 – Mar 31, 2026'),
         ],
       ),
     ),
-    ElItem(
-      media: ElItemMedia(child: ElIcon.lucide(ElLucide.download, size: ElIconSize.sm)),
-      content: ElItemContent(children: [ElItemTitle('Download Q4 data')]),
-      actions: ElItemActions(
+    Item(
+      media: ItemMedia(child: Icon.lucide(Lucide.download, size: IconSize.sm)),
+      content: ItemContent(children: [ItemTitle('Download Q4 data')]),
+      actions: ItemActions(
         children: [
-          ElButton(
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.sm,
+          Button(
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.sm,
             onPressed: () {},
-            child: ElText('Manage', ElComponentType.buttonLabel),
+            child: StyledText('Manage', TextStyles.buttonLabel),
           ),
         ],
       ),
@@ -664,11 +694,11 @@ const String _groupCode = '''ElItemGroup(
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElItem(
-    content: ElItemContent(
+  child: Item(
+    content: ItemContent(
       children: [
-        ElItemTitle('المستند النهائي'),
-        ElItemDescription('تم التحديث اليوم'),
+        ItemTitle('المستند النهائي'),
+        ItemDescription('تم التحديث اليوم'),
       ],
     ),
   ),
@@ -686,7 +716,7 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-elitemgroup',
         child: DocsApiTable(
-          title: 'ElItemGroup',
+          title: 'ItemGroup',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'children',
@@ -697,11 +727,11 @@ class _ApiReferenceContent extends StatelessWidget {
               name: 'gapOverride',
               type: 'double?',
               description:
-                  'Optional. Defaults to null, which keeps ElItemGroup.gap. '
+                  'Optional. Defaults to null, which keeps ItemGroup.gap. '
                   'Overrides the gap for this group only.',
             ),
             DocsApiFact(
-              name: 'ElItemGroup.gap',
+              name: 'ItemGroup.gap',
               type: 'static double',
               description:
                   '10px between rows. Tightens to a hidden 2.5px when the '
@@ -710,39 +740,39 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elitem',
         child: DocsApiTable(
-          title: 'ElItem',
+          title: 'Item',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'media',
               type: 'Widget?',
               description:
-                  'Optional. Defaults to null. Usually a ElItemMedia with '
+                  'Optional. Defaults to null. Usually a ItemMedia with '
                   'an icon or avatar. Sits at the row start.',
             ),
             DocsApiFact(
               name: 'content',
               type: 'Widget',
               description:
-                  'Required. Usually ElItemContent with title and '
+                  'Required. Usually ItemContent with title and '
                   'description. Fills the middle space.',
             ),
             DocsApiFact(
               name: 'actions',
               type: 'Widget?',
               description:
-                  'Optional. Defaults to null. Usually ElItemActions with '
+                  'Optional. Defaults to null. Usually ItemActions with '
                   'buttons. Sits at the row end.',
             ),
             DocsApiFact(
               name: 'variant',
-              type: 'ElItemVariant',
+              type: 'ItemVariant',
               description:
-                  'Optional. Defaults to ElItemVariant.normal. Selects the '
-                  'border: see the ElItemVariant table below.',
+                  'Optional. Defaults to ItemVariant.normal. Selects the '
+                  'border: see the ItemVariant table below.',
             ),
             DocsApiFact(
               name: 'alignStart',
@@ -752,28 +782,28 @@ class _ApiReferenceContent extends StatelessWidget {
                   'and actions to the top instead of the centre.',
             ),
             DocsApiFact(
-              name: 'ElItem.gap',
+              name: 'Item.gap',
               type: 'static double',
               description: '10px between media, content, and actions.',
             ),
             DocsApiFact(
-              name: 'ElItem.padding',
+              name: 'Item.padding',
               type: 'static EdgeInsets',
               description: '12px horizontal, 10px vertical.',
             ),
             DocsApiFact(
-              name: 'ElItem.radius',
+              name: 'Item.radius',
               type: 'static double',
               description: '12px corners.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elitemvariant',
         child: DocsApiTable(
-          title: 'ElItemVariant',
+          title: 'ItemVariant',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'normal',
@@ -799,17 +829,17 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elitemmedia',
         child: DocsApiTable(
-          title: 'ElItemMedia',
+          title: 'ItemMedia',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'child',
               type: 'Widget',
               description:
-                  'Required. Any widget: an icon or a ElAvatar are the two '
+                  'Required. Any widget: an icon or a Avatar are the two '
                   'real shapes in this corpus (see Icon and Avatar above). '
                   'Forced into a 16px square either way.',
             ),
@@ -823,44 +853,44 @@ class _ApiReferenceContent extends StatelessWidget {
                   "the row's centre.",
             ),
             DocsApiFact(
-              name: 'ElItemMedia.size',
+              name: 'ItemMedia.size',
               type: 'static double',
               description: '16px, the forced glyph/avatar square.',
             ),
             DocsApiFact(
-              name: 'ElItemMedia.nudge',
+              name: 'ItemMedia.nudge',
               type: 'static double',
               description: '2px, the top offset nudged applies.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elitemcontent',
         child: DocsApiTable(
-          title: 'ElItemContent',
+          title: 'ItemContent',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'children',
               type: 'List<Widget>',
               description:
-                  'Required. Usually ElItemTitle and ElItemDescription, '
+                  'Required. Usually ItemTitle and ItemDescription, '
                   'joined by a 4px gap.',
             ),
             DocsApiFact(
-              name: 'ElItemContent.gap',
+              name: 'ItemContent.gap',
               type: 'static double',
               description: '4px between children.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elitemtitle',
         child: DocsApiTable(
-          title: 'ElItemTitle',
+          title: 'ItemTitle',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'text',
@@ -872,11 +902,11 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elitemdescription',
         child: DocsApiTable(
-          title: 'ElItemDescription',
+          title: 'ItemDescription',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'text',
@@ -889,11 +919,11 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elitemactions',
         child: DocsApiTable(
-          title: 'ElItemActions',
+          title: 'ItemActions',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'children',
@@ -903,7 +933,7 @@ class _ApiReferenceContent extends StatelessWidget {
                   'gap.',
             ),
             DocsApiFact(
-              name: 'ElItemActions.gap',
+              name: 'ItemActions.gap',
               type: 'static double',
               description: '8px between children.',
             ),
@@ -919,19 +949,19 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Semantic role: none of its own, ElItem, ElItemContent, and '
-            'ElItemActions are plain Row/Column widgets with no Semantics '
+      _bullets(ThemeScope.of(context), <String>[
+        'Semantic role: none of its own, Item, ItemContent, and '
+            'ItemActions are plain Row/Column widgets with no Semantics '
             'wrapper.',
-        'Text is not silent: ElItemTitle and ElItemDescription render '
-            "through ElText, which carries Flutter's default static-text "
+        'Text is not silent: ItemTitle and ItemDescription render '
+            "through StyledText, which carries Flutter's default static-text "
             'semantics: both are individually reachable by a screen '
             'reader.',
-        "Actions inherit semantics from ElItemActions' children (buttons), "
+        "Actions inherit semantics from ItemActions' children (buttons), "
             'which own their own focus and labels; see Keyboard for that '
             'story in full.',
         'ItemGroup carries `role="list"` in the reference; this port\'s '
-            'ElItemGroup is a plain Column with no Semantics(container: '
+            'ItemGroup is a plain Column with no Semantics(container: '
             'true) or list-role marker of its own — a real, currently '
             'harmless gap, reported rather than silently fixed.',
         'Known platform differences: none observed.',
@@ -939,7 +969,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// Split out of Accessibility's own "Keyboard" bullet. Read straight off
-/// `item.dart`: `ElItem`, `ElItemGroup`, and every part class are
+/// `item.dart`: `Item`, `ItemGroup`, and every part class are
 /// `StatelessWidget`s with no `Focus`, `FocusNode`, or `GestureDetector` of
 /// their own.
 class _KeyboardContent extends StatelessWidget {
@@ -947,19 +977,19 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'No keyboard behaviour of its own: ElItem and every part class '
-            '(ElItemGroup, ElItemMedia, ElItemContent, ElItemTitle, '
-            'ElItemDescription, ElItemActions) wire no Focus, FocusNode, '
+      _bullets(ThemeScope.of(context), <String>[
+        'No keyboard behaviour of its own: Item and every part class '
+            '(ItemGroup, ItemMedia, ItemContent, ItemTitle, '
+            'ItemDescription, ItemActions) wire no Focus, FocusNode, '
             'or GestureDetector. None of them ever appears in Tab order.',
-        'Whatever is focusable lives inside ElItemActions: when a caller '
+        'Whatever is focusable lives inside ItemActions: when a caller '
             'places buttons or other interactive controls there (see '
             'Preview and Group above), those children own their own '
             'focus, activation, and key handling — the row around them '
             'contributes only layout.',
         'A row with no actions is not reachable by keyboard at all: '
             'there is nothing on it a screen-reader user can tab to '
-            'beyond whatever static text ElItemTitle/ElItemDescription '
+            'beyond whatever static text ItemTitle/ItemDescription '
             'already expose.',
       ]);
 }
@@ -969,7 +999,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No responsive branching: renders identically across widths. '
             'Media is fixed-square, content fills flex space, actions are '
             'right-aligned or top-aligned depending on the alignStart '
@@ -986,20 +1016,20 @@ class _DependenciesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/item.dart, one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
-        'Imports: foundation/colors.dart (elTransparent), '
+        'Imports: foundation/colors.dart (transparent), '
             'foundation/spacing.dart, foundation/theme.dart, '
             'foundation/typography.dart, theme_scope.dart. '
-            'ElItem.mutedFillAlpha (0.50) is a static const declared '
-            'inside ElItem itself, not imported from colors.dart. No '
+            'Item.mutedFillAlpha (0.50) is a static const declared '
+            'inside Item itself, not imported from colors.dart. No '
             'component or effect dependency.',
         'registryDependencies, resolved automatically by `elattar add '
             'item`: source-foundation only: copied verbatim from '
             'registry/components/item.json.',
         'Assets: none. Fonts: none beyond the system type scale every '
-            'ElText call already depends on. Shaders: none.',
+            'StyledText call already depends on. Shaders: none.',
       ]);
 }
 
@@ -1008,19 +1038,19 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Borders use theme.border (variant=outline) or a transparent '
             'stroke (variant=normal/muted); the muted fill is theme.muted '
-            'at 50% alpha (ElItem.mutedFillAlpha). Content text uses '
-            'theme.foreground/mutedForeground from ElItemContent and '
-            'ElItemDescription. All re-resolve on a live theme flip.',
+            'at 50% alpha (Item.mutedFillAlpha). Content text uses '
+            'theme.foreground/mutedForeground from ItemContent and '
+            'ItemDescription. All re-resolve on a live theme flip.',
         "The group gap drift, reproduced as measured: item.dart's own "
             'doc comment traces it to the reference\'s '
             '`has-data-[size=sm]:gap-2.5` rule, which is meant to read '
             '"when the *items* in me are small, tighten" but compiles to '
             '"when ANY descendant carries that attribute", so a row '
             'ending in a size=sm button tightens the WHOLE group\'s gap, '
-            'not just that row. ElItemGroup.gap is 10px by default; a '
+            'not just that row. ItemGroup.gap is 10px by default; a '
             'caller wanting the tightened 2.5px passes gapOverride '
             'explicitly, since Flutter has no descendant-selector '
             'equivalent to reproduce the quirk automatically.',
@@ -1030,15 +1060,19 @@ class _ThemingContent extends StatelessWidget {
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -1054,18 +1088,18 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Loading / Error / Success / Disabled',
     treatment:
-        'N/A: ElItem carries none of these as its own state. A caller '
+        'N/A: Item carries none of these as its own state. A caller '
         'renders a different row, or disables the buttons it places in '
-        'ElItemActions itself.',
+        'ItemActions itself.',
     userSignal:
-        'Compose with a stateful control at the call site: ElItem does '
+        'Compose with a stateful control at the call site: Item does '
         'not.',
   ),
   DocsStateFact(
     state: 'Hover / Focus-visible / Pressed / Selected',
     treatment:
-        'N/A for ElItem itself: no GestureDetector, FocusNode, or '
-        'onPressed/enabled parameter. ElItemActions can *hold* '
+        'N/A for Item itself: no GestureDetector, FocusNode, or '
+        'onPressed/enabled parameter. ItemActions can *hold* '
         'interactive children (buttons) whose own states apply to them, '
         'not to the row.',
     userSignal: 'Compose with an interactive component at the call site.',

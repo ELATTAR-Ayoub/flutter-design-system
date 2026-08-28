@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/table.dart",
+      "source": "lib/src/components/ui/table.dart",
       "target": "@ui/table.dart",
-      "sha256": "8a37476d34433f1e9f4d39d977670a004a64ab94d85b4228b83bf42bdd534ae8"
+      "sha256": "0c69befe9feadd752c52ac5182b3eef5aadd11263da9fbc6dabf2e45375a4753"
     }
   ],
   "registryDependencies": [
@@ -22,6 +22,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/table",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/table.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/table.dart",
   "deprecated": false
 }

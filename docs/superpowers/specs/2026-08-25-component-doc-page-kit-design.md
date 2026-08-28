@@ -71,11 +71,11 @@ height, but each rail begins *below* the 64px sticky header — so the last
 The fix is the height, not the architecture:
 
 ```
-railMaxHeight = viewportHeight - ElWidths.siteHeader - el(4)
+railMaxHeight = viewportHeight - Widths.siteHeader - el(4)
 ```
 
 Nothing else about the shell changes. The centre column keeps
-`ElWidths.article` (640) and the page scroll.
+`Widths.article` (640) and the page scroll.
 
 ## 4. Component inventory
 
@@ -89,7 +89,7 @@ surface.
 
 The docs currently carry their own tokenizer (`_DsCodeTokenKind`,
 `DocsSelectableCodeBlock`) which is a second, weaker syntax theme. The agent
-family already ships the real one: `ElAgentCodeBlock` over `ElPrismPalette`,
+family already ships the real one: `AgentCodeBlock` over `PrismPalette`,
 which is VS Code **Dark Plus** as `react-syntax-highlighter` writes it, already
 carrying its own `allow-hardcoded` provenance note. `DocsSnippet` renders
 through that, and the docs tokenizer is deleted.
@@ -99,12 +99,12 @@ scrolling, a height cap with expansion, and a copy control. Nothing else in the
 kit renders code.
 
 **`DocsSnippetOverflow`** — the height cap. Above `maxHeight` the body is
-clipped and a "Show more" control unfolds it through `ElUnfold`; the control
+clipped and a "Show more" control unfolds it through `Unfold`; the control
 reads "Show less" when open. Separate from `DocsSnippet` so the showcase can
 cap at 640 while the Usage section does not cap at all.
 
-**`DocsCopyButton`** — `ElButtonVariant.secondary`, `ElButtonSize.iconSm`,
-`ElLucide.copy` → `ElLucide.loaderCircle` → `ElLucide.check`. The accessible
+**`DocsCopyButton`** — `ButtonVariant.secondary`, `ButtonSize.iconSm`,
+`Lucide.copy` → `Lucide.loaderCircle` → `Lucide.check`. The accessible
 name carries the state, because nothing but the glyph distinguishes a copy from
 a mis-tap. Used by every snippet and by the install command.
 
@@ -113,9 +113,9 @@ a mis-tap. Used by every snippet and by the install command.
 **`DocsShowcase`** — the specimen frame, and the component the reader sees most.
 
 - Minimum height `el(160)` = **640**, relaxing to `el(96)` = 384 below
-  `ElBreakpoints.sm`: 640 is taller than a 390×844 phone viewport minus header
+  `Breakpoints.sm`: 640 is taller than a 390×844 phone viewport minus header
   and toggle, and the title and control must stay on screen.
-- A Preview↔Code toggle on `ElToggleGroup`, one item each.
+- A Preview↔Code toggle on `ToggleGroup`, one item each.
 - **Preview** centres the live specimen on a neutral surface.
 - **Code** shows the specimen's own source through `DocsSnippet`, capped at the
   same 640 with `DocsSnippetOverflow`.
@@ -129,20 +129,20 @@ stacked group) can use the frame directly without the toggle.
 
 **`DocsDisclosure`** — every text-or-table section.
 
-`ElCollapsible`, **collapsed by default**. The trigger is a full-width row:
-title on the left, `ElLucide.chevronDown` hard right, `space-between`, width
-100%, the chevron rotating on open through `ElDurations`/`ElCurves`. The whole
+`Collapsible`, **collapsed by default**. The trigger is a full-width row:
+title on the left, `Lucide.chevronDown` hard right, `space-between`, width
+100%, the chevron rotating on open through `Durations`/`Curves`. The whole
 row is the control, with a single focus ring and a keyboard-activatable
 semantics node.
 
 Carries: API Reference, States, Accessibility, Keyboard, Responsive,
 Dependencies, Theming, Source.
 
-**`DocsTable`** — rewritten on the package's `ElTable` instead of the
+**`DocsTable`** — rewritten on the package's `Table` instead of the
 hand-rolled `_TableHeader`/`_FactRow` pair in `docs_facts.dart`.
 
-`ElTable` exposes no width hook — it hardcodes `defaultColumnWidth: const
-ElTableColumnWidth()`, a widest-cell measure — so a table left alone ends at
+`Table` exposes no width hook — it hardcodes `defaultColumnWidth: const
+TableColumnWidth()`, a widest-cell measure — so a table left alone ends at
 its content and leaves a gap. `DocsTable` therefore declares columns as
 fractions summing to 1 and gives each cell that exact width, which makes
 "widest cell" the width we chose and the columns sum to the container. The
@@ -156,7 +156,7 @@ configuration of `DocsTable`, not a second table.
 ### 4.4 Installation
 
 **`DocsInstall`** — CLI↔Manual toggle over `DocsSnippet`, on the same
-`ElToggleGroup` as the showcase so there is one toggle pattern on the page.
+`ToggleGroup` as the showcase so there is one toggle pattern on the page.
 
 The CLI command comes from `ComponentDocEntry.command`, which derives it
 (`'elattar add ' + name`) rather than restating it. A new test asserts that
@@ -168,7 +168,7 @@ Manual shows the installed file paths and their source, as it does today.
 
 ### 4.5 Section and anchor
 
-`ElSection` in `example/lib/kit.dart` does two unrelated jobs: it owns the
+`Section` in `example/lib/kit.dart` does two unrelated jobs: it owns the
 anchor registry the table of contents scrolls to, and it renders a section's
 heading. **92 files call it** — 57 under `components_docs/`, 27 in the gallery
 that no longer routes, 7 elsewhere. Rewriting it in place ripples through all
@@ -177,14 +177,14 @@ of them.
 So it is split rather than mutated:
 
 **`DocsAnchor`** — the anchor registry and `scrollTo`, extracted unchanged.
-`docs_layout.dart` finds sections by `ElSection.anchorKey`, and several page
+`docs_layout.dart` finds sections by `Section.anchorKey`, and several page
 tests find them the same way, so the registry must stay single.
 
 **`DocsSection`** — the presentation, rebuilt: full width, our type roles, and
 **no private measure cap on the description**. That cap is what leaves a gap on
 the right of every section today.
 
-`ElSection` becomes the two composed and forwards its two statics, so the other
+`Section` becomes the two composed and forwards its two statics, so the other
 91 call sites get the corrected behaviour with no edits.
 
 ### 4.6 Page
@@ -209,7 +209,7 @@ contents derived from the same list — so a section can never exist without a
 TOC entry, or a TOC entry without a section.
 
 **`DocsPageHeader`** — breadcrumb, title, description. Composed from
-`ElBreadcrumb` and `ElText`; supplied by `ComponentDocPage`, not by each page.
+`Breadcrumb` and `Text`; supplied by `ComponentDocPage`, not by each page.
 
 ## 5. What a Button section looks like
 
@@ -219,8 +219,8 @@ Every showcase section on the page is one declaration:
 ShowcaseSection(
   title: 'Destructive',
   description: '...',
-  specimen: ElButton(
-    variant: ElButtonVariant.destructive,
+  specimen: Button(
+    variant: ButtonVariant.destructive,
     onPressed: () {},
     child: const Text('Delete'),
   ),
@@ -256,7 +256,7 @@ Sixteen of those, one `InstallSection`, one `SnippetSection`, and eight
 | No uppercase | no uppercase type role is referenced under the documentation directories |
 | Button page | every declared section renders and appears in the TOC; both themes; narrow and wide |
 
-`ElAlert` appears in no part of this kit, so `pumpAndSettle` is safe here — but
+`Alert` appears in no part of this kit, so `pumpAndSettle` is safe here — but
 any test that pumps a page containing one must use `pump()`.
 
 ## 8. Verification

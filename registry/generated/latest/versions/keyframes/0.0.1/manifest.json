@@ -1,15 +1,15 @@
 {
   "name": "keyframes",
-  "type": "motion",
+  "type": "component",
   "version": "0.0.1",
   "description": "`@keyframes` — the reference's fourteen, transcribed whole.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/motion/keyframes.dart",
-      "target": "@motion/keyframes.dart",
-      "sha256": "48884e39d3e647978b04fe97c7784a615c3b1dd92859c87b3bf9f26dd825cce9"
+      "source": "lib/src/components/ui/keyframes.dart",
+      "target": "@ui/keyframes.dart",
+      "sha256": "86b5d9a43c4477af5fe0c5202ba43580c97395f7145888a75d4546305d7c5ded"
     }
   ],
   "registryDependencies": [
@@ -21,7 +21,7 @@
   "fonts": [],
   "shaders": [],
   "licenses": [],
-  "documentationRoute": "/docs/motion/keyframes",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/motion/keyframes.dart",
+  "documentationRoute": "/components/keyframes",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/keyframes.dart",
   "deprecated": false
 }

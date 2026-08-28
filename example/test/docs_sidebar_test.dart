@@ -1,18 +1,41 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_sidebar.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// Real test-view sizing only — [tester.view.physicalSize] plus
 /// [WidgetTester.view]'s own reset, never a synthetic `MediaQuery` override.
-/// [controller] is a single live [ElThemeController] a test can flip in place
-/// with [ElThemeController.setMode] instead of rebuilding a second tree for
+/// [controller] is a single live [ThemeController] a test can flip in place
+/// with [ThemeController.setMode] instead of rebuilding a second tree for
 /// the other theme.
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) {
-  return ElTheme(
+Widget _harness({required Widget child, required ThemeController controller}) {
+  return ThemeScope(
     controller: controller,
     child: MaterialApp(home: Material(child: child)),
   );
@@ -24,13 +47,13 @@ void _setViewSize(WidgetTester tester, Size size) {
   addTearDown(tester.view.reset);
 }
 
-/// Finds a [ElText] by its authored string, not by the [Text] widget it
+/// Finds a [StyledText] by its authored string, not by the [Text] widget it
 /// paints. A group label uses `.type-label`, which renders uppercase —
-/// [ElText.build] calls `text.toUpperCase()` before handing the string to
+/// [StyledText.build] calls `text.toUpperCase()` before handing the string to
 /// Flutter's own `Text` — so `find.text('Sections')` finds nothing; the
-/// source string only survives on [ElText] itself.
+/// source string only survives on [StyledText] itself.
 Finder _dsText(String text) => find.byWidgetPredicate(
-  (Widget widget) => widget is ElText && widget.text == text,
+  (Widget widget) => widget is StyledText && widget.text == text,
 );
 
 /// The reference two groups — "Sections" then "Components" — with "Button"
@@ -65,7 +88,7 @@ void main() {
       _setViewSize(tester, const Size(1440, 900));
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: DocsSidebar(groups: _groups(), onNavigate: (_) {}),
         ),
       );
@@ -101,7 +124,7 @@ void main() {
     _setViewSize(tester, const Size(1440, 900));
     await tester.pumpWidget(
       _harness(
-        controller: ElThemeController(mode: ElThemeMode.dark),
+        controller: ThemeController(mode: ColorMode.dark),
         child: DocsSidebar(groups: _groups(), onNavigate: (_) {}),
       ),
     );
@@ -133,11 +156,11 @@ void main() {
     expect(inactiveDecoration.color, isNull);
     expect(activeDecoration.color, isNot(inactiveDecoration.color));
 
-    final ElText activeText = tester.widget<ElText>(
-      find.descendant(of: active, matching: find.byType(ElText)).first,
+    final StyledText activeText = tester.widget<StyledText>(
+      find.descendant(of: active, matching: find.byType(StyledText)).first,
     );
-    final ElText inactiveText = tester.widget<ElText>(
-      find.descendant(of: inactive, matching: find.byType(ElText)).first,
+    final StyledText inactiveText = tester.widget<StyledText>(
+      find.descendant(of: inactive, matching: find.byType(StyledText)).first,
     );
     expect(activeText.color, isNot(inactiveText.color));
   });
@@ -148,7 +171,7 @@ void main() {
     _setViewSize(tester, const Size(1440, 900));
     await tester.pumpWidget(
       _harness(
-        controller: ElThemeController(mode: ElThemeMode.dark),
+        controller: ThemeController(mode: ColorMode.dark),
         child: DocsSidebar(groups: _groups(), onNavigate: (_) {}),
       ),
     );
@@ -173,7 +196,7 @@ void main() {
     final List<String> routes = <String>[];
     await tester.pumpWidget(
       _harness(
-        controller: ElThemeController(mode: ElThemeMode.dark),
+        controller: ThemeController(mode: ColorMode.dark),
         child: DocsSidebar(groups: _groups(), onNavigate: routes.add),
       ),
     );
@@ -190,7 +213,7 @@ void main() {
     _setViewSize(tester, const Size(1440, 900));
     await tester.pumpWidget(
       _harness(
-        controller: ElThemeController(mode: ElThemeMode.dark),
+        controller: ThemeController(mode: ColorMode.dark),
         child: DocsSidebar(
           groups: const <DocsSidebarGroup>[],
           onNavigate: (_) {},
@@ -209,9 +232,7 @@ void main() {
     'controller',
     (WidgetTester tester) async {
       _setViewSize(tester, const Size(1440, 900));
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       await tester.pumpWidget(
         _harness(
           controller: controller,
@@ -222,7 +243,7 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.text('Button'), findsOneWidget);
 
-      controller.setMode(ElThemeMode.light);
+      controller.setMode(ColorMode.light);
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       expect(find.text('Button'), findsOneWidget);
@@ -238,7 +259,7 @@ void main() {
     _setViewSize(tester, const Size(390, 844));
     await tester.pumpWidget(
       _harness(
-        controller: ElThemeController(mode: ElThemeMode.dark),
+        controller: ThemeController(mode: ColorMode.dark),
         child: SizedBox(
           width: 260,
           child: DocsSidebar(groups: _groups(), onNavigate: (_) {}),

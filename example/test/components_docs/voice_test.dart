@@ -6,16 +6,40 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// The single `DocsDisclosure` whose title is [title]. Matches the
 /// convention `button_test.dart` establishes: `DocsDisclosure.triggerKey`
@@ -69,7 +93,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: VoiceDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -89,7 +113,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in <String>[
           ..._liveWaveformParams,
@@ -107,41 +131,41 @@ void main() {
           );
         }
 
-        final ElMicControl listeningMic = tester.widget<ElMicControl>(
+        final MicControl listeningMic = tester.widget<MicControl>(
           find.descendant(
             of: find.byKey(
               const ValueKey<String>('voice-example:mic-listening'),
             ),
-            matching: find.byType(ElMicControl),
+            matching: find.byType(MicControl),
           ),
         );
         expect(listeningMic.listening, isTrue);
 
-        final ElMicControl disabledMic = tester.widget<ElMicControl>(
+        final MicControl disabledMic = tester.widget<MicControl>(
           find.descendant(
             of: find.byKey(
               const ValueKey<String>('voice-example:mic-disabled'),
             ),
-            matching: find.byType(ElMicControl),
+            matching: find.byType(MicControl),
           ),
         );
         expect(disabledMic.disabled, isTrue);
         expect(disabledMic.listening, isFalse);
 
-        final ElBarVisualizer activeBars = tester.widget<ElBarVisualizer>(
+        final BarVisualizer activeBars = tester.widget<BarVisualizer>(
           find.descendant(
             of: find.byKey(const ValueKey<String>('voice-example:bars-active')),
-            matching: find.byType(ElBarVisualizer),
+            matching: find.byType(BarVisualizer),
           ),
         );
         expect(activeBars.active, isTrue);
 
-        final ElLiveWaveform wideWaveform = tester.widget<ElLiveWaveform>(
+        final LiveWaveform wideWaveform = tester.widget<LiveWaveform>(
           find.descendant(
             of: find.byKey(
               const ValueKey<String>('voice-example:waveform-wide'),
             ),
-            matching: find.byType(ElLiveWaveform),
+            matching: find.byType(LiveWaveform),
           ),
         );
         expect(wideWaveform.width, 320);
@@ -150,11 +174,7 @@ void main() {
         expect(voiceDoc.name, 'voice');
         expect(
           voiceDoc.exports,
-          containsAll(<String>[
-            'ElLiveWaveform',
-            'ElBarVisualizer',
-            'ElMicControl',
-          ]),
+          containsAll(<String>['LiveWaveform', 'BarVisualizer', 'MicControl']),
         );
         expect(voiceDoc.command, 'elattar add voice');
         expect(destination, isNull);
@@ -170,7 +190,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const VoiceDocPage(),
         ),
       );
@@ -180,9 +200,14 @@ void main() {
         const ValueKey<String>('voice-preview:mic'),
       );
       expect(
-        tester.widget<ElMicControl>(
-          find.descendant(of: previewMic, matching: find.byType(ElMicControl)),
-        ).listening,
+        tester
+            .widget<MicControl>(
+              find.descendant(
+                of: previewMic,
+                matching: find.byType(MicControl),
+              ),
+            )
+            .listening,
         isFalse,
       );
 
@@ -190,37 +215,41 @@ void main() {
       await tester.pump();
 
       expect(
-        tester.widget<ElMicControl>(
-          find.descendant(of: previewMic, matching: find.byType(ElMicControl)),
-        ).listening,
+        tester
+            .widget<MicControl>(
+              find.descendant(
+                of: previewMic,
+                matching: find.byType(MicControl),
+              ),
+            )
+            .listening,
         isTrue,
       );
     });
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const VoiceDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const VoiceDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Four specimen stages: Preview, Live waveform, Bar visualizer,
-        // Mic control.
-        expect(find.byType(DocsShowcase), findsNWidgets(4));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Four specimen stages: Preview, Live waveform, Bar visualizer,
+      // Mic control.
+      expect(find.byType(DocsShowcase), findsNWidgets(4));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -253,7 +282,7 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const VoiceDocPage(),
         ),
       );
@@ -291,7 +320,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const VoiceDocPage(),
           ),
         );
@@ -320,15 +349,15 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const VoiceDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('voice-doc-article')),
           ),
@@ -337,10 +366,10 @@ void main() {
         // The SAME controller, flipped in place, one pump only: the
         // listening mic pill and the active bar visualiser both loop
         // forever and must never be settled on.
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('voice-doc-article')),
           ),

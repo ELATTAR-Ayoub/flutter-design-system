@@ -6,12 +6,12 @@
 ///
 /// **A family of parts, not one widget** — the same shape `field`
 /// documents. `agent_transcript.dart` declares ten exported classes: the two
-/// message shapes (`ElUserMessage`, `ElAgentMessage`), a disclosure chip for
-/// a tool call and a plain one for a browser action (`ElToolChip`,
-/// `ElActionChip`), the approval gate (`ElApprovalCard`), the
-/// empty-conversation card (`ElWelcomeCard`), three small entrance
-/// utilities (`ElTypingCursor`, `ElFadeUp`, `ElRowIn`), and the plain data
-/// class the welcome card's grid renders (`ElAgentCapability`). API
+/// message shapes (`UserMessage`, `AgentMessage`), a disclosure chip for
+/// a tool call and a plain one for a browser action (`ToolChip`,
+/// `ActionChip`), the approval gate (`ApprovalCard`), the
+/// empty-conversation card (`WelcomeCard`), three small entrance
+/// utilities (`TypingCursor`, `FadeUp`, `RowIn`), and the plain data
+/// class the welcome card's grid renders (`AgentCapability`). API
 /// Reference gives each of the ten its own `DocsApiTable`, with a rail
 /// sub-anchor per table.
 ///
@@ -22,7 +22,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -42,11 +54,11 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
           'A short real slice of a conversation: a user bubble, a settled '
           'tool chip, and flush agent prose with a live typing cursor — '
           'three of the transcript\'s own row kinds stacked the way '
-          'ElAgentConsole itself stacks turns.',
+          'AgentConsole itself stacks turns.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     InstallSection(
       id: 'install',
@@ -93,10 +105,10 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
       id: 'user-message',
       title: 'User message',
       description:
-          'ElUserMessage: right-aligned, capped at 85% of the available '
-          'width, agentMuted fill with a hairline agent/20 rim. '
+          'UserMessage: right-aligned, capped at 85% of the available '
+          'width, agentAccentMuted fill with a hairline agent/20 rim. '
           'Attachments render below the bubble in their own '
-          'ElAgentAttachmentList, capped to the same width.',
+          'AgentAttachmentList, capped to the same width.',
       specimen: _UserMessageSpecimen(),
       code: _userMessageCode,
       label: 'User message specimen view',
@@ -105,9 +117,9 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
       id: 'agent-message',
       title: 'Agent message',
       description:
-          'ElAgentMessage: no bubble, set flush in the column like body '
+          'AgentMessage: no bubble, set flush in the column like body '
           'copy — the reference\'s own reasoning is that long prose in a '
-          'speech bubble is harder to read for no gain. A ElTypingCursor '
+          'speech bubble is harder to read for no gain. A TypingCursor '
           'follows the text only while turn.streaming is true.',
       specimen: _AgentMessageSpecimen(),
       code: _agentMessageCode,
@@ -117,7 +129,7 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
       id: 'tool-chip',
       title: 'Tool chip',
       description:
-          'ElToolChip: closed by default, one sentence. Tap it to open '
+          'ToolChip: closed by default, one sentence. Tap it to open '
           'the real disclosure — arguments and result — the difference '
           'between a product that claims it did something and one that '
           'can be checked.',
@@ -129,9 +141,9 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
       id: 'action-chip',
       title: 'Action chip',
       description:
-          'ElActionChip: a step the browser performed rather than the '
+          'ActionChip: a step the browser performed rather than the '
           'server, kept visually distinct from a tool chip because the '
-          'user can verify these themselves. Three real ElActionTurn '
+          'user can verify these themselves. Three real ActionTurn '
           'outcomes: settled, failed, and declined.',
       specimen: _ActionChipSpecimen(),
       code: _actionChipCode,
@@ -141,21 +153,21 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
       id: 'approval-card',
       title: 'Approval card',
       description:
-          'ElApprovalCard: a real gate, not a rendering of one — pressing '
-          'Approve or Decline below genuinely calls the ElPendingApproval\'s '
+          'ApprovalCard: a real gate, not a rendering of one — pressing '
+          'Approve or Decline below genuinely calls the PendingApproval\'s '
           'own callback and the card is replaced by the outcome, the same '
           'way a live console resolves the promise the agent is blocked '
           'on.',
       specimen: _ApprovalCardSpecimen(),
       code: _approvalCardCode,
       label: 'Approval card specimen view',
-      minHeight: el(64),
+      minHeight: space(64),
     ),
     ShowcaseSection(
       id: 'welcome-card',
       title: 'Welcome card',
       description:
-          'ElWelcomeCard: what the assistant is, before it has said '
+          'WelcomeCard: what the assistant is, before it has said '
           'anything — skills as chips (arm the composer), suggestions as '
           'lines (send immediately). avatar is left unfilled here on '
           'purpose: the live cube renderer belongs to a different family '
@@ -165,7 +177,7 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
       specimen: _WelcomeCardSpecimen(),
       code: _welcomeCardCode,
       label: 'Welcome card specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     DisclosureSection(
       id: 'api',
@@ -174,19 +186,19 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
           'Every named constructor parameter and every static member each '
           'of the ten exported classes declares: one table each.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElUserMessage', anchor: 'api-eluser-message'),
-        DocsTocEntry(title: 'ElAgentMessage', anchor: 'api-elagent-message'),
-        DocsTocEntry(title: 'ElTypingCursor', anchor: 'api-eltyping-cursor'),
-        DocsTocEntry(title: 'ElToolChip', anchor: 'api-eltool-chip'),
-        DocsTocEntry(title: 'ElActionChip', anchor: 'api-elaction-chip'),
-        DocsTocEntry(title: 'ElApprovalCard', anchor: 'api-elapproval-card'),
-        DocsTocEntry(title: 'ElFadeUp', anchor: 'api-elfade-up'),
-        DocsTocEntry(title: 'ElRowIn', anchor: 'api-elrow-in'),
+        DocsTocEntry(title: 'UserMessage', anchor: 'api-eluser-message'),
+        DocsTocEntry(title: 'AgentMessage', anchor: 'api-elagent-message'),
+        DocsTocEntry(title: 'TypingCursor', anchor: 'api-eltyping-cursor'),
+        DocsTocEntry(title: 'ToolChip', anchor: 'api-eltool-chip'),
+        DocsTocEntry(title: 'ActionChip', anchor: 'api-elaction-chip'),
+        DocsTocEntry(title: 'ApprovalCard', anchor: 'api-elapproval-card'),
+        DocsTocEntry(title: 'FadeUp', anchor: 'api-elfade-up'),
+        DocsTocEntry(title: 'RowIn', anchor: 'api-elrow-in'),
         DocsTocEntry(
-          title: 'ElAgentCapability',
+          title: 'AgentCapability',
           anchor: 'api-elagent-capability',
         ),
-        DocsTocEntry(title: 'ElWelcomeCard', anchor: 'api-elwelcome-card'),
+        DocsTocEntry(title: 'WelcomeCard', anchor: 'api-elwelcome-card'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -276,9 +288,9 @@ class AgentTranscriptDocPage extends StatelessWidget {
       title: agentTranscriptDoc.title,
       description: agentTranscriptDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Agent Transcript'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Agent Transcript'),
     ],
     toc: agentTranscriptDocSpec.toc,
     previous: const DocsPageLink(
@@ -301,33 +313,33 @@ class _PreviewSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElContainers.sm),
+    constraints: const BoxConstraints(maxWidth: Containers.sm),
     child: Column(
       key: const ValueKey<String>('agent-transcript-preview'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const ElUserMessage(
-          turn: ElUserTurn(
+        const UserMessage(
+          turn: UserTurn(
             id: 'u1',
             text: 'Can you check the latest sales numbers?',
           ),
         ),
-        SizedBox(height: el(4)),
-        ElToolChip(
-          turn: const ElToolTurn(
+        SizedBox(height: space(4)),
+        ToolChip(
+          turn: const ToolTurn(
             id: 't1',
             name: 'fetch_sales',
             params: <String, Object?>{'window': '7d'},
-            status: ElAgentTurnStatus.ok,
+            status: AgentTurnStatus.ok,
             attempt: 1,
             ms: 640,
             result: <String, Object?>{'total': 18240, 'currency': 'USD'},
           ),
         ),
-        SizedBox(height: el(4)),
-        const ElAgentMessage(
-          turn: ElTextTurn(
+        SizedBox(height: space(4)),
+        const AgentMessage(
+          turn: TextTurn(
             id: 'a1',
             text: 'The last seven days totalled **\$18,240**.',
           ),
@@ -339,18 +351,18 @@ class _PreviewSpecimen extends StatelessWidget {
 
 const String _previewCode = '''Column(
   children: [
-    ElUserMessage(
-      turn: ElUserTurn(id: 'u1', text: 'Can you check the latest sales numbers?'),
+    UserMessage(
+      turn: UserTurn(id: 'u1', text: 'Can you check the latest sales numbers?'),
     ),
-    ElToolChip(
-      turn: ElToolTurn(
+    ToolChip(
+      turn: ToolTurn(
         id: 't1', name: 'fetch_sales', params: {'window': '7d'},
-        status: ElAgentTurnStatus.ok, attempt: 1, ms: 640,
+        status: AgentTurnStatus.ok, attempt: 1, ms: 640,
         result: {'total': 18240, 'currency': 'USD'},
       ),
     ),
-    ElAgentMessage(
-      turn: ElTextTurn(id: 'a1', text: 'The last seven days totalled **\\\$18,240**.'),
+    AgentMessage(
+      turn: TextTurn(id: 'a1', text: 'The last seven days totalled **\\\$18,240**.'),
     ),
   ],
 )''';
@@ -358,24 +370,24 @@ const String _previewCode = '''Column(
 const String _usageCode =
     '''import 'package:elattar_design_system/elattar_design_system.dart';
 
-const ElAgentMessage(
-  turn: ElTextTurn(id: 'a1', text: 'Done.'),
+const AgentMessage(
+  turn: TextTurn(id: 'a1', text: 'Done.'),
 )''';
 
 class _UserMessageSpecimen extends StatelessWidget {
   const _UserMessageSpecimen();
 
   @override
-  Widget build(BuildContext context) => const ElUserMessage(
-    turn: ElUserTurn(
+  Widget build(BuildContext context) => const UserMessage(
+    turn: UserTurn(
       id: 'u2',
       text: 'Here is the export you asked for.',
-      attachments: <ElAgentAttachment>[
-        ElAgentAttachment(
+      attachments: <AgentAttachment>[
+        AgentAttachment(
           id: 'f1',
           name: 'export.csv',
           mime: 'text/csv',
-          kind: ElAgentAttachmentKind.data,
+          kind: AgentAttachmentKind.data,
           size: 8192,
         ),
       ],
@@ -383,14 +395,14 @@ class _UserMessageSpecimen extends StatelessWidget {
   );
 }
 
-const String _userMessageCode = '''ElUserMessage(
-  turn: ElUserTurn(
+const String _userMessageCode = '''UserMessage(
+  turn: UserTurn(
     id: 'u2',
     text: 'Here is the export you asked for.',
     attachments: [
-      ElAgentAttachment(
+      AgentAttachment(
         id: 'f1', name: 'export.csv', mime: 'text/csv',
-        kind: ElAgentAttachmentKind.data, size: 8192,
+        kind: AgentAttachmentKind.data, size: 8192,
       ),
     ],
   ),
@@ -404,17 +416,18 @@ class _AgentMessageSpecimen extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElAgentMessage(
-        turn: ElTextTurn(
+      AgentMessage(
+        turn: TextTurn(
           id: 'a2',
-          text: 'Three sealed boxes match. The strongest is **Eclipse '
+          text:
+              'Three sealed boxes match. The strongest is **Eclipse '
               'Vault — 1st Edition**.',
         ),
       ),
       SizedBox(height: 16),
-      ElAgentMessage(
+      AgentMessage(
         key: ValueKey<String>('agent-transcript-message-streaming'),
-        turn: ElTextTurn(
+        turn: TextTurn(
           id: 'a3',
           text: 'Checking the balance first',
           streaming: true,
@@ -424,16 +437,16 @@ class _AgentMessageSpecimen extends StatelessWidget {
   );
 }
 
-const String _agentMessageCode = '''ElAgentMessage(
-  turn: ElTextTurn(
+const String _agentMessageCode = '''AgentMessage(
+  turn: TextTurn(
     id: 'a2',
     text: 'Three sealed boxes match. The strongest is **Eclipse Vault — 1st Edition**.',
   ),
 )
 
 // While the model is still writing, the cursor follows:
-ElAgentMessage(
-  turn: ElTextTurn(id: 'a3', text: 'Checking the balance first', streaming: true),
+AgentMessage(
+  turn: TextTurn(id: 'a3', text: 'Checking the balance first', streaming: true),
 )''';
 
 class _ToolChipSpecimen extends StatefulWidget {
@@ -445,13 +458,13 @@ class _ToolChipSpecimen extends StatefulWidget {
 
 class _ToolChipSpecimenState extends State<_ToolChipSpecimen> {
   @override
-  Widget build(BuildContext context) => ElToolChip(
+  Widget build(BuildContext context) => ToolChip(
     key: const ValueKey<String>('agent-transcript-tool-chip'),
-    turn: const ElToolTurn(
+    turn: const ToolTurn(
       id: 't2',
       name: 'search_inventory',
       params: <String, Object?>{'query': 'sealed booster boxes', 'limit': 3},
-      status: ElAgentTurnStatus.ok,
+      status: AgentTurnStatus.ok,
       attempt: 1,
       ms: 900,
       result: <String, Object?>{
@@ -462,11 +475,11 @@ class _ToolChipSpecimenState extends State<_ToolChipSpecimen> {
   );
 }
 
-const String _toolChipCode = '''ElToolChip(
-  turn: ElToolTurn(
+const String _toolChipCode = '''ToolChip(
+  turn: ToolTurn(
     id: 't2', name: 'search_inventory',
     params: {'query': 'sealed booster boxes', 'limit': 3},
-    status: ElAgentTurnStatus.ok, attempt: 1, ms: 900,
+    status: AgentTurnStatus.ok, attempt: 1, ms: 900,
     result: {'matches': 3, 'topResult': 'Eclipse Vault — 1st Edition'},
   ),
 )
@@ -480,54 +493,54 @@ class _ActionChipSpecimen extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      const ElActionChip(
+      const ActionChip(
         key: ValueKey<String>('agent-transcript-action-ok'),
-        turn: ElActionTurn(
+        turn: ActionTurn(
           id: 'ac1',
           action: 'navigate',
           params: <String, Object?>{'url': '/orders/482'},
-          status: ElAgentTurnStatus.ok,
+          status: AgentTurnStatus.ok,
           ms: 240,
         ),
       ),
-      SizedBox(height: el(2)),
-      const ElActionChip(
+      SizedBox(height: space(2)),
+      const ActionChip(
         key: ValueKey<String>('agent-transcript-action-error'),
-        turn: ElActionTurn(
+        turn: ActionTurn(
           id: 'ac2',
           action: 'click',
           params: <String, Object?>{'selector': '#confirm'},
-          status: ElAgentTurnStatus.error,
+          status: AgentTurnStatus.error,
           error: 'Element not found.',
         ),
       ),
-      SizedBox(height: el(2)),
-      const ElActionChip(
+      SizedBox(height: space(2)),
+      const ActionChip(
         key: ValueKey<String>('agent-transcript-action-declined'),
-        turn: ElActionTurn(
+        turn: ActionTurn(
           id: 'ac3',
           action: 'purchase_pack',
           params: <String, Object?>{'pack': 'Eclipse Vault', 'price': 129},
-          status: ElAgentTurnStatus.error,
-          approval: ElApprovalOutcome.rejected,
+          status: AgentTurnStatus.error,
+          approval: ApprovalOutcome.rejected,
         ),
       ),
     ],
   );
 }
 
-const String _actionChipCode = '''ElActionChip(
-  turn: ElActionTurn(
+const String _actionChipCode = '''ActionChip(
+  turn: ActionTurn(
     id: 'ac1', action: 'navigate', params: {'url': '/orders/482'},
-    status: ElAgentTurnStatus.ok, ms: 240,
+    status: AgentTurnStatus.ok, ms: 240,
   ),
 )
 
 // A step the user declined:
-ElActionChip(
-  turn: ElActionTurn(
+ActionChip(
+  turn: ActionTurn(
     id: 'ac3', action: 'purchase_pack', params: {'pack': 'Eclipse Vault'},
-    status: ElAgentTurnStatus.error, approval: ElApprovalOutcome.rejected,
+    status: AgentTurnStatus.error, approval: ApprovalOutcome.rejected,
   ),
 )''';
 
@@ -544,16 +557,16 @@ class _ApprovalCardSpecimenState extends State<_ApprovalCardSpecimen> {
   @override
   Widget build(BuildContext context) {
     if (_outcome != null) {
-      return ElText(
+      return StyledText(
         _outcome!,
-        ElType.small,
-        color: ElTheme.of(context).mutedForeground,
+        TextStyles.small,
+        color: ThemeScope.of(context).mutedForeground,
         key: const ValueKey<String>('agent-transcript-approval-outcome'),
       );
     }
-    return ElApprovalCard(
+    return ApprovalCard(
       key: const ValueKey<String>('agent-transcript-approval-card'),
-      approval: ElPendingApproval(
+      approval: PendingApproval(
         turnId: 'ac4',
         action: 'purchase_pack',
         params: const <String, Object?>{
@@ -569,8 +582,8 @@ class _ApprovalCardSpecimenState extends State<_ApprovalCardSpecimen> {
   }
 }
 
-const String _approvalCardCode = '''ElApprovalCard(
-  approval: ElPendingApproval(
+const String _approvalCardCode = '''ApprovalCard(
+  approval: PendingApproval(
     turnId: 'ac4',
     action: 'purchase_pack',
     params: {'pack': 'Eclipse Vault — 1st Edition', 'price': 129, 'currency': 'USD'},
@@ -583,22 +596,22 @@ class _WelcomeCardSpecimen extends StatelessWidget {
   const _WelcomeCardSpecimen();
 
   @override
-  Widget build(BuildContext context) => ElWelcomeCard(
+  Widget build(BuildContext context) => WelcomeCard(
     key: const ValueKey<String>('agent-transcript-welcome-card'),
     name: 'Vault Assistant',
     blurb: 'Ask about inventory, pricing, or your account.',
-    capabilities: const <ElAgentCapability>[
-      ElAgentCapability(
+    capabilities: const <AgentCapability>[
+      AgentCapability(
         id: 'search',
         label: 'Search inventory',
         hint: 'Find a card or a sealed box',
-        glyph: ElLucide.search,
+        glyph: Lucide.search,
       ),
-      ElAgentCapability(
+      AgentCapability(
         id: 'report',
         label: 'Export activity',
         hint: 'Download the last 30 days as CSV',
-        glyph: ElLucide.scrollText,
+        glyph: Lucide.scrollText,
       ),
     ],
     suggestions: const <String>[
@@ -606,16 +619,16 @@ class _WelcomeCardSpecimen extends StatelessWidget {
       'Show me everything under \$50.',
     ],
     onPick: (String text) {},
-    onUseCapability: (ElAgentCapability capability) {},
+    onUseCapability: (AgentCapability capability) {},
   );
 }
 
-const String _welcomeCardCode = '''ElWelcomeCard(
+const String _welcomeCardCode = '''WelcomeCard(
   name: 'Vault Assistant',
   blurb: 'Ask about inventory, pricing, or your account.',
   capabilities: const [
-    ElAgentCapability(id: 'search', label: 'Search inventory', glyph: ElLucide.search),
-    ElAgentCapability(id: 'report', label: 'Export activity', glyph: ElLucide.scrollText),
+    AgentCapability(id: 'search', label: 'Search inventory', glyph: Lucide.search),
+    AgentCapability(id: 'report', label: 'Export activity', glyph: Lucide.scrollText),
   ],
   suggestions: const ['What is Eclipse Vault worth right now?'],
   onPick: (text) => send(text),         // sends immediately
@@ -633,74 +646,62 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-eluser-message',
-        child: DocsApiTable(title: 'ElUserMessage', facts: _userMessageFacts),
+        child: DocsApiTable(title: 'UserMessage', facts: _userMessageFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagent-message',
-        child: DocsApiTable(
-          title: 'ElAgentMessage',
-          facts: _agentMessageFacts,
-        ),
+        child: DocsApiTable(title: 'AgentMessage', facts: _agentMessageFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eltyping-cursor',
-        child: DocsApiTable(
-          title: 'ElTypingCursor',
-          facts: _typingCursorFacts,
-        ),
+        child: DocsApiTable(title: 'TypingCursor', facts: _typingCursorFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-eltool-chip',
-        child: DocsApiTable(title: 'ElToolChip', facts: _toolChipFacts),
+        child: DocsApiTable(title: 'ToolChip', facts: _toolChipFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elaction-chip',
-        child: DocsApiTable(title: 'ElActionChip', facts: _actionChipFacts),
+        child: DocsApiTable(title: 'ActionChip', facts: _actionChipFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elapproval-card',
-        child: DocsApiTable(
-          title: 'ElApprovalCard',
-          facts: _approvalCardFacts,
-        ),
+        child: DocsApiTable(title: 'ApprovalCard', facts: _approvalCardFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elfade-up',
-        child: DocsApiTable(title: 'ElFadeUp', facts: _fadeUpFacts),
+        child: DocsApiTable(title: 'FadeUp', facts: _fadeUpFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elrow-in',
-        child: DocsApiTable(title: 'ElRowIn', facts: _rowInFacts),
+        child: DocsApiTable(title: 'RowIn', facts: _rowInFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elagent-capability',
-        child: DocsApiTable(
-          title: 'ElAgentCapability',
-          facts: _capabilityFacts,
-        ),
+        child: DocsApiTable(title: 'AgentCapability', facts: _capabilityFacts),
       ),
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elwelcome-card',
-        child: DocsApiTable(title: 'ElWelcomeCard', facts: _welcomeCardFacts),
+        child: DocsApiTable(title: 'WelcomeCard', facts: _welcomeCardFacts),
       ),
     ],
   );
 }
 
 const List<DocsApiFact> _userMessageFacts = <DocsApiFact>[
-  DocsApiFact(name: 'turn', type: 'ElUserTurn', description: 'Required.'),
+  DocsApiFact(name: 'turn', type: 'UserTurn', description: 'Required.'),
   DocsApiFact(
     name: 'imageBuilder',
-    type: 'Widget Function(BuildContext, ElAgentAttachment)?',
+    type: 'Widget Function(BuildContext, AgentAttachment)?',
     description: 'Optional. Passed through to the attachment list.',
   ),
   DocsApiFact(
@@ -709,38 +710,40 @@ const List<DocsApiFact> _userMessageFacts = <DocsApiFact>[
     description: 'Optional. Passed through to the attachment list.',
   ),
   DocsApiFact(
-    name: 'ElUserMessage.maxWidthFraction',
+    name: 'UserMessage.maxWidthFraction',
     type: 'static const double',
     description: '0.85 — the bubble\'s cap against the available width.',
   ),
   DocsApiFact(
-    name: 'ElUserMessage.gap',
+    name: 'UserMessage.gap',
     type: 'static double (get)',
     description: '8px between the bubble and the attachment tray below it.',
   ),
   DocsApiFact(
-    name: 'ElUserMessage.padX / padY',
+    name: 'UserMessage.padX / padY',
     type: 'static double (get)',
     description: '16px / 12px, the bubble\'s own padding.',
   ),
   DocsApiFact(
-    name: 'ElUserMessage.rimAlpha',
+    name: 'UserMessage.rimAlpha',
     type: 'static const double',
-    description: '0.20 — theme.agent at 20% for the bubble\'s hairline rim.',
+    description:
+        '0.20 — theme.agentAccent at 20% for the bubble\'s hairline rim.',
   ),
   DocsApiFact(
-    name: 'ElUserMessage.radius',
+    name: 'UserMessage.radius',
     type: 'static BorderRadius (get)',
-    description: '16 / 16 / 6 / 16 — rounded-xl with a squared bottom-right '
+    description:
+        '16 / 16 / 6 / 16 — rounded-xl with a squared bottom-right '
         'corner.',
   ),
 ];
 
 const List<DocsApiFact> _agentMessageFacts = <DocsApiFact>[
-  DocsApiFact(name: 'turn', type: 'ElTextTurn', description: 'Required.'),
+  DocsApiFact(name: 'turn', type: 'TextTurn', description: 'Required.'),
   DocsApiFact(
     name: 'imageBuilder',
-    type: 'Widget Function(BuildContext, ElAgentAttachment)?',
+    type: 'Widget Function(BuildContext, AgentAttachment)?',
     description: 'Optional.',
   ),
   DocsApiFact(
@@ -749,7 +752,7 @@ const List<DocsApiFact> _agentMessageFacts = <DocsApiFact>[
     description: 'Optional.',
   ),
   DocsApiFact(
-    name: 'ElAgentMessage.gap',
+    name: 'AgentMessage.gap',
     type: 'static double (get)',
     description: '12px between the prose and the attachment tray below it.',
   ),
@@ -757,34 +760,34 @@ const List<DocsApiFact> _agentMessageFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _typingCursorFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'ElTypingCursor.markHeight',
+    name: 'TypingCursor.markHeight',
     type: 'static double (get)',
     description: '16px — the caret\'s own height.',
   ),
   DocsApiFact(
-    name: 'ElTypingCursor.markWidth',
+    name: 'TypingCursor.markWidth',
     type: 'static const double',
-    description: 'ElWidths.hairline — one device pixel wide.',
+    description: 'BorderWidths.hairline — one device pixel wide.',
   ),
   DocsApiFact(
-    name: 'ElTypingCursor.inset',
+    name: 'TypingCursor.inset',
     type: 'static double (get)',
     description: '4px — the gap after the preceding text.',
   ),
 ];
 
 const List<DocsApiFact> _toolChipFacts = <DocsApiFact>[
-  DocsApiFact(name: 'turn', type: 'ElToolTurn', description: 'Required.'),
+  DocsApiFact(name: 'turn', type: 'ToolTurn', description: 'Required.'),
   DocsApiFact(
     name: 'toolStates',
-    type: 'ElToolStateMap?',
+    type: 'ToolStateMap?',
     description:
         'Optional. Same map the console reads, so the chip and the face '
         'never describe the same call differently.',
   ),
   DocsApiFact(
     name: 'renderResult',
-    type: 'Widget Function(ElToolTurn)?',
+    type: 'Widget Function(ToolTurn)?',
     description:
         'Optional. Turns a settled result into the product\'s own '
         'components, shown outside the disclosure — the answer, not the '
@@ -792,7 +795,7 @@ const List<DocsApiFact> _toolChipFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'imageBuilder',
-    type: 'Widget Function(BuildContext, ElAgentAttachment)?',
+    type: 'Widget Function(BuildContext, AgentAttachment)?',
     description: 'Optional.',
   ),
   DocsApiFact(
@@ -801,69 +804,70 @@ const List<DocsApiFact> _toolChipFacts = <DocsApiFact>[
     description: 'Optional.',
   ),
   DocsApiFact(
-    name: 'ElToolChip.gap',
+    name: 'ToolChip.gap',
     type: 'static double (get)',
     description: '8px between the chip and whatever it opens.',
   ),
   DocsApiFact(
-    name: 'ElToolChip.padX / padY',
+    name: 'ToolChip.padX / padY',
     type: 'static double (get)',
-    description: '12px / 4px — the chip\'s own override of the sm button '
+    description:
+        '12px / 4px — the chip\'s own override of the sm button '
         'rung.',
   ),
   DocsApiFact(
-    name: 'ElToolChip.contentGap',
+    name: 'ToolChip.contentGap',
     type: 'static double (get)',
     description:
         '8px between the glyph, the label, the elapsed time and the '
         'chevron.',
   ),
   DocsApiFact(
-    name: 'ElToolChip.chevronPx',
+    name: 'ToolChip.chevronPx',
     type: 'static double (get)',
     description: '12px.',
   ),
   DocsApiFact(
-    name: 'ElToolChip.chevronAlpha',
+    name: 'ToolChip.chevronAlpha',
     type: 'static const double',
     description: '0.60 — mutedForeground at 60%.',
   ),
   DocsApiFact(
-    name: 'ElToolChip.errorRimAlpha',
+    name: 'ToolChip.errorRimAlpha',
     type: 'static const double',
     description: '0.40 — destructive at 40% on a failed chip.',
   ),
   DocsApiFact(
-    name: 'ElToolChip.panelPad / panelGap',
+    name: 'ToolChip.panelPad / panelGap',
     type: 'static double (get)',
     description: '12px each, inside the disclosure panel.',
   ),
   DocsApiFact(
-    name: 'ElToolChip.panelFillAlpha',
+    name: 'ToolChip.panelFillAlpha',
     type: 'static const double',
     description: '0.40 — theme.muted at 40%.',
   ),
   DocsApiFact(
-    name: 'ElToolChip.detailGap',
+    name: 'ToolChip.detailGap',
     type: 'static double (get)',
     description: '4px inside one labelled detail.',
   ),
   DocsApiFact(
-    name: 'ElToolChip.valueMaxHeight',
+    name: 'ToolChip.valueMaxHeight',
     type: 'static double (get)',
     description: '256px cap on a raw argument or result value.',
   ),
 ];
 
 const List<DocsApiFact> _actionChipFacts = <DocsApiFact>[
-  DocsApiFact(name: 'turn', type: 'ElActionTurn', description: 'Required.'),
+  DocsApiFact(name: 'turn', type: 'ActionTurn', description: 'Required.'),
   DocsApiFact(
-    name: 'ElActionChip.padX / padY / gap',
+    name: 'ActionChip.padX / padY / gap',
     type: 'static double (get)',
     description: '12px / 4px / 8px.',
   ),
   DocsApiFact(
-    name: 'ElActionChip.rimAlpha',
+    name: 'ActionChip.rimAlpha',
     type: 'static const double',
     description:
         '0.40 — destructive/40 on a failed action, warning/40 on one the '
@@ -874,7 +878,7 @@ const List<DocsApiFact> _actionChipFacts = <DocsApiFact>[
 const List<DocsApiFact> _approvalCardFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'approval',
-    type: 'ElPendingApproval',
+    type: 'PendingApproval',
     description: 'Required.',
   ),
   DocsApiFact(
@@ -882,46 +886,47 @@ const List<DocsApiFact> _approvalCardFacts = <DocsApiFact>[
     type: 'String Function(String action, Map<String, Object?> params)?',
     description:
         'Optional. Turns the raw action into a sentence a human can '
-        'decide on; falls back to ElApprovalCard.defaultSentence.',
+        'decide on; falls back to ApprovalCard.defaultSentence.',
   ),
   DocsApiFact(
-    name: 'ElApprovalCard.pad / gap',
+    name: 'ApprovalCard.pad / gap',
     type: 'static double (get)',
     description: '16px / 12px.',
   ),
   DocsApiFact(
-    name: 'ElApprovalCard.headGap / headLineGap',
+    name: 'ApprovalCard.headGap / headLineGap',
     type: 'static double (get)',
     description: '12px / 4px.',
   ),
   DocsApiFact(
-    name: 'ElApprovalCard.glyphPx / glyphTop',
+    name: 'ApprovalCard.glyphPx / glyphTop',
     type: 'static double (get)',
     description: '16px / 4px.',
   ),
   DocsApiFact(
-    name: 'ElApprovalCard.rimAlpha / washAlpha',
+    name: 'ApprovalCard.rimAlpha / washAlpha',
     type: 'static const double',
-    description: '0.40 / 0.08 — ElPalette.warning at each alpha.',
+    description: '0.40 / 0.08 — Palette.warning at each alpha.',
   ),
   DocsApiFact(
-    name: 'ElApprovalCard.paramsMaxHeight / paramsPad',
+    name: 'ApprovalCard.paramsMaxHeight / paramsPad',
     type: 'static double (get)',
     description: '160px / 8px, on the parameter block.',
   ),
   DocsApiFact(
-    name: 'ElApprovalCard.actionGap',
+    name: 'ApprovalCard.actionGap',
     type: 'static double (get)',
     description: '8px between Approve and Decline.',
   ),
   DocsApiFact(
-    name: 'ElApprovalCard.declineReason',
+    name: 'ApprovalCard.declineReason',
     type: 'static const String',
-    description: '"The user declined this action." — handed to reject() '
+    description:
+        '"The user declined this action." — handed to reject() '
         'verbatim.',
   ),
   DocsApiFact(
-    name: 'ElApprovalCard.defaultSentence(approval)',
+    name: 'ApprovalCard.defaultSentence(approval)',
     type: 'static String Function',
     description:
         '"The assistant wants to run \\"{action}\\"{ on target}." when no '
@@ -932,11 +937,11 @@ const List<DocsApiFact> _approvalCardFacts = <DocsApiFact>[
 const List<DocsApiFact> _fadeUpFacts = <DocsApiFact>[
   DocsApiFact(name: 'child', type: 'Widget', description: 'Required.'),
   DocsApiFact(
-    name: 'ElFadeUp.rise',
+    name: 'FadeUp.rise',
     type: 'static double (get)',
     description:
         '10px — the translateY the child rises from as it fades in, over '
-        'ElDurations.slow on ElCurves.out.',
+        'MotionDurations.slow on MotionCurves.enter.',
   ),
 ];
 
@@ -944,15 +949,15 @@ const List<DocsApiFact> _rowInFacts = <DocsApiFact>[
   DocsApiFact(name: 'index', type: 'int', description: 'Required.'),
   DocsApiFact(name: 'child', type: 'Widget', description: 'Required.'),
   DocsApiFact(
-    name: 'ElRowIn.slide',
+    name: 'RowIn.slide',
     type: 'static double (get)',
     description: '10px — the translateX the child slides in from.',
   ),
   DocsApiFact(
-    name: 'ElRowIn.delayFor(index)',
+    name: 'RowIn.delayFor(index)',
     type: 'static Duration Function',
     description:
-        'ElDurations.tick × (1 + index / 2) — 80ms, then 40ms more per '
+        'MotionDurations.tick × (1 + index / 2) — 80ms, then 40ms more per '
         'row.',
   ),
 ];
@@ -967,8 +972,8 @@ const List<DocsApiFact> _capabilityFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'glyph',
-    type: 'ElLucideGlyph?',
-    description: 'Optional. Defaults to ElLucide.sparkles when omitted.',
+    type: 'LucideGlyph?',
+    description: 'Optional. Defaults to Lucide.sparkles when omitted.',
   ),
 ];
 
@@ -977,7 +982,7 @@ const List<DocsApiFact> _welcomeCardFacts = <DocsApiFact>[
   DocsApiFact(name: 'blurb', type: 'String?', description: 'Optional.'),
   DocsApiFact(
     name: 'capabilities',
-    type: 'List<ElAgentCapability>',
+    type: 'List<AgentCapability>',
     description:
         'Defaults to []. Skills, as chips; clicking one arms the composer '
         'rather than sending.',
@@ -996,7 +1001,7 @@ const List<DocsApiFact> _welcomeCardFacts = <DocsApiFact>[
   ),
   DocsApiFact(
     name: 'onUseCapability',
-    type: 'void Function(ElAgentCapability)?',
+    type: 'void Function(AgentCapability)?',
     description: 'Optional.',
   ),
   DocsApiFact(
@@ -1012,59 +1017,60 @@ const List<DocsApiFact> _welcomeCardFacts = <DocsApiFact>[
         'the 80px box either way.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.maxCapabilities',
+    name: 'WelcomeCard.maxCapabilities',
     type: 'static const int',
     description: '4 — capabilities beyond the fourth are not shown.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.outerPadY',
+    name: 'WelcomeCard.outerPadY',
     type: 'static double (get)',
     description: '16px.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.columnWidth',
+    name: 'WelcomeCard.columnWidth',
     type: 'static double (get)',
-    description: 'ElContainers.md — the card\'s own max width.',
+    description: 'Containers.md — the card\'s own max width.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.avatarPx',
+    name: 'WelcomeCard.avatarPx',
     type: 'static double (get)',
     description: '80px.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.nameTop / blurbTop / listTop',
+    name: 'WelcomeCard.nameTop / blurbTop / listTop',
     type: 'static double (get)',
     description: '12px / 4px / 16px.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.gridGap',
+    name: 'WelcomeCard.gridGap',
     type: 'static double (get)',
     description: '8px between capability chips.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.suggestionGap',
+    name: 'WelcomeCard.suggestionGap',
     type: 'static double (get)',
-    description: 'ElWidths.hairline — one device pixel between suggestion '
+    description:
+        'BorderWidths.hairline — one device pixel between suggestion '
         'rows.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.capabilityGlyphPx',
+    name: 'WelcomeCard.capabilityGlyphPx',
     type: 'static double (get)',
     description: '14px.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.capabilityHoverRimAlpha',
+    name: 'WelcomeCard.capabilityHoverRimAlpha',
     type: 'static const double',
-    description: '0.50 — theme.agent at 50% on hover.',
+    description: '0.50 — theme.agentAccent at 50% on hover.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.capabilityLabel',
-    type: 'static ElTypeSpec (get)',
+    name: 'WelcomeCard.capabilityLabel',
+    type: 'static TextStyleToken (get)',
     description: 'small\'s size with caption\'s leading, weight 500.',
   ),
   DocsApiFact(
-    name: 'ElWelcomeCard.suggestionLabel',
-    type: 'static ElTypeSpec (get)',
+    name: 'WelcomeCard.suggestionLabel',
+    type: 'static TextStyleToken (get)',
     description: 'small\'s own size and leading, weight 500.',
   ),
 ];
@@ -1073,8 +1079,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Tool chip: running',
     treatment:
-        'A spinning loaderCircle (or rotateCw on attempt > 1), theme.agent '
-        '(or warningInk on a retry), anim-spin at ElDurations.spin, '
+        'A spinning loaderCircle (or rotateCw on attempt > 1), theme.agentAccent '
+        '(or warningText on a retry), anim-spin at MotionDurations.spin, '
         'linear — "a spinner that eases is a spinner that looks broken."',
     userSignal: 'A spinning glyph in front of the tool\'s name.',
   ),
@@ -1083,21 +1089,23 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'A static check (success) or triangleAlert (error) glyph; a '
         'failed chip also gains a destructive/40 border.',
-    userSignal: 'A checkmark or a warning triangle in place of the '
+    userSignal:
+        'A checkmark or a warning triangle in place of the '
         'spinner.',
   ),
   DocsStateFact(
     state: 'Tool chip: open / closed',
     treatment:
         'Local bool _open toggled on press; the chevron rotates a quarter '
-        'turn over ElDurations.transitionDefault, and the disclosure '
+        'turn over MotionDurations.normal, and the disclosure '
         'panel mounts or unmounts entirely rather than collapsing to '
         'zero height.',
     userSignal: 'Arguments and result appear or disappear on tap.',
   ),
   DocsStateFact(
     state: 'Agent message: streaming',
-    treatment: 'turn.streaming true appends a ElTypingCursor, pulsing on '
+    treatment:
+        'turn.streaming true appends a TypingCursor, pulsing on '
         'anim-pulse-live.',
     userSignal: 'A blinking mark follows the last character.',
   ),
@@ -1113,8 +1121,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Welcome card: entrance',
     treatment:
-        'ElSpringUpEntrance on the column, ElPopInEntrance on the avatar '
-        'slot (running independently of each other), ElRowIn staggered '
+        'SpringUpEntrance on the column, PopInEntrance on the avatar '
+        'slot (running independently of each other), RowIn staggered '
         'per capability chip at 80ms + 40ms×index.',
     userSignal:
         'The whole card springs up and the avatar pops in on arrival; '
@@ -1124,7 +1132,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Reduced motion',
     treatment:
         'Every AnimationController in this file routes its duration '
-        'through elAnimationDuration, which is Duration.zero under '
+        'through effectiveMotionDuration, which is Duration.zero under '
         'MediaQuery.disableAnimations.',
     userSignal:
         'Every entrance and the typing cursor\'s pulse land on their end '
@@ -1137,22 +1145,22 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElToolChip is a Button underneath (aria-expanded\'s Flutter '
+      _bullets(ThemeScope.of(context), <String>[
+        'ToolChip is a Button underneath (aria-expanded\'s Flutter '
             'analogue): pressing it toggles Semantics.expanded through '
-            'ElButton\'s own contract, documented on the Button page.',
-        'ElActionChip carries no Semantics of its own beyond what its '
-            'child ElText nodes contribute — it is not interactive, '
+            'Button\'s own contract, documented on the Button page.',
+        'ActionChip carries no Semantics of its own beyond what its '
+            'child StyledText nodes contribute — it is not interactive, '
             'unlike a tool chip.',
-        'ElApprovalCard wraps itself in Semantics(container: true, '
+        'ApprovalCard wraps itself in Semantics(container: true, '
             'label: "The assistant is asking permission"), so a screen '
             'reader announces the gate as a unit before reading into it.',
-        'ElWelcomeCard\'s suggestion rows and capability chips are both '
-            'real ElButtons, so both carry a real accessible name and '
+        'WelcomeCard\'s suggestion rows and capability chips are both '
+            'real Buttons, so both carry a real accessible name and '
             'both are properly disabled together via the one disabled '
             'flag.',
-        'ElUserMessage and ElAgentMessage carry no Semantics of their '
-            'own: the markdown text underneath (ElAgentMarkdown) and the '
+        'UserMessage and AgentMessage carry no Semantics of their '
+            'own: the markdown text underneath (AgentMarkdown) and the '
             'attachment list are where any live-region or role behaviour '
             'in this family actually lives, and both are documented on '
             'their own pages.',
@@ -1164,14 +1172,14 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElToolChip\'s disclosure trigger is a real ElButton, so it '
+      _bullets(ThemeScope.of(context), <String>[
+        'ToolChip\'s disclosure trigger is a real Button, so it '
             'inherits that widget\'s own Enter/Space activation and '
             'focus-visible ring — see the Button page for the exact '
             'ladder.',
-        'ElApprovalCard\'s Approve and Decline are both real ElButtons '
+        'ApprovalCard\'s Approve and Decline are both real Buttons '
             'too, keyboard-operable the same way.',
-        'ElUserMessage, ElAgentMessage, and ElActionChip take no focus '
+        'UserMessage, AgentMessage, and ActionChip take no focus '
             'and handle no key of their own: they are read-only rows.',
         'No custom FocusTraversalPolicy anywhere in this file: Tab and '
             'Shift+Tab walk whatever order the surrounding transcript '
@@ -1184,15 +1192,15 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElUserMessage is the one width-aware part: a LayoutBuilder caps '
+      _bullets(ThemeScope.of(context), <String>[
+        'UserMessage is the one width-aware part: a LayoutBuilder caps '
             'the bubble at maxWidthFraction (85%) of whatever it is '
             'given, so the same tree reads correctly whether the console '
             'is 360px or 1440px wide.',
-        'Every other part in this file (ElAgentMessage, the chips, the '
+        'Every other part in this file (AgentMessage, the chips, the '
             'cards) fills whatever width its parent hands it and reads '
             'no MediaQuery for layout.',
-        'ElWelcomeCard caps itself at columnWidth (ElContainers.md) and '
+        'WelcomeCard caps itself at columnWidth (Containers.md) and '
             'centres inside whatever it is given, rather than growing '
             'with the viewport.',
       ]);
@@ -1216,7 +1224,8 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Component imports',
-            value: 'agent_attachments.dart, agent_core.dart, '
+            value:
+                'agent_attachments.dart, agent_core.dart, '
                 'agent_markdown.dart, button.dart, icon.dart, '
                 'icon_paths.g.dart',
             description:
@@ -1227,13 +1236,14 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Foundation imports',
-            value: 'foundation/colors.dart, foundation/motion.dart, '
+            value:
+                'foundation/colors.dart, foundation/motion.dart, '
                 'foundation/spacing.dart, foundation/theme.dart, '
                 'foundation/typography.dart, motion/keyframes.dart, '
                 'text_layout.dart, theme_scope.dart',
             description:
-                'motion/keyframes.dart supplies ElPulseLive (the typing '
-                'cursor\'s pulse) and ElSpringUp/ElPopIn (the welcome '
+                'motion/keyframes.dart supplies LivePulseMotion (the typing '
+                'cursor\'s pulse) and SpringEntranceMotion/EntranceMotion (the welcome '
                 'card\'s entrance) — the registry\'s own keyframes '
                 'dependency.',
           ),
@@ -1246,7 +1256,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(
@@ -1276,31 +1286,33 @@ class _ThemingContent extends StatelessWidget {
     title: 'What actually varies with the theme',
     facts: const <DocsInstallFact>[
       DocsInstallFact(
-        label: 'theme.agent / theme.agentMuted',
+        label: 'theme.agentAccent / theme.agentAccentMuted',
         value: 'the user bubble',
         description:
-            'agentMuted fills the bubble; agent at 20% rims it and at '
+            'agentAccentMuted fills the bubble; agent at 20% rims it and at '
             '100% paints the typing cursor — "the one place --agent is a '
             'solid fill rather than a foreground."',
       ),
       DocsInstallFact(
         label: 'theme.foreground',
         value: 'agent prose',
-        description: 'Merged over the whole flush-text subtree via '
+        description:
+            'Merged over the whole flush-text subtree via '
             'DefaultTextStyle.',
       ),
       DocsInstallFact(
-        label: 'theme.destructive / theme.destructiveInk',
+        label: 'theme.destructive / theme.destructiveText',
         value: 'a failed tool or action chip',
-        description: 'The rim and, on the tool chip, the error message '
+        description:
+            'The rim and, on the tool chip, the error message '
             'text.',
       ),
       DocsInstallFact(
-        label: 'ElPalette.warning',
+        label: 'Palette.warning',
         value: 'the approval card',
         description:
             'A fixed token, not a theme.* getter — the same reasoning '
-            'ElButtonVariant.premium uses on the Button page: a warning '
+            'ButtonVariant.premium uses on the Button page: a warning '
             'reads as the same colour in both themes.',
       ),
       DocsInstallFact(
@@ -1315,15 +1327,19 @@ class _ThemingContent extends StatelessWidget {
   );
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );

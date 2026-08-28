@@ -2,7 +2,7 @@
 ///
 /// `bubble` HAS a real `registry/components/bubble.json` manifest:
 /// [dependencies] below is that manifest's own `registryDependencies` list,
-/// copied verbatim — `press-motion` (the reaction pill's own press feedback)
+/// copied verbatim — `press` (the reaction pill's own press feedback)
 /// and `source-foundation`. `page.dart` renders the real `elattar add
 /// bubble` command from it rather than a "not available yet" disclosure.
 library;
@@ -18,18 +18,18 @@ const ComponentDocEntry bubbleDoc = ComponentDocEntry(
       'one variant flag so the painted surface can be swapped for a real '
       'button without restating a class.',
   // registry/components/bubble.json's own registryDependencies, verbatim.
-  dependencies: <String>['press-motion', 'source-foundation'],
+  dependencies: <String>['press', 'source-foundation'],
   exports: <String>[
-    'ElBubbleAlign',
-    'ElBubbleVariant',
-    'ElBubbleSide',
-    'ElShowCount',
-    'ElBubbleGroup',
-    'ElBubble',
-    'ElBubbleAlignScope',
-    'ElBubbleContent',
-    'ElBubbleReaction',
-    'ElBubbleReactions',
+    'BubbleAlign',
+    'BubbleVariant',
+    'BubbleSide',
+    'ShowCount',
+    'BubbleGroup',
+    'Bubble',
+    'BubbleAlignScope',
+    'BubbleContent',
+    'BubbleReaction',
+    'BubbleReactions',
   ],
   sourcePath: 'lib/src/components/bubble.dart',
 );

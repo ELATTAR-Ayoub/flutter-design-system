@@ -5,15 +5,15 @@
 /// ## What this page is
 ///
 /// The reference builds it out of eleven files: `components/ui/chart.tsx` (the
-/// shadcn wrapper), `components/el/chart-motion.ts` (the timing hook) and nine
-/// modules under `components/el/charts/`, `data.ts`, `area`, `bar`, `line`,
+/// shadcn wrapper), `components/space/chart-motion.ts` (the timing hook) and nine
+/// modules under `components/space/charts/`, `data.ts`, `area`, `bar`, `line`,
 /// `pie`, `radar`, `radial`, `tooltip`, `state`, `skeletons`, plus the two
 /// hand-built figures `unit-activity` and `conversion-funnel`. The wrapper and
 /// the drawing engine are ported into the package (`chart.dart`,
 /// `chart_geometry.dart`, `chart_cartesian.dart`, `chart_polar.dart`); every
 /// **specimen** lives here, because that is where the reference puts it: the
-/// `components/el/` tree is this file's counterpart, exactly as `kit.dart` is
-/// `components/el/kit.tsx`'s.
+/// `components/space/` tree is this file's counterpart, exactly as `kit.dart` is
+/// `components/space/kit.tsx`'s.
 ///
 /// ## The three sweeps every family file carries, and what they became
 ///
@@ -22,14 +22,14 @@
 ///  1. `hsl(var(--chart-N))` → `var(--color-chart-N)`. The registry's pre-v4
 ///     spelling; `--chart-N` holds a whole colour here, so `hsl()` around it is
 ///     invalid and the series paints nothing. In Dart the tokens are
-///     [ElThemeData.chart1] … `chart5`, read off the theme.
+///     [ThemeTokens.chart1] … `chart5`, read off the theme.
 ///  2. `var(--color-<seriesKey>)` → the direct chart tokens. shadcn's
 ///     `ChartStyle` mints a per-container custom property at runtime, which
 ///     exists in the browser and nowhere in source; `check:refs` fails it.
 ///     There is no `ChartStyle` here for the same reason the page's own note
 ///     gives: the five tokens are already declared once per theme.
 ///  3. Every animated element takes `{...useChartMotion()}`. Here that is
-///     [ElChartMotion], and the caller never types a duration.
+///     [ChartMotion], and the caller never types a duration.
 ///
 /// ## Drift register: recorded, shipped as written
 ///
@@ -89,7 +89,7 @@
 /// easing keywords and no `cubic-bezier`, so `--ease-out` could not be threaded
 /// through and the keyword `ease-out` was passed instead: a different curve,
 /// documented on the page rather than hidden. The port has the token in hand
-/// and uses CSS's `ease-out` anyway ([ElChartMotion.curve]); reproducing the
+/// and uses CSS's `ease-out` anyway ([ChartMotion.curve]); reproducing the
 /// system's own `--ease-out` here would make these charts move differently from
 /// the reference's.
 library;
@@ -97,7 +97,20 @@ library;
 import 'dart:math' as math;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
+import 'package:flutter/widgets.dart' as flutter show AspectRatio;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -112,11 +125,11 @@ const double _measure3xl = 768;
 // allow-hardcoded: framework container scale with no token to read it from.
 const double _measureXl = 576;
 
-/// `ElMetaItem` is a record typedef, so a plain string value has to be wrapped
+/// `MetaItem` is a record typedef, so a plain string value has to be wrapped
 /// in the [InlineSpan] the row renders.
-ElMetaItem _meta(String k, String v) => (k: k, v: TextSpan(text: v));
+MetaItem _meta(String k, String v) => (k: k, v: TextSpan(text: v));
 
-/* ── Fixtures, `components/el/charts/data.ts` ───────────────────────────── */
+/* ── Fixtures, `components/space/charts/data.ts` ───────────────────────────── */
 
 /// One footprint, shared by every chart specimen and by the skeleton that
 /// stands in for it.
@@ -124,8 +137,8 @@ ElMetaItem _meta(String k, String v) => (k: k, v: TextSpan(text: v));
 /// `data.ts`'s own reasoning: §5 asks a skeleton to match what replaces it —
 /// same height, same padding, same radius: and the only way to be sure of that
 /// across seventy charts is for all of them to name the same constant. It is
-/// [ElChartContainer.plotHeight], 256, and nothing here restates it.
-double get _plotHeight => ElChartContainer.plotHeight;
+/// [ChartContainer.plotHeight], 256, and nothing here restates it.
+double get _plotHeight => ChartContainer.plotHeight;
 
 /// 9 variants: area default/linear/step · bar default/horizontal/label · line
 /// default/linear/step.
@@ -318,7 +331,7 @@ List<Map<String, Object?>> _buildDailyVisits() {
   return <Map<String, Object?>>[
     for (int i = 0; i < pairs.length; i++)
       <String, Object?>{
-        'date': ElDateFormat.dayKey(first.add(Duration(days: i))),
+        'date': DateFormat.dayKey(first.add(Duration(days: i))),
         'desktop': pairs[i][0],
         'mobile': pairs[i][1],
       },
@@ -336,7 +349,7 @@ List<Map<String, Object?>> _buildDailyVisits() {
 class _ChartInk {
   const _ChartInk(this.theme);
 
-  final ElThemeData theme;
+  final ThemeTokens theme;
 
   /// `var(--color-chart-N)` for N in 1…5.
   Color slot(int n) => switch (n) {
@@ -359,41 +372,41 @@ class _ChartInk {
 
   /* ── The four configs the registry reuses ─────────────────────────────── */
 
-  ElChartConfig get desktop => ElChartConfig(<String, ElChartSeries>{
-    'desktop': ElChartSeries(label: 'Desktop', color: slot(1)),
+  ChartConfig get desktop => ChartConfig(<String, ChartSeries>{
+    'desktop': ChartSeries(label: 'Desktop', color: slot(1)),
   });
 
-  ElChartConfig get desktopMobile => ElChartConfig(<String, ElChartSeries>{
-    'desktop': ElChartSeries(label: 'Desktop', color: slot(1)),
-    'mobile': ElChartSeries(label: 'Mobile', color: slot(2)),
+  ChartConfig get desktopMobile => ChartConfig(<String, ChartSeries>{
+    'desktop': ChartSeries(label: 'Desktop', color: slot(1)),
+    'mobile': ChartSeries(label: 'Mobile', color: slot(2)),
   });
 
   /// *"`visitors` carries the axis label and deliberately has no colour: it is
   /// the value key, not a series."*
-  ElChartConfig get browser => ElChartConfig(<String, ElChartSeries>{
-    'visitors': const ElChartSeries(label: 'Visitors'),
-    'chrome': ElChartSeries(label: 'Chrome', color: slot(1)),
-    'safari': ElChartSeries(label: 'Safari', color: slot(2)),
-    'firefox': ElChartSeries(label: 'Firefox', color: slot(3)),
-    'edge': ElChartSeries(label: 'Edge', color: slot(4)),
-    'other': ElChartSeries(label: 'Other', color: slot(5)),
+  ChartConfig get browser => ChartConfig(<String, ChartSeries>{
+    'visitors': const ChartSeries(label: 'Visitors'),
+    'chrome': ChartSeries(label: 'Chrome', color: slot(1)),
+    'safari': ChartSeries(label: 'Safari', color: slot(2)),
+    'firefox': ChartSeries(label: 'Firefox', color: slot(3)),
+    'edge': ChartSeries(label: 'Edge', color: slot(4)),
+    'other': ChartSeries(label: 'Other', color: slot(5)),
   });
 
-  ElChartConfig get sport => ElChartConfig(<String, ElChartSeries>{
-    'running': ElChartSeries(label: 'Running', color: slot(1)),
-    'swimming': ElChartSeries(label: 'Swimming', color: slot(2)),
+  ChartConfig get sport => ChartConfig(<String, ChartSeries>{
+    'running': ChartSeries(label: 'Running', color: slot(1)),
+    'swimming': ChartSeries(label: 'Swimming', color: slot(2)),
   });
 
   /// Month keys, because the slices are months rather than series.
-  ElChartConfig get pieMonths => ElChartConfig(<String, ElChartSeries>{
-    'visitors': const ElChartSeries(label: 'Visitors'),
-    'desktop': const ElChartSeries(label: 'Desktop'),
-    'mobile': const ElChartSeries(label: 'Mobile'),
-    'january': ElChartSeries(label: 'January', color: slot(1)),
-    'february': ElChartSeries(label: 'February', color: slot(2)),
-    'march': ElChartSeries(label: 'March', color: slot(3)),
-    'april': ElChartSeries(label: 'April', color: slot(4)),
-    'may': ElChartSeries(label: 'May', color: slot(5)),
+  ChartConfig get pieMonths => ChartConfig(<String, ChartSeries>{
+    'visitors': const ChartSeries(label: 'Visitors'),
+    'desktop': const ChartSeries(label: 'Desktop'),
+    'mobile': const ChartSeries(label: 'Mobile'),
+    'january': ChartSeries(label: 'January', color: slot(1)),
+    'february': ChartSeries(label: 'February', color: slot(2)),
+    'march': ChartSeries(label: 'March', color: slot(3)),
+    'april': ChartSeries(label: 'April', color: slot(4)),
+    'may': ChartSeries(label: 'May', color: slot(5)),
   });
 }
 
@@ -405,29 +418,29 @@ String _month3(Object? value) => '$value'.substring(0, 3);
 /// `new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" })`.
 String _shortDate(Object? value) {
   final DateTime d = DateTime.parse('$value');
-  return '${ElDateFormat.monthsShort[d.month - 1]} ${d.day}';
+  return '${DateFormat.monthsShort[d.month - 1]} ${d.day}';
 }
 
 /// …with `year: "numeric"`: the two interactive tooltips.
 String _shortDateYear(Object? value) {
   final DateTime d = DateTime.parse('$value');
-  return '${ElDateFormat.monthsShort[d.month - 1]} ${d.day}, ${d.year}';
+  return '${DateFormat.monthsShort[d.month - 1]} ${d.day}, ${d.year}';
 }
 
 /// `{ weekday: "short" }`: the tooltip family's whole X axis.
 ///
-/// `ElDateFormat` carries the long names and the narrow ones; en-US's short
+/// `DateFormat` carries the long names and the narrow ones; en-US's short
 /// weekday is the long name's first three letters, so this derives rather than
 /// declaring a seventh list.
 String _weekdayShort(Object? value) {
   final DateTime d = DateTime.parse('$value');
-  return ElDateFormat.weekdaysLong[d.weekday % 7].substring(0, 3);
+  return DateFormat.weekdaysLong[d.weekday % 7].substring(0, 3);
 }
 
 /// `{ day: "numeric", month: "long", year: "numeric" }`, `TooltipLabelFormatter`.
 String _longDate(Object? value) {
   final DateTime d = DateTime.parse('$value');
-  return '${ElDateFormat.monthsLong[d.month - 1]} ${d.day}, ${d.year}';
+  return '${DateFormat.monthsLong[d.month - 1]} ${d.day}, ${d.year}';
 }
 
 /// The bar's corner radius, off the ladder.
@@ -439,7 +452,7 @@ String _longDate(Object? value) {
 /// bar drawn three ways across ten files: and 6px is where they average."*
 /// The port names the rung instead of reading it, which is the same single
 /// source of truth with one fewer indirection.
-const double _barRadius = ElRadii.sm;
+const double _barRadius = Radii.sm;
 
 /// `[0, 0, r, r]`: the bottom of a stack.
 const List<double> _radiiBottom = <double>[0, 0, _barRadius, _barRadius];
@@ -458,10 +471,10 @@ const List<double> _radiiAll = <double>[
 /// `radial.tsx`'s two rungs. *"`10` is exactly the `md` rung already, on a
 /// 30px-thick single ring… `5` is not a rung at all and moves to `sm` (6), the
 /// same rung every bar corner in this system already takes."*
-const double _ringRadius = ElRadii.md;
-const double _stackRadius = ElRadii.sm;
+const double _ringRadius = Radii.md;
+const double _stackRadius = Radii.sm;
 
-/* ── ChartStates, `components/el/charts/state.tsx` ──────────────────────── */
+/* ── ChartStates, `components/space/charts/state.tsx` ──────────────────────── */
 
 /// Which family's shape the loading placeholder draws.
 enum _SkeletonKind { area, bar, line, pie, radar, radial, tooltip }
@@ -474,7 +487,7 @@ enum _SkeletonKind { area, bar, line, pie, radar, radial, tooltip }
 ///    `ChartStates`, never a grid of `Panel`s containing them.
 ///  * **The buttons are a `ToggleGroup`, and that is a rule not a preference.**
 ///    §4: a group with an active option owns one pill that travels.
-///  * **The swap is one event.** `anim-swap-in` on the arriving content and
+///  * **The swap is one event.** `anim-content-change` on the arriving content and
 ///    nothing on the leaving content, replayed by a changed key: which is also
 ///    what remounts the chart so its own entrance replays at the same moment.
 ///  * **`controls` is a component TYPE, not a node.** A control strip owns
@@ -516,7 +529,7 @@ class _ChartStatesState extends State<_ChartStates> {
 
   @override
   Widget build(BuildContext context) {
-    final Widget slot = ElSwapIn(
+    final Widget slot = ContentChange(
       replayKey: ValueKey<_ChartState>(_state),
       child: switch (_state) {
         _ChartState.loading => _ChartSkeleton(kind: widget.skeleton),
@@ -527,7 +540,7 @@ class _ChartStatesState extends State<_ChartStates> {
       },
     );
 
-    return ElPanel(
+    return Panel(
       label: widget.title,
       note: widget.note,
       child: Column(
@@ -535,12 +548,12 @@ class _ChartStatesState extends State<_ChartStates> {
         children: <Widget>[
           Align(
             alignment: Alignment.centerLeft,
-            child: ElToggleGroup(
-              size: ElToggleSize.sm,
-              items: const <ElToggleGroupItem>[
-                ElToggleGroupItem(label: 'Empty'),
-                ElToggleGroupItem(label: 'Loading'),
-                ElToggleGroupItem(label: 'Ready'),
+            child: ToggleGroup(
+              size: ToggleSize.sm,
+              items: const <ToggleGroupItem>[
+                ToggleGroupItem(label: 'Empty'),
+                ToggleGroupItem(label: 'Loading'),
+                ToggleGroupItem(label: 'Ready'),
               ],
               selectedIndex: _state.index,
               // Radix clears the value when the active item is pressed again.
@@ -555,7 +568,7 @@ class _ChartStatesState extends State<_ChartStates> {
           // The 20px below the toggle group belongs to the panel, not to the
           // slot, so a control strip lands in it and the slot keeps its own
           // footprint clean.
-          SizedBox(height: el(5)),
+          SizedBox(height: space(5)),
           if (widget.controls != null)
             widget.controls!(context, slot)
           else
@@ -578,31 +591,31 @@ class _ChartEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
       height: _plotHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(ElRadii.lg),
-          border: Border.all(color: theme.border, width: ElWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.lg),
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
         child: Center(
-          child: ElEmpty(
+          child: Empty(
             children: <Widget>[
-              ElEmptyHeader(
+              EmptyHeader(
                 children: <Widget>[
                   const _ChartEmptyMedia(),
-                  const ElEmptyTitle('No data in this range'),
-                  const ElEmptyDescription(
+                  const EmptyTitle('No data in this range'),
+                  const EmptyDescription(
                     'Nothing came back for the period selected. Load the '
                     'sample series to see the shape this chart draws.',
                   ),
                 ],
               ),
-              ElEmptyContent(
+              EmptyContent(
                 children: <Widget>[
-                  ElButton(
-                    size: ElButtonSize.sm,
+                  Button(
+                    size: ButtonSize.sm,
                     onPressed: onLoad,
                     child: const Text('Load sample data'),
                   ),
@@ -618,40 +631,40 @@ class _ChartEmpty extends StatelessWidget {
 
 /// `EmptyMedia variant="icon"` carrying `ChartLineIcon`.
 ///
-/// **A page-local copy of `ElEmptyMedia`, and the reason is narrow.** That
-/// widget takes a [ElIconGlyph]: the curated set: and `chart-line` is not in
+/// **A page-local copy of `EmptyMedia`, and the reason is narrow.** That
+/// widget takes a [IconGlyph]: the curated set: and `chart-line` is not in
 /// it; it lives only in the generated lucide registry. Widening `empty.dart`
 /// would be a change to the feedback family's file, so the tile is rebuilt here
-/// out of `ElEmptyMedia`'s own public geometry: nothing below restates a
+/// out of `EmptyMedia`'s own public geometry: nothing below restates a
 /// number, and if that widget retunes, this follows.
 class _ChartEmptyMedia extends StatelessWidget {
   const _ChartEmptyMedia();
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: ElEmptyMedia.marginBottom),
+      padding: EdgeInsets.only(bottom: EmptyMedia.marginBottom),
       child: Container(
-        width: ElEmptyMedia.box,
-        height: ElEmptyMedia.box,
+        width: EmptyMedia.box,
+        height: EmptyMedia.box,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: theme.muted,
-          borderRadius: BorderRadius.circular(ElEmptyMedia.radius),
+          borderRadius: BorderRadius.circular(EmptyMedia.radius),
         ),
-        child: ElIcon.lucide(
-          ElLucide.chartLine,
-          sizePx: ElEmptyMedia.glyphSize,
-          strokeOverride: ElEmptyMedia.glyphStroke,
-          tone: ElIconTone.inherit,
+        child: Icon.lucide(
+          Lucide.chartLine,
+          sizePx: EmptyMedia.glyphSize,
+          strokeOverride: EmptyMedia.glyphStroke,
+          tone: IconTone.inherit,
         ),
       ),
     );
   }
 }
 
-/* ── Skeletons, `components/el/charts/skeletons.tsx` ────────────────────── */
+/* ── Skeletons, `components/space/charts/skeletons.tsx` ────────────────────── */
 
 /// One skeleton per chart family, each shaped like the family it stands in for.
 ///
@@ -666,7 +679,7 @@ class _ChartEmptyMedia extends StatelessWidget {
 /// paint inside an SVG `<path>`, so a skeleton drawn as SVG geometry would be a
 /// still silhouette with the shimmer running behind it: the one thing on the
 /// page that looks loaded while it is loading."* Flutter has no such split: a
-/// [ElSkeleton] inside a [ClipPath] shimmers inside the curve, which is what
+/// [Skeleton] inside a [ClipPath] shimmers inside the curve, which is what
 /// the `clip-path` was for.
 class _ChartSkeleton extends StatelessWidget {
   const _ChartSkeleton({required this.kind});
@@ -702,30 +715,30 @@ class _CartesianSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final int ticks = shape == _Shape.bar ? 5 : _ChartSkeleton._series.length;
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: el(2)),
+      padding: EdgeInsets.symmetric(vertical: space(2)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Expanded(child: _Plot(shape: shape)),
-          SizedBox(height: el(2)),
+          SizedBox(height: space(2)),
           SizedBox(
-            height: ElWidths.hairline,
+            height: BorderWidths.hairline,
             child: ColoredBox(color: theme.border),
           ),
-          SizedBox(height: el(2)),
+          SizedBox(height: space(2)),
           Row(
             children: <Widget>[
               for (int i = 0; i < ticks; i++) ...<Widget>[
-                if (i > 0) SizedBox(width: el(4)),
+                if (i > 0) SizedBox(width: space(4)),
                 Expanded(
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: el(8)),
-                      child: ElSkeleton(height: el(2)),
+                      constraints: BoxConstraints(maxWidth: space(8)),
+                      child: Skeleton(height: space(2)),
                     ),
                   ),
                 ),
@@ -753,11 +766,11 @@ class _Plot extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
             for (int i = 0; i < bars.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(width: el(4)),
+              if (i > 0) SizedBox(width: space(4)),
               Expanded(
-                child: ElSkeleton(
+                child: Skeleton(
                   height: c.maxHeight * (100 - bars[i]) / 100,
-                  radius: ElRadii.sm,
+                  radius: Radii.sm,
                 ),
               ),
             ],
@@ -774,7 +787,7 @@ class _Plot extends StatelessWidget {
                 series: _ChartSkeleton._series,
                 stroke: shape == _Shape.line,
               ),
-              child: const ElSkeleton(radius: 0),
+              child: const Skeleton(radius: 0),
             ),
           ),
           if (shape == _Shape.line)
@@ -782,12 +795,12 @@ class _Plot extends StatelessWidget {
               Positioned(
                 left:
                     c.maxWidth * i / (_ChartSkeleton._series.length - 1) -
-                    el(1),
-                top: c.maxHeight * _ChartSkeleton._series[i] / 100 - el(1),
-                child: ElSkeleton(
-                  width: el(2),
-                  height: el(2),
-                  radius: ElRadii.pill,
+                    space(1),
+                top: c.maxHeight * _ChartSkeleton._series[i] / 100 - space(1),
+                child: Skeleton(
+                  width: space(2),
+                  height: space(2),
+                  radius: Radii.full,
                 ),
               ),
         ],
@@ -844,9 +857,9 @@ class _PolarSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.symmetric(vertical: el(2)),
+    padding: EdgeInsets.symmetric(vertical: space(2)),
     child: Center(
-      child: AspectRatio(
+      child: flutter.AspectRatio(
         aspectRatio: 1,
         child: Stack(
           children: <Widget>[
@@ -856,7 +869,7 @@ class _PolarSkeleton extends StatelessWidget {
                   opacity: a.opacity,
                   child: ClipPath(
                     clipper: _AnnulusClipper(a),
-                    child: const ElSkeleton(radius: 0),
+                    child: const Skeleton(radius: 0),
                   ),
                 ),
               ),
@@ -962,25 +975,25 @@ class _TooltipSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints c) => Stack(
         children: <Widget>[
           const Positioned.fill(child: _CartesianSkeleton(shape: _Shape.bar)),
           Positioned(
-            left: c.maxWidth / 2 - ElChartTooltipContent.minWidth / 2,
+            left: c.maxWidth / 2 - ChartTooltipContent.minWidth / 2,
             top: c.maxHeight * 14 / 100,
             child: Container(
-              width: ElChartTooltipContent.minWidth,
-              padding: EdgeInsets.all(el(2.5)),
+              width: ChartTooltipContent.minWidth,
+              padding: EdgeInsets.all(space(2.5)),
               decoration: BoxDecoration(
                 color: theme.background,
-                borderRadius: BorderRadius.circular(ElRadii.lg),
+                borderRadius: BorderRadius.circular(Radii.lg),
                 border: Border.all(
                   color: theme.border.withValues(alpha: 0.5),
-                  width: ElWidths.hairline,
+                  width: BorderWidths.hairline,
                 ),
-                boxShadow: ElShadows.e2.outerShadows(theme),
+                boxShadow: Shadows.md.outerShadows(theme),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -989,21 +1002,21 @@ class _TooltipSkeleton extends StatelessWidget {
                   FractionallySizedBox(
                     alignment: Alignment.centerLeft,
                     widthFactor: 0.6,
-                    child: ElSkeleton(height: el(2)),
+                    child: Skeleton(height: space(2)),
                   ),
                   for (int i = 0; i < 2; i++) ...<Widget>[
-                    SizedBox(height: el(2)),
+                    SizedBox(height: space(2)),
                     Row(
                       children: <Widget>[
-                        ElSkeleton(
-                          width: el(2),
-                          height: el(2),
-                          radius: ElRadii.xs,
+                        Skeleton(
+                          width: space(2),
+                          height: space(2),
+                          radius: Radii.xs,
                         ),
-                        SizedBox(width: el(1.5)),
-                        Expanded(child: ElSkeleton(height: el(2))),
-                        SizedBox(width: el(1.5)),
-                        ElSkeleton(width: el(4), height: el(2)),
+                        SizedBox(width: space(1.5)),
+                        Expanded(child: Skeleton(height: space(2))),
+                        SizedBox(width: space(1.5)),
+                        Skeleton(width: space(4), height: space(2)),
                       ],
                     ),
                   ],
@@ -1017,14 +1030,14 @@ class _TooltipSkeleton extends StatelessWidget {
   }
 }
 
-/* ── Area, `components/el/charts/area.tsx` ──────────────────────────────── */
+/* ── Area, `components/space/charts/area.tsx` ──────────────────────────────── */
 
 /// The plot, in the container every specimen shares.
-Widget _plot(ElChartConfig config, Widget chart) =>
-    ElChartContainer(config: config, child: chart);
+Widget _plot(ChartConfig config, Widget chart) =>
+    ChartContainer(config: config, child: chart);
 
 /// The X axis nine of the ten area variants share, byte for byte.
-ElChartAxis _monthAxis() => const ElChartAxis(
+ChartAxis _monthAxis() => const ChartAxis(
   dataKey: 'month',
   tickLine: false,
   axisLine: false,
@@ -1035,21 +1048,21 @@ ElChartAxis _monthAxis() => const ElChartAxis(
 /// `chart-area-default`: one series, natural curve.
 Widget _areaDefault(_ChartInk ink) => _plot(
   ink.desktop,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktop,
     // Plot maths, not the 8-point scale: recharts' own margin box.
-    margin: const ElChartMargin(left: 12, right: 12),
-    grid: const ElChartGrid(vertical: false),
+    margin: const ChartMargin(left: 12, right: 12),
+    grid: const ChartGrid(vertical: false),
     xAxis: _monthAxis(),
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
-      indicator: ElChartIndicator.line,
+      indicator: ChartIndicator.line,
     ),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.area,
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.area,
         dataKey: 'desktop',
-        curve: ElCurveType.natural,
+        curve: CurveType.natural,
         fill: ink.slot(1),
         fillOpacity: 0.4,
         stroke: ink.slot(1),
@@ -1060,15 +1073,15 @@ Widget _areaDefault(_ChartInk ink) => _plot(
 
 Widget _areaLinear(_ChartInk ink) => _plot(
   ink.desktop,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktop,
-    margin: const ElChartMargin(left: 12, right: 12),
-    grid: const ElChartGrid(vertical: false),
+    margin: const ChartMargin(left: 12, right: 12),
+    grid: const ChartGrid(vertical: false),
     xAxis: _monthAxis(),
-    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.area,
+    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.area,
         dataKey: 'desktop',
         fill: ink.slot(1),
         fillOpacity: 0.4,
@@ -1081,27 +1094,27 @@ Widget _areaLinear(_ChartInk ink) => _plot(
 /// The registry's `chartConfig.desktop.icon` is `Activity`, unused by this
 /// variant's own markup but read by the tooltip's indicator slot: the gap
 /// `area.tsx` documents, where the config's icon bypasses `Icon` entirely.
-/// Flutter's builder slot has no such constraint, so it goes through [ElIcon].
+/// Flutter's builder slot has no such constraint, so it goes through [Icon].
 Widget _areaStep(_ChartInk ink) => _plot(
-  ElChartConfig(<String, ElChartSeries>{
-    'desktop': ElChartSeries(
+  ChartConfig(<String, ChartSeries>{
+    'desktop': ChartSeries(
       label: 'Desktop',
       color: ink.slot(1),
       icon: (BuildContext context) =>
-          const ElIcon.lucide(ElLucide.activity, size: ElIconSize.xs),
+          const Icon.lucide(Lucide.activity, size: IconSize.xs),
     ),
   }),
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktop,
-    margin: const ElChartMargin(left: 12, right: 12),
-    grid: const ElChartGrid(vertical: false),
+    margin: const ChartMargin(left: 12, right: 12),
+    grid: const ChartGrid(vertical: false),
     xAxis: _monthAxis(),
-    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.area,
+    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.area,
         dataKey: 'desktop',
-        curve: ElCurveType.step,
+        curve: CurveType.step,
         fill: ink.slot(1),
         fillOpacity: 0.4,
         stroke: ink.slot(1),
@@ -1112,20 +1125,20 @@ Widget _areaStep(_ChartInk ink) => _plot(
 
 /// The two stacked areas six variants build on. `mobile` is declared first, so
 /// it is drawn at the bottom of the stack.
-List<ElChartSeriesSpec> _stackedAreas(_ChartInk ink) => <ElChartSeriesSpec>[
-  ElChartSeriesSpec(
-    kind: ElChartSeriesKind.area,
+List<ChartSeriesSpec> _stackedAreas(_ChartInk ink) => <ChartSeriesSpec>[
+  ChartSeriesSpec(
+    kind: ChartSeriesKind.area,
     dataKey: 'mobile',
-    curve: ElCurveType.natural,
+    curve: CurveType.natural,
     stackId: 'a',
     fill: ink.slot(2),
     fillOpacity: 0.4,
     stroke: ink.slot(2),
   ),
-  ElChartSeriesSpec(
-    kind: ElChartSeriesKind.area,
+  ChartSeriesSpec(
+    kind: ChartSeriesKind.area,
     dataKey: 'desktop',
-    curve: ElCurveType.natural,
+    curve: CurveType.natural,
     stackId: 'a',
     fill: ink.slot(1),
     fillOpacity: 0.4,
@@ -1135,12 +1148,12 @@ List<ElChartSeriesSpec> _stackedAreas(_ChartInk ink) => <ElChartSeriesSpec>[
 
 Widget _areaStacked(_ChartInk ink) => _plot(
   ink.desktopMobile,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktopMobile,
-    margin: const ElChartMargin(left: 12, right: 12),
-    grid: const ElChartGrid(vertical: false),
+    margin: const ChartMargin(left: 12, right: 12),
+    grid: const ChartGrid(vertical: false),
     xAxis: _monthAxis(),
-    tooltip: const ElChartTooltipSpec(cursor: false),
+    tooltip: const ChartTooltipSpec(cursor: false),
     series: _stackedAreas(ink),
   ),
 );
@@ -1188,24 +1201,24 @@ const List<Map<String, Object?>> _areaExpandData = <Map<String, Object?>>[
 ];
 
 Widget _areaStackedExpand(_ChartInk ink) => _plot(
-  ink.desktopMobile.plus(<String, ElChartSeries>{
-    'other': ElChartSeries(label: 'Other', color: ink.slot(3)),
+  ink.desktopMobile.plus(<String, ChartSeries>{
+    'other': ChartSeries(label: 'Other', color: ink.slot(3)),
   }),
-  ElCartesianChart(
+  CartesianChart(
     data: _areaExpandData,
-    margin: const ElChartMargin(left: 12, right: 12, top: 12),
+    margin: const ChartMargin(left: 12, right: 12, top: 12),
     stackOffsetExpand: true,
-    grid: const ElChartGrid(vertical: false),
+    grid: const ChartGrid(vertical: false),
     xAxis: _monthAxis(),
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
-      indicator: ElChartIndicator.line,
+      indicator: ChartIndicator.line,
     ),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.area,
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.area,
         dataKey: 'other',
-        curve: ElCurveType.natural,
+        curve: CurveType.natural,
         stackId: 'a',
         fill: ink.slot(3),
         fillOpacity: 0.1,
@@ -1218,16 +1231,16 @@ Widget _areaStackedExpand(_ChartInk ink) => _plot(
 
 Widget _areaLegend(_ChartInk ink) => _plot(
   ink.desktopMobile,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktopMobile,
-    margin: const ElChartMargin(left: 12, right: 12),
-    grid: const ElChartGrid(vertical: false),
+    margin: const ChartMargin(left: 12, right: 12),
+    grid: const ChartGrid(vertical: false),
     xAxis: _monthAxis(),
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
-      indicator: ElChartIndicator.line,
+      indicator: ChartIndicator.line,
     ),
-    legend: const ElChartLegendSpec(),
+    legend: const ChartLegendSpec(),
     series: _stackedAreas(ink),
   ),
 );
@@ -1235,30 +1248,30 @@ Widget _areaLegend(_ChartInk ink) => _plot(
 /// `TrendingDown` on `desktop` and `TrendingUp` on `mobile` is the registry's
 /// own pairing, not a claim these charts render onto that shape.
 Widget _areaIcons(_ChartInk ink) => _plot(
-  ElChartConfig(<String, ElChartSeries>{
-    'desktop': ElChartSeries(
+  ChartConfig(<String, ChartSeries>{
+    'desktop': ChartSeries(
       label: 'Desktop',
       color: ink.slot(1),
       icon: (BuildContext context) =>
-          const ElIcon.lucide(ElLucide.trendingDown, size: ElIconSize.sm),
+          const Icon.lucide(Lucide.trendingDown, size: IconSize.sm),
     ),
-    'mobile': ElChartSeries(
+    'mobile': ChartSeries(
       label: 'Mobile',
       color: ink.slot(2),
       icon: (BuildContext context) =>
-          const ElIcon.lucide(ElLucide.trendingUp, size: ElIconSize.sm),
+          const Icon.lucide(Lucide.trendingUp, size: IconSize.sm),
     ),
   }),
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktopMobile,
-    margin: const ElChartMargin(left: 12, right: 12),
-    grid: const ElChartGrid(vertical: false),
+    margin: const ChartMargin(left: 12, right: 12),
+    grid: const ChartGrid(vertical: false),
     xAxis: _monthAxis(),
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
-      indicator: ElChartIndicator.line,
+      indicator: ChartIndicator.line,
     ),
-    legend: const ElChartLegendSpec(),
+    legend: const ChartLegendSpec(),
     series: _stackedAreas(ink),
   ),
 );
@@ -1282,25 +1295,25 @@ LinearGradient _gradientFor(Color colour, {double opacity = 1}) =>
 
 Widget _areaGradient(_ChartInk ink) => _plot(
   ink.desktopMobile,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktopMobile,
-    margin: const ElChartMargin(left: 12, right: 12),
-    grid: const ElChartGrid(vertical: false),
+    margin: const ChartMargin(left: 12, right: 12),
+    grid: const ChartGrid(vertical: false),
     xAxis: _monthAxis(),
-    tooltip: const ElChartTooltipSpec(cursor: false),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.area,
+    tooltip: const ChartTooltipSpec(cursor: false),
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.area,
         dataKey: 'mobile',
-        curve: ElCurveType.natural,
+        curve: CurveType.natural,
         stackId: 'a',
         gradient: _gradientFor(ink.slot(2), opacity: 0.4),
         stroke: ink.slot(2),
       ),
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.area,
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.area,
         dataKey: 'desktop',
-        curve: ElCurveType.natural,
+        curve: CurveType.natural,
         stackId: 'a',
         gradient: _gradientFor(ink.slot(1), opacity: 0.4),
         stroke: ink.slot(1),
@@ -1313,19 +1326,19 @@ Widget _areaGradient(_ChartInk ink) => _plot(
 /// which claws 20 of the Y axis's 60px back out of the plot's left edge.
 Widget _areaAxes(_ChartInk ink) => _plot(
   ink.desktopMobile,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktopMobile,
-    margin: const ElChartMargin(left: -20, right: 12),
-    grid: const ElChartGrid(vertical: false),
+    margin: const ChartMargin(left: -20, right: 12),
+    grid: const ChartGrid(vertical: false),
     xAxis: _monthAxis(),
-    yAxis: const ElChartAxis(
-      type: ElChartAxisType.number,
+    yAxis: const ChartAxis(
+      type: ChartAxisType.number,
       tickLine: false,
       axisLine: false,
       tickMargin: 8,
       tickCount: 3,
     ),
-    tooltip: const ElChartTooltipSpec(cursor: false),
+    tooltip: const ChartTooltipSpec(cursor: false),
     series: _stackedAreas(ink),
   ),
 );
@@ -1399,13 +1412,13 @@ class _AreaInteractiveRange extends InheritedWidget {
 /// The plot only: no wrapper, so its footprint is `PLOT` exactly like the
 /// other nine.
 Widget _areaInteractive(BuildContext context, _ChartInk ink) => _plot(
-  ink.desktopMobile.plus(<String, ElChartSeries>{
-    'visitors': const ElChartSeries(label: 'Visitors'),
+  ink.desktopMobile.plus(<String, ChartSeries>{
+    'visitors': const ChartSeries(label: 'Visitors'),
   }),
-  ElCartesianChart(
+  CartesianChart(
     data: _AreaInteractive.filtered(_AreaInteractiveRange.of(context)),
-    grid: const ElChartGrid(vertical: false),
-    xAxis: const ElChartAxis(
+    grid: const ChartGrid(vertical: false),
+    xAxis: const ChartAxis(
       dataKey: 'date',
       tickLine: false,
       axisLine: false,
@@ -1413,24 +1426,24 @@ Widget _areaInteractive(BuildContext context, _ChartInk ink) => _plot(
       minTickGap: 32,
       tickFormatter: _shortDate,
     ),
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
       labelFormatter: _shortDateLabel,
     ),
-    legend: const ElChartLegendSpec(),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.area,
+    legend: const ChartLegendSpec(),
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.area,
         dataKey: 'mobile',
-        curve: ElCurveType.natural,
+        curve: CurveType.natural,
         stackId: 'a',
         gradient: _gradientFor(ink.slot(2)),
         stroke: ink.slot(2),
       ),
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.area,
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.area,
         dataKey: 'desktop',
-        curve: ElCurveType.natural,
+        curve: CurveType.natural,
         stackId: 'a',
         gradient: _gradientFor(ink.slot(1)),
         stroke: ink.slot(1),
@@ -1439,13 +1452,13 @@ Widget _areaInteractive(BuildContext context, _ChartInk ink) => _plot(
   ),
 );
 
-String _shortDateLabel(String label, List<ElChartTooltipItem> items) =>
+String _shortDateLabel(String label, List<ChartTooltipItem> items) =>
     _shortDate(label);
 
-String _shortDateYearLabel(String label, List<ElChartTooltipItem> items) =>
+String _shortDateYearLabel(String label, List<ChartTooltipItem> items) =>
     _shortDateYear(label);
 
-String _longDateLabel(String label, List<ElChartTooltipItem> items) =>
+String _longDateLabel(String label, List<ChartTooltipItem> items) =>
     _longDate(label);
 
 /// The `Select` strip, rendering unconditionally with `children` exactly once —
@@ -1467,19 +1480,19 @@ class _RangeStrip extends StatelessWidget {
   final double? width;
   final String label;
   final String placeholder;
-  final List<ElSelectOption<String>> options;
+  final List<SelectOption<String>> options;
 
   /// `w-40` on the area strip.
-  static double get rangeWidth => el(40);
+  static double get rangeWidth => space(40);
 
   /// `w-36` on the pie strip.
-  static double get monthWidth => el(36);
+  static double get monthWidth => space(36);
 
-  static const List<ElSelectOption<String>> _rangeOptions =
-      <ElSelectOption<String>>[
-        ElSelectOption<String>(value: '90d', label: 'Last 3 months'),
-        ElSelectOption<String>(value: '30d', label: 'Last 30 days'),
-        ElSelectOption<String>(value: '7d', label: 'Last 7 days'),
+  static const List<SelectOption<String>> _rangeOptions =
+      <SelectOption<String>>[
+        SelectOption<String>(value: '90d', label: 'Last 3 months'),
+        SelectOption<String>(value: '30d', label: 'Last 30 days'),
+        SelectOption<String>(value: '7d', label: 'Last 7 days'),
       ];
 
   @override
@@ -1488,7 +1501,7 @@ class _RangeStrip extends StatelessWidget {
     children: <Widget>[
       Align(
         alignment: Alignment.centerRight,
-        child: ElSelect<String>(
+        child: Select<String>(
           width: width ?? rangeWidth,
           label: label,
           placeholder: placeholder,
@@ -1498,16 +1511,16 @@ class _RangeStrip extends StatelessWidget {
         ),
       ),
       // `mb-5`.
-      SizedBox(height: el(5)),
+      SizedBox(height: space(5)),
       child,
     ],
   );
 }
 
-/* ── Bar, `components/el/charts/bar.tsx` ────────────────────────────────── */
+/* ── Bar, `components/space/charts/bar.tsx` ────────────────────────────────── */
 
 /// The X axis six of the ten bar variants share (`tickMargin` 10, not 8).
-const ElChartAxis _barMonthAxis = ElChartAxis(
+const ChartAxis _barMonthAxis = ChartAxis(
   dataKey: 'month',
   tickLine: false,
   axisLine: false,
@@ -1517,14 +1530,14 @@ const ElChartAxis _barMonthAxis = ElChartAxis(
 
 Widget _barDefault(_ChartInk ink) => _plot(
   ink.desktop,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktop,
-    grid: const ElChartGrid(vertical: false),
+    grid: const ChartGrid(vertical: false),
     xAxis: _barMonthAxis,
-    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'desktop',
         fill: ink.slot(1),
         radii: _radiiAll,
@@ -1537,26 +1550,26 @@ Widget _barDefault(_ChartInk ink) => _plot(
 /// the one the page warns *"reads backwards until you have hit it once"*.
 Widget _barHorizontal(_ChartInk ink) => _plot(
   ink.desktop,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktop,
-    layout: ElChartLayout.vertical,
-    margin: const ElChartMargin(left: -20),
-    xAxis: const ElChartAxis(
-      type: ElChartAxisType.number,
+    layout: ChartLayout.vertical,
+    margin: const ChartMargin(left: -20),
+    xAxis: const ChartAxis(
+      type: ChartAxisType.number,
       dataKey: 'desktop',
       hide: true,
     ),
-    yAxis: const ElChartAxis(
+    yAxis: const ChartAxis(
       dataKey: 'month',
       tickLine: false,
       axisLine: false,
       tickMargin: 10,
       tickFormatter: _month3,
     ),
-    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'desktop',
         fill: ink.slot(1),
         radii: _radiiAll,
@@ -1567,23 +1580,23 @@ Widget _barHorizontal(_ChartInk ink) => _plot(
 
 Widget _barMultiple(_ChartInk ink) => _plot(
   ink.desktopMobile,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktopMobile,
-    grid: const ElChartGrid(vertical: false),
+    grid: const ChartGrid(vertical: false),
     xAxis: _barMonthAxis,
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
-      indicator: ElChartIndicator.dashed,
+      indicator: ChartIndicator.dashed,
     ),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'desktop',
         fill: ink.slot(1),
         radii: _radiiAll,
       ),
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'mobile',
         fill: ink.slot(2),
         radii: _radiiAll,
@@ -1596,22 +1609,22 @@ Widget _barMultiple(_ChartInk ink) => _plot(
 /// radius itself is `--radius-sm`, one rung for the whole family.
 Widget _barStacked(_ChartInk ink) => _plot(
   ink.desktopMobile,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktopMobile,
-    grid: const ElChartGrid(vertical: false),
+    grid: const ChartGrid(vertical: false),
     xAxis: _barMonthAxis,
-    tooltip: const ElChartTooltipSpec(hideLabel: true),
-    legend: const ElChartLegendSpec(),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+    tooltip: const ChartTooltipSpec(hideLabel: true),
+    legend: const ChartLegendSpec(),
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'desktop',
         stackId: 'a',
         fill: ink.slot(1),
         radii: _radiiBottom,
       ),
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'mobile',
         stackId: 'a',
         fill: ink.slot(2),
@@ -1623,23 +1636,23 @@ Widget _barStacked(_ChartInk ink) => _plot(
 
 /// The registry sets `fontSize={12}` on this `LabelList`: a raw SVG number
 /// for a value the type scale already owns. `text-xs` reaches the same size
-/// through CSS; here it is [ElChartText.xs], which is the same statement.
-Widget _barLabel(_ChartInk ink, ElThemeData theme) => _plot(
+/// through CSS; here it is [ChartText.xs], which is the same statement.
+Widget _barLabel(_ChartInk ink, ThemeTokens theme) => _plot(
   ink.desktop,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktop,
-    margin: const ElChartMargin(top: 20),
-    grid: const ElChartGrid(vertical: false),
+    margin: const ChartMargin(top: 20),
+    grid: const ChartGrid(vertical: false),
     xAxis: _barMonthAxis,
-    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'desktop',
         fill: ink.slot(1),
         radii: _radiiAll,
-        labels: <ElChartLabelList>[
-          ElChartLabelList(offset: 12, color: theme.foreground),
+        labels: <ChartLabelList>[
+          ChartLabelList(offset: 12, color: theme.foreground),
         ],
       ),
     ],
@@ -1649,44 +1662,44 @@ Widget _barLabel(_ChartInk ink, ElThemeData theme) => _plot(
 /// The registry mints a per-container `--color-label` so the in-bar month text
 /// can contrast against the bar's own fill; `bar.tsx` replaces it with
 /// `fill-background`, which is a themed utility rather than a runtime mint.
-Widget _barLabelCustom(_ChartInk ink, ElThemeData theme) => _plot(
+Widget _barLabelCustom(_ChartInk ink, ThemeTokens theme) => _plot(
   ink.desktop,
-  ElCartesianChart(
+  CartesianChart(
     data: _monthsDesktop,
-    layout: ElChartLayout.vertical,
-    margin: const ElChartMargin(right: 16),
-    grid: const ElChartGrid(horizontal: false),
-    yAxis: const ElChartAxis(
+    layout: ChartLayout.vertical,
+    margin: const ChartMargin(right: 16),
+    grid: const ChartGrid(horizontal: false),
+    yAxis: const ChartAxis(
       dataKey: 'month',
       tickLine: false,
       axisLine: false,
       hide: true,
     ),
-    xAxis: const ElChartAxis(
+    xAxis: const ChartAxis(
       dataKey: 'desktop',
-      type: ElChartAxisType.number,
+      type: ChartAxisType.number,
       hide: true,
     ),
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
-      indicator: ElChartIndicator.line,
+      indicator: ChartIndicator.line,
     ),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'desktop',
         fill: ink.slot(1),
         radii: _radiiAll,
-        labels: <ElChartLabelList>[
-          ElChartLabelList(
+        labels: <ChartLabelList>[
+          ChartLabelList(
             dataKey: 'month',
-            position: ElChartLabelPosition.insideLeft,
+            position: ChartLabelPosition.insideLeft,
             offset: 8,
             color: theme.background,
           ),
-          ElChartLabelList(
+          ChartLabelList(
             dataKey: 'desktop',
-            position: ElChartLabelPosition.right,
+            position: ChartLabelPosition.right,
             offset: 8,
             color: theme.foreground,
           ),
@@ -1700,26 +1713,26 @@ Widget _barLabelCustom(_ChartInk ink, ElThemeData theme) => _plot(
 /// `BROWSERS` already carries its own.
 Widget _barMixed(_ChartInk ink) => _plot(
   ink.browser,
-  ElCartesianChart(
+  CartesianChart(
     data: _browsers,
-    layout: ElChartLayout.vertical,
-    margin: const ElChartMargin(left: 0),
-    yAxis: ElChartAxis(
+    layout: ChartLayout.vertical,
+    margin: const ChartMargin(left: 0),
+    yAxis: ChartAxis(
       dataKey: 'browser',
       tickLine: false,
       axisLine: false,
       tickMargin: 10,
       tickFormatter: (Object? v) => _browserLabel('$v'),
     ),
-    xAxis: const ElChartAxis(
+    xAxis: const ChartAxis(
       dataKey: 'visitors',
-      type: ElChartAxisType.number,
+      type: ChartAxisType.number,
       hide: true,
     ),
-    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'visitors',
         radii: _radiiAll,
         cellFills: <Color>[
@@ -1756,24 +1769,24 @@ const List<Map<String, Object?>> _barActiveData = <Map<String, Object?>>[
 /// pointer anywhere near it.
 Widget _barActive(_ChartInk ink) => _plot(
   ink.browser,
-  ElCartesianChart(
+  CartesianChart(
     data: _barActiveData,
-    grid: const ElChartGrid(vertical: false),
-    xAxis: ElChartAxis(
+    grid: const ChartGrid(vertical: false),
+    xAxis: ChartAxis(
       dataKey: 'browser',
       tickLine: false,
       axisLine: false,
       tickMargin: 10,
       tickFormatter: (Object? v) => _browserLabel('$v'),
     ),
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
       defaultIndex: 2,
       hideLabel: true,
     ),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'visitors',
         radii: _radiiAll,
         cellFills: <Color>[
@@ -1799,32 +1812,32 @@ const List<Map<String, Object?>> _barNegativeData = <Map<String, Object?>>[
 /// direction is already legible from each bar's own position above or below the
 /// zero baseline, and the registry's own choice separates the two with
 /// `--chart-1` / `--chart-2`, both neutral action-ramp hues.
-Widget _barNegative(_ChartInk ink, ElThemeData theme) => _plot(
-  ElChartConfig(<String, ElChartSeries>{
-    'visitors': const ElChartSeries(label: 'Visitors'),
+Widget _barNegative(_ChartInk ink, ThemeTokens theme) => _plot(
+  ChartConfig(<String, ChartSeries>{
+    'visitors': const ChartSeries(label: 'Visitors'),
   }),
-  ElCartesianChart(
+  CartesianChart(
     data: _barNegativeData,
-    grid: const ElChartGrid(vertical: false),
-    tooltip: const ElChartTooltipSpec(
+    grid: const ChartGrid(vertical: false),
+    tooltip: const ChartTooltipSpec(
       cursor: false,
       hideLabel: true,
       hideIndicator: true,
     ),
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'visitors',
         cellFills: <Color>[
           for (final Map<String, Object?> row in _barNegativeData)
             (row['visitors']! as num) > 0 ? ink.slot(1) : ink.slot(2),
         ],
-        labels: <ElChartLabelList>[
+        labels: <ChartLabelList>[
           // No explicit fill in the registry means recharts' own untokenised
           // grey paints the month labels: the same class of failure
           // `ui/chart.tsx` measured on the axis ticks. `fill-foreground`
           // closes it.
-          ElChartLabelList(dataKey: 'month', color: theme.foreground),
+          ChartLabelList(dataKey: 'month', color: theme.foreground),
         ],
       ),
     ],
@@ -1842,7 +1855,7 @@ Widget _barNegative(_ChartInk ink, ElThemeData theme) => _plot(
 /// their own selected background… Applies to `ToggleGroup` and `Tabs`, and to
 /// anything like them you add later."* `ToggleGroup` itself does not drop in —
 /// its variants are built for label-sized items and these tiles carry a
-/// `Stat`-sized figure: but the travel is [ElSlidingPillGroup]'s, and that is
+/// `Stat`-sized figure: but the travel is [ActiveIndicator]'s, and that is
 /// reusable on its own.
 ///
 /// **The pill carries the series' colour, and only below the text.** `bar.tsx`
@@ -1893,7 +1906,7 @@ class _SeriesStripState extends State<_SeriesStrip> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final Color colour = widget.ink.slot(_active + 1);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1901,14 +1914,17 @@ class _SeriesStripState extends State<_SeriesStrip> {
         DecoratedBox(
           decoration: BoxDecoration(
             color: theme.card,
-            borderRadius: BorderRadius.circular(ElRadii.lg),
-            border: Border.all(color: theme.border, width: ElWidths.hairline),
+            borderRadius: BorderRadius.circular(Radii.lg),
+            border: Border.all(
+              color: theme.border,
+              width: BorderWidths.hairline,
+            ),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(ElRadii.lg),
-            child: ElSlidingPillGroup(
+            borderRadius: BorderRadius.circular(Radii.lg),
+            child: ActiveIndicator(
               activeIndex: _active,
-              pill: DecoratedBox(
+              indicator: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
@@ -1929,7 +1945,7 @@ class _SeriesStripState extends State<_SeriesStrip> {
                 for (int i = 0; i < _SeriesStrip.series.length; i++)
                   _SeriesTile(
                     label: i == 0 ? 'Desktop' : 'Mobile',
-                    value: elChartNumber(
+                    value: chartNumber(
                       _SeriesStrip.total(_SeriesStrip.series[i]),
                     ),
                     swatch: widget.ink.slot(i + 1),
@@ -1941,7 +1957,7 @@ class _SeriesStripState extends State<_SeriesStrip> {
           ),
         ),
         // `mb-5`.
-        SizedBox(height: el(5)),
+        SizedBox(height: space(5)),
         _SeriesScope(series: _SeriesStrip.series[_active], child: widget.child),
       ],
     );
@@ -1967,11 +1983,11 @@ class _SeriesTile extends StatelessWidget {
   /// `size-3 rounded-xs`: the same swatch `PieInteractiveControls` uses, so
   /// the two interactive pickers share one idiom rather than inventing a
   /// second.
-  static double get swatchSize => el(3);
+  static double get swatchSize => space(3);
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -1981,16 +1997,19 @@ class _SeriesTile extends StatelessWidget {
               ? Border(
                   left: BorderSide(
                     color: theme.border,
-                    width: ElWidths.hairline,
+                    width: BorderWidths.hairline,
                   ),
                 )
               : null,
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: el(4), vertical: el(3)),
+          padding: EdgeInsets.symmetric(
+            horizontal: space(4),
+            vertical: space(3),
+          ),
           child: Stack(
             children: <Widget>[
-              ElStat(label: label, value: value),
+              Stat(label: label, value: value),
               Positioned(
                 top: 0,
                 right: 0,
@@ -1999,7 +2018,7 @@ class _SeriesTile extends StatelessWidget {
                   height: swatchSize,
                   decoration: BoxDecoration(
                     color: swatch,
-                    borderRadius: BorderRadius.circular(ElRadii.xs),
+                    borderRadius: BorderRadius.circular(Radii.xs),
                   ),
                 ),
               ),
@@ -2034,14 +2053,14 @@ Color _seriesColour(_ChartInk ink, String key) =>
 Widget _barInteractive(BuildContext context, _ChartInk ink) {
   final String active = _SeriesScope.of(context);
   return _plot(
-    ink.desktopMobile.plus(<String, ElChartSeries>{
-      'views': const ElChartSeries(label: 'Page Views'),
+    ink.desktopMobile.plus(<String, ChartSeries>{
+      'views': const ChartSeries(label: 'Page Views'),
     }),
-    ElCartesianChart(
+    CartesianChart(
       data: _dailyVisits,
-      margin: const ElChartMargin(left: 12, right: 12),
-      grid: const ElChartGrid(vertical: false),
-      xAxis: const ElChartAxis(
+      margin: const ChartMargin(left: 12, right: 12),
+      grid: const ChartGrid(vertical: false),
+      xAxis: const ChartAxis(
         dataKey: 'date',
         tickLine: false,
         axisLine: false,
@@ -2049,13 +2068,13 @@ Widget _barInteractive(BuildContext context, _ChartInk ink) {
         minTickGap: 32,
         tickFormatter: _shortDate,
       ),
-      tooltip: const ElChartTooltipSpec(
+      tooltip: const ChartTooltipSpec(
         nameKey: 'views',
         labelFormatter: _shortDateYearLabel,
       ),
-      series: <ElChartSeriesSpec>[
-        ElChartSeriesSpec(
-          kind: ElChartSeriesKind.bar,
+      series: <ChartSeriesSpec>[
+        ChartSeriesSpec(
+          kind: ChartSeriesKind.bar,
           dataKey: active,
           fill: _seriesColour(ink, active),
         ),
@@ -2064,17 +2083,17 @@ Widget _barInteractive(BuildContext context, _ChartInk ink) {
   );
 }
 
-/* ── Line, `components/el/charts/line.tsx` ──────────────────────────────── */
+/* ── Line, `components/space/charts/line.tsx` ──────────────────────────────── */
 
 /// The one line every `dot={false}` variant draws.
-ElChartSeriesSpec _lineSeries(
+ChartSeriesSpec _lineSeries(
   Color colour,
   String key,
-  ElCurveType curve, {
-  ElChartDot? dot,
-  List<ElChartLabelList> labels = const <ElChartLabelList>[],
-}) => ElChartSeriesSpec(
-  kind: ElChartSeriesKind.line,
+  CurveType curve, {
+  ChartDot? dot,
+  List<ChartLabelList> labels = const <ChartLabelList>[],
+}) => ChartSeriesSpec(
+  kind: ChartSeriesKind.line,
   dataKey: key,
   curve: curve,
   stroke: colour,
@@ -2084,21 +2103,21 @@ ElChartSeriesSpec _lineSeries(
 );
 
 Widget _lineChart(
-  ElChartConfig config,
+  ChartConfig config,
   List<Map<String, Object?>> data,
-  List<ElChartSeriesSpec> series, {
-  ElChartAxis? xAxis,
-  ElChartMargin margin = const ElChartMargin(left: 12, right: 12),
-  ElChartTooltipSpec tooltip = const ElChartTooltipSpec(
+  List<ChartSeriesSpec> series, {
+  ChartAxis? xAxis,
+  ChartMargin margin = const ChartMargin(left: 12, right: 12),
+  ChartTooltipSpec tooltip = const ChartTooltipSpec(
     cursor: false,
     hideLabel: true,
   ),
 }) => _plot(
   config,
-  ElCartesianChart(
+  CartesianChart(
     data: data,
     margin: margin,
-    grid: const ElChartGrid(vertical: false),
+    grid: const ChartGrid(vertical: false),
     xAxis: xAxis,
     tooltip: tooltip,
     series: series,
@@ -2108,55 +2127,55 @@ Widget _lineChart(
 Widget _lineDefault(_ChartInk ink) => _lineChart(
   ink.desktop,
   _monthsDesktop,
-  <ElChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', ElCurveType.natural)],
+  <ChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', CurveType.natural)],
   xAxis: _monthAxis(),
 );
 
 Widget _lineLinear(_ChartInk ink) => _lineChart(
   ink.desktop,
   _monthsDesktop,
-  <ElChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', ElCurveType.linear)],
+  <ChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', CurveType.linear)],
   xAxis: _monthAxis(),
 );
 
 Widget _lineStep(_ChartInk ink) => _lineChart(
   ink.desktop,
   _monthsDesktop,
-  <ElChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', ElCurveType.step)],
+  <ChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', CurveType.step)],
   xAxis: _monthAxis(),
 );
 
 Widget _lineMultiple(_ChartInk ink) => _lineChart(
   ink.desktopMobile,
   _monthsDesktopMobile,
-  <ElChartSeriesSpec>[
-    _lineSeries(ink.slot(1), 'desktop', ElCurveType.monotone),
-    _lineSeries(ink.slot(2), 'mobile', ElCurveType.monotone),
+  <ChartSeriesSpec>[
+    _lineSeries(ink.slot(1), 'desktop', CurveType.monotone),
+    _lineSeries(ink.slot(2), 'mobile', CurveType.monotone),
   ],
   xAxis: _monthAxis(),
-  tooltip: const ElChartTooltipSpec(),
+  tooltip: const ChartTooltipSpec(),
 );
 
 Widget _lineDots(_ChartInk ink) =>
-    _lineChart(ink.desktopMobile, _monthsDesktopMobile, <ElChartSeriesSpec>[
+    _lineChart(ink.desktopMobile, _monthsDesktopMobile, <ChartSeriesSpec>[
       _lineSeries(
         ink.slot(1),
         'desktop',
-        ElCurveType.natural,
-        dot: ElChartDot(fill: ink.slot(1)),
+        CurveType.natural,
+        dot: ChartDot(fill: ink.slot(1)),
       ),
     ], xAxis: _monthAxis());
 
 /// The registry hardcodes 24 for the glyph's box; `line.tsx` reads it off the
 /// icon ladder instead, *"so `xl` is 24 in one place only"*.
-Widget _lineDotsCustom(_ChartInk ink, ElThemeData theme) =>
-    _lineChart(ink.desktopMobile, _monthsDesktopMobile, <ElChartSeriesSpec>[
+Widget _lineDotsCustom(_ChartInk ink, ThemeTokens theme) =>
+    _lineChart(ink.desktopMobile, _monthsDesktopMobile, <ChartSeriesSpec>[
       _lineSeries(
         ink.slot(1),
         'desktop',
-        ElCurveType.natural,
-        dot: ElChartDot(
-          radius: ElIcon.pxFor(ElIconSize.xl) / 2,
+        CurveType.natural,
+        dot: ChartDot(
+          radius: Icon.pxFor(IconSize.xl) / 2,
           fill: theme.background,
           stroke: ink.slot(1),
         ),
@@ -2168,64 +2187,64 @@ Widget _lineDotsCustom(_ChartInk ink, ElThemeData theme) =>
 Widget _lineDotsColors(_ChartInk ink) => _lineChart(
   ink.browser,
   _browsers,
-  <ElChartSeriesSpec>[
-    ElChartSeriesSpec(
-      kind: ElChartSeriesKind.line,
+  <ChartSeriesSpec>[
+    ChartSeriesSpec(
+      kind: ChartSeriesKind.line,
       dataKey: 'visitors',
-      curve: ElCurveType.natural,
+      curve: CurveType.natural,
       // `visitors` is the value key and carries no colour of its own, so
       // the stroke is the plain `--color-chart-2` the registry's config
       // resolves to, not a lookup through it.
       stroke: ink.slot(2),
       strokeWidth: 2,
-      dot: const ElChartDot(radius: 5),
+      dot: const ChartDot(radius: 5),
       cellFills: <Color>[
         for (final Map<String, Object?> row in _browsers) ink.ofRow(row),
       ],
     ),
   ],
-  margin: const ElChartMargin(top: 24, left: 24, right: 24),
-  tooltip: const ElChartTooltipSpec(
+  margin: const ChartMargin(top: 24, left: 24, right: 24),
+  tooltip: const ChartTooltipSpec(
     cursor: false,
-    indicator: ElChartIndicator.line,
+    indicator: ChartIndicator.line,
     nameKey: 'visitors',
     hideLabel: true,
   ),
 );
 
-Widget _lineLabel(_ChartInk ink, ElThemeData theme) => _lineChart(
+Widget _lineLabel(_ChartInk ink, ThemeTokens theme) => _lineChart(
   ink.desktopMobile,
   _monthsDesktopMobile,
-  <ElChartSeriesSpec>[
+  <ChartSeriesSpec>[
     _lineSeries(
       ink.slot(1),
       'desktop',
-      ElCurveType.natural,
-      dot: ElChartDot(fill: ink.slot(1)),
-      labels: <ElChartLabelList>[
-        ElChartLabelList(offset: 12, color: theme.foreground),
+      CurveType.natural,
+      dot: ChartDot(fill: ink.slot(1)),
+      labels: <ChartLabelList>[
+        ChartLabelList(offset: 12, color: theme.foreground),
       ],
     ),
   ],
   xAxis: _monthAxis(),
-  margin: const ElChartMargin(top: 20, left: 12, right: 12),
-  tooltip: const ElChartTooltipSpec(
+  margin: const ChartMargin(top: 20, left: 12, right: 12),
+  tooltip: const ChartTooltipSpec(
     cursor: false,
-    indicator: ElChartIndicator.line,
+    indicator: ChartIndicator.line,
   ),
 );
 
-Widget _lineLabelCustom(_ChartInk ink, ElThemeData theme) => _lineChart(
+Widget _lineLabelCustom(_ChartInk ink, ThemeTokens theme) => _lineChart(
   ink.browser,
   _browsers,
-  <ElChartSeriesSpec>[
+  <ChartSeriesSpec>[
     _lineSeries(
       ink.slot(2),
       'visitors',
-      ElCurveType.natural,
-      dot: ElChartDot(fill: ink.slot(2)),
-      labels: <ElChartLabelList>[
-        ElChartLabelList(
+      CurveType.natural,
+      dot: ChartDot(fill: ink.slot(2)),
+      labels: <ChartLabelList>[
+        ChartLabelList(
           dataKey: 'browser',
           offset: 12,
           color: theme.foreground,
@@ -2234,10 +2253,10 @@ Widget _lineLabelCustom(_ChartInk ink, ElThemeData theme) => _lineChart(
       ],
     ),
   ],
-  margin: const ElChartMargin(top: 24, left: 24, right: 24),
-  tooltip: const ElChartTooltipSpec(
+  margin: const ChartMargin(top: 24, left: 24, right: 24),
+  tooltip: const ChartTooltipSpec(
     cursor: false,
-    indicator: ElChartIndicator.line,
+    indicator: ChartIndicator.line,
     nameKey: 'visitors',
     hideLabel: true,
   ),
@@ -2248,14 +2267,14 @@ String _browserLabelOf(Object? value) => _browserLabel('$value');
 Widget _lineInteractive(BuildContext context, _ChartInk ink) {
   final String active = _SeriesScope.of(context);
   return _plot(
-    ink.desktopMobile.plus(<String, ElChartSeries>{
-      'views': const ElChartSeries(label: 'Page Views'),
+    ink.desktopMobile.plus(<String, ChartSeries>{
+      'views': const ChartSeries(label: 'Page Views'),
     }),
-    ElCartesianChart(
+    CartesianChart(
       data: _dailyVisits,
-      margin: const ElChartMargin(left: 12, right: 12),
-      grid: const ElChartGrid(vertical: false),
-      xAxis: const ElChartAxis(
+      margin: const ChartMargin(left: 12, right: 12),
+      grid: const ChartGrid(vertical: false),
+      xAxis: const ChartAxis(
         dataKey: 'date',
         tickLine: false,
         axisLine: false,
@@ -2263,23 +2282,23 @@ Widget _lineInteractive(BuildContext context, _ChartInk ink) {
         minTickGap: 32,
         tickFormatter: _shortDate,
       ),
-      tooltip: ElChartTooltipSpec(
+      tooltip: ChartTooltipSpec(
         nameKey: 'views',
         labelFormatter: _shortDateYearLabel,
         // `className="w-40"`.
-        width: el(40),
+        width: space(40),
       ),
-      series: <ElChartSeriesSpec>[
-        _lineSeries(_seriesColour(ink, active), active, ElCurveType.monotone),
+      series: <ChartSeriesSpec>[
+        _lineSeries(_seriesColour(ink, active), active, CurveType.monotone),
       ],
     ),
   );
 }
 
-/* ── Pie, `components/el/charts/pie.tsx` ────────────────────────────────── */
+/* ── Pie, `components/space/charts/pie.tsx` ────────────────────────────────── */
 
 /// The bare `Pie` eight of the eleven variants start from.
-ElPieSpec _browserPie(
+PieSpec _browserPie(
   _ChartInk ink, {
   double? innerRadius,
   double strokeWidth = 1,
@@ -2291,7 +2310,7 @@ ElPieSpec _browserPie(
   String Function(Map<String, Object?>)? labelBuilder,
   String? chipLabelKey,
   List<Map<String, Object?>>? data,
-}) => ElPieSpec(
+}) => PieSpec(
   data: ink.rows(data ?? _browsers),
   dataKey: 'visitors',
   nameKey: 'browser',
@@ -2308,9 +2327,9 @@ ElPieSpec _browserPie(
 
 Widget _pieSimple(_ChartInk ink) => _plot(
   ink.browser,
-  ElPieChart(
-    pies: <ElPieSpec>[_browserPie(ink)],
-    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+  PieChart(
+    pies: <PieSpec>[_browserPie(ink)],
+    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
   ),
 );
 
@@ -2319,40 +2338,40 @@ Widget _pieSimple(_ChartInk ink) => _plot(
 /// a token to own.
 Widget _pieSeparatorNone(_ChartInk ink) => _plot(
   ink.browser,
-  ElPieChart(
-    pies: <ElPieSpec>[_browserPie(ink, strokeWidth: 0)],
-    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+  PieChart(
+    pies: <PieSpec>[_browserPie(ink, strokeWidth: 0)],
+    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
   ),
 );
 
 /// The label sits OUTSIDE the wedge, on the panel background, so this is a
 /// background-contrast case rather than the on-fill one `PieLabelList` answers.
-Widget _pieLabel(_ChartInk ink, ElThemeData theme) => _plot(
+Widget _pieLabel(_ChartInk ink, ThemeTokens theme) => _plot(
   ink.browser,
-  ElPieChart(
-    pies: <ElPieSpec>[_browserPie(ink, outsideLabel: true)],
+  PieChart(
+    pies: <PieSpec>[_browserPie(ink, outsideLabel: true)],
     labelColor: theme.foreground,
-    tooltip: const ElChartTooltipSpec(hideLabel: true),
+    tooltip: const ChartTooltipSpec(hideLabel: true),
   ),
 );
 
 /// The registry's custom `label` render function, swept once:
 /// `fill="hsla(var(--foreground))"` → `--foreground`. It still lands outside
 /// the wedge, so this is background contrast again.
-Widget _pieLabelCustom(_ChartInk ink, ElThemeData theme) => _plot(
+Widget _pieLabelCustom(_ChartInk ink, ThemeTokens theme) => _plot(
   ink.browser,
-  ElPieChart(
-    pies: <ElPieSpec>[
+  PieChart(
+    pies: <PieSpec>[
       _browserPie(
         ink,
         outsideLabel: true,
         labelLine: false,
         labelBuilder: (Map<String, Object?> row) =>
-            elChartNumber(row['visitors']! as num),
+            chartNumber(row['visitors']! as num),
       ),
     ],
     labelColor: theme.foreground,
-    tooltip: const ElChartTooltipSpec(nameKey: 'visitors', hideLabel: true),
+    tooltip: const ChartTooltipSpec(nameKey: 'visitors', hideLabel: true),
   ),
 );
 
@@ -2360,18 +2379,18 @@ Widget _pieLabelCustom(_ChartInk ink, ElThemeData theme) => _plot(
 /// see the chip widget in `chart_polar.dart` for the full derivation.
 Widget _pieLabelList(_ChartInk ink) => _plot(
   ink.browser,
-  ElPieChart(
-    pies: <ElPieSpec>[_browserPie(ink, chipLabelKey: 'browser')],
-    tooltip: const ElChartTooltipSpec(nameKey: 'visitors', hideLabel: true),
+  PieChart(
+    pies: <PieSpec>[_browserPie(ink, chipLabelKey: 'browser')],
+    tooltip: const ChartTooltipSpec(nameKey: 'visitors', hideLabel: true),
   ),
 );
 
 /// No tooltip in this variant: the legend is the whole point.
 Widget _pieLegend(_ChartInk ink) => _plot(
   ink.browser,
-  ElPieChart(
-    pies: <ElPieSpec>[_browserPie(ink)],
-    legend: const ElChartLegendSpec(
+  PieChart(
+    pies: <PieSpec>[_browserPie(ink)],
+    legend: const ChartLegendSpec(
       nameKey: 'browser',
       wrap: true,
       // `-translate-y-2`.
@@ -2385,16 +2404,16 @@ Widget _pieLegend(_ChartInk ink) => _plot(
 /// "percentage").
 Widget _pieDonut(_ChartInk ink) => _plot(
   ink.browser,
-  ElPieChart(
-    pies: <ElPieSpec>[_browserPie(ink, innerRadius: 60)],
-    tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+  PieChart(
+    pies: <PieSpec>[_browserPie(ink, innerRadius: 60)],
+    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
   ),
 );
 
 Widget _pieDonutActive(_ChartInk ink) => _plot(
   ink.browser,
-  ElPieChart(
-    pies: <ElPieSpec>[
+  PieChart(
+    pies: <PieSpec>[
       _browserPie(
         ink,
         innerRadius: 60,
@@ -2403,7 +2422,7 @@ Widget _pieDonutActive(_ChartInk ink) => _plot(
         activeGrow: 10,
       ),
     ],
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
       defaultIndex: 0,
       hideLabel: true,
@@ -2426,13 +2445,13 @@ const List<Map<String, Object?>> _pieDonutTextData = <Map<String, Object?>>[
 /// themes. `type-num-xl` replaces the registry's `text-3xl font-bold`, the
 /// weight already living in the class.
 Widget _donutCentre(BuildContext context, String figure, String caption) {
-  final ElThemeData theme = ElTheme.of(context);
+  final ThemeTokens theme = ThemeScope.of(context);
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      ElText(figure, ElType.numXl, color: theme.foreground),
-      SizedBox(height: el(1)),
-      ElText(caption, ElChartText.xs, color: theme.mutedForeground),
+      StyledText(figure, TextStyles.numberXl, color: theme.foreground),
+      SizedBox(height: space(1)),
+      StyledText(caption, ChartText.xs, color: theme.mutedForeground),
     ],
   );
 }
@@ -2444,8 +2463,8 @@ Widget _pieDonutText(_ChartInk ink) {
   );
   return _plot(
     ink.browser,
-    ElPieChart(
-      pies: <ElPieSpec>[
+    PieChart(
+      pies: <PieSpec>[
         _browserPie(
           ink,
           innerRadius: 60,
@@ -2454,8 +2473,8 @@ Widget _pieDonutText(_ChartInk ink) {
         ),
       ],
       centerLabel: (BuildContext context) =>
-          _donutCentre(context, elChartNumber(total), 'Visitors'),
-      tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+          _donutCentre(context, chartNumber(total), 'Visitors'),
+      tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
     ),
   );
 }
@@ -2463,15 +2482,15 @@ Widget _pieDonutText(_ChartInk ink) {
 /// Two rings, one dataset each.
 Widget _pieStacked(_ChartInk ink) => _plot(
   ink.pieMonths,
-  ElPieChart(
-    pies: <ElPieSpec>[
-      ElPieSpec(
+  PieChart(
+    pies: <PieSpec>[
+      PieSpec(
         data: ink.rows(_pieMonthsDesktop),
         dataKey: 'desktop',
         nameKey: 'month',
         outerRadius: 60,
       ),
-      ElPieSpec(
+      PieSpec(
         data: ink.rows(_pieMonthsMobile),
         dataKey: 'mobile',
         nameKey: 'month',
@@ -2479,10 +2498,10 @@ Widget _pieStacked(_ChartInk ink) => _plot(
         outerRadius: 90,
       ),
     ],
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       labelKey: 'visitors',
       nameKey: 'month',
-      indicator: ElChartIndicator.line,
+      indicator: ChartIndicator.line,
     ),
   ),
 );
@@ -2520,9 +2539,9 @@ class _PieInteractiveState extends State<_PieInteractive> {
       width: _RangeStrip.monthWidth,
       label: 'Select a month',
       placeholder: 'Select month',
-      options: <ElSelectOption<String>>[
+      options: <SelectOption<String>>[
         for (int i = 0; i < _PieInteractive.months.length; i++)
-          ElSelectOption<String>(
+          SelectOption<String>(
             value: _PieInteractive.months[i],
             label: _monthLabel(_PieInteractive.months[i]),
           ),
@@ -2537,9 +2556,9 @@ String _monthLabel(String key) => '${key[0].toUpperCase()}${key.substring(1)}';
 Widget _pieInteractive(BuildContext context, _ChartInk ink, int activeIndex) =>
     _plot(
       ink.pieMonths,
-      ElPieChart(
-        pies: <ElPieSpec>[
-          ElPieSpec(
+      PieChart(
+        pies: <PieSpec>[
+          PieSpec(
             data: ink.rows(_pieMonthsDesktop),
             dataKey: 'desktop',
             nameKey: 'month',
@@ -2552,10 +2571,10 @@ Widget _pieInteractive(BuildContext context, _ChartInk ink, int activeIndex) =>
         ],
         centerLabel: (BuildContext context) => _donutCentre(
           context,
-          elChartNumber(_pieMonthsDesktop[activeIndex]['desktop']! as num),
+          chartNumber(_pieMonthsDesktop[activeIndex]['desktop']! as num),
           'Visitors',
         ),
-        tooltip: ElChartTooltipSpec(
+        tooltip: ChartTooltipSpec(
           cursor: false,
           defaultIndex: activeIndex,
           hideLabel: true,
@@ -2563,17 +2582,17 @@ Widget _pieInteractive(BuildContext context, _ChartInk ink, int activeIndex) =>
       ),
     );
 
-/* ── Radar, `components/el/charts/radar.tsx` ────────────────────────────── */
+/* ── Radar, `components/space/charts/radar.tsx` ────────────────────────────── */
 
 /// One `Radar`, at the registry's own `fillOpacity`.
-ElRadarSpec _radar(
+RadarSpec _radar(
   Color colour,
   String key, {
   double fillOpacity = 1,
   Color? stroke,
   double strokeWidth = 1,
-  ElChartDotSpec? dot,
-}) => ElRadarSpec(
+  ChartDotSpec? dot,
+}) => RadarSpec(
   dataKey: key,
   fill: colour,
   fillOpacity: fillOpacity,
@@ -2583,17 +2602,17 @@ ElRadarSpec _radar(
 );
 
 Widget _radarChart(
-  ElChartConfig config,
+  ChartConfig config,
   List<Map<String, Object?>> data,
-  List<ElRadarSpec> series, {
-  ElPolarGrid? grid = const ElPolarGrid(),
-  ElPolarAngleAxis? angleAxis = const ElPolarAngleAxis(dataKey: 'month'),
-  ElPolarRadiusAxis? radiusAxis,
-  ElChartLegendSpec? legend,
-  ElChartMargin margin = ElChartMargin.standard,
+  List<RadarSpec> series, {
+  PolarGrid? grid = const PolarGrid(),
+  PolarAngleAxis? angleAxis = const PolarAngleAxis(dataKey: 'month'),
+  PolarRadiusAxis? radiusAxis,
+  ChartLegendSpec? legend,
+  ChartMargin margin = ChartMargin.standard,
 }) => _plot(
   config,
-  ElRadarChart(
+  RadarChart(
     data: data,
     series: series,
     grid: grid,
@@ -2607,18 +2626,16 @@ Widget _radarChart(
 Widget _radarDefault(_ChartInk ink) => _radarChart(
   ink.desktop,
   _radarMonths,
-  <ElRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.6)],
+  <RadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.6)],
 );
 
-Widget _radarDots(_ChartInk ink) =>
-    _radarChart(ink.desktop, _radarMonths, <ElRadarSpec>[
-      _radar(
-        ink.slot(1),
-        'desktop',
-        fillOpacity: 0.6,
-        dot: const ElChartDotSpec(),
-      ),
-    ]);
+Widget _radarDots(_ChartInk ink) => _radarChart(
+  ink.desktop,
+  _radarMonths,
+  <RadarSpec>[
+    _radar(ink.slot(1), 'desktop', fillOpacity: 0.6, dot: const ChartDotSpec()),
+  ],
+);
 
 /// `data.ts` keeps this shape local: a six-row `{ month, desktop, mobile }`
 /// set close to but not `MONTHS_DESKTOP_MOBILE` (every row differs).
@@ -2632,7 +2649,7 @@ const List<Map<String, Object?>> _radarLinesOnlyData = <Map<String, Object?>>[
 ];
 
 Widget _radarLinesOnly(_ChartInk ink) =>
-    _radarChart(ink.desktopMobile, _radarLinesOnlyData, <ElRadarSpec>[
+    _radarChart(ink.desktopMobile, _radarLinesOnlyData, <RadarSpec>[
       _radar(
         ink.slot(1),
         'desktop',
@@ -2647,7 +2664,7 @@ Widget _radarLinesOnly(_ChartInk ink) =>
         stroke: ink.slot(2),
         strokeWidth: 2,
       ),
-    ], grid: const ElPolarGrid(radialLines: false));
+    ], grid: const PolarGrid(radialLines: false));
 
 /// The one custom tick on the page: two figures over the month name, with the
 /// separator and the caption in `--muted-foreground`.
@@ -2662,11 +2679,11 @@ Widget _radarCustomTick(
   Offset anchor,
   TextAlign align,
 ) {
-  final ElThemeData theme = ElTheme.of(context);
+  final ThemeTokens theme = ThemeScope.of(context);
   final Map<String, Object?> row = _monthsDesktopMobile[index];
-  final TextStyle base = ElText.styleOf(
+  final TextStyle base = StyledText.styleOf(
     context,
-    ElChartText.xs,
+    ChartText.xs,
     color: theme.foreground,
   );
   final TextStyle muted = base.copyWith(color: theme.mutedForeground);
@@ -2674,7 +2691,7 @@ Widget _radarCustomTick(
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: <Widget>[
-      ElRichText(
+      RichText(
         TextSpan(
           style: base,
           children: <InlineSpan>[
@@ -2683,9 +2700,9 @@ Widget _radarCustomTick(
             TextSpan(text: '${row['mobile']}'),
           ],
         ),
-        ElChartText.xs,
+        ChartText.xs,
       ),
-      ElText('${row['month']}', ElChartText.xs, color: theme.mutedForeground),
+      StyledText('${row['month']}', ChartText.xs, color: theme.mutedForeground),
     ],
   );
 }
@@ -2693,15 +2710,15 @@ Widget _radarCustomTick(
 Widget _radarLabelCustom(_ChartInk ink) => _radarChart(
   ink.desktopMobile,
   _monthsDesktopMobile,
-  <ElRadarSpec>[
+  <RadarSpec>[
     _radar(ink.slot(1), 'desktop', fillOpacity: 0.6),
     _radar(ink.slot(2), 'mobile'),
   ],
-  angleAxis: const ElPolarAngleAxis(
+  angleAxis: const PolarAngleAxis(
     dataKey: 'month',
     tickBuilder: _radarCustomTick,
   ),
-  margin: const ElChartMargin(top: 10, right: 10, bottom: 10, left: 10),
+  margin: const ChartMargin(top: 10, right: 10, bottom: 10, left: 10),
 );
 
 /// `polarRadius`/`strokeWidth` are plot maths: the grid ring's own radius and
@@ -2709,33 +2726,27 @@ Widget _radarLabelCustom(_ChartInk ink) => _radarChart(
 Widget _radarGridCustom(_ChartInk ink) => _radarChart(
   ink.desktop,
   _radarMonths,
-  <ElRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.6)],
-  grid: const ElPolarGrid(radialLines: false, polarRadius: <double>[90]),
+  <RadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.6)],
+  grid: const PolarGrid(radialLines: false, polarRadius: <double>[90]),
 );
 
 /// No `PolarGrid` at all, not even a hidden one.
-Widget _radarGridNone(_ChartInk ink) =>
-    _radarChart(ink.desktop, _radarMonths, <ElRadarSpec>[
-      _radar(
-        ink.slot(1),
-        'desktop',
-        fillOpacity: 0.6,
-        dot: const ElChartDotSpec(),
-      ),
-    ], grid: null);
+Widget _radarGridNone(_ChartInk ink) => _radarChart(
+  ink.desktop,
+  _radarMonths,
+  <RadarSpec>[
+    _radar(ink.slot(1), 'desktop', fillOpacity: 0.6, dot: const ChartDotSpec()),
+  ],
+  grid: null,
+);
 
 Widget _radarGridCircle(_ChartInk ink) => _radarChart(
   ink.desktop,
   _radarMonths,
-  <ElRadarSpec>[
-    _radar(
-      ink.slot(1),
-      'desktop',
-      fillOpacity: 0.6,
-      dot: const ElChartDotSpec(),
-    ),
+  <RadarSpec>[
+    _radar(ink.slot(1), 'desktop', fillOpacity: 0.6, dot: const ChartDotSpec()),
   ],
-  grid: const ElPolarGrid(gridType: ElPolarGridType.circle),
+  grid: const PolarGrid(gridType: PolarGridType.circle),
 );
 
 /// `data.ts` keeps this local too: only April moves (273 → 203), so it is a
@@ -2753,15 +2764,10 @@ const List<Map<String, Object?>> _radarCircleNoLinesData =
 Widget _radarGridCircleNoLines(_ChartInk ink) => _radarChart(
   ink.desktop,
   _radarCircleNoLinesData,
-  <ElRadarSpec>[
-    _radar(
-      ink.slot(1),
-      'desktop',
-      fillOpacity: 0.6,
-      dot: const ElChartDotSpec(),
-    ),
+  <RadarSpec>[
+    _radar(ink.slot(1), 'desktop', fillOpacity: 0.6, dot: const ChartDotSpec()),
   ],
-  grid: const ElPolarGrid(gridType: ElPolarGridType.circle, radialLines: false),
+  grid: const PolarGrid(gridType: PolarGridType.circle, radialLines: false),
 );
 
 /// `className="fill-[--color-desktop] opacity-20"` in the registry is the
@@ -2772,9 +2778,9 @@ Widget _radarGridCircleNoLines(_ChartInk ink) => _radarChart(
 Widget _radarGridCircleFill(_ChartInk ink) => _radarChart(
   ink.desktop,
   _radarMonthsFill,
-  <ElRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.5)],
-  grid: ElPolarGrid(
-    gridType: ElPolarGridType.circle,
+  <RadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.5)],
+  grid: PolarGrid(
+    gridType: PolarGridType.circle,
     fills: <Color>[ink.slot(1)],
     opacity: 0.2,
   ),
@@ -2783,14 +2789,14 @@ Widget _radarGridCircleFill(_ChartInk ink) => _radarChart(
 Widget _radarGridFill(_ChartInk ink) => _radarChart(
   ink.desktop,
   _radarMonthsFill,
-  <ElRadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.5)],
-  grid: ElPolarGrid(fills: <Color>[ink.slot(1)], opacity: 0.2),
+  <RadarSpec>[_radar(ink.slot(1), 'desktop', fillOpacity: 0.5)],
+  grid: PolarGrid(fills: <Color>[ink.slot(1)], opacity: 0.2),
 );
 
 /// Drift 7: the registry gives `mobile` no `fillOpacity` at all, so the second
 /// polygon paints fully opaque over the first. Kept: it is the registry's own
 /// choice, repeated identically on five variants.
-List<ElRadarSpec> _radarPair(_ChartInk ink) => <ElRadarSpec>[
+List<RadarSpec> _radarPair(_ChartInk ink) => <RadarSpec>[
   _radar(ink.slot(1), 'desktop', fillOpacity: 0.6),
   _radar(ink.slot(2), 'mobile'),
 ];
@@ -2802,34 +2808,34 @@ Widget _radarLegend(_ChartInk ink) => _radarChart(
   ink.desktopMobile,
   _monthsDesktopMobile,
   _radarPair(ink),
-  legend: const ElChartLegendSpec(),
-  margin: const ElChartMargin(top: -40, bottom: -10),
+  legend: const ChartLegendSpec(),
+  margin: const ChartMargin(top: -40, bottom: -10),
 );
 
 /// Drift 9: structurally identical to `RadarLegend`: the registry's own
 /// `chart-radar-icons` differs only in `chartConfig`.
 Widget _radarIcons(_ChartInk ink) => _plot(
-  ElChartConfig(<String, ElChartSeries>{
-    'desktop': ElChartSeries(
+  ChartConfig(<String, ChartSeries>{
+    'desktop': ChartSeries(
       label: 'Desktop',
       color: ink.slot(1),
       icon: (BuildContext context) =>
-          const ElIcon.lucide(ElLucide.arrowDownFromLine, size: ElIconSize.sm),
+          const Icon.lucide(Lucide.arrowDownFromLine, size: IconSize.sm),
     ),
-    'mobile': ElChartSeries(
+    'mobile': ChartSeries(
       label: 'Mobile',
       color: ink.slot(2),
       icon: (BuildContext context) =>
-          const ElIcon.lucide(ElLucide.arrowUpFromLine, size: ElIconSize.sm),
+          const Icon.lucide(Lucide.arrowUpFromLine, size: IconSize.sm),
     ),
   }),
-  ElRadarChart(
+  RadarChart(
     data: _monthsDesktopMobile,
     series: _radarPair(ink),
-    grid: const ElPolarGrid(),
-    angleAxis: const ElPolarAngleAxis(dataKey: 'month'),
-    legend: const ElChartLegendSpec(),
-    margin: const ElChartMargin(top: -40, bottom: -10),
+    grid: const PolarGrid(),
+    angleAxis: const PolarAngleAxis(dataKey: 'month'),
+    legend: const ChartLegendSpec(),
+    margin: const ChartMargin(top: -40, bottom: -10),
   ),
 );
 
@@ -2838,14 +2844,14 @@ Widget _radarIcons(_ChartInk ink) => _plot(
 /// first real contact with `ui/chart.tsx`'s pre-emptive defence for that axis
 /// family. `stroke="hsla(var(--foreground))"` is the same invalid-colour trap
 /// as `hsl(var(--chart-N))` and becomes `--foreground`.
-Widget _radarRadius(_ChartInk ink, ElThemeData theme) => _plot(
+Widget _radarRadius(_ChartInk ink, ThemeTokens theme) => _plot(
   ink.desktopMobile,
-  ElRadarChart(
+  RadarChart(
     data: _monthsDesktopMobile,
     series: _radarPair(ink),
-    grid: const ElPolarGrid(),
+    grid: const PolarGrid(),
     angleAxis: null,
-    radiusAxis: ElPolarRadiusAxis(
+    radiusAxis: PolarRadiusAxis(
       angle: 60,
       stroke: theme.foreground,
       axisLine: false,
@@ -2853,18 +2859,18 @@ Widget _radarRadius(_ChartInk ink, ElThemeData theme) => _plot(
   ),
 );
 
-/* ── Radial, `components/el/charts/radial.tsx` ──────────────────────────── */
+/* ── Radial, `components/space/charts/radial.tsx` ──────────────────────────── */
 
 Widget _radialSimple(_ChartInk ink) => _plot(
   ink.browser,
-  ElRadialBarChart(
+  RadialBarChart(
     data: ink.rows(_browsers),
     innerRadius: 30,
     outerRadius: 110,
-    series: const <ElRadialBarSpec>[
-      ElRadialBarSpec(dataKey: 'visitors', background: true),
+    series: const <RadialBarSpec>[
+      RadialBarSpec(dataKey: 'visitors', background: true),
     ],
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
       hideLabel: true,
       nameKey: 'browser',
@@ -2874,13 +2880,13 @@ Widget _radialSimple(_ChartInk ink) => _plot(
 
 Widget _radialGrid(_ChartInk ink) => _plot(
   ink.browser,
-  ElRadialBarChart(
+  RadialBarChart(
     data: ink.rows(_browsers),
     innerRadius: 30,
     outerRadius: 100,
-    grid: const ElPolarGrid(gridType: ElPolarGridType.circle),
-    series: const <ElRadialBarSpec>[ElRadialBarSpec(dataKey: 'visitors')],
-    tooltip: const ElChartTooltipSpec(
+    grid: const PolarGrid(gridType: PolarGridType.circle),
+    series: const <RadialBarSpec>[RadialBarSpec(dataKey: 'visitors')],
+    tooltip: const ChartTooltipSpec(
       cursor: false,
       hideLabel: true,
       nameKey: 'browser',
@@ -2893,20 +2899,20 @@ Widget _radialGrid(_ChartInk ink) => _plot(
 /// mid-angle they came out 19.9px apart for labels 48px wide.
 Widget _radialLabel(_ChartInk ink) => _plot(
   ink.browser,
-  ElRadialBarChart(
+  RadialBarChart(
     data: ink.rows(_browsers),
     startAngle: -90,
     endAngle: 380,
     innerRadius: 30,
     outerRadius: 110,
-    series: const <ElRadialBarSpec>[
-      ElRadialBarSpec(
+    series: const <RadialBarSpec>[
+      RadialBarSpec(
         dataKey: 'visitors',
         background: true,
         chipLabelKey: 'browser',
       ),
     ],
-    tooltip: const ElChartTooltipSpec(
+    tooltip: const ChartTooltipSpec(
       cursor: false,
       hideLabel: true,
       nameKey: 'browser',
@@ -2926,61 +2932,61 @@ const List<Map<String, Object?>> _radialShapeData = <Map<String, Object?>>[
   <String, Object?>{'browser': 'safari', 'visitors': 1260, 'slot': 2},
 ];
 
-ElPolarGrid _radialPlate(ElThemeData theme) => ElPolarGrid(
-  gridType: ElPolarGridType.circle,
+PolarGrid _radialPlate(ThemeTokens theme) => PolarGrid(
+  gridType: PolarGridType.circle,
   radialLines: false,
   // `className="first:fill-muted last:fill-background"`.
   fills: <Color>[theme.muted, theme.background],
   polarRadius: const <double>[86, 74],
 );
 
-Widget _radialText(_ChartInk ink, ElThemeData theme) => _plot(
-  ElChartConfig(<String, ElChartSeries>{
-    'visitors': const ElChartSeries(label: 'Visitors'),
-    'safari': ElChartSeries(label: 'Safari', color: ink.slot(2)),
+Widget _radialText(_ChartInk ink, ThemeTokens theme) => _plot(
+  ChartConfig(<String, ChartSeries>{
+    'visitors': const ChartSeries(label: 'Visitors'),
+    'safari': ChartSeries(label: 'Safari', color: ink.slot(2)),
   }),
-  ElRadialBarChart(
+  RadialBarChart(
     data: ink.rows(_radialTextData),
     startAngle: 0,
     endAngle: 250,
     innerRadius: 80,
     outerRadius: 110,
     grid: _radialPlate(theme),
-    series: const <ElRadialBarSpec>[
-      ElRadialBarSpec(
+    series: const <RadialBarSpec>[
+      RadialBarSpec(
         dataKey: 'visitors',
         background: true,
         cornerRadius: _ringRadius,
       ),
     ],
-    radiusAxis: ElPolarRadiusAxis(
+    radiusAxis: PolarRadiusAxis(
       tick: false,
       axisLine: false,
       centerLabel: (BuildContext context) =>
-          _donutCentre(context, elChartNumber(200), 'Visitors'),
+          _donutCentre(context, chartNumber(200), 'Visitors'),
     ),
   ),
 );
 
-Widget _radialShape(_ChartInk ink, ElThemeData theme) => _plot(
-  ElChartConfig(<String, ElChartSeries>{
-    'visitors': const ElChartSeries(label: 'Visitors'),
-    'safari': ElChartSeries(label: 'Safari', color: ink.slot(2)),
+Widget _radialShape(_ChartInk ink, ThemeTokens theme) => _plot(
+  ChartConfig(<String, ChartSeries>{
+    'visitors': const ChartSeries(label: 'Visitors'),
+    'safari': ChartSeries(label: 'Safari', color: ink.slot(2)),
   }),
-  ElRadialBarChart(
+  RadialBarChart(
     data: ink.rows(_radialShapeData),
     endAngle: 100,
     innerRadius: 80,
     outerRadius: 140,
     grid: _radialPlate(theme),
-    series: const <ElRadialBarSpec>[
-      ElRadialBarSpec(dataKey: 'visitors', background: true),
+    series: const <RadialBarSpec>[
+      RadialBarSpec(dataKey: 'visitors', background: true),
     ],
-    radiusAxis: ElPolarRadiusAxis(
+    radiusAxis: PolarRadiusAxis(
       tick: false,
       axisLine: false,
       centerLabel: (BuildContext context) =>
-          _donutCentre(context, elChartNumber(1260), 'Visitors'),
+          _donutCentre(context, chartNumber(1260), 'Visitors'),
     ),
   ),
 );
@@ -3000,68 +3006,72 @@ Widget _radialStacked(_ChartInk ink) {
   const int total = 1260 + 570;
   return _plot(
     ink.desktopMobile,
-    ElRadialBarChart(
+    RadialBarChart(
       data: _radialStackedData,
       endAngle: 180,
       innerRadius: 80,
       outerRadius: 130,
-      angleAxis: ElPolarAngleAxis(
+      angleAxis: PolarAngleAxis(
         tick: false,
         axisLine: false,
         domain: (min: 0, max: total.toDouble()),
       ),
-      radiusAxis: ElPolarRadiusAxis(
+      radiusAxis: PolarRadiusAxis(
         tick: false,
         axisLine: false,
         centerLabel: (BuildContext context) {
-          final ElThemeData theme = ElTheme.of(context);
+          final ThemeTokens theme = ThemeScope.of(context);
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElText(
-                elChartNumber(total),
-                ElType.numLg,
+              StyledText(
+                chartNumber(total),
+                TextStyles.numberLg,
                 color: theme.foreground,
               ),
-              SizedBox(height: el(1)),
-              ElText('Visitors', ElChartText.xs, color: theme.mutedForeground),
+              SizedBox(height: space(1)),
+              StyledText(
+                'Visitors',
+                ChartText.xs,
+                color: theme.mutedForeground,
+              ),
             ],
           );
         },
       ),
-      series: <ElRadialBarSpec>[
-        ElRadialBarSpec(
+      series: <RadialBarSpec>[
+        RadialBarSpec(
           dataKey: 'desktop',
           stackId: 'a',
           cornerRadius: _stackRadius,
           fill: ink.slot(1),
         ),
-        ElRadialBarSpec(
+        RadialBarSpec(
           dataKey: 'mobile',
           stackId: 'a',
           cornerRadius: _stackRadius,
           fill: ink.slot(2),
         ),
       ],
-      tooltip: const ElChartTooltipSpec(cursor: false, hideLabel: true),
+      tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
     ),
   );
 }
 
-/* ── Tooltips, `components/el/charts/tooltip.tsx` ───────────────────────── */
+/* ── Tooltips, `components/space/charts/tooltip.tsx` ───────────────────────── */
 
 /// Every one of the nine is the SAME two-series stacked bar chart, because the
 /// family's whole point is that only the tooltip's configuration changes. No
 /// `CartesianGrid`, no `YAxis`: the registry source for all nine omits both.
 Widget _tooltipChart(
   _ChartInk ink,
-  ElChartConfig config,
-  ElChartTooltipSpec tooltip,
+  ChartConfig config,
+  ChartTooltipSpec tooltip,
 ) => _plot(
   config,
-  ElCartesianChart(
+  CartesianChart(
     data: _sportDays,
-    xAxis: const ElChartAxis(
+    xAxis: const ChartAxis(
       dataKey: 'date',
       tickLine: false,
       tickMargin: 10,
@@ -3069,16 +3079,16 @@ Widget _tooltipChart(
       tickFormatter: _weekdayShort,
     ),
     tooltip: tooltip,
-    series: <ElChartSeriesSpec>[
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+    series: <ChartSeriesSpec>[
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'running',
         stackId: 'a',
         fill: ink.slot(1),
         radii: _radiiBottom,
       ),
-      ElChartSeriesSpec(
-        kind: ElChartSeriesKind.bar,
+      ChartSeriesSpec(
+        kind: ChartSeriesKind.bar,
         dataKey: 'swimming',
         stackId: 'a',
         fill: ink.slot(2),
@@ -3091,23 +3101,23 @@ Widget _tooltipChart(
 Widget _tooltipDefault(_ChartInk ink) => _tooltipChart(
   ink,
   ink.sport,
-  const ElChartTooltipSpec(cursor: false, defaultIndex: 1),
+  const ChartTooltipSpec(cursor: false, defaultIndex: 1),
 );
 
 Widget _tooltipIndicatorLine(_ChartInk ink) => _tooltipChart(
   ink,
   ink.sport,
-  const ElChartTooltipSpec(
+  const ChartTooltipSpec(
     cursor: false,
     defaultIndex: 1,
-    indicator: ElChartIndicator.line,
+    indicator: ChartIndicator.line,
   ),
 );
 
 Widget _tooltipIndicatorNone(_ChartInk ink) => _tooltipChart(
   ink,
   ink.sport,
-  const ElChartTooltipSpec(cursor: false, defaultIndex: 1, hideIndicator: true),
+  const ChartTooltipSpec(cursor: false, defaultIndex: 1, hideIndicator: true),
 );
 
 /// The registry's one extra config key: a label that never comes from the
@@ -3116,21 +3126,21 @@ Widget _tooltipIndicatorNone(_ChartInk ink) => _tooltipChart(
 /// `getPayloadConfigFromPayload` is what makes a key naming no field work.
 Widget _tooltipLabelCustom(_ChartInk ink) => _tooltipChart(
   ink,
-  ink.sport.plus(<String, ElChartSeries>{
-    'activities': const ElChartSeries(label: 'Activities'),
+  ink.sport.plus(<String, ChartSeries>{
+    'activities': const ChartSeries(label: 'Activities'),
   }),
-  const ElChartTooltipSpec(
+  const ChartTooltipSpec(
     cursor: false,
     defaultIndex: 1,
     labelKey: 'activities',
-    indicator: ElChartIndicator.line,
+    indicator: ChartIndicator.line,
   ),
 );
 
 Widget _tooltipLabelFormatter(_ChartInk ink) => _tooltipChart(
   ink,
   ink.sport,
-  const ElChartTooltipSpec(
+  const ChartTooltipSpec(
     cursor: false,
     defaultIndex: 1,
     labelFormatter: _longDateLabel,
@@ -3140,7 +3150,7 @@ Widget _tooltipLabelFormatter(_ChartInk ink) => _tooltipChart(
 Widget _tooltipLabelNone(_ChartInk ink) => _tooltipChart(
   ink,
   ink.sport,
-  const ElChartTooltipSpec(
+  const ChartTooltipSpec(
     cursor: false,
     defaultIndex: 1,
     hideIndicator: true,
@@ -3155,11 +3165,11 @@ Widget _tooltipLabelNone(_ChartInk ink) => _tooltipChart(
 Widget _tooltipFormatter(_ChartInk ink) => _tooltipChart(
   ink,
   ink.sport,
-  ElChartTooltipSpec(
+  ChartTooltipSpec(
     cursor: false,
     defaultIndex: 1,
     hideLabel: true,
-    formatter: (BuildContext context, ElChartTooltipItem item, int index) =>
+    formatter: (BuildContext context, ChartTooltipItem item, int index) =>
         _KcalRow(item: item),
   ),
 );
@@ -3169,24 +3179,24 @@ Widget _tooltipFormatter(_ChartInk ink) => _tooltipChart(
 class _KcalRow extends StatelessWidget {
   const _KcalRow({required this.item, this.showTotal = false, this.total = 0});
 
-  final ElChartTooltipItem item;
+  final ChartTooltipItem item;
   final bool showTotal;
   final int total;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         ConstrainedBox(
-          constraints: BoxConstraints(minWidth: ElChartTooltipContent.minWidth),
+          constraints: BoxConstraints(minWidth: ChartTooltipContent.minWidth),
           child: Row(
             children: <Widget>[
-              ElText(
+              StyledText(
                 item.name == 'running' ? 'Running' : 'Swimming',
-                ElChartText.xs,
+                ChartText.xs,
                 color: theme.mutedForeground,
               ),
               const Spacer(),
@@ -3195,20 +3205,23 @@ class _KcalRow extends StatelessWidget {
           ),
         ),
         if (showTotal) ...<Widget>[
-          SizedBox(height: el(1.5)),
+          SizedBox(height: space(1.5)),
           DecoratedBox(
             decoration: BoxDecoration(
               border: Border(
-                top: BorderSide(color: theme.border, width: ElWidths.hairline),
+                top: BorderSide(
+                  color: theme.border,
+                  width: BorderWidths.hairline,
+                ),
               ),
             ),
             child: Padding(
-              padding: EdgeInsets.only(top: el(1.5)),
+              padding: EdgeInsets.only(top: space(1.5)),
               child: Row(
                 children: <Widget>[
-                  ElText(
+                  StyledText(
                     'Total',
-                    ElChartText.xsMedium,
+                    ChartText.xsMedium,
                     color: theme.foreground,
                   ),
                   const Spacer(),
@@ -3230,17 +3243,21 @@ class _Kcal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: <Widget>[
-        ElText(elChartNumber(value), ElType.numSm, color: theme.foreground),
-        SizedBox(width: el(0.5)),
+        StyledText(
+          chartNumber(value),
+          TextStyles.numberSm,
+          color: theme.foreground,
+        ),
+        SizedBox(width: space(0.5)),
         // `font-normal text-muted-foreground`: the unit steps down out of the
         // figure's own weight.
-        ElText('kcal', ElChartText.xs, color: theme.mutedForeground),
+        StyledText('kcal', ChartText.xs, color: theme.mutedForeground),
       ],
     );
   }
@@ -3251,27 +3268,27 @@ class _Kcal extends StatelessWidget {
 /// in a zero-arg component; the builder slot here needs no such wrapper.
 Widget _tooltipIcons(_ChartInk ink) => _tooltipChart(
   ink,
-  ElChartConfig(<String, ElChartSeries>{
-    'running': ElChartSeries(
+  ChartConfig(<String, ChartSeries>{
+    'running': ChartSeries(
       label: 'Running',
       color: ink.slot(1),
-      icon: (BuildContext context) => const ElIcon.lucide(
-        ElLucide.footprints,
-        size: ElIconSize.xs,
-        tone: ElIconTone.muted,
+      icon: (BuildContext context) => const Icon.lucide(
+        Lucide.footprints,
+        size: IconSize.xs,
+        tone: IconTone.muted,
       ),
     ),
-    'swimming': ElChartSeries(
+    'swimming': ChartSeries(
       label: 'Swimming',
       color: ink.slot(2),
-      icon: (BuildContext context) => const ElIcon.lucide(
-        ElLucide.wavesHorizontal,
-        size: ElIconSize.xs,
-        tone: ElIconTone.muted,
+      icon: (BuildContext context) => const Icon.lucide(
+        Lucide.wavesHorizontal,
+        size: IconSize.xs,
+        tone: IconTone.muted,
       ),
     ),
   }),
-  const ElChartTooltipSpec(cursor: false, defaultIndex: 1, hideLabel: true),
+  const ChartTooltipSpec(cursor: false, defaultIndex: 1, hideLabel: true),
 );
 
 /// The most involved of the nine: a swatch, the series label, the value with
@@ -3279,15 +3296,15 @@ Widget _tooltipIcons(_ChartInk ink) => _tooltipChart(
 Widget _tooltipAdvanced(_ChartInk ink) => _tooltipChart(
   ink,
   ink.sport,
-  ElChartTooltipSpec(
+  ChartTooltipSpec(
     cursor: false,
     defaultIndex: 1,
     hideLabel: true,
     // `className="w-44"`, 176px, the nearest rung of the same scale
     // `min-w-32` uses, close enough that the fixed-width Total row does not
     // reflow between the two hovered series.
-    width: el(44),
-    formatter: (BuildContext context, ElChartTooltipItem item, int index) =>
+    width: space(44),
+    formatter: (BuildContext context, ChartTooltipItem item, int index) =>
         _AdvancedRow(item: item, index: index, ink: ink),
   ),
 );
@@ -3299,13 +3316,13 @@ class _AdvancedRow extends StatelessWidget {
     required this.ink,
   });
 
-  final ElChartTooltipItem item;
+  final ChartTooltipItem item;
   final int index;
   final _ChartInk ink;
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final Map<String, Object?> row = item.payload ?? const <String, Object?>{};
     final int total =
         ((row['running'] as num?) ?? 0).toInt() +
@@ -3314,22 +3331,22 @@ class _AdvancedRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(top: el(0.5)),
+          padding: EdgeInsets.only(top: space(0.5)),
           child: Container(
-            width: el(2.5),
-            height: el(2.5),
+            width: space(2.5),
+            height: space(2.5),
             decoration: BoxDecoration(
               color: ink.slot(item.name == 'running' ? 1 : 2),
-              borderRadius: BorderRadius.circular(ElRadii.xs),
+              borderRadius: BorderRadius.circular(Radii.xs),
             ),
           ),
         ),
-        SizedBox(width: el(2)),
+        SizedBox(width: space(2)),
         Expanded(
           child: DefaultTextStyle(
-            style: ElText.styleOf(
+            style: StyledText.styleOf(
               context,
-              ElChartText.xs,
+              ChartText.xs,
               color: theme.mutedForeground,
             ),
             child: _KcalRow(item: item, showTotal: index == 1, total: total),
@@ -3340,7 +3357,7 @@ class _AdvancedRow extends StatelessWidget {
   }
 }
 
-/* ── Unit activity, `components/el/charts/unit-activity.tsx` ────────────── */
+/* ── Unit activity, `components/space/charts/unit-activity.tsx` ────────────── */
 
 /// One labelled point in a day's row.
 @immutable
@@ -3444,7 +3461,7 @@ class _UnitActivityChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
       height: _plotHeight,
       child: Column(
@@ -3457,23 +3474,26 @@ class _UnitActivityChart extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    ElText('Active users', ElType.label),
-                    SizedBox(height: el(1)),
-                    ElText(
-                      elChartNumber(24815),
-                      ElType.numLg,
+                    StyledText('Active users', TextStyles.eyebrow),
+                    SizedBox(height: space(1)),
+                    StyledText(
+                      chartNumber(24815),
+                      TextStyles.numberLg,
                       color: theme.foreground,
                     ),
-                    SizedBox(height: el(1)),
-                    ElText('5.6k fewer in the last 7 days', ElType.small),
+                    SizedBox(height: space(1)),
+                    StyledText(
+                      '5.6k fewer in the last 7 days',
+                      TextStyles.small,
+                    ),
                   ],
                 ),
               ),
-              SizedBox(width: el(4)),
+              SizedBox(width: space(4)),
               Wrap(
                 alignment: WrapAlignment.end,
-                spacing: el(3),
-                runSpacing: el(3),
+                spacing: space(3),
+                runSpacing: space(3),
                 children: <Widget>[
                   _UnitKey(colour: theme.muted, label: 'Previous'),
                   _UnitKey(colour: theme.chart4, label: 'Current'),
@@ -3481,7 +3501,7 @@ class _UnitActivityChart extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: el(4)),
+          SizedBox(height: space(4)),
           Expanded(
             child: ClipRect(
               child: ConstrainedBox(
@@ -3490,7 +3510,7 @@ class _UnitActivityChart extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     for (int d = 0; d < _unitSample.length; d++) ...<Widget>[
-                      if (d > 0) SizedBox(width: el(2)),
+                      if (d > 0) SizedBox(width: space(2)),
                       Expanded(child: _UnitColumn(day: _unitSample[d])),
                     ],
                   ],
@@ -3505,7 +3525,7 @@ class _UnitActivityChart extends StatelessWidget {
 
   /// One cell's colour: the current period, the comparison remainder, or the
   /// rest of the matrix.
-  static Color cell(ElThemeData theme, int level, _UnitPoint point) {
+  static Color cell(ThemeTokens theme, int level, _UnitPoint point) {
     if (level <= point.current) return theme.chart4;
     if (level <= (point.previous ?? point.current)) return theme.muted;
     return theme.muted.withValues(alpha: _restAlpha);
@@ -3523,15 +3543,15 @@ class _UnitKey extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       Container(
-        width: el(2),
-        height: el(2),
+        width: space(2),
+        height: space(2),
         decoration: BoxDecoration(
           color: colour,
-          borderRadius: BorderRadius.circular(ElRadii.sm),
+          borderRadius: BorderRadius.circular(Radii.sm),
         ),
       ),
-      SizedBox(width: el(1.5)),
-      ElText(label, ElType.label),
+      SizedBox(width: space(1.5)),
+      StyledText(label, TextStyles.eyebrow),
     ],
   );
 }
@@ -3543,7 +3563,7 @@ class _UnitColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -3552,7 +3572,7 @@ class _UnitColumn extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               for (int p = 0; p < day.points.length; p++) ...<Widget>[
-                if (p > 0) SizedBox(width: el(0.5)),
+                if (p > 0) SizedBox(width: space(0.5)),
                 Expanded(
                   child: Column(
                     children: <Widget>[
@@ -3561,7 +3581,7 @@ class _UnitColumn extends StatelessWidget {
                         i < _UnitActivityChart.levels;
                         i++
                       ) ...<Widget>[
-                        if (i > 0) SizedBox(height: el(0.5)),
+                        if (i > 0) SizedBox(height: space(0.5)),
                         Expanded(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
@@ -3570,7 +3590,7 @@ class _UnitColumn extends StatelessWidget {
                                 _UnitActivityChart.levels - i,
                                 day.points[p],
                               ),
-                              borderRadius: BorderRadius.circular(ElRadii.sm),
+                              borderRadius: BorderRadius.circular(Radii.sm),
                             ),
                           ),
                         ),
@@ -3582,14 +3602,14 @@ class _UnitColumn extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: el(2)),
-        ElText(day.label, ElType.numSm, align: TextAlign.center),
+        SizedBox(height: space(2)),
+        StyledText(day.label, TextStyles.numberSm, align: TextAlign.center),
       ],
     );
   }
 }
 
-/* ── Conversion funnel, `components/el/charts/conversion-funnel.tsx` ────── */
+/* ── Conversion funnel, `components/space/charts/conversion-funnel.tsx` ────── */
 
 @immutable
 class _Stage {
@@ -3626,7 +3646,7 @@ class _ConversionFunnelChart extends StatelessWidget {
   static const int stripUnits = 96;
 
   /// `h-12`: the strip's own height.
-  static double get stripHeight => el(12);
+  static double get stripHeight => space(12);
 
   static String percentage(int value, int of) =>
       of > 0 ? '${(value / of * 100).toStringAsFixed(1)}%' : '0.0%';
@@ -3636,7 +3656,7 @@ class _ConversionFunnelChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final _ChartInk ink = _ChartInk(theme);
     final int stageTotal = _funnelStages.fold<int>(
       0,
@@ -3647,22 +3667,26 @@ class _ConversionFunnelChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          ElText('Conversions', ElType.label),
-          SizedBox(height: el(1)),
-          ElText(elChartNumber(total), ElType.numLg, color: theme.foreground),
-          SizedBox(height: el(1)),
-          ElText(
-            '${percentage(_funnelStages.last.value, total)} overall conversion',
-            ElType.small,
-            color: theme.valueInk,
+          StyledText('Conversions', TextStyles.eyebrow),
+          SizedBox(height: space(1)),
+          StyledText(
+            chartNumber(total),
+            TextStyles.numberLg,
+            color: theme.foreground,
           ),
-          SizedBox(height: el(3)),
+          SizedBox(height: space(1)),
+          StyledText(
+            '${percentage(_funnelStages.last.value, total)} overall conversion',
+            TextStyles.small,
+            color: theme.premiumText,
+          ),
+          SizedBox(height: space(3)),
           SizedBox(
             height: stripHeight,
             child: Row(
               children: <Widget>[
                 for (int i = 0; i < _funnelStages.length; i++) ...<Widget>[
-                  if (i > 0) SizedBox(width: el(0.5)),
+                  if (i > 0) SizedBox(width: space(0.5)),
                   Expanded(
                     flex: _funnelStages[i].value,
                     child: Row(
@@ -3672,12 +3696,12 @@ class _ConversionFunnelChart extends StatelessWidget {
                           u < unitCount(_funnelStages[i].value, stageTotal);
                           u++
                         ) ...<Widget>[
-                          if (u > 0) SizedBox(width: el(0.5)),
+                          if (u > 0) SizedBox(width: space(0.5)),
                           Expanded(
                             child: DecoratedBox(
                               decoration: BoxDecoration(
                                 color: ink.slot(_funnelStages[i].slot),
-                                borderRadius: BorderRadius.circular(ElRadii.sm),
+                                borderRadius: BorderRadius.circular(Radii.sm),
                               ),
                             ),
                           ),
@@ -3689,29 +3713,29 @@ class _ConversionFunnelChart extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: el(2)),
+          SizedBox(height: space(2)),
           Row(
             children: <Widget>[
               for (int i = 0; i < _funnelStages.length; i++) ...<Widget>[
-                if (i > 0) SizedBox(width: el(0.5)),
+                if (i > 0) SizedBox(width: space(0.5)),
                 Expanded(
                   flex: _funnelStages[i].value,
-                  child: ElText(
+                  child: StyledText(
                     percentage(_funnelStages[i].value, total),
-                    ElType.numSm,
+                    TextStyles.numberSm,
                   ),
                 ),
               ],
             ],
           ),
-          SizedBox(height: el(3)),
+          SizedBox(height: space(3)),
           Expanded(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.symmetric(
                   horizontal: BorderSide(
                     color: theme.border,
-                    width: ElWidths.hairline,
+                    width: BorderWidths.hairline,
                   ),
                 ),
               ),
@@ -3721,7 +3745,7 @@ class _ConversionFunnelChart extends StatelessWidget {
                   for (int i = 0; i < _funnelStages.length; i++) ...<Widget>[
                     if (i > 0)
                       SizedBox(
-                        height: ElWidths.hairline,
+                        height: BorderWidths.hairline,
                         child: ColoredBox(color: theme.border),
                       ),
                     Expanded(child: _FunnelRow(stage: _funnelStages[i])),
@@ -3743,30 +3767,30 @@ class _FunnelRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final _ChartInk ink = _ChartInk(theme);
     return Row(
       children: <Widget>[
         Container(
-          width: el(2.5),
-          height: el(2.5),
+          width: space(2.5),
+          height: space(2.5),
           decoration: BoxDecoration(
             color: ink.slot(stage.slot),
-            borderRadius: BorderRadius.circular(ElRadii.sm),
+            borderRadius: BorderRadius.circular(Radii.sm),
           ),
         ),
-        SizedBox(width: el(2)),
+        SizedBox(width: space(2)),
         Expanded(
-          child: ElText(
+          child: StyledText(
             stage.label,
-            ElType.small,
+            TextStyles.small,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        ElText(
-          elChartNumber(stage.value),
-          ElType.numSm,
+        StyledText(
+          chartNumber(stage.value),
+          TextStyles.numberSm,
           color: theme.foreground,
         ),
       ],
@@ -3782,14 +3806,14 @@ class ChartsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('base', 'charts');
-    final ElThemeData theme = ElTheme.of(context);
+    final CategoryHit here = findCategory('base', 'charts');
+    final ThemeTokens theme = ThemeScope.of(context);
     final _ChartInk ink = _ChartInk(theme);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           eyebrow: '${here.group.title} · Base',
           title: here.category.title,
           blurb: here.category.blurb,
@@ -3797,24 +3821,24 @@ class ChartsPage extends StatelessWidget {
         ),
         // `className="mb-6"`.
         Padding(
-          padding: EdgeInsets.only(bottom: el(6)),
-          child: const ElNote(
+          padding: EdgeInsets.only(bottom: space(6)),
+          child: const Note(
             title: 'Built, not installed',
             child: _BuiltNotInstalled(),
           ),
         ),
         // `className="mb-12"`.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: const ElNote(
-            tone: ElNoteTone.value,
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: const Note(
+            tone: NoteTone.value,
             title: 'Read the Animation section before you copy any of this',
             child: _ReadAnimationFirst(),
           ),
         ),
         // `className="mb-14"`.
         Padding(
-          padding: EdgeInsets.only(bottom: el(14)),
+          padding: EdgeInsets.only(bottom: space(14)),
           child: const _TokensBlock(),
         ),
         _AreaSection(ink: ink),
@@ -3828,7 +3852,7 @@ class ChartsPage extends StatelessWidget {
         const _UnitActivitySection(),
         const _ConversionFunnelSection(),
         const _StatesSection(),
-        const ElPageFootNav(groupId: 'base', slug: 'charts'),
+        const PageFootNav(groupId: 'base', slug: 'charts'),
       ],
     );
   }
@@ -3838,27 +3862,27 @@ class _BuiltNotInstalled extends StatelessWidget {
   const _BuiltNotInstalled();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
-        ElCode.span('components/ui/chart.tsx'),
+        Code.span('components/ui/chart.tsx'),
         const TextSpan(
           text: ' is the official shadcn wrapper and it arrives with ',
         ),
-        ElCode.span('npx shadcn add chart'),
+        Code.span('npx shadcn add chart'),
         const TextSpan(
           text:
               '. The gallery variants on the shadcn site do not: '
               'querying the registry for “chart” returns three '
               'items — the ',
         ),
-        ElCode.span('chart'),
+        Code.span('chart'),
         const TextSpan(
           text:
               ' component, one example and one dashboard block. '
               'Everything below was written here, against ',
         ),
-        ElCode.span('recharts'),
+        Code.span('recharts'),
         const TextSpan(
           text:
               ', and every colour on it comes from the five chart '
@@ -3866,7 +3890,7 @@ class _BuiltNotInstalled extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -3875,8 +3899,8 @@ class _ReadAnimationFirst extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle base = ElText.styleOf(context, ElType.small);
-    return ElRichText(
+    final TextStyle base = StyledText.styleOf(context, TextStyles.small);
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -3894,7 +3918,7 @@ class _ReadAnimationFirst extends StatelessWidget {
           const TextSpan(
             text: ', so neither is a class and neither is visible to ',
           ),
-          ElCode.span('check:tokens'),
+          Code.span('check:tokens'),
           const TextSpan(
             text:
                 '. That makes charts the one place in this system where §0 '
@@ -3904,7 +3928,7 @@ class _ReadAnimationFirst extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -3915,20 +3939,24 @@ class _TokensBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText('The five chart tokens', ElType.h3, color: theme.foreground),
-        SizedBox(height: el(2)),
+        StyledText(
+          'The five chart tokens',
+          TextStyles.h3,
+          color: theme.foreground,
+        ),
+        SizedBox(height: space(2)),
         ConstrainedBox(
           // `max-w-2xl`.
-          constraints: BoxConstraints(maxWidth: ElContainers.xl2),
-          child: ElRichText(
+          constraints: BoxConstraints(maxWidth: Containers.xl2),
+          child: RichText(
             TextSpan(
               children: <InlineSpan>[
                 const TextSpan(text: 'Declared once per theme in '),
-                ElCode.span('app/globals.css'),
+                Code.span('app/globals.css'),
                 const TextSpan(
                   text:
                       ', and mirrored between them on purpose: 2 and 3 swap, '
@@ -3936,9 +3964,9 @@ class _TokensBlock extends StatelessWidget {
                       'survives the theme flip instead of inverting with it. '
                       'Series colours here name ',
                 ),
-                ElCode.span('var(--color-chart-1)'),
+                Code.span('var(--color-chart-1)'),
                 const TextSpan(text: ' … '),
-                ElCode.span('-5'),
+                Code.span('-5'),
                 const TextSpan(
                   text:
                       ' directly. There is no sixth, and adding one needs a '
@@ -3946,13 +3974,13 @@ class _TokensBlock extends StatelessWidget {
                 ),
               ],
             ),
-            ElType.small,
+            TextStyles.small,
           ),
         ),
-        SizedBox(height: el(6)),
-        const ElTokenSwatchList(
+        SizedBox(height: space(6)),
+        const TokenSwatchList(
           rows: <Widget>[
-            ElTokenSwatch(
+            TokenSwatch(
               token: '--chart-1',
               name: 'Chart 1',
               use:
@@ -3960,7 +3988,7 @@ class _TokensBlock extends StatelessWidget {
                   'reader is meant to follow.',
               measure: false,
             ),
-            ElTokenSwatch(
+            TokenSwatch(
               token: '--chart-2',
               name: 'Chart 2',
               use:
@@ -3969,7 +3997,7 @@ class _TokensBlock extends StatelessWidget {
                   'second-loudest on either surface.',
               measure: false,
             ),
-            ElTokenSwatch(
+            TokenSwatch(
               token: '--chart-3',
               name: 'Chart 3',
               use:
@@ -3977,7 +4005,7 @@ class _TokensBlock extends StatelessWidget {
                   'mode.',
               measure: false,
             ),
-            ElTokenSwatch(
+            TokenSwatch(
               token: '--chart-4',
               name: 'Chart 4',
               use:
@@ -3986,7 +4014,7 @@ class _TokensBlock extends StatelessWidget {
                   'fourth shade of the same one.',
               measure: false,
             ),
-            ElTokenSwatch(
+            TokenSwatch(
               token: '--chart-5',
               name: 'Chart 5',
               use:
@@ -4004,8 +4032,7 @@ class _TokensBlock extends StatelessWidget {
 /* ── Sections ────────────────────────────────────────────────────────────── */
 
 /// `lg:grid-cols-2` with `gap-4`: every family section's own grid.
-Widget _specimenGrid(List<Widget> children) =>
-    ElGrid(lg: 2, children: children);
+Widget _specimenGrid(List<Widget> children) => Grid(lg: 2, children: children);
 
 class _AreaSection extends StatelessWidget {
   const _AreaSection({required this.ink});
@@ -4013,7 +4040,7 @@ class _AreaSection extends StatelessWidget {
   final _ChartInk ink;
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'area',
     title: 'Area',
     description:
@@ -4090,9 +4117,9 @@ class _AreaSection extends StatelessWidget {
             ),
           ),
         ]),
-        SizedBox(height: el(4)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(4)),
+        Meta(
+          items: <MetaItem>[
             _meta(
               'type',
               'natural · monotone · linear · step. natural and monotone both '
@@ -4130,10 +4157,10 @@ class _BarSection extends StatelessWidget {
   const _BarSection({required this.ink, required this.theme});
 
   final _ChartInk ink;
-  final ElThemeData theme;
+  final ThemeTokens theme;
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'bar',
     title: 'Bar',
     description:
@@ -4210,14 +4237,14 @@ class _BarSection extends StatelessWidget {
             ),
           ),
         ]),
-        SizedBox(height: el(4)),
-        const ElNote(
+        SizedBox(height: space(4)),
+        const Note(
           title: 'Why these bars have square corners',
           child: _SquareCorners(),
         ),
-        SizedBox(height: el(4)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(4)),
+        Meta(
+          items: <MetaItem>[
             _meta(
               'layout',
               'horizontal (default) or vertical. vertical is the one that '
@@ -4266,7 +4293,7 @@ class _SquareCorners extends StatelessWidget {
   const _SquareCorners();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(
@@ -4274,15 +4301,15 @@ class _SquareCorners extends StatelessWidget {
               'Recharts takes a bar’s corner radius as a number of '
               'pixels — ',
         ),
-        ElCode.span('radius'),
+        Code.span('radius'),
         const TextSpan(text: ' is typed '),
-        ElCode.span('RectRadius'),
+        Code.span('RectRadius'),
         const TextSpan(
           text: ', a number or four of them, with no string form. Writing ',
         ),
-        ElCode.span('radius={6}'),
+        Code.span('radius={6}'),
         const TextSpan(text: ' there restates '),
-        ElCode.span('--radius-sm'),
+        Code.span('--radius-sm'),
         const TextSpan(
           text:
               ' as a literal, in a prop no guard reads — the same failure '
@@ -4294,7 +4321,7 @@ class _SquareCorners extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -4302,10 +4329,10 @@ class _LineSection extends StatelessWidget {
   const _LineSection({required this.ink, required this.theme});
 
   final _ChartInk ink;
-  final ElThemeData theme;
+  final ThemeTokens theme;
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'line',
     title: 'Line',
     description:
@@ -4384,9 +4411,9 @@ class _LineSection extends StatelessWidget {
             ),
           ),
         ]),
-        SizedBox(height: el(4)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(4)),
+        Meta(
+          items: <MetaItem>[
             _meta(
               'dot',
               'false, true, an object of SVG props, or a render function. '
@@ -4422,10 +4449,10 @@ class _PieSection extends StatelessWidget {
   const _PieSection({required this.ink, required this.theme});
 
   final _ChartInk ink;
-  final ElThemeData theme;
+  final ThemeTokens theme;
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'pie',
     title: 'Pie',
     description:
@@ -4511,9 +4538,9 @@ class _PieSection extends StatelessWidget {
             ),
           ),
         ]),
-        SizedBox(height: el(4)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(4)),
+        Meta(
+          items: <MetaItem>[
             _meta(
               'dataKey / nameKey',
               'dataKey is the number that sizes the slice; nameKey is the '
@@ -4563,10 +4590,10 @@ class _RadarSection extends StatelessWidget {
   const _RadarSection({required this.ink, required this.theme});
 
   final _ChartInk ink;
-  final ElThemeData theme;
+  final ThemeTokens theme;
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'radar',
     title: 'Radar',
     description:
@@ -4662,9 +4689,9 @@ class _RadarSection extends StatelessWidget {
             child: _radarRadius(ink, theme),
           ),
         ]),
-        SizedBox(height: el(4)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(4)),
+        Meta(
+          items: <MetaItem>[
             _meta(
               'PolarGrid gridType',
               'polygon (default) or circle. Polygon makes the vertices — the '
@@ -4703,10 +4730,10 @@ class _RadialSection extends StatelessWidget {
   const _RadialSection({required this.ink, required this.theme});
 
   final _ChartInk ink;
-  final ElThemeData theme;
+  final ThemeTokens theme;
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'radial',
     title: 'Radial',
     description:
@@ -4755,15 +4782,15 @@ class _RadialSection extends StatelessWidget {
             child: _radialStacked(ink),
           ),
         ]),
-        SizedBox(height: el(4)),
-        const ElNote(
-          tone: ElNoteTone.error,
+        SizedBox(height: space(4)),
+        const Note(
+          tone: NoteTone.error,
           title: 'A stacked radial does not widen its own angle axis',
           child: _StackedRadialNote(),
         ),
-        SizedBox(height: el(4)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(4)),
+        Meta(
+          items: <MetaItem>[
             _meta(
               'innerRadius / outerRadius',
               'On the RadialBarChart, not on the bar. Percentages again. A '
@@ -4801,7 +4828,7 @@ class _StackedRadialNote extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElRichText(
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(
@@ -4813,7 +4840,7 @@ class _StackedRadialNote extends StatelessWidget {
                   'nothing — no error, no warning, and a legend that still '
                   'listed all three. The fix is an explicit ',
             ),
-            ElCode.span('<PolarAngleAxis type="number" domain={[0, total]} />'),
+            Code.span('<PolarAngleAxis type="number" domain={[0, total]} />'),
             const TextSpan(
               text:
                   ', with the total summed from the data rather than '
@@ -4821,10 +4848,10 @@ class _StackedRadialNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(
@@ -4832,7 +4859,7 @@ class _StackedRadialNote extends StatelessWidget {
                   'The legend came off for a second reason: with one '
                   'datum and three series keys, ',
             ),
-            ElCode.span('ChartLegendContent'),
+            Code.span('ChartLegendContent'),
             const TextSpan(
               text:
                   ' renders an empty row — a radial legend’s payload is '
@@ -4841,7 +4868,7 @@ class _StackedRadialNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );
@@ -4853,7 +4880,7 @@ class _TooltipSection extends StatelessWidget {
   final _ChartInk ink;
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'tooltips-legends',
     title: 'Tooltips & legends',
     description:
@@ -4919,26 +4946,26 @@ class _TooltipSection extends StatelessWidget {
             child: _tooltipAdvanced(ink),
           ),
         ]),
-        SizedBox(height: el(4)),
-        const ElNote(
+        SizedBox(height: space(4)),
+        const Note(
           title: 'ChartConfig is what makes a tooltip readable',
           child: _ConfigNote(),
         ),
-        SizedBox(height: el(4)),
-        const ElNote(
-          tone: ElNoteTone.value,
+        SizedBox(height: space(4)),
+        const Note(
+          tone: NoteTone.value,
           title: 'Why the fills here do not go through ChartStyle',
           child: _ChartStyleNote(),
         ),
-        SizedBox(height: el(4)),
-        const ElNote(
-          tone: ElNoteTone.error,
+        SizedBox(height: space(4)),
+        const Note(
+          tone: NoteTone.error,
           title: 'Building this page found two live AA failures in chart text',
           child: _AaNote(),
         ),
-        SizedBox(height: el(4)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(4)),
+        Meta(
+          items: <MetaItem>[
             _meta(
               'ChartTooltip',
               "Recharts' Tooltip, re-exported unchanged. Pass "
@@ -4985,21 +5012,21 @@ class _ConfigNote extends StatelessWidget {
   const _ConfigNote();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
         const TextSpan(text: 'Without it a tooltip row says '),
-        ElCode.span('sealed'),
+        Code.span('sealed'),
         const TextSpan(text: ', because that is the key in the data. '),
-        ElCode.span('ChartConfig'),
+        Code.span('ChartConfig'),
         const TextSpan(text: ' maps every series key to a '),
-        ElCode.span('label'),
+        Code.span('label'),
         const TextSpan(text: ' and a '),
-        ElCode.span('color'),
+        Code.span('color'),
         const TextSpan(text: ', and both '),
-        ElCode.span('ChartTooltipContent'),
+        Code.span('ChartTooltipContent'),
         const TextSpan(text: ' and '),
-        ElCode.span('ChartLegendContent'),
+        Code.span('ChartLegendContent'),
         const TextSpan(
           text:
               ' read it out of context. It is the one piece of a chart '
@@ -5007,7 +5034,7 @@ class _ConfigNote extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -5018,35 +5045,35 @@ class _ChartStyleNote extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElRichText(
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(text: 'shadcn’s '),
-            ElCode.span('ChartStyle'),
+            Code.span('ChartStyle'),
             const TextSpan(text: ' mints a '),
-            ElCode.span('--color-<seriesKey>'),
+            Code.span('--color-<seriesKey>'),
             const TextSpan(
               text:
                   ' per container so one config can carry a light value '
                   'and a dark one. This system does not need that second '
                   'layer: ',
             ),
-            ElCode.span('--chart-1'),
+            Code.span('--chart-1'),
             const TextSpan(text: ' … '),
-            ElCode.span('-5'),
+            Code.span('-5'),
             const TextSpan(
               text:
                   ' are already declared once in each theme block, so a '
                   'series that names ',
             ),
-            ElCode.span('var(--color-chart-1)'),
+            Code.span('var(--color-chart-1)'),
             const TextSpan(text: ' gets the per-theme value for free.'),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(
@@ -5054,15 +5081,15 @@ class _ChartStyleNote extends StatelessWidget {
                   'It is also the difference between a reference the '
                   'guards can see and one they cannot. A fill naming ',
             ),
-            ElCode.span('--color-sealed'),
+            Code.span('--color-sealed'),
             const TextSpan(
               text:
                   ', copied out of a shadcn example, reaches a custom '
                   'property that exists only inside a ',
             ),
-            ElCode.span('<style>'),
+            Code.span('<style>'),
             const TextSpan(text: ' tag injected at runtime — '),
-            ElCode.span('check:refs'),
+            Code.span('check:refs'),
             const TextSpan(
               text:
                   ' reports it as undeclared, and it is right to. If you '
@@ -5071,10 +5098,10 @@ class _ChartStyleNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(
@@ -5082,9 +5109,9 @@ class _ChartStyleNote extends StatelessWidget {
                   'This paragraph proved it on the way in. It first '
                   'spelled the example out as a full ',
             ),
-            ElCode.span('var(…)'),
+            Code.span('var(…)'),
             const TextSpan(text: ' call, and '),
-            ElCode.span('check:refs'),
+            Code.span('check:refs'),
             const TextSpan(
               text:
                   ' failed the build on this page’s own documentation — '
@@ -5093,7 +5120,7 @@ class _ChartStyleNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );
@@ -5113,8 +5140,8 @@ class _AaNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle base = ElText.styleOf(context, ElType.small);
-    final ElThemeData theme = ElTheme.of(context);
+    final TextStyle base = StyledText.styleOf(context, TextStyles.small);
+    final ThemeTokens theme = ThemeScope.of(context);
     final TextStyle strong = base.copyWith(
       color: theme.foreground,
       fontWeight: FontWeight.bold,
@@ -5122,7 +5149,7 @@ class _AaNote extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElRichText(
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(
@@ -5130,23 +5157,23 @@ class _AaNote extends StatelessWidget {
                     'Both were invisible to every guard in the repository, '
                     'because recharts writes the colour as an inline ',
               ),
-              ElCode.span('fill'),
+              Code.span('fill'),
               const TextSpan(
                 text:
                     ' attribute on the SVG. They were found by rasterising '
                     'the rendered pixels in both themes — the only method that '
                     'works here, since a ',
               ),
-              ElCode.span('color-mix()'),
+              Code.span('color-mix()'),
               const TextSpan(text: ' read as text parses as '),
-              ElCode.span('oklab()'),
+              Code.span('oklab()'),
               const TextSpan(text: ' and not as RGB.'),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
-        SizedBox(height: el(3)),
-        ElRichText(
+        SizedBox(height: space(3)),
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               TextSpan(
@@ -5154,44 +5181,44 @@ class _AaNote extends StatelessWidget {
                 style: strong,
               ),
               const TextSpan(text: ' '),
-              ElCode.span('chart.tsx'),
+              Code.span('chart.tsx'),
               const TextSpan(text: ' carries '),
-              ElCode.span(
+              Code.span(
                 '[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground',
               ),
               const TextSpan(
                 text: ', and recharts 3.8 renders the label inside ',
               ),
-              ElCode.span('.recharts-cartesian-axis-tick-label'),
+              Code.span('.recharts-cartesian-axis-tick-label'),
               const TextSpan(text: ' with the class '),
-              ElCode.span('.recharts-cartesian-axis-tick-value'),
+              Code.span('.recharts-cartesian-axis-tick-value'),
               const TextSpan(text: ' on the '),
-              ElCode.span('<text>'),
+              Code.span('<text>'),
               const TextSpan(
                 text:
                     '. The selector matched nothing, so every one of the 78 '
                     'axis labels on this page kept recharts’ own ',
               ),
-              ElCode.span(rechartsTickFill),
+              Code.span(rechartsTickFill),
               const TextSpan(
                 text:
                     ' — 3.46:1 in dark, 5.74:1 in light — and the polar ticks '
                     'kept ',
               ),
-              ElCode.span(rechartsPolarFill),
+              Code.span(rechartsPolarFill),
               const TextSpan(
                 text:
                     ', 5.04:1 dark and 3.95:1 light. Each theme was failing '
                     'AA on one of the two. On ',
               ),
-              ElCode.span('--muted-foreground'),
+              Code.span('--muted-foreground'),
               const TextSpan(text: ' they now measure 13.46:1 and 4.83:1.'),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
-        SizedBox(height: el(3)),
-        ElRichText(
+        SizedBox(height: space(3)),
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               TextSpan(
@@ -5199,7 +5226,7 @@ class _AaNote extends StatelessWidget {
                 style: strong,
               ),
               const TextSpan(text: ' Against '),
-              ElCode.span('--background'),
+              Code.span('--background'),
               const TextSpan(
                 text:
                     ' the five chart tokens measure 4.34 · 10.75 · 1.88 · '
@@ -5209,13 +5236,13 @@ class _AaNote extends StatelessWidget {
                     'threshold — which is exactly why a chart token must not be '
                     'reused as a label colour. The labelled pie sets ',
               ),
-              ElCode.span('--foreground'),
+              Code.span('--foreground'),
               const TextSpan(
                 text: ' instead and keeps the slice colour on the leader line.',
               ),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
       ],
     );
@@ -5233,7 +5260,7 @@ class _AnimationSection extends StatelessWidget {
   const _AnimationSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'animation',
     title: 'Animation',
     description:
@@ -5245,21 +5272,21 @@ class _AnimationSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElNote(
+        const Note(
           title: 'The guard is the enforcement, not the rule',
           child: _GuardNote(),
         ),
-        SizedBox(height: el(6)),
+        SizedBox(height: space(6)),
         _AnimationHeading('What the hook resolved, live'),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         const _MotionReadout(),
-        SizedBox(height: el(8)),
+        SizedBox(height: space(8)),
         _AnimationHeading('Why slow, and not base or jelly'),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         const _WhySlow(),
-        SizedBox(height: el(8)),
+        SizedBox(height: space(8)),
         _AnimationHeading('Why ease-out, and not ease-spring'),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         const _Prose(
           '{--ease-spring} overshoots and settles, and that is exactly what '
           'makes it wrong here. A bar that overshoots its own value shows the '
@@ -5269,22 +5296,22 @@ class _AnimationSection extends StatelessWidget {
           'exceed. Everything that draws data decelerates into its final '
           'position and stops.',
         ),
-        SizedBox(height: el(8)),
+        SizedBox(height: space(8)),
         _AnimationHeading(
           'The curve did not make it through. Only the keyword did.',
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         const _CurveFailed(),
-        SizedBox(height: el(8)),
+        SizedBox(height: space(8)),
         _AnimationHeading(
           'Reduced motion is resolved in the hook, and not for the reason '
           'you would expect',
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         const _ReducedMotion(),
-        SizedBox(height: el(8)),
+        SizedBox(height: space(8)),
         _AnimationHeading('Why useSyncExternalStore'),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         const _Prose(
           '{Bar} alone is wider. Its {animationEasing} is {EasingInput}, '
           'which is {NamedBezier | "spring" | EasingFunction}, and '
@@ -5296,11 +5323,11 @@ class _AnimationSection extends StatelessWidget {
           '{getComputedStyle} is typed {string}, which is not assignable to a '
           'template literal type however it is spelled.',
         ),
-        SizedBox(height: el(8)),
+        SizedBox(height: space(8)),
         _AnimationHeading(
           'The tooltip too — and its default only looked right',
         ),
-        SizedBox(height: el(3)),
+        SizedBox(height: space(3)),
         const _Prose(
           'So the duration is read from the system and the curve is not. What '
           'is passed is the keyword {ease-out}, which names the token rather '
@@ -5311,15 +5338,15 @@ class _AnimationSection extends StatelessWidget {
           'points out by hand duplicates a token as a literal, which is the '
           'exact drift {check:tokens} exists to catch.',
         ),
-        SizedBox(height: el(8)),
-        const ElNote(
-          tone: ElNoteTone.value,
+        SizedBox(height: space(8)),
+        const Note(
+          tone: NoteTone.value,
           title:
               'The two SSR fallbacks are duplicated token values, on purpose',
           child: _SsrNote(),
         ),
-        SizedBox(height: el(6)),
-        const ElDoDont(
+        SizedBox(height: space(6)),
+        const DoDont(
           dos: <String>[
             'Call useChartMotion() once per demo and spread the whole result '
                 'onto every animated element in it.',
@@ -5357,7 +5384,7 @@ class _AnimationHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      ElText(text, ElType.h4, color: ElTheme.of(context).foreground);
+      StyledText(text, TextStyles.h4, color: ThemeScope.of(context).foreground);
 }
 
 /// `max-w-3xl` on a block box, and why it is an [Align] rather than a bare
@@ -5381,7 +5408,7 @@ Widget _capped(Widget child) => Align(
 /// `p.type-small.max-w-3xl`, with its `<Code>` chips marked in the copy.
 ///
 /// **The chips are not decoration and dropping them changes the layout.** A
-/// `ElCode` chip is `px-1.5` plus a hairline on each side, so every one of them
+/// `Code` chip is `px-1.5` plus a hairline on each side, so every one of them
 /// is ~13px wider than the same characters set as prose: and this section
 /// carries about forty of them across six blocks. Written as plain strings the
 /// Animation section measured **2439.9** against the reference's 2646.9, and
@@ -5398,7 +5425,7 @@ class _Prose extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _capped(ElRichText(_markup(context, text), ElType.small));
+      _capped(RichText(_markup(context, text), TextStyles.small));
 
   /// `{{…}}` is a chip whose own text contains braces: the one instance is
   /// the spread `{...motion}` the Animation section quotes.
@@ -5407,8 +5434,8 @@ class _Prose extends StatelessWidget {
   );
 
   static InlineSpan _markup(BuildContext context, String source) {
-    final ElThemeData theme = ElTheme.of(context);
-    final TextStyle base = ElText.styleOf(context, ElType.small);
+    final ThemeTokens theme = ThemeScope.of(context);
+    final TextStyle base = StyledText.styleOf(context, TextStyles.small);
     final List<InlineSpan> spans = <InlineSpan>[];
     int cursor = 0;
     for (final RegExpMatch match in _marker.allMatches(source)) {
@@ -5420,9 +5447,9 @@ class _Prose extends StatelessWidget {
       final String? strong = match.group(3);
       final String? emphasis = match.group(4);
       if (braced != null) {
-        spans.add(ElCode.span('{$braced}'));
+        spans.add(Code.span('{$braced}'));
       } else if (code != null) {
-        spans.add(ElCode.span(code));
+        spans.add(Code.span(code));
       } else if (strong != null) {
         // Nested, because the reference puts `<Code>` chips inside its `<em>`
         // and `<strong>` runs and a flat scan would swallow the braces.
@@ -5456,23 +5483,23 @@ class _GuardNote extends StatelessWidget {
   const _GuardNote();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
-        ElCode.span('check:tokens'),
+        Code.span('check:tokens'),
         const TextSpan(
           text:
               ' scans classNames and CSS. A bare JavaScript number in a '
               'JSX prop slips past it completely. That does not make it '
               'allowed — §0 is the rule, and ',
         ),
-        ElCode.span('animationDuration={800}'),
+        Code.span('animationDuration={800}'),
         const TextSpan(
           text:
               ' typed into a chart passes every guard in this repository '
               'and is still a violation. The whole of ',
         ),
-        ElCode.span('components/el/chart-motion.ts'),
+        Code.span('components/space/chart-motion.ts'),
         const TextSpan(
           text:
               ' exists to make the right thing the easy thing: call the '
@@ -5480,7 +5507,7 @@ class _GuardNote extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -5490,16 +5517,16 @@ class _MotionReadout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Duration resolved = elAnimationDuration(
+    final Duration resolved = effectiveMotionDuration(
       context,
-      ElChartMotion.duration,
+      ChartMotion.duration,
     );
-    return ElMeta(
-      items: <ElMetaItem>[
+    return Meta(
+      items: <MetaItem>[
         _meta(
           '--duration-slow',
-          '${ElChartMotion.duration.inMilliseconds}ms · '
-              'named by ElChartMotion, not read off a stylesheet',
+          '${ChartMotion.duration.inMilliseconds}ms · '
+              'named by ChartMotion, not read off a stylesheet',
         ),
         _meta(
           'animationDuration',
@@ -5514,7 +5541,7 @@ class _MotionReadout extends StatelessWidget {
           'animationEasing',
           '"ease-out" · the keyword recharts received instead, because its '
               'types take no cubic-bezier here — reproduced as '
-              'ElCurves.cssEaseOut',
+              'MotionCurves.cssEaseOut',
         ),
         _meta(
           'isAnimationActive',
@@ -5531,10 +5558,10 @@ class _WhySlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _capped(
-    ElRichText(
+    RichText(
       TextSpan(
         children: <InlineSpan>[
-          ElCode.span('--duration-base'),
+          Code.span('--duration-base'),
           const TextSpan(
             text:
                 ' is a control duration. It is the right length for a '
@@ -5542,17 +5569,17 @@ class _WhySlow extends StatelessWidget {
                 'hundred pixels wide it reads as a flicker rather than as a '
                 'drawing-on. ',
           ),
-          ElCode.span('--duration-jelly'),
+          Code.span('--duration-jelly'),
           const TextSpan(text: ' and '),
-          ElCode.span('--duration-reward'),
+          Code.span('--duration-reward'),
           const TextSpan(
             text:
                 ' belong to celebration — a pack opening, a payout landing '
                 '— and a sales chart is neither. ',
           ),
-          ElCode.span('--duration-bloom'),
+          Code.span('--duration-bloom'),
           const TextSpan(text: ' belongs to light. That leaves '),
-          ElCode.span('--duration-slow'),
+          Code.span('--duration-slow'),
           const TextSpan(
             text:
                 ', which is long enough for the eye to follow a bar up and '
@@ -5560,7 +5587,7 @@ class _WhySlow extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     ),
   );
 }
@@ -5573,7 +5600,7 @@ class _CurveFailed extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _capped(
-        ElRichText(
+        RichText(
           TextSpan(
             children: <InlineSpan>[
               const TextSpan(
@@ -5581,42 +5608,42 @@ class _CurveFailed extends StatelessWidget {
                     'This is the half that failed, and it is a limit in '
                     'recharts’ types rather than a shortcut taken here. ',
               ),
-              ElCode.span('node_modules/recharts/types/util/types.d.ts'),
+              Code.span('node_modules/recharts/types/util/types.d.ts'),
               const TextSpan(text: ' declares '),
-              ElCode.span('AnimationTiming'),
+              Code.span('AnimationTiming'),
               const TextSpan(text: ' as five keywords — '),
-              ElCode.span('ease'),
+              Code.span('ease'),
               const TextSpan(text: ', '),
-              ElCode.span('ease-in'),
+              Code.span('ease-in'),
               const TextSpan(text: ', '),
-              ElCode.span('ease-out'),
+              Code.span('ease-out'),
               const TextSpan(text: ', '),
-              ElCode.span('ease-in-out'),
+              Code.span('ease-in-out'),
               const TextSpan(text: ', '),
-              ElCode.span('linear'),
+              Code.span('linear'),
               const TextSpan(text: ' — and '),
-              ElCode.span('Area'),
+              Code.span('Area'),
               const TextSpan(text: ', '),
-              ElCode.span('Line'),
+              Code.span('Line'),
               const TextSpan(text: ', '),
-              ElCode.span('Pie'),
+              Code.span('Pie'),
               const TextSpan(text: ', '),
-              ElCode.span('Radar'),
+              Code.span('Radar'),
               const TextSpan(text: ', '),
-              ElCode.span('RadialBar'),
+              Code.span('RadialBar'),
               const TextSpan(text: ' and '),
-              ElCode.span('Tooltip'),
+              Code.span('Tooltip'),
               const TextSpan(text: ' all type '),
-              ElCode.span('animationEasing'),
+              Code.span('animationEasing'),
               const TextSpan(text: ' as that. A '),
-              ElCode.span('cubic-bezier()'),
+              Code.span('cubic-bezier()'),
               const TextSpan(text: ' string cannot be assigned to it.'),
             ],
           ),
-          ElType.small,
+          TextStyles.small,
         ),
       ),
-      SizedBox(height: el(3)),
+      SizedBox(height: space(3)),
       const _Prose(
         'The obvious shape — {useState} plus a {useEffect} that sets a '
         'mount flag — does not compile here. This repository lints under '
@@ -5624,13 +5651,13 @@ class _CurveFailed extends StatelessWidget {
         'rejects it. {useSyncExternalStore} is the intended tool for '
         'reading a browser value: it subscribes, reads on the client, and '
         'returns a defined server snapshot. {hooks/use-mobile.ts} and '
-        '{components/el/token-swatch.tsx} are the two models, and the '
+        '{components/space/token-swatch.tsx} are the two models, and the '
         'second is where the {MutationObserver} on {<html>} comes from — it '
         'watches {class} for the theme flip and {style} for a runtime '
         'override, so a duration that changes under a mounted chart is '
         'followed rather than missed.',
       ),
-      SizedBox(height: el(3)),
+      SizedBox(height: space(3)),
       const _Prose(
         'Every {ChartTooltip} in {chart-demos.tsx} takes the same '
         '{{...motion}} as the series beside it. It was the last holdout, '
@@ -5644,7 +5671,7 @@ class _CurveFailed extends StatelessWidget {
         'guard and is still a violation* case in its quietest form — a '
         'coincidence doing the work of a token — and the fix is one spread.',
       ),
-      SizedBox(height: el(3)),
+      SizedBox(height: space(3)),
       const _Prose(
         'Two things change with it. The easing was recharts’ {ease} and '
         'is now {ease-out}, the keyword that names {--ease-out}. And '
@@ -5729,24 +5756,24 @@ class _ProseGap extends StatelessWidget {
   const _ProseGap();
 
   @override
-  Widget build(BuildContext context) => SizedBox(height: el(3));
+  Widget build(BuildContext context) => SizedBox(height: space(3));
 }
 
 class _SsrNote extends StatelessWidget {
   const _SsrNote();
 
   @override
-  Widget build(BuildContext context) => ElRichText(
+  Widget build(BuildContext context) => RichText(
     TextSpan(
       children: <InlineSpan>[
-        ElCode.span('chart-motion.ts'),
+        Code.span('chart-motion.ts'),
         const TextSpan(
           text:
               ' carries a millisecond constant and an easing keyword that '
               'restate what the tokens say. §0 would normally forbid that. '
               'They are kept because ',
         ),
-        ElCode.span('getComputedStyle'),
+        Code.span('getComputedStyle'),
         const TextSpan(
           text:
               ' does not exist on the server, and without them a chart '
@@ -5754,7 +5781,7 @@ class _SsrNote extends StatelessWidget {
               'a duplicated constant. They are unreachable in a browser: the '
               'store getters win the moment there is a ',
         ),
-        ElCode.span('document'),
+        Code.span('document'),
         const TextSpan(
           text:
               '. If a token moves and one of these does not, the only '
@@ -5763,7 +5790,7 @@ class _SsrNote extends StatelessWidget {
         ),
       ],
     ),
-    ElType.small,
+    TextStyles.small,
   );
 }
 
@@ -5773,7 +5800,7 @@ class _UnitActivitySection extends StatelessWidget {
   const _UnitActivitySection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'unit-activity',
     title: 'Unit activity',
     description:
@@ -5789,9 +5816,9 @@ class _UnitActivitySection extends StatelessWidget {
           skeleton: _SkeletonKind.bar,
           child: _UnitActivityChart(),
         ),
-        SizedBox(height: el(4)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(4)),
+        Meta(
+          items: <MetaItem>[
             _meta(
               'data',
               'UnitActivityDay[] — each day owns labelled points with current '
@@ -5819,7 +5846,7 @@ class _ConversionFunnelSection extends StatelessWidget {
   const _ConversionFunnelSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'conversion-funnel',
     title: 'Conversion funnel',
     description:
@@ -5835,9 +5862,9 @@ class _ConversionFunnelSection extends StatelessWidget {
           skeleton: _SkeletonKind.bar,
           child: _ConversionFunnelChart(),
         ),
-        SizedBox(height: el(4)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(4)),
+        Meta(
+          items: <MetaItem>[
             _meta(
               'stages',
               'ConversionStage[] — label, value and one of the five chart '
@@ -5864,7 +5891,7 @@ class _StatesSection extends StatelessWidget {
   const _StatesSection();
 
   @override
-  Widget build(BuildContext context) => ElSection(
+  Widget build(BuildContext context) => Section(
     id: 'states',
     title: 'States',
     description:
@@ -5875,16 +5902,16 @@ class _StatesSection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ElNote(
+        const Note(
           title: 'The skeleton is the chart, with the data taken out',
           child: _SkeletonNote(),
         ),
-        SizedBox(height: el(4)),
-        const ElDoDont(
+        SizedBox(height: space(4)),
+        const DoDont(
           dos: <String>[
             'Match the skeleton to the family — a ring where a pie will '
                 'land, bars where bars will.',
-            'Swap once: anim-swap-in on the arriving content, nothing on the '
+            'Swap once: anim-content-change on the arriving content, nothing on the '
                 'leaving content.',
             'Give the empty state a way forward. Every one here loads the '
                 'data.',
@@ -5902,9 +5929,9 @@ class _StatesSection extends StatelessWidget {
                 'you cycle all three.',
           ],
         ),
-        SizedBox(height: el(4)),
-        ElMeta(
-          items: <ElMetaItem>[
+        SizedBox(height: space(4)),
+        Meta(
+          items: <MetaItem>[
             _meta(
               'ChartStates title / note',
               "The variant's name and the registry prop it demonstrates. They "
@@ -5943,20 +5970,20 @@ class _SkeletonNote extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      ElText(
+      StyledText(
         'Seven skeletons, one per family — a sloped band for Area, five '
         'bars for Bar, a polyline for Line, a ring for Pie, a polygon for '
         'Radar, concentric arcs for Radial, a plot plus a floating frame for '
         'Tooltip. Each is drawn at the plot’s real footprint, so the box '
         'does not move when the state changes.',
-        ElType.small,
+        TextStyles.small,
       ),
-      SizedBox(height: el(3)),
-      ElRichText(
+      SizedBox(height: space(3)),
+      RichText(
         TextSpan(
           children: <InlineSpan>[
             const TextSpan(text: 'That is measurable and it was measured: '),
-            ElCode.span('256px'),
+            Code.span('256px'),
             const TextSpan(
               text:
                   ' in the plot slot for all seven skeletons in all three '
@@ -5964,9 +5991,9 @@ class _SkeletonNote extends StatelessWidget {
                   'their full height too — the interactive variants used to '
                   'grow from ',
             ),
-            ElCode.span('393px'),
+            Code.span('393px'),
             const TextSpan(text: ' to '),
-            ElCode.span('453px'),
+            Code.span('453px'),
             const TextSpan(
               text:
                   ' when you switched to Ready, which is the layout jump '
@@ -5976,7 +6003,7 @@ class _SkeletonNote extends StatelessWidget {
             ),
           ],
         ),
-        ElType.small,
+        TextStyles.small,
       ),
     ],
   );

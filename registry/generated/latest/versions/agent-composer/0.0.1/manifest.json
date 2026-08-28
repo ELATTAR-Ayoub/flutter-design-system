@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/agent_composer.dart",
+      "source": "lib/src/components/ui/agent_composer.dart",
       "target": "@ui/agent_composer.dart",
-      "sha256": "95b11637ccde1858d1a50572de51f042784563fa382ad6975bf7bf440f48f74c"
+      "sha256": "621182b7c17fb02a9769eabfac82d0d00dd4e78f3aa662ad8ca921325c32ef92"
     }
   ],
   "registryDependencies": [
@@ -20,7 +20,7 @@
     "button",
     "icon",
     "input",
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "semanticDependencies": [
@@ -31,7 +31,7 @@
     "button",
     "icon",
     "input",
-    "machine-surface"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -39,6 +39,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/agent-composer",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/agent_composer.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_composer.dart",
   "deprecated": false
 }

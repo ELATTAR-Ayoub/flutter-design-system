@@ -16,7 +16,7 @@
 /// code sample is not repeated a second time here: it now lives only on the
 /// Groups section below, which already shows it beside a live specimen.
 ///
-/// **native_select** documents [ElNativeSelect] and [ElNativeSelectSize]
+/// **native_select** documents [NativeSelect] and [NativeSelectSize]
 /// only. `selection_control` and `form` — previously documented on this same
 /// page — now have their own pages: `../selection_control/page.dart` and
 /// `../form/page.dart`.
@@ -29,13 +29,25 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
-import '../../kit.dart' show ElPanel;
+import '../../kit.dart' show Panel;
 import '../catalog.dart';
 import 'meta.dart';
 
@@ -47,7 +59,7 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
     ShowcaseSection(
       id: 'preview',
       title: 'Preview',
-      description: 'A live ElNativeSelect with a small option list.',
+      description: 'A live NativeSelect with a small option list.',
       specimen: const _NativeSelectPreview(),
       code: _previewCode,
       label: 'Preview specimen view',
@@ -73,18 +85,18 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
     SnippetSection(
       id: 'usage',
       title: 'Usage',
-      description: 'ElNativeSelect wrapped in a ElField, with options.',
+      description: 'NativeSelect wrapped in a Field, with options.',
       code: _usageCode,
     ),
     SnippetSection(
       id: 'composition',
       title: 'Composition',
       description:
-          'ElNativeSelect flattens whatever list it is handed to find the '
+          'NativeSelect flattens whatever list it is handed to find the '
           'selected value and to build the open list: a flat list of '
-          'ElSelectOption, or ElSelectOption wrapped in ElSelectGroup '
+          'SelectOption, or SelectOption wrapped in SelectGroup '
           'under a label (see Groups below for the grouped shape, live). '
-          'ElSelectSeparator is legal in the same list but carries no '
+          'SelectSeparator is legal in the same list but carries no '
           'specimen of its own.',
       code: _compositionSimpleCode,
     ),
@@ -92,7 +104,7 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
       id: 'groups',
       title: 'Groups',
       description:
-          'ElSelectGroup organises related options under a label: the '
+          'SelectGroup organises related options under a label: the '
           'label paints inside the open list and is skipped by the '
           'keyboard, the same SelectGroup + SelectLabel pair the '
           'reference composes by hand.',
@@ -106,13 +118,13 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
       description:
           'enabled: false dims the whole wrapper to opacity-50 and stops '
           'it taking pointers, exactly where the reference dims the '
-          'wrapper rather than the control. A single ElSelectOption.'
+          'wrapper rather than the control. A single SelectOption.'
           'enabled: false keeps the rest of the control live but skips '
           'that one row for both the keyboard and the click.',
       specimen: const _NativeSelectDisabledPreview(),
       code: _disabledCode,
       label: 'Disabled specimen view',
-      minHeight: el(96),
+      minHeight: space(96),
     ),
     ShowcaseSection(
       id: 'invalid',
@@ -121,7 +133,7 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
           'invalid: true colours the border and ring destructive and '
           'paints the ring even at rest: the same aria-invalid treatment '
           'the reference\'s class list carries. The enclosing '
-          'ElFieldScope\'s own invalid ORs in, so either side can turn '
+          'FieldScope\'s own invalid ORs in, so either side can turn '
           'it on.',
       specimen: const _NativeSelectInvalidPreview(),
       code: _invalidCode,
@@ -131,18 +143,18 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
       id: 'native-select-vs-select',
       title: 'Native select vs select',
       description:
-          'ElNativeSelect is the platform picker, as far as Flutter can '
+          'NativeSelect is the platform picker, as far as Flutter can '
           'carry it: the closed control is measured 1:1 with the '
           'reference, arrows step the value while closed, and Alt+Down, '
           'Enter, Space, F4 open the list. The open list is a port-built '
-          'ElSelectMenu, not the OS picker: Flutter has no OS <select> '
-          'widget. ElSelect is ElSelectMenu wearing the Radix menu '
+          'SelectMenu, not the OS picker: Flutter has no OS <select> '
+          'widget. Select is SelectMenu wearing the Radix menu '
           'component\'s own closed control instead: fully custom, taller '
           '(40px against 32), and the arrows open it directly rather than '
-          'stepping a value while it stays shut. Reach for ElNativeSelect '
+          'stepping a value while it stays shut. Reach for NativeSelect '
           'when the closed-control fidelity and the value-stepping '
           'keyboard matter more than a fully custom look. Reach for '
-          'ElSelect everywhere else.',
+          'Select everywhere else.',
       code: _vsSelectCode,
     ),
     ShowcaseSection(
@@ -163,12 +175,12 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every constructor parameter ElNativeSelect declares, its own '
-          'static helper, and ElNativeSelectSize\'s two rungs.',
+          'Every constructor parameter NativeSelect declares, its own '
+          'static helper, and NativeSelectSize\'s two rungs.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElNativeSelect', anchor: 'api-elnativeselect'),
+        DocsTocEntry(title: 'NativeSelect', anchor: 'api-elnativeselect'),
         DocsTocEntry(
-          title: 'ElNativeSelectSize',
+          title: 'NativeSelectSize',
           anchor: 'api-elnativeselectsize',
         ),
       ],
@@ -179,14 +191,14 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
       title: 'States',
       description:
           'Rest, hover, focus, invalid, disabled, and open, across both '
-          'size rungs (see ElNativeSelectSize in API Reference above).',
+          'size rungs (see NativeSelectSize in API Reference above).',
       child: const DocsStateMatrix(facts: _stateFacts),
     ),
     DisclosureSection(
       id: 'accessibility',
       title: 'Accessibility',
       description: 'The semantic contract; see Keyboard below for the keys.',
-      child: const ElPanel(
+      child: const Panel(
         label: 'Semantics',
         child: _A11yRow(
           'Semantics',
@@ -203,7 +215,7 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
       description:
           'New: split out of the old Accessibility panel\'s own '
           '"Keyboard" label, moved here verbatim rather than duplicated.',
-      child: const ElPanel(
+      child: const Panel(
         label: 'Keyboard',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,7 +243,7 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
       title: 'Responsive',
       child: _bullets(<String>[
         'expand: true uses double.infinity width; at expand: false is '
-            'w-fit. A ElField wrapper will stretch it to the field\'s own '
+            'w-fit. A Field wrapper will stretch it to the field\'s own '
             'width regardless.',
         'Keyboard activation (arrows, Enter, Space, Tab) and pointer '
             'activation (tap) behave identically on every Flutter target.',
@@ -248,14 +260,14 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
     DisclosureSection(
       id: 'theming',
       title: 'Theming',
-      child: ElPanel(
+      child: Panel(
         label: 'What varies with the theme',
-        child: ElText(
-          'ElNativeSelect reads theme.input, theme.ring, and '
+        child: StyledText(
+          'NativeSelect reads theme.input, theme.ring, and '
           'theme.destructive. Dark mode has a 30%-50% overlay on input; '
           'light mode is transparent. Invalid state uses destructive with '
           'alpha variants.',
-          ElType.small,
+          TextStyles.small,
         ),
       ),
     ),
@@ -298,9 +310,9 @@ class NativeSelectDocPage extends StatelessWidget {
         title: entry.title,
         description: entry.description,
       ),
-      breadcrumbs: const <ElBreadcrumbEntry>[
-        ElBreadcrumbEntry.link('Components'),
-        ElBreadcrumbEntry.page('Native Select'),
+      breadcrumbs: const <BreadcrumbEntry>[
+        BreadcrumbEntry.link('Components'),
+        BreadcrumbEntry.page('Native Select'),
       ],
       toc: nativeSelectDocSpec.toc,
       previous: const DocsPageLink(
@@ -328,15 +340,15 @@ class _A11yRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : el(3)),
+      padding: EdgeInsets.only(bottom: last ? 0 : space(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(label, ElType.section, color: theme.actionInk),
-          SizedBox(height: el(1)),
-          ElText(body, ElType.small),
+          StyledText(label, TextStyles.section, color: theme.actionText),
+          SizedBox(height: space(1)),
+          StyledText(body, TextStyles.small),
         ],
       ),
     );
@@ -355,15 +367,15 @@ class _NativeSelectPreviewState extends State<_NativeSelectPreview> {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElContainers.sm),
-    child: ElField(
+    constraints: const BoxConstraints(maxWidth: Containers.sm),
+    child: Field(
       key: const ValueKey<String>('native-select-preview'),
       label: 'Country',
-      child: ElNativeSelect<String>(
-        options: const <ElSelectChild<String>>[
-          ElSelectOption(value: 'us', label: 'United States'),
-          ElSelectOption(value: 'ca', label: 'Canada'),
-          ElSelectOption(value: 'mx', label: 'Mexico'),
+      child: NativeSelect<String>(
+        options: const <SelectChild<String>>[
+          SelectOption(value: 'us', label: 'United States'),
+          SelectOption(value: 'ca', label: 'Canada'),
+          SelectOption(value: 'mx', label: 'Mexico'),
         ],
         value: _country,
         onChanged: (String next) => setState(() => _country = next),
@@ -386,24 +398,24 @@ class _NativeSelectGroupsPreviewState
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElContainers.sm),
-    child: ElField(
+    constraints: const BoxConstraints(maxWidth: Containers.sm),
+    child: Field(
       key: const ValueKey<String>('native-select-groups-preview'),
       label: 'Role',
-      child: ElNativeSelect<String>(
-        options: const <ElSelectChild<String>>[
-          ElSelectGroup<String>(
+      child: NativeSelect<String>(
+        options: const <SelectChild<String>>[
+          SelectGroup<String>(
             label: 'Engineering',
-            children: <ElSelectOption<String>>[
-              ElSelectOption(value: 'engineer', label: 'Engineer'),
-              ElSelectOption(value: 'designer', label: 'Designer'),
+            children: <SelectOption<String>>[
+              SelectOption(value: 'engineer', label: 'Engineer'),
+              SelectOption(value: 'designer', label: 'Designer'),
             ],
           ),
-          ElSelectGroup<String>(
+          SelectGroup<String>(
             label: 'Operations',
-            children: <ElSelectOption<String>>[
-              ElSelectOption(value: 'support', label: 'Support'),
-              ElSelectOption(value: 'sales', label: 'Sales'),
+            children: <SelectOption<String>>[
+              SelectOption(value: 'support', label: 'Support'),
+              SelectOption(value: 'sales', label: 'Sales'),
             ],
           ),
         ],
@@ -427,41 +439,41 @@ class _NativeSelectDisabledPreviewState
   String _wholeControl = 'apple';
   String _oneOption = 'apple';
 
-  static const List<ElSelectOption<String>> _fruits = <ElSelectOption<String>>[
-    ElSelectOption(value: 'apple', label: 'Apple'),
-    ElSelectOption(value: 'banana', label: 'Banana'),
-    ElSelectOption(value: 'blueberry', label: 'Blueberry'),
+  static const List<SelectOption<String>> _fruits = <SelectOption<String>>[
+    SelectOption(value: 'apple', label: 'Apple'),
+    SelectOption(value: 'banana', label: 'Banana'),
+    SelectOption(value: 'blueberry', label: 'Blueberry'),
   ];
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElContainers.sm),
+    constraints: const BoxConstraints(maxWidth: Containers.sm),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElText('Whole control disabled', ElType.section),
-        SizedBox(height: el(3)),
-        ElField(
+        StyledText('Whole control disabled', TextStyles.section),
+        SizedBox(height: space(3)),
+        Field(
           key: const ValueKey<String>('native-select-disabled-preview'),
           label: 'Fruit',
-          child: ElNativeSelect<String>(
+          child: NativeSelect<String>(
             options: _fruits,
             value: _wholeControl,
             onChanged: (String next) => setState(() => _wholeControl = next),
             enabled: false,
           ),
         ),
-        SizedBox(height: el(7)),
-        ElText('One option disabled', ElType.section),
-        SizedBox(height: el(3)),
-        ElField(
+        SizedBox(height: space(7)),
+        StyledText('One option disabled', TextStyles.section),
+        SizedBox(height: space(3)),
+        Field(
           key: const ValueKey<String>('native-select-disabled-option-preview'),
           label: 'Fruit',
-          child: ElNativeSelect<String>(
-            options: const <ElSelectOption<String>>[
-              ElSelectOption(value: 'apple', label: 'Apple'),
-              ElSelectOption(value: 'banana', label: 'Banana', enabled: false),
-              ElSelectOption(value: 'blueberry', label: 'Blueberry'),
+          child: NativeSelect<String>(
+            options: const <SelectOption<String>>[
+              SelectOption(value: 'apple', label: 'Apple'),
+              SelectOption(value: 'banana', label: 'Banana', enabled: false),
+              SelectOption(value: 'blueberry', label: 'Blueberry'),
             ],
             value: _oneOption,
             onChanged: (String next) => setState(() => _oneOption = next),
@@ -486,16 +498,16 @@ class _NativeSelectInvalidPreviewState
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: ElContainers.sm),
-    child: ElField(
+    constraints: const BoxConstraints(maxWidth: Containers.sm),
+    child: Field(
       key: const ValueKey<String>('native-select-invalid-preview'),
       label: 'Country',
       errors: const <String>['Select a valid country.'],
-      child: ElNativeSelect<String>(
-        options: const <ElSelectChild<String>>[
-          ElSelectOption(value: 'us', label: 'United States'),
-          ElSelectOption(value: 'ca', label: 'Canada'),
-          ElSelectOption(value: 'mx', label: 'Mexico'),
+      child: NativeSelect<String>(
+        options: const <SelectChild<String>>[
+          SelectOption(value: 'us', label: 'United States'),
+          SelectOption(value: 'ca', label: 'Canada'),
+          SelectOption(value: 'mx', label: 'Mexico'),
         ],
         value: _country,
         onChanged: (String next) => setState(() => _country = next),
@@ -520,15 +532,15 @@ class _NativeSelectRtlPreviewState extends State<_NativeSelectRtlPreview> {
   Widget build(BuildContext context) => Directionality(
     textDirection: TextDirection.rtl,
     child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: ElContainers.sm),
-      child: ElField(
+      constraints: const BoxConstraints(maxWidth: Containers.sm),
+      child: Field(
         key: const ValueKey<String>('native-select-rtl-preview'),
         label: 'الدولة',
-        child: ElNativeSelect<String>(
-          options: const <ElSelectChild<String>>[
-            ElSelectOption(value: 'sa', label: 'السعودية'),
-            ElSelectOption(value: 'eg', label: 'مصر'),
-            ElSelectOption(value: 'ma', label: 'المغرب'),
+        child: NativeSelect<String>(
+          options: const <SelectChild<String>>[
+            SelectOption(value: 'sa', label: 'السعودية'),
+            SelectOption(value: 'eg', label: 'مصر'),
+            SelectOption(value: 'ma', label: 'المغرب'),
           ],
           value: _country,
           onChanged: (String next) => setState(() => _country = next),
@@ -541,15 +553,15 @@ class _NativeSelectRtlPreviewState extends State<_NativeSelectRtlPreview> {
 /* ── Disclosure content ─────────────────────────────────────────────────── */
 
 const String _previewCode =
-    '''final List<ElSelectOption<String>> options = <ElSelectOption<String>>[
-  const ElSelectOption(value: 'us', label: 'United States'),
-  const ElSelectOption(value: 'ca', label: 'Canada'),
-  const ElSelectOption(value: 'mx', label: 'Mexico'),
+    '''final List<SelectOption<String>> options = <SelectOption<String>>[
+  const SelectOption(value: 'us', label: 'United States'),
+  const SelectOption(value: 'ca', label: 'Canada'),
+  const SelectOption(value: 'mx', label: 'Mexico'),
 ];
 
-ElField(
+Field(
   label: 'Country',
-  child: ElNativeSelect<String>(
+  child: NativeSelect<String>(
     options: options,
     value: country,
     onChanged: (String next) => setState(() => country = next),
@@ -557,45 +569,45 @@ ElField(
 )''';
 
 const String _usageCode =
-    '''final List<ElSelectOption<String>> options = <ElSelectOption<String>>[
-  const ElSelectOption(value: 'us', label: 'United States'),
-  const ElSelectOption(value: 'ca', label: 'Canada'),
-  const ElSelectOption(value: 'mx', label: 'Mexico'),
+    '''final List<SelectOption<String>> options = <SelectOption<String>>[
+  const SelectOption(value: 'us', label: 'United States'),
+  const SelectOption(value: 'ca', label: 'Canada'),
+  const SelectOption(value: 'mx', label: 'Mexico'),
 ];
 
-ElField(
+Field(
   label: 'Country',
-  child: ElNativeSelect<String>(
+  child: NativeSelect<String>(
     options: options,
     value: country,
     onChanged: (String next) => setState(() => country = next),
   ),
 )''';
 
-const String _compositionSimpleCode = '''ElNativeSelect<String>(
-  options: const <ElSelectOption<String>>[
-    ElSelectOption(value: 'apple', label: 'Apple'),
-    ElSelectOption(value: 'banana', label: 'Banana'),
-    ElSelectOption(value: 'blueberry', label: 'Blueberry'),
+const String _compositionSimpleCode = '''NativeSelect<String>(
+  options: const <SelectOption<String>>[
+    SelectOption(value: 'apple', label: 'Apple'),
+    SelectOption(value: 'banana', label: 'Banana'),
+    SelectOption(value: 'blueberry', label: 'Blueberry'),
   ],
   value: fruit,
   onChanged: (String next) => setState(() => fruit = next),
 )''';
 
-const String _compositionGroupedCode = '''ElNativeSelect<String>(
-  options: const <ElSelectChild<String>>[
-    ElSelectGroup<String>(
+const String _compositionGroupedCode = '''NativeSelect<String>(
+  options: const <SelectChild<String>>[
+    SelectGroup<String>(
       label: 'Engineering',
-      children: <ElSelectOption<String>>[
-        ElSelectOption(value: 'engineer', label: 'Engineer'),
-        ElSelectOption(value: 'designer', label: 'Designer'),
+      children: <SelectOption<String>>[
+        SelectOption(value: 'engineer', label: 'Engineer'),
+        SelectOption(value: 'designer', label: 'Designer'),
       ],
     ),
-    ElSelectGroup<String>(
+    SelectGroup<String>(
       label: 'Operations',
-      children: <ElSelectOption<String>>[
-        ElSelectOption(value: 'support', label: 'Support'),
-        ElSelectOption(value: 'sales', label: 'Sales'),
+      children: <SelectOption<String>>[
+        SelectOption(value: 'support', label: 'Support'),
+        SelectOption(value: 'sales', label: 'Sales'),
       ],
     ),
   ],
@@ -603,9 +615,9 @@ const String _compositionGroupedCode = '''ElNativeSelect<String>(
   onChanged: (String next) => setState(() => role = next),
 )''';
 
-const String _disabledCode = '''ElField(
+const String _disabledCode = '''Field(
   label: 'Fruit',
-  child: ElNativeSelect<String>(
+  child: NativeSelect<String>(
     options: options,
     value: fruit,
     onChanged: (String next) => setState(() => fruit = next),
@@ -613,13 +625,13 @@ const String _disabledCode = '''ElField(
   ),
 )
 
-ElField(
+Field(
   label: 'Fruit',
-  child: ElNativeSelect<String>(
-    options: const <ElSelectOption<String>>[
-      ElSelectOption(value: 'apple', label: 'Apple'),
-      ElSelectOption(value: 'banana', label: 'Banana', enabled: false),
-      ElSelectOption(value: 'blueberry', label: 'Blueberry'),
+  child: NativeSelect<String>(
+    options: const <SelectOption<String>>[
+      SelectOption(value: 'apple', label: 'Apple'),
+      SelectOption(value: 'banana', label: 'Banana', enabled: false),
+      SelectOption(value: 'blueberry', label: 'Blueberry'),
     ],
     value: fruit,
     onChanged: (String next) => setState(() => fruit = next),
@@ -627,10 +639,10 @@ ElField(
   ),
 )''';
 
-const String _invalidCode = '''ElField(
+const String _invalidCode = '''Field(
   label: 'Country',
   errors: const <String>['Select a valid country.'],
-  child: ElNativeSelect<String>(
+  child: NativeSelect<String>(
     options: options,
     value: country,
     onChanged: (String next) => setState(() => country = next),
@@ -638,13 +650,13 @@ const String _invalidCode = '''ElField(
   ),
 )''';
 
-const String _vsSelectCode = '''ElNativeSelect<String>(
+const String _vsSelectCode = '''NativeSelect<String>(
   options: options,
   value: country,
   onChanged: (String next) => setState(() => country = next),
 ) // 1:1 closed control, value-stepping keyboard
 
-ElSelect<String>(
+Select<String>(
   options: options,
   value: country,
   onChanged: (String next) => setState(() => country = next),
@@ -652,13 +664,13 @@ ElSelect<String>(
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElField(
+  child: Field(
     label: 'الدولة',
-    child: ElNativeSelect<String>(
-      options: const <ElSelectChild<String>>[
-        ElSelectOption(value: 'sa', label: 'السعودية'),
-        ElSelectOption(value: 'eg', label: 'مصر'),
-        ElSelectOption(value: 'ma', label: 'المغرب'),
+    child: NativeSelect<String>(
+      options: const <SelectChild<String>>[
+        SelectOption(value: 'sa', label: 'السعودية'),
+        SelectOption(value: 'eg', label: 'مصر'),
+        SelectOption(value: 'ma', label: 'المغرب'),
       ],
       value: country,
       onChanged: (String next) => setState(() => country = next),
@@ -676,15 +688,15 @@ class _ApiReferenceContent extends StatelessWidget {
       DocsAnchor(
         id: 'api-elnativeselect',
         child: const DocsApiTable(
-          title: 'ElNativeSelect',
+          title: 'NativeSelect',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'options',
-              type: 'List<ElSelectChild<T>>',
+              type: 'List<SelectChild<T>>',
               description:
                   'Required. Flattened to find the selected value; '
-                  'includes ElSelectOption, ElSelectGroup, and '
-                  'ElSelectSeparator.',
+                  'includes SelectOption, SelectGroup, and '
+                  'SelectSeparator.',
             ),
             DocsApiFact(
               name: 'value',
@@ -702,23 +714,23 @@ class _ApiReferenceContent extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'size',
-              type: 'ElNativeSelectSize',
+              type: 'NativeSelectSize',
               description:
-                  'Optional. Defaults to ElNativeSelectSize.md. See the '
-                  'ElNativeSelectSize table below.',
+                  'Optional. Defaults to NativeSelectSize.md. See the '
+                  'NativeSelectSize table below.',
             ),
             DocsApiFact(
               name: 'enabled',
               type: 'bool',
               description:
                   'Optional. Defaults to true. ANDed with the enclosing '
-                  'ElFieldScope\'s.',
+                  'FieldScope\'s.',
             ),
             DocsApiFact(
               name: 'invalid',
               type: 'bool',
               description:
-                  'Optional. Defaults to false. ORed with ElFieldScope\'s; '
+                  'Optional. Defaults to false. ORed with FieldScope\'s; '
                   'colours the border and ring red.',
             ),
             DocsApiFact(
@@ -747,31 +759,31 @@ class _ApiReferenceContent extends StatelessWidget {
               type: 'String?',
               description:
                   'Optional. Defaults to null. Accessible name; routed '
-                  'through ElFieldScope.',
+                  'through FieldScope.',
             ),
             DocsApiFact(
               name: 'hint',
               type: 'String?',
               description:
                   'Optional. Defaults to null. aria-describedby; routed '
-                  'through ElFieldScope.',
+                  'through FieldScope.',
             ),
             DocsApiFact(
-              name: 'ElNativeSelect.menuOffset',
+              name: 'NativeSelect.menuOffset',
               type: 'static double (get)',
               description:
-                  'el(1) = 4px: the sideOffset between the closed control '
+                  'space(1) = 4px: the sideOffset between the closed control '
                   'and the open list — PopoverContent\'s own gap, since '
                   'there is no reference for a list the OS draws.',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       DocsAnchor(
         id: 'api-elnativeselectsize',
         child: const DocsApiTable(
-          title: 'ElNativeSelectSize',
+          title: 'NativeSelectSize',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'sm',
@@ -781,8 +793,7 @@ class _ApiReferenceContent extends StatelessWidget {
             DocsApiFact(
               name: 'md',
               type: 'enum value',
-              description:
-                  'h-8 (32px), radius-lg (12px), py-1. The default.',
+              description: 'h-8 (32px), radius-lg (12px), py-1. The default.',
             ),
             DocsApiFact(
               name: 'label',
@@ -794,17 +805,17 @@ class _ApiReferenceContent extends StatelessWidget {
             DocsApiFact(
               name: 'height',
               type: 'double (get)',
-              description: 'el(8) = 32 for md, el(7) = 28 for sm.',
+              description: 'space(8) = 32 for md, space(7) = 28 for sm.',
             ),
             DocsApiFact(
               name: 'radius',
               type: 'double (get)',
-              description: 'ElRadii.lg = 12 for md, ElRadii.md = 10 for sm.',
+              description: 'Radii.lg = 12 for md, Radii.md = 10 for sm.',
             ),
             DocsApiFact(
               name: 'insetY',
               type: 'double (get)',
-              description: 'el(1) = 4 for md, el(0.5) = 2 for sm.',
+              description: 'space(1) = 4 for md, space(0.5) = 2 for sm.',
             ),
           ],
         ),
@@ -838,8 +849,8 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Dependencies',
             value: 'source-foundation, popover, select, field',
             description:
-                'Depends on ElSelectMenu (from select.dart), ElPopover, '
-                'and ElField (which supplies the focus/label/hint '
+                'Depends on SelectMenu (from select.dart), Popover, '
+                'and Field (which supplies the focus/label/hint '
                 'plumbing).',
           ),
           DocsInstallFact(
@@ -850,20 +861,18 @@ class _DependenciesContent extends StatelessWidget {
           DocsInstallFact(
             label: 'Verified',
             value: 'this docs specimen',
-            description: 'example/test/components_docs/native_select_test.dart.',
+            description:
+                'example/test/components_docs/native_select_test.dart.',
           ),
         ],
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       DocsLinkRow(
         links: const <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Icon', route: '/components/icon'),
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
           DocsLink(label: 'Popover', route: '/components/popover'),
           DocsLink(label: 'Select', route: '/components/select'),
           DocsLink(
@@ -878,15 +887,19 @@ class _DependenciesContent extends StatelessWidget {
 
 Widget _bullets(List<String> lines) => Builder(
   builder: (BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+      constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           for (final String line in lines) ...<Widget>[
-            ElText('•  $line', ElType.small, color: theme.mutedForeground),
-            SizedBox(height: el(2)),
+            StyledText(
+              '•  $line',
+              TextStyles.small,
+              color: theme.mutedForeground,
+            ),
+            SizedBox(height: space(2)),
           ],
         ],
       ),
@@ -916,8 +929,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'Border and ring become destructive and destructive/20 '
         '(destructive/50 in dark); ring paints even at rest.',
-    userSignal:
-        'Red border and error ring communicate validation failure.',
+    userSignal: 'Red border and error ring communicate validation failure.',
   ),
   DocsStateFact(
     state: 'Disabled',
@@ -942,8 +954,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'Border becomes ring; list appears below the control without '
         'animation.',
-    userSignal:
-        'The list is anchored below and becomes the focus target.',
+    userSignal: 'The list is anchored below and becomes the focus target.',
   ),
   DocsStateFact(
     state: 'Reduced motion',

@@ -57,7 +57,7 @@ take `--dry-run`; `add` takes `--overwrite`.
   them, and it never touches files Elattar did not install.
 - `init` writes `LICENSES/ELATTAR-MIT.txt`. Items that redistribute
   third-party material carry their own notice: the foundation installs the
-  three font OFL notices, `icon` installs lucide's, `voice-orb` installs the
+  three font OFL notices, `icon` installs lucide's, `voice-indicator` installs the
   ElevenLabs UI notice. Keep them — that is the condition all three licenses
   attach to the grant.
 

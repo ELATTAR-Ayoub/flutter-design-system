@@ -1,12 +1,12 @@
 /// Documentation metadata for `item`.
 ///
 /// `item` is a real, distinct component: `lib/src/components/item.dart`
-/// defines `ElItem`, `ElItemGroup`, `ElItemVariant`, `ElItemMedia`,
-/// `ElItemContent`, `ElItemTitle`, `ElItemDescription`, and `ElItemActions`,
+/// defines `Item`, `ItemGroup`, `ItemVariant`, `ItemMedia`,
+/// `ItemContent`, `ItemTitle`, `ItemDescription`, and `ItemActions`,
 /// verified by reading that file directly. It is not the same widget as
-/// `ElField` (a form-control wrapper, documented on its own page — see this
+/// `Field` (a form-control wrapper, documented on its own page — see this
 /// page's own "Item vs Field" section) and it is not a size/variant of
-/// `ElStat`, `ElEmpty`, or `ElKbd`. `stat/page.dart` used to carry `item`'s
+/// `Stat`, `Empty`, or `Kbd`. `stat/page.dart` used to carry `item`'s
 /// content as one of four merged components; this is the first page that
 /// owns it alone.
 ///
@@ -30,14 +30,14 @@ const ComponentDocEntry itemDoc = ComponentDocEntry(
       'optional actions, with a border variant and an alignment override.',
   dependencies: <String>['source-foundation'],
   exports: <String>[
-    'ElItemGroup',
-    'ElItem',
-    'ElItemVariant',
-    'ElItemMedia',
-    'ElItemContent',
-    'ElItemTitle',
-    'ElItemDescription',
-    'ElItemActions',
+    'ItemGroup',
+    'Item',
+    'ItemVariant',
+    'ItemMedia',
+    'ItemContent',
+    'ItemTitle',
+    'ItemDescription',
+    'ItemActions',
   ],
   sourcePath: 'lib/src/components/item.dart',
 );

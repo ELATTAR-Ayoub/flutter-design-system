@@ -7,17 +7,17 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/alert.dart",
+      "source": "lib/src/components/ui/alert.dart",
       "target": "@ui/alert.dart",
-      "sha256": "be4893eb0f4f8775cd2a21f9cf37934f5b104457936aa412d05337890edda391"
+      "sha256": "a426502c74a93f491905147174be59d5928e9b54c69a2ba43ad2d10649779d75"
     }
   ],
   "registryDependencies": [
-    "bloom-cosmic",
+    "feedback-surface",
     "source-foundation"
   ],
   "semanticDependencies": [
-    "bloom-cosmic"
+    "feedback-surface"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/alert",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/alert.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/alert.dart",
   "deprecated": false
 }

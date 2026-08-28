@@ -24,6 +24,6 @@ const ComponentDocEntry breadcrumbDoc = ComponentDocEntry(
   // (`registry/components/icon.json`) for the chevron separator, plus the
   // foundation every other entry names.
   dependencies: <String>['icon', 'source-foundation'],
-  exports: <String>['ElBreadcrumb', 'ElBreadcrumbEntry'],
+  exports: <String>['Breadcrumb', 'BreadcrumbEntry'],
   sourcePath: 'lib/src/components/breadcrumb.dart',
 );

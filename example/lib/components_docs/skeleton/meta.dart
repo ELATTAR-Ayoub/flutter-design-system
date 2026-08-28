@@ -1,7 +1,7 @@
 /// Documentation metadata for the `skeleton` component.
 ///
-/// **New route, split out of `progress`.** `ElSkeleton` used to share
-/// `/components/progress` with `ElProgress` under one shared
+/// **New route, split out of `progress`.** `Skeleton` used to share
+/// `/components/progress` with `Progress` under one shared
 /// `ComponentDocEntry` (see `progress/meta.dart`'s own note for the split).
 /// It now has its own [name], its own route (`/components/skeleton`), and
 /// its own page class (`SkeletonDocPage`).
@@ -24,6 +24,6 @@ const ComponentDocEntry skeletonDoc = ComponentDocEntry(
       'A shimmering placeholder box, sized like the content that has not '
       'arrived yet, so the layout never jumps when it does.',
   dependencies: <String>['keyframes', 'source-foundation'],
-  exports: <String>['ElSkeleton'],
+  exports: <String>['Skeleton'],
   sourcePath: 'lib/src/components/skeleton.dart',
 );

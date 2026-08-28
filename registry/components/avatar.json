@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/avatar.dart",
+      "source": "lib/src/components/ui/avatar.dart",
       "target": "@ui/avatar.dart",
-      "sha256": "633d0216cea5e86bda8bc75ce939e2a8cb4297491af0cfc17da17cc933883aa6"
+      "sha256": "55d0087dca3c14a48dfd0271471147e8195eeafd2c7e9b2f2c01d83d7ca9b450"
     }
   ],
   "registryDependencies": [
@@ -21,5 +21,14 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/avatar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/avatar.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/avatar.dart",
+  "exports": [
+    "Avatar",
+    "AvatarBadge",
+    "AvatarGroup",
+    "AvatarGroupCount",
+    "AvatarRimPainter",
+    "AvatarRing",
+    "AvatarSize"
+  ]
 }

@@ -1,14 +1,14 @@
 # Map — `/design-system/components/base/selects` (Base Components · Selects & Pickers)
 
-**This is a delta map.** Phase 3 shipped `ElSelect` at *forms-page* fidelity — a working
+**This is a delta map.** Phase 3 shipped `Select` at *forms-page* fidelity — a working
 overlay menu, measured-confirmed 34.571px rows, the `expand` cascade switch — and
 explicitly deferred everything this page is actually about. §3 states line by line what
 exists and what is new; §4–§10 spec the new surface; §15 is the build ledger. Read §3
 before anything else.
 
 **Files that produce the render** (all under `D:\DESIGN\Design-System-2026-8\design-system\`):
-- `app\design-system\components\base\selects\page.tsx` — the page. **`"use client"`**. 485 lines, no page-local components, three `useState` dates and one derived label. Nine `ElSection`s.
-- `components\el\kit.tsx` — `ElPageHeader` (:11), `ElSection` (:45), `Panel` (:77, **`note` prop at :79**), `StateGrid` (:145), `StateCell` (:173), `Meta` (:202), `Code` (:229), `DoDont` (:238), `Note` (:274), `PageFootNav` (:348).
+- `app\design-system\components\base\selects\page.tsx` — the page. **`"use client"`**. 485 lines, no page-local components, three `useState` dates and one derived label. Nine `Section`s.
+- `components\el\kit.tsx` — `PageHeader` (:11), `Section` (:45), `Panel` (:77, **`note` prop at :79**), `StateGrid` (:145), `StateCell` (:173), `Meta` (:202), `Code` (:229), `DoDont` (:238), `Note` (:274), `PageFootNav` (:348).
 - `components\ui\select.tsx` — **all ten exports live on this page** (the forms page used five). `SelectGroup` :16, `SelectLabel` :94, `SelectSeparator` :131, `SelectScrollUpButton` :144, `SelectScrollDownButton` :163 are new here.
 - `components\ui\native-select.tsx` — `NativeSelect` (:11), `NativeSelectOption` (:36). A real `<select>`. `NativeSelectOptGroup` (:49) exists and is unused.
 - `components\ui\combobox.tsx` — 16 exports; the page uses 5 (`Combobox`, `ComboboxInput`, `ComboboxContent`, `ComboboxEmpty`, `ComboboxList`) + `ComboboxItem`. **Built on `@base-ui/react`, not Radix** — the only component in the corpus that is. §16 drift 21.
@@ -57,7 +57,7 @@ every `*-N` above ports as `el(N)` with no conversion.
 
 ---
 
-## 1 · Page header (`ElPageHeader`)
+## 1 · Page header (`PageHeader`)
 
 `<header class="mb-14 border-b border-border pb-10">` (`kit.tsx:23`).
 
@@ -76,8 +76,8 @@ resolves (`nav.dart:731–747`).
 
 ## 2 · Section inventory (verbatim)
 
-One top-level `Note` **before** the first section, then nine `ElSection`s, then `PageFootNav`.
-`ElSection` shell: `<section id class="mb-20">`; `<h2 class="type-h3">`; description
+One top-level `Note` **before** the first section, then nine `Section`s, then `PageFootNav`.
+`Section` shell: `<section id class="mb-20">`; `<h2 class="type-h3">`; description
 `type-small mt-2 max-w-2xl`.
 
 **Pre-section `Note`** — `tone="action"`, `className="mb-12"`, title **"Choosing the right one"** (page:96–103). Copy in §12.1.
@@ -113,7 +113,7 @@ Per-section children, in DOM order:
 
 **§1 is the only section with a `StateGrid`. §6 and §7 are the only two-column sections.
 §8 and §9 have no description and no Panel. There is no `DoDont` anywhere but §9.** Panel
-`note` is used twice on this page and never on the forms page — the port's `ElPanel` already
+`note` is used twice on this page and never on the forms page — the port's `Panel` already
 takes it (`kit.dart:246`).
 
 `rangeLabel` (page:82–85) is derived, not literal:
@@ -126,9 +126,9 @@ With the seeded range → **"12 Jul – 20 Jul"**. The separator is U+2013 EN DA
 
 ---
 
-## 3 · What phase 3 already shipped — the `ElSelect` delta
+## 3 · What phase 3 already shipped — the `Select` delta
 
-`lib\src\components\select.dart` is scoped by its own library doc (`:5–8`) to *"the fidelity
+`lib\src\components\ui\select.dart` is scoped by its own library doc (`:5–8`) to *"the fidelity
 the forms page renders"* and names this page as the owner of the rest. That promise is now
 due.
 
@@ -137,22 +137,22 @@ due.
 | shipped | where | verified by |
 |---|---|---|
 | Trigger 40 / 32px (`data-size` default / sm), pill, `--input` border, `--card` fill | `select.dart:99–112`, `:408–421` | `test\selection_feedback_test.dart:529` |
-| Permanent `shadow-pressed` socket via `ElMachineSurface` | `select.dart:408–415` | `selection_feedback_test.dart:537–539` |
+| Permanent `shadow-pressed` socket via `MachineSurface` | `select.dart:408–415` | `selection_feedback_test.dart:537–539` |
 | `pl-4 pr-3.5`, `gap-2`, 13px `sheetBody`, chevron 16px muted | `select.dart:418`, `:426–444` | — |
-| `transition-colors` on fill / border / ring at **250ms** `ElCurves.out` | `select.dart:378`, `:393–425` | — |
+| `transition-colors` on fill / border / ring at **250ms** `Curves.out` | `select.dart:378`, `:393–425` | — |
 | Focus ring `ring/50`; invalid border + ring incl. the two `dark:` alphas; **invalid beats focus** | `select.dart:70–78`, `:353–373` | `selection_feedback_test.dart:640–654` |
 | `disabled:opacity-50` + `IgnorePointer` | `select.dart:81`, `:473–476` | — |
 | `data-placeholder:text-muted-foreground` | `select.dart:434` | `selection_feedback_test.dart:543` |
 | Dark-only hover fill `--input` 30 % → 50 % (drift 17/18) | `select.dart:346–351` | `selection_feedback_test.dart:658–678` |
 | `expand` — the `w-fit` ↔ `*:w-full` switch (drift 11) | `select.dart:167–172`, `:428`, `:450` | `example\test\forms_page_test.dart:984–991` |
 | Overlay menu, `position="item-aligned"` placement | `select.dart:497–534` | `forms_page_test.dart:1086–1093` |
-| Content `min-w-36`, `rounded-lg`, `ElShadows.tailwindMd` + 1px `foreground/10` ring, viewport `p-2` | `select.dart:88–96`, `:598–614` | `selection_feedback_test.dart:627` |
+| Content `min-w-36`, `rounded-lg`, `Shadows.tailwindMd` + 1px `foreground/10` ring, viewport `p-2` | `select.dart:88–96`, `:598–614` | `selection_feedback_test.dart:627` |
 | Item `py-2 pl-3 pr-9`, `rounded-md`, `accent` highlight, right-3 16px tick, **34.571px** | `select.dart:658–708` | `selection_feedback_test.dart:579–599` |
-| `ElSelect.itemHeight` derived from the type spec, not measured | `select.dart:194–197` | `selection_feedback_test.dart:581` |
+| `Select.itemHeight` derived from the type spec, not measured | `select.dart:194–197` | `selection_feedback_test.dart:581` |
 | Keyboard: ↑ ↓ Home End Enter Space Escape Tab, wrapping over disabled rows | `select.dart:289–340` | `selection_feedback_test.dart:601`, `:616` |
 | Outside-tap dismiss + focus restore | `select.dart:274–280`, `:543–548` | — |
 | **No open/close animation** (drift 10) | `select.dart:25–31` | `selection_feedback_test.dart:569` |
-| `ElFieldScope` integration + label-for activation | `select.dart:218–227`, `:382` | `forms_page_test.dart:1043–1051` |
+| `FieldScope` integration + label-for activation | `select.dart:218–227`, `:382` | `forms_page_test.dart:1043–1051` |
 
 The row-height derivation is exact and already load-bearing:
 `13 × (1.25/0.875) + el(2)×2 = 18.5714 + 16 = **34.5714px**`, matching
@@ -165,11 +165,11 @@ The row-height derivation is exact and already load-bearing:
 | 1 | **`SelectGroup` + `SelectLabel`** | page:119–130; `select.tsx:16`, `:94` | Label is `px-3 py-2 text-xs text-muted-foreground` → **32px** *(derived: 12 × 1.3333 + 16)*. Group carries `scroll-my-2` (8px scroll margin, no paint). |
 | 2 | **`SelectSeparator`** | page:125; `select.tsx:131` | `-mx-2 my-2 h-px bg-border` → 1px rule that **bleeds through the viewport's 8px padding to the full content width**, plus 8px above and below = **17px** of vertical space. |
 | 3 | **Scroll up / down buttons** | `select.tsx:144`, `:163` | `flex items-center justify-center bg-popover py-2` + a 16px chevron → **32px** each. They mount inside `SelectContent`, outside the `Viewport`, and only paint when the viewport overflows. |
-| 4 | **A trigger width that is neither `w-fit` nor `w-full`** | page:166, 176, 186 (`className="w-40"`) | `ElSelect.expand` is a `bool`. `w-40` = 160px is a third case; twMerge kills `w-fit` before CSS sees it. |
+| 4 | **A trigger width that is neither `w-fit` nor `w-full`** | page:166, 176, 186 (`className="w-40"`) | `Select.expand` is a `bool`. `w-40` = 160px is a third case; twMerge kills `w-fit` before CSS sees it. |
 | 5 | **Item-aligned placement over a heterogeneous list** | page:118–131 | `_placement()` (`select.dart:508–510`) computes the chosen row's centre as `el(2) + (index + 0.5) × itemHeight`. With a 32px label, three rows, a 17px separator, a second 32px label and two rows, that arithmetic is wrong. It must become a running offset over a typed child list. **This is the sharpest technical delta on the page.** |
 | 6 | **Content scrolling with the two buttons** | `select.tsx:73`, `:78`, `:88` | Today: a bare `SingleChildScrollView` (`select.dart:617`). The reference caps at `max-h-(--radix-select-content-available-height)` and paints buttons instead of a rail. |
 | 7 | **An empty `SelectContent`** | page:189 (`<SelectContent />`) | `_openMenu` early-returns on `options.isEmpty` (`select.dart:263`), so nothing opens — which happens to match, because that cell is also `disabled`. Confirm intent (§17 Q5). |
-| 8 | **`aria-label` on a trigger with no visible label** | page:166, 176, 186 | `ElSelect.label` already exists (`select.dart:181`). No work — but the page is the first consumer. |
+| 8 | **`aria-label` on a trigger with no visible label** | page:166, 176, 186 | `Select.label` already exists (`select.dart:181`). No work — but the page is the first consumer. |
 | 9 | **The disabled trigger as a rendered specimen** | page:184–191 | Implemented; needs a state cell to render it. |
 
 Everything else in §4–§10 is **new components**, not deltas.
@@ -357,7 +357,7 @@ component ships is **not on this page**.
 | `InputGroupInput` (`:125`) | `flex-1 rounded-none border-0 bg-transparent shadow-none ring-0 focus-visible:border-transparent focus-visible:ring-0` | an `Input` with its own chrome switched off; keeps `Input`'s `px-4` |
 | group → input padding | `has-[>[data-align=inline-end]]:[&>input]:pr-2` | the input's right padding drops to **8px** |
 | `InputGroupAddon align="inline-end"` (`:33`) | `order-last pr-4 has-[>button]:-mr-0.5` | 16px right padding, pulled back **2px** because it holds a button |
-| `InputGroupButton size="icon-xs"` (`:76`) | `size-6 rounded-[calc(var(--radius)-3px)] p-0 has-[>svg]:p-0` | **24 × 24**, radius **7px** (`--radius: 10px`, *measured byte 242912*) — the port already has this as **`ElRadii.addonButton`** (`spacing.dart:125`) |
+| `InputGroupButton size="icon-xs"` (`:76`) | `size-6 rounded-[calc(var(--radius)-3px)] p-0 has-[>svg]:p-0` | **24 × 24**, radius **7px** (`--radius: 10px`, *measured byte 242912*) — the port already has this as **`Radii.addonButton`** (`spacing.dart:125`) |
 | chevron | `pointer-events-none size-4 text-muted-foreground` | 16px, muted |
 | placeholder | **"Search card sets"** | |
 
@@ -600,8 +600,8 @@ Right column: a `Note tone="action"` titled **"This section existed only as a pr
 | picked | `.type-num` | **Geist Mono, 15px, lh 1.2, weight 600, tracking −0.01em, tabular** *(measured, globals.css:1255–1278)* → **"30 Jul 2026"** |
 | empty | *(none)* — inherits the Button | **Inter, 13px (`text-sm`), weight 500** → **"Pick a date"** |
 
-The port has both: `ElType.numBase` (mono/15/1.2/600/−0.01/tabular, `typography.dart:794`) and
-`ElComponentType.buttonLabel` (`:310`).
+The port has both: `Type.numBase` (mono/15/1.2/600/−0.01/tabular, `typography.dart:794`) and
+`ComponentType.buttonLabel` (`:310`).
 
 ### 10.2 · The popover
 
@@ -783,7 +783,7 @@ input **and** the command input.
 
 **The rendered number is 250ms either way**, because `--duration-base` also happens to be 250ms
 — which is precisely why nobody has noticed. Port it as *the default*, not as
-`ElDurations.base`, and treat any future `duration-fast` / `duration-tick` / `duration-slow`
+`Durations.base`, and treat any future `duration-fast` / `duration-tick` / `duration-slow`
 class as **250ms**, not 150 / 80 / 400.
 
 The easing half is **not** affected: Tailwind v4 *does* carry an `--ease-*` namespace, and
@@ -805,8 +805,8 @@ The three animation utilities decompose as: `fade-in-0` = opacity 0→1; `zoom-i
 positioner (`--radix-popover-content-transform-origin` / base-ui's `--transform-origin`), so a
 port must anchor the scale at the corner nearest the trigger, not at the centre.
 
-`--duration-overlay` (320ms) already exists in the port as **`ElDurations.overlay`**
-(`motion.dart:33`) and is currently unused — `ElSelect` deliberately does not animate.
+`--duration-overlay` (320ms) already exists in the port as **`Durations.overlay`**
+(`motion.dart:33`) and is currently unused — `Select` deliberately does not animate.
 Reduced motion collapses everything to `.01ms` (`globals.css:2534–2542`); the port routes this
 through `elAnimationDuration`.
 
@@ -826,14 +826,14 @@ Only what is not already tabulated in `forms-map.md` §13 / `shadows-map.md` §1
 | `.type-num-sm` | `--text-num-sm` | **12** | 1.2, weight 600, mono, tabular | the two Panel `note`s |
 | `--tracking-widest` | — | — | **0.1em** | `CommandShortcut` |
 
-There is **no `ElType` at 12px** in the port outside `ElType.numSm` (mono) and three
-`ElComponentType` roles (`buttonLabelXs`, `buttonLabelCaps`, `kbdKey`) — §17 Q8.
+There is **no `Type` at 12px** in the port outside `Type.numSm` (mono) and three
+`ComponentType` roles (`buttonLabelXs`, `buttonLabelCaps`, `kbdKey`) — §17 Q8.
 
 **Radii used:** `pill` 999 (Select trigger, combobox input, all Buttons, day cells at rest) ·
 `lg` 12 (all three overlays, NativeSelect, Panel/Note/Meta/StateGrid, Command root, command
 input group) · `md` 10 (every menu row, `--cell-radius`) · `sm` 6 (`Code`) ·
 **7** = `calc(--radius − 3px)` (the combobox's `icon-xs` addon button) → already
-`ElRadii.addonButton` (`spacing.dart:125`).
+`Radii.addonButton` (`spacing.dart:125`).
 
 **Widths:** `--container-xs` 320 · `--container-sm` 384 · `--spacing` 4 · `w-40` 160 ·
 `min-w-36` 144 · `max-h-72` 288 · combobox list cap 252 (`el(72) − el(9)`) ·
@@ -841,7 +841,7 @@ combobox popup min-width = anchor + `el(7)` = +28.
 
 **Shadows:** `shadow-pressed` (Select trigger, combobox input) · `shadow-btn` /
 `shadow-btn-down` (date-picker triggers, calendar buttons) · **`shadow-md`** — Tailwind stock,
-on **all three** overlays. The port already carries it as `ElShadows.tailwindMd`
+on **all three** overlays. The port already carries it as `Shadows.tailwindMd`
 (`shadows.dart:168`), documented there as `SelectContent`'s elevation and as forms-map drift 16.
 It now has three consumers.
 
@@ -850,7 +850,7 @@ It now has three consumers.
 highlight, calendar `today` and `range_middle`) · `--input` at **30 %** (command input fill and
 border; Select and NativeSelect dark fill) · `--foreground` at **10 %** (every overlay ring) ·
 `Canvas` / `CanvasText` (native `<option>` — CSS system colours, no token). Every one of these
-exists on `ElThemeData` already.
+exists on `ThemeData` already.
 
 ---
 
@@ -862,36 +862,36 @@ Package root `D:\DESIGN\Design-System-2026-8\flutter-design-system\`. HEAD `d3bb
 
 | need | where |
 |---|---|
-| **`ElSelect<T>`** — trigger, socket, states, keyboard, overlay menu, item-aligned placement, `expand`, field-scope wiring, 34.571px rows | `lib\src\components\select.dart:133` |
-| `ElShadows.tailwindMd` (+ `tailwindLg`) | `lib\src\foundation\shadows.dart:168`, `:153` |
-| `ElMachineSurface` (inset painting, CSS paint order, **`drawDRRect`**) | `lib\src\effects\machine_surface.dart:26`, `:205` |
-| `ElInputGroup` + `ElInputGroupInput` / `Addon` / `Button` / `Align` | `lib\src\components\input_group.dart:124, 314, 387, 474, 534` |
-| `ElInput`, `ElFieldSurface` | `lib\src\components\input.dart:83`, `:427` |
-| Full field layer — `ElFieldScope`, `ElFieldGroup`, `ElField`, `ElFieldLabel`, `ElFieldDescription`, `ElFieldActivator` | `lib\src\components\field.dart:95, 156, 291, 503, 604, 85` |
-| `ElButton` (7 variants incl. `outline`/`ghost`, sizes `sm`/`icon`), `btn-spring`, focus ring helper | `lib\src\components\button.dart:222` |
-| `ElKbd` / `ElKbdGroup` | `lib\src\components\kbd.dart:54`, `:132` |
-| `ElIcon` + glyphs `chevronDown/Up/Left/Right`, `check`, `x`, `search` | `icon.dart:135`; `icon_paths.dart:94–97, 77, 71, 88` |
-| `ElRadii.addonButton` = 7 | `lib\src\foundation\spacing.dart:125` |
-| `ElDurations.overlay` = 320ms, `ElCurves.out` / `.spring` | `lib\src\foundation\motion.dart:33`, `:266`, `:271` |
-| `ElType.numBase` (mono 15/1.2/600), `ElType.numSm`, `ElComponentType.sheetBody` / `buttonLabel` | `typography.dart:794, 783, 451, 310` |
-| Theme fields `popover`, `popoverForeground`, `accent`, `accentForeground`, `muted`, `mutedForeground`, `input`, `ring`, `border` | `lib\src\foundation\theme.dart:109, 113, 138, 142, 125, 134, 150, 175, 146` |
-| Kit: `ElPanel(note:)`, `ElStateGrid`, `ElStateCell`, `ElNote`, `ElMeta`, `ElDoDont`, `ElCode`, `ElPageHeader`, `ElSection`, `ElPageFootNav` | `example\lib\kit.dart:242, 503, 587, 1124, 679, 1025, 737, 54, 148, 1446` |
+| **`Select<T>`** — trigger, socket, states, keyboard, overlay menu, item-aligned placement, `expand`, field-scope wiring, 34.571px rows | `lib\src\components\ui\select.dart:133` |
+| `Shadows.tailwindMd` (+ `tailwindLg`) | `lib\src\design_system\foundation\shadows.dart:168`, `:153` |
+| `MachineSurface` (inset painting, CSS paint order, **`drawDRRect`**) | `lib\src\components\ui\surface.dart:26`, `:205` |
+| `InputGroup` + `InputGroupInput` / `Addon` / `Button` / `Align` | `lib\src\components\ui\input_group.dart:124, 314, 387, 474, 534` |
+| `Input`, `FieldSurface` | `lib\src\components\ui\input.dart:83`, `:427` |
+| Full field layer — `FieldScope`, `FieldGroup`, `Field`, `FieldLabel`, `FieldDescription`, `FieldActivator` | `lib\src\components\ui\field.dart:95, 156, 291, 503, 604, 85` |
+| `Button` (7 variants incl. `outline`/`ghost`, sizes `sm`/`icon`), `btn-spring`, focus ring helper | `lib\src\components\ui\button.dart:222` |
+| `Kbd` / `KbdGroup` | `lib\src\components\ui\kbd.dart:54`, `:132` |
+| `Icon` + glyphs `chevronDown/Up/Left/Right`, `check`, `x`, `search` | `icon.dart:135`; `icon_paths.dart:94–97, 77, 71, 88` |
+| `Radii.addonButton` = 7 | `lib\src\design_system\foundation\spacing.dart:125` |
+| `Durations.overlay` = 320ms, `Curves.out` / `.spring` | `lib\src\design_system\foundation\motion.dart:33`, `:266`, `:271` |
+| `Type.numBase` (mono 15/1.2/600), `Type.numSm`, `ComponentType.sheetBody` / `buttonLabel` | `typography.dart:794, 783, 451, 310` |
+| Theme fields `popover`, `popoverForeground`, `accent`, `accentForeground`, `muted`, `mutedForeground`, `input`, `ring`, `border` | `lib\src\design_system\foundation\theme.dart:109, 113, 138, 142, 125, 134, 150, 175, 146` |
+| Kit: `Panel(note:)`, `StateGrid`, `StateCell`, `Note`, `Meta`, `DoDont`, `Code`, `PageHeader`, `Section`, `PageFootNav` | `example\lib\kit.dart:242, 503, 587, 1124, 679, 1025, 737, 54, 148, 1446` |
 | Nav entry for `selects` + `siblings()` | `example\lib\nav.dart:239–255`, `:731–747` |
 
 ### 15.2 · Missing — must be built
 
 | # | missing | scope | notes |
 |---|---|---|---|
-| 1 | **`ElIconGlyph.calendar`** | 1 path | The page's only glyph gap; blocks §5–§7. Case-insensitive grep for `calendar` across `lib\` returns zero. Must be classified as curated-63 vs off-set before it lands, because `test\icon_paths_test.dart` polices the icons-page registry. |
-| 2 | **`ElSelect` groups / labels / separators** | §3.2 #1, #2 | New row kinds in the menu's child list. |
-| 3 | **`ElSelect` scroll buttons + capped content** | §3.2 #3, #6 | 32px `bg-popover` caps above and below the padded viewport; the rail is replaced, not styled. |
-| 4 | **`ElSelect` item-aligned over a heterogeneous list** | §3.2 #5 | `_placement()`'s uniform-row arithmetic must become a running offset. **The one real algorithmic change to shipped code.** |
-| 5 | **`ElSelect` explicit trigger width** | §3.2 #4 | `expand: bool` → a width mode (`fit` / `fill` / `fixed(w)`), or a `width` param beside `expand`. API decision — §17 Q4. |
-| 6 | **`ElPopover`** | new | Nothing in `lib\` generalizes an anchored overlay: `ElSelect`'s is private (`_SelectContent` `select.dart:579`), `ElSheet` uses a `PopupRoute` (`sheet.dart:141`). Needs side/align/sideOffset, collision handling, a corner transform-origin, and the 320ms enter/exit. **Both the Combobox and the Date Picker depend on it.** |
-| 7 | **`ElNativeSelect`** | new | 32px, 12px radius, transparent, no socket. The *platform picker* part is §17 Q6. |
-| 8 | **`ElCombobox`** | new | `ElInputGroup` chassis + `ElPopover` + a collator-equivalent filter + `data-highlighted` rows + an empty row. |
-| 9 | **`ElCommand`** | new | `ElInputGroup` chassis (socket **off**, `--input` @30 % fill) + group headings + a no-margin separator + `--muted` highlight + shortcut column + first-item-selected-at-rest + the cmdk fuzzy score. §17 Q9. |
-| 10 | **`ElCalendar`** | new, largest | Month grid, outside days, Sunday week start, `cccccc` weekday labels, month/year caption, nav buttons, single + range modes with the 16px `after:` bleeds, `today`, focus ring, keyboard. |
+| 1 | **`IconGlyph.calendar`** | 1 path | The page's only glyph gap; blocks §5–§7. Case-insensitive grep for `calendar` across `lib\` returns zero. Must be classified as curated-63 vs off-set before it lands, because `test\icon_paths_test.dart` polices the icons-page registry. |
+| 2 | **`Select` groups / labels / separators** | §3.2 #1, #2 | New row kinds in the menu's child list. |
+| 3 | **`Select` scroll buttons + capped content** | §3.2 #3, #6 | 32px `bg-popover` caps above and below the padded viewport; the rail is replaced, not styled. |
+| 4 | **`Select` item-aligned over a heterogeneous list** | §3.2 #5 | `_placement()`'s uniform-row arithmetic must become a running offset. **The one real algorithmic change to shipped code.** |
+| 5 | **`Select` explicit trigger width** | §3.2 #4 | `expand: bool` → a width mode (`fit` / `fill` / `fixed(w)`), or a `width` param beside `expand`. API decision — §17 Q4. |
+| 6 | **`Popover`** | new | Nothing in `lib\` generalizes an anchored overlay: `Select`'s is private (`_SelectContent` `select.dart:579`), `Sheet` uses a `PopupRoute` (`sheet.dart:141`). Needs side/align/sideOffset, collision handling, a corner transform-origin, and the 320ms enter/exit. **Both the Combobox and the Date Picker depend on it.** |
+| 7 | **`NativeSelect`** | new | 32px, 12px radius, transparent, no socket. The *platform picker* part is §17 Q6. |
+| 8 | **`Combobox`** | new | `InputGroup` chassis + `Popover` + a collator-equivalent filter + `data-highlighted` rows + an empty row. |
+| 9 | **`Command`** | new | `InputGroup` chassis (socket **off**, `--input` @30 % fill) + group headings + a no-margin separator + `--muted` highlight + shortcut column + first-item-selected-at-rest + the cmdk fuzzy score. §17 Q9. |
+| 10 | **`Calendar`** | new, largest | Month grid, outside days, Sunday week start, `cccccc` weekday labels, month/year caption, nav buttons, single + range modes with the 16px `after:` bleeds, `today`, focus ring, keyboard. |
 | 11 | **A date formatter** | new | `format(d, "d MMM")` and `"d MMM yyyy"` with en-US month abbreviations, plus `formatMonthYear`. No `intl` dependency is in the port today — §17 Q10. |
 | 12 | **`example\lib\pages\selects.dart`** | new | Absent. |
 | 13 | **`main.dart` route arm** | 1 line | `'$elRoot/components/base/selects' => const SelectsPage(),` immediately after the `forms` arm at `main.dart:167` — the switch deliberately follows nav order (`main.dart:153–155`). Today the route falls to `PlaceholderPage`. |
@@ -909,10 +909,10 @@ is the substring `allow-hardcoded:` **anywhere on the line** (`:96`). It is a ra
 **including comments** (`:13–15`).
 
 Consequences for this page:
-- Every geometry number is already expressible: cell size `el(7)`, cell radius `ElRadii.md`,
+- Every geometry number is already expressible: cell size `el(7)`, cell radius `Radii.md`,
   range bleed `el(4)`, combobox cap `el(72) − el(9)`, popup min-width `anchor + el(7)`,
-  addon radius `ElRadii.addonButton`, overlay duration `ElDurations.overlay`. **No new
-  `ElDurations` member is needed** — 320ms already exists as `overlay`.
+  addon radius `Radii.addonButton`, overlay duration `Durations.overlay`. **No new
+  `Durations` member is needed** — 320ms already exists as `overlay`.
 - Plain `double` constants (the cmdk score weights 1 / 0.9 / 0.8 / 0.17 / 0.1 / 0.999 / 0.9999 /
   0.99) match **no** rule and are legal — but they belong in one file beside the matcher, not
   in a page.
@@ -923,13 +923,13 @@ Consequences for this page:
 
 `CanvasKit diverges from the VM raster on Path.combine(difference) under a MaskFilter.blur`
 (`flutter-port-decisions`, phase-3 close). Inset rings paint as
-`canvas.drawDRRect(outer, hole, paint)` — `machine_surface.dart:205`, guarded at
+`canvas.drawDRRect(outer, hole, paint)` — `surface.dart:205`, guarded at
 `test\effects_test.dart:495–509` (*a panel mounts one `BackdropFilter` and a control mounts none*).
 
 For this page:
-- The three overlays reuse the **existing** recipe — `ElMachineSurface` with a prepended 1px
-  ring layer over `ElShadows.tailwindMd` (`select.dart:598–614`). **No new painter.**
-- The Command input asks for `shadow-none`, i.e. `ElShadows.none` — the socket is *removed*, not
+- The three overlays reuse the **existing** recipe — `MachineSurface` with a prepended 1px
+  ring layer over `Shadows.tailwindMd` (`select.dart:598–614`). **No new painter.**
+- The Command input asks for `shadow-none`, i.e. `Shadows.none` — the socket is *removed*, not
   restyled. No painter.
 - **The calendar's range band is the one new paint.** `range_start` / `range_end` are a 10px-rounded
   `--muted` rect with a **16px square bleed on one side**, under a `--primary` pill. That is two
@@ -960,7 +960,7 @@ For this page:
 12. **`Command`'s `rounded-xl!` and `bg-popover` are both discarded by the call site.** twMerge strips the important modifier when grouping, so `rounded-lg` and `bg-card` win before CSS is consulted and the `!` never reaches the stylesheet. The palette renders at `--radius-lg` on `--card`. **Derived from tailwind-merge semantics — §17 Q7.**
 13. **The check indicator is `display:none` on every `CommandItem` on this page.** `group-has-data-[slot=command-shortcut]/command-item:hidden`, and all four items carry a shortcut. The component ships a selection affordance the page can never show.
 14. **`⌘W` / `⌘S` beside "Ctrl + K".** Two platform idioms, one specimen, four inches apart.
-15. **`Icon size="sm"` renders at 16px, not 14.** `[&_svg:not([class*='size-'])]:size-4` on `Button`, `CommandItem` and `SelectItem` beats the SVG's `width`/`height` presentational attributes, while `strokeWidth` stays at the 14px-derived 2.4. Four new sites here (Search ×2, Calendar ×2). Already `icons-map` drift 2 — recorded again because the port's `ElIcon` takes an explicit `sizePx`.
+15. **`Icon size="sm"` renders at 16px, not 14.** `[&_svg:not([class*='size-'])]:size-4` on `Button`, `CommandItem` and `SelectItem` beats the SVG's `width`/`height` presentational attributes, while `strokeWidth` stays at the 14px-derived 2.4. Four new sites here (Search ×2, Calendar ×2). Already `icons-map` drift 2 — recorded again because the port's `Icon` takes an explicit `sizePx`.
 16. **Two dim levels inside one disabled field.** `<Field data-disabled>` dims `FieldLabel` to **0.50**; the `disabled` Button dims itself to **0.45**; the `FieldDescription` is dimmed by neither. The last part is deliberate and the copy says so — the first two are not reconciled anywhere.
 17. **`aria-invalid` beats focus-visible** on `SelectTrigger` and `NativeSelect` (`forms-map` drift 6). Unreachable on this page: nothing validates.
 18. **The "Disabled" state cell ships an empty `<SelectContent />`.** A menu with no rows, behind a trigger that cannot open it.
@@ -978,18 +978,18 @@ For this page:
 
 ## 17 · Open questions for the supervisor
 
-1. **Scope.** This page needs four brand-new components (`ElNativeSelect`, `ElCombobox`, `ElCommand`, `ElCalendar`), one new primitive (`ElPopover`), one new glyph, a date formatter, and six changes to shipped `ElSelect` code — one of them algorithmic. That is comparable to the whole of phase 3, and `ElCalendar` alone is bigger than any single component in the port. **Recommendation:** build `ElSelect`'s deferred surface + `ElPopover` + `ElNativeSelect` + `ElCombobox` first (they share the overlay and the input-group chassis and finish four of seven chips), then `ElCommand`, then `ElCalendar` last as its own wave, since §5/§6/§7 all collapse if the calendar is not right. Confirm the split before I plan.
+1. **Scope.** This page needs four brand-new components (`NativeSelect`, `Combobox`, `Command`, `Calendar`), one new primitive (`Popover`), one new glyph, a date formatter, and six changes to shipped `Select` code — one of them algorithmic. That is comparable to the whole of phase 3, and `Calendar` alone is bigger than any single component in the port. **Recommendation:** build `Select`'s deferred surface + `Popover` + `NativeSelect` + `Combobox` first (they share the overlay and the input-group chassis and finish four of seven chips), then `Command`, then `Calendar` last as its own wave, since §5/§6/§7 all collapse if the calendar is not right. Confirm the split before I plan.
 2. **The calendar's initial month (drift 2) — reproduce or pin?** The reference renders *today's* month with its seeded selection off-screen, and its document height swings 36px with the month's week count. Reproducing it makes the vertical-parity probe non-deterministic; pinning `defaultMonth` to July 2026 makes the port render something the reference does not. **Recommendation:** reproduce the behaviour in the app (it is what the page does), and have the rig **freeze the clock** for capture on both sides — the capture harness can inject a fixed `Date` in Chrome and the Flutter page can take an injectable `DateTime.now`. That keeps the drift honest and the probe stable. This one blocks §15.2 #15; I need your call before any height is pinned.
 3. **Calendar geometry — all derived, none seen.** Every number in §8.5 (196px intrinsic width, 222/212px boxes, 268.571/304.571px heights) is computed from tokens and has never been on screen. **Recommendation:** a browser probe of §5's calendar (root, month, month_grid, one `<td>`, one DayButton, the weekday row) at 1440 in both themes, before a single widget is written. Same for the 293.29px palette and the 412px combobox popup.
-4. **`ElSelect.expand` → a width mode?** The page needs three widths (`w-fit`, `*:w-full`, `w-40`) and `expand` is a `bool`. **Recommendation:** keep `expand` (it names a documented cascade, and `forms_page_test.dart:984` asserts it) and add an optional `width` that wins over both, rather than replacing a documented switch with an enum. Your call — this is public API on a shipped component.
+4. **`Select.expand` → a width mode?** The page needs three widths (`w-fit`, `*:w-full`, `w-40`) and `expand` is a `bool`. **Recommendation:** keep `expand` (it names a documented cascade, and `forms_page_test.dart:984` asserts it) and add an optional `width` that wins over both, rather than replacing a documented switch with an enum. Your call — this is public API on a shipped component.
 5. **The empty `SelectContent` (drift 18).** `_openMenu` early-returns on `options.isEmpty`, so the port already renders nothing. Confirm that "nothing opens" is the intended parity for a disabled trigger over an empty list, rather than an empty popover.
-6. **`ElNativeSelect` — what is "native" in Flutter?** The whole point of §2 is that the OS draws the list; the section title, the description, the Note and Do 3 all say so. Flutter has no OS `<select>`. Options: (a) render the port's own menu and record the divergence, (b) call the platform picker on the platforms that have one (`showCupertinoModalPopup` / a `PlatformMenu`) and fall back elsewhere, (c) render a visually faithful 32px trigger whose list is `ElSelect`'s menu, and say so in the doc comment. **Recommendation: (c)** — the *specimen* on this page is the closed 32px control, which is fully reproducible; the OS list is off-canvas in every screenshot the rig takes. Needs your ruling because it is the first place the port cannot be 1:1 by construction.
+6. **`NativeSelect` — what is "native" in Flutter?** The whole point of §2 is that the OS draws the list; the section title, the description, the Note and Do 3 all say so. Flutter has no OS `<select>`. Options: (a) render the port's own menu and record the divergence, (b) call the platform picker on the platforms that have one (`showCupertinoModalPopup` / a `PlatformMenu`) and fall back elsewhere, (c) render a visually faithful 32px trigger whose list is `Select`'s menu, and say so in the doc comment. **Recommendation: (c)** — the *specimen* on this page is the closed 32px control, which is fully reproducible; the OS list is off-canvas in every screenshot the rig takes. Needs your ruling because it is the first place the port cannot be 1:1 by construction.
 7. **`Command`'s `rounded-xl!` / `bg-popover` (drift 12).** I have derived that tailwind-merge strips the important modifier and the call site wins, giving a 12px `--card` palette. That is a load-bearing 4px and a whole surface colour. **Recommendation:** probe the live reference's computed `border-radius` and `background-color` on `[data-slot=command]` before building. I have not guessed a value into the map — both readings are stated.
-8. **A 12px sans type step.** `SelectLabel`, `ComboboxLabel`, the `CommandGroup` heading and `CommandShortcut` are all 12px sans, and the port has no `ElType` for it — only `ElType.numSm` (mono) and three component roles. **Recommendation:** add `ElComponentType.menuLabel` (12 / `_leadingXs` / 400) and `ElComponentType.menuShortcut` (12 / `_leadingXs` / 400 / tracking 0.1) rather than a new `ElType` rung, consistent with how `sheetBody` and `kbdKey` were handled. The heading's weight-500 variant is a fourth spec or a `wght` override — say which.
-9. **`ElCommand`'s matcher.** cmdk filters **and re-sorts** by a fuzzy `commandScore` with eight weighted constants. Porting it verbatim is ~60 lines of scoring; not porting it means the palette's row order diverges the moment anyone types. **Recommendation:** port `commandScore` verbatim into `lib\src\components\command_score.dart` with the weights as named constants and the two separator regexes transcribed — it is a pure function, it is testable against the JS, and "the list re-sorts as you type" is visible behaviour the fidelity bar covers. Confirm; the alternative is a documented divergence.
-10. **Date formatting without a dependency.** The page needs `d MMM`, `d MMM yyyy` and a month-year caption, plus `cccccc` weekday abbreviations, all en-US. The port takes no dependencies. **Recommendation:** a small `ElDateFormat` in `lib\src\foundation\` with the twelve month abbreviations and seven weekday abbreviations as const lists — it is locale data, it belongs with the tokens, and `intl` would drag ICU in for twelve strings. Flag if you would rather add `intl`.
-11. **`ElPopover`'s scope.** §7 needs exactly one arrangement (`side=bottom`, `align=start`, `sideOffset=4`) and §3 needs one more (`sideOffset=6`). The full Radix/base-ui matrix — six sides, three aligns, collision flipping, arrow — is `menus`/`dialogs` territory. **Recommendation:** build `ElPopover` with side/align/offset parameters and *real* collision flipping (a popover that runs off-screen is a bug, not a drift), but no arrow and no nested-portal support until a later page needs them. Same shape as the ruling that scoped `ElSelect` in phase 3.
-12. **Every `duration-<word>` on this page is a no-op (drift 27, §13.1).** Both sites resolve to the 250ms default rather than to `--duration-base`, and the two numbers coincide, so nothing here changes on screen. **Recommendation:** port them as the default and write the mechanism into the doc comment, so the next reader does not "fix" it back to `ElDurations.base`. Two things I am *not* deciding here: (a) whether the shipped `ElInput` / `ElInputGroup` doc comments need the same correction — a corrective sweep is running in parallel and owns that; (b) whether any `duration-<word>` elsewhere in the corpus names a **non**-250ms token, where the drift would be visible rather than latent. Flag if you want me to add the computed `transitionDuration` on `[data-slot=input-group]` to the §17 Q3 probe list — I have written it as measured-from-the-stylesheet, not measured-from-the-page.
+8. **A 12px sans type step.** `SelectLabel`, `ComboboxLabel`, the `CommandGroup` heading and `CommandShortcut` are all 12px sans, and the port has no `Type` for it — only `Type.numSm` (mono) and three component roles. **Recommendation:** add `ComponentType.menuLabel` (12 / `_leadingXs` / 400) and `ComponentType.menuShortcut` (12 / `_leadingXs` / 400 / tracking 0.1) rather than a new `Type` rung, consistent with how `sheetBody` and `kbdKey` were handled. The heading's weight-500 variant is a fourth spec or a `wght` override — say which.
+9. **`Command`'s matcher.** cmdk filters **and re-sorts** by a fuzzy `commandScore` with eight weighted constants. Porting it verbatim is ~60 lines of scoring; not porting it means the palette's row order diverges the moment anyone types. **Recommendation:** port `commandScore` verbatim into `lib\src\components\command_score.dart` with the weights as named constants and the two separator regexes transcribed — it is a pure function, it is testable against the JS, and "the list re-sorts as you type" is visible behaviour the fidelity bar covers. Confirm; the alternative is a documented divergence.
+10. **Date formatting without a dependency.** The page needs `d MMM`, `d MMM yyyy` and a month-year caption, plus `cccccc` weekday abbreviations, all en-US. The port takes no dependencies. **Recommendation:** a small `DateFormat` in `lib\src\foundation\` with the twelve month abbreviations and seven weekday abbreviations as const lists — it is locale data, it belongs with the tokens, and `intl` would drag ICU in for twelve strings. Flag if you would rather add `intl`.
+11. **`Popover`'s scope.** §7 needs exactly one arrangement (`side=bottom`, `align=start`, `sideOffset=4`) and §3 needs one more (`sideOffset=6`). The full Radix/base-ui matrix — six sides, three aligns, collision flipping, arrow — is `menus`/`dialogs` territory. **Recommendation:** build `Popover` with side/align/offset parameters and *real* collision flipping (a popover that runs off-screen is a bug, not a drift), but no arrow and no nested-portal support until a later page needs them. Same shape as the ruling that scoped `Select` in phase 3.
+12. **Every `duration-<word>` on this page is a no-op (drift 27, §13.1).** Both sites resolve to the 250ms default rather than to `--duration-base`, and the two numbers coincide, so nothing here changes on screen. **Recommendation:** port them as the default and write the mechanism into the doc comment, so the next reader does not "fix" it back to `Durations.base`. Two things I am *not* deciding here: (a) whether the shipped `Input` / `InputGroup` doc comments need the same correction — a corrective sweep is running in parallel and owns that; (b) whether any `duration-<word>` elsewhere in the corpus names a **non**-250ms token, where the drift would be visible rather than latent. Flag if you want me to add the computed `transitionDuration` on `[data-slot=input-group]` to the §17 Q3 probe list — I have written it as measured-from-the-stylesheet, not measured-from-the-page.
 13. **Seven chips, seven promised sections.** `nav.dart:333–342` records that a `contents` entry with no section is the bug this very page's §6 is a postmortem of. The port's nav already promises all seven. **Recommendation:** if the wave splits (Q1), the `selects` route stays on `PlaceholderPage` until **all seven** sections exist, rather than shipping a page that advertises Calendar and renders nothing — repeating the exact bug the page exists to document.
 
 ---
@@ -1000,7 +1000,7 @@ For this page:
   `border-radius` is **16px** in both themes — twMerge keeps `rounded-xl!` in
   its own group key (important modifier) and `!important` wins the cascade
   over the later `rounded-lg`. Background half stands (`--card`; `bg-popover`
-  stripped). Port ships `ElRadii.xl`.
+  stripped). Port ships `Radii.xl`.
 - **New drift — cmdk group re-sort is dead code:** `sort()` looks groups up by
   `[cmdk-group=""][data-value="<React useId>"]` but the element's
   `data-value` holds its heading, so the selector never matches. Item sort is

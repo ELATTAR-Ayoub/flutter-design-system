@@ -2,10 +2,10 @@
 ///
 /// `icon-swap` HAS a real `registry/components/icon-swap.json` manifest —
 /// registry `type: "component"`, unlike its three siblings on this same
-/// rollout (`sliding-pill`, `swap-in`, `lift`, all `type: "motion"`) — but it
+/// rollout (`active-indicator`, `content-change`, `lift`, all `type: "motion"`) — but it
 /// carries no variant enum and is never placed on its own: every real call
 /// site (`lib/src/components/attachment.dart`, `lib/src/components/
-/// sidebar.dart`) puts it inside an `ElButton`'s `child:` slot. [dependencies]
+/// sidebar.dart`) puts it inside an `Button`'s `child:` slot. [dependencies]
 /// is that manifest's own `registryDependencies` list, copied verbatim:
 /// `keyframes`, `source-foundation`.
 library;
@@ -22,6 +22,6 @@ const ComponentDocEntry iconSwapDoc = ComponentDocEntry(
       'instant swap.',
   // registry/components/icon-swap.json's own registryDependencies, verbatim.
   dependencies: <String>['keyframes', 'source-foundation'],
-  exports: <String>['ElIconSwap'],
+  exports: <String>['IconSwap'],
   sourcePath: 'lib/src/components/icon_swap.dart',
 );

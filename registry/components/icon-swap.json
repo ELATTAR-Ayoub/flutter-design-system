@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/icon_swap.dart",
+      "source": "lib/src/components/ui/icon_swap.dart",
       "target": "@ui/icon_swap.dart",
-      "sha256": "2099e7d4c096f7d825c063b5f8bab10892fdfe4dfed21ace6d8fe5915c16b217"
+      "sha256": "facbb2f83a03363f866cd05aa0590350ffa50c0325b59fb6ba1bfc5e5eb735a3"
     }
   ],
   "registryDependencies": [
@@ -24,5 +24,8 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/icon-swap",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/icon_swap.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/icon_swap.dart",
+  "exports": [
+    "IconSwap"
+  ]
 }

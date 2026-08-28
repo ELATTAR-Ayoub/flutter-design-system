@@ -3,13 +3,13 @@
 ///
 /// Re-housed onto the documentation kit (`ComponentDocSpec` +
 /// `ComponentDocPage`): sections now render as `DocsSection` (from
-/// `docs_section.dart`), not the old `kit.dart` `ElSection`, and the live
+/// `docs_section.dart`), not the old `kit.dart` `Section`, and the live
 /// six-cell preview grid is a real `Preview` section with its own rail
 /// entry rather than an unheaded `DocsCodeExample` above the first heading.
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `ElThemeController` is flipped in place for theme
+/// Phase J brief. The live `ThemeController` is flipped in place for theme
 /// coverage rather than re-pumped under a new controller.
 ///
 /// `pumpAndSettle` is forbidden in a documentation-page test (several
@@ -30,7 +30,33 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart' show DocsShowcase;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
@@ -53,13 +79,13 @@ Future<void> _openDisclosure(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every public constructor parameter of `ElTextarea`, enumerated by reading
+/// Every public constructor parameter of `Textarea`, enumerated by reading
 /// `lib/src/components/textarea.dart` directly (Step 1 of the task cycle).
 /// The API table must cover all of these by name.
 const List<String> _textareaParams = <String>[
@@ -77,25 +103,25 @@ const List<String> _textareaParams = <String>[
 
 /// The rest of the public surface: the two static geometry getters.
 const List<String> _textareaStatics = <String>[
-  'ElTextarea.minHeight',
-  'ElTextarea.insets',
+  'Textarea.minHeight',
+  'Textarea.insets',
 ];
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -175,7 +201,7 @@ void main() {
   );
 
   testWidgets(
-    'the API table covers every ElTextarea constructor parameter and both '
+    'the API table covers every Textarea constructor parameter and both '
     'static geometry getters',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -195,14 +221,14 @@ void main() {
         expect(
           documented,
           contains(param),
-          reason: 'ElTextarea constructor parameter "$param" is undocumented',
+          reason: 'Textarea constructor parameter "$param" is undocumented',
         );
       }
       for (final String member in _textareaStatics) {
         expect(
           documented,
           contains(member),
-          reason: 'ElTextarea static member "$member" is undocumented',
+          reason: 'Textarea static member "$member" is undocumented',
         );
       }
     },
@@ -269,24 +295,24 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place, at both wide and narrow widths',
     (WidgetTester tester) async {
-      ElThemeController theme = await _pump(
+      ThemeController theme = await _pump(
         tester,
         size: _wide,
-        mode: ElThemeMode.light,
+        mode: ColorMode.light,
       );
       expect(find.text(textareaDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(textareaDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);
 
-      theme = await _pump(tester, size: _narrow, mode: ElThemeMode.light);
+      theme = await _pump(tester, size: _narrow, mode: ColorMode.light);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
       expect(find.text(textareaDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(textareaDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

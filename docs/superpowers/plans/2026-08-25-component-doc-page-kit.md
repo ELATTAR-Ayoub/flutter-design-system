@@ -16,10 +16,10 @@ Every task's requirements implicitly include this section.
 
 - **Repository mode.** `lib/elattar_design_system.dart` exists, no `elattar.yaml`. All paths below are repository-mode names.
 - **Import the system through the public barrel only:** `package:elattar_design_system/elattar_design_system.dart`. Never reach into `lib/src/`.
-- **No visual literals in `example/lib/`.** Geometry from `el(...)`, `ElWidths`, `ElContainers`, `ElBreakpoints`; colour from `ElTheme.of(context)`; type from `ElText`/`ElType`; timing from `ElDurations`/`ElCurves`. `test/token_guard_test.dart` fails the build otherwise. A bare `0` or `0.0` is legal.
-- **No uppercase type roles** anywhere under `example/lib/docs/` or `example/lib/components_docs/`. The forbidden roles are `ElType.label`, `ElType.micro`, `ElType.tag`, `ElType.badge`, `ElType.serial`, `ElType.inputSerial`, `ElType.buttonLabelCaps`. Use `ElType.caption`, `ElType.small`, `ElType.textSm` instead. Never call `String.toUpperCase()`.
+- **No visual literals in `example/lib/`.** Geometry from `el(...)`, `Widths`, `Containers`, `Breakpoints`; colour from `Theme.of(context)`; type from `Text`/`Type`; timing from `Durations`/`Curves`. `test/token_guard_test.dart` fails the build otherwise. A bare `0` or `0.0` is legal.
+- **No uppercase type roles** anywhere under `example/lib/docs/` or `example/lib/components_docs/`. The forbidden roles are `Type.label`, `Type.micro`, `Type.tag`, `Type.badge`, `Type.serial`, `Type.inputSerial`, `Type.buttonLabelCaps`. Use `Type.caption`, `Type.small`, `Type.textSm` instead. Never call `String.toUpperCase()`.
 - **Product code only.** Everything created here lives in `example/lib/docs/`. Nothing is added to `lib/src/components/`.
-- **`pumpAndSettle` is forbidden** in any test that pumps a widget tree containing `ElAlert`, `ElBloomCosmic`, or a documentation page. Those controllers `repeat(reverse: true)` forever. Use `tester.pump()`.
+- **`pumpAndSettle` is forbidden** in any test that pumps a widget tree containing `Alert`, `BloomCosmic`, or a documentation page. Those controllers `repeat(reverse: true)` forever. Use `tester.pump()`.
 - **Test view sizing** uses `tester.view.physicalSize` + `tester.view.devicePixelRatio` with `addTearDown(tester.view.reset)`, never a synthetic `MediaQuery`. This matches `example/test/components_docs/alert_test.dart`.
 - **Run from `example/`** for every command in this plan unless the command says otherwise.
 - **Commit after every task.** Never combine two tasks in one commit.
@@ -37,7 +37,7 @@ Every task's requirements implicitly include this section.
 | `docs_section.dart` | `DocsAnchor`, `DocsSection` — anchor machinery and section presentation |
 | `docs_showcase.dart` | `DocsShowcaseFrame`, `DocsShowcase` — 640 specimen frame, Preview↔Code |
 | `docs_disclosure.dart` | `DocsDisclosure` — collapsed-by-default text/table section |
-| `docs_table.dart` | `DocsTable`, `DocsApiTable` — `ElTable`-backed, full width |
+| `docs_table.dart` | `DocsTable`, `DocsApiTable` — `Table`-backed, full width |
 | `docs_install.dart` | `DocsInstall` — CLI↔Manual toggle |
 | `component_doc_page.dart` | `DocsSection*` spec model, `DocsPageHeader`, `ComponentDocPage` |
 
@@ -45,7 +45,7 @@ Every task's requirements implicitly include this section.
 
 | File | Change |
 | --- | --- |
-| `example/lib/kit.dart:142-227` | `ElSection` becomes `DocsAnchor` + `DocsSection` composed |
+| `example/lib/kit.dart:142-227` | `Section` becomes `DocsAnchor` + `DocsSection` composed |
 | `example/lib/docs/docs_layout.dart:315` | rail max height stops running past the fold |
 | `example/lib/docs/docs_facts.dart` | `DocsApiTable` removed; re-exported from `docs_table.dart` |
 | `example/lib/docs/docs_code.dart` | `DocsSelectableCodeBlock` and its tokenizer removed |
@@ -88,8 +88,8 @@ Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: Theme(
+      controller: ThemeController(mode: ThemeMode.dark),
       child: Center(child: child),
     ),
   ),
@@ -102,13 +102,13 @@ void main() {
     await tester.pumpWidget(_host(const DocsCopyButton(text: 'const a = 1;')));
     await tester.pump();
 
-    final ElButton button = tester.widget<ElButton>(find.byType(ElButton));
-    expect(button.variant, ElButtonVariant.secondary);
-    expect(button.size, ElButtonSize.iconSm);
+    final Button button = tester.widget<Button>(find.byType(Button));
+    expect(button.variant, ButtonVariant.secondary);
+    expect(button.size, ButtonSize.iconSm);
     expect(button.label, 'Copy code');
     expect(
-      tester.widget<ElIcon>(find.byType(ElIcon)).lucide,
-      ElLucide.copy,
+      tester.widget<Icon>(find.byType(Icon)).lucide,
+      Lucide.copy,
     );
   });
 
@@ -126,18 +126,18 @@ void main() {
     );
     await tester.pump();
 
-    await tester.tap(find.byType(ElButton));
+    await tester.tap(find.byType(Button));
     await tester.pump();
     await tester.pump();
 
     expect(written, <String>['const a = 1;']);
     expect(
-      tester.widget<ElIcon>(find.byType(ElIcon)).lucide,
-      ElLucide.check,
+      tester.widget<Icon>(find.byType(Icon)).lucide,
+      Lucide.check,
       reason: 'the glyph must confirm, or a copy is indistinguishable '
           'from a mis-tap',
     );
-    expect(tester.widget<ElButton>(find.byType(ElButton)).label, 'Copied');
+    expect(tester.widget<Button>(find.byType(Button)).label, 'Copied');
   });
 
   testWidgets('the confirmation reverts', (WidgetTester tester) async {
@@ -150,11 +150,11 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.byType(ElButton));
+    await tester.tap(find.byType(Button));
     await tester.pump();
     await tester.pump(const Duration(seconds: 3));
 
-    expect(tester.widget<ElIcon>(find.byType(ElIcon)).lucide, ElLucide.copy);
+    expect(tester.widget<Icon>(find.byType(Icon)).lucide, Lucide.copy);
   });
 }
 ```
@@ -235,17 +235,17 @@ class _DocsCopyButtonState extends State<DocsCopyButton> {
 
   @override
   Widget build(BuildContext context) {
-    final ElLucideGlyph glyph = switch ((_pending, _copied)) {
-      (true, _) => ElLucide.loaderCircle,
-      (_, true) => ElLucide.check,
-      _ => ElLucide.copy,
+    final LucideGlyph glyph = switch ((_pending, _copied)) {
+      (true, _) => Lucide.loaderCircle,
+      (_, true) => Lucide.check,
+      _ => Lucide.copy,
     };
-    return ElButton(
-      variant: ElButtonVariant.secondary,
-      size: ElButtonSize.iconSm,
+    return Button(
+      variant: ButtonVariant.secondary,
+      size: ButtonSize.iconSm,
       label: _copied ? widget.copiedLabel : widget.copyLabel,
       onPressed: _pending ? null : _copy,
-      child: ElIcon.lucide(glyph, size: ElIconSize.sm),
+      child: Icon.lucide(glyph, size: IconSize.sm),
     );
   }
 }
@@ -267,7 +267,7 @@ git commit -m "feat(docs): add the secondary copy control the kit shares"
 
 ### Task 2: DocsSnippet and DocsSnippetOverflow
 
-The docs carry their own tokenizer (`_DsCodeTokenKind` in `docs_code.dart`), a second and weaker syntax theme. The agent family already ships the real one — `ElAgentCodeBlock` over `ElPrismPalette`, VS Code Dark Plus as `react-syntax-highlighter` writes it. This task makes that the only code renderer.
+The docs carry their own tokenizer (`_DsCodeTokenKind` in `docs_code.dart`), a second and weaker syntax theme. The agent family already ships the real one — `AgentCodeBlock` over `PrismPalette`, VS Code Dark Plus as `react-syntax-highlighter` writes it. This task makes that the only code renderer.
 
 **Files:**
 - Create: `example/lib/docs/docs_snippet.dart`
@@ -288,7 +288,7 @@ The docs carry their own tokenizer (`_DsCodeTokenKind` in `docs_code.dart`), a s
 /// The one code renderer.
 ///
 /// The assertion that matters is the *identity* of the renderer: the docs are
-/// not allowed a second syntax theme, so this pins `ElAgentCodeBlock` rather
+/// not allowed a second syntax theme, so this pins `AgentCodeBlock` rather
 /// than pinning colours.
 library;
 
@@ -302,8 +302,8 @@ Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: Theme(
+      controller: ThemeController(mode: ThemeMode.dark),
       child: Center(child: child),
     ),
   ),
@@ -330,8 +330,8 @@ void main() {
     );
     await tester.pump();
 
-    final ElAgentCodeBlock block = tester.widget<ElAgentCodeBlock>(
-      find.byType(ElAgentCodeBlock),
+    final AgentCodeBlock block = tester.widget<AgentCodeBlock>(
+      find.byType(AgentCodeBlock),
     );
     expect(block.code, 'final a = 1;');
     expect(block.language, 'dart');
@@ -385,7 +385,7 @@ void main() {
 
     await tester.tap(find.text('Show more'));
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(Durations.jelly);
 
     expect(find.text('Show less'), findsOneWidget);
     expect(
@@ -408,8 +408,8 @@ Expected: FAIL — `Target of URI doesn't exist: 'package:example/docs/docs_snip
 /// The only code renderer in the documentation.
 ///
 /// The docs used to carry their own tokenizer. The agent family already
-/// shipped the real VS Code Dark Plus palette — `ElAgentCodeBlock` over
-/// `ElPrismPalette` — so there is one syntax theme on the site and it is that
+/// shipped the real VS Code Dark Plus palette — `AgentCodeBlock` over
+/// `PrismPalette` — so there is one syntax theme on the site and it is that
 /// one. A second one is a second thing to keep true.
 library;
 
@@ -430,7 +430,7 @@ class DocsSnippet extends StatelessWidget {
   /// string, read from the same field.
   final String code;
 
-  /// A language `ElAgentCodeBlock.normalise` recognises. An unrecognised one
+  /// A language `AgentCodeBlock.normalise` recognises. An unrecognised one
   /// renders un-highlighted rather than failing.
   final String language;
 
@@ -443,7 +443,7 @@ class DocsSnippet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget block = ElAgentCodeBlock(code: code, language: language);
+    final Widget block = AgentCodeBlock(code: code, language: language);
     final double? cap = maxHeight;
 
     return Stack(
@@ -511,9 +511,9 @@ class _DocsSnippetOverflowState extends State<DocsSnippetOverflow> {
           padding: EdgeInsets.only(top: el(2)),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: ElButton(
-              variant: ElButtonVariant.ghost,
-              size: ElButtonSize.sm,
+            child: Button(
+              variant: ButtonVariant.ghost,
+              size: ButtonSize.sm,
               onPressed: () => setState(() => _open = !_open),
               child: Text(
                 _open ? widget.showLessLabel : widget.showMoreLabel,
@@ -548,7 +548,7 @@ git commit -m "feat(docs): render every snippet through the agent's VS Code pale
 
 ### Task 3: DocsAnchor and DocsSection
 
-`ElSection` currently does two unrelated jobs — it owns the anchor registry the table of contents scrolls to, and it renders a section's heading. 92 files call it. Splitting the two lets the presentation be rebuilt without touching 92 call sites: `ElSection` becomes the two composed.
+`Section` currently does two unrelated jobs — it owns the anchor registry the table of contents scrolls to, and it renders a section's heading. 92 files call it. Splitting the two lets the presentation be rebuilt without touching 92 call sites: `Section` becomes the two composed.
 
 The presentation change: the description stops being capped at a private `_measure2xl` measure, so a section fills its column with no trailing gap.
 
@@ -563,7 +563,7 @@ The presentation change: the description stops being capped at a private `_measu
   - `class DocsAnchor extends StatelessWidget` with `const DocsAnchor({super.key, required String id, required Widget child})`, plus `static GlobalKey<State<StatefulWidget>> keyFor(String id)` and `static Future<void> scrollTo(String id)`.
   - `class DocsSection extends StatelessWidget` with `const DocsSection({super.key, required String id, required String title, String? description, required Widget child})`.
 
-  Task 8 composes `DocsSection`. `ElSection.anchorKey` and `ElSection.scrollTo` keep working by forwarding, because `docs_layout.dart` calls both.
+  Task 8 composes `DocsSection`. `Section.anchorKey` and `Section.scrollTo` keep working by forwarding, because `docs_layout.dart` calls both.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -582,8 +582,8 @@ Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: Theme(
+      controller: ThemeController(mode: ThemeMode.dark),
       child: child,
     ),
   ),
@@ -633,7 +633,7 @@ void main() {
     );
     await tester.pump();
 
-    for (final ElText text in tester.widgetList<ElText>(find.byType(ElText))) {
+    for (final Text text in tester.widgetList<Text>(find.byType(Text))) {
       expect(
         text.spec.uppercase,
         isFalse,
@@ -642,13 +642,13 @@ void main() {
     }
   });
 
-  testWidgets('the anchor registry is shared with ElSection', (
+  testWidgets('the anchor registry is shared with Section', (
     WidgetTester tester,
   ) async {
-    // `docs_layout.dart` scrolls by `ElSection.anchorKey`. If the split gave
+    // `docs_layout.dart` scrolls by `Section.anchorKey`. If the split gave
     // the two classes separate registries, every table-of-contents link on
     // the site would silently stop working.
-    expect(DocsAnchor.keyFor('shared'), same(ElSection.anchorKey('shared')));
+    expect(DocsAnchor.keyFor('shared'), same(Section.anchorKey('shared')));
   });
 }
 ```
@@ -691,7 +691,7 @@ class DocsAnchor extends StatelessWidget {
       _keys.putIfAbsent(id, () => GlobalKey<State<StatefulWidget>>());
 
   /// Scrolls to the section registered under [id], resting
-  /// `ElWidths.scrollOffset` below the viewport top.
+  /// `Widths.scrollOffset` below the viewport top.
   static Future<void> scrollTo(String id) async {
     final BuildContext? target = keyFor(id).currentContext;
     if (target == null) return;
@@ -704,15 +704,15 @@ class DocsAnchor extends StatelessWidget {
 
     final double delta =
         box.localToGlobal(Offset.zero, ancestor: viewport).dy -
-        ElWidths.scrollOffset;
+        Widths.scrollOffset;
     final ScrollPosition position = scrollable.position;
     await position.animateTo(
       (position.pixels + delta).clamp(
         position.minScrollExtent,
         position.maxScrollExtent,
       ),
-      duration: elAnimationDuration(target, ElDurations.slow),
-      curve: ElCurves.inOut,
+      duration: elAnimationDuration(target, Durations.slow),
+      curve: Curves.inOut,
     );
   }
 
@@ -744,7 +744,7 @@ class DocsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeData theme = Theme.of(context);
     return DocsAnchor(
       id: id,
       child: Padding(
@@ -758,12 +758,12 @@ class DocsSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   // An `h2` wearing `.type-h3`, intentionally.
-                  ElText(title, ElType.h3, color: theme.foreground),
+                  Text(title, Type.h3, color: theme.foreground),
                   if (description != null) ...<Widget>[
                     SizedBox(height: el(2)),
                     // Full width. The old private measure cap left a gap on
                     // the right of every section.
-                    ElText(description!, ElType.small),
+                    Text(description!, Type.small),
                   ],
                 ],
               ),
@@ -777,9 +777,9 @@ class DocsSection extends StatelessWidget {
 }
 ```
 
-- [ ] **Step 4: Make `ElSection` the two composed**
+- [ ] **Step 4: Make `Section` the two composed**
 
-Replace the whole `ElSection` class body in `example/lib/kit.dart` (lines 142-227) with:
+Replace the whole `Section` class body in `example/lib/kit.dart` (lines 142-227) with:
 
 ```dart
 /// The documentation section heading.
@@ -787,8 +787,8 @@ Replace the whole `ElSection` class body in `example/lib/kit.dart` (lines 142-22
 /// Kept as a name because 92 files call it. Its two jobs now live in
 /// `docs/docs_section.dart`: [DocsAnchor] owns the anchor registry the table
 /// of contents scrolls to, [DocsSection] owns the presentation.
-class ElSection extends StatelessWidget {
-  const ElSection({
+class Section extends StatelessWidget {
+  const Section({
     super.key,
     required this.id,
     required this.title,
@@ -833,7 +833,7 @@ Expected: PASS. A failure here means a page asserted the capped description widt
 
 ```bash
 git add example/lib/docs/docs_section.dart example/lib/kit.dart example/test/docs/docs_section_test.dart
-git commit -m "refactor(docs): split ElSection into its anchor and its presentation"
+git commit -m "refactor(docs): split Section into its anchor and its presentation"
 ```
 
 ---
@@ -867,8 +867,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
-  child: ElTheme(
-    controller: ElThemeController(mode: ElThemeMode.dark),
+  child: Theme(
+    controller: ThemeController(mode: ThemeMode.dark),
     child: child,
   ),
 );
@@ -926,7 +926,7 @@ void main() {
 
     expect(find.byType(DocsSnippet), findsNothing);
     expect(
-      tester.widget<ElToggleGroup>(find.byType(ElToggleGroup)).selectedIndex,
+      tester.widget<ToggleGroup>(find.byType(ToggleGroup)).selectedIndex,
       0,
     );
   });
@@ -1017,15 +1017,15 @@ class DocsShowcaseFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeData theme = Theme.of(context);
     return Container(
       constraints: BoxConstraints(minHeight: minHeight),
       width: double.infinity,
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: theme.background,
-        border: Border.all(color: theme.border, width: ElWidths.hairline),
-        borderRadius: BorderRadius.circular(ElRadii.lg),
+        border: Border.all(color: theme.border, width: Widths.hairline),
+        borderRadius: BorderRadius.circular(Radii.lg),
       ),
       child: Align(alignment: alignment, child: child),
     );
@@ -1053,12 +1053,12 @@ class DocsShowcase extends StatefulWidget {
   /// specimen judged in a shorter box reads as cramped.
   static double get tallMinHeight => el(160);
 
-  /// Below `ElBreakpoints.sm` a 640 stage is taller than the whole viewport
+  /// Below `Breakpoints.sm` a 640 stage is taller than the whole viewport
   /// minus header and toggle, which would push the control off screen.
   static double get shortMinHeight => el(96);
 
   static double minHeightFor(double viewportWidth) =>
-      viewportWidth < ElBreakpoints.sm ? shortMinHeight : tallMinHeight;
+      viewportWidth < Breakpoints.sm ? shortMinHeight : tallMinHeight;
 
   @override
   State<DocsShowcase> createState() => _DocsShowcaseState();
@@ -1081,11 +1081,11 @@ class _DocsShowcaseState extends State<DocsShowcase> {
       children: <Widget>[
         Align(
           alignment: Alignment.centerLeft,
-          child: ElToggleGroup(
+          child: ToggleGroup(
             label: 'Specimen view',
-            items: const <ElToggleGroupItem>[
-              ElToggleGroupItem(label: 'Preview'),
-              ElToggleGroupItem(label: 'Code'),
+            items: const <ToggleGroupItem>[
+              ToggleGroupItem(label: 'Preview'),
+              ToggleGroupItem(label: 'Code'),
             ],
             selectedIndex: _selected,
             // Null means the tapped option was already selected. A view
@@ -1156,8 +1156,8 @@ Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: Theme(
+      controller: ThemeController(mode: ThemeMode.dark),
       child: child,
     ),
   ),
@@ -1213,7 +1213,7 @@ void main() {
 
     await tester.tap(find.byKey(DocsDisclosure.triggerKey));
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(Durations.jelly);
     expect(find.text('body'), findsOneWidget);
   });
 
@@ -1235,8 +1235,8 @@ void main() {
     await tester.pump();
 
     expect(
-      tester.widget<ElIcon>(find.byType(ElIcon)).lucide,
-      ElLucide.chevronDown,
+      tester.widget<Icon>(find.byType(Icon)).lucide,
+      Lucide.chevronDown,
     );
     final double closed = tester
         .widget<RotationTransition>(find.byType(RotationTransition))
@@ -1245,7 +1245,7 @@ void main() {
 
     await tester.tap(find.byKey(DocsDisclosure.triggerKey));
     await tester.pump();
-    await tester.pump(ElDurations.jelly);
+    await tester.pump(Durations.jelly);
 
     expect(
       tester
@@ -1267,7 +1267,7 @@ void main() {
     );
     await tester.pump();
 
-    for (final ElText text in tester.widgetList<ElText>(find.byType(ElText))) {
+    for (final Text text in tester.widgetList<Text>(find.byType(Text))) {
       expect(text.spec.uppercase, isFalse, reason: text.text);
     }
   });
@@ -1328,14 +1328,14 @@ class _DocsDisclosureState extends State<DocsDisclosure>
 
   late final AnimationController _chevron = AnimationController(
     vsync: this,
-    duration: ElDurations.base,
+    duration: Durations.base,
     value: _open ? 1 : 0,
   );
 
   late final Animation<double> _turns = Tween<double>(
     begin: 0,
     end: DocsDisclosure.openTurns,
-  ).animate(CurvedAnimation(parent: _chevron, curve: ElCurves.inOut));
+  ).animate(CurvedAnimation(parent: _chevron, curve: Curves.inOut));
 
   @override
   void dispose() {
@@ -1354,9 +1354,9 @@ class _DocsDisclosureState extends State<DocsDisclosure>
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeData theme = Theme.of(context);
 
-    return ElCollapsible(
+    return Collapsible(
       open: _open,
       trigger: Semantics(
         button: true,
@@ -1372,12 +1372,12 @@ class _DocsDisclosureState extends State<DocsDisclosure>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                ElText(widget.title, ElType.h4, color: theme.foreground),
+                Text(widget.title, Type.h4, color: theme.foreground),
                 RotationTransition(
                   turns: _turns,
-                  child: ElIcon.lucide(
-                    ElLucide.chevronDown,
-                    size: ElIconSize.md,
+                  child: Icon.lucide(
+                    Lucide.chevronDown,
+                    size: IconSize.md,
                   ),
                 ),
               ],
@@ -1399,7 +1399,7 @@ class _DocsDisclosureState extends State<DocsDisclosure>
 Run: `flutter test test/docs/docs_disclosure_test.dart`
 Expected: PASS, 4 tests.
 
-If the first test fails because `ElCollapsible` keeps its content mounted while closed, wrap `content` in `Offstage(offstage: !_open, child: ...)` — a closed section's table must not cost layout on every page.
+If the first test fails because `Collapsible` keeps its content mounted while closed, wrap `content` in `Offstage(offstage: !_open, child: ...)` — a closed section's table must not cost layout on every page.
 
 - [ ] **Step 5: Commit**
 
@@ -1443,8 +1443,8 @@ Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: Theme(
+      controller: ThemeController(mode: ThemeMode.dark),
       child: child,
     ),
   ),
@@ -1465,7 +1465,7 @@ void main() {
               DocsTableColumn(header: 'Purpose', flex: 0.4),
             ],
             rows: <List<String>>[
-              <String>['variant', 'ElButtonVariant', 'Which of the seven.'],
+              <String>['variant', 'ButtonVariant', 'Which of the seven.'],
             ],
           ),
         ),
@@ -1473,7 +1473,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.byType(ElTable), findsOneWidget);
+    expect(find.byType(Table), findsOneWidget);
   });
 
   testWidgets('it fills its column with no trailing gap', (
@@ -1501,7 +1501,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(tester.getSize(find.byType(ElTable)).width, 640);
+    expect(tester.getSize(find.byType(Table)).width, 640);
   });
 
   testWidgets('the API table renders one row per fact', (
@@ -1515,12 +1515,12 @@ void main() {
             facts: <DocsApiFact>[
               DocsApiFact(
                 name: 'variant',
-                type: 'ElButtonVariant',
+                type: 'ButtonVariant',
                 description: 'Which of the seven.',
               ),
               DocsApiFact(
                 name: 'size',
-                type: 'ElButtonSize',
+                type: 'ButtonSize',
                 description: 'Which of the nine.',
               ),
             ],
@@ -1551,7 +1551,7 @@ void main() {
     );
     await tester.pump();
 
-    for (final ElText text in tester.widgetList<ElText>(find.byType(ElText))) {
+    for (final Text text in tester.widgetList<Text>(find.byType(Text))) {
       expect(text.spec.uppercase, isFalse, reason: text.text);
     }
   });
@@ -1570,7 +1570,7 @@ Expected: FAIL — `Target of URI doesn't exist: 'package:example/docs/docs_tabl
 /// The documentation tables, on the package's own table.
 ///
 /// These were hand-rolled rows with their own header strip. They are
-/// `ElTable` now, so a reference table hovers, aligns and rules exactly like
+/// `Table` now, so a reference table hovers, aligns and rules exactly like
 /// every other table in the system — and so a fix to the table is a fix here.
 library;
 
@@ -1600,16 +1600,16 @@ class DocsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeData theme = Theme.of(context);
 
-    // `ElTable` sizes every column to its widest cell and exposes no width
+    // `Table` sizes every column to its widest cell and exposes no width
     // hook, so the table would end at its content and leave a gap. Giving
     // each cell an exact width makes "widest cell" the width we chose, and
-    // the columns then sum to the container. The padding `ElTable` adds
+    // the columns then sum to the container. The padding `Table` adds
     // inside each cell is subtracted first, or the sum overshoots.
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final double gutters = columns.length * ElTable.cellPadding * 2;
+        final double gutters = columns.length * Table.cellPadding * 2;
         final double content = (constraints.maxWidth - gutters).clamp(
           0,
           constraints.maxWidth,
@@ -1618,27 +1618,27 @@ class DocsTable extends StatelessWidget {
         Widget sized(int column, Widget child) =>
             SizedBox(width: content * columns[column].flex, child: child);
 
-        return ElTable(
-          header: <ElTableCellSpec>[
+        return Table(
+          header: <TableCellSpec>[
             for (int i = 0; i < columns.length; i++)
-              ElTableCellSpec(
+              TableCellSpec(
                 child: sized(
                   i,
-                  ElText(
+                  Text(
                     columns[i].header,
-                    ElType.textSm,
+                    Type.textSm,
                     color: theme.mutedForeground,
                   ),
                 ),
               ),
           ],
-          rows: <ElTableRowSpec>[
+          rows: <TableRowSpec>[
             for (final List<String> row in rows)
-              ElTableRowSpec(
-                cells: <ElTableCellSpec>[
+              TableRowSpec(
+                cells: <TableCellSpec>[
                   for (int i = 0; i < row.length; i++)
-                    ElTableCellSpec(
-                      child: sized(i, ElText(row[i], ElType.small)),
+                    TableCellSpec(
+                      child: sized(i, Text(row[i], Type.small)),
                     ),
                 ],
               ),
@@ -1670,8 +1670,8 @@ class DocsApiTable extends StatelessWidget {
 }
 ```
 
-The column fractions must sum to 1. `ElTable` has no `columnWidths`
-parameter — it hardcodes `defaultColumnWidth: const ElTableColumnWidth()`,
+The column fractions must sum to 1. `Table` has no `columnWidths`
+parameter — it hardcodes `defaultColumnWidth: const TableColumnWidth()`,
 which measures the widest cell. Do not add a parameter to the package
 component; this is product code and sizes its own cells.
 
@@ -1693,7 +1693,7 @@ Expected: PASS. Update any import of `DocsApiTable` to `package:example/docs/doc
 
 ```bash
 git add example/lib/docs/docs_table.dart example/lib/docs/docs_facts.dart example/test/docs/docs_table_test.dart
-git commit -m "feat(docs): put the reference tables on ElTable at full width"
+git commit -m "feat(docs): put the reference tables on Table at full width"
 ```
 
 ---
@@ -1732,8 +1732,8 @@ Widget _host(Widget child) => MediaQuery(
   data: const MediaQueryData(size: Size(1440, 900)),
   child: Directionality(
     textDirection: TextDirection.ltr,
-    child: ElTheme(
-      controller: ElThemeController(mode: ElThemeMode.dark),
+    child: Theme(
+      controller: ThemeController(mode: ThemeMode.dark),
       child: child,
     ),
   ),
@@ -1774,7 +1774,7 @@ void main() {
             manualFiles: <DocsCodeFile>[
               DocsCodeFile(
                 path: 'lib/components/ui/button.dart',
-                code: 'class ElButton {}',
+                code: 'class Button {}',
               ),
             ],
           ),
@@ -1866,7 +1866,7 @@ class _DocsInstallState extends State<DocsInstall> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeData theme = Theme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1875,11 +1875,11 @@ class _DocsInstallState extends State<DocsInstall> {
         Align(
           alignment: Alignment.centerLeft,
           // The same toggle the showcase uses. One toggle pattern per page.
-          child: ElToggleGroup(
+          child: ToggleGroup(
             label: 'Installation method',
-            items: const <ElToggleGroupItem>[
-              ElToggleGroupItem(label: 'CLI'),
-              ElToggleGroupItem(label: 'Manual'),
+            items: const <ToggleGroupItem>[
+              ToggleGroupItem(label: 'CLI'),
+              ToggleGroupItem(label: 'Manual'),
             ],
             selectedIndex: _selected,
             onChanged: (int? index) =>
@@ -1894,7 +1894,7 @@ class _DocsInstallState extends State<DocsInstall> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               for (final DocsCodeFile file in widget.manualFiles) ...<Widget>[
-                ElText(file.path, ElType.small, color: theme.mutedForeground),
+                Text(file.path, Type.small, color: theme.mutedForeground),
                 SizedBox(height: el(2)),
                 DocsSnippet(code: file.code),
                 SizedBox(height: el(4)),
@@ -1975,13 +1975,13 @@ const ComponentDocSpec _spec = ComponentDocSpec(
     SnippetSection(
       id: 'usage',
       title: 'Usage',
-      code: 'ElButton(onPressed: () {}, child: const Text("Go"))',
+      code: 'Button(onPressed: () {}, child: const Text("Go"))',
     ),
     ShowcaseSection(
       id: 'ghost',
       title: 'Ghost',
       specimen: SizedBox(height: 40, width: 100),
-      code: 'ElButton(variant: ElButtonVariant.ghost)',
+      code: 'Button(variant: ButtonVariant.ghost)',
     ),
     DisclosureSection(
       id: 'theming',
@@ -1993,8 +1993,8 @@ const ComponentDocSpec _spec = ComponentDocSpec(
 
 Widget _host(Widget child) => Directionality(
   textDirection: TextDirection.ltr,
-  child: ElTheme(
-    controller: ElThemeController(mode: ElThemeMode.dark),
+  child: Theme(
+    controller: ThemeController(mode: ThemeMode.dark),
     child: SingleChildScrollView(child: child),
   ),
 );
@@ -2055,7 +2055,7 @@ void main() {
     await tester.pumpWidget(_host(const ComponentDocPage(spec: _spec)));
     await tester.pump();
 
-    for (final ElText text in tester.widgetList<ElText>(find.byType(ElText))) {
+    for (final Text text in tester.widgetList<Text>(find.byType(Text))) {
       expect(text.spec.uppercase, isFalse, reason: text.text);
     }
   });
@@ -2194,15 +2194,15 @@ class DocsPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeData theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(bottom: el(10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ElText(title, ElType.h1, color: theme.foreground),
+          Text(title, Type.h1, color: theme.foreground),
           SizedBox(height: el(3)),
-          ElText(description, ElType.lead),
+          Text(description, Type.lead),
         ],
       ),
     );
@@ -2244,7 +2244,7 @@ class ComponentDocPage extends StatelessWidget {
 
 The breadcrumb is not rendered here: `DocsLayout` already renders one above
 the article, and a second would be a duplicate. Confirm with
-`rg -n "ElBreadcrumb" example/lib/docs/docs_layout.dart` before adding one.
+`rg -n "Breadcrumb" example/lib/docs/docs_layout.dart` before adding one.
 
 - [ ] **Step 4: Run the tests and make sure they pass**
 
@@ -2297,14 +2297,14 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController controller = ElThemeController(
-      mode: ElThemeMode.dark,
+    final ThemeController controller = ThemeController(
+      mode: ThemeMode.dark,
     );
     addTearDown(controller.dispose);
 
     // The same harness every component-doc test uses.
     await tester.pumpWidget(
-      ElTheme(
+      Theme(
         controller: controller,
         child: const MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -2320,7 +2320,7 @@ void main() {
     expect(rail, findsOneWidget);
     expect(
       tester.getSize(rail).height,
-      lessThanOrEqualTo(viewportHeight - ElWidths.siteHeader),
+      lessThanOrEqualTo(viewportHeight - Widths.siteHeader),
     );
   });
 }
@@ -2330,7 +2330,7 @@ Both rail keys already exist: `docs-layout-sidebar` at
 `example/lib/docs/docs_layout.dart:449` and `docs-layout-toc` at `:483`. The
 imports this test needs are `package:flutter/material.dart` (for `MaterialApp`)
 and `package:example/components_docs/button/page.dart`. The rail only renders
-at `ElBreakpoints.lg` and wider, which is why the view is 1600 wide.
+at `Breakpoints.lg` and wider, which is why the view is 1600 wide.
 
 - [ ] **Step 2: Run it to make sure it fails**
 
@@ -2352,7 +2352,7 @@ with:
     // viewport height runs past the fold and its last rows cannot be
     // reached. The gutter keeps the final row off the bottom edge.
     final double railMaxHeight =
-        MediaQuery.sizeOf(context).height - ElWidths.siteHeader - el(4);
+        MediaQuery.sizeOf(context).height - Widths.siteHeader - el(4);
 ```
 
 - [ ] **Step 4: Run the tests and make sure they pass**
@@ -2400,13 +2400,13 @@ import 'package:test/test.dart';
 
 /// The roles whose spec carries `uppercase: true`.
 const List<String> _uppercaseRoles = <String>[
-  'ElType.label',
-  'ElType.micro',
-  'ElType.tag',
-  'ElType.badge',
-  'ElType.serial',
-  'ElType.inputSerial',
-  'ElType.buttonLabelCaps',
+  'Type.label',
+  'Type.micro',
+  'Type.tag',
+  'Type.badge',
+  'Type.serial',
+  'Type.inputSerial',
+  'Type.buttonLabelCaps',
 ];
 
 /// Directories the rule covers.
@@ -2447,7 +2447,7 @@ void main() {
       isEmpty,
       reason:
           'documentation pages must not render uppercase text. Use '
-          'ElType.caption, ElType.small or ElType.textSm instead:\n'
+          'Type.caption, Type.small or Type.textSm instead:\n'
           '${offences.join('\n')}',
     );
   });
@@ -2465,10 +2465,10 @@ For each line the test named, substitute by intent:
 
 | Was | Use |
 | --- | --- |
-| `ElType.label` on a section eyebrow or table header | `ElType.textSm` with `color: theme.mutedForeground` |
-| `ElType.micro` or `ElType.tag` on a small annotation | `ElType.caption` |
-| `ElType.badge` inside a docs page | `ElType.small` |
-| `ElType.serial` on a path or identifier | `ElType.code` |
+| `Type.label` on a section eyebrow or table header | `Type.textSm` with `color: theme.mutedForeground` |
+| `Type.micro` or `Type.tag` on a small annotation | `Type.caption` |
+| `Type.badge` inside a docs page | `Type.small` |
+| `Type.serial` on a path or identifier | `Type.code` |
 
 Do not touch `lib/pages/`, `lib/site/`, or anything under `lib/src/`. The rule covers documentation pages only, by decision.
 
@@ -2597,8 +2597,8 @@ const ShowcaseSection(
       'the default focus target.',
   specimen: _DestructiveSpecimen(),
   code:
-      "ElButton(\n"
-      "  variant: ElButtonVariant.destructive,\n"
+      "Button(\n"
+      "  variant: ButtonVariant.destructive,\n"
       "  onPressed: () {},\n"
       "  child: const Text('Delete'),\n"
       ")",
@@ -2612,8 +2612,8 @@ class _DestructiveSpecimen extends StatelessWidget {
   const _DestructiveSpecimen();
 
   @override
-  Widget build(BuildContext context) => ElButton(
-    variant: ElButtonVariant.destructive,
+  Widget build(BuildContext context) => Button(
+    variant: ButtonVariant.destructive,
     onPressed: () {},
     child: const Text('Delete'),
   );

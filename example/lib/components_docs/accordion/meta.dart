@@ -27,9 +27,9 @@ const ComponentDocEntry accordionDoc = ComponentDocEntry(
     'button',
     'collapsible',
     'icon',
-    'machine-surface',
+    'surface',
     'source-foundation',
   ],
-  exports: <String>['ElAccordion', 'ElAccordionItem'],
+  exports: <String>['Accordion', 'AccordionItem'],
   sourcePath: 'lib/src/components/accordion.dart',
 );

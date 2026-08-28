@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/menu.dart",
+      "source": "lib/src/components/ui/menu.dart",
       "target": "@ui/menu.dart",
-      "sha256": "6a5b9b26ad2f38c39ada9b9266dd518e78e19ec0eb6b5458d4810e12fc35724a"
+      "sha256": "9c902b2ac8e2271c9cb6d7cdcf2e29c7fcd7da1efcf02bdf230bd10136674d8e"
     }
   ],
   "registryDependencies": [
@@ -27,6 +27,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/menu",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/menu.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/menu.dart",
   "deprecated": false
 }

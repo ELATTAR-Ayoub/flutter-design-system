@@ -3,17 +3,29 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// Defaults every field and control returns to on reset.
 const String _defaultCurrency = 'usd';
 const double _defaultAmount = 2500;
 
-const List<ElSelectOption<String>> _currencies = <ElSelectOption<String>>[
-  ElSelectOption<String>(value: 'usd', label: 'USD - United States dollar'),
-  ElSelectOption<String>(value: 'eur', label: 'EUR - Euro'),
-  ElSelectOption<String>(value: 'gbp', label: 'GBP - Pound sterling'),
-  ElSelectOption<String>(value: 'jpy', label: 'JPY - Japanese yen'),
+const List<SelectOption<String>> _currencies = <SelectOption<String>>[
+  SelectOption<String>(value: 'usd', label: 'USD - United States dollar'),
+  SelectOption<String>(value: 'eur', label: 'EUR - Euro'),
+  SelectOption<String>(value: 'gbp', label: 'GBP - Pound sterling'),
+  SelectOption<String>(value: 'jpy', label: 'JPY - Japanese yen'),
 ];
 
 /// Formats a whole-dollar amount with thousands separators, e.g. `$2,500`.
@@ -62,7 +74,7 @@ class _PayoutCardState extends State<PayoutCard> {
   Future<void> _save() async {
     setState(() => _saving = true);
     final double pending = _amount;
-    await Future<void>.delayed(ElDurations.slow);
+    await Future<void>.delayed(MotionDurations.slow);
     if (!mounted) return;
     setState(() {
       _saving = false;
@@ -70,22 +82,22 @@ class _PayoutCardState extends State<PayoutCard> {
     });
   }
 
-  /// Spread, not wrapped: [ElCard] reads `children.last is ElCardFooter` to
+  /// Spread, not wrapped: [Card] reads `children.last is CardFooter` to
   /// decide whether to drop its own bottom padding, and a `Column` around the
   /// pair would hide the footer from that test and swallow the card's own
   /// inter-slot spacing.
-  List<Widget> _dismissedBody(ElThemeData theme) => <Widget>[
-    ElCardContent(
-      child: ElText(
+  List<Widget> _dismissedBody(ThemeTokens theme) => <Widget>[
+    CardContent(
+      child: StyledText(
         'Payout settings hidden.',
-        ElType.small,
+        TextStyles.small,
         color: theme.mutedForeground,
       ),
     ),
-    ElCardFooter(
-      child: ElButton(
+    CardFooter(
+      child: Button(
         key: const ValueKey<String>('home-payout-restore'),
-        variant: ElButtonVariant.ghost,
+        variant: ButtonVariant.ghost,
         onPressed: () => setState(() => _dismissed = false),
         child: const Text('Restore'),
       ),
@@ -94,36 +106,36 @@ class _PayoutCardState extends State<PayoutCard> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     final double? savedAmount = _savedAmount;
 
-    return ElCard(
+    return Card(
       children: <Widget>[
-        ElCardHeader(
-          title: const ElCardTitle('Payout threshold'),
-          description: const ElCardDescription(
+        CardHeader(
+          title: const CardTitle('Payout threshold'),
+          description: const CardDescription(
             'Set the minimum balance required before a payout is triggered.',
           ),
-          action: ElButton(
+          action: Button(
             key: const ValueKey<String>('home-payout-dismiss'),
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.icon,
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.icon,
             label: 'Dismiss payout settings',
             onPressed: () => setState(() => _dismissed = true),
-            child: const ElIcon(ElIconGlyph.x, size: ElIconSize.sm),
+            child: const Icon(IconGlyph.x, size: IconSize.sm),
           ),
         ),
         if (_dismissed)
           ..._dismissedBody(theme)
         else ...<Widget>[
-          ElCardContent(
+          CardContent(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                ElField(
+                Field(
                   label: 'Preferred currency',
-                  child: ElSelect<String>(
+                  child: Select<String>(
                     key: const ValueKey<String>('home-payout-currency'),
                     options: _currencies,
                     value: _currency,
@@ -134,18 +146,21 @@ class _PayoutCardState extends State<PayoutCard> {
                     }),
                   ),
                 ),
-                SizedBox(height: el(4)),
+                SizedBox(height: space(4)),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Expanded(
-                      child: ElText('Minimum payout amount', ElType.small),
+                      child: StyledText(
+                        'Minimum payout amount',
+                        TextStyles.small,
+                      ),
                     ),
-                    ElText(_formatAmount(_amount), ElType.numLg),
+                    StyledText(_formatAmount(_amount), TextStyles.numberLg),
                   ],
                 ),
-                SizedBox(height: el(2)),
-                ElSlider(
+                SizedBox(height: space(2)),
+                Slider(
                   key: const ValueKey<String>('home-payout-slider'),
                   values: <double>[_amount],
                   min: 50,
@@ -157,26 +172,26 @@ class _PayoutCardState extends State<PayoutCard> {
                     _savedAmount = null;
                   }),
                 ),
-                SizedBox(height: el(2)),
+                SizedBox(height: space(2)),
                 Row(
                   children: <Widget>[
-                    ElText(
+                    StyledText(
                       '\$50 (min)',
-                      ElType.caption,
+                      TextStyles.caption,
                       color: theme.mutedForeground,
                     ),
                     const Spacer(),
-                    ElText(
+                    StyledText(
                       '\$10,000 (max)',
-                      ElType.caption,
+                      TextStyles.caption,
                       color: theme.mutedForeground,
                     ),
                   ],
                 ),
-                SizedBox(height: el(4)),
-                ElField(
+                SizedBox(height: space(4)),
+                Field(
                   label: 'Notes',
-                  child: ElTextarea(
+                  child: Textarea(
                     key: const ValueKey<String>('home-payout-notes'),
                     controller: _notes,
                     placeholder: 'Add any notes for this payout',
@@ -190,30 +205,30 @@ class _PayoutCardState extends State<PayoutCard> {
               ],
             ),
           ),
-          ElCardFooter(
+          CardFooter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 if (savedAmount != null) ...<Widget>[
-                  ElText(
+                  StyledText(
                     'Threshold saved at ${_formatAmount(savedAmount)}.',
-                    ElType.small,
+                    TextStyles.small,
                     color: theme.mutedForeground,
                   ),
-                  SizedBox(height: el(3)),
+                  SizedBox(height: space(3)),
                 ],
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    ElButton(
+                    Button(
                       key: const ValueKey<String>('home-payout-reset'),
-                      variant: ElButtonVariant.ghost,
+                      variant: ButtonVariant.ghost,
                       onPressed: _saving ? null : _reset,
                       child: const Text('Reset'),
                     ),
-                    SizedBox(width: el(2)),
-                    ElButton(
+                    SizedBox(width: space(2)),
+                    Button(
                       key: const ValueKey<String>('home-payout-save'),
                       loading: _saving,
                       onPressed: _saving ? null : _save,

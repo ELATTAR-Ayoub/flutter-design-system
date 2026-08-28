@@ -37,11 +37,23 @@
 ///  5. **The Props table documents `value / onChange` and `inputRef`**, which
 ///     this port collapses into one `TextEditingController`. The rows are
 ///     reproduced verbatim anyway: they describe the reference's API, and the
-///     port note that reconciles them lives on `ElAgentComposer` itself.
+///     port note that reconciles them lives on `AgentComposer` itself.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -54,45 +66,45 @@ const String _placeholder = 'Ask about a pack, a pull or your balance…';
 
 /// `COMMANDS` from `agent-demo.tsx`, verbatim: three skills and one command,
 /// each carrying the glyph its capability carries everywhere else.
-const List<ElAgentCommand> _commands = <ElAgentCommand>[
-  ElAgentCommand(
+const List<AgentCommand> _commands = <AgentCommand>[
+  AgentCommand(
     id: 'inventory',
     label: 'inventory',
     hint: 'What is in stock',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.search,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.search,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'wallet',
     label: 'wallet',
     hint: 'Balance and recent movement',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.wallet,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.wallet,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'export',
     label: 'export',
     hint: 'Download activity as CSV',
-    group: ElAgentCommandGroup.skill,
-    icon: ElLucide.download,
+    group: AgentCommandGroup.skill,
+    icon: Lucide.download,
   ),
-  ElAgentCommand(
+  AgentCommand(
     id: 'guide',
     label: 'guide',
     hint: 'How pack odds work',
-    group: ElAgentCommandGroup.command,
-    icon: ElLucide.bookOpen,
+    group: AgentCommandGroup.command,
+    icon: Lucide.bookOpen,
   ),
 ];
 
 /// The one attachment `ComposerSpecimen` seeds when `withAttachment` is set.
-const ElAgentAttachment _seeded = ElAgentAttachment(
+const AgentAttachment _seeded = AgentAttachment(
   id: 'spec-upload',
   name: 'collection-export.csv',
   mime: 'text/csv',
-  kind: ElAgentAttachmentKind.data,
+  kind: AgentAttachmentKind.data,
   size: 18422,
-  delivery: ElAgentDelivery.content(),
+  delivery: AgentDelivery.content(),
 );
 
 /* ── The specimen ────────────────────────────────────────────────────────── */
@@ -120,9 +132,9 @@ class ComposerSpecimen extends StatefulWidget {
 
 class _ComposerSpecimenState extends State<ComposerSpecimen> {
   final TextEditingController _controller = TextEditingController();
-  late List<ElAgentAttachment> _attachments = widget.withAttachment
-      ? <ElAgentAttachment>[_seeded]
-      : <ElAgentAttachment>[];
+  late List<AgentAttachment> _attachments = widget.withAttachment
+      ? <AgentAttachment>[_seeded]
+      : <AgentAttachment>[];
 
   @override
   void dispose() {
@@ -132,7 +144,7 @@ class _ComposerSpecimenState extends State<ComposerSpecimen> {
 
   @override
   Widget build(BuildContext context) {
-    return ElAgentComposer(
+    return AgentComposer(
       controller: _controller,
       // `onSubmit={() => setValue("")}`: the specimen has nowhere to send it,
       // so sending is emptying.
@@ -143,12 +155,12 @@ class _ComposerSpecimenState extends State<ComposerSpecimen> {
       placeholder: _placeholder,
       commands: _commands,
       attachments: _attachments,
-      onAttach: (List<ElAgentAttachment> files) => setState(
-        () => _attachments = <ElAgentAttachment>[..._attachments, ...files],
+      onAttach: (List<AgentAttachment> files) => setState(
+        () => _attachments = <AgentAttachment>[..._attachments, ...files],
       ),
       onRemoveAttachment: (String id) => setState(
         () => _attachments = _attachments
-            .where((ElAgentAttachment a) => a.id != id)
+            .where((AgentAttachment a) => a.id != id)
             .toList(),
       ),
     );
@@ -162,12 +174,12 @@ class ComposerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElCategoryHit here = findCategory('agent', 'composer');
+    final CategoryHit here = findCategory('agent', 'composer');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           // DRIFT 1, "Components", not "Base".
           eyebrow: '${here.group.title} · Components',
           title: here.category.title,
@@ -180,7 +192,7 @@ class ComposerPage extends StatelessWidget {
         const _AttachmentsSection(),
         const _SlashSection(),
         const _PropsSection(),
-        const ElPageFootNav(groupId: 'agent', slug: 'composer'),
+        const PageFootNav(groupId: 'agent', slug: 'composer'),
       ],
     );
   }
@@ -193,7 +205,7 @@ class _RestSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ElSection(
+    return const Section(
       id: 'rest',
       title: 'At rest',
       description:
@@ -201,7 +213,7 @@ class _RestSection extends StatelessWidget {
           'sends and Shift-Enter breaks the line — the convention every chat '
           'surface has agreed on, and breaking it is a novelty nobody asked '
           'for.',
-      child: ElPanel(
+      child: Panel(
         label: 'Composer',
         // DRIFT 4.
         note: 'idle',
@@ -218,7 +230,7 @@ class _StatesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'states',
       title: 'Busy and disabled',
       description:
@@ -231,13 +243,13 @@ class _StatesSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const ElPanel(
+          const Panel(
             label: 'Composer',
             note: 'busy — send becomes stop',
             child: ComposerSpecimen(busy: true),
           ),
-          SizedBox(height: el(6)),
-          const ElPanel(
+          SizedBox(height: space(6)),
+          const Panel(
             label: 'Composer',
             note: 'disabled — transport not ready',
             child: ComposerSpecimen(disabled: true),
@@ -255,7 +267,7 @@ class _AttachmentsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElSection(
+    return Section(
       id: 'attachments',
       title: 'File tray',
       description:
@@ -265,16 +277,16 @@ class _AttachmentsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const ElPanel(
+          const Panel(
             label: 'Composer',
             note: 'one attachment, content delivered',
             child: ComposerSpecimen(withAttachment: true),
           ),
           // `className="mt-6"` on the Note.
           Padding(
-            padding: EdgeInsets.only(top: el(6)),
-            child: const ElNote(
-              tone: ElNoteTone.value,
+            padding: EdgeInsets.only(top: space(6)),
+            child: const Note(
+              tone: NoteTone.value,
               title: 'The border is the drop target',
               child: _DropTargetBody(),
             ),
@@ -290,11 +302,11 @@ class _DropTargetBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Dragging a file over the console lights '),
-          ElCode.span('border-agent bg-agent/8'),
+          Code.span('border-agent bg-agent/8'),
           const TextSpan(
             text:
                 ' on the composer rather than overlaying a dashed rectangle '
@@ -305,7 +317,7 @@ class _DropTargetBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -317,7 +329,7 @@ class _SlashSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ElSection(
+    return const Section(
       id: 'slash',
       title: 'Slash palette',
       description:
@@ -326,7 +338,7 @@ class _SlashSection extends StatelessWidget {
           'Both carry the same glyph they carry in the tool chip, so one '
           'capability has one mark everywhere.',
       // DRIFT 3: the section about the palette holds a paragraph about it.
-      child: ElPanel(
+      child: Panel(
         label: 'SlashPalette',
         note: 'type / in any composer above',
         child: _SlashBody(),
@@ -340,7 +352,7 @@ class _SlashBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElRichText(
+    return RichText(
       TextSpan(
         children: <InlineSpan>[
           const TextSpan(
@@ -349,9 +361,9 @@ class _SlashBody extends StatelessWidget {
                 'anchored to the composer rather than portalled, so it moves '
                 'with the input as it grows. ',
           ),
-          ElCode.span('filterCommands'),
+          Code.span('filterCommands'),
           const TextSpan(text: ' and '),
-          ElCode.span('slashQuery'),
+          Code.span('slashQuery'),
           const TextSpan(
             text:
                 ' are exported separately — the matching is a pure function '
@@ -359,7 +371,7 @@ class _SlashBody extends StatelessWidget {
           ),
         ],
       ),
-      ElType.small,
+      TextStyles.small,
     );
   }
 }
@@ -371,7 +383,7 @@ class _PropsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ElSection(
+    return const Section(
       id: 'props',
       title: 'Props',
       description:
@@ -379,8 +391,8 @@ class _PropsSection extends StatelessWidget {
           'own measurement. The console owns the draft, the attachments and '
           'the dictation session, which is what lets a caller compose a '
           'different shell around the same input.',
-      child: ElMeta(
-        items: <ElMetaItem>[
+      child: Meta(
+        items: <MetaItem>[
           // DRIFT 5: the reference's own API, reproduced as written.
           (k: 'value / onChange', v: TextSpan(text: 'string — controlled')),
           (k: 'onSubmit / onStop', v: TextSpan(text: '() => void')),

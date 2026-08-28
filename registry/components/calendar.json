@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/calendar.dart",
+      "source": "lib/src/components/ui/calendar.dart",
       "target": "@ui/calendar.dart",
-      "sha256": "a9d7d760b2a38bb48bd8930633a6a873b9ed5bc1ead00b5ec330f8bee6d0953a"
+      "sha256": "42f864e1c4491f1dd2a44605951be4d7437e8f93d3b9c67a7216e4725387642f"
     }
   ],
   "registryDependencies": [
@@ -28,5 +28,15 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/calendar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/calendar.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/calendar.dart",
+  "exports": [
+    "Calendar",
+    "CalendarBandPainter",
+    "CalendarDay",
+    "CalendarMode",
+    "CalendarMonth",
+    "CalendarPresentation",
+    "DatePicker",
+    "DateRange"
+  ]
 }

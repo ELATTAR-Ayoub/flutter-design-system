@@ -1,10 +1,22 @@
 /// A live notification-preferences card: four checkbox rows built from
-/// `ElItem`, a select-all/clear-all pair with a live count badge, and a
+/// `Item`, a select-all/clear-all pair with a live count badge, and a
 /// save footer, built only from real `El*` components.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// One preference row: what it is called, what it does, and its default.
 @immutable
@@ -81,7 +93,7 @@ class _NotificationsCardState extends State<NotificationsCard> {
 
   Future<void> _save() async {
     setState(() => _saving = true);
-    await Future<void>.delayed(ElDurations.slow);
+    await Future<void>.delayed(MotionDurations.slow);
     if (!mounted) return;
     setState(() {
       _saving = false;
@@ -95,11 +107,11 @@ class _NotificationsCardState extends State<NotificationsCard> {
       key: ValueKey<String>('home-notifications-row-${item.id}'),
       behavior: HitTestBehavior.opaque,
       onTap: () => _toggle(item.id),
-      child: ElItem(
-        media: ElItemMedia(
-          child: ElCheckbox(
+      child: Item(
+        media: ItemMedia(
+          child: Checkbox(
             key: ValueKey<String>('home-notifications-checkbox-${item.id}'),
-            state: value ? ElCheckboxState.checked : ElCheckboxState.unchecked,
+            state: value ? CheckboxState.checked : CheckboxState.unchecked,
             // The row's GestureDetector covers the rest of the strip, but the
             // box keeps its own handler: without one it is a disabled control,
             // out of the tab order and announced as such.
@@ -107,10 +119,10 @@ class _NotificationsCardState extends State<NotificationsCard> {
             label: item.title,
           ),
         ),
-        content: ElItemContent(
+        content: ItemContent(
           children: <Widget>[
-            ElItemTitle(item.title),
-            ElItemDescription(item.description),
+            ItemTitle(item.title),
+            ItemDescription(item.description),
           ],
         ),
       ),
@@ -119,46 +131,46 @@ class _NotificationsCardState extends State<NotificationsCard> {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
-    return ElCard(
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Card(
       children: <Widget>[
-        const ElCardHeader(
-          title: ElCardTitle('Notifications'),
-          description: ElCardDescription(
+        const CardHeader(
+          title: CardTitle('Notifications'),
+          description: CardDescription(
             'Choose which email and push alerts you want to receive.',
           ),
         ),
-        ElCardContent(
+        CardContent(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Wrap(
-                spacing: el(2),
-                runSpacing: el(2),
+                spacing: space(2),
+                runSpacing: space(2),
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: <Widget>[
-                  ElButton(
+                  Button(
                     key: const ValueKey<String>(
                       'home-notifications-select-all',
                     ),
-                    variant: ElButtonVariant.ghost,
-                    size: ElButtonSize.sm,
+                    variant: ButtonVariant.ghost,
+                    size: ButtonSize.sm,
                     onPressed: () => _setAll(true),
                     child: const Text('Select all'),
                   ),
-                  ElButton(
+                  Button(
                     key: const ValueKey<String>('home-notifications-clear-all'),
-                    variant: ElButtonVariant.ghost,
-                    size: ElButtonSize.sm,
+                    variant: ButtonVariant.ghost,
+                    size: ButtonSize.sm,
                     onPressed: () => _setAll(false),
                     child: const Text('Clear all'),
                   ),
-                  ElBadge(label: '$_onCount of 4 on'),
+                  Badge(label: '$_onCount of 4 on'),
                 ],
               ),
-              SizedBox(height: el(3)),
-              ElItemGroup(
+              SizedBox(height: space(3)),
+              ItemGroup(
                 children: <Widget>[
                   for (final _NotificationItem item in _notificationItems)
                     _row(item),
@@ -167,20 +179,20 @@ class _NotificationsCardState extends State<NotificationsCard> {
             ],
           ),
         ),
-        ElCardFooter(
+        CardFooter(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               if (_justSaved) ...<Widget>[
-                ElText(
+                StyledText(
                   'Preferences saved.',
-                  ElType.small,
+                  TextStyles.small,
                   color: theme.mutedForeground,
                 ),
-                SizedBox(height: el(3)),
+                SizedBox(height: space(3)),
               ],
-              ElButton(
+              Button(
                 key: const ValueKey<String>('home-notifications-save'),
                 loading: _saving,
                 contentAlignment: AlignmentDirectional.center,

@@ -22,18 +22,18 @@ const ComponentDocEntry popoverDoc = ComponentDocEntry(
   // registry/components/popover.json's own registryDependencies, verbatim —
   // a worker that invented a name here is exactly the failure mode the
   // Phase J supervisor notes warn about, and this one does not need to.
-  dependencies: <String>['machine-surface', 'source-foundation'],
+  dependencies: <String>['surface', 'source-foundation'],
   exports: <String>[
-    'ElPopover',
-    'ElPopoverSide',
-    'ElPopoverAlign',
-    'ElPopoverOriginModel',
-    'ElPopoverBarrier',
-    'ElPopoverPlacement',
-    'ElPopoverAnchorMetrics',
-    'ElPopoverContentBuilder',
-    'ElPopoverSurface',
-    'elPopoverPlacement',
+    'Popover',
+    'PopoverSide',
+    'PopoverAlign',
+    'PopoverAnchorMode',
+    'PopoverBarrier',
+    'PopoverPlacement',
+    'PopoverAnchorMetrics',
+    'PopoverContentBuilder',
+    'PopoverSurface',
+    'popoverPlacement',
   ],
   sourcePath: 'lib/src/components/popover.dart',
 );

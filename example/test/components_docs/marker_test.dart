@@ -3,7 +3,7 @@
 /// Re-housed onto the kit alongside the page: the section-order test now
 /// reads `DocsSection.id`/`.title`, and the API-table reads open the
 /// `DocsDisclosure` first — closed by default, unlike the old page's
-/// always-visible `ElSection`.
+/// always-visible `Section`.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -12,7 +12,33 @@ import 'package:example/components_docs/marker/page.dart';
 import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The page's own section order.
@@ -55,28 +81,26 @@ const List<String> _sectionTitles = <String>[
   'Source',
 ];
 
-/// Every named constructor parameter `ElMarker` declares
+/// Every named constructor parameter `Marker` declares
 /// (`lib/src/components/marker.dart`), excluding `key`.
 const List<String> _markerParams = <String>['label', 'variant', 'icon'];
 
-/// Every static measurement `ElMarker` exposes, as the API table names them.
+/// Every static measurement `Marker` exposes, as the API table names them.
 const List<String> _markerStatics = <String>[
-  'ElMarker.gap',
-  'ElMarker.minHeight',
-  'ElMarker.ruleGap',
-  'ElMarker.borderPadding',
+  'Marker.gap',
+  'Marker.minHeight',
+  'Marker.ruleGap',
+  'Marker.borderPadding',
 ];
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: Scaffold(body: SingleChildScrollView(child: child)),
-  ),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(body: SingleChildScrollView(child: child)),
+      ),
+    );
 
 /// The single `DocsDisclosure` whose title is [title].
 Finder _disclosureTrigger(String title) => find.descendant(
@@ -93,18 +117,18 @@ void main() {
       expect(markerDoc.title, 'Marker');
       expect(markerDoc.route, '/components/marker');
       expect(markerDoc.sourcePath, 'lib/src/components/marker.dart');
-      expect(markerDoc.exports, <String>['ElMarker', 'ElMarkerVariant']);
+      expect(markerDoc.exports, <String>['Marker', 'MarkerVariant']);
       expect(markerDoc.command, 'elattar add marker');
       // Nothing from the two families this page was split away from.
-      expect(markerDoc.exports, isNot(contains('ElCarousel')));
-      expect(markerDoc.exports, isNot(contains('ElNavUser')));
+      expect(markerDoc.exports, isNot(contains('Carousel')));
+      expect(markerDoc.exports, isNot(contains('UserMenu')));
     });
 
     test('the static measurements the API table quotes are the real ones', () {
-      expect(ElMarker.gap, el(2));
-      expect(ElMarker.minHeight, el(4));
-      expect(ElMarker.ruleGap, el(1));
-      expect(ElMarker.borderPadding, el(2));
+      expect(Marker.gap, space(2));
+      expect(Marker.minHeight, space(4));
+      expect(Marker.ruleGap, space(1));
+      expect(Marker.borderPadding, space(2));
     });
   });
 
@@ -120,7 +144,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: MarkerDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -138,7 +162,7 @@ void main() {
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _markerParams) {
           expect(
@@ -157,12 +181,12 @@ void main() {
           );
         }
 
-        // Every ElMarkerVariant value is named in the ElMarkerVariant table.
-        for (final ElMarkerVariant variant in ElMarkerVariant.values) {
+        // Every MarkerVariant value is named in the MarkerVariant table.
+        for (final MarkerVariant variant in MarkerVariant.values) {
           expect(
             find.text(variant.name),
             findsWidgets,
-            reason: 'ElMarkerVariant.${variant.name} missing from API table',
+            reason: 'MarkerVariant.${variant.name} missing from API table',
           );
         }
 
@@ -183,7 +207,7 @@ void main() {
       },
     );
 
-    testWidgets('a live specimen of every ElMarkerVariant value mounts', (
+    testWidgets('a live specimen of every MarkerVariant value mounts', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(1440, 900);
@@ -192,35 +216,35 @@ void main() {
 
       await tester.pumpWidget(
         _harness(
-          controller: ElThemeController(mode: ElThemeMode.dark),
+          controller: ThemeController(mode: ColorMode.dark),
           child: const MarkerDocPage(),
         ),
       );
       await tester.pump();
 
-      final List<ElMarker> markers = tester
-          .widgetList<ElMarker>(find.byType(ElMarker))
+      final List<Marker> markers = tester
+          .widgetList<Marker>(find.byType(Marker))
           .toList();
       expect(markers.length, greaterThanOrEqualTo(3));
 
-      final Set<ElMarkerVariant> variants = markers
-          .map((ElMarker marker) => marker.variant)
+      final Set<MarkerVariant> variants = markers
+          .map((Marker marker) => marker.variant)
           .toSet();
-      expect(variants, containsAll(ElMarkerVariant.values));
+      expect(variants, containsAll(MarkerVariant.values));
 
       // The Adding an icon section really passes an icon, rather than only
       // describing one.
-      final Iterable<ElMarker> withIcon = tester
-          .widgetList<ElMarker>(
+      final Iterable<Marker> withIcon = tester
+          .widgetList<Marker>(
             find.descendant(
               of: find.byKey(const ValueKey<String>('marker-example:icon')),
-              matching: find.byType(ElMarker),
+              matching: find.byType(Marker),
             ),
           )
           .toList();
       expect(withIcon, isNotEmpty);
       expect(
-        withIcon.every((ElMarker marker) => marker.icon != null),
+        withIcon.every((Marker marker) => marker.icon != null),
         isTrue,
         reason: 'the icon specimen carries no icon',
       );
@@ -242,7 +266,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const MarkerDocPage(),
           ),
         );
@@ -276,7 +300,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const MarkerDocPage(),
           ),
         );
@@ -304,15 +328,15 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
+        final ThemeController controller = ThemeController(
+          mode: ColorMode.dark,
         );
         await tester.pumpWidget(
           _harness(controller: controller, child: const MarkerDocPage()),
         );
         await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
+        final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('marker-doc-article')),
           ),
@@ -320,10 +344,10 @@ void main() {
 
         // Flip the SAME controller in place. A single pump(), never
         // pumpAndSettle().
-        controller.setMode(ElThemeMode.light);
+        controller.setMode(ColorMode.light);
         await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
+        final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
             find.byKey(const ValueKey<String>('marker-doc-article')),
           ),
@@ -340,11 +364,11 @@ void main() {
           expect(find.byKey(ValueKey<String>(key)), findsOneWidget);
         }
 
-        final Set<ElMarkerVariant> variants = tester
-            .widgetList<ElMarker>(find.byType(ElMarker))
-            .map((ElMarker marker) => marker.variant)
+        final Set<MarkerVariant> variants = tester
+            .widgetList<Marker>(find.byType(Marker))
+            .map((Marker marker) => marker.variant)
             .toSet();
-        expect(variants, containsAll(ElMarkerVariant.values));
+        expect(variants, containsAll(MarkerVariant.values));
       },
     );
   });

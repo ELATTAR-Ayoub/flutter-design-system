@@ -1,12 +1,12 @@
 /// Public documentation page for the `button_group` component.
 ///
 /// **Re-housed onto the documentation kit.** This page used to be a
-/// hand-composed `_Article` built from `kit.dart`'s `ElSection` (see
+/// hand-composed `_Article` built from `kit.dart`'s `Section` (see
 /// `example/lib/components_docs/button/page.dart`'s own library doc for the
 /// house shape every page is being moved onto). Every specimen and every
 /// code string below is the same one the old page rendered; what moved is
 /// only where the content lives: a `ComponentDocSpec` declaration plus a
-/// ten-line widget, `DocsSection`/`DocsDisclosure` instead of `ElSection`,
+/// ten-line widget, `DocsSection`/`DocsDisclosure` instead of `Section`,
 /// and the eight fixed disclosures in the house order (API Reference,
 /// States, Accessibility, Keyboard, Responsive, Dependencies, Theming,
 /// Source) instead of the old page's own varying set.
@@ -17,22 +17,34 @@
 /// of its own — it is a discursive comparison — so it moved into a
 /// `DisclosureSection` of its own, sitting in the middle of the section list
 /// rather than among the eight fixed trailing ones. `Sizes` carries no live
-/// demo either (`ElButtonGroup` has no size prop of its own to demonstrate):
+/// demo either (`ButtonGroup` has no size prop of its own to demonstrate):
 /// it is a `SnippetSection` illustrating the one real pattern its own prose
-/// already named, giving every member the same `ElButtonSize`.
+/// already named, giving every member the same `ButtonSize`.
 ///
 /// **One real addition: Keyboard.** The old page had no dedicated Keyboard
 /// section. `button_group.dart` wires no `Focus.onKeyEvent`, no
 /// `FocusTraversalPolicy`, and no roving-tabindex of its own — every key
 /// event a member receives is handled by that member's own widget (usually
-/// `ElButton`) — and the new Keyboard disclosure below says exactly that.
+/// `Button`) — and the new Keyboard disclosure below says exactly that.
 ///
 /// `buttonGroupDoc` (from `meta.dart`) is the data source, not
 /// `componentDoc('button_group')`.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
@@ -51,8 +63,7 @@ final ComponentDocSpec buttonGroupDocSpec = ComponentDocSpec(
     ShowcaseSection(
       id: 'preview',
       title: 'Preview',
-      description:
-          'A quantity stepper: the app owns the count, not the group.',
+      description: 'A quantity stepper: the app owns the count, not the group.',
       specimen: _PreviewSpecimen(),
       code: _previewCode,
       label: 'Preview specimen view',
@@ -87,15 +98,15 @@ final ComponentDocSpec buttonGroupDocSpec = ComponentDocSpec(
     SnippetSection(
       id: 'composition',
       title: 'Composition',
-      description: 'The widget hierarchy ElButtonGroup builds on.',
+      description: 'The widget hierarchy ButtonGroup builds on.',
       code: _compositionCode,
     ),
     ShowcaseSection(
       id: 'composing-others',
       title: 'Composing other members',
       description:
-          'children accepts any widget, not only ElButton and '
-          'ElButtonGroupText: only those two types get corner reshaping and '
+          'children accepts any widget, not only Button and '
+          'ButtonGroupText: only those two types get corner reshaping and '
           'border synthesis. An unrecognised member is placed flush with its '
           'own corners untouched, which covers a plain field, a dropdown '
           'trigger, a select, or a popover trigger composed alongside a '
@@ -108,7 +119,7 @@ final ComponentDocSpec buttonGroupDocSpec = ComponentDocSpec(
       id: 'separator',
       title: 'Separator',
       description:
-          'ElButtonGroupSeparator draws one hairline rule between two '
+          'ButtonGroupSeparator draws one hairline rule between two '
           'members. Members with an outline border already carry a seam of '
           'their own, a separator is for the five variants that do not.',
       specimen: _SeparatorSpecimen(),
@@ -142,8 +153,8 @@ final ComponentDocSpec buttonGroupDocSpec = ComponentDocSpec(
       id: 'sizes',
       title: 'Sizes',
       description:
-          'ElButtonGroup has no size prop of its own: each member keeps its '
-          'own ElButtonSize. Give every ElButton in a group the same size '
+          'ButtonGroup has no size prop of its own: each member keeps its '
+          'own ButtonSize. Give every Button in a group the same size '
           'for a level row, the sm stepper in the Preview above and the sm '
           'view switcher in Nested above are both already that pattern.',
       code: _sizesCode,
@@ -173,13 +184,10 @@ final ComponentDocSpec buttonGroupDocSpec = ComponentDocSpec(
           'class.',
       child: _ApiReferenceContent(),
       children: <DocsTocEntry>[
-        DocsTocEntry(title: 'ElButtonGroup', anchor: 'api-elbuttongroup'),
+        DocsTocEntry(title: 'ButtonGroup', anchor: 'api-elbuttongroup'),
+        DocsTocEntry(title: 'ButtonGroupText', anchor: 'api-elbuttongrouptext'),
         DocsTocEntry(
-          title: 'ElButtonGroupText',
-          anchor: 'api-elbuttongrouptext',
-        ),
-        DocsTocEntry(
-          title: 'ElButtonGroupSeparator',
+          title: 'ButtonGroupSeparator',
           anchor: 'api-elbuttongroupseparator',
         ),
       ],
@@ -188,7 +196,7 @@ final ComponentDocSpec buttonGroupDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElButtonGroup coordinates no state of its own: every state below '
+          'ButtonGroup coordinates no state of its own: every state below '
           'belongs to a member.',
       child: const DocsStateMatrix(facts: _stateFacts),
     ),
@@ -266,9 +274,9 @@ class ButtonGroupDocPage extends StatelessWidget {
       title: buttonGroupDoc.title,
       description: buttonGroupDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Button group'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Button group'),
     ],
     toc: buttonGroupDocSpec.toc,
     previous: const DocsPageLink(
@@ -302,26 +310,26 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
-    child: ElButtonGroup(
+    child: ButtonGroup(
       children: <Widget>[
-        ElButton(
+        Button(
           key: const ValueKey<String>('button-group-doc-decrease'),
-          variant: ElButtonVariant.outline,
-          size: ElButtonSize.sm,
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
           onPressed: () => setState(() => _count = (_count - 1).clamp(0, 99)),
-          child: ElText('−', ElComponentType.buttonLabel),
+          child: StyledText('−', TextStyles.buttonLabel),
         ),
-        ElButtonGroupText(
+        ButtonGroupText(
           _count.toString(),
           key: const ValueKey<String>('button-group-doc-count'),
           numeric: true,
         ),
-        ElButton(
+        Button(
           key: const ValueKey<String>('button-group-doc-increase'),
-          variant: ElButtonVariant.outline,
-          size: ElButtonSize.sm,
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
           onPressed: () => setState(() => _count = (_count + 1).clamp(0, 99)),
-          child: ElText('+', ElComponentType.buttonLabel),
+          child: StyledText('+', TextStyles.buttonLabel),
         ),
       ],
     ),
@@ -330,62 +338,62 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
 
 const String _previewCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-    'ElButtonGroup(\n'
+    'ButtonGroup(\n'
     '  children: [\n'
-    '    ElButton(\n'
-    '      variant: ElButtonVariant.outline,\n'
-    '      size: ElButtonSize.sm,\n'
+    '    Button(\n'
+    '      variant: ButtonVariant.outline,\n'
+    '      size: ButtonSize.sm,\n'
     '      onPressed: () => setState(() => count--),\n'
     "      child: const Text('−'),\n"
     '    ),\n'
-    "    ElButtonGroupText(count.toString(), numeric: true),\n"
-    '    ElButton(\n'
-    '      variant: ElButtonVariant.outline,\n'
-    '      size: ElButtonSize.sm,\n'
+    "    ButtonGroupText(count.toString(), numeric: true),\n"
+    '    Button(\n'
+    '      variant: ButtonVariant.outline,\n'
+    '      size: ButtonSize.sm,\n'
     '      onPressed: () => setState(() => count++),\n'
     "      child: const Text('+'),\n"
     '    ),\n'
     '  ],\n'
     ')';
 
-const String _usageCode = '''ElButtonGroup(
+const String _usageCode = '''ButtonGroup(
   children: <Widget>[
-    ElButton(
-      variant: ElButtonVariant.outline,
+    Button(
+      variant: ButtonVariant.outline,
       onPressed: () {},
       child: const Text('Day'),
     ),
-    ElButton(
-      variant: ElButtonVariant.outline,
+    Button(
+      variant: ButtonVariant.outline,
       onPressed: () {},
       child: const Text('Week'),
     ),
-    ElButton(
-      variant: ElButtonVariant.outline,
+    Button(
+      variant: ButtonVariant.outline,
       onPressed: () {},
       child: const Text('Month'),
     ),
   ],
 )''';
 
-const String _compositionCode = '''ElButtonGroup
-├── ElButton (or any widget)
-├── ElButtonGroupSeparator
-└── ElButtonGroupText''';
+const String _compositionCode = '''ButtonGroup
+├── Button (or any widget)
+├── ButtonGroupSeparator
+└── ButtonGroupText''';
 
 class _ComposingOthersSpecimen extends StatelessWidget {
   const _ComposingOthersSpecimen();
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: el(72),
-    child: ElButtonGroup(
+    width: space(72),
+    child: ButtonGroup(
       children: <Widget>[
-        Expanded(child: ElInput(placeholder: 'Email address')),
-        ElButton(
-          variant: ElButtonVariant.outline,
+        Expanded(child: Input(placeholder: 'Email address')),
+        Button(
+          variant: ButtonVariant.outline,
           onPressed: () {},
-          child: ElText('Send', ElComponentType.buttonLabel),
+          child: StyledText('Send', TextStyles.buttonLabel),
         ),
       ],
     ),
@@ -393,11 +401,11 @@ class _ComposingOthersSpecimen extends StatelessWidget {
 }
 
 const String _composingOthersCode =
-    'ElButtonGroup(\n'
+    'ButtonGroup(\n'
     '  children: [\n'
-    "    Expanded(child: ElInput(placeholder: 'Email address')),\n"
-    '    ElButton(\n'
-    '      variant: ElButtonVariant.outline,\n'
+    "    Expanded(child: Input(placeholder: 'Email address')),\n"
+    '    Button(\n'
+    '      variant: ButtonVariant.outline,\n'
     '      onPressed: () {},\n'
     "      child: const Text('Send'),\n"
     '    ),\n'
@@ -410,23 +418,23 @@ class _SeparatorSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
-    child: ElButtonGroup(
+    child: ButtonGroup(
       children: <Widget>[
-        ElButton(
-          variant: ElButtonVariant.ghost,
+        Button(
+          variant: ButtonVariant.ghost,
           onPressed: () {},
-          child: ElText('Bold', ElComponentType.buttonLabel),
+          child: StyledText('Bold', TextStyles.buttonLabel),
         ),
-        ElButton(
-          variant: ElButtonVariant.ghost,
+        Button(
+          variant: ButtonVariant.ghost,
           onPressed: () {},
-          child: ElText('Italic', ElComponentType.buttonLabel),
+          child: StyledText('Italic', TextStyles.buttonLabel),
         ),
-        const ElButtonGroupSeparator(),
-        ElButton(
-          variant: ElButtonVariant.ghost,
+        const ButtonGroupSeparator(),
+        Button(
+          variant: ButtonVariant.ghost,
           onPressed: () {},
-          child: ElText('Underline', ElComponentType.buttonLabel),
+          child: StyledText('Underline', TextStyles.buttonLabel),
         ),
       ],
     ),
@@ -434,14 +442,14 @@ class _SeparatorSpecimen extends StatelessWidget {
 }
 
 const String _separatorCode =
-    'ElButtonGroup(\n'
+    'ButtonGroup(\n'
     '  children: [\n'
-    '    ElButton(variant: ElButtonVariant.ghost, onPressed: () {}, '
+    '    Button(variant: ButtonVariant.ghost, onPressed: () {}, '
     "child: const Text('Bold')),\n"
-    '    ElButton(variant: ElButtonVariant.ghost, onPressed: () {}, '
+    '    Button(variant: ButtonVariant.ghost, onPressed: () {}, '
     "child: const Text('Italic')),\n"
-    '    const ElButtonGroupSeparator(),\n'
-    '    ElButton(variant: ElButtonVariant.ghost, onPressed: () {}, '
+    '    const ButtonGroupSeparator(),\n'
+    '    Button(variant: ButtonVariant.ghost, onPressed: () {}, '
     "child: const Text('Underline')),\n"
     '  ],\n'
     ')';
@@ -452,19 +460,19 @@ class _SplitSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     scrollDirection: Axis.horizontal,
-    child: ElButtonGroup(
+    child: ButtonGroup(
       children: <Widget>[
-        ElButton(
+        Button(
           onPressed: () {},
-          child: ElText('Save', ElComponentType.buttonLabel),
+          child: StyledText('Save', TextStyles.buttonLabel),
         ),
-        const ElButtonGroupSeparator(),
-        ElButton(
+        const ButtonGroupSeparator(),
+        Button(
           onPressed: () {},
-          child: const ElIcon(
-            ElIconGlyph.chevronDown,
-            size: ElIconSize.sm,
-            tone: ElIconTone.inherit,
+          child: const Icon(
+            IconGlyph.chevronDown,
+            size: IconSize.sm,
+            tone: IconTone.inherit,
           ),
         ),
       ],
@@ -473,16 +481,16 @@ class _SplitSpecimen extends StatelessWidget {
 }
 
 const String _splitCode =
-    'ElButtonGroup(\n'
+    'ButtonGroup(\n'
     '  children: [\n'
-    '    ElButton(\n'
+    '    Button(\n'
     '      onPressed: () {},\n'
     "      child: const Text('Save'),\n"
     '    ),\n'
-    '    const ElButtonGroupSeparator(),\n'
-    '    ElButton(\n'
+    '    const ButtonGroupSeparator(),\n'
+    '    Button(\n'
     '      onPressed: () {},\n'
-    '      child: const ElIcon(ElIconGlyph.chevronDown, size: ElIconSize.sm),\n'
+    '      child: const Icon(IconGlyph.chevronDown, size: IconSize.sm),\n'
     '    ),\n'
     '  ],\n'
     ')';
@@ -496,30 +504,30 @@ class _NestedSpecimen extends StatelessWidget {
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ElButtonGroup(
+        ButtonGroup(
           children: <Widget>[
-            ElButton(
-              variant: ElButtonVariant.outline,
-              size: ElButtonSize.sm,
+            Button(
+              variant: ButtonVariant.outline,
+              size: ButtonSize.sm,
               onPressed: () {},
-              child: ElText('Cut', ElComponentType.buttonLabel),
+              child: StyledText('Cut', TextStyles.buttonLabel),
             ),
-            ElButton(
-              variant: ElButtonVariant.outline,
-              size: ElButtonSize.sm,
+            Button(
+              variant: ButtonVariant.outline,
+              size: ButtonSize.sm,
               onPressed: () {},
-              child: ElText('Copy', ElComponentType.buttonLabel),
+              child: StyledText('Copy', TextStyles.buttonLabel),
             ),
           ],
         ),
-        SizedBox(width: el(2)),
-        ElButtonGroup(
+        SizedBox(width: space(2)),
+        ButtonGroup(
           children: <Widget>[
-            ElButton(
-              variant: ElButtonVariant.outline,
-              size: ElButtonSize.sm,
+            Button(
+              variant: ButtonVariant.outline,
+              size: ButtonSize.sm,
               onPressed: () {},
-              child: ElText('Paste', ElComponentType.buttonLabel),
+              child: StyledText('Paste', TextStyles.buttonLabel),
             ),
           ],
         ),
@@ -531,32 +539,32 @@ class _NestedSpecimen extends StatelessWidget {
 const String _nestedCode =
     'Row(\n'
     '  children: [\n'
-    '    ElButtonGroup(\n'
+    '    ButtonGroup(\n'
     '      children: [\n'
-    '        ElButton(variant: ElButtonVariant.outline, size: '
-    "ElButtonSize.sm, onPressed: () {}, child: const Text('Cut')),\n"
-    '        ElButton(variant: ElButtonVariant.outline, size: '
-    "ElButtonSize.sm, onPressed: () {}, child: const Text('Copy')),\n"
+    '        Button(variant: ButtonVariant.outline, size: '
+    "ButtonSize.sm, onPressed: () {}, child: const Text('Cut')),\n"
+    '        Button(variant: ButtonVariant.outline, size: '
+    "ButtonSize.sm, onPressed: () {}, child: const Text('Copy')),\n"
     '      ],\n'
     '    ),\n'
     '    SizedBox(width: 8), // no has-[>[data-slot=button-group]]:gap-2 in '
     'this port\n'
-    '    ElButtonGroup(\n'
+    '    ButtonGroup(\n'
     '      children: [\n'
-    '        ElButton(variant: ElButtonVariant.outline, size: '
-    "ElButtonSize.sm, onPressed: () {}, child: const Text('Paste')),\n"
+    '        Button(variant: ButtonVariant.outline, size: '
+    "ButtonSize.sm, onPressed: () {}, child: const Text('Paste')),\n"
     '      ],\n'
     '    ),\n'
     '  ],\n'
     ')';
 
 const String _sizesCode =
-    '// Give every ElButton in a group the same size for a level row.\n'
-    'ElButtonGroup(\n'
+    '// Give every Button in a group the same size for a level row.\n'
+    'ButtonGroup(\n'
     '  children: [\n'
-    '    ElButton(size: ElButtonSize.sm, variant: ElButtonVariant.outline, '
+    '    Button(size: ButtonSize.sm, variant: ButtonVariant.outline, '
     "onPressed: () {}, child: const Text('Cut')),\n"
-    '    ElButton(size: ElButtonSize.sm, variant: ElButtonVariant.outline, '
+    '    Button(size: ButtonSize.sm, variant: ButtonVariant.outline, '
     "onPressed: () {}, child: const Text('Copy')),\n"
     '  ],\n'
     ')';
@@ -565,25 +573,25 @@ class _RtlSpecimen extends StatelessWidget {
   const _RtlSpecimen();
 
   @override
-  Widget build(BuildContext context) => ElButtonGroup(
+  Widget build(BuildContext context) => ButtonGroup(
     children: <Widget>[
-      ElButton(
-        variant: ElButtonVariant.outline,
-        size: ElButtonSize.sm,
+      Button(
+        variant: ButtonVariant.outline,
+        size: ButtonSize.sm,
         onPressed: () {},
-        child: ElText('الكل', ElComponentType.buttonLabel),
+        child: StyledText('الكل', TextStyles.buttonLabel),
       ),
-      ElButton(
-        variant: ElButtonVariant.outline,
-        size: ElButtonSize.sm,
+      Button(
+        variant: ButtonVariant.outline,
+        size: ButtonSize.sm,
         onPressed: () {},
-        child: ElText('نشط', ElComponentType.buttonLabel),
+        child: StyledText('نشط', TextStyles.buttonLabel),
       ),
-      ElButton(
-        variant: ElButtonVariant.outline,
-        size: ElButtonSize.sm,
+      Button(
+        variant: ButtonVariant.outline,
+        size: ButtonSize.sm,
         onPressed: () {},
-        child: ElText('مؤرشف', ElComponentType.buttonLabel),
+        child: StyledText('مؤرشف', TextStyles.buttonLabel),
       ),
     ],
   );
@@ -592,11 +600,11 @@ class _RtlSpecimen extends StatelessWidget {
 const String _rtlCode =
     'Directionality(\n'
     '  textDirection: TextDirection.rtl,\n'
-    '  child: ElButtonGroup(\n'
+    '  child: ButtonGroup(\n'
     '    children: [\n'
-    "      ElButton(variant: ElButtonVariant.outline, size: ElButtonSize.sm, onPressed: () {}, child: const Text('الكل')),\n"
-    "      ElButton(variant: ElButtonVariant.outline, size: ElButtonSize.sm, onPressed: () {}, child: const Text('نشط')),\n"
-    "      ElButton(variant: ElButtonVariant.outline, size: ElButtonSize.sm, onPressed: () {}, child: const Text('مؤرشف')),\n"
+    "      Button(variant: ButtonVariant.outline, size: ButtonSize.sm, onPressed: () {}, child: const Text('الكل')),\n"
+    "      Button(variant: ButtonVariant.outline, size: ButtonSize.sm, onPressed: () {}, child: const Text('نشط')),\n"
+    "      Button(variant: ButtonVariant.outline, size: ButtonSize.sm, onPressed: () {}, child: const Text('مؤرشف')),\n"
     '    ],\n'
     '  ),\n'
     ')';
@@ -608,25 +616,25 @@ class _VsSelectionControlContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ElThemeData theme = ElTheme.of(context);
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _bullets(theme, <String>[
-          'ElButtonGroup: every member is its own action, pressing "Save" '
+          'ButtonGroup: every member is its own action, pressing "Save" '
               'does not change what "Share" does next to it. Use it for '
               'independent commands, a toolbar, a split action, a stepper.',
-          'ElSelectionControl (this port\'s nearest neighbour to shadcn\'s '
+          'SelectionControl (this port\'s nearest neighbour to shadcn\'s '
               'ToggleGroup) tracks which option is chosen and stays chosen. '
               'Use it when pressing one option is meant to change the state '
               'of the others, a view filter, a single-select set of chips.',
-          'The two are not interchangeable: reach for ElButtonGroup by '
-              'default, reach for ElSelectionControl only once a press needs '
+          'The two are not interchangeable: reach for ButtonGroup by '
+              'default, reach for SelectionControl only once a press needs '
               'to persist as selected.',
         ]),
-        SizedBox(height: el(2)),
+        SizedBox(height: space(2)),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+          constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
           child: DocsLinkRow(
             links: <DocsLink>[
               DocsLink(label: 'Button', route: '/components/button'),
@@ -651,21 +659,18 @@ class _ApiReferenceContent extends StatelessWidget {
     children: <Widget>[
       const DocsAnchor(
         id: 'api-elbuttongroup',
-        child: DocsApiTable(
-          title: 'ElButtonGroup',
-          facts: _buttonGroupFacts,
-        ),
+        child: DocsApiTable(title: 'ButtonGroup', facts: _buttonGroupFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elbuttongrouptext',
-        child: DocsApiTable(title: 'ElButtonGroupText', facts: _textFacts),
+        child: DocsApiTable(title: 'ButtonGroupText', facts: _textFacts),
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elbuttongroupseparator',
         child: DocsApiTable(
-          title: 'ElButtonGroupSeparator',
+          title: 'ButtonGroupSeparator',
           facts: <DocsApiFact>[],
         ),
       ),
@@ -678,14 +683,14 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Semantic role: Semantics(container: true, explicitChildNodes: '
             'true) on the row, a plain container role rather than a group '
             'role with its own name, matching the reference\'s role="group". '
             'The members inside keep their own semantics and stay '
             'individually reachable.',
-        'Keyboard: ElButtonGroup is not in the tab order itself, it is a '
-            'control family, not a focusable container. Each ElButton '
+        'Keyboard: ButtonGroup is not in the tab order itself, it is a '
+            'control family, not a focusable container. Each Button '
             'inside keeps its own Enter/Space activation and focus ring — '
             'see Keyboard below.',
         'Focus-visible ring: `*:focus-visible:relative *:focus-visible:z-10` '
@@ -698,8 +703,8 @@ class _AccessibilityContent extends StatelessWidget {
             'around a box stretched a full height wider than its visible '
             'bounds, so the ring closes half a height out instead of '
             'exactly at the seam the way the browser renders it.',
-        'Touch target: each member keeps its own ElButtonSize touch '
-            'target; ElButtonGroup adds no minimum of its own.',
+        'Touch target: each member keeps its own ButtonSize touch '
+            'target; ButtonGroup adds no minimum of its own.',
       ]);
 }
 
@@ -712,12 +717,12 @@ class _KeyboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElButtonGroup itself wires no keyboard handling: no Focus, no '
+      _bullets(ThemeScope.of(context), <String>[
+        'ButtonGroup itself wires no keyboard handling: no Focus, no '
             'FocusNode, no Focus.onKeyEvent, and no FocusTraversalPolicy '
             'anywhere in button_group.dart. Every key a member receives is '
             'handled entirely by that member\'s own widget.',
-        'An ElButton member keeps its own Enter/NumpadEnter/Space '
+        'An Button member keeps its own Enter/NumpadEnter/Space '
             'activation and its own tab stop unchanged: see the button '
             'page\'s own Keyboard section for exactly what that wiring is.',
         'Tab order: source order, one stop per focusable member, the same '
@@ -725,7 +730,7 @@ class _KeyboardContent extends StatelessWidget {
             'stop-then-arrow-keys mechanism the way a native toolbar '
             'widget set might offer: this is a control family, not one '
             'composite control.',
-        'A non-ElButton member (an ElInput, say) keeps whatever keyboard '
+        'A non-Button member (an Input, say) keeps whatever keyboard '
             'behaviour it already had outside the group: composing it here '
             'changes its corners and its border, never its key handling.',
       ]);
@@ -736,7 +741,7 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No breakpoint branching in button_group.dart: BuildContext width '
             'is never read for a layout decision.',
         'Orientation stays horizontal on every viewport: the reference\'s '
@@ -747,7 +752,7 @@ class _ResponsiveContent extends StatelessWidget {
             'caller\'s own ancestor, not the group.',
         'Height: IntrinsicHeight sizes every member to the tallest '
             '(items-stretch), which is the whole reason a height-less '
-            'ElButtonGroupText comes out 40px tall next to a default-size '
+            'ButtonGroupText comes out 40px tall next to a default-size '
             'button.',
         'Platform parity: Android, iOS, Web, macOS, Windows, and Linux all '
             'render the same widget tree: no dart:io Platform branch '
@@ -762,29 +767,31 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/button_group.dart. No companion parts.',
         'Dart imports: dart:math (RRect radius scaling for the pill-corner '
             'clip).',
         'Flutter imports: package:flutter/rendering.dart (the custom '
             'RenderBox that bleeds and clips a button\'s corners), '
             'package:flutter/widgets.dart.',
-        'Foundation imports: colors.dart, spacing.dart (el()), theme.dart, '
+        'Foundation imports: colors.dart, spacing.dart (space()), theme.dart, '
             'typography.dart.',
-        'No effects import: unlike ElInputGroup and ElInputOtp, this file '
+        'No effects import: unlike InputGroup and InputOtp, this file '
             'paints its own borders with a CustomPainter rather than '
-            'reaching for ElMachineSurface.',
-        'Component imports: button.dart (ElButton, ElButtonVariant: reads '
+            'reaching for Surface.',
+        'Component imports: button.dart (Button, ButtonVariant: reads '
             'a member\'s own variant to derive the seam colour it '
             'contributes).',
         'Registry dependencies are resolved automatically by `elattar add '
             'button-group`.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: DocsLinkRow(
-          links: <DocsLink>[DocsLink(label: 'Button', route: '/components/button')],
+          links: <DocsLink>[
+            DocsLink(label: 'Button', route: '/components/button'),
+          ],
         ),
       ),
     ],
@@ -796,33 +803,33 @@ class _ThemingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'ElButtonGroup paints no fill or border of its own: every visible '
+      _bullets(ThemeScope.of(context), <String>[
+        'ButtonGroup paints no fill or border of its own: every visible '
             'colour comes from its members and from the seams the group '
             'synthesises between them.',
-        'Seam colour: theme.input for an outline ElButton, '
+        'Seam colour: theme.input for an outline Button, '
             'theme.destructive at 25% alpha for a destructive one, '
             'transparent for the other five variants (primary, premium, '
             'secondary, ghost, link contribute nothing, which is why an '
             'all-ghost group reads as one solid control with only its '
             'separators visible).',
-        'ElButtonGroupText: theme.muted fill, theme.border stroke (its own '
+        'ButtonGroupText: theme.muted fill, theme.border stroke (its own '
             '@layer base default, not a group-specific colour).',
-        'ElButtonGroupSeparator: theme.input, beating the plain '
+        'ButtonGroupSeparator: theme.input, beating the plain '
             'separator\'s usual theme.border because it is composed later.',
-        'No colour overrides: every value comes from ElTheme.of(context) '
+        'No colour overrides: every value comes from ThemeScope.of(context) '
             'or from the member\'s own resolved variant colour.',
       ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => ConstrainedBox(
-  constraints: const BoxConstraints(maxWidth: ElWidths.prose),
+Widget _bullets(ThemeTokens theme, List<String> lines) => ConstrainedBox(
+  constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       for (final String line in lines) ...<Widget>[
-        ElText('•  $line', ElType.small, color: theme.mutedForeground),
-        SizedBox(height: el(2)),
+        StyledText('•  $line', TextStyles.small, color: theme.mutedForeground),
+        SizedBox(height: space(2)),
       ],
     ],
   ),
@@ -833,21 +840,21 @@ const List<DocsApiFact> _buttonGroupFacts = <DocsApiFact>[
     name: 'children',
     type: 'List<Widget>',
     description:
-        'Required. The members, in source order: ElButton, '
-        'ElButtonGroupText, ElButtonGroupSeparator, or any other widget, '
+        'Required. The members, in source order: Button, '
+        'ButtonGroupText, ButtonGroupSeparator, or any other widget, '
         'placed flush and left unreshaped.',
   ),
   DocsApiFact(
-    name: 'ElButtonGroup.radiiOf',
+    name: 'ButtonGroup.radiiOf',
     type: 'static BorderRadius Function(List<Widget>, int)',
     description:
         'The corner radii the group\'s rules give the member at a given '
         'index: the left end keeps the member\'s own radius, the last '
-        'data-slot member is forced to ElRadii.lg, every interior corner '
+        'data-slot member is forced to Radii.lg, every interior corner '
         'is squared.',
   ),
   DocsApiFact(
-    name: 'ElButtonGroup.hasLeftBorder',
+    name: 'ButtonGroup.hasLeftBorder',
     type: 'static bool Function(List<Widget>, int)',
     description:
         'Whether the member at a given index keeps its left border: '
@@ -866,16 +873,16 @@ const List<DocsApiFact> _textFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to false. Renders with '
-        'ElComponentType.buttonGroupNum (mono, tabular figures) instead '
-        'of ElComponentType.buttonGroupText.',
+        'TextStyles.buttonGroupNum (mono, tabular figures) instead '
+        'of TextStyles.buttonGroupText.',
   ),
   DocsApiFact(
-    name: 'ElButtonGroupText.paddingX',
+    name: 'ButtonGroupText.paddingX',
     type: 'static double',
     description: '10px: horizontal padding.',
   ),
   DocsApiFact(
-    name: 'ElButtonGroupText.gap',
+    name: 'ButtonGroupText.gap',
     type: 'static double',
     description:
         '8px: gap for a caller composing a glyph beside the label. '
@@ -887,8 +894,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest / hover / pressed / focus / disabled',
     treatment:
-        'Owned entirely by each member: a ElButton inside the group '
-        'renders its own variant\'s states unmodified. ElButtonGroup '
+        'Owned entirely by each member: a Button inside the group '
+        'renders its own variant\'s states unmodified. ButtonGroup '
         'reads a member\'s variant only to pick the seam colour between '
         'it and its neighbour.',
     userSignal: 'Refer to the button docs for each member\'s own states.',

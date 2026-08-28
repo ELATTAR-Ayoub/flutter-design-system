@@ -1,6 +1,6 @@
 /// Public documentation page for the `kbd` component.
 ///
-/// **Re-housed onto the kit.** This page used to hand-compose [ElSection]
+/// **Re-housed onto the kit.** This page used to hand-compose [Section]
 /// panels; it now declares a [ComponentDocSpec]
 /// (`example/lib/docs/component_doc_page.dart`) and hands it to
 /// [ComponentDocPage], the same shape `button`, `field`, `popover`, and
@@ -16,7 +16,7 @@
 /// resolved automatically today; copy the imports by hand." Both were
 /// false the whole time this page existed: `registry/components/kbd.json`
 /// is a real manifest — `files`, `registryDependencies:
-/// [machine-surface, source-foundation]`, a `documentationRoute` — and
+/// [surface, source-foundation]`, a `documentationRoute` — and
 /// `elattar add kbd` installs from it and resolves that dependency closure
 /// today. Installation below says so.
 ///
@@ -27,16 +27,16 @@
 ///
 /// **Skipped, honestly**, one of those nine: **Tooltip**. shadcn's demo
 /// composes a `<Kbd>` as arbitrary *content* inside a `<TooltipContent>`.
-/// `ElTooltip`'s content slot (`label`) is typed `String`, not `Widget` —
+/// `Tooltip`'s content slot (`label`) is typed `String`, not `Widget` —
 /// unlike the reference's own Tooltip, which takes children — so a real
-/// `ElKbd` cannot be rendered inside a `ElTooltip` bubble in this port.
+/// `Kbd` cannot be rendered inside a `Tooltip` bubble in this port.
 /// `kbd.dart`'s own doc comment already records the adjacent half of this
 /// gap: the `in-data-[slot=tooltip-content]:…` recolour rule is "recorded
 /// rather than built: … this port has no tooltip for the context selector to
-/// match against." What IS buildable — ElKbd composed as the tooltip's own
+/// match against." What IS buildable — Kbd composed as the tooltip's own
 /// *trigger* child — is a different composition than the reference's demo,
 /// so faking a "Tooltip" section around it would misrepresent the gap. The
-/// **Button** section below already demonstrates ElKbd riding along inside
+/// **Button** section below already demonstrates Kbd riding along inside
 /// another interactive control, which is the closest honest cousin.
 ///
 /// [ComponentDocEntry.description] is the page's only rendered description;
@@ -44,13 +44,25 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
-import '../../kit.dart' show ElRow;
+import '../../kit.dart' show SpecimenRow;
 import 'meta.dart';
 
 /// The declaration: every section this page shows, in TOC order. `final`,
@@ -65,11 +77,11 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'ElKbd renders a 20px-tall, 20px-minimum-wide key cap: muted '
+          'Kbd renders a 20px-tall, 20px-minimum-wide key cap: muted '
           'fill, 6px corners, 12px/500 label, inert to touch and text '
           'selection. Reach for it when the content is a literal key the '
           'reader would press, Ctrl, K, Esc: never a status word (that is '
-          'ElBadge) or a code snippet. ElKbdGroup composes several keys '
+          'Badge) or a code snippet. KbdGroup composes several keys '
           'into one shortcut and merges their semantics into a single '
           'announcement.',
       specimen: _PreviewSpecimen(),
@@ -81,7 +93,7 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'kbd has a real registry manifest, `elattar add kbd` installs '
-          'lib/src/components/kbd.dart and resolves machine-surface and '
+          'lib/src/components/kbd.dart and resolves surface and '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: kbdDoc.command,
@@ -101,7 +113,7 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
-              'Add the export line so ElKbd and ElKbdGroup are reachable '
+              'Add the export line so Kbd and KbdGroup are reachable '
               'the same way the CLI path already makes them.',
           code: "export 'kbd.dart';",
         ),
@@ -117,8 +129,8 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
       id: 'composition',
       title: 'Composition',
       description:
-          'ElKbd has no size or variant axis: ElKbdGroup composes many '
-          'keys, it is not a variant of ElKbd. A part tree, not a runnable '
+          'Kbd has no size or variant axis: KbdGroup composes many '
+          'keys, it is not a variant of Kbd. A part tree, not a runnable '
           'snippet: there is nothing to stage live beyond the Preview '
           'specimen above.',
       code: _compositionTreeCode,
@@ -127,7 +139,7 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
       id: 'group',
       title: 'Group',
       description:
-          'ElKbdGroup composes several keys into one shortcut, read by '
+          'KbdGroup composes several keys into one shortcut, read by '
           'assistive tech as a single combination rather than unrelated '
           'letters (see Accessibility).',
       specimen: const _GroupSpecimen(),
@@ -138,7 +150,7 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
       id: 'button',
       title: 'Button',
       description:
-          "A ElKbd composed inside a ElButton's own child, so the key cap "
+          "A Kbd composed inside a Button's own child, so the key cap "
           'rides along with the label as one control.',
       specimen: const _ButtonSpecimen(),
       code: _buttonCode,
@@ -148,7 +160,7 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
       id: 'input-group',
       title: 'Input group',
       description:
-          'A ElKbd inside a ElInputGroupAddon, hinting at the shortcut '
+          'A Kbd inside a InputGroupAddon, hinting at the shortcut '
           'that focuses the field it sits in.',
       specimen: const _InputGroupSpecimen(),
       code: _inputGroupCode,
@@ -158,7 +170,7 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
       id: 'rtl',
       title: 'RTL',
       description:
-          'ElKbd paints no direction-specific layout of its own: it is a '
+          'Kbd paints no direction-specific layout of its own: it is a '
           'content-wide box with a fixed floor, and it reads '
           'right-to-left under a plain Directionality.',
       specimen: const _RtlSpecimen(),
@@ -169,8 +181,8 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'ElKbd', anchor: 'api-elkbd'),
-        DocsTocEntry(title: 'ElKbdGroup', anchor: 'api-elkbdgroup'),
+        DocsTocEntry(title: 'Kbd', anchor: 'api-elkbd'),
+        DocsTocEntry(title: 'KbdGroup', anchor: 'api-elkbdgroup'),
       ],
       child: const _ApiReferenceContent(),
     ),
@@ -178,16 +190,36 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'ElKbd and ElKbdGroup are static, presentational '
+          'Kbd and KbdGroup are static, presentational '
           'StatelessWidgets: neither owns onPressed/enabled, a '
           'GestureDetector, a FocusNode, or an async flag.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
-    DisclosureSection(id: 'accessibility', title: 'Accessibility', child: const _AccessibilityContent()),
-    DisclosureSection(id: 'keyboard', title: 'Keyboard', child: const _KeyboardContent()),
-    DisclosureSection(id: 'responsive', title: 'Responsive', child: const _ResponsiveContent()),
-    DisclosureSection(id: 'dependencies', title: 'Dependencies', child: const _DependenciesContent()),
-    DisclosureSection(id: 'theming', title: 'Theming', child: const _ThemingContent()),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      child: const _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      child: const _KeyboardContent(),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      child: const _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      child: const _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      child: const _ThemingContent(),
+    ),
     DisclosureSection(
       id: 'source',
       title: 'Source',
@@ -239,9 +271,9 @@ class KbdDocPage extends StatelessWidget {
       title: kbdDoc.title,
       description: kbdDoc.description,
     ),
-    breadcrumbs: const <ElBreadcrumbEntry>[
-      ElBreadcrumbEntry.link('Components'),
-      ElBreadcrumbEntry.page('Kbd'),
+    breadcrumbs: const <BreadcrumbEntry>[
+      BreadcrumbEntry.link('Components'),
+      BreadcrumbEntry.page('Kbd'),
     ],
     toc: kbdDocSpec.toc,
     onNavigate: onNavigate,
@@ -263,17 +295,17 @@ class _PreviewSpecimen extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        ElRow(
+        SpecimenRow(
           children: <Widget>[
-            const ElKbdGroup(children: <Widget>[ElKbd('Ctrl'), ElKbd('K')]),
-            ElText('Open search', ElType.small),
+            const KbdGroup(children: <Widget>[Kbd('Ctrl'), Kbd('K')]),
+            StyledText('Open search', TextStyles.small),
           ],
         ),
-        SizedBox(height: el(4)),
-        ElRow(
+        SizedBox(height: space(4)),
+        SpecimenRow(
           children: <Widget>[
-            const ElKbd('Esc'),
-            ElText('Close this dialog', ElType.small),
+            const Kbd('Esc'),
+            StyledText('Close this dialog', TextStyles.small),
           ],
         ),
       ],
@@ -287,10 +319,10 @@ class _GroupSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('kbd-example:group'),
-    child: ElRow(
+    child: SpecimenRow(
       children: <Widget>[
-        const ElKbdGroup(children: <Widget>[ElKbd('⌘'), ElKbd('K')]),
-        ElText('Open the command palette', ElType.small),
+        const KbdGroup(children: <Widget>[Kbd('⌘'), Kbd('K')]),
+        StyledText('Open the command palette', TextStyles.small),
       ],
     ),
   );
@@ -302,14 +334,14 @@ class _ButtonSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('kbd-example:button'),
-    child: ElButton(
+    child: Button(
       onPressed: () {},
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElText('Save', ElComponentType.buttonLabel),
-          SizedBox(width: el(2)),
-          const ElKbd('⌘S'),
+          StyledText('Save', TextStyles.buttonLabel),
+          SizedBox(width: space(2)),
+          const Kbd('⌘S'),
         ],
       ),
     ),
@@ -322,12 +354,12 @@ class _InputGroupSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('kbd-example:input-group'),
-    child: ElInputGroup(
-      endAddon: const ElInputGroupAddon(
-        align: ElInputGroupAlign.end,
-        child: ElKbd('⌘K'),
+    child: InputGroup(
+      endAddon: const InputGroupAddon(
+        align: InputGroupAlign.end,
+        child: Kbd('⌘K'),
       ),
-      child: const ElInputGroupInput(placeholder: 'Search...'),
+      child: const InputGroupInput(placeholder: 'Search...'),
     ),
   );
 }
@@ -340,13 +372,13 @@ class _RtlSpecimen extends StatelessWidget {
     textDirection: TextDirection.rtl,
     child: KeyedSubtree(
       key: const ValueKey<String>('rtl-example:kbd'),
-      child: ElRow(
+      child: SpecimenRow(
         children: <Widget>[
-          const ElKbdGroup(children: <Widget>[ElKbd('Ctrl'), ElKbd('K')]),
-          ElText(
+          const KbdGroup(children: <Widget>[Kbd('Ctrl'), Kbd('K')]),
+          StyledText(
             'فتح البحث',
-            ElType.small,
-            color: ElTheme.of(context).foreground,
+            TextStyles.small,
+            color: ThemeScope.of(context).foreground,
           ),
         ],
       ),
@@ -354,66 +386,66 @@ class _RtlSpecimen extends StatelessWidget {
   );
 }
 
-const String _previewCode = '''ElRow(
+const String _previewCode = '''SpecimenRow(
   children: [
-    ElKbdGroup(children: [ElKbd('Ctrl'), ElKbd('K')]),
-    ElText('Open search', ElType.small),
+    KbdGroup(children: [Kbd('Ctrl'), Kbd('K')]),
+    StyledText('Open search', TextStyles.small),
   ],
 )
 
-ElRow(
+SpecimenRow(
   children: [
-    ElKbd('Esc'),
-    ElText('Close this dialog', ElType.small),
+    Kbd('Esc'),
+    StyledText('Close this dialog', TextStyles.small),
   ],
 )''';
 
 const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
-ElKbd('Escape')
+Kbd('Escape')
 
-ElKbdGroup(
-  children: [ElKbd('Ctrl'), ElKbd('K')],
+KbdGroup(
+  children: [Kbd('Ctrl'), Kbd('K')],
 )''';
 
-const String _compositionTreeCode = '''ElKbdGroup
-├─ ElKbd
-└─ ElKbd    (one or more)''';
+const String _compositionTreeCode = '''KbdGroup
+├─ Kbd
+└─ Kbd    (one or more)''';
 
-const String _groupCode = '''ElRow(
+const String _groupCode = '''SpecimenRow(
   children: [
-    ElKbdGroup(children: [ElKbd('⌘'), ElKbd('K')]),
-    ElText('Open the command palette', ElType.small),
+    KbdGroup(children: [Kbd('⌘'), Kbd('K')]),
+    StyledText('Open the command palette', TextStyles.small),
   ],
 )''';
 
-const String _buttonCode = '''ElButton(
+const String _buttonCode = '''Button(
   onPressed: () {},
   child: Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      ElText('Save', ElComponentType.buttonLabel),
-      SizedBox(width: el(2)),
-      const ElKbd('⌘S'),
+      StyledText('Save', TextStyles.buttonLabel),
+      SizedBox(width: space(2)),
+      const Kbd('⌘S'),
     ],
   ),
 )''';
 
-const String _inputGroupCode = '''ElInputGroup(
-  endAddon: ElInputGroupAddon(
-    align: ElInputGroupAlign.end,
-    child: const ElKbd('⌘K'),
+const String _inputGroupCode = '''InputGroup(
+  endAddon: InputGroupAddon(
+    align: InputGroupAlign.end,
+    child: const Kbd('⌘K'),
   ),
-  child: const ElInputGroupInput(placeholder: 'Search...'),
+  child: const InputGroupInput(placeholder: 'Search...'),
 )''';
 
 const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
-  child: ElRow(
+  child: SpecimenRow(
     children: [
-      ElKbdGroup(children: [ElKbd('Ctrl'), ElKbd('K')]),
-      ElText('فتح البحث', ElType.small),
+      KbdGroup(children: [Kbd('Ctrl'), Kbd('K')]),
+      StyledText('فتح البحث', TextStyles.small),
     ],
   ),
 )''';
@@ -430,7 +462,7 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-elkbd',
         child: DocsApiTable(
-          title: 'ElKbd',
+          title: 'Kbd',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'text',
@@ -440,58 +472,58 @@ class _ApiReferenceContent extends StatelessWidget {
           ],
         ),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsApiTable(
-        title: 'ElKbd static tokens',
+        title: 'Kbd static tokens',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElKbd.height',
+            name: 'Kbd.height',
             type: 'static double',
             description: '20px tall.',
           ),
           DocsApiFact(
-            name: 'ElKbd.minWidth',
+            name: 'Kbd.minWidth',
             type: 'static double',
             description: '20px, the floor a one-character key sits on.',
           ),
           DocsApiFact(
-            name: 'ElKbd.paddingX',
+            name: 'Kbd.paddingX',
             type: 'static double',
             description: '4px horizontal padding.',
           ),
           DocsApiFact(
-            name: 'ElKbd.gap',
+            name: 'Kbd.gap',
             type: 'static double',
             description:
                 '4px, exposed for a caller composing an icon beside the '
-                'text; nothing on this page uses it, since no ElKbd call '
+                'text; nothing on this page uses it, since no Kbd call '
                 'site in the corpus holds a glyph.',
           ),
         ],
       ),
-      SizedBox(height: el(6)),
+      SizedBox(height: space(6)),
       const DocsAnchor(
         id: 'api-elkbdgroup',
         child: DocsApiTable(
-          title: 'ElKbdGroup',
+          title: 'KbdGroup',
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'children',
               type: 'List<Widget>',
               description:
-                  'Required. The keys, in order: typically ElKbd widgets, '
+                  'Required. The keys, in order: typically Kbd widgets, '
                   'merged into a single Semantics node (see '
                   'Accessibility).',
             ),
           ],
         ),
       ),
-      SizedBox(height: el(4)),
+      SizedBox(height: space(4)),
       const DocsApiTable(
-        title: 'ElKbdGroup static tokens',
+        title: 'KbdGroup static tokens',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'ElKbdGroup.gap',
+            name: 'KbdGroup.gap',
             type: 'static double',
             description: '4px between keys in a group.',
           ),
@@ -506,8 +538,8 @@ class _AccessibilityContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'Semantic role: none of its own, ElKbd wraps its text in '
+      _bullets(ThemeScope.of(context), <String>[
+        'Semantic role: none of its own, Kbd wraps its text in '
             'IgnorePointer and SelectionContainer.disabled only; no '
             'Semantics override. The legend reaches assistive tech as '
             'ordinary static text.',
@@ -516,7 +548,7 @@ class _AccessibilityContent extends StatelessWidget {
             'a screen reader reads "Esc" exactly as it would read the word '
             '"Esc" anywhere else on the page, with no signal that it names '
             'a keyboard key rather than being prose.',
-        'One deliberate exception: ElKbdGroup wraps its children in '
+        'One deliberate exception: KbdGroup wraps its children in '
             'MergeSemantics, so a grouped shortcut *does* fold into a '
             'single announcement instead of two separate stops ("Ctrl K" as '
             'one node, not "Ctrl" then "K"). The source\'s own comment '
@@ -537,19 +569,19 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// Split out of Accessibility's own "Keyboard" bullet. Read straight off
-/// `kbd.dart`: neither `ElKbd` nor `ElKbdGroup` wires a `Focus` widget or a
+/// `kbd.dart`: neither `Kbd` nor `KbdGroup` wires a `Focus` widget or a
 /// `FocusNode` anywhere in the file.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'Never focusable: no Focus widget or FocusNode exists on either '
-            'ElKbd or ElKbdGroup, so neither ever appears in Tab order and '
+            'Kbd or KbdGroup, so neither ever appears in Tab order and '
             'neither can carry a focus ring.',
         'No key events: with nothing to focus, there is nothing here to '
-            'wire an onKeyEvent handler to either. A ElKbd rendering '
+            'wire an onKeyEvent handler to either. A Kbd rendering '
             '"Ctrl" is inert static content, not a control that responds '
             'to the key it names.',
         'Composed inside an interactive control (see Button and Input '
@@ -563,13 +595,13 @@ class _ResponsiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'No responsive branching: BuildContext width is never read for a '
             'layout decision; the same widget tree renders at 390px and '
             '1440px.',
         'Fixed 20px-tall, 20px-minimum-wide box with a 20px floor: the '
             'same footprint at 390px and 1440px; only the legend string '
-            'changes the width it occupies. ElKbdGroup wraps on a new line '
+            'changes the width it occupies. KbdGroup wraps on a new line '
             'if space is tight.',
         'Platform parity: Android, iOS, Web, macOS, Windows, and Linux all '
             'render the same widget tree.',
@@ -583,29 +615,26 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      _bullets(ElTheme.of(context), <String>[
+      _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/kbd.dart, one file, no companions; the '
             'registry manifest lists exactly one entry under "files".',
-        'Imports: effects/machine_surface.dart (ElMachineSurface), '
-            'foundation/shadows.dart (ElShadows.none), '
+        'Imports: effects/surface.dart (Surface), '
+            'foundation/shadows.dart (Shadows.none), '
             'foundation/spacing.dart, foundation/theme.dart, '
-            'foundation/typography.dart (ElComponentType.kbdKey), '
+            'foundation/typography.dart (TextStyles.kbdKey), '
             'theme_scope.dart.',
         'registryDependencies, resolved automatically by `elattar add '
-            'kbd`: machine-surface, source-foundation: copied verbatim '
+            'kbd`: surface, source-foundation: copied verbatim '
             'from registry/components/kbd.json.',
         'Assets: none. Fonts: none beyond the system type scale every '
-            'ElText call already depends on. Shaders: none: the machine '
-            'surface renders ElShadows.none, a flat fill and border, not a '
+            'StyledText call already depends on. Shaders: none: the machine '
+            'surface renders Shadows.none, a flat fill and border, not a '
             'fragment-shader paint.',
       ]),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
       const DocsLinkRow(
         links: <DocsLink>[
-          DocsLink(
-            label: 'Machine Surface',
-            route: '/components/machine_surface',
-          ),
+          DocsLink(label: 'Machine Surface', route: '/components/surface'),
         ],
       ),
     ],
@@ -616,33 +645,38 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ElTheme.of(context), <String>[
-        'The one object in this system that owns an elevation token and '
-            'never wears it: ElShadows.key and ElShadows.keyDown exist for '
-            'exactly this object (documented one foundations page away, on '
-            'Shadows, as a raised key with a side wall that travels into '
-            'its socket) but ElKbd\'s ElMachineSurface call passes '
-            'ElShadows.none explicitly: no border, no shadow, no press. It '
-            'ships flat. The token set is aspirational; the component that '
-            'renders is not using it.',
-        'Fill (theme.muted) and ink (theme.mutedForeground) are the only '
-            'theme-resolved colours it carries: both re-resolve on a live '
-            'theme flip.',
-        'No colour-override parameter of its own: every colour is '
-            'theme-derived, never a bare Color argument.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'The one object in this system that owns an elevation token and '
+        'never wears it: Shadows.keyRaised and Shadows.keyPressed exist for '
+        'exactly this object (documented one foundations page away, on '
+        'Shadows, as a raised key with a side wall that travels into '
+        'its socket) but Kbd\'s Surface call passes '
+        'Shadows.none explicitly: no border, no shadow, no press. It '
+        'ships flat. The token set is aspirational; the component that '
+        'renders is not using it.',
+    'Fill (theme.muted) and ink (theme.mutedForeground) are the only '
+        'theme-resolved colours it carries: both re-resolve on a live '
+        'theme flip.',
+    'No colour-override parameter of its own: every colour is '
+        'theme-derived, never a bare Color argument.',
+  ]);
 }
 
-Widget _bullets(ElThemeData theme, List<String> lines) => Column(
+Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: <Widget>[
     for (final String line in lines) ...<Widget>[
       ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: ElWidths.prose),
-        child: ElText('•  $line', ElType.small, color: theme.mutedForeground),
+        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+        child: StyledText(
+          '•  $line',
+          TextStyles.small,
+          color: theme.mutedForeground,
+        ),
       ),
-      SizedBox(height: el(2)),
+      SizedBox(height: space(2)),
     ],
   ],
 );
@@ -660,8 +694,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'N/A: neither owns a GestureDetector, FocusNode, or '
         'onPressed/enabled parameter.',
-    userSignal:
-        'IgnorePointer makes the "not interactive" contract explicit.',
+    userSignal: 'IgnorePointer makes the "not interactive" contract explicit.',
   ),
   DocsStateFact(
     state: 'Reduced motion',

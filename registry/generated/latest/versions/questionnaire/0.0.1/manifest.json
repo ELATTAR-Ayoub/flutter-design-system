@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/questionnaire.dart",
+      "source": "lib/src/components/ui/questionnaire.dart",
       "target": "@ui/questionnaire.dart",
-      "sha256": "46795bc326a0be3945d88cf25403d29cae3a1efdd3762aeb97d2dc2665459a1c"
+      "sha256": "9d5b9522de51183bf9b666f0273233e9c198a5328bf292b94df49f2bbb1d4478"
     }
   ],
   "registryDependencies": [
@@ -31,6 +31,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/questionnaire",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/questionnaire.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/questionnaire.dart",
   "deprecated": false
 }

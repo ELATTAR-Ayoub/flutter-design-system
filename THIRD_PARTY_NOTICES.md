@@ -113,8 +113,8 @@ sources make, and neither is something this repository may rewrite.
 
 | | |
 | --- | --- |
-| Redistributed file | [`lib/src/components/icon_paths.g.dart`](lib/src/components/icon_paths.g.dart) (763,019 bytes, 1756 glyphs) |
-| Also | [`lib/src/components/icon_paths.g.index.dart`](lib/src/components/icon_paths.g.index.dart) |
+| Redistributed file | [`lib/src/components/ui/icon_paths.g.dart`](lib/src/components/ui/icon_paths.g.dart) (763,019 bytes, 1756 glyphs) |
+| Also | [`lib/src/components/ui/icon_paths.g.index.dart`](lib/src/components/ui/icon_paths.g.index.dart) |
 | Upstream | `lucide-react` 1.28.0 |
 | License | ISC, plus MIT (Cole Bemis) for the glyphs inherited from Feather |
 | Notice file | [`third_party/lucide/LICENSE`](third_party/lucide/LICENSE) |

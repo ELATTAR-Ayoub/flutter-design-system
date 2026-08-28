@@ -1,9 +1,9 @@
 /// Documentation metadata for the `scroll_area` component.
 ///
-/// **Split.** This route used to carry `ElScrollArea`, `ElResizablePanelGroup`
-/// and `ElAspectRatio` together under one [ComponentDocEntry] (see the git
-/// history of this file for that shape). `ElResizablePanelGroup` and
-/// `ElAspectRatio` now have their own routes and their own entries:
+/// **Split.** This route used to carry `ScrollArea`, `ResizablePanelGroup`
+/// and `AspectRatio` together under one [ComponentDocEntry] (see the git
+/// history of this file for that shape). `ResizablePanelGroup` and
+/// `AspectRatio` now have their own routes and their own entries:
 /// `example/lib/components_docs/resizable/meta.dart`'s `resizableDoc` and
 /// `example/lib/components_docs/aspect_ratio/meta.dart`'s `aspectRatioDoc`.
 /// [name], [route] (`/components/scroll_area`), and the page class
@@ -33,6 +33,6 @@ const ComponentDocEntry scrollAreaDoc = ComponentDocEntry(
       'A styled scroll container with an optional hover-visible scrollbar '
       'for either axis.',
   dependencies: <String>['source-foundation'],
-  exports: <String>['ElScrollArea', 'ElScrollAreaBehavior'],
+  exports: <String>['ScrollArea', 'ScrollAreaBehavior'],
   sourcePath: 'lib/src/components/scroll_area.dart',
 );

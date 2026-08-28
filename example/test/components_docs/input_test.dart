@@ -6,16 +6,40 @@ import 'package:example/docs/component_doc_page.dart' show DocsTocEntry;
 import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_install.dart';
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _harness({
-  required Widget child,
-  required ElThemeController controller,
-}) => ElTheme(
-  controller: controller,
-  child: MaterialApp(home: SingleChildScrollView(child: child)),
-);
+Widget _harness({required Widget child, required ThemeController controller}) =>
+    ThemeScope(
+      controller: controller,
+      child: MaterialApp(home: SingleChildScrollView(child: child)),
+    );
 
 /// `DocsDisclosure.triggerKey` is one constant shared by every instance on
 /// the page, so a bare `find.byKey` matches all eight disclosures — this
@@ -27,9 +51,9 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every named constructor parameter `ElInput`'s own class declares
+/// Every named constructor parameter `Input`'s own class declares
 /// (`lib/src/components/input.dart`), excluding `key`: the same set the
-/// page's `ElInput` `DocsApiTable` claims to cover.
+/// page's `Input` `DocsApiTable` claims to cover.
 const List<String> _inputConstructorParams = <String>[
   'controller',
   'initialValue',
@@ -67,7 +91,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: InputDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -79,41 +103,44 @@ void main() {
           find.byKey(const ValueKey<String>('input-doc-article')),
           findsOneWidget,
         );
-        expect(find.byType(ElInput), findsAtLeastNWidgets(1));
+        expect(find.byType(Input), findsAtLeastNWidgets(1));
 
         final Finder apiTrigger = _disclosureTrigger('API Reference');
         await tester.ensureVisible(apiTrigger);
         await tester.pump();
         await tester.tap(apiTrigger);
         await tester.pump();
-        await tester.pump(ElDurations.jelly);
+        await tester.pump(MotionDurations.open);
 
         for (final String param in _inputConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
         for (final String table in <String>[
-          'ElInput',
-          'ElFieldSurface',
-          'ElFieldVisibility',
+          'Input',
+          'FieldSurfaceRecipe',
+          'FieldVisibility',
         ]) {
           expect(find.text(table), findsWidgets, reason: 'missing $table');
         }
 
-        // The preview toggles a live ElInput between invalid, disabled,
+        // The preview toggles a live Input between invalid, disabled,
         // and read-only. Opening the API Reference disclosure above
         // scrolled the article down to it, so the Preview section's own
         // toggles need scrolling back into view before they can be tapped.
         final Finder invalidToggle = find
-            .widgetWithText(ElButton, 'Invalid')
+            .widgetWithText(Button, 'Invalid')
             .first;
         await tester.ensureVisible(invalidToggle);
         await tester.pump();
         await tester.tap(invalidToggle);
         await tester.pump();
-        expect(find.text('That address is missing a valid domain.'), findsWidgets);
+        expect(
+          find.text('That address is missing a valid domain.'),
+          findsWidgets,
+        );
 
         final Finder readOnlyToggle = find
-            .widgetWithText(ElButton, 'Read only')
+            .widgetWithText(Button, 'Read only')
             .first;
         await tester.ensureVisible(readOnlyToggle);
         await tester.pump();
@@ -127,36 +154,39 @@ void main() {
         expect(inputDoc.name, 'input');
         expect(
           inputDoc.exports,
-          containsAll(<String>['ElInput', 'ElFieldSurface', 'ElFieldVisibility']),
+          containsAll(<String>[
+            'Input',
+            'FieldSurfaceRecipe',
+            'FieldVisibility',
+          ]),
         );
         expect(inputDoc.command, 'elattar add input');
         expect(destination, isNull);
       },
     );
 
-    testWidgets(
-      'the page is declared, and every section is a kit component',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the page is declared, and every section is a kit component', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
-            child: const InputDocPage(),
-          ),
-        );
-        await tester.pump();
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const InputDocPage(),
+        ),
+      );
+      await tester.pump();
 
-        // Three specimen stages: Preview, Field companion, Read-only & Bare.
-        expect(find.byType(DocsShowcase), findsNWidgets(3));
-        expect(find.byType(DocsInstall), findsOneWidget);
-        // Eight collapsed sections: API Reference, States, Accessibility,
-        // Keyboard, Responsive, Dependencies, Theming, Source.
-        expect(find.byType(DocsDisclosure), findsNWidgets(8));
-      },
-    );
+      // Three specimen stages: Preview, Field companion, Read-only & Bare.
+      expect(find.byType(DocsShowcase), findsNWidgets(3));
+      expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
+      expect(find.byType(DocsDisclosure), findsNWidgets(8));
+    });
 
     test('the table of contents matches the declared sections', () {
       expect(
@@ -188,7 +218,7 @@ void main() {
 
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: const InputDocPage(),
           ),
         );
@@ -209,41 +239,34 @@ void main() {
       },
     );
 
-    testWidgets(
-      'survives a live theme flip in place, at desktop width',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('survives a live theme flip in place, at desktop width', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        final ElThemeController controller = ElThemeController(
-          mode: ElThemeMode.dark,
-        );
-        await tester.pumpWidget(
-          _harness(controller: controller, child: const InputDocPage()),
-        );
-        await tester.pump();
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
+      await tester.pumpWidget(
+        _harness(controller: controller, child: const InputDocPage()),
+      );
+      await tester.pump();
 
-        final ElThemeData darkTheme = ElTheme.of(
-          tester.element(
-            find.byKey(const ValueKey<String>('input-doc-article')),
-          ),
-        );
+      final ThemeTokens darkTheme = ThemeScope.of(
+        tester.element(find.byKey(const ValueKey<String>('input-doc-article'))),
+      );
 
-        controller.setMode(ElThemeMode.light);
-        await tester.pump();
+      controller.setMode(ColorMode.light);
+      await tester.pump();
 
-        final ElThemeData lightTheme = ElTheme.of(
-          tester.element(
-            find.byKey(const ValueKey<String>('input-doc-article')),
-          ),
-        );
+      final ThemeTokens lightTheme = ThemeScope.of(
+        tester.element(find.byKey(const ValueKey<String>('input-doc-article'))),
+      );
 
-        expect(lightTheme.background, isNot(darkTheme.background));
-        expect(lightTheme.foreground, isNot(darkTheme.foreground));
-        expect(find.byType(ElInput), findsAtLeastNWidgets(1));
-      },
-    );
+      expect(lightTheme.background, isNot(darkTheme.background));
+      expect(lightTheme.foreground, isNot(darkTheme.foreground));
+      expect(find.byType(Input), findsAtLeastNWidgets(1));
+    });
 
     // Migrated from the retired component_docs_input_select_test.dart: the
     // pager's "next" link must fire onNavigate with a route that still
@@ -262,7 +285,7 @@ void main() {
         String? destination;
         await tester.pumpWidget(
           _harness(
-            controller: ElThemeController(mode: ElThemeMode.dark),
+            controller: ThemeController(mode: ColorMode.dark),
             child: InputDocPage(
               onNavigate: (String route) => destination = route,
             ),
@@ -271,7 +294,7 @@ void main() {
         await tester.pump();
 
         final Finder nextLink = find
-            .widgetWithText(ElButton, inputGroup.title)
+            .widgetWithText(Button, inputGroup.title)
             .last;
         await tester.ensureVisible(nextLink);
         await tester.pump();

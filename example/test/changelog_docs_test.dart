@@ -14,7 +14,33 @@ import 'dart:io';
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs_pages/changelog_document.dart';
 import 'package:example/docs_pages/changelog_page.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 /// `flutter test` runs with `example/` as the working directory.
@@ -27,13 +53,13 @@ ChangelogDocument realChangelog() => parseChangelog(realChangelogSource());
 Widget host(
   Widget child, {
   Size size = const Size(1440, 900),
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   double textScale = 1,
 }) {
   return MediaQuery(
     data: MediaQueryData(size: size, textScaler: TextScaler.linear(textScale)),
-    child: ElTheme(
-      controller: ElThemeController(mode: mode),
+    child: ThemeScope(
+      controller: ThemeController(mode: mode),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: SingleChildScrollView(child: child),
@@ -359,7 +385,7 @@ void main() {
         find.byKey(const ValueKey<String>('changelog-loading')),
         findsOneWidget,
       );
-      expect(find.byType(ElSkeleton), findsWidgets);
+      expect(find.byType(Skeleton), findsWidgets);
     });
 
     testWidgets('an empty document explains itself', (
@@ -387,7 +413,7 @@ void main() {
     testWidgets('a parse failure is readable and offers a retry', (
       WidgetTester tester,
     ) async {
-      // No `pumpAndSettle`: `ElAlert` renders an `ElBloomCosmic` whose
+      // No `pumpAndSettle`: `Alert` renders an `FeedbackSurface` whose
       // controllers repeat forever, so settling never returns.
       await tester.pumpWidget(
         host(
@@ -405,10 +431,10 @@ void main() {
         findsOneWidget,
       );
       expect(find.textContaining('is a table'), findsWidgets);
-      expect(find.widgetWithText(ElButton, 'Try again'), findsOneWidget);
+      expect(find.widgetWithText(Button, 'Try again'), findsOneWidget);
       // Stated in words and marked with an icon, not signalled by colour.
       expect(find.textContaining('could not be read'), findsWidgets);
-      expect(find.byType(ElIcon), findsWidgets);
+      expect(find.byType(Icon), findsWidgets);
     });
 
     testWidgets('retry re-runs the loader', (WidgetTester tester) async {
@@ -432,7 +458,7 @@ void main() {
         findsOneWidget,
       );
 
-      await tester.tap(find.widgetWithText(ElButton, 'Try again'));
+      await tester.tap(find.widgetWithText(Button, 'Try again'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 32));
       await tester.pump(const Duration(milliseconds: 32));
@@ -498,7 +524,7 @@ void main() {
       await tester.pumpWidget(
         host(
           ChangelogDocsPage(loader: () async => realChangelog()),
-          mode: ElThemeMode.light,
+          mode: ColorMode.light,
         ),
       );
       await tester.pumpAndSettle();

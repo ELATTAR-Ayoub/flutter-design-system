@@ -7,22 +7,22 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/button.dart",
+      "source": "lib/src/components/ui/button.dart",
       "target": "@ui/button.dart",
-      "sha256": "4fc23ce56b48be88d2b354d11d9525956856750abe83543558cd6c354671d47d"
+      "sha256": "87f59304c1bf48ea0bc0bc9127e1919c3511fbf38549cb150add6e4ba9fd60d5"
     }
   ],
   "registryDependencies": [
-    "foil-value",
-    "machine-surface",
-    "sheen-action",
+    "premium-surface",
+    "surface",
+    "action-feedback",
     "source-foundation",
     "spinner"
   ],
   "semanticDependencies": [
-    "foil-value",
-    "machine-surface",
-    "sheen-action",
+    "premium-surface",
+    "surface",
+    "action-feedback",
     "spinner"
   ],
   "pubDependencies": {},
@@ -31,6 +31,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/button",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/button.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/button.dart",
   "deprecated": false
 }

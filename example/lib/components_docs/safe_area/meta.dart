@@ -27,6 +27,6 @@ const ComponentDocEntry safeAreaDoc = ComponentDocEntry(
   // registry/components/safe-area.json's own registryDependencies,
   // verbatim: empty.
   dependencies: <String>[],
-  exports: <String>['ElSafeArea'],
+  exports: <String>['SafeArea'],
   sourcePath: 'lib/src/components/safe_area.dart',
 );

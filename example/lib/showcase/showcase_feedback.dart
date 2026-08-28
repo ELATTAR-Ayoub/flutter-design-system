@@ -2,7 +2,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// Makes the app-owned toast queue available to each showcase destination.
 ///
@@ -15,9 +27,9 @@ class ShowcaseFeedback extends InheritedWidget {
     required super.child,
   });
 
-  final ElToastController controller;
+  final ToastController controller;
 
-  static ElToastController of(BuildContext context) {
+  static ToastController of(BuildContext context) {
     final ShowcaseFeedback? scope = context
         .dependOnInheritedWidgetOfExactType<ShowcaseFeedback>();
     assert(scope != null, 'No ShowcaseFeedback found above this destination.');

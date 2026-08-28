@@ -44,7 +44,7 @@ Results:
 - `init` wrote 19 foundation/configuration files.
 - `add --all --dry-run` planned 103 writes and did not mutate the app.
 - The dry run left `button.dart`, `icon_paths.g.index.dart`, and
-  `voice_orb.dart` absent and kept the UI directory at one file.
+  `voice_indicator.dart` absent and kept the UI directory at one file.
 - `add --all` wrote 103 files.
 - `doctor` reported `foundation=source`, 95 installed items, and a 99-item
   version `0.0.1` registry.
@@ -62,7 +62,7 @@ C:\Users\Airen\AppData\Local\Temp\elattar-consumer-smoke-20260824\subset_app
 Command:
 
 ```powershell
-dart run <repo>\packages\elattar_cli\bin\elattar.dart add button dialog form chart agent-console voice-orb --registry <repo>\registry\generated\latest
+dart run <repo>\packages\elattar_cli\bin\elattar.dart add button dialog form chart agent-console voice-indicator --registry <repo>\registry\generated\latest
 ```
 
 This selection covers a control, overlay, form, multi-file chart family,

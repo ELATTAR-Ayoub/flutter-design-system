@@ -7,17 +7,17 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/kbd.dart",
+      "source": "lib/src/components/ui/kbd.dart",
       "target": "@ui/kbd.dart",
-      "sha256": "aa282eb0fc0b7cec294e197276a6691bbbdfee6b33f9db54e8bee941b85151d1"
+      "sha256": "2c24ae5e9b5d3bd6102a6725bb6095916e0e0d143e06e50b687784dd554d5d66"
     }
   ],
   "registryDependencies": [
-    "machine-surface",
+    "surface",
     "source-foundation"
   ],
   "semanticDependencies": [
-    "machine-surface"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/kbd",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/kbd.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/kbd.dart",
   "deprecated": false
 }

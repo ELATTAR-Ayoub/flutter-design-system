@@ -3,11 +3,11 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. The live
-/// `ElThemeController` is flipped in place for theme coverage rather than
+/// `ThemeController` is flipped in place for theme coverage rather than
 /// re-pumped under a new controller.
 ///
 /// Re-housed onto the kit alongside the page: sections are now
-/// `DocsSection`s rather than `ElSection`s, and the eight disclosures (API
+/// `DocsSection`s rather than `Section`s, and the eight disclosures (API
 /// Reference, States, Accessibility, Keyboard, Responsive, Dependencies,
 /// Theming, Source) are collapsed `DocsDisclosure`s that mount no content
 /// until opened — see `_openDisclosure`, the same helper `button_test.dart`
@@ -22,7 +22,33 @@ import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_layout.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
 const Size _wide = Size(1440, 900);
@@ -51,7 +77,7 @@ const List<String> _expectedSectionIds = <String>[
   'source',
 ];
 
-/// Every public constructor parameter of `ElTabs`, enumerated by reading
+/// Every public constructor parameter of `Tabs`, enumerated by reading
 /// `lib/src/components/tabs.dart` directly. The API table must cover all of
 /// these by name.
 const List<String> _tabsParams = <String>[
@@ -61,41 +87,41 @@ const List<String> _tabsParams = <String>[
   'variant',
 ];
 
-/// Every public constructor parameter of the `ElTabItem` model.
+/// Every public constructor parameter of the `TabItem` model.
 const List<String> _tabItemParams = <String>[
-  'ElTabItem.label',
-  'ElTabItem.content',
+  'TabItem.label',
+  'TabItem.content',
 ];
 
-/// The rest of the public surface: the `ElTabsVariant` enum and the static
-/// geometry getters on `ElTabs`.
+/// The rest of the public surface: the `TabsVariant` enum and the static
+/// geometry getters on `Tabs`.
 const List<String> _tabsStatics = <String>[
-  'ElTabsVariant.standard',
-  'ElTabsVariant.line',
-  'ElTabs.trackHeight',
-  'ElTabs.triggerHeight',
-  'ElTabs.triggerPaddingX',
-  'ElTabs.ruleHeight',
-  'ElTabs.rootGap',
-  'ElTabs.trackPadding',
-  'ElTabs.gapFor',
+  'TabsVariant.standard',
+  'TabsVariant.line',
+  'Tabs.trackHeight',
+  'Tabs.triggerHeight',
+  'Tabs.triggerPaddingX',
+  'Tabs.ruleHeight',
+  'Tabs.rootGap',
+  'Tabs.trackPadding',
+  'Tabs.gapFor',
 ];
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -125,7 +151,7 @@ Future<void> _openDisclosure(WidgetTester tester, String title) async {
   await tester.pump();
   await tester.tap(trigger);
   await tester.pump();
-  await tester.pump(ElDurations.jelly);
+  await tester.pump(MotionDurations.open);
 }
 
 void main() {
@@ -199,8 +225,8 @@ void main() {
   );
 
   testWidgets(
-    'the API table covers every ElTabs and ElTabItem constructor parameter '
-    'and every ElTabsVariant/static member',
+    'the API table covers every Tabs and TabItem constructor parameter '
+    'and every TabsVariant/static member',
     (WidgetTester tester) async {
       await _pump(tester);
       await _openDisclosure(tester, 'API Reference');
@@ -245,7 +271,7 @@ void main() {
       Finder within(String text) =>
           find.descendant(of: find.byKey(key), matching: find.text(text));
 
-      expect(tester.widget<ElTabs>(find.byKey(key)).selectedIndex, 0);
+      expect(tester.widget<Tabs>(find.byKey(key)).selectedIndex, 0);
       expect(within('Update your account details here.'), findsOneWidget);
       expect(
         within('See who else has access to this workspace.'),
@@ -255,12 +281,15 @@ void main() {
       await tester.tap(within('Team'), warnIfMissed: false);
       await tester.pump();
 
-      expect(tester.widget<ElTabs>(find.byKey(key)).selectedIndex, 1);
+      expect(tester.widget<Tabs>(find.byKey(key)).selectedIndex, 1);
       expect(within('Update your account details here.'), findsNothing);
-      expect(within('See who else has access to this workspace.'), findsOneWidget);
+      expect(
+        within('See who else has access to this workspace.'),
+        findsOneWidget,
+      );
 
-      // A ElTabItem with content: null, a real state the source itself
-      // documents (see tabs.dart's ElTabItem.content doc comment), renders
+      // A TabItem with content: null, a real state the source itself
+      // documents (see tabs.dart's TabItem.content doc comment), renders
       // no panel at all when selected, and toggling to it must not throw.
       await tester.tap(within('More'), warnIfMissed: false);
       await tester.pump();
@@ -294,21 +323,18 @@ void main() {
     },
   );
 
-  testWidgets(
-    'the Account settings specimen mounts a contentless Team trigger '
-    'without throwing',
-    (WidgetTester tester) async {
-      await _pump(tester);
+  testWidgets('the Account settings specimen mounts a contentless Team trigger '
+      'without throwing', (WidgetTester tester) async {
+    await _pump(tester);
 
-      const Key key = ValueKey<String>('tabs-account-settings-specimen');
-      expect(find.byKey(key), findsOneWidget);
-      await tester.ensureVisible(find.byKey(key));
+    const Key key = ValueKey<String>('tabs-account-settings-specimen');
+    expect(find.byKey(key), findsOneWidget);
+    await tester.ensureVisible(find.byKey(key));
 
-      await tester.tap(find.text('Team').last, warnIfMissed: false);
-      await tester.pump();
-      expect(tester.takeException(), isNull);
-    },
-  );
+    await tester.tap(find.text('Team').last, warnIfMissed: false);
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'the standalone Line specimen renders the line variant and switches '
@@ -320,10 +346,7 @@ void main() {
       expect(find.byKey(key), findsOneWidget);
       await tester.ensureVisible(find.byKey(key));
 
-      expect(
-        tester.widget<ElTabs>(find.byKey(key)).variant,
-        ElTabsVariant.line,
-      );
+      expect(tester.widget<Tabs>(find.byKey(key)).variant, TabsVariant.line);
 
       // Scoped: 'Stats' is also this specimen's own choice of label for
       // Preview's Line cell above, both mounted at once.
@@ -341,7 +364,7 @@ void main() {
   );
 
   testWidgets(
-    'ElTabs and its trigger wire no Focus widget of their own: there is no '
+    'Tabs and its trigger wire no Focus widget of their own: there is no '
     'keyboard tab stop and no arrow-key traversal',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -353,7 +376,7 @@ void main() {
         ),
         findsNothing,
         reason:
-            'if this starts failing, ElTabs has grown real keyboard focus '
+            'if this starts failing, Tabs has grown real keyboard focus '
             'and the Accessibility/Keyboard sections of the docs page must '
             'be updated to stop saying otherwise',
       );
@@ -368,23 +391,23 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    final ElThemeController theme = ElThemeController(mode: ElThemeMode.dark);
+    final ThemeController theme = ThemeController(mode: ColorMode.dark);
     addTearDown(theme.dispose);
 
     await tester.pumpWidget(
-      ElTheme(
+      ThemeScope(
         controller: theme,
         child: MaterialApp(
           home: Scaffold(
             body: Padding(
               padding: const EdgeInsets.all(16),
-              child: ElTabs(
-                items: const <ElTabItem>[
-                  ElTabItem(label: 'Overview'),
-                  ElTabItem(label: 'Analytics dashboard'),
-                  ElTabItem(label: 'Notification preferences'),
-                  ElTabItem(label: 'Billing and subscriptions'),
-                  ElTabItem(label: 'Security settings'),
+              child: Tabs(
+                items: const <TabItem>[
+                  TabItem(label: 'Overview'),
+                  TabItem(label: 'Analytics dashboard'),
+                  TabItem(label: 'Notification preferences'),
+                  TabItem(label: 'Billing and subscriptions'),
+                  TabItem(label: 'Security settings'),
                 ],
                 selectedIndex: 0,
                 onChanged: (int _) {},
@@ -396,7 +419,7 @@ void main() {
     );
     await tester.pump();
 
-    // ElTabs' track is an un-clipped, unscrolled Row (ElSlidingPillGroup):
+    // Tabs' track is an un-clipped, unscrolled Row (ActiveIndicator):
     // it neither scrolls nor wraps when its triggers do not fit, so a
     // RenderFlex overflow is the real, current behaviour, recorded here
     // rather than asserted away, so the docs page's Responsive section
@@ -428,19 +451,19 @@ void main() {
       firstTop.dx,
       greaterThan(secondTop.dx),
       reason:
-          'under RTL the first ElTabItem should paint to the right of '
+          'under RTL the first TabItem should paint to the right of '
           'the second, the same mirroring Flutter\'s own Row gives every '
           'other RTL layout: if this fails, the RTL section\'s claim '
-          'that ElTabs needs no direction-specific code is wrong',
+          'that Tabs needs no direction-specific code is wrong',
     );
 
-    expect(tester.widget<ElTabs>(specimen).selectedIndex, 0);
+    expect(tester.widget<Tabs>(specimen).selectedIndex, 0);
     expect(find.text('تحديث بيانات حسابك هنا.'), findsOneWidget);
 
     await tester.tap(find.text('الفريق'), warnIfMissed: false);
     await tester.pump();
 
-    expect(tester.widget<ElTabs>(specimen).selectedIndex, 1);
+    expect(tester.widget<Tabs>(specimen).selectedIndex, 1);
     expect(
       find.text('من يملك صلاحية الوصول إلى مساحة العمل هذه.'),
       findsOneWidget,
@@ -452,13 +475,10 @@ void main() {
     'both themes render the article with no exceptions when flipped in '
     'place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(tabsDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(tabsDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

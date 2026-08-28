@@ -1,0 +1,27 @@
+{
+  "name": "hover-builder",
+  "type": "component",
+  "version": "0.0.1",
+  "description": "The hover lift — the `lift` utility, `app/globals.css` L2318–2330.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/hover_builder.dart",
+      "target": "@ui/hover_builder.dart",
+      "sha256": "644cf526d4c18848e30589069ef9c1ec7b8f1855cc1bab2453a006a7aa3c34b9"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/hover-builder",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/hover_builder.dart",
+  "deprecated": false
+}

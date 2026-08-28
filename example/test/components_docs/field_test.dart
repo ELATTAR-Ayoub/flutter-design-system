@@ -5,13 +5,13 @@
 /// reads `DocsSection.id` (the kit's own section widget), and the
 /// API-table / state-matrix tests open the relevant `DocsDisclosure` first —
 /// closed by default in the new kit, unlike the old page's always-visible
-/// `ElSection`.
+/// `Section`.
 ///
 /// `field` is a family of nine classes plus one enum
 /// (`lib/src/components/field.dart`, read directly for Step 1 of the task
-/// cycle): [ElField], [ElFieldScope], [ElFieldActivator],
-/// [ElFieldOrientation], [ElFieldGroup], [ElFieldSet], [ElFieldLegend],
-/// [ElFieldLabel], [ElFieldDescription], [ElFieldError]. The API-completeness
+/// cycle): [Field], [FieldScope], [FieldActivator],
+/// [FieldOrientation], [FieldGroup], [FieldSet], [FieldLegend],
+/// [FieldLabel], [FieldDescription], [FieldError]. The API-completeness
 /// test below checks each class's own [DocsApiTable] by title rather than one
 /// flat merged set, because several classes share parameter names (`label`,
 /// `enabled`, `focusNode`, `child`/`children`) and a flat set would not catch
@@ -19,7 +19,7 @@
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`, per the
-/// Phase J brief. The live `ElThemeController` is flipped in place for theme
+/// Phase J brief. The live `ThemeController` is flipped in place for theme
 /// coverage rather than re-pumped under a new controller.
 library;
 
@@ -30,8 +30,34 @@ import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_facts.dart';
 import 'package:example/docs/docs_section.dart' show DocsSection;
 import 'package:example/docs/docs_showcase.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth,
+        ActionChip,
+        AlertDialog,
+        Badge,
+        Card,
+        CarouselController,
+        Checkbox,
+        Dialog,
+        DropdownMenu,
+        Drawer,
+        DrawerHeader,
+        Slider,
+        Switch,
+        TextFormField,
+        Tooltip;
+import 'package:flutter/rendering.dart' hide ScrollDirection;
 import 'package:flutter_test/flutter_test.dart';
 
 /// The house-shape section order this page must render, top to bottom.
@@ -63,13 +89,13 @@ const List<String> _expectedSectionOrder = <String>[
 const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
-/// Every `ElApiTable` this page must render, by title, and every public
+/// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class found by reading
 /// `lib/src/components/field.dart` directly (Step 1). The completeness test
 /// asserts each list is a subset of that specific table's own facts: not of
 /// a set merged across every table on the page.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
-  'ElField': <String>[
+  'Field': <String>[
     'child',
     'label',
     'description',
@@ -78,10 +104,10 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'enabled',
     'focusNode',
     'orientation',
-    'ElField.gap',
-    'ElField.describedGap',
+    'Field.gap',
+    'Field.describedGap',
   ],
-  'ElFieldScope': <String>[
+  'FieldScope': <String>[
     'label',
     'describedBy',
     'invalid',
@@ -89,39 +115,39 @@ const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
     'focusNode',
     'activator',
     'child',
-    'ElFieldScope.maybeOf',
+    'FieldScope.maybeOf',
   ],
-  'ElFieldActivator': <String>['callback'],
-  'ElFieldGroup': <String>[
+  'FieldActivator': <String>['callback'],
+  'FieldGroup': <String>[
     'children',
     'nested',
-    'ElFieldGroup.gap',
-    'ElFieldGroup.nestedGap',
+    'FieldGroup.gap',
+    'FieldGroup.nestedGap',
   ],
-  'ElFieldSet': <String>[
+  'FieldSet': <String>[
     'children',
     'tightForGroup',
-    'ElFieldSet.gap',
-    'ElFieldSet.groupGap',
+    'FieldSet.gap',
+    'FieldSet.groupGap',
   ],
-  'ElFieldLegend': <String>['text', 'ElFieldLegend.spaceBelow'],
-  'ElFieldLabel': <String>[
+  'FieldLegend': <String>['text', 'FieldLegend.spaceBelow'],
+  'FieldLabel': <String>[
     'text',
     'spec',
     'focusNode',
     'activator',
     'enabled',
     'onTap',
-    'ElFieldLabel.normal',
-    'ElFieldLabel.disabledOpacity',
+    'FieldLabel.normal',
+    'FieldLabel.disabledOpacity',
   ],
-  'ElFieldDescription': <String>['text'],
-  'ElFieldError': <String>[
+  'FieldDescription': <String>['text'],
+  'FieldError': <String>[
     'messages',
-    'ElFieldError.listIndent',
-    'ElFieldError.itemGap',
+    'FieldError.listIndent',
+    'FieldError.itemGap',
   ],
-  'ElFieldOrientation': <String>['vertical', 'horizontal'],
+  'FieldOrientation': <String>['vertical', 'horizontal'],
 };
 
 /// The single `DocsDisclosure` whose title is [title]. `DocsDisclosure`'s
@@ -136,21 +162,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-Future<ElThemeController> _pump(
+Future<ThemeController> _pump(
   WidgetTester tester, {
   Size size = _wide,
-  ElThemeMode mode = ElThemeMode.dark,
+  ColorMode mode = ColorMode.dark,
   ValueChanged<String>? onNavigate,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final ElThemeController theme = ElThemeController(mode: mode);
+  final ThemeController theme = ThemeController(mode: mode);
   addTearDown(theme.dispose);
 
   await tester.pumpWidget(
-    ElTheme(
+    ThemeScope(
       controller: theme,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -195,22 +221,21 @@ void main() {
     },
   );
 
+  testWidgets('renders the house-shape section order, section for section', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester);
+
+    final List<String> ids = tester
+        .widgetList<DocsSection>(find.byType(DocsSection))
+        .map((DocsSection section) => section.id)
+        .toList();
+
+    expect(ids, _expectedSectionOrder);
+  });
+
   testWidgets(
-    'renders the house-shape section order, section for section',
-    (WidgetTester tester) async {
-      await _pump(tester);
-
-      final List<String> ids = tester
-          .widgetList<DocsSection>(find.byType(DocsSection))
-          .map((DocsSection section) => section.id)
-          .toList();
-
-      expect(ids, _expectedSectionOrder);
-    },
-  );
-
-  testWidgets(
-    'each ElApiTable covers every public constructor parameter and static '
+    'each ApiTable covers every public constructor parameter and static '
     'of its own class',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -219,7 +244,7 @@ void main() {
       await tester.ensureVisible(apiTrigger);
       await tester.tap(apiTrigger);
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
       final List<DocsApiTable> tables = tester
           .widgetList<DocsApiTable>(find.byType(DocsApiTable))
@@ -239,7 +264,7 @@ void main() {
         expect(
           documented,
           isNotNull,
-          reason: 'no ElApiTable titled "${expected.key}" was rendered',
+          reason: 'no ApiTable titled "${expected.key}" was rendered',
         );
         for (final String param in expected.value) {
           expect(
@@ -263,20 +288,20 @@ void main() {
       const Key toggleKey = ValueKey<String>('field-doc-toggle-error');
       // Scoped to this one toggleable specimen: the page's static
       // "Separable" pairing further down deliberately keeps a second,
-      // permanent ElFieldError mounted elsewhere on the same page, so a
-      // page-wide byType(ElFieldError) search cannot tell "this specimen's
+      // permanent FieldError mounted elsewhere on the same page, so a
+      // page-wide byType(FieldError) search cannot tell "this specimen's
       // error" from "that unrelated, always-on specimen's error".
       final Finder toggleField = find.byKey(
         const ValueKey<String>('field-doc-toggle-field'),
       );
       final Finder toggleFieldError = find.descendant(
         of: toggleField,
-        matching: find.byType(ElFieldError),
+        matching: find.byType(FieldError),
       );
       await tester.ensureVisible(find.byKey(inputKey));
 
-      // Rest: no error message, and ElFieldError builds no widget at all —
-      // not a zero-height live region, per ElFieldError.build's own
+      // Rest: no error message, and FieldError builds no widget at all —
+      // not a zero-height live region, per FieldError.build's own
       // "returns null when valid" contract.
       expect(toggleFieldError, findsNothing);
 
@@ -301,7 +326,7 @@ void main() {
 
   testWidgets(
     'the live horizontal field specimen toggles its wrapped checkbox on tap, '
-    'and the visible ElFieldLabel activates it too: ElFieldLabel\'s own '
+    'and the visible FieldLabel activates it too: FieldLabel\'s own '
     'activator ladder, not just the checkbox\'s own hit area',
     (WidgetTester tester) async {
       await _pump(tester);
@@ -309,19 +334,19 @@ void main() {
       const Key key = ValueKey<String>('field-doc-specimen-checkbox');
       await tester.ensureVisible(find.byKey(key));
       expect(
-        tester.widget<ElCheckbox>(find.byKey(key)).state,
-        ElCheckboxState.unchecked,
+        tester.widget<Checkbox>(find.byKey(key)).state,
+        CheckboxState.unchecked,
       );
 
       await tester.tap(find.byKey(key), warnIfMissed: false);
       await tester.pump();
       expect(
-        tester.widget<ElCheckbox>(find.byKey(key)).state,
-        ElCheckboxState.checked,
+        tester.widget<Checkbox>(find.byKey(key)).state,
+        CheckboxState.checked,
       );
 
-      // The field's own visible label, a plain ElText, not the checkbox's
-      // hit area, activates the control through ElFieldScope.activator,
+      // The field's own visible label, a plain StyledText, not the checkbox's
+      // hit area, activates the control through FieldScope.activator,
       // exactly as an HTML <label for> click would.
       await tester.tap(
         find.text('Email me about product updates'),
@@ -329,8 +354,8 @@ void main() {
       );
       await tester.pump();
       expect(
-        tester.widget<ElCheckbox>(find.byKey(key)).state,
-        ElCheckboxState.unchecked,
+        tester.widget<Checkbox>(find.byKey(key)).state,
+        CheckboxState.unchecked,
       );
 
       expect(tester.takeException(), isNull);
@@ -347,7 +372,7 @@ void main() {
       await tester.ensureVisible(statesTrigger);
       await tester.tap(statesTrigger);
       await tester.pump();
-      await tester.pump(ElDurations.jelly);
+      await tester.pump(MotionDurations.open);
 
       final DocsStateMatrix matrix = tester.widget<DocsStateMatrix>(
         find.byType(DocsStateMatrix),
@@ -375,13 +400,10 @@ void main() {
   testWidgets(
     'both themes render the article with no exceptions when flipped in place',
     (WidgetTester tester) async {
-      final ElThemeController theme = await _pump(
-        tester,
-        mode: ElThemeMode.light,
-      );
+      final ThemeController theme = await _pump(tester, mode: ColorMode.light);
       expect(find.text(fieldDoc.title), findsWidgets);
 
-      theme.setMode(ElThemeMode.dark);
+      theme.setMode(ColorMode.dark);
       await tester.pump();
       expect(find.text(fieldDoc.title), findsWidgets);
       expect(tester.takeException(), isNull);

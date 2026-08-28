@@ -19,7 +19,7 @@
 /// `SiteShell` tree (a diagnostic that walked the mounted ancestor chain
 /// from the sidebar rail up to the `RenderView`, not just this file's own
 /// harness): `_SiteBody` (site_shell.dart) narrows the box `DocsLayout` is
-/// given down to `ElWidths.page`, centred, and every ancestor between that
+/// given down to `LayoutWidths.page`, centred, and every ancestor between that
 /// narrowing and the `Stack` — `DocsLayout`'s own outer `Column` and
 /// `Semantics`, `_SiteBody`'s own `ConstrainedBox`, and the render objects
 /// `SelectionArea` introduces — applies the identical gate against the
@@ -54,15 +54,27 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/button/page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' show MaterialApp;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets(
     'the sidebar and table-of-contents rails scroll from their escaped band',
     (WidgetTester tester) async {
-      // The rail only renders at ElBreakpoints.lg and wider, and the toc
-      // rail only at ElBreakpoints.xl and wider (1280) — 1600 clears both,
+      // The rail only renders at Breakpoints.lg and wider, and the toc
+      // rail only at Breakpoints.xl and wider (1280) — 1600 clears both,
       // and is the width the diagnosis's own inset arithmetic uses.
       const double viewportWidth = 1600;
       const double viewportHeight = 900;
@@ -70,14 +82,12 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
-      final ElThemeController controller = ElThemeController(
-        mode: ElThemeMode.dark,
-      );
+      final ThemeController controller = ThemeController(mode: ColorMode.dark);
       addTearDown(controller.dispose);
 
       // `_SiteBody` (site_shell.dart) is what actually narrows the box
       // `docs_layout.dart`'s own `LayoutBuilder` is given, down from the raw
-      // viewport to `ElWidths.page` (1200), centred — the exact shape that
+      // viewport to `LayoutWidths.page` (1200), centred — the exact shape that
       // makes `inset` positive and the escaped band exist. The bare
       // `SingleChildScrollView(child: ButtonDocPage())` harness
       // `docs_rail_height_test.dart` uses does NOT reproduce this: nothing
@@ -85,14 +95,16 @@ void main() {
       // rails never leave the Stack's own bounds. This harness adds back
       // the one piece of `_SiteBody`'s shape the defect actually depends on.
       await tester.pumpWidget(
-        ElTheme(
+        ThemeScope(
           controller: controller,
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             home: SingleChildScrollView(
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: ElWidths.page),
+                  constraints: const BoxConstraints(
+                    maxWidth: LayoutWidths.page,
+                  ),
                   child: const ButtonDocPage(),
                 ),
               ),
@@ -149,9 +161,13 @@ void main() {
               matching: find.byType(SingleChildScrollView),
             ),
           );
-      final SingleChildScrollView tocView = tester.widget<SingleChildScrollView>(
-        find.descendant(of: tocKey, matching: find.byType(SingleChildScrollView)),
-      );
+      final SingleChildScrollView tocView = tester
+          .widget<SingleChildScrollView>(
+            find.descendant(
+              of: tocKey,
+              matching: find.byType(SingleChildScrollView),
+            ),
+          );
       final ScrollController sidebarController = sidebarView.controller!;
       final ScrollController tocController = tocView.controller!;
 
@@ -174,7 +190,9 @@ void main() {
       expect(sidebarCatcher, findsOneWidget);
       expect(tocCatcher, findsOneWidget);
 
-      final RenderObject sidebarCatcherBox = tester.renderObject(sidebarCatcher);
+      final RenderObject sidebarCatcherBox = tester.renderObject(
+        sidebarCatcher,
+      );
       final RenderObject tocCatcherBox = tester.renderObject(tocCatcher);
 
       final HitTestResult sidebarHit = tester.hitTestOnBinding(
@@ -226,10 +244,14 @@ void main() {
             'a wheel notch must start a glide, not teleport the rail on the '
             'frame the event arrives.',
       );
-      await tester.pump(ElDurations.fast ~/ 2);
+      await tester.pump(MotionDurations.fast ~/ 2);
       final double sidebarMidway = sidebarController.offset;
-      expect(sidebarMidway, greaterThan(0.0), reason: 'the glide never started.');
-      await tester.pump(ElDurations.fast);
+      expect(
+        sidebarMidway,
+        greaterThan(0.0),
+        reason: 'the glide never started.',
+      );
+      await tester.pump(MotionDurations.fast);
       expect(
         sidebarController.offset,
         greaterThan(sidebarMidway),
@@ -246,10 +268,10 @@ void main() {
       );
       await tester.pump();
       expect(tocController.offset, equals(0.0));
-      await tester.pump(ElDurations.fast ~/ 2);
+      await tester.pump(MotionDurations.fast ~/ 2);
       final double tocMidway = tocController.offset;
       expect(tocMidway, greaterThan(0.0));
-      await tester.pump(ElDurations.fast);
+      await tester.pump(MotionDurations.fast);
       expect(
         tocController.offset,
         greaterThan(tocMidway),
@@ -268,7 +290,7 @@ void main() {
       // the 300px notch above already carried it to its `maxScrollExtent`,
       // so a second notch there would be a no-op no matter what handled it.
       // The sidebar's "Components" list is 55 rows and has room left.
-      await tester.pump(ElDurations.fast);
+      await tester.pump(MotionDurations.fast);
       final double sidebarBefore = sidebarController.offset;
       expect(
         sidebarBefore,
@@ -297,7 +319,7 @@ void main() {
         equals(sidebarBefore),
         reason: 'the rail body must glide too, not jump.',
       );
-      await tester.pump(ElDurations.fast * 2);
+      await tester.pump(MotionDurations.fast * 2);
       expect(sidebarController.offset, greaterThan(sidebarBefore));
     },
   );

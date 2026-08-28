@@ -1,8 +1,8 @@
 /// Public documentation metadata for the `input_group` component.
 ///
 /// Split off Phase F/J's merged `input_group` page, which documented three
-/// unrelated components (`ElInputGroup`, `ElButtonGroup`, `ElInputOtp`) on
-/// one route. This entry now covers `ElInputGroup` and its addon/button/text
+/// unrelated components (`InputGroup`, `ButtonGroup`, `InputOtp`) on
+/// one route. This entry now covers `InputGroup` and its addon/button/text
 /// family only: see `../button_group/meta.dart` and `../input_otp/meta.dart`
 /// for the other two, each its own route and its own `<name>Doc` const.
 ///
@@ -17,7 +17,7 @@ const ComponentDocEntry inputGroupDoc = ComponentDocEntry(
   name: 'input_group',
   title: 'Input group',
   description:
-      'ElInputGroup wraps a form control in a 40px pill-shaped container '
+      'InputGroup wraps a form control in a 40px pill-shaped container '
       'with optional leading and trailing addons: text, icons, or buttons, '
       'used for search prefixes, password visibility toggles, or unit '
       'indicators.',
@@ -25,18 +25,18 @@ const ComponentDocEntry inputGroupDoc = ComponentDocEntry(
     'button',
     'field',
     'input',
-    'machine-surface',
-    'press-motion',
+    'surface',
+    'press',
     'source-foundation',
   ],
   exports: <String>[
-    'ElInputGroup',
-    'ElInputGroupInput',
-    'ElInputGroupAddon',
-    'ElInputGroupText',
-    'ElInputGroupButton',
-    'ElInputGroupAlign',
-    'ElInputGroupButtonSize',
+    'InputGroup',
+    'InputGroupInput',
+    'InputGroupAddon',
+    'InputGroupText',
+    'InputGroupButton',
+    'InputGroupAlign',
+    'InputGroupButtonSize',
   ],
   sourcePath: 'lib/src/components/input_group.dart',
 );

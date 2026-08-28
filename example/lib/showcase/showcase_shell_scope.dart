@@ -2,7 +2,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// Shares the compact dock's scroll clearance without reserving shell layout.
 ///
@@ -19,7 +31,8 @@ class ShowcaseShellScope extends InheritedWidget {
   final bool compact;
 
   /// The dock's content height plus its visual breathing room.
-  static double get compactDockClearance => ElWidths.siteHeader + el(12);
+  static double get compactDockClearance =>
+      LayoutHeights.siteHeader + space(12);
 
   static double bottomOverlayClearanceOf(BuildContext context) {
     final ShowcaseShellScope? scope = context

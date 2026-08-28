@@ -5,7 +5,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 /// One queued release: an id for removal and the title it was created with.
 @immutable
@@ -51,7 +63,7 @@ class _ReleaseCardState extends State<ReleaseCard> {
   Widget _dialog({
     required Widget Function(BuildContext context, VoidCallback open) trigger,
   }) {
-    return ElDialog(
+    return Dialog(
       trigger: trigger,
       content: (BuildContext context, VoidCallback close) =>
           _ReleaseTitleDialog(onCreate: _add, onClose: close),
@@ -59,23 +71,23 @@ class _ReleaseCardState extends State<ReleaseCard> {
   }
 
   Widget _emptyState() {
-    return ElCardContent(
-      child: ElEmpty(
+    return CardContent(
+      child: Empty(
         children: <Widget>[
-          const ElEmptyHeader(
+          const EmptyHeader(
             children: <Widget>[
-              ElEmptyMedia(glyph: ElIconGlyph.plus, tone: ElIconTone.action),
-              ElEmptyTitle('Distribute your first track'),
-              ElEmptyDescription(
+              EmptyMedia(glyph: IconGlyph.plus, tone: IconTone.action),
+              EmptyTitle('Distribute your first track'),
+              EmptyDescription(
                 'Upload a master and we will start reaching listeners on '
                 'the major stores.',
               ),
             ],
           ),
-          ElEmptyContent(
+          EmptyContent(
             children: <Widget>[
               _dialog(
-                trigger: (BuildContext context, VoidCallback open) => ElButton(
+                trigger: (BuildContext context, VoidCallback open) => Button(
                   key: const ValueKey<String>('home-release-create'),
                   onPressed: open,
                   child: const Text('Create release'),
@@ -89,30 +101,30 @@ class _ReleaseCardState extends State<ReleaseCard> {
   }
 
   Widget _row(_Release release) {
-    return ElItem(
-      media: ElItemMedia(
-        child: const ElIcon(
-          ElIconGlyph.radio,
-          size: ElIconSize.sm,
-          tone: ElIconTone.muted,
+    return Item(
+      media: ItemMedia(
+        child: const Icon(
+          IconGlyph.radio,
+          size: IconSize.sm,
+          tone: IconTone.muted,
         ),
       ),
-      content: ElItemContent(
+      content: ItemContent(
         children: <Widget>[
-          ElItemTitle(release.title),
-          const ElItemDescription('Queued for distribution'),
+          ItemTitle(release.title),
+          const ItemDescription('Queued for distribution'),
         ],
       ),
-      actions: ElItemActions(
+      actions: ItemActions(
         children: <Widget>[
-          const ElBadge(label: 'Pending'),
-          ElButton(
+          const Badge(label: 'Pending'),
+          Button(
             key: ValueKey<String>('home-release-remove-${release.id}'),
-            variant: ElButtonVariant.ghost,
-            size: ElButtonSize.iconSm,
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.iconSm,
             label: 'Remove ${release.title}',
             onPressed: () => _remove(release.id),
-            child: const ElIcon(ElIconGlyph.x, size: ElIconSize.sm),
+            child: const Icon(IconGlyph.x, size: IconSize.sm),
           ),
         ],
       ),
@@ -122,24 +134,24 @@ class _ReleaseCardState extends State<ReleaseCard> {
   List<Widget> _filledState() {
     final int count = _releases.length;
     return <Widget>[
-      ElCardHeader(
-        title: const ElCardTitle('Releases'),
-        description: ElCardDescription(
+      CardHeader(
+        title: const CardTitle('Releases'),
+        description: CardDescription(
           '$count release${count == 1 ? '' : 's'} queued for distribution.',
         ),
       ),
-      ElCardContent(
-        child: ElItemGroup(
+      CardContent(
+        child: ItemGroup(
           children: <Widget>[
             for (final _Release release in _releases) _row(release),
           ],
         ),
       ),
-      ElCardFooter(
+      CardFooter(
         child: _dialog(
-          trigger: (BuildContext context, VoidCallback open) => ElButton(
+          trigger: (BuildContext context, VoidCallback open) => Button(
             key: const ValueKey<String>('home-release-add-another'),
-            variant: ElButtonVariant.outline,
+            variant: ButtonVariant.outline,
             contentAlignment: AlignmentDirectional.center,
             onPressed: open,
             child: const Text('Add another release'),
@@ -151,7 +163,7 @@ class _ReleaseCardState extends State<ReleaseCard> {
 
   @override
   Widget build(BuildContext context) {
-    return ElCard(
+    return Card(
       children: _releases.isEmpty ? <Widget>[_emptyState()] : _filledState(),
     );
   }
@@ -189,30 +201,28 @@ class _ReleaseTitleDialogState extends State<_ReleaseTitleDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return ElDialogContent(
+    return DialogContent(
       onClose: widget.onClose,
       children: <Widget>[
-        const ElDialogHeader(
-          children: <Widget>[ElDialogTitle('Create a release')],
-        ),
-        ElField(
+        const DialogHeader(children: <Widget>[DialogTitle('Create a release')]),
+        Field(
           label: 'Release title',
-          child: ElInput(
+          child: Input(
             key: const ValueKey<String>('home-release-title-input'),
             controller: _title,
             placeholder: 'My new single',
             onSubmitted: (_) => _create(),
           ),
         ),
-        ElDialogFooter(
+        DialogFooter(
           children: <Widget>[
-            ElButton(
+            Button(
               key: const ValueKey<String>('home-release-dialog-cancel'),
-              variant: ElButtonVariant.ghost,
+              variant: ButtonVariant.ghost,
               onPressed: widget.onClose,
               child: const Text('Cancel'),
             ),
-            ElButton(
+            Button(
               key: const ValueKey<String>('home-release-dialog-create'),
               onPressed: _create,
               child: const Text('Create'),

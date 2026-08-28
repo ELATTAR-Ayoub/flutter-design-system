@@ -20,6 +20,6 @@ const ComponentDocEntry spinnerDoc = ComponentDocEntry(
       'A looping indeterminate activity indicator that settles under reduced motion.',
   // registry/components/spinner.json's registryDependencies, verbatim.
   dependencies: <String>['icon', 'source-foundation'],
-  exports: <String>['ElSpinner'],
+  exports: <String>['Spinner'],
   sourcePath: 'lib/src/components/spinner.dart',
 );

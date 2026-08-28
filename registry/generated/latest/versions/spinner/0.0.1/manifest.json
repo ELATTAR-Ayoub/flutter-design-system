@@ -7,9 +7,9 @@
   "minFlutter": ">=3.44.8",
   "files": [
     {
-      "source": "lib/src/components/spinner.dart",
+      "source": "lib/src/components/ui/spinner.dart",
       "target": "@ui/spinner.dart",
-      "sha256": "e7d07b7384ba91c5b1a3b2ad9b7b1520c5abaf6ac1f1df0cf108db63b66ea123"
+      "sha256": "602395b4cb2f7b9e43165a861049d63e4e657bb23eec2fd8a411fd97ba53df44"
     }
   ],
   "registryDependencies": [
@@ -25,6 +25,6 @@
   "shaders": [],
   "licenses": [],
   "documentationRoute": "/components/spinner",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/spinner.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/spinner.dart",
   "deprecated": false
 }

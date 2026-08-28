@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "rules": [
+    {"from": "lib/src/components", "to": "lib/src/components/ui"},
+    {"from": "lib/src/effects", "to": "lib/src/components/ui"},
+    {"from": "lib/src/motion", "to": "lib/src/components/ui"},
+    {"from": "lib/src/foundation", "to": "lib/src/design_system/foundation"}
+  ],
+  "files": {
+    "lib/src/theme_scope.dart": "lib/src/design_system/foundation/theme_scope.dart",
+    "lib/src/text_layout.dart": "lib/src/design_system/foundation/text_layout.dart",
+    "lib/src/components/agent_console.dart": "lib/src/blocks/agent_console/agent_console.dart",
+    "lib/src/components/ui/premium_surface.dart": "lib/src/components/ui/premium_surface.dart",
+    "lib/src/components/ui/action_feedback.dart": "lib/src/components/ui/action_feedback.dart",
+    "lib/src/components/ui/feedback_surface.dart": "lib/src/components/ui/feedback_surface.dart",
+    "lib/src/components/ui/surface.dart": "lib/src/components/ui/surface.dart",
+    "lib/src/components/ui/background_effect.dart": "lib/src/components/ui/background_effect.dart",
+    "lib/src/components/ui/starfield.dart": "lib/src/components/ui/ambient_pattern.dart",
+    "lib/src/components/ui/voice_indicator.dart": "lib/src/components/ui/voice_indicator.dart",
+    "lib/src/components/ui/lift.dart": "lib/src/components/ui/hover_builder.dart",
+    "lib/src/components/ui/active_indicator.dart": "lib/src/components/ui/active_indicator.dart",
+    "lib/src/components/ui/content_change.dart": "lib/src/components/ui/content_change.dart"
+  }
+}

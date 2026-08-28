@@ -34,7 +34,7 @@ until phase 3 and moved here so it survives sessions.
   `window.scrollTo` and reads `window.scrollY`; the Flutter capture drives
   the gallery's js_interop seam (`__elScrollTo` / `__elScrollY`, installed
   by `example/lib/scroll_bridge*.dart`). Pixel matching cannot recover
-  advances — `ElPageGlow` is viewport-fixed, so scrolled content is never
+  advances — `BackgroundEffect` is viewport-fixed, so scrolled content is never
   a pure translation and SAD has no zero to find. The wheel path in
   `capture.js` survives only as a fallback for bundles without the seam;
   its totals over-append at the bottom clamp.
@@ -45,11 +45,11 @@ until phase 3 and moved here so it survives sessions.
   capture polls until two consecutive shots are pixel-stable before frame
   0 counts (~570px of phantom height otherwise).
 - **Two pages the stitcher cannot reach on its own.** The documentation
-  *error* states render `ElAlert`, whose `ElBloomCosmic` controllers
+  *error* states render `Alert`, whose `FeedbackSurface` controllers
   `repeat(reverse: true)` forever; the page never goes network-idle and
   `capture.js` dies on its 90s navigation timeout. Pass
   `--nav domcontentloaded`. This is the browser-side twin of the widget-test
-  rule that on any page containing `ElAlert` you `pump()` and never
+  rule that on any page containing `Alert` you `pump()` and never
   `pumpAndSettle()`.
 - **Narrow widths are `shot.js`, not `capture.js`.** The matcher's content clip
   (x∈[248,1424), y≥64) is the wide shell's own geometry. Below the sidebar

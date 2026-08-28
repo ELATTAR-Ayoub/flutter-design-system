@@ -23,7 +23,19 @@
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Form,
+        FormField,
+        Icon,
+        OverlayPortal,
+        RadioGroup,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
 
 import '../kit.dart';
 import '../nav.dart';
@@ -35,7 +47,7 @@ import '../token_swatch.dart';
 /// this file, so a page cannot end up named one thing in the sidebar and
 /// another at the top of itself. The blurb and the chips below are the page's
 /// own: the registry's differ, and that drift is the reference's (§12.1).
-final ElCategoryHit _here = findCategory('foundations', 'colors');
+final CategoryHit _here = findCategory('foundations', 'colors');
 
 /* ── The four ramps, as the reference declares them ──────────────────────── */
 
@@ -45,13 +57,13 @@ final ElCategoryHit _here = findCategory('foundations', 'colors');
 /// `--card`, `--muted` or `--accent`, so a ratio for them would be a number
 /// without a question, and the reference passes `measure: false`.
 const List<Widget> _monochrome = <Widget>[
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--background',
     name: 'Background',
     use: 'The page. White on light, zinc 950 on dark. Utility: bg-background.',
     measure: false,
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--card',
     name: 'Card',
     use:
@@ -59,7 +71,7 @@ const List<Widget> _monochrome = <Widget>[
         'Utilities: bg-card, bg-popover.',
     measure: false,
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--muted',
     name: 'Muted',
     use:
@@ -67,7 +79,7 @@ const List<Widget> _monochrome = <Widget>[
         'Utilities: bg-muted, border-border.',
     measure: false,
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--accent',
     name: 'Accent',
     use:
@@ -75,12 +87,12 @@ const List<Widget> _monochrome = <Widget>[
         'Utilities: bg-accent, border-input.',
     measure: false,
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--foreground',
     name: 'Foreground',
     use: 'All primary text. Utility: text-foreground.',
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--muted-foreground',
     name: 'Muted foreground',
     use:
@@ -92,7 +104,7 @@ const List<Widget> _monochrome = <Widget>[
 
 /// `#action`: the ink first, then the three ends of the ramp.
 const List<Widget> _action = <Widget>[
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-action-ink',
     name: 'Action ink',
     use:
@@ -100,21 +112,21 @@ const List<Widget> _action = <Widget>[
         'action colour allowed on text, icons and links. '
         'Utility: text-action-ink.',
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-action-bright',
     name: 'Action bright',
     use:
         'The lifted end. Ink on dark, and the focus ring there. Illegible as '
         'text on light — never name it directly.',
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-action',
     name: 'Action',
     use:
         'The fill. Drives --primary: buttons, selection, active nav. Never '
         'carries a glyph — put text-primary-foreground on top.',
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-action-dark',
     name: 'Action dark',
     use:
@@ -128,24 +140,24 @@ const List<Widget> _action = <Widget>[
 /// The order is not the action ramp's: mid comes second here and last-but-one
 /// there. Kept as shipped.
 const List<Widget> _value = <Widget>[
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-value-ink',
     name: 'Value ink',
     use:
         'The text-safe end, resolved per theme. Every figure, label and glyph '
         'that means worth.',
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-value',
     name: 'Value',
     use: 'Balances, rankings, premium actions, reward surfaces.',
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-value-bright',
     name: 'Value bright',
     use: "Reward moments and the foil gradient's top stop.",
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-value-dark',
     name: 'Value dark',
     use: 'Foil gradient floor, and ink on light.',
@@ -158,26 +170,26 @@ const List<Widget> _value = <Widget>[
 /// `--destructive`, which is shadcn's own and the only one of the four with a
 /// theme block behind it.
 const List<Widget> _state = <Widget>[
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-success',
     name: 'Success',
     use:
         'Completed, cleared, live, gained. Emerald rather than a plain green, '
         'to open a gap against lime.',
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-warning',
     name: 'Warning',
     use: 'Pending, needs attention, purchase limit approaching.',
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--color-info',
     name: 'Information',
     use:
         'Neutral notices and explainers. Cyan rather than blue, so a notice '
         'cannot be mistaken for the brand.',
   ),
-  ElTokenSwatch(
+  TokenSwatch(
     token: '--destructive',
     name: 'Destructive',
     use: "shadcn's own. Deletes, failed payments, validation errors.",
@@ -194,7 +206,7 @@ class ColorsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ElPageHeader(
+        PageHeader(
           eyebrow: _here.group.title,
           title: _here.category.title,
           blurb:
@@ -215,10 +227,10 @@ class ColorsPage extends StatelessWidget {
 
         // `Note … className="mb-12"`, before any section.
         Padding(
-          padding: EdgeInsets.only(bottom: el(12)),
-          child: ElNote(
+          padding: EdgeInsets.only(bottom: space(12)),
+          child: Note(
             title: 'Measured, not asserted',
-            child: ElRichText(
+            child: RichText(
               TextSpan(
                 children: <InlineSpan>[
                   const TextSpan(
@@ -228,7 +240,7 @@ class ColorsPage extends StatelessWidget {
                         'runtime. Nothing on this page is typed by hand, so it '
                         'cannot disagree with ',
                   ),
-                  ElCode.span('app/globals.css'),
+                  Code.span('app/globals.css'),
                   const TextSpan(
                     text:
                         ' — and it re-measures when you flip the theme, so '
@@ -236,16 +248,16 @@ class ColorsPage extends StatelessWidget {
                         'mode you are actually in. The rules that govern all '
                         'of it live in ',
                   ),
-                  ElCode.span('RULES.md'),
+                  Code.span('RULES.md'),
                   const TextSpan(text: '.'),
                 ],
               ),
-              ElType.small,
+              TextStyles.small,
             ),
           ),
         ),
 
-        ElSection(
+        Section(
           id: 'monochrome',
           title: 'Monochrome — zinc',
           description:
@@ -254,12 +266,12 @@ class ColorsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const ElTokenSwatchList(rows: _monochrome),
-              SizedBox(height: el(4)), // `mt-4`
-              ElNote(
-                tone: ElNoteTone.value,
+              const TokenSwatchList(rows: _monochrome),
+              SizedBox(height: space(4)), // `mt-4`
+              Note(
+                tone: NoteTone.value,
                 title: 'The one step that is not a mirror',
-                child: ElRichText(
+                child: RichText(
                   TextSpan(
                     children: <InlineSpan>[
                       const TextSpan(
@@ -272,9 +284,9 @@ class ColorsPage extends StatelessWidget {
                             'zinc 500, which this system shipped for a long '
                             'time: that clears AA on ',
                       ),
-                      ElCode.span('--background'),
+                      Code.span('--background'),
                       const TextSpan(text: ' and misses it on '),
-                      ElCode.span('--muted'),
+                      Code.span('--muted'),
                       const TextSpan(
                         text:
                             ' by a tenth of a point — and muted text on a '
@@ -286,14 +298,14 @@ class ColorsPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  ElType.small,
+                  TextStyles.small,
                 ),
               ),
             ],
           ),
         ),
 
-        ElSection(
+        Section(
           id: 'action',
           title: 'Action — the thing that acts',
           description:
@@ -304,13 +316,13 @@ class ColorsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const ElTokenSwatchList(rows: _action),
-              SizedBox(height: el(4)),
-              ElNote(
+              const TokenSwatchList(rows: _action),
+              SizedBox(height: space(4)),
+              Note(
                 title:
                     'One text-safe shade per theme — and it is not the same '
                     'shade',
-                child: ElRichText(
+                child: RichText(
                   TextSpan(
                     children: <InlineSpan>[
                       const TextSpan(
@@ -318,7 +330,7 @@ class ColorsPage extends StatelessWidget {
                             'The ratios above are measured live, so flip the '
                             'theme and watch them trade places. On dark, ',
                       ),
-                      ElCode.span('--color-action-bright'),
+                      Code.span('--color-action-bright'),
                       const TextSpan(
                         text:
                             ' clears AA and the deep end fails. On light it '
@@ -326,18 +338,18 @@ class ColorsPage extends StatelessWidget {
                             'which surface it is sitting on, so it never names '
                             'either end — it writes ',
                       ),
-                      ElCode.span('text-action-ink'),
+                      Code.span('text-action-ink'),
                       const TextSpan(
                         text:
                             ', and the theme block answers. The mid shade is '
                             'a fill in both themes and can never carry a '
                             'glyph; put ',
                       ),
-                      ElCode.span('text-primary-foreground'),
+                      Code.span('text-primary-foreground'),
                       const TextSpan(text: ' on top of it.'),
                     ],
                   ),
-                  ElType.small,
+                  TextStyles.small,
                 ),
               ),
             ],
@@ -346,17 +358,17 @@ class ColorsPage extends StatelessWidget {
 
         // The one section with no note: the value ramp follows the action
         // ramp's rule, and the reference does not restate it.
-        const ElSection(
+        const Section(
           id: 'value',
           title: 'Value — the thing that is worth something',
           description:
               'Balances, rankings, rewards, premium actions. Nothing '
               'else. It is lime today, and it follows the same ink rule the '
               'action ramp does.',
-          child: ElTokenSwatchList(rows: _value),
+          child: TokenSwatchList(rows: _value),
         ),
 
-        ElSection(
+        Section(
           id: 'state',
           title: 'State',
           description:
@@ -365,14 +377,14 @@ class ColorsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const ElTokenSwatchList(rows: _state),
-              SizedBox(height: el(4)),
-              ElNote(
-                tone: ElNoteTone.value,
+              const TokenSwatchList(rows: _state),
+              SizedBox(height: space(4)),
+              Note(
+                tone: NoteTone.value,
                 title: 'Why info is cyan and success is emerald',
                 // "in the same same row": the source breaks the line between
                 // the two, JSX collapses it, and the doubled word ships.
-                child: ElText(
+                child: StyledText(
                   'A state colour has one job: to be unmistakable for anything '
                   'else on the screen. Information used to be blue 400, which '
                   'stopped working the moment action became blue — a neutral '
@@ -383,27 +395,27 @@ class ColorsPage extends StatelessWidget {
                   'amber, and lime sits forty degrees away from it, where the '
                   'old value hue sat almost on top of it. That collision is '
                   'the one this rebrand fixed by accident.',
-                  ElType.small,
+                  TextStyles.small,
                 ),
               ),
             ],
           ),
         ),
 
-        ElSection(
+        Section(
           id: 'beyond',
           title: 'What is deliberately not a colour token',
           description:
               'Two things this system refuses to express as a colour, '
               'because a colour is the wrong tool for both.',
-          child: ElGrid(
+          child: Grid(
             sm: 2,
             children: <Widget>[
-              ElPanel(
+              Panel(
                 label: 'Texture',
-                child: ElRichText(
+                child: RichText(
                   TextSpan(
-                    style: ElText.styleOf(context, ElType.small),
+                    style: StyledText.styleOf(context, TextStyles.small),
                     children: <InlineSpan>[
                       const TextSpan(
                         text:
@@ -421,13 +433,13 @@ class ColorsPage extends StatelessWidget {
                             ', not a hue — a moving gradient, a foil ramp, '
                             'an iridescent bloom. Those live in ',
                       ),
-                      ElCode.span('globals.css'),
+                      Code.span('globals.css'),
                       const TextSpan(text: ' as utilities ('),
-                      ElCode.span('foil-value'),
+                      Code.span('premium-surface'),
                       const TextSpan(text: ', '),
-                      ElCode.span('bloom-cosmic'),
+                      Code.span('feedback-surface'),
                       const TextSpan(text: ', '),
-                      ElCode.span('sheen-action'),
+                      Code.span('action-feedback'),
                       const TextSpan(
                         text:
                             ') and are built from the two ramps above, so '
@@ -436,19 +448,19 @@ class ColorsPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  ElType.small,
+                  TextStyles.small,
                 ),
               ),
-              ElPanel(
+              Panel(
                 label: 'Meaning',
-                child: ElText(
+                child: StyledText(
                   'Nothing may be communicated by colour alone. A state ships '
                   'its glyph and its label as well as its hue; a status ships '
                   'its sentence. The four state colours above are a second '
                   'signal on top of a first one, never the only one — which is '
                   'also what keeps this system legible when both themes and '
                   'every form of colour-blindness are accounted for.',
-                  ElType.small,
+                  TextStyles.small,
                 ),
               ),
             ],
@@ -456,7 +468,7 @@ class ColorsPage extends StatelessWidget {
         ),
 
         // Colors is index 0 of foundations: no previous, next is Typography.
-        const ElPageFootNav(groupId: 'foundations', slug: 'colors'),
+        const PageFootNav(groupId: 'foundations', slug: 'colors'),
       ],
     );
   }
