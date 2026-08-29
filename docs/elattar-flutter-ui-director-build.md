@@ -122,3 +122,25 @@ repository (`lib/src/components/`, `lib/src/foundation/`).
 
 Rationale and tradeoffs:
 `docs/superpowers/reports/public-release/decisions/005-public-skill-location.md`.
+
+## 2026-08-30 — UI completeness restructure
+
+The skill was reorganised around a completeness contract. SKILL.md became a
+router; the guidance moved into fifteen references, five templates, and one
+script.
+
+- New references: `ui-contract.md`, `states.md`, `errors.md`, `feedback.md`,
+  `page-blueprint.md`, `component-spec.md`, `accessibility.md`, `responsive.md`,
+  `theming.md`, `copy.md`. `state-accessibility.md` and `platform-contracts.md`
+  were replaced by them and removed.
+- New templates: `ui-state.md` (a sealed `UiState` and `SubmitState`),
+  `app-error.md` (an eleven category taxonomy, a mapper, and the copy table),
+  `async-section.md`, `page-scaffold.md`, `component-doc.md`.
+- New script: `scripts/check_ui_completeness.dart`, a dependency free scanner
+  covering eight rules, with `--exclude`, `// ui-check: ignore`, and
+  `// ui-check: ignore-file`. Exit 1 on findings so it can gate a commit.
+- `verify.md` gained the scanner section and a completeness gate that must be
+  filled with evidence before a surface is called done.
+- The plugin description no longer claims an `El*` public API.
+
+Design record: `docs/superpowers/specs/2026-08-30-ui-completeness-contract-design.md`.

@@ -1,7 +1,7 @@
 {
   "name": "elattar-design-system",
   "version": "0.0.1",
-  "description": "Directs coding agents to build Flutter UI from the Elattar design system: public El* API discovery, foundation tokens, component placement, state and accessibility coverage, responsive contracts, and a verification ladder.",
+  "description": "Directs coding agents to build complete Flutter UI from the Elattar design system: public API discovery, foundation tokens, component placement, a required UI contract, full state coverage with skeletons and empty states, human error copy with a next step, feedback on every trigger, keyboard and screen-reader access, responsive structure, both themes, and a verification ladder with a completeness gate and scanner.",
   "author": {
     "name": "ELATTAR Ayoub",
     "url": "https://github.com/ELATTAR-Ayoub"
