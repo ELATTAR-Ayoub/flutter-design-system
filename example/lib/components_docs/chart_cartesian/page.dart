@@ -355,7 +355,6 @@ class ChartCartesianDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: chartCartesianDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: chartCartesianDoc.title,
       description: chartCartesianDoc.description,
     ),

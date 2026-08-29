@@ -268,7 +268,6 @@ class CheckboxDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: checkboxDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: checkboxDoc.title,
       description: checkboxDoc.description,
     ),

@@ -230,7 +230,6 @@ class AmbientPatternDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: ambientPatternDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / EFFECTS',
       title: ambientPatternDoc.title,
       description: ambientPatternDoc.description,
     ),

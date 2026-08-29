@@ -319,7 +319,6 @@ class ComboboxDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: comboboxDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: comboboxDoc.title,
       description: comboboxDoc.description,
     ),

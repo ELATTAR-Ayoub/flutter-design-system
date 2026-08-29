@@ -305,11 +305,7 @@ class NativeSelectDocPage extends StatelessWidget {
     final ComponentDocEntry entry = nativeSelectDoc;
     return DocsLayout(
       route: entry.route,
-      intro: DocsPageIntro(
-        eyebrow: 'COMPONENTS / BASE',
-        title: entry.title,
-        description: entry.description,
-      ),
+      intro: DocsPageIntro(title: entry.title, description: entry.description),
       breadcrumbs: const <BreadcrumbEntry>[
         BreadcrumbEntry.link('Components'),
         BreadcrumbEntry.page('Native Select'),

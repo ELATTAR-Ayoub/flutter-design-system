@@ -284,7 +284,6 @@ class MenubarDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: menubarDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: menubarDocSpec.title,
       description: menubarDocSpec.description,
     ),

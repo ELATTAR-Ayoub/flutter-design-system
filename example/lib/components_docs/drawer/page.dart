@@ -232,7 +232,6 @@ class DrawerDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: drawerDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / OVERLAYS',
       title: drawerDoc.title,
       description: drawerDoc.description,
     ),

@@ -192,7 +192,6 @@ class BackgroundEffectDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: backgroundEffectDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / EFFECTS',
       title: backgroundEffectDoc.title,
       description: backgroundEffectDoc.description,
     ),

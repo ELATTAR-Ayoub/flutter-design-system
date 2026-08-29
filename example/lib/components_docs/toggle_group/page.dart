@@ -388,7 +388,6 @@ class ToggleGroupDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: toggleGroupDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: toggleGroupDoc.title,
       description: toggleGroupDoc.description,
     ),

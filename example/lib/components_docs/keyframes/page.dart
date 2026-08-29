@@ -270,7 +270,6 @@ class KeyframesDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: keyframesDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / MOTION',
       title: keyframesDoc.title,
       description: keyframesDoc.description,
     ),

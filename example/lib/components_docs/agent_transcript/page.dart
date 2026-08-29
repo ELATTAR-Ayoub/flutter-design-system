@@ -284,7 +284,6 @@ class AgentTranscriptDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: agentTranscriptDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / AGENT',
       title: agentTranscriptDoc.title,
       description: agentTranscriptDoc.description,
     ),

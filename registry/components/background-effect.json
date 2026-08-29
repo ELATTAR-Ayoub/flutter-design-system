@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/background_effect.dart",
       "target": "@ui/background_effect.dart",
-      "sha256": "93e5b6031dcd76e189f5c753d040029768e8e0514461f4bbba533ab27f4aafb0"
+      "sha256": "3966bd04051dc4a9a254699d3db156856c33f927a91f24fe62bddd24d828de22"
     }
   ],
   "registryDependencies": [

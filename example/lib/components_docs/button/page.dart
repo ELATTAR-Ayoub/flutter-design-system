@@ -445,7 +445,6 @@ class ButtonDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: buttonDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: buttonDoc.title,
       description: buttonDoc.description,
     ),

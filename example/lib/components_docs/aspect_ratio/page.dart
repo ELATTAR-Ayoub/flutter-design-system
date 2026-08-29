@@ -238,7 +238,6 @@ class AspectRatioDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: aspectRatioDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: aspectRatioDoc.title,
       description: aspectRatioDoc.description,
     ),

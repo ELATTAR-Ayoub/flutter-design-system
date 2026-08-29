@@ -305,7 +305,6 @@ class TooltipDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: tooltipDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: tooltipDoc.title,
       description: tooltipDoc.description,
     ),

@@ -268,7 +268,6 @@ class ValidationRuleDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: validationRuleDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / PRIMITIVES',
       title: validationRuleDoc.title,
       description: validationRuleDoc.description,
     ),

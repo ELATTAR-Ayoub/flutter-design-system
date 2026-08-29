@@ -242,7 +242,7 @@ class Clock extends InheritedWidget {
 ///
 /// It is declared **here** rather than in `typography.dart` because that file
 /// has a single writer per wave and this wave is not it. It is a token, so it
-/// belongs under `lib/src/foundation/` — which is the rule the guard actually
+/// belongs under `lib/src/design_system/foundation/` — which is the rule the guard actually
 /// enforces — and it should move up to `ComponentTextStyles` the next time
 /// `typography.dart` is opened.
 class CalendarTextStyles {

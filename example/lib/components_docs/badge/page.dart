@@ -274,7 +274,6 @@ class BadgeDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: badgeDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: badgeDoc.title,
       description: badgeDoc.description,
     ),

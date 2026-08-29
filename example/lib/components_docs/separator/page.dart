@@ -267,7 +267,6 @@ class SeparatorDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: separatorDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: separatorDoc.title,
       description: separatorDoc.description,
     ),

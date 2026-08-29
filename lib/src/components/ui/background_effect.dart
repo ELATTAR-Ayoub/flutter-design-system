@@ -75,7 +75,7 @@ class BackgroundEffect extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
     return CustomPaint(
-      painter: _PageGlowPainter(
+      painter: _BackgroundEffectPainter(
         background: theme.background,
         glow: theme.pageGlow,
       ),
@@ -84,8 +84,11 @@ class BackgroundEffect extends StatelessWidget {
   }
 }
 
-class _PageGlowPainter extends CustomPainter {
-  const _PageGlowPainter({required this.background, required this.glow});
+class _BackgroundEffectPainter extends CustomPainter {
+  const _BackgroundEffectPainter({
+    required this.background,
+    required this.glow,
+  });
 
   final Color background;
   final Color glow;
@@ -136,6 +139,6 @@ class _PageGlowPainter extends CustomPainter {
       ]);
 
   @override
-  bool shouldRepaint(_PageGlowPainter old) =>
+  bool shouldRepaint(_BackgroundEffectPainter old) =>
       old.background != background || old.glow != glow;
 }

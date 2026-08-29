@@ -288,7 +288,6 @@ class BreadcrumbDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: breadcrumbDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: breadcrumbDoc.title,
       description:
           'Breadcrumb shows where the current page sits inside a '

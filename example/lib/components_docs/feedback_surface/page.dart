@@ -218,7 +218,6 @@ class FeedbackSurfaceDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: feedbackSurfaceDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / EFFECTS',
       title: feedbackSurfaceDoc.title,
       description: feedbackSurfaceDoc.description,
     ),

@@ -267,7 +267,6 @@ class SourceFoundationDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: sourceFoundationDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / FOUNDATIONS',
       title: sourceFoundationDoc.title,
       description: sourceFoundationDoc.description,
     ),

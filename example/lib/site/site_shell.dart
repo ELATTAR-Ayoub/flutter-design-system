@@ -21,6 +21,7 @@ import '../logo.dart';
 import '../shell.dart';
 import '../theme_toggle.dart';
 import 'site_navigation.dart';
+import '../docs/docs_rail_scroll.dart';
 import 'site_routes.dart';
 
 /// Shell-scoped toasts for public-site actions.
@@ -49,6 +50,11 @@ class SiteShell extends StatefulWidget {
 
 class _SiteShellState extends State<SiteShell> {
   final ScrollController _main = ScrollController();
+
+  /// Where the documentation left rail was last left, kept here rather than
+  /// in `DocsLayout` because this state is what survives a route change and
+  /// that one is not. See [DocsRailScrollScope].
+  final DocsRailScrollStore _railScroll = DocsRailScrollStore();
 
   /// A new page starts at its top.
   ///
@@ -129,6 +135,19 @@ class _SiteShellState extends State<SiteShell> {
       LayoutHeights.siteHeader,
     );
 
+    return DocsRailScrollScope(
+      store: _railScroll,
+      child: _body(context, theme, header, desktop, viewport),
+    );
+  }
+
+  Widget _body(
+    BuildContext context,
+    ThemeTokens theme,
+    double header,
+    bool desktop,
+    double viewport,
+  ) {
     return DefaultTextStyle(
       // `<body class="… text-foreground">`, exactly as `shell.dart:165` states
       // it for the documentation shell and `showcase/showcase_app.dart:151`

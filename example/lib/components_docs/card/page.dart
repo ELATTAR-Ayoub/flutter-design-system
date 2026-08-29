@@ -264,7 +264,6 @@ class CardDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: cardDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENT · CARD',
       title: cardDocSpec.title,
       description: cardDocSpec.description,
     ),

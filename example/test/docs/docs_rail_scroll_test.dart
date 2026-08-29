@@ -227,7 +227,12 @@ void main() {
       // the movement is animated (nothing on the event frame, something part
       // way through), and that it still arrives, which is the original
       // "the rail is present but inert" check unchanged.
-      expect(sidebarController.offset, equals(0.0));
+      // Not `equals(0)`: the rail opens on the row for the page being read
+      // (`DocsLayout`'s `_restoreOrRevealRail`), so its resting offset is
+      // wherever that row is. What this asserts is the delta a wheel notch
+      // produces, which is what "the rail is present but inert" was ever
+      // about.
+      final double sidebarResting = sidebarController.offset;
       final TestPointer sidebarPointer = TestPointer(
         1,
         PointerDeviceKind.mouse,
@@ -239,7 +244,7 @@ void main() {
       await tester.pump();
       expect(
         sidebarController.offset,
-        equals(0.0),
+        equals(sidebarResting),
         reason:
             'a wheel notch must start a glide, not teleport the rail on the '
             'frame the event arrives.',
@@ -248,7 +253,7 @@ void main() {
       final double sidebarMidway = sidebarController.offset;
       expect(
         sidebarMidway,
-        greaterThan(0.0),
+        greaterThan(sidebarResting),
         reason: 'the glide never started.',
       );
       await tester.pump(MotionDurations.fast);
@@ -260,17 +265,21 @@ void main() {
             'ScrollController — the rail is present but inert.',
       );
 
-      expect(tocController.offset, equals(0.0));
+      // The toc rail has no selected row to reveal, so it does still rest
+      // at zero — asserted rather than assumed, so this stays a real
+      // starting point rather than a coincidence.
+      final double tocResting = tocController.offset;
+      expect(tocResting, equals(0.0));
       final TestPointer tocPointer = TestPointer(2, PointerDeviceKind.mouse);
       tocPointer.hover(tocEscapedPoint);
       await tester.sendEventToBinding(
         tocPointer.scroll(const Offset(0.0, 300.0)),
       );
       await tester.pump();
-      expect(tocController.offset, equals(0.0));
+      expect(tocController.offset, equals(tocResting));
       await tester.pump(MotionDurations.fast ~/ 2);
       final double tocMidway = tocController.offset;
-      expect(tocMidway, greaterThan(0.0));
+      expect(tocMidway, greaterThan(tocResting));
       await tester.pump(MotionDurations.fast);
       expect(
         tocController.offset,

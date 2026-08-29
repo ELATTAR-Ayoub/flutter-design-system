@@ -204,7 +204,6 @@ class PressDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: pressDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / MOTION',
       title: pressDoc.title,
       description: pressDoc.description,
     ),

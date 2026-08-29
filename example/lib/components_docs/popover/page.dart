@@ -261,7 +261,6 @@ class PopoverDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: popoverDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: popoverDoc.title,
       description: popoverDoc.description,
     ),

@@ -279,7 +279,6 @@ class AgentAvatarDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: agentAvatarDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / AGENT',
       title: agentAvatarDoc.title,
       description: agentAvatarDoc.description,
     ),

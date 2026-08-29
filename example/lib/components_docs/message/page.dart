@@ -258,7 +258,6 @@ class MessageDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: messageDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENT · MESSAGE',
       title: messageDocSpec.title,
       description: messageDocSpec.description,
     ),

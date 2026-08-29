@@ -280,7 +280,6 @@ class RadioDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: radioDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: radioDocSpec.title,
       description: radioDocSpec.description,
     ),

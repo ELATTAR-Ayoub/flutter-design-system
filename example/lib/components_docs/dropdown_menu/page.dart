@@ -387,7 +387,6 @@ class DropdownMenuDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: dropdownMenuDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: dropdownMenuDocSpec.title,
       description: dropdownMenuDocSpec.description,
     ),

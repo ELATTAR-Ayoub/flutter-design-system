@@ -283,7 +283,6 @@ class MenuDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: menuDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / OVERLAYS',
       title: menuDoc.title,
       description: menuDoc.description,
     ),

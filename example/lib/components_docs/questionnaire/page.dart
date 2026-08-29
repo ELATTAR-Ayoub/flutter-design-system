@@ -258,7 +258,6 @@ class QuestionnaireDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: questionnaireDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: questionnaireDoc.title,
       description: questionnaireDoc.description,
     ),

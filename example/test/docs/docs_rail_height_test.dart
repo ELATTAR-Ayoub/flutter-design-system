@@ -46,13 +46,18 @@ void main() {
     );
     await tester.pump();
 
-    // The cap the implementation targets: the sticky header plus its own
-    // bottom gutter, not just the header. A regression that drops the
-    // gutter term but keeps the header term would still clear a bound of
-    // `viewportHeight - LayoutHeights.siteHeader` alone, so the full expression
-    // is pinned here, not a looser approximation of it.
+    // The cap the implementation targets: the sticky header, the gutter a
+    // pinned rail keeps below it, and the rail's own bottom gutter — not
+    // just the header. A regression that drops either gutter term but keeps
+    // the header term would still clear a bound of
+    // `viewportHeight - LayoutHeights.siteHeader` alone, so the full
+    // expression is pinned here, not a looser approximation of it.
+    //
+    // `space(6)` is `_railStickyGutter()` in docs_layout.dart, spelled out
+    // rather than imported: it is private, and a test that reads the
+    // implementation's own constant cannot catch that constant changing.
     final double railMaxHeight =
-        viewportHeight - LayoutHeights.siteHeader - space(4);
+        viewportHeight - LayoutHeights.siteHeader - space(6) - space(4);
 
     final Finder sidebarRail = find.byKey(
       const ValueKey<String>('docs-layout-sidebar'),
@@ -106,10 +111,10 @@ void main() {
     // constant cannot catch that constant changing.
     const double desktopMaxHeight = viewportHeight * 0.8; // 720
 
-    // The fold bound at this viewport is 900 - 64 - 16 = 820, so the
+    // The fold bound at this viewport is 900 - 64 - 24 - 16 = 796, so the
     // fraction is the tighter of the two and is what must actually bind. A
     // regression that dropped the fraction and kept only the fold bound
-    // would land at 820 and fail here.
+    // would land at 796 and fail here.
     for (final String key in const <String>[
       'docs-layout-sidebar',
       'docs-layout-toc',

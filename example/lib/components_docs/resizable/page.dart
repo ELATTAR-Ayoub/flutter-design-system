@@ -240,7 +240,6 @@ class ResizableDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: resizableDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: resizableDoc.title,
       description: resizableDoc.description,
     ),

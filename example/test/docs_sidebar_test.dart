@@ -415,6 +415,30 @@ void main() {
       expect(selected.properties.selected, isTrue);
     });
 
+    testWidgets('a page introduces itself with the group it is filed under', (
+      WidgetTester tester,
+    ) async {
+      _setViewSize(tester, const Size(1440, 900));
+      const Map<String, String> expected = <String, String>{
+        '/components/accordion': 'COMPONENTS',
+        '/components/premium_surface': 'COMPONENTS / EFFECTS',
+        '/components/agent-composer': 'COMPONENTS / AGENT',
+        '/components/chart': 'COMPONENTS / CHARTS',
+      };
+      for (final MapEntry<String, String> entry in expected.entries) {
+        await tester.pumpWidget(_page(entry.key));
+        await tester.pump();
+        expect(
+          find.byWidgetPredicate(
+            (Widget widget) =>
+                widget is StyledText && widget.text == entry.value,
+          ),
+          findsOneWidget,
+          reason: '${entry.key} should introduce itself as ${entry.value}',
+        );
+      }
+    });
+
     testWidgets('renders clean wide, narrow, text-scaled, light and dark', (
       WidgetTester tester,
     ) async {

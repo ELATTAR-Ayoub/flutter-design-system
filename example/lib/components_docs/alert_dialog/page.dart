@@ -306,7 +306,6 @@ class AlertDialogDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: alertDialogDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / OVERLAYS',
       title: alertDialogDoc.title,
       description: alertDialogDoc.description,
     ),

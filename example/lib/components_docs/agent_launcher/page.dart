@@ -202,7 +202,6 @@ class AgentLauncherDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: agentLauncherDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / AGENT',
       title: agentLauncherDoc.title,
       description: agentLauncherDoc.description,
     ),

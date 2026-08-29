@@ -238,7 +238,6 @@ class SurfaceDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: surfaceDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / EFFECTS',
       title: surfaceDoc.title,
       description: surfaceDoc.description,
     ),

@@ -301,7 +301,6 @@ class ProgressDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: progressDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: progressDoc.title,
       description: progressDoc.description,
     ),

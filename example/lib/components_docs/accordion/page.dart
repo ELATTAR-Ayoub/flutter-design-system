@@ -217,7 +217,6 @@ class AccordionDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: accordionDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: accordionDoc.title,
       description: accordionDoc.description,
     ),

@@ -293,7 +293,6 @@ class MarkerDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: markerDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / LAYOUT & UI',
       title: markerDoc.title,
       description: markerDoc.description,
     ),

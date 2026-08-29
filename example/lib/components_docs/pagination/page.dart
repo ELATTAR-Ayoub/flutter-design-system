@@ -372,7 +372,6 @@ class PaginationDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: paginationDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: paginationDoc.title,
       description:
           'Pagination is a centred row of cells, page links, an optional '

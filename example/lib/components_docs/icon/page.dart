@@ -261,7 +261,6 @@ class IconDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: iconDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / PRIMITIVES',
       title: iconDoc.title,
       description: iconDoc.description,
     ),

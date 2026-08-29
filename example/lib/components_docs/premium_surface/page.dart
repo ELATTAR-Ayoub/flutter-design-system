@@ -224,7 +224,6 @@ class PremiumSurfaceDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: premiumSurfaceDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / EFFECTS',
       title: premiumSurfaceDoc.title,
       description: premiumSurfaceDoc.description,
     ),

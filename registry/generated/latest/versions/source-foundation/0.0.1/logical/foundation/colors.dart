@@ -5,7 +5,7 @@
 /// (`D:/DESIGN/Design-System-2026-8/design-system/app/globals.css`).
 /// Line references in this file point at that stylesheet.
 ///
-/// This file and its siblings under `lib/src/foundation/` are the ONLY place in
+/// This file and its siblings under `lib/src/design_system/foundation/` are the ONLY place in
 /// the package where a literal is allowed; `test/token_guard_test.dart` enforces
 /// that. Every doc comment carries the CSS declaration it transcribes, so the
 /// file reads as a transcript rather than as a set of choices.

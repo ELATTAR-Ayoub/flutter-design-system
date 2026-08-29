@@ -253,7 +253,6 @@ class VoiceIndicatorDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: voiceIndicatorDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / AGENT',
       title: voiceIndicatorDoc.title,
       description: voiceIndicatorDoc.description,
     ),

@@ -499,7 +499,6 @@ class TextareaDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: textareaDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: textareaDoc.title,
       description: textareaDoc.description,
     ),

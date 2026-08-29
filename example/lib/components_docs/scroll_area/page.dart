@@ -241,7 +241,6 @@ class ScrollAreaDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: scrollAreaDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: scrollAreaDoc.title,
       description: scrollAreaDoc.description,
     ),

@@ -219,7 +219,6 @@ class IconSwapDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: iconSwapDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: iconSwapDoc.title,
       description: iconSwapDoc.description,
     ),

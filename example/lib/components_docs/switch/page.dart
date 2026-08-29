@@ -269,7 +269,6 @@ class SwitchDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: switchDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENT · SWITCH',
       title: switchDoc.title,
       description: switchDoc.description,
     ),

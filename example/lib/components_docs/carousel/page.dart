@@ -322,7 +322,6 @@ class CarouselDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: carouselDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / LAYOUT & UI',
       title: carouselDoc.title,
       description: carouselDoc.description,
     ),

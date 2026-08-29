@@ -213,7 +213,6 @@ class ContentChangeDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: contentChangeDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / MOTION',
       title: contentChangeDoc.title,
       description: contentChangeDoc.description,
     ),

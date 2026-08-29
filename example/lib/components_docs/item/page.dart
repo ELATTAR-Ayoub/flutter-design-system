@@ -329,7 +329,6 @@ class ItemDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: itemDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: itemDoc.title,
       description: itemDoc.description,
     ),

@@ -326,7 +326,6 @@ class ContextMenuDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: contextMenuDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: contextMenuDocSpec.title,
       description: contextMenuDocSpec.description,
     ),

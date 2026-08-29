@@ -262,15 +262,24 @@ ComponentDocEntry componentDoc(String name) =>
 /// animated, or both — hence "Effects" rather than "Animations", a label that
 /// would stop being true the moment a reader replaces the implementation.
 enum ComponentDocFamily {
-  components('Components'),
-  effects('Effects'),
-  agent('Agent'),
-  charts('Charts');
+  components('Components', 'COMPONENTS'),
+  effects('Effects', 'COMPONENTS / EFFECTS'),
+  agent('Agent', 'COMPONENTS / AGENT'),
+  charts('Charts', 'COMPONENTS / CHARTS');
 
-  const ComponentDocFamily(this.label);
+  const ComponentDocFamily(this.label, this.eyebrow);
 
   /// The sidebar and index heading for this family.
   final String label;
+
+  /// The kicker a page in this family prints above its title.
+  ///
+  /// Written out rather than derived from [label] with `toUpperCase()`:
+  /// `TextStyles.section` upper-cases at render time, and
+  /// `docs_no_uppercase_test.dart` fails any documentation source that
+  /// upper-cases by hand. Components says only "COMPONENTS" — the second
+  /// half would repeat the first.
+  final String eyebrow;
 }
 
 /// Reusable visual, interaction, and motion effects.
@@ -354,6 +363,25 @@ bool isConfiguredFamilyName(String name) {
   return effectsDocNames.contains(key) ||
       agentDocNames.contains(key) ||
       chartsDocNames.contains(key);
+}
+
+/// The eyebrow a component page prints above its title: the family the site
+/// files it under, in the site's own words.
+///
+/// Derived, never typed. Ninety-nine pages each carried a literal here, and
+/// between them they claimed eight different taxonomies — `COMPONENTS / BASE`,
+/// `/ PRIMITIVES`, `/ MOTION`, `/ LAYOUT & UI`, `/ OVERLAYS`,
+/// `/ FOUNDATIONS`, plus seven pages on a `COMPONENT · TOASTER` shape of
+/// their own — none of which matched the four groups the rail and the
+/// `/components` index actually use. A reader who arrived at Chart from the
+/// Charts group was told the page was `COMPONENTS / BASE`.
+///
+/// Null for a route that is not a component page, so `DocsLayout` can fall
+/// back to whatever eyebrow that page passes for itself.
+String? componentDocEyebrow(String route) {
+  final ComponentDocEntry? entry = componentDocForRoute(route);
+  if (entry == null) return null;
+  return componentDocFamily(entry).eyebrow;
 }
 
 /// Every [componentDocs] entry in [family], alphabetical by title.

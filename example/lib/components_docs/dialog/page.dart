@@ -235,7 +235,6 @@ class DialogDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: dialogDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / OVERLAYS',
       title: dialogDoc.title,
       description: dialogDoc.description,
     ),

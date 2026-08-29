@@ -220,7 +220,6 @@ class AgentAttachMenuDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: agentAttachMenuDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / AGENT',
       title: agentAttachMenuDoc.title,
       description: agentAttachMenuDoc.description,
     ),

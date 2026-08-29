@@ -330,7 +330,6 @@ class AvatarDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: avatarDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: avatarDoc.title,
       description:
           'Use Avatar to represent a person or account: a photo when one '

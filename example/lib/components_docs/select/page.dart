@@ -227,7 +227,6 @@ class SelectDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: selectDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: selectDoc.title,
       description: selectDoc.description,
     ),

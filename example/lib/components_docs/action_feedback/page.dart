@@ -211,7 +211,6 @@ class ActionFeedbackDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: actionFeedbackDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / EFFECTS',
       title: actionFeedbackDoc.title,
       description: actionFeedbackDoc.description,
     ),

@@ -251,7 +251,6 @@ class AgentSlashPaletteDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: agentSlashPaletteDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / AGENT',
       title: agentSlashPaletteDoc.title,
       description: agentSlashPaletteDoc.description,
     ),

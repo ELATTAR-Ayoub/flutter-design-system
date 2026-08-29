@@ -260,7 +260,6 @@ class FormDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: formDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: formDocSpec.title,
       description: formDocSpec.description,
     ),

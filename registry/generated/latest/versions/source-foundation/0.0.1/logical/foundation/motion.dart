@@ -1,7 +1,7 @@
 /// Motion tokens — a transcript of the reference's timing layer.
 ///
 /// Source of truth: `design-system/app/globals.css` L395–432.
-/// This file is inside `lib/src/foundation/`, the one place literals live.
+/// This file is inside `lib/src/design_system/foundation/`, the one place literals live.
 library;
 
 import 'package:flutter/animation.dart';

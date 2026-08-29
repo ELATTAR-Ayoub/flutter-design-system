@@ -277,7 +277,6 @@ class HoverCardDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: hoverCardDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: hoverCardDoc.title,
       description: hoverCardDoc.description,
     ),

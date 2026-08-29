@@ -61,6 +61,9 @@ List<File> _currentWebsiteSources(Directory root) {
 
 String _posix(String path) => path.replaceAll(r'\', '/');
 
+/// A literal newline, kept out of the reason strings this file builds.
+const String _newline = '\n';
+
 void main() {
   final Directory root = _repositoryRoot();
 
@@ -144,6 +147,24 @@ void main() {
         }
       }
       expect(offenders, isEmpty, reason: offenders.join('\n'));
+    });
+
+    test('no component page hand-types its own eyebrow', () {
+      // The kicker is derived from the catalog family
+      // (`componentDocEyebrow`). Ninety-nine pages used to type it, and
+      // between them claimed eight taxonomies that matched neither the rail
+      // nor each other — Chart introduced itself as "COMPONENTS / BASE"
+      // while the rail filed it under Charts. A page that starts typing one
+      // again is a page that can disagree with the group it is listed in.
+      final List<String> offenders = <String>[
+        for (final File file in Directory(
+          '${root.path}/example/lib/components_docs',
+        ).listSync(recursive: true).whereType<File>())
+          if (file.path.endsWith('page.dart') &&
+              file.readAsStringSync().contains('eyebrow:'))
+            _posix(file.path),
+      ];
+      expect(offenders, isEmpty, reason: offenders.join(_newline));
     });
 
     test('no source carries a retired public API name', () {

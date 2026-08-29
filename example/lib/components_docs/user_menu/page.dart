@@ -326,7 +326,6 @@ class UserMenuDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: userMenuDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / LAYOUT & UI',
       title: userMenuDoc.title,
       description: userMenuDoc.description,
     ),

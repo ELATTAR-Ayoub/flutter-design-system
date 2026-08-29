@@ -8,7 +8,7 @@
 /// become explicit: [ThemeScope] is the cascade, [StyledText] is the class.
 ///
 /// Nothing here restates a token — every value comes from
-/// `lib/src/foundation/`.
+/// `lib/src/design_system/foundation/`.
 library;
 
 import 'package:flutter/widgets.dart'

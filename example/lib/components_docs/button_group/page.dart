@@ -270,7 +270,6 @@ class ButtonGroupDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: buttonGroupDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: buttonGroupDoc.title,
       description: buttonGroupDoc.description,
     ),

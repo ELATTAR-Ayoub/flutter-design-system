@@ -343,7 +343,6 @@ class TableDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: tableDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: tableDoc.title,
       description: tableDoc.description,
     ),

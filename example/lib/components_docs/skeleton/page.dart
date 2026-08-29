@@ -308,7 +308,6 @@ class SkeletonDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: skeletonDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: skeletonDoc.title,
       description: skeletonDoc.description,
     ),

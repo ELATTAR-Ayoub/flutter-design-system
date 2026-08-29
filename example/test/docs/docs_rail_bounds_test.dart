@@ -141,6 +141,14 @@ void main() {
         const ValueKey<String>('docs-sidebar:/docs/installation'),
       );
       expect(row, findsOneWidget, reason: 'no rail row to tap at $width');
+      // The rail opens on the row for the page being read (`DocsLayout`'s
+      // `_restoreOrRevealRail`), which on the button page is far below
+      // Installation. Scroll the rail to the row before tapping it: what is
+      // under test here is horizontal escape — a row painted outside the
+      // boxes that gate its hit test — and where the rail happens to be
+      // scrolled to vertically has nothing to do with that.
+      await tester.ensureVisible(row);
+      await tester.pump();
       await tester.tap(row, warnIfMissed: false);
       await tester.pump();
       expect(

@@ -268,7 +268,6 @@ class SliderDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: sliderDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: sliderDoc.title,
       description: sliderDoc.description,
     ),

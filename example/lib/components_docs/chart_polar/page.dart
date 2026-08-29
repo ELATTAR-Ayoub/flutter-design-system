@@ -327,7 +327,6 @@ class ChartPolarDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: chartPolarDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: chartPolarDoc.title,
       description: chartPolarDoc.description,
     ),

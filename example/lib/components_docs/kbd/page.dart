@@ -266,11 +266,7 @@ class KbdDocPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DocsLayout(
     route: kbdDoc.route,
-    intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
-      title: kbdDoc.title,
-      description: kbdDoc.description,
-    ),
+    intro: DocsPageIntro(title: kbdDoc.title, description: kbdDoc.description),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
       BreadcrumbEntry.page('Kbd'),

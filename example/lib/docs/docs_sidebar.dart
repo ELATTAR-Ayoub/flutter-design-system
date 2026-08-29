@@ -86,14 +86,30 @@ class DocsSidebar extends StatelessWidget {
     super.key,
     required this.groups,
     required this.onNavigate,
+    this.selectedKey,
   });
 
   final List<DocsSidebarGroup> groups;
   final ValueChanged<String> onNavigate;
 
+  /// Attached to the one selected row, so an owner can scroll it into view.
+  ///
+  /// The rail is four groups and ninety-nine rows long: on a cold load of
+  /// `/components/voice-indicator` the selected row is far below the fold,
+  /// and a reader who followed a link has no way of knowing the rail even
+  /// knows where they are. `DocsLayout` uses this to put the current page on
+  /// screen the first time it mounts the rail. Null when nothing is
+  /// selected, and attached to the first selected row if a caller ever
+  /// breaks the one-selected-entry contract, since two widgets cannot share
+  /// a [GlobalKey].
+  final GlobalKey? selectedKey;
+
   @override
   Widget build(BuildContext context) {
     if (groups.isEmpty) return const SizedBox.shrink();
+    final DocsSidebarEntry? selected = <DocsSidebarEntry>[
+      for (final DocsSidebarGroup group in groups) ...group.items,
+    ].where((DocsSidebarEntry entry) => entry.selected).firstOrNull;
     return Semantics(
       container: true,
       label: 'Documentation navigation',
@@ -102,7 +118,12 @@ class DocsSidebar extends StatelessWidget {
         children: <Widget>[
           for (int i = 0; i < groups.length; i++) ...<Widget>[
             if (i > 0) SizedBox(height: space(6)),
-            _SidebarGroup(group: groups[i], onNavigate: onNavigate),
+            _SidebarGroup(
+              group: groups[i],
+              onNavigate: onNavigate,
+              selectedKey: selectedKey,
+              selected: selected,
+            ),
           ],
         ],
       ),
@@ -111,10 +132,17 @@ class DocsSidebar extends StatelessWidget {
 }
 
 class _SidebarGroup extends StatelessWidget {
-  const _SidebarGroup({required this.group, required this.onNavigate});
+  const _SidebarGroup({
+    required this.group,
+    required this.onNavigate,
+    required this.selectedKey,
+    required this.selected,
+  });
 
   final DocsSidebarGroup group;
   final ValueChanged<String> onNavigate;
+  final GlobalKey? selectedKey;
+  final DocsSidebarEntry? selected;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +159,11 @@ class _SidebarGroup extends StatelessWidget {
         SizedBox(height: space(3)),
         for (int i = 0; i < group.items.length; i++) ...<Widget>[
           if (i > 0) SizedBox(height: space(1)),
-          _SidebarRow(entry: group.items[i], onNavigate: onNavigate),
+          _SidebarRow(
+            key: identical(group.items[i], selected) ? selectedKey : null,
+            entry: group.items[i],
+            onNavigate: onNavigate,
+          ),
         ],
       ],
     );
@@ -153,7 +185,7 @@ class _SidebarGroup extends StatelessWidget {
 /// pill" rather than "an invisible one." It swaps directly on the same build
 /// that flips [_hovered] instead.
 class _SidebarRow extends StatefulWidget {
-  const _SidebarRow({required this.entry, required this.onNavigate});
+  const _SidebarRow({super.key, required this.entry, required this.onNavigate});
 
   final DocsSidebarEntry entry;
   final ValueChanged<String> onNavigate;

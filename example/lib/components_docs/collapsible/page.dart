@@ -250,7 +250,6 @@ class CollapsibleDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: collapsibleDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: collapsibleDoc.title,
       description: collapsibleDoc.description,
     ),

@@ -271,7 +271,6 @@ class SheetDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: sheetDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / OVERLAYS',
       title: sheetDoc.title,
       description: sheetDoc.description,
     ),

@@ -271,7 +271,6 @@ class InputGroupDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: inputGroupDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: inputGroupDoc.title,
       description: inputGroupDoc.description,
     ),

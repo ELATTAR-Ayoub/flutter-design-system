@@ -284,7 +284,6 @@ class AgentComposerDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: agentComposerDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / AGENT',
       title: agentComposerDoc.title,
       description: agentComposerDoc.description,
     ),

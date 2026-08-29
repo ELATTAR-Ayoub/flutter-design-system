@@ -508,7 +508,6 @@ class SidebarDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: sidebarDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: sidebarDoc.title,
       description: sidebarDoc.description,
     ),

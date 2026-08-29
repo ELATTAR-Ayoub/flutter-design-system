@@ -240,7 +240,6 @@ class SafeAreaDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: safeAreaDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / PRIMITIVES',
       title: safeAreaDoc.title,
       description: safeAreaDoc.description,
     ),

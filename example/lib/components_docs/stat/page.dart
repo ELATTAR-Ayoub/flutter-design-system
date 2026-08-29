@@ -262,7 +262,6 @@ class StatDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: statDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: statDocSpec.title,
       description: statDocSpec.description,
     ),

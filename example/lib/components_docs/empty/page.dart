@@ -265,7 +265,6 @@ class EmptyDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: emptyDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: emptyDoc.title,
       description: emptyDoc.description,
     ),

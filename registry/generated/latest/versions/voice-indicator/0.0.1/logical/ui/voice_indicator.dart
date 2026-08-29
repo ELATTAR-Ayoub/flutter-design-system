@@ -291,13 +291,13 @@ class VoiceIndicator extends StatefulWidget {
   /// all.
   @visibleForTesting
   static List<double> offsetsForSeed(int seed) =>
-      _VoiceOrbState._makeOffsets(seed).toList();
+      _VoiceIndicatorState._makeOffsets(seed).toList();
 
   @override
-  State<VoiceIndicator> createState() => _VoiceOrbState();
+  State<VoiceIndicator> createState() => _VoiceIndicatorState();
 }
 
-class _VoiceOrbState extends State<VoiceIndicator>
+class _VoiceIndicatorState extends State<VoiceIndicator>
     with SingleTickerProviderStateMixin {
   /// `offsets` — seven phases, `random() * Math.PI * 2`.
   late Float32List _offsets = _makeOffsets(widget.seed);
@@ -516,7 +516,7 @@ class _OrbPainter extends CustomPainter {
 
   final ui.FragmentShader shader;
   final ui.Image noise;
-  final _VoiceOrbState state;
+  final _VoiceIndicatorState state;
   final Color from;
   final Color to;
   final bool inverted;

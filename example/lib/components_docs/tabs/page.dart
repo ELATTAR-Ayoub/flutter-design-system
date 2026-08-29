@@ -385,7 +385,6 @@ class TabsDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: tabsDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: tabsDoc.title,
       description: tabsDoc.description,
     ),

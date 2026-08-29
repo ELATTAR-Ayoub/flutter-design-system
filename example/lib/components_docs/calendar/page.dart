@@ -372,7 +372,6 @@ class CalendarDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: calendarDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: calendarDoc.title,
       description: calendarDoc.description,
     ),

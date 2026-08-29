@@ -215,7 +215,6 @@ class MediaScrimDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: mediaScrimDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / EFFECTS',
       title: mediaScrimDoc.title,
       description: mediaScrimDoc.description,
     ),

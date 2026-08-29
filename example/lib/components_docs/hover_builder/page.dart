@@ -222,7 +222,6 @@ class HoverBuilderDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: hoverBuilderDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / MOTION',
       title: hoverBuilderDoc.title,
       description: hoverBuilderDoc.description,
     ),

@@ -369,7 +369,6 @@ class FieldDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: fieldDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: fieldDocSpec.title,
       description: fieldDocSpec.description,
     ),

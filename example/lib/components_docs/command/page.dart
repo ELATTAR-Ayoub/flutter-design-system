@@ -377,7 +377,6 @@ class CommandDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: commandDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: commandDocSpec.title,
       description: commandDocSpec.description,
     ),

@@ -254,7 +254,6 @@ class AttachmentDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: attachmentDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / AGENT',
       title: attachmentDoc.title,
       description: attachmentDoc.description,
     ),

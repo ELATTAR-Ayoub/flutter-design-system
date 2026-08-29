@@ -230,7 +230,6 @@ class ActiveIndicatorDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: activeIndicatorDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / MOTION',
       title: activeIndicatorDoc.title,
       description: activeIndicatorDoc.description,
     ),

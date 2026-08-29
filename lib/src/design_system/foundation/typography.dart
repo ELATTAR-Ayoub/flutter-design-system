@@ -7,7 +7,7 @@
 ///   * `.type-*` classes  L1018–1292 (`@layer components`)
 ///
 /// 1 CSS `rem` = 16px, so every `rem` below is written as its px value.
-/// This file is inside `lib/src/foundation/`, the one place literals live.
+/// This file is inside `lib/src/design_system/foundation/`, the one place literals live.
 library;
 
 import 'package:flutter/painting.dart';

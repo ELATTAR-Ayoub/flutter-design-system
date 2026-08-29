@@ -263,7 +263,6 @@ class SpinnerDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: spinnerDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / PRIMITIVES',
       title: spinnerDoc.title,
       description: spinnerDoc.description,
     ),

@@ -250,7 +250,6 @@ class AgentFaceDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: agentFaceDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / AGENT',
       title: agentFaceDoc.title,
       description: agentFaceDoc.description,
     ),

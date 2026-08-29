@@ -266,7 +266,6 @@ class MessageScrollerDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: messageScrollerDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENT · MESSAGE SCROLLER',
       title: messageScrollerDocSpec.title,
       description: messageScrollerDocSpec.description,
     ),

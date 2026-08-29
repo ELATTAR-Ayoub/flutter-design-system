@@ -259,7 +259,6 @@ class ToasterDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: toasterDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENT · TOASTER',
       title: toasterDoc.title,
       description: toasterDoc.description,
     ),

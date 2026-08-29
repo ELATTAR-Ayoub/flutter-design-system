@@ -284,7 +284,6 @@ class AgentHistoryDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: agentHistoryDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / AGENT',
       title: agentHistoryDoc.title,
       description: agentHistoryDoc.description,
     ),

@@ -330,7 +330,6 @@ class BubbleDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: bubbleDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENT · BUBBLE',
       title: bubbleDocSpec.title,
       description: bubbleDocSpec.description,
     ),

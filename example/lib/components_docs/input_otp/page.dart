@@ -279,7 +279,6 @@ class InputOtpDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: inputOtpDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: inputOtpDoc.title,
       description: inputOtpDoc.description,
     ),

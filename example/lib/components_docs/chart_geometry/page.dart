@@ -290,7 +290,6 @@ class ChartGeometryDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: chartGeometryDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / BASE',
       title: chartGeometryDoc.title,
       description: chartGeometryDoc.description,
     ),

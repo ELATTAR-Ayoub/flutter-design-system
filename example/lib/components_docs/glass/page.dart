@@ -244,7 +244,6 @@ class GlassDocPage extends StatelessWidget {
   Widget build(BuildContext context) => DocsLayout(
     route: glassDoc.route,
     intro: DocsPageIntro(
-      eyebrow: 'COMPONENTS / EFFECTS',
       title: glassDoc.title,
       description: glassDoc.description,
     ),

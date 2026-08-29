@@ -59,12 +59,17 @@ import 'package:flutter/widgets.dart'
 import 'package:flutter/gestures.dart';
 
 import '../components_docs/catalog.dart'
-    show ComponentDocEntry, ComponentDocFamily, componentDocsIn;
+    show
+        ComponentDocEntry,
+        ComponentDocFamily,
+        componentDocEyebrow,
+        componentDocsIn;
 import '../kit.dart' show Section;
 // The ambient router, so the rails navigate on pages that pass no callback.
 import '../shell.dart' show AppRouterScope;
 import '../site/site_routes.dart' show SiteRoute, SiteSection, siteRoutes;
 import 'docs_link.dart';
+import 'docs_rail_scroll.dart';
 import 'docs_sidebar.dart';
 
 export 'docs_link.dart' show DocsLink, DocsLinkRow;
@@ -86,6 +91,22 @@ export 'docs_sidebar.dart' show DocsSidebar, DocsSidebarEntry, DocsSidebarGroup;
 /// edge of the screen: the rail reads as a panel with room around it rather
 /// than as a column of text poured into the window.
 const double _railViewportFraction = 0.8;
+
+/// The gap a pinned rail keeps between its own top and the sticky header's
+/// underside.
+///
+/// [_StickyRail] used to pin a rail at exactly [LayoutHeights.siteHeader], so
+/// the moment the page scrolled far enough for a rail to stick, the rail's
+/// first group label sat flush against the header's bottom edge with nothing
+/// between them — the two surfaces read as one block, and the rail looked
+/// cropped rather than pinned. Its resting position has always had air above
+/// it (`SizedBox(height: space(6))` before the [Stack]); this is the same
+/// measure, kept while the rail is pinned.
+///
+/// The fold bound in [_DocsLayoutState.build] subtracts it too. A rail is
+/// only reachable while it ends above the fold, and pushing its top down by
+/// this much moves its bottom down by the same amount.
+double _railStickyGutter() => space(6);
 
 /// The rail [_DocsLayoutState.build] falls back to when a page supplies
 /// neither [DocsLayout.sidebarGroups] nor the legacy [DocsLayout.sidebar]
@@ -174,12 +195,19 @@ class DocsTocEntry {
 
 class DocsPageIntro {
   const DocsPageIntro({
-    required this.eyebrow,
+    this.eyebrow,
     required this.title,
     required this.description,
   });
 
-  final String eyebrow;
+  /// The kicker above the title, or null to let [DocsLayout] derive it.
+  ///
+  /// A component page leaves this out: its family is a fact the catalog
+  /// already knows (`componentDocEyebrow`), and ninety-nine pages typing it
+  /// by hand is ninety-nine chances to disagree with the rail — which is
+  /// exactly what happened. Pages outside the component tree, which have no
+  /// catalog entry to derive from, still state their own.
+  final String? eyebrow;
   final String title;
   final String description;
 }
@@ -243,12 +271,38 @@ class _DocsLayoutState extends State<DocsLayout> {
 
   /// Own their own scroll position, independent of the article's — see
   /// [_StickyRail].
-  final ScrollController _sidebarScroll = ScrollController(
+  ///
+  /// The left rail's starts wherever the reader left it. `SiteShell` sends
+  /// the *article* back to its top on every route change, which is right:
+  /// a new page starts at its top. The rail is not a new page — it is the
+  /// same list, and the row that was just clicked is the row the reader is
+  /// looking at — so it holds its offset instead, read from the shell-owned
+  /// [DocsRailScrollStore]. See [_restoreOrRevealRail] for the cold-load
+  /// case, where there is no offset to hold.
+  late final ScrollController _sidebarScroll = ScrollController(
     debugLabel: 'DocsLayout sidebar rail',
-  );
+    initialScrollOffset: _railStore?.offset ?? 0,
+  )..addListener(_rememberRailOffset);
   final ScrollController _tocScroll = ScrollController(
     debugLabel: 'DocsLayout toc rail',
   );
+
+  /// The shell's rail-offset cell, resolved once this state has a context.
+  DocsRailScrollStore? _railStore;
+
+  /// Marks the selected row so [_restoreOrRevealRail] can scroll to it.
+  final GlobalKey _selectedRow = GlobalKey(
+    debugLabel: 'DocsLayout selected sidebar row',
+  );
+
+  /// Whether this state has already decided where the rail starts. The
+  /// decision is made once per mounted page, not once per rebuild.
+  bool _railPlaced = false;
+
+  void _rememberRailOffset() {
+    if (!_sidebarScroll.hasClients) return;
+    _railStore?.offset = _sidebarScroll.position.pixels;
+  }
 
   /// One per rail — see [_SmoothRailScroll]. Held on the state, not rebuilt
   /// per frame, because each one carries the running target of an in-flight
@@ -281,7 +335,40 @@ class _DocsLayoutState extends State<DocsLayout> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Resolved before `_sidebarScroll` is first touched: the controller is
+    // `late` and reads `_railStore` for its initial offset, and the first
+    // thing to touch it is `build`, which always runs after this.
+    _railStore ??= DocsRailScrollScope.maybeOf(context);
+    if (_railPlaced) return;
+    _railPlaced = true;
+    WidgetsBinding.instance.addPostFrameCallback(
+      (Duration _) => _restoreOrRevealRail(),
+    );
+  }
+
+  /// Puts the rail where the reader left it, or — the first time in a
+  /// session, and on any cold load of a deep link — on the page they are
+  /// actually reading.
+  ///
+  /// The remembered offset is already applied by `initialScrollOffset`, so
+  /// there is nothing to do in that case. What is left is the other one: no
+  /// remembered offset, a rail ninety-nine rows long, and a selected row that
+  /// may be hundreds of pixels below the fold with nothing to say so.
+  /// [Scrollable.ensureVisible] with a mid-rail alignment puts it on screen
+  /// with its neighbours around it, which is what makes the rail readable as
+  /// "you are here" rather than "here is the alphabet".
+  void _restoreOrRevealRail() {
+    if (!mounted || _railStore?.offset != null) return;
+    final BuildContext? row = _selectedRow.currentContext;
+    if (row == null || !_sidebarScroll.hasClients) return;
+    Scrollable.ensureVisible(row, alignment: 0.5, duration: Duration.zero);
+  }
+
+  @override
   void dispose() {
+    _sidebarScroll.removeListener(_rememberRailOffset);
     _sidebarScroll.dispose();
     _tocScroll.dispose();
     super.dispose();
@@ -413,7 +500,10 @@ class _DocsLayoutState extends State<DocsLayout> {
     // rule reads as what it is, a desktop rule. See [_railViewportFraction].
     final double viewportHeight = MediaQuery.sizeOf(context).height;
     final double foldMaxHeight =
-        viewportHeight - LayoutHeights.siteHeader - space(4);
+        viewportHeight -
+        LayoutHeights.siteHeader -
+        _railStickyGutter() -
+        space(4);
     final double railMaxHeight = wide
         ? math.min(viewportHeight * _railViewportFraction, foldMaxHeight)
         : foldMaxHeight;
@@ -472,6 +562,7 @@ class _DocsLayoutState extends State<DocsLayout> {
     final Widget article = _Article(
       key: _article,
       intro: widget.intro,
+      eyebrow: widget.intro.eyebrow ?? componentDocEyebrow(widget.route),
       breadcrumbs: widget.breadcrumbs,
       toc: toc,
       previous: widget.previous,
@@ -628,6 +719,7 @@ class _DocsLayoutState extends State<DocsLayout> {
                                         child: DocsSidebar(
                                           groups: sidebarGroups,
                                           onNavigate: _navigate,
+                                          selectedKey: _selectedRow,
                                         ),
                                       ),
                                     ),
@@ -1012,6 +1104,10 @@ class _StickyRailState extends State<_StickyRail> {
   /// before that line is reached, and zero again once translating further
   /// would push the rail's own bottom past the article's.
   ///
+  /// The sticky line is the header's underside plus [_railStickyGutter], not
+  /// the header's underside itself: a rail pinned flush to the header reads
+  /// as part of it.
+  ///
   /// Reads render boxes straight from [GlobalKey]s rather than a
   /// [LayoutBuilder]: what is needed is each box's *position*, settled only
   /// after layout, not a constraint available while building. The one frame
@@ -1036,7 +1132,10 @@ class _StickyRailState extends State<_StickyRail> {
     final double staticTop = rest
         .localToGlobal(Offset.zero, ancestor: viewport)
         .dy;
-    final double wanted = math.max(0.0, LayoutHeights.siteHeader - staticTop);
+    final double wanted = math.max(
+      0.0,
+      LayoutHeights.siteHeader + _railStickyGutter() - staticTop,
+    );
     if (wanted == 0) return 0;
 
     final double articleBottom = article
@@ -1054,6 +1153,7 @@ class _Article extends StatelessWidget {
   const _Article({
     super.key,
     required this.intro,
+    required this.eyebrow,
     required this.breadcrumbs,
     required this.child,
     required this.toc,
@@ -1063,6 +1163,12 @@ class _Article extends StatelessWidget {
   });
 
   final DocsPageIntro intro;
+
+  /// Already resolved by [DocsLayout]: the page's own kicker, or the one the
+  /// catalog derives from the route. Null only for a page that states none
+  /// and has no catalog entry, and then nothing is drawn rather than a gap
+  /// where a kicker would be.
+  final String? eyebrow;
   final List<BreadcrumbEntry> breadcrumbs;
   final Widget child;
   final List<DocsTocEntry> toc;
@@ -1094,12 +1200,14 @@ class _Article extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              StyledText(
-                intro.eyebrow,
-                TextStyles.section,
-                color: theme.actionText,
-              ),
-              SizedBox(height: space(2)),
+              if (eyebrow != null) ...<Widget>[
+                StyledText(
+                  eyebrow!,
+                  TextStyles.section,
+                  color: theme.actionText,
+                ),
+                SizedBox(height: space(2)),
+              ],
               StyledText(
                 intro.title,
                 TextStyles.h1,
