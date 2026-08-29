@@ -27,7 +27,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/chart-polar",
+  "documentationRoute": "/components/chart_polar",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/chart_polar.dart",
   "exports": [
     "ChartDotSpec",

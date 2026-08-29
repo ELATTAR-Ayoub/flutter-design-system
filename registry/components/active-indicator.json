@@ -23,7 +23,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/active-indicator",
+  "documentationRoute": "/components/active_indicator",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/active_indicator.dart",
   "exports": [
     "ActiveIndicator"

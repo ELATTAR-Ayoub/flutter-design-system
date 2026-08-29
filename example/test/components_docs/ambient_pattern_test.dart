@@ -1,4 +1,4 @@
-/// Tests for the starfield effect documentation page.
+/// Tests for the ambient-pattern effect documentation page.
 ///
 /// **No `pumpAndSettle` anywhere in this file.** Both of AmbientPattern's sway
 /// `AnimationController`s call `repeat(reverse: true)` forever, so
@@ -58,8 +58,11 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// `AmbientPattern`'s own constructor parameters, and every field of the two
-/// data records it is built from (`lib/src/components/ui/starfield.dart`).
-const List<String> _starfieldConstructorParams = <String>['bloom2', 'hovered'];
+/// data records it is built from (`lib/src/components/ui/ambient_pattern.dart`).
+const List<String> _ambientPatternConstructorParams = <String>[
+  'bloom2',
+  'hovered',
+];
 const List<String> _clusterFields = <String>[
   'tile',
   'corner',
@@ -73,7 +76,7 @@ const List<String> _clusterFields = <String>[
 const List<String> _sparkleFields = <String>['opacity', 'x', 'y', 'scale'];
 
 void main() {
-  group('starfield docs page', () {
+  group('ambient pattern docs page', () {
     testWidgets(
       'renders the article, all three API tables, and every specimen this '
       'page claims to show',
@@ -94,7 +97,7 @@ void main() {
         await tester.pump();
 
         expect(
-          find.byKey(const ValueKey<String>('starfield-doc-article')),
+          find.byKey(const ValueKey<String>('ambient-pattern-doc-article')),
           findsOneWidget,
         );
 
@@ -105,7 +108,7 @@ void main() {
         await tester.pump();
         await tester.pump(MotionDurations.open);
 
-        for (final String param in _starfieldConstructorParams) {
+        for (final String param in _ambientPatternConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
         for (final String field in _clusterFields) {
@@ -120,10 +123,10 @@ void main() {
         expect(find.byType(AmbientPattern), findsNWidgets(4));
 
         for (final String key in <String>[
-          'starfield-preview:with',
-          'starfield-preview:without',
-          'starfield-host-height:short',
-          'starfield-host-height:tall',
+          'ambient-pattern-preview:with',
+          'ambient-pattern-preview:without',
+          'ambient-pattern-host-height:short',
+          'ambient-pattern-host-height:tall',
         ]) {
           expect(
             find.byKey(ValueKey<String>(key)),
@@ -243,7 +246,9 @@ void main() {
 
     test('the table of contents matches the declared sections', () {
       expect(
-        starfieldDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        ambientPatternDocSpec.toc
+            .map((DocsTocEntry entry) => entry.title)
+            .toList(),
         <String>[
           'Preview',
           'Installation',
@@ -260,11 +265,11 @@ void main() {
           'Source',
         ],
       );
-      final DocsTocEntry api = starfieldDocSpec.toc.firstWhere(
+      final DocsTocEntry api = ambientPatternDocSpec.toc.firstWhere(
         (DocsTocEntry e) => e.anchor == 'api',
       );
       expect(api.children.map((DocsTocEntry e) => e.anchor).toList(), <String>[
-        'api-elstarfield',
+        'api-elambientpattern',
         'api-elstarfieldcluster',
         'api-elsparkle',
       ]);
@@ -321,7 +326,7 @@ void main() {
         await tester.pump();
 
         expect(
-          find.byKey(const ValueKey<String>('starfield-doc-article')),
+          find.byKey(const ValueKey<String>('ambient-pattern-doc-article')),
           findsOneWidget,
         );
         expect(
@@ -355,7 +360,7 @@ void main() {
         await tester.pump();
 
         expect(
-          find.byKey(const ValueKey<String>('starfield-doc-article')),
+          find.byKey(const ValueKey<String>('ambient-pattern-doc-article')),
           findsOneWidget,
           reason: '$mode',
         );

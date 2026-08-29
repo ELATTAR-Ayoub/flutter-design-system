@@ -225,7 +225,7 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Package tests',
-            value: 'test/selection_control_test.dart',
+            value: 'test/selection_feedback_test.dart',
             description: 'Tests for the shared primitive.',
           ),
           const DocsInstallFact(
@@ -1003,7 +1003,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Verified',
             value: 'package tests + this docs specimen',
             description:
-                'test/selection_control_test.dart and '
+                'test/selection_feedback_test.dart and '
                 'example/test/components_docs/'
                 'selection_control_test.dart.',
           ),

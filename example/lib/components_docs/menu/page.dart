@@ -252,7 +252,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Package tests',
-            value: 'test/menu_test.dart',
+            value: 'test/menus_test.dart',
             description: 'MenuContent and the row model are covered there.',
           ),
           const DocsInstallFact(

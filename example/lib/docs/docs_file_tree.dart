@@ -197,7 +197,7 @@ class _SelectedFilePane extends StatelessWidget {
               // Without one, neither of them is a container either, so the
               // title text has nowhere of its own to land and merges into
               // the button's node instead, producing a label like
-              // "LIB/SHOTS/DEMO/A.DART\nCopy lib/shots/demo/a.dart".
+              // "LIB/COMPONENTS/UI/A.DART\nCopy lib/components/ui/a.dart".
               Semantics(
                 container: true,
                 child: ConstrainedBox(

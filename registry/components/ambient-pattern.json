@@ -23,7 +23,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/ambient-pattern",
+  "documentationRoute": "/components/ambient_pattern",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/ambient_pattern.dart",
   "exports": [
     "AmbientPattern",

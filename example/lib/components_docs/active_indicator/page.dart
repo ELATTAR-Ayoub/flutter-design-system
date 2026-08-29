@@ -73,18 +73,18 @@ final ComponentDocSpec slidingPillDocSpec = ComponentDocSpec(
       command: activeIndicatorDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/motion/active_indicator.dart',
+          path: 'lib/components/ui/active_indicator.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/active_indicator.dart's generated "
-              '@ui/active_indicator.dart payload into your motion folder.',
+              '@ui/active_indicator.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated active-indicator source here when using '
               'manual mode.',
         ),
         DocsCodeFile(
-          path: 'lib/motion/motion.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so ActiveIndicator is reachable the '
@@ -201,11 +201,11 @@ final ComponentDocSpec slidingPillDocSpec = ComponentDocSpec(
             description:
                 'ActiveIndicator has its own group in the shared motion '
                 'suite, including a reduced-motion group: there is no '
-                'dedicated sliding_pill_test.dart in the package yet.',
+                'dedicated active_indicator_test.dart in the package yet.',
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/sliding_pill_test.dart',
+            value: 'example/test/components_docs/active_indicator_test.dart',
             description:
                 'Covers this page: the article mounts, the full API table, '
                 'both real call sites, deselection, and both themes.',
@@ -238,7 +238,10 @@ class ActiveIndicatorDocPage extends StatelessWidget {
       BreadcrumbEntry.page('Active Indicator'),
     ],
     toc: slidingPillDocSpec.toc,
-    previous: const DocsPageLink(title: 'Lift', route: '/components/lift'),
+    previous: const DocsPageLink(
+      title: 'Hover Builder',
+      route: '/components/hover_builder',
+    ),
     next: const DocsPageLink(
       title: 'Content Change',
       route: '/components/content_change',

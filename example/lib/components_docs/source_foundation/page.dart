@@ -231,8 +231,8 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
           const DocsInstallFact(
             label: 'Package tests',
             value:
-                'test/colors_test.dart, test/typography_test.dart, '
-                'test/motion_test.dart, test/shadows_test.dart, '
+                'test/foundation_colors_test.dart, test/foundation_type_motion_test.dart, '
+                'test/motion_test.dart, test/effects_test.dart, '
                 'test/theme_scope_test.dart',
             description:
                 'Every foundation file has its own dedicated suite; '

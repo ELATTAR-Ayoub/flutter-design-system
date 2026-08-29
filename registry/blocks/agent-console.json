@@ -47,7 +47,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/blocks/agent-console",
+  "documentationRoute": "/components/agent-console",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/blocks/agent_console/agent_console.dart",
   "exports": [
     "AgentConsole",

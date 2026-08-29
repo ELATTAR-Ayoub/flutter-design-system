@@ -3,7 +3,7 @@
 /// Written from nothing: no page existed for this registry item before
 /// this file. Read end to end from `lib/src/components/ui/agent_face.dart`
 /// (404 lines, `parts/agent-face.tsx` ported) and from
-/// `test/agent_face_test.dart`.
+/// `test/agent_console_test.dart`.
 ///
 /// **Two objects share one slot, and the choice is not a style one.** The
 /// file's own docstring: the avatar draws the twenty states of an agent
@@ -218,7 +218,7 @@ final ComponentDocSpec agentFaceDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Package tests',
-            value: 'test/agent_face_test.dart',
+            value: 'test/agent_console_test.dart',
             description:
                 "The package's own coverage of AgentFace and its family.",
           ),

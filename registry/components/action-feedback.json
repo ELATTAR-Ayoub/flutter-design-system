@@ -23,7 +23,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/action-feedback",
+  "documentationRoute": "/components/action_feedback",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/action_feedback.dart",
   "exports": [
     "ActionFeedback"

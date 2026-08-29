@@ -75,18 +75,18 @@ final ComponentDocSpec foilValueDocSpec = ComponentDocSpec(
       command: premiumSurfaceDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/effects/premium_surface.dart',
+          path: 'lib/components/ui/premium_surface.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/premium_surface.dart's generated "
-              '@ui/premium_surface.dart payload into effects.',
+              '@ui/premium_surface.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated premium-surface source here when using '
               'manual mode.',
         ),
         DocsCodeFile(
-          path: 'lib/effects/effects.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so PremiumSurface is reachable the same '
@@ -198,7 +198,7 @@ final ComponentDocSpec foilValueDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/foil_value_test.dart',
+            value: 'example/test/components_docs/premium_surface_test.dart',
             description:
                 'Covers this page: the article mounts, the full API '
                 'table, and both themes at two viewport widths — never '

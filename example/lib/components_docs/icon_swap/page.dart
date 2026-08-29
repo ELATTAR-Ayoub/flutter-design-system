@@ -228,7 +228,10 @@ class IconSwapDocPage extends StatelessWidget {
     ],
     toc: iconSwapDocSpec.toc,
     previous: null,
-    next: const DocsPageLink(title: 'Lift', route: '/components/lift'),
+    next: const DocsPageLink(
+      title: 'Hover Builder',
+      route: '/components/hover_builder',
+    ),
     onNavigate: onNavigate,
     child: KeyedSubtree(
       key: const ValueKey<String>('icon-swap-doc-article'),

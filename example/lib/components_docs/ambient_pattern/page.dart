@@ -1,4 +1,4 @@
-/// Public documentation page for the `starfield` effect.
+/// Public documentation page for the `ambient-pattern` effect.
 ///
 /// **Why `EffectSection`, not `ShowcaseSection`.** [AmbientPattern] renders
 /// nothing on its own terms — it is `Positioned.fill` sparkle paint that
@@ -13,7 +13,7 @@
 /// 384-tall default shows almost no field, per the brief for this page.
 /// Host Height reproduces the source's own documented "measured catch": the
 /// two clusters are anchored and clipped, never rescaled, so a short host
-/// loses sparkles a tall one keeps — the exact fact `starfield.dart`'s
+/// loses sparkles a tall one keeps — the exact fact `ambient_pattern.dart`'s
 /// class doc records for a 69.125px Alert. Hover shows the per-cluster lean
 /// `AmbientPattern.hovered` drives.
 library;
@@ -39,9 +39,9 @@ import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
 
-final ComponentDocSpec starfieldDocSpec = ComponentDocSpec(
+final ComponentDocSpec ambientPatternDocSpec = ComponentDocSpec(
   name: 'ambient_pattern',
-  title: 'Starfield',
+  title: 'Ambient Pattern',
   description:
       'Thirteen hand-placed sparkles across two independently-swaying '
       'clusters, anchored to a corner and clipped to whatever box they '
@@ -67,30 +67,30 @@ final ComponentDocSpec starfieldDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'ambient-pattern has a real registry manifest: `elattar add ambient-pattern` '
-          'installs lib/src/components/ui/starfield.dart and resolves its two '
+          'installs lib/src/components/ui/ambient_pattern.dart and resolves its two '
           'registryDependencies automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: ambientPatternDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/effects/starfield.dart',
+          path: 'lib/components/ui/ambient_pattern.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/ui/starfield.dart's generated "
-              '@ui/starfield.dart payload into effects.',
+              "Copy lib/src/components/ui/ambient_pattern.dart's generated "
+              '@ui/ambient_pattern.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// Copy the generated starfield source here when using '
+              '// Copy the generated ambient-pattern source here when using '
               'manual mode.',
         ),
         DocsCodeFile(
-          path: 'lib/effects/effects.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so AmbientPattern, StarfieldCluster and '
               'Sparkle are reachable the same way the CLI path already '
               'makes them.',
-          code: "export 'starfield.dart';",
+          code: "export 'ambient_pattern.dart';",
         ),
       ],
     ),
@@ -113,7 +113,7 @@ final ComponentDocSpec starfieldDocSpec = ComponentDocSpec(
           'than rescaling to fit it. At 72px tall — close to the Alert\'s '
           'own measured ~69px padding box — the dense cluster\'s topmost '
           'sparkles fall outside the box and are clipped away, exactly '
-          'the catch starfield.dart\'s own class doc records. At 192px '
+          'the catch ambient_pattern.dart\'s own class doc records. At 192px '
           'tall the same cluster clears the box entirely and nothing is '
           'lost.',
       host: _HostHeightSpecimen(),
@@ -130,7 +130,7 @@ final ComponentDocSpec starfieldDocSpec = ComponentDocSpec(
           'about the cluster\'s own anchored corner — on MotionDurations.bloom '
           '(1000ms), independently of the sway that keeps running '
           'underneath it.',
-      host: _StarfieldHost(width: space(68), height: space(48)),
+      host: _AmbientPatternHost(width: space(68), height: space(48)),
       code: _hoverCode,
       label: 'Hover specimen view',
       minHeight: space(160),
@@ -142,7 +142,7 @@ final ComponentDocSpec starfieldDocSpec = ComponentDocSpec(
           'Every constructor parameter AmbientPattern declares, and every '
           'field of the two data records it is built from.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'AmbientPattern', anchor: 'api-elstarfield'),
+        DocsTocEntry(title: 'AmbientPattern', anchor: 'api-elambientpattern'),
         DocsTocEntry(
           title: 'StarfieldCluster',
           anchor: 'api-elstarfieldcluster',
@@ -205,14 +205,14 @@ final ComponentDocSpec starfieldDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/starfield_test.dart',
+            value: 'example/test/components_docs/ambient_pattern_test.dart',
             description:
                 'Covers this page: the article mounts, the API table, a '
                 'live hover on the host specimens, and both themes.',
           ),
           const DocsInstallFact(
             label: 'Edit these docs',
-            value: 'example/lib/components_docs/starfield/page.dart',
+            value: 'example/lib/components_docs/ambient_pattern/page.dart',
             description: 'This file.',
           ),
         ],
@@ -235,15 +235,15 @@ class AmbientPatternDocPage extends StatelessWidget {
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
-      BreadcrumbEntry.page('Starfield'),
+      BreadcrumbEntry.page('Ambient Pattern'),
     ],
-    toc: starfieldDocSpec.toc,
+    toc: ambientPatternDocSpec.toc,
     previous: null,
     next: null,
     onNavigate: onNavigate,
     child: KeyedSubtree(
-      key: const ValueKey<String>('starfield-doc-article'),
-      child: ComponentDocPage(spec: starfieldDocSpec, header: false),
+      key: const ValueKey<String>('ambient-pattern-doc-article'),
+      child: ComponentDocPage(spec: ambientPatternDocSpec, header: false),
     ),
   );
 }
@@ -259,8 +259,8 @@ Widget _caption(BuildContext context, String label) => StyledText(
 /// A themed panel with [AmbientPattern] hung over it as a `Positioned.fill`
 /// layer, and a [MouseRegion] driving the hover boolean the way a real host
 /// (an Alert, a toast) drives it in the corpus.
-class _StarfieldHost extends StatefulWidget {
-  const _StarfieldHost({
+class _AmbientPatternHost extends StatefulWidget {
+  const _AmbientPatternHost({
     required this.width,
     required this.height,
     this.hoverable = true,
@@ -271,10 +271,10 @@ class _StarfieldHost extends StatefulWidget {
   final bool hoverable;
 
   @override
-  State<_StarfieldHost> createState() => _StarfieldHostState();
+  State<_AmbientPatternHost> createState() => _AmbientPatternHostState();
 }
 
-class _StarfieldHostState extends State<_StarfieldHost> {
+class _AmbientPatternHostState extends State<_AmbientPatternHost> {
   bool _hovered = false;
 
   void _setHovered(bool value) {
@@ -354,8 +354,8 @@ class _PreviewSpecimen extends StatelessWidget {
           _caption(context, 'With AmbientPattern'),
           SizedBox(height: space(3)),
           KeyedSubtree(
-            key: const ValueKey<String>('starfield-preview:with'),
-            child: _StarfieldHost(
+            key: const ValueKey<String>('ambient-pattern-preview:with'),
+            child: _AmbientPatternHost(
               width: space(68),
               height: space(48),
               hoverable: false,
@@ -370,7 +370,7 @@ class _PreviewSpecimen extends StatelessWidget {
           _caption(context, 'Without'),
           SizedBox(height: space(3)),
           KeyedSubtree(
-            key: const ValueKey<String>('starfield-preview:without'),
+            key: const ValueKey<String>('ambient-pattern-preview:without'),
             child: _PlainPanel(width: space(68), height: space(48)),
           ),
         ],
@@ -408,8 +408,8 @@ class _HostHeightSpecimen extends StatelessWidget {
           _caption(context, '72px — an Alert-sized host'),
           SizedBox(height: space(3)),
           KeyedSubtree(
-            key: const ValueKey<String>('starfield-host-height:short'),
-            child: _StarfieldHost(
+            key: const ValueKey<String>('ambient-pattern-host-height:short'),
+            child: _AmbientPatternHost(
               width: space(68),
               height: space(18),
               hoverable: false,
@@ -424,8 +424,8 @@ class _HostHeightSpecimen extends StatelessWidget {
           _caption(context, '192px — nothing clipped'),
           SizedBox(height: space(3)),
           KeyedSubtree(
-            key: const ValueKey<String>('starfield-host-height:tall'),
-            child: _StarfieldHost(
+            key: const ValueKey<String>('ambient-pattern-host-height:tall'),
+            child: _AmbientPatternHost(
               width: space(68),
               height: space(48),
               hoverable: false,
@@ -488,8 +488,11 @@ class _ApiReferenceContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsAnchor(
-        id: 'api-elstarfield',
-        child: DocsApiTable(title: 'AmbientPattern', facts: _starfieldApiFacts),
+        id: 'api-elambientpattern',
+        child: DocsApiTable(
+          title: 'AmbientPattern',
+          facts: _ambientPatternApiFacts,
+        ),
       ),
       SizedBox(height: space(6)),
       const DocsAnchor(
@@ -527,7 +530,7 @@ class _KeyboardContent extends StatelessWidget {
   Widget build(BuildContext context) =>
       _bullets(ThemeScope.of(context), <String>[
         'AmbientPattern takes no focus and handles no key: there is no Focus, '
-            'no FocusNode and no onKeyEvent anywhere in starfield.dart.',
+            'no FocusNode and no onKeyEvent anywhere in ambient_pattern.dart.',
         'The hover it reacts to is not its own, either — hovered is a '
             'boolean the host hands in from its own MouseRegion; '
             'AmbientPattern\'s IgnorePointer keeps it from ever seeing a '
@@ -539,15 +542,16 @@ class _ResponsiveContent extends StatelessWidget {
   const _ResponsiveContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ThemeScope.of(context), <String>[
-        'No MediaQuery or breakpoint branching anywhere in starfield.dart.',
-        'What does vary with size is the host\'s own geometry, not the '
-            'viewport: both clusters are anchored and clipped rather than '
-            'rescaled, so which of the thirteen sparkles actually render is '
-            'a property of the box AmbientPattern is given — see Host Height '
-            'above, not a responsive rule in this file.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'No MediaQuery or breakpoint branching anywhere in ambient_pattern.dart.',
+    'What does vary with size is the host\'s own geometry, not the '
+        'viewport: both clusters are anchored and clipped rather than '
+        'rescaled, so which of the thirteen sparkles actually render is '
+        'a property of the box AmbientPattern is given — see Host Height '
+        'above, not a responsive rule in this file.',
+  ]);
 }
 
 class _DependenciesContent extends StatelessWidget {
@@ -558,18 +562,18 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/ui/starfield.dart — one file, three classes, '
+        'File: lib/src/components/ui/ambient_pattern.dart — one file, three classes, '
             'no companions.',
         'Flutter imports: dart:math, dart:ui, foundation.dart (@immutable, '
             '@visibleForTesting, listEquals), widgets.dart.',
-        'Foundation imports: ../components/icon_paths.dart (IconPaths, '
+        'Foundation imports: icon_paths.dart (IconPaths, '
             'the sparkle path and its viewBox), foundation/colors.dart '
             '(hslColor, OklabColor), foundation/motion.dart (effectiveMotionDuration, '
             'MotionDurations, MotionCurves), foundation/theme.dart, theme_scope.dart.',
         'registryDependencies, resolved automatically by `elattar add '
-            'starfield`: icon, source-foundation — copied verbatim from '
-            'registry/components/starfield.json.',
-        'Not a dependency of starfield.dart itself, but its one real '
+            'ambient-pattern`: icon, source-foundation — copied verbatim from '
+            'registry/components/ambient-pattern.json.',
+        'Not a dependency of ambient_pattern.dart itself, but its one real '
             'consumer in the corpus: FeedbackSurface mounts AmbientPattern '
             'internally whenever its own starfield parameter is true (the '
             'default), which is how it reaches an Alert and every toast.',
@@ -630,7 +634,7 @@ Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   ],
 );
 
-const List<DocsApiFact> _starfieldApiFacts = <DocsApiFact>[
+const List<DocsApiFact> _ambientPatternApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'bloom2',
     type: 'Color',

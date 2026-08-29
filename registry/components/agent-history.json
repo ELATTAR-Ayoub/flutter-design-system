@@ -53,7 +53,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/agent-history",
+  "documentationRoute": "/components/agent_history",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_history.dart",
   "exports": [
     "BlurSwitch",

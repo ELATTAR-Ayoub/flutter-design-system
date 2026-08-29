@@ -79,18 +79,18 @@ final ComponentDocSpec machineSurfaceDocSpec = ComponentDocSpec(
       command: surfaceDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/effects/surface.dart',
+          path: 'lib/components/ui/surface.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/surface.dart's generated "
-              '@ui/surface.dart payload into effects.',
+              '@ui/surface.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated surface source here when '
               'using manual mode.',
         ),
         DocsCodeFile(
-          path: 'lib/effects/effects.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so Surface is reachable the '
@@ -204,16 +204,15 @@ final ComponentDocSpec machineSurfaceDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Package tests',
-            value: 'test/effects_test.dart, test/components_test.dart',
+            value: 'test/surface_test.dart, test/components_test.dart',
             description:
-                'Surface has no dedicated machine_surface_test.dart: '
-                'its inset-ring geometry is asserted in effects_test.dart, '
-                'and every component that composes it is asserted where '
-                'that component is.',
+                'Group "Surface" and group "the inset ring" carry its own '
+                'geometry; every component that composes it is asserted '
+                'where that component is.',
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/machine_surface_test.dart',
+            value: 'example/test/components_docs/surface_test.dart',
             description:
                 'Covers this page: the article mounts, the full API table, '
                 'and both themes at two viewport widths.',

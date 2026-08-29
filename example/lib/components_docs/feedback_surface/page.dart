@@ -67,18 +67,18 @@ final ComponentDocSpec bloomCosmicDocSpec = ComponentDocSpec(
       command: feedbackSurfaceDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/effects/feedback_surface.dart',
+          path: 'lib/components/ui/feedback_surface.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/feedback_surface.dart's generated "
-              '@ui/feedback_surface.dart payload into effects.',
+              '@ui/feedback_surface.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated feedback-surface source here when using '
               'manual mode.',
         ),
         DocsCodeFile(
-          path: 'lib/effects/effects.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so FeedbackSurface, BloomDrift, '
@@ -193,7 +193,7 @@ final ComponentDocSpec bloomCosmicDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/bloom_cosmic_test.dart',
+            value: 'example/test/components_docs/feedback_surface_test.dart',
             description:
                 'Covers this page: the article mounts, both API tables, '
                 'every named constructor rendering, and both themes.',
@@ -620,10 +620,10 @@ class _DependenciesContent extends StatelessWidget {
         'Foundation imports: foundation/colors.dart (OklabColor), '
             'foundation/motion.dart (effectiveMotionDuration, MotionDurations, '
             'MotionCurves), foundation/spacing.dart, foundation/theme.dart, '
-            'motion/keyframes.dart (Keyframes), theme_scope.dart, and '
-            'starfield.dart for the AmbientPattern it mounts internally.',
+            'keyframes.dart (Keyframes), theme_scope.dart, and '
+            'ambient_pattern.dart for the AmbientPattern it mounts internally.',
         'registryDependencies, resolved automatically by `elattar add '
-            'feedback-surface`: keyframes, source-foundation, starfield — '
+            'feedback-surface`: keyframes, source-foundation, ambient-pattern — '
             'copied verbatim from registry/components/feedback-surface.json.',
         'Not a dependency of feedback_surface.dart itself, but its real '
             'consumers in the corpus: Alert\'s five variants and every '
@@ -636,7 +636,10 @@ class _DependenciesContent extends StatelessWidget {
           const DocsLink(label: 'Alert', route: '/components/alert'),
           const DocsLink(label: 'Keyframes', route: '/components/keyframes'),
           const DocsLink(label: 'Toaster', route: '/components/toaster'),
-          const DocsLink(label: 'Starfield', route: '/components/starfield'),
+          const DocsLink(
+            label: 'Ambient Pattern',
+            route: '/components/ambient_pattern',
+          ),
         ],
       ),
     ],

@@ -33,7 +33,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/user-menu",
+  "documentationRoute": "/components/user_menu",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/user_menu.dart",
   "exports": [
     "UserMenu",

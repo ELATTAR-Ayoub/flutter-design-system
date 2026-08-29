@@ -26,7 +26,7 @@
   "fonts": [],
   "shaders": [],
   "licenses": [],
-  "documentationRoute": "/components/chart-cartesian",
+  "documentationRoute": "/components/chart_cartesian",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/chart_cartesian.dart",
   "deprecated": false
 }

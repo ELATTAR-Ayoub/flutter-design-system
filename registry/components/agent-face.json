@@ -31,7 +31,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/agent-face",
+  "documentationRoute": "/components/agent_face",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_face.dart",
   "exports": [
     "AgentAvatarBuilder",

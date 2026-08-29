@@ -1,4 +1,4 @@
-/// Public documentation page for the `lift` motion primitive.
+/// Public documentation page for the `hover-builder` component.
 ///
 /// **Why `EffectSection`, not `ShowcaseSection`.** Neither `HoverBuilder` nor
 /// `InteractiveCard` has a variant enum, and `HoverBuilder` in particular renders
@@ -45,9 +45,9 @@ import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
 
-final ComponentDocSpec liftDocSpec = ComponentDocSpec(
+final ComponentDocSpec hoverBuilderDocSpec = ComponentDocSpec(
   name: 'hover_builder',
-  title: 'Lift',
+  title: 'Hover Builder',
   description:
       'A hover rise — translateY(-3px) onto a deeper shadow, with an '
       'optional border-colour swap — for a card or tile that answers the '
@@ -71,29 +71,29 @@ final ComponentDocSpec liftDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'hover-builder has a real registry manifest: `elattar add hover-builder` installs '
-          'lib/src/components/ui/lift.dart and resolves its one registryDependency '
+          'lib/src/components/ui/hover_builder.dart and resolves its one registryDependency '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
       command: hoverBuilderDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/motion/lift.dart',
+          path: 'lib/components/ui/hover_builder.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/ui/lift.dart's generated @ui/lift.dart "
-              'payload into your motion folder.',
+              "Copy lib/src/components/ui/hover_builder.dart's generated @ui/hover_builder.dart "
+              'payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// Copy the generated lift source here when using manual '
+              '// Copy the generated hover-builder source here when using manual '
               'mode.',
         ),
         DocsCodeFile(
-          path: 'lib/motion/motion.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so HoverBuilder and InteractiveCard are reachable '
               'the same way the CLI path already makes them.',
-          code: "export 'lift.dart';",
+          code: "export 'hover_builder.dart';",
         ),
       ],
     ),
@@ -119,17 +119,17 @@ final ComponentDocSpec liftDocSpec = ComponentDocSpec(
       label: 'Index Card specimen view',
     ),
     EffectSection(
-      id: 'bare-lift',
-      title: 'Bare Lift',
+      id: 'bare',
+      title: 'Bare HoverBuilder',
       description:
           'HoverBuilder undressed: no card, no shadow, no border — just the hover '
           'boolean, handed to a builder that slides an arrow and recolours '
           'the label. Neither is anything HoverBuilder itself animates; both are '
           'the caller\'s own AnimatedPadding and colour swap, reacting to '
           'the flag HoverBuilder reports.',
-      host: _BareLiftSpecimen(),
-      code: _bareLiftCode,
-      label: 'Bare Lift specimen view',
+      host: _BareHoverBuilderSpecimen(),
+      code: _bareHoverBuilderCode,
+      label: 'Bare HoverBuilder specimen view',
     ),
     DisclosureSection(
       id: 'api',
@@ -139,8 +139,8 @@ final ComponentDocSpec liftDocSpec = ComponentDocSpec(
           'InteractiveCard declares — two tables, since the file exports two '
           'classes.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'HoverBuilder', anchor: 'api-ellift'),
-        DocsTocEntry(title: 'InteractiveCard', anchor: 'api-elliftcard'),
+        DocsTocEntry(title: 'HoverBuilder', anchor: 'api-elhoverbuilder'),
+        DocsTocEntry(title: 'InteractiveCard', anchor: 'api-elinteractivecard'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -192,19 +192,19 @@ final ComponentDocSpec liftDocSpec = ComponentDocSpec(
             value: 'test/motion_test.dart',
             description:
                 'Both HoverBuilder and InteractiveCard have their own groups in the '
-                'shared motion suite: there is no dedicated lift_test.dart '
+                'shared motion suite: there is no dedicated hover_builder_test.dart '
                 'in the package yet.',
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/lift_test.dart',
+            value: 'example/test/components_docs/hover_builder_test.dart',
             description:
                 'Covers this page: the article mounts, both API tables, a '
                 'live hover on each specimen, and both themes.',
           ),
           const DocsInstallFact(
             label: 'Edit these docs',
-            value: 'example/lib/components_docs/lift/page.dart',
+            value: 'example/lib/components_docs/hover_builder/page.dart',
             description: 'This file.',
           ),
         ],
@@ -227,9 +227,9 @@ class HoverBuilderDocPage extends StatelessWidget {
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
-      BreadcrumbEntry.page('Lift'),
+      BreadcrumbEntry.page('Hover Builder'),
     ],
-    toc: liftDocSpec.toc,
+    toc: hoverBuilderDocSpec.toc,
     previous: const DocsPageLink(
       title: 'Icon Swap',
       route: '/components/icon_swap',
@@ -240,8 +240,8 @@ class HoverBuilderDocPage extends StatelessWidget {
     ),
     onNavigate: onNavigate,
     child: KeyedSubtree(
-      key: const ValueKey<String>('lift-doc-article'),
-      child: ComponentDocPage(spec: liftDocSpec, header: false),
+      key: const ValueKey<String>('hover-builder-doc-article'),
+      child: ComponentDocPage(spec: hoverBuilderDocSpec, header: false),
     ),
   );
 }
@@ -273,7 +273,7 @@ class _PreviewSpecimen extends StatelessWidget {
               _caption(context, 'Lifts on hover'),
               SizedBox(height: space(3)),
               const KeyedSubtree(
-                key: ValueKey<String>('lift-preview:lifts'),
+                key: ValueKey<String>('hover-builder-preview:lifts'),
                 child: _LiftingCard(),
               ),
             ],
@@ -286,7 +286,7 @@ class _PreviewSpecimen extends StatelessWidget {
               _caption(context, 'Static'),
               SizedBox(height: space(3)),
               const KeyedSubtree(
-                key: ValueKey<String>('lift-preview:static'),
+                key: ValueKey<String>('hover-builder-preview:static'),
                 child: _StaticCard(),
               ),
             ],
@@ -353,7 +353,7 @@ class _IndexCardSpecimen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
     return KeyedSubtree(
-      key: const ValueKey<String>('lift-example:index-card'),
+      key: const ValueKey<String>('hover-builder-example:index-card'),
       child: SizedBox(
         width: space(80),
         child: InteractiveCard(
@@ -370,8 +370,8 @@ class _IndexCardSpecimen extends StatelessWidget {
               StyledText('Motion', TextStyles.h4, color: theme.foreground),
               SizedBox(height: space(2)),
               StyledText(
-                'Sliding pill, swap in, lift — the primitives every '
-                'interactive surface composes from.',
+                'Active indicator, content change, hover builder — the primitives '
+                'every interactive surface composes from.',
                 TextStyles.small,
                 color: theme.mutedForeground,
               ),
@@ -400,14 +400,14 @@ const String _indexCardCode =
     '  ),\n'
     ')';
 
-class _BareLiftSpecimen extends StatelessWidget {
-  const _BareLiftSpecimen();
+class _BareHoverBuilderSpecimen extends StatelessWidget {
+  const _BareHoverBuilderSpecimen();
 
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
     return KeyedSubtree(
-      key: const ValueKey<String>('lift-example:bare'),
+      key: const ValueKey<String>('hover-builder-example:bare'),
       child: HoverBuilder(
         cursor: SystemMouseCursors.click,
         builder: (BuildContext context, bool hovered) => Row(
@@ -434,7 +434,7 @@ class _BareLiftSpecimen extends StatelessWidget {
   }
 }
 
-const String _bareLiftCode =
+const String _bareHoverBuilderCode =
     'HoverBuilder(\n'
     '  builder: (context, hovered) => Row(\n'
     '    mainAxisSize: MainAxisSize.min,\n'
@@ -471,13 +471,19 @@ class _ApiReferenceContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsAnchor(
-        id: 'api-ellift',
-        child: DocsApiTable(title: 'HoverBuilder', facts: _liftApiFacts),
+        id: 'api-elhoverbuilder',
+        child: DocsApiTable(
+          title: 'HoverBuilder',
+          facts: _hoverBuilderApiFacts,
+        ),
       ),
       SizedBox(height: space(6)),
       const DocsAnchor(
-        id: 'api-elliftcard',
-        child: DocsApiTable(title: 'InteractiveCard', facts: _liftCardApiFacts),
+        id: 'api-elinteractivecard',
+        child: DocsApiTable(
+          title: 'InteractiveCard',
+          facts: _interactiveCardApiFacts,
+        ),
       ),
     ],
   );
@@ -511,7 +517,7 @@ class _KeyboardContent extends StatelessWidget {
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
         'Neither class takes focus or handles a key: no Focus, no '
-            'FocusNode, no onKeyEvent anywhere in lift.dart.',
+            'FocusNode, no onKeyEvent anywhere in hover_builder.dart.',
         'InteractiveCard.onTap fires only from GestureDetector\'s pointer tap — '
             'there is no keyboard path to it at all. A caller that needs '
             'Enter/Space to activate the same action must wrap it in its '
@@ -535,43 +541,45 @@ class _ResponsiveContent extends StatelessWidget {
   const _ResponsiveContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ThemeScope.of(context), <String>[
-        'No breakpoint branching anywhere in lift.dart: BuildContext width '
-            'is never read.',
-        'MotionTransforms.liftY (the -3px rise) is a fixed token regardless of '
-            'card size or viewport.',
-        'Touch parity is not addressed: MouseRegion.onEnter/onExit do not '
-            'fire from a touch tap on a platform with no hover concept, so '
-            'a touch-only visitor never sees the rise at all — only '
-            'whatever onTap does.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'No breakpoint branching anywhere in hover_builder.dart: BuildContext width '
+        'is never read.',
+    'MotionTransforms.liftY (the -3px rise) is a fixed token regardless of '
+        'card size or viewport.',
+    'Touch parity is not addressed: MouseRegion.onEnter/onExit do not '
+        'fire from a touch tap on a platform with no hover concept, so '
+        'a touch-only visitor never sees the rise at all — only '
+        'whatever onTap does.',
+  ]);
 }
 
 class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/ui/lift.dart: one file, two classes, no '
-            'companions; the registry manifest lists exactly one entry '
-            'under "files".',
-        'Flutter imports: package:flutter/widgets.dart only.',
-        'Foundation imports: foundation/colors.dart (transparent), '
-            'foundation/motion.dart (MotionDurations, MotionCurves, '
-            'effectiveMotionDuration, MotionTransforms.liftY), foundation/'
-            'shadows.dart (Shadows.lg), foundation/spacing.dart, '
-            'foundation/theme.dart, theme_scope.dart (ThemeScope).',
-        'registryDependencies, resolved automatically by `elattar add '
-            'lift`: source-foundation — copied verbatim from registry/'
-            'motion/lift.json.',
-        'Not a dependency of lift.dart itself, but its real consumers in '
-            'the corpus: example/lib/kit.dart\'s IndexCard, the layout '
-            'and motion pages\' own prev/next and demo cards — all site '
-            'chrome under example/lib/, none of it a documented registry '
-            'component to link here.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'File: lib/src/components/ui/hover_builder.dart: one file, two classes, no '
+        'companions; the registry manifest lists exactly one entry '
+        'under "files".',
+    'Flutter imports: package:flutter/widgets.dart only.',
+    'Foundation imports: foundation/colors.dart (transparent), '
+        'foundation/motion.dart (MotionDurations, MotionCurves, '
+        'effectiveMotionDuration, MotionTransforms.liftY), foundation/'
+        'shadows.dart (Shadows.lg), foundation/spacing.dart, '
+        'foundation/theme.dart, theme_scope.dart (ThemeScope).',
+    'registryDependencies, resolved automatically by `elattar add '
+        'hover-builder`: source-foundation — copied verbatim from '
+        'registry/components/hover-builder.json.',
+    'Not a dependency of hover_builder.dart itself, but its real consumers in '
+        'the corpus: example/lib/kit.dart\'s IndexCard, the layout '
+        'and motion pages\' own prev/next and demo cards — all site '
+        'chrome under example/lib/, none of it a documented registry '
+        'component to link here.',
+  ]);
 }
 
 class _ThemingContent extends StatelessWidget {
@@ -619,7 +627,7 @@ Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   ],
 );
 
-const List<DocsApiFact> _liftApiFacts = <DocsApiFact>[
+const List<DocsApiFact> _hoverBuilderApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'builder',
     type: 'Widget Function(BuildContext, bool hovered)',
@@ -635,7 +643,7 @@ const List<DocsApiFact> _liftApiFacts = <DocsApiFact>[
   ),
 ];
 
-const List<DocsApiFact> _liftCardApiFacts = <DocsApiFact>[
+const List<DocsApiFact> _interactiveCardApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'builder',
     type: 'Widget Function(BuildContext, bool hovered)',

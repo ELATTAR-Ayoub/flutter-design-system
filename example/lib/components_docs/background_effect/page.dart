@@ -69,18 +69,18 @@ final ComponentDocSpec pageGlowDocSpec = ComponentDocSpec(
       command: backgroundEffectDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/effects/background_effect.dart',
+          path: 'lib/components/ui/background_effect.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/background_effect.dart's generated "
-              '@ui/background_effect.dart payload into effects.',
+              '@ui/background_effect.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated background-effect source here when using '
               'manual mode.',
         ),
         DocsCodeFile(
-          path: 'lib/effects/effects.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so BackgroundEffect is reachable the same '
@@ -159,7 +159,7 @@ final ComponentDocSpec pageGlowDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Package tests',
-            value: 'test/machine_surface_test.dart',
+            value: 'test/surface_test.dart',
             description:
                 'Group "BackgroundEffect": both themes paint without error, the '
                 'ellipse\'s own 120%x90% geometry at 62%/34%, and the '
@@ -167,7 +167,7 @@ final ComponentDocSpec pageGlowDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/page_glow_test.dart',
+            value: 'example/test/components_docs/background_effect_test.dart',
             description:
                 'Covers this page: the article mounts, the API table, '
                 'both example composition, and both themes.',

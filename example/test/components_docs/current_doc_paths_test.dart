@@ -19,9 +19,11 @@
 ///     search would falsify it.
 library;
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:example/components_docs/catalog.dart';
+import 'package:example/site/site_routes.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The repository root, found by walking up from the test's working
@@ -99,6 +101,86 @@ void main() {
     });
   });
 
+  group('registry manifests', () {
+    /// Every hand-maintained manifest under `registry/`, decoded.
+    ///
+    /// The generated tree is not read: it is derived from these, so a wrong
+    /// route there is a symptom and a wrong route here is the cause.
+    List<MapEntry<String, Map<String, Object?>>> manifests() {
+      final List<MapEntry<String, Map<String, Object?>>> out =
+          <MapEntry<String, Map<String, Object?>>>[];
+      for (final String directory in <String>[
+        'components',
+        'foundations',
+        'blocks',
+      ]) {
+        final Directory dir = Directory('${root.path}/registry/$directory');
+        if (!dir.existsSync()) continue;
+        for (final File file in dir.listSync().whereType<File>()) {
+          if (!file.path.endsWith('.json')) continue;
+          out.add(
+            MapEntry<String, Map<String, Object?>>(
+              _posix(file.path),
+              jsonDecode(file.readAsStringSync()) as Map<String, Object?>,
+            ),
+          );
+        }
+      }
+      return out;
+    }
+
+    test('every documentationRoute resolves through siteRouteFor', () {
+      // The field was typed by hand and hyphenated by habit, while the site
+      // derives its routes from `ComponentDocEntry.name`, which is
+      // inconsistent by history — `agent-console` and `ambient_pattern` are
+      // both real. Thirty-four manifests pointed at a route nothing answers,
+      // and one pointed into a `/blocks/` tree the site does not serve. A
+      // consumer following a manifest's own link landed on the homepage.
+      final List<String> offenders = <String>[];
+      for (final MapEntry<String, Map<String, Object?>> entry in manifests()) {
+        final Object? route = entry.value['documentationRoute'];
+        expect(route, isA<String>(), reason: entry.key);
+        if (siteRouteFor(route! as String) == null) {
+          offenders.add('${entry.key} → $route');
+        }
+      }
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'these manifests link to a route no page answers:'
+            '$_newline${offenders.join(_newline)}',
+      );
+    });
+
+    test('every documentationRoute is the catalog entry it belongs to', () {
+      // Resolving is necessary but not sufficient: a manifest could point at
+      // some *other* real page. Pair each item with its catalog entry by the
+      // one thing both spell the same once separators are normalised.
+      String key(String name) => name.replaceAll('-', '_');
+      final Map<String, ComponentDocEntry> byKey = <String, ComponentDocEntry>{
+        for (final ComponentDocEntry entry in componentDocs)
+          key(entry.name): entry,
+      };
+      final List<String> offenders = <String>[];
+      for (final MapEntry<String, Map<String, Object?>> entry in manifests()) {
+        final String name = entry.value['name']! as String;
+        final ComponentDocEntry? doc = byKey[key(name)];
+        if (doc == null) {
+          offenders.add('${entry.key} → no catalog entry for $name');
+          continue;
+        }
+        if (entry.value['documentationRoute'] != doc.route) {
+          offenders.add(
+            '${entry.key} → ${entry.value['documentationRoute']} '
+            '(should be ${doc.route})',
+          );
+        }
+      }
+      expect(offenders, isEmpty, reason: offenders.join(_newline));
+    });
+  });
+
   group('current website copy', () {
     test('no source states lib/src/components/ without the ui segment', () {
       final List<String> offenders = <String>[];
@@ -149,6 +231,118 @@ void main() {
       expect(offenders, isEmpty, reason: offenders.join('\n'));
     });
 
+    test('every authored /components/ link resolves to a real page', () {
+      // The rail and the index build their links from the catalog, so they
+      // cannot dangle. Hand-written ones can, and did: `/components/lift`,
+      // `/components/starfield`, `/components/rule` and `/components/layout`
+      // all survived the rename as prev/next links and See-also rows,
+      // pointing at routes no page answers. `siteRouteFor` is the same
+      // resolver `main.dart` dispatches through, so a link that fails here
+      // is a link that lands a reader on the homepage.
+      final RegExp link = RegExp(r"'(/components/[a-z0-9_-]*)'");
+      final List<String> offenders = <String>[];
+      for (final File file in _currentWebsiteSources(root)) {
+        final List<String> lines = file.readAsStringSync().split('\n');
+        for (int i = 0; i < lines.length; i++) {
+          for (final RegExpMatch match in link.allMatches(lines[i])) {
+            final String route = match.group(1)!;
+            if (route == '/components/') continue;
+            if (siteRouteFor(route) == null) {
+              offenders.add('${_posix(file.path)}:${i + 1}  $route');
+            }
+          }
+        }
+      }
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'these authored links resolve to nothing and drop the reader on '
+            'the homepage:$_newline${offenders.join(_newline)}',
+      );
+    });
+
+    test('no source cites a retired file, manifest or install destination', () {
+      // Deliberately narrow: every entry is a full filename, manifest path,
+      // logical target or install destination, never a bare word. `starfield`
+      // on its own is still the name of a live FeedbackSurface parameter and
+      // of the visual pattern itself, and `lift` is what a card does on
+      // hover; neither may trip this.
+      const List<String> retired = <String>[
+        'starfield.dart',
+        'lift.dart',
+        'machine_surface.dart',
+        'page_glow.dart',
+        'sheen_action.dart',
+        'foil_value.dart',
+        'bloom_cosmic.dart',
+        'voice_orb.dart',
+        'sliding_pill.dart',
+        'swap_in.dart',
+        'nav_user.dart',
+        'registry/components/starfield.json',
+        'registry/components/lift.json',
+        'registry/components/machine-surface.json',
+        'registry/components/page-glow.json',
+        'registry/components/sheen-action.json',
+        'registry/components/foil-value.json',
+        'registry/components/bloom-cosmic.json',
+        'registry/components/voice-orb.json',
+        'registry/components/sliding-pill.json',
+        '@ui/starfield.dart',
+        '@ui/lift.dart',
+        'lib/effects/',
+        'lib/motion/',
+        'lib/shots/',
+      ];
+      final List<String> offenders = <String>[];
+      for (final File file in _currentWebsiteSources(root)) {
+        final String text = file.readAsStringSync();
+        for (final String name in retired) {
+          if (text.contains(name)) {
+            offenders.add('${_posix(file.path)} → $name');
+          }
+        }
+      }
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'these name a file, manifest or install destination that does '
+            'not exist:$_newline${offenders.join(_newline)}',
+      );
+    });
+
+    test('every test path a page cites exists', () {
+      // Total, not a blacklist. A "Tests" section that names a file nobody
+      // wrote is a claim about coverage that no one can check: eleven of
+      // these shipped, some renamed with their component
+      // (`sliding_pill_test.dart`), some purely aspirational
+      // (`example/test/sidebar_page_test.dart`). Both kinds read as evidence.
+      final RegExp cited = RegExp(
+        r"'((?:example/)?test/[a-z0-9_/]*[a-z0-9_]+_test\.dart)'",
+      );
+      final List<String> offenders = <String>[];
+      for (final File file in _currentWebsiteSources(root)) {
+        final List<String> lines = file.readAsStringSync().split('\n');
+        for (int i = 0; i < lines.length; i++) {
+          for (final RegExpMatch match in cited.allMatches(lines[i])) {
+            final String path = match.group(1)!;
+            if (!File('${root.path}/$path').existsSync()) {
+              offenders.add('${_posix(file.path)}:${i + 1}  $path');
+            }
+          }
+        }
+      }
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'these cite a test suite that does not exist:'
+            '$_newline${offenders.join(_newline)}',
+      );
+    });
+
     test('no component page hand-types its own eyebrow', () {
       // The kicker is derived from the catalog family
       // (`componentDocEyebrow`). Ninety-nine pages used to type it, and
@@ -188,6 +382,16 @@ void main() {
         'Sheen Action',
         'MachineSurface',
         'Machine Surface',
+        // Sentence case too: a section title or a sentence-initial name
+        // renders this way, and no ordinary sentence does. Deliberately not
+        // extended to 'Swap in', which is a normal imperative.
+        'Machine surface',
+        'Page glow',
+        'Sheen action',
+        'Foil value',
+        'Bloom cosmic',
+        'Voice orb',
+        'Sliding pill',
         'PageGlow',
         'Page Glow',
         'VoiceOrb',

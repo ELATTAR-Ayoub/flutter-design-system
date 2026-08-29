@@ -25,7 +25,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/agent-avatar",
+  "documentationRoute": "/components/agent_avatar",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_avatar.dart",
   "exports": [
     "AgentAvatar",

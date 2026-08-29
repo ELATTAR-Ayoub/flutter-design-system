@@ -18,7 +18,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/aspect-ratio",
+  "documentationRoute": "/components/aspect_ratio",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/aspect_ratio.dart",
   "exports": [
     "AspectRatio"

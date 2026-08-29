@@ -74,18 +74,18 @@ final ComponentDocSpec glassDocSpec = ComponentDocSpec(
       command: glassDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/effects/glass.dart',
+          path: 'lib/components/ui/glass.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/glass.dart's generated "
-              '@ui/glass.dart payload into effects.',
+              '@ui/glass.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated glass source here when using manual '
               'mode.',
         ),
         DocsCodeFile(
-          path: 'lib/effects/effects.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so all four glass widgets are '

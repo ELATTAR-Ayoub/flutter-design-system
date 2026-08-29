@@ -26,7 +26,7 @@
   "fonts": [],
   "shaders": [],
   "licenses": [],
-  "documentationRoute": "/components/feedback-surface",
+  "documentationRoute": "/components/feedback_surface",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/feedback_surface.dart",
   "deprecated": false
 }

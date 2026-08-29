@@ -2,9 +2,9 @@
 ///
 /// `feedback-surface` HAS a real `registry/components/feedback-surface.json` manifest:
 /// [dependencies] below is that manifest's own `registryDependencies` list,
-/// copied verbatim: `keyframes`, `source-foundation`, `starfield` —
+/// copied verbatim: `keyframes`, `source-foundation`, `ambient-pattern` —
 /// `keyframes` because the two drifts are built through `Keyframes.doubles`
-/// keyframe tables, and `starfield` because [FeedbackSurface] mounts
+/// keyframe tables, and `ambient-pattern` because [FeedbackSurface] mounts
 /// `AmbientPattern` itself whenever its own `starfield` parameter is true (the
 /// default). `page.dart` renders the real `elattar add feedback-surface`
 /// command from it.
@@ -32,7 +32,7 @@ const ComponentDocEntry feedbackSurfaceDoc = ComponentDocEntry(
       'variant\'s own two hues, swelling on hover — with the starfield\'s '
       'sparkles riding along over the top.',
   // registry/components/feedback-surface.json's own registryDependencies, verbatim.
-  dependencies: <String>['keyframes', 'source-foundation', 'starfield'],
+  dependencies: <String>['keyframes', 'source-foundation', 'ambient-pattern'],
   exports: <String>[
     'FeedbackSurface',
     'BloomDrift',

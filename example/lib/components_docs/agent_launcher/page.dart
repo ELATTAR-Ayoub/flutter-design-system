@@ -3,7 +3,7 @@
 /// Written from nothing: no page existed for this registry item before
 /// this file. Read end to end from `lib/src/components/ui/agent_launcher.dart`
 /// (387 lines, `agent-launcher.tsx` ported) and from
-/// `test/agent_launcher_test.dart`.
+/// `test/agent_console_test.dart`.
 ///
 /// **The trigger is fixed to the whole page, not to this card.** The live
 /// specimen below sits inside an `AgentLauncher`, genuinely positioned
@@ -170,7 +170,7 @@ final ComponentDocSpec agentLauncherDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Package tests',
-            value: 'test/agent_launcher_test.dart',
+            value: 'test/agent_console_test.dart',
             description: "The package's own coverage of AgentLauncher.",
           ),
           const DocsInstallFact(

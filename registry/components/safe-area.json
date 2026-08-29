@@ -18,7 +18,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/safe-area",
+  "documentationRoute": "/components/safe_area",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/safe_area.dart",
   "exports": [
     "SafeArea"

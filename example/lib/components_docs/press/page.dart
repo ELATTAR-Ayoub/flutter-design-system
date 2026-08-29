@@ -75,18 +75,18 @@ final ComponentDocSpec pressMotionDocSpec = ComponentDocSpec(
       command: pressDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/motion/press.dart',
+          path: 'lib/components/ui/press.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/press.dart's generated "
-              '@ui/press.dart payload into your motion folder.',
+              '@ui/press.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated press source here when using manual '
               'mode.',
         ),
         DocsCodeFile(
-          path: 'lib/motion/motion.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so Press is reachable the same way '
@@ -178,7 +178,7 @@ final ComponentDocSpec pressMotionDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/press_motion_test.dart',
+            value: 'example/test/components_docs/press_test.dart',
             description:
                 'Covers this page: the article mounts, the full API '
                 'table, a live pointer-down/up sequence on the Preview '

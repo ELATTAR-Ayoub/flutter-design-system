@@ -223,7 +223,7 @@ import 'components_docs/voice_indicator/meta.dart' as voice_indicator;
 import 'components_docs/voice_indicator/page.dart';
 import 'components_docs/icon_swap/meta.dart' as icon_swap;
 import 'components_docs/icon_swap/page.dart';
-import 'components_docs/hover_builder/meta.dart' as lift;
+import 'components_docs/hover_builder/meta.dart' as hover_builder;
 import 'components_docs/hover_builder/page.dart';
 import 'components_docs/active_indicator/meta.dart' as active_indicator;
 import 'components_docs/active_indicator/page.dart';
@@ -243,7 +243,7 @@ import 'components_docs/background_effect/meta.dart' as background_effect;
 import 'components_docs/background_effect/page.dart';
 import 'components_docs/action_feedback/meta.dart' as action_feedback;
 import 'components_docs/action_feedback/page.dart';
-import 'components_docs/ambient_pattern/meta.dart' as starfield;
+import 'components_docs/ambient_pattern/meta.dart' as ambient_pattern;
 import 'components_docs/ambient_pattern/page.dart';
 import 'components_docs/press/meta.dart' as press;
 import 'components_docs/press/page.dart';
@@ -837,7 +837,7 @@ final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
           VoiceIndicatorDocPage(onNavigate: onNavigate),
       icon_swap.iconSwapDoc.route: ({onNavigate}) =>
           IconSwapDocPage(onNavigate: onNavigate),
-      lift.hoverBuilderDoc.route: ({onNavigate}) =>
+      hover_builder.hoverBuilderDoc.route: ({onNavigate}) =>
           HoverBuilderDocPage(onNavigate: onNavigate),
       active_indicator.activeIndicatorDoc.route: ({onNavigate}) =>
           ActiveIndicatorDocPage(onNavigate: onNavigate),
@@ -857,7 +857,7 @@ final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
           BackgroundEffectDocPage(onNavigate: onNavigate),
       action_feedback.actionFeedbackDoc.route: ({onNavigate}) =>
           ActionFeedbackDocPage(onNavigate: onNavigate),
-      starfield.ambientPatternDoc.route: ({onNavigate}) =>
+      ambient_pattern.ambientPatternDoc.route: ({onNavigate}) =>
           AmbientPatternDocPage(onNavigate: onNavigate),
       press.pressDoc.route: ({onNavigate}) =>
           PressDocPage(onNavigate: onNavigate),

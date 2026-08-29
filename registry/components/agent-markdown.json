@@ -20,7 +20,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/agent-markdown",
+  "documentationRoute": "/components/agent_markdown",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_markdown.dart",
   "exports": [
     "AgentCodeBlock",

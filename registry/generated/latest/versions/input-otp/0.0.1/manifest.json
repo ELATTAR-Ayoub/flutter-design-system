@@ -34,7 +34,7 @@
   "fonts": [],
   "shaders": [],
   "licenses": [],
-  "documentationRoute": "/components/input-otp",
+  "documentationRoute": "/components/input_otp",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/input_otp.dart",
   "deprecated": false
 }

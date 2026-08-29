@@ -79,7 +79,7 @@ void main() {
             ),
           ),
         );
-        // A sliding pill re-measures via a post-frame callback: one extra
+        // The travelling pill re-measures via a post-frame callback: one extra
         // pump settles that without ever approaching pumpAndSettle.
         await tester.pump();
         await tester.pump();

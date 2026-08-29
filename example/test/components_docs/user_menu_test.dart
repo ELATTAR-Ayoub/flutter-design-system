@@ -72,7 +72,7 @@ const List<String> _sectionOrder = <String>[
 
 /// Every named constructor parameter each exported class declares
 /// (`lib/src/components/ui/user_menu.dart`), excluding `key`.
-const List<String> _navUserParams = <String>['user', 'items'];
+const List<String> _userMenuParams = <String>['user', 'items'];
 const List<String> _accountParams = <String>['name', 'email', 'avatar'];
 const List<String> _itemParams = <String>[
   'label',
@@ -134,7 +134,7 @@ void main() {
 
     test('the table of contents matches the declared sections', () {
       expect(
-        navUserDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        userMenuDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
         _sectionOrder,
       );
     });
@@ -182,14 +182,14 @@ void main() {
           .widgetList<UserMenu>(find.byType(UserMenu))
           .toList();
       expect(mounted.length, 3);
-      for (final UserMenu navUser in mounted) {
+      for (final UserMenu userMenu in mounted) {
         expect(
-          navUser.items.where((UserMenuItem i) => i.destructive),
+          userMenu.items.where((UserMenuItem i) => i.destructive),
           isNotEmpty,
           reason: 'no destructive item in a specimen',
         );
         expect(
-          navUser.items.every((UserMenuItem i) => i.label.isNotEmpty),
+          userMenu.items.every((UserMenuItem i) => i.label.isNotEmpty),
           isTrue,
         );
       }
@@ -231,7 +231,7 @@ void main() {
         await tester.pump(MotionDurations.open);
 
         for (final String param in <String>[
-          ..._navUserParams,
+          ..._userMenuParams,
           ..._accountParams,
           ..._itemParams,
         ]) {

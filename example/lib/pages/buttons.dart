@@ -95,7 +95,7 @@
 ///    copy says to add it "when it is a toggle": and its caption reads
 ///    "Playing"/"Paused", which is state. See [_PlayPauseDemo].
 /// 24. **`--shadow-btn`'s use copy names three variants and one wears it.** In
-///    the eight-cell variants grid, `outline` is a machine surface while
+///    the eight-cell variants grid, `outline` is an inset surface while
 ///    `secondary`, `destructive`, `ghost` and `link` are flat.
 library;
 

@@ -73,18 +73,18 @@ final ComponentDocSpec keyframesDocSpec = ComponentDocSpec(
       command: keyframesDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/motion/keyframes.dart',
+          path: 'lib/components/ui/keyframes.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/keyframes.dart's generated "
-              '@ui/keyframes.dart payload into your motion folder.',
+              '@ui/keyframes.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated keyframes source here when using '
               'manual mode.',
         ),
         DocsCodeFile(
-          path: 'lib/motion/motion.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so every table and KeyframePlayer '
@@ -1190,7 +1190,7 @@ const List<DocsApiFact> _apiFacts = <DocsApiFact>[
     name: 'OpenMotion',
     type: 'both · 420ms · ease-spring',
     description:
-        'Opacity, scale and translateY together: the sliding pill\'s own '
+        'Opacity, scale and translateY together: the active indicator\'s own '
         'arrival — opacity 0 → 1 by 60%, scale 0.92 → 1.02 → 1, translateY '
         '24px → -4px → 0.',
   ),

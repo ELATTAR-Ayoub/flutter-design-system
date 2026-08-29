@@ -1,5 +1,5 @@
 /// `/design-system/components/agent/avatar`: twenty isometric cube scenes,
-/// one per state, plus the voice orb.
+/// one per state, plus the orb face.
 ///
 /// The shortest agent page and the busiest render in the corpus: §states alone
 /// draws twenty avatars, nineteen of them isometric scenes holding up to twenty
@@ -66,7 +66,7 @@
 ///     header reads *Agent · Components*: the base pages' *"Base twice"* drift
 ///     in its agent-group form.
 ///  2. **Five contents chips against seven sections.** `nav.ts` lists *State
-///     set*, *Sizes*, *Accent knob*, *Voice orb* and *Reduced motion*;
+///     set*, *Sizes*, *Accent knob*, *Orb face* and *Reduced motion*;
 ///     §playground and §renderer are unlisted, and not one chip's text matches
 ///     the section title it points at (*State set* against *Twenty states*).
 ///  3. **The playground's buttons are labelled with wire ids, not labels.**
@@ -605,7 +605,7 @@ class _OrbSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Section(
       id: 'orb',
-      title: 'Voice orb',
+      title: 'Orb face',
       description:
           'The other face. Where the cube says what the agent is doing, the '
           'orb says that it is listening — it reacts to level rather than to '

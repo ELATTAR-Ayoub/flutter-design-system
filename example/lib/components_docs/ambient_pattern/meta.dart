@@ -1,9 +1,9 @@
-/// Public documentation metadata for the `starfield` effect.
+/// Public documentation metadata for the `ambient-pattern` effect.
 ///
-/// `starfield` HAS a real `registry/components/starfield.json` manifest:
+/// `ambient-pattern` HAS a real `registry/components/ambient-pattern.json` manifest:
 /// [dependencies] below is that manifest's own `registryDependencies` list,
 /// copied verbatim: `icon`, `source-foundation` — `icon` because
-/// `lib/src/components/ui/starfield.dart` paints each sparkle from
+/// `lib/src/components/ui/ambient_pattern.dart` paints each sparkle from
 /// `IconPaths.sparkleElement` / `IconPaths.viewBox` rather than declaring
 /// its own path data. `page.dart` renders the real `elattar add ambient-pattern`
 /// command from it.
@@ -30,7 +30,7 @@ const ComponentDocEntry ambientPatternDoc = ComponentDocEntry(
       'clusters, anchored to a corner and clipped to whatever box they '
       'hang off — the dust that rides along wherever feedback-surface hangs '
       'its corner light.',
-  // registry/components/starfield.json's own registryDependencies, verbatim.
+  // registry/components/ambient-pattern.json's own registryDependencies, verbatim.
   dependencies: <String>['icon', 'source-foundation'],
   exports: <String>['AmbientPattern', 'StarfieldCluster', 'Sparkle'],
   sourcePath: 'lib/src/components/ui/ambient_pattern.dart',

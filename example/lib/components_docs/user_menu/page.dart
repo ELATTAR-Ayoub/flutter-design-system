@@ -24,7 +24,7 @@
 ///
 /// **Split, 2026-08-24.** `UserMenu`, `UserMenuAccount`, and
 /// `UserMenuItem` used to be documented inside
-/// `components_docs/carousel/page.dart` under a single "Nav user" section.
+/// `components_docs/carousel/page.dart` under a single "User menu" section.
 /// They are their own barrel export and now own this page; nothing about
 /// carousel or marker appears here.
 ///
@@ -68,7 +68,7 @@ import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
 
-final ComponentDocSpec navUserDocSpec = ComponentDocSpec(
+final ComponentDocSpec userMenuDocSpec = ComponentDocSpec(
   name: 'user-menu',
   title: userMenuDoc.title,
   description: userMenuDoc.description,
@@ -223,9 +223,9 @@ final ComponentDocSpec navUserDocSpec = ComponentDocSpec(
           'lib/src/components/ui/user_menu.dart. The private _IdentityText '
           'widget is not part of the API and is not listed.',
       children: const <DocsTocEntry>[
-        DocsTocEntry(title: 'UserMenu', anchor: 'api-elnavuser'),
-        DocsTocEntry(title: 'UserMenuAccount', anchor: 'api-elnavuseraccount'),
-        DocsTocEntry(title: 'UserMenuItem', anchor: 'api-elnavuseritem'),
+        DocsTocEntry(title: 'UserMenu', anchor: 'api-elusermenu'),
+        DocsTocEntry(title: 'UserMenuAccount', anchor: 'api-elusermenuaccount'),
+        DocsTocEntry(title: 'UserMenuItem', anchor: 'api-elusermenuitem'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -333,7 +333,7 @@ class UserMenuDocPage extends StatelessWidget {
       BreadcrumbEntry.link('Components'),
       BreadcrumbEntry.page('User Menu'),
     ],
-    toc: navUserDocSpec.toc,
+    toc: userMenuDocSpec.toc,
     previous: const DocsPageLink(
       title: 'Native Select',
       route: '/components/native_select',
@@ -345,7 +345,7 @@ class UserMenuDocPage extends StatelessWidget {
     onNavigate: onNavigate,
     child: KeyedSubtree(
       key: const ValueKey<String>('user-menu-doc-article'),
-      child: ComponentDocPage(spec: navUserDocSpec, header: false),
+      child: ComponentDocPage(spec: userMenuDocSpec, header: false),
     ),
   );
 }
@@ -406,17 +406,17 @@ class _ApiReferenceContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       const DocsAnchor(
-        id: 'api-elnavuser',
-        child: DocsApiTable(title: 'UserMenu', facts: _navUserFacts),
+        id: 'api-elusermenu',
+        child: DocsApiTable(title: 'UserMenu', facts: _userMenuFacts),
       ),
       SizedBox(height: space(6)),
       const DocsAnchor(
-        id: 'api-elnavuseraccount',
+        id: 'api-elusermenuaccount',
         child: DocsApiTable(title: 'UserMenuAccount', facts: _accountFacts),
       ),
       SizedBox(height: space(6)),
       const DocsAnchor(
-        id: 'api-elnavuseritem',
+        id: 'api-elusermenuitem',
         child: DocsApiTable(title: 'UserMenuItem', facts: _itemFacts),
       ),
     ],
@@ -700,7 +700,7 @@ DropdownMenu(
   trigger: trigger,
 )''';
 
-const List<DocsApiFact> _navUserFacts = <DocsApiFact>[
+const List<DocsApiFact> _userMenuFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'user',
     type: 'UserMenuAccount',

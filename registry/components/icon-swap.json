@@ -23,7 +23,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/icon-swap",
+  "documentationRoute": "/components/icon_swap",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/icon_swap.dart",
   "exports": [
     "IconSwap"

@@ -235,7 +235,7 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
           ),
           DocsInstallFact(
             label: 'Package tests',
-            value: 'test/form_test.dart',
+            value: 'test/inputs_test.dart',
             description: 'Tests for the form state machine.',
           ),
           DocsInstallFact(
@@ -1133,7 +1133,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Verified',
             value: 'package tests + this docs specimen',
             description:
-                'test/form_test.dart and example/test/components_docs/'
+                'test/inputs_test.dart and example/test/components_docs/'
                 'form_test.dart.',
           ),
         ],
@@ -1143,7 +1143,10 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Button', route: '/components/button'),
-          DocsLink(label: 'Rule', route: '/components/rule'),
+          DocsLink(
+            label: 'Validation Rule',
+            route: '/components/validation_rule',
+          ),
         ],
       ),
     ],

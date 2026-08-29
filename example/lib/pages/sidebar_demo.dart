@@ -47,8 +47,8 @@
 /// `section-oracle.js` measures document height for a docs route inside the
 /// reading column; this page has neither. Its contract is behavioural: it
 /// mounts full-viewport, the panel collapses and expands, and the three shell
-/// knobs remount it: and that is what `example/test/sidebar_demo_test.dart`
-/// pins.
+/// knobs remount it. No suite pins that today: the claim that one did named a
+/// file nobody wrote.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';

@@ -82,7 +82,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 // `listEquals` is not among the names `widgets.dart` re-exports, so the
-// foundation import is load-bearing here exactly as it is in `machine_surface`.
+// foundation import is load-bearing here exactly as it is in `surface`.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart'
     hide
@@ -267,7 +267,7 @@ const ShadowStyle _controlSpec = ShadowStyle(<ShadowLayer>[
 
 /// How far past the shape a blurred outer layer still puts ink.
 ///
-/// The same arithmetic as `machine_surface.dart`'s private `_ringReach`, and
+/// The same arithmetic as `surface.dart`'s private `_ringReach`, and
 /// for the same reason: a Gaussian is spent by three sigma and sigma is half
 /// the CSS blur, so `1.5 × blur` would cover it and `2 × blur` is that with
 /// room to spare. The offset and spread move the ink before it is blurred; the

@@ -384,7 +384,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
         DocsTocEntry(title: 'SidebarMenuSkeleton', anchor: 'api-menu-skeleton'),
         DocsTocEntry(title: 'Sub-menu and field', anchor: 'api-sub-menu-field'),
         DocsTocEntry(title: 'Scopes', anchor: 'api-scopes'),
-        DocsTocEntry(title: 'UserMenu', anchor: 'api-navuser'),
+        DocsTocEntry(title: 'UserMenu', anchor: 'api-usermenu'),
       ],
       child: const _ApiReferenceContent(),
     ),
@@ -729,7 +729,7 @@ class _ApiReferenceContent extends StatelessWidget {
       ),
       SizedBox(height: space(5)),
       const DocsAnchor(
-        id: 'api-navuser',
+        id: 'api-usermenu',
         child: DocsApiTable(
           title: 'UserMenu (user_menu.dart)',
           facts: _apiUserMenuFacts,

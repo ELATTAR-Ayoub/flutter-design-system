@@ -20,7 +20,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/scroll-area",
+  "documentationRoute": "/components/scroll_area",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/scroll_area.dart",
   "exports": [
     "ScrollArea",

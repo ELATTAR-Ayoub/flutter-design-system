@@ -28,7 +28,7 @@
   "fonts": [],
   "shaders": [],
   "licenses": [],
-  "documentationRoute": "/components/selection-control",
+  "documentationRoute": "/components/selection_control",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/selection_control.dart",
   "deprecated": false
 }

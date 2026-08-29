@@ -77,9 +77,10 @@ failed download leaves your project untouched rather than half-installed.
   dependency-free validator, selection, selects and pickers, dialogs and
   overlays, menus, navigation, feedback, data display, charts, chat, layout
   primitives, sidebar, and a complete agent-console family.
-- **Effects and motion** — machine surface, page glow, sheen, foil, glass,
-  bloom, starfield, media scrim, the voice orb; lift/press, sliding pill,
-  keyframe player.
+- **Effects and motion** — surface, background effect, action feedback,
+  premium surface, glass, feedback surface, ambient pattern, media scrim,
+  the voice indicator; hover builder, press, active indicator, content
+  change, keyframes.
 - **Three faces** — Inter, Geist Mono and Redaction 35, wired into your
   `pubspec.yaml` under the family names the installed typography asks for.
 

@@ -34,7 +34,7 @@
   "fonts": [],
   "shaders": [],
   "licenses": [],
-  "documentationRoute": "/components/native-select",
+  "documentationRoute": "/components/native_select",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/native_select.dart",
   "deprecated": false
 }

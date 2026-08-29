@@ -18,7 +18,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/docs/foundations/rules",
+  "documentationRoute": "/components/validation_rule",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/validation_rule.dart",
   "exports": [
     "IssueMode",

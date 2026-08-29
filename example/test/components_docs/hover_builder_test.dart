@@ -50,9 +50,12 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter each exported class declares
-/// (`lib/src/components/ui/lift.dart`), excluding `key`.
-const List<String> _liftConstructorParams = <String>['builder', 'cursor'];
-const List<String> _liftCardConstructorParams = <String>[
+/// (`lib/src/components/ui/hover_builder.dart`), excluding `key`.
+const List<String> _hoverBuilderConstructorParams = <String>[
+  'builder',
+  'cursor',
+];
+const List<String> _interactiveCardConstructorParams = <String>[
   'builder',
   'radius',
   'fill',
@@ -65,7 +68,7 @@ const List<String> _liftCardConstructorParams = <String>[
 ];
 
 void main() {
-  group('lift docs page', () {
+  group('hover builder docs page', () {
     testWidgets(
       'renders the article, both API tables, and every specimen this page '
       'claims to show',
@@ -86,7 +89,7 @@ void main() {
         await tester.pump();
 
         expect(
-          find.byKey(const ValueKey<String>('lift-doc-article')),
+          find.byKey(const ValueKey<String>('hover-builder-doc-article')),
           findsOneWidget,
         );
 
@@ -97,10 +100,10 @@ void main() {
         await tester.pump();
         await tester.pump(MotionDurations.open);
 
-        for (final String param in _liftConstructorParams) {
+        for (final String param in _hoverBuilderConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
-        for (final String param in _liftCardConstructorParams) {
+        for (final String param in _interactiveCardConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
 
@@ -111,10 +114,10 @@ void main() {
         expect(find.byType(HoverBuilder), findsNWidgets(3));
 
         for (final String key in <String>[
-          'lift-preview:lifts',
-          'lift-preview:static',
-          'lift-example:index-card',
-          'lift-example:bare',
+          'hover-builder-preview:lifts',
+          'hover-builder-preview:static',
+          'hover-builder-example:index-card',
+          'hover-builder-example:bare',
         ]) {
           expect(
             find.byKey(ValueKey<String>(key)),
@@ -150,7 +153,7 @@ void main() {
         await tester.pump();
 
         final Finder card = find.byKey(
-          const ValueKey<String>('lift-preview:lifts'),
+          const ValueKey<String>('hover-builder-preview:lifts'),
         );
         await tester.ensureVisible(card);
         await tester.pump();
@@ -194,7 +197,7 @@ void main() {
       );
       await tester.pump();
 
-      // Three EffectSection stages: Preview, Index Card, Bare Lift.
+      // Three EffectSection stages: Preview, Index Card, Bare HoverBuilder.
       expect(find.byType(DocsShowcase), findsNWidgets(3));
       expect(find.byType(DocsInstall), findsOneWidget);
       expect(find.byType(DocsDisclosure), findsNWidgets(8));
@@ -202,13 +205,15 @@ void main() {
 
     test('the table of contents matches the declared sections', () {
       expect(
-        liftDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        hoverBuilderDocSpec.toc
+            .map((DocsTocEntry entry) => entry.title)
+            .toList(),
         <String>[
           'Preview',
           'Installation',
           'Usage',
           'Index Card',
-          'Bare Lift',
+          'Bare HoverBuilder',
           'API Reference',
           'States',
           'Accessibility',
@@ -246,7 +251,7 @@ void main() {
         'Installation',
         'Usage',
         'Index Card',
-        'Bare Lift',
+        'Bare HoverBuilder',
         'API Reference',
         'States',
         'Accessibility',
@@ -274,7 +279,7 @@ void main() {
         await tester.pump();
 
         expect(
-          find.byKey(const ValueKey<String>('lift-doc-article')),
+          find.byKey(const ValueKey<String>('hover-builder-doc-article')),
           findsOneWidget,
         );
         expect(
@@ -306,7 +311,7 @@ void main() {
 
         final ThemeTokens darkTheme = ThemeScope.of(
           tester.element(
-            find.byKey(const ValueKey<String>('lift-doc-article')),
+            find.byKey(const ValueKey<String>('hover-builder-doc-article')),
           ),
         );
 
@@ -315,7 +320,7 @@ void main() {
 
         final ThemeTokens lightTheme = ThemeScope.of(
           tester.element(
-            find.byKey(const ValueKey<String>('lift-doc-article')),
+            find.byKey(const ValueKey<String>('hover-builder-doc-article')),
           ),
         );
 
@@ -323,10 +328,10 @@ void main() {
         expect(lightTheme.foreground, isNot(darkTheme.foreground));
 
         for (final String key in <String>[
-          'lift-preview:lifts',
-          'lift-preview:static',
-          'lift-example:index-card',
-          'lift-example:bare',
+          'hover-builder-preview:lifts',
+          'hover-builder-preview:static',
+          'hover-builder-example:index-card',
+          'hover-builder-example:bare',
         ]) {
           expect(find.byKey(ValueKey<String>(key)), findsOneWidget);
         }

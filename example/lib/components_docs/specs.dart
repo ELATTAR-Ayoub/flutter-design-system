@@ -104,7 +104,7 @@ import 'tooltip/page.dart' as tooltip;
 import 'voice/page.dart' as voice;
 import 'voice_indicator/page.dart' as voice_indicator;
 import 'icon_swap/page.dart' as icon_swap;
-import 'hover_builder/page.dart' as lift;
+import 'hover_builder/page.dart' as hover_builder;
 import 'active_indicator/page.dart' as active_indicator;
 import 'content_change/page.dart' as content_change;
 import 'premium_surface/page.dart' as premium_surface;
@@ -114,7 +114,7 @@ import 'media_scrim/page.dart' as media_scrim;
 import 'feedback_surface/page.dart' as feedback_surface;
 import 'background_effect/page.dart' as background_effect;
 import 'action_feedback/page.dart' as action_feedback;
-import 'ambient_pattern/page.dart' as starfield;
+import 'ambient_pattern/page.dart' as ambient_pattern;
 import 'press/page.dart' as press;
 import 'keyframes/page.dart' as keyframes;
 import 'safe_area/page.dart' as safe_area;
@@ -171,7 +171,7 @@ final Map<String, ComponentDocSpec> componentDocSpecs =
         calendar.calendarDocSpec,
         avatar.avatarDocSpec,
         hover_card.hoverCardDocSpec,
-        user_menu.navUserDocSpec,
+        user_menu.userMenuDocSpec,
         tooltip.tooltipDocSpec,
         kbd.kbdDocSpec,
         carousel.carouselDocSpec,
@@ -209,7 +209,7 @@ final Map<String, ComponentDocSpec> componentDocSpecs =
         voice.voiceDocSpec,
         voice_indicator.voiceOrbDocSpec,
         icon_swap.iconSwapDocSpec,
-        lift.liftDocSpec,
+        hover_builder.hoverBuilderDocSpec,
         active_indicator.slidingPillDocSpec,
         content_change.swapInDocSpec,
         premium_surface.foilValueDocSpec,
@@ -219,7 +219,7 @@ final Map<String, ComponentDocSpec> componentDocSpecs =
         feedback_surface.bloomCosmicDocSpec,
         background_effect.pageGlowDocSpec,
         action_feedback.sheenActionDocSpec,
-        starfield.starfieldDocSpec,
+        ambient_pattern.ambientPatternDocSpec,
         press.pressMotionDocSpec,
         keyframes.keyframesDocSpec,
         safe_area.safeAreaDocSpec,

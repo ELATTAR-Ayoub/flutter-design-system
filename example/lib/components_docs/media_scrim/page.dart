@@ -76,18 +76,18 @@ final ComponentDocSpec mediaScrimDocSpec = ComponentDocSpec(
       command: mediaScrimDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/effects/media_scrim.dart',
+          path: 'lib/components/ui/media_scrim.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/media_scrim.dart's generated "
-              '@ui/media_scrim.dart payload into effects.',
+              '@ui/media_scrim.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated media-scrim source here when using '
               'manual mode.',
         ),
         DocsCodeFile(
-          path: 'lib/effects/effects.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so MediaScrim is reachable the same '

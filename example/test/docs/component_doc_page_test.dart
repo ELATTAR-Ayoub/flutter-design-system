@@ -173,8 +173,8 @@ void main() {
       _host(
         ComponentDocPage(
           spec: ComponentDocSpec(
-            name: 'starfield',
-            title: 'Starfield',
+            name: 'demo_effect',
+            title: 'Demo Effect',
             description: 'A field of stars.',
             sections: <DocsPageSection>[
               EffectSection(

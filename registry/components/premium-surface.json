@@ -23,7 +23,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/premium-surface",
+  "documentationRoute": "/components/premium_surface",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/premium_surface.dart",
   "exports": [
     "PremiumSurface"

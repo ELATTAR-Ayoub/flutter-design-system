@@ -12,31 +12,31 @@
       "name": "action-feedback",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/action-feedback"
+      "documentationRoute": "/components/action_feedback"
     },
     {
       "name": "active-indicator",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/active-indicator"
+      "documentationRoute": "/components/active_indicator"
     },
     {
       "name": "agent-attach-menu",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/agent-attach-menu"
+      "documentationRoute": "/components/agent_attach_menu"
     },
     {
       "name": "agent-attachments",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/agent-attachments"
+      "documentationRoute": "/components/agent_attachments"
     },
     {
       "name": "agent-avatar",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/agent-avatar"
+      "documentationRoute": "/components/agent_avatar"
     },
     {
       "name": "agent-composer",
@@ -48,7 +48,7 @@
       "name": "agent-console",
       "type": "block",
       "version": "0.0.1",
-      "documentationRoute": "/blocks/agent-console"
+      "documentationRoute": "/components/agent-console"
     },
     {
       "name": "agent-core",
@@ -60,31 +60,31 @@
       "name": "agent-face",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/agent-face"
+      "documentationRoute": "/components/agent_face"
     },
     {
       "name": "agent-history",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/agent-history"
+      "documentationRoute": "/components/agent_history"
     },
     {
       "name": "agent-launcher",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/agent-launcher"
+      "documentationRoute": "/components/agent_launcher"
     },
     {
       "name": "agent-markdown",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/agent-markdown"
+      "documentationRoute": "/components/agent_markdown"
     },
     {
       "name": "agent-slash-palette",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/agent-slash-palette"
+      "documentationRoute": "/components/agent_slash_palette"
     },
     {
       "name": "agent-transcript",
@@ -108,13 +108,13 @@
       "name": "ambient-pattern",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/ambient-pattern"
+      "documentationRoute": "/components/ambient_pattern"
     },
     {
       "name": "aspect-ratio",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/aspect-ratio"
+      "documentationRoute": "/components/aspect_ratio"
     },
     {
       "name": "attachment",
@@ -132,7 +132,7 @@
       "name": "background-effect",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/background-effect"
+      "documentationRoute": "/components/background_effect"
     },
     {
       "name": "badge",
@@ -162,7 +162,7 @@
       "name": "button-group",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/button-group"
+      "documentationRoute": "/components/button_group"
     },
     {
       "name": "calendar",
@@ -192,19 +192,19 @@
       "name": "chart-cartesian",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/chart-cartesian"
+      "documentationRoute": "/components/chart_cartesian"
     },
     {
       "name": "chart-geometry",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/chart-geometry"
+      "documentationRoute": "/components/chart_geometry"
     },
     {
       "name": "chart-polar",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/chart-polar"
+      "documentationRoute": "/components/chart_polar"
     },
     {
       "name": "checkbox",
@@ -234,7 +234,7 @@
       "name": "content-change",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/content-change"
+      "documentationRoute": "/components/content_change"
     },
     {
       "name": "context-menu",
@@ -270,7 +270,7 @@
       "name": "feedback-surface",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/feedback-surface"
+      "documentationRoute": "/components/feedback_surface"
     },
     {
       "name": "field",
@@ -294,7 +294,7 @@
       "name": "hover-builder",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/hover-builder"
+      "documentationRoute": "/components/hover_builder"
     },
     {
       "name": "hover-card",
@@ -312,7 +312,7 @@
       "name": "icon-swap",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/icon-swap"
+      "documentationRoute": "/components/icon_swap"
     },
     {
       "name": "input",
@@ -324,13 +324,13 @@
       "name": "input-group",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/input-group"
+      "documentationRoute": "/components/input_group"
     },
     {
       "name": "input-otp",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/input-otp"
+      "documentationRoute": "/components/input_otp"
     },
     {
       "name": "item",
@@ -360,7 +360,7 @@
       "name": "media-scrim",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/media-scrim"
+      "documentationRoute": "/components/media_scrim"
     },
     {
       "name": "menu",
@@ -390,7 +390,7 @@
       "name": "native-select",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/native-select"
+      "documentationRoute": "/components/native_select"
     },
     {
       "name": "navigation-menu",
@@ -414,7 +414,7 @@
       "name": "premium-surface",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/premium-surface"
+      "documentationRoute": "/components/premium_surface"
     },
     {
       "name": "press",
@@ -450,13 +450,13 @@
       "name": "safe-area",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/safe-area"
+      "documentationRoute": "/components/safe_area"
     },
     {
       "name": "scroll-area",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/scroll-area"
+      "documentationRoute": "/components/scroll_area"
     },
     {
       "name": "select",
@@ -468,7 +468,7 @@
       "name": "selection-control",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/selection-control"
+      "documentationRoute": "/components/selection_control"
     },
     {
       "name": "separator",
@@ -504,7 +504,7 @@
       "name": "source-foundation",
       "type": "foundation",
       "version": "0.0.1",
-      "documentationRoute": "/docs/foundations"
+      "documentationRoute": "/components/source_foundation"
     },
     {
       "name": "spinner",
@@ -576,13 +576,13 @@
       "name": "user-menu",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/user-menu"
+      "documentationRoute": "/components/user_menu"
     },
     {
       "name": "validation-rule",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/docs/foundations/rules"
+      "documentationRoute": "/components/validation_rule"
     },
     {
       "name": "voice",
@@ -594,7 +594,7 @@
       "name": "voice-indicator",
       "type": "component",
       "version": "0.0.1",
-      "documentationRoute": "/components/voice-indicator"
+      "documentationRoute": "/components/voice_indicator"
     }
   ]
 }

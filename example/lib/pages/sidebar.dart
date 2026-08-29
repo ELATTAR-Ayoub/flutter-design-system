@@ -28,7 +28,8 @@
 ///
 /// `node tool/verify/section-oracle.js /design-system/components/base/sidebar`
 ///: document `scrollHeight` **5644**, `main` 64 → 5579.7. Section tops and
-/// border-box heights are pinned in `example/test/sidebar_page_test.dart`.
+/// border-box heights are recorded here only; no suite pins them, and the
+/// file this line used to cite was never written.
 ///
 /// ## Drift register: reproduced, recorded, never fixed
 ///

@@ -133,7 +133,7 @@ class DisclosureSection extends DocsPageSection {
 ///
 /// The fifth case, and the last. Fourteen registry items — nine effects,
 /// five motion items, one foundation item — have no variants and often no
-/// widget of their own: `starfield`, `background-effect`, `press`,
+/// widget of their own: `ambient-pattern`, `background-effect`, `press`,
 /// `keyframes`, `safe-area`, `source-foundation` are applied *to* something
 /// rather than placed. A [ShowcaseSection] would stage an empty box and call
 /// it a preview, which is a lie about what the reader is looking at.

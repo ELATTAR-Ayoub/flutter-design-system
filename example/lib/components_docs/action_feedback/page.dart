@@ -67,18 +67,18 @@ final ComponentDocSpec sheenActionDocSpec = ComponentDocSpec(
       command: actionFeedbackDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/effects/action_feedback.dart',
+          path: 'lib/components/ui/action_feedback.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/action_feedback.dart's generated "
-              '@ui/action_feedback.dart payload into effects.',
+              '@ui/action_feedback.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated action-feedback source here when using '
               'manual mode.',
         ),
         DocsCodeFile(
-          path: 'lib/effects/effects.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so ActionFeedback is reachable the '
@@ -185,7 +185,7 @@ final ComponentDocSpec sheenActionDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/sheen_action_test.dart',
+            value: 'example/test/components_docs/action_feedback_test.dart',
             description:
                 'Covers this page: the article mounts, the API table, a '
                 'live hover and a live press on the two interactive '

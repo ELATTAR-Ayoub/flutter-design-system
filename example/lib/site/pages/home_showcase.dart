@@ -1,9 +1,9 @@
 /// The home page's grid: live compositions built only from real `El*`
 /// components, no screenshots and no descriptions.
 ///
-/// Three of the six cards defined in this file started as
-/// `example/lib/shots/`'s three installable compositions (settings, sign-in,
-/// dashboard); that directory is gone, so their content lives on here, trimmed
+/// Three of the six cards defined in this file started as three installable
+/// compositions (settings, sign-in, dashboard) in a directory of this app's
+/// own; that directory is gone, so their content lives on here, trimmed
 /// to card size and stripped of the outer width cap a full-screen composition
 /// wanted but a grid cell does not need. The other three are new, built the
 /// same way: real state, real validation, real components.

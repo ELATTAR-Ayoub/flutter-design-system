@@ -71,18 +71,18 @@ final ComponentDocSpec swapInDocSpec = ComponentDocSpec(
       command: contentChangeDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/motion/content_change.dart',
+          path: 'lib/components/ui/content_change.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/content_change.dart's generated "
-              '@ui/content_change.dart payload into your motion folder.',
+              '@ui/content_change.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated content-change source here when using manual '
               'mode.',
         ),
         DocsCodeFile(
-          path: 'lib/motion/motion.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so ContentChange is reachable the same way '
@@ -184,11 +184,11 @@ final ComponentDocSpec swapInDocSpec = ComponentDocSpec(
             value: 'test/motion_test.dart',
             description:
                 'ContentChange is covered inside the shared motion suite: there '
-                'is no dedicated swap_in_test.dart in the package yet.',
+                'is no dedicated content_change_test.dart in the package yet.',
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/swap_in_test.dart',
+            value: 'example/test/components_docs/content_change_test.dart',
             description:
                 'Covers this page: the article mounts, the full API table, '
                 'the keyed/unkeyed distinction, and both themes.',

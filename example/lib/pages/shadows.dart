@@ -14,7 +14,7 @@
 ///    *"Secondary, outline and destructive buttons."* Only
 ///    [ButtonVariant.outline] carries `shadow-btn`; `secondary` and
 ///    `destructive` declare no shadow class at all. Visible in `#in-use` on
-///    this very page: "View Hits" is flat, "Filters" is a machine surface.
+///    this very page: "View Hits" is flat, "Filters" is an inset surface.
 /// 2. **The `#in-use` caption against its own specimens.** *"Buttons carry
 ///    `shadow-btn` or `shadow-btn-primary`…"*: the premium button carries
 ///    `shadow-btn-value` (swapping to `shadow-glow-value` on hover), and two of
@@ -139,7 +139,7 @@ final List<_Specimen> _ambient = <_Specimen>[
   ),
 ];
 
-/// `const machine`: the eight machine surfaces. Every one of these carries at
+/// `const machine`: the eight inset surfaces. Every one of these carries at
 /// least one `inset` layer, which is why the cells go through
 /// [Surface] rather than a plain decoration.
 final List<_Specimen> _machine = <_Specimen>[
@@ -372,7 +372,7 @@ class _MachineSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Section(
       id: 'machine',
-      title: 'Machine surfaces',
+      title: 'Inset surfaces',
       description:
           'Depth that implies a mechanism. These carry inset '
           'highlights and shades, so a control looks like it has a top face '

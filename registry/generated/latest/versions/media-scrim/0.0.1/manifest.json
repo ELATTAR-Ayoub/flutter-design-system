@@ -21,7 +21,7 @@
   "fonts": [],
   "shaders": [],
   "licenses": [],
-  "documentationRoute": "/components/media-scrim",
+  "documentationRoute": "/components/media_scrim",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/media_scrim.dart",
   "deprecated": false
 }

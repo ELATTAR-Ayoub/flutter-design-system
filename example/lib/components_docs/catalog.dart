@@ -93,13 +93,13 @@ import 'toggle_group/meta.dart' as toggle_group;
 import 'voice/meta.dart' as voice;
 import 'voice_indicator/meta.dart' as voice_indicator;
 import 'icon_swap/meta.dart' as icon_swap;
-import 'hover_builder/meta.dart' as lift;
+import 'hover_builder/meta.dart' as hover_builder;
 import 'active_indicator/meta.dart' as active_indicator;
 import 'content_change/meta.dart' as content_change;
 import 'feedback_surface/meta.dart' as feedback_surface;
 import 'background_effect/meta.dart' as background_effect;
 import 'action_feedback/meta.dart' as action_feedback;
-import 'ambient_pattern/meta.dart' as starfield;
+import 'ambient_pattern/meta.dart' as ambient_pattern;
 
 class ComponentDocEntry {
   const ComponentDocEntry({
@@ -230,13 +230,13 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
   voice.voiceDoc,
   voice_indicator.voiceIndicatorDoc,
   icon_swap.iconSwapDoc,
-  lift.hoverBuilderDoc,
+  hover_builder.hoverBuilderDoc,
   active_indicator.activeIndicatorDoc,
   content_change.contentChangeDoc,
   feedback_surface.feedbackSurfaceDoc,
   background_effect.backgroundEffectDoc,
   action_feedback.actionFeedbackDoc,
-  starfield.ambientPatternDoc,
+  ambient_pattern.ambientPatternDoc,
 ];
 
 ComponentDocEntry? componentDocForRoute(String route) {
@@ -249,7 +249,7 @@ ComponentDocEntry? componentDocForRoute(String route) {
 ComponentDocEntry componentDoc(String name) =>
     componentDocs.singleWhere((ComponentDocEntry entry) => entry.name == name);
 
-/// The five documentation families the site groups [componentDocs] into.
+/// The four documentation families the site groups [componentDocs] into.
 ///
 /// [componentDocs] itself stays the complete, flat route and search catalog:
 /// this is a view over it, not a second list. The left rail

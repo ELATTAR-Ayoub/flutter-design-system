@@ -86,7 +86,7 @@ final ComponentDocSpec voiceOrbDocSpec = ComponentDocSpec(
       command: voiceIndicatorDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/effects/voice_indicator.dart',
+          path: 'lib/components/ui/voice_indicator.dart',
           title: '1. Copy the source',
           description:
               "Copy lib/src/components/ui/voice_indicator.dart's generated "
@@ -99,7 +99,7 @@ final ComponentDocSpec voiceOrbDocSpec = ComponentDocSpec(
               'manual mode.',
         ),
         DocsCodeFile(
-          path: 'lib/effects/effects.dart',
+          path: 'lib/components/ui/ui.dart',
           title: '2. Export it from your barrel',
           description:
               'Add the export line so VoiceIndicator, VoiceIndicatorState and '
@@ -228,7 +228,7 @@ final ComponentDocSpec voiceOrbDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Docs test',
-            value: 'example/test/components_docs/voice_orb_test.dart',
+            value: 'example/test/components_docs/voice_indicator_test.dart',
             description:
                 'Covers this page: the article mounts, the full API '
                 'table, and every VoiceIndicatorState this page claims to show.',

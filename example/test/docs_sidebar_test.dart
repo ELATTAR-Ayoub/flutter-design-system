@@ -277,7 +277,7 @@ void main() {
     /// them out. Read from a real page, because `_defaultSidebarGroups` is
     /// private to `docs_layout.dart` on purpose: the rail's shape is a
     /// rendering fact, not an exported list.
-    List<String> _groupOrder(WidgetTester tester) => find
+    List<String> groupOrder(WidgetTester tester) => find
         .byWidgetPredicate((Widget widget) {
           final Key? key = widget.key;
           return key is ValueKey<String> &&
@@ -292,7 +292,7 @@ void main() {
 
     /// Every `docs-sidebar:<route>` rendered inside the group labelled
     /// [label].
-    List<String> _routesIn(WidgetTester tester, String label) => find
+    List<String> routesIn(WidgetTester tester, String label) => find
         .descendant(
           of: find.byKey(ValueKey<String>('docs-sidebar-group:$label')),
           matching: find.byWidgetPredicate((Widget widget) {
@@ -312,7 +312,7 @@ void main() {
     /// route tests use: an article is taller than any test viewport, so an
     /// unscrolled page overflows for reasons that have nothing to do with
     /// the rail.
-    Widget _page(
+    Widget page(
       String route, {
       ColorMode mode = ColorMode.dark,
       double textScale = 1,
@@ -338,10 +338,10 @@ void main() {
     testWidgets('the groups read Sections, Components, Effects, Agent, '
         'Charts, in that order', (WidgetTester tester) async {
       _setViewSize(tester, const Size(1440, 900));
-      await tester.pumpWidget(_page('/components/button'));
+      await tester.pumpWidget(page('/components/button'));
       await tester.pump();
 
-      expect(_groupOrder(tester), <String>[
+      expect(groupOrder(tester), <String>[
         'Sections',
         'Components',
         'Effects',
@@ -355,12 +355,12 @@ void main() {
       WidgetTester tester,
     ) async {
       _setViewSize(tester, const Size(1440, 900));
-      await tester.pumpWidget(_page('/components/button'));
+      await tester.pumpWidget(page('/components/button'));
       await tester.pump();
 
       final Map<String, List<String>> byGroup = <String, List<String>>{
         for (final ComponentDocFamily family in ComponentDocFamily.values)
-          family.label: _routesIn(tester, family.label),
+          family.label: routesIn(tester, family.label),
       };
       final List<String> all = <String>[
         for (final List<String> routes in byGroup.values) ...routes,
@@ -393,11 +393,11 @@ void main() {
       WidgetTester tester,
     ) async {
       _setViewSize(tester, const Size(1440, 900));
-      await tester.pumpWidget(_page('/components/premium_surface'));
+      await tester.pumpWidget(page('/components/premium_surface'));
       await tester.pump();
 
       expect(
-        _routesIn(tester, 'Effects'),
+        routesIn(tester, 'Effects'),
         contains('/components/premium_surface'),
       );
       final Semantics selected = tester.widget<Semantics>(
@@ -426,7 +426,7 @@ void main() {
         '/components/chart': 'COMPONENTS / CHARTS',
       };
       for (final MapEntry<String, String> entry in expected.entries) {
-        await tester.pumpWidget(_page(entry.key));
+        await tester.pumpWidget(page(entry.key));
         await tester.pump();
         expect(
           find.byWidgetPredicate(
@@ -452,7 +452,7 @@ void main() {
         ]) {
           _setViewSize(tester, size);
           await tester.pumpWidget(
-            _page('/components', mode: mode, textScale: 1.3),
+            page('/components', mode: mode, textScale: 1.3),
           );
           await tester.pump();
           expect(tester.takeException(), isNull, reason: '$size / $mode');

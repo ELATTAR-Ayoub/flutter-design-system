@@ -254,7 +254,7 @@ class ScrollAreaDocPage extends StatelessWidget {
       title: 'Resizable',
       route: '/components/resizable',
     ),
-    next: const DocsPageLink(title: 'Layout', route: '/components/layout'),
+    next: const DocsPageLink(title: 'Select', route: '/components/select'),
     onNavigate: onNavigate,
     child: KeyedSubtree(
       key: const ValueKey<String>('scroll-area-doc-article'),

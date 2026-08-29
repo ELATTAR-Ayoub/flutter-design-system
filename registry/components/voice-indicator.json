@@ -39,7 +39,7 @@
       "sha256": "ad3f66b8568970d067e3bd47b690ad013945a61f972559743946a3a6558dc828"
     }
   ],
-  "documentationRoute": "/components/voice-indicator",
+  "documentationRoute": "/components/voice_indicator",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/voice_indicator.dart",
   "exports": [
     "VoiceIndicator",

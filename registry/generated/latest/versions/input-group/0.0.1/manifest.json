@@ -32,7 +32,7 @@
   "fonts": [],
   "shaders": [],
   "licenses": [],
-  "documentationRoute": "/components/input-group",
+  "documentationRoute": "/components/input_group",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/input_group.dart",
   "deprecated": false
 }

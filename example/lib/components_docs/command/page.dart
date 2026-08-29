@@ -7,7 +7,7 @@
 /// `context_menu` and `menubar` established. Every specimen widget and
 /// every code string below is the same one the hand-composed page carried,
 /// with one required addition: the house shape's first section is always
-/// titled Preview (`test/docs/docs_page_shape_test.dart` enforces it), so
+/// titled Preview (`example/test/docs/docs_page_shape_test.dart` enforces it), so
 /// the previously-unheaded live demo above Installation now owns a real
 /// `ShowcaseSection` and a rail entry, where it used to be a bare
 /// `DocsCodeExample` with neither. Four sections that were prose-only before
