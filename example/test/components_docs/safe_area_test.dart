@@ -49,7 +49,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `SafeArea`'s own class declares
-/// (`lib/src/components/safe_area.dart`), excluding `key`.
+/// (`lib/src/components/ui/safe_area.dart`), excluding `key`.
 const List<String> _safeAreaConstructorParams = <String>[
   'left',
   'top',

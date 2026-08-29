@@ -28,5 +28,5 @@ const ComponentDocEntry toggleDoc = ComponentDocEntry(
       'action that fires.',
   dependencies: <String>['button', 'icon', 'surface', 'source-foundation'],
   exports: <String>['Toggle', 'ToggleVariant', 'ToggleSize'],
-  sourcePath: 'lib/src/components/toggle.dart',
+  sourcePath: 'lib/src/components/ui/toggle.dart',
 );

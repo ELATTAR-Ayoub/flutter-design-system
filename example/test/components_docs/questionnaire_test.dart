@@ -49,7 +49,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `Questionnaire` itself declares
-/// (`lib/src/components/questionnaire.dart`), excluding `key`.
+/// (`lib/src/components/ui/questionnaire.dart`), excluding `key`.
 const List<String> _questionnaireParams = <String>[
   'children',
   'shortcuts',

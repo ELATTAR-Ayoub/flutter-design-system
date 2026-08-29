@@ -161,7 +161,7 @@ void main() {
         await tester.pump(MotionDurations.normal);
 
         // The API table lists every Badge constructor parameter found in
-        // lib/src/components/badge.dart.
+        // lib/src/components/ui/badge.dart.
         for (final String param in <String>[
           'label',
           'variant',

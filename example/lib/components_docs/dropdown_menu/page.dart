@@ -1,6 +1,6 @@
 /// Public documentation page for `DropdownMenu`
-/// (`lib/src/components/dropdown_menu.dart`) **and** the shared menu engine
-/// it is built from (`lib/src/components/menu.dart`): one page, because
+/// (`lib/src/components/ui/dropdown_menu.dart`) **and** the shared menu engine
+/// it is built from (`lib/src/components/ui/menu.dart`): one page, because
 /// `menu.dart`'s own library doc names itself as "the shared body of
 /// `dropdown-menu.tsx`, `context-menu.tsx` and `menubar.tsx`": it is not a
 /// second component to choose between, it is the row model, geometry,
@@ -121,7 +121,7 @@ final ComponentDocSpec dropdownMenuDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/menu.dart',
           title: '1. Copy the shared engine',
           description:
-              "Copy lib/src/components/menu.dart's generated @ui/"
+              "Copy lib/src/components/ui/menu.dart's generated @ui/"
               'menu.dart payload into components/ui: the row model, '
               'geometry, surface and keyboard behaviour dropdown_menu.dart '
               'is built from.',
@@ -134,7 +134,7 @@ final ComponentDocSpec dropdownMenuDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/dropdown_menu.dart',
           title: '2. Copy the trigger root',
           description:
-              "Copy lib/src/components/dropdown_menu.dart's generated "
+              "Copy lib/src/components/ui/dropdown_menu.dart's generated "
               '@ui/dropdown_menu.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"

@@ -35,7 +35,6 @@ import 'package:flutter/material.dart'
         Tooltip;
 
 import '../../kit.dart';
-import '../../nav.dart';
 import '../../components_docs/catalog.dart';
 // `/docs` and `/components` are documentation pages, so they render in the
 // same [DocsLayout] shell every other documentation page uses, which is where
@@ -194,13 +193,12 @@ class PublicDocsPage extends StatelessWidget {
 /// heading: one line under the page title is the only prose on the page.
 /// That is reproduced here rather than improved on, per the parity brief.
 ///
-/// Two link sections mirror the two catalogs this site actually has:
-/// [componentDocs] (34 individually documented components, alphabetical, one
-/// route each, the direct counterpart of the reference's "All Components")
-/// under "Ready to install", then one section per non-Foundations [Group]
-/// listing its categories, since those are the site's only other
-/// individually routable pages. Foundations is excluded, as it was before
-/// this page was reshaped: it is not a component family.
+/// Four link sections, one per [ComponentDocFamily], read from the same
+/// `componentDocsIn` classifier the left rail reads: Components, Effects,
+/// Agent, Charts. There is no second list to keep in step — a component
+/// appears here in exactly the group the rail puts it in, or the taxonomy
+/// test fails. Every entry still opens `/components/<name>`; splitting the
+/// index changed no route.
 class PublicComponentsPage extends StatelessWidget {
   const PublicComponentsPage({super.key, this.onNavigate});
 
@@ -221,32 +219,46 @@ class PublicComponentsPage extends StatelessWidget {
         title: 'Components',
         description: 'Every component available in the library, in one place.',
       ),
-      toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Ready to install', anchor: 'ready'),
+      toc: <DocsTocEntry>[
+        for (final ComponentDocFamily family in ComponentDocFamily.values)
+          DocsTocEntry(title: family.label, anchor: _familyAnchor(family)),
       ],
       onNavigate: onNavigate,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          KeyedSubtree(
-            key: docsAnchorKey('ready'),
-            child: _ComponentLinkSection(
-              title: 'Ready to install',
-              entries: <_ComponentLinkEntry>[
-                for (final ComponentDocEntry component in componentDocs)
-                  _ComponentLinkEntry(
-                    title: component.title,
-                    route: component.route,
-                  ),
-              ],
-              onNavigate: onNavigate,
+          for (final ComponentDocFamily family in ComponentDocFamily.values)
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: family == ComponentDocFamily.values.last
+                    ? 0
+                    : space(10),
+              ),
+              child: KeyedSubtree(
+                key: docsAnchorKey(_familyAnchor(family)),
+                child: _ComponentLinkSection(
+                  title: family.label,
+                  entries: <_ComponentLinkEntry>[
+                    for (final ComponentDocEntry component in componentDocsIn(
+                      family,
+                    ))
+                      _ComponentLinkEntry(
+                        title: component.title,
+                        route: component.route,
+                      ),
+                  ],
+                  onNavigate: onNavigate,
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 }
+
+/// The in-page anchor for one family heading: its label, lower-cased.
+String _familyAnchor(ComponentDocFamily family) => family.name;
 
 /// One "Ready to install" or group heading plus its dense link grid: the
 /// reference's `## New Components` / `## All Components` shape, generalised

@@ -29,5 +29,5 @@ const ComponentDocEntry resizableDoc = ComponentDocEntry(
       'each with its own pixel floor.',
   dependencies: <String>['source-foundation'],
   exports: <String>['ResizablePanelGroup', 'ResizablePanel'],
-  sourcePath: 'lib/src/components/resizable.dart',
+  sourcePath: 'lib/src/components/ui/resizable.dart',
 );

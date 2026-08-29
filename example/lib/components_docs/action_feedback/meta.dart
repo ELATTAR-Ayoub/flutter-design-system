@@ -20,7 +20,7 @@ import '../catalog.dart' show ComponentDocEntry;
 
 const ComponentDocEntry actionFeedbackDoc = ComponentDocEntry(
   name: 'action_feedback',
-  title: 'Sheen Action',
+  title: 'Action Feedback',
   description:
       'The default Button\'s surface: a derived five-stop ramp, a static '
       'blended texture, and a double-thump light that beats on hover and '

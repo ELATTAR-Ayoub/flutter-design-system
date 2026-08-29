@@ -1,7 +1,7 @@
 /// Public documentation page for the `agent-avatar` component.
 ///
 /// Written from nothing: no page existed for this registry item before this
-/// file. Read end to end from `lib/src/components/agent_avatar.dart`
+/// file. Read end to end from `lib/src/components/ui/agent_avatar.dart`
 /// (1760 lines, one file folding four reference files into one library) and
 /// from `test/agent_avatar_test.dart`, the package's own coverage.
 ///
@@ -95,7 +95,7 @@ final ComponentDocSpec agentAvatarDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'agent-avatar has a real registry manifest: `elattar add '
-          'agent-avatar` installs lib/src/components/agent_avatar.dart and '
+          'agent-avatar` installs lib/src/components/ui/agent_avatar.dart and '
           'resolves agent-core, keyframes, and source-foundation '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
@@ -105,7 +105,7 @@ final ComponentDocSpec agentAvatarDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_avatar.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_avatar.dart's generated "
+              "Copy lib/src/components/ui/agent_avatar.dart's generated "
               '@ui/agent_avatar.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -648,7 +648,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/agent_avatar.dart — one file, no '
+        'File: lib/src/components/ui/agent_avatar.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
         'Flutter imports: package:flutter/widgets.dart only (plus '

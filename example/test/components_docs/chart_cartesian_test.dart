@@ -52,7 +52,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `CartesianChart`'s own class declares
-/// (`lib/src/components/chart_cartesian.dart`), excluding `key`.
+/// (`lib/src/components/ui/chart_cartesian.dart`), excluding `key`.
 const List<String> _cartesianConstructorParams = <String>[
   'data',
   'series',

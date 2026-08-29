@@ -41,5 +41,5 @@ const ComponentDocEntry attachmentDoc = ComponentDocEntry(
     'AttachmentTrigger',
     'AttachmentGroup',
   ],
-  sourcePath: 'lib/src/components/attachment.dart',
+  sourcePath: 'lib/src/components/ui/attachment.dart',
 );

@@ -118,7 +118,7 @@ class _ThemingArticle extends StatelessWidget {
           'ThemeScope.of(context), a ThemeTokens instance resolved from a live '
           'ThemeController, never a literal picked per widget. There is '
           'no palette editor: the two ThemeTokens instances (light, dark) '
-          'are fixed in lib/src/foundation/theme.dart, and customization '
+          'are fixed in lib/src/design_system/foundation/theme.dart, and customization '
           'means either editing that file directly (source mode) or '
           'choosing which of the two paints (package mode). Both are '
           'covered below.',
@@ -147,7 +147,7 @@ class _ThemingArticle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _prose(
-          'Palette (lib/src/foundation/colors.dart) holds fixed, '
+          'Palette (lib/src/design_system/foundation/colors.dart) holds fixed, '
           'theme-independent brand hues — action, value, success, warning, '
           'info, plus bright/dark/deep variants of each. These do not '
           'change between light and dark.',
@@ -301,14 +301,14 @@ class _ThemingArticle extends StatelessWidget {
           facts: <DocsApiFact>[
             DocsApiFact(
               name: 'Radii',
-              type: 'lib/src/foundation/spacing.dart',
+              type: 'lib/src/design_system/foundation/spacing.dart',
               description:
                   'xs 2, sm 6, md 10, lg 12, xl 16 — corner radii components '
                   'select by role, not by literal.',
             ),
             DocsApiFact(
               name: 'Shadows',
-              type: 'lib/src/foundation/shadows.dart',
+              type: 'lib/src/design_system/foundation/shadows.dart',
               description:
                   'Named elevation specs (e.g. chip, btnValue) consumed by '
                   'Surface, matched CSS-blur-exact to the '
@@ -316,7 +316,7 @@ class _ThemingArticle extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'MotionDurations / MotionCurves',
-              type: 'lib/src/foundation/motion.dart',
+              type: 'lib/src/design_system/foundation/motion.dart',
               description:
                   'tick 80ms, fast 150ms, base 250ms; curves spring/out/'
                   'curveIn. effectiveMotionDuration() collapses any of them to '
@@ -324,7 +324,7 @@ class _ThemingArticle extends StatelessWidget {
             ),
             DocsApiFact(
               name: 'LayoutWidths / Breakpoints',
-              type: 'lib/src/foundation/spacing.dart',
+              type: 'lib/src/design_system/foundation/spacing.dart',
               description:
                   'Layout measures (content 1080, page 1200, shell 1680) and '
                   'the four responsive steps (640 / 768 / 1024 / 1280) '
@@ -354,7 +354,7 @@ class _ThemingArticle extends StatelessWidget {
         ),
         SizedBox(height: space(4)),
         // The actual `light` instance this page's own swatches above are
-        // reading from (lib/src/foundation/theme.dart) — capped, since the
+        // reading from (lib/src/design_system/foundation/theme.dart) — capped, since the
         // full instance runs on for another two dozen fields past what a
         // reader needs to see the shape of the thing they would edit.
         DocsSnippet(
@@ -390,7 +390,7 @@ class _ThemingArticle extends StatelessWidget {
               '  // ...bubble-glow fields, then:\n'
               '  radius: 10,\n'
               '  // ...ink/rim layers, chart colours, bloom and star fields\n'
-              '  // follow — see lib/src/foundation/theme.dart for the rest.\n'
+              '  // follow — see lib/src/design_system/foundation/theme.dart for the rest.\n'
               ');',
           maxHeight: space(48),
         ),

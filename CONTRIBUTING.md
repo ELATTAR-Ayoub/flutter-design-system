@@ -9,7 +9,7 @@ The package version is `0.0.1`, the first public release. The Flutter package in
 - Search existing issues and pull requests before opening a new one.
 - Keep changes scoped. Small, reviewable pull requests move fastest.
 - If your change affects product UI, components, motion, responsive behavior, or accessibility, follow [`AGENTS.md`](AGENTS.md) and the [`elattar-flutter-ui-director`](skills/elattar-flutter-ui-director/SKILL.md) skill contract.
-- Do not move product UI into `lib/src/components/` unless that is already the correct package surface.
+- Do not move product UI into `lib/src/components/ui/` unless that is already the correct package surface.
 - Do not add hardcoded visual or motion literals in `lib/` or `example/lib/` when the design-system tokens already cover the need. The repository enforces this with `test/token_guard_test.dart`.
 
 ## Activating the agent skill locally

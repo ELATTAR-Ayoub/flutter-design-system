@@ -5,7 +5,7 @@
 /// `registryDependencies`, copied verbatim — `agent-core`, `agent-face`,
 /// `button`, `dialog`, `source-foundation`.
 ///
-/// `lib/src/components/agent_launcher.dart` ports `agent-launcher.tsx`: a
+/// `lib/src/components/ui/agent_launcher.dart` ports `agent-launcher.tsx`: a
 /// fixed-position trigger — the same face the console header shows, at
 /// rest — that opens whatever is passed as [AgentLauncher.child] in a
 /// wide dialog. [exports] lists the one public class the file declares;
@@ -29,5 +29,5 @@ const ComponentDocEntry agentLauncherDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['AgentLauncher'],
-  sourcePath: 'lib/src/components/agent_launcher.dart',
+  sourcePath: 'lib/src/components/ui/agent_launcher.dart',
 );

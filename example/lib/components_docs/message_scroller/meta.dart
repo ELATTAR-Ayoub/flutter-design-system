@@ -39,5 +39,5 @@ const ComponentDocEntry messageScrollerDoc = ComponentDocEntry(
     'MessageScrollerItem',
     'MessageScrollerButton',
   ],
-  sourcePath: 'lib/src/components/message_scroller.dart',
+  sourcePath: 'lib/src/components/ui/message_scroller.dart',
 );

@@ -25,7 +25,7 @@
 ///   command and manual files, the same shape `button` uses.
 ///
 /// New: a Keyboard disclosure, between Accessibility and Responsive, read
-/// directly off `lib/src/components/selection_control.dart`'s shared
+/// directly off `lib/src/components/ui/selection_control.dart`'s shared
 /// `_onKey` (checkbox.dart composes `SelectionControl`, it does not wire
 /// its own key handler).
 library;
@@ -82,7 +82,7 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/checkbox.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/checkbox.dart's generated "
+              "Copy lib/src/components/ui/checkbox.dart's generated "
               '@ui/checkbox.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -198,7 +198,7 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          'Read off lib/src/components/selection_control.dart\'s shared '
+          'Read off lib/src/components/ui/selection_control.dart\'s shared '
           '_onKey: checkbox.dart composes SelectionControl rather than '
           'wiring its own key handler.',
       child: _KeyboardContent(),
@@ -233,7 +233,7 @@ final ComponentDocSpec checkboxDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Shared machinery',
-            value: 'lib/src/components/selection_control.dart',
+            value: 'lib/src/components/ui/selection_control.dart',
             description:
                 'SelectionControl, HitArea and StateChangeFeedback, shared '
                 'with the switch and radio families and documented on '
@@ -953,7 +953,7 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
   ),
 ];
 
-/// Read directly off `lib/src/components/selection_control.dart`'s shared
+/// Read directly off `lib/src/components/ui/selection_control.dart`'s shared
 /// `_onKey`: `checkbox.dart` composes `SelectionControl` rather than
 /// wiring its own key handler, so every fact here is that file's, not
 /// invented for this page.
@@ -1027,7 +1027,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Status',
             value: 'Stable, installable through elattar add checkbox',
             description:
-                'Ported and tested against lib/src/components/'
+                'Ported and tested against lib/src/components/ui/'
                 'checkbox.dart, and shipped as a registry item.',
           ),
           const DocsInstallFact(

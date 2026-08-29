@@ -22,5 +22,5 @@ const ComponentDocEntry markerDoc = ComponentDocEntry(
       'it draws no background.',
   dependencies: <String>['source-foundation'],
   exports: <String>['Marker', 'MarkerVariant'],
-  sourcePath: 'lib/src/components/marker.dart',
+  sourcePath: 'lib/src/components/ui/marker.dart',
 );

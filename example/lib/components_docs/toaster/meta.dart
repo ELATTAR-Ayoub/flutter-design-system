@@ -39,5 +39,5 @@ const ComponentDocEntry toasterDoc = ComponentDocEntry(
     'ToastPosition',
     'Toast',
   ],
-  sourcePath: 'lib/src/components/toaster.dart',
+  sourcePath: 'lib/src/components/ui/toaster.dart',
 );

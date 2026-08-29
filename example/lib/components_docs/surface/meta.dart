@@ -15,7 +15,7 @@ import '../catalog.dart' show ComponentDocEntry;
 
 const ComponentDocEntry surfaceDoc = ComponentDocEntry(
   name: 'surface',
-  title: 'Machine Surface',
+  title: 'Surface',
   description:
       'The shadow specs CSS can paint and Flutter cannot: outer drop '
       'shadows and inset highlight/shade layers, composited in CSS order '

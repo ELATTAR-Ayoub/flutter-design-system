@@ -2,7 +2,7 @@
 ///
 /// **Written from nothing**, per the rollout's per-item brief:
 /// `agent-composer` has no page today. Everything on it is read off
-/// `lib/src/components/agent_composer.dart` directly, and every specimen is
+/// `lib/src/components/ui/agent_composer.dart` directly, and every specimen is
 /// a real, functioning `AgentComposer` — typing, sending, removing an
 /// attachment, and stopping a busy turn all genuinely run the widget's own
 /// callbacks, not a screenshot standing in for them.
@@ -66,7 +66,7 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'agent-composer has a real registry manifest: elattar add '
-          'agent-composer installs lib/src/components/agent_composer.dart '
+          'agent-composer installs lib/src/components/ui/agent_composer.dart '
           'and resolves agent-attach-menu, agent-attachments, agent-core, '
           'agent-slash-palette, button, icon, input, surface and '
           'source-foundation automatically. The Manual tab is for a '
@@ -77,7 +77,7 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_composer.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_composer.dart's generated "
+              "Copy lib/src/components/ui/agent_composer.dart's generated "
               '@ui/agent_composer.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1004,7 +1004,7 @@ class _DependenciesContent extends StatelessWidget {
         facts: <DocsInstallFact>[
           const DocsInstallFact(
             label: 'File',
-            value: 'lib/src/components/agent_composer.dart',
+            value: 'lib/src/components/ui/agent_composer.dart',
             description:
                 'One file, no companions; the registry manifest lists '
                 'exactly one entry under "files".',
@@ -1064,7 +1064,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Input', route: '/components/input'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
         ],
       ),
     ],

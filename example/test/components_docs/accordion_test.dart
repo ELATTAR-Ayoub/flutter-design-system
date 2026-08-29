@@ -77,7 +77,7 @@ void main() {
     test('documents the real public API surface', () {
       expect(accordionDoc.name, 'accordion');
       expect(accordionDoc.title, 'Accordion');
-      expect(accordionDoc.sourcePath, 'lib/src/components/accordion.dart');
+      expect(accordionDoc.sourcePath, 'lib/src/components/ui/accordion.dart');
       expect(
         accordionDoc.exports,
         containsAll(<String>['Accordion', 'AccordionItem']),
@@ -164,7 +164,7 @@ void main() {
       await tester.pump(MotionDurations.open);
 
       // Accordion's constructor parameters, from
-      // lib/src/components/accordion.dart: items, openIndex, onChanged.
+      // lib/src/components/ui/accordion.dart: items, openIndex, onChanged.
       for (final String param in <String>['items', 'openIndex', 'onChanged']) {
         expect(
           find.text(param),

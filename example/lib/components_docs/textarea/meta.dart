@@ -17,5 +17,5 @@ const ComponentDocEntry textareaDoc = ComponentDocEntry(
   // Registry dependencies resolved by `elattar add textarea`.
   dependencies: <String>['field', 'input', 'source-foundation'],
   exports: <String>['Textarea'],
-  sourcePath: 'lib/src/components/textarea.dart',
+  sourcePath: 'lib/src/components/ui/textarea.dart',
 );

@@ -23,7 +23,7 @@
 /// component onto its own page; that prefix is dropped here since the page
 /// is now about exactly one component.
 ///
-/// **API tables, verified.** Built from `lib/src/components/menubar.dart`'s
+/// **API tables, verified.** Built from `lib/src/components/ui/menubar.dart`'s
 /// real constructors and static getters: Menubar takes exactly one
 /// parameter, `menus`; MenubarMenu takes `label` and `children`.
 ///
@@ -78,7 +78,7 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
       description:
           'registry/components/menubar.json ships and resolves menu, '
           'popover and source-foundation automatically: elattar add '
-          'menubar installs lib/src/components/menubar.dart. The Manual '
+          'menubar installs lib/src/components/ui/menubar.dart. The Manual '
           'tab is for a project not using the CLI.',
       command: menubarDoc.command,
       manualFiles: <DocsCodeFile>[
@@ -86,7 +86,7 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/menubar.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/menubar.dart's generated @ui/"
+              "Copy lib/src/components/ui/menubar.dart's generated @ui/"
               'menubar.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -248,7 +248,7 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Row model source',
-            value: 'lib/src/components/menu.dart',
+            value: 'lib/src/components/ui/menu.dart',
             description:
                 'MenuChild and its variants (MenuItem, '
                 'MenuCheckboxItem, MenuRadioGroup/Item, MenuSub, '

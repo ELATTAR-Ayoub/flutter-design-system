@@ -30,5 +30,5 @@ const ComponentDocEntry agentComposerDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['AgentComposer'],
-  sourcePath: 'lib/src/components/agent_composer.dart',
+  sourcePath: 'lib/src/components/ui/agent_composer.dart',
 );

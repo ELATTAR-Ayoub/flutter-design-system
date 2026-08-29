@@ -1,5 +1,5 @@
 /// Public documentation page for the `resizable` component —
-/// `lib/src/components/resizable.dart`'s [ResizablePanelGroup] and
+/// `lib/src/components/ui/resizable.dart`'s [ResizablePanelGroup] and
 /// [ResizablePanel].
 ///
 /// **Re-housed onto the kit.** This page used to hand-compose `Section`
@@ -90,7 +90,7 @@ final ComponentDocSpec resizableDocSpec = ComponentDocSpec(
       description:
           '`elattar add resizable` installs the component and its '
           'declared dependency closure. No registry/components/'
-          'resizable.json exists yet: copy lib/src/components/'
+          'resizable.json exists yet: copy lib/src/components/ui/'
           'resizable.dart manually until it does.',
       command: resizableDoc.command,
       manualFiles: <DocsCodeFile>[
@@ -105,8 +105,8 @@ final ComponentDocSpec resizableDocSpec = ComponentDocSpec(
               'handling.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// No registry manifest yet: copy lib/src/components/'
-              'resizable.dart into your project directly.',
+              '// No registry manifest yet: copy lib/src/components/ui/'
+              'resizable.dart into lib/components/ui/ in your project.',
         ),
       ],
     ),
@@ -174,7 +174,7 @@ final ComponentDocSpec resizableDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'Read directly off _GrabStripState._onKey '
-          '(lib/src/components/resizable.dart): every key it recognises, '
+          '(lib/src/components/ui/resizable.dart): every key it recognises, '
           'and what it ignores.',
       child: _KeyboardContent(),
     ),
@@ -352,7 +352,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// Read directly off `_GrabStripState._onKey`
-/// (`lib/src/components/resizable.dart`): the strip only inspects
+/// (`lib/src/components/ui/resizable.dart`): the strip only inspects
 /// `KeyDownEvent` and `KeyRepeatEvent`, and only four logical keys.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();

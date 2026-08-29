@@ -24,7 +24,7 @@
 /// than a shape gallery alone. Kept for the same reason.
 ///
 /// **The manifest is real.** `registry/components/skeleton.json` ships
-/// today: `elattar add skeleton` installs `lib/src/components/skeleton.dart`
+/// today: `elattar add skeleton` installs `lib/src/components/ui/skeleton.dart`
 /// and resolves `keyframes` and `source-foundation` automatically. The
 /// Manual tab below is for a project not using the CLI.
 ///
@@ -84,7 +84,7 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'skeleton has a real registry manifest, `elattar add skeleton` '
-          'installs lib/src/components/skeleton.dart and resolves keyframes '
+          'installs lib/src/components/ui/skeleton.dart and resolves keyframes '
           'and source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: skeletonDoc.command,
@@ -93,7 +93,7 @@ final ComponentDocSpec skeletonDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/skeleton.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/skeleton.dart's generated "
+              "Copy lib/src/components/ui/skeleton.dart's generated "
               '@ui/skeleton.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"

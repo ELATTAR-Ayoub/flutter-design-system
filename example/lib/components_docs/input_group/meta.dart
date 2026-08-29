@@ -38,5 +38,5 @@ const ComponentDocEntry inputGroupDoc = ComponentDocEntry(
     'InputGroupAlign',
     'InputGroupButtonSize',
   ],
-  sourcePath: 'lib/src/components/input_group.dart',
+  sourcePath: 'lib/src/components/ui/input_group.dart',
 );

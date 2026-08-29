@@ -38,5 +38,5 @@ const ComponentDocEntry chartCartesianDoc = ComponentDocEntry(
     'BarRect',
     'BarSeriesPainter',
   ],
-  sourcePath: 'lib/src/components/chart_cartesian.dart',
+  sourcePath: 'lib/src/components/ui/chart_cartesian.dart',
 );

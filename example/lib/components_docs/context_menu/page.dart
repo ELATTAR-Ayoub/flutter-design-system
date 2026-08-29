@@ -34,7 +34,7 @@
 /// across both mounts.
 ///
 /// **API table, verified.** Built from
-/// `lib/src/components/context_menu.dart`'s real constructor: `child`,
+/// `lib/src/components/ui/context_menu.dart`'s real constructor: `child`,
 /// `children`, `width`, `enabled`. Matches the merged page's old table,
 /// which was already correct for this component.
 ///
@@ -84,7 +84,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
       description:
           'registry/components/context-menu.json ships and resolves '
           'menu, popover and source-foundation automatically: elattar '
-          'add context-menu installs lib/src/components/context_menu.dart. '
+          'add context-menu installs lib/src/components/ui/context_menu.dart. '
           'The Manual tab is for a project not using the CLI.',
       command: contextMenuDoc.command,
       manualFiles: <DocsCodeFile>[
@@ -92,7 +92,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/context_menu.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/context_menu.dart's generated "
+              "Copy lib/src/components/ui/context_menu.dart's generated "
               '@ui/context_menu.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -292,7 +292,7 @@ final ComponentDocSpec contextMenuDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Row model source',
-            value: 'lib/src/components/menu.dart',
+            value: 'lib/src/components/ui/menu.dart',
             description:
                 'MenuChild and its variants: not documented on this '
                 'page. See the Dropdown Menu page for the full row-model '

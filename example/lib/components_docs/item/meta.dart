@@ -1,6 +1,6 @@
 /// Documentation metadata for `item`.
 ///
-/// `item` is a real, distinct component: `lib/src/components/item.dart`
+/// `item` is a real, distinct component: `lib/src/components/ui/item.dart`
 /// defines `Item`, `ItemGroup`, `ItemVariant`, `ItemMedia`,
 /// `ItemContent`, `ItemTitle`, `ItemDescription`, and `ItemActions`,
 /// verified by reading that file directly. It is not the same widget as
@@ -39,5 +39,5 @@ const ComponentDocEntry itemDoc = ComponentDocEntry(
     'ItemDescription',
     'ItemActions',
   ],
-  sourcePath: 'lib/src/components/item.dart',
+  sourcePath: 'lib/src/components/ui/item.dart',
 );

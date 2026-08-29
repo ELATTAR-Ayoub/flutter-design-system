@@ -67,7 +67,7 @@ import 'meta.dart';
 /// own examples where `progress.dart`'s class doc quotes them verbatim
 /// (`20.6`, `66.7`, and the drift-7 array's `{ tone: "default", label:
 /// "Steps today", value: 72 }`): see drift 6 and drift 7 in
-/// `lib/src/components/progress.dart` for why the first bar below is
+/// `lib/src/components/ui/progress.dart` for why the first bar below is
 /// deliberately unlabelled.
 class _ProgressSpecimen {
   const _ProgressSpecimen(this.value, this.tone, this.label);
@@ -108,7 +108,7 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'progress has a real registry manifest, `elattar add progress` '
-          'installs lib/src/components/progress.dart and resolves '
+          'installs lib/src/components/ui/progress.dart and resolves '
           'surface and source-foundation automatically. The '
           'Manual tab is for a project not using the CLI.',
       command: progressDoc.command,
@@ -117,7 +117,7 @@ final ComponentDocSpec progressDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/progress.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/progress.dart's generated "
+              "Copy lib/src/components/ui/progress.dart's generated "
               '@ui/progress.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -812,7 +812,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Files',
-            value: 'lib/src/components/progress.dart',
+            value: 'lib/src/components/ui/progress.dart',
             description:
                 'One file (a private _AnimatedFractionalTranslation '
                 'helper included).',
@@ -855,7 +855,7 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Spinner', route: '/components/spinner'),
           DocsLink(label: 'Skeleton', route: '/components/skeleton'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',

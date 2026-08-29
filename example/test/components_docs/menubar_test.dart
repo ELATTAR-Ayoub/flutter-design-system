@@ -117,7 +117,7 @@ void main() {
         'popover',
         'source-foundation',
       ]);
-      expect(menubarDoc.sourcePath, 'lib/src/components/menubar.dart');
+      expect(menubarDoc.sourcePath, 'lib/src/components/ui/menubar.dart');
       expect(
         menubarDoc.exports,
         containsAll(<String>['Menubar', 'MenubarMenu']),

@@ -33,5 +33,5 @@ const ComponentDocEntry inputOtpDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['InputOtp', 'InputOtpSlot', 'InputOtpSeparator'],
-  sourcePath: 'lib/src/components/input_otp.dart',
+  sourcePath: 'lib/src/components/ui/input_otp.dart',
 );

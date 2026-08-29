@@ -4,7 +4,7 @@
 /// manifest (`registry/components/menu.json`) says so in its first line:
 /// *"The shared body of `dropdown-menu.tsx`, `context-menu.tsx` and
 /// `menubar.tsx`"* — one Radix `Menu` primitive, wrapped by three different
-/// roots. `lib/src/components/menu.dart` is the row model (`MenuItem`,
+/// roots. `lib/src/components/ui/menu.dart` is the row model (`MenuItem`,
 /// `MenuCheckboxItem`, `MenuRadioItem`/`MenuRadioGroup`, `MenuLabel`,
 /// `MenuSeparator`, `MenuGroup`, `MenuSub`), the geometry and surface
 /// (`Menu`, `MenuSurface`, `MenuSurfaceVariant`, `MenuIndicatorSide`),
@@ -49,5 +49,5 @@ const ComponentDocEntry menuDoc = ComponentDocEntry(
     'MenuPointerDown',
     'MenuMotion',
   ],
-  sourcePath: 'lib/src/components/menu.dart',
+  sourcePath: 'lib/src/components/ui/menu.dart',
 );

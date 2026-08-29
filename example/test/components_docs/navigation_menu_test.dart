@@ -119,7 +119,7 @@ void main() {
       ]);
       expect(
         navigationMenuDoc.sourcePath,
-        'lib/src/components/navigation_menu.dart',
+        'lib/src/components/ui/navigation_menu.dart',
       );
       expect(
         navigationMenuDoc.exports,

@@ -40,5 +40,5 @@ const ComponentDocEntry buttonDoc = ComponentDocEntry(
     'ButtonEmphasis',
     'ButtonStyleRecipe',
   ],
-  sourcePath: 'lib/src/components/button.dart',
+  sourcePath: 'lib/src/components/ui/button.dart',
 );

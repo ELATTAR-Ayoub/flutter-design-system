@@ -2,7 +2,7 @@
 ///
 /// **Written from nothing**, per the rollout's per-item brief:
 /// `agent-transcript` has no page today. Everything on it is read off
-/// `lib/src/components/agent_transcript.dart` directly.
+/// `lib/src/components/ui/agent_transcript.dart` directly.
 ///
 /// **A family of parts, not one widget** — the same shape `field`
 /// documents. `agent_transcript.dart` declares ten exported classes: the two
@@ -66,7 +66,7 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
       description:
           'agent-transcript has a real registry manifest: elattar add '
           'agent-transcript installs '
-          'lib/src/components/agent_transcript.dart and resolves '
+          'lib/src/components/ui/agent_transcript.dart and resolves '
           'agent-attachments, agent-core, agent-markdown, button, icon, '
           'keyframes and source-foundation automatically. The Manual tab '
           'is for a project not using the CLI.',
@@ -76,7 +76,7 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_transcript.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_transcript.dart's generated "
+              "Copy lib/src/components/ui/agent_transcript.dart's generated "
               '@ui/agent_transcript.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1217,7 +1217,7 @@ class _DependenciesContent extends StatelessWidget {
         facts: <DocsInstallFact>[
           const DocsInstallFact(
             label: 'File',
-            value: 'lib/src/components/agent_transcript.dart',
+            value: 'lib/src/components/ui/agent_transcript.dart',
             description:
                 'One file, no companions; the registry manifest lists '
                 'exactly one entry under "files".',

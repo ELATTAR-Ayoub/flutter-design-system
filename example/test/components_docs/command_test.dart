@@ -220,7 +220,7 @@ void main() {
       expect(commandDoc.title, 'Command');
       expect(commandDoc.route, '/components/command');
       expect(commandDoc.command, 'elattar add command');
-      expect(commandDoc.sourcePath, 'lib/src/components/command.dart');
+      expect(commandDoc.sourcePath, 'lib/src/components/ui/command.dart');
       expect(commandDoc.exports, <String>[
         'Command',
         'CommandItem',

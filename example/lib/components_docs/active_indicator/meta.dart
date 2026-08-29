@@ -10,7 +10,7 @@ import '../catalog.dart' show ComponentDocEntry;
 
 const ComponentDocEntry activeIndicatorDoc = ComponentDocEntry(
   name: 'active_indicator',
-  title: 'Sliding Pill',
+  title: 'Active Indicator',
   description:
       'A single travelling pill that measures the selected option and moves '
       'to it with a squash on arrival — selection travels, it never blinks '

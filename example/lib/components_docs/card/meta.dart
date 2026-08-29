@@ -30,5 +30,5 @@ const ComponentDocEntry cardDoc = ComponentDocEntry(
     'CardContent',
     'CardFooter',
   ],
-  sourcePath: 'lib/src/components/card.dart',
+  sourcePath: 'lib/src/components/ui/card.dart',
 );

@@ -84,7 +84,7 @@ final ComponentDocSpec breadcrumbDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/breadcrumb.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/breadcrumb.dart's source into "
+              "Copy lib/src/components/ui/breadcrumb.dart's source into "
               'components/ui — there is no generated @ui/breadcrumb.dart '
               'payload to pull from yet.',
           code:
@@ -248,7 +248,7 @@ final ComponentDocSpec breadcrumbDocSpec = ComponentDocSpec(
             label: 'GitHub',
             value:
                 'github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/'
-                'lib/src/components/breadcrumb.dart',
+                'lib/src/components/ui/breadcrumb.dart',
             description:
                 "The same blob path every published registry item's "
                 'sourceLink points at.',
@@ -629,7 +629,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/breadcrumb.dart: one file, no '
+        'File: lib/src/components/ui/breadcrumb.dart: one file, no '
             'companions.',
         'Real transitive needs: the foundation modules (motion, spacing, '
             'theme, typography) source-foundation already stands for '

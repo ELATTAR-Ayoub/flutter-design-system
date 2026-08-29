@@ -7,7 +7,7 @@
 ///
 /// Two things about this entry are unlike its Wave 1 siblings:
 ///
-///  * **It is a family, not a component.** `lib/src/components/sidebar.dart`
+///  * **It is a family, not a component.** `lib/src/components/ui/sidebar.dart`
 ///    exports thirty-three public names: a provider, two inherited scopes,
 ///    the panel, a rail, a trigger, an inset, five regions, three group
 ///    parts, twelve menu parts and a field: and
@@ -21,7 +21,7 @@
 ///
 /// [dependencies] is therefore **source-level imports**, not a verified
 /// `registryDependencies` list: the component files those two libraries
-/// actually import from `lib/src/components/`. Inventing registry names here
+/// actually import from `lib/src/components/ui/`. Inventing registry names here
 /// is the exact failure mode the Phase J plan warns about, so none are
 /// invented.
 library;
@@ -93,10 +93,10 @@ const ComponentDocEntry sidebarDoc = ComponentDocEntry(
     'UserMenuAccount',
     'UserMenuItem',
   ],
-  sourcePath: 'lib/src/components/sidebar.dart',
+  sourcePath: 'lib/src/components/ui/sidebar.dart',
 );
 
 /// The family's second source file. [ComponentDocEntry] carries one
 /// [ComponentDocEntry.sourcePath], and the account block in a sidebar footer
 /// lives in its own library.
-const String sidebarNavUserSourcePath = 'lib/src/components/ui/user_menu.dart';
+const String sidebarUserMenuSourcePath = 'lib/src/components/ui/user_menu.dart';

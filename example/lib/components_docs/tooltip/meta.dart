@@ -25,5 +25,5 @@ const ComponentDocEntry tooltipDoc = ComponentDocEntry(
   // Phase J supervisor notes warn about, and this one does not need to.
   dependencies: <String>['source-foundation'],
   exports: <String>['Tooltip', 'TooltipSide', 'TooltipContent'],
-  sourcePath: 'lib/src/components/tooltip.dart',
+  sourcePath: 'lib/src/components/ui/tooltip.dart',
 );

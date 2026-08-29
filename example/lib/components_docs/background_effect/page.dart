@@ -39,7 +39,7 @@ import 'meta.dart';
 
 final ComponentDocSpec pageGlowDocSpec = ComponentDocSpec(
   name: 'background_effect',
-  title: 'Page Glow',
+  title: 'Background Effect',
   description:
       'The page atmosphere: a wide, off-centre radial gradient painted '
       'behind the background fill, fixed to the viewport rather than the '
@@ -198,7 +198,7 @@ class BackgroundEffectDocPage extends StatelessWidget {
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
-      BreadcrumbEntry.page('Page Glow'),
+      BreadcrumbEntry.page('Background Effect'),
     ],
     toc: pageGlowDocSpec.toc,
     previous: null,
@@ -471,7 +471,7 @@ class _ThemingContent extends StatelessWidget {
             'fading to itself at alpha 0 rather than to a literal '
             'transparent black — see the source\'s own note on '
             'premultiplied interpolation).',
-        '_PageGlowPainter.shouldRepaint compares exactly those two '
+        "The painter's shouldRepaint compares exactly those two "
             'colours: a rebuild that changes neither costs nothing extra.',
         'Both dark and light declare their own background and pageGlow '
             'on ThemeTokens — there is no third variant.',

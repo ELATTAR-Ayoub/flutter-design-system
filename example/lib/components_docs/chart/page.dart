@@ -19,9 +19,9 @@
 /// eight standing disclosures.
 ///
 /// **Read, not inferred.** Every claim here traces to a line in
-/// `lib/src/components/chart.dart`. In particular: this file wires no
+/// `lib/src/components/ui/chart.dart`. In particular: this file wires no
 /// `Semantics` node, no `FocusNode`, and no keyboard handling anywhere —
-/// checked with `grep -n "Semantics\|FocusNode" lib/src/components/chart.dart`,
+/// checked with `grep -n "Semantics\|FocusNode" lib/src/components/ui/chart.dart`,
 /// zero matches — so Accessibility and Keyboard both say so rather than
 /// inventing a story chart.dart does not tell.
 library;
@@ -75,7 +75,7 @@ final ComponentDocSpec chartDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'chart has a real registry manifest, `elattar add chart` installs '
-          'lib/src/components/chart.dart and resolves its one '
+          'lib/src/components/ui/chart.dart and resolves its one '
           'registryDependency, source-foundation, automatically. The Manual '
           'tab is for a project not using the CLI.',
       command: chartDoc.command,
@@ -84,7 +84,7 @@ final ComponentDocSpec chartDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/chart.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/chart.dart's generated "
+              "Copy lib/src/components/ui/chart.dart's generated "
               '@ui/chart.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1141,7 +1141,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/chart.dart — one file, no companions; '
+        'File: lib/src/components/ui/chart.dart — one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/widgets.dart only — no '
             'package:flutter/material.dart anywhere in the file.',

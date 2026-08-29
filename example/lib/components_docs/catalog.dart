@@ -248,3 +248,124 @@ ComponentDocEntry? componentDocForRoute(String route) {
 
 ComponentDocEntry componentDoc(String name) =>
     componentDocs.singleWhere((ComponentDocEntry entry) => entry.name == name);
+
+/// The five documentation families the site groups [componentDocs] into.
+///
+/// [componentDocs] itself stays the complete, flat route and search catalog:
+/// this is a view over it, not a second list. The left rail
+/// (`../docs/docs_layout.dart`) and the `/components` index
+/// (`../site/pages/public_pages.dart`) both read the families from here, so a
+/// component can never appear in one and not the other, or land in two groups.
+///
+/// The names are the site's, not the registry's: `effects` collects the
+/// reusable visual, interaction, and motion surfaces, which may be static,
+/// animated, or both — hence "Effects" rather than "Animations", a label that
+/// would stop being true the moment a reader replaces the implementation.
+enum ComponentDocFamily {
+  components('Components'),
+  effects('Effects'),
+  agent('Agent'),
+  charts('Charts');
+
+  const ComponentDocFamily(this.label);
+
+  /// The sidebar and index heading for this family.
+  final String label;
+}
+
+/// Reusable visual, interaction, and motion effects.
+///
+/// Ordinary state components — Skeleton, Spinner, Progress — stay under
+/// Components: they are things a reader places, not effects a reader applies.
+const Set<String> effectsDocNames = <String>{
+  'action_feedback',
+  'active_indicator',
+  'ambient_pattern',
+  'background_effect',
+  'content_change',
+  'feedback_surface',
+  'glass',
+  'hover_builder',
+  'icon_swap',
+  'keyframes',
+  'media_scrim',
+  'premium_surface',
+  'press',
+  'surface',
+};
+
+/// The agent family, plus the two voice surfaces that only exist for it.
+///
+/// Generic conversation primitives — Attachment, Bubble, Message,
+/// MessageScroller, Questionnaire — stay under Components: they are useful
+/// without an agent behind them.
+const Set<String> agentDocNames = <String>{
+  'agent_attach_menu',
+  'agent_attachments',
+  'agent_avatar',
+  'agent_composer',
+  'agent_console',
+  'agent_core',
+  'agent_face',
+  'agent_history',
+  'agent_launcher',
+  'agent_markdown',
+  'agent_slash_palette',
+  'agent_transcript',
+  'voice',
+  'voice_indicator',
+};
+
+/// The charts family.
+const Set<String> chartsDocNames = <String>{
+  'chart',
+  'chart_cartesian',
+  'chart_geometry',
+  'chart_polar',
+};
+
+/// One spelling of a catalog name, for membership tests only.
+///
+/// [ComponentDocEntry.name] is inconsistent by history — `agent-console` and
+/// `agent_attach_menu` are both real, and both feed `/components/<name>` —
+/// and the routes are public, so neither spelling can be normalised away.
+/// Family membership compares the underscored form so a set entry is never
+/// silently a miss.
+String _familyKey(String name) => name.replaceAll('-', '_');
+
+/// Which family [entry] belongs to.
+///
+/// Membership is by explicit name set, so a new catalog entry lands in
+/// [ComponentDocFamily.components] until somebody deliberately says otherwise
+/// — the safe default, and the one `catalog_wiring_test.dart` proves is
+/// exhaustive and non-overlapping.
+ComponentDocFamily componentDocFamily(ComponentDocEntry entry) {
+  final String key = _familyKey(entry.name);
+  if (effectsDocNames.contains(key)) return ComponentDocFamily.effects;
+  if (agentDocNames.contains(key)) return ComponentDocFamily.agent;
+  if (chartsDocNames.contains(key)) return ComponentDocFamily.charts;
+  return ComponentDocFamily.components;
+}
+
+/// Whether [name], in either spelling, is configured into a non-default
+/// family. Used by the taxonomy test to prove no set entry is a typo.
+bool isConfiguredFamilyName(String name) {
+  final String key = _familyKey(name);
+  return effectsDocNames.contains(key) ||
+      agentDocNames.contains(key) ||
+      chartsDocNames.contains(key);
+}
+
+/// Every [componentDocs] entry in [family], alphabetical by title.
+///
+/// [componentDocs] is already alphabetical by title per its own contract; the
+/// sort is kept so that contract failing cannot silently reorder a rail.
+List<ComponentDocEntry> componentDocsIn(ComponentDocFamily family) {
+  final List<ComponentDocEntry> entries = componentDocs
+      .where((ComponentDocEntry entry) => componentDocFamily(entry) == family)
+      .toList();
+  entries.sort(
+    (ComponentDocEntry a, ComponentDocEntry b) => a.title.compareTo(b.title),
+  );
+  return entries;
+}

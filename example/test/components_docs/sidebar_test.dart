@@ -191,7 +191,7 @@ void main() {
       expect(sidebarDoc.title, 'Sidebar');
       expect(sidebarDoc.route, '/components/sidebar');
       expect(sidebarDoc.command, 'elattar add sidebar');
-      expect(sidebarDoc.sourcePath, 'lib/src/components/sidebar.dart');
+      expect(sidebarDoc.sourcePath, 'lib/src/components/ui/sidebar.dart');
 
       // The whole family, not just the panel: provider, panel, rail, trigger,
       // inset, regions, groups, menu, submenu, and the user_menu block that

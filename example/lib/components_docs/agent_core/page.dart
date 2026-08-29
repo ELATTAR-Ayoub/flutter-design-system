@@ -2,7 +2,7 @@
 ///
 /// **Written from nothing**, per the rollout's per-item brief: `agent-core`
 /// has no page today. Everything on it is read off
-/// `lib/src/components/agent_core.dart` directly.
+/// `lib/src/components/ui/agent_core.dart` directly.
 ///
 /// **Not a widget.** Every other item in this family draws something;
 /// `agent_core.dart` declares none of its own — it is *"the vocabulary every
@@ -73,7 +73,7 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'agent-core has a real registry manifest: elattar add agent-core '
-          'installs lib/src/components/agent_core.dart and resolves icon '
+          'installs lib/src/components/ui/agent_core.dart and resolves icon '
           'and source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: agentCoreDoc.command,
@@ -82,7 +82,7 @@ final ComponentDocSpec agentCoreDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_core.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_core.dart's generated "
+              "Copy lib/src/components/ui/agent_core.dart's generated "
               '@ui/agent_core.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1861,7 +1861,7 @@ class _DependenciesContent extends StatelessWidget {
         facts: <DocsInstallFact>[
           const DocsInstallFact(
             label: 'File',
-            value: 'lib/src/components/agent_core.dart',
+            value: 'lib/src/components/ui/agent_core.dart',
             description:
                 'One file, no companions; the registry manifest lists '
                 'exactly one entry under "files".',

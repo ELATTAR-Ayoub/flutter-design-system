@@ -1,7 +1,7 @@
 /// Public documentation page for the `agent-launcher` component.
 ///
 /// Written from nothing: no page existed for this registry item before
-/// this file. Read end to end from `lib/src/components/agent_launcher.dart`
+/// this file. Read end to end from `lib/src/components/ui/agent_launcher.dart`
 /// (387 lines, `agent-launcher.tsx` ported) and from
 /// `test/agent_launcher_test.dart`.
 ///
@@ -76,7 +76,7 @@ final ComponentDocSpec agentLauncherDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'agent-launcher has a real registry manifest: `elattar add '
-          'agent-launcher` installs lib/src/components/agent_launcher.dart '
+          'agent-launcher` installs lib/src/components/ui/agent_launcher.dart '
           'and resolves agent-core, agent-face, button, dialog, and '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
@@ -86,7 +86,7 @@ final ComponentDocSpec agentLauncherDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_launcher.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_launcher.dart's generated "
+              "Copy lib/src/components/ui/agent_launcher.dart's generated "
               '@ui/agent_launcher.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -440,7 +440,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/agent_launcher.dart — one file, no '
+        'File: lib/src/components/ui/agent_launcher.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
         'registryDependencies, resolved automatically by `elattar add '

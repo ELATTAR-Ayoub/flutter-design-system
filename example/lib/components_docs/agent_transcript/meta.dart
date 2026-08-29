@@ -47,5 +47,5 @@ const ComponentDocEntry agentTranscriptDoc = ComponentDocEntry(
     'AgentCapability',
     'WelcomeCard',
   ],
-  sourcePath: 'lib/src/components/agent_transcript.dart',
+  sourcePath: 'lib/src/components/ui/agent_transcript.dart',
 );

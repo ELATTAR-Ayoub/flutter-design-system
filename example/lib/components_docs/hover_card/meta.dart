@@ -25,5 +25,5 @@ const ComponentDocEntry hoverCardDoc = ComponentDocEntry(
       'pointer users only: not available on touch.',
   dependencies: <String>['popover', 'source-foundation'],
   exports: <String>['HoverCard', 'HoverCardContent'],
-  sourcePath: 'lib/src/components/hover_card.dart',
+  sourcePath: 'lib/src/components/ui/hover_card.dart',
 );

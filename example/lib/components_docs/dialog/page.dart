@@ -63,7 +63,7 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'dialog has a real registry manifest: elattar add dialog '
-          'installs lib/src/components/dialog.dart and resolves button, '
+          'installs lib/src/components/ui/dialog.dart and resolves button, '
           'icon, surface, and source-foundation automatically. '
           'The Manual tab is for a project not using the CLI.',
       command: dialogDoc.command,
@@ -72,7 +72,7 @@ final ComponentDocSpec dialogDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/dialog.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/dialog.dart's generated "
+              "Copy lib/src/components/ui/dialog.dart's generated "
               '@ui/dialog.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -979,7 +979,7 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Icon', route: '/components/icon'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(label: 'Alert dialog', route: '/components/alert-dialog'),
           DocsLink(label: 'Sheet', route: '/components/sheet'),
           DocsLink(label: 'Drawer', route: '/components/drawer'),

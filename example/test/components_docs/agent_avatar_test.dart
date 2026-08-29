@@ -3,7 +3,7 @@
 ///
 /// `agent-avatar` is a brand-new page — no `page.dart` existed for this
 /// registry item before this file's counterpart. `AgentAvatar`'s own
-/// constructor (`lib/src/components/agent_avatar.dart`) declares four named
+/// constructor (`lib/src/components/ui/agent_avatar.dart`) declares four named
 /// parameters excluding `key`: `state`, `size`, `accent`, `speed`. The
 /// API-completeness test below checks all four, plus every
 /// `AgentAvatarSize` rung, appear in the `AgentAvatar` API table.
@@ -72,7 +72,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `AgentAvatar`'s own class declares
-/// (`lib/src/components/agent_avatar.dart`), excluding `key`.
+/// (`lib/src/components/ui/agent_avatar.dart`), excluding `key`.
 const List<String> _cubeAvatarConstructorParams = <String>[
   'state',
   'size',

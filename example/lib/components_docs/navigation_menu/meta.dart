@@ -33,5 +33,5 @@ const ComponentDocEntry navigationMenuDoc = ComponentDocEntry(
     'NavigationMenuIndicator',
     'NavigationMenuLink',
   ],
-  sourcePath: 'lib/src/components/navigation_menu.dart',
+  sourcePath: 'lib/src/components/ui/navigation_menu.dart',
 );

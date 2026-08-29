@@ -3,8 +3,8 @@
 /// **Split from a combined page.** `sheet` and `drawer` used to share one
 /// page and one `ComponentDocEntry` because they read as the same idea at
 /// different edges. The owner asked for one component per page instead: this
-/// file documents `lib/src/components/drawer.dart` alone.
-/// `lib/src/components/sheet.dart` has its own page and its own directory,
+/// file documents `lib/src/components/ui/drawer.dart` alone.
+/// `lib/src/components/ui/sheet.dart` has its own page and its own directory,
 /// `../sheet/page.dart`, not this one.
 ///
 /// **Re-housed onto the kit.** This page used to hand-compose [Section]
@@ -126,7 +126,7 @@ final ComponentDocSpec drawerDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every public constructor parameter declared on every public '
-          'class in lib/src/components/drawer.dart: one table each.',
+          'class in lib/src/components/ui/drawer.dart: one table each.',
       children: const <DocsTocEntry>[
         DocsTocEntry(title: 'Drawer', anchor: 'api-eldrawer'),
         DocsTocEntry(title: 'DrawerContent', anchor: 'api-eldrawercontent'),
@@ -164,7 +164,7 @@ final ComponentDocSpec drawerDocSpec = ComponentDocSpec(
       description:
           'drawer.dart wires no key handling of its own: every fact '
           'here belongs to the shared OverlayPortal it rides '
-          '(lib/src/components/dialog.dart).',
+          '(lib/src/components/ui/dialog.dart).',
       child: _KeyboardContent(),
     ),
     DisclosureSection(
@@ -665,7 +665,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// `drawer.dart` wires no key handling of its own — every fact here belongs
-/// to the shared `OverlayPortal` it rides (`lib/src/components/dialog.dart`).
+/// to the shared `OverlayPortal` it rides (`lib/src/components/ui/dialog.dart`).
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
@@ -732,7 +732,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/drawer.dart: one file, no '
+        'File: lib/src/components/ui/drawer.dart: one file, no '
             'companions.',
         'Flutter imports: package:flutter/gestures.dart '
             '(VerticalDragGestureRecognizer), '

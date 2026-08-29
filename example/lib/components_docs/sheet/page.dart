@@ -3,8 +3,8 @@
 /// **Split from a combined page.** `sheet` and `drawer` used to share one
 /// page and one [ComponentDocEntry] because they read as the same idea at
 /// different edges. The owner asked for one component per page instead: this
-/// file documents `lib/src/components/sheet.dart` alone.
-/// `lib/src/components/drawer.dart` has its own page and its own directory,
+/// file documents `lib/src/components/ui/sheet.dart` alone.
+/// `lib/src/components/ui/drawer.dart` has its own page and its own directory,
 /// `../drawer/page.dart`, not this one.
 ///
 /// **Re-housed onto the kit.** This page used to hand-compose [Section]
@@ -154,7 +154,7 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every public constructor parameter declared on every public '
-          'class or enum in lib/src/components/sheet.dart: one table '
+          'class or enum in lib/src/components/ui/sheet.dart: one table '
           'each.',
       children: const <DocsTocEntry>[
         DocsTocEntry(title: 'SheetOverlay', anchor: 'api-elsheetoverlay'),
@@ -203,7 +203,7 @@ final ComponentDocSpec sheetDocSpec = ComponentDocSpec(
       description:
           'sheet.dart wires no key handling of its own: every fact here '
           'belongs to the shared OverlayPortal it rides '
-          '(lib/src/components/dialog.dart).',
+          '(lib/src/components/ui/dialog.dart).',
       child: _KeyboardContent(),
     ),
     DisclosureSection(
@@ -955,7 +955,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// `sheet.dart` wires no key handling of its own — every fact here belongs
-/// to the shared `OverlayPortal` it rides (`lib/src/components/dialog.dart`).
+/// to the shared `OverlayPortal` it rides (`lib/src/components/ui/dialog.dart`).
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
@@ -1019,7 +1019,7 @@ class _DependenciesContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         _bullets(theme, <String>[
-          'File: lib/src/components/sheet.dart: one file, no '
+          'File: lib/src/components/ui/sheet.dart: one file, no '
               'companions.',
           'Flutter imports: dart:ui (ImageFilter, the mobile-nav '
               'backdrop blur only), package:flutter/widgets.dart.',

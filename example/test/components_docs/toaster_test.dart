@@ -16,7 +16,7 @@
 /// non-looping clocks (the 4000ms lifetime, the 200ms unmount window): the
 /// forever loops mean `pumpAndSettle` would hang, so every timed assertion
 /// below drives the clock with an explicit `tester.pump(duration)` using the
-/// real durations read off `lib/src/components/toaster.dart`
+/// real durations read off `lib/src/components/ui/toaster.dart`
 /// ([Toaster.transition], [Toaster.lifetime], [Toaster.unmountDelay]),
 /// exactly the pattern `test/feedback_effects_test.dart` already established
 /// for this widget.
@@ -109,7 +109,7 @@ void main() {
   test('toasterDoc exposes accurate registry metadata', () {
     expect(toasterDoc.name, 'toaster');
     expect(toasterDoc.title, 'Toaster');
-    expect(toasterDoc.sourcePath, 'lib/src/components/toaster.dart');
+    expect(toasterDoc.sourcePath, 'lib/src/components/ui/toaster.dart');
     // Both halves of the public surface: the overlay host and the
     // imperative controller/message/action/type/position types it takes —
     // are named as exports, not just the widget.

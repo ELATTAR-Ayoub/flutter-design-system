@@ -44,7 +44,7 @@
 ///     `.type-num-xs` (11/600) against `Badge`'s `text-xs font-medium`
 ///     (12/500): measured 12px at 500, mono, tabular. Carried by
 ///     [TextStyles.sidebarMenuBadge].
-///  4. **`NavUser`'s avatar fallback splits the difference**, 13px from
+///  4. **`UserMenu`'s avatar fallback splits the difference**, 13px from
 ///     `text-sm`, 600 from `.type-num-sm`, mono from `.type-num-sm`.
 ///  5. **Every row on the page is a `<button>` with no `onClick`.** The active
 ///     row is fixed by prop, so the travelling pill never travels here: it
@@ -448,7 +448,7 @@ class _AddCollection extends StatelessWidget {
   );
 }
 
-/// `FixtureFooter`, *"one NavUser composition, pinned by SidebarFooter."*
+/// `FixtureFooter`, *"one UserMenu composition, pinned by SidebarFooter."*
 class _FixtureFooter extends StatelessWidget {
   const _FixtureFooter();
 
@@ -523,7 +523,7 @@ class _AnatomySection extends StatelessWidget {
                       k: 'Footer',
                       v: const TextSpan(
                         text:
-                            'One NavUser composition, pinned by '
+                            'One UserMenu composition, pinned by '
                             'SidebarFooter.',
                       ),
                     ),
@@ -1119,7 +1119,7 @@ class _FooterSection extends StatelessWidget {
     id: 'footer',
     title: 'Footer',
     description:
-        'SidebarFooter pins the shared NavUser composition to the '
+        'SidebarFooter pins the shared UserMenu composition to the '
         'panel floor.',
     child: const Grid(
       lg: 2,

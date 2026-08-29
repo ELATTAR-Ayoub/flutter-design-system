@@ -42,5 +42,5 @@ const ComponentDocEntry questionnaireDoc = ComponentDocEntry(
     'QuestionnaireNext',
     'QuestionnaireSubmit',
   ],
-  sourcePath: 'lib/src/components/questionnaire.dart',
+  sourcePath: 'lib/src/components/ui/questionnaire.dart',
 );

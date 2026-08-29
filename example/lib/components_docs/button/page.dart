@@ -115,7 +115,7 @@ final ComponentDocSpec buttonDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'button has a real registry manifest, `elattar add button` '
-          'installs lib/src/components/button.dart and resolves all seven '
+          'installs lib/src/components/ui/button.dart and resolves all seven '
           'registryDependencies automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: buttonDoc.command,
@@ -124,7 +124,7 @@ final ComponentDocSpec buttonDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/button.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/button.dart's generated "
+              "Copy lib/src/components/ui/button.dart's generated "
               '@ui/button.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -338,7 +338,7 @@ final ComponentDocSpec buttonDocSpec = ComponentDocSpec(
           "shadcn's Button Group section points at a separate ButtonGroup "
           'component and shows Archive, Report, and Snooze composed inside '
           'it. This system keeps the same split: ButtonGroup '
-          '(lib/src/components/button_group.dart) is its own file, not '
+          '(lib/src/components/ui/button_group.dart) is its own file, not '
           'part of button.dart, and reshapes a row of Button members into '
           'one segmented control, squaring interior corners and dropping '
           'interior borders to one hairline per seam. It has no catalog '
@@ -1121,7 +1121,7 @@ class _AccessibilityContent extends StatelessWidget {
 /// New: the design calls for this page to carry its own Keyboard section,
 /// separate from the interaction facts folded into Accessibility above.
 /// Every claim here is read off the same source Accessibility already
-/// cites (`lib/src/components/button.dart`'s `_onKey` and its `Focus`
+/// cites (`lib/src/components/ui/button.dart`'s `_onKey` and its `Focus`
 /// wrapper), not inferred.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
@@ -1185,7 +1185,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/button.dart: one file, no companions; '
+        'File: lib/src/components/ui/button.dart: one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/foundation.dart (clampDouble), '
             'package:flutter/services.dart (LogicalKeyboardKey, KeyEvent), '
@@ -1211,11 +1211,17 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: space(2)),
       const DocsLinkRow(
         links: <DocsLink>[
-          DocsLink(label: 'Foil Value', route: '/components/premium_surface'),
+          DocsLink(
+            label: 'Premium Surface',
+            route: '/components/premium_surface',
+          ),
           DocsLink(label: 'Icon', route: '/components/icon'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(label: 'Press Motion', route: '/components/press'),
-          DocsLink(label: 'Sheen Action', route: '/components/action_feedback'),
+          DocsLink(
+            label: 'Action Feedback',
+            route: '/components/action_feedback',
+          ),
           DocsLink(label: 'Spinner', route: '/components/spinner'),
         ],
       ),

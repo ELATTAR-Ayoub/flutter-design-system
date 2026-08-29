@@ -43,7 +43,7 @@
 /// collide across all three.
 ///
 /// **API tables, verified.** Built from
-/// `lib/src/components/hover_card.dart`'s real constructors: `openDelay`
+/// `lib/src/components/ui/hover_card.dart`'s real constructors: `openDelay`
 /// and `closeDelay` default to the real `MotionDurations.hoverCardShowDelay`
 /// (700ms) and `MotionDurations.hoverCardHideDelay` (300ms) tokens, not bare
 /// literals. `width` defaults to null, which falls back to the static
@@ -96,7 +96,7 @@ final ComponentDocSpec hoverCardDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'hover-card has a real registry manifest, `elattar add '
-          'hover-card` installs lib/src/components/hover_card.dart and '
+          'hover-card` installs lib/src/components/ui/hover_card.dart and '
           'resolves popover and source-foundation automatically. The '
           'Manual tab is for a project not using the CLI.',
       command: hoverCardDoc.command,
@@ -105,7 +105,7 @@ final ComponentDocSpec hoverCardDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/hover_card.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/hover_card.dart's generated "
+              "Copy lib/src/components/ui/hover_card.dart's generated "
               '@ui/hover_card.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"

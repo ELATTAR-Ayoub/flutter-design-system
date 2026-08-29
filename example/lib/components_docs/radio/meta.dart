@@ -24,5 +24,5 @@ const ComponentDocEntry radioDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['RadioGroup', 'RadioGroupItem'],
-  sourcePath: 'lib/src/components/radio.dart',
+  sourcePath: 'lib/src/components/ui/radio.dart',
 );

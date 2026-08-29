@@ -45,7 +45,7 @@ import 'meta.dart';
 
 final ComponentDocSpec foilValueDocSpec = ComponentDocSpec(
   name: 'premium_surface',
-  title: 'Foil Value',
+  title: 'Premium Surface',
   description: premiumSurfaceDoc.description,
   sections: <DocsPageSection>[
     EffectSection(
@@ -230,7 +230,7 @@ class PremiumSurfaceDocPage extends StatelessWidget {
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
-      BreadcrumbEntry.page('Foil Value'),
+      BreadcrumbEntry.page('Premium Surface'),
     ],
     toc: foilValueDocSpec.toc,
     previous: null,
@@ -611,7 +611,7 @@ class _DependenciesContent extends StatelessWidget {
             'verbatim from registry/components/premium-surface.json. '
             'semanticDependencies (the manifest\'s narrower field): '
             'surface.',
-        'Real use in this corpus: lib/src/components/button.dart\'s '
+        'Real use in this corpus: lib/src/components/ui/button.dart\'s '
             '_surface, the premium arm only — ButtonVariant.premium is '
             'the sole caller in the package. action_feedback.dart carries a '
             'near-identical CSS-background-painting toolkit '
@@ -623,7 +623,7 @@ class _DependenciesContent extends StatelessWidget {
       DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
         ],
       ),
     ],
@@ -652,7 +652,7 @@ class _ThemingContent extends StatelessWidget {
             'each ShadowLayer inside Shadows.controlPremium / glowValue / '
             'btnDown is a Color Function(ThemeTokens), resolved live via '
             'ThemeScope.of(context) inside PremiumSurface.build — see the '
-            'Machine Surface page\'s own Theming section for what that '
+            'Surface page\'s own Theming section for what that '
             'means.',
         'The one theme-dependent blend-mode split the reference makes '
             'elsewhere (multiply on light, screen on dark, for '

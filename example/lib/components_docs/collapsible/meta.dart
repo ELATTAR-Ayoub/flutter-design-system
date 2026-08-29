@@ -1,6 +1,6 @@
 /// Public documentation metadata for the `collapsible` component.
 ///
-/// `lib/src/components/collapsible.dart` exports two public classes:
+/// `lib/src/components/ui/collapsible.dart` exports two public classes:
 /// [Collapsible] (the disclosure) and [Unfold] (the shared expand/collapse
 /// animation `Accordion` also mounts per open item). Both are named in
 /// [exports] because both are part of what a reader installs by copying this
@@ -27,5 +27,5 @@ const ComponentDocEntry collapsibleDoc = ComponentDocEntry(
       'else on the page.',
   dependencies: <String>['source-foundation'],
   exports: <String>['Collapsible', 'Unfold'],
-  sourcePath: 'lib/src/components/collapsible.dart',
+  sourcePath: 'lib/src/components/ui/collapsible.dart',
 );

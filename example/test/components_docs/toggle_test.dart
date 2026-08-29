@@ -86,7 +86,7 @@ const List<String> _sectionTitles = <String>[
 ];
 
 /// Every named constructor parameter `Toggle` declares, excluding `key`,
-/// read directly from `lib/src/components/toggle.dart` (L166-L178).
+/// read directly from `lib/src/components/ui/toggle.dart` (L166-L178).
 const List<String> _toggleParams = <String>[
   'child',
   'pressed',
@@ -416,34 +416,31 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets(
-      'the Independent toggles specimen mounts two Toggles that stay '
-      'mutually independent',
-      (WidgetTester tester) async {
-        await _pump(tester);
+    testWidgets('the Independent toggles specimen mounts two Toggles that stay '
+        'mutually independent', (WidgetTester tester) async {
+      await _pump(tester);
 
-        final Finder bold = find.byKey(
-          const ValueKey<String>('toggle-independent-bold-specimen'),
-        );
-        final Finder italic = find.byKey(
-          const ValueKey<String>('toggle-independent-italic-specimen'),
-        );
-        await tester.ensureVisible(bold);
-        expect(tester.widget<Toggle>(bold).pressed, isFalse);
-        expect(tester.widget<Toggle>(italic).pressed, isFalse);
+      final Finder bold = find.byKey(
+        const ValueKey<String>('toggle-independent-bold-specimen'),
+      );
+      final Finder italic = find.byKey(
+        const ValueKey<String>('toggle-independent-italic-specimen'),
+      );
+      await tester.ensureVisible(bold);
+      expect(tester.widget<Toggle>(bold).pressed, isFalse);
+      expect(tester.widget<Toggle>(italic).pressed, isFalse);
 
-        await tester.tap(bold, warnIfMissed: false);
-        await tester.pump();
-        expect(tester.widget<Toggle>(bold).pressed, isTrue);
-        expect(
-          tester.widget<Toggle>(italic).pressed,
-          isFalse,
-          reason: 'Bold and Italic must not be mutually exclusive',
-        );
+      await tester.tap(bold, warnIfMissed: false);
+      await tester.pump();
+      expect(tester.widget<Toggle>(bold).pressed, isTrue);
+      expect(
+        tester.widget<Toggle>(italic).pressed,
+        isFalse,
+        reason: 'Bold and Italic must not be mutually exclusive',
+      );
 
-        expect(tester.takeException(), isNull);
-      },
-    );
+      expect(tester.takeException(), isNull);
+    });
 
     testWidgets(
       'the Disabled specimens really are disabled, at both pressed values',
@@ -588,7 +585,7 @@ void main() {
       expect(toggleDoc.name, 'toggle');
       expect(toggleDoc.route, '/components/toggle');
       expect(toggleDoc.command, 'elattar add toggle');
-      expect(toggleDoc.sourcePath, 'lib/src/components/toggle.dart');
+      expect(toggleDoc.sourcePath, 'lib/src/components/ui/toggle.dart');
       expect(toggleDoc.exports, <String>[
         'Toggle',
         'ToggleVariant',

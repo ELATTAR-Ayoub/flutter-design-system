@@ -6,7 +6,7 @@
 /// relevant `DocsDisclosure` first — closed by default, unlike the old
 /// page's always-visible `Section`.
 ///
-/// Reads `lib/src/components/resizable.dart` directly; every public class
+/// Reads `lib/src/components/ui/resizable.dart` directly; every public class
 /// and constructor parameter enumerated below is one this page's API
 /// tables must cover.
 ///

@@ -16,5 +16,5 @@ const ComponentDocEntry iconDoc = ComponentDocEntry(
   // registry/components/icon.json's registryDependencies, verbatim.
   dependencies: <String>['source-foundation'],
   exports: <String>['Icon', 'IconGlyph', 'IconSize', 'IconTone'],
-  sourcePath: 'lib/src/components/icon.dart',
+  sourcePath: 'lib/src/components/ui/icon.dart',
 );

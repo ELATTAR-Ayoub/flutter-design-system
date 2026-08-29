@@ -5,7 +5,7 @@
 /// copied verbatim — `agent-avatar`, `agent-core`, `keyframes`,
 /// `source-foundation`, `voice`, `voice-indicator`.
 ///
-/// `lib/src/components/agent_face.dart` is `parts/agent-face.tsx` ported:
+/// `lib/src/components/ui/agent_face.dart` is `parts/agent-face.tsx` ported:
 /// which of two objects sits in the face's slot — the working avatar or the
 /// listening/speaking voice orb — plus the sentence beside it. [exports]
 /// lists every public name the file declares; the page documents
@@ -43,5 +43,5 @@ const ComponentDocEntry agentFaceDoc = ComponentDocEntry(
     'AgentOrbBuilder',
     'AgentVisualiserBuilder',
   ],
-  sourcePath: 'lib/src/components/agent_face.dart',
+  sourcePath: 'lib/src/components/ui/agent_face.dart',
 );

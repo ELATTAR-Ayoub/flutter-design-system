@@ -52,7 +52,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every field `BandScale`, `PointScale`, `LinearScale` and
-/// `BarSlot` declare (`lib/src/components/chart_geometry.dart`), plus
+/// `BarSlot` declare (`lib/src/components/ui/chart_geometry.dart`), plus
 /// every `CurveType` value — this file has no widget, so there is no
 /// constructor parameter list to assert against; these are the equivalent
 /// completeness check for a file of pure functions and value classes.

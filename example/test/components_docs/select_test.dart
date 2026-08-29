@@ -53,7 +53,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `Select`'s own class declares
-/// (`lib/src/components/select.dart`), excluding `key`: the same set the
+/// (`lib/src/components/ui/select.dart`), excluding `key`: the same set the
 /// page's `Select` `DocsApiTable` claims to cover.
 const List<String> _selectConstructorParams = <String>[
   'options',

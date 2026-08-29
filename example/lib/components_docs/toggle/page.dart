@@ -28,7 +28,7 @@
 /// **One real addition: Keyboard.** The old page's Accessibility panel
 /// already named the activation keys and the focus-visible predicate; the
 /// new Keyboard disclosure restates them on their own, read directly off
-/// `lib/src/components/toggle.dart`'s `_onKey` and its `Focus` wrapper —
+/// `lib/src/components/ui/toggle.dart`'s `_onKey` and its `Focus` wrapper —
 /// the same split the button page made between its own Accessibility and
 /// Keyboard sections.
 ///
@@ -85,7 +85,7 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
       command: toggleDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/src/components/toggle.dart',
+          path: 'lib/src/components/ui/toggle.dart',
           title: 'Manual: source mode (not recommended yet)',
           description:
               'Copying this file will not compile on its own: it needs '
@@ -189,7 +189,7 @@ final ComponentDocSpec toggleDocSpec = ComponentDocSpec(
       description:
           'Every constructor parameter Toggle declares, its six static '
           'helpers, and both enums it owns: one table each, read off '
-          'lib/src/components/toggle.dart.',
+          'lib/src/components/ui/toggle.dart.',
       child: _ApiReferenceContent(),
       children: <DocsTocEntry>[
         DocsTocEntry(title: 'Toggle', anchor: 'api-eltoggle'),
@@ -1101,7 +1101,7 @@ class _AccessibilityContent extends StatelessWidget {
 
 /// New: the design calls for this page to carry its own Keyboard section,
 /// separate from the interaction facts folded into Accessibility above.
-/// Every claim here is read off `lib/src/components/toggle.dart`'s own
+/// Every claim here is read off `lib/src/components/ui/toggle.dart`'s own
 /// `_onKey` (L334-L339) and its `Focus` wrapper (L465-L469), not inferred.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
@@ -1245,7 +1245,7 @@ class _DependenciesContent extends StatelessWidget {
             DocsLink(label: 'Button', route: '/components/button'),
             DocsLink(label: 'Icon', route: '/components/icon'),
             DocsLink(label: 'Toggle group', route: '/components/toggle-group'),
-            DocsLink(label: 'Machine Surface', route: '/components/surface'),
+            DocsLink(label: 'Surface', route: '/components/surface'),
             DocsLink(
               label: 'Source Foundation',
               route: '/components/source_foundation',

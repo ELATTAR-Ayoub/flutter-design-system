@@ -52,7 +52,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter each exported widget declares
-/// (`lib/src/components/voice.dart`), excluding `key`.
+/// (`lib/src/components/ui/voice.dart`), excluding `key`.
 const List<String> _liveWaveformParams = <String>['samples', 'width', 'height'];
 const List<String> _barVisualizerParams = <String>[
   'spectrum',

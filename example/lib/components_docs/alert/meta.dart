@@ -20,5 +20,5 @@ const ComponentDocEntry alertDoc = ComponentDocEntry(
       'across five variants, told apart only by icon color and bloom.',
   dependencies: <String>['feedback-surface', 'source-foundation'],
   exports: <String>['Alert', 'AlertVariant'],
-  sourcePath: 'lib/src/components/alert.dart',
+  sourcePath: 'lib/src/components/ui/alert.dart',
 );

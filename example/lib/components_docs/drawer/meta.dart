@@ -1,7 +1,7 @@
 /// Documentation metadata for the `drawer` component.
 ///
 /// Split out of a former combined sheet+drawer page: this file documents
-/// `lib/src/components/drawer.dart` alone. `lib/src/components/sheet.dart`
+/// `lib/src/components/ui/drawer.dart` alone. `lib/src/components/ui/sheet.dart`
 /// has its own page and its own `../sheet/meta.dart`, not this one.
 ///
 /// [dependencies] names the real modules `drawer.dart` imports (for the
@@ -32,5 +32,5 @@ const ComponentDocEntry drawerDoc = ComponentDocEntry(
     'DrawerTitle',
     'DrawerDescription',
   ],
-  sourcePath: 'lib/src/components/drawer.dart',
+  sourcePath: 'lib/src/components/ui/drawer.dart',
 );

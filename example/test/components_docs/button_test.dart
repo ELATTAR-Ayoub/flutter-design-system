@@ -54,7 +54,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `Button`'s own class declares
-/// (`lib/src/components/button.dart`), excluding `key`: the same set the
+/// (`lib/src/components/ui/button.dart`), excluding `key`: the same set the
 /// page's `Button` [DocsApiTable] claims to cover.
 const List<String> _buttonConstructorParams = <String>[
   'child',

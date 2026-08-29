@@ -8,7 +8,7 @@
 /// `Section`.
 ///
 /// `field` is a family of nine classes plus one enum
-/// (`lib/src/components/field.dart`, read directly for Step 1 of the task
+/// (`lib/src/components/ui/field.dart`, read directly for Step 1 of the task
 /// cycle): [Field], [FieldScope], [FieldActivator],
 /// [FieldOrientation], [FieldGroup], [FieldSet], [FieldLegend],
 /// [FieldLabel], [FieldDescription], [FieldError]. The API-completeness
@@ -91,7 +91,7 @@ const Size _narrow = Size(390, 844);
 
 /// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class found by reading
-/// `lib/src/components/field.dart` directly (Step 1). The completeness test
+/// `lib/src/components/ui/field.dart` directly (Step 1). The completeness test
 /// asserts each list is a subset of that specific table's own facts: not of
 /// a set merged across every table on the page.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{

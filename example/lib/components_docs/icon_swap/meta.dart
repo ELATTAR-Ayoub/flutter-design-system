@@ -4,7 +4,7 @@
 /// registry `type: "component"`, unlike its three siblings on this same
 /// rollout (`active-indicator`, `content-change`, `lift`, all `type: "motion"`) — but it
 /// carries no variant enum and is never placed on its own: every real call
-/// site (`lib/src/components/attachment.dart`, `lib/src/components/
+/// site (`lib/src/components/ui/attachment.dart`, `lib/src/components/ui/
 /// sidebar.dart`) puts it inside an `Button`'s `child:` slot. [dependencies]
 /// is that manifest's own `registryDependencies` list, copied verbatim:
 /// `keyframes`, `source-foundation`.
@@ -23,5 +23,5 @@ const ComponentDocEntry iconSwapDoc = ComponentDocEntry(
   // registry/components/icon-swap.json's own registryDependencies, verbatim.
   dependencies: <String>['keyframes', 'source-foundation'],
   exports: <String>['IconSwap'],
-  sourcePath: 'lib/src/components/icon_swap.dart',
+  sourcePath: 'lib/src/components/ui/icon_swap.dart',
 );

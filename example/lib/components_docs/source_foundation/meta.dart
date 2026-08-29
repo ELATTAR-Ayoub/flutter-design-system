@@ -4,8 +4,9 @@
 /// `registry/foundations/source.json`, the only registry item of that type
 /// — and [dependencies] is that manifest's own `registryDependencies` list,
 /// copied verbatim: empty. It is the copy-first Flutter foundation: eleven
-/// files (`lib/src/foundation/*.dart`, plus `lib/src/text_layout.dart` and
-/// `lib/src/theme_scope.dart`), covering semantic colours, both themes,
+/// files, all of them `lib/src/design_system/foundation/*.dart` — text
+/// layout and the theme scope moved in there too — covering semantic
+/// colours, both themes,
 /// typography, spacing, motion, shadows and surfaces — every token every
 /// other registry item is built from.
 library;
@@ -55,5 +56,5 @@ const ComponentDocEntry sourceFoundationDoc = ComponentDocEntry(
     'DateFormat',
     'Fluid',
   ],
-  sourcePath: 'lib/src/foundation/',
+  sourcePath: 'lib/src/design_system/foundation/',
 );

@@ -41,5 +41,5 @@ const ComponentDocEntry agentConsoleDoc = ComponentDocEntry(
     'AgentPersona',
     'AgentModel',
   ],
-  sourcePath: 'lib/src/components/agent_console.dart',
+  sourcePath: 'lib/src/blocks/agent_console/agent_console.dart',
 );

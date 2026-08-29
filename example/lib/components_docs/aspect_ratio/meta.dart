@@ -13,7 +13,7 @@
 /// `registry/components/aspect_ratio.json` "does not exist yet":
 /// `registry/components/aspect-ratio.json` (hyphenated, matching the
 /// registry's own naming) exists, lists exactly one file
-/// (`lib/src/components/aspect_ratio.dart`) and **no** registry
+/// (`lib/src/components/ui/aspect_ratio.dart`) and **no** registry
 /// dependencies. [dependencies] is empty because the manifest's own
 /// `registryDependencies` array is empty — not because nothing has
 /// resolved it.
@@ -29,5 +29,5 @@ const ComponentDocEntry aspectRatioDoc = ComponentDocEntry(
       'given.',
   dependencies: <String>[],
   exports: <String>['AspectRatio'],
-  sourcePath: 'lib/src/components/aspect_ratio.dart',
+  sourcePath: 'lib/src/components/ui/aspect_ratio.dart',
 );

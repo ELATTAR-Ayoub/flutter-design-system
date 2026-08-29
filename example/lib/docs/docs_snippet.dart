@@ -9,7 +9,7 @@
 /// DEVIATION from the task-2 brief, ruled by the repository owner: the brief
 /// had this widget render through `AgentCodeBlock` itself. That widget's
 /// `normalise` looks the language up in `languageAliases`
-/// (`lib/src/components/agent_markdown.dart`), which registers bash, css,
+/// (`lib/src/components/ui/agent_markdown.dart`), which registers bash, css,
 /// js/javascript, json, jsx, md/markdown, py/python, sh/shell, sql, ts/tsx/
 /// typescript — and no `dart`. Since `dart` is the default language and
 /// nearly all documentation code, routing through `AgentCodeBlock` would

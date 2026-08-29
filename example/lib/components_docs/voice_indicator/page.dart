@@ -59,7 +59,7 @@ const List<int> _orbSeeds = <int>[10, 20, 30, 40];
 
 final ComponentDocSpec voiceOrbDocSpec = ComponentDocSpec(
   name: 'voice-indicator',
-  title: 'Voice Orb',
+  title: 'Voice Indicator',
   description: voiceIndicatorDoc.description,
   sections: <DocsPageSection>[
     ShowcaseSection(
@@ -167,7 +167,7 @@ final ComponentDocSpec voiceOrbDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read off _VoiceOrbState._tick and _play directly, not '
+          "Read off the indicator state's _tick and _play directly, not "
           'inferred: the ticker is a hand-integrated feedback loop, not '
           'an AnimationController curve.',
       child: DocsStateMatrix(facts: _stateFacts),
@@ -259,7 +259,7 @@ class VoiceIndicatorDocPage extends StatelessWidget {
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
-      BreadcrumbEntry.page('Voice Orb'),
+      BreadcrumbEntry.page('Voice Indicator'),
     ],
     toc: voiceOrbDocSpec.toc,
     previous: null,

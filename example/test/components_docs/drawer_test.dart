@@ -79,7 +79,7 @@ const List<String> _sectionOrder = <String>[
 ];
 
 /// Every constructor parameter name declared on the public classes of
-/// `lib/src/components/drawer.dart`. [DrawerHandle] takes no constructor
+/// `lib/src/components/ui/drawer.dart`. [DrawerHandle] takes no constructor
 /// parameters of its own.
 const List<String> _drawerParamNames = <String>[
   'trigger', // Drawer
@@ -139,7 +139,7 @@ void main() {
       expect(drawerDoc.name, 'drawer');
       expect(drawerDoc.title, 'Drawer');
       expect(drawerDoc.route, '/components/drawer');
-      expect(drawerDoc.sourcePath, 'lib/src/components/drawer.dart');
+      expect(drawerDoc.sourcePath, 'lib/src/components/ui/drawer.dart');
       expect(drawerDoc.description, isNotEmpty);
       expect(drawerDoc.description, isNot(contains('..')));
       expect(drawerDoc.description.trim(), drawerDoc.description);

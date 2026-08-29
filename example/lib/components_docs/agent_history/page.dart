@@ -1,7 +1,7 @@
 /// Public documentation page for the `agent-history` component.
 ///
 /// Written from nothing: no page existed for this registry item before
-/// this file. Read end to end from `lib/src/components/agent_history.dart`
+/// this file. Read end to end from `lib/src/components/ui/agent_history.dart`
 /// (1911 lines, three reference files folded into one) and from
 /// `test/agent_history_test.dart`.
 ///
@@ -71,7 +71,7 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'agent-history has a real registry manifest: `elattar add '
-          'agent-history` installs lib/src/components/agent_history.dart '
+          'agent-history` installs lib/src/components/ui/agent_history.dart '
           'and resolves all seventeen registryDependencies automatically. '
           'The Manual tab is for a project not using the CLI.',
       command: agentHistoryDoc.command,
@@ -80,7 +80,7 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_history.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_history.dart's generated "
+              "Copy lib/src/components/ui/agent_history.dart's generated "
               '@ui/agent_history.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1022,7 +1022,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/agent_history.dart — one file, no '
+        'File: lib/src/components/ui/agent_history.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
         'registryDependencies, resolved automatically by `elattar add '
@@ -1057,7 +1057,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Input', route: '/components/input'),
           DocsLink(label: 'Item', route: '/components/item'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(label: 'Menu', route: '/components/menu'),
           DocsLink(label: 'Popover', route: '/components/popover'),
           DocsLink(label: 'Spinner', route: '/components/spinner'),

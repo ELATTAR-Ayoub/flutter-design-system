@@ -10,7 +10,7 @@
 /// nowhere left to travel.
 ///
 /// This page is new — `message-scroller` had no page before this pass —
-/// built from `lib/src/components/message_scroller.dart` end to end and from
+/// built from `lib/src/components/ui/message_scroller.dart` end to end and from
 /// the live specimen already staged on
 /// `example/lib/pages/chat.dart`'s "Message Scroller" section, reused here
 /// rather than invented fresh, per the rollout's own brief. Every stage on
@@ -66,7 +66,7 @@ final ComponentDocSpec messageScrollerDocSpec = ComponentDocSpec(
       description:
           'message-scroller has a real registry manifest, `elattar add '
           'message-scroller` installs '
-          'lib/src/components/message_scroller.dart and resolves button, '
+          'lib/src/components/ui/message_scroller.dart and resolves button, '
           'icon and source-foundation automatically. The Manual tab is '
           'for a project not using the CLI.',
       command: messageScrollerDoc.command,
@@ -75,7 +75,7 @@ final ComponentDocSpec messageScrollerDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/message_scroller.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/message_scroller.dart's generated "
+              "Copy lib/src/components/ui/message_scroller.dart's generated "
               '@ui/message_scroller.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -932,7 +932,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/message_scroller.dart — one file, no '
+        'File: lib/src/components/ui/message_scroller.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
         'Flutter imports: dart:math (sqrt for the smooth-scroll '

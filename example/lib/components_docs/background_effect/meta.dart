@@ -17,7 +17,7 @@ import '../catalog.dart' show ComponentDocEntry;
 
 const ComponentDocEntry backgroundEffectDoc = ComponentDocEntry(
   name: 'background_effect',
-  title: 'Page Glow',
+  title: 'Background Effect',
   description:
       'The page atmosphere: a wide, off-centre radial gradient painted '
       'behind the background fill, fixed to the viewport rather than the '

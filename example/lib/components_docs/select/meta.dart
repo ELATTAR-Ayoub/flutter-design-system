@@ -41,5 +41,5 @@ const ComponentDocEntry selectDoc = ComponentDocEntry(
     'SelectSeparator',
     'SelectMenu',
   ],
-  sourcePath: 'lib/src/components/select.dart',
+  sourcePath: 'lib/src/components/ui/select.dart',
 );

@@ -77,7 +77,7 @@ const List<String> _expectedSectionIds = <String>[
 ];
 
 /// Every public constructor parameter of `Switch`, enumerated by reading
-/// `lib/src/components/switch.dart` directly. The API table must cover all
+/// `lib/src/components/ui/switch.dart` directly. The API table must cover all
 /// of these by name.
 const List<String> _switchParams = <String>[
   'value',

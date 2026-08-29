@@ -83,7 +83,7 @@ final ComponentDocSpec statDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'stat ships a real registry manifest: `elattar add stat` '
-          'installs lib/src/components/stat.dart and resolves icon, '
+          'installs lib/src/components/ui/stat.dart and resolves icon, '
           'skeleton, source-foundation, and content-change automatically. The '
           'Manual tab is for a project not using the CLI.',
       command: statDoc.command,
@@ -92,7 +92,7 @@ final ComponentDocSpec statDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/stat.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/stat.dart's generated @ui/stat.dart "
+              "Copy lib/src/components/ui/stat.dart's generated @ui/stat.dart "
               'payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -896,7 +896,10 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Source Foundation',
             route: '/components/source_foundation',
           ),
-          DocsLink(label: 'Swap In', route: '/components/content_change'),
+          DocsLink(
+            label: 'Content Change',
+            route: '/components/content_change',
+          ),
         ],
       ),
     ],

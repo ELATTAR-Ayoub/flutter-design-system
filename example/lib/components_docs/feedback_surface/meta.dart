@@ -25,7 +25,7 @@ import '../catalog.dart' show ComponentDocEntry;
 
 const ComponentDocEntry feedbackSurfaceDoc = ComponentDocEntry(
   name: 'feedback_surface',
-  title: 'Bloom Cosmic',
+  title: 'Feedback Surface',
   description:
       'The iridescence behind an Alert and a toast: two blurred, '
       'forever-drifting radial-gradient layers hung off a corner in the '

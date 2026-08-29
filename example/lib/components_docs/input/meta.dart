@@ -26,5 +26,5 @@ const ComponentDocEntry inputDoc = ComponentDocEntry(
   // registry/components/input.json's own registryDependencies, verbatim.
   dependencies: <String>['button', 'field', 'surface', 'source-foundation'],
   exports: <String>['Input', 'FieldSurfaceRecipe', 'FieldVisibility'],
-  sourcePath: 'lib/src/components/input.dart',
+  sourcePath: 'lib/src/components/ui/input.dart',
 );

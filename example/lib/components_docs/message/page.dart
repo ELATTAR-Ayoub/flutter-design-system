@@ -10,7 +10,7 @@
 /// sender's own turn needs no second component.
 ///
 /// This page is new — `message` had no page before this pass — built from
-/// `lib/src/components/message.dart` end to end and from the live specimens
+/// `lib/src/components/ui/message.dart` end to end and from the live specimens
 /// already staged on `example/lib/pages/chat.dart`'s "Message" section,
 /// reused here rather than invented fresh, per the rollout's own brief.
 library;
@@ -57,7 +57,7 @@ final ComponentDocSpec messageDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'message has a real registry manifest, `elattar add message` '
-          'installs lib/src/components/message.dart and resolves bubble '
+          'installs lib/src/components/ui/message.dart and resolves bubble '
           'and source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: messageDoc.command,
@@ -66,7 +66,7 @@ final ComponentDocSpec messageDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/message.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/message.dart's generated "
+              "Copy lib/src/components/ui/message.dart's generated "
               '@ui/message.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -918,7 +918,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/message.dart — one file, no companions; '
+        'File: lib/src/components/ui/message.dart — one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/widgets.dart only.',
         'Foundation imports: foundation/spacing.dart (space()), '

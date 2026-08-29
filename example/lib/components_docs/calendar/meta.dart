@@ -8,7 +8,7 @@
 /// `calendar` ships `registry/components/calendar.json`, so
 /// `elattar add calendar` resolves today. [dependencies] mirrors that
 /// manifest's `registryDependencies`, which also match the real imports at
-/// the top of `lib/src/components/calendar.dart`:
+/// the top of `lib/src/components/ui/calendar.dart`:
 ///
 ///  * `source-foundation`, `colors`, `date_format`, `motion`, `spacing`,
 ///    `theme` and `typography`. `date_format.dart` is inside the foundation
@@ -43,5 +43,5 @@ const ComponentDocEntry calendarDoc = ComponentDocEntry(
     'CalendarBandPainter',
     'DatePicker',
   ],
-  sourcePath: 'lib/src/components/calendar.dart',
+  sourcePath: 'lib/src/components/ui/calendar.dart',
 );

@@ -17,7 +17,7 @@
 /// own sections below it, since `SnippetSection` carries no live
 /// specimen), Grouped menu, Size & width, then the eight disclosures. New:
 /// a Keyboard disclosure, between Accessibility and Responsive, read
-/// directly off `lib/src/components/select.dart`'s `_SelectState`
+/// directly off `lib/src/components/ui/select.dart`'s `_SelectState`
 /// keyboard handling.
 library;
 
@@ -65,7 +65,7 @@ final ComponentDocSpec selectDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'select has a real registry manifest: elattar add select '
-          'installs lib/src/components/select.dart and resolves button, '
+          'installs lib/src/components/ui/select.dart and resolves button, '
           'field, icon, surface, popover, and source-foundation '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
@@ -75,7 +75,7 @@ final ComponentDocSpec selectDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/select.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/select.dart's generated "
+              "Copy lib/src/components/ui/select.dart's generated "
               '@ui/select.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -935,7 +935,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Popover', route: '/components/popover'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',

@@ -43,13 +43,13 @@ const ComponentDocEntry toggleGroupDoc = ComponentDocEntry(
     'toggle',
   ],
   exports: <String>['ToggleGroup', 'ToggleGroupItem'],
-  sourcePath: 'lib/src/components/toggle_group.dart',
+  sourcePath: 'lib/src/components/ui/toggle_group.dart',
 );
 
 /// The sibling source file every `ToggleGroupItem` is rendered through:
 /// `toggle_group.dart` builds one `Toggle` per item. The single
 /// [ComponentDocEntry.sourcePath] field has no room for it.
-const String toggleItemSourcePath = 'lib/src/components/toggle.dart';
+const String toggleItemSourcePath = 'lib/src/components/ui/toggle.dart';
 
 /// The travelling-pill engine `ToggleGroup` renders through, shared with
 /// `Tabs`, `Sidebar` and `IconSwap`. `Toggle` does not import it.

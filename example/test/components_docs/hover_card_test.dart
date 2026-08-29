@@ -124,7 +124,7 @@ void main() {
         'popover',
         'source-foundation',
       ]);
-      expect(hoverCardDoc.sourcePath, 'lib/src/components/hover_card.dart');
+      expect(hoverCardDoc.sourcePath, 'lib/src/components/ui/hover_card.dart');
       expect(
         hoverCardDoc.exports,
         containsAll(<String>['HoverCard', 'HoverCardContent']),

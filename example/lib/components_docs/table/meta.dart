@@ -8,7 +8,7 @@
 /// `table` ships `registry/components/table.json`, so `elattar add table`
 /// resolves today. [dependencies] mirrors that manifest's
 /// `registryDependencies`, which is also the real import list at the top of
-/// `lib/src/components/table.dart`: colour, spacing, theme, typography and
+/// `lib/src/components/ui/table.dart`: colour, spacing, theme, typography and
 /// motion tokens, and no other component or effect file.
 library;
 
@@ -38,5 +38,5 @@ const ComponentDocEntry tableDoc = ComponentDocEntry(
     'tableHoverDuration',
     'tableHoverCurve',
   ],
-  sourcePath: 'lib/src/components/table.dart',
+  sourcePath: 'lib/src/components/ui/table.dart',
 );

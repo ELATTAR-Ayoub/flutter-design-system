@@ -1,7 +1,7 @@
 /// Public documentation page for the `attachment` component.
 ///
 /// Written from nothing: no page existed for this registry item before this
-/// file. Read end to end from `lib/src/components/attachment.dart` (1320
+/// file. Read end to end from `lib/src/components/ui/attachment.dart` (1320
 /// lines) and from the working specimens already live in
 /// `example/lib/pages/chat.dart`'s `_AttachmentSection` and `_Tray`, whose
 /// state grid, size row, media-variant row, preview-and-download row and
@@ -53,7 +53,7 @@ final ComponentDocSpec attachmentDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'attachment has a real registry manifest, `elattar add '
-          'attachment` installs lib/src/components/attachment.dart and '
+          'attachment` installs lib/src/components/ui/attachment.dart and '
           'resolves all five registryDependencies automatically. The '
           'Manual tab is for a project not using the CLI.',
       command: attachmentDoc.command,
@@ -62,7 +62,7 @@ final ComponentDocSpec attachmentDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/attachment.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/attachment.dart's generated "
+              "Copy lib/src/components/ui/attachment.dart's generated "
               '@ui/attachment.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1275,7 +1275,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/attachment.dart — one file, no '
+        'File: lib/src/components/ui/attachment.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
         'Flutter imports: dart:math, dart:ui, package:flutter/'

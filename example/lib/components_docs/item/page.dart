@@ -107,7 +107,7 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'item has a real registry manifest, `elattar add item` installs '
-          'lib/src/components/item.dart and resolves source-foundation '
+          'lib/src/components/ui/item.dart and resolves source-foundation '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
       command: itemDoc.command,
@@ -116,7 +116,7 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/item.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/item.dart's generated @ui/item.dart "
+              "Copy lib/src/components/ui/item.dart's generated @ui/item.dart "
               'payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -234,7 +234,7 @@ final ComponentDocSpec itemDocSpec = ComponentDocSpec(
       description:
           'One prop table per exported class, plus a static-tokens table '
           'for two of them. Every row below is a real constructor '
-          'parameter, verified against lib/src/components/item.dart '
+          'parameter, verified against lib/src/components/ui/item.dart '
           'directly.',
       children: const <DocsTocEntry>[
         DocsTocEntry(title: 'ItemGroup', anchor: 'api-elitemgroup'),
@@ -1017,7 +1017,7 @@ class _DependenciesContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/item.dart, one file, no companions; '
+        'File: lib/src/components/ui/item.dart, one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
         'Imports: foundation/colors.dart (transparent), '
             'foundation/spacing.dart, foundation/theme.dart, '

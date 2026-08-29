@@ -27,5 +27,5 @@ const ComponentDocEntry menubarDoc = ComponentDocEntry(
       'Popover: File/Edit/View style application chrome.',
   dependencies: <String>['menu', 'popover', 'source-foundation'],
   exports: <String>['Menubar', 'MenubarMenu'],
-  sourcePath: 'lib/src/components/menubar.dart',
+  sourcePath: 'lib/src/components/ui/menubar.dart',
 );

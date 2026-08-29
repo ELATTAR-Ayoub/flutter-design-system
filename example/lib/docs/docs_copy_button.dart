@@ -5,7 +5,7 @@
 /// invisible against the block it sits on, and this is the only affordance
 /// the block has.
 ///
-/// The glyph rolls through [IconSwap] (`lib/src/components/icon_swap.dart`)
+/// The glyph rolls through [IconSwap] (`lib/src/components/ui/icon_swap.dart`)
 /// rather than swapping instantly. That component's own docstring states the
 /// system's rule plainly: *"every control that alternates between icons swaps
 /// them through this... No crossfades, no instant swaps — a control that

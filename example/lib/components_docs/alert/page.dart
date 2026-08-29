@@ -74,7 +74,7 @@ final ComponentDocSpec alertDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'alert has a real registry manifest, `elattar add alert` installs '
-          'lib/src/components/alert.dart and resolves feedback-surface and '
+          'lib/src/components/ui/alert.dart and resolves feedback-surface and '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: alertDoc.command,
@@ -83,7 +83,7 @@ final ComponentDocSpec alertDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/alert.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/alert.dart's generated "
+              "Copy lib/src/components/ui/alert.dart's generated "
               '@ui/alert.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -215,7 +215,7 @@ final ComponentDocSpec alertDocSpec = ComponentDocSpec(
       description:
           'Every Alert constructor parameter and static member, and '
           'every AlertVariant value, read directly from '
-          'lib/src/components/alert.dart.',
+          'lib/src/components/ui/alert.dart.',
       child: _ApiReferenceContent(),
     ),
     DisclosureSection(
@@ -860,7 +860,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Files',
-            value: 'lib/src/components/alert.dart',
+            value: 'lib/src/components/ui/alert.dart',
             description: 'One file; Alert and AlertVariant both live here.',
           ),
           const DocsInstallFact(
@@ -904,7 +904,7 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Alert Dialog', route: '/components/alert-dialog'),
           DocsLink(
-            label: 'Bloom Cosmic',
+            label: 'Feedback Surface',
             route: '/components/feedback_surface',
           ),
           DocsLink(label: 'Toaster', route: '/components/toaster'),

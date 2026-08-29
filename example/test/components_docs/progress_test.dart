@@ -107,7 +107,7 @@ void main() {
     test('progressDoc exposes accurate registry metadata', () {
       expect(progressDoc.name, 'progress');
       expect(progressDoc.title, 'Progress');
-      expect(progressDoc.sourcePath, 'lib/src/components/progress.dart');
+      expect(progressDoc.sourcePath, 'lib/src/components/ui/progress.dart');
       expect(
         progressDoc.exports,
         containsAll(<String>['Progress', 'ProgressTone']),

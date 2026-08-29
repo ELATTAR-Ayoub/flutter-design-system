@@ -12,7 +12,7 @@
 /// **Section order**: Preview, Installation, Usage, Composition, Basic,
 /// Card, then the eight disclosures. New: a Keyboard disclosure, between
 /// Accessibility and Responsive — read directly off
-/// `_AccordionTriggerState.build` (`lib/src/components/accordion.dart`),
+/// `_AccordionTriggerState.build` (`lib/src/components/ui/accordion.dart`),
 /// which wires a bare `GestureDetector.onTap` and a `Focus` widget for its
 /// ring, but no `onKeyEvent` of any kind: the fact that used to live as one
 /// bullet inside Accessibility now gets the section the house shape
@@ -77,8 +77,8 @@ final ComponentDocSpec accordionDocSpec = ComponentDocSpec(
               'sibling-component files.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// No registry manifest yet: copy lib/src/components/'
-              'accordion.dart into your project directly.',
+              '// No registry manifest yet: copy lib/src/components/ui/'
+              'accordion.dart into lib/components/ui/ in your project.',
         ),
       ],
     ),
@@ -352,7 +352,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// Read directly off `_AccordionTriggerState.build`
-/// (`lib/src/components/accordion.dart`): a bare `GestureDetector.onTap`
+/// (`lib/src/components/ui/accordion.dart`): a bare `GestureDetector.onTap`
 /// and a `Focus` widget kept only for the ring's `onFocusChange`, with no
 /// `onKeyEvent` anywhere in the file.
 class _KeyboardContent extends StatelessWidget {
@@ -443,7 +443,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Collapsible', route: '/components/collapsible'),
           DocsLink(label: 'Icon', route: '/components/icon'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
         ],
       ),
     ],

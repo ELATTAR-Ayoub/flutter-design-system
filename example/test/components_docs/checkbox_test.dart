@@ -76,7 +76,7 @@ const List<String> _expectedSectionIds = <String>[
 ];
 
 /// Every public constructor parameter of `Checkbox`, enumerated by reading
-/// `lib/src/components/checkbox.dart` directly (Step 1 of the task cycle).
+/// `lib/src/components/ui/checkbox.dart` directly (Step 1 of the task cycle).
 /// The API table must cover all of these by name.
 const List<String> _checkboxParams = <String>[
   'state',

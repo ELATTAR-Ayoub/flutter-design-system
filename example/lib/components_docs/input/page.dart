@@ -64,7 +64,7 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'input has a real registry manifest: elattar add input '
-          'installs lib/src/components/input.dart and resolves button, '
+          'installs lib/src/components/ui/input.dart and resolves button, '
           'field, surface, and source-foundation automatically. '
           'The Manual tab is for a project not using the CLI.',
       command: inputDoc.command,
@@ -73,7 +73,7 @@ final ComponentDocSpec inputDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/input.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/input.dart's generated "
+              "Copy lib/src/components/ui/input.dart's generated "
               '@ui/input.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -864,7 +864,7 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Button', route: '/components/button'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
         ],
       ),
     ],

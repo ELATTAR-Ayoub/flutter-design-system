@@ -85,7 +85,7 @@ const List<String> _sectionTitles = <String>[
 ];
 
 /// Every named constructor parameter `Carousel` declares
-/// (`lib/src/components/carousel.dart`), excluding `key`: the same set the
+/// (`lib/src/components/ui/carousel.dart`), excluding `key`: the same set the
 /// page's `Carousel` API table claims to cover.
 const List<String> _carouselConstructorParams = <String>[
   'basis',
@@ -130,7 +130,7 @@ void main() {
       expect(carouselDoc.title, 'Carousel');
       expect(carouselDoc.route, '/components/carousel');
       expect(carouselDoc.command, 'elattar add carousel');
-      expect(carouselDoc.sourcePath, 'lib/src/components/carousel.dart');
+      expect(carouselDoc.sourcePath, 'lib/src/components/ui/carousel.dart');
       expect(carouselDoc.exports, <String>['Carousel', 'CarouselController']);
       expect(carouselDoc.dependencies, <String>[
         'button',

@@ -101,7 +101,7 @@ final ComponentDocSpec textareaDocSpec = ComponentDocSpec(
               'below), and no manifest exists yet to resolve them for you.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// Copy lib/src/components/textarea.dart, field.dart, and '
+              '// Copy lib/src/components/ui/textarea.dart, field.dart, and '
               'input.dart together.',
         ),
       ],
@@ -465,7 +465,7 @@ final ComponentDocSpec textareaDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Shared machinery',
-            value: 'lib/src/components/input.dart',
+            value: 'lib/src/components/ui/input.dart',
             description:
                 'FieldSurfaceRecipe and FieldVisibility: shared with '
                 'Input and documented on its own component page.',

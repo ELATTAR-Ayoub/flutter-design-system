@@ -78,7 +78,7 @@ const List<String> _expectedSectionIds = <String>[
 ];
 
 /// Every public constructor parameter of `Slider`, enumerated by reading
-/// `lib/src/components/slider.dart` directly. The API table must cover all
+/// `lib/src/components/ui/slider.dart` directly. The API table must cover all
 /// of these by name.
 const List<String> _sliderParams = <String>[
   'values',

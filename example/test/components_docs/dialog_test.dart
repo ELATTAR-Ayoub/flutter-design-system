@@ -115,7 +115,7 @@ void main() {
       expect(dialogDoc.title, 'Dialog');
       expect(dialogDoc.route, '/components/dialog');
       expect(dialogDoc.command, 'elattar add dialog');
-      expect(dialogDoc.sourcePath, 'lib/src/components/dialog.dart');
+      expect(dialogDoc.sourcePath, 'lib/src/components/ui/dialog.dart');
       // registry/components/dialog.json's own registryDependencies, verbatim.
       expect(dialogDoc.dependencies, <String>[
         'button',

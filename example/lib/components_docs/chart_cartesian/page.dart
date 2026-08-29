@@ -25,8 +25,8 @@
 /// shape and the numbers are the same fixture, not an invented one.
 ///
 /// **Read, not inferred.** Every claim traces to a line in
-/// `lib/src/components/chart_cartesian.dart`. `grep -n "Semantics\|FocusNode"
-/// lib/src/components/chart_cartesian.dart` returns zero matches for
+/// `lib/src/components/ui/chart_cartesian.dart`. `grep -n "Semantics\|FocusNode"
+/// lib/src/components/ui/chart_cartesian.dart` returns zero matches for
 /// `Semantics` and exactly one `MouseRegion` for `FocusNode` context (there is
 /// none) — Accessibility and Keyboard both say so rather than inventing a
 /// story the file does not tell.
@@ -104,7 +104,7 @@ final ComponentDocSpec chartCartesianDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'chart-cartesian has a real registry manifest, `elattar add '
-          'chart-cartesian` installs lib/src/components/chart_cartesian.dart '
+          'chart-cartesian` installs lib/src/components/ui/chart_cartesian.dart '
           'and resolves its two registryDependencies, chart and '
           'chart-geometry, automatically. The Manual tab is for a project '
           'not using the CLI.',
@@ -114,7 +114,7 @@ final ComponentDocSpec chartCartesianDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/chart_cartesian.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/chart_cartesian.dart's generated "
+              "Copy lib/src/components/ui/chart_cartesian.dart's generated "
               '@ui/chart_cartesian.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1548,7 +1548,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/chart_cartesian.dart — one file, no '
+        'File: lib/src/components/ui/chart_cartesian.dart — one file, no '
             'companions.',
         'Flutter imports: package:flutter/gestures.dart (PointerHoverEvent) '
             'and package:flutter/widgets.dart only — no '

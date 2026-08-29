@@ -11,8 +11,8 @@
 /// **Section list.** Preview contrasts RULES §4's own claim — "selection
 /// travels, never blinks" — against a plain two-state control with no shared
 /// pill. Toggle Group and Tabs — Line are this port's two real corpus
-/// consumers (`lib/src/components/toggle_group.dart`,
-/// `lib/src/components/tabs.dart`'s `line` variant), the second chosen over
+/// consumers (`lib/src/components/ui/toggle_group.dart`,
+/// `lib/src/components/ui/tabs.dart`'s `line` variant), the second chosen over
 /// the `standard` variant specifically because it exercises `jellyAlignment`,
 /// a real constructor parameter Toggle Group never varies from its default.
 /// Deselection is the one behaviour the source's own docstring calls out at
@@ -43,7 +43,7 @@ import 'meta.dart';
 
 final ComponentDocSpec slidingPillDocSpec = ComponentDocSpec(
   name: 'active_indicator',
-  title: 'Sliding Pill',
+  title: 'Active Indicator',
   description:
       'A single travelling pill that measures the selected option and moves '
       'to it with a squash on arrival — selection travels, it never blinks '
@@ -105,7 +105,7 @@ final ComponentDocSpec slidingPillDocSpec = ComponentDocSpec(
       id: 'toggle-group',
       title: 'Toggle Group',
       description:
-          "lib/src/components/toggle_group.dart's own composition: an "
+          "lib/src/components/ui/toggle_group.dart's own composition: an "
           'Surface pill wearing shadow-chip over theme.primary, '
           'behind Toggle members in an exclusive group. Tapping the '
           'already-selected option clears the selection — see Deselection '
@@ -118,7 +118,7 @@ final ComponentDocSpec slidingPillDocSpec = ComponentDocSpec(
       id: 'tabs-line',
       title: 'Tabs — Line',
       description:
-          "lib/src/components/tabs.dart's line variant: the jelly span is "
+          "lib/src/components/ui/tabs.dart's line variant: the jelly span is "
           're-classed to a 2px rule sitting on the bottom edge of the '
           'trigger rather than a filled pill behind it, so it scales about '
           'its own centre rather than the rect\'s — jellyAlignment: '
@@ -153,7 +153,7 @@ final ComponentDocSpec slidingPillDocSpec = ComponentDocSpec(
       id: 'states',
       title: 'States',
       description:
-          'Read straight off _SlidingPillGroupState and the source\'s own '
+          'Read straight off _ActiveIndicatorState and the source\'s own '
           'behaviour-audit citations, not inferred.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -236,12 +236,12 @@ class ActiveIndicatorDocPage extends StatelessWidget {
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
-      BreadcrumbEntry.page('Sliding Pill'),
+      BreadcrumbEntry.page('Active Indicator'),
     ],
     toc: slidingPillDocSpec.toc,
     previous: const DocsPageLink(title: 'Lift', route: '/components/lift'),
     next: const DocsPageLink(
-      title: 'Swap In',
+      title: 'Content Change',
       route: '/components/content_change',
     ),
     onNavigate: onNavigate,

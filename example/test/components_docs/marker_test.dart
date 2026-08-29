@@ -82,7 +82,7 @@ const List<String> _sectionTitles = <String>[
 ];
 
 /// Every named constructor parameter `Marker` declares
-/// (`lib/src/components/marker.dart`), excluding `key`.
+/// (`lib/src/components/ui/marker.dart`), excluding `key`.
 const List<String> _markerParams = <String>['label', 'variant', 'icon'];
 
 /// Every static measurement `Marker` exposes, as the API table names them.
@@ -116,7 +116,7 @@ void main() {
       expect(markerDoc.name, 'marker');
       expect(markerDoc.title, 'Marker');
       expect(markerDoc.route, '/components/marker');
-      expect(markerDoc.sourcePath, 'lib/src/components/marker.dart');
+      expect(markerDoc.sourcePath, 'lib/src/components/ui/marker.dart');
       expect(markerDoc.exports, <String>['Marker', 'MarkerVariant']);
       expect(markerDoc.command, 'elattar add marker');
       // Nothing from the two families this page was split away from.

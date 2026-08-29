@@ -144,7 +144,7 @@ void main() {
       expect(tooltipDoc.title, 'Tooltip');
       expect(tooltipDoc.route, '/components/tooltip');
       expect(tooltipDoc.command, 'elattar add tooltip');
-      expect(tooltipDoc.sourcePath, 'lib/src/components/tooltip.dart');
+      expect(tooltipDoc.sourcePath, 'lib/src/components/ui/tooltip.dart');
       expect(
         tooltipDoc.exports,
         containsAll(<String>['Tooltip', 'TooltipSide', 'TooltipContent']),

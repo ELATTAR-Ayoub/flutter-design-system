@@ -1,10 +1,11 @@
 /// Wiring tests for the four `docs_pages/` articles (`IntroductionDocsPage`,
 /// `InstallationDocsPage`, `ThemingDocsPage`, `CliDocsPage`): that
 /// `main.dart`'s `publicPageFor` actually dispatches their route to their
-/// widget, and that the documentation shell's "Sections" rail
-/// (`docs/docs_layout.dart`'s `_defaultSidebarGroups`, read from
-/// `site/site_routes.dart`'s `siteRoutes`, neither file touched here) lists
-/// them in the required reading order.
+/// widget, and that the documentation shell's "Sections" group — the first
+/// of the five the rail now has (`docs/docs_layout.dart`'s
+/// `_defaultSidebarGroups`, read from `site/site_routes.dart`'s
+/// `siteRoutes`, neither file touched here) — lists them in the required
+/// reading order.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';

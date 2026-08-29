@@ -4,7 +4,7 @@
 /// [dependencies] below is that manifest's own `registryDependencies`,
 /// copied verbatim — `agent-core`, `keyframes`, `source-foundation`.
 ///
-/// `lib/src/components/agent_avatar.dart` is one file that folds four
+/// `lib/src/components/ui/agent_avatar.dart` is one file that folds four
 /// reference files into one library: the isometric cube projection, the
 /// nineteen scene recipes, the fourteen keyframe tables, and
 /// [AgentAvatar] — the crossfade and the idle cube — itself. [exports]
@@ -39,5 +39,5 @@ const ComponentDocEntry agentAvatarDoc = ComponentDocEntry(
     'AgentCubeFaces',
     'AgentCube',
   ],
-  sourcePath: 'lib/src/components/agent_avatar.dart',
+  sourcePath: 'lib/src/components/ui/agent_avatar.dart',
 );

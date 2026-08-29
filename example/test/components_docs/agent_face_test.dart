@@ -2,7 +2,7 @@
 /// the agent-face component documentation page.
 ///
 /// `agent-face` is a brand-new page. `AgentFace`'s own constructor
-/// (`lib/src/components/agent_face.dart`) declares six named parameters
+/// (`lib/src/components/ui/agent_face.dart`) declares six named parameters
 /// excluding `key`: `state`, `voice`, `avatar`, `size`, `accent`, `speed`.
 /// The API-completeness test below checks all six appear in the
 /// `AgentFace` API table.
@@ -64,7 +64,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `AgentFace`'s own class declares
-/// (`lib/src/components/agent_face.dart`), excluding `key`.
+/// (`lib/src/components/ui/agent_face.dart`), excluding `key`.
 const List<String> _agentFaceConstructorParams = <String>[
   'state',
   'voice',

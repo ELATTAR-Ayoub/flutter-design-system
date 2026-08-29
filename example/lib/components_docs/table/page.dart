@@ -33,7 +33,7 @@
 ///
 /// ## The one finding this page exists to surface
 ///
-/// `lib/src/components/table.dart`'s own library doc describes the
+/// `lib/src/components/ui/table.dart`'s own library doc describes the
 /// reference's `<table>` as living in its own `relative w-full
 /// overflow-x-auto` container: that wrapper is never reproduced here.
 /// `Table.build` returns a bare `Column` around a `Table`, nothing more.
@@ -102,7 +102,7 @@ final ComponentDocSpec tableDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'table ships a real registry manifest: `elattar add table` '
-          'installs lib/src/components/table.dart and resolves '
+          'installs lib/src/components/ui/table.dart and resolves '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: tableDoc.command,
@@ -111,7 +111,7 @@ final ComponentDocSpec tableDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/table.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/table.dart's generated "
+              "Copy lib/src/components/ui/table.dart's generated "
               '@ui/table.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"

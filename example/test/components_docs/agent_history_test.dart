@@ -2,7 +2,7 @@
 /// [AgentHistoryDocPage]: the agent-history component documentation page.
 ///
 /// `agent-history` is a brand-new page covering three real widgets
-/// (`lib/src/components/agent_history.dart`): `HistoryCard` (11 named
+/// (`lib/src/components/ui/agent_history.dart`): `HistoryCard` (11 named
 /// constructor parameters excluding `key`), `HistorySearch` (6), and
 /// `ChatHistory` (5). The API-completeness test below checks all three
 /// tables, matching `field_test.dart`'s own precedent of checking several

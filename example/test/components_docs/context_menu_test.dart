@@ -121,7 +121,10 @@ void main() {
         'popover',
         'source-foundation',
       ]);
-      expect(contextMenuDoc.sourcePath, 'lib/src/components/context_menu.dart');
+      expect(
+        contextMenuDoc.sourcePath,
+        'lib/src/components/ui/context_menu.dart',
+      );
       expect(contextMenuDoc.exports, containsAll(<String>['ContextMenu']));
       // Short description: one sentence, no trailing ellipsis.
       expect(contextMenuDoc.description, isNot(contains('..')));

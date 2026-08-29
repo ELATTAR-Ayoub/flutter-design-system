@@ -141,7 +141,7 @@ class _IntroductionArticle extends StatelessWidget {
       children: <Widget>[
         _prose(
           'Running `elattar add button` does not add a dependency, it '
-          'copies lib/src/components/button.dart, resolves its registry '
+          'copies lib/src/components/ui/button.dart, resolves its registry '
           'dependencies transitively (icon, spinner, and the three visual '
           'effects it composes), and writes every one of them into '
           'lib/components/ui/ inside your own project. From that point the '

@@ -108,7 +108,7 @@ void main() {
       expect(breadcrumbDoc.name, 'breadcrumb');
       expect(breadcrumbDoc.title, 'Breadcrumb');
       expect(breadcrumbDoc.route, '/components/breadcrumb');
-      expect(breadcrumbDoc.sourcePath, 'lib/src/components/breadcrumb.dart');
+      expect(breadcrumbDoc.sourcePath, 'lib/src/components/ui/breadcrumb.dart');
       expect(
         breadcrumbDoc.exports,
         containsAll(<String>['Breadcrumb', 'BreadcrumbEntry']),

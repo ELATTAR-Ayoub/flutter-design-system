@@ -39,5 +39,5 @@ const ComponentDocEntry chartGeometryDoc = ComponentDocEntry(
     'sectorWithCornerPath',
     'polarPolygonPath',
   ],
-  sourcePath: 'lib/src/components/chart_geometry.dart',
+  sourcePath: 'lib/src/components/ui/chart_geometry.dart',
 );

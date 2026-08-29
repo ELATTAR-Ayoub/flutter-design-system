@@ -1,7 +1,7 @@
 /// Public documentation metadata for the `command` component.
 ///
 /// **Split from a combined page.** This directory used to document
-/// `lib/src/components/command.dart` and `lib/src/components/combobox.dart`
+/// `lib/src/components/ui/command.dart` and `lib/src/components/ui/combobox.dart`
 /// together, under one [ComponentDocEntry] titled "Command & Combobox", with
 /// a second `comboboxSourcePath` const beside it for the file
 /// [ComponentDocEntry.sourcePath] could not name. Both components are real,
@@ -12,7 +12,7 @@
 /// `command` ships `registry/components/command.json`, and
 /// [dependencies] below mirrors that manifest's `registryDependencies`.
 /// Those entries still line up with the real modules `command.dart` imports
-/// from `lib/src/components/`: `icon.dart`, `icon_paths.dart`,
+/// from `lib/src/components/ui/`: `icon.dart`, `icon_paths.dart`,
 /// `icon_paths.g.dart`, `input.dart`, and `input_group.dart`, plus the
 /// shared `source-foundation` item. `field`, `popover`, and `select` were
 /// on the old combined list only because **combobox** imports them, and they
@@ -29,10 +29,10 @@ const ComponentDocEntry commandDoc = ComponentDocEntry(
       'An inline, always-open action launcher: one search field over '
       'grouped rows that a ported cmdk scorer both filters and re-ranks on '
       'every keystroke.',
-  // What lib/src/components/command.dart actually imports from
-  // lib/src/components/: real source-level dependencies, not a registry
+  // What lib/src/components/ui/command.dart actually imports from
+  // lib/src/components/ui/: real source-level dependencies, not a registry
   // dependency list. See the library note above for why.
   dependencies: <String>['icon', 'input', 'input-group', 'source-foundation'],
   exports: <String>['Command', 'CommandItem', 'CommandGroup', 'commandScore'],
-  sourcePath: 'lib/src/components/command.dart',
+  sourcePath: 'lib/src/components/ui/command.dart',
 );

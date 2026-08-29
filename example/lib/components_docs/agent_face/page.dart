@@ -1,7 +1,7 @@
 /// Public documentation page for the `agent-face` component.
 ///
 /// Written from nothing: no page existed for this registry item before
-/// this file. Read end to end from `lib/src/components/agent_face.dart`
+/// this file. Read end to end from `lib/src/components/ui/agent_face.dart`
 /// (404 lines, `parts/agent-face.tsx` ported) and from
 /// `test/agent_face_test.dart`.
 ///
@@ -69,7 +69,7 @@ final ComponentDocSpec agentFaceDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'agent-face has a real registry manifest: `elattar add '
-          'agent-face` installs lib/src/components/agent_face.dart and '
+          'agent-face` installs lib/src/components/ui/agent_face.dart and '
           'resolves agent-avatar, agent-core, keyframes, source-foundation, '
           'voice, and voice-indicator automatically. The Manual tab is for a '
           'project not using the CLI.',
@@ -79,7 +79,7 @@ final ComponentDocSpec agentFaceDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_face.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_face.dart's generated "
+              "Copy lib/src/components/ui/agent_face.dart's generated "
               '@ui/agent_face.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -698,7 +698,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/agent_face.dart — one file, no '
+        'File: lib/src/components/ui/agent_face.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
         'registryDependencies, resolved automatically by `elattar add '
@@ -720,7 +720,10 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Agent Core', route: '/components/agent-core'),
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
           DocsLink(label: 'Voice', route: '/components/voice'),
-          DocsLink(label: 'Voice Orb', route: '/components/voice_indicator'),
+          DocsLink(
+            label: 'Voice Indicator',
+            route: '/components/voice_indicator',
+          ),
         ],
       ),
     ],

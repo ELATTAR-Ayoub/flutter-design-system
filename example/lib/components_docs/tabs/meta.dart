@@ -27,5 +27,5 @@ const ComponentDocEntry tabsDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['Tabs', 'TabItem', 'TabsVariant'],
-  sourcePath: 'lib/src/components/tabs.dart',
+  sourcePath: 'lib/src/components/ui/tabs.dart',
 );

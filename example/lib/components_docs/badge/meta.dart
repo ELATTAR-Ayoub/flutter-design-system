@@ -20,5 +20,5 @@ const ComponentDocEntry badgeDoc = ComponentDocEntry(
       'A small pill-shaped label for status, counts, or metadata: not a control.',
   dependencies: <String>['surface', 'source-foundation'],
   exports: <String>['Badge', 'BadgeVariant'],
-  sourcePath: 'lib/src/components/badge.dart',
+  sourcePath: 'lib/src/components/ui/badge.dart',
 );

@@ -36,5 +36,5 @@ const ComponentDocEntry formDoc = ComponentDocEntry(
     'TextFormField',
     'ValidateMode',
   ],
-  sourcePath: 'lib/src/components/form.dart',
+  sourcePath: 'lib/src/components/ui/form.dart',
 );

@@ -118,7 +118,7 @@ void main() {
       expect(popoverDoc.title, 'Popover');
       expect(popoverDoc.route, '/components/popover');
       expect(popoverDoc.command, 'elattar add popover');
-      expect(popoverDoc.sourcePath, 'lib/src/components/popover.dart');
+      expect(popoverDoc.sourcePath, 'lib/src/components/ui/popover.dart');
       expect(
         popoverDoc.exports,
         containsAll(<String>[

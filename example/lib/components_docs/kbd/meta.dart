@@ -26,5 +26,5 @@ const ComponentDocEntry kbdDoc = ComponentDocEntry(
       'corners, inert to touch and text selection.',
   dependencies: <String>['surface', 'source-foundation'],
   exports: <String>['Kbd', 'KbdGroup'],
-  sourcePath: 'lib/src/components/kbd.dart',
+  sourcePath: 'lib/src/components/ui/kbd.dart',
 );

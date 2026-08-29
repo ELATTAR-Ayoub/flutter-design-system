@@ -18,13 +18,13 @@
 /// with the effect removed or a variable changed, so the difference is the
 /// thing on screen rather than a claim in prose.
 ///
-/// **Real use, not invented.** `grep -rln "Surface\b" lib/src/components/`
+/// **Real use, not invented.** `grep -rln "Surface\b" lib/src/components/ui/`
 /// returns 25 files at the time this page was written; `button.dart` is the
 /// one this page's specimens are modelled on (`_surface`'s `secondary`,
 /// `outline`, `ghost`, `destructive`, `link` arms all return
 /// `Surface` directly). `effects/premium_surface.dart` and
 /// `effects/action_feedback.dart` both compose it too, for the inset layers
-/// under their own gradients — see the Glass and Foil Value pages, which
+/// under their own gradients — see the Glass and Premium Surface pages, which
 /// depend on this one.
 library;
 
@@ -50,7 +50,7 @@ import 'meta.dart';
 
 final ComponentDocSpec machineSurfaceDocSpec = ComponentDocSpec(
   name: 'surface',
-  title: 'Machine Surface',
+  title: 'Surface',
   description: surfaceDoc.description,
   sections: <DocsPageSection>[
     EffectSection(
@@ -244,7 +244,7 @@ class SurfaceDocPage extends StatelessWidget {
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
-      BreadcrumbEntry.page('Machine Surface'),
+      BreadcrumbEntry.page('Surface'),
     ],
     toc: machineSurfaceDocSpec.toc,
     previous: null,
@@ -667,7 +667,10 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Glass', route: '/components/glass'),
-          DocsLink(label: 'Foil Value', route: '/components/premium_surface'),
+          DocsLink(
+            label: 'Premium Surface',
+            route: '/components/premium_surface',
+          ),
         ],
       ),
     ],

@@ -29,5 +29,5 @@ const ComponentDocEntry paginationDoc = ComponentDocEntry(
     'PaginationStep',
     'PaginationEllipsis',
   ],
-  sourcePath: 'lib/src/components/pagination.dart',
+  sourcePath: 'lib/src/components/ui/pagination.dart',
 );

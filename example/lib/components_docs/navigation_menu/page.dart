@@ -76,7 +76,7 @@ final ComponentDocSpec navigationMenuDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'navigation-menu is a registry item: elattar add navigation-menu '
-          'installs lib/src/components/navigation_menu.dart and resolves '
+          'installs lib/src/components/ui/navigation_menu.dart and resolves '
           'icon, popover, press and source-foundation '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
@@ -86,7 +86,7 @@ final ComponentDocSpec navigationMenuDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/navigation_menu.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/navigation_menu.dart's generated "
+              "Copy lib/src/components/ui/navigation_menu.dart's generated "
               '@ui/navigation_menu.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"

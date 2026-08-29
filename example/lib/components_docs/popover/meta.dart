@@ -35,5 +35,5 @@ const ComponentDocEntry popoverDoc = ComponentDocEntry(
     'PopoverSurface',
     'popoverPlacement',
   ],
-  sourcePath: 'lib/src/components/popover.dart',
+  sourcePath: 'lib/src/components/ui/popover.dart',
 );

@@ -76,7 +76,7 @@ final ComponentDocSpec toasterDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'toaster has a real registry manifest, `elattar add toaster` '
-          'installs lib/src/components/toaster.dart and resolves '
+          'installs lib/src/components/ui/toaster.dart and resolves '
           'feedback-surface, icon, surface, safe-area and '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
@@ -86,7 +86,7 @@ final ComponentDocSpec toasterDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/toaster.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/toaster.dart's generated "
+              "Copy lib/src/components/ui/toaster.dart's generated "
               '@ui/toaster.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -164,7 +164,7 @@ final ComponentDocSpec toasterDocSpec = ComponentDocSpec(
           'Every Toaster constructor parameter and static member, '
           'every ToastType value, every ToastController method, and '
           'every ToastMessage / ToastAction field, read directly '
-          'from lib/src/components/toaster.dart. ToastController also '
+          'from lib/src/components/ui/toaster.dart. ToastController also '
           'exposes length, visibleCount, and messageOf(id) under '
           '@visibleForTesting -- test-only introspection, not part of '
           'the surface a call site is meant to drive, so they are noted '
@@ -1226,7 +1226,7 @@ class _DependenciesContent extends StatelessWidget {
           ),
           const DocsInstallFact(
             label: 'Files',
-            value: 'lib/src/components/toaster.dart',
+            value: 'lib/src/components/ui/toaster.dart',
             description:
                 'One file; every public class -- Toaster, Toast, '
                 'ToastController, ToastMessage, ToastAction, '
@@ -1278,10 +1278,10 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Alert', route: '/components/alert'),
           DocsLink(label: 'Alert Dialog', route: '/components/alert-dialog'),
           DocsLink(
-            label: 'Bloom Cosmic',
+            label: 'Feedback Surface',
             route: '/components/feedback_surface',
           ),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(label: 'Safe Area', route: '/components/safe_area'),
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(

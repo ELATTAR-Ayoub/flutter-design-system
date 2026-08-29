@@ -65,7 +65,7 @@ final ComponentDocSpec spinnerDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'spinner has a real registry manifest, `elattar add spinner` '
-          'installs lib/src/components/spinner.dart and resolves icon and '
+          'installs lib/src/components/ui/spinner.dart and resolves icon and '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: spinnerDoc.command,
@@ -684,7 +684,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/spinner.dart, one file, no '
+        'File: lib/src/components/ui/spinner.dart, one file, no '
             'companions.',
         'Imports icon.dart directly: Spinner wraps a '
             'Icon(IconGlyph.loaderCircle, ...) in a '

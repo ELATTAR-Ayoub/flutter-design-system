@@ -5,7 +5,7 @@
 /// and the reading column running under the gesture bar. The reference has
 /// no counterpart to reproduce: a desktop browser has no status bar, and
 /// `env(safe-area-inset-*)` — the one CSS spelling of this idea — appears
-/// nowhere in `app/globals.css`. `lib/src/components/safe_area.dart` is
+/// nowhere in `app/globals.css`. `lib/src/components/ui/safe_area.dart` is
 /// written to the ruling rather than to a source line: *"Backgrounds paint
 /// edge-to-edge; content and interactive chrome respect
 /// MediaQueryData.padding."*
@@ -28,5 +28,5 @@ const ComponentDocEntry safeAreaDoc = ComponentDocEntry(
   // verbatim: empty.
   dependencies: <String>[],
   exports: <String>['SafeArea'],
-  sourcePath: 'lib/src/components/safe_area.dart',
+  sourcePath: 'lib/src/components/ui/safe_area.dart',
 );

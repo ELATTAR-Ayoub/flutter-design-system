@@ -25,5 +25,5 @@ const ComponentDocEntry breadcrumbDoc = ComponentDocEntry(
   // foundation every other entry names.
   dependencies: <String>['icon', 'source-foundation'],
   exports: <String>['Breadcrumb', 'BreadcrumbEntry'],
-  sourcePath: 'lib/src/components/breadcrumb.dart',
+  sourcePath: 'lib/src/components/ui/breadcrumb.dart',
 );

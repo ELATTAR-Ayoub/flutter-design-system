@@ -1,6 +1,6 @@
 /// Public documentation page for the `menu` component.
 ///
-/// **Not a control a reader places directly.** `lib/src/components/
+/// **Not a control a reader places directly.** `lib/src/components/ui/
 /// menu.dart`'s own library doc opens with it: *"The shared body of
 /// `dropdown-menu.tsx`, `context-menu.tsx` and `menubar.tsx` — three files,
 /// one Radix `Menu`, one set of rows."* Every `*Content`, `*Item`, `*Label`,
@@ -23,7 +23,7 @@
 /// and Responsive, read directly off `_MenuContentState._onKey`.
 ///
 /// **Do not invent behaviour.** Every fact below is read off
-/// `lib/src/components/menu.dart` itself — including the two DOCUMENTED
+/// `lib/src/components/ui/menu.dart` itself — including the two DOCUMENTED
 /// DRIFTs the source already names (menus drift 4: the three elevation
 /// recipes; menus drift 5: the indicator side) and the submenu-kind gap
 /// (`_buildRow`'s `MenuSub` case maps every `content`-kind parent to
@@ -79,7 +79,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'menu has a real registry manifest: elattar add menu installs '
-          'lib/src/components/menu.dart and resolves icon, popover, and '
+          'lib/src/components/ui/menu.dart and resolves icon, popover, and '
           'source-foundation automatically. A reader almost never installs '
           'menu directly: elattar add dropdown-menu, elattar add '
           'context-menu, and elattar add menubar each resolve it as a '
@@ -91,7 +91,7 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/menu.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/menu.dart's generated "
+              "Copy lib/src/components/ui/menu.dart's generated "
               '@ui/menu.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"

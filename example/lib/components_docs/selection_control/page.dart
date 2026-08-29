@@ -74,7 +74,7 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/selection_control.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/selection_control.dart's generated "
+              "Copy lib/src/components/ui/selection_control.dart's generated "
               '@ui/selection_control.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -191,7 +191,7 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          "Read off lib/src/components/selection_control.dart's own "
+          "Read off lib/src/components/ui/selection_control.dart's own "
           '_onKey directly: the shared handler every Checkbox, '
           'RadioGroup and Switch answers keyboard input through.',
       child: _KeyboardContent(),
@@ -220,7 +220,7 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
         facts: <DocsInstallFact>[
           const DocsInstallFact(
             label: 'Source',
-            value: 'lib/src/components/selection_control.dart',
+            value: 'lib/src/components/ui/selection_control.dart',
             description: 'The one source file.',
           ),
           const DocsInstallFact(
@@ -238,7 +238,7 @@ final ComponentDocSpec selectionControlDocSpec = ComponentDocSpec(
           DocsInstallFact(
             label: 'Edit these docs',
             value: selectionControlDoc.sourcePath.replaceFirst(
-              'lib/src/components/selection_control.dart',
+              'lib/src/components/ui/selection_control.dart',
               'example/lib/components_docs/selection_control/page.dart',
             ),
             description: 'This file.',
@@ -913,7 +913,7 @@ class _AccessibilityContent extends StatelessWidget {
       ]);
 }
 
-/// Read directly off `lib/src/components/selection_control.dart`'s own
+/// Read directly off `lib/src/components/ui/selection_control.dart`'s own
 /// `_onKey`: the shared handler every `Checkbox`, `RadioGroup` and
 /// `Switch` answers keyboard input through.
 class _KeyboardContent extends StatelessWidget {
@@ -983,7 +983,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Source file',
             value: 'selection_control.dart',
             description:
-                'lib/src/components/selection_control.dart, exported '
+                'lib/src/components/ui/selection_control.dart, exported '
                 'from the public barrel.',
           ),
           DocsInstallFact(
@@ -1014,7 +1014,7 @@ class _DependenciesContent extends StatelessWidget {
       const DocsLinkRow(
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
           DocsLink(
             label: 'Source Foundation',

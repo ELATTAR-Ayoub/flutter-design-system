@@ -40,7 +40,7 @@
 /// A test that forgot it would pass while exercising nothing.
 ///
 /// New: a Keyboard disclosure, between Accessibility and Responsive, read
-/// directly off `lib/src/components/combobox.dart`'s own `_onKey`: the
+/// directly off `lib/src/components/ui/combobox.dart`'s own `_onKey`: the
 /// caret-stays-in-the-field fact that used to live in Accessibility moved
 /// there with it.
 library;
@@ -95,7 +95,7 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/combobox.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/combobox.dart's generated "
+              "Copy lib/src/components/ui/combobox.dart's generated "
               '@ui/combobox.dart payload into components/ui. The file '
               'needs its sibling dependencies too: see Dependencies below.',
           code:
@@ -195,7 +195,7 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every constructor parameter, static helper and top-level '
-          'function lib/src/components/combobox.dart declares: one table '
+          'function lib/src/components/ui/combobox.dart declares: one table '
           'each, read off the real constructors.',
       children: const <DocsTocEntry>[
         DocsTocEntry(title: 'Combobox', anchor: 'api-elcombobox'),
@@ -229,7 +229,7 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          "Read off lib/src/components/combobox.dart's own _onKey "
+          "Read off lib/src/components/ui/combobox.dart's own _onKey "
           'directly: a Focus ancestor of the text field, so it sees the '
           "field's own key events before EditableText's shortcuts turn "
           'them into a caret move.',
@@ -266,7 +266,7 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Sibling component',
-            value: 'lib/src/components/command.dart',
+            value: 'lib/src/components/ui/command.dart',
             description:
                 'Command, the inline action launcher that used to '
                 'share this page. It has its own page now, at '
@@ -277,7 +277,7 @@ final ComponentDocSpec comboboxDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Row type',
-            value: 'lib/src/components/select.dart',
+            value: 'lib/src/components/ui/select.dart',
             description:
                 'ComboboxItem is a typedef for SelectOption, so a '
                 'list written for Select drops in unchanged and the '
@@ -884,7 +884,7 @@ class _AccessibilityContent extends StatelessWidget {
   );
 }
 
-/// Read directly off `lib/src/components/combobox.dart`'s own `_onKey`: a
+/// Read directly off `lib/src/components/ui/combobox.dart`'s own `_onKey`: a
 /// `Focus` ancestor of the text field, so it sees the field's own key
 /// events before `EditableText`'s shortcuts turn them into a caret move.
 class _KeyboardContent extends StatelessWidget {
@@ -957,7 +957,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/combobox.dart. One file, no '
+        'File: lib/src/components/ui/combobox.dart. One file, no '
             'companions, and a shipped registry manifest.',
         'Flutter imports: dart:math (clamping the popup height), '
             'package:flutter/services.dart (LogicalKeyboardKey, '

@@ -22,7 +22,7 @@
 /// **One real addition: Keyboard.** The old page had no dedicated Keyboard
 /// section; its Accessibility bullet already stated `Badge` takes no
 /// keyboard interactions at all. The new Keyboard disclosure below restates
-/// that fact on its own, read directly off `lib/src/components/badge.dart`:
+/// that fact on its own, read directly off `lib/src/components/ui/badge.dart`:
 /// there is no `Focus`, no `FocusNode`, and no `Focus.onKeyEvent` anywhere in
 /// the file, so there is nothing for a key to reach.
 ///
@@ -529,7 +529,7 @@ const String _compositionCode =
     '  ],\n'
     ')\n'
     '\n'
-    '// The SidebarMenuBadge precedent: lib/src/components/sidebar.dart\n'
+    '// The SidebarMenuBadge precedent: lib/src/components/ui/sidebar.dart\n'
     '// composes Badge directly, overriding spec/paddingX/minWidth exactly\n'
     '// as documented above, rather than adding a new widget:\n'
     'Badge(\n'
@@ -626,7 +626,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// New: the design calls for this page to carry its own Keyboard section.
-/// Every claim here is read off `lib/src/components/badge.dart` directly,
+/// Every claim here is read off `lib/src/components/ui/badge.dart` directly,
 /// not inferred: `Badge` is a `StatelessWidget` and its `build` method
 /// contains no `Focus`, no `FocusNode`, and no `Focus.onKeyEvent`.
 class _KeyboardContent extends StatelessWidget {
@@ -678,7 +678,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/badge.dart (one file, no companion parts).',
+        'File: lib/src/components/ui/badge.dart (one file, no companion parts).',
         'Foundation imports: foundation/colors.dart (hslColor, Palette), '
             'foundation/shadows.dart (Shadows.compactControl, Shadows.controlPremium), '
             'foundation/spacing.dart (space()), foundation/theme.dart '
@@ -699,7 +699,7 @@ class _DependenciesContent extends StatelessWidget {
             DocsLink(label: 'Button', route: '/components/button'),
             DocsLink(label: 'Icon', route: '/components/icon'),
             DocsLink(label: 'Kbd', route: '/components/kbd'),
-            DocsLink(label: 'Machine Surface', route: '/components/surface'),
+            DocsLink(label: 'Surface', route: '/components/surface'),
             DocsLink(label: 'Sidebar', route: '/components/sidebar'),
           ],
         ),

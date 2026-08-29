@@ -21,5 +21,5 @@ const ComponentDocEntry spinnerDoc = ComponentDocEntry(
   // registry/components/spinner.json's registryDependencies, verbatim.
   dependencies: <String>['icon', 'source-foundation'],
   exports: <String>['Spinner'],
-  sourcePath: 'lib/src/components/spinner.dart',
+  sourcePath: 'lib/src/components/ui/spinner.dart',
 );

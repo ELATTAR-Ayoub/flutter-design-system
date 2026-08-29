@@ -29,7 +29,7 @@
 /// Dependencies sections used to say, twice, that no registry manifest
 /// existed and no CLI command could be printed. That was false the whole
 /// time: `registry/components/sidebar.json` exists, lists
-/// `lib/src/components/sidebar.dart` and the same twelve
+/// `lib/src/components/ui/sidebar.dart` and the same twelve
 /// `registryDependencies` this page's [dependencies] already named, and its
 /// own `documentationRoute` already points at `/components/sidebar`.
 /// `elattar add sidebar` works. The one real gap the corrected text still
@@ -105,7 +105,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'sidebar has a real registry manifest, `elattar add sidebar` '
-          'installs lib/src/components/sidebar.dart and resolves all '
+          'installs lib/src/components/ui/sidebar.dart and resolves all '
           'twelve registryDependencies automatically. That manifest does '
           'not list user_menu.dart: the footer account block ships as its '
           'own registry item, `user-menu` (`elattar add user-menu`, which '
@@ -130,7 +130,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
               "The user-menu registry item's own payload. It reads "
               'SidebarScope for isMobile and composes SidebarMenu, so '
               'it only works inside a provider.',
-          code: _installNavUserExcerpt,
+          code: _installUserMenuExcerpt,
         ),
         DocsCodeFile(
           path: 'lib/components/ui/ (also copy)',
@@ -357,7 +357,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'Every public class in lib/src/components/sidebar.dart and '
+          'Every public class in lib/src/components/ui/sidebar.dart and '
           'lib/src/components/ui/user_menu.dart, with every constructor '
           'parameter and its default: fourteen tables, the largest '
           'single disclosure in the corpus.',
@@ -446,7 +446,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Source (family)',
-            value: sidebarNavUserSourcePath,
+            value: sidebarUserMenuSourcePath,
             description:
                 'The footer account block, in its own library because it '
                 'composes the dropdown menu and avatar families as well.',
@@ -455,7 +455,7 @@ final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
             label: 'GitHub',
             value:
                 'github.com/ELATTAR-Ayoub/flutter-design-system/blob/'
-                'main/lib/src/components/sidebar.dart',
+                'main/lib/src/components/ui/sidebar.dart',
             description:
                 'Composed from the same repository path the sidebar '
                 'registry manifest itself references.',
@@ -582,7 +582,7 @@ class _FooterContent extends StatelessWidget {
       const Panel(
         label: 'DART',
         note: 'FOOTER ACCOUNT BLOCK',
-        child: DocsSelectableCodeBlock(code: _usageNavUserCode),
+        child: DocsSelectableCodeBlock(code: _usageUserMenuCode),
       ),
     ],
   );
@@ -733,7 +733,7 @@ class _ApiReferenceContent extends StatelessWidget {
         id: 'api-navuser',
         child: DocsApiTable(
           title: 'UserMenu (user_menu.dart)',
-          facts: _apiNavUserFacts,
+          facts: _apiUserMenuFacts,
         ),
       ),
     ],
@@ -1029,7 +1029,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Icon Swap', route: '/components/icon_swap'),
           DocsLink(label: 'Input', route: '/components/input'),
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(label: 'Sheet', route: '/components/sheet'),
           DocsLink(label: 'Skeleton', route: '/components/skeleton'),
           DocsLink(
@@ -1901,7 +1901,7 @@ SidebarProvider(
   ],
 )''';
 
-const String _usageNavUserCode =
+const String _usageUserMenuCode =
     '''// user_menu.dart: the account block a sidebar footer is incomplete
 // without. It reads SidebarScope for isMobile, so it only works inside a
 // provider, and it composes SidebarMenu itself: put it straight into the
@@ -1965,7 +1965,7 @@ class Sidebar extends StatelessWidget {
 // SidebarInset, and the region, group and menu parts: see the API
 // Reference section on this page for every one of them.''';
 
-const String _installNavUserExcerpt = '''class UserMenuAccount {
+const String _installUserMenuExcerpt = '''class UserMenuAccount {
   const UserMenuAccount({
     required this.name,
     required this.email,
@@ -3059,7 +3059,7 @@ const List<DocsApiFact> _apiScopesFacts = <DocsApiFact>[
   ),
 ];
 
-const List<DocsApiFact> _apiNavUserFacts = <DocsApiFact>[
+const List<DocsApiFact> _apiUserMenuFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'UserMenu.user',
     type: 'UserMenuAccount',

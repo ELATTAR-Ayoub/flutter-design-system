@@ -28,5 +28,5 @@ const ComponentDocEntry separatorDoc = ComponentDocEntry(
       'parent height.',
   dependencies: <String>['source-foundation'],
   exports: <String>['Separator', 'SeparatorOrientation'],
-  sourcePath: 'lib/src/components/separator.dart',
+  sourcePath: 'lib/src/components/ui/separator.dart',
 );

@@ -59,7 +59,7 @@ const Size _narrow = Size(390, 844);
 
 /// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or member of each documented class found by
-/// reading `lib/src/components/form.dart` directly.
+/// reading `lib/src/components/ui/form.dart` directly.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'Form': <String>[
     'fields',

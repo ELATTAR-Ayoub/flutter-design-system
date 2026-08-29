@@ -17,14 +17,14 @@
 /// used to live inside Accessibility.
 ///
 /// **The manifest is real.** `registry/components/marker.json` ships
-/// today: `elattar add marker` installs `lib/src/components/marker.dart`
+/// today: `elattar add marker` installs `lib/src/components/ui/marker.dart`
 /// and resolves `source-foundation` automatically. The pre-kit page
 /// claimed no manifest existed; it does, and the command below is real.
 ///
 /// **No shadcn counterpart.** `marker` is not in shadcn's documented
 /// component set, so this page is not shaped to a reference page and its
 /// sections are not named after shadcn headings. They are named for what
-/// the component does, taken from `lib/src/components/marker.dart`'s own
+/// the component does, taken from `lib/src/components/ui/marker.dart`'s own
 /// library note, whose first job is to correct the name: this is not
 /// `<mark>`, it draws no background, and it will not emphasise a matched
 /// substring. It is the row that says something happened between the rows
@@ -82,7 +82,7 @@ final ComponentDocSpec markerDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'marker has a real registry manifest, `elattar add marker` '
-          'installs lib/src/components/marker.dart and resolves '
+          'installs lib/src/components/ui/marker.dart and resolves '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: markerDoc.command,
@@ -91,7 +91,7 @@ final ComponentDocSpec markerDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/marker.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/marker.dart's generated "
+              "Copy lib/src/components/ui/marker.dart's generated "
               '@ui/marker.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -189,7 +189,7 @@ final ComponentDocSpec markerDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every constructor parameter, every static measurement, and '
-          'every enum value, read straight off lib/src/components/'
+          'every enum value, read straight off lib/src/components/ui/'
           'marker.dart.',
       children: const <DocsTocEntry>[
         DocsTocEntry(title: 'Marker', anchor: 'api-elmarker'),
@@ -421,7 +421,7 @@ class _DependenciesContent extends StatelessWidget {
   Widget build(
     BuildContext context,
   ) => _bullets(ThemeScope.of(context), <String>[
-    'File: lib/src/components/marker.dart, one file, holding Marker '
+    'File: lib/src/components/ui/marker.dart, one file, holding Marker '
         'and MarkerVariant and nothing private at all.',
     'Flutter import: package:flutter/widgets.dart only.',
     'Foundation imports: foundation/spacing.dart (space(), '

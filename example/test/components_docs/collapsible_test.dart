@@ -122,7 +122,10 @@ void main() {
     test('collapsibleDoc names the real public API', () {
       expect(collapsibleDoc.name, 'collapsible');
       expect(collapsibleDoc.route, '/components/collapsible');
-      expect(collapsibleDoc.sourcePath, 'lib/src/components/collapsible.dart');
+      expect(
+        collapsibleDoc.sourcePath,
+        'lib/src/components/ui/collapsible.dart',
+      );
       expect(
         collapsibleDoc.exports,
         containsAll(<String>['Collapsible', 'Unfold']),

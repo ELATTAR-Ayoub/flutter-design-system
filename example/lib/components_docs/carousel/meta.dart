@@ -27,5 +27,5 @@ const ComponentDocEntry carouselDoc = ComponentDocEntry(
       'press ArrowLeft/ArrowRight.',
   dependencies: <String>['button', 'icon', 'source-foundation'],
   exports: <String>['Carousel', 'CarouselController'],
-  sourcePath: 'lib/src/components/carousel.dart',
+  sourcePath: 'lib/src/components/ui/carousel.dart',
 );

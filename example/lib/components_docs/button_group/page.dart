@@ -80,7 +80,7 @@ final ComponentDocSpec buttonGroupDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/button_group.dart',
           description:
               'No registry/components/button-group.json exists yet. Copy '
-              'lib/src/components/button_group.dart manually.',
+              'lib/src/components/ui/button_group.dart manually.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Install with: elattar add button-group',
@@ -180,7 +180,7 @@ final ComponentDocSpec buttonGroupDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every constructor parameter each exported class declares, read '
-          'directly off lib/src/components/button_group.dart: one table per '
+          'directly off lib/src/components/ui/button_group.dart: one table per '
           'class.',
       child: _ApiReferenceContent(),
       children: <DocsTocEntry>[
@@ -709,7 +709,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// New: the design calls for this page to carry its own Keyboard section.
-/// Every claim here is read off `lib/src/components/button_group.dart`
+/// Every claim here is read off `lib/src/components/ui/button_group.dart`
 /// directly: the file wires no `Focus.onKeyEvent`, no
 /// `FocusTraversalPolicy`, and no roving-tabindex mechanism of its own.
 class _KeyboardContent extends StatelessWidget {
@@ -768,7 +768,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/button_group.dart. No companion parts.',
+        'File: lib/src/components/ui/button_group.dart. No companion parts.',
         'Dart imports: dart:math (RRect radius scaling for the pill-corner '
             'clip).',
         'Flutter imports: package:flutter/rendering.dart (the custom '

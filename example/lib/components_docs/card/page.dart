@@ -70,7 +70,7 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'card has a real registry manifest, `elattar add card` installs '
-          'lib/src/components/card.dart and resolves source-foundation '
+          'lib/src/components/ui/card.dart and resolves source-foundation '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
       command: cardDoc.command,
@@ -79,7 +79,7 @@ final ComponentDocSpec cardDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/card.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/card.dart's generated @ui/card.dart "
+              "Copy lib/src/components/ui/card.dart's generated @ui/card.dart "
               'payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -927,7 +927,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/card.dart — one file, no companions; the '
+        'File: lib/src/components/ui/card.dart — one file, no companions; the '
             'registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/widgets.dart only.',
         'Foundation imports: foundation/shadows.dart (ShadowStyle, the '

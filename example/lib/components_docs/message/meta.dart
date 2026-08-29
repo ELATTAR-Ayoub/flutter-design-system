@@ -29,5 +29,5 @@ const ComponentDocEntry messageDoc = ComponentDocEntry(
     'MessageHeader',
     'MessageFooter',
   ],
-  sourcePath: 'lib/src/components/message.dart',
+  sourcePath: 'lib/src/components/ui/message.dart',
 );

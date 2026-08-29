@@ -10,7 +10,7 @@ import '../catalog.dart' show ComponentDocEntry;
 
 const ComponentDocEntry contentChangeDoc = ComponentDocEntry(
   name: 'content_change',
-  title: 'Swap In',
+  title: 'Content Change',
   description:
       'A 250ms spring pop — opacity 0 to 1, scale 0.96 to 1 — for content '
       'replacing content in the same slot: a figure that just changed value, '

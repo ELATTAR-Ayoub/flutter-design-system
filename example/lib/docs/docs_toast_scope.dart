@@ -2,7 +2,7 @@
 /// Threads the documentation app's [ToastController] down to any control
 /// that wants to confirm an action with a toast.
 ///
-/// `lib/src/components/toaster.dart` ships [Toaster] (the overlay host) and
+/// `lib/src/components/ui/toaster.dart` ships [Toaster] (the overlay host) and
 /// [ToastController] (the imperative queue a caller fires into), but
 /// neither exposes an inherited lookup of its own — there is no
 /// `Toaster.of(context)`. Reaching for a top-level global instead would

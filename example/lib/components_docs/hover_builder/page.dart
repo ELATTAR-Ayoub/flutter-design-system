@@ -236,7 +236,7 @@ class HoverBuilderDocPage extends StatelessWidget {
       route: '/components/icon_swap',
     ),
     next: const DocsPageLink(
-      title: 'Sliding Pill',
+      title: 'Active Indicator',
       route: '/components/active_indicator',
     ),
     onNavigate: onNavigate,

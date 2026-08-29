@@ -1,5 +1,5 @@
 /// Public documentation page for the `collapsible` component —
-/// `lib/src/components/collapsible.dart`'s [Collapsible] and the shared
+/// `lib/src/components/ui/collapsible.dart`'s [Collapsible] and the shared
 /// [Unfold] expand/collapse animation it mounts (the same animation
 /// `Accordion` mounts per open item).
 ///
@@ -109,8 +109,8 @@ final ComponentDocSpec collapsibleDocSpec = ComponentDocSpec(
               'files.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// No registry manifest yet: copy lib/src/components/'
-              'collapsible.dart into your project directly.',
+              '// No registry manifest yet: copy lib/src/components/ui/'
+              'collapsible.dart into lib/components/ui/ in your project.',
         ),
       ],
     ),
@@ -359,7 +359,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// Read directly off `Collapsible.build`
-/// (`lib/src/components/collapsible.dart`): a bare `Column` stacking
+/// (`lib/src/components/ui/collapsible.dart`): a bare `Column` stacking
 /// `trigger` and an `Unfold`, with no `Focus` widget and no
 /// `GestureDetector` of its own anywhere in the file.
 class _KeyboardContent extends StatelessWidget {
@@ -422,7 +422,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Foundation dependencies',
             value: collapsibleDoc.dependencies.join(', '),
             description:
-                'Only lib/src/foundation/motion.dart (durations, curves) '
+                'Only lib/src/design_system/foundation/motion.dart (durations, curves) '
                 'and theme_scope.dart (effectiveMotionDuration). No '
                 'component or effect file is imported.',
           ),

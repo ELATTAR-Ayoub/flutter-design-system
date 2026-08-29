@@ -159,7 +159,7 @@ void main() {
       expect(calendarDoc.title, 'Calendar');
       expect(calendarDoc.route, '/components/calendar');
       expect(calendarDoc.command, 'elattar add calendar');
-      expect(calendarDoc.sourcePath, 'lib/src/components/calendar.dart');
+      expect(calendarDoc.sourcePath, 'lib/src/components/ui/calendar.dart');
       expect(
         calendarDoc.exports,
         containsAll(<String>[
@@ -173,7 +173,7 @@ void main() {
           'DatePicker',
         ]),
       );
-      // The real imports of lib/src/components/calendar.dart, mapped onto
+      // The real imports of lib/src/components/ui/calendar.dart, mapped onto
       // registry item names that exist today: foundation (which carries
       // date_format.dart, and therefore DateFormat, Clock and
       // CalendarTextStyles), button, icon (which ships icon_paths.dart too), and

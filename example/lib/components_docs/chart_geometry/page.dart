@@ -76,7 +76,7 @@ final ComponentDocSpec chartGeometryDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'chart-geometry has a real registry manifest, `elattar add '
-          'chart-geometry` installs lib/src/components/chart_geometry.dart. '
+          'chart-geometry` installs lib/src/components/ui/chart_geometry.dart. '
           'Its registryDependencies list is empty — this is the leaf of the '
           'chart family\'s dependency graph, and every other chart item '
           'depends on it. The Manual tab is for a project not using the '
@@ -87,7 +87,7 @@ final ComponentDocSpec chartGeometryDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/chart_geometry.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/chart_geometry.dart's generated "
+              "Copy lib/src/components/ui/chart_geometry.dart's generated "
               '@ui/chart_geometry.dart payload into components/ui.',
           code:
               "// Copy the generated chart_geometry source here when using "
@@ -1128,7 +1128,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/chart_geometry.dart — one file, no '
+        'File: lib/src/components/ui/chart_geometry.dart — one file, no '
             'companions.',
         'Imports: dart:math and dart:ui (Offset, Path, Rect, RRect, '
             'Radius) only. No package:flutter import of any kind, and no '

@@ -1,7 +1,7 @@
 /// Public documentation page for the `questionnaire` component.
 ///
 /// Written from nothing: no page existed for this registry item before this
-/// file. Read end to end from `lib/src/components/questionnaire.dart`
+/// file. Read end to end from `lib/src/components/ui/questionnaire.dart`
 /// (1185 lines, `@shadcn/react/questionnaire` ported) and from
 /// `test/agent_transcript_test.dart`, which exercises it live inside the
 /// transcript page's own `_QuestionnaireDemo`. That specimen — a
@@ -61,7 +61,7 @@ final ComponentDocSpec questionnaireDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'questionnaire has a real registry manifest, `elattar add '
-          'questionnaire` installs lib/src/components/questionnaire.dart '
+          'questionnaire` installs lib/src/components/ui/questionnaire.dart '
           'and resolves all five registryDependencies automatically. The '
           'Manual tab is for a project not using the CLI.',
       command: questionnaireDoc.command,
@@ -70,7 +70,7 @@ final ComponentDocSpec questionnaireDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/questionnaire.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/questionnaire.dart's generated "
+              "Copy lib/src/components/ui/questionnaire.dart's generated "
               '@ui/questionnaire.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1157,7 +1157,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/questionnaire.dart — one file, no '
+        'File: lib/src/components/ui/questionnaire.dart — one file, no '
             'companions; the registry manifest lists exactly one entry '
             'under "files".',
         'Flutter imports: package:flutter/services.dart '

@@ -580,7 +580,7 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           const DocsLink(label: 'Icon', route: '/components/icon'),
           const DocsLink(
-            label: 'Bloom Cosmic',
+            label: 'Feedback Surface',
             route: '/components/feedback_surface',
           ),
           const DocsLink(

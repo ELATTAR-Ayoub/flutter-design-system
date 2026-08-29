@@ -748,7 +748,7 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: space(2)),
       DocsLinkRow(
         links: <DocsLink>[
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
         ],
       ),
     ],
@@ -786,7 +786,7 @@ class _ThemingContent extends StatelessWidget {
     'The two panels\' ambient is Shadows.md (GlassVariant.panel, '
         'GlassVariant.navigation) or Shadows.xl (GlassVariant.prominent): each '
         'layer inside those specs is itself a Color Function'
-        '(ThemeTokens), resolved live — see the Machine Surface '
+        '(ThemeTokens), resolved live — see the Surface '
         'page\'s own Theming section for what that means.',
     'The backdrop blur and saturation (blur(24px) saturate(1.5) on '
         'the two panels; none on the control) are geometry, not '

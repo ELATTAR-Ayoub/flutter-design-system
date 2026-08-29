@@ -7,7 +7,7 @@
 /// `field`, `icon`, `input`, `item`, `surface`, `menu`, `popover`,
 /// `source-foundation`, `spinner`.
 ///
-/// `lib/src/components/agent_history.dart` ports three reference files —
+/// `lib/src/components/ui/agent_history.dart` ports three reference files —
 /// `history-card.tsx`, `chat-history.tsx`, `history-search.tsx` — plus one
 /// motion helper the three of them share. [exports] lists every public
 /// name the file declares; the page documents [HistoryCard],
@@ -55,5 +55,5 @@ const ComponentDocEntry agentHistoryDoc = ComponentDocEntry(
     'BlurSwitch',
     'FlipController',
   ],
-  sourcePath: 'lib/src/components/agent_history.dart',
+  sourcePath: 'lib/src/components/ui/agent_history.dart',
 );

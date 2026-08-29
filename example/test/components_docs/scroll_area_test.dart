@@ -4,7 +4,7 @@
 /// (`resizable_test.dart`, `aspect_ratio_test.dart`); see
 /// `scroll_area/meta.dart`'s library note for the split.
 ///
-/// Reads `lib/src/components/scroll_area.dart` directly; every public
+/// Reads `lib/src/components/ui/scroll_area.dart` directly; every public
 /// class, enum, and constructor parameter enumerated below is one this
 /// page's API tables must cover.
 ///
@@ -78,7 +78,7 @@ Future<void> _open(WidgetTester tester, String title) async {
 
 /// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class, read directly off
-/// `lib/src/components/scroll_area.dart`.
+/// `lib/src/components/ui/scroll_area.dart`.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'ScrollArea': <String>[
     'child',

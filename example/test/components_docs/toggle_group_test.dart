@@ -91,7 +91,7 @@ const List<String> _sectionTitles = <String>[
 ];
 
 /// Every named constructor parameter `ToggleGroup` declares, excluding
-/// `key`, read directly from `lib/src/components/toggle_group.dart`
+/// `key`, read directly from `lib/src/components/ui/toggle_group.dart`
 /// (L144-L152).
 const List<String> _groupParams = <String>[
   'items',
@@ -623,7 +623,10 @@ void main() {
       expect(toggleGroupDoc.name, 'toggle-group');
       expect(toggleGroupDoc.route, '/components/toggle-group');
       expect(toggleGroupDoc.command, 'elattar add toggle-group');
-      expect(toggleGroupDoc.sourcePath, 'lib/src/components/toggle_group.dart');
+      expect(
+        toggleGroupDoc.sourcePath,
+        'lib/src/components/ui/toggle_group.dart',
+      );
       expect(toggleGroupDoc.exports, <String>[
         'ToggleGroup',
         'ToggleGroupItem',
@@ -632,7 +635,7 @@ void main() {
       expect(toggleGroupDoc.exports, isNot(contains('Toggle')));
       expect(toggleGroupDoc.exports, isNot(contains('ToggleVariant')));
       expect(toggleGroupDoc.exports, isNot(contains('ToggleSize')));
-      expect(toggleItemSourcePath, 'lib/src/components/toggle.dart');
+      expect(toggleItemSourcePath, 'lib/src/components/ui/toggle.dart');
       expect(
         slidingPillSourcePath,
         'lib/src/components/ui/active_indicator.dart',

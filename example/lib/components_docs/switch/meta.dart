@@ -14,8 +14,8 @@ const ComponentDocEntry switchDoc = ComponentDocEntry(
   description:
       'A boolean control that takes effect the instant it is flipped: no '
       'separate save step.',
-  // What lib/src/components/switch.dart itself imports from
-  // lib/src/components/: real source-level dependencies, not a verified
+  // What lib/src/components/ui/switch.dart itself imports from
+  // lib/src/components/ui/: real source-level dependencies, not a verified
   // registry dependency list. Switch installs through `elattar add switch` (see
   // DocsInstallFacts on the page), so these are documented as internal
   // dependencies rather than claimed as CLI-resolvable ones.
@@ -26,5 +26,5 @@ const ComponentDocEntry switchDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['Switch', 'SwitchSize'],
-  sourcePath: 'lib/src/components/switch.dart',
+  sourcePath: 'lib/src/components/ui/switch.dart',
 );

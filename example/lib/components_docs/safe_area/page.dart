@@ -82,7 +82,7 @@ final ComponentDocSpec safeAreaDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'safe-area has a real registry manifest, `elattar add '
-          'safe-area` installs lib/src/components/safe_area.dart. Its '
+          'safe-area` installs lib/src/components/ui/safe_area.dart. Its '
           'registryDependencies list is empty — the Manual tab is for a '
           'project not using the CLI.',
       command: safeAreaDoc.command,
@@ -91,7 +91,7 @@ final ComponentDocSpec safeAreaDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/safe_area.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/safe_area.dart's generated "
+              "Copy lib/src/components/ui/safe_area.dart's generated "
               '@ui/safe_area.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -154,7 +154,7 @@ final ComponentDocSpec safeAreaDocSpec = ComponentDocSpec(
       description:
           'Every constructor parameter SafeArea declares, plus its '
           'three static helpers, read off '
-          'lib/src/components/safe_area.dart.',
+          'lib/src/components/ui/safe_area.dart.',
       children: const <DocsTocEntry>[
         DocsTocEntry(title: 'SafeArea', anchor: 'api-elsafearea'),
         DocsTocEntry(title: 'SafeArea static', anchor: 'api-elsafearea-static'),
@@ -747,7 +747,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/safe_area.dart: one file, no '
+        'File: lib/src/components/ui/safe_area.dart: one file, no '
             'companions.',
         'Flutter imports: package:flutter/widgets.dart only.',
         'No foundation import at all: SafeArea reads MediaQuery, not a '

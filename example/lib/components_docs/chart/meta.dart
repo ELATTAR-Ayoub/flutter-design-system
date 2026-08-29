@@ -39,5 +39,5 @@ const ComponentDocEntry chartDoc = ComponentDocEntry(
     'ChartLegendAlign',
     'chartNumber',
   ],
-  sourcePath: 'lib/src/components/chart.dart',
+  sourcePath: 'lib/src/components/ui/chart.dart',
 );

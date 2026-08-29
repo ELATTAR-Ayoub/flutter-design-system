@@ -14,7 +14,7 @@
 /// and its Installation and Dependencies sections all claimed `avatar` "is
 /// not backed by a registry manifest yet." That was false the whole time:
 /// `registry/components/avatar.json` exists, lists exactly one file
-/// (`lib/src/components/avatar.dart`) and one registry dependency
+/// (`lib/src/components/ui/avatar.dart`) and one registry dependency
 /// (`source-foundation`), and its `documentationRoute` already points at
 /// this page. `avatar/meta.dart`'s own doc comment repeated the same claim
 /// and is corrected alongside this file.
@@ -77,7 +77,7 @@ final ComponentDocSpec avatarDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'avatar has a real registry manifest, `elattar add avatar` '
-          'installs lib/src/components/avatar.dart and resolves '
+          'installs lib/src/components/ui/avatar.dart and resolves '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: avatarDoc.command,
@@ -86,7 +86,7 @@ final ComponentDocSpec avatarDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/avatar.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/avatar.dart's generated "
+              "Copy lib/src/components/ui/avatar.dart's generated "
               '@ui/avatar.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -198,7 +198,7 @@ final ComponentDocSpec avatarDocSpec = ComponentDocSpec(
       description:
           'Avatar takes no onTap of its own, so any pressable ancestor '
           'can use one as its trigger: here, DropdownMenu.trigger, the '
-          'same pattern the sidebar footer\'s NavUser composes.',
+          'same pattern the sidebar footer\'s UserMenu composes.',
       specimen: _DropdownPreview(),
       code: _dropdownCode,
       label: 'Dropdown specimen view',
@@ -236,7 +236,7 @@ final ComponentDocSpec avatarDocSpec = ComponentDocSpec(
       description:
           'Avatar is not interactive on its own, so hover, focus, press, '
           'select, and disabled do not apply to it directly: wrap it in a '
-          'pressable ancestor, as NavUser wraps it in a '
+          'pressable ancestor, as UserMenu wraps it in a '
           'SidebarMenuButton, if the composition needs one of those.',
       child: DocsStateMatrix(facts: _stateFacts),
     ),
@@ -245,7 +245,7 @@ final ComponentDocSpec avatarDocSpec = ComponentDocSpec(
       title: 'Accessibility',
       description:
           'Avatar does not wrap itself in a Semantics node: read directly '
-          'from lib/src/components/avatar.dart, there is none in the '
+          'from lib/src/components/ui/avatar.dart, there is none in the '
           'class.',
       child: _AccessibilityContent(),
     ),
@@ -1000,7 +1000,7 @@ class _AccessibilityContent extends StatelessWidget {
             'Semantics(label: "…profile photo", image: true, child: '
             'Avatar(...)).',
         'When the avatar sits beside visible identity text: as it does '
-            'in the sidebar footer\'s NavUser: that adjacent text already '
+            'in the sidebar footer\'s UserMenu: that adjacent text already '
             'names the person, so no extra label is needed there.',
         'Avatar is not focusable and defines no keyboard behavior of '
             'its own; keyboard interaction belongs to whatever '

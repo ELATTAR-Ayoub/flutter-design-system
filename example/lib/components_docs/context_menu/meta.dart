@@ -22,5 +22,5 @@ const ComponentDocEntry contextMenuDoc = ComponentDocEntry(
       'Popover: for secondary actions on an element.',
   dependencies: <String>['menu', 'popover', 'source-foundation'],
   exports: <String>['ContextMenu'],
-  sourcePath: 'lib/src/components/context_menu.dart',
+  sourcePath: 'lib/src/components/ui/context_menu.dart',
 );

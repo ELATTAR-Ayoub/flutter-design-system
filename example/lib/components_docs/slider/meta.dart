@@ -16,8 +16,8 @@ const ComponentDocEntry sliderDoc = ComponentDocEntry(
   description:
       'A ranged control for one or more thumbs sliding along a track '
       'between a minimum and a maximum.',
-  // What lib/src/components/slider.dart itself imports from
-  // lib/src/components/: real source-level dependencies, not a verified
+  // What lib/src/components/ui/slider.dart itself imports from
+  // lib/src/components/ui/: real source-level dependencies, not a verified
   // registry dependency list. Slider installs through `elattar add slider` (see
   // DocsInstallFacts on the page), so these are documented as internal
   // dependencies rather than claimed as CLI-resolvable ones.
@@ -28,5 +28,5 @@ const ComponentDocEntry sliderDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['Slider'],
-  sourcePath: 'lib/src/components/slider.dart',
+  sourcePath: 'lib/src/components/ui/slider.dart',
 );

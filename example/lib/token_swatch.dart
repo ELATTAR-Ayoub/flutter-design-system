@@ -56,7 +56,7 @@ import 'package:flutter/widgets.dart'
 
 // The formula's own constants. They are literals in the strict sense, but they
 // are not design tokens and never will be: a rebrand cannot move them, and
-// pushing them into `lib/src/foundation/` would file the accessibility standard
+// pushing them into `lib/src/design_system/foundation/` would file the accessibility standard
 // under the colour system. They are named here instead, one per line, so the
 // arithmetic below reads as the specification it transcribes.
 

@@ -72,8 +72,8 @@ const Map<String, bool> redistributedFiles = <String, bool>{
   'assets/fonts/Redaction35-Italic.ttf': true,
   'shaders/orb.frag': true,
   'assets/textures/perlin-noise.png': true,
-  'lib/src/components/icon_paths.g.dart': false,
-  'lib/src/components/icon_paths.g.index.dart': false,
+  'lib/src/components/ui/icon_paths.g.dart': false,
+  'lib/src/components/ui/icon_paths.g.index.dart': false,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

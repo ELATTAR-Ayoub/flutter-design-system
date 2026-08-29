@@ -9,7 +9,7 @@
 /// reference's own 8px gap.
 ///
 /// This page is new — `bubble` had no page before this pass — built from
-/// `lib/src/components/bubble.dart` end to end and from the live specimens
+/// `lib/src/components/ui/bubble.dart` end to end and from the live specimens
 /// already staged on `example/lib/pages/chat.dart`'s "Bubble" section, reused
 /// here rather than invented fresh, per the rollout's own brief.
 ///
@@ -61,7 +61,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'bubble has a real registry manifest, `elattar add bubble` '
-          'installs lib/src/components/bubble.dart and resolves '
+          'installs lib/src/components/ui/bubble.dart and resolves '
           'press and source-foundation automatically. The Manual '
           'tab is for a project not using the CLI.',
       command: bubbleDoc.command,
@@ -70,7 +70,7 @@ final ComponentDocSpec bubbleDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/bubble.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/bubble.dart's generated "
+              "Copy lib/src/components/ui/bubble.dart's generated "
               '@ui/bubble.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1196,7 +1196,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/bubble.dart — one file, no companions; '
+        'File: lib/src/components/ui/bubble.dart — one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/rendering.dart '
             '(RenderProxyBox/RenderStack, the width-cap and reactions-'

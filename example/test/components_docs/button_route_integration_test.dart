@@ -7,9 +7,11 @@
 ///   page's example sections like Size and Default, which the retired page
 ///   has no equivalent of.
 /// * A component route's left rail is now `DocsLayout`'s new default —
-///   "Sections" then "Components", the latter built from every
-///   `components_docs/catalog.dart` entry: rather than the page's own
-///   retired five-item list.
+///   "Sections" then the four `ComponentDocFamily` groups, together built
+///   from every `components_docs/catalog.dart` entry: rather than the page's
+///   own retired five-item list. This test checks every entry is reachable
+///   somewhere in the rail; `docs_sidebar_test.dart` checks which group each
+///   one lands in.
 /// * The button page's TOC has fourteen example sections as top-level entries,
 ///   siblings of Installation and Usage, with no "Examples" wrapper.
 ///   `ComponentDocSpec.toc` is flat by design (see
@@ -136,10 +138,13 @@ void main() {
         find.byKey(const ValueKey<String>('docs-sidebar-group:Sections')),
         findsOneWidget,
       );
-      expect(
-        find.byKey(const ValueKey<String>('docs-sidebar-group:Components')),
-        findsOneWidget,
-      );
+      for (final ComponentDocFamily family in ComponentDocFamily.values) {
+        expect(
+          find.byKey(ValueKey<String>('docs-sidebar-group:${family.label}')),
+          findsOneWidget,
+          reason: family.label,
+        );
+      }
 
       for (final ComponentDocEntry entry in componentDocs) {
         expect(

@@ -28,5 +28,5 @@ const ComponentDocEntry progressDoc = ComponentDocEntry(
       'for the moment you can compute a fraction done.',
   dependencies: <String>['surface', 'source-foundation'],
   exports: <String>['Progress', 'ProgressTone'],
-  sourcePath: 'lib/src/components/progress.dart',
+  sourcePath: 'lib/src/components/ui/progress.dart',
 );

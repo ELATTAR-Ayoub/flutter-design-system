@@ -58,7 +58,8 @@ import 'package:flutter/widgets.dart'
 // `material.dart` itself.
 import 'package:flutter/gestures.dart';
 
-import '../components_docs/catalog.dart' show ComponentDocEntry, componentDocs;
+import '../components_docs/catalog.dart'
+    show ComponentDocEntry, ComponentDocFamily, componentDocsIn;
 import '../kit.dart' show Section;
 // The ambient router, so the rails navigate on pages that pass no callback.
 import '../shell.dart' show AppRouterScope;
@@ -79,16 +80,16 @@ export 'docs_sidebar.dart' show DocsSidebar, DocsSidebarEntry, DocsSidebarGroup;
 /// applies it only on the `wide` branch to keep that explicit rather than
 /// implied.
 ///
-/// A rail that fits inside this never notices it. It is the long
-/// "Components" list, and a long outline on a component page, that stop
+/// A rail that fits inside this never notices it. It is the component
+/// family lists, and a long outline on a component page, that stop
 /// short of the fold instead of running the eye all the way to the bottom
 /// edge of the screen: the rail reads as a panel with room around it rather
 /// than as a column of text poured into the window.
 const double _railViewportFraction = 0.8;
 
-/// The "Sections" then "Components" rail [_DocsLayoutState.build] falls back
-/// to when a page supplies neither [DocsLayout.sidebarGroups] nor the legacy
-/// [DocsLayout.sidebar] list.
+/// The rail [_DocsLayoutState.build] falls back to when a page supplies
+/// neither [DocsLayout.sidebarGroups] nor the legacy [DocsLayout.sidebar]
+/// list: "Sections", then the four component families, in that order.
 ///
 /// "Sections" lists the top-level public destinations from
 /// `../site/site_routes.dart`, deliberately excluding two kinds of entry.
@@ -104,9 +105,12 @@ const double _railViewportFraction = 0.8;
 /// exactly what `main.dart`'s `publicPageFor` resolves today. Nothing listed
 /// here is a dead link.
 ///
-/// "Components" lists every `../components_docs/catalog.dart` entry —
-/// already alphabetical by title, per that file's own contract — with
-/// whichever one matches [route] marked [DocsSidebarEntry.selected].
+/// "Components", "Effects", "Agent" and "Charts" are the four
+/// [ComponentDocFamily] views over `../components_docs/catalog.dart` — the
+/// same classifier the `/components` index reads, so the two can never
+/// disagree — with whichever entry matches [route] marked
+/// [DocsSidebarEntry.selected]. One long alphabetical list became four
+/// scannable ones; no component route changed.
 List<DocsSidebarGroup> _defaultSidebarGroups(String route) {
   return <DocsSidebarGroup>[
     DocsSidebarGroup(
@@ -121,17 +125,18 @@ List<DocsSidebarGroup> _defaultSidebarGroups(String route) {
             ),
       ],
     ),
-    DocsSidebarGroup(
-      label: 'Components',
-      items: <DocsSidebarEntry>[
-        for (final ComponentDocEntry component in componentDocs)
-          DocsSidebarEntry(
-            title: component.title,
-            route: component.route,
-            selected: component.route == route,
-          ),
-      ],
-    ),
+    for (final ComponentDocFamily family in ComponentDocFamily.values)
+      DocsSidebarGroup(
+        label: family.label,
+        items: <DocsSidebarEntry>[
+          for (final ComponentDocEntry component in componentDocsIn(family))
+            DocsSidebarEntry(
+              title: component.title,
+              route: component.route,
+              selected: component.route == route,
+            ),
+        ],
+      ),
   ];
 }
 
@@ -213,8 +218,8 @@ class DocsLayout extends StatefulWidget {
   /// prefer [sidebarGroups].
   final List<DocsSidebarEntry> sidebar;
 
-  /// The grouped left rail — "Sections" then "Components" in the reference
-  /// layout. Takes priority over [sidebar] whenever it is non-empty. A page
+  /// The grouped left rail — "Sections" then the four component families
+  /// in the reference layout. Takes priority over [sidebar] whenever it is non-empty. A page
   /// that supplies neither this nor [sidebar] gets [_defaultSidebarGroups]
   /// instead of an empty rail — see that function.
   final List<DocsSidebarGroup> sidebarGroups;

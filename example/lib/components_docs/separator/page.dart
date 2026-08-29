@@ -81,7 +81,7 @@ final ComponentDocSpec separatorDocSpec = ComponentDocSpec(
       description:
           '`elattar add separator` installs the component and its '
           'declared dependency closure. No registry/components/'
-          'separator.json exists yet: copy lib/src/components/'
+          'separator.json exists yet: copy lib/src/components/ui/'
           'separator.dart manually until it does.',
       command: separatorDoc.command,
       manualFiles: <DocsCodeFile>[
@@ -93,8 +93,8 @@ final ComponentDocSpec separatorDocSpec = ComponentDocSpec(
               'its relative imports pointed at the same foundation files.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// No registry manifest yet: copy lib/src/components/'
-              'separator.dart into your project directly.',
+              '// No registry manifest yet: copy lib/src/components/ui/'
+              'separator.dart into lib/components/ui/ in your project.',
         ),
       ],
     ),

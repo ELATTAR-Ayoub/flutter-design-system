@@ -151,7 +151,7 @@ from foundation tokens, cover loading/empty/error/success and accessibility
 states, respect responsive contracts, and run the right verification ladder.
 
 It is mode-aware. In a checkout of this repository it uses the package layout
-(`lib/src/foundation/`, `lib/src/components/`, `example/lib/`). In an
+(`lib/src/design_system/foundation/`, `lib/src/components/ui/`, `example/lib/`). In an
 application that installed the design system through the CLI, it detects
 `elattar.yaml` and uses that project's layout instead. One skill directory
 serves both; there is no second copy to drift.

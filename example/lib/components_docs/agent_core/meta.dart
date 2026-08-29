@@ -50,5 +50,5 @@ const ComponentDocEntry agentCoreDoc = ComponentDocEntry(
     'SwitchPhase',
     'BlurSwitchController',
   ],
-  sourcePath: 'lib/src/components/agent_core.dart',
+  sourcePath: 'lib/src/components/ui/agent_core.dart',
 );

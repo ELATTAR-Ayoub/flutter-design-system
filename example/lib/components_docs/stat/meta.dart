@@ -39,5 +39,5 @@ const ComponentDocEntry statDoc = ComponentDocEntry(
     'StatDeltaMark',
     'StatState',
   ],
-  sourcePath: 'lib/src/components/stat.dart',
+  sourcePath: 'lib/src/components/ui/stat.dart',
 );

@@ -82,7 +82,7 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/radio.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/radio.dart's generated @ui/"
+              "Copy lib/src/components/ui/radio.dart's generated @ui/"
               'radio.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -209,7 +209,7 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           'Verified against the real implementation rather than assumed: '
-          'lib/src/components/radio.dart\'s own _onKey and _RadioGroupState'
+          'lib/src/components/ui/radio.dart\'s own _onKey and _RadioGroupState'
           '.moveFrom.',
       child: DocsInstallFacts(title: 'Keyboard', facts: _keyboardFacts),
     ),
@@ -243,7 +243,7 @@ final ComponentDocSpec radioDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Shared machinery',
-            value: 'lib/src/components/selection_control.dart',
+            value: 'lib/src/components/ui/selection_control.dart',
             description:
                 'SelectionControl, HitArea and StateChangeFeedback, shared '
                 'with the checkbox and switch families and documented on '
@@ -1291,7 +1291,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Status',
             value: 'Stable, installable through elattar add radio',
             description:
-                'Ported and tested against lib/src/components/radio.dart, '
+                'Ported and tested against lib/src/components/ui/radio.dart, '
                 'and shipped as a registry item.',
           ),
           const DocsInstallFact(
@@ -1369,7 +1369,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Selection control',
             route: '/components/selection_control',
           ),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
           DocsLink(
             label: 'Source Foundation',

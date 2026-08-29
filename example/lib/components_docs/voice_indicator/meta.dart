@@ -17,7 +17,7 @@ import '../catalog.dart' show ComponentDocEntry;
 
 const ComponentDocEntry voiceIndicatorDoc = ComponentDocEntry(
   name: 'voice_indicator',
-  title: 'Voice Orb',
+  title: 'Voice Indicator',
   description:
       'The voice face: a shader-painted disc that reacts to a level '
       'the caller feeds it, coloured from the theme and never from a '

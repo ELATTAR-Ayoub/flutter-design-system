@@ -4,7 +4,7 @@
 /// `agent_markdown.dart` declares three widgets ([AgentMarkdown],
 /// [AgentCodeBlock], [PreformattedCode]) and two supporting classes
 /// ([PrismPalette], [CodeToken]) this page documents — read directly
-/// from `lib/src/components/agent_markdown.dart`. The parser's own block
+/// from `lib/src/components/ui/agent_markdown.dart`. The parser's own block
 /// model and top-level parse/render/tokenise functions are deliberately out
 /// of scope for the API table, per the page's own library doc; this file
 /// does not assert tables for them either.

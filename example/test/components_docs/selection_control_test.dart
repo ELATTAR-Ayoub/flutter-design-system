@@ -78,7 +78,7 @@ const List<String> _expectedSectionIds = <String>[
 
 /// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of each documented class found by
-/// reading `lib/src/components/selection_control.dart` directly.
+/// reading `lib/src/components/ui/selection_control.dart` directly.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'SelectionControl': <String>[
     'width',

@@ -160,7 +160,7 @@ void main() {
 
         await _open(tester, 'API Reference');
 
-        // Every public member enumerated from lib/src/components/table.dart:
+        // Every public member enumerated from lib/src/components/ui/table.dart:
         // Table's own constructor and static tokens, TableCellSpec,
         // TableRowSpec (both constructors) plus isSpan, TableAlign and its
         // alignment getter, TableColumnWidth's three overrides, and the two

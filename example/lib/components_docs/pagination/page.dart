@@ -19,7 +19,7 @@
 /// wires none of its own, but every cell is a real, composed [Button],
 /// so Tab and Enter both genuinely work here, inherited whole.
 ///
-/// **The one fact this page exists to get right:** `lib/src/components/`
+/// **The one fact this page exists to get right:** `lib/src/components/ui/`
 /// `pagination.dart` contains zero truncation logic. There is no
 /// `siblingCount`, no `boundaryCount`, and no `generatePagination`-style
 /// helper anywhere in that file, [Pagination.children] is a bare
@@ -87,7 +87,7 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/pagination.dart',
           title: '1. Copy the source',
           description:
-              'Copy lib/src/components/pagination.dart from the package '
+              'Copy lib/src/components/ui/pagination.dart from the package '
               'source directly, then update its relative imports '
               '(button.dart, icon.dart, icon_paths.dart, '
               'foundation/spacing.dart) to wherever you land them.',
@@ -160,7 +160,7 @@ final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
       description:
           'This is the one thing this page exists to get right, read it '
           'before reaching for Simple or Icons only. '
-          'lib/src/components/pagination.dart is 227 lines and none of '
+          'lib/src/components/ui/pagination.dart is 227 lines and none of '
           'them compute a page range: there is no siblingCount, no '
           'boundaryCount, and no generatePagination-shaped helper '
           'anywhere in the file. Pagination.children is a bare '

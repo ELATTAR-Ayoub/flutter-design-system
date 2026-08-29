@@ -31,5 +31,5 @@ const ComponentDocEntry nativeSelectDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['NativeSelect', 'NativeSelectSize'],
-  sourcePath: 'lib/src/components/native_select.dart',
+  sourcePath: 'lib/src/components/ui/native_select.dart',
 );

@@ -52,7 +52,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `Input`'s own class declares
-/// (`lib/src/components/input.dart`), excluding `key`: the same set the
+/// (`lib/src/components/ui/input.dart`), excluding `key`: the same set the
 /// page's `Input` `DocsApiTable` claims to cover.
 const List<String> _inputConstructorParams = <String>[
   'controller',

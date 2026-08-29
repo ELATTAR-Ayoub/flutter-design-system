@@ -2,7 +2,7 @@
 /// [AgentLauncherDocPage]: the agent-launcher component documentation page.
 ///
 /// `agent-launcher` is a brand-new page. `AgentLauncher`'s own
-/// constructor (`lib/src/components/agent_launcher.dart`) declares five
+/// constructor (`lib/src/components/ui/agent_launcher.dart`) declares five
 /// named parameters excluding `key`: `label`, `title`, `description`,
 /// `child`, `avatar`. The API-completeness test below checks all five
 /// appear in the `AgentLauncher` API table.
@@ -64,7 +64,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `AgentLauncher`'s own class declares
-/// (`lib/src/components/agent_launcher.dart`), excluding `key`.
+/// (`lib/src/components/ui/agent_launcher.dart`), excluding `key`.
 const List<String> _launcherConstructorParams = <String>[
   'label',
   'title',

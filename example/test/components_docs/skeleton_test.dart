@@ -180,7 +180,7 @@ void main() {
         await tester.pump(const Duration(milliseconds: 300));
 
         // The API table lists every Skeleton constructor parameter found
-        // in lib/src/components/skeleton.dart.
+        // in lib/src/components/ui/skeleton.dart.
         for (final String param in <String>['width', 'height', 'radius']) {
           expect(
             find.text(param),

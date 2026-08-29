@@ -70,7 +70,7 @@ Future<void> _openDisclosure(WidgetTester tester, String title) async {
   await tester.pump(MotionDurations.open);
 }
 
-/// Every constructor parameter [pagination.dart](../../../lib/src/components/pagination.dart)
+/// Every constructor parameter [pagination.dart](../../../lib/src/components/ui/pagination.dart)
 /// declares across its four public classes: [Pagination], [PaginationLink],
 /// [PaginationStep] (both named constructors share the same field set) and
 /// [PaginationEllipsis] (key only). The API table must render each of
@@ -155,7 +155,7 @@ void main() {
         await _openDisclosure(tester, 'API Reference');
 
         // The API table lists every constructor parameter found in
-        // lib/src/components/pagination.dart.
+        // lib/src/components/ui/pagination.dart.
         for (final String param in _apiParamNames) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }

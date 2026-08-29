@@ -37,7 +37,7 @@ import 'meta.dart';
 
 final ComponentDocSpec sheenActionDocSpec = ComponentDocSpec(
   name: 'action_feedback',
-  title: 'Sheen Action',
+  title: 'Action Feedback',
   description:
       'The default Button\'s surface: a derived five-stop ramp, a static '
       'blended texture, and a double-thump light that beats on hover and '
@@ -217,7 +217,7 @@ class ActionFeedbackDocPage extends StatelessWidget {
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
-      BreadcrumbEntry.page('Sheen Action'),
+      BreadcrumbEntry.page('Action Feedback'),
     ],
     toc: sheenActionDocSpec.toc,
     previous: null,
@@ -470,10 +470,7 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: space(3)),
       DocsLinkRow(
         links: <DocsLink>[
-          const DocsLink(
-            label: 'Machine Surface',
-            route: '/components/surface',
-          ),
+          const DocsLink(label: 'Surface', route: '/components/surface'),
           const DocsLink(label: 'Button', route: '/components/button'),
           const DocsLink(
             label: 'Source Foundation',

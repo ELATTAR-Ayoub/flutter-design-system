@@ -86,7 +86,7 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
       command: toggleGroupDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/src/components/toggle_group.dart',
+          path: 'lib/src/components/ui/toggle_group.dart',
           title: 'Manual: source mode (not recommended yet)',
           description:
               'Copying toggle_group.dart alone will not compile: every '
@@ -276,7 +276,7 @@ final ComponentDocSpec toggleGroupDocSpec = ComponentDocSpec(
       description:
           'Every constructor parameter ToggleGroup and ToggleGroupItem '
           'declare, and the group\'s one static: one table each, read off '
-          'lib/src/components/toggle_group.dart.',
+          'lib/src/components/ui/toggle_group.dart.',
       child: _ApiReferenceContent(),
       children: <DocsTocEntry>[
         DocsTocEntry(title: 'ToggleGroup', anchor: 'api-eltogglegroup'),
@@ -1151,7 +1151,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// New: the design calls for this page to carry its own Keyboard section.
-/// Every claim here is read off `lib/src/components/toggle_group.dart`
+/// Every claim here is read off `lib/src/components/ui/toggle_group.dart`
 /// directly: the file wires no `Focus.onKeyEvent` of its own — every item
 /// is a plain `Toggle`, so activation and the disabled/traversal rule
 /// come from that component's own `_onKey` and `Focus` wiring — plus the
@@ -1307,10 +1307,10 @@ class _DependenciesContent extends StatelessWidget {
           links: <DocsLink>[
             DocsLink(label: 'Toggle', route: '/components/toggle'),
             DocsLink(
-              label: 'Sliding Pill',
+              label: 'Active Indicator',
               route: '/components/active_indicator',
             ),
-            DocsLink(label: 'Machine Surface', route: '/components/surface'),
+            DocsLink(label: 'Surface', route: '/components/surface'),
             DocsLink(
               label: 'Source Foundation',
               route: '/components/source_foundation',

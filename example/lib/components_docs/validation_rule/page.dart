@@ -481,7 +481,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/validation_rule.dart, one file, no companions, no '
+        'File: lib/src/components/ui/validation_rule.dart, one file, no companions, no '
             'Flutter import.',
         'registryDependencies: empty. Nothing to resolve: validation_rule.dart has '
             'no import of its own to chase.',

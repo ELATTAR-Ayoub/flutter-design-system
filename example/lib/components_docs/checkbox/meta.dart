@@ -28,5 +28,5 @@ const ComponentDocEntry checkboxDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['Checkbox', 'CheckboxState'],
-  sourcePath: 'lib/src/components/checkbox.dart',
+  sourcePath: 'lib/src/components/ui/checkbox.dart',
 );

@@ -82,7 +82,7 @@ final ComponentDocSpec navUserDocSpec = ComponentDocSpec(
           'menu it opens.',
       specimen: const KeyedSubtree(
         key: ValueKey<String>('user-menu-preview'),
-        child: _NavUserPreview(),
+        child: _UserMenuPreview(),
       ),
       code: _usageCode,
       label: 'User Menu specimen view',
@@ -160,7 +160,7 @@ final ComponentDocSpec navUserDocSpec = ComponentDocSpec(
           'image.',
       specimen: const KeyedSubtree(
         key: ValueKey<String>('user-menu-example:initials'),
-        child: _NavUserPreview(name: 'Marguerite Okonkwo Adeyemi'),
+        child: _UserMenuPreview(name: 'Marguerite Okonkwo Adeyemi'),
       ),
       code: _accountCode,
       label: 'Initials fallback specimen view',
@@ -281,7 +281,7 @@ final ComponentDocSpec navUserDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Menu engine',
-            value: 'lib/src/components/dropdown_menu.dart, menu.dart',
+            value: 'lib/src/components/ui/dropdown_menu.dart, menu.dart',
             description:
                 'The shared engine this component composes. Documented on '
                 'the Dropdown Menu page, not here.',
@@ -356,8 +356,8 @@ class UserMenuDocPage extends StatelessWidget {
 /// The page's one specimen shape: an account with three rows, one of them
 /// destructive. [name] varies only so the initials section can show a longer
 /// one.
-class _NavUserPreview extends StatelessWidget {
-  const _NavUserPreview({this.name = 'Alex Johnson'});
+class _UserMenuPreview extends StatelessWidget {
+  const _UserMenuPreview({this.name = 'Alex Johnson'});
 
   final String name;
 
@@ -377,7 +377,7 @@ class _FooterSpecimen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      SidebarFooter(children: const <Widget>[_NavUserPreview()]);
+      SidebarFooter(children: const <Widget>[_UserMenuPreview()]);
 }
 
 Widget _bullets(ThemeTokens theme, List<String> lines) => Column(

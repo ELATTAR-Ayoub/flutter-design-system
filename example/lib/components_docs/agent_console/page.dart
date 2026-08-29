@@ -2,7 +2,7 @@
 ///
 /// **Written from nothing**, per the rollout's per-item brief:
 /// `agent-console` has no page today. Everything on it is read off
-/// `lib/src/components/agent_console.dart` directly.
+/// `lib/src/blocks/agent_console/agent_console.dart` directly.
 ///
 /// **The mock transport is reused, not reinvented.** `example/lib/agent/
 /// mock_transport.dart`'s own library doc names exactly why it exists:
@@ -73,7 +73,7 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'agent-console has a real registry manifest: elattar add '
-          'agent-console installs lib/src/components/agent_console.dart '
+          'agent-console installs lib/src/blocks/agent_console/agent_console.dart '
           'and resolves agent-avatar, agent-composer, agent-core, '
           'agent-face, agent-history, agent-slash-palette, '
           'agent-transcript, button, dropdown-menu, icon, marker, menu, '
@@ -85,7 +85,7 @@ final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_console.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_console.dart's generated "
+              "Copy lib/src/blocks/agent_console/agent_console.dart's generated "
               '@ui/agent_console.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -915,7 +915,7 @@ class _DependenciesContent extends StatelessWidget {
         facts: <DocsInstallFact>[
           const DocsInstallFact(
             label: 'File',
-            value: 'lib/src/components/agent_console.dart',
+            value: 'lib/src/blocks/agent_console/agent_console.dart',
             description:
                 'One file, no companions; the registry manifest lists '
                 'exactly one entry under "files".',

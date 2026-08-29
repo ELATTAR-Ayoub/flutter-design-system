@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// The generated lucide registry, judged against the hand transcription.
 ///
-/// `lib/src/components/icon_paths.dart` embeds 78 glyphs transcribed by hand
+/// `lib/src/components/ui/icon_paths.dart` embeds 78 glyphs transcribed by hand
 /// from `design-system/node_modules/lucide-react/dist/esm/icons/`.
 /// `icon_paths.g.dart` is the whole package — 1756 glyphs — emitted
 /// mechanically from those same modules by `tool/generate_icons.mjs`.

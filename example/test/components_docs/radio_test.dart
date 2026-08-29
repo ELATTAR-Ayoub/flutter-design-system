@@ -76,7 +76,7 @@ const List<String> _expectedSectionTitles = <String>[
 ];
 
 /// Every public constructor parameter of `RadioGroup<T>`, enumerated by
-/// reading `lib/src/components/radio.dart` directly (Step 1 of the task
+/// reading `lib/src/components/ui/radio.dart` directly (Step 1 of the task
 /// cycle). The API table must cover all of these by name.
 const List<String> _radioGroupParams = <String>[
   'value',

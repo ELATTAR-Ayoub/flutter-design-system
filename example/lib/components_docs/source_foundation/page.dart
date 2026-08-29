@@ -7,7 +7,7 @@
 /// package sits beneath it.
 ///
 /// **Why `EffectSection`, not `ShowcaseSection`, and why there is no single
-/// specimen.** `lib/src/foundation/` is eleven files of tokens and
+/// specimen.** `lib/src/design_system/foundation/` is eleven files of tokens and
 /// utilities — colours, both themes, typography, spacing, motion, shadows,
 /// surfaces, dates, text layout — not one widget with a shape to show. This
 /// page cannot stage "the foundation" as one specimen, so it is built out
@@ -73,12 +73,13 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
       command: sourceFoundationDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
-          path: 'lib/foundation/foundation.dart',
+          path: 'lib/design_system/foundation.dart',
           title: '1. Copy the source',
           description:
-              'Copy every file under lib/src/foundation/, plus '
-              'lib/src/text_layout.dart and lib/src/theme_scope.dart, '
-              "into your project's own foundation folder.",
+              "Copy all eleven files under this package's "
+              'lib/src/design_system/foundation/ into your own project at '
+              'lib/design_system/foundation/ — the repository source path '
+              'and the consumer destination are not the same path.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
               '// Copy the generated foundation source here when using '
@@ -164,7 +165,7 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
       description:
           'Shadows.sm through e4 — the ambient depth ladder, the '
           'other shadow family being the MACHINE surfaces '
-          '(Shadows.control and its kin) the Machine Surface page '
+          '(Shadows.control and its kin) the Surface page '
           'documents on its own. Every layer stores a Color '
           'Function(ThemeTokens), never a literal Color, which is why '
           'this ladder repaints correctly in both themes without this '
@@ -177,7 +178,7 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
       id: 'api',
       title: 'API Reference',
       description:
-          'A representative inventory of what lib/src/foundation/ '
+          'A representative inventory of what lib/src/design_system/foundation/ '
           'exports, by class, read off the source: not every static '
           'field of every class — there are hundreds — but every class '
           'this page\'s own specimens reach for, and what each one is '
@@ -872,14 +873,15 @@ class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ThemeScope.of(context), <String>[
-        'The foundation itself takes no focus and handles no key: it is '
-            'tokens and pure functions, not an interactive widget. '
-            'ThemeScope is an InheritedNotifier with no Focus of its own; '
-            'every keyboard story on this kit belongs to a component '
-            'built on top of it, never to lib/src/foundation/ directly.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'The foundation itself takes no focus and handles no key: it is '
+        'tokens and pure functions, not an interactive widget. '
+        'ThemeScope is an InheritedNotifier with no Focus of its own; '
+        'every keyboard story on this kit belongs to a component '
+        'built on top of it, never to lib/src/design_system/foundation/ directly.',
+  ]);
 }
 
 class _ResponsiveContent extends StatelessWidget {

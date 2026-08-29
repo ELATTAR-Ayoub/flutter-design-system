@@ -29,5 +29,5 @@ const ComponentDocEntry agentMarkdownDoc = ComponentDocEntry(
     'safeHref',
     'languageAliases',
   ],
-  sourcePath: 'lib/src/components/agent_markdown.dart',
+  sourcePath: 'lib/src/components/ui/agent_markdown.dart',
 );

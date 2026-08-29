@@ -78,7 +78,7 @@ const List<String> _expectedSectionIds = <String>[
 ];
 
 /// Every public constructor parameter of `Tabs`, enumerated by reading
-/// `lib/src/components/tabs.dart` directly. The API table must cover all of
+/// `lib/src/components/ui/tabs.dart` directly. The API table must cover all of
 /// these by name.
 const List<String> _tabsParams = <String>[
   'items',

@@ -6,7 +6,7 @@
 ///
 /// Three widgets from two reference files — `voice/visualisers.tsx`
 /// ([LiveWaveform], [BarVisualizer]) and `voice/pickers.tsx`
-/// ([MicControl]) — read end to end from `lib/src/components/voice.dart`
+/// ([MicControl]) — read end to end from `lib/src/components/ui/voice.dart`
 /// and from `test/agent_voice_test.dart`.
 library;
 
@@ -22,5 +22,5 @@ const ComponentDocEntry voiceDoc = ComponentDocEntry(
   // registry/components/voice.json's own registryDependencies, verbatim.
   dependencies: <String>['button', 'icon', 'source-foundation'],
   exports: <String>['LiveWaveform', 'BarVisualizer', 'MicControl'],
-  sourcePath: 'lib/src/components/voice.dart',
+  sourcePath: 'lib/src/components/ui/voice.dart',
 );

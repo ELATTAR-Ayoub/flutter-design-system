@@ -53,7 +53,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 
 /// The union of every named constructor parameter `PieChart`,
 /// `RadarChart` and `RadialBarChart` declare
-/// (`lib/src/components/chart_polar.dart`), excluding `key`.
+/// (`lib/src/components/ui/chart_polar.dart`), excluding `key`.
 const List<String> _polarConstructorParams = <String>[
   'pies',
   'legend',

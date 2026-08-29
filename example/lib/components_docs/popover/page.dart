@@ -63,7 +63,7 @@ final ComponentDocSpec popoverDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'popover already has a registry manifest: this installs '
-          'lib/src/components/popover.dart and its one dependency, '
+          'lib/src/components/ui/popover.dart and its one dependency, '
           'source-foundation, resolved automatically.',
       command: popoverDoc.command,
       manualFiles: const <DocsCodeFile>[
@@ -185,7 +185,7 @@ final ComponentDocSpec popoverDocSpec = ComponentDocSpec(
       title: 'Keyboard',
       description:
           "Read straight off Popover's own Focus wrapper and _onKey "
-          '(lib/src/components/popover.dart), not inferred.',
+          '(lib/src/components/ui/popover.dart), not inferred.',
       child: _KeyboardContent(),
     ),
     DisclosureSection(
@@ -226,7 +226,7 @@ final ComponentDocSpec popoverDocSpec = ComponentDocSpec(
             label: 'GitHub',
             value:
                 'github.com/ELATTAR-Ayoub/flutter-design-system/blob/'
-                'main/lib/src/components/popover.dart',
+                'main/lib/src/components/ui/popover.dart',
             description: "The registry manifest's own sourceLink, verbatim.",
           ),
           const DocsInstallFact(
@@ -1238,7 +1238,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// Read straight off `Popover`'s own `Focus` wrapper and `_onKey`
-/// (`lib/src/components/popover.dart`), not inferred.
+/// (`lib/src/components/ui/popover.dart`), not inferred.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
@@ -1384,7 +1384,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Native Select', route: '/components/native_select'),
           DocsLink(label: 'Calendar', route: '/components/calendar'),
           DocsLink(label: 'Hover Card', route: '/components/hover-card'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',

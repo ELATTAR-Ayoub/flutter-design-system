@@ -71,7 +71,7 @@ final ComponentDocSpec agentSlashPaletteDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'agent-slash-palette has a real registry manifest, `elattar add '
-          'agent-slash-palette` installs lib/src/components/'
+          'agent-slash-palette` installs lib/src/components/ui/'
           'agent_slash_palette.dart and resolves both registryDependencies '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
@@ -81,7 +81,7 @@ final ComponentDocSpec agentSlashPaletteDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_slash_palette.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_slash_palette.dart's "
+              "Copy lib/src/components/ui/agent_slash_palette.dart's "
               'generated @ui/agent_slash_palette.dart payload into '
               'components/ui.',
           code:
@@ -816,7 +816,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/agent_slash_palette.dart. No companion '
+        'File: lib/src/components/ui/agent_slash_palette.dart. No companion '
             'parts.',
         'Flutter imports: package:flutter/gestures.dart (PointerEnterEvent, '
             'PointerDownEvent), package:flutter/rendering.dart '

@@ -10,7 +10,7 @@
 ///
 /// **Section list.** Preview contrasts the spring against a plain instant
 /// replace. Stat Figure reproduces this port's one real corpus consumer
-/// (`lib/src/components/stat.dart`) faithfully. Replay Key is the source's
+/// (`lib/src/components/ui/stat.dart`) faithfully. Replay Key is the source's
 /// own documented split, quoted directly from its class doc: a widget keyed
 /// on [replayKey] restarts the spring every time that key changes (`Stat`'s
 /// figure, keyed on state); a widget that keeps the same [replayKey] plays
@@ -41,7 +41,7 @@ import 'meta.dart';
 
 final ComponentDocSpec swapInDocSpec = ComponentDocSpec(
   name: 'content_change',
-  title: 'Swap In',
+  title: 'Content Change',
   description:
       'A 250ms spring pop — opacity 0 to 1, scale 0.96 to 1 — for content '
       'replacing content in the same slot: a figure that just changed value, '
@@ -104,7 +104,7 @@ final ComponentDocSpec swapInDocSpec = ComponentDocSpec(
       id: 'stat-figure',
       title: 'Stat Figure',
       description:
-          "lib/src/components/stat.dart's own composition: the arriving "
+          "lib/src/components/ui/stat.dart's own composition: the arriving "
           'figure is wrapped ContentChange(replayKey: state, …), so a loading '
           '→ ready transition — a changed React key in the reference, a '
           'changed replayKey here — remounts the figure and the spring '
@@ -219,11 +219,11 @@ class ContentChangeDocPage extends StatelessWidget {
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
-      BreadcrumbEntry.page('Swap In'),
+      BreadcrumbEntry.page('Content Change'),
     ],
     toc: swapInDocSpec.toc,
     previous: const DocsPageLink(
-      title: 'Sliding Pill',
+      title: 'Active Indicator',
       route: '/components/active_indicator',
     ),
     next: null,

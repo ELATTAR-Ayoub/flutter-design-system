@@ -50,7 +50,7 @@
 /// for.
 ///
 /// Two corrections against the task brief, both resolved in favour of the
-/// real source (`lib/src/components/tooltip.dart`), which is the documented
+/// real source (`lib/src/components/ui/tooltip.dart`), which is the documented
 /// source of truth here:
 ///
 ///  * The touch path is a **tap**, not a long press, [Tooltip] opens on
@@ -112,7 +112,7 @@ final ComponentDocSpec tooltipDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'tooltip already has a registry manifest: this installs '
-          'lib/src/components/tooltip.dart and its one dependency, '
+          'lib/src/components/ui/tooltip.dart and its one dependency, '
           'source-foundation, resolved automatically. The Manual tab is '
           'for a project not using the CLI.',
       command: tooltipDoc.command,
@@ -270,7 +270,7 @@ final ComponentDocSpec tooltipDocSpec = ComponentDocSpec(
             label: 'GitHub',
             value:
                 'github.com/ELATTAR-Ayoub/flutter-design-system/blob/'
-                'main/lib/src/components/tooltip.dart',
+                'main/lib/src/components/ui/tooltip.dart',
             description: "The registry manifest's own sourceLink, verbatim.",
           ),
           const DocsInstallFact(

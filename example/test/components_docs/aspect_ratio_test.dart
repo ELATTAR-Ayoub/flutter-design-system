@@ -3,7 +3,7 @@
 /// former shared `scroll_area` route; see `aspect_ratio/meta.dart`'s
 /// library note.
 ///
-/// Reads `lib/src/components/aspect_ratio.dart` directly; every public
+/// Reads `lib/src/components/ui/aspect_ratio.dart` directly; every public
 /// constructor parameter enumerated below is one this page's API table
 /// must cover.
 ///

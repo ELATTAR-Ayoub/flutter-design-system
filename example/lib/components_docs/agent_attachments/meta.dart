@@ -36,5 +36,5 @@ const ComponentDocEntry agentAttachmentsDoc = ComponentDocEntry(
     'agentAttachmentGlyph',
     'agentAttachmentIsVideo',
   ],
-  sourcePath: 'lib/src/components/agent_attachments.dart',
+  sourcePath: 'lib/src/components/ui/agent_attachments.dart',
 );

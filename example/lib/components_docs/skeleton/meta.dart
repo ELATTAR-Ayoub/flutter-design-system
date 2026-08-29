@@ -25,5 +25,5 @@ const ComponentDocEntry skeletonDoc = ComponentDocEntry(
       'arrived yet, so the layout never jumps when it does.',
   dependencies: <String>['keyframes', 'source-foundation'],
   exports: <String>['Skeleton'],
-  sourcePath: 'lib/src/components/skeleton.dart',
+  sourcePath: 'lib/src/components/ui/skeleton.dart',
 );

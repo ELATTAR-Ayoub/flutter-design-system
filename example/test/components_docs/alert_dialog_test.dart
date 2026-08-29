@@ -196,7 +196,10 @@ void main() {
       expect(alertDialogDoc.title, 'Alert Dialog');
       expect(alertDialogDoc.route, '/components/alert-dialog');
       expect(alertDialogDoc.command, 'elattar add alert-dialog');
-      expect(alertDialogDoc.sourcePath, 'lib/src/components/alert_dialog.dart');
+      expect(
+        alertDialogDoc.sourcePath,
+        'lib/src/components/ui/alert_dialog.dart',
+      );
       expect(
         alertDialogDoc.exports,
         containsAll(<String>[

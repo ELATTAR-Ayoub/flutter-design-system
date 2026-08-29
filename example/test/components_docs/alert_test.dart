@@ -110,7 +110,7 @@ void main() {
   test('alertDoc exposes accurate registry metadata', () {
     expect(alertDoc.name, 'alert');
     expect(alertDoc.title, 'Alert');
-    expect(alertDoc.sourcePath, 'lib/src/components/alert.dart');
+    expect(alertDoc.sourcePath, 'lib/src/components/ui/alert.dart');
     expect(alertDoc.exports, containsAll(<String>['Alert', 'AlertVariant']));
     expect(alertDoc.dependencies, <String>[
       'feedback-surface',

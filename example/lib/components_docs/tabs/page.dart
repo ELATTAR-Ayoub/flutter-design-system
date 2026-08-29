@@ -74,7 +74,7 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'tabs is a registry item: elattar add tabs installs '
-          'lib/src/components/tabs.dart and resolves button, '
+          'lib/src/components/ui/tabs.dart and resolves button, '
           'surface, active-indicator and source-foundation '
           'automatically. The Manual tab is for a project not using the '
           'CLI — copying tabs.dart alone will not compile without those '
@@ -85,7 +85,7 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/tabs.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/tabs.dart's generated "
+              "Copy lib/src/components/ui/tabs.dart's generated "
               '@ui/tabs.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1206,10 +1206,10 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(
-            label: 'Sliding Pill',
+            label: 'Active Indicator',
             route: '/components/active_indicator',
           ),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',

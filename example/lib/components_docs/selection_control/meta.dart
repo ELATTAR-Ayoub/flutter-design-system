@@ -25,5 +25,5 @@ const ComponentDocEntry selectionControlDoc = ComponentDocEntry(
   // Registry dependencies are resolved by `elattar add selection-control`.
   dependencies: <String>['button', 'keyframes', 'surface', 'source-foundation'],
   exports: <String>['SelectionControl', 'HitArea', 'StateChangeFeedback'],
-  sourcePath: 'lib/src/components/selection_control.dart',
+  sourcePath: 'lib/src/components/ui/selection_control.dart',
 );

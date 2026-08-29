@@ -14,7 +14,7 @@
 /// behavior" section.
 ///
 /// Two findings, resolved in favour of the real source
-/// (`lib/src/components/alert_dialog.dart`), which is the documented source
+/// (`lib/src/components/ui/alert_dialog.dart`), which is the documented source
 /// of truth here:
 ///
 ///  * **`AlertDialogSize.sm` is only half-built.** The enum's own doc
@@ -100,7 +100,7 @@ final ComponentDocSpec alertDialogDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'alert-dialog already has a registry manifest: this installs '
-          'lib/src/components/alert_dialog.dart and its dependencies, '
+          'lib/src/components/ui/alert_dialog.dart and its dependencies, '
           'button, dialog, surface, source-foundation, and '
           'tooltip, resolved automatically.',
       command: alertDialogDoc.command,
@@ -109,7 +109,7 @@ final ComponentDocSpec alertDialogDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/alert_dialog.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/alert_dialog.dart's generated "
+              "Copy lib/src/components/ui/alert_dialog.dart's generated "
               '@ui/alert_dialog.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -232,7 +232,7 @@ final ComponentDocSpec alertDialogDocSpec = ComponentDocSpec(
       description:
           'Read off Button\'s own key handler (shared by Cancel and '
           'Action) and OverlayPortalState\'s Escape branch '
-          '(lib/src/components/dialog.dart), not inferred.',
+          '(lib/src/components/ui/dialog.dart), not inferred.',
       child: _KeyboardContent(),
     ),
     DisclosureSection(
@@ -1067,9 +1067,9 @@ class _AccessibilityContent extends StatelessWidget {
   );
 }
 
-/// Read directly off `Button`'s own key handler (`lib/src/components/
+/// Read directly off `Button`'s own key handler (`lib/src/components/ui/
 /// button.dart`, shared by Cancel and Action) and `OverlayPortalState._onKey`
-/// (`lib/src/components/dialog.dart`), not inferred.
+/// (`lib/src/components/ui/dialog.dart`), not inferred.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
@@ -1209,7 +1209,7 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Dialog', route: '/components/dialog'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(label: 'Tooltip', route: '/components/tooltip'),
         ],
       ),

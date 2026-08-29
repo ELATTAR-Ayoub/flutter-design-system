@@ -175,7 +175,7 @@ void main() {
       expect(comboboxDoc.title, 'Combobox');
       expect(comboboxDoc.route, '/components/combobox');
       expect(comboboxDoc.command, 'elattar add combobox');
-      expect(comboboxDoc.sourcePath, 'lib/src/components/combobox.dart');
+      expect(comboboxDoc.sourcePath, 'lib/src/components/ui/combobox.dart');
       expect(comboboxDoc.exports, <String>[
         'Combobox',
         'ComboboxItem',

@@ -86,7 +86,7 @@ const Size _wide = Size(1440, 900);
 const Size _narrow = Size(390, 844);
 
 /// Every public constructor parameter of `Textarea`, enumerated by reading
-/// `lib/src/components/textarea.dart` directly (Step 1 of the task cycle).
+/// `lib/src/components/ui/textarea.dart` directly (Step 1 of the task cycle).
 /// The API table must cover all of these by name.
 const List<String> _textareaParams = <String>[
   'controller',

@@ -23,5 +23,5 @@ const ComponentDocEntry buttonGroupDoc = ComponentDocEntry(
       'actions.',
   dependencies: <String>['button', 'source-foundation'],
   exports: <String>['ButtonGroup', 'ButtonGroupText', 'ButtonGroupSeparator'],
-  sourcePath: 'lib/src/components/button_group.dart',
+  sourcePath: 'lib/src/components/ui/button_group.dart',
 );

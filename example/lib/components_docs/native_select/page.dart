@@ -279,7 +279,7 @@ final ComponentDocSpec nativeSelectDocSpec = ComponentDocSpec(
         facts: const <DocsInstallFact>[
           DocsInstallFact(
             label: 'Source',
-            value: 'lib/src/components/native_select.dart',
+            value: 'lib/src/components/ui/native_select.dart',
             description: 'The one source file.',
           ),
           DocsInstallFact(
@@ -842,7 +842,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Source file',
             value: 'native_select.dart',
             description:
-                'lib/src/components/native_select.dart, exported from the '
+                'lib/src/components/ui/native_select.dart, exported from the '
                 'public barrel.',
           ),
           DocsInstallFact(
@@ -872,7 +872,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Icon', route: '/components/icon'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(label: 'Popover', route: '/components/popover'),
           DocsLink(label: 'Select', route: '/components/select'),
           DocsLink(

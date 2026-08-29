@@ -34,5 +34,5 @@ const ComponentDocEntry fieldDoc = ComponentDocEntry(
     'FieldDescription',
     'FieldError',
   ],
-  sourcePath: 'lib/src/components/field.dart',
+  sourcePath: 'lib/src/components/ui/field.dart',
 );

@@ -12,7 +12,7 @@
 /// — this page had none before, only a merged "Accessibility and keyboard
 /// behavior" heading whose bullets, read closely, never actually named a key.
 /// The keyboard facts below are new prose, read directly off
-/// `lib/src/components/input_group.dart`, not inferred: `InputGroupButton`
+/// `lib/src/components/ui/input_group.dart`, not inferred: `InputGroupButton`
 /// wires no `onKeyEvent` of its own (its `Press` wraps a bare
 /// `GestureDetector.onTap`), so a focused addon button does not activate on
 /// Enter or Space — a real, documented gap, not a claim this page invents.
@@ -86,7 +86,7 @@ final ComponentDocSpec inputGroupDocSpec = ComponentDocSpec(
           '`elattar add input-group` installs the component and its '
           'declared dependency closure. No registry/components/'
           'input_group.json exists yet: copy '
-          'lib/src/components/input_group.dart manually until it does.',
+          'lib/src/components/ui/input_group.dart manually until it does.',
       command: inputGroupDoc.command,
       manualFiles: <DocsCodeFile>[
         DocsCodeFile(
@@ -94,8 +94,8 @@ final ComponentDocSpec inputGroupDocSpec = ComponentDocSpec(
           title: '1. Copy the source',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// No registry manifest yet: copy lib/src/components/'
-              'input_group.dart into your project directly.',
+              '// No registry manifest yet: copy lib/src/components/ui/'
+              'input_group.dart into lib/components/ui/ in your project.',
         ),
       ],
     ),
@@ -170,7 +170,7 @@ final ComponentDocSpec inputGroupDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every constructor parameter each exported class declares, read '
-          'directly off lib/src/components/input_group.dart: one table per '
+          'directly off lib/src/components/ui/input_group.dart: one table per '
           'class or enum.',
       children: const <DocsTocEntry>[
         DocsTocEntry(title: 'InputGroup', anchor: 'api-elinputgroup'),
@@ -698,7 +698,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/input_group.dart. No companion parts.',
+        'File: lib/src/components/ui/input_group.dart. No companion parts.',
         'Foundation imports: colors.dart, motion.dart, shadows.dart, '
             'spacing.dart (space()), theme.dart, typography.dart.',
         'Effect imports: effects/surface.dart (Surface: '
@@ -719,7 +719,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Button', route: '/components/button'),
           DocsLink(label: 'Field', route: '/components/field'),
           DocsLink(label: 'Input', route: '/components/input'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(label: 'Press Motion', route: '/components/press'),
         ],
       ),

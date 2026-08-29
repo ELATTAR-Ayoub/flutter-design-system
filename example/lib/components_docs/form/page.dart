@@ -75,7 +75,7 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/form.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/form.dart's generated @ui/"
+              "Copy lib/src/components/ui/form.dart's generated @ui/"
               'form.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -230,7 +230,7 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
         facts: const <DocsInstallFact>[
           DocsInstallFact(
             label: 'Source',
-            value: 'lib/src/components/form.dart',
+            value: 'lib/src/components/ui/form.dart',
             description: 'The one source file.',
           ),
           DocsInstallFact(
@@ -1054,7 +1054,7 @@ class _AccessibilityContent extends StatelessWidget {
 
 /// `Form` owns no widget tree, so this section is entirely about the one
 /// keyboard-relevant behaviour it does own — `focusFirstError()`, called
-/// from `submit()` — read off `lib/src/components/form.dart` directly.
+/// from `submit()` — read off `lib/src/components/ui/form.dart` directly.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
@@ -1114,7 +1114,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Source file',
             value: 'form.dart',
             description:
-                'lib/src/components/form.dart, exported from the public '
+                'lib/src/components/ui/form.dart, exported from the public '
                 'barrel.',
           ),
           DocsInstallFact(

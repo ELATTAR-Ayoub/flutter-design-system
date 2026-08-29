@@ -1388,7 +1388,7 @@ class _DependenciesContent extends StatelessWidget {
         links: <DocsLink>[
           DocsLink(label: 'Icon Swap', route: '/components/icon_swap'),
           DocsLink(
-            label: 'Sliding Pill',
+            label: 'Active Indicator',
             route: '/components/active_indicator',
           ),
           DocsLink(

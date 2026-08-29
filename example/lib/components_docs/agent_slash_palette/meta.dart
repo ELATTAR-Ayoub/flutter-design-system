@@ -27,5 +27,5 @@ const ComponentDocEntry agentSlashPaletteDoc = ComponentDocEntry(
     'slashQuery',
     'filterCommands',
   ],
-  sourcePath: 'lib/src/components/agent_slash_palette.dart',
+  sourcePath: 'lib/src/components/ui/agent_slash_palette.dart',
 );

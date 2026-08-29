@@ -30,5 +30,5 @@ const ComponentDocEntry agentAttachMenuDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['AgentAttachMenu'],
-  sourcePath: 'lib/src/components/agent_attach_menu.dart',
+  sourcePath: 'lib/src/components/ui/agent_attach_menu.dart',
 );

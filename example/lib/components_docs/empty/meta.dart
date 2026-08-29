@@ -31,5 +31,5 @@ const ComponentDocEntry emptyDoc = ComponentDocEntry(
     'EmptyDescription',
     'EmptyContent',
   ],
-  sourcePath: 'lib/src/components/empty.dart',
+  sourcePath: 'lib/src/components/ui/empty.dart',
 );

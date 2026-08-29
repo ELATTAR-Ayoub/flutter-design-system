@@ -31,5 +31,5 @@ const ComponentDocEntry accordionDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['Accordion', 'AccordionItem'],
-  sourcePath: 'lib/src/components/accordion.dart',
+  sourcePath: 'lib/src/components/ui/accordion.dart',
 );

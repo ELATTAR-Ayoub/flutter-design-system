@@ -20,7 +20,7 @@
 /// registry dependencies, and `catalog.dart`'s `componentDocs` list already
 /// carries this entry. See `meta.dart` for the correction.
 ///
-/// **Eleven lines, no styling of its own** — `lib/src/components/
+/// **Eleven lines, no styling of its own** — `lib/src/components/ui/
 /// aspect_ratio.dart`'s own library doc counts them. The widget wraps only
 /// Flutter's own `AspectRatio` and, when `margin` is non-zero, `Padding`: no
 /// foundation import, no colour, no Semantics node, no key handling. States,
@@ -69,7 +69,7 @@ final ComponentDocSpec aspectRatioDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'aspect_ratio has a real registry manifest, `elattar add '
-          'aspect-ratio` installs lib/src/components/aspect_ratio.dart. It '
+          'aspect-ratio` installs lib/src/components/ui/aspect_ratio.dart. It '
           'declares no registry dependencies at all: the source imports '
           'only package:flutter/widgets.dart, not even the foundation. '
           'The Manual tab is for a project not using the CLI.',
@@ -79,7 +79,7 @@ final ComponentDocSpec aspectRatioDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/aspect_ratio.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/aspect_ratio.dart's generated "
+              "Copy lib/src/components/ui/aspect_ratio.dart's generated "
               '@ui/aspect_ratio.dart payload into components/ui.',
           code:
               "import 'package:flutter/widgets.dart' hide AspectRatio, Form, FormField, Icon, OverlayPortal, RadioGroup, RichText, SafeArea, ScrollPosition, Table, TableColumnWidth;\n\n"

@@ -30,7 +30,7 @@
 /// New: a Keyboard disclosure, between Accessibility and Responsive — the
 /// "enclosing Scrollable still answers arrow keys" fact the old
 /// Accessibility section folded in is moved there, read off the same
-/// source (`lib/src/components/scroll_area.dart` wires no `Focus` node and
+/// source (`lib/src/components/ui/scroll_area.dart` wires no `Focus` node and
 /// no key handling of its own anywhere).
 library;
 
@@ -74,7 +74,7 @@ final ComponentDocSpec scrollAreaDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'scroll_area has a real registry manifest, `elattar add '
-          'scroll-area` installs lib/src/components/scroll_area.dart and '
+          'scroll-area` installs lib/src/components/ui/scroll_area.dart and '
           'resolves source-foundation automatically. The Manual tab is '
           'for a project not using the CLI.',
       command: scrollAreaDoc.command,
@@ -83,7 +83,7 @@ final ComponentDocSpec scrollAreaDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/scroll_area.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/scroll_area.dart's generated "
+              "Copy lib/src/components/ui/scroll_area.dart's generated "
               '@ui/scroll_area.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"

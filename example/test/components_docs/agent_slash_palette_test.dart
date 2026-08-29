@@ -5,7 +5,7 @@
 /// `agent_slash_palette.dart` declares one widget ([AgentSlashPalette]),
 /// one data class ([AgentCommand]), one enum ([AgentCommandGroup]), and
 /// two top-level functions ([slashQuery], [filterCommands]) — read
-/// directly from `lib/src/components/agent_slash_palette.dart`. The
+/// directly from `lib/src/components/ui/agent_slash_palette.dart`. The
 /// API-completeness test below checks each `DocsApiTable` by its own title,
 /// not a flat merged set, so a table missing one field cannot hide behind
 /// another table that happens to share a name.
@@ -72,7 +72,7 @@ const List<String> _expectedSectionOrder = <String>[
 
 /// Every `DocsApiTable` this page must render, by title, and every named
 /// constructor parameter / public field / public static / enum value found
-/// by reading `lib/src/components/agent_slash_palette.dart` directly.
+/// by reading `lib/src/components/ui/agent_slash_palette.dart` directly.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'AgentSlashPalette': <String>[
     'commands',

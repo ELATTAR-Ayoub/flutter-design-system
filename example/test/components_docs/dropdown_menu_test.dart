@@ -1,8 +1,8 @@
 /// Tests for `components_docs/dropdown_menu/meta.dart` and
 /// `components_docs/dropdown_menu/page.dart`: the public documentation page
-/// for **both** `DropdownMenu` (`lib/src/components/dropdown_menu.dart`)
+/// for **both** `DropdownMenu` (`lib/src/components/ui/dropdown_menu.dart`)
 /// and the shared menu engine it is built from
-/// (`lib/src/components/menu.dart`).
+/// (`lib/src/components/ui/menu.dart`).
 ///
 /// Real test-view sizing throughout (`tester.view.physicalSize` +
 /// `addTearDown(tester.view.reset)`), never synthetic `MediaQuery`. Theme
@@ -139,9 +139,9 @@ void main() {
       expect(dropdownMenuDoc.command, 'elattar add dropdown-menu');
       expect(
         dropdownMenuDoc.sourcePath,
-        'lib/src/components/dropdown_menu.dart',
+        'lib/src/components/ui/dropdown_menu.dart',
       );
-      expect(menuSourcePath, 'lib/src/components/menu.dart');
+      expect(menuSourcePath, 'lib/src/components/ui/menu.dart');
       expect(
         dropdownMenuDoc.exports,
         containsAll(<String>[

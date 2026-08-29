@@ -34,5 +34,5 @@ const ComponentDocEntry scrollAreaDoc = ComponentDocEntry(
       'for either axis.',
   dependencies: <String>['source-foundation'],
   exports: <String>['ScrollArea', 'ScrollAreaBehavior'],
-  sourcePath: 'lib/src/components/scroll_area.dart',
+  sourcePath: 'lib/src/components/ui/scroll_area.dart',
 );

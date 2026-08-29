@@ -84,7 +84,7 @@ final ComponentDocSpec inputOtpDocSpec = ComponentDocSpec(
       description:
           '`elattar add input-otp` installs the component and its declared '
           'dependency closure. No registry/components/input_otp.json '
-          'exists yet: copy lib/src/components/input_otp.dart manually '
+          'exists yet: copy lib/src/components/ui/input_otp.dart manually '
           'until it does.',
       command: inputOtpDoc.command,
       manualFiles: <DocsCodeFile>[
@@ -93,8 +93,8 @@ final ComponentDocSpec inputOtpDocSpec = ComponentDocSpec(
           title: '1. Copy the source',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-              '// No registry manifest yet: copy lib/src/components/'
-              'input_otp.dart into your project directly.',
+              '// No registry manifest yet: copy lib/src/components/ui/'
+              'input_otp.dart into lib/components/ui/ in your project.',
         ),
       ],
     ),
@@ -184,7 +184,7 @@ final ComponentDocSpec inputOtpDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every constructor parameter each exported class declares, read '
-          'directly off lib/src/components/input_otp.dart: one table per '
+          'directly off lib/src/components/ui/input_otp.dart: one table per '
           'class.',
       children: const <DocsTocEntry>[
         DocsTocEntry(title: 'InputOtp', anchor: 'api-elinputotp'),
@@ -629,7 +629,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/input_otp.dart. No companion parts.',
+        'File: lib/src/components/ui/input_otp.dart. No companion parts.',
         'Dart imports: dart:math (the selection-expansion arithmetic that '
             'decides which slot is active).',
         'Flutter imports: package:flutter/semantics.dart '
@@ -658,7 +658,7 @@ class _DependenciesContent extends StatelessWidget {
           DocsLink(label: 'Icon', route: '/components/icon'),
           DocsLink(label: 'Input', route: '/components/input'),
           DocsLink(label: 'Keyframes', route: '/components/keyframes'),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
         ],
       ),
     ],

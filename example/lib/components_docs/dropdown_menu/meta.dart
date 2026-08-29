@@ -8,7 +8,7 @@
 /// `componentDoc('dropdown-menu')`.
 ///
 /// One [ComponentDocEntry], not two, for the reason `toggle/meta.dart`
-/// already established for its own paired file: `lib/src/components/
+/// already established for its own paired file: `lib/src/components/ui/
 /// menu.dart`'s own library doc states that its "row model, the surface, the
 /// geometry, the keyboard" is the shared body of `dropdown-menu.tsx`,
 /// `context-menu.tsx` and `menubar.tsx`: it is not a component of its own to
@@ -21,11 +21,11 @@ library;
 
 import '../catalog.dart';
 
-/// `lib/src/components/menu.dart`: the shared row model, geometry, surface
+/// `lib/src/components/ui/menu.dart`: the shared row model, geometry, surface
 /// and keyboard behaviour [DropdownMenu] is built from. Read directly
 /// wherever the page cites the second source file [ComponentDocEntry] has no
 /// room for.
-const String menuSourcePath = 'lib/src/components/menu.dart';
+const String menuSourcePath = 'lib/src/components/ui/menu.dart';
 
 const ComponentDocEntry dropdownMenuDoc = ComponentDocEntry(
   name: 'dropdown-menu',
@@ -33,8 +33,8 @@ const ComponentDocEntry dropdownMenuDoc = ComponentDocEntry(
   description:
       'A trigger button that opens a list of commands, built from the same '
       'row engine a context menu and a menubar also mount.',
-  // What lib/src/components/dropdown_menu.dart and lib/src/components/
-  // menu.dart themselves import from lib/src/components/: real
+  // What lib/src/components/ui/dropdown_menu.dart and lib/src/components/ui/
+  // menu.dart themselves import from lib/src/components/ui/: real
   // source-level dependencies, not a verified registry dependency list.
   // Neither file has a registry manifest yet (see DocsInstallFacts on the
   // page), so these are documented as internal dependencies rather than
@@ -68,5 +68,5 @@ const ComponentDocEntry dropdownMenuDoc = ComponentDocEntry(
     'MenuPointerDown',
     'MenuMotion',
   ],
-  sourcePath: 'lib/src/components/dropdown_menu.dart',
+  sourcePath: 'lib/src/components/ui/dropdown_menu.dart',
 );

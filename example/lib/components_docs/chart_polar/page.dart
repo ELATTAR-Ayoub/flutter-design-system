@@ -24,8 +24,8 @@
 /// and the numbers are the same fixture, not an invented one.
 ///
 /// **Read, not inferred.** Every claim traces to a line in
-/// `lib/src/components/chart_polar.dart`. `grep -n "Semantics\|FocusNode"
-/// lib/src/components/chart_polar.dart` returns zero matches — Accessibility
+/// `lib/src/components/ui/chart_polar.dart`. `grep -n "Semantics\|FocusNode"
+/// lib/src/components/ui/chart_polar.dart` returns zero matches — Accessibility
 /// and Keyboard both say so rather than inventing a story the file does not
 /// tell.
 library;
@@ -118,7 +118,7 @@ final ComponentDocSpec chartPolarDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'chart-polar has a real registry manifest, `elattar add '
-          'chart-polar` installs lib/src/components/chart_polar.dart and '
+          'chart-polar` installs lib/src/components/ui/chart_polar.dart and '
           'resolves its three registryDependencies, chart, chart-cartesian '
           'and chart-geometry, automatically. The Manual tab is for a '
           'project not using the CLI.',
@@ -128,7 +128,7 @@ final ComponentDocSpec chartPolarDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/chart_polar.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/chart_polar.dart's generated "
+              "Copy lib/src/components/ui/chart_polar.dart's generated "
               '@ui/chart_polar.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1266,7 +1266,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/chart_polar.dart — one file, no '
+        'File: lib/src/components/ui/chart_polar.dart — one file, no '
             'companions.',
         'Flutter imports: package:flutter/widgets.dart only — no '
             'package:flutter/material.dart anywhere in the file.',

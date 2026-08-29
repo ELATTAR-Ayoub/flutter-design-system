@@ -11,7 +11,7 @@
 /// Responsive.
 ///
 /// **The manifest is real.** `registry/components/empty.json` ships today:
-/// `elattar add empty` installs `lib/src/components/empty.dart` and
+/// `elattar add empty` installs `lib/src/components/ui/empty.dart` and
 /// resolves `icon` and `source-foundation` automatically.
 ///
 /// **Reference shape**, mirrored from shadcn's own
@@ -92,7 +92,7 @@ final ComponentDocSpec emptyDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'empty has a real registry manifest, `elattar add empty` '
-          'installs lib/src/components/empty.dart and resolves icon and '
+          'installs lib/src/components/ui/empty.dart and resolves icon and '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: emptyDoc.command,
@@ -101,7 +101,7 @@ final ComponentDocSpec emptyDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/empty.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/empty.dart's generated "
+              "Copy lib/src/components/ui/empty.dart's generated "
               '@ui/empty.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"

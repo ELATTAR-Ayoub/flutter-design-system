@@ -104,7 +104,7 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'calendar ships in the registry: `elattar add calendar` '
-          'installs lib/src/components/calendar.dart and resolves button, '
+          'installs lib/src/components/ui/calendar.dart and resolves button, '
           'icon, popover, and source-foundation automatically. The Manual '
           'tab is for a project not using the CLI.',
       command: calendarDoc.command,
@@ -113,7 +113,7 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/calendar.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/calendar.dart's generated "
+              "Copy lib/src/components/ui/calendar.dart's generated "
               '@ui/calendar.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -171,7 +171,7 @@ final ComponentDocSpec calendarDocSpec = ComponentDocSpec(
       description:
           'The reference splits this into its own page: a Calendar '
           'wrapped in a Popover behind a Button. This port keeps both '
-          'symbols in the one source file, lib/src/components/'
+          'symbols in the one source file, lib/src/components/ui/'
           'calendar.dart, so the specimen lives here rather than behind '
           'a second page. Enabled opens on tap; Disabled passes a null '
           'onChanged, the only per-instance disabling the family offers.',
@@ -1524,7 +1524,7 @@ class _AccessibilityContent extends StatelessWidget {
   );
 }
 
-/// Read directly off `_CalendarState._onKey` (`lib/src/components/
+/// Read directly off `_CalendarState._onKey` (`lib/src/components/ui/
 /// calendar.dart`): every branch that function actually takes, driven on
 /// the live reference before being ported.
 class _KeyboardContent extends StatelessWidget {

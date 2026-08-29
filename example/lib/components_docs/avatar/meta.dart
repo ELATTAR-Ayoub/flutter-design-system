@@ -3,7 +3,7 @@
 /// **Correction.** This file previously claimed `avatar` had no
 /// `registry/components/avatar.json` manifest yet. That was false:
 /// `registry/components/avatar.json` exists, lists exactly one file
-/// (`lib/src/components/avatar.dart`) and one registry dependency
+/// (`lib/src/components/ui/avatar.dart`) and one registry dependency
 /// (`source-foundation`), and its own `documentationRoute` already points
 /// at `/components/avatar`. [dependencies] below mirrors that shipped
 /// manifest, not an invented list.
@@ -29,5 +29,5 @@ const ComponentDocEntry avatarDoc = ComponentDocEntry(
     'AvatarGroupCount',
     'AvatarRimPainter',
   ],
-  sourcePath: 'lib/src/components/avatar.dart',
+  sourcePath: 'lib/src/components/ui/avatar.dart',
 );

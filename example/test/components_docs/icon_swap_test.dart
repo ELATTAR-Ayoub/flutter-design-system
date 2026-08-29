@@ -53,7 +53,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `IconSwap`'s own class declares
-/// (`lib/src/components/icon_swap.dart`), excluding `key`: the same set the
+/// (`lib/src/components/ui/icon_swap.dart`), excluding `key`: the same set the
 /// page's `IconSwap` `DocsApiTable` claims to cover.
 const List<String> _iconSwapConstructorParams = <String>[
   'icons',

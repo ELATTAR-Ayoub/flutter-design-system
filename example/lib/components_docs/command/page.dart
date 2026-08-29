@@ -106,7 +106,7 @@ final ComponentDocSpec commandDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/command.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/command.dart's generated @ui/"
+              "Copy lib/src/components/ui/command.dart's generated @ui/"
               'command.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -263,7 +263,7 @@ final ComponentDocSpec commandDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every constructor parameter, static helper and top-level '
-          'function lib/src/components/command.dart declares: one table '
+          'function lib/src/components/ui/command.dart declares: one table '
           'each, read off the real constructors.',
       children: const <DocsTocEntry>[
         DocsTocEntry(title: 'Command', anchor: 'api-elcommand'),
@@ -331,7 +331,7 @@ final ComponentDocSpec commandDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Sibling component',
-            value: 'lib/src/components/combobox.dart',
+            value: 'lib/src/components/ui/combobox.dart',
             description:
                 'Combobox, the anchored form control that used to '
                 'share this page. It has its own page now, at '
@@ -959,7 +959,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/command.dart. One file, no '
+        'File: lib/src/components/ui/command.dart. One file, no '
             'companions, and shipped registry manifest.',
         'Flutter imports: dart:math (the score decay), '
             'package:flutter/services.dart (LogicalKeyboardKey, '
@@ -1046,7 +1046,7 @@ Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
   ],
 );
 
-// ── API tables, read off lib/src/components/command.dart ────────────────────
+// ── API tables, read off lib/src/components/ui/command.dart ────────────────────
 
 const List<DocsApiFact> _commandFacts = <DocsApiFact>[
   DocsApiFact(

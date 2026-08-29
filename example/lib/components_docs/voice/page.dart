@@ -1,7 +1,7 @@
 /// Public documentation page for the `voice` component.
 ///
 /// Written from nothing: no page existed for this registry item before this
-/// file. Read end to end from `lib/src/components/voice.dart` (three
+/// file. Read end to end from `lib/src/components/ui/voice.dart` (three
 /// widgets, two reference files) and from `test/agent_voice_test.dart`
 /// (which covers this family together with the orb).
 ///
@@ -68,7 +68,7 @@ final ComponentDocSpec voiceDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'voice has a real registry manifest, `elattar add voice` '
-          'installs lib/src/components/voice.dart and resolves its three '
+          'installs lib/src/components/ui/voice.dart and resolves its three '
           'registryDependencies automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: voiceDoc.command,
@@ -77,7 +77,7 @@ final ComponentDocSpec voiceDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/voice.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/voice.dart's generated "
+              "Copy lib/src/components/ui/voice.dart's generated "
               '@ui/voice.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -664,7 +664,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/voice.dart — one file, three widgets, '
+        'File: lib/src/components/ui/voice.dart — one file, three widgets, '
             'no companions; the registry manifest lists exactly one '
             'entry under "files".',
         'Flutter imports: dart:math (the band reduction), package:'

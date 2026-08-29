@@ -68,7 +68,7 @@ final ComponentDocSpec agentAttachmentsDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'agent-attachments has a real registry manifest, `elattar add '
-          'agent-attachments` installs lib/src/components/'
+          'agent-attachments` installs lib/src/components/ui/'
           'agent_attachments.dart and resolves all seven '
           'registryDependencies automatically. The Manual tab is for a '
           'project not using the CLI.',
@@ -78,7 +78,7 @@ final ComponentDocSpec agentAttachmentsDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_attachments.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_attachments.dart's generated "
+              "Copy lib/src/components/ui/agent_attachments.dart's generated "
               '@ui/agent_attachments.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -710,7 +710,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/agent_attachments.dart. No companion '
+        'File: lib/src/components/ui/agent_attachments.dart. No companion '
             'parts.',
         'Flutter imports: package:flutter/widgets.dart.',
         'Foundation imports: shadows.dart, spacing.dart (space()), '

@@ -37,7 +37,7 @@ import 'meta.dart';
 
 final ComponentDocSpec bloomCosmicDocSpec = ComponentDocSpec(
   name: 'feedback_surface',
-  title: 'Bloom Cosmic',
+  title: 'Feedback Surface',
   description:
       'The iridescence behind an Alert and a toast: two blurred, '
       'forever-drifting radial-gradient layers hung off a corner in the '
@@ -224,7 +224,7 @@ class FeedbackSurfaceDocPage extends StatelessWidget {
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Components'),
-      BreadcrumbEntry.page('Bloom Cosmic'),
+      BreadcrumbEntry.page('Feedback Surface'),
     ],
     toc: bloomCosmicDocSpec.toc,
     previous: null,

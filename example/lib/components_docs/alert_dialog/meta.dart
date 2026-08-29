@@ -9,7 +9,7 @@
 ///
 /// [ComponentDocEntry.name] is the registry/route slug `alert-dialog`
 /// (kebab-case), which does **not** match the Dart source file
-/// `lib/src/components/alert_dialog.dart` (snake_case, because Dart file
+/// `lib/src/components/ui/alert_dialog.dart` (snake_case, because Dart file
 /// names cannot carry a hyphen). The manifest, [ComponentDocEntry.route] and
 /// [ComponentDocEntry.command] all agree on the kebab-case spelling: only
 /// [sourcePath] stays snake_case, because it names a real file on disk.
@@ -47,5 +47,5 @@ const ComponentDocEntry alertDialogDoc = ComponentDocEntry(
     'AlertDialogAction',
     'AlertDialogCancel',
   ],
-  sourcePath: 'lib/src/components/alert_dialog.dart',
+  sourcePath: 'lib/src/components/ui/alert_dialog.dart',
 );

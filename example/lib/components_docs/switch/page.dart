@@ -25,7 +25,7 @@
 /// "not yet published" Installation facts were correct when written and are
 /// gone now that `elattar add switch` actually resolves. New: a Keyboard
 /// disclosure, between Accessibility and Responsive, read directly off
-/// `lib/src/components/selection_control.dart`'s shared `_onKey`
+/// `lib/src/components/ui/selection_control.dart`'s shared `_onKey`
 /// (switch.dart composes `SelectionControl`, it does not wire its own key
 /// handler).
 library;
@@ -202,7 +202,7 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          "Read off lib/src/components/selection_control.dart's shared "
+          "Read off lib/src/components/ui/selection_control.dart's shared "
           '_onKey: switch.dart composes SelectionControl rather than '
           'wiring its own key handler.',
       child: _KeyboardContent(),
@@ -234,7 +234,7 @@ final ComponentDocSpec switchDocSpec = ComponentDocSpec(
             description:
                 'Authoritative implementation: the truth this page was '
                 'written from. Paired with '
-                'lib/src/components/selection_control.dart, documented '
+                'lib/src/components/ui/selection_control.dart, documented '
                 'separately.',
           ),
           const DocsInstallFact(
@@ -755,7 +755,7 @@ class _AccessibilityContent extends StatelessWidget {
       ]);
 }
 
-/// Read directly off `lib/src/components/selection_control.dart`'s shared
+/// Read directly off `lib/src/components/ui/selection_control.dart`'s shared
 /// `_onKey`: `switch.dart` composes `SelectionControl` rather than wiring
 /// its own key handler, so every fact here is that file's, not invented for
 /// this page.
@@ -823,7 +823,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Status',
             value: 'Stable, installable through elattar add switch',
             description:
-                'Ported and tested against lib/src/components/switch.dart, '
+                'Ported and tested against lib/src/components/ui/switch.dart, '
                 'and shipped as a registry item.',
           ),
           const DocsInstallFact(
@@ -893,7 +893,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Selection control',
             route: '/components/selection_control',
           ),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',

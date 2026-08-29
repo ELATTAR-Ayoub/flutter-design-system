@@ -38,5 +38,5 @@ const ComponentDocEntry chartPolarDoc = ComponentDocEntry(
     'RadialBarSpec',
     'RadialBarChart',
   ],
-  sourcePath: 'lib/src/components/chart_polar.dart',
+  sourcePath: 'lib/src/components/ui/chart_polar.dart',
 );

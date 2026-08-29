@@ -16,7 +16,7 @@ import '../catalog.dart' show ComponentDocEntry;
 
 const ComponentDocEntry premiumSurfaceDoc = ComponentDocEntry(
   name: 'premium_surface',
-  title: 'Foil Value',
+  title: 'Premium Surface',
   description:
       'The premium Button\'s surface: a seven-stop metal ramp under a '
       'drifting foil sheen and a sweeping glint, both perpetual, both on '

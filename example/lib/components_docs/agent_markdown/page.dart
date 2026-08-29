@@ -76,7 +76,7 @@ final ComponentDocSpec agentMarkdownDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'agent-markdown has a real registry manifest, `elattar add '
-          'agent-markdown` installs lib/src/components/'
+          'agent-markdown` installs lib/src/components/ui/'
           'agent_markdown.dart and resolves source-foundation '
           'automatically. The Manual tab is for a project not using the '
           'CLI.',
@@ -86,7 +86,7 @@ final ComponentDocSpec agentMarkdownDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/agent_markdown.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/agent_markdown.dart's generated "
+              "Copy lib/src/components/ui/agent_markdown.dart's generated "
               '@ui/agent_markdown.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -836,7 +836,7 @@ class _DependenciesContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/agent_markdown.dart. No companion '
+        'File: lib/src/components/ui/agent_markdown.dart. No companion '
             'parts.',
         'Flutter imports: package:flutter/widgets.dart.',
         'Foundation imports: spacing.dart (space()), theme.dart, '
@@ -844,7 +844,7 @@ class _DependenciesContent extends StatelessWidget {
             'engineLineHeight — for the code block\'s own line-box '
             'math), theme_scope.dart (StyledText, RichText, ThemeScope).',
         'No component imports at all: agent_markdown.dart reaches for no '
-            'other file under lib/src/components/, which is the whole of '
+            'other file under lib/src/components/ui/, which is the whole of '
             'why registryDependencies is exactly one entry.',
         'registryDependencies, resolved automatically by `elattar add '
             'agent-markdown`: source-foundation — copied verbatim from '

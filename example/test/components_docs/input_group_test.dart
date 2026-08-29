@@ -15,7 +15,7 @@
 /// `docs_disclosure_test.dart`), so any test reading their content opens
 /// the panel first via [_disclosureTrigger].
 ///
-/// Reads from `lib/src/components/input_group.dart` directly (Step 1 of the
+/// Reads from `lib/src/components/ui/input_group.dart` directly (Step 1 of the
 /// task cycle): every public class, enum, and constructor parameter
 /// enumerated below is one this page's API tables must cover.
 ///
@@ -111,7 +111,7 @@ const Size _narrow = Size(390, 844);
 
 /// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of that class, read directly off
-/// `lib/src/components/input_group.dart`.
+/// `lib/src/components/ui/input_group.dart`.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'InputGroup': <String>[
     'child',

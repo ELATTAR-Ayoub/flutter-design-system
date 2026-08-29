@@ -5,7 +5,7 @@
 /// `agent_attachments.dart` declares three widgets ([AgentAttachmentCard],
 /// [AgentAttachmentList], [AgentDeliveryBadge]) and two top-level
 /// functions ([agentAttachmentGlyph], [agentAttachmentIsVideo]) — read
-/// directly from `lib/src/components/agent_attachments.dart`. The
+/// directly from `lib/src/components/ui/agent_attachments.dart`. The
 /// API-completeness test checks each `DocsApiTable` by its own title.
 ///
 /// No `pumpAndSettle` anywhere: only `tester.pump()` / `tester.pump(duration)`.

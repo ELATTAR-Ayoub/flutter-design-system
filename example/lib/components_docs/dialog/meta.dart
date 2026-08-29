@@ -43,5 +43,5 @@ const ComponentDocEntry dialogDoc = ComponentDocEntry(
     'DialogDescription',
     'DialogMedia',
   ],
-  sourcePath: 'lib/src/components/dialog.dart',
+  sourcePath: 'lib/src/components/ui/dialog.dart',
 );

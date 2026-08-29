@@ -49,7 +49,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `AgentComposer`'s own class
-/// declares (`lib/src/components/agent_composer.dart`), excluding `key`.
+/// declares (`lib/src/components/ui/agent_composer.dart`), excluding `key`.
 const List<String> _composerConstructorParams = <String>[
   'controller',
   'focusNode',

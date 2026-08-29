@@ -31,5 +31,5 @@ const ComponentDocEntry bubbleDoc = ComponentDocEntry(
     'BubbleReaction',
     'BubbleReactions',
   ],
-  sourcePath: 'lib/src/components/bubble.dart',
+  sourcePath: 'lib/src/components/ui/bubble.dart',
 );

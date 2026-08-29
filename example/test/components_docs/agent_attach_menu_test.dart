@@ -3,7 +3,7 @@
 /// page.
 ///
 /// `agent_attach_menu.dart` declares one widget, [AgentAttachMenu], read
-/// directly from `lib/src/components/agent_attach_menu.dart`. The
+/// directly from `lib/src/components/ui/agent_attach_menu.dart`. The
 /// API-completeness test checks its two `DocsApiTable`s (constructor
 /// parameters, then public statics) by title.
 ///

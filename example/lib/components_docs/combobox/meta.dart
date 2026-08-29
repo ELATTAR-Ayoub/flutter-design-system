@@ -5,13 +5,13 @@
 /// because both are "filter as you type" surfaces. They are separate public
 /// components with separate source files and separate barrel exports, so
 /// they now get one page each: this file documents
-/// `lib/src/components/combobox.dart` alone, and `../command/meta.dart`
-/// documents `lib/src/components/command.dart` alone.
+/// `lib/src/components/ui/combobox.dart` alone, and `../command/meta.dart`
+/// documents `lib/src/components/ui/command.dart` alone.
 ///
 /// `combobox` ships `registry/components/combobox.json`, and
 /// [dependencies] below mirrors that manifest's `registryDependencies`.
 /// Those entries still line up with the real modules `combobox.dart`
-/// imports from `lib/src/components/`: `field.dart`, `icon.dart`,
+/// imports from `lib/src/components/ui/`: `field.dart`, `icon.dart`,
 /// `icon_paths.dart`, `input_group.dart`, `popover.dart`, and `select.dart`,
 /// plus the shared `source-foundation` item. `select` is load-bearing rather
 /// than incidental: [ComboboxItem] is a typedef for `SelectOption`.
@@ -31,8 +31,8 @@ const ComponentDocEntry comboboxDoc = ComponentDocEntry(
       'A form control the reader can type into: an anchored popup of '
       'options narrowed by a plain accent- and case-insensitive substring '
       'match, holding one committed value.',
-  // What lib/src/components/combobox.dart actually imports from
-  // lib/src/components/: real source-level dependencies, not a registry
+  // What lib/src/components/ui/combobox.dart actually imports from
+  // lib/src/components/ui/: real source-level dependencies, not a registry
   // dependency list. See the library note above for why.
   dependencies: <String>[
     'field',
@@ -43,5 +43,5 @@ const ComponentDocEntry comboboxDoc = ComponentDocEntry(
     'source-foundation',
   ],
   exports: <String>['Combobox', 'ComboboxItem', 'collatorContains'],
-  sourcePath: 'lib/src/components/combobox.dart',
+  sourcePath: 'lib/src/components/ui/combobox.dart',
 );

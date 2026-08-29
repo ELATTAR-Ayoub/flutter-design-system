@@ -49,7 +49,7 @@ Finder _disclosureTrigger(String title) => find.descendant(
 );
 
 /// Every named constructor parameter `Attachment` itself declares
-/// (`lib/src/components/attachment.dart`), excluding `key`.
+/// (`lib/src/components/ui/attachment.dart`), excluding `key`.
 const List<String> _attachmentParams = <String>[
   'media',
   'content',

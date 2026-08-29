@@ -93,7 +93,7 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'kbd has a real registry manifest, `elattar add kbd` installs '
-          'lib/src/components/kbd.dart and resolves surface and '
+          'lib/src/components/ui/kbd.dart and resolves surface and '
           'source-foundation automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: kbdDoc.command,
@@ -102,7 +102,7 @@ final ComponentDocSpec kbdDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/kbd.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/kbd.dart's generated @ui/kbd.dart "
+              "Copy lib/src/components/ui/kbd.dart's generated @ui/kbd.dart "
               'payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -616,7 +616,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/kbd.dart, one file, no companions; the '
+        'File: lib/src/components/ui/kbd.dart, one file, no companions; the '
             'registry manifest lists exactly one entry under "files".',
         'Imports: effects/surface.dart (Surface), '
             'foundation/shadows.dart (Shadows.none), '
@@ -634,7 +634,7 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: space(2)),
       const DocsLinkRow(
         links: <DocsLink>[
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
         ],
       ),
     ],

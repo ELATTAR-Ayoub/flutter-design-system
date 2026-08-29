@@ -14,7 +14,7 @@
 ///
 /// **Corrected, not carried across.** The hand-composed page's
 /// Installation section said `elattar add icon` "installs
-/// lib/src/components/icon.dart and its two companion path files."
+/// lib/src/components/ui/icon.dart and its two companion path files."
 /// `registry/components/icon.json`'s own `files` array lists **three**
 /// companions, not two — `icon_paths.dart`, `icon_paths.g.dart`, and
 /// `icon_paths.g.index.dart` — plus a `licenses` entry
@@ -82,7 +82,7 @@ final ComponentDocSpec iconDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'icon has a real registry manifest, `elattar add icon` installs '
-          'lib/src/components/icon.dart, its three companion path files '
+          'lib/src/components/ui/icon.dart, its three companion path files '
           '(icon_paths.dart, icon_paths.g.dart, icon_paths.g.index.dart), '
           "and lucide's ISC license file, and resolves source-foundation "
           'automatically.',
@@ -634,7 +634,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/icon.dart (Icon widget, IconSize/'
+        'File: lib/src/components/ui/icon.dart (Icon widget, IconSize/'
             'IconTone enums, the glyph painter).',
         'Companion: icon_paths.dart (the sealed IconElement/'
             'IconPaths model every glyph is expressed in).',

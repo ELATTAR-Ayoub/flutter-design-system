@@ -4,7 +4,7 @@
 /// enum and, per its own class doc, is never placed "beside" the control it
 /// belongs to: it is always the `child:` of some other pressable — an
 /// `Button` in both real corpus call sites this page cites
-/// (`lib/src/components/attachment.dart`, `lib/src/components/sidebar.dart`).
+/// (`lib/src/components/ui/attachment.dart`, `lib/src/components/ui/sidebar.dart`).
 /// A `ShowcaseSection` stages a specimen on its own; `EffectSection` stages
 /// the **host it is applied to**, which is what a reader actually needs to
 /// see to understand a control that changed meaning. Every non-Preview
@@ -65,7 +65,7 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'icon-swap has a real registry manifest: `elattar add icon-swap` '
-          'installs lib/src/components/icon_swap.dart and resolves both '
+          'installs lib/src/components/ui/icon_swap.dart and resolves both '
           'registryDependencies automatically. The Manual tab is for a '
           'project not using the CLI.',
       command: iconSwapDoc.command,
@@ -74,7 +74,7 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/icon_swap.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/icon_swap.dart's generated "
+              "Copy lib/src/components/ui/icon_swap.dart's generated "
               '@ui/icon_swap.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -104,7 +104,7 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
       id: 'sidebar-trigger',
       title: 'Sidebar Trigger',
       description:
-          "lib/src/components/sidebar.dart's SidebarTrigger: a ghost "
+          "lib/src/components/ui/sidebar.dart's SidebarTrigger: a ghost "
           'iconSm Button whose glyph rolls between panelLeftClose and '
           'panelLeft as the panel opens and closes. Tap it a few times: '
           'collapsing rolls one way through the strip, expanding rolls '
@@ -119,7 +119,7 @@ final ComponentDocSpec iconSwapDocSpec = ComponentDocSpec(
       id: 'download-confirmation',
       title: 'Download Confirmation',
       description:
-          "lib/src/components/attachment.dart's download action: a ghost "
+          "lib/src/components/ui/attachment.dart's download action: a ghost "
           'iconXs Button rolling from a download glyph to a check on tap. '
           'The real call site also auto-reverts the check back to download '
           'after MotionDurations.attachmentSaving, on a timer AttachmentAction '
@@ -586,7 +586,7 @@ class _DependenciesContent extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
-        'File: lib/src/components/icon_swap.dart: one file, no companions; '
+        'File: lib/src/components/ui/icon_swap.dart: one file, no companions; '
             'the registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/foundation.dart (clampDouble), '
             'package:flutter/widgets.dart.',

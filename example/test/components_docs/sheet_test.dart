@@ -79,7 +79,7 @@ const List<String> _sectionOrder = <String>[
 ];
 
 /// Every constructor parameter name declared on the public classes of
-/// `lib/src/components/sheet.dart`.
+/// `lib/src/components/ui/sheet.dart`.
 const List<String> _sheetParamNames = <String>[
   'builder', // Sheet.showLeft
   'width', // SheetPanel / SheetContent
@@ -148,7 +148,7 @@ void main() {
       expect(sheetDoc.name, 'sheet');
       expect(sheetDoc.title, 'Sheet');
       expect(sheetDoc.route, '/components/sheet');
-      expect(sheetDoc.sourcePath, 'lib/src/components/sheet.dart');
+      expect(sheetDoc.sourcePath, 'lib/src/components/ui/sheet.dart');
       expect(sheetDoc.description, isNotEmpty);
       expect(sheetDoc.description, isNot(contains('..')));
       expect(sheetDoc.description.trim(), sheetDoc.description);

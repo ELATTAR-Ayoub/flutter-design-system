@@ -167,7 +167,7 @@ void main() {
       expect(menuDoc.title, 'Menu');
       expect(menuDoc.route, '/components/menu');
       expect(menuDoc.command, 'elattar add menu');
-      expect(menuDoc.sourcePath, 'lib/src/components/menu.dart');
+      expect(menuDoc.sourcePath, 'lib/src/components/ui/menu.dart');
       // registry/components/menu.json's own registryDependencies, verbatim.
       expect(menuDoc.dependencies, <String>[
         'icon',

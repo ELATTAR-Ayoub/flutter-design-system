@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:example/components_docs/catalog.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/main.dart';
 import 'package:example/skills_docs/catalog.dart';
@@ -134,7 +135,7 @@ void main() {
     expect(routes, <String>[publicDocsRoute, publicComponentsRoute]);
   });
 
-  testWidgets('components page renders installable docs and legacy groups', (
+  testWidgets('components page renders the four taxonomy sections', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(_harness(const PublicComponentsPage()));
@@ -144,16 +145,21 @@ void main() {
     // article, and once as its entry in the right-hand "ON THIS PAGE" rail.
     // A bare `find.text` is therefore ambiguous and reports "is too many",
     // which reads confusingly as a missing heading. Assert `findsWidgets` for
-    // the titles the rail echoes, and keep `findsOneWidget` for the ones it
-    // does not.
-    // The `elGroups` sections (Base Components, Agent, Site Pages) are gone
-    // from this index: every entry in them linked into the legacy `/space/...`
+    // the titles the rail echoes.
+    //
+    // The `elGroups` sections (Base Components, Site Pages) are gone from
+    // this index: every entry in them linked into the legacy `/space/...`
     // tree, which no longer exists, and an index must not list pages a reader
-    // cannot open. What remains is the documented components, each of which
-    // has a real `/components/<name>` page.
+    // cannot open. The one heading that came back — "Agent" — is a
+    // `ComponentDocFamily` now, listing real `/components/<name>` pages, not
+    // an `elGroups` category. The single "Ready to install" section it
+    // replaced is gone with it.
     expect(find.text('Base Components'), findsNothing);
-    expect(find.text('Agent'), findsNothing);
-    expect(find.text('Ready to install'), findsWidgets);
+    expect(find.text('Site Pages'), findsNothing);
+    expect(find.text('Ready to install'), findsNothing);
+    for (final ComponentDocFamily family in ComponentDocFamily.values) {
+      expect(find.text(family.label), findsWidgets, reason: family.label);
+    }
     expect(find.text('Button'), findsWidgets);
     // Reshaped to match https://ui.shadcn.com/docs/components: a dense list
     // of plain-name links, not a card with a description and a command

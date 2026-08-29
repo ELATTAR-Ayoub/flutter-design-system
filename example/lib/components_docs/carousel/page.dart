@@ -106,7 +106,7 @@ final ComponentDocSpec carouselDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'carousel ships a real registry manifest: `elattar add '
-          'carousel` installs lib/src/components/carousel.dart and '
+          'carousel` installs lib/src/components/ui/carousel.dart and '
           'resolves button, icon, and source-foundation automatically. '
           'The Manual tab is for a project not using the CLI.',
       command: carouselDoc.command,
@@ -115,7 +115,7 @@ final ComponentDocSpec carouselDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/carousel.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/carousel.dart's generated "
+              "Copy lib/src/components/ui/carousel.dart's generated "
               '@ui/carousel.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -220,7 +220,7 @@ final ComponentDocSpec carouselDocSpec = ComponentDocSpec(
       title: 'API Reference',
       description:
           'Every constructor parameter and public member, read straight '
-          'off lib/src/components/carousel.dart. Private engine constants '
+          'off lib/src/components/ui/carousel.dart. Private engine constants '
           'and the private _Track / _Arrow widgets are not part of the '
           'API and are not listed.',
       children: const <DocsTocEntry>[
@@ -931,7 +931,7 @@ class _AccessibilityContent extends StatelessWidget {
       ]);
 }
 
-/// Read directly off `_CarouselState._onKey` (`lib/src/components/
+/// Read directly off `_CarouselState._onKey` (`lib/src/components/ui/
 /// carousel.dart`): the region's Focus wraps the track and both arrows and
 /// answers exactly two keys, whatever a surrounding frame does to the
 /// arrows themselves.

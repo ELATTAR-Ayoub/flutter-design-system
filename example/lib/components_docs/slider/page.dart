@@ -24,7 +24,7 @@
 /// and platform behavior" -> "Responsive", "Dependencies, files, assets,
 /// fonts and shaders" -> "Dependencies", "Theming notes" -> "Theming". New:
 /// a Keyboard disclosure, between Accessibility and Responsive, read
-/// directly off `lib/src/components/slider.dart`'s own `_onKey` (unlike
+/// directly off `lib/src/components/ui/slider.dart`'s own `_onKey` (unlike
 /// `switch` and `checkbox`, `slider` wires its own key handler rather than
 /// composing `selection_control.dart`'s shared one).
 library;
@@ -81,7 +81,7 @@ final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/slider.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/slider.dart's generated "
+              "Copy lib/src/components/ui/slider.dart's generated "
               '@ui/slider.dart payload into components/ui. The file needs '
               'its sibling dependencies too: see Dependencies below.',
           code:
@@ -190,7 +190,7 @@ final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
       id: 'keyboard',
       title: 'Keyboard',
       description:
-          "Read off lib/src/components/slider.dart's own _onKey directly: "
+          "Read off lib/src/components/ui/slider.dart's own _onKey directly: "
           'unlike switch and checkbox, slider wires its own key handler '
           "rather than composing selection_control.dart's shared one.",
       child: _KeyboardContent(),
@@ -225,7 +225,7 @@ final ComponentDocSpec sliderDocSpec = ComponentDocSpec(
           ),
           const DocsInstallFact(
             label: 'Shared machinery',
-            value: 'lib/src/components/selection_control.dart',
+            value: 'lib/src/components/ui/selection_control.dart',
             description:
                 'HitArea: shared with the checkbox, switch and radio '
                 'families and documented on their own component pages.',
@@ -892,7 +892,7 @@ const List<DocsInstallFact> _a11yFacts = <DocsInstallFact>[
   ),
 ];
 
-/// Read directly off `lib/src/components/slider.dart`'s own `_onKey`: unlike
+/// Read directly off `lib/src/components/ui/slider.dart`'s own `_onKey`: unlike
 /// `switch` and `checkbox`, `slider` wires its own key handler rather than
 /// composing `selection_control.dart`'s shared one.
 class _KeyboardContent extends StatelessWidget {
@@ -1025,7 +1025,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Selection control',
             route: '/components/selection_control',
           ),
-          DocsLink(label: 'Machine Surface', route: '/components/surface'),
+          DocsLink(label: 'Surface', route: '/components/surface'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',

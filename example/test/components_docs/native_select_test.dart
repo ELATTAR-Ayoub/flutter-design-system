@@ -90,7 +90,7 @@ const Size _narrow = Size(390, 844);
 
 /// Every `ApiTable` this page must render, by title, and every public
 /// constructor parameter or static member of each documented class found by
-/// reading `lib/src/components/native_select.dart` directly.
+/// reading `lib/src/components/ui/native_select.dart` directly.
 const Map<String, List<String>> _expectedApiTables = <String, List<String>>{
   'NativeSelect': <String>[
     'options',

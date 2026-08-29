@@ -98,5 +98,92 @@ void main() {
         reason: 'componentDocs has a duplicate route.',
       );
     });
+
+    test('every entry lands in exactly one family, and the union is the '
+        'whole catalog', () {
+      final Map<ComponentDocFamily, List<String>> byFamily =
+          <ComponentDocFamily, List<String>>{
+            for (final ComponentDocFamily family in ComponentDocFamily.values)
+              family: componentDocsIn(
+                family,
+              ).map((ComponentDocEntry entry) => entry.name).toList(),
+          };
+
+      final List<String> union = <String>[
+        for (final List<String> names in byFamily.values) ...names,
+      ];
+
+      expect(
+        union.toSet(),
+        hasLength(union.length),
+        reason: 'a component appears in more than one family.',
+      );
+      expect(
+        union.toSet(),
+        componentDocs.map((ComponentDocEntry entry) => entry.name).toSet(),
+        reason:
+            'the four families do not add up to componentDocs — a component '
+            'is either listed twice or reachable from no group.',
+      );
+    });
+
+    test('each configured family name is a real catalog entry', () {
+      final Set<String> known = componentDocs
+          .map((ComponentDocEntry entry) => entry.name.replaceAll('-', '_'))
+          .toSet();
+      for (final MapEntry<String, Set<String>> configured
+          in <String, Set<String>>{
+            'effectsDocNames': effectsDocNames,
+            'agentDocNames': agentDocNames,
+            'chartsDocNames': chartsDocNames,
+          }.entries) {
+        expect(
+          configured.value.difference(known),
+          isEmpty,
+          reason:
+              '${configured.key} names a component that is not in '
+              'componentDocs; the taxonomy would silently drop it.',
+        );
+      }
+
+      // The three sets together account for every non-default member, and
+      // nothing else claims to be one.
+      final int configuredCount = componentDocs
+          .where(
+            (ComponentDocEntry entry) => isConfiguredFamilyName(entry.name),
+          )
+          .length;
+      expect(
+        configuredCount,
+        effectsDocNames.length + agentDocNames.length + chartsDocNames.length,
+      );
+    });
+
+    test('every family is alphabetical by title', () {
+      for (final ComponentDocFamily family in ComponentDocFamily.values) {
+        final List<String> titles = componentDocsIn(
+          family,
+        ).map((ComponentDocEntry entry) => entry.title).toList();
+        final List<String> sorted = <String>[...titles]..sort();
+        expect(titles, sorted, reason: '${family.label} is out of order.');
+      }
+    });
+
+    test('the four families own the components the site promises', () {
+      ComponentDocFamily familyOf(String name) =>
+          componentDocFamily(componentDoc(name));
+
+      // The four named in the required outcome, one per family, plus the
+      // three boundary cases the taxonomy exists to settle: an ordinary
+      // state component is not an effect, a generic conversation primitive
+      // is not agent-only, and the voice indicator is.
+      expect(familyOf('button'), ComponentDocFamily.components);
+      expect(familyOf('premium_surface'), ComponentDocFamily.effects);
+      expect(familyOf('agent-composer'), ComponentDocFamily.agent);
+      expect(familyOf('chart'), ComponentDocFamily.charts);
+      expect(familyOf('skeleton'), ComponentDocFamily.components);
+      expect(familyOf('message'), ComponentDocFamily.components);
+      expect(familyOf('voice_indicator'), ComponentDocFamily.agent);
+    });
   });
 }

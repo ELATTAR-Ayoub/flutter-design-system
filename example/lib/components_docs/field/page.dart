@@ -84,7 +84,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'field already has a registry manifest: this installs '
-          'lib/src/components/field.dart and resolves source-foundation '
+          'lib/src/components/ui/field.dart and resolves source-foundation '
           'and rule automatically. The Manual tab is for a project not '
           'using the CLI.',
       command: fieldDoc.command,
@@ -93,7 +93,7 @@ final ComponentDocSpec fieldDocSpec = ComponentDocSpec(
           path: 'lib/components/ui/field.dart',
           title: '1. Copy the source',
           description:
-              "Copy lib/src/components/field.dart's generated @ui/"
+              "Copy lib/src/components/ui/field.dart's generated @ui/"
               'field.dart payload into components/ui.',
           code:
               "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
@@ -1445,7 +1445,7 @@ class _A11yRow extends StatelessWidget {
   }
 }
 
-/// Read directly off `FieldLabel.build` (`lib/src/components/field.dart`):
+/// Read directly off `FieldLabel.build` (`lib/src/components/ui/field.dart`):
 /// field.dart wires no `Focus.onKeyEvent` of its own anywhere, so every fact
 /// here is about what does NOT happen.
 class _KeyboardContent extends StatelessWidget {
