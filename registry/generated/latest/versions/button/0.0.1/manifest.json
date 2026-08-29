@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/button.dart",
       "target": "@ui/button.dart",
-      "sha256": "87f59304c1bf48ea0bc0bc9127e1919c3511fbf38549cb150add6e4ba9fd60d5"
+      "sha256": "72e1d41e7e2ac64976934e0565e4fe32430e2d547d6c55c9a79c473547210938"
     }
   ],
   "registryDependencies": [

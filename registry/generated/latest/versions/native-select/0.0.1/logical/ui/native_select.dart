@@ -89,6 +89,7 @@ import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -108,9 +109,6 @@ const double _invalidRingAlphaDark = 0.40;
 
 /// `dark:aria-invalid:border-destructive/50`.
 const double _invalidBorderAlphaDark = 0.50;
-
-/// `has-[select:disabled]:opacity-50` — on the wrapper.
-const double _disabledOpacity = 0.50;
 
 /// `dark:bg-input/30` and `dark:hover:bg-input/50`.
 const double _darkFillAlpha = 0.30;
@@ -573,7 +571,7 @@ class _NativeSelectState<T> extends State<NativeSelect<T>> {
     // The dim is on the wrapper — `has-[select:disabled]:opacity-50` — while
     // the control itself only stops taking pointers.
     control = Opacity(
-      opacity: _fieldEnabled ? 1 : _disabledOpacity,
+      opacity: _fieldEnabled ? 1 : SurfaceOpacity.disabled,
       child: IgnorePointer(ignoring: !_enabled, child: control),
     );
 

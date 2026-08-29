@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart' show RenderParagraph;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/services.dart';
@@ -151,6 +152,105 @@ Rect rowRect(WidgetTester t, String text, {Finder? within}) => t.getRect(
 );
 
 void main() {
+  group('the trigger row and the open menu', () {
+    testWidgets('the chevron sits at the far edge, not beside the value', (
+      WidgetTester t,
+    ) async {
+      // `justify-between`: the value takes the room and the chevron sits out.
+      // The row said exactly that in a comment and then laid out `start`, so
+      // on any trigger wider than its own text the chevron rode along beside
+      // the label with dead space after it.
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 320,
+            child: Select<String>(
+              value: 'a',
+              onChanged: (_) {},
+              placeholder: 'Pick',
+              options: const <SelectChild<String>>[
+                SelectOption<String>(value: 'a', label: 'A'),
+              ],
+            ),
+          ),
+        ),
+      );
+      await t.pump();
+
+      final Rect trigger = t.getRect(find.byType(Select<String>));
+      final Rect chevron = t.getRect(
+        find.descendant(
+          of: find.byType(Select<String>),
+          matching: find.byType(Icon),
+        ),
+      );
+      final Rect value = t.getRect(find.text('A'));
+
+      // `pr-3.5` is the only thing between the chevron and the edge.
+      expect(
+        trigger.right - chevron.right,
+        closeTo(space(3.5), 1),
+        reason: 'the chevron must sit against the trailing padding',
+      );
+      expect(
+        chevron.left - value.right,
+        greaterThan(space(2)),
+        reason: 'a 320px trigger holding "A" must leave a gap between them',
+      );
+    });
+
+    testWidgets('menu text is not underlined by the app fallback style', (
+      WidgetTester t,
+    ) async {
+      // The menu is mounted as a raw OverlayEntry, so it builds in the
+      // Overlay's context and inherits whatever DefaultTextStyle lives above
+      // the Navigator. In a WidgetsApp with no Material that is the "you
+      // forgot a Material" style: red ink under a double yellow underline.
+      // `StyledText` sets its own colour and never a decoration, so the ink
+      // looked right and every row wore two yellow lines.
+      await t.pumpWidget(
+        DefaultTextStyle(
+          style: const TextStyle(
+            decoration: TextDecoration.underline,
+            decorationStyle: TextDecorationStyle.double,
+            decorationColor: Color(0xFFFFFF00),
+          ),
+          child: overlayHost(
+            Select<String>(
+              value: 'a',
+              onChanged: (_) {},
+              options: const <SelectChild<String>>[
+                SelectOption<String>(value: 'a', label: 'Newest'),
+                SelectOption<String>(value: 'b', label: 'Volatility'),
+              ],
+            ),
+          ),
+        ),
+      );
+      await t.tap(find.byType(Select<String>));
+      await t.pumpAndSettle();
+
+      for (final String label in <String>['Newest', 'Volatility']) {
+        // The painted style, not the authored one: `StyledText` never
+        // declares a decoration, so an inherited underline only appears once
+        // `Text` has merged with the ambient `DefaultTextStyle`.
+        // Scoped to the menu: the trigger shows the selected label too, and
+        // in this harness the trigger legitimately sits inside the underlined
+        // style being simulated.
+        final RenderParagraph painted = t.renderObject<RenderParagraph>(
+          find.descendant(
+            of: find.byType(SelectMenu<String>),
+            matching: find.text(label),
+          ),
+        );
+        expect(
+          painted.text.style?.decoration ?? TextDecoration.none,
+          TextDecoration.none,
+          reason: '$label must paint with no inherited decoration',
+        );
+      }
+    });
+  });
   group('Select — the deferred row kinds', () {
     testWidgets('every row kind states its own height', (WidgetTester t) async {
       // *(measured)*: the label row computes 32px and the item 34.563 on the

@@ -61,6 +61,7 @@ import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import './keyframes.dart';
@@ -84,9 +85,6 @@ const double _invalidRingAlphaDark = 0.40;
 /// `dark:bg-input/30` — the slot fill. **Light has none**: the boxes are
 /// transparent there and read only by their hairlines.
 const double _slotFillAlphaDark = 0.30;
-
-/// `has-disabled:opacity-50`.
-const double _disabledOpacity = 0.50;
 
 /// `@keyframes pulls-caret` (globals.css L2454–2457), as a fraction of the
 /// cycle:
@@ -375,7 +373,7 @@ class _InputOtpState extends State<InputOtp> {
     );
 
     field = Opacity(
-      opacity: enabled ? 1 : _disabledOpacity,
+      opacity: enabled ? 1 : SurfaceOpacity.disabled,
       child: IgnorePointer(ignoring: !enabled, child: field),
     );
 

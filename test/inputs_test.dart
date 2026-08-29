@@ -907,8 +907,10 @@ void main() {
                   .first,
             )
             .opacity,
-        0.45,
-        reason: 'the field\'s own 45, not a group\'s 50',
+        SurfaceOpacity.disabled,
+        reason:
+            'the field dims to the one disabled token, the same as the group '
+            'around it — it used to carry its own 45 against the group\'s 50',
       );
     });
   });

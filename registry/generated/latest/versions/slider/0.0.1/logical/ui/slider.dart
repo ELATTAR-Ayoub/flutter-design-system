@@ -82,6 +82,7 @@ import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
@@ -112,17 +113,6 @@ double get _thumbReach => _thumbSize / 2 - BorderWidths.hairline + _hitInset;
 
 /// `ring-ring/50` — the alpha every ring in the system carries.
 const double _ringAlpha = 0.50;
-
-/// `data-disabled:opacity-50`, on the root and nowhere else.
-///
-/// The thumb's own `disabled:opacity-50` and `disabled:pointer-events-none`
-/// **never fire**: Radix renders the thumb as a `<span>` carrying
-/// `data-disabled=""` and no `disabled` attribute, and `disabled:` compiles to
-/// the `:disabled` pseudo-class, which no `<span>` can match. Probed on the
-/// disabled matrix cell — root `opacity: 0.5`, thumb `opacity: 1`. So the knob
-/// dims once, through the root, exactly as the track does (selection-map drift
-/// 11, supervisor ruling S7: port the render, record the dead classes).
-const double _disabledOpacity = 0.50;
 
 /// `PageUp` / `PageDown` move ten steps at once.
 ///
@@ -549,7 +539,7 @@ class _SliderState extends State<Slider> {
     // reads `pointer-events: auto` on a disabled root and the value still does
     // not move.
     slider = Opacity(
-      opacity: widget.enabled ? 1 : _disabledOpacity,
+      opacity: widget.enabled ? 1 : SurfaceOpacity.disabled,
       child: IgnorePointer(ignoring: !_operable, child: slider),
     );
 

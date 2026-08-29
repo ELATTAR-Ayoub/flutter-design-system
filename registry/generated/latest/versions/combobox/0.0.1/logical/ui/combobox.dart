@@ -98,6 +98,7 @@ import 'package:flutter/widgets.dart' as flutter show ScrollPosition;
 
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -107,10 +108,6 @@ import './icon_paths.dart';
 import './input_group.dart';
 import './popover.dart';
 import './select.dart';
-
-/// `data-highlighted:bg-accent` — the same token `SelectItem` highlights with,
-/// reached through a different state name (drift 5).
-const double _disabledOpacity = 0.50;
 
 /// One row of the popup.
 ///
@@ -673,7 +670,10 @@ class _ComboboxRow<T> extends StatelessWidget {
       style: TextStyle(color: ink),
       child: row,
     );
-    row = Opacity(opacity: item.enabled ? 1 : _disabledOpacity, child: row);
+    row = Opacity(
+      opacity: item.enabled ? 1 : SurfaceOpacity.disabled,
+      child: row,
+    );
 
     return Semantics(
       button: true,

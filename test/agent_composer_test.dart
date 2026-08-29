@@ -456,7 +456,7 @@ void main() {
       await tester.pumpComposer(const _Specimen(disabled: true));
       await tester.pump();
 
-      expect(AgentComposer.disabledInputOpacity, 0.60);
+      expect(AgentComposer.disabledInputOpacity, SurfaceOpacity.disabled);
       final Iterable<double> opacities = tester
           .widgetList<Opacity>(find.byType(Opacity))
           .map((Opacity o) => o.opacity);

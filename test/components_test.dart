@@ -699,11 +699,16 @@ void main() {
         if (opacity() < lowest) lowest = opacity();
       }
       // `opacity` IS in btn-spring's transition list, so it springs like the
-      // colours: measured 1 → 0.3969 at Δ~180 → 0.45 at Δ~280, an undershoot of
-      // (0.45 − 0.3969) / (1 − 0.45) = +9.65%.
-      expect(lowest, closeTo(0.3969, 0.005));
+      // colours: measured 1 → 0.3969 at Δ~180 → 0.45 at Δ~280 when the resting
+      // value was 0.45, an undershoot of (0.45 − 0.3969) / (1 − 0.45) = 9.65%
+      // of the travel. The fraction is what btn-spring owns; the resting value
+      // is `SurfaceOpacity.disabled`, so the undershoot is expressed against it
+      // rather than re-measured by hand whenever the token moves.
+      const double undershoot =
+          SurfaceOpacity.disabled - 0.0965 * (1 - SurfaceOpacity.disabled);
+      expect(lowest, closeTo(undershoot, 0.005));
       await t.pump(const Duration(milliseconds: 250));
-      expect(opacity(), closeTo(0.45, 1e-9));
+      expect(opacity(), closeTo(SurfaceOpacity.disabled, 1e-9));
     });
 
     testWidgets('fires onPressed', (WidgetTester t) async {
@@ -1084,7 +1089,7 @@ void main() {
             .descendant(of: find.byType(Button), matching: find.byType(Opacity))
             .first,
       );
-      expect(opacity.opacity, 0.45);
+      expect(opacity.opacity, SurfaceOpacity.disabled);
     });
 
     testWidgets('the width DOES jump, by 24px on the default rung — drift 3', (

@@ -72,6 +72,7 @@ import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -90,9 +91,6 @@ const double _focusRingAlpha = 0.35;
 /// at 40% on dark. Same error state, two reds, depending only on whether an
 /// addon happens to be present (inputs-map drift 6).
 const double _invalidRingAlpha = 0.20;
-
-/// `disabled:opacity-45`, shared with `Button`'s base class list.
-const double _disabledOpacity = 0.45;
 
 /// A genuinely editable pill field.
 ///
@@ -457,7 +455,7 @@ class _InputState extends State<Input> {
     );
 
     field = Opacity(
-      opacity: enabled ? 1 : _disabledOpacity,
+      opacity: enabled ? 1 : SurfaceOpacity.disabled,
       child: IgnorePointer(ignoring: !enabled, child: field),
     );
 

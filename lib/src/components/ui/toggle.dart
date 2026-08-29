@@ -70,6 +70,7 @@ import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -120,13 +121,6 @@ enum ToggleSize {
   /// `h-9 min-w-9 px-2.5` — 36px tall.
   lg,
 }
-
-/// `disabled:opacity-50`.
-///
-/// Deliberately not [Button]'s 45%: the two components declare their own,
-/// and the States cell's "45% opacity" note is true only of the Button three
-/// sections above the disabled Toggle (buttons-map drift 12).
-const double _disabledOpacity = 0.50;
 
 /// `focus-visible:ring-ring/50` — the same alpha a Button's ring carries.
 const double _focusRingAlpha = 0.50;
@@ -490,7 +484,7 @@ class _ToggleState extends State<Toggle> {
     // is what makes the first half true, and it takes the hover with it: a
     // disabled control is never in the hit-test path, so `onEnter` cannot run.
     toggle = Opacity(
-      opacity: _enabled ? 1 : _disabledOpacity,
+      opacity: _enabled ? 1 : SurfaceOpacity.disabled,
       child: IgnorePointer(ignoring: !_enabled, child: toggle),
     );
 

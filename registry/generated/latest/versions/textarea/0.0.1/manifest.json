@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/textarea.dart",
       "target": "@ui/textarea.dart",
-      "sha256": "9b537b6850056121b60373492ba1e21c34fa971bff93c963d1c8df6a189784ea"
+      "sha256": "2506629f43f0861fa6ccd0ecdc98d1ff668d5cae5e0dc00904230de8110898af"
     }
   ],
   "registryDependencies": [

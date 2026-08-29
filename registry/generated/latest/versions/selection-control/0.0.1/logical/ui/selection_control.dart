@@ -43,6 +43,7 @@ import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import './keyframes.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -54,13 +55,6 @@ const double _focusRingAlpha = 0.50;
 
 /// `aria-invalid:ring-destructive/20`.
 const double _invalidRingAlpha = 0.20;
-
-/// `disabled:opacity-50` / `data-disabled:opacity-50`.
-///
-/// Deliberately not `Button`'s and `Input`'s 45%: the five form controls follow
-/// the shadcn default here and the two text surfaces do not (forms-map drift
-/// 13). Both numbers ship.
-const double _disabledOpacity = 0.50;
 
 /// `after:-inset-x-3` — 12px of invisible target on each side.
 double get _hitInsetX => space(3);
@@ -563,7 +557,7 @@ class _SelectionControlState extends State<SelectionControl> {
     );
 
     control = Opacity(
-      opacity: widget.enabled ? 1 : _disabledOpacity,
+      opacity: widget.enabled ? 1 : SurfaceOpacity.disabled,
       child: IgnorePointer(ignoring: !_enabled, child: control),
     );
 

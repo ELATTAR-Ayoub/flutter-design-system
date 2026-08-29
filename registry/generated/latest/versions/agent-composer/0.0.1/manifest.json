@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_composer.dart",
       "target": "@ui/agent_composer.dart",
-      "sha256": "621182b7c17fb02a9769eabfac82d0d00dd4e78f3aa662ad8ca921325c32ef92"
+      "sha256": "bad989bfa325b78844a465c803b8fe9e1e12b0c7d1a04b74f37af6cd6d92e1b3"
     }
   ],
   "registryDependencies": [

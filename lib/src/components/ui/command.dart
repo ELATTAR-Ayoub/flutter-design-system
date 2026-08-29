@@ -110,6 +110,7 @@ import 'package:flutter/widgets.dart'
 
 import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -560,7 +561,7 @@ class Command extends StatefulWidget {
   static const double searchGlyphOpacity = 0.50;
 
   /// `data-[disabled=true]:opacity-50`.
-  static const double disabledOpacity = 0.50;
+  static const double disabledOpacity = SurfaceOpacity.disabled;
 
   /// `px-3 py-2` around one `text-sm` line box — **34.5625px** *(measured)*.
   static double get itemHeight {

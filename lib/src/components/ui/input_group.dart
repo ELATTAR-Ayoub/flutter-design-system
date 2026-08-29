@@ -69,6 +69,7 @@ import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import './press.dart';
@@ -85,14 +86,6 @@ const double _focusRingAlpha = 0.50;
 /// `dark:` override at 40. The bare `Input` declares no `dark:` variant at all.
 const double _invalidRingAlpha = 0.20;
 const double _invalidRingAlphaDark = 0.40;
-
-/// `has-disabled:opacity-50` — five points weaker than the bare field's 45.
-const double _disabledOpacity = 0.50;
-
-/// `disabled:opacity-45`, off `Button`'s own base list. An addon button is a
-/// button first: it fades at the button's 45 even inside a group that fades at
-/// 50.
-const double _buttonDisabledOpacity = 0.45;
 
 /// What the group tells the control and the addons about itself.
 class _GroupScope extends InheritedWidget {
@@ -305,7 +298,7 @@ class _InputGroupState extends State<InputGroup> {
     // the two class lists do. Unreachable on both ported pages; neither has a
     // disabled group.
     group = Opacity(
-      opacity: enabled ? 1 : _disabledOpacity,
+      opacity: enabled ? 1 : SurfaceOpacity.disabled,
       child: IgnorePointer(ignoring: !enabled, child: group),
     );
 
@@ -756,7 +749,7 @@ class _InputGroupButtonState extends State<InputGroupButton> {
     );
 
     button = Opacity(
-      opacity: _enabled ? 1 : _buttonDisabledOpacity,
+      opacity: _enabled ? 1 : SurfaceOpacity.disabled,
       child: IgnorePointer(ignoring: !_enabled, child: button),
     );
 

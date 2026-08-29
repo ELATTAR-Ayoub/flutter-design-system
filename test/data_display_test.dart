@@ -826,7 +826,7 @@ void main() {
       );
       expect(
         tester.widget<Opacity>(find.byType(Opacity).first).opacity,
-        closeTo(0.45, 0.001),
+        closeTo(SurfaceOpacity.disabled, 0.001),
       );
       expect(find.text(r'$12,480'), findsOneWidget);
     });

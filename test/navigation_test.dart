@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart'
     hide
@@ -101,6 +102,80 @@ List<TabItem> _liveTabs() => <TabItem>[
 ];
 
 void main() {
+  group('the shared viewport follows the trigger that opened it', () {
+    List<NavigationMenuItem> pair() => <NavigationMenuItem>[
+      NavigationMenuItem.trigger(
+        label: 'Products',
+        content: const SizedBox(width: 120, height: 60),
+      ),
+      NavigationMenuItem.trigger(
+        label: 'Company',
+        content: const SizedBox(
+          key: ValueKey<String>('company-panel'),
+          width: 90,
+          height: 60,
+        ),
+      ),
+    ];
+
+    Future<Rect> openSecond(
+      WidgetTester tester,
+      TextDirection direction,
+    ) async {
+      // `overlayHost` pins `TextDirection.ltr`, so the direction under test
+      // has to be pushed *inside* it — an outer Directionality is shadowed
+      // and the tree stays left-to-right, which quietly turns an RTL test
+      // into a second LTR one.
+      await tester.pumpWidget(
+        overlayHost(
+          Directionality(
+            textDirection: direction,
+            child: NavigationMenu(items: pair()),
+          ),
+        ),
+      );
+      await tester.pump();
+      final TestGesture pointer = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      addTearDown(pointer.removePointer);
+      await pointer.addPointer(
+        location: tester.getCenter(find.text('Company')),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      return tester.getRect(
+        find.byKey(const ValueKey<String>('company-panel')),
+      );
+    }
+
+    testWidgets('left to right, the panel opens under the open trigger', (
+      WidgetTester tester,
+    ) async {
+      final Rect panel = await openSecond(tester, TextDirection.ltr);
+      final Rect trigger = tester.getRect(find.text('Company'));
+      expect(
+        panel.left,
+        lessThanOrEqualTo(trigger.left + 1),
+        reason:
+            'the viewport was anchored to the whole row, so it opened under '
+            'the first trigger no matter which one you hovered',
+      );
+      expect(panel.right, greaterThanOrEqualTo(trigger.left - 1));
+    });
+
+    testWidgets('right to left, it mirrors', (WidgetTester tester) async {
+      final Rect panel = await openSecond(tester, TextDirection.rtl);
+      final Rect trigger = tester.getRect(find.text('Company'));
+      expect(
+        panel.right,
+        greaterThanOrEqualTo(trigger.right - 1),
+        reason: 'PopoverAlign.start is physical, so RTL needs the far edge',
+      );
+      expect(panel.left, lessThanOrEqualTo(trigger.right + 1));
+    });
+  });
   /* ── Tabs ──────────────────────────────────────────────────────────────── */
 
   group('Tabs — the ladder §3 states in prose', () {
@@ -657,8 +732,8 @@ void main() {
       expect(find.byType(PopoverSurface), findsNothing);
     });
 
-    testWidgets('DRIFT — the indicator takes the open trigger\'s width and '
-        'stays at the list\'s leading edge', (WidgetTester tester) async {
+    testWidgets('the indicator takes the open trigger\'s width and follows '
+        'it', (WidgetTester tester) async {
       await tester.pumpWidget(
         overlayHost(NavigationMenu(indicator: true, items: items())),
       );
@@ -677,9 +752,13 @@ void main() {
       final Rect second = tester.getRect(find.byType(NavigationMenuIndicator));
       // The width follows the trigger…
       expect(second.width, greaterThan(first.width));
-      // …and the position does not. Radix reads `offsetLeft`, and every
-      // trigger's offset parent is its own `relative` list item.
-      expect(second.left, closeTo(listLeft, 0.5));
+      // …and so does the position now. Radix reads `offsetLeft` against
+      // each trigger's own `relative` list item and leaves the caret at the
+      // row's leading edge; this port does not reproduce that, because the
+      // caret's whole job is to tie the open panel back to the trigger that
+      // opened it, and a caret under the wrong trigger does the opposite.
+      // See `_triggerRect` in navigation_menu.dart.
+      expect(second.left, greaterThan(first.left));
     });
 
     testWidgets('an indicator spends the panel\'s own 8px rather than adding '

@@ -43,15 +43,12 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './field.dart';
 import './input.dart';
-
-/// `disabled:opacity-45` — the same 45 the bare field uses, and deliberately
-/// not `InputGroup`'s 50 (inputs-map drift 7).
-const double _disabledOpacity = 0.45;
 
 /// A field that grows with what is typed into it.
 class Textarea extends StatefulWidget {
@@ -262,7 +259,7 @@ class _TextareaState extends State<Textarea> {
     // `disabled:opacity-45` — and **no** `IgnorePointer`. The class list omits
     // `pointer-events-none` where the input's carries it, so a disabled
     // textarea still receives the pointer and shows `cursor-not-allowed` for it.
-    body = Opacity(opacity: enabled ? 1 : _disabledOpacity, child: body);
+    body = Opacity(opacity: enabled ? 1 : SurfaceOpacity.disabled, child: body);
 
     if (label != null || hint != null || invalid) {
       body = Semantics(

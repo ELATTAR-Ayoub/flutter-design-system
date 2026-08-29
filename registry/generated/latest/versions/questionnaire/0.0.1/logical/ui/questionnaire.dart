@@ -58,6 +58,7 @@ import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import './keyframes.dart';
@@ -697,7 +698,7 @@ class QuestionnaireChoice extends StatefulWidget {
   /// `data-disabled:opacity-50`. Declared here rather than read off
   /// `Button`'s own 0.45: that one is a *measured* disabled button, and this
   /// is the utility's nominal half, which is what the class says.
-  static const double disabledOpacity = 0.50;
+  static const double disabledOpacity = SurfaceOpacity.disabled;
 
   /// `dark:bg-input/20` at rest, `data-checked:border-primary/40`,
   /// `hover:bg-muted/50`.

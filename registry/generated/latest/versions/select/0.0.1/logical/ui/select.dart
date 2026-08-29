@@ -94,6 +94,7 @@ import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -113,9 +114,6 @@ const double _invalidRingAlphaDark = 0.40;
 /// `dark:aria-invalid:border-destructive/50` — the border the dark theme
 /// substitutes for the opaque one.
 const double _invalidBorderAlphaDark = 0.50;
-
-/// `disabled:opacity-50`.
-const double _disabledOpacity = 0.50;
 
 /// `dark:bg-input/30` and `dark:hover:bg-input/50`.
 const double _darkFillAlpha = 0.30;
@@ -582,6 +580,10 @@ class _SelectState<T> extends State<Select<T>> {
           ),
       child: Row(
         // `justify-between` — the value takes the room, the chevron sits out.
+        // Said in a comment and not in the layout until this landed: a
+        // `Flexible` label shrink-wraps, so a trigger wider than its own text
+        // packed both children at the start and left the room after them.
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: fills ? MainAxisSize.max : MainAxisSize.min,
         children: <Widget>[
           Flexible(
@@ -628,7 +630,7 @@ class _SelectState<T> extends State<Select<T>> {
     );
 
     trigger = Opacity(
-      opacity: _fieldEnabled ? 1 : _disabledOpacity,
+      opacity: _fieldEnabled ? 1 : SurfaceOpacity.disabled,
       child: IgnorePointer(ignoring: !_enabled, child: trigger),
     );
 
@@ -1238,7 +1240,10 @@ class _SelectItem<T> extends StatelessWidget {
       style: TextStyle(color: ink),
       child: row,
     );
-    row = Opacity(opacity: option.enabled ? 1 : _disabledOpacity, child: row);
+    row = Opacity(
+      opacity: option.enabled ? 1 : SurfaceOpacity.disabled,
+      child: row,
+    );
 
     return Semantics(
       button: true,

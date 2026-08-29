@@ -65,6 +65,7 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/text_layout.dart';
@@ -580,7 +581,7 @@ class FieldLabel extends StatelessWidget {
   final VoidCallback? onTap;
 
   /// `group-data-[disabled=true]/field:opacity-50`.
-  static const double disabledOpacity = 0.50;
+  static const double disabledOpacity = SurfaceOpacity.disabled;
 
   @override
   Widget build(BuildContext context) {

@@ -73,6 +73,7 @@ import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -196,9 +197,6 @@ enum ButtonEmphasis {
   /// (buttons-map drift 22).
   caps,
 }
-
-/// `disabled:opacity-45` — the one opacity in the base class list.
-const double _disabledOpacity = 0.45;
 
 /// `focus-visible:ring-3` — a `0 0 0 3px` non-inset ring: zero offset, zero
 /// blur, 3px spread.
@@ -1131,7 +1129,7 @@ class _ButtonState extends State<Button> {
     // `pointer-events: none` is not on that clock: the reference kills input in
     // the same frame the attribute lands, so [IgnorePointer] stays instant.
     button = TweenAnimationBuilder<double>(
-      tween: Tween<double>(end: _enabled ? 1 : _disabledOpacity),
+      tween: Tween<double>(end: _enabled ? 1 : SurfaceOpacity.disabled),
       duration: transition,
       curve: MotionCurves.emphasized,
       builder: (BuildContext context, double value, Widget? child) => Opacity(

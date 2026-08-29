@@ -273,6 +273,22 @@ class _NavigationMenuState extends State<NavigationMenu> {
     setState(() => _widths = measured);
   }
 
+  /// The box of trigger [index] in global coordinates, or null before it has
+  /// been laid out.
+  ///
+  /// Read straight off the [GlobalKey] rather than stored, because a stored
+  /// global rect changes on every scroll and would drive `setState` from the
+  /// post-frame measure into a loop. The one frame of lag that costs is the
+  /// same trade-off `_measure` already makes, and a trigger does not move
+  /// between the frame that opens a panel and the frame that mounts it.
+  Rect? _triggerRect(int index) {
+    if (index < 0 || index >= _itemKeys.length) return null;
+    final RenderObject? box = _itemKeys[index].currentContext
+        ?.findRenderObject();
+    if (box is! RenderBox || !box.hasSize) return null;
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+
   void _hoverTrigger(int index, bool entered) {
     if (!entered) {
       if (_pending == index) _pending = null;
@@ -367,12 +383,28 @@ class _NavigationMenuState extends State<NavigationMenu> {
       return list;
     }
 
-    // One shared panel, anchored to the root's leading edge — `absolute
-    // top-full left-0` on the viewport's wrapper.
+    // One shared panel, anchored to the trigger that opened it.
+    //
+    // It used to anchor to the whole row — `absolute top-full left-0` on the
+    // viewport's wrapper, read literally — so the panel opened under the
+    // first trigger no matter which one the pointer was on. The content was
+    // right and the position was not, which reads as a broken menu.
+    //
+    // The anchor is a zero-size point at the open trigger's bottom corner,
+    // the same virtual-element path a context menu uses: it keeps the
+    // collision clamp and the side flip, and it costs no new API.
+    // [PopoverAlign.start] is physical, not directional, so right-to-left
+    // takes the trailing corner and aligns the panel's own far edge to it —
+    // without that, RTL pinned the panel to the row's left edge as well.
     final int? open = _open;
+    final bool rtl = Directionality.of(context) == TextDirection.rtl;
+    final Rect? openTrigger = open == null ? null : _triggerRect(open);
     return Popover(
       open: open != null && widget.items[open].content != null,
-      align: PopoverAlign.start,
+      align: rtl ? PopoverAlign.end : PopoverAlign.start,
+      anchorPoint: openTrigger == null
+          ? null
+          : (rtl ? openTrigger.bottomRight : openTrigger.bottomLeft),
       // The indicator lives in the 8px the panel would otherwise be offset by,
       // so the two never both spend it.
       sideOffset: widget.indicator ? 0 : NavigationMenu.panelOffset,
@@ -565,8 +597,7 @@ class _NavigationMenuTrigger extends StatefulWidget {
   final ValueChanged<bool>? onHover;
 
   @override
-  State<_NavigationMenuTrigger> createState() =>
-      _NavigationMenuTriggerState();
+  State<_NavigationMenuTrigger> createState() => _NavigationMenuTriggerState();
 }
 
 class _NavigationMenuTriggerState extends State<_NavigationMenuTrigger> {

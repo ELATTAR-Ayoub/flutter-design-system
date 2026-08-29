@@ -476,8 +476,21 @@ class PopoverSurface extends StatelessWidget {
       fill: theme.popover,
       border: border,
       // `text-popover-foreground` — an ambient style, the way the class is.
+      //
+      // The decoration is reset with it, and that is not decoration for its
+      // own sake. A popup that is mounted as a raw `OverlayEntry` builds in
+      // the Overlay's context, not the caller's, so it inherits whatever
+      // `DefaultTextStyle` sits above the Navigator — in a `WidgetsApp` with
+      // no `Material` that is the "you forgot a Material" style: red ink
+      // under a double yellow underline. `StyledText` sets its own colour and
+      // never a decoration, so the ink came out right and every row in an
+      // open `Select` wore two yellow lines. Merging a colour alone left the
+      // underline behind; a popup surface owns its whole text style.
       child: DefaultTextStyle.merge(
-        style: TextStyle(color: theme.popoverForeground),
+        style: TextStyle(
+          color: theme.popoverForeground,
+          decoration: TextDecoration.none,
+        ),
         child: child,
       ),
     );
@@ -577,8 +590,7 @@ class Popover extends StatefulWidget {
   State<Popover> createState() => _PopoverState();
 }
 
-class _PopoverState extends State<Popover>
-    with SingleTickerProviderStateMixin {
+class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
   final GlobalKey _anchorKey = GlobalKey();
 
   /// Built in [initState] rather than lazily: a popover that never opened

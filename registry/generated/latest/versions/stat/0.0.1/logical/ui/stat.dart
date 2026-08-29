@@ -66,6 +66,7 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import './content_change.dart';
@@ -73,11 +74,6 @@ import '../../design_system/foundation/theme_scope.dart';
 import './icon.dart';
 import './icon_paths.g.dart';
 import './skeleton.dart';
-
-/// `opacity-45` — *"contrast-exempt (WCAG 2.1 SC 1.4.3, trap 9): it only has
-/// to read as unavailable, and the shimmer is what separates it from
-/// loading."*
-const double _disabledOpacity = 0.45;
 
 /// `StatDirection`.
 enum StatDirection {
@@ -334,7 +330,7 @@ class Stat extends StatelessWidget {
     );
 
     if (disabled) {
-      body = Opacity(opacity: _disabledOpacity, child: body);
+      body = Opacity(opacity: SurfaceOpacity.disabled, child: body);
     }
     return Semantics(enabled: !disabled, child: body);
   }

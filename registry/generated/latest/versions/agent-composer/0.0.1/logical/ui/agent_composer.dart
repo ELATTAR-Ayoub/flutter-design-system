@@ -135,6 +135,7 @@ import 'package:flutter/widgets.dart'
 import './surface.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -250,7 +251,7 @@ class AgentComposer extends StatefulWidget {
 
   /// `disabled:opacity-60` — on the input alone, and deliberately not the 45
   /// the button family dims to.
-  static const double disabledInputOpacity = 0.60;
+  static const double disabledInputOpacity = SurfaceOpacity.disabled;
 
   /// `mt-2` above the refusal and dictation lines.
   static double get messageTopGap => space(2);

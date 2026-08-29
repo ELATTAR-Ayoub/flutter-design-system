@@ -79,6 +79,52 @@ const List<String> _namedConstructors = <String>[
 ];
 
 void main() {
+  group('the Variants specimen', () {
+    testWidgets('each variant surface fills its card, not just its label', (
+      WidgetTester tester,
+    ) async {
+      // The five cards used to mount their FeedbackSurface inside a `Center`,
+      // so the surface shrink-wrapped to one line of text. The bloom is
+      // painted across the surface's own box, so a text-sized box showed
+      // nothing: five bordered rectangles with a word in them and no effect.
+      tester.view.physicalSize = const Size(1600, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const FeedbackSurfaceDocPage(),
+        ),
+      );
+      await tester.pump();
+
+      for (final String variant in <String>[
+        'action',
+        'destructive',
+        'success',
+        'warning',
+        'info',
+      ]) {
+        final Finder card = find.byKey(
+          ValueKey<String>('feedback-surface-variant:$variant'),
+        );
+        expect(card, findsOneWidget, reason: variant);
+        final Finder surface = find.descendant(
+          of: card,
+          matching: find.byType(FeedbackSurface),
+        );
+        expect(surface, findsOneWidget, reason: variant);
+        final Size painted = tester.getSize(surface);
+        expect(
+          painted.width,
+          closeTo(space(36), 1),
+          reason: '$variant must fill the card it is shown in',
+        );
+        expect(painted.height, closeTo(space(20), 1), reason: variant);
+      }
+    });
+  });
   group('feedback-surface docs page', () {
     testWidgets(
       'renders the article, both API tables, and every specimen this page '

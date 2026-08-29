@@ -86,6 +86,7 @@ import 'package:flutter/widgets.dart'
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -93,9 +94,6 @@ import './icon.dart';
 import './icon_paths.dart';
 import './icon_paths.g.dart';
 import './popover.dart';
-
-/// `data-disabled:opacity-50`.
-const double _disabledOpacity = 0.50;
 
 /// `data-[variant=destructive]:focus:bg-destructive/10` and its
 /// `dark:…:bg-destructive/20` twin — *(measured in both themes)*.
@@ -1400,7 +1398,7 @@ class _MenuRow extends StatelessWidget {
       style: TextStyle(color: ink),
       child: row,
     );
-    row = Opacity(opacity: enabled ? 1 : _disabledOpacity, child: row);
+    row = Opacity(opacity: enabled ? 1 : SurfaceOpacity.disabled, child: row);
 
     return Semantics(
       button: true,
