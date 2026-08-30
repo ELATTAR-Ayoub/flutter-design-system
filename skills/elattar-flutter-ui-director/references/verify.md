@@ -133,6 +133,22 @@ Future<void> settle(WidgetTester tester, {int frames = 6}) async {
 }
 ```
 
+Guard the fallback text style automatically, since nothing else catches it:
+
+```dart
+testWidgets('no text renders in the fallback error style', (tester) async {
+  await tester.pumpWidget(const MyApp());
+  await settle(tester);
+  for (final RichText text in tester.widgetList<RichText>(find.byType(RichText))) {
+    expect(
+      text.text.style?.decorationColor,
+      isNot(const Color(0xFFFFFF00)),
+      reason: 'the shell is missing its DefaultTextStyle',
+    );
+  }
+});
+```
+
 Assert focus restoration directly: keep a `FocusNode` on the trigger, and after
 closing the overlay expect `trigger.focusNode?.hasFocus` to be true. Nothing in
 the overlay does this for you.
@@ -174,6 +190,13 @@ not evidence, and a green analyzer is not a render review.
 - [ ] Async results and failures are announced.
 - [ ] 200 percent text scale renders; targets at least 44 by 44 on touch.
 - [ ] No status carried by color alone; reduced motion respected.
+
+**Render review** (nothing below is provable by a test alone)
+
+- [ ] The app was opened and looked at, in both themes, at a narrow and a wide width.
+- [ ] No text renders in Flutter's fallback error style: red, monospace, double yellow underline. If any does, the shell is missing its `DefaultTextStyle`; see theming.md.
+- [ ] Fonts resolved. The type is the system's, not a fallback face.
+- [ ] Contrast is readable in both themes, including over `Glass` and `BackgroundEffect`.
 
 **Responsive and theme**
 

@@ -41,3 +41,5 @@
 | Assuming an overlay restores focus | `Dialog`, `AlertDialog` and `SheetOverlay` trap focus and close on Escape, but they do not hand focus back. Keep a `FocusNode` on the trigger and request it on close. |
 | Two controls sharing a row at large text | A `Row` overflows; a `Wrap` reflows. Anything that can grow with text scale belongs in a `Wrap` or behind an `Expanded`. |
 | `pumpAndSettle` on a page with a skeleton | `Skeleton` and `Spinner` animate forever and ignore `MediaQuery.disableAnimations`, so the tree never settles. Pump a fixed number of `MotionDurations` beats instead. |
+| No `DefaultTextStyle` at the app root | Every string paints red, monospace, double yellow underline. `MaterialApp` alone does not provide one outside `Material`/`Scaffold`. Set it at the shell from `StyledText.styleOf(context, TextStyles.body, color: tokens.foreground)`. |
+| Trusting a green test run as proof the UI renders | The fallback text style, a wrong theme colour and an unreadable contrast all pass every widget test. Look at the running app. |

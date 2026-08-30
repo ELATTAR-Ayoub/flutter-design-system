@@ -37,6 +37,28 @@ Rules:
 spacing, or line height outside the foundation. Numeric type for metrics, so
 figures align. Headings come from the role, not from picking a larger size.
 
+### The shell sets the default text style
+
+Every app root must install a `DefaultTextStyle` before any page renders:
+
+```dart
+DefaultTextStyle(
+  style: StyledText.styleOf(context, TextStyles.body, color: tokens.foreground),
+  child: ...,
+)
+```
+
+Without it, every string in the tree paints in Flutter's fallback error style:
+red, monospace, double yellow underline. A `MaterialApp` does not save you,
+because it supplies a text style only through `Material` or `Scaffold`, and a
+design-system shell has neither. Both shipped apps in this repository set one at
+the shell for exactly this reason.
+
+This failure is invisible to widget tests. Every assertion still passes, the
+analyzer is clean, the token guard is clean, and the running app is unreadable.
+It is the single strongest argument for the render review in
+[verify.md](verify.md).
+
 ## Geometry and depth
 
 `space(...)` for spacing, `Radii` for corners, `Shadows` for depth,
