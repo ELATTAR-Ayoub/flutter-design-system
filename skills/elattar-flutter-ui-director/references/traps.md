@@ -33,3 +33,11 @@
 | `Theme.of(context)` styling | A parallel visual system. Use `ThemeScope` and the system components. |
 | "Oops", "Please wait", "Error: null" | See `copy.md`. Say what happened, and what to do next. |
 | Suppressing scanner findings to get a quiet run | Fix them, or justify each one in the handoff. |
+| `ScrollArea` as a page scroller | It wraps its child in an `IntrinsicWidth`. A `LayoutBuilder` descendant throws, and a wide table sizes past the viewport so its right-hand controls become unclickable. Use `SingleChildScrollView`, which is what the shipped agent console block uses. |
+| A `LayoutBuilder` inside a scroller | Decide the structure once, above the scroller, and pass the result down. |
+| A pinned header above a pinned composer or footer | At 200 percent text on a phone the two alone exceed the viewport and the middle gets a negative height. Let the header scroll; pin only what must stay reachable. |
+| The next step living on the retry button | A non-retryable failure then has no next step at all, which is exactly where one is needed: a declined card, a forbidden page, a conflict. Render it either way. |
+| Passing a raw string into `ErrorTurn.message` | Map to `AppError` first. The turn will render whatever it is given, backend text included. |
+| Assuming an overlay restores focus | `Dialog`, `AlertDialog` and `SheetOverlay` trap focus and close on Escape, but they do not hand focus back. Keep a `FocusNode` on the trigger and request it on close. |
+| Two controls sharing a row at large text | A `Row` overflows; a `Wrap` reflows. Anything that can grow with text scale belongs in a `Wrap` or behind an `Expanded`. |
+| `pumpAndSettle` on a page with a skeleton | `Skeleton` and `Spinner` animate forever and ignore `MediaQuery.disableAnimations`, so the tree never settles. Pump a fixed number of `MotionDurations` beats instead. |

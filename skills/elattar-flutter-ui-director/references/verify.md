@@ -100,6 +100,43 @@ make the run quiet.
 Exit code 0 means clean, 1 means findings, 2 means a usage error, so it can gate
 a commit.
 
+## Testing the two widths, both themes, and 200 percent text
+
+A `RenderFlex` overflow raises a `FlutterError` that fails a widget test on its
+own, so pumping each page in each configuration is the assertion. This is
+cheaper and far more reliable than reading screenshots, and it catches the two
+failures that dominate: a row that cannot hold its children at large text, and
+a pinned header plus a pinned footer leaving the middle a negative height.
+
+```dart
+tester.view.devicePixelRatio = 1;
+tester.view.physicalSize = const Size(390, 844);       // and 1440x900
+tester.view.padding = const FakeViewPadding(top: 47, bottom: 34);
+tester.platformDispatcher.textScaleFactorTestValue = 2;
+addTearDown(tester.view.reset);
+addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+```
+
+Run the matrix over both `ColorMode` values, both sizes, and text scale 1 and 2,
+then `expect(tester.takeException(), isNull)`.
+
+**`pumpAndSettle` does not work on these pages.** `Skeleton` and `Spinner`
+animate perpetually and do not honour `MediaQuery.disableAnimations`, so the
+tree never reaches a quiet frame and the call times out. Pump a fixed number of
+`MotionDurations` beats instead:
+
+```dart
+Future<void> settle(WidgetTester tester, {int frames = 6}) async {
+  for (int i = 0; i < frames; i++) {
+    await tester.pump(MotionDurations.slow);
+  }
+}
+```
+
+Assert focus restoration directly: keep a `FocusNode` on the trigger, and after
+closing the overlay expect `trigger.focusNode?.hasFocus` to be true. Nothing in
+the overlay does this for you.
+
 ## Completeness gate
 
 Fill this before claiming any surface is done. Every line needs evidence: a

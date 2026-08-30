@@ -53,6 +53,13 @@ Only these components render these states. Do not hand roll an equivalent.
 | `validating` | Field level state, no page state | See `Form`, `Field`, `FieldError`, `ValidationRule`, `Validators`, `ValidateMode`. |
 | `disabled` | The component's own disabled state | Never a wrapper with reduced opacity. Give the reason in a `Tooltip` when it is not obvious. |
 
+## Components that carry their own state
+
+Some primitives already model the states, and hand rolling around them is how a
+surface ends up with two ideas of "loading". Check the constructor before
+wrapping: `Stat` takes `state: StatState.ready | loading | error | empty`, and
+`Button` takes `loading`. Use the parameter rather than swapping the widget out.
+
 ## Optimistic updates
 
 Allowed when the write is small, reversible, and the failure is rare: toggles,

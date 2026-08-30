@@ -148,6 +148,9 @@ final RegExp _collectionRender = RegExp(
   r'\bListView\.(builder|separated)\(|\bGridView\.builder\(|'
   r'\.map\(\s*\(|\bfor\s*\(\s*final\b',
 );
+/// A loop over `SomeEnum.values` is a compile time list. It has no empty case
+/// to handle, so it must not count as rendering a collection.
+final RegExp _enumValuesLoop = RegExp(r'\bfor\s*\([^)]*\bin\s+\w+\.values\b');
 final RegExp _emptyHandled = RegExp(
   r'\bisEmpty\b|\bisNotEmpty\b|\bEmpty\(|\bUiEmpty\b|\bUiNoResults\b|'
   r'\bEmptyTitle\b|\borElse\b',
@@ -165,9 +168,13 @@ final RegExp _iconChild = RegExp(r'\bIcon\s*\(|\bglyph\s*:');
 final RegExp _hasLabel = RegExp(
   r'\blabel\s*:|\bsemanticsLabel\s*:|\bSemantics\s*\(|\bTooltip\s*\(',
 );
+/// A file is UI when it actually builds widgets. Importing the design system
+/// for one token does not make a data layer a widget layer, and scanning it
+/// for loading states produces nothing but noise.
 final RegExp _isWidgetFile = RegExp(
-  r"import\s+'package:flutter/(widgets|material|cupertino)\.dart'|"
-  r"import\s+'package:elattar_design_system/",
+  r'Widget\s+build\s*\(|'
+  r'extends\s+(StatelessWidget|StatefulWidget|InheritedWidget)|'
+  r'extends\s+State<',
 );
 
 /// A file carrying `// ui-check: ignore-file` is skipped. A line carrying
@@ -233,8 +240,9 @@ List<_Finding> _scan(File file) {
   // Only for files that render data. A specimen iterating a compile time list
   // has no empty case to handle.
   final bool rendersData = _asyncWork.hasMatch(code) || _dataShape.hasMatch(code);
+  final String withoutEnumLoops = code.replaceAll(_enumValuesLoop, '');
   if (rendersData &&
-      _collectionRender.hasMatch(code) &&
+      _collectionRender.hasMatch(withoutEnumLoops) &&
       !_emptyHandled.hasMatch(code)) {
     add('no-empty', _firstLineOf(lines, _collectionRender), 'collection rendered here');
   }

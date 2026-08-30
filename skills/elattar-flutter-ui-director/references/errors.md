@@ -64,6 +64,10 @@ Rules the copy must keep:
 - Never write "unexpected", "oops", "uh oh", or an exclamation mark.
 - One action. Two actions is a decision, and a decision belongs in a dialog.
 
+The next step is rendered whether or not the failure is retryable. Attaching it
+only to a retry button loses it on every failure that cannot be retried, which
+is where the user most needs to be told what to do instead.
+
 ## Diagnostics
 
 `AppError` keeps `diagnostics`: the original message, the status, and a
