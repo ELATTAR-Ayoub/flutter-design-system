@@ -1,4 +1,4 @@
-/// A live card built only from real `El*` components: a claimable balance
+/// A live card built only from real design-system components: a claimable balance
 /// with a claim flow that flips the figure, the badge and the footer once it
 /// resolves.
 library;

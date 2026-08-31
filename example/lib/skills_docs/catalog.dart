@@ -257,60 +257,79 @@ const List<String> verifiedCommands = <String>[
 ];
 
 const String _licenseStatus =
-    'The root LICENSE is still a placeholder ("TODO: Add your license here."). '
-    'A plugin marketplace entry and a "copy this into your agent config" '
-    'instruction are both invitations to redistribute, with no grant attached '
-    'yet: so the routes below are documented, not published as working. See '
-    'Decision 005 (docs/superpowers/reports/public-release/decisions/'
-    '005-public-skill-location.md).';
+    'This repository is MIT licensed, so copying the skill into an agent '
+    'configuration is permitted. What gates a route below is evidence, not '
+    'permission: a route stays pending until a round trip has actually been '
+    'recorded, and a pending route is documented rather than recommended.';
 
 const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
   slug: 'elattar-flutter-ui-director',
   name: 'elattar-flutter-ui-director',
   title: 'Elattar Flutter UI Director',
+  // Verbatim from `.claude-plugin/plugin.json`'s `description`, checked by
+  // `example/test/skills_docs_test.dart`.
   summary:
-      'Directs coding agents to build Flutter UI from the Elattar design '
-      'system: public El* API discovery, foundation tokens, component '
-      'placement, state and accessibility coverage, responsive contracts, and '
-      'a verification ladder.',
+      'Directs coding agents to build complete Flutter UI from the Elattar '
+      'design system: public API discovery, foundation tokens, component '
+      'placement, a required UI contract, full state coverage with skeletons '
+      'and empty states, human error copy with a next step, feedback on every '
+      'trigger, keyboard and screen-reader access, responsive structure, both '
+      'themes, and a verification ladder with a completeness gate and '
+      'scanner.',
+  // Verbatim from `SKILL.md`'s frontmatter `description:`, the text an agent
+  // harness actually matches on. Checked by the same test.
   description:
       "Direct production Flutter UI with Elattar's design system, in the "
       'design-system repository itself or in a consumer app that installed it '
       'with the elattar CLI. Use when designing, implementing, reviewing, or '
-      'documenting Flutter screens, flows, dashboards, mobile navigation, '
-      'component specimens, loading/empty/error/success feedback, responsive '
-      'behavior, visual verification, or agent-console experiences that must '
-      'use the local El* APIs and token source of truth.',
+      'documenting Flutter screens, pages, sections, flows, dashboards, '
+      'forms, mobile navigation, or component specimens that must be '
+      'complete: loading skeletons, empty and no-results states, human error '
+      'copy with a next step, success and undo feedback, keyboard and '
+      'screen-reader access, responsive structure, and both themes, all built '
+      'from the local design-system APIs and token source of truth.',
   version: '0.0.1',
   pluginName: 'elattar-design-system',
   marketplaceName: 'elattar',
   repository: 'https://github.com/ELATTAR-Ayoub/flutter-design-system',
   licenseStatus: _licenseStatus,
   supportedAgents: <String>['Claude Code'],
+  // Condensed from SKILL.md's own numbered workflow, one line per step, in
+  // its order. The step count is asserted against that file by test, so a
+  // step added to the skill cannot go unreported here.
   workflow: <String>[
-    'Resolve the project mode: repository or consumer: before reading or '
-        'writing anything.',
-    'Classify the work and name its primary action, critical states, and '
-        'supported form factors.',
-    'Inventory the relevant public El* APIs, foundations, and specimens '
-        'before proposing a primitive.',
-    'State the dominant visual idea, hierarchy, and one restrained '
-        'supporting effect.',
-    'Define normal, loading, empty, error, success, disabled, focus, and '
-        'recovery states before writing widgets.',
-    'Compose El* widgets outside the system-owned component directory; keep '
-        'system components reusable.',
-    'Apply adaptive layout, safe areas, themes, input, and motion contracts.',
-    'Add or update a specimen and focused tests, then run the verification '
-        'ladder and report the mode, commands, and captures.',
+    'Resolve the mode, repository or consumer, before reading or writing '
+        'anything.',
+    'Classify the work: product screen, package component, port, agent '
+        'console, or review and fix.',
+    'Write the UI contract. No widgets before it exists.',
+    'Inventory the real public APIs: barrel, source, tests, specimens. Never '
+        'guess that a widget exists.',
+    'Set the visual direction: one dominant idea, a clear hierarchy, at most '
+        'one supporting effect.',
+    'Design the states before the widgets, for every region rather than only '
+        'the page.',
+    'Build by composing exported widgets, keeping product UI outside the '
+        'system-owned component directory.',
+    'Cover platform, access, theme and copy: responsive structure, keyboard '
+        'and screen reader, both themes.',
+    'Verify and hand off: run the ladder, the scanner and the completeness '
+        'gate, and report what was actually run.',
   ],
   referenceFiles: <SkillReferenceFile>[
     SkillReferenceFile(
       path: 'SKILL.md',
       title: 'Skill definition',
       description:
-          'Frontmatter, the eight-step workflow, the non-negotiable contract, '
-          'and the reference index.',
+          'Frontmatter, the nine-step workflow, the non-negotiable '
+          'contract, and the reference index.',
+    ),
+    SkillReferenceFile(
+      path: 'references/accessibility.md',
+      title: 'Accessibility',
+      description:
+          'Labels, focus order, keyboard reachability, and '
+          'announcements.',
     ),
     SkillReferenceFile(
       path: 'references/agent-console.md',
@@ -318,20 +337,57 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
       description: 'Agent-facing interaction requirements.',
     ),
     SkillReferenceFile(
-      path: 'references/platform-contracts.md',
-      title: 'Platform contracts',
-      description: 'Adaptive layout, safe areas, input, themes, and motion.',
+      path: 'references/component-spec.md',
+      title: 'Component spec',
+      description:
+          'When a reusable component is finished, and when one is not '
+          'warranted.',
     ),
     SkillReferenceFile(
-      path: 'references/state-accessibility.md',
-      title: 'State & accessibility',
-      description: 'Feedback, semantics, and state coverage.',
+      path: 'references/copy.md',
+      title: 'Copy',
+      description: 'Microcopy rules for labels, empty states, and failures.',
+    ),
+    SkillReferenceFile(
+      path: 'references/errors.md',
+      title: 'Errors',
+      description:
+          'The failure taxonomy, human error copy, and where a failure '
+          'appears.',
+    ),
+    SkillReferenceFile(
+      path: 'references/feedback.md',
+      title: 'Feedback',
+      description:
+          'One channel per trigger, its timing, and the next step it '
+          'offers.',
+    ),
+    SkillReferenceFile(
+      path: 'references/page-blueprint.md',
+      title: 'Page blueprint',
+      description: 'Pages, regions, lists, forms, and multi-step flows.',
+    ),
+    SkillReferenceFile(
+      path: 'references/responsive.md',
+      title: 'Responsive',
+      description: 'Breakpoints, insets, input modes, and content stress.',
+    ),
+    SkillReferenceFile(
+      path: 'references/states.md',
+      title: 'States',
+      description: 'The state model, and what renders each state.',
     ),
     SkillReferenceFile(
       path: 'references/system-map.md',
       title: 'System map',
       description:
-          'Mode discrimination, repository topology, and discovery commands.',
+          'Mode discrimination, repository topology, and discovery '
+          'commands.',
+    ),
+    SkillReferenceFile(
+      path: 'references/theming.md',
+      title: 'Theming',
+      description: 'Tokens, both themes, and effects.',
     ),
     SkillReferenceFile(
       path: 'references/traps.md',
@@ -339,14 +395,51 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
       description: 'Common failure modes.',
     ),
     SkillReferenceFile(
+      path: 'references/ui-contract.md',
+      title: 'UI contract',
+      description: 'The artifact to write before any widget.',
+    ),
+    SkillReferenceFile(
       path: 'references/verify.md',
       title: 'Verify',
-      description: 'Test, guard, build, and visual review ladder.',
+      description: 'The test, guard, build and visual review ladder.',
     ),
     SkillReferenceFile(
       path: 'references/visual-direction.md',
       title: 'Visual direction',
       description: 'Hierarchy, restraint, and reference handling.',
+    ),
+    SkillReferenceFile(
+      path: 'scripts/check_ui_completeness.dart',
+      title: 'Completeness scanner',
+      description:
+          'The script the verification ladder runs over changed '
+          'surfaces.',
+    ),
+    SkillReferenceFile(
+      path: 'templates/app-error.md',
+      title: 'Template: app error',
+      description: 'Error taxonomy, mapper, and copy table.',
+    ),
+    SkillReferenceFile(
+      path: 'templates/async-section.md',
+      title: 'Template: async section',
+      description: 'One region, every state.',
+    ),
+    SkillReferenceFile(
+      path: 'templates/component-doc.md',
+      title: 'Template: component doc',
+      description: 'The component documentation block.',
+    ),
+    SkillReferenceFile(
+      path: 'templates/page-scaffold.md',
+      title: 'Template: page scaffold',
+      description: 'A page whose regions fail independently.',
+    ),
+    SkillReferenceFile(
+      path: 'templates/ui-state.md',
+      title: 'Template: UI state',
+      description: 'The sealed state model.',
     ),
   ],
   installRoutes: <SkillInstallRoute>[
@@ -378,9 +471,10 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
           '(.claude-plugin/marketplace.json + plugin.json, source "./"). '
           "Adding it registers the skill in Claude Code's own plugin manager.",
       blockedBy:
-          'No dated transcript yet proving the add/install round trip and '
-          "the skill's appearance in Claude Code's own skill listing. Also "
-          'gated on the licensing decision above.',
+          'The manifests are real and the install has been exercised from a '
+          'local marketplace directory, but no round trip has been recorded '
+          'for the GitHub shorthand below, which is the part these two '
+          'commands actually claim.',
       install: <SkillCommand>[
         SkillCommand(
           command:
@@ -429,9 +523,9 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
           'folder: user-scoped (every project) or project-scoped (one '
           'repository).',
       blockedBy:
-          'Same licensing gate as the plugin route above; the mechanism is '
-          'ordinary file copying and needs no transcript of its own once the '
-          'license is decided.',
+          'The mechanism is ordinary file copying and the license permits it, '
+          'but no run has been recorded ending in the skill appearing in an '
+          'agent listing. Documented, not recommended.',
       install: <SkillCommand>[
         SkillCommand(
           command:

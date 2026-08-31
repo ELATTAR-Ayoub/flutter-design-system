@@ -1,5 +1,5 @@
 name: elattar_design_system
-description: "Flutter design system package with El* foundations, components, effects, and motion primitives."
+description: "Flutter design system package: foundation tokens, components, effects, and motion primitives, with an unprefixed public API."
 version: 0.0.1
 homepage: https://github.com/ELATTAR-Ayoub/flutter-design-system
 repository: https://github.com/ELATTAR-Ayoub/flutter-design-system
@@ -64,11 +64,14 @@ flutter:
     # the real bytes of the one source of truth rather than a copy of them:
     # there is no second tree to regenerate and nothing that can drift.
     #
-    # One entry per directory, because a directory asset is non-recursive.
-    # `example/test/public_pages_test.dart` fails if either line goes missing —
-    # it compares what the bundle hands the page against what is on disk.
+    # One entry per directory, because a directory asset is non-recursive:
+    # the skill has four, and the Skills page publishes the whole tree.
+    # `example/test/public_pages_test.dart` fails if any line goes missing.
+    # It compares what the bundle hands the page against what is on disk.
     - skills/elattar-flutter-ui-director/
     - skills/elattar-flutter-ui-director/references/
+    - skills/elattar-flutter-ui-director/scripts/
+    - skills/elattar-flutter-ui-director/templates/
 
     # The generated registry's two catalog files, and the changelog, declared
     # here for the same reason as the skill above: both sit at the repository

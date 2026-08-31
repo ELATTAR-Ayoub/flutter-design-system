@@ -1,7 +1,7 @@
 /// A live release-distribution card: an empty seed state that creates the
 /// first release through a dialog, and a filled state that lists every
 /// release with a per-row remove and a footer dialog for adding another —
-/// built only from real `El*` components.
+/// built only from real design-system components.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';

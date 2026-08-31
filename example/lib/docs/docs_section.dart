@@ -22,6 +22,8 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 import 'package:flutter/widgets.dart' as flutter show ScrollPosition;
 
+import 'docs_layout.dart' show docsAnchorKey;
+
 /// Registers [child] under [id] so [scrollTo] can find it later.
 class DocsAnchor extends StatelessWidget {
   const DocsAnchor({super.key, required this.id, required this.child});
@@ -67,8 +69,18 @@ class DocsAnchor extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      KeyedSubtree(key: keyFor(id), child: child);
+  Widget build(BuildContext context) => KeyedSubtree(
+    // Two keys, because two mechanisms look for this target and neither can
+    // see the other's. [scrollTo] resolves the [GlobalKey] registry above;
+    // `docs_layout.dart` walks its own article for a `docsAnchorKey` value
+    // key and never touches that registry, so a `DocsSection` carrying only
+    // the global key was invisible to the table of contents, and every TOC
+    // row on all seven `docs_pages/` articles resolved to nothing and
+    // silently scrolled nowhere. Marking both makes one section answer both
+    // callers without either learning about the other.
+    key: docsAnchorKey(id),
+    child: KeyedSubtree(key: keyFor(id), child: child),
+  );
 }
 
 /// A titled section of a documentation page.

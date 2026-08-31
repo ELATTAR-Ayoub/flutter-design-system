@@ -32,6 +32,7 @@ import 'package:flutter/widgets.dart'
         Table,
         TableColumnWidth;
 
+import '../docs/docs_disclosure.dart';
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
 import '../docs/docs_section.dart';
@@ -75,9 +76,8 @@ class _RegistryDocsPageState extends State<RegistryDocsPage> {
       eyebrow: 'DOCS',
       title: 'Registry',
       description:
-          'How a component name becomes files in your project: what an item '
-          'declares, how dependencies resolve, and why the URL carries a '
-          'version number.',
+          'How a component name becomes files you own: what arrives, where '
+          'it lands, and what the hashes promise.',
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Docs'),
@@ -85,14 +85,15 @@ class _RegistryDocsPageState extends State<RegistryDocsPage> {
     ],
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'What ships today', anchor: 'shipped'),
+      DocsTocEntry(title: 'Where files land', anchor: 'targets'),
+      DocsTocEntry(title: 'Source ownership', anchor: 'ownership'),
+      DocsTocEntry(title: 'Hashes', anchor: 'hashes'),
       DocsTocEntry(title: 'What an item is', anchor: 'item'),
       DocsTocEntry(title: 'How dependencies resolve', anchor: 'dependencies'),
-      DocsTocEntry(title: 'Where files land', anchor: 'targets'),
-      DocsTocEntry(title: 'Hashes', anchor: 'hashes'),
       DocsTocEntry(title: 'Versioned and hosted', anchor: 'hosted'),
       DocsTocEntry(title: 'Cache and offline', anchor: 'offline'),
       DocsTocEntry(title: 'Reading the registry', anchor: 'commands'),
-      DocsTocEntry(title: 'Source ownership', anchor: 'ownership'),
+      DocsTocEntry(title: 'What this is not', anchor: 'not-included'),
     ],
     previous: const DocsPageLink(title: 'Typeset', route: docsTypesetRoute),
     next: const DocsPageLink(title: 'Changelog', route: docsChangelogRoute),
@@ -153,14 +154,15 @@ class _RegistryArticle extends StatelessWidget {
                   },
         ),
       ),
+      _targets(),
+      _ownership(context),
+      _hashes(),
       _item(),
       _dependencies(),
-      _targets(),
-      _hashes(),
       _hosted(),
       _offline(),
       _commands(),
-      _ownership(context),
+      _notIncluded(),
     ],
   );
 
@@ -447,6 +449,48 @@ class _RegistryArticle extends StatelessWidget {
       ],
     ),
   );
+
+  Widget _notIncluded() => DocsSection(
+    id: 'not-included',
+    title: 'What this is not',
+    description:
+        'Named so a reader stops looking. These are things a registry can '
+        'have and this one does not.',
+    child: const DocsApiTable(
+      title: 'Not Elattar features',
+      facts: <DocsApiFact>[
+        DocsApiFact(
+          name: 'Authentication',
+          type: 'not implemented',
+          description:
+              'Every registry this CLI reads is public and unauthenticated. '
+              'There are no tokens, accounts or private items.',
+        ),
+        DocsApiFact(
+          name: 'Namespaces',
+          type: 'not implemented',
+          description:
+              'An item name is a bare slug. Nothing scopes the names of one '
+              'registry against those of another, so a mirror is a copy '
+              'rather than a namespace.',
+        ),
+        DocsApiFact(
+          name: 'Server-side search',
+          type: 'not implemented',
+          description:
+              'search runs locally over the catalog the CLI already has. '
+              'The registry serves static files and answers no queries.',
+        ),
+        DocsApiFact(
+          name: 'An MCP server',
+          type: 'not implemented',
+          description:
+              'Nothing here exposes the registry to an agent over a '
+              'protocol. An agent reads the same files a person does.',
+        ),
+      ],
+    ),
+  );
 }
 
 /// The loaded figures.
@@ -567,18 +611,32 @@ class _Failed extends StatelessWidget {
       // `Alert`'s destructive variant carries an icon and a title as well as
       // its colour, so the state is legible without relying on hue — and it is
       // announced rather than merely coloured.
-      Alert(
+      // What happened and what to do, in words a reader can act on. The
+      // parser's own sentence is a diagnostic, not an instruction, so it
+      // goes behind the disclosure rather than into the alert: a public
+      // reader can do nothing with it, and it is the first thing a
+      // maintainer asks for.
+      const Alert(
         variant: AlertVariant.destructive,
-        icon: const Icon(IconGlyph.circleX),
+        icon: Icon(IconGlyph.circleX),
         title: 'The registry figures could not be read',
-        description: error is RegistryDocumentException
-            ? '$error'
-            : 'The bundled registry could not be read: $error',
+        description:
+            'The rest of this page is unaffected. Try again, and if it keeps '
+            'failing the published registry is the thing at fault, not your '
+            'setup.',
       ),
       SizedBox(height: space(4)),
       Align(
         alignment: Alignment.centerLeft,
         child: Button(onPressed: onRetry, child: const Text('Try again')),
+      ),
+      SizedBox(height: space(4)),
+      DocsDisclosure(
+        title: 'Technical detail',
+        // The raw message is the point here: this is the diagnostic
+        // disclosure, not the copy. The alert above it carries what
+        // happened and what to do.
+        child: StyledText('$error', TextStyles.small), // ui-check: ignore
       ),
     ],
   );

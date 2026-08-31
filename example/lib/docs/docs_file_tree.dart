@@ -11,7 +11,7 @@
 /// copy/clipboard seam already carries its own failure-recovery tests. The
 /// copy affordance below reuses the same public [DocsClipboardWriter] seam —
 /// `docs_code.dart`'s own copy header (`_DocsCodeHeader`) is private to that
-/// library, so an equivalent is composed here from public `El*` parts instead
+/// library, so an equivalent is composed here from public parts instead
 /// of duplicating its file.
 library;
 

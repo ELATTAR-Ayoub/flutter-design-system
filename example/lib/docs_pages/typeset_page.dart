@@ -6,7 +6,12 @@
 /// on the page serves that, and the page teaches no raw `TextStyle` value,
 /// because a reader who copies a font size has taken the system apart.
 ///
-/// Two rules hold the content together.
+/// Three rules hold the content together.
+///
+/// **The scale comes before the reference.** The whole catalog renders once,
+/// in order, at real size, above the per-role blocks. Choosing between two
+/// neighbours is a comparison, and a reader cannot make it from twenty-seven
+/// separate cards.
 ///
 /// **Every specimen is the real token.** Nothing here restates a size or a
 /// weight in prose. The metadata beside each role is read out of its
@@ -37,6 +42,7 @@ import 'package:flutter/widgets.dart'
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
 import '../docs/docs_section.dart';
+import '../docs/docs_showcase.dart';
 import '../docs/docs_snippet.dart';
 import 'catalog.dart';
 import 'typeset_catalog.dart';
@@ -49,19 +55,20 @@ class TypesetDocsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DocsLayout(
     route: docsTypesetRoute,
-    intro: const DocsPageIntro(
+    intro: DocsPageIntro(
       eyebrow: 'DOCS',
       title: 'Typeset',
       description:
-          'Twenty-seven named roles across five faces. Choose the one that '
-          'matches what you are writing, and the size, weight and leading '
-          'follow from it.',
+          '${typesetRoles.length} named roles. Choose the one that matches '
+          'what you are writing; size, weight and leading follow from it. '
+          'The whole scale is rendered below.',
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Docs'),
       BreadcrumbEntry.page('Typeset'),
     ],
     toc: const <DocsTocEntry>[
+      DocsTocEntry(title: 'Full type scale', anchor: 'scale'),
       DocsTocEntry(title: 'Choosing a role', anchor: 'choosing'),
       DocsTocEntry(title: 'The five faces', anchor: 'faces'),
       DocsTocEntry(title: 'What a spec records', anchor: 'anatomy'),
@@ -90,6 +97,7 @@ class _TypesetArticle extends StatelessWidget {
       key: const ValueKey<String>('typeset-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
+        _fullScale(),
         _choosing(theme),
         _faces(theme),
         _anatomy(theme),
@@ -104,6 +112,38 @@ class _TypesetArticle extends StatelessWidget {
   Widget _prose(String text, {TextStyleToken? spec}) => ConstrainedBox(
     constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
     child: StyledText(text, spec ?? TextStyles.body),
+  );
+
+  /// The whole scale, once, in catalog order: the comparison surface a
+  /// reader needs before any single role's reference block is useful.
+  ///
+  /// One continuous vertical run inside one stage, not a card per role.
+  /// Every line is [_Specimen], the same widget the reference blocks below
+  /// use, so a size, weight, family or tracking cannot be written down here
+  /// even by accident. Group titles are dividers, not headings: they help a
+  /// reader find where the numerics start without breaking the run.
+  Widget _fullScale() => DocsSection(
+    id: 'scale',
+    title: 'Full type scale',
+    description:
+        'Every role, once, in reading order, at its real size. Read down it '
+        'before you read about any single role: the choice between two '
+        'neighbours is easier to see than to describe.',
+    child: DocsShowcaseFrame(
+      alignment: Alignment.topLeft,
+      minHeight: space(96),
+      child: Column(
+        key: const ValueKey<String>('typeset-full-scale'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          for (int i = 0; i < typesetRoles.length; i++) ...<Widget>[
+            if (i == 0 || typesetRoles[i].group != typesetRoles[i - 1].group)
+              _ScaleDivider(group: typesetRoles[i].group, first: i == 0),
+            _ScaleLine(role: typesetRoles[i]),
+          ],
+        ],
+      ),
+    ),
   );
 
   Widget _choosing(ThemeTokens theme) => DocsSection(
@@ -361,6 +401,56 @@ class _TypesetArticle extends StatelessWidget {
               "// This.\n"
               "Button(onPressed: onPressed, child: const Text('Continue'))",
         ),
+      ],
+    ),
+  );
+}
+
+/// The rule and title that mark where one reading group ends and the next
+/// begins, inside the continuous scale.
+class _ScaleDivider extends StatelessWidget {
+  const _ScaleDivider({required this.group, required this.first});
+
+  final TypesetGroup group;
+
+  /// The first group opens the stage, so it takes the title without the rule
+  /// above it.
+  final bool first;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.only(top: first ? 0 : space(4), bottom: space(5)),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        if (!first) ...<Widget>[const Separator(), SizedBox(height: space(4))],
+        StyledText(group.title, TextStyles.eyebrow),
+      ],
+    ),
+  );
+}
+
+/// One line of the scale: the role's name, small and quiet, above the role
+/// rendered at its own size.
+///
+/// The name is a scanning cue, not a heading. The reference blocks below own
+/// the heading semantics, and repeating them here would give a screen-reader
+/// user twenty-seven duplicate landmarks to walk past.
+class _ScaleLine extends StatelessWidget {
+  const _ScaleLine({required this.role});
+
+  final TypesetRole role;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    key: ValueKey<String>('typeset-preview-${role.name}'),
+    padding: EdgeInsets.only(bottom: space(6)),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        StyledText('TextStyles.${role.name}', TextStyles.eyebrowSmall),
+        SizedBox(height: space(2)),
+        _Specimen(role: role),
       ],
     ),
   );

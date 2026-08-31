@@ -7,9 +7,11 @@ in the repository root.
 
 ## 0.0.1
 
-First release. Code, tests and CI gates are complete —
-`dart pub publish --dry-run` reports 0 warnings — but this version has not
-been published to pub.dev yet, and no `v0.0.1` git tag exists.
+First release.
+
+```bash
+dart install elattar_cli
+```
 
 ### Commands
 

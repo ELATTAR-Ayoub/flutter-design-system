@@ -1,34 +1,29 @@
 /// Public documentation page for `/docs/installation`.
 ///
-/// Content contract: `docs/superpowers/plans/2026-08-21-public-website-ui-
-/// information-architecture.md` section 7.5.
+/// One job: a reader with a Flutter project ends up with a themed component
+/// in it. Everything on the page serves that, and anything that explains the
+/// machinery rather than the action links to the page that owns it.
 ///
-/// This page used to open by explaining that nothing on it could be obtained:
-/// the CLI was unpublishable, the repository was unreachable, and the
-/// reference's `dart install elattar_cli` two-liner was deliberately withheld
-/// as unrunnable. That is no longer the situation, so the page leads with the
-/// three commands instead of with an apology for not having them.
+/// **Which command this page leads with is not decided here.** It comes from
+/// `release_facts.dart`, whose `cliOnPubDev` says whether `elattar_cli`
+/// resolves on pub.dev for a reader of this build, and whose guard fails if
+/// the pages and that answer disagree. The 0.0.1 release publishes the CLI
+/// before it deploys the site, so the published spelling leads and the
+/// from-source spelling stays documented beneath it.
 ///
-/// `example/test/public_claims_test.dart` scans this directory for the
-/// phrases that described the old state and fails if any of them return —
-/// including from a comment, which is why the sentence above paraphrases
-/// rather than quotes.
+/// Both routes were driven end to end against the hosted registry, with
+/// nothing local in the picture, before being written down:
 ///
-/// Every command below was executed before being written down, against the
-/// package as a consumer receives it — only the files `dart pub publish
-/// --dry-run` lists, resolved on their own, driven at a registry served over
-/// plain HTTP:
+///  * install the CLI -> `Activated elattar_cli 0.0.1`
 ///  * `elattar --version` -> `0.0.1`
-///  * `elattar init --foundation source` -> wrote the foundation, the fonts,
-///    `elattar.yaml`, `.elattar/manifest.json` and four license notices,
-///    exit 0
-///  * `elattar add button voice-indicator` -> wrote the dependency closure and two
-///    further notices, exit 0
-///  * `elattar doctor` -> reported remote registry, 99 items, cache state,
-///    exit 0
-///  * `elattar list --offline` with the server stopped -> served from cache
-///  * `flutter analyze` in the resulting project -> no issues
-/// Nothing below states a command that was not exercised this way.
+///  * `elattar init --foundation source` -> foundation, fonts, `elattar.yaml`,
+///    `.elattar/manifest.json` and four license notices, exit 0
+///  * `elattar add button` -> seven items and a fifth notice, exit 0
+///  * `elattar doctor` -> remote registry, 99 items, schema v1, cache warm
+///
+/// `example/test/public_claims_test.dart` scans this directory for phrases
+/// that describe a state the product has left, which is why the note above
+/// paraphrases rather than quotes them.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -47,11 +42,13 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import '../docs/docs_code.dart';
+import '../docs/docs_disclosure.dart';
 import '../docs/docs_facts.dart';
 import '../docs/docs_layout.dart';
 import '../docs/docs_section.dart';
 import '../docs/docs_snippet.dart';
 import 'catalog.dart';
+import 'release_facts.dart';
 
 class InstallationDocsPage extends StatelessWidget {
   const InstallationDocsPage({super.key, this.onNavigate});
@@ -65,8 +62,8 @@ class InstallationDocsPage extends StatelessWidget {
       eyebrow: 'DOCS',
       title: 'Installation',
       description:
-          'Install the CLI, set up your project, add a component. Three '
-          'commands, no clone, no dependency on this package.',
+          'Install the command, set your project up, add a component. Three '
+          'steps, no clone, no dependency on this package.',
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Docs'),
@@ -79,10 +76,10 @@ class InstallationDocsPage extends StatelessWidget {
       DocsTocEntry(title: 'Where components come from', anchor: 'registry'),
       DocsTocEntry(title: 'Working offline', anchor: 'offline'),
       DocsTocEntry(title: 'What lands in your project', anchor: 'what-lands'),
+      DocsTocEntry(title: 'Verify it worked', anchor: 'verification'),
+      DocsTocEntry(title: 'When a command refuses', anchor: 'troubleshooting'),
       DocsTocEntry(title: 'Package foundation', anchor: 'package-foundation'),
       DocsTocEntry(title: 'Full maintained package', anchor: 'full-package'),
-      DocsTocEntry(title: 'Verification', anchor: 'verification'),
-      DocsTocEntry(title: 'Troubleshooting', anchor: 'troubleshooting'),
     ],
     previous: const DocsPageLink(title: 'Components', route: '/components'),
     next: const DocsPageLink(title: 'Theming', route: docsThemingRoute),
@@ -101,12 +98,9 @@ class _InstallationArticle extends StatelessWidget {
       key: const ValueKey<String>('installation-doc-article'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        // The reference's own "Recommended for new projects" callout sits
-        // directly under the intro paragraph, before its first heading. See
-        // https://ui.shadcn.com/docs/installation. This is that same slot.
-        Alert(
+        const Alert(
           variant: AlertVariant.success,
-          icon: const Icon(IconGlyph.circleCheck),
+          icon: Icon(IconGlyph.circleCheck),
           title: 'Recommended: source foundation',
           description:
               '`elattar init --foundation source` copies the foundation into '
@@ -119,31 +113,51 @@ class _InstallationArticle extends StatelessWidget {
         _registry(theme),
         _offline(theme),
         _whatLands(),
+        _verification(theme),
+        _troubleshooting(),
         _packageFoundation(theme),
         _fullPackage(),
-        _verification(),
-        _troubleshooting(theme),
       ],
     );
   }
 
-  Widget _prose(String text, ThemeTokens theme, {TextStyleToken? spec}) =>
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
-        child: StyledText(text, spec ?? TextStyles.body),
-      );
+  Widget _prose(String text, {TextStyleToken? spec}) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+    child: StyledText(text, spec ?? TextStyles.body),
+  );
+
+  Widget _see(
+    ThemeTokens theme,
+    String lead,
+    List<(String, String)> links,
+    String tail,
+  ) => Wrap(
+    crossAxisAlignment: WrapCrossAlignment.center,
+    children: <Widget>[
+      StyledText(lead, TextStyles.small, color: theme.mutedForeground),
+      for (int i = 0; i < links.length; i++) ...<Widget>[
+        if (i > 0)
+          StyledText(
+            i == links.length - 1 ? ' and ' : ', ',
+            TextStyles.small,
+            color: theme.mutedForeground,
+          ),
+        DocsLink(label: links[i].$1, route: links[i].$2, underline: true),
+      ],
+      StyledText(tail, TextStyles.small, color: theme.mutedForeground),
+    ],
+  );
 
   Widget _quickstart() => DocsSection(
     id: 'quickstart',
     title: 'Quickstart',
     description:
-        'From nothing to a themed button in a Flutter project you already '
-        'have.',
-    child: const DocsSnippet(
+        'From nothing to a themed button, in a Flutter project you already '
+        'have. Run the last two from inside it.',
+    child: DocsSnippet(
       language: 'bash',
       code:
-          'dart install elattar_cli\n\n'
-          'cd my_flutter_app\n'
+          '${releaseFacts.installCommand}\n\n'
           'elattar init --foundation source\n'
           'elattar add button',
     ),
@@ -153,20 +167,35 @@ class _InstallationArticle extends StatelessWidget {
     id: 'install-cli',
     title: 'Install the CLI',
     description:
-        'elattar_cli is not on pub.dev yet — 0.0.1 is prepared and gated, '
-        'and this command starts working the day it is published. It has '
-        'one dependency, so it will be a small resolve rather than a tree '
-        'to audit.',
+        'This puts an `elattar` executable on your PATH. One resolve, and a '
+        'small dependency tree rather than one to audit.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const DocsSnippet(language: 'bash', code: 'dart install elattar_cli'),
+        DocsSnippet(language: 'bash', code: releaseFacts.installCommand),
         SizedBox(height: space(4)),
         _prose(
-          'On an older SDK, or if you prefer the long spelling, `dart pub '
-          'global activate elattar_cli` does the same thing. Both put an '
-          '`elattar` executable on your PATH.',
-          theme,
+          'On an older SDK, or if you prefer the long spelling, '
+          '`dart pub global activate elattar_cli` does the same thing.',
+          spec: TextStyles.small,
+        ),
+        SizedBox(height: space(4)),
+        DocsDisclosure(
+          title: 'Install from source instead',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _prose(
+                'Compiles the CLI from the public repository, with no clone '
+                'and no checkout. This is what a contributor uses, and what '
+                'to reach for when you want the default branch rather than '
+                'the released version.',
+                spec: TextStyles.small,
+              ),
+              SizedBox(height: space(4)),
+              const DocsSnippet(language: 'bash', code: gitInstallCommand),
+            ],
+          ),
         ),
         SizedBox(height: space(4)),
         const DocsInstallFacts(
@@ -189,16 +218,15 @@ class _InstallationArticle extends StatelessWidget {
               value: 'dart pub global run elattar_cli:elattar --version',
               description:
                   'Works from anywhere, and is the quickest way to confirm '
-                  'the install succeeded before touching your PATH.',
+                  'the install succeeded. It should print 0.0.1.',
             ),
             DocsInstallFact(
               label: 'Update or remove',
-              value: 'dart install elattar_cli',
+              value: 'dart pub global deactivate elattar_cli',
               description:
-                  'Re-running installs the newest version. `dart pub global '
-                  'deactivate elattar_cli` removes the command and leaves '
-                  'everything it installed in place: that source is your '
-                  'project\'s now.',
+                  'Re-running the install command takes the newest version; '
+                  'deactivating removes the command and leaves everything it '
+                  'installed in place. That source is your project\'s now.',
             ),
           ],
         ),
@@ -210,9 +238,8 @@ class _InstallationArticle extends StatelessWidget {
     id: 'source-foundation',
     title: 'Set up a project',
     description:
-        'init copies the theme, typography, spacing and motion foundation '
-        'into your project as local files, wires the three font faces into '
-        'your pubspec.yaml, and records what it did. add then copies '
+        'init copies the foundation into your project as local files and '
+        'wires the three font faces into your pubspec.yaml. add then copies '
         'component source the same way, resolving dependencies for you.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -225,18 +252,13 @@ class _InstallationArticle extends StatelessWidget {
               '# One component, with everything it depends on.\n'
               'elattar add button\n\n'
               '# Or the whole set.\n'
-              'elattar add --all',
-          // Eight lines is enough to be worth collapsing on a page this
+              'elattar add --all\n\n'
+              '# Lists every file that would be written, and writes none.\n'
+              'elattar add button --dry-run',
+          // Eleven lines is enough to be worth collapsing on a page this
           // long — see the expansion-control test in
           // installation_docs_test.dart.
           maxHeight: space(28),
-        ),
-        SizedBox(height: space(4)),
-        const DocsSnippet(
-          language: 'bash',
-          code:
-              '# Lists every file that would be written, and writes none.\n'
-              'elattar add button --dry-run',
         ),
       ],
     ),
@@ -249,29 +271,25 @@ class _InstallationArticle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _prose(
-          'The CLI reads a hosted registry, pinned to its own version. '
-          'elattar_cli 0.0.1 reads /registry/0.0.1/, and that path is '
-          'immutable: publishing a change means publishing a new version, '
-          'never rewriting a released one. What you install today is what '
-          'you install next year.',
-          theme,
+          'A hosted registry, pinned to the CLI\'s own version, with a '
+          'sha256 on every distributed file. Nothing is written until the '
+          'whole install has arrived and verified, so a dropped connection '
+          'leaves your project exactly as it was. Use --registry to point '
+          'somewhere else: a mirror, or a registry you built yourself.',
         ),
         SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'bash',
           code:
-              '# A mirror, or a registry you built yourself.\n'
-              'elattar add button --registry https://example.com/elattar/0.0.1/\n'
-              'elattar add button --registry ../flutter-design-system/registry/generated/latest',
+              'elattar add button --registry https://example.com/elattar/0.0.1/',
         ),
         SizedBox(height: space(4)),
-        _prose(
-          'Every manifest and every payload is checked against the sha256 the '
-          'registry declares, and everything is downloaded and verified '
-          'before the first file is written. A dropped connection or a '
-          'substituted payload aborts the whole command with your project '
-          'exactly as it was.',
+        _see(
           theme,
+          'See ',
+          <(String, String)>[('Registry', docsRegistryRoute)],
+          ' for what an item declares, how the closure resolves, and what '
+              'the published registry contains.',
         ),
       ],
     ),
@@ -285,8 +303,8 @@ class _InstallationArticle extends StatelessWidget {
       children: <Widget>[
         _prose(
           'Downloads are cached per user, so a command that has run once '
-          'online can run again with no network at all.',
-          theme,
+          'online runs again with no network. Set ELATTAR_CACHE_DIR to keep '
+          'the cache inside a workspace, which is what CI wants.',
         ),
         SizedBox(height: space(4)),
         const DocsSnippet(
@@ -296,35 +314,9 @@ class _InstallationArticle extends StatelessWidget {
               'elattar add card --offline    # reads only the cache',
         ),
         SizedBox(height: space(4)),
-        const DocsInstallFacts(
-          title: 'Cache location',
-          facts: <DocsInstallFact>[
-            DocsInstallFact(
-              label: 'Windows',
-              value: r'%LOCALAPPDATA%\elattar\registry\v1',
-              description: 'The documented home for regenerable data.',
-            ),
-            DocsInstallFact(
-              label: 'macOS',
-              value: '~/Library/Caches/elattar/registry/v1',
-              description: 'The platform cache directory.',
-            ),
-            DocsInstallFact(
-              label: 'Linux',
-              value: r'$XDG_CACHE_HOME/elattar/registry/v1',
-              description:
-                  'Falling back to ~/.cache/elattar/registry/v1, as the XDG '
-                  'base directory specification requires.',
-            ),
-            DocsInstallFact(
-              label: 'Override',
-              value: 'ELATTAR_CACHE_DIR',
-              description:
-                  'Set it to keep a cache inside a workspace, which is what '
-                  'CI wants.',
-            ),
-          ],
-        ),
+        _see(theme, 'See ', <(String, String)>[
+          ('CLI', docsCliRoute),
+        ], ' for where the cache lives on each platform.'),
       ],
     ),
   );
@@ -343,9 +335,8 @@ class _InstallationArticle extends StatelessWidget {
           label: 'Foundation',
           value: 'lib/design_system/foundation/*.dart',
           description:
-              'colors, typography, spacing, shadows, motion, theme, '
-              'surfaces, media, text_layout, date_format, theme_scope, plus '
-              'the lib/design_system/foundation.dart barrel.',
+              'Colours, typography, spacing, shadows, motion, theme and the '
+              'surfaces, plus the lib/design_system/foundation.dart barrel.',
         ),
         DocsInstallFact(
           label: 'Components',
@@ -358,8 +349,7 @@ class _InstallationArticle extends StatelessWidget {
           label: 'Fonts',
           value: 'assets/elattar/fonts/*.ttf',
           description:
-              'InterVariable, GeistMono-Variable and Redaction35-Italic, '
-              'registered under `flutter: fonts:` in your pubspec.yaml '
+              'Registered under `flutter: fonts:` in your pubspec.yaml '
               'automatically, under the family names the installed '
               'typography actually asks for.',
         ),
@@ -367,11 +357,9 @@ class _InstallationArticle extends StatelessWidget {
           label: 'License notices',
           value: 'LICENSES/*.txt',
           description:
-              'Elattar\'s MIT notice always; the three font OFL notices with '
-              'the foundation; lucide\'s ISC notice with icon, and so with '
-              'most components; the ElevenLabs UI notice with voice-indicator. '
-              'Keep them: carrying the notice is the condition all three '
-              'licenses attach to the grant.',
+              'Elattar\'s MIT notice always, and each third-party notice '
+              'alongside the source it covers. Keep them: carrying the '
+              'notice is the condition each license attaches to the grant.',
         ),
         DocsInstallFact(
           label: 'Project record',
@@ -386,43 +374,107 @@ class _InstallationArticle extends StatelessWidget {
     ),
   );
 
+  Widget _verification(ThemeTokens theme) => DocsSection(
+    id: 'verification',
+    title: 'Verify it worked',
+    description:
+        'One command. doctor checks the project, the config, whether your '
+        'dependencies actually resolved, the manifest, and the registry it '
+        'would use, and exits 0 only when every check passes.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const DocsSnippet(language: 'bash', code: 'elattar doctor'),
+        SizedBox(height: space(4)),
+        _prose(
+          'A failing line names the one thing to fix. The most common is '
+          'dependencies: run flutter pub get after init, because init adds '
+          'the font registrations your project has not resolved yet.',
+          spec: TextStyles.small,
+        ),
+      ],
+    ),
+  );
+
+  Widget _troubleshooting() => DocsSection(
+    id: 'troubleshooting',
+    title: 'When a command refuses',
+    description:
+        'Every refusal below leaves your project untouched. Fix the one '
+        'thing it names and run the same command again.',
+    child: const DocsStateMatrix(
+      title: 'Common failures',
+      facts: <DocsStateFact>[
+        DocsStateFact(
+          state: 'Run add before init',
+          treatment: 'add stops: there is no elattar.yaml to read.',
+          userSignal: 'Run `elattar init --foundation source` first.',
+        ),
+        DocsStateFact(
+          state: 'Not inside a Flutter project',
+          treatment:
+              'No pubspec.yaml declaring Flutter was found above the current '
+              'directory.',
+          userSignal: 'Change into your app and run the command again.',
+        ),
+        DocsStateFact(
+          state: 'The registry could not be reached',
+          treatment:
+              'The host did not answer, or the request timed out. Nothing '
+              'was written.',
+          userSignal:
+              'Check the connection, or add --offline to work from the '
+              'cache you already have.',
+        ),
+        DocsStateFact(
+          state: 'Nothing cached, under --offline',
+          treatment:
+              'The command names the file it wanted and the registry it '
+              'wanted it from.',
+          userSignal:
+              'Run the same command once without --offline to fill the '
+              'cache.',
+        ),
+        DocsStateFact(
+          state: 'A file failed its hash check',
+          treatment:
+              'Verification runs before the first write, so nothing landed.',
+          userSignal:
+              'Retry. If it repeats, the registry you pointed at is not '
+              'serving what it declares.',
+        ),
+        DocsStateFact(
+          state: 'Your files would be overwritten',
+          treatment:
+              'add lists every conflicting destination and writes nothing.',
+          userSignal:
+              'That usually means you edited an installed file, which you '
+              'are meant to be able to do. Save your version, then re-run '
+              'with --overwrite.',
+        ),
+      ],
+    ),
+  );
+
   Widget _packageFoundation(ThemeTokens theme) => DocsSection(
     id: 'package-foundation',
     title: 'Package foundation',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Alert(
+        const Alert(
           variant: AlertVariant.destructive,
-          icon: const Icon(IconGlyph.circleX),
+          icon: Icon(IconGlyph.circleX),
           title: 'Not available',
           description:
               '`elattar init --foundation package` is refused before it '
-              'touches the project, with exit code 64.',
+              'touches your project. It would depend on a package that does '
+              'not exist, producing an app that cannot resolve.',
         ),
         SizedBox(height: space(4)),
         _prose(
-          'This is the exact message packages/elattar_cli/lib/src/commands/'
-          'app.dart returns:',
-          theme,
-        ),
-        SizedBox(height: space(3)),
-        const DocsSnippet(
-          language: 'bash',
-          code:
-              '\$ elattar init --foundation package\n'
-              'The `package` foundation mode is not available in elattar '
-              '0.0.1: it depends on a package named `elattar_core` that '
-              'does not exist yet, so `flutter pub get` cannot resolve the '
-              'project it produces. Use `--foundation source`, which '
-              'copies the foundation into your project.',
-        ),
-        SizedBox(height: space(3)),
-        _prose(
-          'An earlier build of this CLI did write that broken project; it '
-          'was reverted for this reason and this mode is refused up front '
-          'now rather than left undocumented.',
-          theme,
+          'It stays refused until such a package is really published. Use '
+          '--foundation source, which is what the rest of this page shows.',
           spec: TextStyles.small,
         ),
       ],
@@ -433,39 +485,38 @@ class _InstallationArticle extends StatelessWidget {
     id: 'full-package',
     title: 'Full maintained package',
     description:
-        'Depend on elattar_design_system directly and import El* widgets '
-        'from the package barrel, no CLI involved. The package is not on '
-        'pub.dev — source installation through the CLI is the distribution '
-        'route — so this is a git or path dependency, exactly as this '
-        'repository\'s own example/pubspec.yaml consumes it.',
+        'If you would rather depend on the package than own the source: '
+        'depend on elattar_design_system and import the same public names '
+        'from its barrel, no CLI involved. The package itself is not '
+        'published, because source installation is the distribution route, '
+        'so this is a git or path dependency, exactly as this repository\'s '
+        'own example app consumes it.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         DocsCodeExample(
           title: 'pubspec.yaml',
-          manualFiles: const <DocsCodeFile>[
+          manualFiles: <DocsCodeFile>[
             DocsCodeFile(
               path: 'pubspec.yaml',
               title: 'From Git',
               description:
-                  'Pins the public repository. Add `ref:` to pin a tag if '
-                  'you would rather not track the default branch.',
+                  'The `ref:` pins the release tag, which is cut at the same '
+                  'commit the registry and this site were built from. Drop '
+                  'it to track the default branch instead.',
               code:
                   'dependencies:\n'
                   '  elattar_design_system:\n'
                   '    git:\n'
                   '      url: https://github.com/ELATTAR-Ayoub/flutter-design-system.git\n'
-                  '      ref: v0.0.1',
+                  '      ref: ${releaseFacts.tag}',
             ),
-            DocsCodeFile(
+            const DocsCodeFile(
               path: 'pubspec.yaml',
               title: 'From a local checkout',
               description:
-                  'Path relative to your project — adjust the number of '
-                  '`../` segments to wherever you cloned the repository. '
-                  'This repository\'s own example/pubspec.yaml uses '
-                  '`path: ../`, because example/ lives directly inside the '
-                  'checkout it depends on.',
+                  'Path relative to your project. Adjust the `../` segments '
+                  'to wherever you cloned the repository.',
               code:
                   'dependencies:\n'
                   '  elattar_design_system:\n'
@@ -475,91 +526,6 @@ class _InstallationArticle extends StatelessWidget {
         ),
         SizedBox(height: space(4)),
         const DocsSnippet(language: 'bash', code: 'flutter pub get'),
-      ],
-    ),
-  );
-
-  Widget _verification() => DocsSection(
-    id: 'verification',
-    title: 'Verification',
-    description:
-        'doctor checks the project, the config, whether your dependencies '
-        'actually resolved, the manifest, and the registry it would use. It '
-        'exits 0 only when every check passes.',
-    child: const DocsSnippet(
-      language: 'bash',
-      code:
-          'elattar doctor\n\n'
-          '# Add --verbose to include the cache path.\n'
-          'elattar doctor --verbose',
-    ),
-  );
-
-  Widget _troubleshooting(ThemeTokens theme) => DocsSection(
-    id: 'troubleshooting',
-    title: 'Troubleshooting',
-    child: const DocsStateMatrix(
-      title: 'Common failures',
-      facts: <DocsStateFact>[
-        DocsStateFact(
-          state: 'Missing elattar.yaml',
-          treatment:
-              'add and doctor both refuse with "Missing elattar.yaml. Run '
-              '`elattar init` first.", exit 78.',
-          userSignal: 'Run init before add in a new project.',
-        ),
-        DocsStateFact(
-          state: 'Not a Flutter project',
-          treatment:
-              'No pubspec.yaml with a flutter dependency was found above the '
-              'current directory, exit 72.',
-          userSignal: 'Run the command from inside your Flutter app.',
-        ),
-        DocsStateFact(
-          state: 'Registry unreachable',
-          treatment:
-              'The host could not be reached, or the request timed out, '
-              'exit 70. Nothing was written.',
-          userSignal:
-              'Check the connection, or pass --offline to work from the '
-              'cache.',
-        ),
-        DocsStateFact(
-          state: 'Nothing cached, under --offline',
-          treatment:
-              'The command names the file it wanted and the registry it '
-              'wanted it from, exit 70.',
-          userSignal:
-              'Run the same command once without --offline to populate the '
-              'cache.',
-        ),
-        DocsStateFact(
-          state: 'A payload failed its hash check',
-          treatment:
-              'The item, the target and both hashes are printed, exit 65. '
-              'Verification runs before the first write, so nothing landed.',
-          userSignal:
-              'Retry. If it repeats, the registry you are pointing at is not '
-              'serving what it declares.',
-        ),
-        DocsStateFact(
-          state: 'Existing files would be overwritten',
-          treatment:
-              'add reports every conflicting destination and writes nothing, '
-              'exit 73.',
-          userSignal:
-              'That usually means you edited an installed file, which you '
-              'are meant to be able to do. Save your version, then re-run '
-              'with --overwrite.',
-        ),
-        DocsStateFact(
-          state: 'foundation: package in elattar.yaml',
-          treatment:
-              'add refuses with the same packageModeUnavailable message as '
-              'init, exit 78.',
-          userSignal:
-              'Edit elattar.yaml to `foundation: source` and re-run init.',
-        ),
       ],
     ),
   );

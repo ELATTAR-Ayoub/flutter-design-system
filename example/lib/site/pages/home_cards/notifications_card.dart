@@ -1,6 +1,6 @@
 /// A live notification-preferences card: four checkbox rows built from
 /// `Item`, a select-all/clear-all pair with a live count badge, and a
-/// save footer, built only from real `El*` components.
+/// save footer, built only from real design-system components.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';

@@ -342,7 +342,7 @@ final List<TypesetRole> typesetRoles = <TypesetRole>[
     usage:
         'The default figure: body-sized, so a number set inline with prose '
         'sits on the same line without disturbing it.',
-    sample: '84 components',
+    sample: '1,024 rows',
     sizeRule: null,
   ),
   TypesetRole(

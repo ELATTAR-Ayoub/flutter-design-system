@@ -1,15 +1,17 @@
 /// Public documentation page for `/docs/cli`.
 ///
-/// Content contract: `docs/superpowers/plans/2026-08-21-public-website-ui-
-/// information-architecture.md` section 7.9. The command reference below is
-/// read directly from `packages/elattar_cli/lib/src/commands/app.dart`
-/// (`ElattarCli.run`, `_printUsage`, and the `try`/`catch` exit-code ladder in
-/// `run`) and confirmed by executing every command listed against this
-/// checkout: `--version`, `help`, `init`, `add`, `list`, `search`, `info`,
-/// and `doctor` all ran; `list` and `info` were checked against the real
-/// registry, both from `registry/generated/latest/` and over HTTP.
-/// `--foundation package` is documented as refused because it was run and
-/// refused with exit 64.
+/// One job: a reader knows which command to type next. `init` and `add` are
+/// the two that matter and they come first; the reference table, the exit
+/// codes, the output shapes and the recovery paths follow in that order,
+/// because that is the order a developer needs them in.
+///
+/// **The command surface is not written here.** It comes from
+/// `cli_catalog.dart`, which `example/test/cli_docs_test.dart` checks against
+/// `packages/elattar_cli/lib/src/commands/app.dart`'s own `_printUsage`,
+/// option by option. The exit-code ladder below is read from the same file's
+/// `try`/`catch` chain in `ElattarCli.run`.
+///
+/// Nothing on this page documents a command Elattar does not implement.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -32,6 +34,7 @@ import '../docs/docs_layout.dart';
 import '../docs/docs_section.dart';
 import '../docs/docs_snippet.dart';
 import 'catalog.dart';
+import 'cli_catalog.dart';
 
 class CliDocsPage extends StatelessWidget {
   const CliDocsPage({super.key, this.onNavigate});
@@ -45,22 +48,22 @@ class CliDocsPage extends StatelessWidget {
       eyebrow: 'DOCS',
       title: 'CLI',
       description:
-          'The real elattar command surface: six commands, their flags, '
-          'and the exit code each failure path returns.',
+          'One command with six subcommands. The two you will type are '
+          'init and add.',
     ),
     breadcrumbs: const <BreadcrumbEntry>[
       BreadcrumbEntry.link('Docs'),
       BreadcrumbEntry.page('CLI'),
     ],
     toc: const <DocsTocEntry>[
-      DocsTocEntry(title: 'Synopsis', anchor: 'synopsis'),
+      DocsTocEntry(title: 'The two you need', anchor: 'synopsis'),
       DocsTocEntry(title: 'Running it', anchor: 'running'),
-      DocsTocEntry(title: 'Global options', anchor: 'global-options'),
-      DocsTocEntry(title: 'Commands', anchor: 'commands'),
+      DocsTocEntry(title: 'Shared options', anchor: 'global-options'),
+      DocsTocEntry(title: 'Every command', anchor: 'commands'),
       DocsTocEntry(title: 'Common workflows', anchor: 'workflows'),
       DocsTocEntry(title: 'Exit codes', anchor: 'exit-codes'),
       DocsTocEntry(title: 'Output format', anchor: 'output'),
-      DocsTocEntry(title: 'Offline and CI usage', anchor: 'offline'),
+      DocsTocEntry(title: 'Offline and CI', anchor: 'offline'),
       DocsTocEntry(title: 'Conflicts and recovery', anchor: 'conflicts'),
     ],
     previous: const DocsPageLink(title: 'Theming', route: docsThemingRoute),
@@ -82,8 +85,8 @@ class _CliArticle extends StatelessWidget {
       children: <Widget>[
         _synopsis(),
         _running(theme),
-        _globalOptions(theme),
-        _commands(theme),
+        _globalOptions(),
+        _commands(),
         _workflows(),
         _exitCodes(),
         _output(theme),
@@ -93,28 +96,47 @@ class _CliArticle extends StatelessWidget {
     );
   }
 
-  Widget _prose(String text, ThemeTokens theme, {TextStyleToken? spec}) =>
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
-        child: StyledText(text, spec ?? TextStyles.body),
-      );
+  Widget _prose(String text, {TextStyleToken? spec}) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
+    child: StyledText(text, spec ?? TextStyles.body),
+  );
+
+  Widget _see(
+    ThemeTokens theme,
+    String lead,
+    List<(String, String)> links,
+    String tail,
+  ) => Wrap(
+    crossAxisAlignment: WrapCrossAlignment.center,
+    children: <Widget>[
+      StyledText(lead, TextStyles.small, color: theme.mutedForeground),
+      for (int i = 0; i < links.length; i++) ...<Widget>[
+        if (i > 0)
+          StyledText(
+            i == links.length - 1 ? ' and ' : ', ',
+            TextStyles.small,
+            color: theme.mutedForeground,
+          ),
+        DocsLink(label: links[i].$1, route: links[i].$2, underline: true),
+      ],
+      StyledText(tail, TextStyles.small, color: theme.mutedForeground),
+    ],
+  );
 
   Widget _synopsis() => DocsSection(
     id: 'synopsis',
-    title: 'Synopsis',
+    title: 'The two you need',
+    description:
+        'init prepares the project. add copies a component and everything it '
+        'depends on. Everything else on this page reads the registry or '
+        'reports on what already happened.',
     child: const DocsSnippet(
       language: 'bash',
       code:
-          'elattar --version\n'
-          'elattar init [--foundation source] [--yes] [--dry-run]\n'
-          '     [--registry PATH_OR_URL] [--offline]\n'
-          'elattar add <items...> [--all] [--overwrite] [--dry-run]\n'
-          '     [--registry PATH_OR_URL] [--offline]\n'
-          'elattar list [--registry PATH_OR_URL] [--offline]\n'
-          'elattar search <query> [--registry PATH_OR_URL] [--offline]\n'
-          'elattar info <name> [--registry PATH_OR_URL] [--offline]\n'
-          'elattar doctor [--registry PATH_OR_URL] [--offline] [--verbose]\n'
-          'elattar help',
+          '# Once per project.\n'
+          'elattar init --foundation source\n\n'
+          '# Whenever you want a component.\n'
+          'elattar add button',
     ),
   );
 
@@ -124,128 +146,82 @@ class _CliArticle extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const Alert(
-          variant: AlertVariant.info,
-          icon: Icon(IconGlyph.info),
-          title: 'Getting the command',
-          description:
-              '`dart install elattar_cli` puts `elattar` on your PATH, and '
-              'every command on this page is then exactly what you type. '
-              'Contributors working inside a checkout can run the same '
-              'commands as '
-              '`dart run packages/elattar_cli/bin/elattar.dart <command>` '
-              'without installing anything.',
+        _prose(
+          'Every command below assumes an `elattar` executable on your PATH. '
+          'Run it with no arguments, or with help, to print the same usage '
+          'this page is built from.',
         ),
-        SizedBox(height: space(3)),
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: <Widget>[
-            StyledText('See ', TextStyles.small, color: theme.mutedForeground),
-            const DocsLink(
-              label: 'Installation',
-              route: docsInstallationRoute,
-              underline: true,
-            ),
-            StyledText('.', TextStyles.small, color: theme.mutedForeground),
-          ],
+        SizedBox(height: space(4)),
+        _see(
+          theme,
+          'See ',
+          <(String, String)>[('Installation', docsInstallationRoute)],
+          ' for how to get the command, and what to do when your shell '
+              'cannot find it.',
         ),
       ],
     ),
   );
 
-  Widget _globalOptions(ThemeTokens theme) => DocsSection(
+  Widget _globalOptions() => DocsSection(
     id: 'global-options',
-    title: 'Global options',
+    title: 'Shared options',
+    description:
+        'Every subcommand takes these two. The rest belong to one command '
+        'each and are listed with it.',
     child: const DocsApiTable(
-      title: 'Options accepted before any subcommand',
+      title: 'Accepted by every subcommand',
       facts: <DocsApiFact>[
         DocsApiFact(
-          name: '--version',
-          type: 'flag',
+          name: '--registry',
+          type: 'PATH_OR_URL',
           description:
-              'Prints the CLI version (0.0.1) and exits 0. Consumed before '
-              'any subcommand is parsed.',
+              'A local directory or an http(s) URL; anything else is refused '
+              'before it reaches the filesystem. Without it the CLI walks up '
+              'from the working directory looking for a local registry, and '
+              'only then falls back to the versioned public one over HTTP, '
+              'so a plain run outside a checkout does make a network '
+              'request. When a local registry is discovered rather than '
+              'named, the CLI says so.',
         ),
         DocsApiFact(
-          name: 'help / --help / -h',
+          name: '--offline',
           type: 'flag',
-          description: 'Prints the synopsis above and exits 0.',
-        ),
-        DocsApiFact(
-          name: '--registry PATH',
-          type: 'per-command option',
           description:
-              'Every command below accepts this. Without it, the CLI walks '
-              'up from the current directory looking for '
-              'registry/generated/latest, then falls back to the versioned '
-              'public registry over HTTP. See Offline and CI usage.',
+              'Restricts the command to what is already cached and never '
+              'opens a connection. A cache miss and a network failure are '
+              'reported differently, because they have different fixes.',
         ),
       ],
     ),
   );
 
-  Widget _commands(ThemeTokens theme) => DocsSection(
+  Widget _commands() => DocsSection(
     id: 'commands',
-    title: 'Commands',
+    title: 'Every command',
+    description:
+        'The usage column is the CLI\'s own, checked against it by test. '
+        'Options every command shares are above and not repeated here.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const DocsApiTable(
-          title: 'Every subcommand',
+        DocsApiTable(
+          title: 'Subcommands',
           facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'init',
-              type:
-                  '[--foundation source] [--yes] [--dry-run] '
-                  '[--registry PATH_OR_URL] [--offline]',
-              description:
-                  'Writes elattar.yaml, the source-foundation files, fonts, '
-                  'and an empty lib/components/ui/ui.dart barrel. '
-                  '--foundation package is refused with exit 64, see '
-                  'Introduction and Installation. --yes is accepted and has '
-                  'no effect: init never prompts.',
-            ),
-            DocsApiFact(
-              name: 'add <items...>',
-              type:
-                  '[--all] [--overwrite] [--dry-run] '
-                  '[--registry PATH_OR_URL] [--offline]',
-              description:
-                  'Resolves each item\'s transitive registryDependencies and '
-                  'writes the resulting files, assets, and font '
-                  'registrations. Requires elattar.yaml and '
-                  '.elattar/manifest.json to already exist (run init first).',
-            ),
-            DocsApiFact(
-              name: 'list',
-              type: '[--registry PATH_OR_URL] [--offline]',
-              description:
-                  'Prints one tab-separated line per registry item: '
-                  'name, type, version.',
-            ),
-            DocsApiFact(
-              name: 'search <query>',
-              type: '[--registry PATH_OR_URL] [--offline]',
-              description:
-                  'Prints one tab-separated line per match: name, type, '
-                  'description.',
-            ),
-            DocsApiFact(
-              name: 'info <name>',
-              type: '[--registry PATH_OR_URL] [--offline]',
-              description:
-                  'Prints one item\'s full manifest as indented JSON: the '
-                  'only command that emits JSON. See Output format.',
-            ),
-            DocsApiFact(
-              name: 'doctor',
-              type: '[--registry PATH_OR_URL] [--offline]',
-              description:
-                  'Checks the Flutter project, elattar.yaml, declared '
-                  'dependency resolution, the manifest, and the registry. '
-                  'Prints one ok/err line per check.',
-            ),
+            for (final CliCommand command in cliCommands)
+              DocsApiFact(
+                name: command.name,
+                type: command.usage.isEmpty ? 'flag' : command.usage,
+                description: command.summary,
+              ),
           ],
+        ),
+        SizedBox(height: space(5)),
+        DocsSnippet(
+          language: 'bash',
+          code: <String>[
+            for (final CliCommand command in cliCommands) command.example,
+          ].join('\n'),
         ),
       ],
     ),
@@ -260,16 +236,18 @@ class _CliArticle extends StatelessWidget {
         const DocsSnippet(
           language: 'bash',
           code:
-              'elattar init --foundation source --registry registry/generated/latest\n'
-              'elattar add button --registry registry/generated/latest',
+              '# Find something, read what it brings with it, install it.\n'
+              'elattar search dialog\n'
+              'elattar info dialog\n'
+              'elattar add dialog --dry-run\n'
+              'elattar add dialog',
         ),
         SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'bash',
           code:
-              'elattar list --registry registry/generated/latest\n'
-              'elattar search dialog --registry registry/generated/latest\n'
-              'elattar info button --registry registry/generated/latest',
+              '# Against a registry you built, with no network at all.\n'
+              'elattar add button --registry ../flutter-design-system/registry/generated/latest',
         ),
       ],
     ),
@@ -278,65 +256,72 @@ class _CliArticle extends StatelessWidget {
   Widget _exitCodes() => DocsSection(
     id: 'exit-codes',
     title: 'Exit codes',
-    description: 'Every code `ElattarCli.run` can return, and what causes it.',
+    description:
+        'Every code the CLI returns, and the one thing that causes it. Useful '
+        'when a script has to tell "you typed it wrong" from "the network '
+        'was down".',
     child: const DocsApiTable(
       title: 'Exit codes',
       facts: <DocsApiFact>[
         DocsApiFact(
           name: '0',
           type: 'success',
-          description: 'Command completed, including --version and help.',
+          description: 'The command completed, --version and help included.',
         ),
         DocsApiFact(
           name: '1',
-          type: 'StateError / doctor issues',
+          type: 'doctor found problems',
           description:
-              'An unclassified StateError, or doctor exits 1 when any check '
-              'reported err.',
+              'Or an unclassified internal error. doctor is the usual cause.',
         ),
         DocsApiFact(
           name: '64',
-          type: 'FormatException / RegistryLocationException',
+          type: 'usage',
           description:
-              'Bad or unknown arguments, an unknown command, an unusable '
-              '--registry value, or the --foundation package refusal.',
+              'An unknown flag or command, an unusable --registry value, or '
+              'the --foundation package refusal.',
         ),
         DocsApiFact(
           name: '65',
-          type: 'RegistryDependencyCycleException / RegistryIntegrityException',
+          type: 'integrity',
           description:
-              'A dependency cycle, or a file whose sha256 does not match.',
+              'A file whose sha256 did not match, or a dependency cycle. '
+              'Nothing was written either way.',
         ),
         DocsApiFact(
           name: '66',
-          type: 'RegistryItemNotFoundException',
+          type: 'no such item',
           description:
-              'add or info named an item the registry does not contain.',
+              'add or info named something the registry does not '
+              'contain.',
         ),
         DocsApiFact(
           name: '70',
-          type: 'RegistrySourceException',
+          type: 'registry unreachable',
           description:
-              'The command was well formed but a remote registry could not '
-              'be reached or read, or --offline found nothing cached.',
+              'The command was well formed; a remote registry could not be '
+              'read, or --offline found nothing cached.',
         ),
         DocsApiFact(
           name: '72',
-          type: 'FlutterProjectNotFound',
+          type: 'no Flutter project',
           description:
-              'No pubspec.yaml with a flutter dependency found above the current directory.',
+              'No pubspec.yaml declaring Flutter above the current '
+              'directory.',
         ),
         DocsApiFact(
           name: '73',
-          type: 'install conflicts',
+          type: 'conflicts',
           description:
-              'add would overwrite existing files and --overwrite was not passed.',
+              'add would overwrite files that differ, and --overwrite was '
+              'not passed. See Conflicts and recovery.',
         ),
         DocsApiFact(
           name: '78',
-          type: 'ElattarConfigException / ElattarManifestException',
+          type: 'project record',
           description:
-              'Missing or invalid elattar.yaml or .elattar/manifest.json.',
+              'elattar.yaml or .elattar/manifest.json is missing or '
+              'unusable. Run init first.',
         ),
       ],
     ),
@@ -346,58 +331,54 @@ class _CliArticle extends StatelessWidget {
     id: 'output',
     title: 'Output format',
     child: _prose(
-      'There is no --json flag on any command. info always prints indented '
-      'JSON; list and search always print tab-separated plain text, one '
-      'result per line; init, add, and doctor print one prefixed line per '
-      'step or check (init/add write a summary of every file written; '
-      'doctor prints "ok" or "err" per check). A caller scripting against '
-      'this CLI should parse info\'s JSON and split the others on tabs, not '
-      'expect a shared machine format across commands.',
-      theme,
+      'There is no --json flag. info always prints indented JSON; list and '
+      'search always print tab-separated plain text, one result per line; '
+      'init, add and doctor print one prefixed line per step or check. A '
+      'script should parse info\'s JSON and split the others on tabs, rather '
+      'than expect one machine format across all six.',
     ),
   );
 
   Widget _offline(ThemeTokens theme) => DocsSection(
     id: 'offline',
-    title: 'Offline and CI usage',
+    title: 'Offline and CI',
     child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         _prose(
-          '--registry PATH accepts either a local directory or an http(s) '
-          'URL; anything else is refused before it reaches the filesystem. '
-          'Named nothing, the CLI walks up from the working directory '
-          'looking for registry/generated/latest, and only then falls back '
-          'to the versioned public registry over HTTP — so a plain run '
-          'outside a checkout of this repository does make a network '
-          'request by default.',
-          theme,
+          'Two ways to make a run deterministic: --offline, which reads only '
+          'the cache, and --registry pointed at a checked-in directory, which '
+          'never resolves to the remote registry at all. Downloads are cached '
+          'per user, and writes are atomic, so an interrupted download never '
+          'becomes a readable cache entry.',
         ),
         SizedBox(height: space(4)),
-        _prose(
-          '--offline is what makes a run deterministic without one: every '
-          'command above restricts itself to whatever is already cached and '
-          'never opens a connection. Pointing --registry at a local, '
-          'checked-in directory (as the workflows above do) removes the '
-          'network dependency a different way, by never resolving to the '
-          'remote registry in the first place.',
-          theme,
-        ),
-        SizedBox(height: space(3)),
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: <Widget>[
-            StyledText('See ', TextStyles.small, color: theme.mutedForeground),
-            const DocsLink(
-              label: 'Registry',
-              route: docsRegistryRoute,
-              underline: true,
+        const DocsInstallFacts(
+          title: 'Cache location',
+          facts: <DocsInstallFact>[
+            DocsInstallFact(
+              label: 'Windows',
+              value: r'%LOCALAPPDATA%\elattar\registry\v1',
+              description: 'The documented home for regenerable data.',
             ),
-            StyledText(
-              ' for how a registry location resolves and how the cache '
-              'works.',
-              TextStyles.small,
-              color: theme.mutedForeground,
+            DocsInstallFact(
+              label: 'macOS',
+              value: '~/Library/Caches/elattar/registry/v1',
+              description: 'The platform cache directory.',
+            ),
+            DocsInstallFact(
+              label: 'Linux',
+              value: r'$XDG_CACHE_HOME/elattar/registry/v1',
+              description:
+                  'Falling back to ~/.cache/elattar/registry/v1, as the XDG '
+                  'base directory specification requires.',
+            ),
+            DocsInstallFact(
+              label: 'Override',
+              value: 'ELATTAR_CACHE_DIR',
+              description:
+                  'Set it to keep the cache inside a workspace, which is '
+                  'what CI wants.',
             ),
           ],
         ),
@@ -412,22 +393,29 @@ class _CliArticle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _prose(
-          'add plans every write before touching disk. If any destination '
+          'add plans every write before touching disk. If a destination '
           'already exists and differs from what would be written, it lists '
-          'every conflicting path and writes nothing, exit 73. Pass '
-          '--overwrite to proceed once you have reviewed them, or '
-          '--dry-run first to preview a plan without writing anything.',
-          theme,
+          'every conflicting path, writes nothing, and exits 73. That '
+          'usually means you edited an installed file, which you are meant '
+          'to be able to do.',
         ),
-        SizedBox(height: space(3)),
+        SizedBox(height: space(4)),
+        const DocsSnippet(
+          language: 'bash',
+          code:
+              '# See the plan without writing any of it.\n'
+              'elattar add button --dry-run\n\n'
+              '# Take the registry\'s copy, once you have saved yours.\n'
+              'elattar add button --overwrite',
+        ),
+        SizedBox(height: space(4)),
         _prose(
-          'doctor is the recovery entry point: it separately checks the '
-          'Flutter project, elattar.yaml, whether pubspec.yaml\'s declared '
-          'dependencies actually resolved (.dart_tool/package_config.json '
-          'exists and lists them), the install manifest, and the registry, '
-          'and exits 1 the moment any one of those is wrong, rather than '
-          'reporting a project healthy because its own four files parsed.',
-          theme,
+          'doctor is the entry point when something is wrong but no command '
+          'has failed: it checks the project, the config, whether the '
+          'declared dependencies actually resolved, the manifest and the '
+          'registry separately, so it cannot report a project healthy '
+          'because its own four files parsed.',
+          spec: TextStyles.small,
         ),
       ],
     ),

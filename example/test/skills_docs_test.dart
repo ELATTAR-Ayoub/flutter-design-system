@@ -138,6 +138,87 @@ void main() {
       );
     });
 
+    test('the summary is the plugin manifest\'s own description', () {
+      final Map<String, Object?> plugin =
+          jsonDecode(
+                File(_rooted('.claude-plugin/plugin.json')).readAsStringSync(),
+              )
+              as Map<String, Object?>;
+      expect(
+        _entry.summary,
+        plugin['description'],
+        reason:
+            'the one-line summary is the plugin manifest\'s own, restated '
+            'here only so the page can render it without reading the '
+            'filesystem',
+      );
+    });
+
+    test('the description is SKILL.md\'s own frontmatter description', () {
+      final String skill = File(
+        _rooted('skills/elattar-flutter-ui-director/SKILL.md'),
+      ).readAsStringSync();
+      final RegExpMatch? match = RegExp(
+        r'^description:\s*(.+)$',
+        multiLine: true,
+      ).firstMatch(skill);
+      expect(match, isNotNull, reason: 'SKILL.md declares no description');
+      // The value is a double-quoted YAML scalar: the sentence contains
+      // "complete: loading skeletons", and a bare colon inside a plain
+      // scalar makes the whole frontmatter unparsable, which it was until
+      // the quotes went on.
+      String declared = match!.group(1)!.trim();
+      if (declared.startsWith('"') && declared.endsWith('"')) {
+        declared = declared.substring(1, declared.length - 1);
+      }
+      expect(
+        _entry.description,
+        declared,
+        reason:
+            'the description is the text an agent harness matches on. A '
+            'paraphrase here describes a skill that does not exist.',
+      );
+    });
+
+    test('the workflow lists one line per step SKILL.md declares', () {
+      final String skill = File(
+        _rooted('skills/elattar-flutter-ui-director/SKILL.md'),
+      ).readAsStringSync();
+      final int start = skill.indexOf('## Workflow');
+      expect(start, greaterThanOrEqualTo(0));
+      final int end = skill.indexOf('\n## ', start + 1);
+      final String section = skill.substring(
+        start,
+        end < 0 ? skill.length : end,
+      );
+      final int steps = RegExp(
+        r'^\d+\. ',
+        multiLine: true,
+      ).allMatches(section).length;
+      expect(steps, greaterThan(1), reason: 'the step parse found nothing');
+      expect(
+        _entry.workflow.length,
+        steps,
+        reason:
+            'SKILL.md declares $steps steps and the catalog lists '
+            '${_entry.workflow.length}',
+      );
+    });
+
+    test('no retired API spelling survives in the catalog', () {
+      // The public names carry no prefix. `El*` in a user-facing string names
+      // an API that does not exist, and this catalog carried four of them.
+      final RegExp retired = RegExp(r'\bEl[A-Z*]');
+      final String source = File(
+        'lib/skills_docs/catalog.dart',
+      ).readAsStringSync();
+      expect(
+        retired.hasMatch(source),
+        isFalse,
+        reason: 'skills_docs/catalog.dart still names the retired prefix',
+      );
+    });
+
     test(
       'the catalog version and plugin name match .claude-plugin/plugin.json',
       () {

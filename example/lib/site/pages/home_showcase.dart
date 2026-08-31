@@ -1,4 +1,4 @@
-/// The home page's grid: live compositions built only from real `El*`
+/// The home page's grid: live compositions built only from real design-system
 /// components, no screenshots and no descriptions.
 ///
 /// Three of the six cards defined in this file started as three installable

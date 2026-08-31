@@ -1,5 +1,5 @@
 /// A live payout-threshold card: a currency select, a slider-driven amount,
-/// notes, and a save/reset footer, built only from real `El*` components.
+/// notes, and a save/reset footer, built only from real design-system components.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';

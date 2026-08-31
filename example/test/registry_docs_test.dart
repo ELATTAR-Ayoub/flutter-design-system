@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs_pages/registry_document.dart';
 import 'package:example/docs_pages/registry_page.dart';
 import 'package:flutter/material.dart'
@@ -440,8 +441,22 @@ void main() {
         find.byKey(const ValueKey<String>('registry-error')),
         findsOneWidget,
       );
-      expect(find.textContaining('It did not parse.'), findsWidgets);
       expect(find.widgetWithText(Button, 'Try again'), findsOneWidget);
+
+      // The parser's own sentence is a diagnostic. It must not be in the
+      // alert a public reader sees, and it must still be reachable.
+      expect(
+        find.textContaining('It did not parse.'),
+        findsNothing,
+        reason: 'a parser message is not error copy',
+      );
+      await tester.ensureVisible(find.byKey(DocsDisclosure.triggerKey));
+      await tester.pump();
+      await tester.tap(find.byKey(DocsDisclosure.triggerKey));
+      for (int frame = 0; frame < 8; frame++) {
+        await tester.pump(MotionDurations.open);
+      }
+      expect(find.textContaining('It did not parse.'), findsWidgets);
     });
 
     testWidgets('retry re-runs the loader and can succeed', (

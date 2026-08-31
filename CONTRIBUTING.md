@@ -26,10 +26,10 @@ Do not copy the skill into a personal agent configuration directory and edit it 
 
 ## Good first contribution areas
 
-- Fix a bug in a public `El*` API or its tests.
+- Fix a bug in a public API (`Button`, `Card`, `Icon`, `TextStyles`, `space`) or its tests.
 - Improve documentation or examples for the package.
 - Add verification coverage for an existing component or effect.
-- Improve the CLI (`packages/elattar_cli/`) or the registry (`registry/`, `tool/registry_builder/`). Both are published as of `0.0.1`, which raises the bar rather than lowering it: a change to either reaches installed projects, so extending their test coverage is as welcome as extending their behaviour.
+- Improve the CLI (`packages/elattar_cli/`) or the registry (`registry/`, `tool/registry_builder/`). The registry is published as of `0.0.1` and the CLI is installed straight from this repository, which raises the bar rather than lowering it: a change to either reaches installed projects, so extending their test coverage is as welcome as extending their behaviour.
 - Improve accessibility, keyboard handling, semantics, focus order, or reduced-motion behavior.
 
 ## Workflow
@@ -98,11 +98,39 @@ Please include:
 
 ## Design-system rules
 
-- Prefer public `El*` APIs over reaching into private internals.
+- Prefer the unprefixed public APIs the barrel exports over reaching into private internals. There is no `El*` prefix; a name starting with `El` is a retired spelling.
 - Keep new behavior token-driven and theme-aware.
 - Preserve accessibility semantics and keyboard behavior.
 - Match existing naming and placement conventions.
 - Avoid mixing unrelated refactors into the same pull request.
+
+## Release engineering
+
+Three mechanisms exist because this repository already made the mistake each
+one prevents. They belong here rather than in the changelog, which is for what
+a reader of the product needs to know.
+
+- **Line endings are pinned to LF** by `.gitattributes`. The generated
+  registry records a sha256 per distributed file computed from the working
+  tree, and with automatic translation enabled 51 of the 112 hashed files
+  differed per operating system, making every published hash correct on
+  exactly one platform.
+- **Release staging is a checked tool, not workflow shell.**
+  `tool/release_registry/` copies the generated registry into the site
+  artifact under `/registry/<version>/`, validates the staged copy rather than
+  the source, and refuses to republish different bytes under a published
+  version.
+- **Guards against the mistakes the release actually made.**
+  `test/license_distribution_test.dart` recomputes every provenance hash and
+  fails if a consumer could receive third-party source without its notice;
+  `example/test/public_claims_test.dart` fails if the site claims a shipped
+  component cannot be installed, or prints a command with a character missing;
+  `example/test/cli_docs_test.dart` holds the website's command surface to the
+  CLI's own usage; `packages/elattar_cli/test/version_identity_test.dart`
+  compares the places the version is stated against each other.
+
+A release tag must be cut from the same commit the registry and the site were
+built from. `v0.0.1` was not, and the changelog records the consequence.
 
 ## Third-party code and assets
 

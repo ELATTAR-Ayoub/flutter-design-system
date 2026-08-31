@@ -6,18 +6,17 @@ The first public release. Elattar becomes something a stranger can install.
 
 ### Distribution
 
-* **`elattar_cli` `0.0.1` is built and ready to publish, not yet on
-  pub.dev.** The code, tests and CI gates are complete and
-  `dart pub publish --dry-run` reports 0 warnings; the publish itself, the
-  release tag and the site deploy are the steps still ahead. Once published,
-  `dart install elattar_cli` puts an `elattar` command on your PATH; `elattar
-  init --foundation source` and `elattar add button` set up a Flutter project
-  without cloning anything. The CLI has one dependency.
-* **A hosted, version-pinned registry.** The CLI reads
-  `https://flutter.elattar.dev/registry/0.0.1/` by
-  default. That path is immutable: a change ships as a new version rather than
-  as a rewrite of a released one, so an installed `0.0.1` keeps installing the
-  same sources. `--registry` accepts any other directory or `http(s)` URL.
+* **A hosted, version-pinned registry, live at**
+  <https://flutter.elattar.dev/registry/0.0.1/>. That path is immutable: a
+  change ships as a new version rather than as a rewrite of a released one, so
+  an installed `0.0.1` keeps installing the same sources. `--registry` accepts
+  any other directory or `http(s)` URL.
+* **The documentation site is live** at <https://flutter.elattar.dev>.
+* **`elattar_cli` `0.0.1` on pub.dev.** `dart install elattar_cli` puts an
+  `elattar` command on your PATH; `elattar init --foundation source` and
+  `elattar add button` set up a Flutter project without cloning anything. The
+  CLI has one dependency, so it is a small resolve rather than a tree to
+  audit.
 * **Integrity before mutation.** Every manifest and payload is verified
   against its declared sha256, and the entire install is downloaded and
   checked before the first file is written. A dropped connection or a
@@ -26,8 +25,6 @@ The first public release. Elattar becomes something a stranger can install.
   cache directory (`ELATTAR_CACHE_DIR` overrides). `--offline` reads only that
   cache and distinguishes a cache miss from a network failure.
 * **`elattar add --all`** installs the complete registry in one command.
-* **The documentation site will be live** at
-  <https://flutter.elattar.dev>.
 
 ### Licensing and provenance
 
@@ -41,10 +38,10 @@ The first public release. Elattar becomes something a stranger can install.
   same file, so the icon generator now embeds the whole file rather than a
   transcription — and Redaction is dual OFL 1.1 / LGPL 2.1 per its publisher
   although the binary declares only the OFL.
-* **Notices travel with what they cover.** A new `@license/` registry target
+* **Notices travel with what they cover.** A `@license/` registry target
   installs them into the consumer's `LICENSES/` directory: Elattar's MIT
   always, the three font OFL notices with the foundation, lucide's with
-  `icon`, ElevenLabs UI's with `voice-orb`.
+  `icon`, ElevenLabs UI's with `voice-indicator`.
 * **`assets/textures/perlin-noise.png` was replaced.** It was a byte copy of a
   file whose original this repository could not name. It is now generated from
   a checked-in seed by `tool/generate_perlin_texture/`, matching the file it
@@ -53,34 +50,18 @@ The first public release. Elattar becomes something a stranger can install.
 
 ### Package
 
-* **The public API is `El*` throughout.** All maintained package, example,
-  registry, CLI, test, documentation and skill surfaces use the `El*` prefix
-  and the `space(...)` spacing helper. A hard rename with no compatibility
-  aliases, because `0.0.1` had not been published.
-* **The registry covers the full component surface**: 99 items — 84
-  components, 9 effects, 5 motion, 1 foundation — at schema v1.
+* **`v0.0.1` is cut at the commit the registry and the site were built from**,
+  so an item's `sourceLink` resolves to the source that item actually
+  distributes, and `ref: v0.0.1` on a git dependency is the released code.
+* **The public API carries no prefix.** The names are ordinary nouns:
+  `Button`, `Card`, `Icon`, `TextStyles`, and the `space(...)` spacing helper.
+  A hard rename with no compatibility aliases, because `0.0.1` had not been
+  published when it happened.
+* **The registry covers the full component surface**: 99 items at schema
+  v1, across 112 distributed source files. 97 components, one block, one foundation
+  bundle.
 * Foundation, components, effects, motion and the three font faces are
   described in the sections below; nothing about them changed at release.
-
-### Repository
-
-* **Line endings are normalised to LF.** The generated registry records a
-  sha256 per distributed file computed from the working tree, and with
-  automatic line-ending translation enabled 51 of the 112 files hashed
-  differently per operating system — making every published hash correct on
-  exactly one platform. `.gitattributes` now pins them.
-* **Release staging is a checked tool, not workflow shell.**
-  `tool/release_registry/` copies the generated registry into the site
-  artifact under `/registry/<version>/`, validates the staged copy rather than
-  the source, and refuses to republish different bytes under a published
-  version.
-* **Guards against the mistakes this release actually made.**
-  `test/license_distribution_test.dart` recomputes every provenance hash and
-  fails if a consumer could receive third-party source without its notice;
-  `example/test/public_claims_test.dart` fails if the site claims a shipped
-  component cannot be installed, or prints a command with a character missing;
-  `packages/elattar_cli/test/version_identity_test.dart` compares the six
-  places the version is stated against each other.
 
 ### Known limitations
 
@@ -174,9 +155,9 @@ running reference at 1440×900 in both themes.
   shell, the documentation system, per-component guide pages, and
   public-repository governance (README, CONTRIBUTING, CODE_OF_CONDUCT,
   SECURITY, issue templates, the CI and deploy workflows). At the time this
-  landed neither the CLI nor the registry had a public route, and as of this
-  writing neither does: `0.0.1` is prepared and gated, not published. The
-  release record above is the current truth.
+  landed neither the CLI nor the registry had a public route. Both the
+  registry and the site went live afterwards; the CLI has not. The release
+  record above is the current truth.
 
 * Shots (2026-08-23): a `shot` registry item kind installs multi-file,
   product-neutral application compositions into a consumer's `@app/`, with an

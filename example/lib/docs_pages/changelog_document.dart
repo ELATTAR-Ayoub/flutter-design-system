@@ -106,6 +106,7 @@ class ChangelogDocument {
     required this.title,
     required this.preamble,
     required this.releases,
+    this.postscript = const <ChangelogBlock>[],
   });
 
   /// The `# ` heading, if the file opens with one.
@@ -116,6 +117,17 @@ class ChangelogDocument {
 
   /// Releases in source order, which for a changelog is newest first.
   final List<ChangelogRelease> releases;
+
+  /// Blocks after the last release: a non-version `## ` section that returns
+  /// the document to its own scope, such as the port history this repository
+  /// keeps under "How this was built".
+  ///
+  /// Separate from [preamble] because of where each one renders. Everything
+  /// after the releases used to be folded back into [preamble], which put the
+  /// build log *above* the current release, so a reader opening the page met
+  /// several screens of history before the version they came for. The two
+  /// lists are the same shape and mean opposite things about ordering.
+  final List<ChangelogBlock> postscript;
 }
 
 /// Reads the document. Injected so widget tests never touch a bundle.
@@ -144,10 +156,22 @@ ChangelogDocument parseChangelog(String source) {
   String title = '';
   final List<ChangelogBlock> preamble = <ChangelogBlock>[];
   final List<ChangelogRelease> releases = <ChangelogRelease>[];
+  final List<ChangelogBlock> postscript = <ChangelogBlock>[];
 
   List<ChangelogBlock> current = preamble;
   String? currentVersion;
   final List<String> paragraph = <String>[];
+
+  /// The bullet being read, and its nesting level.
+  ///
+  /// A changelog wraps its prose, so most bullets span several source lines
+  /// and only the first of them starts with a marker. Without this the
+  /// continuation lines fell through to the paragraph branch and rendered as
+  /// an unindented paragraph *beside* the bullet, which is how nearly every
+  /// multi-line entry on the page came out: one indented line, then the rest
+  /// of the sentence back at the margin.
+  final List<String> bulletLines = <String>[];
+  int bulletIndent = 0;
 
   void flushParagraph() {
     if (paragraph.isEmpty) return;
@@ -160,8 +184,26 @@ ChangelogDocument parseChangelog(String source) {
     paragraph.clear();
   }
 
-  void closeRelease() {
+  void flushBullet() {
+    if (bulletLines.isEmpty) return;
+    current.add(
+      ChangelogBlock(
+        kind: ChangelogBlockKind.bullet,
+        spans: parseInline(bulletLines.join(' ')),
+        indent: bulletIndent,
+      ),
+    );
+    bulletLines.clear();
+  }
+
+  /// Every point that ends a block ends both kinds of block.
+  void flushBlock() {
+    flushBullet();
     flushParagraph();
+  }
+
+  void closeRelease() {
+    flushBlock();
     if (currentVersion case final String version) {
       releases.add(
         ChangelogRelease(
@@ -178,7 +220,7 @@ ChangelogDocument parseChangelog(String source) {
 
     // ── fenced code ──────────────────────────────────────────────────────
     if (line.trimLeft().startsWith('```')) {
-      flushParagraph();
+      flushBlock();
       final List<String> body = <String>[];
       int j = i + 1;
       while (j < lines.length && !lines[j].trimLeft().startsWith('```')) {
@@ -198,7 +240,7 @@ ChangelogDocument parseChangelog(String source) {
     }
 
     if (line.trim().isEmpty) {
-      flushParagraph();
+      flushBlock();
       continue;
     }
 
@@ -207,14 +249,14 @@ ChangelogDocument parseChangelog(String source) {
     // dropping it loses no release information. Named here so it is a
     // decision rather than an omission.
     if (RegExp(r'^\s*(-{3,}|\*{3,}|_{3,})\s*$').hasMatch(line)) {
-      flushParagraph();
+      flushBlock();
       continue;
     }
 
     // ── headings ─────────────────────────────────────────────────────────
     final RegExpMatch? heading = RegExp(r'^(#{1,6})\s+(.*)$').firstMatch(line);
     if (heading != null) {
-      flushParagraph();
+      flushBlock();
       final int level = heading.group(1)!.length;
       final String text = heading.group(2)!.trim();
       if (level == 1) {
@@ -233,11 +275,13 @@ ChangelogDocument parseChangelog(String source) {
           continue;
         }
         // A non-version level-two heading after the releases have started
-        // closes the last one and returns to document scope.
+        // closes the last one and returns to document scope: the postscript,
+        // never the preamble, so it renders after the releases rather than
+        // in front of them.
         if (currentVersion != null) {
           closeRelease();
           currentVersion = null;
-          current = preamble;
+          current = postscript;
         }
       }
       current.add(
@@ -253,16 +297,11 @@ ChangelogDocument parseChangelog(String source) {
     // ── bullets ──────────────────────────────────────────────────────────
     final RegExpMatch? bullet = RegExp(r'^(\s*)[-*+]\s+(.*)$').firstMatch(line);
     if (bullet != null) {
-      flushParagraph();
+      flushBlock();
       final int spaces = bullet.group(1)!.length;
-      current.add(
-        ChangelogBlock(
-          kind: ChangelogBlockKind.bullet,
-          spans: parseInline(bullet.group(2)!.trim()),
-          // Two spaces per level, which is what this changelog uses.
-          indent: spaces ~/ 2,
-        ),
-      );
+      // Two spaces per level, which is what this changelog uses.
+      bulletIndent = spaces ~/ 2;
+      bulletLines.add(bullet.group(2)!.trim());
       continue;
     }
 
@@ -273,7 +312,11 @@ ChangelogDocument parseChangelog(String source) {
       // distinct quote style is presentation this page does not need — but
       // the *text* must not be dropped, which is why this is handled rather
       // than ignored.
-      paragraph.add(quote.group(1)!.trim());
+      if (bulletLines.isNotEmpty) {
+        bulletLines.add(quote.group(1)!.trim());
+      } else {
+        paragraph.add(quote.group(1)!.trim());
+      }
       continue;
     }
 
@@ -302,8 +345,13 @@ ChangelogDocument parseChangelog(String source) {
       );
     }
 
-    // A continuation of the paragraph in progress. A changelog wraps its
-    // prose, so this is the common case, not the fallback.
+    // A continuation of the block in progress. A changelog wraps its prose,
+    // so this is the common case rather than the fallback, and the block in
+    // progress is a bullet at least as often as it is a paragraph.
+    if (bulletLines.isNotEmpty) {
+      bulletLines.add(line.trim());
+      continue;
+    }
     paragraph.add(line.trim());
   }
 
@@ -320,6 +368,7 @@ ChangelogDocument parseChangelog(String source) {
     title: title,
     preamble: List<ChangelogBlock>.unmodifiable(preamble),
     releases: List<ChangelogRelease>.unmodifiable(releases),
+    postscript: List<ChangelogBlock>.unmodifiable(postscript),
   );
 }
 

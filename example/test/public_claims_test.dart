@@ -17,6 +17,7 @@ library;
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:example/docs_pages/release_facts.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// `flutter test` runs with `example/` as the working directory.
@@ -176,15 +177,84 @@ void main() {
       expect(offenders, isEmpty);
     });
 
-    test('the retired type prefix appears nowhere in the site', () {
-      // The rename to `El*` completed in code, and the guard that protects it
-      // reads four hand-listed files. This is the site's half.
-      final RegExp retired = RegExp(r'\bDs[A-Z*]');
+    test('no retired type prefix appears anywhere in the site', () {
+      // Two renames have passed through this repository, and the site was
+      // the slowest surface to follow each one. `Ds*` went first; `El*` went
+      // second and was still in the introduction page, the skills catalog
+      // and five home cards long after the code had stopped using it. Both
+      // spellings are matched.
+      //
+      // Case-sensitive, and anchored on a capital or a `*` after the two
+      // letters: `Elattar`, `ElevenLabs` and `Dashboard` are ordinary words
+      // and must not be flagged, while `ElButton` and the prose `El*` must
+      // be. Only `lib/` is scanned, so this file is not part of the corpus
+      // whose vocabulary it forbids.
+      final RegExp retired = RegExp(r'\b(?:Ds|El)[A-Z*]');
+      final List<String> offenders = <String>[];
       for (final File file in _dartSources('lib')) {
+        for (final RegExpMatch match in retired.allMatches(
+          file.readAsStringSync(),
+        )) {
+          offenders.add('${file.path}: "${match.group(0)}"');
+        }
+      }
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'the public API carries no prefix. It is Button, Card, Icon, '
+            'TextStyles, space, and a page that says otherwise names an API '
+            'a reader cannot import',
+      );
+    });
+
+    test('no page says the CLI is unpublished once it is published', () {
+      // The site is deployed after the CLI is published, so a build that
+      // still apologises for an unpublished package is describing the
+      // previous release candidate. `release_facts.dart` holds the answer and
+      // `release_facts_test.dart` holds that file to its owners; this is the
+      // prose half.
+      const List<String> stale = <String>[
+        'not on pub.dev yet',
+        'not yet on pub.dev',
+        'is built and gated but not published',
+        'does not resolve today',
+        'until it publishes',
+      ];
+      final List<String> offenders = <String>[];
+      for (final File file in _dartSources('lib')) {
+        final String text = file.readAsStringSync();
+        for (final String phrase in stale) {
+          if (text.contains(phrase)) offenders.add('${file.path}: "$phrase"');
+        }
+      }
+
+      if (releaseFacts.cliOnPubDev) {
         expect(
-          retired.hasMatch(file.readAsStringSync()),
-          isFalse,
-          reason: '${file.path} still names the retired type prefix',
+          offenders,
+          isEmpty,
+          reason:
+              'releaseFacts.cliOnPubDev is true, so the package resolves and '
+              'no page may tell a reader otherwise',
+        );
+      } else {
+        // The mirror image, kept live rather than deleted: while the package
+        // is unpublished a page must not render the command as a copyable
+        // line, because the reader who copies it gets a resolution failure
+        // with no way to tell it apart from a broken setup of their own. The
+        // shape matched is a whole Dart string literal, a snippet's own
+        // `code:` value, never a mention inside a sentence.
+        final RegExp copyable = RegExp(r"'dart install elattar_cli(?:\\n)?'");
+        final List<String> copied = <String>[
+          for (final File file in _dartSources('lib'))
+            if (copyable.hasMatch(file.readAsStringSync())) file.path,
+        ];
+        expect(
+          copied,
+          isEmpty,
+          reason:
+              'releaseFacts.cliOnPubDev is false: present the pub.dev '
+              'spelling in prose, never as a command to copy',
         );
       }
     });

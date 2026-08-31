@@ -290,6 +290,173 @@ void main() {
     });
   });
 
+  group('the full type scale comes first, and is the whole scale', () {
+    /// Every line of the preview, in the order they were laid out.
+    Finder previewLines() => find.byWidgetPredicate((Widget widget) {
+      final Key? key = widget.key;
+      return key is ValueKey<String> &&
+          key.value.startsWith('typeset-preview-');
+    });
+
+    testWidgets('it renders one line per role and no more', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(host(const TypesetDocsPage()));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey<String>('typeset-full-scale')),
+        findsOneWidget,
+      );
+      for (final TypesetRole role in typesetRoles) {
+        expect(
+          find.byKey(ValueKey<String>('typeset-preview-${role.name}')),
+          findsOneWidget,
+          reason: '${role.name} is missing from the full scale',
+        );
+      }
+      // Counted, not just spot-checked: a preview that quietly grew a
+      // twenty-eighth line, or listed one role twice, would pass every
+      // per-role lookup above.
+      expect(
+        previewLines().evaluate().length,
+        TextStyles.all.length,
+        reason:
+            'the preview must show TextStyles.all exactly once, through the '
+            'catalog',
+      );
+    });
+
+    testWidgets('the lines run in catalog order', (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(host(const TypesetDocsPage()));
+      await tester.pumpAndSettle();
+
+      double previous = double.negativeInfinity;
+      for (final TypesetRole role in typesetRoles) {
+        final double top = tester
+            .getTopLeft(
+              find.byKey(ValueKey<String>('typeset-preview-${role.name}')),
+            )
+            .dy;
+        expect(
+          top,
+          greaterThan(previous),
+          reason: '${role.name} is out of catalog order in the preview',
+        );
+        previous = top;
+      }
+    });
+
+    testWidgets('the whole preview sits above the first role reference', (
+      WidgetTester tester,
+    ) async {
+      // The preview is the comparison surface; the reference blocks are what
+      // a reader drops into after choosing. Reversed, the page opens with
+      // twenty-seven API blocks and buries the thing it exists to show.
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(host(const TypesetDocsPage()));
+      await tester.pumpAndSettle();
+
+      final double lastPreview = tester
+          .getTopLeft(
+            find.byKey(
+              ValueKey<String>('typeset-preview-${typesetRoles.last.name}'),
+            ),
+          )
+          .dy;
+      final double firstReference = tester
+          .getTopLeft(
+            find.byKey(
+              ValueKey<String>('typeset-role-${typesetRoles.first.name}'),
+            ),
+          )
+          .dy;
+      expect(lastPreview, lessThan(firstReference));
+    });
+
+    testWidgets('the fluid roles are sized in the preview too', (
+      WidgetTester tester,
+    ) async {
+      // display, h1 and accent carry no intrinsic size, and the preview is
+      // the one place they are shown without an accompanying size rule to
+      // explain a fallback.
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(host(const TypesetDocsPage()));
+      await tester.pumpAndSettle();
+
+      for (final TypesetRole role in typesetRoles) {
+        if (role.spec.size != null) continue;
+        final Finder line = find.byKey(
+          ValueKey<String>('typeset-preview-${role.name}'),
+        );
+        final StyledText specimen = tester.widget<StyledText>(
+          find.descendant(
+            of: line,
+            matching: find.byWidgetPredicate(
+              (Widget widget) =>
+                  widget is StyledText && identical(widget.spec, role.spec),
+            ),
+          ),
+        );
+        expect(
+          specimen.fontSize,
+          isNotNull,
+          reason: '${role.name} is rendered without a resolved size',
+        );
+        expect(specimen.text, role.sample);
+      }
+    });
+
+    for (final ColorMode mode in <ColorMode>[ColorMode.dark, ColorMode.light]) {
+      for (final Size size in <Size>[
+        const Size(390, 844),
+        const Size(1440, 900),
+      ]) {
+        testWidgets(
+          'no overflow at ${size.width.toInt()}px, 200% text, ${mode.name}',
+          (WidgetTester tester) async {
+            tester.view.physicalSize = size;
+            tester.view.devicePixelRatio = 1;
+            addTearDown(tester.view.reset);
+
+            await tester.pumpWidget(
+              host(
+                const TypesetDocsPage(),
+                size: size,
+                mode: mode,
+                textScale: 2,
+              ),
+            );
+            await tester.pumpAndSettle();
+
+            expect(tester.takeException(), isNull);
+            for (final TypesetRole role in typesetRoles) {
+              expect(
+                find.byKey(ValueKey<String>('typeset-preview-${role.name}')),
+                findsOneWidget,
+                reason: '${role.name} disappeared from the preview',
+              );
+            }
+          },
+        );
+      }
+    }
+  });
+
   group('the page holds up under real conditions', () {
     testWidgets('narrow: no overflow, every role still present', (
       WidgetTester tester,

@@ -12,6 +12,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs_pages/changelog_document.dart';
 import 'package:example/docs_pages/changelog_page.dart';
 import 'package:flutter/material.dart'
@@ -82,6 +83,105 @@ void main() {
       expect(
         realChangelog().releases.map((ChangelogRelease r) => r.version),
         contains('0.0.1'),
+      );
+    });
+
+    test('a wrapped bullet is one bullet, not a bullet and a paragraph', () {
+      // Every multi-line entry used to render as an indented first line
+      // followed by the rest of the sentence back at the page margin,
+      // because only the marker line matched the bullet branch and the
+      // continuations fell through to the paragraph one.
+      final ChangelogDocument document = parseChangelog(
+        '# Changelog\n'
+        '\n'
+        '## 0.0.1\n'
+        '\n'
+        '* **A hosted registry.** The path is immutable, so a change ships\n'
+        '  as a new version rather than as a rewrite of a released one.\n'
+        '* A second entry.\n',
+      );
+
+      final List<ChangelogBlock> blocks = document.releases.single.blocks;
+      expect(
+        blocks.map((ChangelogBlock b) => b.kind),
+        <ChangelogBlockKind>[
+          ChangelogBlockKind.bullet,
+          ChangelogBlockKind.bullet,
+        ],
+        reason: 'the wrapped line must join its bullet, not become a block',
+      );
+      final String joined = blocks.first.spans
+          .map((ChangelogSpan s) => s.text)
+          .join();
+      expect(joined, contains('immutable, so a change ships as a new version'));
+    });
+
+    test('every bullet in the real file keeps its whole sentence', () {
+      // Counted against the source: one block per marker line, and nothing
+      // orphaned into a paragraph beside it.
+      final int markers = RegExp(
+        r'^\s*[-*+]\s+',
+        multiLine: true,
+      ).allMatches(realChangelogSource()).length;
+      final int rendered = <ChangelogBlock>[
+        ...realChangelog().preamble,
+        ...realChangelog().postscript,
+        for (final ChangelogRelease release in realChangelog().releases)
+          ...release.blocks,
+      ].where((ChangelogBlock b) => b.kind == ChangelogBlockKind.bullet).length;
+      expect(rendered, markers);
+      expect(markers, greaterThan(10));
+    });
+
+    test('the port history is a postscript, not a preamble', () {
+      // It used to be a preamble, which is where a non-version `## ` section
+      // landed once the releases had started. The page renders the preamble
+      // first, so several screens of build log stood between a reader and
+      // the release they opened the page for.
+      final ChangelogDocument document = realChangelog();
+      expect(
+        document.postscript,
+        isNotEmpty,
+        reason:
+            'CHANGELOG.md keeps a "How this was built" section; it belongs '
+            'after the releases',
+      );
+      expect(
+        document.preamble.length,
+        lessThan(document.postscript.length),
+        reason:
+            'the preamble is the one line under the title, not the whole '
+            'port history',
+      );
+    });
+
+    testWidgets('the release renders above the port history', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 20000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        host(ChangelogDocsPage(loader: () async => realChangelog())),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 32));
+
+      final double release = tester
+          .getTopLeft(
+            find.byKey(const ValueKey<String>('changelog-release-0.0.1')),
+          )
+          .dy;
+      final double history = tester
+          .getTopLeft(
+            find.byKey(const ValueKey<String>('changelog-doc-postscript')),
+          )
+          .dy;
+      expect(
+        release,
+        lessThan(history),
+        reason: 'the current release must come first on a changelog',
       );
     });
 
@@ -430,11 +530,27 @@ void main() {
         find.byKey(const ValueKey<String>('changelog-error')),
         findsOneWidget,
       );
-      expect(find.textContaining('is a table'), findsWidgets);
       expect(find.widgetWithText(Button, 'Try again'), findsOneWidget);
       // Stated in words and marked with an icon, not signalled by colour.
       expect(find.textContaining('could not be read'), findsWidgets);
       expect(find.byType(Icon), findsWidgets);
+
+      // The parser's sentence names a file and a line. A public reader can
+      // do nothing with either, and reads them as their own mistake, so it
+      // belongs behind the disclosure, not in the alert.
+      expect(
+        find.textContaining('is a table'),
+        findsNothing,
+        reason: 'a parser message is not error copy',
+      );
+      expect(find.textContaining('CHANGELOG.md line'), findsNothing);
+      await tester.ensureVisible(find.byKey(DocsDisclosure.triggerKey));
+      await tester.pump();
+      await tester.tap(find.byKey(DocsDisclosure.triggerKey));
+      for (int frame = 0; frame < 8; frame++) {
+        await tester.pump(MotionDurations.open);
+      }
+      expect(find.textContaining('is a table'), findsWidgets);
     });
 
     testWidgets('retry re-runs the loader', (WidgetTester tester) async {

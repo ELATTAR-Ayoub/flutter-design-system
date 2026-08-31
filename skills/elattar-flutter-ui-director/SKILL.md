@@ -1,6 +1,6 @@
 ---
 name: elattar-flutter-ui-director
-description: Direct production Flutter UI with Elattar's design system, in the design-system repository itself or in a consumer app that installed it with the elattar CLI. Use when designing, implementing, reviewing, or documenting Flutter screens, pages, sections, flows, dashboards, forms, mobile navigation, or component specimens that must be complete: loading skeletons, empty and no-results states, human error copy with a next step, success and undo feedback, keyboard and screen-reader access, responsive structure, and both themes, all built from the local design-system APIs and token source of truth.
+description: "Direct production Flutter UI with Elattar's design system, in the design-system repository itself or in a consumer app that installed it with the elattar CLI. Use when designing, implementing, reviewing, or documenting Flutter screens, pages, sections, flows, dashboards, forms, mobile navigation, or component specimens that must be complete: loading skeletons, empty and no-results states, human error copy with a next step, success and undo feedback, keyboard and screen-reader access, responsive structure, and both themes, all built from the local design-system APIs and token source of truth."
 ---
 
 # Elattar Flutter UI Director

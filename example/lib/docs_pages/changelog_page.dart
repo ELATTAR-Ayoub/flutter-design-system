@@ -25,6 +25,7 @@ import 'package:flutter/widgets.dart'
         Table,
         TableColumnWidth;
 
+import '../docs/docs_disclosure.dart';
 import '../docs/docs_layout.dart';
 import '../docs/docs_section.dart';
 import '../docs/docs_snippet.dart';
@@ -150,6 +151,22 @@ class _Document extends StatelessWidget {
           id: _anchorFor(release.version),
           title: release.version,
           child: _Blocks(blocks: release.blocks, onOpenLink: onOpenLink),
+        ),
+      // After the releases, and behind a rule. Whatever the document keeps
+      // outside its version sections is history: it must not stand between
+      // a reader and the release they opened the page for.
+      if (document.postscript.isNotEmpty)
+        Padding(
+          key: const ValueKey<String>('changelog-doc-postscript'),
+          padding: EdgeInsets.only(top: space(6)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const Separator(),
+              SizedBox(height: space(6)),
+              _Blocks(blocks: document.postscript, onOpenLink: onOpenLink),
+            ],
+          ),
         ),
     ],
   );
@@ -426,18 +443,32 @@ class _Failed extends StatelessWidget {
     key: const ValueKey<String>('changelog-error'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      Alert(
+      // A public reader is not the person who can fix a malformed release
+      // note, and a parser sentence naming a file and a line number reads to
+      // them as their own error. So the alert says what happened and what to
+      // do, and the diagnostic sits behind a disclosure for whoever can act
+      // on it.
+      const Alert(
         variant: AlertVariant.destructive,
-        icon: const Icon(IconGlyph.circleX),
+        icon: Icon(IconGlyph.circleX),
         title: 'The changelog could not be read',
-        description: error is ChangelogDocumentException
-            ? '$error'
-            : 'CHANGELOG.md could not be rendered: $error',
+        description:
+            'Nothing is missing from the product, only from this page. Try '
+            'again, and the release notes are also on the repository if this '
+            'keeps failing.',
       ),
       SizedBox(height: space(4)),
       Align(
         alignment: Alignment.centerLeft,
         child: Button(onPressed: onRetry, child: const Text('Try again')),
+      ),
+      SizedBox(height: space(4)),
+      DocsDisclosure(
+        title: 'Technical detail',
+        // The raw message is the point here: this is the diagnostic
+        // disclosure, not the copy. The alert above it carries what
+        // happened and what to do.
+        child: StyledText('$error', TextStyles.small), // ui-check: ignore
       ),
     ],
   );

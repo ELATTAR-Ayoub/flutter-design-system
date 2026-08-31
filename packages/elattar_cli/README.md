@@ -30,6 +30,15 @@ dart pub global activate elattar_cli
 
 Both put an `elattar` executable on your PATH.
 
+To compile the CLI from the repository instead, taking the default branch
+rather than the released version, which is what a contributor wants:
+
+```bash
+dart pub global activate --source git \
+  https://github.com/ELATTAR-Ayoub/flutter-design-system.git \
+  --git-path packages/elattar_cli
+```
+
 ### `elattar: command not found`
 
 The executable landed in pub's bin directory, which is not on your PATH yet.

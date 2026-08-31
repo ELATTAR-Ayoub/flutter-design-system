@@ -23,11 +23,10 @@ elattar add button
 
 | | |
 | --- | --- |
-| CLI | `elattar_cli` `0.0.1` — code, tests and CI gates complete (`dart pub publish --dry-run` reports 0 warnings); not yet published to pub.dev |
-| Registry | 99 items — 84 components, 9 effects, 5 motion, 1 foundation — schema v1 |
-| Documentation | <https://flutter.elattar.dev> |
+| CLI | `elattar_cli` `0.0.1` on pub.dev: `dart install elattar_cli`; see [Quickstart](#quickstart) |
+| Registry | Live at <https://flutter.elattar.dev/registry/0.0.1/>: 99 items (97 components, 1 block, 1 foundation), schema v1, 112 distributed source files |
+| Documentation | Live at <https://flutter.elattar.dev> |
 | License | MIT for Elattar's own work; see [License](#license) |
-| Tests | 1510 package, 795 example, 118 CLI, 45 tooling |
 
 The root `elattar_design_system` package is **not** on pub.dev, and that is
 the design rather than a gap: source installation through the CLI is the
@@ -40,6 +39,11 @@ consumed directly from Git when you want the dependency model instead — see
 ```bash
 dart install elattar_cli
 ```
+
+On an older SDK, or if you prefer the long spelling, `dart pub global activate
+elattar_cli` does the same thing. To compile the CLI from this repository
+instead of taking the released version, see the
+[CLI package README](packages/elattar_cli/README.md).
 
 Then, from inside a Flutter project:
 
@@ -139,7 +143,9 @@ dependencies:
       ref: v0.0.1
 ```
 
-A `path:` dependency works the same way, and is what this repository's own
+`ref:` pins the release tag, which is cut at the same commit the registry and
+the site were built from. Drop it to track the default branch. A `path:`
+dependency works the same way, and is what this repository's own
 `example/pubspec.yaml` uses.
 
 ## Agent skill
@@ -147,7 +153,7 @@ A `path:` dependency works the same way, and is what this repository's own
 This repository carries a coding-agent skill,
 [`elattar-flutter-ui-director`](skills/elattar-flutter-ui-director/SKILL.md),
 that teaches an agent to build Flutter UI from this design system: inventory
-the public `El*` APIs before inventing a widget, resolve every visual value
+the real public APIs before inventing a widget, resolve every visual value
 from foundation tokens, cover loading/empty/error/success and accessibility
 states, respect responsive contracts, and run the right verification ladder.
 
