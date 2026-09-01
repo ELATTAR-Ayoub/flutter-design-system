@@ -179,8 +179,9 @@ void main() {
     if (!directory.existsSync()) continue;
     for (final entity in _sourceFiles(directory)) {
       final path = entity.path.replaceAll('\\', '/');
-      if (path.endsWith('tool/migration/apply_semantic_member_renames.dart'))
+      if (path.endsWith('tool/migration/apply_semantic_member_renames.dart')) {
         continue;
+      }
       if (path.endsWith('lib/src/components/ui/glass.dart')) continue;
       if (!const <String>{
         '.dart',
@@ -188,8 +189,9 @@ void main() {
         '.json',
         '.yaml',
         '.yml',
-      }.contains(_extension(entity.path)))
+      }.contains(_extension(entity.path))) {
         continue;
+      }
       var text = entity.readAsStringSync();
       final before = text;
       for (final entry in replacements.entries) {

@@ -1,7 +1,8 @@
-/// Motion tokens — a transcript of the reference's timing layer.
+/// Motion tokens owned by the Flutter design system.
 ///
-/// Source of truth: `design-system/app/globals.css` L395–432.
-/// This file is inside `lib/src/design_system/foundation/`, the one place literals live.
+/// This Flutter foundation file is the source of truth and the one place
+/// motion literals live. Historical stylesheet and library references below
+/// explain provenance only.
 library;
 
 import 'package:flutter/animation.dart';
@@ -137,7 +138,7 @@ class MotionDurations {
   /// **16.8 ms per √px**, one frame, so the port computes
   /// `frame × sqrt(distancePx)` rather than pinning either measurement.
   ///
-  /// The shape runs on [MotionCurves.cssEase]; see
+  /// The shape runs on [MotionCurves.balanced]; see
   /// `MessageScrollerController.scrollToEnd` for the residual that fit
   /// leaves.
   static const Duration frame = Duration(microseconds: 16667);
@@ -460,7 +461,8 @@ class MotionCurves {
 
   /// CSS's own `linear` — `cubic-bezier(0, 0, 1, 1)`, i.e. no easing at all.
   ///
-  /// **Not one of the system's easings and not on [all]**, on [cssEase]'s
+  /// **Not one of the primary system easings and not on [all]**, on
+  /// [balanced]'s
   /// precedent: `globals.css` declares no `--ease-linear`, so `ease-linear` is
   /// Tailwind's own utility emitting the CSS keyword.
   ///
@@ -496,28 +498,29 @@ class MotionCurves {
   /// through a real toast entrance (1440 × 900, dark, 2026-08-16): opacity read
   /// 0.314 at 20.3% of the 400ms window, 0.645 at 38.3% and 0.9445 at 69.6% —
   /// which is this curve to within the sampler's own frame slop, and is not
-  /// [standard], [out] or [inOut] at any of the three.
+  /// [standard], [enter] or [move] at any of the three.
   ///
   /// Sonner's swipe-out is the one leg that names an easing, and it names
   /// `ease-out` — CSS's `cubic-bezier(0, 0, 0.58, 1)`, which is a *fourth*
-  /// stock curve and not this system's [out]. See [cssEaseOut].
-  static const Cubic cssEase = Cubic(0.25, 0.1, 0.25, 1);
+  /// stock curve and not this system's [enter]. See [decelerate].
+  static const Cubic balanced = Cubic(0.25, 0.1, 0.25, 1);
 
   /// CSS's own `ease-out` — `cubic-bezier(0, 0, 0.58, 1)`.
   ///
-  /// The companion to [cssEase], and here for the same one reason: sonner's
+  /// The companion to [balanced], preserving the measured deceleration used
+  /// by swipe exits.
   /// `swipe-out-*` keyframes run `200ms ease-out forwards` (`styles.css`
   /// L356–358), and that `ease-out` is the CSS keyword, not `--ease-out`.
   /// Measured on a live downward swipe: transform and opacity both read 95.5%
   /// of their travel at 77.5% of the 200ms window, which is this curve and is
-  /// visibly not [out] `(0.22, 1, 0.36, 1)` — that one is 99.7% done by the
+  /// visibly not [enter] `(0.22, 1, 0.36, 1)` — that one is 99.7% done by the
   /// same instant.
-  static const Cubic cssEaseOut = Cubic(0, 0, 0.58, 1);
+  static const Cubic decelerate = Cubic(0, 0, 0.58, 1);
 
   /// CSS's own `ease-in-out` — `cubic-bezier(0.42, 0, 0.58, 1)`.
   ///
-  /// The third stock keyword, and here for the same reason as [cssEase] and
-  /// [cssEaseOut]: `shadcn/tailwind.css`'s `scroll-fade-*` utilities write
+  /// A symmetric measured curve, retained for scroll-fade geometry where the
+  /// system's primary [move] curve would materially change the reveal.
   /// `animation: 1ms ease-in-out scroll-fade-reveal-b` and name the keyword,
   /// not `--ease-in-out`. The two are far apart — this one is much lazier in
   /// the middle — and the mask geometry is where it shows.
@@ -525,19 +528,19 @@ class MotionCurves {
   /// Measured on the chat page's message scroller (`ba2-chat-scroll.js`,
   /// 1440×900, 2026-08-16): with the reveal 58.33% through its 96px range the
   /// mask's remaining fade read **0.3588** of full, and `1 - Y(0.5833)` on
-  /// this curve is 0.3563; the system's own [inOut] `(0.65, 0, 0.35, 1)` would
+  /// this curve is 0.3563; the system's own [move] `(0.65, 0, 0.35, 1)` would
   /// give 0.284 at the same point. Two more samples (75% → 0.1292, 87.5% →
   /// 0.0561) agree to within the sampler's slop.
-  static const Cubic cssEaseInOut = Cubic(0.42, 0, 0.58, 1);
+  static const Cubic symmetric = Cubic(0.42, 0, 0.58, 1);
 
   /// **vaul**'s own easing — `cubic-bezier(0.32, 0.72, 0, 1)`.
   ///
   /// Read off the live drawer's computed `animation-timing-function`
-  /// (2026-08-16). A fifth curve in the system and, like [cssEase] and
-  /// [cssEaseOut], one this design system did not choose: it arrives with the
+  /// (2026-08-16). A fifth curve in the system and, like [balanced] and
+  /// [decelerate], a compatibility curve retained from measured behavior.
   /// library, applies to `fadeIn` and `slideFromBottom` alike, and is much
-  /// flatter at the start than [out] — 50% of the travel is still 130ms away
-  /// at 500ms total, where [out] would be past 90%.
+  /// flatter at the start than [enter] — 50% of the travel is still 130ms away
+  /// at 500ms total, where [enter] would be past 90%.
   static const Cubic vaul = Cubic(0.32, 0.72, 0, 1);
 
   /// All seven easings, in the order globals.css **declares** them:

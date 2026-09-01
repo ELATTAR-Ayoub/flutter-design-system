@@ -46,7 +46,7 @@
 ///    `translateY(100%)` (of its own box) and `opacity: 0`, and one frame later
 ///    `data-mounted="true"` flips it to `translateY(0)` / `opacity: 1`. The
 ///    transition it rides is `transform, opacity, height` over the slow window
-///    on [MotionCurves.cssEase]. Sonner's own comment: *"Trigger enter animation
+///    on [MotionCurves.balanced]. Sonner's own comment: *"Trigger enter animation
 ///    without using CSS animation."*
 ///  * **The collapsed stack.** Only the front toast is legible. Every toast
 ///    behind it is translated by the gap times its index, scaled `1 − 0.05n`,
@@ -79,7 +79,7 @@
 ///    corner's own two directions is 1:1; against them it is dampened by
 ///    `1 / (1.5 + |delta| / 20)`. Released past the threshold the toast
 ///    animates out by a further 100% on the swiped axis over the short window
-///    on [MotionCurves.cssEaseOut] — the one leg that names its easing. Released
+///    on [MotionCurves.decelerate] — the one leg that names its easing. Released
 ///    short, it **snaps** back: `transition: none` is still in force.
 ///  * **Hover-pause is resume-from-remainder, not restart.** `pauseTimer`
 ///    subtracts the elapsed time and stores what is left. Measured: a toast
@@ -1133,9 +1133,9 @@ class _ToasterState extends State<Toaster>
       double scale;
       double opacity = 1;
       Duration transformDuration = _transition;
-      Curve transformCurve = MotionCurves.cssEase;
+      Curve transformCurve = MotionCurves.balanced;
       Duration opacityDuration = _transition;
-      Curve opacityCurve = MotionCurves.cssEase;
+      Curve opacityCurve = MotionCurves.balanced;
 
       if (blanked) {
         // `--y: translateY(--lift-amount * --toasts-before) scale(1 - 0.05n)`.
@@ -1157,9 +1157,9 @@ class _ToasterState extends State<Toaster>
           // of them carries `[data-swipe-out=false]`. `--y` reverts to the
           // resting value and the keyframes ride on top of it.
           transformDuration = _swipeOutDuration;
-          transformCurve = MotionCurves.cssEaseOut;
+          transformCurve = MotionCurves.decelerate;
           opacityDuration = _swipeOutDuration;
-          opacityCurve = MotionCurves.cssEaseOut;
+          opacityCurve = MotionCurves.decelerate;
         } else if (isFront) {
           // `--y: translateY(--lift * -100%)` — out the way it came.
           fraction = -lift;
@@ -1238,7 +1238,7 @@ class _ToasterState extends State<Toaster>
     _extent.retarget(
       <double>[math.max(extent, 0)],
       effectiveMotionDuration(context, _transition),
-      MotionCurves.cssEase,
+      MotionCurves.balanced,
     );
 
     // Give this widget a full-size slot — `Positioned.fill` inside the shell's
@@ -1331,7 +1331,7 @@ class _Track {
   final AnimationController c;
   final List<double> _from;
   final List<double> _to;
-  Curve _curve = MotionCurves.cssEase;
+  Curve _curve = MotionCurves.balanced;
   bool _seeded = false;
 
   double at(int i) {
@@ -1544,13 +1544,13 @@ class _ToastSlotState extends State<_ToastSlot> with TickerProviderStateMixin {
       _height.retarget(
         <double>[c.height],
         effectiveMotionDuration(context, _transition),
-        MotionCurves.cssEase,
+        MotionCurves.balanced,
       );
     }
     _contentOpacity.retarget(
       <double>[c.contentOpacity],
       effectiveMotionDuration(context, _transition),
-      MotionCurves.cssEase,
+      MotionCurves.balanced,
     );
     _opacity.retarget(<double>[c.opacity], c.opacityDuration, c.opacityCurve);
   }
@@ -1630,11 +1630,11 @@ class _ToastSlotState extends State<_ToastSlot> with TickerProviderStateMixin {
         // clocks rebuild, and a value captured in the enclosing `build` would
         // only ever be as fresh as the last time the whole host rebuilt — which
         // is when a toast is queued, not once a frame.
-        final double swapIn = MotionCurves.cssEase.transform(
+        final double swapIn = MotionCurves.balanced.transform(
           _swap.value.clamp(0.0, 1.0),
         );
         // The loader's shorter window, read off the same elapsed time.
-        final double swapOut = MotionCurves.cssEase.transform(
+        final double swapOut = MotionCurves.balanced.transform(
           (_swap.value *
                   _promiseSwapIn.inMicroseconds /
                   _promiseSwapOut.inMicroseconds)

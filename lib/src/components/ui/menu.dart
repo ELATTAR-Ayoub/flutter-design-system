@@ -501,11 +501,11 @@ class MenuSurface extends StatelessWidget {
       // rather than restated.
       MenuSurfaceVariant.content => PopoverSurface(child: child),
       MenuSurfaceVariant.subRinged => PopoverSurface(
-        shadow: Shadows.tailwindLg,
+        shadow: Shadows.overlay,
         child: child,
       ),
       MenuSurfaceVariant.subBordered => PopoverSurface(
-        shadow: Shadows.tailwindLg,
+        shadow: Shadows.overlay,
         ring: false,
         border: Border.all(color: theme.border, width: BorderWidths.hairline),
         child: child,

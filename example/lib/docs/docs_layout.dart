@@ -356,14 +356,22 @@ class _DocsLayoutState extends State<DocsLayout> {
   /// there is nothing to do in that case. What is left is the other one: no
   /// remembered offset, a rail ninety-nine rows long, and a selected row that
   /// may be hundreds of pixels below the fold with nothing to say so.
-  /// [Scrollable.ensureVisible] with a mid-rail alignment puts it on screen
-  /// with its neighbours around it, which is what makes the rail readable as
-  /// "you are here" rather than "here is the alphabet".
+  /// The rail's own [ScrollPosition.ensureVisible] with a mid-rail alignment
+  /// puts it on screen with its neighbours around it. Calling
+  /// [Scrollable.ensureVisible] here would also scroll the enclosing page;
+  /// cold deep links to lower catalog entries would then open with their title
+  /// already above the viewport.
   void _restoreOrRevealRail() {
     if (!mounted || _railStore?.offset != null) return;
     final BuildContext? row = _selectedRow.currentContext;
     if (row == null || !_sidebarScroll.hasClients) return;
-    Scrollable.ensureVisible(row, alignment: 0.5, duration: Duration.zero);
+    final RenderObject? target = row.findRenderObject();
+    if (target == null) return;
+    _sidebarScroll.position.ensureVisible(
+      target,
+      alignment: 0.5,
+      duration: Duration.zero,
+    );
   }
 
   @override

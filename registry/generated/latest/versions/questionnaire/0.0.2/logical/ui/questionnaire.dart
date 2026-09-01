@@ -1068,20 +1068,35 @@ class QuestionnaireActions extends StatelessWidget {
       }
     }
 
+    // A plain `Row` gives its non-flex children an *unbounded* main axis to
+    // measure themselves against — that is the budget an `Expanded`/
+    // `Flexible` sibling divides in the first place, and it is why the
+    // Approve/Decline family of fixes in this pass reaches for `Wrap`
+    // instead of a fixed `Row`. But nesting that `Wrap` back *inside* a
+    // `Row` (as a plain, non-flex child, the way this footer used to)
+    // hands the `Wrap` the same unbounded main axis: with nothing to wrap
+    // against, it just reports one un-wrapped line, exactly as the `Row`
+    // it replaced did, and the outer row still overflows once "Skip" and
+    // "Next" no longer both fit at large text scales. One flat `Wrap`,
+    // reachable directly from this box's own real (bounded) width, is what
+    // actually lets `middle`/`trailing` drop to a second line — `lead` on
+    // the left, the actions cluster pinned to the right for as long as
+    // both fit on one line, exactly like `justify-between`.
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: wide ? minHeightWide : minHeight),
-      child: Row(
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: gap,
+        runSpacing: gap,
         children: <Widget>[
-          Expanded(
-            child: Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: Row(mainAxisSize: MainAxisSize.min, children: lead),
-            ),
+          Row(mainAxisSize: MainAxisSize.min, children: lead),
+          Wrap(
+            spacing: gap,
+            runSpacing: gap,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[?middle, ?trailing],
           ),
-          SizedBox(width: gap),
-          ?middle,
-          SizedBox(width: gap),
-          ?trailing,
         ],
       ),
     );

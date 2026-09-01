@@ -31,7 +31,7 @@
 /// * `animation-range: calc(100% - 96px) 100%` on `scroll(self y)` with
 ///   `animation-fill-mode: both` shrinks `F` from full to zero across the last
 ///   **96px** of travel, on the CSS `ease-in-out` keyword
-///   ([MotionCurves.cssEaseInOut], *not* `--ease-in-out`).
+///   ([MotionCurves.symmetric], distinct from the system movement curve).
 ///
 /// So the fade is at full height for the first 302 of this specimen's 398px of
 /// travel and closes over the last 96. [ScrollFade] reproduces exactly that,
@@ -218,7 +218,7 @@ class MessageScrollerController extends ChangeNotifier {
   /// Chrome, not the stylesheet, owns this timing. Measured
   /// (`ba2-chat-inter.js`): 100px settles in ~168ms, 398px in ~335ms — `√d` to
   /// within a frame, so the duration is [MotionDurations.frame] × `√distance` and
-  /// the shape is [MotionCurves.cssEase].
+  /// the shape is [MotionCurves.balanced].
   ///
   /// **Residual, recorded:** the fitted curve tracks the samples at the two
   /// ends and runs up to ~9% of the travel *behind* Chrome through the middle
@@ -234,7 +234,7 @@ class MessageScrollerController extends ChangeNotifier {
     await scroll.position.animateTo(
       target,
       duration: MotionDurations.frame * math.sqrt(distance),
-      curve: MotionCurves.cssEase,
+      curve: MotionCurves.balanced,
     );
     _autoscrolling = false;
     notifyListeners();
@@ -451,7 +451,7 @@ class ScrollFade extends StatelessWidget {
     if (max <= 0) return full;
     final double start = max - reveal;
     final double t = ((offset - start) / reveal).clamp(0.0, 1.0);
-    return full * (1 - MotionCurves.cssEaseInOut.transform(t));
+    return full * (1 - MotionCurves.symmetric.transform(t));
   }
 
   @override

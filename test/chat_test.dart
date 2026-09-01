@@ -941,10 +941,7 @@ void main() {
 
     test('the curve is CSS ease-in-out, not --ease-in-out', () {
       // The measurement that separates them: 0.6412 against 0.716.
-      expect(
-        MotionCurves.cssEaseInOut.transform(0.5833),
-        closeTo(0.6437, 0.005),
-      );
+      expect(MotionCurves.symmetric.transform(0.5833), closeTo(0.6437, 0.005));
       expect(MotionCurves.move.transform(0.5833), isNot(closeTo(0.6437, 0.02)));
     });
 
@@ -1420,11 +1417,11 @@ void main() {
   /* ── The shared foundation extensions ─────────────────────────────────── */
 
   group('foundation', () {
-    test('MotionCurves.cssEaseInOut is the CSS keyword, not the token', () {
-      expect(MotionCurves.cssEaseInOut, const Cubic(0.42, 0, 0.58, 1));
-      expect(MotionCurves.cssEaseInOut, isNot(MotionCurves.move));
+    test('MotionCurves.symmetric preserves measured scroll geometry', () {
+      expect(MotionCurves.symmetric, const Cubic(0.42, 0, 0.58, 1));
+      expect(MotionCurves.symmetric, isNot(MotionCurves.move));
       // Not on `all`: it is a stock keyword the system did not choose.
-      expect(MotionCurves.all.contains(MotionCurves.cssEaseInOut), isFalse);
+      expect(MotionCurves.all.contains(MotionCurves.symmetric), isFalse);
     });
 
     test('MotionDurations.frame is one 60 Hz frame', () {

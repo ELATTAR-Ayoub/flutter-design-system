@@ -46,5 +46,9 @@ migrate_working_dir/
 # uploaded as a failure artifact, never committed.
 reports/
 
+# Disposable registry copies used only to exercise release staging. Visual
+# review captures beside them remain visible to Git as audit evidence.
+tool/verify/out/release-stage-*/
+
 # Local environment. `.env.example` is the committed documentation.
 .env

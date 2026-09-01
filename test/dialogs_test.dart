@@ -396,7 +396,9 @@ void main() {
 
       _useFrame(t);
       await t.pumpWidget(_host(_dialog(variant: DialogVariant.media)));
-      await _open(t);
+      // The existing Dialog state stays open across this widget update; only
+      // settle the updated overlay instead of tapping the obscured trigger.
+      await t.pump(MotionDurations.open);
       expect(t.getSize(find.byType(DialogContent)).width, Containers.md);
     });
 
@@ -432,7 +434,8 @@ void main() {
 
       _useFrame(t);
       await t.pumpWidget(_host(_dialog(showCloseButton: false)));
-      await _open(t);
+      // As above, this updates the already-open overlay in place.
+      await t.pump(MotionDurations.open);
       expect(
         find.byType(Icon),
         findsNothing,

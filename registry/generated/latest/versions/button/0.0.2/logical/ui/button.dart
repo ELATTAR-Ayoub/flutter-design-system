@@ -893,7 +893,11 @@ class _ButtonState extends State<Button> {
       children: <Widget>[
         const Spinner(),
         SizedBox(width: Button.gapFor(widget.size)),
-        label,
+        // The spinner is the fixed part; the label is what gives. Without
+        // `Flexible` a loading button in a narrow box overflows by however
+        // much the label's natural width exceeds what is left beside the
+        // spinner — confirmed at 2x text scale, 986px on a 96px button.
+        Flexible(child: label),
       ],
     );
   }

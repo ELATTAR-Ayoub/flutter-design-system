@@ -1,4 +1,5 @@
-/// Single source of truth for the design-system tree: a verbatim port of the
+/// Single source of truth for the Flutter documentation tree. Its initial
+/// route hierarchy was informed by the
 /// reference's `lib/space/nav.ts` (615 lines).
 ///
 /// That file's own header states the contract, which this port inherits

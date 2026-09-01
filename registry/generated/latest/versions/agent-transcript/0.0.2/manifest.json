@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_transcript.dart",
       "target": "@ui/agent_transcript.dart",
-      "sha256": "4b2d7ed9d754d047ba3b69ebfee247941ee240d3b2de5c78208975fee096a941"
+      "sha256": "c79b14c36229c14eb3bb3eb2608aa2faddbbbe178578d243b0c812cc5b9dbf29"
     }
   ],
   "registryDependencies": [

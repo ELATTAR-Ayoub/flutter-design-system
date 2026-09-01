@@ -9,12 +9,12 @@
     {
       "source": "lib/src/components/ui/icon.dart",
       "target": "@ui/icon.dart",
-      "sha256": "771a5bd8d8889e18c7ecea4abcd0f34f5786d9dfb29a490e1481832dabf65818"
+      "sha256": "b96252df59b642b9da9a8215e39c35ab59cd5298d50de2f96f1b2665e5e9d0c8"
     },
     {
       "source": "lib/src/components/ui/icon_paths.dart",
       "target": "@ui/icon_paths.dart",
-      "sha256": "fddac99d96cca546e2865f0c9c99c72ff36088c198a1f7e6cc803a72bed7be7d"
+      "sha256": "7d6b8e4f8624c4be095adfbba303796a3abf0f63801ea40e054a84f4b53c3095"
     },
     {
       "source": "lib/src/components/ui/icon_paths.g.dart",

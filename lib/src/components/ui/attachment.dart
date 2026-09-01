@@ -1234,7 +1234,7 @@ class _AttachmentGroupState extends State<AttachmentGroup> {
     _c.animateTo(
       best,
       duration: effectiveMotionDuration(context, MotionDurations.normal),
-      curve: MotionCurves.cssEase,
+      curve: MotionCurves.balanced,
     );
   }
 
@@ -1322,7 +1322,7 @@ class _ScrollFadeX extends StatelessWidget {
 
   /// The leading fade grows as the box scrolls away from the start; the
   /// trailing one shrinks as it reaches the end. Both run on
-  /// [MotionCurves.cssEaseInOut] over [reveal] px.
+  /// [MotionCurves.symmetric] over [reveal] px.
   static (double start, double end) fadesFor({
     required double width,
     required double offset,
@@ -1333,8 +1333,8 @@ class _ScrollFadeX extends StatelessWidget {
     final double sT = (offset / reveal).clamp(0.0, 1.0);
     final double eT = ((offset - (max - reveal)) / reveal).clamp(0.0, 1.0);
     return (
-      full * MotionCurves.cssEaseInOut.transform(sT),
-      full * (1 - MotionCurves.cssEaseInOut.transform(eT)),
+      full * MotionCurves.symmetric.transform(sT),
+      full * (1 - MotionCurves.symmetric.transform(eT)),
     );
   }
 

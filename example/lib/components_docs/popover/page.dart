@@ -933,7 +933,7 @@ const List<DocsApiFact> _surfaceFacts = <DocsApiFact>[
     name: 'shadow',
     type: 'ShadowStyle?',
     description:
-        'Default null, which resolves to Shadows.tailwindMd. Every '
+        'Default null, which resolves to Shadows.popover. Every '
         '*SubContent in the menu family passes shadow-lg here instead.',
   ),
   DocsApiFact(
@@ -1407,7 +1407,7 @@ class _ThemingContent extends StatelessWidget {
         'The ring is a flat 10% of theme.foreground over the shadow layer, '
             'on every instance that leaves ring at its true default: the '
             'corner radius (Radii.lg, 12px) and the elevation '
-            '(Shadows.tailwindMd) are each overridable per instance '
+            '(Shadows.popover) are each overridable per instance '
             'through radius and shadow, unlike the fixed pill Tooltip '
             'renders.',
         'The open/close transition: an 8px slide on whichever sides '

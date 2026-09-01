@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-/// The standing contract of this port: **literals live in exactly one place.**
+/// The standing Flutter contract: **literals live in exactly one place.**
 ///
 /// `lib/src/design_system/foundation/` is the token source of truth (colors, sizes, tracking,
 /// durations, curves, radii, shadow geometry). Every other file in `lib/` and

@@ -14,7 +14,8 @@ until phase 3 and moved here so it survives sessions.
   (`npm run dev` in the reference repo)
 - Flutter gallery release bundle on `localhost:8321`
   (`flutter build web --release` in `example/`, then
-  `python -m http.server 8321` from `example/build/web`)
+  `node tool/verify/serve-spa.js example/build/web 8321` from the repository
+  root). The SPA fallback is required for direct component and docs routes.
 
 ## Scripts
 
@@ -22,6 +23,7 @@ until phase 3 and moved here so it survives sessions.
 |---|---|
 | `capture.js <url> <out.png> [--theme t] [--settle ms] [--reduced] [--nav n]` | full-page stitched capture at 1440×900, 810px steps |
 | `shot.js <url> <out.png> [w] [h] [settle]` | one viewport at any size, fixed settle, prints console + pending requests |
+| `review-batch.js <base-url> <out-dir>` | current-tree smoke captures for typography and the highest-risk public components at mobile, tablet and desktop widths in both themes |
 | `diff.js <a.png> <b.png> <out.png>` | pixelmatch diff: raw / AA-aware / half-res %, first divergent + structural rows |
 | `locate.js <a.png> <b.png> <y>` | per-band alignment profile (δ∈[−32,32]) around a row |
 | `crop.js <in.png> <out.png> <x> <y> <w> <h>` | crop for eyeballing a region |

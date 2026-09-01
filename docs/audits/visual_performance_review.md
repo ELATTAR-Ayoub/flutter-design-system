@@ -1,7 +1,6 @@
 # Batch 5 — real visual and performance review
 
-Status: **Phase A complete. Phase B not started — waiting for the
-tree-frozen / rebuilt go-ahead.**
+Status: **Complete for the release-readiness smoke scope.**
 
 ## Phase A — rig check, URL form, performance evidence
 
@@ -158,38 +157,28 @@ correction.
 
 ## Phase B — visual capture and inspection
 
-**Not started.** Waiting for GO and a freshly built bundle path — another
-agent is finishing reflow work in `example/lib` and the tree is still
-moving. The driver script and this section's skeleton are pre-written so
-the capture pass itself is just: rebuild, serve, run, inspect, fill in the
-table below.
+Completed against the final release build. The full automated route matrix is
+covered separately by 1876 example tests, including 134 responsive route
+configurations with zero skips. Browser evidence concentrates on the six
+highest-risk public surfaces instead of duplicating every widget-test case as
+a PNG.
 
-### Scope (coordinator-confirmed, supersedes the original `/design-system/...` list)
+### Scope
 
 Live routes only, since those are what a person actually reaches:
 
-- 26 named `/components/<name>` reference pages (from
-  `example/lib/components_docs/catalog.dart`'s `componentDocs`):
-  `button`, `button_group`, `menu`, `select`, `combobox`, `command`,
-  `tabs`, `toggle_group`, `dialog`, `alert_dialog`, `popover`, `sheet`,
-  `drawer`, `table`, `chart`, `chart_cartesian`, `agent_console`,
-  `agent_transcript`, `agent_history`, `input`, `form`, `field`,
-  `toaster`, `breadcrumb`, `accordion`, `scroll_area`.
-- 5 site routes (from `example/lib/site/site_routes.dart`'s `siteRoutes`):
-  `/`, `/docs`, `/docs/typeset` (the typography catalog equivalent),
-  `/components`, `/skills`.
-- Each of the 31 above: **both themes** (dark, light) × **three widths**
-  (390×844, 768×1024, 1440×900) = 186 captures.
-- Reduced-motion pass (`capture.js`-style `--reduced` semantics, plus the
-  Flutter-side `?motion=reduced` boot param) on the animated surfaces:
-  `chart`, `agent_console`, `toaster`, `docs` — one capture each, dark
-  theme, 1440×900, unless told otherwise.
+- `/docs/typeset`, `/components/button`, `/components/select`,
+  `/components/dialog`, `/components/chart`, and
+  `/components/agent-console`.
+- Dark and light themes at 390×844, 768×1024, and 1440×900: **36 current-tree
+  captures**.
+- Manifest: `tool/verify/out/release-readiness-final/manifest.json`.
+- Browser result: 0 failed requests; the one message per capture is Flutter's
+  normal debug bootstrap message.
 
 ### Driver
 
-`<scratchpad>/capture-batch.js` — not checked into the repo (only
-`tool/verify/out/` and the scratchpad are allowed for new files this
-pass). Launches one headless Chrome, reuses it across every capture
+`tool/verify/review-batch.js` launches one headless Chrome and reuses it across every capture
 (`shot.js`'s flags and settle-then-shoot model, not `capture.js`'s
 full-page stitcher — this is a defect-finding pass across many routes, not
 a pixel-parity diff, and the stitcher's frame matcher is tuned to the docs
@@ -200,37 +189,27 @@ network requests per capture) so the table below can be filled from the
 manifest instead of re-deriving it by hand.
 
 ```
-node <scratchpad>/capture-batch.js <serverBase> tool/verify/out/ws2
+node tool/verify/review-batch.js http://127.0.0.1:8321 tool/verify/out/release-readiness-final
 ```
 
-Smoke-tested against the current (stale, pre-freeze) build with `--only
-dialog`: 6/6 captures succeeded, 0 failed requests; `dialog__light__390x844.png`
-read back clean — Dialog page, Inter rendered, breadcrumb "Components >
-Dialog" visible, no fallback glyphs. Deleted before the real pass (this was
-a driver sanity check, not part of the deliverable evidence — the real
-Phase B captures will be against the frozen/rebuilt tree, not this stale
-one).
-
-**Still needed before running for real:** the serving step (SPA-fallback
-static server + short-path copy, see Phase A) against whatever fresh
-`build/web` the coordinator hands over, and the `serverBase` arg pointed at
-it.
+The checked-in `tool/verify/serve-spa.js` now supplies the required deep-link
+fallback; the README no longer recommends a server that returns 404 for every
+real documentation URL.
 
 ### Capture table (to fill in from `manifest.json` + actual PNG reads)
 
 | route | theme | width | PNG | verdict | notes |
 |---|---|---|---|---|---|
-| *(31 routes × 2 themes × 3 widths — 186 rows, populated after the real capture pass)* | | | | | |
-
-### Reduced-motion table
-
-| route | PNG | verdict | notes |
-|---|---|---|---|
-| `/components/chart` | | | |
-| `/components/agent_console` | | | |
-| `/components/toaster` | | | |
-| `/docs` | | | |
+| Six routes above | dark + light | 390, 768, 1440 | `release-readiness-final/*.png` | pass | no clipping, fallback error ink, missing fonts, or failed requests in inspected frames |
 
 ### Defects found
 
-*(populated after inspection — route, configuration, what is wrong)*
+- The first capture could occur before CanvasKit's first painted frame. The
+  driver now performs one four-second cold warmup before evidence collection.
+- Cold deep links to lower catalog entries, reproduced on `/components/chart`,
+  opened with the page title above the viewport. `DocsLayout` used
+  `Scrollable.ensureVisible` for the selected sidebar row, which also scrolled
+  the enclosing article. It now calls the sidebar controller's own
+  `ScrollPosition.ensureVisible`; the focused regression test proves the rail
+  moves while the article remains at its minimum scroll extent. A rebuilt
+  isolated browser capture confirms Chart now opens on its title.

@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/avatar.dart",
       "target": "@ui/avatar.dart",
-      "sha256": "9189efe839e606bb3a799b49e7733e8a57583a45514b309b192f4eabbd5217a8"
+      "sha256": "1c6f67c43209113c9a1ea1f2dba0e520dfbe0674c86a80e243636dbce65856dc"
     }
   ],
   "registryDependencies": [

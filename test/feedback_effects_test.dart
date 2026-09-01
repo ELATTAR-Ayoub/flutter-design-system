@@ -1366,7 +1366,7 @@ void main() {
         // `data-mounted="true"` — one frame later, and it travels.
         await t.pump();
         await t.pump(Toaster.transition ~/ 2);
-        final double half = MotionCurves.cssEase.transform(0.5);
+        final double half = MotionCurves.balanced.transform(0.5);
         expect(
           raise(t, 'Sold 3 cards for \$2,481.00'),
           closeTo(-height * (1 - half), 0.6),
@@ -1562,7 +1562,7 @@ void main() {
         // Mid-fade: content, scale and offset all part-way, on the one 400ms
         // window they share.
         await t.pump(Toaster.transition ~/ 2);
-        final double half = MotionCurves.cssEase.transform(0.5);
+        final double half = MotionCurves.balanced.transform(0.5);
         expect(contentOpacityOf(t, back1), closeTo(half, 0.02));
         expect(opacityOf(t, back1), 1);
         expect(
@@ -1718,7 +1718,7 @@ void main() {
         );
 
         await t.pump(Toaster.transition ~/ 2);
-        final double half = MotionCurves.cssEase.transform(0.5);
+        final double half = MotionCurves.balanced.transform(0.5);
         expect(contentOpacityOf(t, first), closeTo(1 - half, 0.06));
         expect(
           contentOpacityOf(t, first),
@@ -1942,7 +1942,7 @@ void main() {
       await t.pump();
       await t.pump(Toaster.unmountDelay ~/ 2);
       // `--y: translateY(--lift * -100%)` — the entrance, run backwards.
-      final double t100 = MotionCurves.cssEase.transform(
+      final double t100 = MotionCurves.balanced.transform(
         Toaster.unmountDelay.inMicroseconds /
             2 /
             Toaster.transition.inMicroseconds,
@@ -1985,7 +1985,7 @@ void main() {
       // `--y: translateY(40%)` with NO `scale()` in it — so the scale is
       // released back to 1 on the way out. Measured: 0.9 → 0.9019 → 0.9152 →
       // 0.9295 over the frames before the unmount.
-      final double moved = MotionCurves.cssEase.transform(
+      final double moved = MotionCurves.balanced.transform(
         Toaster.unmountDelay.inMicroseconds /
             2 /
             Toaster.collapsedExitTransform.inMicroseconds,
@@ -2002,7 +2002,7 @@ void main() {
 
       // `transition: transform 500ms, opacity 200ms` — the fade is more than
       // twice as far along as the fall.
-      final double faded = MotionCurves.cssEase.transform(0.5);
+      final double faded = MotionCurves.balanced.transform(0.5);
       expect(opacityOf(t, back), closeTo(1 - faded, 0.06));
       expect(
         1 - opacityOf(t, back),
@@ -2051,7 +2051,7 @@ void main() {
 
         // `--y: translateY(--lift * --offset + --lift * -100%)` — it keeps the
         // slot the expansion gave it and travels a whole box further down it.
-        final double moved = MotionCurves.cssEase.transform(
+        final double moved = MotionCurves.balanced.transform(
           Toaster.unmountDelay.inMicroseconds /
               2 /
               Toaster.transition.inMicroseconds,
@@ -2586,28 +2586,28 @@ void main() {
     ) async {
       // Both are foreign defaults, and both are visibly not the tokens whose
       // names they share. Measured against the live traces.
-      expect(MotionCurves.cssEase, const Cubic(0.25, 0.1, 0.25, 1));
-      expect(MotionCurves.cssEaseOut, const Cubic(0, 0, 0.58, 1));
+      expect(MotionCurves.balanced, const Cubic(0.25, 0.1, 0.25, 1));
+      expect(MotionCurves.decelerate, const Cubic(0, 0, 0.58, 1));
       expect(
         MotionCurves.all,
-        isNot(contains(MotionCurves.cssEase)),
+        isNot(contains(MotionCurves.balanced)),
         reason:
             'the transcript of --ease-* has seven entries and neither of '
             'these is one of them',
       );
-      expect(MotionCurves.all, isNot(contains(MotionCurves.cssEaseOut)));
+      expect(MotionCurves.all, isNot(contains(MotionCurves.decelerate)));
       // The retiming that snapping either to a system token would have caused.
       expect(
-        MotionCurves.cssEase.transform(0.2),
+        MotionCurves.balanced.transform(0.2),
         isNot(closeTo(MotionCurves.standard.transform(0.2), 0.05)),
       );
       expect(
-        MotionCurves.cssEaseOut.transform(0.775),
+        MotionCurves.decelerate.transform(0.775),
         isNot(closeTo(MotionCurves.enter.transform(0.775), 0.02)),
       );
       // The two numbers the live traces actually produced.
-      expect(MotionCurves.cssEase.transform(0.383), closeTo(0.645, 0.02));
-      expect(MotionCurves.cssEaseOut.transform(0.775), closeTo(0.923, 0.02));
+      expect(MotionCurves.balanced.transform(0.383), closeTo(0.645, 0.02));
+      expect(MotionCurves.decelerate.transform(0.775), closeTo(0.923, 0.02));
     });
   });
 
@@ -2996,7 +2996,7 @@ void main() {
       // same slow window and the same CSS ease as the wide contract.
       await t.pump();
       await t.pump(Toaster.transition ~/ 2);
-      final double half = MotionCurves.cssEase.transform(0.5);
+      final double half = MotionCurves.balanced.transform(0.5);
       expect(drop(t, title), closeTo(-height * (1 - half), 0.6));
       expect(
         drop(t, title),

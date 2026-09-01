@@ -1,9 +1,8 @@
-/// Icon geometry — a transcript of lucide-react's own icon nodes.
+/// Generated icon geometry shipped as native Flutter paths.
 ///
-/// Source of truth: `design-system/node_modules/lucide-react/dist/esm/icons/`
-/// — lucide-react **1.28.0**, ISC, both confirmed in that package's
-/// `package.json`. One module per glyph; [IconGlyph] names them all and each
-/// entry in [IconPaths.elements] carries its module in a header comment.
+/// [IconPaths] is the runtime source of truth. The paths were generated from
+/// lucide-react **1.28.0** under the ISC license; source module notes remain as
+/// provenance for auditing and regeneration.
 ///
 /// Each module exports `__iconNode`: an ordered list of `[tag, attributes]`
 /// SVG elements drawn on lucide's 24×24 grid and stroked, via the `<svg>`

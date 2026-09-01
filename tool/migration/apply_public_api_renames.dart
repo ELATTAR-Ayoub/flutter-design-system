@@ -114,18 +114,18 @@ void main(List<String> arguments) {
     ]..sort((a, b) => '${a['current']}'.compareTo('${b['current']}'));
     _validate(rows);
     mapFile.parent.createSync(recursive: true);
-    mapFile.writeAsStringSync(
-      const JsonEncoder.withIndent('  ').convert(<String, Object?>{
-            'schemaVersion': 1,
-            'baseline': _git(root, const <String>[
-              'rev-parse',
-              '--short',
-              'HEAD',
-            ]).trim(),
-            'renames': rows,
-          }) +
-          '\n',
+    final String encoded = const JsonEncoder.withIndent('  ').convert(
+      <String, Object?>{
+        'schemaVersion': 1,
+        'baseline': _git(root, const <String>[
+          'rev-parse',
+          '--short',
+          'HEAD',
+        ]).trim(),
+        'renames': rows,
+      },
     );
+    mapFile.writeAsStringSync('$encoded\n');
     stdout.writeln('prepared ${rows.length} exact identifier renames');
     return;
   }

@@ -806,7 +806,7 @@ void main() {
       await t.tap(find.byType(Select<String>));
       await t.pump();
       final Surface content = t.widget<Surface>(find.byType(Surface).last);
-      expect(content.spec.layers.skip(1).toList(), Shadows.tailwindMd.layers);
+      expect(content.spec.layers.skip(1).toList(), Shadows.popover.layers);
       expect(content.spec.layers.first.spread, BorderWidths.hairline);
       expect(content.radius, BorderRadius.circular(Radii.lg));
     });

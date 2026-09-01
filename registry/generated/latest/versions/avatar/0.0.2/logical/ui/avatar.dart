@@ -185,7 +185,24 @@ class Avatar extends StatelessWidget {
             // `aspect-square size-full rounded-full object-cover`.
             ClipRRect(
               borderRadius: radius,
-              child: Image(image: image!, fit: BoxFit.cover),
+              // Radix shows the fallback while the image is missing *or
+              // fails to decode* — a broken URL is not different from a
+              // missing one, from the user's point of view. Without
+              // `errorBuilder` a decode failure reports straight to
+              // [FlutterError] instead, with no way for a caller to route it
+              // anywhere; the fallback is already painted underneath in this
+              // [Stack] (`content`, above), so a transparent box here is all
+              // it takes to let it show through.
+              child: Image(
+                image: image!,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (
+                      BuildContext context,
+                      Object error,
+                      StackTrace? stackTrace,
+                    ) => const SizedBox.shrink(),
+              ),
             ),
           // `after:` — painted last, over both.
           IgnorePointer(

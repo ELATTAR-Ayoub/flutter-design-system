@@ -1591,7 +1591,7 @@ class _ThemingContent extends StatelessWidget {
         'ChartSeriesSpec.fill/stroke are always supplied by the '
         'caller, normally one of theme.chart1…5.',
     'ChartMotion.duration (MotionDurations.slow) and ChartMotion.curve '
-        '(MotionCurves.cssEaseOut, not MotionCurves.enter — a documented drift, '
+        '(MotionCurves.decelerate, not MotionCurves.enter — a documented drift, '
         'see chart\'s own Theming disclosure) drive every entrance '
         'animation.',
     'Every label is ChartText.xs — never a `.type-*` rung from the '

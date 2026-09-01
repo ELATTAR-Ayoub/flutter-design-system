@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/tabs.dart",
       "target": "@ui/tabs.dart",
-      "sha256": "f801bc1b364babda7e51902baf0f1017fcc313f7c1cbebcbe73d856f0f9bf37a"
+      "sha256": "d503b4075eef42cf0338e671173991987bf2f7b60269555247477dd823d268d8"
     }
   ],
   "registryDependencies": [

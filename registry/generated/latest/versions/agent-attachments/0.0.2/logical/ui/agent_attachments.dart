@@ -119,6 +119,13 @@ class AgentDeliveryBadge extends StatelessWidget {
 
     return Tooltip(
       label: delivery.reason ?? '',
+      // `mainAxisSize.min` sizes this row to its content, but a `Row`'s
+      // non-flex children — the glyph *and* an un-flexed label — measure
+      // themselves against an unbounded main axis regardless: whatever
+      // bounded slot a caller (the description `Wrap`, one file over) gives
+      // this badge, "Name only" ignores it and can overflow the badge's own
+      // box at large text scales. `Flexible` is what makes the label answer
+      // to that slot instead of its own unclamped preference.
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -128,7 +135,15 @@ class AgentDeliveryBadge extends StatelessWidget {
             tone: IconTone.warning,
           ),
           SizedBox(width: gap),
-          StyledText('Name only', TextStyles.small, color: theme.warningText),
+          Flexible(
+            child: StyledText(
+              'Name only',
+              TextStyles.small,
+              color: theme.warningText,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
@@ -204,19 +219,30 @@ class AgentAttachmentCard extends StatelessWidget {
         // the size string and the badge rather than the string alone.
         description: Padding(
           padding: EdgeInsets.only(top: AttachmentDescription.topGap),
-          child: Row(
+          // `Row` gives a non-flex child (the badge) an *unbounded* main
+          // axis to measure itself against — that is how `Flexible`/
+          // `Expanded` siblings end up with a real budget to divide in the
+          // first place. At rest the badge is short enough that this never
+          // shows, but `AgentDeliveryBadge`'s own label is real text and
+          // grows with it: at 2x scale "Name only" plus its glyph can be
+          // wider than the whole description line, and a `Row` has nowhere
+          // to put that but on top of the meta string (measured: the badge
+          // alone reported 270px against a 192px line). `Wrap` lets the
+          // badge drop to its own line instead of squeezing the size string
+          // to nothing or overflowing outright.
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: descriptionGap,
+            runSpacing: descriptionGap,
             children: <Widget>[
-              Flexible(
-                child: StyledText(
-                  meta,
-                  TextStyles.small,
-                  color: theme.mutedForeground,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: false,
-                ),
+              StyledText(
+                meta,
+                TextStyles.small,
+                color: theme.mutedForeground,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
               ),
-              SizedBox(width: descriptionGap),
               AgentDeliveryBadge(attachment: attachment),
             ],
           ),

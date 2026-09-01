@@ -162,7 +162,7 @@ class Tooltip extends StatefulWidget {
   /// `Tooltip._defaultShowDuration` is `1500ms` and is passed as `touchDelay`,
   /// which is exactly this quantity: how long a label lingers after a touch
   /// opened it. Taking the host platform's answer for a question the reference
-  /// never asked is [MotionCurves.cssEase]'s argument one layer up — a foreign
+  /// never asked is [MotionCurves.balanced]'s argument one layer up — a foreign
   /// default, adopted rather than invented.
   ///
   /// Spelled as ten beats of [MotionDurations.fast] rather than typed, because the

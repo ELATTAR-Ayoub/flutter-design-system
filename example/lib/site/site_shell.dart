@@ -441,7 +441,7 @@ class _SearchOverlayState extends State<_SearchOverlay> {
                 color: theme.border,
                 width: BorderWidths.hairline,
               ),
-              boxShadow: Shadows.tailwindLg.outerShadows(theme),
+              boxShadow: Shadows.overlay.outerShadows(theme),
             ),
             child: Padding(
               padding: EdgeInsets.all(space(4)),

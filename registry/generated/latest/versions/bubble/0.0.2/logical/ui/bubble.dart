@@ -375,6 +375,31 @@ class _RenderMaxWidthFraction extends RenderProxyBox {
     );
     size = constraints.constrain(kid.size);
   }
+
+  // `RenderProxyBox`'s default intrinsic-height methods forward the
+  // *unconstrained* width straight to the child, but [performLayout] never
+  // gives the child that much: it narrows to `width * factor` first. Left
+  // unoverridden, an intrinsic query reports the height a full-width child
+  // would need, which is less than the height the narrowed child actually
+  // takes — any parent that measures intrinsics over a bubble under-reserves
+  // and the real layout pass then overflows. Applying the same cap here is
+  // what keeps the two passes honest with each other.
+  double _cappedWidth(double width) =>
+      width.isFinite ? width * _factor : double.infinity;
+
+  @override
+  double computeMinIntrinsicHeight(double width) {
+    final RenderBox? kid = child;
+    if (kid == null) return 0;
+    return kid.getMinIntrinsicHeight(_cappedWidth(width));
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    final RenderBox? kid = child;
+    if (kid == null) return 0;
+    return kid.getMaxIntrinsicHeight(_cappedWidth(width));
+  }
 }
 
 /// The variant and alignment a [BubbleContent] reads off its bubble — the

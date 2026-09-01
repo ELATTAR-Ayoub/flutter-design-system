@@ -46,7 +46,13 @@
 /// supply is the Escape key *when focus is already inside the popup* — key
 /// events travel up from the focused node, so a `Focus` wrapped around the
 /// content sees them, and a caller whose focus stays outside (the combobox)
-/// handles Escape where the focus is.
+/// handles Escape where the focus is. The same restraint holds for `Tab`: the
+/// content's `Focus` installs no `FocusScope`/`FocusTraversalGroup` of its
+/// own, so a plain, non-modal popover does **not** trap it — `Tab` is free to
+/// travel out of the popup subtree exactly the way it would if the popup were
+/// not there. A real menu traps it anyway, but that trap is `menu.dart`'s own
+/// content deciding to close on `Tab` rather than this kernel deciding to
+/// block it.
 ///
 /// ## What the `menus` family added (2026-08-16)
 ///
@@ -464,7 +470,7 @@ class PopoverSurface extends StatelessWidget {
             BorderWidths.hairline,
             (ThemeTokens t) => t.foreground.withValues(alpha: _ringAlpha),
           ),
-        ...(shadow ?? Shadows.tailwindMd).layers,
+        ...(shadow ?? Shadows.popover).layers,
       ]);
 
   @override

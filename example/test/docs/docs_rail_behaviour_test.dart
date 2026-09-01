@@ -179,6 +179,17 @@ void main() {
           'to it rather than opening on the alphabet',
     );
 
+    final ScrollableState page = tester.state<ScrollableState>(
+      find.byType(Scrollable).first,
+    );
+    expect(
+      page.position.pixels,
+      page.position.minScrollExtent,
+      reason:
+          'revealing the selected rail row must not scroll the article that '
+          'contains the rail',
+    );
+
     final Finder selected = find.byKey(
       const ValueKey<String>('docs-sidebar:$route'),
     );

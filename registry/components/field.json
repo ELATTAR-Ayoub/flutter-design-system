@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/field.dart",
       "target": "@ui/field.dart",
-      "sha256": "ab6ace74846f0c7d53468b4b8ab5341177732b78517b5b6b720e34c1bfef3ff9"
+      "sha256": "df72ae3e434a21d20f1f24d3d7bcbdaccb43a1748c2e646ce14bf71a9c44b8bc"
     }
   ],
   "registryDependencies": [

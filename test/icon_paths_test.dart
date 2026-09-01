@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// Value-for-value transcript check of the embedded lucide glyphs, plus a unit
 /// test of the SVG path-data reader that turns them into a [Path].
 ///
-/// Source of truth: `design-system/node_modules/lucide-react/dist/esm/icons/` —
+/// Generation provenance: `design-system/node_modules/lucide-react/dist/esm/icons/` —
 /// lucide-react 1.28.0, ISC. One module per glyph; [_transcript] below names
 /// every element of every one of them, independently of the comments in
 /// `icon_paths.dart`, so the two have to agree.

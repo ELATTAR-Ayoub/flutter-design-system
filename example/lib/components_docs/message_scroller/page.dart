@@ -821,7 +821,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Fade closing',
     treatment:
         'Shrinks to zero over the last 96px of scroll travel, on '
-        'MotionCurves.cssEaseInOut — the CSS ease-in-out keyword, not this '
+        'MotionCurves.symmetric — the measured compatibility curve, not this '
         "system's own --ease-in-out.",
     userSignal: 'The mask visibly thins as the reader nears the bottom.',
   ),

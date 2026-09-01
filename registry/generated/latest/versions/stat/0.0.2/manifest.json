@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/stat.dart",
       "target": "@ui/stat.dart",
-      "sha256": "09db3763866408c41394a7a72723587465c51d45b831bd0cf961c5b1f73d29d7"
+      "sha256": "07e6a64472a4c7ad7b4a5ecc2e6a66b954a3930c6ae989b7fbf7e4d8137db4a5"
     }
   ],
   "registryDependencies": [

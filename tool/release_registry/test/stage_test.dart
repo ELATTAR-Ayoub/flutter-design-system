@@ -146,6 +146,20 @@ void main() {
   Directory web([String name = 'web']) =>
       Directory('${root.path}/$name')..createSync(recursive: true);
 
+  test(
+    'the command exposes a failing result as its process exit code',
+    () async {
+      final ProcessResult result = await Process.run(
+        Platform.resolvedExecutable,
+        <String>[File('bin/stage.dart').absolute.path],
+        workingDirectory: Directory.current.path,
+      );
+
+      expect(result.exitCode, 64);
+      expect(result.stderr, contains('--version is required.'));
+    },
+  );
+
   group('staging', () {
     test('writes the registry under a versioned path', () {
       final Directory webRoot = web();

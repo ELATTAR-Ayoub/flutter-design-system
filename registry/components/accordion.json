@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/accordion.dart",
       "target": "@ui/accordion.dart",
-      "sha256": "82bad5751eaadfd02b698abd93475ea193bb0c356a3af0f3aec5ebd217112fee"
+      "sha256": "b7aad1d37db5908123fe0373e2e21f16cbccdbf3bd6553398a37a7ccd56f9039"
     }
   ],
   "registryDependencies": [

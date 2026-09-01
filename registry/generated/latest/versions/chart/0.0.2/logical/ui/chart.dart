@@ -187,7 +187,7 @@ class ChartScope extends InheritedWidget {
 /// assigned; what is passed is the keyword `ease-out`, which is CSS's
 /// `cubic-bezier(0, 0, 0.58, 1)` and a visibly different curve. Reproducing the
 /// port on [MotionCurves.enter] would make the Flutter charts *better* than the
-/// reference and therefore wrong, so [curve] is [MotionCurves.cssEaseOut] and the
+/// reference and therefore wrong, so [curve] is [MotionCurves.decelerate] and the
 /// page documents the difference exactly as the reference's Animation section
 /// does.
 ///
@@ -204,7 +204,7 @@ class ChartMotion {
   static Duration get duration => MotionDurations.slow;
 
   /// The CSS keyword `ease-out`, which is what recharts received.
-  static Curve get curve => MotionCurves.cssEaseOut;
+  static Curve get curve => MotionCurves.decelerate;
 }
 
 /* ── Container ───────────────────────────────────────────────────────────── */
@@ -404,7 +404,7 @@ class ChartTooltipContent extends StatelessWidget {
             color: theme.border.withValues(alpha: _borderAlpha),
             width: BorderWidths.hairline,
           ),
-          boxShadow: Shadows.tailwindXl.outerShadows(theme),
+          boxShadow: Shadows.dataTooltip.outerShadows(theme),
         ),
         // `display: grid` shrink-to-fit under a `min-width`: the panel is as
         // wide as its widest row or 128, whichever is larger, and every row is

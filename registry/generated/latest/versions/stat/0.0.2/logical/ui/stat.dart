@@ -301,43 +301,55 @@ class Stat extends StatelessWidget {
         ),
         if (hasDeltaRow) ...<Widget>[
           SizedBox(height: rowGap),
-          Wrap(
-            spacing: deltaGap,
-            runSpacing: deltaGap,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: <Widget>[
-              if (delta != null)
-                if (loading)
-                  Skeleton(
-                    width: deltaSkeleton.width,
-                    height: deltaSkeleton.height,
-                  )
-                else if (!blank)
-                  StatDeltaMark(delta: delta!, betterWhen: betterWhen),
-              if (state == StatState.error && message != null)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Icon.lucide(
-                      Lucide.triangleAlert,
-                      size: IconSize.xs,
-                      tone: IconTone.inherit,
-                    ),
-                    SizedBox(width: messageGap),
-                    StyledText(
-                      message!,
-                      TextStyles.small,
-                      color: theme.destructiveText,
-                    ),
-                  ],
-                )
-              else if (state == StatState.empty && message != null)
-                StyledText(message!, TextStyles.small)
-              else if (hint != null)
-                StyledText(hint!, TextStyles.small),
-            ],
-          ),
+          if (state == StatState.error && message != null)
+            // Not put through the `Wrap` below: `Wrap` hands every child
+            // *unbounded* main-axis constraints — that is how a run decides
+            // what fits — so a `Flexible`/ellipsis inside one never actually
+            // gets to shrink; the row just paints past a narrow cell at any
+            // text scale. A direct `Column` child gets the card's real width
+            // instead, which is what the glyph-fixed, message-gives shape
+            // needs to work at all.
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon.lucide(
+                  Lucide.triangleAlert,
+                  size: IconSize.xs,
+                  tone: IconTone.inherit,
+                ),
+                SizedBox(width: messageGap),
+                Flexible(
+                  child: StyledText(
+                    message!,
+                    TextStyles.small,
+                    color: theme.destructiveText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            )
+          else
+            Wrap(
+              spacing: deltaGap,
+              runSpacing: deltaGap,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: <Widget>[
+                if (delta != null)
+                  if (loading)
+                    Skeleton(
+                      width: deltaSkeleton.width,
+                      height: deltaSkeleton.height,
+                    )
+                  else if (!blank)
+                    StatDeltaMark(delta: delta!, betterWhen: betterWhen),
+                if (state == StatState.empty && message != null)
+                  StyledText(message!, TextStyles.small)
+                else if (hint != null)
+                  StyledText(hint!, TextStyles.small),
+              ],
+            ),
         ],
       ],
     );

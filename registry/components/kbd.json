@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/kbd.dart",
       "target": "@ui/kbd.dart",
-      "sha256": "5db9c96949cac2afaab9edb0114c2f69d98a21f5f4356e4d89130225e44e7ad2"
+      "sha256": "fcf7a24df1f80506e3cc81379f61aa08df9aec8fe82911b0fb356352cf940939"
     }
   ],
   "registryDependencies": [

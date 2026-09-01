@@ -1,6 +1,6 @@
 /// `/design-system/typography`: the Typography foundation page.
 ///
-/// A transcript of `app/design-system/typography/page.tsx`: the two-face rule,
+/// The Flutter typography specimen: the two-face rule,
 /// the ten word-scale specimens, the five numeric ones, the tabular argument,
 /// the canonical pairings, the full `.prose` demo, and the rules.
 ///

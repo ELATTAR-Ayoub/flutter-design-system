@@ -1,4 +1,4 @@
-/// Elevation — `app/globals.css` L340–387.
+/// Elevation owned by the Flutter design system.
 ///
 /// Two families. `e1`–`e4` are ambient depth. The rest are MACHINE surfaces:
 /// things that look like they can be physically pressed — which is why a button
@@ -18,12 +18,11 @@ import 'package:flutter/painting.dart';
 import './colors.dart';
 import './theme.dart';
 
-/// One CSS `box-shadow` layer, in CSS units:
+/// One layered shadow specification:
 /// `[inset] <dx> <dy> <blur> <spread> <color>`.
 ///
-/// The four numbers are the **raw CSS values**, so this class reads as a
-/// transcript of globals.css. The CSS→Skia blur conversion happens in
-/// [blurRadius], not here.
+/// The four numbers retain the original design geometry. Conversion to
+/// Flutter's Skia blur model happens in [blurRadius].
 @immutable
 class ShadowLayer {
   const ShadowLayer(
@@ -130,9 +129,8 @@ Color _actionBrightAt(double alpha) =>
     Palette.actionBright.withValues(alpha: alpha);
 Color _valueAt(double alpha) => Palette.value.withValues(alpha: alpha);
 
-/// Tailwind's own `shadow-lg` ink: `rgb(0 0 0 / 0.1)`, the same in both
-/// themes because it is not part of the `--ink-*` family.
-Color _tailwindShadowInk(ThemeTokens t) => const Color(0x1A000000);
+/// Neutral overlay ink used by compatibility elevations in both themes.
+Color _overlayShadowInk(ThemeTokens t) => const Color(0x1A000000);
 
 /// Every `--shadow-*` token in `app/globals.css` L354–387.
 class Shadows {
@@ -145,61 +143,29 @@ class Shadows {
   /// of special-casing null.
   static const ShadowStyle none = ShadowStyle(<ShadowLayer>[]);
 
-  /// Tailwind's stock `shadow-lg`, carried because `SheetContent` asks for it
-  /// by that name (`components/ui/sheet.tsx`) and `globals.css` never
-  /// redeclares `--shadow-lg` — so the framework default is what renders.
-  ///
-  /// Deliberately outside the `e1`–`e4` ladder: it is not part of this
-  /// system's elevation vocabulary, and calling it `e3` would launder a
-  /// foreign value into the token set.
-  static const ShadowStyle tailwindLg = ShadowStyle(<ShadowLayer>[
-    ShadowLayer(0, 10, 15, -3, _tailwindShadowInk),
-    ShadowLayer(0, 4, 6, -4, _tailwindShadowInk),
+  /// Elevation for large overlay panels such as sheets and menus.
+  static const ShadowStyle overlay = ShadowStyle(<ShadowLayer>[
+    ShadowLayer(0, 10, 15, -3, _overlayShadowInk),
+    ShadowLayer(0, 4, 6, -4, _overlayShadowInk),
   ]);
 
-  /// Tailwind's stock `shadow-md`, carried for the same reason as
-  /// [tailwindLg]: `SelectContent` asks for it by that name
-  /// (`components/ui/select.tsx`) and `globals.css` never redeclares
-  /// `--shadow-md`, so the framework default is what renders.
-  ///
-  /// `0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)`.
-  ///
-  /// DOCUMENTED DRIFT (forms-map drift 16): it is the only elevation on the
-  /// forms page not drawn from the `--shadow-*` token set — fixed black at
-  /// 10%, with no theme response at all, under a popover whose fill flips.
-  static const ShadowStyle tailwindMd = ShadowStyle(<ShadowLayer>[
-    ShadowLayer(0, 4, 6, -1, _tailwindShadowInk),
-    ShadowLayer(0, 2, 4, -2, _tailwindShadowInk),
+  /// Elevation for compact anchored surfaces such as popovers and selects.
+  static const ShadowStyle popover = ShadowStyle(<ShadowLayer>[
+    ShadowLayer(0, 4, 6, -1, _overlayShadowInk),
+    ShadowLayer(0, 2, 4, -2, _overlayShadowInk),
   ]);
 
-  /// Tailwind's stock `shadow-xl`, carried for the same reason as [tailwindLg]
-  /// and [tailwindMd]: `ChartTooltipContent` asks for it by that name
-  /// (`components/ui/chart.tsx` — `rounded-lg border border-border/50
-  /// bg-background px-2.5 py-1.5 text-xs shadow-xl`) and `globals.css` never
-  /// redeclares `--shadow-xl`, so the framework default is what renders.
-  ///
-  /// `0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)`.
-  ///
-  /// The third foreign elevation in the system, and the third one to arrive
-  /// through a vendored shadcn component rather than through a design
-  /// decision — which is why it stays outside the `e1`–`e4` ladder like the
-  /// other two.
-  static const ShadowStyle tailwindXl = ShadowStyle(<ShadowLayer>[
-    ShadowLayer(0, 20, 25, -5, _tailwindShadowInk),
-    ShadowLayer(0, 8, 10, -6, _tailwindShadowInk),
+  /// Strong elevation for data-rich transient surfaces such as chart
+  /// tooltips.
+  static const ShadowStyle dataTooltip = ShadowStyle(<ShadowLayer>[
+    ShadowLayer(0, 20, 25, -5, _overlayShadowInk),
+    ShadowLayer(0, 8, 10, -6, _overlayShadowInk),
   ]);
 
-  /// Tailwind's stock `shadow-sm`, the fourth foreign elevation and the
-  /// smallest: `Sidebar`'s `floating` variant lifts its panel with it
-  /// (`group-data-[variant=floating]:shadow-sm`) and its `inset` variant lifts
-  /// the **main column** with it (`md:peer-data-[variant=inset]:shadow-sm`).
-  /// `globals.css` never redeclares `--shadow-sm`, so the framework default is
-  /// what renders.
-  ///
-  /// `0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)`.
-  static const ShadowStyle tailwindSm = ShadowStyle(<ShadowLayer>[
-    ShadowLayer(0, 1, 3, 0, _tailwindShadowInk),
-    ShadowLayer(0, 1, 2, -1, _tailwindShadowInk),
+  /// Subtle elevation for floating navigation and inset application shells.
+  static const ShadowStyle floatingPanel = ShadowStyle(<ShadowLayer>[
+    ShadowLayer(0, 1, 3, 0, _overlayShadowInk),
+    ShadowLayer(0, 1, 2, -1, _overlayShadowInk),
   ]);
 
   /// `--shadow-e1: 0 1px 1px var(--ink-2), 0 1px 3px var(--ink-1)`

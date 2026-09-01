@@ -933,14 +933,22 @@ class ApprovalCard extends StatelessWidget {
                 ),
               ],
               SizedBox(height: gap),
-              Row(
+              // Two buttons side by side, neither of which shrinks its own
+              // label — a plain `Row` overflows once "Approve" and "Decline"
+              // no longer both fit at large text scales. A pair of
+              // `Expanded`s would squeeze the labels instead of overflowing,
+              // but a control that needs more than half the width to read
+              // should drop to its own line rather than be compressed, so
+              // `Wrap` is the more honest answer here.
+              Wrap(
+                spacing: actionGap,
+                runSpacing: actionGap,
                 children: <Widget>[
                   Button(
                     size: ButtonSize.sm,
                     onPressed: approval.approve,
                     child: const Text('Approve'),
                   ),
-                  SizedBox(width: actionGap),
                   Button(
                     variant: ButtonVariant.outline,
                     size: ButtonSize.sm,

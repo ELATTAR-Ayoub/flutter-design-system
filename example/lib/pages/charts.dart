@@ -5659,7 +5659,7 @@ class _MotionReadout extends StatelessWidget {
           'animationEasing',
           '"ease-out" · the keyword recharts received instead, because its '
               'types take no cubic-bezier here — reproduced as '
-              'MotionCurves.cssEaseOut',
+              'MotionCurves.decelerate',
         ),
         _meta(
           'isAnimationActive',

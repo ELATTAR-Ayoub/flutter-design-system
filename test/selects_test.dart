@@ -822,7 +822,7 @@ void main() {
           matching: find.byType(Surface),
         ),
       );
-      expect(surface.spec.layers.skip(1).toList(), Shadows.tailwindMd.layers);
+      expect(surface.spec.layers.skip(1).toList(), Shadows.popover.layers);
       expect(surface.spec.layers.first.spread, BorderWidths.hairline);
       expect(surface.radius, BorderRadius.circular(Radii.lg));
       expect(surface.fill, themeIn(t, PopoverSurface).popover);

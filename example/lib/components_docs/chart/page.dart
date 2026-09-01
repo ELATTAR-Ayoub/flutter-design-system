@@ -782,7 +782,7 @@ const List<DocsApiFact> _motionFacts = <DocsApiFact>[
     name: 'curve',
     type: 'Curve (static getter)',
     description:
-        'MotionCurves.cssEaseOut, not MotionCurves.enter. Documented drift: recharts '
+        'MotionCurves.decelerate, not MotionCurves.enter. Documented drift: recharts '
         'can only receive the CSS keyword "ease-out" '
         '(cubic-bezier(0,0,0.58,1)), a visibly different curve from the '
         'design system\'s own MotionCurves.enter. Reproducing the reference '
@@ -1145,7 +1145,7 @@ class _DependenciesContent extends StatelessWidget {
         'Flutter imports: package:flutter/widgets.dart only — no '
             'package:flutter/material.dart anywhere in the file.',
         'Foundation imports: foundation/motion.dart (MotionDurations, '
-            'MotionCurves), foundation/shadows.dart (Shadows.tailwindXl, the '
+            'MotionCurves), foundation/shadows.dart (Shadows.dataTooltip, the '
             "tooltip panel's own shadow), foundation/spacing.dart (space()), "
             'foundation/theme.dart, foundation/typography.dart (Fonts, '
             'TextStyleToken), theme_scope.dart (StyledText, ThemeScope, '
@@ -1189,7 +1189,7 @@ class _ThemingContent extends StatelessWidget {
             'fill and hairline, at 50% alpha), theme.foreground (a row\'s '
             'printed value, and the fallback ink for an indicator or swatch '
             'with no colour of its own).',
-        'The tooltip panel\'s shadow is Shadows.tailwindXl, a fixed '
+        'The tooltip panel\'s shadow is Shadows.dataTooltip, a fixed '
             'token, not one that varies by state — there is no separate '
             '"open" or "pinned" elevation.',
         'Every label chart.dart draws is ChartText.xs, xsMedium, or '

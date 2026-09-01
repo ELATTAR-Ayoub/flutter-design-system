@@ -222,7 +222,7 @@ class Icon extends StatelessWidget {
 
   /// The `strokeWidth` the reference computes for a glyph rendered at [px].
   ///
-  /// A transcript of one expression in `icon.tsx`:
+  /// The Flutter equivalent of one expression in the historical icon source:
   ///
   /// ```tsx
   /// strokeWidth={(2 * 24) / px > 2.6 ? 2.4 : (2 * 24) / px < 1.5 ? 1.6 : 2}

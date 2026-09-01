@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/toggle.dart",
       "target": "@ui/toggle.dart",
-      "sha256": "b9bb7b553886093daef961ce961025c71f231e062125ad4d67e2521fda64d535"
+      "sha256": "484fb04a079f439559c3fddfdc22d75a4bb03a8b02cf648c6dcae624b75859ef"
     }
   ],
   "registryDependencies": [

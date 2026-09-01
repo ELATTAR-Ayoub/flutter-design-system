@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+// This migration runs from the repository root beside the nested registry
+// builder package; a package import cannot address that sibling package.
+// ignore: avoid_relative_lib_imports
 import '../registry_builder/lib/generator.dart' show sha256Hex;
 
 const Map<String, String> itemNames = <String, String>{
@@ -84,8 +87,9 @@ void main() {
       final exports = <String>{};
       for (final entry in manifestFiles) {
         final source = entry['source']! as String;
-        if (source.endsWith('.dart'))
+        if (source.endsWith('.dart')) {
           exports.addAll(_publicDeclarations(source));
+        }
       }
       json['exports'] = exports.toList()..sort();
     }
@@ -143,8 +147,9 @@ void _refreshHashes(Map<String, Object?> json) {
     if (entries is! List<Object?>) continue;
     for (final entry in entries.cast<Map<String, Object?>>()) {
       final file = File(entry['source']! as String);
-      if (file.existsSync())
+      if (file.existsSync()) {
         entry['sha256'] = sha256Hex(file.readAsBytesSync());
+      }
     }
   }
 }

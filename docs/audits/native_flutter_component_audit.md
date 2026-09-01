@@ -253,7 +253,7 @@ One row per component file in `lib/src/components/ui/`, one column per axis. A c
 | `breadcrumb` | verified | verified | audited | verified | audited | audited | audited | audited | n/a | audited | **interaction** — test/interaction_kernel_test.dart (via Press)<br>**keyboard & focus** — test/interaction_kernel_test.dart (via Press) |
 | `bubble` | verified | audited | audited | audited | audited | audited | audited | audited | n/a | audited | — |
 | `button` | verified | audited | audited | audited | audited | audited | audited | audited | n/a | audited | — |
-| `button_group` | verified | n/a | audited | n/a | audited | n/a | open | n/a | n/a | audited | **text scale & reflow** — scrolls now; the docs specimen still composes a rigid row — see example/test/responsive_text_scale_test.dart |
+| `button_group` | verified | n/a | audited | n/a | audited | n/a | verified | n/a | n/a | audited | **text scale & reflow** — `example/test/responsive_text_scale_test.dart`; the parent specimen owns narrow scrolling without changing ButtonGroup's content-sized contract |
 | `calendar` | verified | audited | audited | audited | audited | audited | audited | audited | n/a | audited | — |
 | `card` | verified | n/a | audited | n/a | audited | n/a | audited | n/a | n/a | audited | — |
 | `carousel` | verified | n/a | audited | n/a | audited | n/a | audited | audited | audited | audited | — |
@@ -263,8 +263,8 @@ One row per component file in `lib/src/components/ui/`, one column per axis. A c
 | `chart_polar` | verified | n/a | audited | n/a | audited | n/a | audited | audited | audited | audited | — |
 | `checkbox` | verified | audited | audited | audited | audited | verified | audited | n/a | n/a | audited | **target sizing** — test/selection_feedback_test.dart (HitArea) |
 | `collapsible` | verified | n/a | audited | n/a | audited | n/a | audited | audited | audited | audited | — |
-| `combobox` | verified | audited | audited | audited | audited | open | audited | n/a | n/a | audited | **target sizing** — list rows, as `menu`. |
-| `command` | verified | audited | audited | audited | audited | open | audited | n/a | n/a | audited | **target sizing** — list rows, as `menu`. |
+| `combobox` | verified | verified | verified | verified | verified | verified | audited | n/a | verified | audited | **interaction / overlay / keyboard / semantics / disposal** — `test/overlay_menu_family_test.dart`, `test/select_combobox_keyboard_test.dart`<br>**target sizing** — `test/target_sizing_test.dart` |
+| `command` | verified | verified | n/a | verified | verified | verified | audited | n/a | verified | audited | **interaction / keyboard / semantics / disposal** — `test/overlay_menu_family_test.dart`<br>**target sizing** — `test/target_sizing_test.dart` |
 | `content_change` | n/a | n/a | audited | n/a | audited | n/a | n/a | n/a | n/a | audited | — |
 | `context_menu` | verified | n/a | audited | n/a | audited | n/a | audited | n/a | n/a | audited | — |
 | `dialog` | verified | audited | verified | verified | verified | audited | verified | audited | verified | audited | **overlay lifecycle** — test/overlay_lifecycle_test.dart<br>**keyboard & focus** — test/overlay_lifecycle_test.dart<br>**semantics** — test/overlay_lifecycle_test.dart<br>**text scale & reflow** — root suite — DialogFooter wraps<br>**disposal** — test/overlay_lifecycle_test.dart |
@@ -288,7 +288,7 @@ One row per component file in `lib/src/components/ui/`, one column per axis. A c
 | `keyframes` | n/a | n/a | audited | n/a | audited | n/a | n/a | audited | audited | audited | — |
 | `marker` | n/a | n/a | audited | n/a | audited | n/a | n/a | n/a | n/a | audited | — |
 | `media_scrim` | n/a | n/a | audited | n/a | audited | n/a | n/a | n/a | n/a | audited | — |
-| `menu` | verified | audited | audited | audited | audited | open | audited | n/a | n/a | audited | **target sizing** — rows are 36px and packed; a symmetric expansion would make each row answer for its neighbour. Reference geometry drives the scroll math. Decided: not expanded. |
+| `menu` | verified | verified | verified | verified | verified | verified | audited | n/a | verified | audited | **interaction / overlay / keyboard / semantics / disposal** — `test/overlay_menu_family_test.dart`<br>**target sizing** — `test/target_sizing_test.dart` asserts real row layout boxes are at least 44 logical pixels |
 | `menubar` | verified | n/a | audited | n/a | audited | n/a | audited | n/a | n/a | audited | — |
 | `message` | verified | n/a | audited | n/a | audited | n/a | audited | n/a | n/a | audited | — |
 | `message_scroller` | verified | n/a | audited | n/a | audited | n/a | audited | audited | n/a | audited | — |
@@ -303,8 +303,8 @@ One row per component file in `lib/src/components/ui/`, one column per axis. A c
 | `radio` | verified | audited | audited | audited | audited | verified | audited | n/a | n/a | audited | **target sizing** — test/selection_feedback_test.dart (HitArea) |
 | `resizable` | verified | n/a | audited | n/a | audited | n/a | audited | n/a | n/a | audited | — |
 | `safe_area` | n/a | n/a | audited | n/a | audited | n/a | n/a | n/a | n/a | audited | — |
-| `scroll_area` | verified | audited | audited | audited | audited | open | audited | n/a | n/a | audited | **target sizing** — the scrollbar is a pointer affordance duplicating the scrollable's own keyboard scrolling. Decided: not a control, not expanded. |
-| `select` | verified | audited | audited | audited | audited | open | audited | audited | n/a | audited | **target sizing** — list rows, as `menu`. The trigger IS expanded. |
+| `scroll_area` | verified | verified | n/a | verified | verified | n/a | audited | n/a | verified | audited | **interaction / keyboard / semantics / disposal** — `test/scroll_area_platform_test.dart`; the thumb is a pointer affordance and not a semantic control, while viewport touch and keyboard scrolling remain available |
+| `select` | verified | verified | verified | verified | verified | verified | audited | audited | verified | audited | **interaction / overlay / keyboard / semantics / disposal** — `test/overlay_menu_family_test.dart`, `test/select_combobox_keyboard_test.dart`<br>**target sizing** — `test/target_sizing_test.dart` |
 | `selection_control` | verified | verified | audited | verified | audited | verified | audited | audited | n/a | audited | **interaction** — test/selection_feedback_test.dart<br>**keyboard & focus** — test/selection_feedback_test.dart<br>**target sizing** — test/selection_feedback_test.dart (HitArea) |
 | `separator` | n/a | n/a | audited | n/a | audited | n/a | n/a | n/a | n/a | audited | — |
 | `sheet` | verified | n/a | audited | n/a | audited | n/a | audited | n/a | n/a | audited | — |
@@ -320,7 +320,7 @@ One row per component file in `lib/src/components/ui/`, one column per axis. A c
 | `textarea` | verified | audited | audited | audited | audited | audited | audited | n/a | n/a | audited | — |
 | `toaster` | verified | verified | audited | verified | verified | audited | audited | audited | audited | audited | **interaction** — test/interaction_kernel_test.dart (via Press)<br>**keyboard & focus** — test/interaction_kernel_test.dart (via Press)<br>**semantics** — test/interaction_kernel_test.dart (via Press) |
 | `toggle` | verified | audited | audited | audited | audited | audited | audited | audited | n/a | audited | — |
-| `toggle_group` | verified | n/a | audited | n/a | audited | open | verified | n/a | n/a | audited | **target sizing** — items are packed edge to edge; a standalone `Toggle` IS expanded.<br>**text scale & reflow** — root suite — scrolls |
+| `toggle_group` | verified | verified | n/a | verified | verified | verified | verified | audited | verified | audited | **interaction / keyboard / semantics / disposal** — `test/interaction_kernel_test.dart`<br>**target sizing** — `test/target_sizing_test.dart`<br>**text scale & reflow** — root and responsive route suites |
 | `tooltip` | verified | n/a | audited | n/a | audited | n/a | audited | audited | audited | audited | — |
 | `user_menu` | verified | n/a | audited | n/a | audited | n/a | audited | n/a | n/a | audited | — |
 | `validation_rule` | verified | n/a | n/a | n/a | audited | n/a | audited | n/a | n/a | audited | — |
@@ -334,29 +334,24 @@ One row per component file in `lib/src/components/ui/`, one column per axis. A c
 | `lib/src/design_system/foundation/typography.dart` | authored | **remove** the 27-class transcript, `TextColorRole`, `defaultColor`, `uppercase`, the fluid size functions, `Fonts.heading`, `Fonts.accent`; **translate** family/size/leading/weight/tracking/features into 17 roles with three responsive steps; **fix** the sub-14px reading sizes | complete | `test/foundation_type_motion_test.dart` — 17 roles asserted field by field, boundary tests at 767/768/1023/1024, no-ink test over every role |
 | `lib/src/design_system/foundation/text_layout.dart` | authored | **keep** — `LineBox`/`InlineBox`/`glueInlineBoxes` are Flutter layout corrections, not CSS emulation | complete | `test/text_layout_test.dart` — one line is the role's own leading, for all 17 roles |
 | `lib/src/design_system/foundation/theme_scope.dart` | authored | **remove** `Fluid`, colour-from-role resolution and the uppercase transform; **translate** `StyledText` into a width-resolving renderer; **keep** `ThemeScope`, `RichText`, `effectiveMotionDuration`; **document** `TypeWidthScope` as the region override | complete | `test/theme_scope_test.dart` — width scope, step resolution, inherited ink, authored text |
-| `lib/src/design_system/foundation/colors.dart` | authored | pending | pending | — |
-| `lib/src/design_system/foundation/theme.dart` | authored | pending | pending | — |
-| `lib/src/design_system/foundation/spacing.dart` | authored | pending | pending | — |
-| `lib/src/design_system/foundation/shadows.dart` | authored | pending | pending | — |
-| `lib/src/design_system/foundation/surfaces.dart` | authored | pending | pending | — |
-| `lib/src/design_system/foundation/motion.dart` | authored | pending | pending | — |
-| `lib/src/design_system/foundation/media.dart` | authored | pending | pending | — |
+| `lib/src/design_system/foundation/colors.dart` | authored | **keep** — semantic Flutter color ramps and contrast relationships; historical CSS notes are provenance only | complete | `test/token_guard_test.dart`, both-theme responsive matrix |
+| `lib/src/design_system/foundation/theme.dart` | authored | **keep** — resolved light/dark Flutter theme contract; no browser cascade | complete | `test/theme_scope_test.dart`, both-theme responsive matrix |
+| `lib/src/design_system/foundation/spacing.dart` | authored | **keep** — logical-pixel spacing, radius, target and layout tokens | complete | `test/token_guard_test.dart`, `test/target_sizing_test.dart` |
+| `lib/src/design_system/foundation/shadows.dart` | authored | **translate** — web-framework names removed; `floatingPanel`, `popover`, `overlay`, and `dataTooltip` describe native Flutter use while preserving reviewed geometry | complete | component suites plus `test/flutter_authority_test.dart` |
+| `lib/src/design_system/foundation/surfaces.dart` | authored | **keep** — native Flutter surface painting and theme-resolved elevation | complete | surface/component suites and token guard |
+| `lib/src/design_system/foundation/motion.dart` | authored | **translate** — compatibility curves use semantic Flutter names (`balanced`, `decelerate`, `symmetric`); measured values retained | complete | `test/foundation_type_motion_test.dart`, `test/feedback_effects_test.dart`, `test/flutter_authority_test.dart` |
+| `lib/src/design_system/foundation/media.dart` | authored | **keep** — Flutter media and reduced-motion contract | complete | responsive matrix reduced-motion cases and motion suites |
 | `lib/src/design_system/foundation/date_format.dart` | authored | **translate** — the day number derives tabular figures from `body` | complete | `test/calendar_test.dart` |
 | `lib/elattar_design_system.dart` (public barrel) | authored | **keep** — whole-file exports, so `TypeGroup`, `TypeStep` and `TypeWidthScope` are public and the retired members are gone with their declarations | complete | `test/public_api_prefix_test.dart` |
-| `pubspec.yaml` (SDK floor, fonts, assets) | authored | **remove** the Redaction 35 registration and packaged asset | fonts complete; **SDK floor still `flutter: >=1.17.0` and not yet corrected** | `test/assets_test.dart`, `test/license_distribution_test.dart` |
+| `pubspec.yaml` (SDK floor, fonts, assets) | authored | **remove** the Redaction 35 registration and packaged asset; state the verified Flutter floor | complete — Flutter `>=3.44.8`, Dart `^3.12.2` | `test/assets_test.dart`, `test/license_distribution_test.dart`, analyzers |
 
-## What "type contract complete" means, and what it does not
+## How to read the completed matrix
 
-Every one of the 100 rows above has had its **typography and any geometry
-derived from typography** migrated to the native contract, and the whole root
-suite is green against it. That is one batch of the master plan — Workstream 1
-and the parts of Workstreams 3 and 4 that it forced.
-
-It is **not** the full per-row acceptance in the plan's matrix. The
-interaction-kernel, overlay-lifecycle, semantics, focus, 44x44-target and
-reduced-motion audits (Workstream 2, and the per-row "validate" work) have not
-been performed for these rows, and no row should be read as signed off on those
-axes.
+Typography and typography-derived geometry are complete across all 100 rows.
+The shared interaction, overlay, focus, semantics, 44 by 44 target, disposal,
+responsive, and reduced-motion contracts have also been exercised by their
+named focused suites. A cell still marked `audited` remains static-inspection
+evidence, deliberately weaker than `verified`; it is not silently promoted.
 
 ## Workstream 2 — what was changed, and what was decided against
 
@@ -382,12 +377,12 @@ axes.
 
 | Component | Axis | Decision |
 |---|---|---|
-| `menu`, `select`, `combobox`, `command` (list rows) | target sizing | **Not expanded.** The rows are packed with no gap, so a symmetric hit expansion would make each row answer for its neighbour's edge — a worse failure than a small target. The row height also drives the popup's scroll math (`(index + 0.5) x itemHeight`), and the existing tests are authoritative on that geometry. |
-| `toggle_group` items | target sizing | **Not expanded**, for the same reason. A standalone `Toggle` is. |
+| `menu`, `select`, `combobox`, `command` (list rows) | target sizing | **Corrected in layout.** Their real row boxes are at least 44 logical pixels, and popup height, alignment, and scroll math use the same geometry. `test/target_sizing_test.dart` verifies the rendered boxes rather than an invisible overlap. |
+| `toggle_group` items | target sizing | **Corrected in layout.** Each item owns a real 44 logical pixel minimum without overlapping its neighbour; the group scrolls when the available width cannot contain its content. |
 | `scroll_area` scrollbar | interaction, semantics, target sizing | **Not a control.** It duplicates the scrollable's own keyboard scrolling; making it focusable would add a Tab stop that does nothing new. |
 | `input`, `textarea`, `input_otp`, `field` | keyboard & focus | **No change.** The tap handler focuses the field; `EditableText` owns the keyboard, and each announces `Semantics(textField: true)`. |
 | `button_group`, `pagination` | text scale & reflow | **Not scrolled — tried and reverted.** Wrapping either `w-fit` row in its own horizontal scroll view unbounds the width its members measure against. That changed what every specimen of both components measures, and `IntrinsicHeight` over `ButtonGroup`'s slot render objects then flushed semantics against boxes that were never laid out (`RenderBox was not laid out`, 45 exceptions in one docs test). Six `button_group` and seven `pagination` docs tests caught it. Reverted; the consumer decides whether these rows scroll, as it does for a wide table. |
-| The 18 docs specimen pages listed in `example/test/responsive_text_scale_test.dart` | text scale & reflow | **Deferred and named.** Each is a hand-built figure in `example/lib` laid out for a desktop column, not a library defect. The list is explicit: every route not on it is a live regression test. |
+| Documentation specimens | text scale & reflow | **No deferral remains.** `example/test/responsive_text_scale_test.dart` has no skip or pending allowlist and passes 134 route/configuration cases across mobile, tablet, desktop, both themes, 100%/200% text, and reduced motion on animated routes. |
 
 ### Sweeps, as run
 
@@ -413,17 +408,17 @@ Flutter this tree has actually been verified against — which is now what
 
 | Command | Result |
 |---|---|
-| `dart format lib test tool/… example/lib example/test packages/…` | 647 files, 18 changed |
 | `flutter analyze` (root) | no issues |
-| `flutter test` (root) | **1514 passed, 0 failed** |
-| `cd example && flutter analyze lib test` | no issues |
-| `cd example && flutter test` | **1436 passed, 0 failed** |
-| `cd example && flutter build web --release` | built `build/web` (77.9s compile) |
+| `flutter test` (root) | **1685 passed, 0 failed** |
+| `cd example && flutter analyze` | no issues |
+| `cd example && flutter test` | **1876 passed, 0 failed** |
+| `cd example && flutter build web --release` | built `build/web` (73.9s final compile) |
 | `cd packages/elattar_cli && dart test` | **129 passed, 0 failed** |
-| `cd tool/release_audit && dart test` | 32 passed |
-| `cd tool/registry_builder && dart test` | 5 passed |
-| `cd tool/release_registry && dart test` | 28 passed |
-| `dart run tool/registry_builder/bin/reseal.dart --apply` | 56 + 3 pins across 54 + 3 manifests |
+| `cd tool/release_audit && dart test` | 36 passed |
+| `cd tool/registry_builder && dart test` | 11 passed |
+| `cd tool/release_registry && dart test` | 29 passed |
+| `cd tool/deploy_site && dart test` | 17 passed |
+| `dart run tool/registry_builder/bin/reseal.dart --apply` | 52 pins across 43 manifests |
 | `dart run tool/registry_builder/bin/build.dart .` | generated 99 items |
 | `dart run tool/registry_builder/bin/validate.dart …/registry.json` | valid, 99 items, schema v1 |
 | `dart run tool/release_audit/bin/verify.dart .` | **12 checks, 0 failures** |
@@ -444,15 +439,29 @@ empty project, then analyses and runs that project.
 - The semantic colour tokens are untouched: 97 `theme.accent` /
   `accentForeground` / `agentAccent` references remain.
 
-### Scanner findings, unchanged by this batch
+The per-component rows above retain the 1514-test count recorded by the
+typography migration that created them. The current full-tree result is 1685;
+this table is the release-readiness result and supersedes that historical row
+annotation.
+
+### Scanner findings, classified
 
 `dart run skills/elattar-flutter-ui-director/scripts/check_ui_completeness.dart
-example/lib` reports 398 heuristic findings over the documentation app:
+example/lib` reports 396 heuristic findings over the documentation app:
 `dead-press` 239 (a component gallery's specimens have no-op handlers by
-design), `raw-token` 128, `no-empty` 15, `no-loading` 7, `copy` 7,
-`unlabelled-icon` 2. None of the sampled findings sit in code this batch
-authored, and `test/token_guard_test.dart` — the enforced subset of the same
-rule over `lib/` and `example/lib/` — is green.
+design), `raw-token` 128, `no-empty` 15, `no-loading` 7, and `copy` 7.
+`unlabelled-icon` is now zero after the split-button specimen received the
+missing `Show save options` label.
+
+The scanner's own verification guide says to exclude specimen and
+documentation directories instead of treating their intentionally inert
+controls as product defects. With `example/lib/components_docs/` and the
+retired `example/lib/pages/` specimen tree excluded, 13 findings remain: six
+copy/scroll/asset awaits that already expose pending state or are not data
+loads; three fixed compile-time catalogs that cannot be empty; three inert
+buttons in the homepage component specimen; and one two-second copied-state
+dwell. None is an unexplained product-state defect. `test/token_guard_test.dart`
+— the enforced literal gate over `lib/` and `example/lib/` — is green.
 
 ---
 

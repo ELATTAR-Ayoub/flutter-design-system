@@ -778,7 +778,7 @@ class _ThemingContent extends StatelessWidget {
         'theme.muted paints DrawerHandle\'s grip pill. drawer.dart '
             'never reads Shadows: the panel carries no '
             'elevation/shadow spec at all, unlike Sheet\'s '
-            'Shadows.tailwindLg.',
+            'Shadows.overlay.',
         'Radii.xl (16px) rounds the top corners only (rounded-t-xl); '
             'the bottom stays square, flush with the viewport edge.',
         'DrawerHeader and DrawerFooter carry NO muted band or rule '

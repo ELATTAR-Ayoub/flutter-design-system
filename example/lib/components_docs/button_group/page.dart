@@ -463,6 +463,7 @@ class _SplitSpecimen extends StatelessWidget {
         const ButtonGroupSeparator(),
         Button(
           onPressed: () {},
+          label: 'Show save options',
           child: const Icon(
             IconGlyph.chevronDown,
             size: IconSize.sm,
@@ -484,6 +485,7 @@ const String _splitCode =
     '    const ButtonGroupSeparator(),\n'
     '    Button(\n'
     '      onPressed: () {},\n'
+    "      label: 'Show save options',\n"
     '      child: const Icon(IconGlyph.chevronDown, size: IconSize.sm),\n'
     '    ),\n'
     '  ],\n'

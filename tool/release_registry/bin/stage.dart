@@ -15,7 +15,15 @@ import '../../registry_builder/lib/registry_schema.dart';
 import '../../registry_builder/lib/registry_validator.dart';
 import '../lib/stage.dart';
 
-Future<int> main(List<String> arguments) async {
+Future<void> main(List<String> arguments) async {
+  exitCode = await run(arguments);
+}
+
+/// Runs the staging command and returns the process exit code.
+///
+/// Keep this separate from [main]: Dart does not use a value returned by
+/// `main` as the process exit code.
+Future<int> run(List<String> arguments) async {
   String version = '';
   String webRoot = 'example/build/web';
   String source = 'registry/generated/latest';

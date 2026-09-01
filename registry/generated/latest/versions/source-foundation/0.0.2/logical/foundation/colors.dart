@@ -1,14 +1,14 @@
-/// Raw colour of the design system — the ramps, the state hues, and the colour
-/// maths the reference stylesheet performs in CSS.
+/// Raw colour of the Flutter design system: ramps, state hues, and colour
+/// relationships shared by every component.
 ///
-/// Source of truth: `app/globals.css` in the reference repo
-/// (`D:/DESIGN/Design-System-2026-8/design-system/app/globals.css`).
-/// Line references in this file point at that stylesheet.
+/// This Flutter foundation file is the source of truth. Historical stylesheet
+/// references below record provenance only; they do not define current
+/// behavior.
 ///
 /// This file and its siblings under `lib/src/design_system/foundation/` are the ONLY place in
 /// the package where a literal is allowed; `test/token_guard_test.dart` enforces
 /// that. Every doc comment carries the CSS declaration it transcribes, so the
-/// file reads as a transcript rather than as a set of choices.
+/// file remains auditable without outsourcing ownership of the choices.
 library;
 
 import 'dart:math' as math;

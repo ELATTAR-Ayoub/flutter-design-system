@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/command.dart",
       "target": "@ui/command.dart",
-      "sha256": "271e6d1ed54648815f3af3d21092be3c59886303d2fee9a9767f96c32437456c"
+      "sha256": "ff5d890a35faf9c7e1777ee0672c7d180d7ed5c77191dad441e965459c18b15b"
     }
   ],
   "registryDependencies": [

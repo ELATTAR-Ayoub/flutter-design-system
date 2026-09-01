@@ -120,7 +120,7 @@ class SheetPanel extends StatelessWidget {
               width: BorderWidths.hairline,
             ),
           ),
-          boxShadow: Shadows.tailwindLg.outerShadows(theme),
+          boxShadow: Shadows.overlay.outerShadows(theme),
         ),
         // `w-72` is the *border* box: `box-sizing: border-box` spends one of
         // those 288 pixels on the right-hand hairline, so the panel's content
@@ -502,7 +502,7 @@ class SheetContent extends StatelessWidget {
               SheetSide.top => Border(bottom: edge),
               SheetSide.bottom => Border(top: edge),
             },
-            boxShadow: Shadows.tailwindLg.outerShadows(theme),
+            boxShadow: Shadows.overlay.outerShadows(theme),
           ),
           child: Padding(
             // `box-sizing: border-box` — the border is paid out of the 384.

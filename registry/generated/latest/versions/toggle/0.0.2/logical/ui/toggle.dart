@@ -65,7 +65,6 @@ import 'package:flutter/widgets.dart'
         Table,
         TableColumnWidth;
 
-import './press.dart';
 import './surface.dart';
 import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
@@ -446,13 +445,29 @@ class _ToggleState extends State<Toggle> {
           },
     );
 
-    toggle = SizedBox(height: Toggle.heightFor(widget.size), child: toggle);
+    // TARGET SIZING: [Toggle.heightFor] and [Toggle.minWidthFor] stay the
+    // reference's own 28/32/36 — the `#api` table on the toggle page prints
+    // those exact numbers, and [test/components_test.dart] pins them. The
+    // floor to [TouchTargets.minimum] is applied here instead, to the real
+    // layout box: this control paints its own fill, border and radius, so a
+    // control below the touch minimum grows its whole visible surface rather
+    // than sitting inside a larger invisible hit area — see the removed
+    // `TapTarget` wrap below.
+    toggle = SizedBox(
+      height: math.max(Toggle.heightFor(widget.size), TouchTargets.minimum),
+      child: toggle,
+    );
     // `min-w-*`. Outside the height so the floor reaches the content: the
     // padding subtracts from it on the way down, exactly as it does in a
     // border-box layout, leaving the label a 12px minimum measure on a 32px
     // control.
     toggle = ConstrainedBox(
-      constraints: BoxConstraints(minWidth: Toggle.minWidthFor(widget.size)),
+      constraints: BoxConstraints(
+        minWidth: math.max(
+          Toggle.minWidthFor(widget.size),
+          TouchTargets.minimum,
+        ),
+      ),
       child: toggle,
     );
 
@@ -489,11 +504,16 @@ class _ToggleState extends State<Toggle> {
       child: IgnorePointer(ignoring: !_enabled, child: toggle),
     );
 
-    // A 32px control against a 44px finger. Expanded only when the toggle
-    // stands alone: inside a `ToggleGroup` the items are packed edge to edge,
-    // and a symmetric expansion would make each one answer for its
-    // neighbour's border rather than for itself.
-    if (!widget.inExclusiveGroup) toggle = TapTarget(child: toggle);
+    // TARGET SIZING, was `if (!widget.inExclusiveGroup) toggle =
+    // TapTarget(child: toggle)`: a grown, invisible hit box was the standalone
+    // control's own answer, and grouped items opted out of it entirely,
+    // trusting their neighbours' padding to make up the difference — which
+    // the owner has ruled out. Adjacency is not an exemption: two items 8px
+    // apart with a `TapTarget` margin each would overlap into that gap, and a
+    // finger landing there could not tell which item it meant. The
+    // `SizedBox`/`ConstrainedBox` floor above is real for both cases —
+    // standalone and grouped alike — so nothing here needs to grow a hit
+    // box that no longer falls short of one.
 
     return Semantics(
       button: true,

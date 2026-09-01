@@ -355,7 +355,7 @@ void main() {
       addTearDown(trigger.dispose);
       await t.pumpWidget(menuHost(triggerFocus: trigger, enabled: false));
 
-      await t.tap(find.text('Open menu'));
+      await t.tap(find.text('Open menu'), warnIfMissed: false);
       await t.pump();
 
       expect(find.byType(MenuContent), findsNothing);
@@ -611,7 +611,7 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(selectHost(enabled: false));
-      await t.tap(find.byType(Select<String>));
+      await t.tap(find.byType(Select<String>), warnIfMissed: false);
       await t.pump();
       expect(find.byType(SelectMenu<String>), findsNothing);
     });
@@ -862,7 +862,7 @@ void main() {
       addTearDown(input.dispose);
       await t.pumpWidget(comboboxHost(enabled: false, focusNode: input));
 
-      await t.tap(find.byType(Combobox<String>));
+      await t.tap(find.byType(Combobox<String>), warnIfMissed: false);
       await t.pump();
       expect(find.text('Alpha'), findsNothing);
     });

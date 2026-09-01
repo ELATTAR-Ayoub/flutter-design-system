@@ -71,6 +71,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
@@ -257,12 +258,32 @@ class _AttachmentState extends State<Attachment> {
               ],
             ],
           )
-        // `IntrinsicWidth` is what makes `flex-1` expressible on a `w-fit`
-        // card: the row shrink-wraps its content unless `min-w-40` forces it
-        // wider, and only then does the content column have slack to absorb.
-        // A bare `Expanded` cannot do that — it needs a bounded width, and a
-        // card inside a wrap gets none.
-        : IntrinsicWidth(
+        // Sizing this the way `flex-1` reads on a `w-fit` card needs the row
+        // to shrink-wrap its content unless `min-w-40` forces it wider — only
+        // then does the content column have slack to absorb. A bare
+        // `Expanded` cannot do that on its own: it needs a bounded width, and
+        // a card inside a `Wrap` gets none.
+        //
+        // Stock `IntrinsicWidth` looks like the fix, and mostly is: when the
+        // incoming width is already bounded (the ordinary case — an
+        // `Expanded` grid cell) it passes that width straight through with
+        // no intrinsic query at all. But it does not extend the same courtesy
+        // to *height* — whenever the incoming height is unbounded (any
+        // scrollable list, which is most of them) it substitutes a tight
+        // height computed from `getMaxIntrinsicHeight`, a second, separate
+        // measurement of the very same content the real layout pass is about
+        // to measure again. The two do not always agree — an `Expanded`
+        // inside the intrinsic pass gets its natural preferred width rather
+        // than the width it is actually laid out at, and at large text
+        // scales that reports a shorter box than the real one — and when
+        // they disagree the row is locked into a height too short for what
+        // it goes on to paint, which reads as a horizontal overflow once the
+        // wrapped content has nowhere left to go. [_WidthOnlyIntrinsic] is
+        // the same width fix with that second measurement removed: it bounds
+        // the width exactly as `IntrinsicWidth` does and lets the height
+        // constraint pass through untouched, so there is only ever the one
+        // real layout pass to agree with.
+        : _WidthOnlyIntrinsic(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
@@ -350,6 +371,41 @@ class _AttachmentState extends State<Attachment> {
         ),
       ),
     );
+  }
+}
+
+/// `IntrinsicWidth`, minus the intrinsic *height* pass it also does on the
+/// side — see the call site's comment for the mismatch that causes.
+///
+/// Bounds the width exactly as `IntrinsicWidth` does: a finite incoming
+/// `maxWidth` passes straight through, and only an unbounded one falls back
+/// to `getMaxIntrinsicWidth`. The height constraint is never touched — no
+/// second, intrinsic-only measurement of the child ever runs, so there is
+/// nothing for the real layout pass to disagree with.
+class _WidthOnlyIntrinsic extends SingleChildRenderObjectWidget {
+  const _WidthOnlyIntrinsic({required Widget super.child});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderWidthOnlyIntrinsic();
+}
+
+class _RenderWidthOnlyIntrinsic extends RenderProxyBox {
+  @override
+  void performLayout() {
+    final RenderBox? kid = child;
+    if (kid == null) {
+      size = constraints.smallest;
+      return;
+    }
+    final double width = constraints.hasBoundedWidth
+        ? constraints.maxWidth
+        : kid.getMaxIntrinsicWidth(constraints.maxHeight);
+    kid.layout(
+      constraints.copyWith(minWidth: width, maxWidth: width),
+      parentUsesSize: true,
+    );
+    size = constraints.constrain(kid.size);
   }
 }
 
@@ -1178,7 +1234,7 @@ class _AttachmentGroupState extends State<AttachmentGroup> {
     _c.animateTo(
       best,
       duration: effectiveMotionDuration(context, MotionDurations.normal),
-      curve: MotionCurves.cssEase,
+      curve: MotionCurves.balanced,
     );
   }
 
@@ -1266,7 +1322,7 @@ class _ScrollFadeX extends StatelessWidget {
 
   /// The leading fade grows as the box scrolls away from the start; the
   /// trailing one shrinks as it reaches the end. Both run on
-  /// [MotionCurves.cssEaseInOut] over [reveal] px.
+  /// [MotionCurves.symmetric] over [reveal] px.
   static (double start, double end) fadesFor({
     required double width,
     required double offset,
@@ -1277,8 +1333,8 @@ class _ScrollFadeX extends StatelessWidget {
     final double sT = (offset / reveal).clamp(0.0, 1.0);
     final double eT = ((offset - (max - reveal)) / reveal).clamp(0.0, 1.0);
     return (
-      full * MotionCurves.cssEaseInOut.transform(sT),
-      full * (1 - MotionCurves.cssEaseInOut.transform(eT)),
+      full * MotionCurves.symmetric.transform(sT),
+      full * (1 - MotionCurves.symmetric.transform(eT)),
     );
   }
 

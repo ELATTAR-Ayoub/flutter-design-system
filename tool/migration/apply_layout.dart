@@ -55,7 +55,7 @@ void main(List<String> arguments) {
     };
     manifestFile.parent.createSync(recursive: true);
     manifestFile.writeAsStringSync(
-      const JsonEncoder.withIndent('  ').convert(manifest) + '\n',
+      '${const JsonEncoder.withIndent('  ').convert(manifest)}\n',
     );
     stdout.writeln('prepared ${moves.length} explicit moves');
     return;

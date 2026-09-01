@@ -1072,7 +1072,7 @@ class _ThemingContent extends StatelessWidget {
         'theme.border paints the single hairline seam on the edge the '
             'panel detaches from the page along: right sheet, left '
             'edge; left sheet, right edge; and so on.',
-        'Shadows.tailwindLg is the panel\'s one elevation layer, the '
+        'Shadows.overlay is the panel\'s one elevation layer, the '
             'same shadow spec dialog\'s content uses.',
         'theme.muted at the system\'s standard 0.5 alpha bands '
             'SheetHeader and SheetFooter: the same muted-band '

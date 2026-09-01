@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/press.dart",
       "target": "@ui/press.dart",
-      "sha256": "e8170f0769f883ff69ed5e6ac0d8a1e7c312251b08eeba6babe99f6212172214"
+      "sha256": "ef2aa4231021c177a030a53d1dec0fe53434e595c1947c4a228955a627726067"
     }
   ],
   "registryDependencies": [

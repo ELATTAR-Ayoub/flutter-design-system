@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/alert.dart",
       "target": "@ui/alert.dart",
-      "sha256": "ed1adb6990dbe07545100868bdd9bb9e49619e54bcfba491bcac2322cbb38e92"
+      "sha256": "d4718f2e581619b32b3d91ca22709800aadec0f7a4cc5241604fe775482ca974"
     }
   ],
   "registryDependencies": [

@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/breadcrumb.dart",
       "target": "@ui/breadcrumb.dart",
-      "sha256": "797a4edc6f0aa951a973c808dfe4be42bfe6df0c0a5b39428304d3775841ffc4"
+      "sha256": "42260e5fbfa3585eeeeaf1519da07d91fbaccdad3ed4c706f5fa546e0fc67dad"
     }
   ],
   "registryDependencies": [

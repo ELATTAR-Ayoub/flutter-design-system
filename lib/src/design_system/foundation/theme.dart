@@ -1,7 +1,7 @@
-/// The two theme blocks of `app/globals.css`, resolved.
+/// Resolved light and dark themes for the Flutter design system.
 ///
-/// * light — `:root, .light` (globals.css L546–735)
-/// * dark  — `.dark` (globals.css L741–942)
+/// This file is authoritative. Historical stylesheet references document the
+/// initial palette provenance only.
 ///
 /// Dark is the mode the system was designed in and is still its default
 /// (L737–740). `.light` exists so a light island inside a dark page resolves

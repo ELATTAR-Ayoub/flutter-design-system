@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/pagination.dart",
       "target": "@ui/pagination.dart",
-      "sha256": "fa82a5337d78bf44bb01bc5f385d826e0e4bdfcdf01e279319523ac71332f26b"
+      "sha256": "f6567cedcb9e0bbb23f26cf77f811e82ce354f3a0baf5e8d1d3dd6f0da0b7fa5"
     }
   ],
   "registryDependencies": [

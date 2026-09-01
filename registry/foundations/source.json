@@ -9,12 +9,12 @@
     {
       "source": "lib/src/design_system/foundation/colors.dart",
       "target": "@foundation/colors.dart",
-      "sha256": "c5b41755762dfbb25d2ca756f8d58ce55f741eaa1c70b670702616402ff86c57"
+      "sha256": "d67140147b368e5286743537d3862fcc3b591e3d2e022f1529e8cc6649af525e"
     },
     {
       "source": "lib/src/design_system/foundation/date_format.dart",
       "target": "@foundation/date_format.dart",
-      "sha256": "afc7415e092ad13157f47731fd0e07b358972cc9bd283d9d211d5a6e2776d6bd"
+      "sha256": "f2b90aa01e4bc80e519852b78bdb5dd6e680f11ff051a5bb37a08be6d3b2b2b3"
     },
     {
       "source": "lib/src/design_system/foundation/media.dart",
@@ -24,17 +24,17 @@
     {
       "source": "lib/src/design_system/foundation/motion.dart",
       "target": "@foundation/motion.dart",
-      "sha256": "4b363ffea8166bb2a6ca6c74ce8702f001a6deac1b452bb3def36d7f85297e29"
+      "sha256": "13324529cbbeb81efb6d548138333e2efc487710a568c8f5ddcef3bf05f28bb1"
     },
     {
       "source": "lib/src/design_system/foundation/shadows.dart",
       "target": "@foundation/shadows.dart",
-      "sha256": "827140aac2137d94195592d57670b44b10c5cbeedfe78d843fc9408ef9000f15"
+      "sha256": "33f1af3814d68d35ed7dce3803f11ccd94902c128faa9ffb895529a7cc51c959"
     },
     {
       "source": "lib/src/design_system/foundation/spacing.dart",
       "target": "@foundation/spacing.dart",
-      "sha256": "8c0c6718f066f1be96a77eb1b901dafa34bce10384d014fed864938b700b2b17"
+      "sha256": "5298f7b2078648a3ff514784ad9cc265ade2effad284c6d9a53661786d5c828d"
     },
     {
       "source": "lib/src/design_system/foundation/surfaces.dart",
@@ -44,22 +44,22 @@
     {
       "source": "lib/src/design_system/foundation/theme.dart",
       "target": "@foundation/theme.dart",
-      "sha256": "61610dad0355cde857227d6fe826729411bc28035d42e14aee392c37c5579ca3"
+      "sha256": "4ab108f25ec64f98c468c60966f5f691a6debbb4697ac1dd1dff8df50bf39af1"
     },
     {
       "source": "lib/src/design_system/foundation/typography.dart",
       "target": "@foundation/typography.dart",
-      "sha256": "e6b14445643d874279a72a15bfa709c5459a2e99115395c09381db6fe58c513c"
+      "sha256": "9f97890a10fdffa4ce0091bba3a0655aa8f56202a6767c3b3e2ae6f0595e9891"
     },
     {
       "source": "lib/src/design_system/foundation/text_layout.dart",
       "target": "@foundation/text_layout.dart",
-      "sha256": "dc9df00923617a6b8ffde30e445085a6f6f18cf821297508f711a56d8037c2ee"
+      "sha256": "c0fa1abb49f92c038c4c4ee80bb084d5b4d143571e950b18675b551f0a41fb0d"
     },
     {
       "source": "lib/src/design_system/foundation/theme_scope.dart",
       "target": "@foundation/theme_scope.dart",
-      "sha256": "5a54b8f3b2635e897f9c172461852993dc0f760c0aff23a0a3b33613db7f4f1c"
+      "sha256": "0733b6343b76f23927238bfdcfc620f8ebd4369377d652a813719499ea36ad49"
     }
   ],
   "registryDependencies": [],

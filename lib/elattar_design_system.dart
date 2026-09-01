@@ -1,7 +1,8 @@
-/// Elattar's Design System — Flutter port.
+/// Elattar's native Flutter design system.
 ///
-/// A 1:1 port of the web design system defined in `app/globals.css`.
-/// One token source of truth: literals live ONLY under
+/// The Flutter foundation is authoritative. Historical web assets informed
+/// the initial values, but they are not runtime dependencies or current API.
+/// One token source of truth: visual and motion literals live only under
 /// `lib/src/design_system/foundation/`
 /// (enforced by `test/token_guard_test.dart`); everything else consumes tokens.
 library;

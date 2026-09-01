@@ -1,8 +1,8 @@
 /// Distance, measure and corner — the geometry half of the token set.
 ///
-/// Source of truth: `app/globals.css` in the reference repo
-/// (`D:/DESIGN/Design-System-2026-8/design-system/app/globals.css`).
-/// 1 CSS `rem` = 16px throughout.
+/// This Flutter foundation file is the source of truth. Historical CSS names
+/// below are provenance for the initial values only. Logical pixels are used
+/// throughout.
 library;
 
 import 'dart:ui' show Size;

@@ -668,7 +668,7 @@ class Sidebar extends StatelessWidget {
             color: theme.sidebarBorder,
             width: BorderWidths.hairline,
           ),
-          boxShadow: Shadows.tailwindSm.outerShadows(theme),
+          boxShadow: Shadows.floatingPanel.outerShadows(theme),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(Radii.lg - BorderWidths.hairline),
@@ -896,7 +896,7 @@ class SidebarInset extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.background,
           borderRadius: BorderRadius.circular(Radii.xl),
-          boxShadow: Shadows.tailwindSm.outerShadows(theme),
+          boxShadow: Shadows.floatingPanel.outerShadows(theme),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(Radii.xl),

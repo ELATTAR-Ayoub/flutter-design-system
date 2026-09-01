@@ -470,7 +470,7 @@ class PopoverSurface extends StatelessWidget {
             BorderWidths.hairline,
             (ThemeTokens t) => t.foreground.withValues(alpha: _ringAlpha),
           ),
-        ...(shadow ?? Shadows.tailwindMd).layers,
+        ...(shadow ?? Shadows.popover).layers,
       ]);
 
   @override

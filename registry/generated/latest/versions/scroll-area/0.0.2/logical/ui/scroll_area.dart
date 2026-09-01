@@ -72,6 +72,24 @@ import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/theme_scope.dart';
 
 /// `w-2.5` — the rail's lane.
+/// When a rail is on screen.
+///
+/// Radix's `<ScrollArea type>`, reduced to the two values this port actually
+/// uses. `hover` is the reference's own default and the one a reading surface
+/// wants: the rail is a pointer affordance, and a rail that is always there is
+/// a permanent 10px stripe down the side of the text.
+///
+/// `always` exists because a specimen has the opposite problem. A rail nobody
+/// can see is a rail nobody can review, and a documentation page whose whole
+/// subject is the scrollbar cannot demonstrate it only on hover.
+enum ScrollBarVisibility {
+  /// Visible while the pointer is over the area, then faded out. The default.
+  hover,
+
+  /// Visible whenever the axis has somewhere to scroll to.
+  always,
+}
+
 double get _railWidth => space(2.5);
 
 /// `p-px` on the bar, plus its 1px transparent `border-l`: the thumb sits
@@ -83,6 +101,13 @@ const double _railPadding = BorderWidths.hairline;
 // allow-hardcoded: a third-party library's constant, with no token to read it
 // from.
 const double _minThumbLength = 18;
+
+/// The key on [_Rail]'s [ExcludeSemantics] wrap — public so a test can find
+/// this exact node rather than any platform-injected scrollbar's own.
+@visibleForTesting
+const Key thumbSemanticsKey = ValueKey<String>(
+  'scrollAreaThumbExcludeSemantics',
+);
 
 /// `scrollHideDelay`, Radix's default. Measured between 542ms and 650ms.
 ///
@@ -97,11 +122,31 @@ const Duration _hideDelay = Duration(
 /// The caller supplies the frame (border, radius, height) exactly as the
 /// reference puts it on `className`; [borderRadius] is `rounded-[inherit]`,
 /// which is what the viewport clips its content to.
+///
+/// TARGET SIZING — the platform decision, made explicit: **the scrollbar
+/// thumb is pointer-only.** [_Rail] never mounts until [MouseRegion.onEnter]
+/// fires, and touch has no hover event — Radix's own `type="hover"` default,
+/// reproduced — so on a touch device the thumb is never in the tree at all,
+/// let alone a tap target that would need [TouchTargets.minimum]. Growing it
+/// to 44px anyway would mean either enlarging a 10px rail that exists to stay
+/// out of the reading column's way, or layering an invisible hit box a
+/// hovering mouse would never ask for. Neither answers a real need: the
+/// [_Viewport] underneath is a plain [SingleChildScrollView], which already
+/// scrolls by touch drag and, once focused, by the platform's own keyboard
+/// scrolling — both paths reach every pixel the thumb can reach, without the
+/// thumb. So the thumb stays a mouse/trackpad convenience — a visual position
+/// indicator with a pointer-drag shortcut — and [_Rail] wraps it in
+/// [ExcludeSemantics] so a screen reader is never told to tap a control nothing
+/// but a mouse can reliably hit. [test/target_sizing_test.dart] and
+/// `test/scroll_area_platform_test.dart` hold this contract: the scrollable
+/// scrolls by drag and by keyboard with the thumb never shown, and the thumb
+/// carries no semantics once it is.
 class ScrollArea extends StatefulWidget {
   const ScrollArea({
     super.key,
     this.borderRadius,
     this.horizontalBar = false,
+    this.barVisibility = ScrollBarVisibility.hover,
     this.controller,
     required this.child,
   });
@@ -112,6 +157,11 @@ class ScrollArea extends StatefulWidget {
   /// `<ScrollBar orientation="horizontal" />`, which the wrapper does not
   /// render for you. Without it the horizontal axis is `overflow-x: hidden`.
   final bool horizontalBar;
+
+  /// When the rails are on screen. See [ScrollBarVisibility]; `hover` is the
+  /// reference's default and the one every reading surface in this system
+  /// uses.
+  final ScrollBarVisibility barVisibility;
 
   /// Drives the vertical axis from outside; otherwise one is made here.
   final ScrollController? controller;
@@ -125,7 +175,15 @@ class ScrollArea extends StatefulWidget {
 class _ScrollAreaState extends State<ScrollArea> {
   ScrollController? _owned;
   late final ScrollController _horizontal = ScrollController();
-  bool _visible = false;
+  bool _hovered = false;
+
+  /// Whether a rail should paint right now.
+  ///
+  /// `always` does not mean "paint a rail on a box with nothing to scroll":
+  /// each [_Rail] already returns nothing when its own axis has no travel, so
+  /// this only decides whether hover is required on top of that.
+  bool get _visible =>
+      widget.barVisibility == ScrollBarVisibility.always || _hovered;
 
   ScrollController get _vertical =>
       widget.controller ?? (_owned ??= ScrollController());
@@ -145,8 +203,8 @@ class _ScrollAreaState extends State<ScrollArea> {
   /// `pointerenter` clears the pending hide and shows in the same frame.
   void _show() {
     _generation++;
-    if (_visible) return;
-    setState(() => _visible = true);
+    if (_hovered) return;
+    setState(() => _hovered = true);
   }
 
   /// `pointerleave` starts `scrollHideDelay`. The rail unmounts when it fires
@@ -155,7 +213,7 @@ class _ScrollAreaState extends State<ScrollArea> {
     final int mine = ++_generation;
     Future<void>.delayed(_hideDelay, () {
       if (!mounted || mine != _generation) return;
-      setState(() => _visible = false);
+      setState(() => _hovered = false);
     });
   }
 
@@ -183,6 +241,21 @@ class _ScrollAreaState extends State<ScrollArea> {
                 bottom: 0,
                 width: _railWidth,
                 child: _Rail(controller: _vertical, colour: theme.border),
+              ),
+            // `<ScrollBar orientation="horizontal" />`. Only when the axis was
+            // asked for: with `horizontalBar` false the axis does not scroll at
+            // all, so a rail would report travel that does not exist.
+            if (_visible && widget.horizontalBar)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: _railWidth,
+                child: _Rail(
+                  controller: _horizontal,
+                  colour: theme.border,
+                  axis: Axis.horizontal,
+                ),
               ),
           ],
         ),
@@ -253,10 +326,19 @@ class _Viewport extends StatelessWidget {
 
 /// `data-slot="scroll-area-scrollbar"` plus its thumb.
 class _Rail extends StatefulWidget {
-  const _Rail({required this.controller, required this.colour});
+  const _Rail({
+    required this.controller,
+    required this.colour,
+    this.axis = Axis.vertical,
+  });
 
   final ScrollController controller;
   final Color colour;
+
+  /// Which axis this rail reports. Radix renders a `<ScrollBar>` per axis and
+  /// the two are the same component turned ninety degrees, so this is one
+  /// widget with an axis rather than two that would drift apart.
+  final Axis axis;
 
   @override
   State<_Rail> createState() => _RailState();
@@ -296,20 +378,30 @@ class _RailState extends State<_Rail> {
   Widget build(BuildContext context) {
     if (!widget.controller.hasClients) return const SizedBox.shrink();
     final flutter.ScrollPosition position = widget.controller.position;
+    // `hasContentDimensions` before `maxScrollExtent`, which throws until the
+    // viewport has applied its dimensions. Hover never reached this on the
+    // first frame because a pointer cannot be inside a box that has not been
+    // laid out yet; [ScrollBarVisibility.always] builds the rail immediately
+    // and does.
+    if (!position.hasContentDimensions) return const SizedBox.shrink();
     if (position.maxScrollExtent <= 0) return const SizedBox.shrink();
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        // `p-px` top and bottom.
-        final double track = constraints.maxHeight - _railPadding * 2;
+        final bool vertical = widget.axis == Axis.vertical;
+        // `p-px` at both ends of whichever axis this is.
+        final double extent = vertical
+            ? constraints.maxHeight
+            : constraints.maxWidth;
+        final double track = extent - _railPadding * 2;
         final double thumb = _thumbLength(track, position);
         final double travel = track - thumb;
         final double fraction = position.maxScrollExtent <= 0
             ? 0
             : (position.pixels / position.maxScrollExtent).clamp(0.0, 1.0);
 
-        void toThumbCentre(double localY) {
-          final double top = (localY - _railPadding - thumb / 2).clamp(
+        void toThumbCentre(double local) {
+          final double top = (local - _railPadding - thumb / 2).clamp(
             0,
             travel,
           );
@@ -319,34 +411,68 @@ class _RailState extends State<_Rail> {
           );
         }
 
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          // A click anywhere on the track centres the thumb on the pointer —
-          // measured going straight to the maximum from a click near the foot.
-          onTapDown: (TapDownDetails d) => toThumbCentre(d.localPosition.dy),
-          onVerticalDragUpdate: (DragUpdateDetails d) {
-            if (travel <= 0) return;
-            _jumpTo(
-              position.pixels + d.delta.dy / travel * position.maxScrollExtent,
-              position,
-            );
-          },
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                top: _railPadding + fraction * travel,
-                // 1px of transparent `border-l` and 1px of `p-px`.
-                left: _railPadding * 2,
-                right: _railPadding,
-                height: thumb,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: widget.colour,
-                    borderRadius: BorderRadius.circular(Radii.full),
+        // TARGET SIZING: pointer-only, per the decision on [ScrollArea] —
+        // excluded from the semantics tree so a screen reader never offers a
+        // control a touch or keyboard user cannot reliably operate. The
+        // viewport it sits over remains fully reachable by drag and by
+        // keyboard on its own. Keyed so a test can find this exact node
+        // without also matching a platform-injected `Scrollbar`'s own
+        // `ExcludeSemantics` — desktop `ScrollBehavior`s wrap every
+        // `Scrollable` in one automatically, this widget's own thumb
+        // notwithstanding.
+        return ExcludeSemantics(
+          key: thumbSemanticsKey,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            // A click anywhere on the track centres the thumb on the pointer —
+            // measured going straight to the maximum from a click near the foot.
+            onTapDown: (TapDownDetails d) => toThumbCentre(
+              vertical ? d.localPosition.dy : d.localPosition.dx,
+            ),
+            onVerticalDragUpdate: vertical
+                ? (DragUpdateDetails d) {
+                    if (travel <= 0) return;
+                    _jumpTo(
+                      position.pixels +
+                          d.delta.dy / travel * position.maxScrollExtent,
+                      position,
+                    );
+                  }
+                : null,
+            onHorizontalDragUpdate: vertical
+                ? null
+                : (DragUpdateDetails d) {
+                    if (travel <= 0) return;
+                    _jumpTo(
+                      position.pixels +
+                          d.delta.dx / travel * position.maxScrollExtent,
+                      position,
+                    );
+                  },
+            child: Stack(
+              children: <Widget>[
+                Positioned(
+                  // 1px of transparent border on the rail's own leading edge
+                  // and 1px of `p-px`, on whichever axis is the cross one.
+                  top: vertical
+                      ? _railPadding + fraction * travel
+                      : _railPadding * 2,
+                  bottom: vertical ? null : _railPadding,
+                  left: vertical
+                      ? _railPadding * 2
+                      : _railPadding + fraction * travel,
+                  right: vertical ? _railPadding : null,
+                  height: vertical ? thumb : null,
+                  width: vertical ? null : thumb,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: widget.colour,
+                      borderRadius: BorderRadius.circular(Radii.full),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

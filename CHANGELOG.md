@@ -5,6 +5,20 @@
 The type layer becomes a Flutter contract rather than a transcript of a
 stylesheet.
 
+### Native Flutter foundation
+
+* **Flutter is the authority.** The public barrel and foundation documentation
+  no longer describe a retired stylesheet as the source of truth. Historical
+  CSS and third-party references remain only as provenance for measured values;
+  the package has no browser runtime dependency.
+* **Compatibility motion curves have semantic names.** `cssEase`,
+  `cssEaseOut`, and `cssEaseInOut` are replaced by `balanced`, `decelerate`,
+  and `symmetric`. Their measured curve values are unchanged.
+* **Compatibility elevations describe their Flutter use.** `tailwindSm`,
+  `tailwindMd`, `tailwindLg`, and `tailwindXl` are replaced by
+  `floatingPanel`, `popover`, `overlay`, and `dataTooltip`. Their layer
+  geometry is unchanged.
+
 ### Typography — a breaking, pre-release correction
 
 * **Seventeen public roles replace the previous catalog.** Ten Words
