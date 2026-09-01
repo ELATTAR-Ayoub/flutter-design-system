@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme/hero.png" alt="Elattar components floating over a quiet green landscape" width="100%" />
+  <img src="docs/assets/readme/hero.png" alt="Blueprint tiles for Elattar source, foundation, and agent tooling" width="100%" />
 </p>
 
 # Elattar Design System
@@ -36,7 +36,7 @@ the [CLI README](packages/elattar_cli/README.md).
 ## Source you own
 
 <p align="center">
-  <img src="docs/assets/readme/source-owned.png" alt="A source document and component tile in a green landscape" width="100%" />
+  <img src="docs/assets/readme/source-owned.png" alt="A luminous blue blueprint tile for source-owned code" width="100%" />
 </p>
 
 Elattar distributes Flutter source instead of hiding components behind a
@@ -55,7 +55,7 @@ distribution route is `elattar_cli` and the source registry.
 ## What is included
 
 <p align="center">
-  <img src="docs/assets/readme/foundation.png" alt="A minimal tray of color, typography, and spacing tokens" width="100%" />
+  <img src="docs/assets/readme/foundation.png" alt="A luminous violet blueprint tile for foundation tokens" width="100%" />
 </p>
 
 The `0.0.2` registry contains 99 items: 97 components, one application block,
@@ -109,7 +109,7 @@ The published CLI is `elattar_cli 0.0.2`. It reads the immutable
 ## Agent skill
 
 <p align="center">
-  <img src="docs/assets/readme/agent-skill.png" alt="An agent instruction card assembling interface components" width="100%" />
+  <img src="docs/assets/readme/agent-skill.png" alt="A luminous pink blueprint tile for the agent skill" width="100%" />
 </p>
 
 `elattar-flutter-ui-director` teaches Claude Code to inspect the installed API,
