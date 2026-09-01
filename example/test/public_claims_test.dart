@@ -151,6 +151,32 @@ void main() {
   });
 
   group('what the site says about obtaining the product', () {
+    test('current release and Windows dart install paths stay accurate', () {
+      final String rootReadme = File('$_repoRoot/README.md').readAsStringSync();
+      final String cliReadme = File(
+        '$_repoRoot/packages/elattar_cli/README.md',
+      ).readAsStringSync();
+      final String installation = File(
+        'lib/docs_pages/installation_page.dart',
+      ).readAsStringSync();
+
+      expect(rootReadme, contains('`0.0.2`, the current public release.'));
+      expect(rootReadme, contains('/registry/0.0.2/'));
+      expect(rootReadme, isNot(contains('`0.0.1`, the first public release.')));
+
+      for (final String source in <String>[cliReadme, installation]) {
+        expect(source, contains(r'%LOCALAPPDATA%\Dart\install\bin'));
+        expect(source, contains('dart uninstall elattar_cli'));
+        expect(
+          source,
+          isNot(contains('dart pub global run elattar_cli:elattar')),
+          reason:
+              'dart install and legacy global activation use different '
+              'stores; the legacy runner cannot verify the native install.',
+        );
+      }
+    });
+
     test('no page describes the CLI or repository as unobtainable', () {
       // The gate for the public release: a reader must not be told the thing
       // they are reading about cannot be had. Each phrase below was live on

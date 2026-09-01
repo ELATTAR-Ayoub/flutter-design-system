@@ -63,7 +63,7 @@ const List<CliCommand> cliCommands = <CliCommand>[
         '[--foundation source] [--yes] [--dry-run] [--registry PATH_OR_URL] '
         '[--offline]',
     summary:
-        'Sets a Flutter project up: the foundation as local source, the three '
+        'Sets a Flutter project up: the foundation as local source, the two '
         'font faces wired into your pubspec.yaml, elattar.yaml, the install '
         'manifest and the license notices. Run it once.',
     example: 'elattar init --foundation source',

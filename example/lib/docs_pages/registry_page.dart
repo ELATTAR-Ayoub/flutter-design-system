@@ -39,6 +39,7 @@ import '../docs/docs_section.dart';
 import '../docs/docs_snippet.dart';
 import 'catalog.dart';
 import 'registry_document.dart';
+import 'release_facts.dart';
 
 class RegistryDocsPage extends StatefulWidget {
   const RegistryDocsPage({super.key, this.onNavigate, this.loader});
@@ -345,18 +346,20 @@ class _RegistryArticle extends StatelessWidget {
       children: <Widget>[
         _prose(
           'The CLI reads a registry pinned to its own version. elattar_cli '
-          '0.0.1 reads /registry/0.0.1/, and that path is immutable: a '
+          '${releaseFacts.version} reads /registry/${releaseFacts.version}/, '
+          'and that path is immutable: a '
           'change ships as a new version rather than as a rewrite of a '
           'released one. The publishing tool refuses to overwrite a '
           'published version with different bytes, which is what makes the '
           'pin mean something.',
         ),
         SizedBox(height: space(4)),
-        const DocsSnippet(
+        DocsSnippet(
           language: 'bash',
           code:
               '# A mirror.\n'
-              'elattar list --registry https://example.com/elattar/0.0.1/\n\n'
+              'elattar list --registry https://example.com/elattar/'
+              '${releaseFacts.version}/\n\n'
               '# A registry you generated yourself.\n'
               'elattar list --registry ../flutter-design-system/registry/generated/latest',
         ),

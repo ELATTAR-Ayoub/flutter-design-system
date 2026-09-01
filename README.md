@@ -19,12 +19,12 @@ elattar add button
 
 ## Status
 
-`0.0.1`, the first public release.
+`0.0.2`, the current public release.
 
 | | |
 | --- | --- |
-| CLI | `elattar_cli` `0.0.1` on pub.dev: `dart install elattar_cli`; see [Quickstart](#quickstart) |
-| Registry | Live at <https://flutter.elattar.dev/registry/0.0.1/>: 99 items (97 components, 1 block, 1 foundation), schema v1, 112 distributed source files |
+| CLI | `elattar_cli` `0.0.2` on pub.dev: `dart install elattar_cli`; see [Quickstart](#quickstart) |
+| Registry | Live at <https://flutter.elattar.dev/registry/0.0.2/>: 99 items (97 components, 1 block, 1 foundation), schema v1, 112 distributed source files |
 | Documentation | Live at <https://flutter.elattar.dev> |
 | License | MIT for Elattar's own work; see [License](#license) |
 
@@ -63,7 +63,7 @@ Full instructions, PATH recovery, offline use and troubleshooting are in the
 ### Where components come from
 
 The CLI reads a hosted registry pinned to its own version —
-`/registry/0.0.1/` — and that path is immutable. Publishing a change means
+`/registry/0.0.2/` — and that path is immutable. Publishing a change means
 publishing a new version, never rewriting a released one, so what you install
 today is what you install next year. `--registry` points at a mirror or a
 local directory when you want one.
@@ -140,7 +140,7 @@ dependencies:
   elattar_design_system:
     git:
       url: https://github.com/ELATTAR-Ayoub/flutter-design-system.git
-      ref: v0.0.1
+      ref: v0.0.2
 ```
 
 `ref:` pins the release tag, which is cut at the same commit the registry and
@@ -166,11 +166,15 @@ serves both; there is no second copy to drift.
 **In this repository** — nothing to install. [`AGENTS.md`](AGENTS.md) sits at
 the root and routes any agent that reads it into the skill.
 
-**Elsewhere** — the repository root is also a single-plugin Claude Code
-marketplace ([`.claude-plugin/`](.claude-plugin/)), so it can be added as a
-plugin source directly. See [`/skills`](https://flutter.elattar.dev/skills)
-for each route and its current verification state; routes that have not been
-demonstrated end to end say so rather than being presented as working.
+**Elsewhere** — the repository root is a public Claude Code marketplace:
+
+```text
+/plugin marketplace add ELATTAR-Ayoub/flutter-design-system
+/plugin install elattar-design-system@elattar
+```
+
+See [`/skills`](https://flutter.elattar.dev/skills) for examples, how the skill
+works, and update or removal commands.
 
 ## Development
 

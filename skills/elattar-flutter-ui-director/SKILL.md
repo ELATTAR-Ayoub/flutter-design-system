@@ -1,6 +1,6 @@
 ---
 name: elattar-flutter-ui-director
-description: "Direct production Flutter UI with Elattar's design system, in the design-system repository itself or in a consumer app that installed it with the elattar CLI. Use when designing, implementing, reviewing, or documenting Flutter screens, pages, sections, flows, dashboards, forms, mobile navigation, or component specimens that must be complete: loading skeletons, empty and no-results states, human error copy with a next step, success and undo feedback, keyboard and screen-reader access, responsive structure, and both themes, all built from the local design-system APIs and token source of truth."
+description: "Build and review Flutter UI with Elattar's installed components and foundation tokens. Applies in the design-system repository and consumer apps with elattar.yaml when work touches screens, flows, components, responsive behavior, theming, accessibility, feedback, or UI documentation."
 ---
 
 # Elattar Flutter UI Director
@@ -17,38 +17,66 @@ Public names carry no prefix. They are ordinary nouns: `Button`, `Card`, `Icon`,
 `TextStyles`, `space`. Never search for or compose an `El*` API; a name starting
 with `El` is a retired spelling, not a widget.
 
+## Choose the depth
+
+Match the process to the risk. Do not turn a copy edit or a read-only review
+into a full product-delivery exercise.
+
+- **Quick** — explanation, audit, documentation-only change, or one contained
+  correction with no new rendered behavior. Resolve the mode, inspect the
+  relevant source, make the scoped change, and run focused checks. No UI
+  contract, state matrix, capture set, or full suite unless the change affects
+  them.
+- **Standard** — a change to an existing screen, component, interaction, or
+  responsive layout. Write a short contract for the affected surface, cover
+  the states that apply, and run focused tests plus the relevant width, theme,
+  text-scale, and accessibility checks.
+- **Full** — a new screen or flow, a new system primitive, or a cross-system
+  foundation change. Use the complete workflow, verification ladder, scanner,
+  captures, and handoff gate.
+
 ## Workflow
 
 1. **Resolve the mode.** Step 0 of [system-map.md](references/system-map.md),
    before reading or writing anything. Consumer mode and repository mode put the
    system in different directories, and every path named in this skill is the
    repository-mode name. If neither probe matches, say so and stop.
-2. **Classify the work.** Product screen, package component, web-parity port,
-   agent console, or review and fix.
-3. **Write the UI contract.** [ui-contract.md](references/ui-contract.md). No
-   widgets before it exists. It is the input to the gate.
+2. **Choose the depth.** Quick, standard, or full. State it before acting.
+3. **Classify the work.** Product screen, package component, lineage-informed
+   port, agent console, documentation, or review and fix.
 4. **Inventory the real APIs.** Use the discovery commands for your mode in
    [system-map.md](references/system-map.md): barrel, source, tests, specimens.
    Do not guess that a widget exists.
-5. **Set the visual direction.** [visual-direction.md](references/visual-direction.md).
-   One dominant idea, a clear hierarchy, at most one supporting effect.
-6. **Design the states before the widgets.**
+5. **Define the outcome.** For standard work, write a short acceptance contract.
+   For full work, write [ui-contract.md](references/ui-contract.md). Quick work
+   needs only the requested outcome and the focused check that proves it.
+6. **Set the visual direction when visuals change.**
+   [visual-direction.md](references/visual-direction.md): one dominant idea, a
+   clear hierarchy, at most one supporting effect.
+7. **Design the states that apply before the widgets.**
    [states.md](references/states.md), [errors.md](references/errors.md),
-   [feedback.md](references/feedback.md). Every region, not just the page.
-7. **Build.** Compose exported widgets. Follow
+   [feedback.md](references/feedback.md). Static documentation and read-only
+   reviews do not invent asynchronous states they do not have.
+8. **Build.** Compose exported widgets. Follow
    [page-blueprint.md](references/page-blueprint.md) for pages and sections, and
    [component-spec.md](references/component-spec.md) for anything reusable.
    Product UI stays outside the system-owned component directory.
-8. **Cover platform, access, theme, and copy.**
+9. **Cover the relevant platform, access, theme, and copy rules.**
    [responsive.md](references/responsive.md),
    [accessibility.md](references/accessibility.md),
    [theming.md](references/theming.md), [copy.md](references/copy.md). For
    agent-facing work, [agent-console.md](references/agent-console.md).
-9. **Verify and hand off.** Run the ladder, the scanner, and the completeness
-   gate in [verify.md](references/verify.md). Report the mode, the commands you
-   actually ran, what you inspected, and the limitations.
+10. **Verify in proportion to the depth.** Use [verify.md](references/verify.md).
+    Run focused checks for quick work, the affected surface matrix for standard
+    work, and the complete ladder and gate for full work. Report only commands
+    actually run and limitations that matter.
 
 ## Non-negotiable contract
+
+Apply every clause relevant to the task. Source of truth, access, and
+composition always apply. Completeness, errors, and feedback apply when the
+surface reads data or accepts interaction; they are not paperwork for static
+documentation.
 
 Paths here are repository-mode names. In consumer mode substitute
 `lib/design_system/foundation/` for `lib/src/design_system/foundation/`,
@@ -104,9 +132,10 @@ Choose the existing system contract before creating one.
   product code.
 - Installed sources in a consumer project are that project's own code and may be
   edited, but `elattar add --overwrite` replaces them. Record any customisation.
-- Hand off: the contract, changed files, API inventory, states covered, token
-  and motion compliance, scanner output, automated and visual verification, and
-  limitations. Apply the gate in [verify.md](references/verify.md).
+- Hand off at the chosen depth. Quick work names the changed files and focused
+  checks. Standard work adds the affected contract, states, and render checks.
+  Full work reports the API inventory, token and motion compliance, scanner,
+  automated and visual verification, and limitations from the complete gate.
 
 ## References
 

@@ -142,6 +142,9 @@ class SkillDocEntry {
     required this.repository,
     required this.licenseStatus,
     required this.supportedAgents,
+    required this.examples,
+    required this.included,
+    required this.howItWorks,
     required this.workflow,
     required this.referenceFiles,
     required this.installRoutes,
@@ -190,7 +193,16 @@ class SkillDocEntry {
   /// route and no recorded Codex run, so Codex is not named here at all.
   final List<String> supportedAgents;
 
-  /// Condensed restatement of `SKILL.md`'s eight-step workflow.
+  /// Short requests a reader can paste after installation.
+  final List<String> examples;
+
+  /// The capabilities worth knowing before opening the source tree.
+  final List<String> included;
+
+  /// The public four-step explanation, kept shorter than the agent workflow.
+  final List<String> howItWorks;
+
+  /// Condensed restatement of `SKILL.md`'s ten-step workflow.
   final List<String> workflow;
 
   final List<SkillReferenceFile> referenceFiles;
@@ -237,15 +249,19 @@ const List<String> verifiedCommands = <String>[
   // the file is the whole route.
   'cat AGENTS.md',
 
-  // Pending verification (Claude Code plugin route): see
-  // `SkillDocEntry.licenseStatus` and Decision 005 §"Publication gate". The
-  // exact `/plugin` subcommand syntax below was confirmed against current
-  // Claude Code plugin-marketplace documentation, not invented.
+  // Verified Claude Code plugin route. The GitHub marketplace round trip was
+  // completed against the public repository and the installed plugin appeared
+  // enabled in Claude Code's plugin manager.
   '/plugin marketplace add ELATTAR-Ayoub/flutter-design-system',
   '/plugin install elattar-design-system@elattar',
   '/plugin marketplace update elattar',
+  'claude plugin update elattar-design-system@elattar',
+  '/reload-plugins',
+  '/plugin',
   '/plugin list',
+  '/elattar-design-system:elattar-flutter-ui-director',
   '/plugin uninstall elattar-design-system@elattar',
+  '/plugin marketplace remove elattar',
 
   // Pending verification (manual copy route): same gate as above. Plain
   // POSIX `cp`/`ls`/`rm`; no GitHub dependency, since the source directory is
@@ -257,10 +273,7 @@ const List<String> verifiedCommands = <String>[
 ];
 
 const String _licenseStatus =
-    'This repository is MIT licensed, so copying the skill into an agent '
-    'configuration is permitted. What gates a route below is evidence, not '
-    'permission: a route stays pending until a round trip has actually been '
-    'recorded, and a pending route is documented rather than recommended.';
+    'MIT licensed. The Claude Code plugin is the recommended install.';
 
 const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
   slug: 'elattar-flutter-ui-director',
@@ -269,59 +282,79 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
   // Verbatim from `.claude-plugin/plugin.json`'s `description`, checked by
   // `example/test/skills_docs_test.dart`.
   summary:
-      'Directs coding agents to build complete Flutter UI from the Elattar '
-      'design system: public API discovery, foundation tokens, component '
-      'placement, a required UI contract, full state coverage with skeletons '
-      'and empty states, human error copy with a next step, feedback on every '
-      'trigger, keyboard and screen-reader access, responsive structure, both '
-      'themes, and a verification ladder with a completeness gate and '
-      'scanner.',
+      "Builds and reviews Flutter UI with Elattar's installed components and "
+      'foundation tokens, using project-aware API discovery, responsive and '
+      'accessible composition, relevant state coverage, and verification '
+      'proportional to the task.',
   // Verbatim from `SKILL.md`'s frontmatter `description:`, the text an agent
   // harness actually matches on. Checked by the same test.
   description:
-      "Direct production Flutter UI with Elattar's design system, in the "
-      'design-system repository itself or in a consumer app that installed it '
-      'with the elattar CLI. Use when designing, implementing, reviewing, or '
-      'documenting Flutter screens, pages, sections, flows, dashboards, '
-      'forms, mobile navigation, or component specimens that must be '
-      'complete: loading skeletons, empty and no-results states, human error '
-      'copy with a next step, success and undo feedback, keyboard and '
-      'screen-reader access, responsive structure, and both themes, all built '
-      'from the local design-system APIs and token source of truth.',
-  version: '0.0.1',
+      "Build and review Flutter UI with Elattar's installed components and "
+      'foundation tokens. Applies in the design-system repository and '
+      'consumer apps with elattar.yaml when work touches screens, flows, '
+      'components, responsive behavior, theming, accessibility, feedback, or '
+      'UI documentation.',
+  version: '0.0.2',
   pluginName: 'elattar-design-system',
   marketplaceName: 'elattar',
   repository: 'https://github.com/ELATTAR-Ayoub/flutter-design-system',
   licenseStatus: _licenseStatus,
   supportedAgents: <String>['Claude Code'],
+  examples: <String>[
+    'Build a responsive settings page from the Elattar components already '
+        'installed in this project.',
+    'Review this Flutter screen for token, accessibility, theme, and '
+        'responsive issues. Do not change code.',
+    'Add loading, empty, error, and retry states to this existing results '
+        'section.',
+    'Document this component using its real public API and examples.',
+  ],
+  included: <String>[
+    'Project detection for the design-system repository and CLI-installed '
+        'consumer apps.',
+    'Public API and registry discovery before a component is composed or '
+        'installed.',
+    'Native Flutter tokens for type, color, spacing, depth, and motion.',
+    'Responsive, theme, keyboard, screen-reader, feedback, and state rules.',
+    'Quick, standard, and full verification paths matched to task risk.',
+  ],
+  howItWorks: <String>[
+    'Detects repository or consumer mode from the files in the project.',
+    'Reads the public barrels, installed manifest, tests, and examples instead '
+        'of guessing APIs.',
+    'Composes existing components and foundation tokens, adding only the '
+        'states and behavior the surface needs.',
+    'Runs focused or full verification according to the size and risk of the '
+        'change.',
+  ],
   // Condensed from SKILL.md's own numbered workflow, one line per step, in
   // its order. The step count is asserted against that file by test, so a
   // step added to the skill cannot go unreported here.
   workflow: <String>[
     'Resolve the mode, repository or consumer, before reading or writing '
         'anything.',
+    'Choose quick, standard, or full depth before acting.',
     'Classify the work: product screen, package component, port, agent '
-        'console, or review and fix.',
-    'Write the UI contract. No widgets before it exists.',
+        'console, documentation, or review and fix.',
     'Inventory the real public APIs: barrel, source, tests, specimens. Never '
         'guess that a widget exists.',
-    'Set the visual direction: one dominant idea, a clear hierarchy, at most '
-        'one supporting effect.',
-    'Design the states before the widgets, for every region rather than only '
-        'the page.',
+    'Define a focused outcome, a short contract, or the full UI contract '
+        'according to the chosen depth.',
+    'Set the visual direction only when visuals change.',
+    'Design the states that apply before the widgets.',
     'Build by composing exported widgets, keeping product UI outside the '
         'system-owned component directory.',
-    'Cover platform, access, theme and copy: responsive structure, keyboard '
+    'Cover relevant platform, access, theme and copy rules: keyboard '
         'and screen reader, both themes.',
-    'Verify and hand off: run the ladder, the scanner and the completeness '
-        'gate, and report what was actually run.',
+    'Verify and hand off in proportion to the chosen depth, and report only '
+        'what was actually run.',
   ],
   referenceFiles: <SkillReferenceFile>[
     SkillReferenceFile(
       path: 'SKILL.md',
       title: 'Skill definition',
       description:
-          'Frontmatter, the nine-step workflow, the non-negotiable '
+          'Frontmatter, the ten-step workflow, the non-negotiable '
           'contract, and the reference index.',
     ),
     SkillReferenceFile(
@@ -465,16 +498,11 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
     SkillInstallRoute(
       id: 'plugin',
       title: 'Claude Code plugin',
-      status: SkillRouteStatus.pendingVerification,
+      status: SkillRouteStatus.verifiedToday,
       summary:
           'The repository is its own single-plugin marketplace '
           '(.claude-plugin/marketplace.json + plugin.json, source "./"). '
           "Adding it registers the skill in Claude Code's own plugin manager.",
-      blockedBy:
-          'The manifests are real and the install has been exercised from a '
-          'local marketplace directory, but no round trip has been recorded '
-          'for the GitHub shorthand below, which is the part these two '
-          'commands actually claim.',
       install: <SkillCommand>[
         SkillCommand(
           command:
@@ -489,15 +517,37 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
               'Installs the elattar-design-system plugin, which '
               'declares this one skill.',
         ),
+        SkillCommand(
+          command: '/reload-plugins',
+          label: 'Activate when prompted',
+          description:
+              'Run only when the install summary asks for it; otherwise the '
+              'plugin is already active.',
+        ),
       ],
       update: <SkillCommand>[
         SkillCommand(
+          command: 'claude plugin update elattar-design-system@elattar',
+          label: 'Update from a terminal',
+          description:
+              'Fetches and installs the latest public plugin. Restart Claude '
+              'Code after it completes.',
+        ),
+        SkillCommand(
           command: '/plugin marketplace update elattar',
-          label: 'Update the marketplace',
-          description: 'Fetches the marketplace\'s latest commit.',
+          label: 'Refresh inside Claude Code',
+          description:
+              'Refreshes the marketplace listing; installed plugins can also '
+              'update automatically when marketplace auto-update is enabled.',
         ),
       ],
       inspect: <SkillCommand>[
+        SkillCommand(
+          command: '/plugin',
+          label: 'Open the plugin manager',
+          description:
+              'The Installed tab shows the plugin enabled and names its skill.',
+        ),
         SkillCommand(
           command: '/plugin list',
           label: 'List installed plugins',
@@ -505,12 +555,26 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
               'Shows whether elattar-design-system is installed and '
               'enabled.',
         ),
+        SkillCommand(
+          command: '/elattar-design-system:elattar-flutter-ui-director',
+          label: 'Invoke the skill',
+          description:
+              'Loads the skill explicitly; ordinary matching UI requests '
+              'also load it automatically.',
+        ),
       ],
       remove: <SkillCommand>[
         SkillCommand(
           command: '/plugin uninstall elattar-design-system@elattar',
           label: 'Uninstall the plugin',
           description: 'Removes the plugin and its skill.',
+        ),
+        SkillCommand(
+          command: '/plugin marketplace remove elattar',
+          label: 'Remove the marketplace',
+          description:
+              'Use this only to remove the source or replace an earlier local '
+              'elattar marketplace with the public GitHub source.',
         ),
       ],
     ),

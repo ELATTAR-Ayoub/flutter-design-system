@@ -32,7 +32,7 @@ Each `items[].files[].target` is the real project-relative path the installer
 wrote, alongside the hashes it wrote it from. Read it before assuming anything.
 
 Do **not** read locations out of `elattar.yaml`. The CLI writes `paths:` and
-`barrels:` keys into it, but as of CLI `0.0.1` nothing reads them back — install
+`barrels:` keys into it, but as of CLI `0.0.2` nothing reads them back — install
 destinations are fixed in the installer's target mapper, and the table below is
 what that mapper actually produces. (`elattar.yaml` even defaults its
 `barrels.design_system` to a `design_system.dart` file the installer never

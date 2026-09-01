@@ -10,7 +10,7 @@
 /// cannot describe one release while the artifacts are another.
 ///
 /// **[cliOnPubDev] is a release-ordering switch, not a preference.** It is
-/// true for the 0.0.1 release, which publishes the CLI before the site is
+/// true for the 0.0.2 release, which publishes the CLI before the site is
 /// deployed. Deploying a build with it true while the package is unpublished
 /// prints a command that does not resolve, and a reader cannot tell that
 /// apart from a broken setup of their own. If the publish is deferred, flip

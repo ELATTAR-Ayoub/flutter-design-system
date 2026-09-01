@@ -87,8 +87,8 @@ const List<DocsPageEntry> docsPageEntries = <DocsPageEntry>[
     slug: 'typeset',
     title: 'Typeset',
     description:
-        'The TextStyles scale, TextStyleToken anatomy, the fluid clamps, and the '
-        'three font families.',
+        'The TextStyles scale, TextStyleToken anatomy, responsive steps, and '
+        'the two font families.',
     route: docsTypesetRoute,
   ),
   DocsPageEntry(

@@ -23,6 +23,7 @@ import 'dart:io';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/docs/docs_file_tree.dart';
 import 'package:example/skills_docs/catalog.dart';
 import 'package:example/skills_docs/skills_page.dart';
@@ -102,6 +103,14 @@ Future<ThemeController> _pumpSkills(
   );
   await tester.pump();
   return theme;
+}
+
+Future<void> _openSkillFiles(WidgetTester tester) async {
+  final Finder trigger = find.byKey(DocsDisclosure.triggerKey);
+  await tester.ensureVisible(trigger);
+  await tester.pump();
+  await tester.tap(trigger);
+  await tester.pumpAndSettle();
 }
 
 void main() {
@@ -282,18 +291,17 @@ void main() {
       }
     });
 
-    test('exactly one route is verified today; the rest are pending', () {
+    test('repository and public plugin routes are verified today', () {
       final Iterable<SkillInstallRoute> verified = _entry.installRoutes.where(
         (SkillInstallRoute route) =>
             route.status == SkillRouteStatus.verifiedToday,
       );
       expect(
-        verified.length,
-        1,
+        verified.map((SkillInstallRoute route) => route.id),
+        containsAll(<String>['agents-md', 'plugin']),
         reason:
-            'Only the AGENTS.md route is demonstrated by this checkout today; '
-            'every other route must stay pendingVerification until a '
-            'transcript and a licensing decision back it.',
+            'The public GitHub marketplace round trip and this repository\'s '
+            'AGENTS.md route have both been demonstrated.',
       );
       for (final SkillInstallRoute route in _entry.installRoutes) {
         if (route.status == SkillRouteStatus.pendingVerification) {
@@ -308,18 +316,24 @@ void main() {
   });
 
   group('rendered page', () {
-    testWidgets('renders the header, overview, and workflow steps', (
-      WidgetTester tester,
-    ) async {
-      await _pumpSkills(tester);
+    testWidgets(
+      'renders the direct install, examples, included set, and flow',
+      (WidgetTester tester) async {
+        await _pumpSkills(tester);
 
-      expect(find.text(_entry.title), findsWidgets);
-      expect(find.text(_entry.description), findsOneWidget);
-      expect(find.text(_entry.summary), findsOneWidget);
-      for (final String step in _entry.workflow) {
-        expect(find.text(step), findsOneWidget, reason: step);
-      }
-    });
+        expect(find.text(_entry.title), findsWidgets);
+        expect(find.text(_entry.description), findsOneWidget);
+        for (final String example in _entry.examples) {
+          expect(find.text('“$example”'), findsOneWidget, reason: example);
+        }
+        for (final String item in <String>[
+          ..._entry.included,
+          ..._entry.howItWorks,
+        ]) {
+          expect(find.text(item), findsOneWidget, reason: item);
+        }
+      },
+    );
 
     testWidgets('renders exactly the supported agents named in the catalog', (
       WidgetTester tester,
@@ -327,7 +341,14 @@ void main() {
       await _pumpSkills(tester);
 
       for (final String agent in _entry.supportedAgents) {
-        expect(find.text(agent), findsOneWidget, reason: agent);
+        expect(
+          find.descendant(
+            of: find.byKey(const ValueKey<String>('skill-source')),
+            matching: find.text(agent),
+          ),
+          findsOneWidget,
+          reason: agent,
+        );
       }
       // Decision 005 deleted the Codex claim (`agents/openai.yaml`, no
       // recorded run, no self-serve install route). It must not reappear.
@@ -378,44 +399,41 @@ void main() {
       expect(find.textContaining('npx'), findsNothing);
     });
 
-    testWidgets('renders every command from every install route', (
+    testWidgets('renders every command from the recommended plugin route', (
       WidgetTester tester,
     ) async {
       await _pumpSkills(tester);
 
-      for (final SkillInstallRoute route in _entry.installRoutes) {
-        for (final SkillCommand command in route.allCommands) {
-          expect(
-            find.text(command.command),
-            findsOneWidget,
-            reason: command.command,
-          );
-        }
+      final SkillInstallRoute plugin = _entry.installRoutes.singleWhere(
+        (SkillInstallRoute route) => route.id == 'plugin',
+      );
+      for (final SkillCommand command in plugin.allCommands) {
+        expect(
+          find.text(command.command),
+          findsOneWidget,
+          reason: command.command,
+        );
       }
     });
 
     testWidgets(
-      'marks each route Works today or Pending verification, never both',
+      'presents the verified GitHub route without stale pending copy',
       (WidgetTester tester) async {
         await _pumpSkills(tester);
 
-        for (final SkillInstallRoute route in _entry.installRoutes) {
-          final Finder card = find.byKey(
-            ValueKey<String>('skill-route:${route.id}'),
-          );
-          expect(card, findsOneWidget, reason: route.id);
-
-          final Badge rendered = tester.widget<Badge>(
-            find.descendant(of: card, matching: find.byType(Badge)),
-          );
-          expect(
-            rendered.label,
-            route.status == SkillRouteStatus.pendingVerification
-                ? 'Pending verification'
-                : 'Works today',
-            reason: route.id,
-          );
-        }
+        expect(find.textContaining('Pending verification'), findsNothing);
+        expect(find.textContaining('no round trip'), findsNothing);
+        expect(
+          find.text(
+            '/plugin marketplace add ELATTAR-Ayoub/flutter-design-system',
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('/reload-plugins'), findsOneWidget);
+        expect(
+          find.text('/elattar-design-system:elattar-flutter-ui-director'),
+          findsOneWidget,
+        );
       },
     );
 
@@ -423,6 +441,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await _pumpSkills(tester);
+      await _openSkillFiles(tester);
 
       expect(find.byType(DocsFileTree), findsOneWidget);
       final String firstFile = _entry.referenceFiles.first.path;
@@ -444,6 +463,7 @@ void main() {
           tester,
           fileSource: <String, String>{skillFile: '# Real skill content'},
         );
+        await _openSkillFiles(tester);
 
         expect(find.text('# Real skill content'), findsOneWidget);
         expect(
@@ -453,12 +473,12 @@ void main() {
       },
     );
 
-    testWidgets('renders the version facts', (WidgetTester tester) async {
+    testWidgets('renders the source and current version', (
+      WidgetTester tester,
+    ) async {
       await _pumpSkills(tester);
 
-      expect(find.text(_entry.version), findsOneWidget);
-      expect(find.text(_entry.pluginName), findsOneWidget);
-      expect(find.text(_entry.marketplaceName), findsOneWidget);
+      expect(find.text('v${_entry.version}'), findsOneWidget);
       expect(find.text(_entry.repository), findsOneWidget);
     });
   });
@@ -522,7 +542,10 @@ void main() {
       await _pumpSkills(tester, mode: ColorMode.light);
 
       expect(find.text(_entry.title), findsWidgets);
-      expect(find.byType(DocsFileTree), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey<String>('skill-source')),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
 
@@ -532,7 +555,10 @@ void main() {
       await _pumpSkills(tester, mode: ColorMode.dark);
 
       expect(find.text(_entry.title), findsWidgets);
-      expect(find.byType(DocsFileTree), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey<String>('skill-source')),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
 
@@ -550,7 +576,10 @@ void main() {
       await tester.pump();
 
       expect(find.text(_entry.title), findsWidgets);
-      expect(find.byType(DocsFileTree), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey<String>('skill-source')),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
   });

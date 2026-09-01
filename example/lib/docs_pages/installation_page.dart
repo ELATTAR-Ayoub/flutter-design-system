@@ -7,15 +7,15 @@
 /// **Which command this page leads with is not decided here.** It comes from
 /// `release_facts.dart`, whose `cliOnPubDev` says whether `elattar_cli`
 /// resolves on pub.dev for a reader of this build, and whose guard fails if
-/// the pages and that answer disagree. The 0.0.1 release publishes the CLI
+/// the pages and that answer disagree. The 0.0.2 release publishes the CLI
 /// before it deploys the site, so the published spelling leads and the
 /// from-source spelling stays documented beneath it.
 ///
 /// Both routes were driven end to end against the hosted registry, with
 /// nothing local in the picture, before being written down:
 ///
-///  * install the CLI -> `Activated elattar_cli 0.0.1`
-///  * `elattar --version` -> `0.0.1`
+///  * install the CLI -> `Installed elattar_cli 0.0.2`
+///  * `elattar --version` -> `0.0.2`
 ///  * `elattar init --foundation source` -> foundation, fonts, `elattar.yaml`,
 ///    `.elattar/manifest.json` and four license notices, exit 0
 ///  * `elattar add button` -> seven items and a fifth notice, exit 0
@@ -167,8 +167,8 @@ class _InstallationArticle extends StatelessWidget {
     id: 'install-cli',
     title: 'Install the CLI',
     description:
-        'This puts an `elattar` executable on your PATH. One resolve, and a '
-        'small dependency tree rather than one to audit.',
+        'This installs the `elattar` executable. If Dart says its install '
+        'directory is not on PATH, add the directory it prints.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -202,30 +202,40 @@ class _InstallationArticle extends StatelessWidget {
           title: 'If `elattar` is not found',
           facts: <DocsInstallFact>[
             DocsInstallFact(
-              label: 'macOS and Linux',
-              value: r'export PATH="$HOME/.pub-cache/bin:$PATH"',
+              label: 'Recommended install',
+              value: r'$DART_DATA_HOME/install/bin',
               description:
-                  'Add it to your shell profile. If PUB_CACHE is set, the '
-                  'directory is \$PUB_CACHE/bin instead.',
+                  'Add the directory printed by dart install to PATH. This '
+                  'is separate from pub\'s legacy global cache.',
             ),
             DocsInstallFact(
               label: 'Windows',
-              value: r'%LOCALAPPDATA%\Pub\Cache\bin',
-              description: 'Add that directory to your user Path variable.',
-            ),
-            DocsInstallFact(
-              label: 'Without fixing PATH',
-              value: 'dart pub global run elattar_cli:elattar --version',
+              value: r'%LOCALAPPDATA%\Dart\install\bin',
               description:
-                  'Works from anywhere, and is the quickest way to confirm '
-                  'the install succeeded. It should print 0.0.1.',
+                  'Add it to your user Path, then open a new terminal. An '
+                  'already-open terminal keeps its old environment.',
             ),
             DocsInstallFact(
-              label: 'Update or remove',
-              value: 'dart pub global deactivate elattar_cli',
+              label: 'Verify directly on Windows',
+              value:
+                  r'& "$env:LOCALAPPDATA\Dart\install\bin\elattar.bat" --version',
+              description:
+                  'Runs the launcher before PATH is fixed. It should print '
+                  '0.0.2.',
+            ),
+            DocsInstallFact(
+              label: 'Legacy activation',
+              value: r'$PUB_CACHE/bin',
+              description:
+                  'Only dart pub global activate uses this directory; its '
+                  r'Windows default is %LOCALAPPDATA%\Pub\Cache\bin.',
+            ),
+            DocsInstallFact(
+              label: 'Remove',
+              value: 'dart uninstall elattar_cli',
               description:
                   'Re-running the install command takes the newest version; '
-                  'deactivating removes the command and leaves everything it '
+                  'uninstalling removes the command and leaves everything it '
                   'installed in place. That source is your project\'s now.',
             ),
           ],
@@ -239,7 +249,7 @@ class _InstallationArticle extends StatelessWidget {
     title: 'Set up a project',
     description:
         'init copies the foundation into your project as local files and '
-        'wires the three font faces into your pubspec.yaml. add then copies '
+        'wires the two font faces into your pubspec.yaml. add then copies '
         'component source the same way, resolving dependencies for you.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -281,7 +291,7 @@ class _InstallationArticle extends StatelessWidget {
         const DocsSnippet(
           language: 'bash',
           code:
-              'elattar add button --registry https://example.com/elattar/0.0.1/',
+              'elattar add button --registry https://example.com/elattar/0.0.2/',
         ),
         SizedBox(height: space(4)),
         _see(

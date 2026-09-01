@@ -1,6 +1,5 @@
-/// The public Skills page: what the skill is, which agents it is actually
-/// verified for, how to install/update/inspect/remove it, its reference file
-/// tree, and its version: for one [SkillDocEntry].
+/// The public Skills page: what the skill does, how to install and try it,
+/// what it includes, how it works, and where to inspect the source.
 ///
 /// An article built on `docs/docs_layout.dart`'s [DocsLayout], with the same
 /// breadcrumb / sidebar / TOC / prev-next chrome every other public
@@ -32,7 +31,7 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import '../docs/docs_code.dart';
-import '../docs/docs_facts.dart';
+import '../docs/docs_disclosure.dart';
 import '../docs/docs_file_tree.dart';
 import '../docs/docs_layout.dart';
 import '../kit.dart';
@@ -92,11 +91,12 @@ class SkillsPage extends StatelessWidget {
       breadcrumbs: const <BreadcrumbEntry>[BreadcrumbEntry.page('Skills')],
       sidebar: _sidebar(skill.route),
       toc: const <DocsTocEntry>[
-        DocsTocEntry(title: 'Overview', anchor: 'overview'),
-        DocsTocEntry(title: 'Supported agents', anchor: 'agents'),
-        DocsTocEntry(title: 'Install & manage', anchor: 'install'),
-        DocsTocEntry(title: 'Files', anchor: 'files'),
-        DocsTocEntry(title: 'Version', anchor: 'version'),
+        DocsTocEntry(title: 'Install', anchor: 'install'),
+        DocsTocEntry(title: 'Try it', anchor: 'examples'),
+        DocsTocEntry(title: 'What is included', anchor: 'included'),
+        DocsTocEntry(title: 'How it works', anchor: 'how-it-works'),
+        DocsTocEntry(title: 'Manage', anchor: 'manage'),
+        DocsTocEntry(title: 'Source', anchor: 'source'),
       ],
       onNavigate: onNavigate,
       child: _SkillArticle(entry: skill, fileSource: fileSource),
@@ -141,80 +141,83 @@ class _SkillArticle extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
       KeyedSubtree(
-        key: docsAnchorKey('overview'),
-        child: _OverviewPanel(entry: entry),
-      ),
-      SizedBox(height: space(6)),
-      KeyedSubtree(
-        key: docsAnchorKey('agents'),
-        child: _AgentsPanel(entry: entry),
-      ),
-      SizedBox(height: space(6)),
-      KeyedSubtree(
         key: docsAnchorKey('install'),
         child: _InstallPanel(entry: entry),
       ),
       SizedBox(height: space(6)),
       KeyedSubtree(
-        key: docsAnchorKey('files'),
-        child: DocsFileTree(
-          // A distinct identity per skill, the same reasoning
-          // `shot_detail_page.dart` documents on its own `DocsFileTree` call:
-          // without this, swapping the `entry` in place could reuse this
-          // widget's selected-file state across a different file list.
-          key: ValueKey<String>('docs-file-tree:${entry.slug}'),
-          label: 'Files',
-          files: _files,
-        ),
+        key: docsAnchorKey('examples'),
+        child: _ExamplesPanel(entry: entry),
       ),
       SizedBox(height: space(6)),
       KeyedSubtree(
-        key: docsAnchorKey('version'),
-        child: _VersionPanel(entry: entry),
+        key: docsAnchorKey('included'),
+        child: _NumberedPanel(label: 'What is included', items: entry.included),
+      ),
+      SizedBox(height: space(6)),
+      KeyedSubtree(
+        key: docsAnchorKey('how-it-works'),
+        child: _NumberedPanel(label: 'How it works', items: entry.howItWorks),
+      ),
+      SizedBox(height: space(6)),
+      KeyedSubtree(
+        key: docsAnchorKey('manage'),
+        child: _ManagePanel(entry: entry),
+      ),
+      SizedBox(height: space(6)),
+      KeyedSubtree(
+        key: docsAnchorKey('source'),
+        child: _SourcePanel(entry: entry, files: _files),
       ),
     ],
   );
 }
 
-class _OverviewPanel extends StatelessWidget {
-  const _OverviewPanel({required this.entry});
+class _ExamplesPanel extends StatelessWidget {
+  const _ExamplesPanel({required this.entry});
 
   final SkillDocEntry entry;
 
   @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    return Semantics(
-      key: const ValueKey<String>('skill-overview'),
-      container: true,
-      label: 'Overview',
-      child: Panel(
-        label: 'Overview',
-        note: '${entry.workflow.length} workflow steps',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            StyledText(entry.summary, TextStyles.body, color: theme.foreground),
-            SizedBox(height: space(5)),
-            StyledText(
-              'WORKFLOW',
-              TextStyles.small,
-              color: theme.mutedForeground,
-            ),
-            SizedBox(height: space(3)),
-            for (int i = 0; i < entry.workflow.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(height: space(2)),
-              _WorkflowStep(index: i + 1, text: entry.workflow[i]),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Panel(
+    key: const ValueKey<String>('skill-examples'),
+    label: 'Try it',
+    note: '${entry.examples.length} examples',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        for (int i = 0; i < entry.examples.length; i++) ...<Widget>[
+          if (i > 0) SizedBox(height: space(3)),
+          StyledText('“${entry.examples[i]}”', TextStyles.body),
+        ],
+      ],
+    ),
+  );
 }
 
-class _WorkflowStep extends StatelessWidget {
-  const _WorkflowStep({required this.index, required this.text});
+class _NumberedPanel extends StatelessWidget {
+  const _NumberedPanel({required this.label, required this.items});
+
+  final String label;
+  final List<String> items;
+
+  @override
+  Widget build(BuildContext context) => Panel(
+    label: label,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        for (int i = 0; i < items.length; i++) ...<Widget>[
+          if (i > 0) SizedBox(height: space(2)),
+          _NumberedItem(index: i + 1, text: items[i]),
+        ],
+      ],
+    ),
+  );
+}
+
+class _NumberedItem extends StatelessWidget {
+  const _NumberedItem({required this.index, required this.text});
 
   final int index;
   final String text;
@@ -224,7 +227,7 @@ class _WorkflowStep extends StatelessWidget {
     final ThemeTokens theme = ThemeScope.of(context);
     return Semantics(
       container: true,
-      label: 'Step $index: $text',
+      label: '$index. $text',
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -243,49 +246,14 @@ class _WorkflowStep extends StatelessWidget {
   }
 }
 
-class _AgentsPanel extends StatelessWidget {
-  const _AgentsPanel({required this.entry});
-
-  final SkillDocEntry entry;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    return Semantics(
-      key: const ValueKey<String>('skill-agents'),
-      container: true,
-      label: 'Supported agents',
-      child: Panel(
-        label: 'Supported agents',
-        note: '${entry.supportedAgents.length} verified',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            SpecimenRow(
-              children: <Widget>[
-                for (final String agent in entry.supportedAgents)
-                  Badge(label: agent, variant: BadgeVariant.success),
-              ],
-            ),
-            SizedBox(height: space(3)),
-            StyledText(
-              'This skill is written for, and verified only against, the '
-              'harness named above. No other agent harness has a recorded '
-              'install route, so none is claimed here.',
-              TextStyles.small,
-              color: theme.mutedForeground,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _InstallPanel extends StatelessWidget {
   const _InstallPanel({required this.entry});
 
   final SkillDocEntry entry;
+
+  SkillInstallRoute get _plugin => entry.installRoutes.singleWhere(
+    (SkillInstallRoute route) => route.id == 'plugin',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -293,23 +261,27 @@ class _InstallPanel extends StatelessWidget {
     return Semantics(
       key: const ValueKey<String>('skill-install'),
       container: true,
-      label: 'Install and manage',
+      label: 'Install for Claude Code',
       child: Panel(
-        label: 'Install & manage',
-        note: '${entry.installRoutes.length} routes',
+        label: 'Install',
+        note: 'Claude Code',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             StyledText(
-              entry.licenseStatus,
+              'Run these inside Claude Code. The public GitHub marketplace '
+              'route is verified.',
+              TextStyles.body,
+              color: theme.foreground,
+            ),
+            SizedBox(height: space(3)),
+            StyledText(
+              'Slash commands are not PowerShell commands. If the install '
+              'summary says the plugin is already active, skip reload.',
               TextStyles.small,
               color: theme.mutedForeground,
             ),
-            for (final SkillInstallRoute route
-                in entry.installRoutes) ...<Widget>[
-              SizedBox(height: space(6)),
-              _RoutePanel(route: route),
-            ],
+            _RouteAction(label: 'Install', commands: _plugin.install),
           ],
         ),
       ),
@@ -317,89 +289,85 @@ class _InstallPanel extends StatelessWidget {
   }
 }
 
-class _RoutePanel extends StatelessWidget {
-  const _RoutePanel({required this.route});
+class _ManagePanel extends StatelessWidget {
+  const _ManagePanel({required this.entry});
 
-  final SkillInstallRoute route;
+  final SkillDocEntry entry;
 
-  bool get _pending => route.status == SkillRouteStatus.pendingVerification;
+  SkillInstallRoute get _plugin => entry.installRoutes.singleWhere(
+    (SkillInstallRoute route) => route.id == 'plugin',
+  );
+
+  @override
+  Widget build(BuildContext context) => Panel(
+    key: const ValueKey<String>('skill-manage'),
+    label: 'Manage',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _RouteAction(label: 'Update', commands: _plugin.update),
+        _RouteAction(label: 'Inspect and try', commands: _plugin.inspect),
+        _RouteAction(label: 'Remove', commands: _plugin.remove),
+      ],
+    ),
+  );
+}
+
+class _SourcePanel extends StatelessWidget {
+  const _SourcePanel({required this.entry, required this.files});
+
+  final SkillDocEntry entry;
+  final List<DocsCodeFile> files;
 
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
-    return Semantics(
-      container: true,
-      label:
-          '${route.title}, ${_pending ? 'pending verification' : 'works today'}',
-      child: Container(
-        key: ValueKey<String>('skill-route:${route.id}'),
-        padding: EdgeInsets.all(space(5)),
-        decoration: BoxDecoration(
-          color: theme.card,
-          borderRadius: BorderRadius.circular(Radii.lg),
-          border: Border.all(color: theme.border, width: BorderWidths.hairline),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              runSpacing: space(2),
-              spacing: space(3),
-              children: <Widget>[
-                StyledText(
-                  route.title,
-                  TextStyles.small,
-                  color: theme.foreground,
-                ),
-                Badge(
-                  label: _pending ? 'Pending verification' : 'Works today',
-                  variant: _pending
-                      ? BadgeVariant.warning
-                      : BadgeVariant.success,
-                ),
-              ],
-            ),
-            SizedBox(height: space(2)),
-            StyledText(
-              route.summary,
-              TextStyles.small,
-              color: theme.mutedForeground,
-            ),
-            if (route.blockedBy != null) ...<Widget>[
-              SizedBox(height: space(3)),
-              Note(
-                tone: NoteTone.error,
-                title: 'Pending',
-                child: StyledText(route.blockedBy!, TextStyles.small),
-              ),
+    return Panel(
+      key: const ValueKey<String>('skill-source'),
+      label: 'Source',
+      note: 'v${entry.version}',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          SpecimenRow(
+            children: <Widget>[
+              for (final String agent in entry.supportedAgents)
+                Badge(label: agent, variant: BadgeVariant.success),
             ],
-            _RouteAction(label: 'Install', commands: route.install),
-            _RouteAction(
-              label: 'Update',
-              commands: route.update,
-              note: route.updateNote,
+          ),
+          SizedBox(height: space(3)),
+          StyledText(entry.repository, TextStyles.identifier),
+          SizedBox(height: space(2)),
+          StyledText(
+            '${entry.licenseStatus} Detailed rules and templates ship with '
+            'the plugin and load only when relevant.',
+            TextStyles.small,
+            color: theme.mutedForeground,
+          ),
+          SizedBox(height: space(4)),
+          DocsDisclosure(
+            title: 'Browse skill files',
+            child: DocsFileTree(
+              key: ValueKey<String>('docs-file-tree:${entry.slug}'),
+              label: 'Files',
+              files: files,
             ),
-            _RouteAction(label: 'Inspect', commands: route.inspect),
-            _RouteAction(label: 'Remove', commands: route.remove),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class _RouteAction extends StatelessWidget {
-  const _RouteAction({required this.label, required this.commands, this.note});
+  const _RouteAction({required this.label, required this.commands});
 
   final String label;
   final List<SkillCommand> commands;
-  final String? note;
 
   @override
   Widget build(BuildContext context) {
-    if (commands.isEmpty && note == null) return const SizedBox.shrink();
+    if (commands.isEmpty) return const SizedBox.shrink();
     final ThemeTokens theme = ThemeScope.of(context);
     return Padding(
       padding: EdgeInsets.only(top: space(4)),
@@ -412,13 +380,10 @@ class _RouteAction extends StatelessWidget {
             color: theme.mutedForeground,
           ),
           SizedBox(height: space(2)),
-          if (commands.isEmpty)
-            StyledText(note!, TextStyles.small, color: theme.mutedForeground)
-          else
-            for (int i = 0; i < commands.length; i++) ...<Widget>[
-              if (i > 0) SizedBox(height: space(3)),
-              _CommandBlock(command: commands[i]),
-            ],
+          for (int i = 0; i < commands.length; i++) ...<Widget>[
+            if (i > 0) SizedBox(height: space(3)),
+            _CommandBlock(command: commands[i]),
+          ],
         ],
       ),
     );
@@ -465,50 +430,4 @@ class _CommandBlock extends StatelessWidget {
       ],
     );
   }
-}
-
-class _VersionPanel extends StatelessWidget {
-  const _VersionPanel({required this.entry});
-
-  final SkillDocEntry entry;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-    key: const ValueKey<String>('skill-version'),
-    container: true,
-    label: 'Version',
-    child: DocsInstallFacts(
-      title: 'Version',
-      facts: <DocsInstallFact>[
-        DocsInstallFact(
-          label: 'Skill version',
-          value: entry.version,
-          description:
-              'First release. Version compatibility beyond "tested against '
-              'the current Claude Code plugin system" is not claimed.',
-        ),
-        DocsInstallFact(
-          label: 'Plugin name',
-          value: entry.pluginName,
-          description:
-              'The plugin name Claude Code installs once the plugin route '
-              'is verified.',
-        ),
-        DocsInstallFact(
-          label: 'Marketplace',
-          value: entry.marketplaceName,
-          description:
-              "This repository's own marketplace name: see "
-              '.claude-plugin/marketplace.json.',
-        ),
-        DocsInstallFact(
-          label: 'Repository',
-          value: entry.repository,
-          description:
-              "Source of truth for the skill's files. Not a "
-              'copy-pasteable install command: see Install & manage above.',
-        ),
-      ],
-    ),
-  );
 }

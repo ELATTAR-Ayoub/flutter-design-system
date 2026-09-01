@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/catalog.dart';
 import 'package:example/docs/docs_code.dart';
+import 'package:example/docs/docs_disclosure.dart';
 import 'package:example/main.dart';
 import 'package:example/skills_docs/catalog.dart';
 import 'package:example/skills_docs/skills_page.dart';
@@ -350,6 +351,12 @@ void main() {
         find.byType(SkillsPage),
       );
       expect(page.fileSource, loaded);
+
+      final Finder trigger = find.byKey(DocsDisclosure.triggerKey);
+      await tester.ensureVisible(trigger);
+      await tester.pump();
+      await tester.tap(trigger);
+      await tester.pumpAndSettle();
 
       // …and that the file tree renders it. The tree shows the selected file,
       // which is the first one, as a single Text — so this compares the pixels

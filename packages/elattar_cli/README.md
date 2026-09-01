@@ -28,7 +28,8 @@ On older SDKs, or if you prefer the long spelling:
 dart pub global activate elattar_cli
 ```
 
-Both put an `elattar` executable on your PATH.
+The recommended command installs a native executable. The legacy command uses
+pub's global package cache. They use different executable directories.
 
 To compile the CLI from the repository instead, taking the default branch
 rather than the released version, which is what a contributor wants:
@@ -41,27 +42,28 @@ dart pub global activate --source git \
 
 ### `elattar: command not found`
 
-The executable landed in pub's bin directory, which is not on your PATH yet.
-Add it:
+Use the directory printed by `dart install`. For the recommended install, Dart
+places launchers under `$DART_DATA_HOME/install/bin`:
 
-| Platform | Directory | Add to |
+| Install method | Windows | macOS / Linux |
 | --- | --- | --- |
-| macOS / Linux | `$HOME/.pub-cache/bin` | `~/.zshrc`, `~/.bashrc` |
-| Windows | `%LOCALAPPDATA%\Pub\Cache\bin` | your user `Path` variable |
+| `dart install` | `%LOCALAPPDATA%\Dart\install\bin` | `$DART_DATA_HOME/install/bin` |
+| `dart pub global activate` | `%LOCALAPPDATA%\Pub\Cache\bin` | `$PUB_CACHE/bin`, normally `~/.pub-cache/bin` |
 
-```bash
-export PATH="$HOME/.pub-cache/bin:$PATH"
+Until PATH is fixed on Windows, run the installed launcher directly:
+
+```powershell
+& "$env:LOCALAPPDATA\Dart\install\bin\elattar.bat" --version
 ```
 
-If `$PUB_CACHE` is set, the directory is `$PUB_CACHE/bin` instead. Until you
-fix the PATH, `dart pub global run elattar_cli:elattar <args>` works from
-anywhere.
+After changing your user PATH, open a new terminal. An already-open terminal
+keeps its previous environment.
 
 ### Update and uninstall
 
 ```bash
 dart install elattar_cli          # re-run: installs the newest version
-dart pub global deactivate elattar_cli
+dart uninstall elattar_cli
 ```
 
 Uninstalling the CLI does not touch anything it installed. Those files are
@@ -73,7 +75,7 @@ Run `elattar` with no arguments for the same summary.
 
 | Command | What it does |
 | --- | --- |
-| `elattar init --foundation source` | Sets the project up: `elattar.yaml`, the foundation sources, the three font faces wired into your `pubspec.yaml`, `LICENSES/ELATTAR-MIT.txt`, and `.elattar/manifest.json`. |
+| `elattar init --foundation source` | Sets the project up: `elattar.yaml`, the foundation sources, the two font faces wired into your `pubspec.yaml`, `LICENSES/ELATTAR-MIT.txt`, and `.elattar/manifest.json`. |
 | `elattar add <items…>` | Installs items and everything they depend on. |
 | `elattar add --all` | Installs the whole registry. |
 | `elattar list` | Every item, with type and description. |
@@ -111,10 +113,10 @@ Run `elattar` with no arguments for the same summary.
 By default this CLI reads a **hosted, version-pinned registry**:
 
 ```
-https://flutter.elattar.dev/registry/0.0.1/
+https://flutter.elattar.dev/registry/0.0.2/
 ```
 
-That path is immutable. `elattar_cli 0.0.1` will install the same sources in a
+That path is immutable. `elattar_cli 0.0.2` will install the same sources in a
 year that it installs today, because a later release publishes a new versioned
 path rather than changing this one. Nothing you install can change under you
 without you changing the CLI version.
@@ -122,7 +124,7 @@ without you changing the CLI version.
 Point somewhere else with `--registry`:
 
 ```bash
-elattar add button --registry https://mirror.example.com/elattar/0.0.1/
+elattar add button --registry https://mirror.example.com/elattar/0.0.2/
 elattar add button --registry ../flutter-design-system/registry/generated/latest
 ```
 
