@@ -1,12 +1,23 @@
+<p align="center">
+  <img src="docs/assets/readme/hero.png" alt="Elattar components floating over a quiet green landscape" width="100%" />
+</p>
+
 # Elattar Design System
 
-A Flutter design system you install as **source you own**, not as a dependency
-you track.
+A native Flutter design system with source-owned components, a versioned CLI
+registry, and an agent skill that knows how to use both.
 
-`elattar add button` copies `button.dart` into your project, rewrites its
-imports to point at your own files, and records what it did. From that moment
-the file is yours: read it, edit it, delete half of it. Nothing upgrades it
-behind your back.
+`0.0.2`, the current public release.
+
+[Documentation](https://flutter.elattar.dev) ·
+[Components](https://flutter.elattar.dev/components) ·
+[Installation](https://flutter.elattar.dev/docs/installation) ·
+[Skills](https://flutter.elattar.dev/skills) ·
+[Changelog](CHANGELOG.md)
+
+## Install
+
+Install the CLI, then run it inside your Flutter project:
 
 ```bash
 dart install elattar_cli
@@ -15,166 +26,128 @@ elattar init --foundation source
 elattar add button
 ```
 
-[Quickstart](#quickstart) • [What you get](#what-you-get) • [Agent skill](#agent-skill) • [Development](#development) • [License](#license) • [Contributing](#contributing)
+`elattar add button` copies the component and its dependencies into your
+project. The installed source is yours to read, change, and ship.
 
-## Status
+Use `elattar add --all` for the complete registry and `elattar doctor` to check
+the installation. Windows PATH help, offline use, and every CLI option live in
+the [CLI README](packages/elattar_cli/README.md).
 
-`0.0.2`, the current public release.
+## Source you own
 
-| | |
-| --- | --- |
-| CLI | `elattar_cli` `0.0.2` on pub.dev: `dart install elattar_cli`; see [Quickstart](#quickstart) |
-| Registry | Live at <https://flutter.elattar.dev/registry/0.0.2/>: 99 items (97 components, 1 block, 1 foundation), schema v1, 112 distributed source files |
-| Documentation | Live at <https://flutter.elattar.dev> |
-| License | MIT for Elattar's own work; see [License](#license) |
+<p align="center">
+  <img src="docs/assets/readme/source-owned.png" alt="A source document and component tile in a green landscape" width="100%" />
+</p>
 
-The root `elattar_design_system` package is **not** on pub.dev, and that is
-the design rather than a gap: source installation through the CLI is the
-product. The package remains the authoritative implementation and can be
-consumed directly from Git when you want the dependency model instead — see
-[Full package](#full-package).
+Elattar distributes Flutter source instead of hiding components behind a
+package boundary.
 
-## Quickstart
+- Files are copied into your project and recorded in `.elattar/manifest.json`.
+- Imports are rewritten to your generated local barrels.
+- Every registry payload is verified before the first file is written.
+- Released registry paths are immutable.
+- `--dry-run`, `--offline`, local registries, and mirrors are supported.
 
-```bash
-dart install elattar_cli
-```
+The root `elattar_design_system` package remains the authoritative
+implementation, but it is intentionally not published to pub.dev. The public
+distribution route is `elattar_cli` and the source registry.
 
-On an older SDK, or if you prefer the long spelling, `dart pub global activate
-elattar_cli` does the same thing. To compile the CLI from this repository
-instead of taking the released version, see the
-[CLI package README](packages/elattar_cli/README.md).
+## What is included
 
-Then, from inside a Flutter project:
+<p align="center">
+  <img src="docs/assets/readme/foundation.png" alt="A minimal tray of color, typography, and spacing tokens" width="100%" />
+</p>
 
-```bash
-elattar init --foundation source   # foundation, fonts, config, notices
-elattar add button                 # one component and its dependencies
-elattar add --all                  # or the whole registry
-```
+The `0.0.2` registry contains 99 items: 97 components, one application block,
+and one foundation bundle.
 
-`elattar doctor` checks the result. `elattar add <name> --dry-run` shows every
-file a command would write without writing any of them.
+- **Foundation:** semantic color, responsive typography, spacing, radii,
+  shadows, surfaces, media queries, motion, reduced motion, and path-drawn
+  icons.
+- **Components:** forms, selection, menus, navigation, dialogs, overlays,
+  feedback, data display, charts, chat, layout, sidebar, and agent UI.
+- **Effects and motion:** press and hover feedback, active indicators,
+  keyframes, glass, premium surfaces, ambient patterns, and the voice orb.
+- **Fonts:** Inter for words and Geist Mono for code, identifiers, and numbers.
 
-Full instructions, PATH recovery, offline use and troubleshooting are in the
-[CLI package README](packages/elattar_cli/README.md) and on the
-[installation page](https://flutter.elattar.dev/docs/installation).
+The public API uses ordinary Flutter names with no prefix: `Button`, `Card`,
+`Icon`, `TextStyles`, and `space(...)`.
 
-### Where components come from
+## Use a component
 
-The CLI reads a hosted registry pinned to its own version —
-`/registry/0.0.2/` — and that path is immutable. Publishing a change means
-publishing a new version, never rewriting a released one, so what you install
-today is what you install next year. `--registry` points at a mirror or a
-local directory when you want one.
-
-Every manifest and payload is verified against its declared sha256, and
-everything is downloaded and checked **before the first file is written**, so a
-failed download leaves your project untouched rather than half-installed.
-
-## What you get
-
-- **Foundation** — colour (OKLab/OKLCH with chroma-reduction gamut mapping),
-  typography, spacing, radii, shadows, surfaces, media queries, motion tokens
-  with a reduced-motion resolver, and a path-drawn icon registry.
-- **Components** — buttons, inputs and the field family, forms with a
-  dependency-free validator, selection, selects and pickers, dialogs and
-  overlays, menus, navigation, feedback, data display, charts, chat, layout
-  primitives, sidebar, and a complete agent-console family.
-- **Effects and motion** — surface, background effect, action feedback,
-  premium surface, glass, feedback surface, ambient pattern, media scrim,
-  the voice indicator; hover builder, press, active indicator, content
-  change, keyframes.
-- **Two faces** — Inter and Geist Mono, wired into your
-  `pubspec.yaml` under the family names the installed typography asks for.
-
-## Minimal usage
-
-```dart
-import 'package:elattar_design_system/elattar_design_system.dart';
-import 'package:flutter/material.dart';
-
-void main() {
-  runApp(
-    ThemeScope(
-      controller: ThemeController(),
-      child: const MaterialApp(home: DemoPage()),
-    ),
-  );
-}
-
-class DemoPage extends StatelessWidget {
-  const DemoPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-
-    return ColoredBox(
-      color: theme.background,
-      child: Center(
-        child: Button(
-          onPressed: () {},
-          child: const StyledText('Continue', TextStyles.nav),
-        ),
-      ),
-    );
-  }
-}
-```
-
-In a project set up by the CLI, the two generated barrels replace that single
-package import:
+Projects initialized by the CLI receive two local barrels:
 
 ```dart
 import 'components/ui/ui.dart';
 import 'design_system/foundation.dart';
+
+Button(
+  onPressed: () {},
+  child: const StyledText('Continue', TextStyles.nav),
+)
 ```
 
-## Full package
+The foundation owns visual values. Components consume its color, type,
+spacing, radius, shadow, and motion tokens rather than creating a second visual
+system.
 
-If you would rather depend on the package than own the source:
+## CLI
 
-```yaml
-dependencies:
-  elattar_design_system:
-    git:
-      url: https://github.com/ELATTAR-Ayoub/flutter-design-system.git
-      ref: v0.0.2
-```
+| Command | Purpose |
+| --- | --- |
+| `elattar init --foundation source` | Install the foundation, fonts, config, and notices |
+| `elattar add <items...>` | Install components and their dependencies |
+| `elattar add --all` | Install the complete registry |
+| `elattar list` | List available items |
+| `elattar search <query>` | Search the registry |
+| `elattar info <name>` | Inspect one item |
+| `elattar doctor` | Check the project, manifest, dependencies, and registry |
 
-`ref:` pins the release tag, which is cut at the same commit the registry and
-the site were built from. Drop it to track the default branch. A `path:`
-dependency works the same way, and is what this repository's own
-`example/pubspec.yaml` uses.
+The published CLI is `elattar_cli 0.0.2`. It reads the immutable
+[`0.0.2` registry](https://flutter.elattar.dev/registry/0.0.2/) by default.
 
 ## Agent skill
 
-This repository carries a coding-agent skill,
-[`elattar-flutter-ui-director`](skills/elattar-flutter-ui-director/SKILL.md),
-that teaches an agent to build Flutter UI from this design system: inventory
-the real public APIs before inventing a widget, resolve every visual value
-from foundation tokens, cover loading/empty/error/success and accessibility
-states, respect responsive contracts, and run the right verification ladder.
+<p align="center">
+  <img src="docs/assets/readme/agent-skill.png" alt="An agent instruction card assembling interface components" width="100%" />
+</p>
 
-It is mode-aware. In a checkout of this repository it uses the package layout
-(`lib/src/design_system/foundation/`, `lib/src/components/ui/`, `example/lib/`). In an
-application that installed the design system through the CLI, it detects
-`elattar.yaml` and uses that project's layout instead. One skill directory
-serves both; there is no second copy to drift.
+`elattar-flutter-ui-director` teaches Claude Code to inspect the installed API,
+compose existing components, use foundation tokens, cover relevant states, and
+verify Flutter UI in proportion to the task.
 
-**In this repository** — nothing to install. [`AGENTS.md`](AGENTS.md) sits at
-the root and routes any agent that reads it into the skill.
-
-**Elsewhere** — the repository root is a public Claude Code marketplace:
+Run these commands inside Claude Code:
 
 ```text
 /plugin marketplace add ELATTAR-Ayoub/flutter-design-system
 /plugin install elattar-design-system@elattar
 ```
 
-See [`/skills`](https://flutter.elattar.dev/skills) for examples, how the skill
-works, and update or removal commands.
+The same skill works in this repository and in applications initialized by the
+CLI. See the concise [Skills guide](https://flutter.elattar.dev/skills) for
+example prompts, updates, and removal.
+
+## Releases
+
+### 0.0.2 — current
+
+- Replaced the inherited stylesheet transcript with a native Flutter
+  foundation.
+- Introduced 17 responsive typography roles with no role-owned color.
+- Added keyboard, focus, semantics, minimum-target, and focus-restoration work
+  across core interactions.
+- Versioned registry items individually and protected released payloads from
+  mutation.
+- Published `elattar_cli 0.0.2` against `/registry/0.0.2/`.
+
+### 0.0.1
+
+- First public CLI, source registry, documentation site, package tag, and
+  Claude Code skill.
+- Published 99 registry items with integrity checks and offline caching.
+
+Read the complete [design-system changelog](CHANGELOG.md) or the
+[CLI changelog](packages/elattar_cli/CHANGELOG.md).
 
 ## Development
 
@@ -182,65 +155,24 @@ works, and update or removal commands.
 flutter pub get
 flutter analyze
 flutter test
-```
 
-The docs app:
-
-```bash
 cd example
 flutter pub get
 flutter run
 ```
 
-The registry, after changing any distributed source:
+The public barrel is [`lib/elattar_design_system.dart`](lib/elattar_design_system.dart).
+The documentation app starts at [`example/lib/main.dart`](example/lib/main.dart).
+Registry and release tooling is documented in [`tool/README.md`](tool/README.md).
 
-```bash
-dart run tool/registry_builder/bin/build.dart .
-dart run tool/registry_builder/bin/validate.dart registry/generated/latest/registry.json
-git diff --exit-code -- registry/generated/latest
-```
+## License and contributing
 
-Entry points: [`lib/elattar_design_system.dart`](lib/elattar_design_system.dart)
-(the public barrel), [`example/lib/main.dart`](example/lib/main.dart) (the docs
-app), [`tool/README.md`](tool/README.md) (every generator and what reruns it).
+Elattar's work is [MIT licensed](LICENSE). Redistributed fonts, icon geometry,
+and shader assets retain their upstream notices in
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) and [`third_party/`](third_party/).
+Those notices travel with the source that requires them.
 
-## Verification
-
-```bash
-flutter analyze && flutter test
-cd example && flutter analyze && flutter test
-cd packages/elattar_cli && dart analyze && dart test
-```
-
-`test/token_guard_test.dart` mechanically enforces the no-literal rule — no raw
-colours, sizes, radii, shadows, curves or durations outside the foundation
-directory. `example/test/public_claims_test.dart` enforces that the site never
-tells a reader something untrue about what can be installed. The pixel-parity
-rig is documented in [`tool/verify/README.md`](tool/verify/README.md).
-
-## License
-
-Elattar's own work is **MIT** — see [`LICENSE`](LICENSE).
-
-That covers Elattar's code and nothing else. This repository also
-redistributes fonts, icon geometry and a shader written by other people, under
-their licenses. Every one of them is recorded — upstream source, version,
-retrieval date and hash — in
-[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md), and the license texts are
-reproduced verbatim under [`third_party/`](third_party/).
-
-Components you install are copied into your project and become your code. The
-notices come with them, into your project's `LICENSES/` directory. Keep them:
-carrying the notice is the condition MIT, ISC and the SIL Open Font License
-each attach to the grant. None of them asks for visible credit in your
-application's interface.
-
-## Contributing
-
-- Issues: [github.com/ELATTAR-Ayoub/flutter-design-system/issues](https://github.com/ELATTAR-Ayoub/flutter-design-system/issues)
-- Pull requests: [github.com/ELATTAR-Ayoub/flutter-design-system/pulls](https://github.com/ELATTAR-Ayoub/flutter-design-system/pulls)
-- Guide: [`CONTRIBUTING.md`](CONTRIBUTING.md)
-- Security: [`SECURITY.md`](SECURITY.md)
-
-If you are changing package behaviour, include the smallest relevant test
-coverage and note any effect on the example app.
+Before contributing, read [`CONTRIBUTING.md`](CONTRIBUTING.md) and
+[`SECURITY.md`](SECURITY.md). Use
+[issues](https://github.com/ELATTAR-Ayoub/flutter-design-system/issues) for bugs
+and proposals, and include focused tests with behavior changes.
