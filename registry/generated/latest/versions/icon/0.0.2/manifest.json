@@ -1,0 +1,48 @@
+{
+  "name": "icon",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "Curated, token-sized icon renderer and generated path catalog used by interactive components.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/icon.dart",
+      "target": "@ui/icon.dart",
+      "sha256": "771a5bd8d8889e18c7ecea4abcd0f34f5786d9dfb29a490e1481832dabf65818"
+    },
+    {
+      "source": "lib/src/components/ui/icon_paths.dart",
+      "target": "@ui/icon_paths.dart",
+      "sha256": "fddac99d96cca546e2865f0c9c99c72ff36088c198a1f7e6cc803a72bed7be7d"
+    },
+    {
+      "source": "lib/src/components/ui/icon_paths.g.dart",
+      "target": "@ui/icon_paths.g.dart",
+      "sha256": "4993c5d70266cb88b2f4a1d3b2a5520ab462a5bb6e618bdf08ec95e950e65c29"
+    },
+    {
+      "source": "lib/src/components/ui/icon_paths.g.index.dart",
+      "target": "@ui/icon_paths.g.index.dart",
+      "sha256": "58234d428593568c86e7f4485aa8c59908e185fdcce8b84cec811bde41dca5de"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [
+    {
+      "source": "third_party/lucide/LICENSE",
+      "target": "@license/Lucide-ISC.txt",
+      "sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57"
+    }
+  ],
+  "documentationRoute": "/components/icon",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/icon.dart",
+  "deprecated": false
+}

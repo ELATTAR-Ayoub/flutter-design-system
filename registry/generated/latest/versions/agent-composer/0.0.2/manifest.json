@@ -1,0 +1,44 @@
+{
+  "name": "agent-composer",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/agent/parts/composer.tsx` — where the user says things.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/agent_composer.dart",
+      "target": "@ui/agent_composer.dart",
+      "sha256": "1b19fb02a80c3285572ba9adf7048893208b1c233961e29348dfc98589203d40"
+    }
+  ],
+  "registryDependencies": [
+    "agent-attach-menu",
+    "agent-attachments",
+    "agent-core",
+    "agent-slash-palette",
+    "button",
+    "icon",
+    "input",
+    "surface",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "agent-attach-menu",
+    "agent-attachments",
+    "agent-core",
+    "agent-slash-palette",
+    "button",
+    "icon",
+    "input",
+    "surface"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/agent-composer",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_composer.dart",
+  "deprecated": false
+}

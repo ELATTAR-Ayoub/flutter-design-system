@@ -1,0 +1,30 @@
+{
+  "name": "popover",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "Anchored overlay surface with semantic placement, barrier, alignment, and token-backed transition behavior.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.12.2",
+  "files": [
+    {
+      "source": "lib/src/components/ui/popover.dart",
+      "target": "@ui/popover.dart",
+      "sha256": "7fb0b42f0ebc42ba51061369bc03edb7856fa051f793d1a5c601591d5fba1952"
+    }
+  ],
+  "registryDependencies": [
+    "surface",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "surface"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/popover",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/popover.dart",
+  "deprecated": false
+}

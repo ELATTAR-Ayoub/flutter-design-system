@@ -164,19 +164,14 @@ final double _bulletTop = space(2);
 /// class: `font-semibold` over whatever `<body>` inherits. `html` sets only
 /// `font-sans` and `body` sets no size, so the computed value is the browser
 /// default.
-///
-// integration-verify: ruling M5: the supervisor confirms 16px by
-// computed-style probe on the rig and clears this marker.
-// allow-hardcoded: the browser's own default font-size, which no token names.
-const double _inheritedFontSize = 16;
 
-/// `--font-weight-semibold: 600` (globals.css L179).
+/// The semibold step this page emphasises with.
 const double _semiboldWght = 600;
 
-/// `font-semibold` at the inherited size: see [_inheritedFontSize].
-final TextStyleToken _inheritedSemibold = TextStyleToken(
-  family: Fonts.sans,
-  size: _inheritedFontSize,
+/// The reading role at semibold: emphasis inside a paragraph, derived rather
+/// than published, and sized by the role rather than by a number here.
+final TextStyleToken _inheritedSemibold = TextStyles.body.derive(
+  name: 'motion-emphasis',
   wght: _semiboldWght,
 );
 
@@ -417,8 +412,10 @@ class _ReplayButton extends StatelessWidget {
             SizedBox(width: Button.gapFor(ButtonSize.sm)),
             // Bare [Text]: the button installs its own `text-sm font-medium`
             // as the ambient style, which is exactly what the label inherits
-            // in the reference.
-            Text(label),
+            // in the reference. Wrapped in Flexible so a doubled text scale
+            // wraps the label instead of pushing the row past the button's
+            // constrained width.
+            Flexible(child: Text(label)),
           ],
         ),
       ),
@@ -1822,11 +1819,7 @@ class _PulseLiveDemo extends StatelessWidget {
               SizedBox(width: space(2.5)),
               // `text-success-ink` is a utility, so it beats `.type-micro`'s
               // own muted colour.
-              StyledText(
-                'Live',
-                TextStyles.eyebrowSmall,
-                color: theme.successText,
-              ),
+              StyledText('Live', TextStyles.small, color: theme.successText),
             ],
           ),
         ),

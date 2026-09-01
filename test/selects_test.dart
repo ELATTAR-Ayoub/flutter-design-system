@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/rendering.dart' show RenderParagraph;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
@@ -253,22 +255,45 @@ void main() {
   });
   group('Select — the deferred row kinds', () {
     testWidgets('every row kind states its own height', (WidgetTester t) async {
-      // *(measured)*: the label row computes 32px and the item 34.563 on the
-      // live page; the port derives both off the type scale, so the item lands
-      // on the exact 34.5714 the browser rounds.
-      expect(Select.itemHeight, closeTo(34.571, 0.001));
-      expect(Select.labelHeight, 32);
-      expect(Select.separatorHeight, 17);
+      // Every row derives its height from the role it sets and the padding it
+      // writes, so the scale can move without a number here going stale.
+      //
+      // TARGET SIZING: `Select.itemHeight` used to assert exact equality with
+      // the unfloored type sum (24 + 16 = 40); an option is a real touch
+      // target, so it is now floored at TouchTargets.minimum (44) — see
+      // `lib/src/components/ui/select.dart`.
+      expect(
+        Select.itemHeight,
+        math.max(
+          TextStyles.body.step.leading + space(2) * 2,
+          TouchTargets.minimum,
+        ),
+      );
+      expect(Select.labelHeight, TextStyles.small.step.leading + space(2) * 2);
+      expect(Select.separatorHeight, BorderWidths.hairline + space(2) * 2);
       expect(Select.scrollButtonHeight, 32);
+      // An option is a touch target: never smaller than the platform minimum.
+      expect(Select.itemHeight, TouchTargets.minimum);
     });
 
     testWidgets('the grouped menu totals what the map derives', (
       WidgetTester t,
     ) async {
-      // §4.2: 8 + 32 + 3×34.571 + 17 + 32 + 2×34.571 + 8 = 269.857.
-      expect(SelectMenu.heightOf<String>(sortMenu()), closeTo(269.857, 0.01));
-      // §4.2: 8 + 6×34.571 + 8 = 223.429.
-      expect(SelectMenu.heightOf<String>(rarityMenu()), closeTo(223.429, 0.01));
+      // Two labels, five options, one rule, inside the viewport padding.
+      expect(
+        SelectMenu.heightOf<String>(sortMenu()),
+        closeTo(
+          space(2) * 2 +
+              Select.labelHeight * 2 +
+              Select.itemHeight * 5 +
+              Select.separatorHeight,
+          0.01,
+        ),
+      );
+      expect(
+        SelectMenu.heightOf<String>(rarityMenu()),
+        closeTo(space(2) * 2 + Select.itemHeight * 6, 0.01),
+      );
     });
 
     testWidgets('a group paints its label and a separator paints a rule', (
@@ -292,8 +317,11 @@ void main() {
 
       expect(find.text('Activity'), findsOneWidget);
       expect(find.text('Price'), findsOneWidget);
-      expect(rowRect(t, 'Activity').height, 32);
-      expect(rowRect(t, 'Most popular').height, closeTo(34.571, 0.001));
+      expect(rowRect(t, 'Activity').height, Select.labelHeight);
+      expect(
+        rowRect(t, 'Most popular').height,
+        closeTo(Select.itemHeight, 0.001),
+      );
 
       // The rule is 1px inside 17px of box, and it is `--border`.
       final ThemeTokens theme = themeIn(t, Select<String>);
@@ -409,9 +437,11 @@ void main() {
       final Rect content = t.getRect(find.byType(SelectMenu<String>));
       final Rect chosen = rowRect(t, 'Most popular');
 
-      // *(measured on the live reference: `offsetInContent: 40`)* — the
-      // viewport's 8px of padding plus a 32px label, and nothing else.
-      expect(chosen.top - content.top, closeTo(40, 0.001));
+      // The viewport's padding plus one group label, and nothing else.
+      expect(
+        chosen.top - content.top,
+        closeTo(space(2) + Select.labelHeight, 0.001),
+      );
 
       // …which is what puts its middle on the trigger's middle.
       expect(chosen.center.dy, closeTo(trigger.center.dy, 0.001));
@@ -424,7 +454,7 @@ void main() {
       expect(chosen.center.dy - content.top, isNot(closeTo(shipped, 0.001)));
       expect(
         chosen.center.dy - content.top,
-        closeTo(40 + Select.itemHeight / 2, 0.001),
+        closeTo(space(2) + Select.labelHeight + Select.itemHeight / 2, 0.001),
       );
     });
 
@@ -1061,11 +1091,21 @@ void main() {
       );
     });
 
-    testWidgets('a row is 26.571px with the tick 8px in', (
+    testWidgets('a row is floored at the touch-target minimum, tick 8px in', (
       WidgetTester t,
     ) async {
-      expect(Combobox.itemHeight, closeTo(26.571, 0.001));
-      expect(Combobox.emptyHeight, closeTo(34.571, 0.001));
+      // TARGET SIZING: the measured 26.571px reading (`py-1` around one line
+      // box) is well below TouchTargets.minimum (44); a combobox option is a
+      // real touch target, so the row's own layout height is the floor.
+      expect(
+        Combobox.itemHeight,
+        math.max(
+          TextStyles.body.step.leading + space(1) * 2,
+          TouchTargets.minimum,
+        ),
+      );
+      expect(Combobox.itemHeight, TouchTargets.minimum);
+      expect(Combobox.emptyHeight, TextStyles.body.step.leading + space(2) * 2);
       expect(Combobox.listMaxHeight, 252);
 
       await t.pumpWidget(combobox(value: 'golden'));
@@ -1074,7 +1114,7 @@ void main() {
       await runOverlay(t);
       expect(
         rowRect(t, 'Eclipse Vault', within: find.byType(PopoverSurface)).height,
-        closeTo(26.571, 0.001),
+        closeTo(Combobox.itemHeight, 0.001),
       );
 
       final Rect tick = t.getRect(
@@ -1214,25 +1254,18 @@ void main() {
     });
   });
 
-  group('ComponentTextStyles — the menu family', () {
-    test('menuLabel is 12/400 in a 16px line box', () {
-      final TextStyleToken spec = TextStyles.menuLabel;
-      expect(spec.size, 12);
-      expect(spec.height! * spec.size!, 16);
+  group('the menu family reads at one role', () {
+    test('a menu group label is the supporting-copy role', () {
+      final TextStyleToken spec = TextStyles.small;
+      expect(spec.step, const TypeStep(14, 20));
       expect(spec.weight, FontWeight.w400);
       expect(spec.tracking, isNull);
       expect(spec.family, Fonts.sans);
+      expect(spec.isStatic, isTrue, reason: 'furniture does not resize');
     });
 
-    test('menuShortcut adds `--tracking-widest` and nothing else', () {
-      final TextStyleToken spec = TextStyles.menuShortcut;
-      expect(spec.size, TextStyles.menuLabel.size);
-      expect(spec.height, TextStyles.menuLabel.height);
-      expect(spec.weight, FontWeight.w400);
-      expect(spec.tracking, 0.1);
-      // Sans, not mono — selects-map drift 4: the palette's prices ride this
-      // class instead of the numerical foundation the same page prescribes.
-      expect(spec.family, Fonts.sans);
+    test('a shortcut column reads at the same role, never smaller', () {
+      expect(TextStyles.small.step.size, greaterThanOrEqualTo(14));
     });
   });
 
@@ -1428,13 +1461,24 @@ void main() {
 
   group('Command — measured geometry', () {
     testWidgets('every row kind states its own height', (WidgetTester t) async {
-      // The browser lays out on a 1/64px grid and reports 34.5625 / 32 /
-      // 66.5625; the port derives all three off the type scale, so it lands on
-      // the exact ratio the browser is rounding — the same relationship
-      // `Select.itemHeight` already documents.
-      expect(Command.itemHeight, closeTo(34.571, 0.001));
-      expect(Command.headingHeight, 32);
-      expect(Command.emptyHeight, closeTo(66.571, 0.001));
+      // All three derive off the type scale and the padding each row writes.
+      //
+      // TARGET SIZING: `Command.itemHeight` used to assert exact equality
+      // with the unfloored type sum (34.5625px); a palette row is a real
+      // touch target, so it is now floored at TouchTargets.minimum (44).
+      expect(
+        Command.itemHeight,
+        math.max(
+          TextStyles.body.step.leading + space(2) * 2,
+          TouchTargets.minimum,
+        ),
+      );
+      expect(Command.itemHeight, TouchTargets.minimum);
+      expect(
+        Command.headingHeight,
+        TextStyles.small.step.leading + space(2) * 2,
+      );
+      expect(Command.emptyHeight, TextStyles.body.step.leading + space(6) * 2);
       expect(Command.inputHeight, 32);
       expect(Command.listMaxHeight, 288);
     });
@@ -1443,16 +1487,25 @@ void main() {
       WidgetTester t,
     ) async {
       await pumpPalette(t);
-      // §7.2 derives 293.29 and the browser renders **293.25** *(measured)* —
-      // the same box, seen through the 1/64px grid. 2 border + 8 root pad +
-      // 8 wrapper pad + 32 input + 235.29 list + 8 root pad.
-      expect(t.getSize(find.byType(Command)).height, closeTo(293.29, 0.01));
-
-      // The list: two 117.14 groups with a 1px rule between them.
+      // The list: two groups of a heading and two rows, with a rule between.
+      final double group =
+          Command.headingHeight + Command.itemHeight * 2 + space(2) * 2;
       final double listHeight = t
           .getSize(find.byType(SingleChildScrollView))
           .height;
-      expect(listHeight, closeTo(235.29, 0.01));
+      expect(listHeight, closeTo(group * 2 + BorderWidths.hairline, 0.01));
+      // The palette is that list, the input above it, and the shell around
+      // both.
+      expect(
+        t.getSize(find.byType(Command)).height,
+        closeTo(
+          listHeight +
+              Command.inputHeight +
+              BorderWidths.hairline * 2 +
+              space(2) * 3,
+          0.01,
+        ),
+      );
     });
 
     testWidgets(
@@ -1557,10 +1610,10 @@ void main() {
       await pumpPalette(t);
       final ThemeTokens theme = themeIn(t, Command);
       final Text heading = t.widget<Text>(find.text('Packs'));
-      expect(heading.style!.fontSize, 12);
+      expect(heading.style!.fontSize, TextStyles.small.step.size);
       expect(heading.style!.fontWeight, FontWeight.w500);
       expect(heading.style!.color, theme.mutedForeground);
-      // `px-3 py-2` — 32px around a 16px line box *(measured)*.
+      // One supporting line box inside the row padding.
       expect(
         t
             .getSize(
@@ -1576,16 +1629,16 @@ void main() {
       );
     });
 
-    testWidgets('the shortcut is 12px sans at 0.1em — drift 4, shipped', (
+    testWidgets('the shortcut column reads at the supporting-copy role', (
       WidgetTester t,
     ) async {
       await pumpPalette(t);
       final Text price = t.widget<Text>(find.text(r'$48.00'));
-      expect(price.style!.fontSize, 12);
-      // Sans, not the mono numerical foundation the same page's Do 5 asks for.
+      expect(price.style!.fontSize, TextStyles.small.step.size);
       expect(price.style!.fontFamily, contains(Fonts.sans));
-      // `--tracking-widest` 0.1em → 1.2px at 12px *(measured)*.
-      expect(price.style!.letterSpacing, closeTo(1.2, 0.001));
+      // The retired role tracked this column wide enough to read as a caption
+      // rather than as a value. It tracks naturally now.
+      expect(price.style!.letterSpacing, isNull);
     });
   });
 
@@ -1724,7 +1777,18 @@ void main() {
       expect(find.text('Packs'), findsNothing);
       expect(find.text('Actions'), findsOneWidget);
       expect(paletteOrder(t), <String>['Open Wallet']);
-      expect(t.getSize(find.byType(Command)).height, closeTo(140.57, 0.02));
+      expect(
+        t.getSize(find.byType(Command)).height,
+        closeTo(
+          Command.headingHeight +
+              Command.itemHeight +
+              space(2) * 2 +
+              Command.inputHeight +
+              BorderWidths.hairline * 2 +
+              space(2) * 3,
+          0.02,
+        ),
+      );
     });
 
     testWidgets('the shortcut is part of what gets searched', (
@@ -1874,8 +1938,16 @@ void main() {
             .height,
         closeTo(Command.emptyHeight, 0.001),
       );
-      // *(Measured)* 124.56 with only the empty row showing.
-      expect(t.getSize(find.byType(Command)).height, closeTo(124.57, 0.02));
+      expect(
+        t.getSize(find.byType(Command)).height,
+        closeTo(
+          Command.emptyHeight +
+              Command.inputHeight +
+              BorderWidths.hairline * 2 +
+              space(2) * 3,
+          0.02,
+        ),
+      );
     });
 
     testWidgets('with no emptyLabel nothing is rendered in its place', (
@@ -2102,22 +2174,13 @@ void main() {
     });
   });
 
-  group('TextStyles.menuHeading — RULING L8, probe-confirmed', () {
-    test('it is menuLabel at weight 500', () {
-      final TextStyleToken heading = TextStyles.menuHeading;
-      final TextStyleToken label = TextStyles.menuLabel;
-      // *(Measured)* the live `CommandGroup` heading computes 12px / 16px
-      // line box / weight 500 at `font-variation-settings: normal` — which is
-      // what L8 made the fourth spec conditional on.
-      expect(heading.size, 12);
-      expect(heading.height! * heading.size!, 16);
-      expect(heading.weight, FontWeight.w500);
-      expect(heading.family, Fonts.sans);
-      expect(heading.tracking, isNull);
-      // One weight step from `SelectLabel`'s, and that step is drift 6.
-      expect(heading.size, label.size);
-      expect(heading.height, label.height);
-      expect(heading.weight, isNot(label.weight));
+  group('TextStyles.small — RULING L8, probe-confirmed', () {
+    test('a group heading and a group label are one role', () {
+      // The retired catalog spelled the same role three ways across Select,
+      // Combobox, and Command. There is one now.
+      expect(TextStyles.small.step, const TypeStep(14, 20));
+      expect(TextStyles.small.family, Fonts.sans);
+      expect(TextStyles.small.tracking, isNull);
     });
   });
 

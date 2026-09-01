@@ -442,7 +442,7 @@ class ContrastBadge extends StatelessWidget {
     if (!TokenRegistry.has(token) || !TokenRegistry.has(against)) {
       return StyledText(
         _unresolved,
-        TextStyles.eyebrowSmall,
+        TextStyles.small,
         color: theme.mutedForeground,
       );
     }
@@ -453,20 +453,23 @@ class ContrastBadge extends StatelessWidget {
       against: against,
     );
 
-    // `.type-micro` sets its own colour, so the sentence needs no override; the
-    // verdict span is the one place the markup writes a `text-*` utility.
+    // The sentence is muted and the verdict word takes value ink: the badge
+    // states both, because no type role carries a colour of its own.
     final TextStyle sentence = StyledText.styleOf(
       context,
-      TextStyles.eyebrowSmall,
+      TextStyles.small,
+      color: theme.mutedForeground,
     );
     final TextStyle verdict = StyledText.styleOf(
       context,
-      TextStyles.eyebrowSmall,
+      TextStyles.small,
       color: elContrastVerdictColor(ratio, theme),
     );
 
-    String cased(String text) =>
-        TextStyles.eyebrowSmall.uppercase ? text.toUpperCase() : text;
+    // The badge is set in caps: a fixed-shape verdict a reader scans rather
+    // than reads. No type role transforms its text, so the treatment is stated
+    // here, and the authored sentence stays the accessible name below.
+    String cased(String text) => text.toUpperCase();
 
     return RichText(
       TextSpan(
@@ -476,7 +479,7 @@ class ContrastBadge extends StatelessWidget {
           TextSpan(text: cased(elContrastVerdict(ratio)), style: verdict),
         ],
       ),
-      TextStyles.eyebrowSmall,
+      TextStyles.small,
     );
   }
 }

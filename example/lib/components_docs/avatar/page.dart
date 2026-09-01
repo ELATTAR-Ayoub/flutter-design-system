@@ -363,7 +363,7 @@ const String _usageCode = '''const Avatar(fallback: 'AB')
 Avatar(
   fallback: 'AB',
   image: NetworkImage(user.photoUrl),
-  fallbackSpec: TextStyles.avatarFallback,
+  fallbackSpec: TextStyles.nav,
 )
 
 Avatar(
@@ -380,7 +380,7 @@ const String _previewCode = '''Wrap(
     Avatar(
       fallback: 'AB',
       size: AvatarSize.sm,
-      fallbackSpec: TextStyles.avatarInitials,
+      fallbackSpec: TextStyles.nav,
     ),
     Avatar(fallback: 'AB'), // size: AvatarSize.md, the default
     const Avatar(fallback: 'AB', size: AvatarSize.lg),
@@ -448,7 +448,7 @@ const String _avatarGroupCode = '''AvatarGroup(
     for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
       Avatar(
         fallback: initials,
-        fallbackSpec: TextStyles.avatarFallback,
+        fallbackSpec: TextStyles.nav,
         ring: AvatarGroup.ringOf(context),
       ),
   ],
@@ -459,7 +459,7 @@ const String _avatarGroupCountCode = '''AvatarGroup(
     for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
       Avatar(
         fallback: initials,
-        fallbackSpec: TextStyles.avatarFallback,
+        fallbackSpec: TextStyles.nav,
         ring: AvatarGroup.ringOf(context),
       ),
     const AvatarGroupCount('+248'),
@@ -473,7 +473,7 @@ Avatar(fallback: 'AB', size: AvatarSize.lg)''';
 const String _dropdownCode = '''DropdownMenu(
   trigger: const Avatar(
     fallback: 'AB',
-    fallbackSpec: TextStyles.avatarFallback,
+    fallbackSpec: TextStyles.nav,
   ),
   children: <MenuChild>[
     const MenuLabel('My Account'),
@@ -489,7 +489,7 @@ const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
   child: Row(
     children: <Widget>[
-      Avatar(fallback: 'أف', fallbackSpec: TextStyles.avatarFallback),
+      Avatar(fallback: 'أف', fallbackSpec: TextStyles.nav),
       // name and email column, same as the LTR identity row
     ],
   ),
@@ -519,7 +519,7 @@ const List<DocsApiFact> _dsAvatarFacts = <DocsApiFact>[
     name: 'fallbackSpec',
     type: 'TextStyleToken?',
     description:
-        'The fallback text\'s type. Defaults to TextStyles.bodySmall; '
+        'The fallback text\'s type. Defaults to TextStyles.small; '
         'avatarFallback and avatarInitials are the two named specs the '
         'corpus reaches for instead.',
   ),
@@ -729,9 +729,9 @@ class _PreviewSpecimen extends StatelessWidget {
                 Avatar(
                   fallback: 'AB',
                   size: AvatarSize.sm,
-                  fallbackSpec: TextStyles.avatarInitials,
+                  fallbackSpec: TextStyles.nav,
                 ),
-                Avatar(fallback: 'AB', fallbackSpec: TextStyles.avatarFallback),
+                Avatar(fallback: 'AB', fallbackSpec: TextStyles.nav),
                 const Avatar(fallback: 'AB', size: AvatarSize.lg),
                 Avatar(
                   fallback: '#1',
@@ -866,7 +866,7 @@ class _AvatarGroupPreview extends StatelessWidget {
         for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
           Avatar(
             fallback: initials,
-            fallbackSpec: TextStyles.avatarFallback,
+            fallbackSpec: TextStyles.nav,
             ring: AvatarGroup.ringOf(context),
           ),
       ],
@@ -884,7 +884,7 @@ class _AvatarGroupCountPreview extends StatelessWidget {
         for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
           Avatar(
             fallback: initials,
-            fallbackSpec: TextStyles.avatarFallback,
+            fallbackSpec: TextStyles.nav,
             ring: AvatarGroup.ringOf(context),
           ),
         const AvatarGroupCount('+248'),
@@ -902,12 +902,8 @@ class _SizesPreview extends StatelessWidget {
     runSpacing: space(3),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: <Widget>[
-      Avatar(
-        fallback: 'AB',
-        size: AvatarSize.sm,
-        fallbackSpec: TextStyles.avatarInitials,
-      ),
-      Avatar(fallback: 'AB', fallbackSpec: TextStyles.avatarFallback),
+      Avatar(fallback: 'AB', size: AvatarSize.sm, fallbackSpec: TextStyles.nav),
+      Avatar(fallback: 'AB', fallbackSpec: TextStyles.nav),
       const Avatar(fallback: 'AB', size: AvatarSize.lg),
     ],
   );
@@ -919,7 +915,7 @@ class _DropdownPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DropdownMenu(
     width: space(52),
-    trigger: Avatar(fallback: 'AB', fallbackSpec: TextStyles.avatarFallback),
+    trigger: Avatar(fallback: 'AB', fallbackSpec: TextStyles.nav),
     children: <MenuChild>[
       const MenuLabel('My Account'),
       const MenuSeparator(),
@@ -942,19 +938,31 @@ class _RtlPreview extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Avatar(fallback: 'أف', fallbackSpec: TextStyles.avatarFallback),
+          Avatar(fallback: 'أف', fallbackSpec: TextStyles.nav),
           SizedBox(width: space(2)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              StyledText('أسترا فالي', TextStyles.nav, color: theme.foreground),
-              StyledText(
-                'astra@elattar.dev',
-                TextStyles.small,
-                color: theme.mutedForeground,
-              ),
-            ],
+          // `Flexible`, not a bare `Column`: at a large accessibility text
+          // scale the email alone can outgrow the showcase frame, and a
+          // `mainAxisSize.min` `Column` gives it nothing to shrink into.
+          // `Flexible` lets both lines ellipsize instead of overflowing.
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                StyledText(
+                  'أسترا فالي',
+                  TextStyles.nav,
+                  color: theme.foreground,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                StyledText(
+                  'astra@elattar.dev',
+                  TextStyles.small,
+                  color: theme.mutedForeground,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ],
       ),

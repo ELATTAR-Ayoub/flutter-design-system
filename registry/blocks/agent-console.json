@@ -1,7 +1,7 @@
 {
   "name": "agent-console",
   "type": "block",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/agent/agent-console.tsx` — the whole component.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/blocks/agent_console/agent_console.dart",
       "target": "@block/agent_console/agent_console.dart",
-      "sha256": "19607e502f8f83967ebe347b7755b7e8c73d44b0ec4ceae3917369f033b11f5a"
+      "sha256": "227815b7a63318e70a810e627c078616f906b5870044d3081b790340aa61efa5"
     }
   ],
   "registryDependencies": [
@@ -48,7 +48,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent-console",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/blocks/agent_console/agent_console.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/blocks/agent_console/agent_console.dart",
   "exports": [
     "AgentConsole",
     "AgentFeatures",

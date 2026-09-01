@@ -383,7 +383,7 @@ class _RtlOtp extends StatelessWidget {
         children: <Widget>[
           StyledText(
             'أدخل رمز التحقق',
-            TextStyles.section,
+            TextStyles.small,
             color: theme.foreground,
           ),
           SizedBox(height: space(3)),
@@ -422,14 +422,14 @@ class _OtpFormComposition extends StatelessWidget {
           Button(
             expanded: true,
             onPressed: () {},
-            child: StyledText('Verify', TextStyles.buttonLabel),
+            child: StyledText('Verify', TextStyles.nav),
           ),
           SizedBox(height: space(3)),
           Center(
             child: Button(
               variant: ButtonVariant.link,
               onPressed: () {},
-              child: StyledText('Resend code', TextStyles.buttonLabel),
+              child: StyledText('Resend code', TextStyles.nav),
             ),
           ),
         ],
@@ -680,7 +680,7 @@ class _ThemingContent extends StatelessWidget {
             'theme.destructive at 20% (light) or 40% (dark), matching '
             'InputGroup\'s own theme-split.',
         'Caret and digit text: theme.foreground for both. The digit is '
-            'TextStyles.bodySmall (Inter, not mono) — DOCUMENTED DRIFT: '
+            'TextStyles.small (Inter, not mono) — DOCUMENTED DRIFT: '
             'the reference\'s section description says "using the '
             'numerical mono foundation," but InputOTPSlot itself carries '
             'no mono class; only the invisible overlay is monospace, and '

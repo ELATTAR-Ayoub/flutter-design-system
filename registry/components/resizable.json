@@ -1,7 +1,7 @@
 {
   "name": "resizable",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/resizable.tsx` — three wrappers over",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -21,7 +21,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/resizable",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/resizable.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/resizable.dart",
   "exports": [
     "ResizablePanel",
     "ResizablePanelGroup"

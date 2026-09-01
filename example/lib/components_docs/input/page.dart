@@ -442,7 +442,7 @@ class _TogglePill extends StatelessWidget {
       size: ButtonSize.sm,
       label: label,
       onPressed: onPressed,
-      child: StyledText(label, TextStyles.buttonLabel),
+      child: StyledText(label, TextStyles.nav),
     );
   }
 }
@@ -561,7 +561,7 @@ const List<DocsApiFact> _inputFacts = <DocsApiFact>[
     name: 'textSpec',
     type: 'TextStyleToken?',
     description:
-        'Optional. Defaults to TextStyles.bodyCompact. The .type-* '
+        'Optional. Defaults to TextStyles.body. The .type-* '
         'class stacked on the field\'s own text-sm.',
   ),
   DocsApiFact(

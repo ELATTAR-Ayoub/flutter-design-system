@@ -1,7 +1,7 @@
 {
   "name": "pagination",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/pagination.tsx` — page numbers, built entirely out of",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/pagination.dart",
       "target": "@ui/pagination.dart",
-      "sha256": "b52413afbe1b1b0286cfe0f9fd4cd9e300b15e32536704161095a44dd39878b3"
+      "sha256": "fa82a5337d78bf44bb01bc5f385d826e0e4bdfcdf01e279319523ac71332f26b"
     }
   ],
   "registryDependencies": [
@@ -26,7 +26,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/pagination",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/pagination.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/pagination.dart",
   "exports": [
     "Pagination",
     "PaginationEllipsis",

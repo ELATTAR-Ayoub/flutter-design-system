@@ -1,7 +1,7 @@
 {
   "name": "agent-composer",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/agent/parts/composer.tsx` — where the user says things.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_composer.dart",
       "target": "@ui/agent_composer.dart",
-      "sha256": "bad989bfa325b78844a465c803b8fe9e1e12b0c7d1a04b74f37af6cd6d92e1b3"
+      "sha256": "1b19fb02a80c3285572ba9adf7048893208b1c233961e29348dfc98589203d40"
     }
   ],
   "registryDependencies": [
@@ -38,7 +38,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent-composer",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_composer.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_composer.dart",
   "exports": [
     "AgentComposer"
   ]

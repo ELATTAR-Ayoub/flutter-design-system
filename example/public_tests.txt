@@ -1,0 +1,21 @@
+00:00 +0: loading D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart
+00:00 +0: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart: the source is clean text no Dart source carries a control character
+00:00 +1: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart: the source is clean text no page prints the CLI name with a character missing
+00:00 +2: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart: what the site says you can install (setUpAll)
+00:00 +2: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart: what the site says you can install the registry has items to check against
+00:00 +3: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart: what the site says you can install every `elattar add <name>` names a real registry item
+00:00 +4: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart: what the site says you can install no page claims a shipped item cannot be installed
+00:00 +5: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart: what the site says you can install (tearDownAll)
+00:00 +5: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart: what the site says about obtaining the product no page describes the CLI or repository as unobtainable
+00:01 +6: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart: what the site says about obtaining the product no retired type prefix appears anywhere in the site
+00:01 +7: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_claims_test.dart: what the site says about obtaining the product no page says the CLI is unpublished once it is published
+00:02 +8: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_pages_test.dart: home exposes the pill, headline, subhead and live grid
+00:04 +9: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_pages_test.dart: the home grid renders every live card it declares
+00:05 +10: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_pages_test.dart: public page actions report their route without owning routing
+00:05 +11: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_pages_test.dart: components page renders the four taxonomy sections
+00:06 +12: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_pages_test.dart: a component link in the dense grid opens its own reference
+00:06 +13: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_pages_test.dart: the skills route resolves to the real Skills page, not the placeholder
+00:07 +14: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_pages_test.dart: the skills route stays legible at a narrow viewport
+00:08 +15: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_pages_test.dart: the skills route publishes no npx text and no command outside the allowlist
+00:08 +16: D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/public_pages_test.dart: the skills route renders the real bytes of the skill on disk
+00:09 +17: All tests passed!

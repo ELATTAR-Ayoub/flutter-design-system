@@ -89,7 +89,6 @@ class PublicHomePage extends StatelessWidget {
               child: StyledText(
                 'Build the interface\nyou mean.',
                 TextStyles.display,
-                fontSize: Fluid.display(context),
                 align: TextAlign.center,
                 color: theme.foreground,
               ),
@@ -143,10 +142,16 @@ class _HeroPill extends StatelessWidget {
     onPressed: onNavigate == null
         ? null
         : () => onNavigate!(publicComponentsRoute),
+    // `Flexible` on the label, not a bare `Text`: at a large accessibility
+    // text scale the hero pill's own width is capped by the page padding, so
+    // the label needs somewhere to give before the row overflows. Desktop at
+    // 100% never approaches that cap, so the ellipsis never engages there.
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const Text('Browse components'),
+        const Flexible(
+          child: Text('Browse components', overflow: TextOverflow.ellipsis),
+        ),
         SizedBox(width: space(1.5)),
         const Icon(
           IconGlyph.arrowRight,
@@ -426,7 +431,7 @@ class _PublicLinkCard extends StatelessWidget {
           title: StyledText(title, TextStyles.h4, color: theme.foreground),
           description: StyledText(
             label,
-            TextStyles.eyebrow,
+            TextStyles.small,
             color: theme.actionText,
           ),
         ),

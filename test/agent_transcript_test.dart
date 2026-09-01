@@ -255,7 +255,10 @@ void main() {
         tester,
         const AgentMarkdown(text: '```ts\nconst a = 1;\n```'),
       );
-      expect(_copy('typescript'), findsOneWidget);
+      // The strip sets the name in caps and keeps the authored name as its
+      // accessible label.
+      expect(_copy('TYPESCRIPT'), findsOneWidget);
+      expect(find.bySemanticsLabel('typescript'), findsOneWidget);
       // The body is a span tree, one span per Prism token, so it is read back
       // off the paragraph rather than found as a `Text`.
       expect(

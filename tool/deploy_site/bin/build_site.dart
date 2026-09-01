@@ -141,7 +141,9 @@ Future<int> main(List<String> arguments) async {
       return stageExit;
     }
 
-    stdout.writeln('Site built and registry staged: ${_join(exampleDir, 'build/web')}');
+    stdout.writeln(
+      'Site built and registry staged: ${_join(exampleDir, 'build/web')}',
+    );
     return 0;
   } on BuildConfigException catch (error) {
     stderr.writeln('error: $error');
@@ -179,5 +181,7 @@ void _usage() {
     ..writeln('  --registry-version X.Y.Z   override the version read from')
     ..writeln('                             packages/elattar_cli identity.dart')
     ..writeln('  --no-stage-registry        build only, skip staging')
-    ..writeln('  --alias-registry           also write the mutable /registry/latest/');
+    ..writeln(
+      '  --alias-registry           also write the mutable /registry/latest/',
+    );
 }

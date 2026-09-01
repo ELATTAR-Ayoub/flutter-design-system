@@ -143,7 +143,11 @@ class DocsSection extends StatelessWidget {
                       if (heading) SizedBox(height: space(2)),
                       // Full width. The old private measure cap left a gap on
                       // the right of every section.
-                      StyledText(description!, TextStyles.small),
+                      StyledText(
+                        description!,
+                        TextStyles.small,
+                        color: theme.mutedForeground,
+                      ),
                     ],
                   ],
                 ),

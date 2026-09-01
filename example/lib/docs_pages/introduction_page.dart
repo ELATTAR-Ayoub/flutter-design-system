@@ -226,7 +226,7 @@ class _IntroductionArticle extends StatelessWidget {
           code:
               "Button(\n"
               "  onPressed: onSave,\n"
-              "  child: const StyledText('Save changes', TextStyles.label),\n"
+              "  child: const StyledText('Save changes', TextStyles.small),\n"
               ")",
         ),
         SizedBox(height: space(4)),

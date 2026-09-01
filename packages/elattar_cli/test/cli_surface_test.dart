@@ -283,7 +283,10 @@ flutter:
       expect(add.exitCode, 0, reason: '${add.stdout}${add.stderr}');
       expect('${add.stdout}', contains('dry-run wrote'));
       expect('${add.stdout}', contains('lib/components/ui/accordion.dart'));
-      expect('${add.stdout}', contains('lib/components/ui/validation_rule.dart'));
+      expect(
+        '${add.stdout}',
+        contains('lib/components/ui/validation_rule.dart'),
+      );
       expect('${add.stdout}', contains('lib/components/ui/safe_area.dart'));
     });
 
@@ -383,7 +386,10 @@ flutter:
 
     test('a registry outside the project is not recorded at all', () {
       expect(projectRelativeRegistry('/work/app', '/work/design-system'), null);
-      expect(projectRelativeRegistry(r'C:\work\app', r'D:\space\registry'), null);
+      expect(
+        projectRelativeRegistry(r'C:\work\app', r'D:\space\registry'),
+        null,
+      );
       // A sibling whose name merely starts with the project path is not inside
       // it.
       expect(projectRelativeRegistry('/work/app', '/work/app-2/reg'), null);

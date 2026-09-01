@@ -1315,7 +1315,19 @@ class _SubmitStatesState extends State<_SubmitStates> {
 
   @override
   Widget build(BuildContext context) {
-    return StateGrid(
+    // The kit's default map starts at 2 columns below `sm`. "Pending" runs
+    // its label through `Button.loading`'s own internal row (Spinner +
+    // label, un-flexed: see the reported lib note), so it cannot wrap to fit
+    // a half-width cell at 2x text on a 320px phone. Four columns is also too
+    // tight at a tablet's 768px even at 1x scale, by a few pixels: the same
+    // row is still there, just less stretched. `StateGrid.columns` moves the
+    // bump to four columns from `sm` (640px) to `lg` (1024px) and adds a
+    // three-column step between them, so only the two narrower tiers change;
+    // the desktop frame this section documents (past `lg`) is unchanged.
+    return StateGrid.columns(
+      base: 1,
+      sm: 3,
+      lg: 4,
       children: <Widget>[
         StateCell(
           label: 'Idle',

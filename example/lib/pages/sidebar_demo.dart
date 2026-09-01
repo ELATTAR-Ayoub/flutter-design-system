@@ -331,7 +331,7 @@ class _WorkspaceLabel extends StatelessWidget {
         ),
         StyledText(
           '12 members',
-          TextStyles.caption,
+          TextStyles.small,
           color: theme.mutedForeground,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -517,7 +517,7 @@ class _InsetHeader extends StatelessWidget {
           children: <Widget>[
             const SidebarTrigger(),
             SizedBox(width: space(3)),
-            StyledText(active, TextStyles.eyebrow),
+            StyledText(active, TextStyles.small),
             // `ml-auto flex items-center gap-2`.
             const Spacer(),
             if (wide) ...<Widget>[
@@ -525,7 +525,7 @@ class _InsetHeader extends StatelessWidget {
               // is doing real work at both caption sites on this page.
               StyledText(
                 'Toggle with',
-                TextStyles.caption,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
               SizedBox(width: space(2)),
@@ -673,7 +673,7 @@ class _ShellSetting extends StatelessWidget {
       // `className="type-caption text-muted-foreground"`.
       StyledText(
         label,
-        TextStyles.caption,
+        TextStyles.small,
         color: ThemeScope.of(context).mutedForeground,
       ),
       // `gap-2` on the column.

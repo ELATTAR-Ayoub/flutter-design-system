@@ -180,35 +180,44 @@ void main() {
       return t.widget<Text>(find.byType(Text));
     }
 
-    testWidgets('uppercases when the class does', (WidgetTester t) async {
-      await render(t, StyledText('Remaining supply', TextStyles.eyebrow));
-      expect(find.text('REMAINING SUPPLY'), findsOneWidget);
-    });
-
-    testWidgets('leaves a class without text-transform alone', (
+    testWidgets('renders the string exactly as it was authored', (
       WidgetTester t,
     ) async {
-      await render(t, StyledText('Remaining supply', TextStyles.body));
-      expect(find.text('Remaining supply'), findsOneWidget);
+      // No role transforms its text. A component that wants an uppercase
+      // treatment performs it itself and keeps the authored accessible name.
+      for (final TextStyleToken role in TextStyles.all) {
+        await render(t, StyledText('Remaining supply', role));
+        expect(
+          find.text('Remaining supply'),
+          findsOneWidget,
+          reason: role.name,
+        );
+      }
     });
 
-    testWidgets("takes the class's own colour from the live theme", (
-      WidgetTester t,
-    ) async {
-      final Text dark = await render(t, StyledText('x', TextStyles.eyebrow));
-      expect(dark.style!.color, ThemeTokens.dark.mutedForeground);
+    testWidgets('no role paints ink of its own', (WidgetTester t) async {
+      for (final TextStyleToken role in TextStyles.all) {
+        final Text dark = await render(t, StyledText('x', role));
+        expect(
+          dark.style!.color,
+          ThemeTokens.dark.foreground,
+          reason: role.name,
+        );
 
-      final Text light = await render(
-        t,
-        StyledText('x', TextStyles.eyebrow),
-        mode: ColorMode.light,
-      );
-      expect(light.style!.color, ThemeTokens.light.mutedForeground);
+        final Text light = await render(
+          t,
+          StyledText('x', role),
+          mode: ColorMode.light,
+        );
+        expect(
+          light.style!.color,
+          ThemeTokens.light.foreground,
+          reason: role.name,
+        );
+      }
     });
 
-    testWidgets('a class with no colour of its own inherits', (
-      WidgetTester t,
-    ) async {
+    testWidgets('every role inherits its ink', (WidgetTester t) async {
       // No DefaultTextStyle above it → the surface colour, `--foreground`.
       final Text bare = await render(t, StyledText('x', TextStyles.body));
       expect(bare.style!.color, ThemeTokens.dark.foreground);
@@ -232,40 +241,62 @@ void main() {
     testWidgets('an explicit colour beats both', (WidgetTester t) async {
       final Text text = await render(
         t,
-        StyledText(
-          'x',
-          TextStyles.eyebrow,
-          color: ThemeTokens.dark.premiumText,
-        ),
+        StyledText('x', TextStyles.small, color: ThemeTokens.dark.premiumText),
       );
       expect(text.style!.color, ThemeTokens.dark.premiumText);
     });
 
-    testWidgets('renders the class metrics', (WidgetTester t) async {
+    testWidgets('renders the role metrics', (WidgetTester t) async {
       final Text text = await render(t, StyledText('x', TextStyles.numberSm));
       final TextStyle style = text.style!;
-      expect(style.fontSize, TextStyles.numberSm.size);
-      expect(style.height, TextStyles.numberSm.height);
+      final TypeStep step = TextStyles.numberSm.step;
+      expect(style.fontSize, step.size);
+      expect(style.height, step.ratio);
       expect(
         style.letterSpacing,
-        closeTo(
-          TextStyles.numberSm.tracking! * TextStyles.numberSm.size!,
-          1e-9,
-        ),
+        closeTo(TextStyles.numberSm.tracking! * step.size, 1e-9),
       );
       expect(style.fontFeatures, isNotEmpty);
     });
 
-    testWidgets('fontSize carries the fluid classes', (WidgetTester t) async {
-      final Text text = await render(
-        t,
-        StyledText(
-          'x',
-          TextStyles.display,
-          fontSize: TextStyles.displaySize(1440),
+    testWidgets('a responsive role resolves against the viewport', (
+      WidgetTester t,
+    ) async {
+      // The host renders at 1440 logical pixels.
+      final Text text = await render(t, StyledText('x', TextStyles.display));
+      expect(text.style!.fontSize, TextStyles.display.desktop.size);
+    });
+
+    testWidgets('TypeWidthScope overrides the width a role resolves at', (
+      WidgetTester t,
+    ) async {
+      late TextStyle style;
+      await t.pumpWidget(
+        host(
+          controller: ThemeController(),
+          child: TypeWidthScope(
+            width: 390,
+            child: Builder(
+              builder: (BuildContext c) {
+                style = StyledText.styleOf(c, TextStyles.display);
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
         ),
       );
-      expect(text.style!.fontSize, TextStyles.displaySize(1440));
+      expect(style.fontSize, TextStyles.display.mobile.size);
+    });
+
+    testWidgets('an explicit fontSize keeps the role leading ratio', (
+      WidgetTester t,
+    ) async {
+      final Text text = await render(
+        t,
+        StyledText('x', TextStyles.body, fontSize: 40),
+      );
+      expect(text.style!.fontSize, 40);
+      expect(text.style!.height, TextStyles.body.step.ratio);
     });
 
     testWidgets('styleOf resolves the same style for spans', (
@@ -277,38 +308,36 @@ void main() {
           controller: ThemeController(),
           child: Builder(
             builder: (BuildContext c) {
-              style = StyledText.styleOf(c, TextStyles.eyebrow);
+              style = StyledText.styleOf(c, TextStyles.small);
               return const SizedBox.shrink();
             },
           ),
         ),
       );
-      expect(style.color, ThemeTokens.dark.mutedForeground);
-      expect(style.fontSize, TextStyles.eyebrow.size);
+      expect(
+        style.color,
+        ThemeTokens.dark.foreground,
+        reason: 'no role owns ink; small inherits the surface foreground',
+      );
+      expect(style.fontSize, TextStyles.small.step.size);
     });
-  });
 
-  group('Fluid', () {
-    testWidgets('reads the clamp against the viewport width', (
+    testWidgets('stepOf reports the step a role resolves to', (
       WidgetTester t,
     ) async {
-      late double display;
-      late double h1;
+      late TypeStep step;
       await t.pumpWidget(
         host(
           controller: ThemeController(),
           child: Builder(
             builder: (BuildContext c) {
-              display = Fluid.display(c);
-              h1 = Fluid.h1(c);
+              step = StyledText.stepOf(c, TextStyles.h1);
               return const SizedBox.shrink();
             },
           ),
         ),
       );
-
-      expect(display, TextStyles.displaySize(1440)); // 4.4vw of 1440 = 63.36
-      expect(h1, TextStyles.h1Size(1440)); // 2.8vw = 40.32, clamped to 40
+      expect(step, TextStyles.h1.desktop);
     });
   });
 }

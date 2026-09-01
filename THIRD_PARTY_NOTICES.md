@@ -27,7 +27,7 @@ material carries its own notice as part of the item:
 | You install | You receive, in `LICENSES/` |
 | --- | --- |
 | anything (`elattar init`) | `ELATTAR-MIT.txt` |
-| `source-foundation` (any component depends on it) | `Inter-OFL-1.1.txt`, `Geist-Mono-OFL-1.1.txt`, `Redaction-OFL-1.1.txt` |
+| `source-foundation` (any component depends on it) | `Inter-OFL-1.1.txt`, `Geist-Mono-OFL-1.1.txt` |
 | `icon` (and therefore `button`, and most of the set) | `Lucide-ISC.txt` |
 | `voice-orb` | `ElevenLabs-UI-MIT.txt` |
 
@@ -77,37 +77,6 @@ line followed by the full OFL 1.1 text.
 | Retrieved | 2026-08-24 |
 
 The notice file is upstream's own `OFL.txt`, byte for byte.
-
-### Redaction 35
-
-| | |
-| --- | --- |
-| Redistributed file | [`assets/fonts/Redaction35-Italic.ttf`](assets/fonts/Redaction35-Italic.ttf) |
-| Binary sha256 | `a87aea4af107f393edf6fe198c4f961ec4ff955407fa62a70563ce403e1499d3` |
-| Version, from the binary | `Version 2.001; Redaction 35 Italic` |
-| Copyright, from the binary | `(c) 2019 MCKL. All Rights Reserved.` |
-| Designer | Jeremy Mickel / Forest Young, MCKL |
-| Publisher | `https://www.redaction.us/` |
-| License | Dual: SIL Open Font License 1.1 **and** LGPL 2.1, per the publisher. Elattar redistributes under the OFL 1.1 arm. |
-| Notice file | [`third_party/fonts/redaction/OFL.txt`](third_party/fonts/redaction/OFL.txt) |
-| Notice sha256 | `8c13186f0201838de84a9254fb79265e9a6441e2352e1fdc245ae031cbb5848d` |
-| Retrieved | 2026-08-24 |
-
-**This one notice is assembled, not copied, and the file says so in its own
-first paragraph.** MCKL publishes the license as a page on `redaction.us`
-rather than as a file in a repository, so there is no upstream `OFL.txt` to
-reproduce. The assembled file quotes the binary's own copyright and license
-declarations verbatim, quotes the publisher's dual-license sentence verbatim,
-and then reproduces SIL's canonical OFL 1.1 plain text — retrieved 2026-08-24
-from `https://openfontlicense.org/documents/OFL.txt`, sha256
-`1d361a8f8e8ce6e68457dcd93fb56e162e6baa3bbb7e7573a290d44399f6b57e` — from its
-separator line onward, byte for byte.
-
-Two discrepancies are recorded rather than smoothed over. The publisher's page
-grants OFL **and** LGPL 2.1; the binary's own metadata names only the OFL. And
-the binary's copyright field reads "All Rights Reserved", which is not the
-OFL's own recommended copyright-line form. Neither affects the OFL grant both
-sources make, and neither is something this repository may rewrite.
 
 ## Icon geometry
 

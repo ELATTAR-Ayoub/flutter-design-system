@@ -676,11 +676,11 @@ class _HandleSpecimen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        StyledText('withHandle: true (default)', TextStyles.section),
+        StyledText('withHandle: true (default)', TextStyles.small),
         SizedBox(height: space(2)),
         group(withHandle: true),
         SizedBox(height: space(6)),
-        StyledText('withHandle: false', TextStyles.section),
+        StyledText('withHandle: false', TextStyles.small),
         SizedBox(height: space(2)),
         group(withHandle: false),
       ],

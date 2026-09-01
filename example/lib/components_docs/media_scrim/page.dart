@@ -281,7 +281,7 @@ class _Captioned extends StatelessWidget {
       children: <Widget>[
         child,
         SizedBox(height: space(2)),
-        StyledText(caption, TextStyles.section, color: theme.mutedForeground),
+        StyledText(caption, TextStyles.small, color: theme.mutedForeground),
       ],
     );
   }
@@ -406,6 +406,11 @@ class _OverlaidCopyHost extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: EdgeInsets.all(space(4)),
+              // `maxLines` + ellipsis on both lines: the card is a fixed
+              // 160x224 poster stand-in (a decorative aspect-ratio tile, not
+              // scrollable content), so at 200% text scale the overlaid
+              // caption has to clip to one line each rather than wrap and
+              // overflow the tile it sits on.
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -414,12 +419,16 @@ class _OverlaidCopyHost extends StatelessWidget {
                     'Late-night skyline',
                     TextStyles.h4,
                     color: MediaScrimTokens.foreground,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: space(1)),
                   StyledText(
                     'Shot on the roof, no filter · 12.4k views',
                     TextStyles.small,
                     color: MediaScrimTokens.foreground,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

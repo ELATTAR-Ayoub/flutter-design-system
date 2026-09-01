@@ -1,0 +1,46 @@
+Resolving dependencies...
+Downloading packages...
+  clock 1.1.2 (1.1.3 available)
+  matcher 0.12.19 (0.12.20 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.0 (1.19.0 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  test_api 0.7.11 (0.7.13 available)
+  vector_math 2.2.0 (2.4.2 available)
+  vm_service 15.2.0 (15.3.0 available)
+  yaml 3.1.3 (3.1.4 available)
+Got dependencies!
+9 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Resolving dependencies in `.\example`...
+Downloading packages...
+Got dependencies in `.\example`.
+00:00 +0: loading D:/DESIGN/Design-System-2026-8/flutter-design-system/test/overlay_popover_family_test.dart
+00:00 +0: Popover kernel focus on open "Focus is the content's business": content that never asks for it stays unfocused
+00:01 +1: Popover kernel focus on open content that autofocuses lands the focus inside the popup
+00:01 +2: Popover kernel Escape closes the popup when focus is already inside it
+00:01 +3: Popover kernel Escape does nothing when focus is outside the popup — key events travel up from where the focus is, and the popup's Focus is not an ancestor of the trigger
+00:01 +4: Popover kernel hands the focus back to what held it before the popup opened
+00:01 +5: Popover kernel a dismiss that already handed focus elsewhere does not pull it back to the trigger
+00:01 +6: Popover kernel disposal pumping the overlay away mid-animation throws nothing
+00:01 +7: Popover kernel disposal pumping the overlay away once fully open throws nothing
+00:02 +8: Popover kernel a plain non-modal popover does not trap Tab — the kernel wraps content in one Focus that only intercepts Escape, so Tab travels past the popup's own two rows and out to whatever comes after it in the tree, exactly as the class doc says: "Focus is the content's business. Nothing here steals it."
+00:02 +9: DropdownMenu opened by pointer, focus lands on the menu content itself — nothing is highlighted (initialHighlight -1 is "nothing focused yet", the way a pointer-opened menu leaves it on Radix's own RovingFocusGroup)
+00:02 +10: DropdownMenu Tab closes the menu rather than trapping or wrapping — menu.dart's own switch: `case LogicalKeyboardKey.tab: widget.onClose();`
+00:02 +11: DropdownMenu Tab Shift+Tab also closes it, not wraps to the last row
+00:03 +12: DropdownMenu Escape closes the menu and returns focus to the trigger
+00:03 +13: DropdownMenu an item whose onSelect moves focus elsewhere keeps that focus — the consumer does not defeat Popover's _restoreFocus guard
+00:03 +14: DropdownMenu disposal mid-animation throws nothing
+00:03 +15: DropdownMenu disposal once fully open throws nothing
+00:03 +16: DropdownMenu a disabled DropdownMenu does not open on pointer-down
+00:03 +17: DropdownMenu rows carry the button role, enabled state and a label
+00:04 +18: ContextMenu opened by right-click, focus lands on the menu content itself
+00:04 +19: ContextMenu Tab closes the context menu and returns focus to what held it before the right-click
+00:04 +20: ContextMenu Home/End do not wrap here either
+00:04 +21: ContextMenu Escape closes the context menu
+00:04 +22: ContextMenu an item whose onSelect moves focus elsewhere keeps that focus
+00:04 +23: ContextMenu disposal mid-animation throws nothing
+00:04 +24: ContextMenu disposal once fully open throws nothing
+00:05 +25: ContextMenu a disabled ContextMenu does not open on right-click
+00:05 +26: ContextMenu rows carry the button role, enabled state and a label
+00:05 +27: All tests passed!

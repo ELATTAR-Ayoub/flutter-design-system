@@ -341,10 +341,18 @@ class _PreviewSpecimen extends StatelessWidget {
                   tone: IconTone.muted,
                 ),
                 SizedBox(width: space(1.5)),
-                StyledText(
-                  state.label,
-                  TextStyles.chip,
-                  color: theme.mutedForeground,
+                // `Flexible`, not a bare `StyledText`: the longest state
+                // labels ("awaitingApproval", "callingTools") can outgrow a
+                // single pill's share of the showcase width at a large
+                // accessibility text scale, and `Wrap` only wraps between
+                // pills, not within one.
+                Flexible(
+                  child: StyledText(
+                    state.label,
+                    TextStyles.badge,
+                    color: theme.mutedForeground,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
@@ -360,7 +368,7 @@ const String _previewCode = '''for (final AgentState state in AgentState.values)
     children: [
       Icon.lucide(state.glyph, sizePx: 14, tone: IconTone.muted),
       const SizedBox(width: 6),
-      StyledText(state.label, TextStyles.chip),
+      StyledText(state.label, TextStyles.badge),
     ],
   )''';
 

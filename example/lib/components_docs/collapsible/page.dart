@@ -563,10 +563,13 @@ class _CollapsiblePreviewState extends State<_CollapsiblePreview> {
         variant: ButtonVariant.outline,
         onPressed: () => setState(() => _open = !_open),
         child: Row(
-          // `className="w-full justify-between"`.
+          // `className="w-full justify-between"`. `Expanded` + ellipsis
+          // rather than `Spacer` so the label yields to the trailing chevron
+          // instead of overflowing at large text scales.
           children: <Widget>[
-            const Text('Advanced filters'),
-            const Spacer(),
+            const Expanded(
+              child: Text('Advanced filters', overflow: TextOverflow.ellipsis),
+            ),
             Icon(
               IconGlyph.chevronRight,
               size: IconSize.sm,
@@ -696,9 +699,15 @@ class _IndependentPairPreviewState extends State<_IndependentPairPreview> {
             variant: ButtonVariant.ghost,
             onPressed: () => setState(() => _a = !_a),
             child: Row(
+              // `Expanded` + ellipsis rather than `Spacer`, matching the
+              // preview trigger above, so the label yields to the chevron.
               children: <Widget>[
-                const Text('Shipping details'),
-                const Spacer(),
+                const Expanded(
+                  child: Text(
+                    'Shipping details',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
                 Icon(
                   IconGlyph.chevronRight,
                   size: IconSize.sm,
@@ -726,9 +735,12 @@ class _IndependentPairPreviewState extends State<_IndependentPairPreview> {
             variant: ButtonVariant.ghost,
             onPressed: () => setState(() => _b = !_b),
             child: Row(
+              // Same `Expanded` + ellipsis treatment as the two triggers
+              // above.
               children: <Widget>[
-                const Text('Return policy'),
-                const Spacer(),
+                const Expanded(
+                  child: Text('Return policy', overflow: TextOverflow.ellipsis),
+                ),
                 Icon(
                   IconGlyph.chevronRight,
                   size: IconSize.sm,

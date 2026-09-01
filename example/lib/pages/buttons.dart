@@ -75,7 +75,7 @@
 /// 16. **`ButtonGroupText className="type-num"` does not render as
 ///    `type-num`**: the utilities beat the component layer on size and
 ///    weight, and the mono family, the tabular figures and the tracking
-///    survive. Pre-resolved as `TextStyles.buttonGroupNum`.
+///    survive. Pre-resolved as `TextStyles.numberBase`.
 /// 17. **`icon-xs` is documented and never rendered.** The cva declares it,
 ///    the `#api` table prints it, the page shows eight of the nine. Built
 ///    anyway (ruling B3), so the printed row stays true.
@@ -456,7 +456,7 @@ class _LadderColumn extends StatelessWidget {
       children: <Widget>[
         Button(size: size, onPressed: () {}, child: Text(label)),
         SizedBox(height: space(3)),
-        StyledText(caption, TextStyles.eyebrowSmall, align: TextAlign.center),
+        StyledText(caption, TextStyles.small, align: TextAlign.center),
       ],
     );
   }
@@ -523,8 +523,19 @@ class _StatesSection extends StatelessWidget {
         children: <Widget>[
           // `cols={5}`, `grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`, so one
           // clean row at this frame and only at this frame.
-          StateGrid(
-            cols: 5,
+          //
+          // The kit's `cols: 5` map starts at 2 columns below `sm`, which is
+          // fine for the other five cells but not for "Loading": its button
+          // holds two words ("Open Pack") through `Button.loading`'s own
+          // internal row (Spinner + label, un-flexed: see the reported lib
+          // note), so at 2x text on a 320px phone a half-width cell doesn't
+          // leave the label enough room. `StateGrid.columns` swaps only the
+          // base tier to one column; `sm`/`lg` keep the shared map's 3/5, so
+          // the wider frames this section documents are unchanged.
+          StateGrid.columns(
+            base: 1,
+            sm: 3,
+            lg: 5,
             children: <Widget>[
               StateCell(
                 label: 'Default',
@@ -550,10 +561,22 @@ class _StatesSection extends StatelessWidget {
               // No handler and `loading`: the reference passes neither an
               // `onClick` nor `disabled`, and `disabled = disabled || loading`
               // does the rest.
-              const StateCell(
+              StateCell(
                 label: 'Loading',
                 note: 'Disabled, width held',
-                child: Button(loading: true, child: Text('Open Pack')),
+                // The point of this cell is that the button keeps its
+                // resting width while loading: `Button.loading` wraps the
+                // label in its own internal row without a flexible slot for
+                // it (a lib gap, see the report), so the label cannot wrap
+                // to fit a narrower box. Shrinking it here would also
+                // contradict what "width held" is demonstrating. A
+                // horizontal scroll lets the held width render in full
+                // rather than erroring, matching the wide reading exactly
+                // and only adding a scroll affordance on the narrow one.
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: const Button(loading: true, child: Text('Open Pack')),
+                ),
               ),
               const StateCell(
                 label: 'Disabled',
@@ -786,7 +809,10 @@ class _LabelledIconButton extends StatelessWidget {
         children: <Widget>[
           Icon(glyph, sizePx: Button.iconPxFor(size)),
           SizedBox(width: Button.gapFor(size)),
-          Text(label),
+          // The icon is the fixed part; the label is the part that gives. A
+          // `Row` of two rigid children inside a button is what overflows the
+          // moment a reader doubles their text size on a narrow phone.
+          Flexible(child: Text(label)),
         ],
       ),
     );
@@ -813,67 +839,84 @@ class _GroupsSection extends StatelessWidget {
           children: <Widget>[
             // `w-fit`: a group shrinks to its members rather than filling the
             // panel, so the column starts them rather than stretching them.
-            ButtonGroup(
-              children: <Widget>[
-                for (final String label in const <String>[
-                  'Newest',
-                  'Price',
-                  'Popularity',
-                ])
-                  Button(
-                    variant: ButtonVariant.outline,
-                    onPressed: () {},
-                    child: Text(label),
-                  ),
-              ],
+            //
+            // ButtonGroup is a single segmented control: its members share
+            // one IntrinsicHeight row by design, and the group cannot break
+            // across lines without ceasing to read as one control. A
+            // horizontal scroll is the deliberate escape here, not a
+            // shortcut: at 2x text on a 320px phone the labelled segments
+            // outgrow the panel, and the alternative (shrinking the labels)
+            // would defeat the point of the specimen.
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ButtonGroup(
+                children: <Widget>[
+                  for (final String label in const <String>[
+                    'Newest',
+                    'Price',
+                    'Popularity',
+                  ])
+                    Button(
+                      variant: ButtonVariant.outline,
+                      onPressed: () {},
+                      child: Text(label),
+                    ),
+                ],
+              ),
             ),
             // `space-y-6`.
             SizedBox(height: space(6)),
-            ButtonGroup(
-              children: <Widget>[
-                const ButtonGroupText('Quantity'),
-                const ButtonGroupSeparator(),
-                Button(
-                  variant: ButtonVariant.outline,
-                  size: ButtonSize.icon,
-                  label: 'Decrease quantity',
-                  onPressed: () {},
-                  child: Icon(
-                    IconGlyph.minus,
-                    sizePx: Button.iconPxFor(ButtonSize.icon),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ButtonGroup(
+                children: <Widget>[
+                  const ButtonGroupText('Quantity'),
+                  const ButtonGroupSeparator(),
+                  Button(
+                    variant: ButtonVariant.outline,
+                    size: ButtonSize.icon,
+                    label: 'Decrease quantity',
+                    onPressed: () {},
+                    child: Icon(
+                      IconGlyph.minus,
+                      sizePx: Button.iconPxFor(ButtonSize.icon),
+                    ),
                   ),
-                ),
-                // DRIFT 16: `className="type-num"` loses its size and its
-                // weight to the utilities already on the element, and keeps
-                // the mono family, the tabular figures and the tracking.
-                const ButtonGroupText('3', numeric: true),
-                Button(
-                  variant: ButtonVariant.outline,
-                  size: ButtonSize.icon,
-                  label: 'Increase quantity',
-                  onPressed: () {},
-                  child: Icon(
-                    IconGlyph.plus,
-                    sizePx: Button.iconPxFor(ButtonSize.icon),
+                  // DRIFT 16: `className="type-num"` loses its size and its
+                  // weight to the utilities already on the element, and keeps
+                  // the mono family, the tabular figures and the tracking.
+                  const ButtonGroupText('3', numeric: true),
+                  Button(
+                    variant: ButtonVariant.outline,
+                    size: ButtonSize.icon,
+                    label: 'Increase quantity',
+                    onPressed: () {},
+                    child: Icon(
+                      IconGlyph.plus,
+                      sizePx: Button.iconPxFor(ButtonSize.icon),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             SizedBox(height: space(6)),
-            ButtonGroup(
-              children: <Widget>[
-                Button(onPressed: () {}, child: const Text('Open Pack')),
-                const ButtonGroupSeparator(),
-                Button(
-                  size: ButtonSize.icon,
-                  label: 'More open options',
-                  onPressed: () {},
-                  child: Icon(
-                    IconGlyph.chevronDown,
-                    sizePx: Button.iconPxFor(ButtonSize.icon),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ButtonGroup(
+                children: <Widget>[
+                  Button(onPressed: () {}, child: const Text('Open Pack')),
+                  const ButtonGroupSeparator(),
+                  Button(
+                    size: ButtonSize.icon,
+                    label: 'More open options',
+                    onPressed: () {},
+                    child: Icon(
+                      IconGlyph.chevronDown,
+                      sizePx: Button.iconPxFor(ButtonSize.icon),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -1088,7 +1131,7 @@ class _SwapDemo extends StatelessWidget {
     children: <Widget>[
       control,
       SizedBox(height: space(3)),
-      StyledText(caption, TextStyles.eyebrowSmall, align: TextAlign.center),
+      StyledText(caption, TextStyles.small, align: TextAlign.center),
     ],
   );
 }

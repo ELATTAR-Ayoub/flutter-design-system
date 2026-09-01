@@ -449,7 +449,7 @@ void main() {
       );
       expect(page.color, theme.foreground);
       // `font-normal` on a `text-sm` list — 13px at the inherited 400.
-      expect(page.spec, TextStyles.bodySmall);
+      expect(page.spec, TextStyles.small);
 
       final StyledText link = tester.widget<StyledText>(
         find
@@ -569,14 +569,12 @@ void main() {
 
     testWidgets('DRIFT — the numbers inherit the page\'s type, the words do '
         'not', (WidgetTester tester) async {
-      // `size="icon"` is `size-10` and nothing else: no `text-*`, so the rung
-      // answers null and the button merges only the ink *(measured
-      // `16px/24px 500` on the squares against `13px/18.5714px 500` on the two
-      // word buttons)*.
+      // A square rung owns no label type, so the button merges only its ink
+      // into whatever the page is set in; a word rung states its own.
       expect(Button.typeFor(ButtonSize.icon, ButtonEmphasis.none), isNull);
       expect(
-        Button.typeFor(ButtonSize.md, ButtonEmphasis.none),
-        TextStyles.buttonLabel,
+        Button.typeFor(ButtonSize.md, ButtonEmphasis.none)!.step,
+        TextStyles.body.step,
       );
     });
 
@@ -639,19 +637,14 @@ void main() {
       expect(NavigationMenu.chevronPx, 14);
     });
 
-    test(
-      '`text-nav` is not `.type-nav`, and the difference is 4px of leading',
-      () {
-        // *(Measured: the trigger and its plain-link sibling read
-        // `13.5px/20.25px 500`; the top-nav buttons three sections up, which wear
-        // the `.type-nav` class, read `13.5px/16.2px 500`.)*
-        expect(TextStyles.navMenuTrigger.size, 13.5);
-        expect(TextStyles.nav.size, 13.5);
-        expect(TextStyles.navMenuTrigger.height, 1.5);
-        expect(TextStyles.nav.height, 1.2);
-        expect(TextStyles.navMenuTrigger.weight, TextStyles.nav.weight);
-      },
-    );
+    test('every navigation word is one role, at one size', () {
+      // The retired catalog carried two spellings of a navigation label four
+      // pixels of leading apart. A trigger, a plain link, and a panel title
+      // now read identically.
+      expect(TextStyles.nav.step, const TypeStep(16, 20));
+      expect(TextStyles.nav.weight, FontWeight.w500);
+      expect(TextStyles.nav.isStatic, isTrue);
+    });
 
     testWidgets('a tap opens the shared viewport and a second tap closes it', (
       WidgetTester tester,

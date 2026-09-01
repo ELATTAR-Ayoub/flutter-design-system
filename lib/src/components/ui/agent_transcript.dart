@@ -297,7 +297,7 @@ class _TypingCursorState extends State<TypingCursor>
     final ThemeTokens theme = ThemeScope.of(context);
     final TextStyle ambient = DefaultTextStyle.of(context).style;
     final double lineBox =
-        (ambient.fontSize ?? TextStyles.body.size!) * (ambient.height ?? 1);
+        (ambient.fontSize ?? TextStyles.body.step.size) * (ambient.height ?? 1);
     // CSS splits the leading evenly; `align-text-bottom` puts the mark's bottom
     // on the content area's, which is half a leading above the line box's.
     final double halfLeading = ((lineBox - contentAreaHeight(ambient)) / 2)
@@ -556,7 +556,7 @@ class _ToolChipState extends State<ToolChip> {
               Flexible(
                 child: StyledText(
                   turn.attempt > 1 ? '$label · attempt ${turn.attempt}' : label,
-                  TextStyles.chip,
+                  TextStyles.badge,
                   color: theme.mutedForeground,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -567,7 +567,7 @@ class _ToolChipState extends State<ToolChip> {
                 SizedBox(width: ToolChip.contentGap),
                 StyledText(
                   formatMs(turn.ms!),
-                  TextStyles.caption,
+                  TextStyles.small,
                   color: theme.mutedForeground,
                 ),
               ],
@@ -671,7 +671,7 @@ class _Detail extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        StyledText(label, TextStyles.caption, color: theme.mutedForeground),
+        StyledText(label, TextStyles.small, color: theme.mutedForeground),
         SizedBox(height: ToolChip.detailGap),
         child,
       ],
@@ -769,7 +769,7 @@ class ActionChip extends StatelessWidget {
                 turn.approval == ApprovalOutcome.rejected
                     ? 'Declined: $label'
                     : label,
-                TextStyles.chip,
+                TextStyles.badge,
                 color: theme.mutedForeground,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -780,7 +780,7 @@ class ActionChip extends StatelessWidget {
               SizedBox(width: gap),
               StyledText(
                 formatMs(turn.ms!),
-                TextStyles.caption,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
             ],
@@ -890,7 +890,7 @@ class ApprovalCard extends StatelessWidget {
                       children: <Widget>[
                         StyledText(
                           'Needs your approval',
-                          TextStyles.eyebrow,
+                          TextStyles.small,
                           color: theme.warningText,
                         ),
                         SizedBox(height: headLineGap),
@@ -933,14 +933,22 @@ class ApprovalCard extends StatelessWidget {
                 ),
               ],
               SizedBox(height: gap),
-              Row(
+              // Two buttons side by side, neither of which shrinks its own
+              // label — a plain `Row` overflows once "Approve" and "Decline"
+              // no longer both fit at large text scales. A pair of
+              // `Expanded`s would squeeze the labels instead of overflowing,
+              // but a control that needs more than half the width to read
+              // should drop to its own line rather than be compressed, so
+              // `Wrap` is the more honest answer here.
+              Wrap(
+                spacing: actionGap,
+                runSpacing: actionGap,
                 children: <Widget>[
                   Button(
                     size: ButtonSize.sm,
                     onPressed: approval.approve,
                     child: const Text('Approve'),
                   ),
-                  SizedBox(width: actionGap),
                   Button(
                     variant: ButtonVariant.outline,
                     size: ButtonSize.sm,
@@ -1209,18 +1217,14 @@ class WelcomeCard extends StatelessWidget {
   /// `type-caption` losing its size to the `sm` rung's `text-small`: measured
   /// **13px / 17.55px / 500** on the live chip. The utility layer wins the
   /// size, the component class keeps the leading.
-  static final TextStyleToken capabilityLabel = TextStyleToken(
-    family: Fonts.sans,
-    size: TextStyles.small.size,
-    height: TextStyles.caption.height,
+  static final TextStyleToken capabilityLabel = TextStyles.small.derive(
+    name: 'transcript-capability',
     wght: 500,
   );
 
   /// `type-small` under the same rung — 13px / 19.5px / 500.
-  static final TextStyleToken suggestionLabel = TextStyleToken(
-    family: Fonts.sans,
-    size: TextStyles.small.size,
-    height: TextStyles.small.height,
+  static final TextStyleToken suggestionLabel = TextStyles.small.derive(
+    name: 'transcript-suggestion',
     wght: 500,
   );
 

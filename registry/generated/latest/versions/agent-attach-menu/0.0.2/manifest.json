@@ -1,0 +1,40 @@
+{
+  "name": "agent-attach-menu",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/agent/parts/attach-menu.tsx` — the plus.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/agent_attach_menu.dart",
+      "target": "@ui/agent_attach_menu.dart",
+      "sha256": "56d3e27fa577342805a696f2bad85ca5aa78f5a816ac4861c700f3d3f06e463f"
+    }
+  ],
+  "registryDependencies": [
+    "agent-slash-palette",
+    "button",
+    "dropdown-menu",
+    "icon",
+    "menu",
+    "popover",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "agent-slash-palette",
+    "button",
+    "dropdown-menu",
+    "icon",
+    "menu",
+    "popover"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/agent_attach_menu",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_attach_menu.dart",
+  "deprecated": false
+}

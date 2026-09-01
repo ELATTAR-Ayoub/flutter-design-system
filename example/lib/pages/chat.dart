@@ -564,7 +564,13 @@ class _BubbleSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          // `matchHeights: false`: `Bubble`'s `_MaxWidthFraction` answers
+          // the intrinsic-height query with the unconstrained width rather
+          // than `width * factor` (`lib/src/components/ui/bubble.dart`), so
+          // `IntrinsicHeight` under-reserves for it and the row overflows —
+          // see `Grid.matchHeights`.
           StateGrid(
+            matchHeights: false,
             children: <Widget>[
               for (final (BubbleVariant v, String note) in _bubbleVariants)
                 StateCell(
@@ -816,6 +822,9 @@ class _ReactionRails extends StatelessWidget {
     base: 2,
     sm: 4,
     gap: space(8),
+    // See the bubble StateGrid above for why: every cell here is a `Bubble`
+    // too.
+    matchHeights: false,
     children: <Widget>[
       for (final (BubbleSide side, BubbleAlign align) in _corners)
         Column(
@@ -835,7 +844,7 @@ class _ReactionRails extends StatelessWidget {
             SizedBox(height: space(6)),
             StyledText(
               '${side.name} · ${align.name}',
-              TextStyles.eyebrowSmall,
+              TextStyles.small,
               align: TextAlign.center,
             ),
           ],
@@ -861,6 +870,7 @@ class _ReactionCounts extends StatelessWidget {
       Grid(
         sm: 2,
         gap: space(10),
+        matchHeights: false,
         children: <Widget>[
           _CountRail(
             showCount: ShowCount.hover,
@@ -904,7 +914,7 @@ class _CountRail extends StatelessWidget {
         child: const BubbleContent(child: Text('Nice pull')),
       ),
       SizedBox(height: space(6)),
-      StyledText(caption, TextStyles.eyebrowSmall, align: TextAlign.center),
+      StyledText(caption, TextStyles.small, align: TextAlign.center),
     ],
   );
 }
@@ -1657,7 +1667,7 @@ class _WhySection extends StatelessWidget {
                   children: <Widget>[
                     StyledText(
                       'What it is for',
-                      TextStyles.eyebrow,
+                      TextStyles.small,
                       color: theme.actionText,
                     ),
                     SizedBox(height: space(2)),
@@ -1666,7 +1676,7 @@ class _WhySection extends StatelessWidget {
                     SizedBox(height: space(5)),
                     StyledText(
                       'What the console does instead',
-                      TextStyles.eyebrow,
+                      TextStyles.small,
                     ),
                     SizedBox(height: space(2)),
                     StyledText(instead, TextStyles.small),

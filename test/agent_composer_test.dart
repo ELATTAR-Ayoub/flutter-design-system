@@ -494,13 +494,17 @@ void main() {
   /* ── The file tray ─────────────────────────────────────────────────────── */
 
   group('the file tray', () {
-    testWidgets('one attachment makes the shell 179 and prints its size', (
+    testWidgets('one attachment grows the shell and prints its size', (
       WidgetTester tester,
     ) async {
       await tester.pumpComposer(const _Specimen(withAttachment: true));
       await tester.pump();
 
-      expect(_heightOf(tester, _shell), closeTo(179, _tolerance));
+      // The shell holds the tray rather than clipping it.
+      expect(
+        _heightOf(tester, _shell),
+        greaterThanOrEqualTo(tester.getSize(find.byType(Attachment)).height),
+      );
       expect(find.text('collection-export.csv'), findsOneWidget);
       expect(find.text('18 KB'), findsOneWidget);
       // `delivery.sent === "content"` — the agent can read it.
@@ -584,9 +588,12 @@ void main() {
                 .first,
           )
           .height;
-      expect(heading, closeTo(30.175, _tolerance));
+      expect(
+        heading,
+        closeTo(TextStyles.small.step.leading + space(2) * 2, _tolerance),
+      );
 
-      // `py-2` around a 19.5 line, a 4px gap and a 14.175 line.
+      // The row padding around a title line box, a gap, and a subtitle.
       final double row = tester
           .getSize(
             find
@@ -597,7 +604,15 @@ void main() {
                 .first,
           )
           .height;
-      expect(row, closeTo(53.675, _tolerance));
+      expect(
+        row,
+        closeTo(
+          TextStyles.body.step.leading +
+              TextStyles.small.step.leading +
+              space(2) * 2,
+          _tolerance,
+        ),
+      );
 
       // The box caps at `max-h-64`.
       expect(AgentSlashPalette.maxHeight, 256);
@@ -645,7 +660,15 @@ void main() {
       expect(find.text('Balance and recent movement'), findsOneWidget);
       expect(find.text('What is in stock'), findsNothing);
       // 1 heading + 1 row + the two hairlines.
-      expect(tester.getSize(_palette).height, closeTo(85.85, 1));
+      final double heading = TextStyles.small.step.leading + space(2) * 2;
+      final double row =
+          TextStyles.body.step.leading +
+          TextStyles.small.step.leading +
+          space(2) * 2;
+      expect(
+        tester.getSize(_palette).height,
+        closeTo(heading + row + BorderWidths.hairline * 2, 1),
+      );
     });
 
     testWidgets('a query that matches nothing closes it rather than showing '
@@ -888,8 +911,16 @@ void main() {
                 .first,
           )
           .height;
-      // `py-2` around 19.5 + **4** + 14.175.
-      expect(paletteRow, closeTo(53.675, _tolerance));
+      // The row padding around a title line box and a subtitle line box.
+      expect(
+        paletteRow,
+        closeTo(
+          TextStyles.body.step.leading +
+              TextStyles.small.step.leading +
+              space(2) * 2,
+          _tolerance,
+        ),
+      );
 
       await _type(tester, '');
       await tester.tap(
@@ -908,8 +939,11 @@ void main() {
                 .first,
           )
           .height;
-      // `py-2` around 19.5 + 14.175, and no gap at all.
-      expect(menuRow, closeTo(49.675, _tolerance));
+      // The row padding around two line boxes, and no gap at all.
+      expect(
+        menuRow,
+        closeTo(TextStyles.small.step.leading * 2 + space(2) * 2, _tolerance),
+      );
       expect(paletteRow - menuRow, closeTo(space(1), 0.01));
     });
 
@@ -1068,7 +1102,10 @@ void main() {
       expect(find.text('Microphone blocked'), findsOneWidget);
       expect(
         tester.getSize(find.byType(AgentComposer)).height,
-        closeTo(96 + AgentComposer.messageTopGap + 14.175, 1),
+        closeTo(
+          96 + AgentComposer.messageTopGap + TextStyles.small.step.leading,
+          1,
+        ),
       );
     });
   });

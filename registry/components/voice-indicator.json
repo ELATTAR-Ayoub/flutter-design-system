@@ -1,7 +1,7 @@
 {
   "name": "voice-indicator",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/agent/voice/orb.tsx` — the voice face.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -40,7 +40,7 @@
     }
   ],
   "documentationRoute": "/components/voice_indicator",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/voice_indicator.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/voice_indicator.dart",
   "exports": [
     "VoiceIndicator",
     "VoiceIndicatorProgram",

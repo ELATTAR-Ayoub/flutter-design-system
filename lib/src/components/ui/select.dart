@@ -76,6 +76,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart'
@@ -90,6 +91,7 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 import 'package:flutter/widgets.dart' as flutter show ScrollPosition;
 
+import './press.dart';
 import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
@@ -290,27 +292,31 @@ class Select<T> extends StatefulWidget {
   /// `aria-describedby`, resolved: description, then error message.
   final String? hint;
 
-  /// `py-2` plus one `text-sm` line box — the height of one row, and the step
-  /// `item-aligned` positioning counts in.
+  /// `py-2` plus one `text-sm` line box, floored at [TouchTargets.minimum] —
+  /// the height of one row, and the step `item-aligned` positioning counts in.
   ///
   /// Read off the type spec rather than measured, because the placement runs
-  /// before the menu has ever been laid out: `text-sm` is 13px on Tailwind's
-  /// own `--text-sm--line-height`, which `LineBox` renders at exactly
-  /// `size × height`.
-  static double get itemHeight {
-    final TextStyleToken spec = TextStyles.bodyCompact;
-    return (spec.size ?? 0) * (spec.height ?? 1) + space(2) * 2;
-  }
+  /// before the menu has ever been laid out.
+  ///
+  /// TARGET SIZING: the type-derived number is below the platform's 44px
+  /// touch-target floor, so the floor is applied here, to the row's own
+  /// layout height — [_SelectItem] sizes itself to exactly this number rather
+  /// than relying on a grown, invisible hit box. Every offset in
+  /// [_MenuGeometry] (`centreOfOption`, `scrollBoxOfOption`, `contentHeight`)
+  /// sums this getter rather than a literal, so raising the floor here keeps
+  /// the item-aligned placement math and the scroll-into-view math
+  /// self-consistent with what actually renders.
+  static double get itemHeight => math.max(
+    TextStyles.body.step.leading + space(2) * 2,
+    TouchTargets.minimum,
+  );
 
   /// `SelectLabel`'s `px-3 py-2 text-xs` — 12px in a 16px line box, so **32**.
   ///
-  /// Derived from [TextStyles.menuLabel] for the same reason [itemHeight]
+  /// Derived from [TextStyles.small] for the same reason [itemHeight]
   /// is derived from `sheetBody`: the placement counts this height before the
   /// row exists.
-  static double get labelHeight {
-    final TextStyleToken spec = TextStyles.menuLabel;
-    return (spec.size ?? 0) * (spec.height ?? 1) + space(2) * 2;
-  }
+  static double get labelHeight => TextStyles.small.step.leading + space(2) * 2;
 
   /// `SelectSeparator`'s `my-2 h-px` — 8 + 1 + 8 = **17**.
   static double get separatorHeight => BorderWidths.hairline + space(2) * 2;
@@ -352,6 +358,17 @@ class _SelectState<T> extends State<Select<T>> {
 
   OverlayEntry? _entry;
 
+  /// The open menu's own focus node.
+  ///
+  /// `Focus(autofocus: true)` is not enough here: autofocus only wins while
+  /// nothing else in the tree holds focus, and the trigger that opened this
+  /// menu still does — a mounted route's `FocusScopeNode` always has
+  /// *something* focused. [_MenuContentState.initState] in `menu.dart` hits
+  /// the identical problem and solves it the identical way: an owned node,
+  /// requested explicitly at the frame boundary, because the overlay's first
+  /// build has not attached its render tree yet.
+  FocusNode? _menuFocus;
+
   /// The overlay's own box, captured when the menu opens.
   ///
   /// The entry's builder cannot ask for it: on the first build its context has
@@ -385,6 +402,7 @@ class _SelectState<T> extends State<Select<T>> {
   void dispose() {
     _entry?.remove();
     _entry = null;
+    _menuFocus?.dispose();
     _ownedFocusNode?.dispose();
     super.dispose();
   }
@@ -406,8 +424,16 @@ class _SelectState<T> extends State<Select<T>> {
     if (overlay == null || box is! RenderBox) return;
     _overlayBox = box;
     _highlighted = _selectedIndex;
+    _menuFocus = FocusNode(debugLabel: 'SelectMenu');
     _entry = OverlayEntry(builder: _buildMenu);
     overlay.insert(_entry!);
+    // The frame boundary, not this build: the overlay's own render object
+    // does not exist until the entry's first build finishes, and requesting
+    // focus before that would ask a `FocusNode` no `Focus` widget has
+    // attached to yet.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _open) _menuFocus?.requestFocus();
+    });
     setState(() {});
   }
 
@@ -415,6 +441,8 @@ class _SelectState<T> extends State<Select<T>> {
     if (!_open) return;
     _entry!.remove();
     _entry = null;
+    _menuFocus?.dispose();
+    _menuFocus = null;
     if (restoreFocus) _focusNode.requestFocus();
     if (mounted) setState(() {});
   }
@@ -589,7 +617,7 @@ class _SelectState<T> extends State<Select<T>> {
           Flexible(
             child: StyledText(
               chosen?.label ?? widget.placeholder ?? '',
-              TextStyles.bodyCompact,
+              TextStyles.body,
               color: chosen == null ? theme.mutedForeground : theme.foreground,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -620,6 +648,10 @@ class _SelectState<T> extends State<Select<T>> {
         child: trigger,
       ),
     );
+
+    // A 36px-height control against a 44px finger. The hit box grows and
+    // the paint box does not, so the reference's measure is untouched.
+    trigger = TapTarget(child: trigger);
 
     trigger = Focus(
       focusNode: _focusNode,
@@ -737,7 +769,7 @@ class _SelectState<T> extends State<Select<T>> {
           child: ConstrainedBox(
             constraints: BoxConstraints(maxHeight: at.maxHeight),
             child: Focus(
-              autofocus: true,
+              focusNode: _menuFocus,
               onKeyEvent: _onMenuKey,
               child: SelectMenu<T>(
                 children: widget.options,
@@ -1077,7 +1109,7 @@ class _SelectLabel extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: space(3), vertical: space(2)),
       child: StyledText(
         text,
-        TextStyles.menuLabel,
+        TextStyles.small,
         color: theme.mutedForeground,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
@@ -1202,13 +1234,31 @@ class _SelectItem<T> extends StatelessWidget {
           top: space(2),
           bottom: space(2),
         ),
-        child: StyledText(
-          option.label,
-          TextStyles.bodyCompact,
-          color: ink,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          softWrap: false,
+        // TARGET SIZING: the `SizedBox` below forces this row taller than
+        // `py-2` plus one line box, so the padding's own box is taller than
+        // its label needs. A `Row` with one `Expanded` child is what re-
+        // centres the label in that box rather than leaving it pinned to the
+        // top: `Expanded` keeps the label's own width tight to the row —
+        // load-bearing, since the accent highlight above depends on the
+        // label reaching the row's full width — while `Row`'s cross-axis
+        // alignment (default centre) is free to loosen and re-centre the
+        // *height* alone, the same mechanism [Menu] and `Command` already
+        // rely on for their own rows. A bare `Text`, given the taller box
+        // directly, would not do this: it reports the box it is handed and
+        // paints from the top, leaving the extra room silently below.
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: StyledText(
+                option.label,
+                TextStyles.body,
+                color: ink,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -1233,6 +1283,13 @@ class _SelectItem<T> extends StatelessWidget {
           ),
       ],
     );
+
+    // TARGET SIZING: [Select.itemHeight] is floored at [TouchTargets.minimum],
+    // above what the `py-2` padding alone produces. Sizing the row itself —
+    // rather than the padding — is what keeps the highlight fill, the hit box
+    // and [_MenuGeometry]'s offset math all agreeing on one number; the `Row`
+    // above centres its content vertically inside the taller box for free.
+    row = SizedBox(height: Select.itemHeight, child: row);
 
     // The tick is `tone="inherit"` — `text-current` — so it takes whatever the
     // row's own colour resolves to, highlighted or not.

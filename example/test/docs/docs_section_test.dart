@@ -71,7 +71,9 @@ void main() {
     expect(tester.getSize(find.byType(DocsSection)).width, 640);
   });
 
-  testWidgets('it uses no uppercase type role', (WidgetTester tester) async {
+  testWidgets('it sets no text below the supporting-copy role', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       _host(
         const SizedBox(
@@ -91,9 +93,9 @@ void main() {
       find.byType(StyledText),
     )) {
       expect(
-        text.spec.uppercase,
-        isFalse,
-        reason: '"${text.text}" renders through an uppercase role',
+        text.spec.mobile.size,
+        greaterThanOrEqualTo(TextStyles.small.mobile.size),
+        reason: '"${text.text}" is set below the supporting-copy role',
       );
     }
   });

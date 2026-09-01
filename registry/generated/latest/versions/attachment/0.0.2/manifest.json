@@ -1,0 +1,36 @@
+{
+  "name": "attachment",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/attachment.tsx` — a file, in a conversation.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/attachment.dart",
+      "target": "@ui/attachment.dart",
+      "sha256": "b72fa54b60adbfc0dd4decc96e35e161ed7a4d598adf9c383ea8016fffb7f554"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "dialog",
+    "icon",
+    "icon-swap",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "dialog",
+    "icon",
+    "icon-swap"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/attachment",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/attachment.dart",
+  "deprecated": false
+}

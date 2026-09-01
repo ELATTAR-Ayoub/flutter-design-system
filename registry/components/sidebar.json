@@ -1,7 +1,7 @@
 {
   "name": "sidebar",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/sidebar.tsx` — the app shell, taken apart.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/sidebar.dart",
       "target": "@ui/sidebar.dart",
-      "sha256": "5f84346cd6720358cb017fa35b1dfefd7c6f33b37620088fc6176f9cb611c173"
+      "sha256": "62f0caa101c39e3c16ea78132ee944eaf3cb4656d44799cba353bebe336f0750"
     }
   ],
   "registryDependencies": [
@@ -44,7 +44,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/sidebar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/sidebar.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/sidebar.dart",
   "exports": [
     "Sidebar",
     "SidebarChrome",

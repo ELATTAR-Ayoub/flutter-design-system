@@ -587,7 +587,7 @@ class _CardSpecimenState extends State<_CardSpecimen> {
             Expanded(
               child: StyledText(
                 'Deleted.',
-                TextStyles.caption,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
             ),
@@ -795,7 +795,7 @@ class _SearchSpecimenState extends State<_SearchSpecimen> {
           SizedBox(height: space(3)),
           StyledText(
             _opened == null ? 'Nothing opened yet.' : 'Opened: $_opened',
-            TextStyles.caption,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
           HistorySearch(
@@ -876,7 +876,7 @@ class _DrawerSpecimenState extends State<_DrawerSpecimen> {
           Center(
             child: StyledText(
               'the console\'s own surface',
-              TextStyles.caption,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
           ),

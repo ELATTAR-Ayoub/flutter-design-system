@@ -242,7 +242,7 @@ void main() {
       await _open(tester, 'Accessibility');
 
       expect(find.textContaining('Pointer only'), findsWidgets);
-      // Note's title renders through TextStyles.eyebrow, which uppercases its
+      // Note's title renders through TextStyles.small, which uppercases its
       // text, so match on the body copy instead of the title.
       expect(find.textContaining('optional detail'), findsWidgets);
     });

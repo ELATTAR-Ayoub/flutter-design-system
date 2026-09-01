@@ -3,13 +3,10 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:yaml/yaml.dart';
 
-/// The three reference faces, converted from the web repo's own binaries, and
-/// the family names the tokens use (`--font-sans`, `--font-mono`,
-/// `--font-accent` — NOT the "Space Grotesk" prose drift).
+/// The two faces the type system ships, and the family names it asks for.
 const Map<String, String> _families = <String, String>{
   'InterLocal': 'assets/fonts/InterVariable.ttf',
   'GeistMono': 'assets/fonts/GeistMono-Variable.ttf',
-  'Redaction35': 'assets/fonts/Redaction35-Italic.ttf',
 };
 
 Directory get _packageRoot => Directory.current;
@@ -84,19 +81,13 @@ void main() {
       }
     });
 
-    test(
-      'Redaction35 is registered as italic (the file is an italic face)',
-      () {
-        final YamlList fonts =
-            (pubspec['flutter'] as YamlMap)['fonts'] as YamlList;
-        final YamlMap redaction =
-            fonts.firstWhere(
-                  (dynamic e) => (e as YamlMap)['family'] == 'Redaction35',
-                )
-                as YamlMap;
-        final YamlMap asset = (redaction['fonts'] as YamlList).first as YamlMap;
-        expect(asset['style'], 'italic');
-      },
-    );
+    test('the package declares exactly the two shipped faces', () {
+      final YamlList fonts =
+          (pubspec['flutter'] as YamlMap)['fonts'] as YamlList;
+      expect(
+        fonts.map((dynamic e) => (e as YamlMap)['family']),
+        _families.keys,
+      );
+    });
   });
 }

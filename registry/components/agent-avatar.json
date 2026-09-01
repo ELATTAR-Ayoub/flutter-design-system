@@ -1,7 +1,7 @@
 {
   "name": "agent-avatar",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/agent/avatar/` — the default face, whole.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -26,7 +26,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent_avatar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_avatar.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_avatar.dart",
   "exports": [
     "AgentAvatar",
     "AgentAvatarSize",

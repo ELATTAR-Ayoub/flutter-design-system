@@ -133,7 +133,7 @@ class _SignalStudioProfilePageState extends State<SignalStudioProfilePage> {
                   SizedBox(height: space(8)),
                   StyledText(
                     'PROFILE SIGNAL',
-                    TextStyles.eyebrow,
+                    TextStyles.small,
                     color: theme.mutedForeground,
                   ),
                   SizedBox(height: space(2)),
@@ -229,7 +229,7 @@ class _ProfileHero extends StatelessWidget {
             key: const Key('profile-edit'),
             variant: ButtonVariant.primary,
             onPressed: open,
-            child: StyledText('Edit profile', TextStyles.buttonLabel),
+            child: StyledText('Edit profile', TextStyles.nav),
           ),
           content: (BuildContext context, VoidCallback close) =>
               _ProfileEditor(profile: profile, close: close, onSave: onSave),
@@ -251,7 +251,7 @@ class _ProfileHero extends StatelessWidget {
               children: <Widget>[
                 const Icon(IconGlyph.share2, size: IconSize.sm),
                 const _ActionGap(),
-                StyledText('Share profile', TextStyles.buttonLabel),
+                StyledText('Share profile', TextStyles.nav),
               ],
             ),
           ),
@@ -260,7 +260,7 @@ class _ProfileHero extends StatelessWidget {
           variant: ButtonVariant.outline,
           loading: refreshing,
           onPressed: refreshing ? null : onRefresh,
-          child: StyledText('Refresh', TextStyles.buttonLabel),
+          child: StyledText('Refresh', TextStyles.nav),
         ),
       ],
     );
@@ -650,13 +650,13 @@ class _ProfileEditorState extends State<_ProfileEditor> {
               key: const Key('profile-cancel'),
               variant: ButtonVariant.ghost,
               onPressed: _saving ? null : widget.close,
-              child: StyledText('Cancel', TextStyles.buttonLabel),
+              child: StyledText('Cancel', TextStyles.nav),
             ),
             Button(
               key: const Key('profile-save'),
               loading: _saving,
               onPressed: _saving ? null : _save,
-              child: StyledText('Save changes', TextStyles.buttonLabel),
+              child: StyledText('Save changes', TextStyles.nav),
             ),
           ],
         ),
@@ -742,7 +742,7 @@ class _ProfileMediaEditor extends StatelessWidget {
                       children: <Widget>[
                         const Icon.lucide(Lucide.camera, size: IconSize.sm),
                         const _ActionGap(),
-                        StyledText('Change avatar', TextStyles.buttonLabelSm),
+                        StyledText('Change avatar', TextStyles.small),
                       ],
                     ),
                   ),
@@ -756,7 +756,7 @@ class _ProfileMediaEditor extends StatelessWidget {
                       children: <Widget>[
                         const Icon.lucide(Lucide.image, size: IconSize.sm),
                         const _ActionGap(),
-                        StyledText('Change cover', TextStyles.buttonLabelSm),
+                        StyledText('Change cover', TextStyles.small),
                       ],
                     ),
                   ),
@@ -1058,7 +1058,7 @@ class _HighlightCard extends StatelessWidget {
             children: <Widget>[
               StyledText(
                 eyebrow,
-                TextStyles.eyebrow,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
               SizedBox(height: space(2)),
@@ -1114,7 +1114,7 @@ class _CollectionsError extends StatelessWidget {
       size: ButtonSize.sm,
       variant: ButtonVariant.secondary,
       onPressed: onRetry,
-      child: StyledText('Retry', TextStyles.buttonLabelSm),
+      child: StyledText('Retry', TextStyles.small),
     ),
   );
 }

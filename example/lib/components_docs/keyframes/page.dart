@@ -305,7 +305,7 @@ class _Captioned extends StatelessWidget {
       SizedBox(height: space(2)),
       StyledText(
         caption,
-        TextStyles.section,
+        TextStyles.small,
         color: ThemeScope.of(context).mutedForeground,
       ),
     ],
@@ -1097,7 +1097,7 @@ class _TransitionHostState extends State<_TransitionHost> {
         SizedBox(height: space(2)),
         StyledText(
           'Tap to roll',
-          TextStyles.section,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
       ],

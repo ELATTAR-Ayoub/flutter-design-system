@@ -242,7 +242,10 @@ class _DialogSection extends StatelessWidget {
                     children: <Widget>[
                       Icon(IconGlyph.packageOpen, size: IconSize.sm),
                       _ButtonGap(),
-                      Text('Open Pack'),
+                      // Flexible so a doubled text scale wraps the label
+                      // instead of pushing the row past the button's
+                      // constrained width.
+                      Flexible(child: Text('Open Pack')),
                     ],
                   ),
                 ),
@@ -385,7 +388,7 @@ class _LineItem extends StatelessWidget {
         children: <Widget>[
           StyledText(
             k,
-            total ? TextStyles.eyebrow : TextStyles.small,
+            total ? TextStyles.small : TextStyles.small,
             color: theme.mutedForeground,
           ),
           StyledText(
@@ -896,7 +899,7 @@ class _BadDayCell extends StatelessWidget {
     children: <Widget>[
       StyledText(
         label,
-        TextStyles.eyebrow,
+        TextStyles.small,
         color: ThemeScope.of(context).mutedForeground,
       ),
       SizedBox(height: space(3)),
@@ -1136,10 +1139,14 @@ class _DangerHeading extends StatelessWidget {
               tone: IconTone.error,
             ),
             SizedBox(width: space(2)),
-            StyledText(
-              'Danger zone',
-              TextStyles.eyebrow,
-              color: theme.destructiveText,
+            // Flexible so a doubled text scale wraps the heading instead of
+            // pushing the row past a narrow bad-day cell's width.
+            Flexible(
+              child: StyledText(
+                'Danger zone',
+                TextStyles.small,
+                color: theme.destructiveText,
+              ),
             ),
           ],
         ),
@@ -1199,7 +1206,7 @@ class _Unavailable extends StatelessWidget {
       // contrast (trap 9); this sentence is not."*
       StyledText(
         reason,
-        TextStyles.caption,
+        TextStyles.small,
         align: TextAlign.right,
         color: ThemeScope.of(context).mutedForeground,
       ),
@@ -1335,7 +1342,10 @@ class _SheetSection extends StatelessWidget {
                   children: <Widget>[
                     const Icon(IconGlyph.slidersHorizontal, size: IconSize.sm),
                     const _ButtonGap(),
-                    Text('Filters (${side.name})'),
+                    // Flexible so a doubled text scale wraps the label
+                    // instead of pushing the row past the button's
+                    // constrained width.
+                    Flexible(child: Text('Filters (${side.name})')),
                   ],
                 ),
               ),
@@ -1394,7 +1404,7 @@ class _FilterSheetState extends State<_FilterSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                StyledText('Price range', TextStyles.eyebrow),
+                StyledText('Price range', TextStyles.small),
                 SizedBox(height: space(4)),
                 Slider(
                   values: _price,
@@ -1409,7 +1419,7 @@ class _FilterSheetState extends State<_FilterSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                StyledText('Rarity floor', TextStyles.eyebrow),
+                StyledText('Rarity floor', TextStyles.small),
                 SizedBox(height: space(4)),
                 for (int i = 0; i < _floor.length; i++) ...<Widget>[
                   if (i > 0) SizedBox(height: space(3)),
@@ -1631,7 +1641,10 @@ class _PopoverSectionState extends State<_PopoverSection> {
                 children: <Widget>[
                   Icon(IconGlyph.info, size: IconSize.sm),
                   SizedBox(width: 6), // allow-hardcoded: `gap-1.5` on `sm`.
-                  Text('How odds work'),
+                  // Flexible so a doubled text scale wraps the label
+                  // instead of pushing the row past the button's
+                  // constrained width.
+                  Flexible(child: Text('How odds work')),
                 ],
               ),
             ),
@@ -1732,18 +1745,10 @@ class _PopoverHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        StyledText(
-          title,
-          TextStyles.popoverTitle,
-          color: theme.popoverForeground,
-        ),
+        StyledText(title, TextStyles.h4, color: theme.popoverForeground),
         // `gap-0.5`.
         SizedBox(height: space(0.5)),
-        StyledText(
-          description,
-          TextStyles.bodyCompact,
-          color: theme.mutedForeground,
-        ),
+        StyledText(description, TextStyles.body, color: theme.mutedForeground),
       ],
     );
   }
@@ -1869,7 +1874,7 @@ class _CardPreview extends StatelessWidget {
             children: <Widget>[
               StyledText(
                 'Legendary',
-                TextStyles.eyebrow,
+                TextStyles.small,
                 color: theme.premiumText,
               ),
               StyledText(

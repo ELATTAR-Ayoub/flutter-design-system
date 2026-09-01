@@ -22,8 +22,8 @@
 /// 13px at an 18.5714px line box: the utility takes the size **and** the
 /// leading.)* What survives is the family, the tabular figures, the 600 weight
 /// and the −0.01em tracking, which is why "the shared mono foundation" is
-/// two-thirds true and drift 8 records the third. [TextStyles.inputNumber] and
-/// [TextStyles.inputSerial] are that collapse already resolved in the
+/// two-thirds true and drift 8 records the third. [TextStyles.numberBase] and
+/// [TextStyles.identifier] are that collapse already resolved in the
 /// foundation layer: passing `TextStyles.numberBase` to any field on this page renders
 /// two pixels large.
 ///
@@ -507,13 +507,23 @@ class _Measure extends StatelessWidget {
   final double? width;
 
   @override
-  Widget build(BuildContext context) => Align(
-    alignment: AlignmentDirectional.centerStart,
-    child: ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: width ?? _measureLg),
-      child: child,
-    ),
-  );
+  Widget build(BuildContext context) {
+    // The reference's `max-w-*` is a rem value: on a real device a doubled
+    // text-size setting doubles the root font size too, so the same class
+    // measures twice as wide. A literal px cap does not follow along, and
+    // then an addon and a value that fit at 1x no longer fit inside it at
+    // 2x. Scaling the cap by the active text scaler reproduces the rem
+    // behaviour instead of inventing new headroom, and it is bounded by
+    // whatever width the layout actually has to give.
+    final double scale = MediaQuery.textScalerOf(context).scale(1.0);
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: (width ?? _measureLg) * scale),
+        child: child,
+      ),
+    );
+  }
 }
 
 /// `aria-invalid` on the control, with the `Field` left valid.
@@ -664,7 +674,7 @@ class _TypesSectionState extends State<_TypesSection> {
                     child: InputGroupInput(
                       initialValue: '3',
                       keyboardType: TextInputType.number,
-                      textSpec: TextStyles.inputNumber,
+                      textSpec: TextStyles.numberBase,
                     ),
                   ),
                 ),
@@ -682,7 +692,7 @@ class _TypesSectionState extends State<_TypesSection> {
                 focusNode: _nodes['i-phone'],
                 child: InputGroup(
                   startAddon: InputGroupAddon(
-                    child: InputGroupText('+1', spec: TextStyles.inputNumber),
+                    child: InputGroupText('+1', spec: TextStyles.numberBase),
                   ),
                   child: InputGroupInput(
                     placeholder: '555 0134 908',
@@ -690,7 +700,7 @@ class _TypesSectionState extends State<_TypesSection> {
                     autofillHints: const <String>[
                       AutofillHints.telephoneNumber,
                     ],
-                    textSpec: TextStyles.inputNumber,
+                    textSpec: TextStyles.numberBase,
                   ),
                 ),
               ),
@@ -705,7 +715,7 @@ class _TypesSectionState extends State<_TypesSection> {
                 focusNode: _nodes['i-amount'],
                 child: InputGroup(
                   startAddon: InputGroupAddon(
-                    child: InputGroupText(r'$', spec: TextStyles.inputNumber),
+                    child: InputGroupText(r'$', spec: TextStyles.numberBase),
                   ),
                   endAddon: const InputGroupAddon(
                     align: InputGroupAlign.end,
@@ -716,7 +726,7 @@ class _TypesSectionState extends State<_TypesSection> {
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    textSpec: TextStyles.inputNumber,
+                    textSpec: TextStyles.numberBase,
                   ),
                 ),
               ),
@@ -747,7 +757,7 @@ class _TypesSectionState extends State<_TypesSection> {
                   ),
                   child: InputGroupInput(
                     placeholder: 'ECLIPSE-2K4A',
-                    textSpec: TextStyles.inputSerial,
+                    textSpec: TextStyles.identifier,
                   ),
                 ),
               ),
@@ -772,7 +782,7 @@ class _TypesSectionState extends State<_TypesSection> {
                     child: InputGroupInput(
                       initialValue: '5',
                       keyboardType: TextInputType.number,
-                      textSpec: TextStyles.inputNumber,
+                      textSpec: TextStyles.numberBase,
                     ),
                   ),
                 ),
@@ -964,7 +974,7 @@ class _OtpDemo extends StatelessWidget {
       children: <Widget>[
         // `.type-label` uppercases at paint and brings its own
         // `--muted-foreground`; the element states no colour of its own.
-        StyledText(label, TextStyles.eyebrow),
+        StyledText(label, TextStyles.small),
         SizedBox(height: _OtpSection._labelGap),
         child,
       ],
@@ -1040,12 +1050,12 @@ class _ValidationSectionState extends State<_ValidationSection> {
                         startAddon: InputGroupAddon(
                           child: InputGroupText(
                             r'$',
-                            spec: TextStyles.inputNumber,
+                            spec: TextStyles.numberBase,
                           ),
                         ),
                         child: InputGroupInput(
                           initialValue: '2,400.00',
-                          textSpec: TextStyles.inputNumber,
+                          textSpec: TextStyles.numberBase,
                         ),
                       ),
                     ),
@@ -1206,7 +1216,7 @@ class _FormSectionState extends State<_FormSection> {
                       startAddon: InputGroupAddon(
                         child: InputGroupText(
                           r'$',
-                          spec: TextStyles.inputNumber,
+                          spec: TextStyles.numberBase,
                         ),
                       ),
                       endAddon: const InputGroupAddon(
@@ -1218,7 +1228,7 @@ class _FormSectionState extends State<_FormSection> {
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        textSpec: TextStyles.inputNumber,
+                        textSpec: TextStyles.numberBase,
                       ),
                     ),
                   ),
@@ -1243,14 +1253,19 @@ class _FormSectionState extends State<_FormSection> {
                     ),
                   ),
                 ),
-                child: Row(
+                // A Row of two full-label buttons is what a doubled text
+                // scale breaks first: Wrap keeps them on one line at the
+                // reference's own width and drops "Cancel" to its own line
+                // only once the pair genuinely does not fit.
+                child: Wrap(
+                  spacing: space(3),
+                  runSpacing: space(3),
                   children: <Widget>[
                     Button(
                       variant: ButtonVariant.premium,
                       onPressed: () {},
                       child: const Text('Deposit Funds'),
                     ),
-                    SizedBox(width: space(3)),
                     Button(
                       variant: ButtonVariant.ghost,
                       onPressed: () {},

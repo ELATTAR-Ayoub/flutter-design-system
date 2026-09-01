@@ -335,7 +335,7 @@ class _ButtonSpecimen extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          StyledText('Save', TextStyles.buttonLabel),
+          StyledText('Save', TextStyles.nav),
           SizedBox(width: space(2)),
           const Kbd('⌘S'),
         ],
@@ -421,7 +421,7 @@ const String _buttonCode = '''Button(
   child: Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      StyledText('Save', TextStyles.buttonLabel),
+      StyledText('Save', TextStyles.nav),
       SizedBox(width: space(2)),
       const Kbd('⌘S'),
     ],
@@ -473,9 +473,11 @@ class _ApiReferenceContent extends StatelessWidget {
         title: 'Kbd static tokens',
         facts: <DocsApiFact>[
           DocsApiFact(
-            name: 'Kbd.height',
+            name: 'Kbd.minHeight',
             type: 'static double',
-            description: '20px tall.',
+            description:
+                '20px, the floor a key sits on. A minimum, so a scaled legend '
+                'grows the key instead of being clipped by it.',
           ),
           DocsApiFact(
             name: 'Kbd.minWidth',
@@ -617,7 +619,7 @@ class _DependenciesContent extends StatelessWidget {
         'Imports: effects/surface.dart (Surface), '
             'foundation/shadows.dart (Shadows.none), '
             'foundation/spacing.dart, foundation/theme.dart, '
-            'foundation/typography.dart (TextStyles.kbdKey), '
+            'foundation/typography.dart (TextStyles.code), '
             'theme_scope.dart.',
         'registryDependencies, resolved automatically by `elattar add '
             'kbd`: surface, source-foundation: copied verbatim '

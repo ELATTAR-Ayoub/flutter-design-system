@@ -1,7 +1,7 @@
 {
   "name": "questionnaire",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/questionnaire.tsx` over `@shadcn/react/questionnaire` — a",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/questionnaire.dart",
       "target": "@ui/questionnaire.dart",
-      "sha256": "ee2ca77f68862b5808825fb22fb35fd27654aae1dcfdcb97fa84a93630f4be8b"
+      "sha256": "f9516ace93b999846a6bc2a44a18e487e28486b28678fda9bf9868beabc06896"
     }
   ],
   "registryDependencies": [
@@ -30,7 +30,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/questionnaire",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/questionnaire.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/questionnaire.dart",
   "exports": [
     "Questionnaire",
     "QuestionnaireActions",

@@ -1,0 +1,34 @@
+Resolving dependencies...
+Downloading packages...
+  clock 1.1.2 (1.1.3 available)
+  matcher 0.12.19 (0.12.20 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.0 (1.19.0 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  test_api 0.7.11 (0.7.13 available)
+  vector_math 2.2.0 (2.4.2 available)
+  vm_service 15.2.0 (15.3.0 available)
+  yaml 3.1.3 (3.1.4 available)
+Got dependencies!
+9 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Resolving dependencies in `.\example`...
+Downloading packages...
+Got dependencies in `.\example`.
+00:00 +0: loading D:/DESIGN/Design-System-2026-8/flutter-design-system/test/overlay_dialog_family_test.dart
+00:00 +0: AlertDialog Escape closes it, despite the copy promising no escape-to-cancel — the reference itself was measured closing on Escape (see the library doc's drift 1), and the kernel's Escape handler makes no exception for the alert dialog
+00:05 +1: AlertDialog a tap on the scrim does NOT close it — measured, and wired as dismissOnOverlayTap: false
+00:05 +2: AlertDialog focus returns to the trigger once Cancel closes it
+00:06 +3: AlertDialog a disabled trigger does not open it
+00:06 +4: AlertDialog title and description surface as reader-visible labels
+00:06 +5: AlertDialog disposes cleanly if torn down mid-open
+00:06 +6: SheetOverlay Escape closes it and focus returns to the trigger
+00:07 +7: SheetOverlay a disabled trigger does not open it
+00:07 +8: SheetOverlay the close button drives the same close/restore path
+00:07 +9: SheetOverlay the panel scopes its own route, distinct from the page
+00:07 +10: SheetOverlay disposes cleanly if torn down mid-open
+00:07 +11: Drawer Escape closes it and focus returns to the trigger
+00:08 +12: Drawer a disabled trigger does not open it
+00:08 +13: Drawer disposes cleanly if torn down mid-drag, with the drag recognizer and the portal both live
+00:08 +14: Drawer the panel scopes its own route
+00:08 +15: All tests passed!

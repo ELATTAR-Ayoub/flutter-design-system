@@ -601,7 +601,7 @@ class _CollectingSpecimen extends StatelessWidget {
       children: <Widget>[
         StyledText(
           'IssueMode.first (${firstOnly.length} shown)',
-          TextStyles.section,
+          TextStyles.small,
         ),
         for (final String issue in firstOnly)
           StyledText(
@@ -610,7 +610,7 @@ class _CollectingSpecimen extends StatelessWidget {
             color: theme.destructiveText,
           ),
         SizedBox(height: space(4)),
-        StyledText('IssueMode.all (${all.length} shown)', TextStyles.section),
+        StyledText('IssueMode.all (${all.length} shown)', TextStyles.small),
         for (final String issue in all)
           StyledText(
             '• $issue',

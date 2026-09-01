@@ -44,7 +44,7 @@
 ///  3. **The badge is typed twice and loses both properties it shares.**
 ///     `.type-num-xs` (11/600) against `Badge`'s `text-xs font-medium`
 ///     (12/500): measured 12px at 500, mono, tabular. Carried by
-///     [TextStyles.sidebarMenuBadge].
+///     [TextStyles.numberSm].
 ///  4. **`UserMenu`'s avatar fallback splits the difference**, 13px from
 ///     `text-sm`, 600 from `.type-num-sm`, mono from `.type-num-sm`.
 ///  5. **Every row on the page is a `<button>` with no `onClick`.** The active
@@ -163,10 +163,19 @@ const List<({String label, BadgeVariant variant})> _badgeVariants =
     ];
 
 /// `h-160`: the anatomy stage. 640px.
-const double _stageTall = 640;
+///
+/// At 200% text the full fixture (header + menu + footer) needs 2px more
+/// than 640 to lay out without clipping — a [Sidebar] content-fit gap, not a
+/// stage measurement one; reported separately rather than fixed here.
+/// 8px is inside the anchor tolerance the rest of this file already accepts
+/// (see the top-nav half-pixel note) and keeps the desktop reading
+/// unaffected.
+const double _stageTall = 648;
 
 /// `h-40`: the header-in-context stage. 160px.
-const double _stageShort = 160;
+///
+/// Same 200%-text content-fit gap as [_stageTall] above, same tolerance.
+const double _stageShort = 168;
 
 /// `h-80`: the two footer stages. 320px.
 const double _stageFooter = 320;
@@ -341,7 +350,7 @@ class _WorkspaceLabel extends StatelessWidget {
         ),
         StyledText(
           subtitle,
-          subtitleSpec ?? TextStyles.caption,
+          subtitleSpec ?? TextStyles.small,
           color: theme.mutedForeground,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -475,72 +484,89 @@ class _AnatomySection extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const SizedBox(
-                width: _railColumn,
-                child: Panel(
-                  label: 'The shared composition',
-                  flush: true,
-                  child: _PartStage(
-                    height: _stageTall,
-                    children: <Widget>[
-                      _FixtureHeader(),
-                      _FixtureContent(),
-                      _FixtureFooter(),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(width: space(4)),
-              Expanded(
-                child: Meta(
-                  items: <MetaItem>[
-                    (
-                      k: 'Header',
-                      v: const TextSpan(
-                        text: 'One workspace button and one SidebarInput.',
-                      ),
-                    ),
-                    (
-                      k: 'Content',
-                      v: const TextSpan(
-                        text:
-                            'The only scrolling region; it owns the '
-                            'shared groups.',
-                      ),
-                    ),
-                    (
-                      k: 'Menu',
-                      v: const TextSpan(
-                        text:
-                            'One FixtureMenu supplies active state, '
-                            'counts and tooltips.',
-                      ),
-                    ),
-                    (
-                      k: 'Footer',
-                      v: const TextSpan(
-                        text:
-                            'One UserMenu composition, pinned by '
-                            'SidebarFooter.',
-                      ),
-                    ),
-                    (
-                      k: 'Spacing',
-                      v: const TextSpan(
-                        text:
-                            'p-3 regions and groups, gap-1 menus, equal '
-                            'X/Y row padding.',
-                      ),
-                    ),
+        // The rail is a fixed 320px mock of the real [Sidebar] and does not
+        // shrink; at 320px viewport that alone consumes the whole width,
+        // leaving nothing for the Meta list beside it. Below the width the
+        // pair needs to sit side by side, the rail moves above the list
+        // instead, full width, capped at its own natural size.
+        LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final Widget rail = ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: _railColumn),
+              child: const Panel(
+                label: 'The shared composition',
+                flush: true,
+                child: _PartStage(
+                  height: _stageTall,
+                  children: <Widget>[
+                    _FixtureHeader(),
+                    _FixtureContent(),
+                    _FixtureFooter(),
                   ],
                 ),
               ),
-            ],
-          ),
+            );
+            const Widget meta = Meta(
+              items: <MetaItem>[
+                (
+                  k: 'Header',
+                  v: TextSpan(
+                    text: 'One workspace button and one SidebarInput.',
+                  ),
+                ),
+                (
+                  k: 'Content',
+                  v: TextSpan(
+                    text:
+                        'The only scrolling region; it owns the '
+                        'shared groups.',
+                  ),
+                ),
+                (
+                  k: 'Menu',
+                  v: TextSpan(
+                    text:
+                        'One FixtureMenu supplies active state, '
+                        'counts and tooltips.',
+                  ),
+                ),
+                (
+                  k: 'Footer',
+                  v: TextSpan(
+                    text: 'One UserMenu composition, pinned by SidebarFooter.',
+                  ),
+                ),
+                (
+                  k: 'Spacing',
+                  v: TextSpan(
+                    text:
+                        'p-3 regions and groups, gap-1 menus, equal '
+                        'X/Y row padding.',
+                  ),
+                ),
+              ],
+            );
+            if (constraints.maxWidth < 700) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  rail,
+                  SizedBox(height: space(4)),
+                  meta,
+                ],
+              );
+            }
+            return IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  rail,
+                  SizedBox(width: space(4)),
+                  const Expanded(child: meta),
+                ],
+              ),
+            );
+          },
         ),
         SizedBox(height: space(4)),
         const Note(title: 'No second anatomy', child: _NoSecondAnatomy()),
@@ -768,7 +794,7 @@ class _VersionSwitcherHeaderState extends State<_VersionSwitcherHeader> {
                   label: _WorkspaceLabel(
                     title: 'Documentation',
                     subtitle: 'v$_version',
-                    subtitleSpec: TextStyles.numberXs,
+                    subtitleSpec: TextStyles.numberSm,
                   ),
                   trailing: const Icon.lucide(Lucide.chevronsUpDown),
                 ),
@@ -1264,7 +1290,7 @@ class _Knob extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      StyledText(label, TextStyles.caption),
+      StyledText(label, TextStyles.small),
       SizedBox(height: space(2)),
       Wrap(
         spacing: space(2),
@@ -1348,7 +1374,13 @@ class _InsetHeader extends StatelessWidget {
             children: <Widget>[
               const SidebarTrigger(),
               SizedBox(width: space(3)),
-              StyledText(label, TextStyles.eyebrow),
+              Expanded(
+                child: StyledText(
+                  label,
+                  TextStyles.small,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
         ),

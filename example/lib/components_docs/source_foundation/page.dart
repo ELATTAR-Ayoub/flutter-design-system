@@ -65,8 +65,8 @@ final ComponentDocSpec sourceFoundationDocSpec = ComponentDocSpec(
       title: 'Installation',
       description:
           'source-foundation has a real registry manifest, `elattar add '
-          'source-foundation` installs all eleven files plus its three '
-          'bundled fonts (InterVariable, Geist Mono, Redaction35) and '
+          'source-foundation` installs all eleven files plus its two '
+          'bundled fonts (InterVariable, Geist Mono) and '
           'their OFL licenses. Its registryDependencies list is empty — '
           'this is the root of the graph. The Manual tab is for a '
           'project not using the CLI.',
@@ -302,7 +302,7 @@ class _Captioned extends StatelessWidget {
       SizedBox(height: space(2)),
       StyledText(
         caption,
-        TextStyles.section,
+        TextStyles.small,
         color: ThemeScope.of(context).mutedForeground,
       ),
     ],
@@ -499,15 +499,9 @@ class _TypeHost extends StatelessWidget {
           'TextStyles.display',
           TextStyles.display,
           color: theme.foreground,
-          fontSize: Fluid.display(context),
         ),
         SizedBox(height: space(2)),
-        StyledText(
-          'TextStyles.h1',
-          TextStyles.h1,
-          color: theme.foreground,
-          fontSize: Fluid.h1(context),
-        ),
+        StyledText('TextStyles.h1', TextStyles.h1, color: theme.foreground),
         SizedBox(height: space(2)),
         for (final (String, TextStyleToken) pair in <(String, TextStyleToken)>[
           ('h2', TextStyles.h2),
@@ -777,7 +771,7 @@ const List<DocsApiFact> _apiFacts = <DocsApiFact>[
         'mixes through for perceptually-even colour math.',
   ),
   DocsApiFact(
-    name: 'TextStyles / ComponentTextStyles / TextStyleToken / StyledText',
+    name: 'TextStyles / TextStyleToken / TypeStep / StyledText',
     type: 'static TextStyleToken constants, and the widget that paints them',
     description:
         'The full type scale (display through the numeric rungs) plus '
@@ -894,11 +888,11 @@ class _ResponsiveContent extends StatelessWidget {
             'check anywhere else in this package (the docs shell\'s own '
             'rail-vs-sheet switch, a dialog\'s width cap) reads one of '
             'these two ladders rather than a literal pixel comparison.',
-        'Fluid (theme_scope.dart) is the type scale\'s own responsive '
-            'half: TextStyles.displaySize(vw) and h1Size(vw) clamp a '
-            'viewport-relative size between a floor and a ceiling, the '
-            'one place in the foundation where a token is a function of '
-            'width rather than a constant.',
+        'Type resolves its own responsive step: a role carries a mobile, '
+            'a tablet and a desktop step, and StyledText picks the one '
+            'for the width in scope at Breakpoints.md and Breakpoints.lg. '
+            'A call site never does viewport arithmetic, and TypeWidthScope '
+            'lets a narrow region answer the width question for itself.',
         'None of this page\'s own six specimen sections branch on '
             'width themselves — every one is sized off space(...) so it '
             'reflows with whatever column the docs shell gives it, the '

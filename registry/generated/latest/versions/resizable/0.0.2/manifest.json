@@ -1,0 +1,27 @@
+{
+  "name": "resizable",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/resizable.tsx` — three wrappers over",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/resizable.dart",
+      "target": "@ui/resizable.dart",
+      "sha256": "2a88a4c7473ac7fd326df11847c27a847db10e81e9b7306a200b850d363452a0"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/resizable",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/resizable.dart",
+  "deprecated": false
+}

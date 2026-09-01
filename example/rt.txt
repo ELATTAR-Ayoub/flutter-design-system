@@ -1,0 +1,435 @@
+00:00 +0: loading D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart
+00:00 +0: /design-system/colors survives mobile dark 200%
+00:01 +1: /design-system/colors survives mobile light 100%
+00:01 +2: /design-system/colors survives tablet dark 100%
+00:01 +3: /design-system/colors survives desktop light 200%
+00:02 +4: /design-system/typography survives mobile dark 200%
+00:02 +5: /design-system/typography survives mobile light 100%
+00:02 +6: /design-system/typography survives tablet dark 100%
+00:03 +7: /design-system/typography survives desktop light 200%
+00:03 +8: /design-system/spacing survives mobile dark 200%
+00:03 +9: /design-system/spacing survives mobile light 100%
+00:03 +10: /design-system/spacing survives tablet dark 100%
+00:03 +11: /design-system/spacing survives desktop light 200%
+00:04 +12: /design-system/shadows survives mobile dark 200%
+00:04 +13: /design-system/shadows survives mobile light 100%
+00:04 +14: /design-system/shadows survives tablet dark 100%
+00:04 +15: /design-system/shadows survives desktop light 200%
+00:04 +16: /design-system/motion survives mobile dark 200%
+00:05 +17: /design-system/motion survives mobile light 100%
+00:05 +18: /design-system/motion survives tablet dark 100%
+00:05 +19: /design-system/motion survives desktop light 200%
+00:06 +20: /design-system/motion survives with reduced motion asked for
+00:06 +21: /design-system/icons survives mobile dark 200%
+00:06 +22: /design-system/icons survives mobile light 100%
+00:06 +23: /design-system/icons survives tablet dark 100%
+00:07 +24: /design-system/icons survives desktop light 200%
+00:07 +25: /design-system/components/base/buttons survives mobile dark 200%
+00:08 +26: /design-system/components/base/buttons survives mobile light 100%
+00:08 +27: /design-system/components/base/buttons survives tablet dark 100%
+00:08 +28: /design-system/components/base/buttons survives desktop light 200%
+00:09 +29: /design-system/components/base/inputs survives mobile dark 200%
+00:09 +30: /design-system/components/base/inputs survives mobile light 100%
+00:10 +31: /design-system/components/base/inputs survives tablet dark 100%
+00:10 +32: /design-system/components/base/inputs survives desktop light 200%
+00:10 +33: /design-system/components/base/forms survives mobile dark 200%
+00:11 +34: /design-system/components/base/forms survives mobile light 100%
+00:11 +35: /design-system/components/base/forms survives tablet dark 100%
+00:11 +36: /design-system/components/base/forms survives desktop light 200%
+00:12 +37: /design-system/components/base/selects survives mobile dark 200%
+00:12 +38: /design-system/components/base/selects survives mobile light 100%
+00:13 +39: /design-system/components/base/selects survives tablet dark 100%
+00:13 +40: /design-system/components/base/selects survives desktop light 200%
+00:14 +41: /design-system/components/base/selection survives mobile dark 200%
+00:14 +42: /design-system/components/base/selection survives mobile light 100%
+00:14 +43: /design-system/components/base/selection survives tablet dark 100%
+00:15 +44: /design-system/components/base/selection survives desktop light 200%
+00:15 +45: /design-system/components/base/dialogs survives mobile dark 200%
+00:15 +46: /design-system/components/base/dialogs survives mobile light 100%
+00:15 +47: /design-system/components/base/dialogs survives tablet dark 100%
+00:15 +48: /design-system/components/base/dialogs survives desktop light 200%
+00:16 +49: /design-system/components/base/dialogs survives with reduced motion asked for
+00:16 +50: /design-system/components/base/menus survives mobile dark 200%
+00:16 +51: /design-system/components/base/menus survives mobile light 100%
+00:16 +52: /design-system/components/base/menus survives tablet dark 100%
+00:16 +53: /design-system/components/base/menus survives desktop light 200%
+00:16 +54: /design-system/components/base/navigation survives mobile dark 200%
+00:17 +55: /design-system/components/base/navigation survives mobile light 100%
+00:17 +56: /design-system/components/base/navigation survives tablet dark 100%
+00:17 +57: /design-system/components/base/navigation survives desktop light 200%
+00:18 +58: /design-system/components/base/feedback survives mobile dark 200%
+00:18 +59: /design-system/components/base/feedback survives mobile light 100%
+00:18 +60: /design-system/components/base/feedback survives tablet dark 100%
+00:18 +61: /design-system/components/base/feedback survives desktop light 200%
+00:19 +62: /design-system/components/base/feedback survives with reduced motion asked for
+00:19 +63: /design-system/components/base/chat survives mobile dark 200%
+00:20 +64: /design-system/components/base/chat survives mobile light 100%
+00:20 +65: /design-system/components/base/chat survives tablet dark 100%
+00:21 +66: /design-system/components/base/chat survives desktop light 200%
+00:21 +67: /design-system/components/base/data survives mobile dark 200%
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 66 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/stat.dart:318:17
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#39ad9 relayoutBoundary=up18 OVERFLOWING:
+  creator: Row ← Wrap ← Column ← Semantics ← Stat ← Center ← ConstrainedBox ← Padding ← Column ←
+    Padding ← ColoredBox ← Container ← ⋯
+  parentData: offset=Offset(0.0, 0.0) (can use size)
+  constraints: BoxConstraints(0.0<=w<=348.0, 0.0<=h<=Infinity)
+  size: Size(348.0, 40.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 96 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/item.dart:174:16
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#886b9 OVERFLOWING:
+  needs compositing
+  creator: Row ← IntrinsicHeight ← Padding ← DecoratedBox ← Container ← Item ← Column ← ItemGroup ←
+    Padding ← ColoredBox ← Container ← Column ← ⋯
+  parentData: <none> (can use size)
+  constraints: BoxConstraints(w=362.0, h=132.0)
+  size: Size(362.0, 132.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: stretch
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: 'Multiple exceptions (2) were detected during the running of the current test, and at
+least one was unexpected.'
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart:168:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart line 168
+The test description was:
+  survives mobile dark 200%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:24 +67 -1: /design-system/components/base/data survives mobile dark 200% [E]
+  Test failed. See exception logs above.
+  The test description was: survives mobile dark 200%
+  
+00:24 +67 -1: /design-system/components/base/data survives mobile light 100%
+00:24 +68 -1: /design-system/components/base/data survives tablet dark 100%
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: FlutterError:<A RenderFlex overflowed by 2.8 pixels on the right.>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart:168:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart line 168
+The test description was:
+  survives tablet dark 100%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:26 +68 -2: /design-system/components/base/data survives tablet dark 100% [E]
+  Test failed. See exception logs above.
+  The test description was: survives tablet dark 100%
+  
+00:26 +68 -2: /design-system/components/base/data survives desktop light 200%
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: FlutterError:<A RenderFlex overflowed by 167 pixels on the right.>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart:168:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart line 168
+The test description was:
+  survives desktop light 200%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:27 +68 -3: /design-system/components/base/data survives desktop light 200% [E]
+  Test failed. See exception logs above.
+  The test description was: survives desktop light 200%
+  
+00:27 +68 -3: /design-system/components/base/charts survives mobile dark 200%
+00:30 +69 -3: /design-system/components/base/charts survives mobile light 100%
+00:32 +70 -3: /design-system/components/base/charts survives tablet dark 100%
+00:33 +71 -3: /design-system/components/base/charts survives desktop light 200%
+00:35 +72 -3: /design-system/components/base/charts survives with reduced motion asked for
+00:37 +73 -3: /design-system/components/base/layout survives mobile dark 200%
+00:37 +74 -3: /design-system/components/base/layout survives mobile light 100%
+00:37 +75 -3: /design-system/components/base/layout survives tablet dark 100%
+00:37 +76 -3: /design-system/components/base/layout survives desktop light 200%
+00:37 +77 -3: /design-system/components/base/sidebar survives mobile dark 200%
+00:38 +78 -3: /design-system/components/base/sidebar survives mobile light 100%
+00:39 +79 -3: /design-system/components/base/sidebar survives tablet dark 100%
+00:39 +80 -3: /design-system/components/base/sidebar survives desktop light 200%
+00:40 +81 -3: /design-system/components/agent/console survives mobile dark 200%
+00:40 +82 -3: /design-system/components/agent/console survives mobile light 100%
+00:40 +83 -3: /design-system/components/agent/console survives tablet dark 100%
+00:40 +84 -3: /design-system/components/agent/console survives desktop light 200%
+00:41 +85 -3: /design-system/components/agent/console survives with reduced motion asked for
+00:41 +86 -3: /design-system/components/agent/avatar survives mobile dark 200%
+00:41 +87 -3: /design-system/components/agent/avatar survives mobile light 100%
+00:41 +88 -3: /design-system/components/agent/avatar survives tablet dark 100%
+00:42 +89 -3: /design-system/components/agent/avatar survives desktop light 200%
+00:42 +90 -3: /design-system/components/agent/composer survives mobile dark 200%
+00:42 +91 -3: /design-system/components/agent/composer survives mobile light 100%
+00:42 +92 -3: /design-system/components/agent/composer survives tablet dark 100%
+00:42 +93 -3: /design-system/components/agent/composer survives desktop light 200%
+00:42 +94 -3: /design-system/components/agent/transcript survives mobile dark 200%
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 25 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/questionnaire.dart:1073:14
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#f25e4 relayoutBoundary=up8 OVERFLOWING:
+  needs compositing
+  creator: Row ← ConstrainedBox ← QuestionnaireActions ← Column ← _ItemScope ← QuestionnaireItem ←
+    Column ← Semantics ← _FocusInheritedScope ← Focus ← _QScope ← _ChoiceRegistrar ← ⋯
+  parentData: <none> (can use size)
+  constraints: BoxConstraints(w=153.5, 44.0<=h<=Infinity)
+  size: Size(153.5, 44.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 12 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/agent_attachments.dart:207:18
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#15c77 relayoutBoundary=up4 OVERFLOWING:
+  creator: Row ← Padding ← Column ← Padding ← AttachmentContent ← Expanded ← Row ← IntrinsicWidth ←
+    Padding ← Padding ← DecoratedBox ← _DashedBorderBox ← ⋯
+  parentData: offset=Offset(0.0, 2.0) (can use size)
+  constraints: BoxConstraints(w=266.0, 0.0<=h<=Infinity)
+  size: Size(266.0, 40.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 36 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/agent_attachments.dart:207:18
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#03c38 relayoutBoundary=up4 OVERFLOWING:
+  creator: Row ← Padding ← Column ← Padding ← AttachmentContent ← Expanded ← Row ← IntrinsicWidth ←
+    Padding ← Padding ← DecoratedBox ← _DashedBorderBox ← ⋯
+  parentData: offset=Offset(0.0, 2.0) (can use size)
+  constraints: BoxConstraints(w=242.0, 0.0<=h<=Infinity)
+  size: Size(242.0, 40.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 154 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/agent_transcript.dart:936:15
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#40cef relayoutBoundary=up17 OVERFLOWING:
+  needs compositing
+  creator: Row ← Column ← Padding ← DecoratedBox ← Container ← Semantics ← Transform ← Opacity ←
+    AnimatedBuilder ← FadeUp ← ApprovalCard ← Padding ← ⋯
+  parentData: offset=Offset(0.0, 846.0); flex=null; fit=null (can use size)
+  constraints: BoxConstraints(w=306.0, 0.0<=h<=Infinity)
+  size: Size(306.0, 32.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: 'Multiple exceptions (4) were detected during the running of the current test, and at
+least one was unexpected.'
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart:168:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart line 168
+The test description was:
+  survives mobile dark 200%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:44 +94 -4: /design-system/components/agent/transcript survives mobile dark 200% [E]
+  Test failed. See exception logs above.
+  The test description was: survives mobile dark 200%
+  
+00:44 +94 -4: /design-system/components/agent/transcript survives mobile light 100%
+00:45 +95 -4: /design-system/components/agent/transcript survives tablet dark 100%
+00:45 +96 -4: /design-system/components/agent/transcript survives desktop light 200%
+00:46 +97 -4: /design-system/components/agent/history survives mobile dark 200%
+00:46 +98 -4: /design-system/components/agent/history survives mobile light 100%
+00:46 +99 -4: /design-system/components/agent/history survives tablet dark 100%
+00:46 +100 -4: /design-system/components/agent/history survives desktop light 200%
+00:47 +101 -4: /design-system/components/agent/voice survives mobile dark 200%
+00:47 +102 -4: /design-system/components/agent/voice survives mobile light 100%
+00:47 +103 -4: /design-system/components/agent/voice survives tablet dark 100%
+00:47 +104 -4: /design-system/components/agent/voice survives desktop light 200%
+00:47 +105 -4: /design-system/components/agent/voice survives with reduced motion asked for
+00:47 +106 -4: /design-system/components/site/structure survives mobile dark 200%
+00:47 +107 -4: /design-system/components/site/structure survives mobile light 100%
+00:47 +108 -4: /design-system/components/site/structure survives tablet dark 100%
+00:47 +109 -4: /design-system/components/site/structure survives desktop light 200%
+00:47 +110 -4: /design-system/components/site/intro survives mobile dark 200%
+00:47 +111 -4: /design-system/components/site/intro survives mobile light 100%
+00:47 +112 -4: /design-system/components/site/intro survives tablet dark 100%
+00:47 +113 -4: /design-system/components/site/intro survives desktop light 200%
+00:47 +114 -4: /design-system/components/site/landing survives mobile dark 200%
+00:47 +115 -4: /design-system/components/site/landing survives mobile light 100%
+00:47 +116 -4: /design-system/components/site/landing survives tablet dark 100%
+00:47 +117 -4: /design-system/components/site/landing survives desktop light 200%
+00:47 +118 -4: /design-system/components/site/navigation survives mobile dark 200%
+00:48 +119 -4: /design-system/components/site/navigation survives mobile light 100%
+00:48 +120 -4: /design-system/components/site/navigation survives tablet dark 100%
+00:48 +121 -4: /design-system/components/site/navigation survives desktop light 200%
+00:48 +122 -4: /design-system/components/site/sections survives mobile dark 200%
+00:48 +123 -4: /design-system/components/site/sections survives mobile light 100%
+00:48 +124 -4: /design-system/components/site/sections survives tablet dark 100%
+00:48 +125 -4: /design-system/components/site/sections survives desktop light 200%
+00:48 +126 -4: /design-system/components/site/chrome survives mobile dark 200%
+00:48 +127 -4: /design-system/components/site/chrome survives mobile light 100%
+00:48 +128 -4: /design-system/components/site/chrome survives tablet dark 100%
+00:48 +129 -4: /design-system/components/site/chrome survives desktop light 200%
+00:48 +130 -4: Some tests failed.
+
+Failing tests:
+  D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart: /design-system/components/agent/transcript survives mobile dark 200%
+  D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart: /design-system/components/base/data survives desktop light 200%
+  D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart: /design-system/components/base/data survives mobile dark 200%
+  D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart: /design-system/components/base/data survives tablet dark 100%

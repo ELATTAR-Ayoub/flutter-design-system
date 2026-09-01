@@ -436,11 +436,19 @@ Stat(
 class _StatesDemoSpecimen extends StatelessWidget {
   const _StatesDemoSpecimen();
 
+  // Stat's error/empty message row is icon + `Text` with no ellipsis and no
+  // caller hook to add one (see the library's own `stat.dart:318`), so at
+  // 200% text scale "Failed to load" alone needs more than the full mobile
+  // specimen width — not just its share of one `Wrap` run. Below the
+  // breakpoint this switches from `Wrap` to a horizontally scrolling `Row`
+  // of the same four cards, the last-resort technique, chosen because
+  // there is no narrower text to fall back to without changing what the
+  // states actually say.
+  static const double _scrollBreakpoint = 480;
+
   @override
-  Widget build(BuildContext context) => Wrap(
-    spacing: space(10),
-    runSpacing: space(6),
-    children: <Widget>[
+  Widget build(BuildContext context) {
+    final List<Widget> cards = <Widget>[
       const KeyedSubtree(
         key: ValueKey<String>('stat-example:loading'),
         child: Stat(
@@ -479,8 +487,27 @@ class _StatesDemoSpecimen extends StatelessWidget {
           disabled: true,
         ),
       ),
-    ],
-  );
+    ];
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (constraints.maxWidth < _scrollBreakpoint) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                for (int i = 0; i < cards.length; i++) ...<Widget>[
+                  if (i > 0) SizedBox(width: space(10)),
+                  cards[i],
+                ],
+              ],
+            ),
+          );
+        }
+        return Wrap(spacing: space(10), runSpacing: space(6), children: cards);
+      },
+    );
+  }
 }
 
 const String _statesDemoCode = '''Stat(

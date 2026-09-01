@@ -412,7 +412,7 @@ final ComponentDocSpec textareaDocSpec = ComponentDocSpec(
           DocsInstallFact(
             label: 'Text and cursor',
             value:
-                'TextStyles.textareaBody / theme.foreground (cursor) '
+                'TextStyles.body / theme.foreground (cursor) '
                 '/ theme.mutedForeground (placeholder, background cursor)',
             description:
                 'The typed text inherits whatever colour Field applies — '
@@ -1024,7 +1024,7 @@ class _DependenciesContent extends StatelessWidget {
                 'foundation/typography.dart, theme_scope.dart',
             description:
                 'Token sources: the space() spacing scale and Radii, the '
-                'live theme, StyledText/TextStyles.textareaBody, and the '
+                'live theme, StyledText/TextStyles.body, and the '
                 'theme scope.',
           ),
           DocsInstallFact(
@@ -1043,7 +1043,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Fonts',
             value: 'none of its own',
             description:
-                'Text renders through TextStyles.textareaBody, the '
+                'Text renders through TextStyles.body, the '
                 'app\'s own type scale: no font file is bundled by this '
                 'component.',
           ),

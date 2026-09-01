@@ -17,6 +17,7 @@ import 'package:flutter/widgets.dart'
         Table,
         TableColumnWidth;
 
+import '../kit.dart' show CapsLabel;
 import '../logo.dart';
 import '../shell.dart';
 import '../theme_toggle.dart';
@@ -152,13 +153,12 @@ class _SiteShellState extends State<SiteShell> {
       // `<body class="… text-foreground">`, exactly as `shell.dart:165` states
       // it for the documentation shell and `showcase/showcase_app.dart:151`
       // states it for Signal Studio. Without it this subtree has no
-      // [DefaultTextStyle] of its own, so every [StyledText] inherits
-      // [WidgetsApp]'s fallback, 0xD0FF0000 ink under a double yellow
-      // underline, the "you forgot a Material" style: because [StyledText] builds
-      // with `inherit: true` and never declares a `decoration`, and because its
-      // [TextColorRole.none] classes resolve their ink from
-      // `DefaultTextStyle.of(context).style.color`. Both leaked onto every
-      // public route until this landed.
+      // [DefaultTextStyle] of its own, so every [StyledText] would fall back
+      // to the theme's foreground rather than to the shell's own ink. The
+      // foundation refuses [WidgetsApp]'s red "you forgot a Material" fallback
+      // outright — see `StyledText._inheritedInk` — so the failure this line
+      // prevents is now a wrong-but-legible colour rather than a red page; it
+      // is still the shell's job to state the ink its routes inherit.
       style: StyledText.styleOf(
         context,
         TextStyles.body,
@@ -368,7 +368,7 @@ class _SiteHeader extends StatelessWidget {
                         children: <Widget>[
                           Icon.lucide(Lucide.search, size: IconSize.sm),
                           SizedBox(width: Button.gapFor(ButtonSize.sm)),
-                          StyledText('Search', TextStyles.buttonLabel),
+                          StyledText('Search', TextStyles.nav),
                         ],
                       ),
               ),
@@ -572,7 +572,7 @@ class _SiteMobileNavigation extends StatelessWidget {
             ),
           ),
           for (final SiteNavGroup group in footerSiteNavigation) ...<Widget>[
-            StyledText(group.title, TextStyles.eyebrow),
+            CapsLabel(group.title),
             SizedBox(height: space(3)),
             for (final SiteNavEntry entry in group.entries) ...<Widget>[
               Button(
@@ -674,7 +674,7 @@ class _FooterColumn extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(group.title, TextStyles.eyebrow, color: theme.foreground),
+          CapsLabel(group.title, color: theme.foreground),
           SizedBox(height: space(3)),
           for (final SiteNavEntry entry in group.entries) ...<Widget>[
             MouseRegion(

@@ -444,8 +444,13 @@ class _FilterRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    // The reference class name above says `flex-wrap`; the row itself had
+    // stayed a plain `Row`, which is what let the selection count run off
+    // the filter width at 320px. `Wrap` is what the comment already claimed.
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: space(3),
+      runSpacing: space(2),
       children: <Widget>[
         SizedBox(
           width: DataTableDemo.filterWidth,
@@ -479,15 +484,13 @@ class _FilterRow extends StatelessWidget {
             ],
           ),
         ),
-        if (selected > 0) ...<Widget>[
-          // `gap-3`.
-          SizedBox(width: space(3)),
+        if (selected > 0)
+          // `gap-3`, now `Wrap.spacing`'s own gap.
           StyledText(
             '$selected selected',
-            TextStyles.caption,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
-        ],
       ],
     );
   }
@@ -589,19 +592,23 @@ class _PagerRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // `Row` with `spaceBetween` still needs both sides' fixed widths to fit
+    // side by side; at 320px and 200% text the two pager buttons alone do
+    // not leave room for the caption. `Wrap` lets the caption drop to its
+    // own line above the buttons instead of overflowing the row.
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: space(3),
+      runSpacing: space(2),
       children: <Widget>[
-        Flexible(
-          child: StyledText(
-            caption,
-            TextStyles.caption,
-            color: theme.mutedForeground,
-          ),
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
+        StyledText(caption, TextStyles.small, color: theme.mutedForeground),
+        // `Wrap`, not a fixed `Row`: at 320px and 200% text the two buttons
+        // alone can still outgrow the strip even once the caption has its
+        // own line, so the buttons get the same fallback.
+        Wrap(
+          spacing: space(2),
+          runSpacing: space(2),
           children: <Widget>[
             Button(
               variant: ButtonVariant.outline,
@@ -609,8 +616,6 @@ class _PagerRow extends StatelessWidget {
               onPressed: onPrevious,
               child: const Text('Previous'),
             ),
-            // `gap-2`.
-            SizedBox(width: space(2)),
             Button(
               variant: ButtonVariant.outline,
               size: ButtonSize.sm,

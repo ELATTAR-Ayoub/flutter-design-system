@@ -1,0 +1,36 @@
+{
+  "name": "checkbox",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/checkbox.tsx` — 20px, and the tick draws itself.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/checkbox.dart",
+      "target": "@ui/checkbox.dart",
+      "sha256": "7ebed80a059ddf2c78f1005cc4de01d44b230325c2ce3397a12d572801b3c0c2"
+    }
+  ],
+  "registryDependencies": [
+    "field",
+    "icon",
+    "keyframes",
+    "selection-control",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "field",
+    "icon",
+    "keyframes",
+    "selection-control"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/checkbox",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/checkbox.dart",
+  "deprecated": false
+}

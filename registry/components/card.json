@@ -1,7 +1,7 @@
 {
   "name": "card",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A neutral content surface with structured header, title, description, content, and footer regions.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/card.dart",
       "target": "@ui/card.dart",
-      "sha256": "d652f6b43dd524a923759ff6ddd6d092ba7a7b27daebc71abc3ae18c5043c0e7"
+      "sha256": "f7643a36dfeb82493e8acef297e9bc8e27f51f2bdb69a22b9f0a832d15637444"
     }
   ],
   "registryDependencies": [
@@ -29,5 +29,5 @@
     "CardFooter"
   ],
   "documentationRoute": "/components/card",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/card.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/card.dart"
 }

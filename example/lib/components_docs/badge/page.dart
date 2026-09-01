@@ -121,7 +121,8 @@ final ComponentDocSpec badgeDocSpec = ComponentDocSpec(
       title: 'Variants',
       description:
           'All eleven BadgeVariant values. Badge has no size axis: every '
-          'chip is the same hard 20px border box (Badge.height); content '
+          'chip sits on the same 20px floor (Badge.minHeight) and grows with '
+          'its label; content '
           'never grows it. Use paddingX or minWidth to adjust footprint '
           'instead of a size enum.',
       specimen: _VariantsSpecimen(),
@@ -485,10 +486,19 @@ class _CompositionSpecimen extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       Row(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          StyledText('Workspace plan', TextStyles.section),
+          // `Flexible`, not a bare `StyledText`: at a large accessibility
+          // text scale "Workspace plan" alone can outgrow the showcase
+          // frame once the badge takes its own share, so the label
+          // ellipsizes instead of the row overflowing.
+          Flexible(
+            child: StyledText(
+              'Workspace plan',
+              TextStyles.small,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           SizedBox(width: space(2)),
           const Badge(label: 'Pro', variant: BadgeVariant.premium),
         ],
@@ -511,7 +521,7 @@ const String _compositionCode =
     '// A labelled metadata row\n'
     'Row(\n'
     '  children: [\n'
-    "    StyledText('Workspace plan', TextStyles.section),\n"
+    "    StyledText('Workspace plan', TextStyles.small),\n"
     '    SizedBox(width: 8),\n'
     "    Badge(label: 'Pro', variant: BadgeVariant.premium),\n"
     '  ],\n'
@@ -534,7 +544,7 @@ const String _compositionCode =
     'Badge(\n'
     '  label: count,\n'
     '  variant: BadgeVariant.secondary,\n'
-    '  spec: TextStyles.sidebarMenuBadge,\n'
+    '  spec: TextStyles.numberSm,\n'
     '  paddingX: space(1.5),\n'
     '  minWidth: space(5),\n'
     ')';
@@ -651,22 +661,23 @@ class _ResponsiveContent extends StatelessWidget {
   const _ResponsiveContent();
 
   @override
-  Widget build(BuildContext context) =>
-      _bullets(ThemeScope.of(context), <String>[
-        'No responsive branching, Badge reads no breakpoint from '
-            'BuildContext and renders identically at 390px and 1440px; only '
-            'the label string can change the width it occupies.',
-        'Height is fixed at 20px (Badge.height) everywhere; width is '
-            'intrinsic to the label plus 16px of horizontal padding unless '
-            'paddingX/minWidth override it.',
-        'Long labels are not truncated by Badge itself: overflow-hidden '
-            'clips the 16px line box to the 14px content box vertically, but '
-            'there is no horizontal ellipsis. A very long label simply widens '
-            'the chip; constrain the surrounding layout if the label is '
-            'untrusted length.',
-        'Platform parity: Android, iOS, Web, macOS, Windows, and Linux all '
-            'render the same widget tree.',
-      ]);
+  Widget build(
+    BuildContext context,
+  ) => _bullets(ThemeScope.of(context), <String>[
+    'No responsive branching, Badge reads no breakpoint from '
+        'BuildContext and renders identically at 390px and 1440px; only '
+        'the label string can change the width it occupies.',
+    'Height starts at 20px (Badge.minHeight) and grows with the label; width is '
+        'intrinsic to the label plus 16px of horizontal padding unless '
+        'paddingX/minWidth override it.',
+    'Long labels are not truncated by Badge itself: overflow-hidden '
+        'clips the 16px line box to the 14px content box vertically, but '
+        'there is no horizontal ellipsis. A very long label simply widens '
+        'the chip; constrain the surrounding layout if the label is '
+        'untrusted length.',
+    'Platform parity: Android, iOS, Web, macOS, Windows, and Linux all '
+        'render the same widget tree.',
+  ]);
 }
 
 class _DependenciesContent extends StatelessWidget {
@@ -681,7 +692,7 @@ class _DependenciesContent extends StatelessWidget {
         'Foundation imports: foundation/colors.dart (hslColor, Palette), '
             'foundation/shadows.dart (Shadows.compactControl, Shadows.controlPremium), '
             'foundation/spacing.dart (space()), foundation/theme.dart '
-            '(ThemeTokens), foundation/typography.dart (ComponentTextStyles).',
+            '(ThemeTokens), foundation/typography.dart (TextStyles).',
         'Effect import: effects/surface.dart (Surface), '
             'paints the fill, border, and shadow together for every filled '
             'variant.',
@@ -765,9 +776,9 @@ const List<DocsApiFact> _badgeApiFacts = <DocsApiFact>[
     name: 'spec',
     type: 'TextStyleToken?',
     description:
-        'Overrides TextStyles.badgeLabel, the resolved type spec the '
+        'Overrides TextStyles.badge, the resolved type spec the '
         'label renders with. SidebarMenuBadge passes '
-        'TextStyles.sidebarMenuBadge here.',
+        'TextStyles.numberSm here.',
   ),
   DocsApiFact(
     name: 'paddingX',
@@ -794,9 +805,11 @@ const List<DocsApiFact> _badgeApiFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _badgeStaticFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'Badge.height',
+    name: 'Badge.minHeight',
     type: 'static double',
-    description: 'The hard 20px border-box height every badge renders at.',
+    description:
+        'The 20px border-box floor every badge sits on. A minimum, so a '
+        'scaled label grows the chip instead of being clipped by it.',
   ),
   DocsApiFact(
     name: 'Badge.horizontalPadding',

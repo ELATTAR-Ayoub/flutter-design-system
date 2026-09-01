@@ -201,7 +201,12 @@ void main() {
     for (final StyledText text in tester.widgetList<StyledText>(
       find.byType(StyledText),
     )) {
-      expect(text.spec.uppercase, isFalse, reason: text.text);
+      expect(text.text, text.text.trim(), reason: text.text);
+      expect(
+        text.spec.mobile.size,
+        greaterThanOrEqualTo(TextStyles.small.mobile.size),
+        reason: text.text,
+      );
     }
   });
 }

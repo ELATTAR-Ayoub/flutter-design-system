@@ -130,7 +130,9 @@ void main() {
     );
   });
 
-  testWidgets('it uses no uppercase type role', (WidgetTester tester) async {
+  testWidgets('it sets no text below the supporting-copy role', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       _host(
         const SizedBox(
@@ -144,7 +146,12 @@ void main() {
     for (final StyledText text in tester.widgetList<StyledText>(
       find.byType(StyledText),
     )) {
-      expect(text.spec.uppercase, isFalse, reason: text.text);
+      expect(text.text, text.text.trim(), reason: text.text);
+      expect(
+        text.spec.mobile.size,
+        greaterThanOrEqualTo(TextStyles.small.mobile.size),
+        reason: text.text,
+      );
     }
   });
 

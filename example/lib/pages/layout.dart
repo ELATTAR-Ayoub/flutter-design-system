@@ -249,7 +249,7 @@ class _RatioCell extends StatelessWidget {
         ),
         // `mt-3`.
         SizedBox(height: space(3)),
-        StyledText(title, TextStyles.eyebrow),
+        StyledText(title, TextStyles.small),
         // `mt-1`.
         SizedBox(height: space(1)),
         StyledText(blurb, TextStyles.small),
@@ -418,7 +418,7 @@ class _CardSetRail extends StatelessWidget {
                       child: Center(
                         child: StyledText(
                           _packs[i].$1,
-                          TextStyles.eyebrowSmall,
+                          TextStyles.small,
                           align: TextAlign.center,
                         ),
                       ),
@@ -564,9 +564,16 @@ class _ActivityRow extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: space(4), vertical: space(3)),
       child: Row(
         children: <Widget>[
-          StyledText(name, TextStyles.small, color: theme.foreground),
-          const Spacer(),
-          StyledText('Ready', TextStyles.caption, color: theme.mutedForeground),
+          Expanded(
+            child: StyledText(
+              name,
+              TextStyles.small,
+              color: theme.foreground,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          SizedBox(width: space(2)),
+          StyledText('Ready', TextStyles.small, color: theme.mutedForeground),
         ],
       ),
     );
@@ -639,7 +646,7 @@ class _WideShelfState extends State<_WideShelf> {
                             child: Center(
                               child: StyledText(
                                 _packs[i].$1,
-                                TextStyles.eyebrowSmall,
+                                TextStyles.small,
                                 align: TextAlign.center,
                                 color: theme.foreground,
                               ),
@@ -679,13 +686,26 @@ class _CarouselSection extends StatelessWidget {
         // clipped by this panel's own frame: drift 1, and the whole reason
         // [Carousel] takes a padding of its own.
         flush: true,
-        child: Carousel(
-          padding: EdgeInsets.all(space(6)),
-          // `basis-1/2 lg:basis-1/3` at the port's 1440 frame.
-          basis: 1 / 3,
-          items: <Widget>[
-            for (final (String, String) pack in _packs) _PackCard(pack: pack),
-          ],
+        child: Builder(
+          builder: (BuildContext context) {
+            // `basis-1/2 lg:basis-1/3`: the reference is already responsive
+            // here and the port had frozen it at the `lg` fraction, which is
+            // what made each card a third of a 320px phone — under 107px,
+            // far narrower than the card's own content. Reading the other
+            // half of the class back in is a page fix, not a Carousel one.
+            final double basis =
+                MediaQuery.sizeOf(context).width >= Breakpoints.lg
+                ? 1 / 3
+                : 1 / 2;
+            return Carousel(
+              padding: EdgeInsets.all(space(6)),
+              basis: basis,
+              items: <Widget>[
+                for (final (String, String) pack in _packs)
+                  _PackCard(pack: pack),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -725,20 +745,26 @@ class _PackCard extends StatelessWidget {
               ),
             ),
           ),
-          StyledText('Eclipse series', TextStyles.eyebrow),
+          StyledText('Eclipse series', TextStyles.small),
           // `mt-1.5`.
           SizedBox(height: space(1.5)),
           StyledText(pack.$1, TextStyles.h4, color: theme.foreground),
           // `mt-3`.
           SizedBox(height: space(3)),
-          Row(
+          // `Wrap`, not a fixed `Row`: a carousel card is already this
+          // narrow by design (`basis-1/2` on a phone), and the badge does
+          // not shrink, so the price drops to its own line above it rather
+          // than the row overflowing the card.
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: space(2),
+            runSpacing: space(1),
             children: <Widget>[
               StyledText(
                 pack.$2,
                 TextStyles.numberMd,
                 color: theme.premiumText,
               ),
-              const Spacer(),
               const Badge(label: '6 Cards', variant: BadgeVariant.secondary),
             ],
           ),
@@ -842,7 +868,7 @@ class _SplitPane extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            StyledText(title, TextStyles.eyebrow),
+            StyledText(title, TextStyles.small),
             // `mb-3`.
             SizedBox(height: space(3)),
             StyledText(body, TextStyles.small),

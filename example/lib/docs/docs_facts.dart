@@ -230,7 +230,7 @@ class _TableHeader extends StatelessWidget {
               width: space(44),
               child: StyledText(
                 cell,
-                TextStyles.section,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
             ),
@@ -299,7 +299,7 @@ class _InstallRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          StyledText(fact.label, TextStyles.section, color: theme.actionText),
+          StyledText(fact.label, TextStyles.small, color: theme.actionText),
           SizedBox(height: space(1)),
           _SelectableFactText(
             text: fact.value,

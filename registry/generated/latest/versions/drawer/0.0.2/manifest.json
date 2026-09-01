@@ -1,0 +1,30 @@
+{
+  "name": "drawer",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/drawer.tsx` — *\\\"the mobile bottom sheet. Draggable, and the",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/drawer.dart",
+      "target": "@ui/drawer.dart",
+      "sha256": "a5517acd6d43afcf6e1c9ec865e89b26859b8193d7a28289062c6a0c6ed3c04d"
+    }
+  ],
+  "registryDependencies": [
+    "dialog",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "dialog"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/drawer",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/drawer.dart",
+  "deprecated": false
+}

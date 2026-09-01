@@ -214,12 +214,7 @@ class DocsPageHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(
-            title,
-            TextStyles.h1,
-            color: theme.foreground,
-            fontSize: Fluid.h1(context),
-          ),
+          StyledText(title, TextStyles.h1, color: theme.foreground),
           SizedBox(height: space(3)),
           StyledText(description, TextStyles.lead),
         ],

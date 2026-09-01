@@ -1,5 +1,154 @@
 # Changelog
 
+## 0.0.2
+
+The type layer becomes a Flutter contract rather than a transcript of a
+stylesheet.
+
+### Typography — a breaking, pre-release correction
+
+* **Seventeen public roles replace the previous catalog.** Ten Words
+  (`display`, `h1`–`h4`, `lead`, `body`, `small`, `nav`, `badge`), two Code and
+  identifiers (`code`, `identifier`), five Numerics (`numberSm`, `numberBase`,
+  `numberMd`, `numberLg`, `numberXl`). `TextStyles.all` holds exactly those, in
+  that order.
+* **Every role resolves its own size for the width it renders at.** Headings
+  and the three largest metrics step up at 768 and again at 1024; reading and
+  interface text is one size everywhere. A call site no longer passes a
+  `fontSize` for a fluid role, and `Fluid.display` / `Fluid.h1` /
+  `TextStyles.displaySize` / `TextStyles.h1Size` are gone. `TypeWidthScope` puts
+  a region's own width in scope where a heading should step with the panel
+  rather than with the screen.
+* **The smallest reading size is 14px.** Every 10–13px role is retired.
+* **No role owns ink.** `TextColorRole` and `TextStyleToken.defaultColor` are
+  removed, and `lead` and `small` no longer arrive muted. `StyledText` refuses
+  to inherit `WidgetsApp`'s red fallback style: in debug it asserts, naming the
+  missing root `DefaultTextStyle`, and in release it substitutes the theme
+  foreground rather than painting a screen red. Muted, destructive,
+  success, link and inverse ink now come from the component or the surface —
+  `StyledText(text, TextStyles.small, color: theme.mutedForeground)`. The
+  semantic colour tokens (`theme.accent`, `accentForeground`, the agent accent
+  colours) are unrelated and unchanged.
+* **No role transforms its text.** `TextStyleToken.uppercase` is removed; a
+  component that wants an uppercase treatment performs it itself and keeps the
+  authored accessible name, as `Button`'s `caps` emphasis does.
+* **Component type is derived, not published.** `TextStyleToken.derive(...)`
+  gives a component a weight, a slant, or tabular figures on top of a public
+  role without adding a role to the catalog. The `buttonLabel*`, `menuLabel`,
+  `menuHeading`, `overlayTitle`, `cardTitle`, `itemTitle`, `fieldLabel`,
+  `attachmentTitle*`, `bubbleContent`, `messageMetadata`, `inputNumber`,
+  `inputSerial`, `sidebarMenuBadge`, `avatarFallback`, `tableHead` and
+  `navMenuTrigger` tokens are gone; their consumers derive.
+* **The catalog is reached by its sets.** `TextStyles.wordRoles`,
+  `TextStyles.codeRoles` and `TextStyles.numericRoles` are the three groups, and
+  `TextStyles.all` is composed from them; `ofGroup(TypeGroup)` is gone, so
+  nothing outside the foundation needs to hold the enum.
+  `test/typography_api_surface_test.dart` pins what the layer publishes, because
+  a barrel that exports whole files publishes by default rather than by
+  decision.
+* **`TextStyleToken` exposes `mobile` / `tablet` / `desktop` steps** rather
+  than a single `size` and `height`. `role.step` is the single step of a role
+  that does not respond to width; `StyledText.stepOf(context, role)` resolves
+  one that does.
+* **Migration.** `tool/migration/migrate_type_roles.dart` maps every retired
+  member to its replacement and is idempotent; run it with `--dry-run` first.
+
+### Fonts
+
+* **Two faces, not three.** The Redaction 35 italic serif backed exactly one
+  type role, which is retired, so the face, its `pubspec` registration, its
+  packaged asset, its registry manifest entry and its OFL notice are all
+  removed. `Fonts.accent` and `Fonts.heading` are gone; `Fonts.heading` always
+  resolved to `Fonts.sans`.
+
+### Registry and release
+
+* **Items are versioned individually.** The registry is `0.0.2`; the 94 items
+  whose sources changed — or that depend, transitively, on something that
+  changed — are at `0.0.2`, and `aspect-ratio`, `chart-geometry`, `form`,
+  `safe-area` and `validation-rule` stay at `0.0.1` because nothing they
+  install moved. `/registry/0.0.1/` is untouched, byte for byte, and a consumer
+  pinned to it installs what it always installed.
+* **The dependency closure is computed, not judged.** An item's version is a
+  promise about what installing it *does*: `form` installs `validation-rule`
+  too. `bump_version.dart` walks the reverse-dependency graph so an unchanged
+  item cannot be left behind while its effective installation changes.
+* **A released payload can no longer be rewritten by accident.**
+  `registry/released/0.0.1.lock.json` records the 221 payloads that version
+  published, and `test/registry_released_immutability_test.dart` fails if any
+  of them is regenerated with different bytes — the check that used to happen
+  only at the release gate now happens in `flutter test`.
+* **The generator stopped wiping its output.** It clears only the
+  `<item>/<version>` directory it is about to write, plus items the registry no
+  longer has, so regenerating a new version cannot delete the payloads an
+  earlier release is still serving.
+* **New release tools**, documented in `tool/README.md`: `reseal.dart` (move
+  authored hashes after an intended edit), `bump_version.dart` (item versions
+  and their closure), `snapshot_released.dart` (record what a release
+  published).
+* **`elattar_cli 0.0.2`** reads `/registry/0.0.2/` by default. `0.0.1` is
+  published and unchanged, and goes on reading `/registry/0.0.1/`.
+
+### Components
+
+* **Fixed heights around text became minimums.** `Badge.height` is
+  `Badge.minHeight`, `Kbd.height` is `Kbd.minHeight`, and `Stat.figureHeight`
+  is `Stat.figureMinHeightOf(context)` — a scaled label now grows its container
+  instead of being clipped by it.
+* **`FieldDescription` states its own muted ink**, so it stays secondary when
+  the field around it turns invalid.
+* **`FieldLabel.medium`** is the default label anatomy; `FieldLabel.normal`
+  remains for a list of many labels.
+
+### Interaction, focus and semantics
+
+* **`Press` is a control, not a squish.** With `onTap` it is now reachable by
+  Tab, activated by Enter and Space, ringed on keyboard focus only, announced
+  as a button (or, with `link: true`, as a link) with its `semanticLabel`, and
+  answers a pointer over at least 44 x 44 however small it paints. Without
+  `onTap` it stays exactly what it was: a decoration that takes no focus and
+  adds nothing to the semantics tree. New parameters: `semanticLabel`,
+  `focusNode`, `autofocus`, `enabled`, `expanded`, `link`, `showFocusRing`,
+  `focusRadius`, `minimumTarget`, `onFocusChange`, `onHoverChange`.
+* **`TapTarget` is public.** It expands a control's hit box to
+  `TouchTargets.minimum` without touching layout, so a 32px pill answers a
+  fingertip and nothing around it moves.
+* **`Breadcrumb` links, the `Toaster` action and the `Accordion` trigger go
+  through `Press`**, so all three are now keyboard-operable and named. The
+  accordion trigger also announces whether it is expanded.
+* **`Tabs` owns one Tab stop for the whole set.** Tab enters at the selected
+  tab and the next Tab leaves; Left and Right move between the tabs (reversed
+  under RTL) and wrap, Home and End go to the ends, and selection follows
+  focus. `Tabs` is a `StatefulWidget` now — it owns the focus nodes — which is
+  a source-compatible change for every call site.
+* **A modal gives the focus back.** `OverlayPortal` remembers what held the
+  focus when it opened and returns it on close, moves the focus to the panel's
+  first tabbable child on open (which `FocusScope(autofocus:)` alone did not do
+  while the trigger held the focus), lays a `BlockSemantics` over the page it
+  covers, names a dismissible scrim, and marks the panel as a route scope with
+  explicit child nodes.
+* **A popup gives the focus back too.** `Popover` restores the focus to its
+  trigger on dismissal, but only when the focus was still inside the popup —
+  a click elsewhere keeps whatever it landed on.
+
+### Narrow columns and large text
+
+* **A single-row `ChartLegendContent` scrolls rather than clipping** when its
+  keys outgrow the chart, and stays centred whenever they fit. `ButtonGroup`
+  and `Pagination` deliberately do **not**: both are `w-fit` rows whose members
+  measure against the width they are given, and wrapping either in its own
+  scroll view unbounds that width — which changed what every specimen of the
+  component measures, and made `ButtonGroup` flush semantics against boxes that
+  were never laid out. Scrolling those two is the page's decision, as it is for
+  a wide table.
+* **Labels that cannot fit now shorten rather than overflow.** The inline
+  punctuation box in `text_layout.dart`, `StatDeltaMark`'s number and the
+  cartesian axis tick labels flex instead of painting past their box.
+* **A standalone `Toggle`, the `Select` trigger and the `NativeSelect`
+  trigger** reach a 44px hit box. A `Toggle` inside a `ToggleGroup` does not:
+  the items are packed edge to edge, and a symmetric expansion would make each
+  one answer for its neighbour.
+
 ## 0.0.1
 
 The first public release. Elattar becomes something a stranger can install.

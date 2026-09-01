@@ -1,0 +1,27 @@
+{
+  "name": "scroll-area",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/scroll-area.tsx` — the browser rail replaced by a composed",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/scroll_area.dart",
+      "target": "@ui/scroll_area.dart",
+      "sha256": "58632353f3f043009e259fa02cdc2e70870ed80b8478af8576c49ebcf74be92b"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/scroll_area",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/scroll_area.dart",
+  "deprecated": false
+}

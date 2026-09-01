@@ -319,7 +319,11 @@ class _HorizontalSpecimen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
     return SizedBox(
-      height: space(24),
+      // Four steps taller than the cards need. The rail is a 10px lane along
+      // the bottom edge, and at the old height it sat flush against the
+      // container's own border in the same `--border` token, which made a rail
+      // that was painting look like a rail that was missing.
+      height: space(28),
       child: DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(color: theme.border),
@@ -328,10 +332,17 @@ class _HorizontalSpecimen extends StatelessWidget {
         child: ScrollArea(
           borderRadius: BorderRadius.circular(Radii.lg),
           horizontalBar: true,
+          // The one specimen whose subject IS the scrollbar, so it does not
+          // hide it behind a hover the way a reading surface does.
+          barVisibility: ScrollBarVisibility.always,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              for (int i = 0; i < 6; i++)
+              // Fifteen, not six: six fit inside the box at any width this
+              // page is read at, so the axis had nothing to scroll and the
+              // rail correctly refused to paint. A specimen has to overflow to
+              // demonstrate the thing it is demonstrating.
+              for (int i = 0; i < 15; i++)
                 Padding(
                   padding: EdgeInsets.all(space(2)),
                   child: SizedBox(
@@ -632,6 +643,17 @@ const List<DocsApiFact> _scrollAreaFacts = <DocsApiFact>[
     description:
         'Defaults to false. Without it, horizontal overflow is clipped '
         '(overflow-x: hidden).',
+  ),
+  DocsApiFact(
+    name: 'barVisibility',
+    type: 'ScrollBarVisibility',
+    description:
+        'Defaults to ScrollBarVisibility.hover, which is the reference default '
+        'default and what a reading surface wants: the rail is a pointer '
+        'affordance, and one that is always there is a permanent stripe down '
+        'the side of the text. ScrollBarVisibility.always keeps it on screen '
+        'wherever the rail itself is the subject, as on this page. Neither '
+        'value paints a rail on an axis with nothing to scroll.',
   ),
   DocsApiFact(
     name: 'controller',

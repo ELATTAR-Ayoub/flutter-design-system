@@ -338,7 +338,7 @@ class _TooltipPreview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        StyledText('Top side: the default', TextStyles.section),
+        StyledText('Top side: the default', TextStyles.small),
         SizedBox(height: space(3)),
         Wrap(
           spacing: space(4),
@@ -370,7 +370,7 @@ class _TooltipPreview extends StatelessWidget {
         SizedBox(height: space(6)),
         StyledText(
           "Right side: a collapsed rail row's only label",
-          TextStyles.section,
+          TextStyles.small,
         ),
         SizedBox(height: space(3)),
         Tooltip(
@@ -867,7 +867,7 @@ class _ThemingContent extends StatelessWidget {
             ),
             SizedBox(height: space(3)),
             StyledText(
-              'The label always renders at TextStyles.tooltipLabel '
+              'The label always renders at TextStyles.small '
               '(12px, weight 400) and the pill corner radius is always '
               'Radii.md, neither is configurable per instance.',
               TextStyles.small,
@@ -951,7 +951,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(label, TextStyles.section, color: theme.actionText),
+          StyledText(label, TextStyles.small, color: theme.actionText),
           SizedBox(height: space(1)),
           StyledText(body, TextStyles.small),
         ],

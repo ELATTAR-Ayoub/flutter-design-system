@@ -1,7 +1,7 @@
 {
   "name": "source-foundation",
   "type": "foundation",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The copy-first Flutter foundation: semantic colors, themes, typography, spacing, motion, shadows, surfaces, dates, and text layout.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -14,7 +14,7 @@
     {
       "source": "lib/src/design_system/foundation/date_format.dart",
       "target": "@foundation/date_format.dart",
-      "sha256": "e665e105f569f36025140aae4defa6058a282d3727c6506cb79e700b0cc3d28a"
+      "sha256": "afc7415e092ad13157f47731fd0e07b358972cc9bd283d9d211d5a6e2776d6bd"
     },
     {
       "source": "lib/src/design_system/foundation/media.dart",
@@ -34,7 +34,7 @@
     {
       "source": "lib/src/design_system/foundation/spacing.dart",
       "target": "@foundation/spacing.dart",
-      "sha256": "d7a40f9bf8a937af7e517a6f6d13dd02a91bba392953a3f92fbd7bdc6cffe43e"
+      "sha256": "8c0c6718f066f1be96a77eb1b901dafa34bce10384d014fed864938b700b2b17"
     },
     {
       "source": "lib/src/design_system/foundation/surfaces.dart",
@@ -49,17 +49,17 @@
     {
       "source": "lib/src/design_system/foundation/typography.dart",
       "target": "@foundation/typography.dart",
-      "sha256": "d749c791c2fffbb1e05fb0329eaac5eb421fef4f3aee016bd0dbdd086028cc89"
+      "sha256": "e6b14445643d874279a72a15bfa709c5459a2e99115395c09381db6fe58c513c"
     },
     {
       "source": "lib/src/design_system/foundation/text_layout.dart",
       "target": "@foundation/text_layout.dart",
-      "sha256": "0855e2409ede8244f83558c3e2f910b57a43efa3b64507e6417a0cf5c649d3dc"
+      "sha256": "dc9df00923617a6b8ffde30e445085a6f6f18cf821297508f711a56d8037c2ee"
     },
     {
       "source": "lib/src/design_system/foundation/theme_scope.dart",
       "target": "@foundation/theme_scope.dart",
-      "sha256": "54558d9596eb2edefc1429ba1a4bd633a13f4d4b76b84766f57eb00f881c1cdc"
+      "sha256": "5a54b8f3b2635e897f9c172461852993dc0f760c0aff23a0a3b33613db7f4f1c"
     }
   ],
   "registryDependencies": [],
@@ -78,13 +78,6 @@
       "target": "@foundation/fonts/GeistMono-Variable.ttf",
       "sha256": "0e1af3f507a1c8dfbb03d13ffad585834cd45ed7ccb78c756c7ce7873d180d30",
       "family": "GeistMono"
-    },
-    {
-      "source": "assets/fonts/Redaction35-Italic.ttf",
-      "target": "@foundation/fonts/Redaction35-Italic.ttf",
-      "sha256": "a87aea4af107f393edf6fe198c4f961ec4ff955407fa62a70563ce403e1499d3",
-      "family": "Redaction35",
-      "style": "italic"
     }
   ],
   "shaders": [],
@@ -98,15 +91,10 @@
       "source": "third_party/fonts/geist-mono/OFL.txt",
       "target": "@license/Geist-Mono-OFL-1.1.txt",
       "sha256": "c683bfbcc7e087f5d37a54ef628f10387c451a83ddc459b151403a164ac46c90"
-    },
-    {
-      "source": "third_party/fonts/redaction/OFL.txt",
-      "target": "@license/Redaction-OFL-1.1.txt",
-      "sha256": "8c13186f0201838de84a9254fb79265e9a6441e2352e1fdc245ae031cbb5848d"
     }
   ],
   "documentationRoute": "/components/source_foundation",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/elattar_design_system.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/elattar_design_system.dart",
   "deprecated": false,
   "exports": [
     "AgentCubeTokens",

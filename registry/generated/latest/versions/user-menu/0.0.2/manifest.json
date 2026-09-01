@@ -1,0 +1,40 @@
+{
+  "name": "user-menu",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/user-menu.tsx` — *\\\"the account block a sidebar footer is",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/user_menu.dart",
+      "target": "@ui/user_menu.dart",
+      "sha256": "2123509b38b828cd6bd4ab97b8eb39e385c7d0515addb5ad149a2d3f42040c9d"
+    }
+  ],
+  "registryDependencies": [
+    "avatar",
+    "dropdown-menu",
+    "icon",
+    "menu",
+    "popover",
+    "sidebar",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "avatar",
+    "dropdown-menu",
+    "icon",
+    "menu",
+    "popover",
+    "sidebar"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/user_menu",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/user_menu.dart",
+  "deprecated": false
+}

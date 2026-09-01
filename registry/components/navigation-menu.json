@@ -1,7 +1,7 @@
 {
   "name": "navigation-menu",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/navigation-menu.tsx` — a top bar whose items can open a",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/navigation_menu.dart",
       "target": "@ui/navigation_menu.dart",
-      "sha256": "397c254d22db702afd1d106ce2e1d7acfb64d3b0762256b9b2532a1105acf0ee"
+      "sha256": "35f274f80126cc406cf6f3e4407b76066624581b16687a3713f536ec07f9fe77"
     }
   ],
   "registryDependencies": [
@@ -28,7 +28,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/navigation-menu",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/navigation_menu.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/navigation_menu.dart",
   "exports": [
     "NavigationMenu",
     "NavigationMenuIndicator",

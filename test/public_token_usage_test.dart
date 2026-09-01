@@ -4,14 +4,18 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('new semantic tokens have production consumers', () {
-    final String production = <Directory>[
-      Directory('lib/src/components'),
-      Directory('lib/src/blocks'),
-    ].expand((Directory directory) => directory.listSync(recursive: true))
-        .whereType<File>()
-        .where((File file) => file.path.endsWith('.dart'))
-        .map((File file) => file.readAsStringSync())
-        .join('\n');
+    final String production =
+        <Directory>[
+              Directory('lib/src/components'),
+              Directory('lib/src/blocks'),
+            ]
+            .expand(
+              (Directory directory) => directory.listSync(recursive: true),
+            )
+            .whereType<File>()
+            .where((File file) => file.path.endsWith('.dart'))
+            .map((File file) => file.readAsStringSync())
+            .join('\n');
 
     const List<String> tokens = <String>[
       'overlayEnter',

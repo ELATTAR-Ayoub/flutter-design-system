@@ -83,7 +83,14 @@ class ShowcaseShareDialog extends StatelessWidget {
                 children: <Widget>[
                   const Icon.lucide(Lucide.copy, size: IconSize.sm),
                   SizedBox(width: Button.gapFor(ButtonSize.md)),
-                  StyledText('Copy link', TextStyles.buttonLabel),
+                  Flexible(
+                    child: StyledText(
+                      'Copy link',
+                      TextStyles.nav,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -101,7 +108,14 @@ class ShowcaseShareDialog extends StatelessWidget {
                       children: <Widget>[
                         const Icon.lucide(Lucide.atSign, size: IconSize.sm),
                         SizedBox(width: Button.gapFor(ButtonSize.md)),
-                        StyledText('Threads', TextStyles.buttonLabel),
+                        Flexible(
+                          child: StyledText(
+                            'Threads',
+                            TextStyles.nav,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -119,7 +133,14 @@ class ShowcaseShareDialog extends StatelessWidget {
                       children: <Widget>[
                         const Icon.lucide(Lucide.send, size: IconSize.sm),
                         SizedBox(width: Button.gapFor(ButtonSize.md)),
-                        StyledText('X', TextStyles.buttonLabel),
+                        Flexible(
+                          child: StyledText(
+                            'X',
+                            TextStyles.nav,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -134,7 +155,7 @@ class ShowcaseShareDialog extends StatelessWidget {
               key: const Key('share-done'),
               variant: ButtonVariant.ghost,
               onPressed: close,
-              child: StyledText('Done', TextStyles.buttonLabel),
+              child: StyledText('Done', TextStyles.nav),
             ),
           ],
         ),

@@ -1,7 +1,7 @@
 {
   "name": "toaster",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/sonner.tsx` + the `.cn-toast` block (`app/globals.css`",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/toaster.dart",
       "target": "@ui/toaster.dart",
-      "sha256": "6bbf3d6e6e8d4cc3a28c18fd26d1631e0fa99e3fce881d0394b387329ea89c32"
+      "sha256": "6b0da45612c23daa2dc017887e06591486e2b1a592c0500f542ce78dc2638d2d"
     }
   ],
   "registryDependencies": [
@@ -30,7 +30,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/toaster",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/toaster.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/toaster.dart",
   "exports": [
     "Toast",
     "ToastAction",

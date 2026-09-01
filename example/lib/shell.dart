@@ -376,7 +376,7 @@ class _Header extends StatelessWidget {
                         Flexible(
                           child: StyledText(
                             'Desktop-first · 1440 frame · Light & dark',
-                            TextStyles.eyebrowSmall,
+                            TextStyles.small,
                           ),
                         ),
                         // The header's own `gap-4`…
@@ -399,7 +399,7 @@ class _Header extends StatelessWidget {
                                 size: IconSize.sm,
                               ),
                               SizedBox(width: Button.gapFor(ButtonSize.sm)),
-                              StyledText('Example app', TextStyles.buttonLabel),
+                              StyledText('Example app', TextStyles.nav),
                             ],
                           ),
                         ),
@@ -437,7 +437,7 @@ class _VersionPill extends StatelessWidget {
           borderRadius: BorderRadius.circular(Radii.full),
           border: Border.all(color: theme.border, width: BorderWidths.hairline),
         ),
-        child: StyledText('Design System v0.1', TextStyles.eyebrowSmall),
+        child: StyledText('Design System v0.1', TextStyles.small),
       ),
     );
   }
@@ -530,7 +530,7 @@ class _MobileNavSheet extends StatelessWidget {
                 children: <Widget>[
                   Icon.lucide(Lucide.layoutDashboard, size: IconSize.sm),
                   SizedBox(width: Button.gapFor(ButtonSize.md)),
-                  StyledText('Example app', TextStyles.buttonLabel),
+                  StyledText('Example app', TextStyles.nav),
                 ],
               ),
             ),
@@ -820,7 +820,7 @@ class _GroupLabelState extends State<_GroupLabel> {
           child: _ColorFade(
             target: ink,
             builder: (BuildContext context, Color colour) =>
-                StyledText(widget.title, TextStyles.eyebrow, color: colour),
+                StyledText(widget.title, TextStyles.small, color: colour),
           ),
         ),
       ),

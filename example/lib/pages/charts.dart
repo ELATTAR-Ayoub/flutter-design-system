@@ -1922,37 +1922,45 @@ class _SeriesStripState extends State<_SeriesStrip> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(Radii.lg),
-            child: ActiveIndicator(
-              activeIndex: _active,
-              indicator: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    stops: const <double>[0, _tintStop],
-                    colors: <Color>[
-                      colour.withValues(alpha: _tintAlpha),
-                      colour.withValues(alpha: 0),
-                    ],
-                  ),
-                  border: Border(
-                    bottom: BorderSide(color: colour, width: _ruleHeight),
-                  ),
-                ),
-                child: const SizedBox.expand(),
-              ),
-              children: <Widget>[
-                for (int i = 0; i < _SeriesStrip.series.length; i++)
-                  _SeriesTile(
-                    label: i == 0 ? 'Desktop' : 'Mobile',
-                    value: chartNumber(
-                      _SeriesStrip.total(_SeriesStrip.series[i]),
+            // Two `Stat` tiles at 200% text can outgrow the strip's own
+            // width; [ActiveIndicator]'s row is intrinsically sized (it has
+            // to be, to track the sliding fill under whichever tile is
+            // active), so it scrolls horizontally rather than compressing
+            // the figures it is tracking.
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ActiveIndicator(
+                activeIndex: _active,
+                indicator: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      stops: const <double>[0, _tintStop],
+                      colors: <Color>[
+                        colour.withValues(alpha: _tintAlpha),
+                        colour.withValues(alpha: 0),
+                      ],
                     ),
-                    swatch: widget.ink.slot(i + 1),
-                    leadingBorder: i > 0,
-                    onTap: () => setState(() => _active = i),
+                    border: Border(
+                      bottom: BorderSide(color: colour, width: _ruleHeight),
+                    ),
                   ),
-              ],
+                  child: const SizedBox.expand(),
+                ),
+                children: <Widget>[
+                  for (int i = 0; i < _SeriesStrip.series.length; i++)
+                    _SeriesTile(
+                      label: i == 0 ? 'Desktop' : 'Mobile',
+                      value: chartNumber(
+                        _SeriesStrip.total(_SeriesStrip.series[i]),
+                      ),
+                      swatch: widget.ink.slot(i + 1),
+                      leadingBorder: i > 0,
+                      onTap: () => setState(() => _active = i),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -3192,14 +3200,21 @@ class _KcalRow extends StatelessWidget {
       children: <Widget>[
         ConstrainedBox(
           constraints: BoxConstraints(minWidth: ChartTooltipContent.minWidth),
-          child: Row(
+          // `Wrap`, not a `Row`: the advanced tooltip fixes its own width at
+          // `w-44` (a spec value, not a layout column), and at 200% text a
+          // sport name plus its figure can still outgrow that regardless of
+          // which side gives room. `Wrap` drops the figure to its own line
+          // rather than asserting when even that is not enough.
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: space(2),
+            runSpacing: space(0.5),
             children: <Widget>[
               StyledText(
                 item.name == 'running' ? 'Running' : 'Swimming',
                 ChartText.xs,
                 color: theme.mutedForeground,
               ),
-              const Spacer(),
               _Kcal(value: item.value ?? 0),
             ],
           ),
@@ -3217,14 +3232,16 @@ class _KcalRow extends StatelessWidget {
             ),
             child: Padding(
               padding: EdgeInsets.only(top: space(1.5)),
-              child: Row(
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: space(2),
+                runSpacing: space(0.5),
                 children: <Widget>[
                   StyledText(
                     'Total',
                     ChartText.xsMedium,
                     color: theme.foreground,
                   ),
-                  const Spacer(),
                   _Kcal(value: total),
                 ],
               ),
@@ -3249,10 +3266,17 @@ class _Kcal extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: <Widget>[
-        StyledText(
-          chartNumber(value),
-          TextStyles.numberSm,
-          color: theme.foreground,
+        // Flexible so a tooltip squeezed to its `min-w` at 200% text can
+        // still shrink the figure instead of asserting; `mainAxisSize.min`
+        // alone only affects how much of the *given* space this row claims,
+        // not whether the given space is enough.
+        Flexible(
+          child: StyledText(
+            chartNumber(value),
+            TextStyles.numberSm,
+            color: theme.foreground,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         SizedBox(width: space(0.5)),
         // `font-normal text-muted-foreground`: the unit steps down out of the
@@ -3462,6 +3486,11 @@ class _UnitActivityChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
+    // The plot below the header fills the rest of `_plotHeight` through its
+    // own `Expanded`, which needs that height to stay a real bound — a
+    // `minHeight` here leaves it unbounded instead (Expanded inside an
+    // unbounded Column asserts). The header is what grows at 200% text, so
+    // it is the header's own lines that are capped, not the box around it.
     return SizedBox(
       height: _plotHeight,
       child: Column(
@@ -3474,30 +3503,51 @@ class _UnitActivityChart extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    StyledText('Active users', TextStyles.eyebrow),
+                    StyledText(
+                      'Active users',
+                      TextStyles.small,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     SizedBox(height: space(1)),
                     StyledText(
                       chartNumber(24815),
                       TextStyles.numberLg,
                       color: theme.foreground,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: space(1)),
                     StyledText(
                       '5.6k fewer in the last 7 days',
                       TextStyles.small,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
               SizedBox(width: space(4)),
-              Wrap(
-                alignment: WrapAlignment.end,
-                spacing: space(3),
-                runSpacing: space(3),
-                children: <Widget>[
-                  _UnitKey(colour: theme.muted, label: 'Previous'),
-                  _UnitKey(colour: theme.chart4, label: 'Current'),
-                ],
+              // `Flexible`, not a bare non-flex child: a `Row` hands its
+              // non-flexible children *unbounded* width, so this strip never
+              // actually shrank — it just reported its full two-key width
+              // back, which is what overflowed the row. A `Row` rather than
+              // a `Wrap` here so the strip stays exactly one line tall (the
+              // header's own height budget assumes that); each `_UnitKey`
+              // shrinks its own label instead of the strip wrapping.
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Flexible(
+                      child: _UnitKey(colour: theme.muted, label: 'Previous'),
+                    ),
+                    SizedBox(width: space(3)),
+                    Flexible(
+                      child: _UnitKey(colour: theme.chart4, label: 'Current'),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -3551,7 +3601,16 @@ class _UnitKey extends StatelessWidget {
         ),
       ),
       SizedBox(width: space(1.5)),
-      StyledText(label, TextStyles.eyebrow),
+      // Flexible so this key can still shrink once the header's own
+      // `Flexible` has divided the row and left it less than its natural
+      // width to work with.
+      Flexible(
+        child: StyledText(
+          label,
+          TextStyles.small,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
     ],
   );
 }
@@ -3568,6 +3627,7 @@ class _UnitColumn extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Expanded(
+          flex: 20,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -3603,7 +3663,23 @@ class _UnitColumn extends StatelessWidget {
           ),
         ),
         SizedBox(height: space(2)),
-        StyledText(day.label, TextStyles.numberSm, align: TextAlign.center),
+        // The column itself is given a tight height (its share of a fixed
+        // plot height), and at 200% text a single line of the day label can
+        // need more of it than the column's own share leaves — a `Column`
+        // asserts on that regardless of the `ClipRect` around the whole
+        // plot. `Expanded` keeps the label inside a real budget instead of
+        // asking for its natural size: it clips rather than overflows.
+        Expanded(
+          flex: 3,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: StyledText(
+              day.label,
+              TextStyles.numberSm,
+              align: TextAlign.center,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -3662,23 +3738,56 @@ class _ConversionFunnelChart extends StatelessWidget {
       0,
       (int acc, _Stage s) => acc + s.value,
     );
+    // An exact height, not a minimum — see `_UnitActivityChart` above: the
+    // strip below fills the rest of it through its own sizing and needs a
+    // real bound. The header lines are capped to one line each instead, so
+    // 200% text cannot grow past what `_plotHeight` holds.
     return SizedBox(
       height: _plotHeight,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          StyledText('Conversions', TextStyles.eyebrow),
-          SizedBox(height: space(1)),
-          StyledText(
-            chartNumber(total),
-            TextStyles.numberLg,
-            color: theme.foreground,
-          ),
-          SizedBox(height: space(1)),
-          StyledText(
-            '${percentage(_funnelStages.last.value, total)} overall conversion',
-            TextStyles.small,
-            color: theme.premiumText,
+          // Three single lines of real text, one of them `numberLg`, still
+          // grow with 200% text even capped at one line each — enough that
+          // the block can outgrow whatever fixed share of `_plotHeight` it
+          // is given. `Expanded` bounds the block; `FittedBox` is what
+          // actually keeps its *own* Column (a Flex, which asserts the same
+          // way the outer one does) from throwing once its natural content
+          // no longer fits that bound, scaling it down in place instead.
+          Expanded(
+            flex: 5,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: AlignmentDirectional.centerStart,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  StyledText(
+                    'Conversions',
+                    TextStyles.small,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: space(1)),
+                  StyledText(
+                    chartNumber(total),
+                    TextStyles.numberLg,
+                    color: theme.foreground,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: space(1)),
+                  StyledText(
+                    '${percentage(_funnelStages.last.value, total)} overall conversion',
+                    TextStyles.small,
+                    color: theme.premiumText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
           ),
           SizedBox(height: space(3)),
           SizedBox(
@@ -3714,22 +3823,31 @@ class _ConversionFunnelChart extends StatelessWidget {
             ),
           ),
           SizedBox(height: space(2)),
-          Row(
-            children: <Widget>[
-              for (int i = 0; i < _funnelStages.length; i++) ...<Widget>[
-                if (i > 0) SizedBox(width: space(0.5)),
-                Expanded(
-                  flex: _funnelStages[i].value,
-                  child: StyledText(
-                    percentage(_funnelStages[i].value, total),
-                    TextStyles.numberSm,
+          // Also given a real budget rather than its natural size, for the
+          // same reason as the block above.
+          Expanded(
+            flex: 2,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                for (int i = 0; i < _funnelStages.length; i++) ...<Widget>[
+                  if (i > 0) SizedBox(width: space(0.5)),
+                  Expanded(
+                    flex: _funnelStages[i].value,
+                    child: StyledText(
+                      percentage(_funnelStages[i].value, total),
+                      TextStyles.numberSm,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
+                ],
               ],
-            ],
+            ),
           ),
           SizedBox(height: space(3)),
           Expanded(
+            flex: 7,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.symmetric(

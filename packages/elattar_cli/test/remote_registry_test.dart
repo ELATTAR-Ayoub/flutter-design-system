@@ -18,6 +18,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import '../lib/src/commands/app.dart';
+import '../lib/src/identity.dart' show cliVersion;
 import '../lib/src/registry/http_fetcher.dart';
 import '../lib/src/registry/source.dart';
 
@@ -278,7 +279,6 @@ void main() {
         'ELATTAR-MIT.txt',
         'Inter-OFL-1.1.txt',
         'Geist-Mono-OFL-1.1.txt',
-        'Redaction-OFL-1.1.txt',
       ]) {
         expect(
           File('${project.path}/LICENSES/$notice').existsSync(),
@@ -536,7 +536,9 @@ void main() {
       final _Run result = await run(<String>['doctor']);
       expect(result.stdout, contains('registry source: remote'));
       expect(result.stdout, contains(server.baseUri.toString()));
-      expect(result.stdout, contains('registry: v0.0.1'));
+      // The registry version the served index declares, not the CLI's own:
+      // a CLI may be pointed at any registry it can read.
+      expect(result.stdout, contains('registry: v$cliVersion'));
       expect(result.stdout, contains('items'));
     });
 

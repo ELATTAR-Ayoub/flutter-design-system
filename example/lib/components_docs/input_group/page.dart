@@ -384,7 +384,7 @@ class _ContentSpecimen extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      StyledText('Search with leading icon and button', TextStyles.section),
+      StyledText('Search with leading icon and button', TextStyles.small),
       SizedBox(height: space(2)),
       InputGroup(
         startAddon: InputGroupAddon(
@@ -411,7 +411,7 @@ class _ContentSpecimen extends StatelessWidget {
         child: InputGroupInput(placeholder: 'Search...'),
       ),
       SizedBox(height: space(4)),
-      StyledText('Text addon: currency prefix', TextStyles.section),
+      StyledText('Text addon: currency prefix', TextStyles.small),
       SizedBox(height: space(2)),
       InputGroup(
         startAddon: InputGroupAddon(
@@ -421,7 +421,7 @@ class _ContentSpecimen extends StatelessWidget {
         child: InputGroupInput(placeholder: '0.00'),
       ),
       SizedBox(height: space(4)),
-      StyledText('Kbd addon: keyboard shortcut', TextStyles.section),
+      StyledText('Kbd addon: keyboard shortcut', TextStyles.small),
       SizedBox(height: space(2)),
       InputGroup(
         endAddon: InputGroupAddon(
@@ -431,7 +431,7 @@ class _ContentSpecimen extends StatelessWidget {
         child: InputGroupInput(placeholder: 'Quick search'),
       ),
       SizedBox(height: space(4)),
-      StyledText('Spinner addon: loading state', TextStyles.section),
+      StyledText('Spinner addon: loading state', TextStyles.small),
       SizedBox(height: space(2)),
       InputGroup(
         endAddon: InputGroupAddon(

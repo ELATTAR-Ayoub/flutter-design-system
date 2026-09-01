@@ -597,7 +597,7 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
       context,
       TextStyles.code,
       color: theme.foreground,
-    ).copyWith(height: TextStyles.textareaBody.height);
+    ).copyWith(height: TextStyles.body.step.ratio);
 
     final List<String> sourceLines = widget.code.split('\n');
     final bool multiline = sourceLines.length > 1;

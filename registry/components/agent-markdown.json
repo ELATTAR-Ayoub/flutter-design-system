@@ -1,7 +1,7 @@
 {
   "name": "agent-markdown",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/agent/parts/markdown.tsx` + `parts/code-block.tsx` — formatted",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_markdown.dart",
       "target": "@ui/agent_markdown.dart",
-      "sha256": "9ec44c3188d80fe2ed99f2a2d60486e52824c3d1c6864d7a940d6f3cb5865b22"
+      "sha256": "93cc5f32cd060407fdd413c069ba88c6fd9212e5d84fff7ee6238de1b9eaa6ae"
     }
   ],
   "registryDependencies": [
@@ -21,7 +21,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent_markdown",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_markdown.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_markdown.dart",
   "exports": [
     "AgentCodeBlock",
     "AgentMarkdown",

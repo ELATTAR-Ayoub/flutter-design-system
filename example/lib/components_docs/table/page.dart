@@ -1281,7 +1281,7 @@ class _ThemingContent extends StatelessWidget {
             'for the header and row rules, theme.muted for the hover and '
             'selected fills, theme.foreground and theme.mutedForeground '
             'for header, body and caption text via '
-            'TextStyles.tableHead, TextStyles.bodySmall and TextStyles.small. '
+            'TextStyles.small, TextStyles.small and TextStyles.small. '
             'Flipping ThemeController re-resolves all of them live: '
             'nothing is cached.',
       ),

@@ -207,18 +207,23 @@ class Combobox<T> extends StatefulWidget {
   /// 252px, before `--available-height` is consulted.
   static double get listMaxHeight => space(72) - space(9);
 
-  /// `py-1` around one `text-sm` line box — **26.571px**.
-  static double get itemHeight {
-    final TextStyleToken spec = TextStyles.bodyCompact;
-    return (spec.size ?? 0) * (spec.height ?? 1) + space(1) * 2;
-  }
+  /// `py-1` around one `text-sm` line box, floored at [TouchTargets.minimum].
+  ///
+  /// TARGET SIZING: the `py-1` reading is well below the platform's 44px
+  /// touch-target floor, so the floor is applied to the row's own layout
+  /// height rather than to a grown, invisible hit box — [_ComboboxRow] sizes
+  /// itself to exactly this number, and [_ComboboxPopupState._reveal]'s
+  /// scroll math multiplies this same getter, so raising the floor here
+  /// keeps the scroll-into-view arithmetic self-consistent with what
+  /// actually renders.
+  static double get itemHeight => math.max(
+    TextStyles.body.step.leading + space(1) * 2,
+    TouchTargets.minimum,
+  );
 
   /// `ComboboxEmpty`'s `py-2` around the same line box — 34.571px, an item row
   /// in every dimension but its padding.
-  static double get emptyHeight {
-    final TextStyleToken spec = TextStyles.bodyCompact;
-    return (spec.size ?? 0) * (spec.height ?? 1) + space(2) * 2;
-  }
+  static double get emptyHeight => TextStyles.body.step.leading + space(2) * 2;
 
   @override
   State<Combobox<T>> createState() => _ComboboxState<T>();
@@ -234,6 +239,12 @@ class _ComboboxState<T> extends State<Combobox<T>> {
       widget.focusNode ??
       _scope?.focusNode ??
       (_ownedFocusNode ??= FocusNode(debugLabel: 'Combobox'));
+
+  /// The node [_onFocusChanged] is currently attached to — tracked because
+  /// [_focusNode] can resolve to a different node across a rebuild (a
+  /// [FieldScope] appearing, [Combobox.focusNode] changing), and the old one
+  /// has to hear the listener go before the new one hears it arrive.
+  FocusNode? _listenedFocusNode;
 
   bool _open = false;
 
@@ -258,19 +269,45 @@ class _ComboboxState<T> extends State<Combobox<T>> {
     if (old.value != widget.value && !_open) {
       _controller.text = _labelOf(widget.value) ?? '';
     }
+    if (old.focusNode != widget.focusNode) _syncFocusListener();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _scope = FieldScope.maybeOf(context);
+    _syncFocusListener();
   }
 
   @override
   void dispose() {
+    _listenedFocusNode?.removeListener(_onFocusChanged);
     _controller.dispose();
     _ownedFocusNode?.dispose();
     super.dispose();
+  }
+
+  /// Keeps [_onFocusChanged] attached to whichever node [_focusNode]
+  /// currently resolves to.
+  void _syncFocusListener() {
+    final FocusNode node = _focusNode;
+    if (identical(_listenedFocusNode, node)) return;
+    _listenedFocusNode?.removeListener(_onFocusChanged);
+    node.addListener(_onFocusChanged);
+    _listenedFocusNode = node;
+  }
+
+  /// A blur — Tab, Shift+Tab, or a pointer landing anywhere else. base-ui's
+  /// own combobox closes on blur (`AriaCombobox.js`'s `onBlur`), and this
+  /// port had no path back to that at all: nothing else in `_onKey` sees Tab,
+  /// because Tab is not a key this component's `Focus` intercepts — it is the
+  /// platform's own traversal key, and letting it traverse normally while
+  /// reacting to the resulting blur is what a native `<input>` does too. Once
+  /// focus has left the field, there is no keyboard route back into a popup
+  /// nothing above it still points at, so it closes rather than outliving the
+  /// control that opened it.
+  void _onFocusChanged() {
+    if (!_focusNode.hasFocus && _open) _closePopup();
   }
 
   bool get _invalid => widget.invalid || (_scope?.invalid ?? false);
@@ -633,13 +670,29 @@ class _ComboboxRow<T> extends StatelessWidget {
           top: space(1),
           bottom: space(1),
         ),
-        child: StyledText(
-          item.label,
-          TextStyles.bodyCompact,
-          color: ink,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          softWrap: false,
+        // TARGET SIZING: the row below is forced taller than `py-1` plus one
+        // line box. A `Row` with one `Expanded` child re-centres the label in
+        // that box instead of pinning it to the top — [Select]'s own
+        // `_SelectItem` needed the identical fix for the identical reason.
+        // `Expanded` keeps the label's own width tight to the row, which the
+        // accent highlight above depends on; `Row`'s cross-axis alignment
+        // (default centre) is what is free to loosen and re-centre the
+        // height alone. A bare `Text` given the taller box directly would
+        // not do this — it reports the box it is handed and paints from the
+        // top, leaving the extra room silently below.
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: StyledText(
+                item.label,
+                TextStyles.body,
+                color: ink,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -665,6 +718,14 @@ class _ComboboxRow<T> extends StatelessWidget {
           ),
       ],
     );
+
+    // TARGET SIZING: [Combobox.itemHeight] is floored at
+    // [TouchTargets.minimum], above what the `py-1` padding alone produces.
+    // Sizing the row itself — rather than the padding — keeps the highlight
+    // fill, the hit box and [_ComboboxPopupState._reveal]'s scroll math all
+    // agreeing on one number; the row's own `Row`/`Stack` content centres
+    // vertically inside the taller box for free.
+    row = SizedBox(height: Combobox.itemHeight, child: row);
 
     row = DefaultTextStyle.merge(
       style: TextStyle(color: ink),
@@ -711,7 +772,7 @@ class _ComboboxEmpty extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: space(2)),
       child: StyledText(
         label!,
-        TextStyles.bodyCompact,
+        TextStyles.body,
         color: theme.mutedForeground,
         align: TextAlign.center,
       ),

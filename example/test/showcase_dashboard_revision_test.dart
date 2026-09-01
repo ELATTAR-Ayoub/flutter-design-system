@@ -32,6 +32,21 @@ import 'package:flutter/material.dart'
         Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
+/// The ambient ink every route inherits, as the shell sets it for the real app.
+///
+/// A surface mounted bare in a test has no shell above it, so the nearest
+/// `DefaultTextStyle` is `WidgetsApp`'s red fallback — which `StyledText`
+/// asserts on rather than quietly painting over. Threaded through
+/// `MaterialApp.builder` so it covers routes and overlays too, not just `home`.
+Widget _ambientInk(BuildContext context, Widget? child) => DefaultTextStyle(
+  style: StyledText.styleOf(
+    context,
+    TextStyles.body,
+    color: ThemeScope.of(context).foreground,
+  ),
+  child: child!,
+);
+
 Future<void> _pumpDashboard(WidgetTester tester, {required Size size}) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -44,6 +59,7 @@ Future<void> _pumpDashboard(WidgetTester tester, {required Size size}) async {
     ThemeScope(
       controller: theme,
       child: MaterialApp(
+        builder: _ambientInk,
         home: ShowcaseFeedback(
           controller: toasts,
           child: const ShowcaseShellScope(

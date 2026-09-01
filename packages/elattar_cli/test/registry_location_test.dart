@@ -29,10 +29,7 @@ void main() {
         environment: const <String, String>{},
       );
       expect(location, isA<RemoteRegistryLocation>());
-      expect(
-        (location as RemoteRegistryLocation).baseUri,
-        defaultRegistryUri,
-      );
+      expect((location as RemoteRegistryLocation).baseUri, defaultRegistryUri);
     });
   });
 
@@ -108,10 +105,7 @@ void main() {
         environment: const <String, String>{'ELATTAR_REGISTRY_URL': ''},
       );
       expect(location, isA<RemoteRegistryLocation>());
-      expect(
-        (location as RemoteRegistryLocation).baseUri,
-        defaultRegistryUri,
-      );
+      expect((location as RemoteRegistryLocation).baseUri, defaultRegistryUri);
     });
 
     test('a whitespace-only value is ignored, not treated as a URL', () {

@@ -1,7 +1,7 @@
 {
   "name": "content-change",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`@utility anim-content-change` — globals.css L2904–2906.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -24,7 +24,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/content_change",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/content_change.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/content_change.dart",
   "exports": [
     "ContentChange"
   ]

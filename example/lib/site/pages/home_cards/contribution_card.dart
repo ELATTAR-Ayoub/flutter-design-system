@@ -74,7 +74,7 @@ class _ContributionCardState extends State<ContributionCard> {
             children: <Widget>[
               StyledText(
                 tile.caption,
-                TextStyles.caption,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
               SizedBox(height: space(1)),

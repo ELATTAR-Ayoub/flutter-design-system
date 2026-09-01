@@ -126,10 +126,10 @@ Finder dayCell(String day) => find.ancestor(
   ),
 );
 
-/// The caption — the only `TextStyles.buttonLabel` run in the tree.
+/// The caption — the only `TextStyles.nav` run in the tree.
 String captionOf(WidgetTester t) => t
     .widgetList<StyledText>(find.byType(StyledText))
-    .firstWhere((StyledText d) => d.spec == TextStyles.buttonLabel)
+    .firstWhere((StyledText d) => d.spec == TextStyles.nav)
     .text;
 
 /// One rasterised pixel ROW through [child] at [atY], in the child's own
@@ -188,7 +188,7 @@ Matcher isColor(Color expected) => isA<Color>()
 /// `13 × calc(1.25 / .875)` — the weekday row's line box.
 ///
 /// *(Chrome: 18.563. The ¹⁄₆₄px grid is the only difference.)*
-const double _weekdayRow = 13 * (1.25 / 0.875);
+final double _weekdayRow = TextStyles.small.step.leading;
 
 /// `--cell-size`, `--cell-radius`, and the two paddings.
 const double _cell = 28;
@@ -356,19 +356,18 @@ void main() {
     test('the outer heights the parity probe is pinned against', () {
       double outer(DateTime m) =>
           CalendarMonth(m).outerHeight(_weekdayRow, CalendarPresentation.card);
-      // *(Measured: 232.563 / 268.563 / 304.563 — Chrome's 1/64px grid under
-      // the exact values below.)*
+      // Four, five, and six week rows, each 36px, over the same header.
       expect(
         outer(DateTime(2026, 2, 1)),
-        moreOrLessEquals(232.5714, epsilon: 0.01),
+        moreOrLessEquals(_panelHeight(4), epsilon: 0.01),
       );
       expect(
         outer(DateTime(2026, 7, 1)),
-        moreOrLessEquals(268.5714, epsilon: 0.01),
+        moreOrLessEquals(_panelHeight(5), epsilon: 0.01),
       );
       expect(
         outer(DateTime(2026, 8, 1)),
-        moreOrLessEquals(304.5714, epsilon: 0.01),
+        moreOrLessEquals(_panelHeight(6), epsilon: 0.01),
       );
       // The map derived 268.571 / 304.571 and had no 4-row case at all.
       expect(
@@ -377,8 +376,7 @@ void main() {
       );
     });
 
-    test('the popover surface is 8px shorter and 10px narrower *(measured '
-        '212 × 294.563)*', () {
+    test('the popover surface is 8px shorter and 10px narrower', () {
       final double panel = CalendarMonth(
         DateTime(2026, 8, 1),
       ).outerHeight(_weekdayRow, CalendarPresentation.card);
@@ -388,7 +386,7 @@ void main() {
       // `p-3` → `p-2` is 8px of padding, and the popover calendar has no
       // border of its own.
       expect(panel - popover, moreOrLessEquals(8 + 2, epsilon: 0.001));
-      expect(popover, moreOrLessEquals(294.5714, epsilon: 0.01));
+      expect(popover, moreOrLessEquals(_panelHeight(6) - 10, epsilon: 0.01));
     });
 
     test('the twenty-two-month sweep the live calendar was walked through', () {
@@ -1289,9 +1287,13 @@ void main() {
     ) async {
       await t.pumpWidget(host(const Calendar.single(), clock: _frozen));
       await t.pump();
-      expect(CalendarTextStyles.dayNumber.size, 16);
-      expect(CalendarTextStyles.dayNumber.height, 1);
+      expect(CalendarTextStyles.dayNumber.step, TextStyles.body.step);
       expect(CalendarTextStyles.dayNumber.family, Fonts.sans);
+      expect(
+        CalendarTextStyles.dayNumber.tabular,
+        isTrue,
+        reason: 'a date grid aligns its columns of digits',
+      );
       // The cell's number goes through that spec and no other.
       final StyledText number = t.widget<StyledText>(
         find.descendant(
@@ -1426,7 +1428,7 @@ void main() {
       );
       // `.type-num` — *(measured 15px / 18 / 600, Geist Mono, −0.15px)*.
       expect(picked.spec, TextStyles.numberBase);
-      expect(picked.spec.size, 15);
+      expect(picked.spec.step, const TypeStep(16, 20));
       expect(picked.spec.family, Fonts.mono);
       expect(picked.spec.tabular, isTrue);
 
@@ -1447,7 +1449,7 @@ void main() {
         ),
       );
       // No class of its own — it inherits the Button's 13px / 500 sans.
-      expect(empty.spec, TextStyles.buttonLabel);
+      expect(empty.spec, TextStyles.nav);
       expect(empty.spec.family, Fonts.sans);
     });
 

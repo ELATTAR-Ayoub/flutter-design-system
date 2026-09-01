@@ -309,14 +309,14 @@ class _SizeSpecimen extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      StyledText('Default (16px, 900ms cycle)', TextStyles.section),
+      StyledText('Default (16px, 900ms cycle)', TextStyles.small),
       SizedBox(height: space(3)),
       const KeyedSubtree(
         key: ValueKey<String>('spinner-example:size-default'),
         child: Spinner(),
       ),
       SizedBox(height: space(5)),
-      StyledText('Larger size (24px)', TextStyles.section),
+      StyledText('Larger size (24px)', TextStyles.small),
       SizedBox(height: space(3)),
       const KeyedSubtree(
         key: ValueKey<String>('spinner-example:size-large'),
@@ -345,7 +345,21 @@ class _ButtonSpecimen extends StatelessWidget {
         child: Button(
           loading: true,
           onPressed: () {},
-          child: const Text('Loading...'),
+          // `Button._content()` lays the spinner and this label out in its
+          // own `Row(mainAxisSize: min)`, with no ellipsis of its own —
+          // there is no caller hook to wrap the label in a `Flexible` from
+          // out here. A bounded width with its own ellipsis keeps the label
+          // from pushing that Row past the mobile 200%-scale specimen
+          // width, the same failure `Loading...` alone at that scale would
+          // hit unprefixed.
+          child: SizedBox(
+            width: space(24),
+            child: const Text(
+              'Loading...',
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
         ),
       ),
       KeyedSubtree(
@@ -356,7 +370,13 @@ class _ButtonSpecimen extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const Text('Processing'),
+              Flexible(
+                child: Text(
+                  'Processing',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
               SizedBox(width: Button.gapFor(ButtonSize.md)),
               const Spinner(),
             ],
@@ -488,12 +508,21 @@ class _RtlSpecimen extends StatelessWidget {
   Widget build(BuildContext context) => Directionality(
     key: const ValueKey<String>('spinner-example:rtl'),
     textDirection: TextDirection.rtl,
+    // `Flexible` + ellipsis, matching the button specimens above: at 200%
+    // text scale on mobile the label alone can outgrow the row.
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         const Spinner(),
         SizedBox(width: space(2)),
-        StyledText('جارٍ التحميل', TextStyles.body),
+        Flexible(
+          child: StyledText(
+            'جارٍ التحميل',
+            TextStyles.body,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
       ],
     ),
   );

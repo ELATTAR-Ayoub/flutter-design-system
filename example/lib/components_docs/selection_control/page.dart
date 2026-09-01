@@ -326,7 +326,7 @@ class _SelectionControlPreviewState extends State<_SelectionControlPreview> {
           onPressed: () => setState(() => _forceFocusRing = !_forceFocusRing),
           child: StyledText(
             _forceFocusRing ? 'Hide focus ring' : 'Show focus ring',
-            TextStyles.buttonLabel,
+            TextStyles.nav,
           ),
         ),
         SizedBox(height: space(3)),
@@ -485,7 +485,7 @@ class _FocusRingPreviewState extends State<_FocusRingPreview> {
                   : ButtonVariant.outline,
               size: ButtonSize.sm,
               onPressed: () => setState(() => _forced = null),
-              child: StyledText('null (follow focus)', TextStyles.buttonLabel),
+              child: StyledText('null (follow focus)', TextStyles.nav),
             ),
             Button(
               key: const ValueKey<String>('selection-control-focus-ring-true'),
@@ -494,7 +494,7 @@ class _FocusRingPreviewState extends State<_FocusRingPreview> {
                   : ButtonVariant.outline,
               size: ButtonSize.sm,
               onPressed: () => setState(() => _forced = true),
-              child: StyledText('true (forced on)', TextStyles.buttonLabel),
+              child: StyledText('true (forced on)', TextStyles.nav),
             ),
             Button(
               key: const ValueKey<String>('selection-control-focus-ring-false'),
@@ -503,7 +503,7 @@ class _FocusRingPreviewState extends State<_FocusRingPreview> {
                   : ButtonVariant.outline,
               size: ButtonSize.sm,
               onPressed: () => setState(() => _forced = false),
-              child: StyledText('false (withheld)', TextStyles.buttonLabel),
+              child: StyledText('false (withheld)', TextStyles.nav),
             ),
           ],
         ),
@@ -574,7 +574,7 @@ class _InertVsDisabledPreview extends StatelessWidget {
   Widget _labelled(ThemeTokens theme, String label, Widget child) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      StyledText(label, TextStyles.section, color: theme.mutedForeground),
+      StyledText(label, TextStyles.small, color: theme.mutedForeground),
       SizedBox(height: space(2)),
       SizedBox(width: space(32), height: space(32), child: child),
     ],
@@ -612,7 +612,7 @@ class _JellyReplayPreviewState extends State<_JellyReplayPreview> {
           variant: ButtonVariant.outline,
           size: ButtonSize.sm,
           onPressed: () => setState(() => _on = !_on),
-          child: StyledText('Toggle', TextStyles.buttonLabel),
+          child: StyledText('Toggle', TextStyles.nav),
         ),
         SizedBox(height: space(3)),
         SizedBox(

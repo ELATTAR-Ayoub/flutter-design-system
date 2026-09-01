@@ -735,20 +735,30 @@ class _DatePickerSpecimenState extends State<_DatePickerSpecimen> {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      StyledText('Enabled', TextStyles.section),
+      StyledText('Enabled', TextStyles.small),
       SizedBox(height: space(2)),
       KeyedSubtree(
         key: const ValueKey<String>('calendar-doc-picker'),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: DatePicker(
-            value: _value,
-            onChanged: (DateTime? day) => setState(() => _value = day),
+        // A horizontal scroll, not a bare `Align`: the trigger sizes to its
+        // label (calendar.dart's own Row is MainAxisSize.max with no
+        // Flexible around the text, so it cannot shrink), and at a large
+        // accessibility text scale the default placeholder, 'Pick a date',
+        // is long enough to overflow the 390px viewport the docs test
+        // renders at. Scrolling keeps the documented default rather than
+        // swapping in a shorter placeholder just to dodge the width.
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: DatePicker(
+              value: _value,
+              onChanged: (DateTime? day) => setState(() => _value = day),
+            ),
           ),
         ),
       ),
       SizedBox(height: space(5)),
-      StyledText('Disabled', TextStyles.section),
+      StyledText('Disabled', TextStyles.small),
       SizedBox(height: space(2)),
       const KeyedSubtree(
         key: ValueKey<String>('calendar-doc-picker-disabled'),
@@ -1441,7 +1451,7 @@ class _AccessibilityContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      StyledText('What the semantics tree carries', TextStyles.section),
+      StyledText('What the semantics tree carries', TextStyles.small),
       SizedBox(height: space(2)),
       StyledText(
         'Every day cell is a button whose accessible name is the whole '
@@ -1455,7 +1465,7 @@ class _AccessibilityContent extends StatelessWidget {
         TextStyles.small,
       ),
       SizedBox(height: space(5)),
-      StyledText('Known gaps', TextStyles.section),
+      StyledText('Known gaps', TextStyles.small),
       SizedBox(height: space(2)),
       StyledText(
         'No grid role. The cells are buttons in a Column of Rows, not a '
@@ -1498,7 +1508,7 @@ class _AccessibilityContent extends StatelessWidget {
         TextStyles.small,
       ),
       SizedBox(height: space(5)),
-      StyledText('Locale and the first day of the week', TextStyles.section),
+      StyledText('Locale and the first day of the week', TextStyles.small),
       SizedBox(height: space(2)),
       StyledText(
         'Every string this component prints is hardcoded en-US, in '
@@ -1555,7 +1565,7 @@ class _KeyboardContent extends StatelessWidget {
 
 /// One keyboard row: the key on its own line, then what it does.
 ///
-/// The key name is deliberately **not** [TextStyles.eyebrow]: that spec is
+/// The key name is deliberately **not** [TextStyles.small]: that spec is
 /// `uppercase`, and `StyledText` performs the transform on the string itself
 /// (`theme_scope.dart`), so `PageUp` would reach the tree as `PAGEUP`. Key
 /// names are case-carrying identifiers, not decorative eyebrows: they are

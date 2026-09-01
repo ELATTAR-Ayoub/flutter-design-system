@@ -933,12 +933,22 @@ class _SpinnerSpecimen extends StatelessWidget {
   const _SpinnerSpecimen();
 
   @override
-  Widget build(BuildContext context) => KeyedSubtree(
-    key: const ValueKey<String>('button-example:loading'),
-    child: Button(
-      loading: true,
-      onPressed: () {},
-      child: const Text('Please wait'),
+  // A horizontal scroll, not a bare `Button`: `loading: true` prepends a
+  // `Spinner` and its own gap ahead of the label inside `Button`'s own
+  // internal row (`button.dart`'s `_content`), which `Button` sizes to fit
+  // its content and cannot shrink. That extra width is usually invisible,
+  // but at a large accessibility text scale it is enough to overflow a
+  // narrow showcase frame where the same label without the spinner would
+  // not have.
+  Widget build(BuildContext context) => SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: KeyedSubtree(
+      key: const ValueKey<String>('button-example:loading'),
+      child: Button(
+        loading: true,
+        onPressed: () {},
+        child: const Text('Please wait'),
+      ),
     ),
   );
 }

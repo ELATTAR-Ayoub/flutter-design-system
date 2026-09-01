@@ -335,10 +335,16 @@ class _TableSection extends StatelessWidget {
                                   : IconTone.subtle,
                             ),
                             SizedBox(width: space(2)),
-                            StyledText(
-                              row.type,
-                              TextStyles.bodySmall,
-                              color: theme.foreground,
+                            // Flexible so a narrow column can shrink the
+                            // type word under 200% text instead of
+                            // overflowing the cell.
+                            Flexible(
+                              child: StyledText(
+                                row.type,
+                                TextStyles.small,
+                                color: theme.foreground,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ],
                         ),
@@ -346,7 +352,7 @@ class _TableSection extends StatelessWidget {
                       TableCellSpec(
                         child: StyledText(
                           row.detail,
-                          TextStyles.bodySmall,
+                          TextStyles.small,
                           color: theme.mutedForeground,
                         ),
                       ),
@@ -708,12 +714,12 @@ class _AvatarSection extends StatelessWidget {
                     Avatar(
                       fallback: 'VW',
                       sizePx: space(6),
-                      fallbackSpec: TextStyles.avatarInitials,
+                      fallbackSpec: TextStyles.nav,
                     ),
                     Avatar(
                       fallback: 'VW',
                       sizePx: space(8),
-                      fallbackSpec: TextStyles.avatarFallback,
+                      fallbackSpec: TextStyles.nav,
                     ),
                     Avatar(fallback: 'VW', sizePx: space(10)),
                     Avatar(fallback: 'VW', sizePx: space(12)),
@@ -754,7 +760,7 @@ class _AvatarSection extends StatelessWidget {
                     Avatar(
                       fallback: initials,
                       sizePx: space(8),
-                      fallbackSpec: TextStyles.avatarFallback,
+                      fallbackSpec: TextStyles.nav,
                       ring: AvatarGroup.ringOf(context),
                     ),
                   const AvatarGroupCount('+248'),
@@ -804,13 +810,16 @@ class _CardSection extends StatelessWidget {
                   action: Badge(label: 'Live', variant: BadgeVariant.premium),
                 ),
                 CardContent(
-                  // `flex items-baseline justify-between`.
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // `flex items-baseline justify-between`, as a `Wrap`: at
+                  // 200% text `numberMd` alone can outgrow the card's own
+                  // column width, so the label drops to its own line above
+                  // the figure instead of the row overflowing past it.
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    runSpacing: space(1),
                     children: <Widget>[
-                      StyledText('Prize pool', TextStyles.eyebrow),
+                      StyledText('Prize pool', TextStyles.small),
                       StyledText(
                         r'$24,000.00',
                         TextStyles.numberMd,
@@ -854,7 +863,7 @@ class _CardSection extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            StyledText(figure.k, TextStyles.eyebrow),
+                            StyledText(figure.k, TextStyles.small),
                             // `mt-1.5`.
                             SizedBox(height: space(1.5)),
                             StyledText(
@@ -1054,8 +1063,14 @@ class _StatSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: _panelGap),
-        const StateGrid(
-          cols: 5,
+        // `cols: 5` resolves to a 2-column base, which is right for a state
+        // chip but too narrow for a Stat carrying an error message at 200%
+        // text — `StateGrid.columns` keeps the same sm/lg breakpoints and
+        // only widens the base column to one Stat per row.
+        const StateGrid.columns(
+          base: 1,
+          sm: 3,
+          lg: 5,
           children: <Widget>[
             StateCell(
               label: 'rest',
@@ -1164,7 +1179,14 @@ class _StatSection extends StatelessWidget {
                           tone: IconTone.inherit,
                         ),
                         _ButtonGap(),
-                        Text('Reload Figures'),
+                        // Flexible so 200% text shrinks the label instead of
+                        // overflowing the button's own row.
+                        Flexible(
+                          child: Text(
+                            'Reload Figures',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -1409,22 +1431,20 @@ class _ItemSection extends StatelessWidget {
         children: <Widget>[
           for (final ({String title, String desc, String badge}) method
               in _methods)
-            Item(
-              media: const ItemMedia(
-                child: Icon.lucide(
-                  Lucide.arrowUpRight,
-                  size: IconSize.md,
-                  tone: IconTone.subtle,
-                ),
-              ),
-              content: ItemContent(
-                children: <Widget>[
-                  ItemTitle(method.title),
-                  ItemDescription(method.desc),
-                ],
-              ),
-              actions: ItemActions(
-                children: <Widget>[
+            // The actions move INTO the content column on a narrow row.
+            //
+            // `Item` lays its slots out in a `Row`, and a `Row` hands a
+            // non-flexible child an unbounded main axis, so nothing placed in
+            // [Item.actions] can be told a width to wrap against. `Item` cannot
+            // supply that bound without moving its own recorded geometry, which
+            // `HistoryCard` pins. What a page CAN do is decide, at a width it
+            // knows, that the row has no business being three columns wide: at
+            // 480 and below the badge and the button stack under the text
+            // instead of fighting it for the same line.
+            LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                final bool wide = constraints.maxWidth > Breakpoints.sm - 160;
+                final List<Widget> actions = <Widget>[
                   if (method.badge.isNotEmpty)
                     Badge(label: method.badge, variant: BadgeVariant.action),
                   Button(
@@ -1433,8 +1453,34 @@ class _ItemSection extends StatelessWidget {
                     onPressed: () {},
                     child: const Text('Manage'),
                   ),
-                ],
-              ),
+                ];
+
+                return Item(
+                  media: const ItemMedia(
+                    child: Icon.lucide(
+                      Lucide.arrowUpRight,
+                      size: IconSize.md,
+                      tone: IconTone.subtle,
+                    ),
+                  ),
+                  content: ItemContent(
+                    children: <Widget>[
+                      ItemTitle(method.title),
+                      ItemDescription(method.desc),
+                      if (!wide) ...<Widget>[
+                        SizedBox(height: ItemActions.gap),
+                        Wrap(
+                          spacing: ItemActions.gap,
+                          runSpacing: ItemActions.gap,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: actions,
+                        ),
+                      ],
+                    ],
+                  ),
+                  actions: wide ? ItemActions(children: actions) : null,
+                );
+              },
             ),
         ],
       ),
@@ -1575,11 +1621,16 @@ class _SeparatorSection extends StatelessWidget {
           'every surface in the ladder without being restyled.',
       child: Panel(
         label: 'Horizontal and vertical',
+        // `max-w-md` is a maximum, not a fixed width: a bare `SizedBox` here
+        // enforced 448px regardless of the panel's own width, which is what
+        // overflowed the figures row at 320px. `Align` turns the incoming
+        // tight constraint loose again so `ConstrainedBox`'s `maxWidth` can
+        // act as a cap instead of an exact width — the same reasoning
+        // `feedback.dart`'s own `_measured` helper documents for the class.
         child: Align(
           alignment: AlignmentDirectional.centerStart,
-          child: SizedBox(
-            // `max-w-md`.
-            width: _measureMd,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _measureMd),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
@@ -1593,23 +1644,53 @@ class _SeparatorSection extends StatelessWidget {
                 SizedBox(height: _panelGap),
                 const Separator(),
                 SizedBox(height: _panelGap),
-                SizedBox(
-                  // `flex h-6 items-center gap-4`.
-                  height: space(6),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      figure('412 packs'),
-                      SizedBox(width: _panelGap),
-                      const Separator.vertical(),
-                      SizedBox(width: _panelGap),
-                      figure('1,284 cards'),
-                      SizedBox(width: _panelGap),
-                      const Separator.vertical(),
-                      SizedBox(width: _panelGap),
-                      figure('8 sets'),
-                    ],
-                  ),
+                // The vertical rule needs a bounded cross axis (it is
+                // `self-stretch` in the reference), which only a fixed-height
+                // `Row` can give it; at 320px and 200% text three figures and
+                // two rules no longer fit one line. `LayoutBuilder` keeps the
+                // rule row exactly as built whenever it still fits, and falls
+                // back to a `Wrap` of the figures alone — no vertical rule,
+                // since `Wrap` cannot bound one — only when it does not.
+                LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    final Widget ruled = SizedBox(
+                      // `flex h-6 items-center gap-4`.
+                      height: space(6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          figure('412 packs'),
+                          SizedBox(width: _panelGap),
+                          const Separator.vertical(),
+                          SizedBox(width: _panelGap),
+                          figure('1,284 cards'),
+                          SizedBox(width: _panelGap),
+                          const Separator.vertical(),
+                          SizedBox(width: _panelGap),
+                          figure('8 sets'),
+                        ],
+                      ),
+                    );
+                    // The 360 threshold alone is a viewport-width read; it
+                    // missed that this column's own `_measureMd` cap (448)
+                    // never grows, so at 200% text even a desktop-wide page
+                    // still overflowed inside it. What three figures and two
+                    // rules need scales with the text, not the viewport, so
+                    // the threshold scales with `textScaler` too.
+                    final double textScale = MediaQuery.textScalerOf(
+                      context,
+                    ).scale(1);
+                    if (constraints.maxWidth >= 360 * textScale) return ruled;
+                    return Wrap(
+                      spacing: _panelGap,
+                      runSpacing: space(2),
+                      children: <Widget>[
+                        figure('412 packs'),
+                        figure('1,284 cards'),
+                        figure('8 sets'),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),

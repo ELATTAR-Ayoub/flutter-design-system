@@ -1,0 +1,30 @@
+{
+  "name": "skeleton",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/skeleton.tsx` — thirty-two lines, one utility, one prop.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/skeleton.dart",
+      "target": "@ui/skeleton.dart",
+      "sha256": "838d461d68bebf989f5097ae1c7d484fe1cef75a3083972e68c4fcfeef2e1605"
+    }
+  ],
+  "registryDependencies": [
+    "keyframes",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "keyframes"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/skeleton",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/skeleton.dart",
+  "deprecated": false
+}

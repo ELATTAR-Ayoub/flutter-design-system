@@ -1,0 +1,32 @@
+{
+  "name": "carousel",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/carousel.tsx` — the shadcn wrapper around Embla, and the one",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/carousel.dart",
+      "target": "@ui/carousel.dart",
+      "sha256": "d6c2c051bac1cba92d8d568934210c0f915a3f65b6e0c164c1ed1747daf5267c"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "icon",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "icon"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/carousel",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/carousel.dart",
+  "deprecated": false
+}

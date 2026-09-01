@@ -1,0 +1,34 @@
+{
+  "name": "slider",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/slider.tsx` — a knob sitting in a groove.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/slider.dart",
+      "target": "@ui/slider.dart",
+      "sha256": "b56e11bd644c1d041a922c8e624281ff32b64f8fd7e3e5d589b13b8b7c741052"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "surface",
+    "selection-control",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "surface",
+    "selection-control"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/slider",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/slider.dart",
+  "deprecated": false
+}

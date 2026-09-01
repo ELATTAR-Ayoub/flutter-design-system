@@ -146,10 +146,9 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
           'no content on purpose — selecting it moves the mark and shows '
           'nothing, the exact Empty tab state below, not an authoring '
           'gap in this example. Three real triggers run wider than a '
-          'narrow stage, so the live specimen wraps them in a horizontal '
-          'scroll view — the exact mitigation Responsive below names for '
-          'a caller in the same spot; the quoted code stays the bare '
-          'construction.',
+          'narrow stage, so the track scrolls them — the behaviour '
+          'Responsive below records; the quoted code is the bare '
+          'construction, because the scrolling is the component\'s own.',
       specimen: _AccountSettingsSpecimen(),
       code: _accountSettingsCode,
       label: 'Account settings specimen view',
@@ -359,7 +358,7 @@ final ComponentDocSpec tabsDocSpec = ComponentDocSpec(
             value: 'example/test/components_docs/tabs_test.dart',
             description:
                 'Coverage for this page: API completeness, the live '
-                'specimens\' panel switching, the absent-Focus '
+                'specimens\' panel switching, the keyboard '
                 'regression check backing the Accessibility and '
                 'Keyboard claims above, the 390px overflow reproduction '
                 'backing the Responsive claims above, the RTL mirroring '
@@ -432,11 +431,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        StyledText(
-          'Standard',
-          TextStyles.section,
-          color: theme.mutedForeground,
-        ),
+        StyledText('Standard', TextStyles.small, color: theme.mutedForeground),
         SizedBox(height: space(3)),
         Tabs(
           key: const ValueKey<String>('tabs-live-specimen'),
@@ -461,7 +456,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           onChanged: (int next) => setState(() => _standardIndex = next),
         ),
         SizedBox(height: space(8)),
-        StyledText('Line', TextStyles.section, color: theme.mutedForeground),
+        StyledText('Line', TextStyles.small, color: theme.mutedForeground),
         SizedBox(height: space(3)),
         Tabs(
           key: const ValueKey<String>('tabs-line-specimen'),
@@ -538,17 +533,13 @@ class _AccountSettingsSpecimenState extends State<_AccountSettingsSpecimen> {
   int _selectedIndex = 0;
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    // Three real triggers (Account, Password, Team) run wider than a
-    // narrow docs column: Responsive below names exactly this mitigation
-    // ("a caller with more triggers than fit a narrow layout must wrap
-    // Tabs in its own horizontal scroll view"), so this specimen does
-    // it. The quoted code beside it stays the bare construction — the
-    // wrapper is a caller's own choice, not something Tabs does itself.
-    scrollDirection: Axis.horizontal,
-    child: SizedBox(
-      width: space(95),
-      child: Tabs(
+  Widget build(BuildContext context) => SizedBox(
+    // A fixed measure so the specimen reads the same at every docs width.
+    // Nothing here scrolls it: the track does that itself when its three
+    // triggers do not fit, which is what the quoted bare construction gets.
+    width: space(95),
+    child: Builder(
+      builder: (BuildContext context) => Tabs(
         key: const ValueKey<String>('tabs-account-settings-specimen'),
         items: <TabItem>[
           TabItem(
@@ -582,8 +573,8 @@ class _AccountSettingsSpecimenState extends State<_AccountSettingsSpecimen> {
 /// illustrative, same as Section switcher below). The second trigger reads
 /// Stats rather than Analytics here: at a narrow, 390px-class viewport the
 /// longer label pushes this track's own RenderFlex 30px past its available
-/// width, the same unwrapped, unscrolled overflow Responsive documents —
-/// real, but not a fact this specimen needs to demonstrate a second time.
+/// width, which the track now absorbs by scrolling — real, but not a fact
+/// this specimen needs to demonstrate a second time.
 class _LineSpecimen extends StatefulWidget {
   const _LineSpecimen();
 
@@ -1001,9 +992,10 @@ class _StatesContent extends StatelessWidget {
                   'ring\'s spread and alpha are multiplied by zero on '
                   'every build.',
               userSignal:
-                  'No focus ring is ever painted, because nothing in '
-                  'Tabs ever focuses a trigger in the first place: see '
-                  'Accessibility and Keyboard.',
+                  'No focus ring is painted: a trigger does take the '
+                  'focus now, but the travelling indicator already marks '
+                  'the tab the focus is on. See Accessibility and '
+                  'Keyboard.',
             ),
             const DocsStateFact(
               state: 'Empty',
@@ -1071,12 +1063,18 @@ class _AccessibilityContent extends StatelessWidget {
             'track itself with a container role naming it a tab list, '
             'and the content panel underneath carries no semantic link '
             'back to the trigger that revealed it.',
-        'Keyboard interactions: none. See Keyboard below for the full '
+        'Keyboard interactions: one Tab stop, arrows between tabs, '
+            'Home and End to the ends, selection following focus. See '
+            'Keyboard below for the full '
             'account, read directly off the source.',
-        'Focus behavior: the ring is coded but permanently inert — '
-            'Button.withFocusRing is called with progress: 0 '
-            'hardcoded, and with no FocusNode in the tree there is no '
-            'real focus state that could ever change that value.',
+        'Focus behavior: the set owns one FocusNode per trigger and '
+            'moves the focus with the selection. The trigger paints no '
+            'ring of its own — the selected tab is already marked by the '
+            'travelling indicator, and a second mark on the same tab '
+            'would say the same thing twice.',
+        'Target size: a trigger paints at 32px and answers a pointer '
+            'over at least 44, through TapTarget. The paint box is '
+            'unchanged, so nothing around it moves.',
         'Touch target: Tabs.triggerHeight (32px) tall, label-width '
             'wide, no hit-area growth. Unlike Checkbox\'s 42x34 '
             'HitArea, tabs.dart wraps each trigger in a plain '
@@ -1106,23 +1104,26 @@ class _KeyboardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       _bullets(ThemeScope.of(context), <String>[
-        'Read plainly rather than described as the ARIA ideal: no '
-            'keyboard interaction is wired at all. Neither '
-            '_DsTabsTrigger nor ActiveIndicator contains a Focus '
-            'widget, a FocusNode, a Shortcuts or Actions mapping, or an '
-            'onKeyEvent handler anywhere in the file.',
-        'A tab list is conventionally one keyboard tab stop with arrow '
-            'keys moving between tabs and Enter/Space (or automatic '
-            'activation) selecting one: none of that exists here.',
-        'Tab order: a trigger cannot be reached with the Tab key at '
-            'all; tapping or clicking through the plain GestureDetector '
-            'is the only way to operate one.',
-        'No custom FocusTraversalPolicy: moot, since nothing here ever '
-            'enters the focus tree to traverse.',
-        'If this ever changes, `tabs_test.dart`\'s own regression check '
-            '(asserting no Focus descendant under the live specimen) '
-            'starts failing first, and this section and Accessibility '
-            'above both need updating to match.',
+        'One Tab stop for the whole set, not one per tab. Tab enters '
+            'at the tab that is showing and the next Tab leaves; the set '
+            'owns a FocusNode per trigger and every trigger but the '
+            'selected one skips traversal. Nine tabs are one stop '
+            'between a keyboard reader and the panel, not nine.',
+        'Left and Right move between the tabs and wrap at both ends. '
+            'The direction follows the reading direction, so a '
+            'right-to-left tab list moves the way its reader expects '
+            'rather than the way its array is indexed.',
+        'Home goes to the first tab and End to the last.',
+        'Selection follows focus: arrowing onto a tab shows its panel as '
+            'you arrive, so the keyboard sees what the pointer sees. '
+            'There is no separate Enter or Space commit step.',
+        'No custom FocusTraversalPolicy is needed: skipTraversal on the '
+            'unselected triggers is what makes the set one stop, and the '
+            'arrow keys are read on one listener above the track rather '
+            'than on each trigger.',
+        'Held to `test/tabs_keyboard_test.dart` in the package root: one '
+            'Tab stop, both wraps, Home and End, RTL, focus travelling '
+            'with the selection, and the nodes going out with the set.',
       ]);
 }
 
@@ -1133,28 +1134,19 @@ class _ResponsiveContent extends StatelessWidget {
   Widget build(BuildContext context) => ConstrainedBox(
     constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
     child: StyledText(
-      'Tabs neither scrolls nor wraps its triggers when they exceed '
-      'the available width, and it does not clip them either: the '
-      'track\'s Row (inside ActiveIndicator) keeps Flutter\'s '
-      'Row/Flex default clipBehavior of Clip.none, so content that does '
-      'not fit paints straight past the track\'s right edge instead of '
-      'being cut off at it. Verified directly at a 390px-class width: '
+      'The track scrolls horizontally when its triggers do not fit, so '
+      'every tab stays reachable at a phone width instead of the last '
+      'one being clipped off the edge. Verified at a 390px-class width: '
       'five triggers reading Overview, Analytics dashboard, '
-      'Notification preferences, Billing and subscriptions and '
-      'Security settings inside a 358px-wide column report "A '
-      'RenderFlex overflowed by 1068 pixels on the right", a live '
-      'RenderFlex assertion, not a cosmetic warning (see tabs_test.dart '
-      'for the reproduction this page\'s claim is checked against). In '
-      'an unclipped ancestor that bleed can overlap whatever sits to '
-      'the right of the tab set; in a clipped one (a ListView tile, a '
-      'Card with ClipBehavior.hardEdge) it is invisibly cut instead. '
-      'Either way, a caller with more triggers than fit a narrow layout '
-      'must wrap Tabs in its own horizontal scroll view or reduce the '
-      'trigger count itself. The component supplies neither. Beyond '
-      'that, Tabs has no other responsive behaviour: no breakpoint '
-      'changes shape and keyboard versus pointer operation is identical '
-      'on every Flutter target this package supports (there is no '
-      'keyboard operation to differ, per Keyboard above).',
+      'Notification preferences, Billing and subscriptions and Security '
+      'settings inside a 358px-wide column lay out without a RenderFlex '
+      'assertion, and Security settings can be scrolled to (see '
+      'tabs_test.dart for the check this claim is held to). The track '
+      'is a minimum height rather than a fixed one, so a trigger label '
+      'at 200% text scale grows the track instead of being cut by it. '
+      'Beyond that, Tabs has no breakpoint of its own: no width changes '
+      'its shape, and pointer and keyboard operation are identical on '
+      'every Flutter target this package supports.',
       TextStyles.small,
       color: ThemeScope.of(context).mutedForeground,
     ),
@@ -1194,8 +1186,8 @@ class _DependenciesContent extends StatelessWidget {
             'fills inside Surface, not images or drawn '
             'CustomPainter glyphs.',
         'Fonts: none dedicated. Trigger labels and panel text resolve '
-            'through the ambient TextStyles.buttonLabel and '
-            'TextStyles.bodySmall type specs: the same system type '
+            'through the ambient TextStyles.nav and '
+            'TextStyles.small type specs: the same system type '
             'scale every other component reads, not a font loaded for '
             'tabs itself.',
         'Shaders: none. No fragment shader is used.',

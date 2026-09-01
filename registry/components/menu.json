@@ -1,7 +1,7 @@
 {
   "name": "menu",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The shared body of `dropdown-menu.tsx`, `context-menu.tsx` and",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/menu.dart",
       "target": "@ui/menu.dart",
-      "sha256": "c6172f9b6930a2c7b9488e9018586c11df7a2326b40b5ace930719330e84ae0a"
+      "sha256": "e25fa6f315b977a2b3a7190ebb07a9356b2e5c96fba1674c7dd2dd64dd8de382"
     }
   ],
   "registryDependencies": [
@@ -26,7 +26,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/menu",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/menu.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/menu.dart",
   "exports": [
     "MenuCheckboxItem",
     "MenuChild",

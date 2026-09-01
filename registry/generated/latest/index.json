@@ -1,113 +1,113 @@
 {
   "schemaVersion": 1,
-  "registryVersion": "0.0.1",
+  "registryVersion": "0.0.2",
   "items": [
     {
       "name": "accordion",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/accordion"
     },
     {
       "name": "action-feedback",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/action_feedback"
     },
     {
       "name": "active-indicator",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/active_indicator"
     },
     {
       "name": "agent-attach-menu",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent_attach_menu"
     },
     {
       "name": "agent-attachments",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent_attachments"
     },
     {
       "name": "agent-avatar",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent_avatar"
     },
     {
       "name": "agent-composer",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent-composer"
     },
     {
       "name": "agent-console",
       "type": "block",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent-console"
     },
     {
       "name": "agent-core",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent-core"
     },
     {
       "name": "agent-face",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent_face"
     },
     {
       "name": "agent-history",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent_history"
     },
     {
       "name": "agent-launcher",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent_launcher"
     },
     {
       "name": "agent-markdown",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent_markdown"
     },
     {
       "name": "agent-slash-palette",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent_slash_palette"
     },
     {
       "name": "agent-transcript",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/agent-transcript"
     },
     {
       "name": "alert",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/alert"
     },
     {
       "name": "alert-dialog",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/alert-dialog"
     },
     {
       "name": "ambient-pattern",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/ambient_pattern"
     },
     {
@@ -119,79 +119,79 @@
     {
       "name": "attachment",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/attachment"
     },
     {
       "name": "avatar",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/avatar"
     },
     {
       "name": "background-effect",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/background_effect"
     },
     {
       "name": "badge",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/badge"
     },
     {
       "name": "breadcrumb",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/breadcrumb"
     },
     {
       "name": "bubble",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/bubble"
     },
     {
       "name": "button",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/button"
     },
     {
       "name": "button-group",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/button_group"
     },
     {
       "name": "calendar",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/calendar"
     },
     {
       "name": "card",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/card"
     },
     {
       "name": "carousel",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/carousel"
     },
     {
       "name": "chart",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/chart"
     },
     {
       "name": "chart-cartesian",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/chart_cartesian"
     },
     {
@@ -203,79 +203,79 @@
     {
       "name": "chart-polar",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/chart_polar"
     },
     {
       "name": "checkbox",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/checkbox"
     },
     {
       "name": "collapsible",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/collapsible"
     },
     {
       "name": "combobox",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/combobox"
     },
     {
       "name": "command",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/command"
     },
     {
       "name": "content-change",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/content_change"
     },
     {
       "name": "context-menu",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/context-menu"
     },
     {
       "name": "dialog",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/dialog"
     },
     {
       "name": "drawer",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/drawer"
     },
     {
       "name": "dropdown-menu",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/dropdown-menu"
     },
     {
       "name": "empty",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/empty"
     },
     {
       "name": "feedback-surface",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/feedback_surface"
     },
     {
       "name": "field",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/field"
     },
     {
@@ -287,163 +287,163 @@
     {
       "name": "glass",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/glass"
     },
     {
       "name": "hover-builder",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/hover_builder"
     },
     {
       "name": "hover-card",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/hover-card"
     },
     {
       "name": "icon",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/icon"
     },
     {
       "name": "icon-swap",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/icon_swap"
     },
     {
       "name": "input",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/input"
     },
     {
       "name": "input-group",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/input_group"
     },
     {
       "name": "input-otp",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/input_otp"
     },
     {
       "name": "item",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/item"
     },
     {
       "name": "kbd",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/kbd"
     },
     {
       "name": "keyframes",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/keyframes"
     },
     {
       "name": "marker",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/marker"
     },
     {
       "name": "media-scrim",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/media_scrim"
     },
     {
       "name": "menu",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/menu"
     },
     {
       "name": "menubar",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/menubar"
     },
     {
       "name": "message",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/message"
     },
     {
       "name": "message-scroller",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/message-scroller"
     },
     {
       "name": "native-select",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/native_select"
     },
     {
       "name": "navigation-menu",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/navigation-menu"
     },
     {
       "name": "pagination",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/pagination"
     },
     {
       "name": "popover",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/popover"
     },
     {
       "name": "premium-surface",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/premium_surface"
     },
     {
       "name": "press",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/press"
     },
     {
       "name": "progress",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/progress"
     },
     {
       "name": "questionnaire",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/questionnaire"
     },
     {
       "name": "radio",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/radio"
     },
     {
       "name": "resizable",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/resizable"
     },
     {
@@ -455,127 +455,127 @@
     {
       "name": "scroll-area",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/scroll_area"
     },
     {
       "name": "select",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/select"
     },
     {
       "name": "selection-control",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/selection_control"
     },
     {
       "name": "separator",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/separator"
     },
     {
       "name": "sheet",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/sheet"
     },
     {
       "name": "sidebar",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/sidebar"
     },
     {
       "name": "skeleton",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/skeleton"
     },
     {
       "name": "slider",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/slider"
     },
     {
       "name": "source-foundation",
       "type": "foundation",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/source_foundation"
     },
     {
       "name": "spinner",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/spinner"
     },
     {
       "name": "stat",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/stat"
     },
     {
       "name": "surface",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/surface"
     },
     {
       "name": "switch",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/switch"
     },
     {
       "name": "table",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/table"
     },
     {
       "name": "tabs",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/tabs"
     },
     {
       "name": "textarea",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/textarea"
     },
     {
       "name": "toaster",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/toaster"
     },
     {
       "name": "toggle",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/toggle"
     },
     {
       "name": "toggle-group",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/toggle-group"
     },
     {
       "name": "tooltip",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/tooltip"
     },
     {
       "name": "user-menu",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/user_menu"
     },
     {
@@ -587,13 +587,13 @@
     {
       "name": "voice",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/voice"
     },
     {
       "name": "voice-indicator",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "documentationRoute": "/components/voice_indicator"
     }
   ]

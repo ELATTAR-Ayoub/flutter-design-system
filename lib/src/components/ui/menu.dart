@@ -70,6 +70,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart'
@@ -273,8 +274,8 @@ class MenuRadioGroup extends MenuChild {
 
 /// `*MenuLabel` — `px-3 py-2 text-xs font-medium text-muted-foreground`.
 ///
-/// **Weight 500**, which is [TextStyles.menuHeading] and not
-/// [TextStyles.menuLabel]: `SelectLabel` writes no `font-*` class and
+/// **Weight 500**, which is [TextStyles.small] and not
+/// [TextStyles.small]: `SelectLabel` writes no `font-*` class and
 /// inherits 400, this one writes `font-medium`. Same 12px rung, one weight
 /// apart — selects-map drift 6, now with a fourth spelling.
 @immutable
@@ -360,37 +361,69 @@ enum MenuIndicatorSide {
 /// item-aligned placement, a parity test and a page test all need a row's
 /// height **before** the row exists.
 abstract final class Menu {
-  /// `py-2` plus one `text-sm` line box — **34.5714**, and the reference
-  /// renders 34.5625 (Chrome quantises the 18.5714px line box to 18.5625).
+  /// `py-2` plus one `text-sm` line box, floored at [TouchTargets.minimum].
   ///
   /// Read off the type spec, not measured, exactly as [Select.itemHeight] is
   /// and against the same `text-sm` rung — the two menus are the same row.
-  static double get itemHeight {
-    final TextStyleToken spec = TextStyles.bodyCompact;
-    return (spec.size ?? 0) * (spec.height ?? 1) + space(2) * 2;
-  }
+  ///
+  /// TARGET SIZING: the type-derived number is below the platform's 44px
+  /// touch-target floor, and a menu row is a real tap target — there is no
+  /// separate hit-test surface layered over it the way [TapTarget] gives a
+  /// small control room to grow into. The floor is therefore applied to the
+  /// row's own layout height, not to an invisible margin around it: the
+  /// highlight fill, the hover surface and the hit box all agree, and
+  /// [_MenuRow] sizes itself to exactly this number. Every consumer of this
+  /// getter — [_MenuGeometry.contentHeight], [MenuContent.heightOf], the
+  /// item-aligned placement math one file over — reads it live, so raising
+  /// the floor here keeps the popup's height and scroll math self-consistent
+  /// with what actually paints.
+  static double get itemHeight => math.max(
+    TextStyles.body.step.leading + space(2) * 2,
+    TouchTargets.minimum,
+  );
 
-  /// A row carrying a [MenuItem.subtitle] — **52.7464**.
+  /// [itemHeight], scaled by the ambient [TextScaler].
   ///
-  /// The same `py-2` as [itemHeight], now over two line boxes and the row's own
-  /// `gap-1`: 16 + 18.5714 (`text-sm`) + 4 + 14.175 (`.type-caption`). Read off
-  /// the type specs for the reason [itemHeight] is, and stated here rather than
-  /// left to the layout because [_Row.height] adds a menu up before it exists.
+  /// `itemHeight` reads `TextStyles.body.step.leading` — the type spec's own
+  /// line height — which is unscaled by construction: nothing routes the
+  /// reader's text-size setting through a static getter. At 200% that leaves
+  /// the row's fixed height shorter than the two-line-box-tall label it now
+  /// has to hold, and [_MenuRow] overflows. This is the number every one of
+  /// them should read instead: the row's own [SizedBox], [_MenuGeometry]'s
+  /// per-row heights and [MenuContent.heightOf]'s sum, so the popup's height
+  /// and scroll math stay honest with what actually paints, at any scale.
+  static double itemHeightOf(BuildContext context) => math.max(
+    MediaQuery.textScalerOf(
+          context,
+        ).scale(StyledText.stepOf(context, TextStyles.body).leading) +
+        space(2) * 2,
+    TouchTargets.minimum,
+  );
+
+  /// A row carrying a [MenuItem.subtitle].
   ///
-  /// `CommandItem`'s two-line row is **48.7** — the same two line boxes in the
-  /// same padding, 4px shorter, because a command row writes no gap between
-  /// them and a menu row writes `gap-1`. Two components, two numbers, one
-  /// reference.
-  static double get twoLineItemHeight {
-    final TextStyleToken caption = TextStyles.caption;
-    return itemHeight + space(1) + (caption.size ?? 0) * (caption.height ?? 1);
-  }
+  /// The same `py-2` as [itemHeight], now over two line boxes and the row's
+  /// own `gap-1`. Built on the (now touch-floored) [itemHeight] rather than
+  /// re-deriving the padding, so a two-line row is always at least a gap and
+  /// a supporting line box taller than a one-line one — already clear of
+  /// [TouchTargets.minimum] on its own account.
+  ///
+  /// `CommandItem`'s two-line row is 4px shorter, because a command row
+  /// writes no gap between its two lines and a menu row writes `gap-1`. Two
+  /// components, two numbers, one reference.
+  static double get twoLineItemHeight =>
+      itemHeight + space(1) + TextStyles.small.step.leading;
+
+  /// [twoLineItemHeight], scaled the same way [itemHeightOf] is.
+  static double twoLineItemHeightOf(BuildContext context) =>
+      itemHeightOf(context) +
+      space(1) +
+      MediaQuery.textScalerOf(
+        context,
+      ).scale(StyledText.stepOf(context, TextStyles.small).leading);
 
   /// `*MenuLabel`'s `px-3 py-2 text-xs` — 12px in a 16px line box, so **32**.
-  static double get labelHeight {
-    final TextStyleToken spec = TextStyles.menuHeading;
-    return (spec.size ?? 0) * (spec.height ?? 1) + space(2) * 2;
-  }
+  static double get labelHeight => TextStyles.small.step.leading + space(2) * 2;
 
   /// `my-2 h-px` — 8 + 1 + 8 = **17**.
   static double get separatorHeight => BorderWidths.hairline + space(2) * 2;
@@ -526,13 +559,25 @@ class _Row {
   /// The row's own height, for a caller that has to add the menu up before it
   /// is laid out. A [MenuLabel] with a custom [MenuLabel.child] is
   /// intrinsic and reports its plain-text height instead.
-  double get height => switch (kind) {
+  ///
+  /// Null [context] falls back to the unscaled numbers — for a caller that
+  /// genuinely cannot reach one, such as [MenuContent.heightOf]'s own
+  /// no-context overload, which exists for measuring a menu's height before
+  /// any of it is in a tree. Every live row reachable from a [BuildContext]
+  /// should pass one, so its height agrees with what [_MenuRow] actually
+  /// paints at the reader's text scale.
+  double heightOf(BuildContext? context) => switch (kind) {
     // The one row-like kind that can be two lines tall: only [MenuItem]
     // carries a subtitle, and a check row, a radio row and a sub-trigger
     // have no slot for one.
     _RowKind.item =>
-      item!.subtitle == null ? Menu.itemHeight : Menu.twoLineItemHeight,
-    _RowKind.checkbox || _RowKind.radio || _RowKind.sub => Menu.itemHeight,
+      item!.subtitle == null
+          ? (context == null ? Menu.itemHeight : Menu.itemHeightOf(context))
+          : (context == null
+                ? Menu.twoLineItemHeight
+                : Menu.twoLineItemHeightOf(context)),
+    _RowKind.checkbox || _RowKind.radio || _RowKind.sub =>
+      context == null ? Menu.itemHeight : Menu.itemHeightOf(context),
     _RowKind.label => Menu.labelHeight,
     _RowKind.separator => Menu.separatorHeight,
   };
@@ -540,7 +585,7 @@ class _Row {
 
 /// Every row in document order, with the focusable ones indexed.
 class _MenuGeometry {
-  _MenuGeometry(List<MenuChild> children) {
+  _MenuGeometry(List<MenuChild> children, [this.context]) {
     void walk(List<MenuChild> list) {
       for (final MenuChild child in list) {
         switch (child) {
@@ -606,10 +651,16 @@ class _MenuGeometry {
   /// check row and sub-trigger, and nothing else.
   final List<_Row> focusable = <_Row>[];
 
+  /// The context every row height is scaled against — see [_Row.heightOf].
+  final BuildContext? context;
+
   /// `p-2` + every row + `p-2`.
   double get contentHeight =>
       Menu.contentPadding * 2 +
-      rows.fold<double>(0, (double sum, _Row row) => sum + row.height);
+      rows.fold<double>(
+        0,
+        (double sum, _Row row) => sum + row.heightOf(context),
+      );
 }
 
 /* ── The content ─────────────────────────────────────────────────────────── */
@@ -726,10 +777,20 @@ class _MenuContentState extends State<MenuContent> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Recomputed here, not only in [initState]'s field initializer: `context`
+    // is not usable before the state is mounted, and this is also where a
+    // change to the ambient [TextScaler] arrives, which is exactly what
+    // [Menu.itemHeightOf] needs to stay in step with.
+    _menu = _MenuGeometry(widget.children, context);
+  }
+
+  @override
   void didUpdateWidget(MenuContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!identical(oldWidget.children, widget.children)) {
-      _menu = _MenuGeometry(widget.children);
+      _menu = _MenuGeometry(widget.children, context);
     }
   }
 
@@ -1090,7 +1151,7 @@ class _MenuLabel extends StatelessWidget {
         label.child ??
         StyledText(
           label.text,
-          TextStyles.menuHeading,
+          TextStyles.small,
           color: theme.mutedForeground,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -1110,7 +1171,7 @@ class _MenuLabel extends StatelessWidget {
       child: DefaultTextStyle.merge(
         style: StyledText.styleOf(
           context,
-          TextStyles.menuHeading,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
         child: body,
@@ -1290,7 +1351,7 @@ class _MenuRow extends StatelessWidget {
                     children: <Widget>[
                       StyledText(
                         label,
-                        TextStyles.bodyCompact,
+                        TextStyles.body,
                         color: ink,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1301,7 +1362,7 @@ class _MenuRow extends StatelessWidget {
                         SizedBox(height: space(1)),
                         StyledText(
                           subtitle!,
-                          TextStyles.caption,
+                          TextStyles.small,
                           // `text-muted-foreground`, and muted whether or not
                           // the row is highlighted — the span's own class beats
                           // the row's `focus:text-accent-foreground`, exactly as
@@ -1323,7 +1384,7 @@ class _MenuRow extends StatelessWidget {
               padding: EdgeInsetsDirectional.only(start: space(2)),
               child: StyledText(
                 shortcut!,
-                TextStyles.menuShortcut,
+                TextStyles.small,
                 color: highlighted
                     ? theme.accentForeground
                     : theme.mutedForeground,
@@ -1389,8 +1450,17 @@ class _MenuRow extends StatelessWidget {
       );
     }
 
-    row = SizedBox(
-      height: subtitle == null ? Menu.itemHeight : Menu.twoLineItemHeight,
+    // A `minHeight`, not a fixed `height`: at 200% text the label's own line
+    // boxes need more room than the unscaled number gives, and a tight
+    // `SizedBox` just clips the overflow. [Menu.itemHeightOf] /
+    // [Menu.twoLineItemHeightOf] scale with the same [TextScaler] the label
+    // renders at, so the two agree at any scale, not only at 100%.
+    row = ConstrainedBox(
+      constraints: BoxConstraints(
+        minHeight: subtitle == null
+            ? Menu.itemHeightOf(context)
+            : Menu.twoLineItemHeightOf(context),
+      ),
       child: row,
     );
     // The row's resolved `color`, which every `text-current` child reads.

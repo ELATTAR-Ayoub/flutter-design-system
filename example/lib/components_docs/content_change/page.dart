@@ -238,7 +238,7 @@ class ContentChangeDocPage extends StatelessWidget {
 
 Widget _caption(BuildContext context, String label) => StyledText(
   label,
-  TextStyles.caption,
+  TextStyles.small,
   color: ThemeScope.of(context).mutedForeground,
 );
 
@@ -246,9 +246,13 @@ class _PreviewSpecimen extends StatelessWidget {
   const _PreviewSpecimen();
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.start,
+  // Side by side where there is room, stacked where there is not: the two
+  // previews are a comparison, and a comparison that runs off the edge is not
+  // one.
+  Widget build(BuildContext context) => Wrap(
+    spacing: space(10),
+    runSpacing: space(6),
+    crossAxisAlignment: WrapCrossAlignment.start,
     children: <Widget>[
       Column(
         mainAxisSize: MainAxisSize.min,
@@ -262,7 +266,6 @@ class _PreviewSpecimen extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(width: space(10)),
       Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -85,7 +85,7 @@ failed download leaves your project untouched rather than half-installed.
   premium surface, glass, feedback surface, ambient pattern, media scrim,
   the voice indicator; hover builder, press, active indicator, content
   change, keyframes.
-- **Three faces** — Inter, Geist Mono and Redaction 35, wired into your
+- **Two faces** — Inter and Geist Mono, wired into your
   `pubspec.yaml` under the family names the installed typography asks for.
 
 ## Minimal usage
@@ -115,7 +115,7 @@ class DemoPage extends StatelessWidget {
       child: Center(
         child: Button(
           onPressed: () {},
-          child: const StyledText('Continue', TextStyles.label),
+          child: const StyledText('Continue', TextStyles.nav),
         ),
       ),
     );

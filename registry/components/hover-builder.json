@@ -1,7 +1,7 @@
 {
   "name": "hover-builder",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The hover lift — the `lift` utility, `app/globals.css` L2318–2330.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -21,7 +21,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/hover_builder",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/hover_builder.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/hover_builder.dart",
   "exports": [
     "HoverBuilder",
     "InteractiveCard"

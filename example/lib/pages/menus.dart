@@ -327,8 +327,18 @@ class _AccountTrigger extends StatelessWidget {
           const _Avatar('VW'),
           // `gap-2.5`, 10, not the rung's own 8.
           SizedBox(width: space(2.5)),
-          // `<span className="type-small text-foreground">`.
-          StyledText('voidwing', TextStyles.small, color: theme.foreground),
+          // `<span className="type-small text-foreground">`. Flexible so a
+          // narrow phone at 200% text can shrink the name instead of
+          // overflowing the trigger; the desktop column never gets this
+          // narrow, so it never sees the ellipsis.
+          Flexible(
+            child: StyledText(
+              'voidwing',
+              TextStyles.small,
+              color: theme.foreground,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
@@ -350,7 +360,7 @@ class _OutlineTrigger extends StatelessWidget {
     suppressPressScale: true,
     expanded: MenuTriggerScope.openOf(context),
     onPressed: () {},
-    child: StyledText(label, TextStyles.buttonLabel),
+    child: StyledText(label, TextStyles.nav),
   );
 }
 
@@ -404,7 +414,7 @@ class _AccountLabel extends StatelessWidget {
       children: <Widget>[
         // `<span className="block text-foreground">`: no `font-*` of its own,
         // so it inherits the label's own 12px / 500.
-        StyledText('voidwing', TextStyles.menuHeading, color: theme.foreground),
+        StyledText('voidwing', TextStyles.small, color: theme.foreground),
         // `mt-1`.
         SizedBox(height: space(1)),
         // `<span className="type-micro mt-1 flex items-center gap-1.5">`.
@@ -421,7 +431,7 @@ class _AccountLabel extends StatelessWidget {
             ),
             // `gap-1.5`.
             SizedBox(width: space(1.5)),
-            StyledText('Verified · Rank 24', TextStyles.eyebrowSmall),
+            StyledText('Verified · Rank 24', TextStyles.small),
           ],
         ),
       ],
@@ -494,8 +504,12 @@ class _StashCard extends StatelessWidget {
     final ThemeTokens theme = ThemeScope.of(context);
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: _measureXs),
-      child: SizedBox(
-        height: _cardHeight,
+      // `h-40` in the reference is a fixed height for the reference's own
+      // fixed text scale; a minimum instead of an exact height keeps that
+      // reading at normal scale while letting scaled-up text grow the card
+      // instead of overflowing it.
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: _cardHeight),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: theme.card,
@@ -521,7 +535,7 @@ class _StashCard extends StatelessWidget {
                 SizedBox(height: space(2)),
                 StyledText(
                   'Legendary',
-                  TextStyles.eyebrow,
+                  TextStyles.small,
                   color: theme.premiumText,
                   align: TextAlign.center,
                 ),
@@ -588,7 +602,22 @@ class _MenubarSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // DRIFT 2, 32px triggers in a 32px bar with 4px of padding.
-            Menubar(menus: _admin),
+            //
+            // A menubar is a single-row toolbar in the reference itself, not
+            // a layout this page chose; at 320px and 200% text three
+            // triggers do not fit the strip, so it scrolls horizontally the
+            // way a real app's menu bar would rather than reflowing into
+            // something the component was never designed to be.
+            //
+            // Menubar's own `OverflowBox` only relaxes its height, and
+            // forwards the ambient width through unchanged (drift 2's own
+            // comment): a bare scroll view hands it *infinite* width, which
+            // is a different assertion than the one this fixes. `IntrinsicWidth`
+            // gives it the bounded width its own content needs instead.
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: IntrinsicWidth(child: Menubar(menus: _admin)),
+            ),
             _Caption(
               'Included so the design system can absorb the admin panel later '
               'without inventing new patterns, per the brief.',

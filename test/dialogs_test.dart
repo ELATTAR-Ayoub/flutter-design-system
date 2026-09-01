@@ -219,7 +219,6 @@ void main() {
   setUpAll(() async {
     await _loadFont('InterLocal', 'InterVariable.ttf');
     await _loadFont('GeistMono', 'GeistMono-Variable.ttf');
-    await _loadFont('Redaction35', 'Redaction35-Italic.ttf');
   });
 
   group('OverlayPortal', () {
@@ -464,10 +463,22 @@ void main() {
         _host(const Badge(label: 'New release', variant: BadgeVariant.action)),
       );
       final Size size = t.getSize(find.byType(Badge));
-      expect(size.height, Badge.height);
-      // `w-fit` — measured 89.06 for this label at 12px/500; the port is within
-      // a pixel of it on the same face.
-      expect(size.width, closeTo(89.06, 3));
+      expect(size.height, greaterThanOrEqualTo(Badge.minHeight));
+      // `w-fit` — the chip is as wide as its label plus its padding, and no
+      // wider.
+      expect(
+        size.width,
+        greaterThan(t.getSize(find.text('New release')).width),
+      );
+      expect(
+        size.width,
+        closeTo(
+          t.getSize(find.text('New release')).width +
+              Badge.horizontalPadding * 2 +
+              BorderWidths.hairline * 2,
+          1,
+        ),
+      );
     });
 
     testWidgets('the unfilled variants take neither ramp nor shadow', (
@@ -752,8 +763,9 @@ void main() {
       // trigger's top — which is where the measured 10px gap comes from.
       expect(content.bottom, closeTo(trigger.top, 0.5));
       expect(content.center.dx, closeTo(trigger.center.dx, 0.5));
-      // `px-3 py-1.5` on `text-xs` — 28px of pill, plus the lane.
-      expect(content.height, closeTo(28 + Tooltip.arrowSize, 1));
+      // One supporting line box in the pill's own padding, plus the lane.
+      final double pill = TextStyles.small.step.leading + space(1.5) * 2;
+      expect(content.height, closeTo(pill + Tooltip.arrowSize, 1));
     });
 
     // ── the shrink-wrap pins ────────────────────────────────────────────────
@@ -859,8 +871,11 @@ void main() {
 
       final Rect trigger = t.getRect(find.byType(Button));
       final Rect content = t.getRect(find.byType(TooltipContent));
-      // 28px of pill — the lane is the row's leading column, not its height.
-      expect(content.height, closeTo(28, 1));
+      // The lane is the row's leading column, not its height.
+      expect(
+        content.height,
+        closeTo(TextStyles.small.step.leading + space(1.5) * 2, 1),
+      );
       expect(content.left, closeTo(trigger.right, 0.5));
       expect(content.center.dy, closeTo(trigger.center.dy, 0.5));
     });

@@ -272,7 +272,7 @@ class _Captioned extends StatelessWidget {
       SizedBox(height: space(2)),
       StyledText(
         caption,
-        TextStyles.section,
+        TextStyles.small,
         color: ThemeScope.of(context).mutedForeground,
       ),
     ],
@@ -452,6 +452,89 @@ const List<DocsApiFact> _apiFacts = <DocsApiFact>[
         'Optional. Defaults to MotionDurations.normal (250ms) — how long the '
         'spring-back takes. The asymmetry against downDuration is the '
         'whole feel: instant in, springy out.',
+  ),
+  DocsApiFact(
+    name: 'semanticLabel',
+    type: 'String?',
+    description:
+        'Optional. Defaults to null. What a screen reader calls this '
+        'control. Null leaves the child text to name it, which is what a '
+        'plain label already does; supply one where the child is a glyph.',
+  ),
+  DocsApiFact(
+    name: 'focusNode',
+    type: 'FocusNode?',
+    description:
+        'Optional. Defaults to null, and Press owns its own. Supply one '
+        'where a parent moves the focus between several controls.',
+  ),
+  DocsApiFact(
+    name: 'autofocus',
+    type: 'bool',
+    description:
+        'Optional. Defaults to false. Whether this control takes the focus '
+        'as soon as it is mounted.',
+  ),
+  DocsApiFact(
+    name: 'enabled',
+    type: 'bool',
+    description:
+        'Optional. Defaults to true. A disabled control announces that it '
+        'is disabled rather than going quiet: it keeps its enabled state '
+        'in the semantics tree, refuses activation, and takes no focus.',
+  ),
+  DocsApiFact(
+    name: 'expanded',
+    type: 'bool?',
+    description:
+        'Optional. Defaults to null. Whether this control shows or hides '
+        'something, and which way it is now. Null for a control that '
+        'discloses nothing, which is most of them.',
+  ),
+  DocsApiFact(
+    name: 'link',
+    type: 'bool',
+    description:
+        'Optional. Defaults to false. Announces as a link rather than a '
+        'button — what Breadcrumb passes.',
+  ),
+  DocsApiFact(
+    name: 'showFocusRing',
+    type: 'bool',
+    description:
+        'Optional. Defaults to true. The ring is painted outside the child '
+        'and takes no part in layout, so it cannot move a neighbour. Pass '
+        'false where the surface already draws its own, as Accordion does.',
+  ),
+  DocsApiFact(
+    name: 'focusRadius',
+    type: 'double',
+    description:
+        'Optional. Defaults to Radii.md. The corner the focus ring follows; '
+        'a pill passes Radii.full.',
+  ),
+  DocsApiFact(
+    name: 'minimumTarget',
+    type: 'bool',
+    description:
+        'Optional. Defaults to true. Expands the hit box to '
+        'TouchTargets.minimum (44) through TapTarget, without touching '
+        'layout. Pass false only where the control is packed against '
+        'another and the two would answer for each other.',
+  ),
+  DocsApiFact(
+    name: 'onFocusChange',
+    type: 'ValueChanged<bool>?',
+    description:
+        'Optional. Defaults to null. Reported so a surface can restyle on '
+        'focus without wiring a second Focus widget.',
+  ),
+  DocsApiFact(
+    name: 'onHoverChange',
+    type: 'ValueChanged<bool>?',
+    description:
+        'Optional. Defaults to null. Reported so a surface can tint on '
+        'hover without wiring a second MouseRegion.',
   ),
 ];
 

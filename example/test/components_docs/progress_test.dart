@@ -76,7 +76,22 @@ Widget _harness({
     textDirection: TextDirection.ltr,
     child: ThemeScope(
       controller: controller,
-      child: MaterialApp(home: SingleChildScrollView(child: child)),
+      child: MaterialApp(
+        home: Builder(
+          // The ambient ink every route inherits, as the docs shell sets it
+          // for the real app. Without it this subtree sits under WidgetsApp's
+          // red fallback style, which StyledText asserts on rather than
+          // quietly painting over.
+          builder: (BuildContext context) => DefaultTextStyle(
+            style: StyledText.styleOf(
+              context,
+              TextStyles.body,
+              color: ThemeScope.of(context).foreground,
+            ),
+            child: SingleChildScrollView(child: child),
+          ),
+        ),
+      ),
     ),
   ),
 );

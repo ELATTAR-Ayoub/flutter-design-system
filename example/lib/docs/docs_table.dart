@@ -88,7 +88,7 @@ class DocsTable extends StatelessWidget {
                   i,
                   StyledText(
                     columns[i].header,
-                    TextStyles.bodySmall,
+                    TextStyles.small,
                     color: theme.mutedForeground,
                   ),
                 ),

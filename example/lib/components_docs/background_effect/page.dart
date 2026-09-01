@@ -214,7 +214,7 @@ class BackgroundEffectDocPage extends StatelessWidget {
 
 Widget _caption(BuildContext context, String label) => StyledText(
   label,
-  TextStyles.caption,
+  TextStyles.small,
   color: ThemeScope.of(context).mutedForeground,
 );
 
@@ -296,14 +296,24 @@ class _BackdropSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
+    // `minHeight`, not a fixed `height`: at 100% text scale the caption
+    // fits comfortably inside `space(56)`, but at a large accessibility
+    // scale the two lines of copy need more room than that. A floor lets
+    // the card grow to fit the text instead of clipping it, while leaving
+    // the ordinary case exactly as tall as it always was.
     return Container(
       width: space(90),
-      height: space(56),
+      constraints: BoxConstraints(minHeight: space(56)),
       decoration: BoxDecoration(
         border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
+      // No `StackFit.expand`: the outer `Container` no longer has a fixed
+      // height (see above), so an expanding `Stack` would be asked to fill
+      // an unbounded height inside the page's scroll view. `StackFit.loose`
+      // sizes the `Stack` to its one non-positioned child — the caption
+      // column — and `Positioned.fill` still makes `BackgroundEffect` cover
+      // exactly that area.
       child: Stack(
-        fit: StackFit.expand,
         children: <Widget>[
           const Positioned.fill(child: BackgroundEffect()),
           Padding(

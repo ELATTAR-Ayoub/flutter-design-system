@@ -166,7 +166,7 @@ Widget pageLevelFailure(BuildContext context, AppError error) => Empty(
         Button(
           variant: ButtonVariant.outline,
           onPressed: () => Navigator.of(context).maybePop(),
-          child: StyledText(error.nextStep, TextStyles.buttonLabel),
+          child: StyledText(error.nextStep, TextStyles.nav),
         ),
       ],
     ),

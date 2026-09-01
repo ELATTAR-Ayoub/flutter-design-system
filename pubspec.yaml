@@ -1,6 +1,6 @@
 name: elattar_design_system
 description: "Flutter design system package: foundation tokens, components, effects, and motion primitives, with an unprefixed public API."
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/ELATTAR-Ayoub/flutter-design-system
 repository: https://github.com/ELATTAR-Ayoub/flutter-design-system
 issue_tracker: https://github.com/ELATTAR-Ayoub/flutter-design-system/issues
@@ -8,7 +8,12 @@ publish_to: 'none'
 
 environment:
   sdk: ^3.12.2
-  flutter: ">=1.17.0"
+  # The oldest Flutter this package is actually verified against, and the same
+  # floor every registry manifest already declares. The default `>=1.17.0` a
+  # package template ships is not a claim this package can support: the
+  # foundation and the components use TextScaler, FontVariation, OverlayPortal,
+  # menu anchors and RawMenuAnchor, none of which existed then.
+  flutter: ">=3.44.8"
 
 dependencies:
   flutter:
@@ -22,9 +27,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-  # Reference faces, converted from the web repo's own binaries.
-  # Families follow the TOKENS (--font-sans/--font-mono/--font-accent), not the
-  # prose comment in globals.css that names Space Grotesk.
+  # The two faces the type system ships: Inter for words, Geist Mono for code,
+  # identifiers and every numeric role.
   #
   # These are declared in the PACKAGE pubspec, so flutter_tools bundles them
   # automatically for every dependent app and registers them under the prefixed
@@ -38,10 +42,6 @@ flutter:
     - family: GeistMono
       fonts:
         - asset: assets/fonts/GeistMono-Variable.ttf
-    - family: Redaction35
-      fonts:
-        - asset: assets/fonts/Redaction35-Italic.ttf
-          style: italic
 
   # The voice orb's perlin field. `orb-vendor.tsx` edit 1 repointed upstream's
   # Google-CDN fetch at the reference's own `public/textures/perlin-noise.png`

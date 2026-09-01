@@ -498,7 +498,7 @@ Widget _bullets(ThemeTokens theme, List<String> lines) => Column(
 );
 
 /// One menu item for [_MenuSpecimen]: a label over a one-line muted
-/// description, centred in the fixed-height row the vertical rules sit in.
+/// description, centred in the row the vertical rules sit in.
 Widget _menuItem(ThemeTokens theme, String label, String description) => Column(
   mainAxisAlignment: MainAxisAlignment.center,
   crossAxisAlignment: CrossAxisAlignment.start,
@@ -506,7 +506,7 @@ Widget _menuItem(ThemeTokens theme, String label, String description) => Column(
   children: <Widget>[
     StyledText(label, TextStyles.small, color: theme.foreground),
     SizedBox(height: space(1)),
-    StyledText(description, TextStyles.caption, color: theme.mutedForeground),
+    StyledText(description, TextStyles.small, color: theme.mutedForeground),
   ],
 );
 
@@ -522,7 +522,7 @@ class _PreviewSpecimen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        StyledText('Horizontal', TextStyles.section),
+        StyledText('Horizontal', TextStyles.small),
         SizedBox(height: space(3)),
         Align(
           alignment: AlignmentDirectional.centerStart,
@@ -545,7 +545,7 @@ class _PreviewSpecimen extends StatelessWidget {
           ),
         ),
         SizedBox(height: space(8)),
-        StyledText('Vertical', TextStyles.section),
+        StyledText('Vertical', TextStyles.small),
         SizedBox(height: space(3)),
         SizedBox(
           height: space(6),
@@ -632,26 +632,36 @@ class _VerticalSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     height: space(5),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        StyledText('Blog', TextStyles.small),
-        SizedBox(width: space(4)),
-        const KeyedSubtree(
-          key: ValueKey<String>('separator-example:vertical-1'),
-          child: Separator.vertical(),
-        ),
-        SizedBox(width: space(4)),
-        StyledText('Docs', TextStyles.small),
-        SizedBox(width: space(4)),
-        const KeyedSubtree(
-          key: ValueKey<String>('separator-example:vertical-2'),
-          child: Separator.vertical(),
-        ),
-        SizedBox(width: space(4)),
-        StyledText('Source', TextStyles.small),
-      ],
+    // Horizontal scroll rather than wrapping to a second line: the row's
+    // fixed height is what lets `Separator.vertical()` stretch to a real
+    // rule rather than a zero-height one, and a `Wrap` would need to grow
+    // that height back on its own second line. At 200% text scale on
+    // mobile, "Blog · Docs · Source" alone already outgrows the width this
+    // has to fit in, so scrolling is the least invasive way to keep every
+    // label and rule on the one line the fixed height was built for.
+    child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          StyledText('Blog', TextStyles.small),
+          SizedBox(width: space(4)),
+          const KeyedSubtree(
+            key: ValueKey<String>('separator-example:vertical-1'),
+            child: Separator.vertical(),
+          ),
+          SizedBox(width: space(4)),
+          StyledText('Docs', TextStyles.small),
+          SizedBox(width: space(4)),
+          const KeyedSubtree(
+            key: ValueKey<String>('separator-example:vertical-2'),
+            child: Separator.vertical(),
+          ),
+          SizedBox(width: space(4)),
+          StyledText('Source', TextStyles.small),
+        ],
+      ),
     ),
   );
 }
@@ -680,30 +690,37 @@ class _MenuSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
-    return SizedBox(
-      height: space(10),
+    return ConstrainedBox(
+      // A minimum, not a height: two lines of scaled text need more room than
+      // 40px, and a vertical rule is happy to be taller.
+      constraints: BoxConstraints(minHeight: space(10)),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            _menuItem(theme, 'Docs', 'Guides and API'),
-            SizedBox(width: space(4)),
-            const KeyedSubtree(
-              key: ValueKey<String>('separator-example:menu-1'),
-              child: Separator.vertical(),
-            ),
-            SizedBox(width: space(4)),
-            _menuItem(theme, 'Blog', 'Release notes'),
-            SizedBox(width: space(4)),
-            const KeyedSubtree(
-              key: ValueKey<String>('separator-example:menu-2'),
-              child: Separator.vertical(),
-            ),
-            SizedBox(width: space(4)),
-            _menuItem(theme, 'Source', 'Open on GitHub'),
-          ],
+        // The rules stretch to whatever the tallest item measures, which is
+        // what a vertical separator is for; the row is no longer told a height
+        // in advance.
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              _menuItem(theme, 'Docs', 'Guides and API'),
+              SizedBox(width: space(4)),
+              const KeyedSubtree(
+                key: ValueKey<String>('separator-example:menu-1'),
+                child: Separator.vertical(),
+              ),
+              SizedBox(width: space(4)),
+              _menuItem(theme, 'Blog', 'Release notes'),
+              SizedBox(width: space(4)),
+              const KeyedSubtree(
+                key: ValueKey<String>('separator-example:menu-2'),
+                child: Separator.vertical(),
+              ),
+              SizedBox(width: space(4)),
+              _menuItem(theme, 'Source', 'Open on GitHub'),
+            ],
+          ),
         ),
       ),
     );

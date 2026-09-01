@@ -1,7 +1,7 @@
 {
   "name": "input-otp",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/input-otp.tsx` + the `input-otp` package it is markup for.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/input_otp.dart",
       "target": "@ui/input_otp.dart",
-      "sha256": "52ab646985c17b4c21686d70b8bec0c9a8a59dc0b7803524c71f5f5a5546af35"
+      "sha256": "23035f0d1268d814e5a37b05d0ff374c2c1798c6a32d65a0b034344d54101ef2"
     }
   ],
   "registryDependencies": [
@@ -34,7 +34,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/input_otp",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/input_otp.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/input_otp.dart",
   "exports": [
     "InputOtp",
     "InputOtpSeparator",

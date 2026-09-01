@@ -1,7 +1,7 @@
 {
   "name": "icon",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Curated, token-sized icon renderer and generated path catalog used by interactive components.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -43,7 +43,7 @@
     }
   ],
   "documentationRoute": "/components/icon",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/icon.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/icon.dart",
   "exports": [
     "Icon",
     "IconCircleElement",

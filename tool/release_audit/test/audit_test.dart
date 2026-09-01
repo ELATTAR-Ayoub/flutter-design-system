@@ -47,7 +47,10 @@ Map<String, Object?> _item(
   'type': type,
   'version': version,
   'documentationRoute': route,
-  'sourceLink': link ?? 'https://example.test/blob/v0.0.1/lib/$name.dart',
+  // An item pins its OWN version's tag: that is the commit its payload came
+  // from, and an item that stayed behind is still pointing at the release it
+  // was published in.
+  'sourceLink': link ?? 'https://example.test/blob/v$version/lib/$name.dart',
 };
 
 void main() {
@@ -153,18 +156,16 @@ const String defaultRegistryUrl =
       expect(dartStringConstant(identity, 'notThere'), isNull);
     });
 
-    test(
-      'resolves only the requested interpolation, leaving an unrequested '
-      'one as literal text',
-      () {
-        // The real shape post-refactor: `defaultRegistryUrl` interpolates
-        // both `siteOrigin` and `cliVersion` into one literal, and the audit
-        // only ever resolves `cliVersion` (see the comment in audit.dart).
-        // This pins that resolving one placeholder does not choke on, or
-        // silently drop, the other — the exact regression that would make
-        // the version-identity check start comparing `$cliVersion` against
-        // itself instead of against the real version.
-        const String withSiteOrigin = '''
+    test('resolves only the requested interpolation, leaving an unrequested '
+        'one as literal text', () {
+      // The real shape post-refactor: `defaultRegistryUrl` interpolates
+      // both `siteOrigin` and `cliVersion` into one literal, and the audit
+      // only ever resolves `cliVersion` (see the comment in audit.dart).
+      // This pins that resolving one placeholder does not choke on, or
+      // silently drop, the other — the exact regression that would make
+      // the version-identity check start comparing `$cliVersion` against
+      // itself instead of against the real version.
+      const String withSiteOrigin = '''
 const String siteOrigin = String.fromEnvironment(
   'ELATTAR_SITE_ORIGIN',
   defaultValue: 'https://example.test',
@@ -173,16 +174,15 @@ const String cliVersion = '0.0.1';
 
 const String defaultRegistryUrl = '\$siteOrigin/registry/\$cliVersion/';
 ''';
-        expect(
-          dartStringConstant(
-            withSiteOrigin,
-            'defaultRegistryUrl',
-            interpolations: const <String, String>{'cliVersion': '0.0.1'},
-          ),
-          r'$siteOrigin/registry/0.0.1/',
-        );
-      },
-    );
+      expect(
+        dartStringConstant(
+          withSiteOrigin,
+          'defaultRegistryUrl',
+          interpolations: const <String, String>{'cliVersion': '0.0.1'},
+        ),
+        r'$siteOrigin/registry/0.0.1/',
+      );
+    });
   });
 
   group('registryUrlCompositionFinding', () {
@@ -383,13 +383,64 @@ const String defaultRegistryUrl = '\$siteOrigin/registry/\$cliVersion/';
       );
     });
 
-    test('catches an item left at an older version', () {
+    test('an item may stay at the version it was released under', () {
+      // Immutability means an unchanged item keeps serving the payload it
+      // published. Forcing it forward would be a claim that it changed.
       expect(
         registryPinningFindings(
-          registry(<Map<String, Object?>>[_item('button', version: '0.0.0')]),
-          '0.0.1',
+          registry(<Map<String, Object?>>[
+            _item('button', version: '0.0.2'),
+            _item('form', version: '0.0.1'),
+          ]),
+          '0.0.2',
+        ),
+        isEmpty,
+      );
+    });
+
+    test('catches an item ahead of the registry version', () {
+      expect(
+        registryPinningFindings(
+          registry(<Map<String, Object?>>[_item('button', version: '0.1.0')]),
+          '0.0.2',
+        ),
+        contains(contains('ahead of the registry version')),
+      );
+    });
+
+    test('catches a version that is not a semver triple', () {
+      expect(
+        registryPinningFindings(
+          registry(<Map<String, Object?>>[_item('button', version: 'latest')]),
+          '0.0.2',
         ),
         contains(contains('declares version')),
+      );
+    });
+
+    test('catches a registry version no item is actually at', () {
+      expect(
+        registryPinningFindings(
+          registry(<Map<String, Object?>>[_item('button', version: '0.0.1')]),
+          '0.0.2',
+        ),
+        contains(contains('no item is at the registry version')),
+      );
+    });
+
+    test('catches a sourceLink pinned to the wrong tag', () {
+      expect(
+        registryPinningFindings(
+          registry(<Map<String, Object?>>[
+            _item(
+              'button',
+              version: '0.0.2',
+              link: 'https://example.test/blob/v0.0.1/lib/button.dart',
+            ),
+          ]),
+          '0.0.2',
+        ),
+        contains(contains('does not pin /blob/v0.0.2/')),
       );
     });
 

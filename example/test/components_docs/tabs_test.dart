@@ -363,30 +363,24 @@ void main() {
     },
   );
 
-  testWidgets(
-    'Tabs and its trigger wire no Focus widget of their own: there is no '
-    'keyboard tab stop and no arrow-key traversal',
-    (WidgetTester tester) async {
-      await _pump(tester);
+  testWidgets('Tabs wires real keyboard focus', (WidgetTester tester) async {
+    await _pump(tester);
 
-      expect(
-        find.descendant(
-          of: find.byKey(const ValueKey<String>('tabs-live-specimen')),
-          matching: find.byType(Focus),
-        ),
-        findsNothing,
-        reason:
-            'if this starts failing, Tabs has grown real keyboard focus '
-            'and the Accessibility/Keyboard sections of the docs page must '
-            'be updated to stop saying otherwise',
-      );
-    },
-  );
+    // The inverse of what this check used to assert. `Tabs` had no focus of
+    // any kind and the page said so plainly; the set owns one Tab stop now,
+    // and the Accessibility and Keyboard sections were rewritten with it.
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey<String>('tabs-live-specimen')),
+        matching: find.byType(Focus),
+      ),
+      findsWidgets,
+      reason: 'the set owns a FocusNode per trigger',
+    );
+  });
 
-  testWidgets('tabs exceeding the available track width overflow rather than '
-      'scrolling or wrapping, verified at a 390px-class width', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('tabs exceeding the available track width scroll rather than '
+      'clipping, verified at a 390px-class width', (WidgetTester tester) async {
     tester.view.physicalSize = _narrow;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -419,14 +413,31 @@ void main() {
     );
     await tester.pump();
 
-    // Tabs' track is an un-clipped, unscrolled Row (ActiveIndicator):
-    // it neither scrolls nor wraps when its triggers do not fit, so a
-    // RenderFlex overflow is the real, current behaviour, recorded here
-    // rather than asserted away, so the docs page's Responsive section
-    // stays honest if that ever changes.
-    final dynamic exception = tester.takeException();
-    expect(exception, isNotNull);
-    expect(exception.toString(), contains('overflowed'));
+    // The track scrolls when its triggers do not fit, so every tab stays
+    // reachable at a phone width instead of the last one being clipped off
+    // the edge.
+    expect(tester.takeException(), isNull);
+
+    final Finder scroller = find.ancestor(
+      of: find.byType(ActiveIndicator),
+      matching: find.byType(Scrollable),
+    );
+    expect(scroller, findsOneWidget);
+    final ScrollableState state = tester.state<ScrollableState>(scroller);
+    expect(state.position.axis, Axis.horizontal);
+    expect(
+      state.position.maxScrollExtent,
+      greaterThan(0),
+      reason: 'the five long labels do not fit 390px, so there is room to move',
+    );
+
+    // And the last tab is reachable by scrolling to it.
+    await tester.scrollUntilVisible(
+      find.text('Security settings'),
+      200,
+      scrollable: scroller,
+    );
+    expect(find.text('Security settings'), findsOneWidget);
   });
 
   testWidgets('the RTL specimen mirrors trigger order under a right-to-left '
@@ -496,7 +507,7 @@ void main() {
 
   testWidgets(
     'the state matrix documents selected, empty, focus-visible and reduced '
-    'motion, and the page states the missing keyboard support plainly',
+    'motion, and the page states the keyboard contract plainly',
     (WidgetTester tester) async {
       await _pump(tester);
       await _openDisclosure(tester, 'States');
@@ -524,7 +535,11 @@ void main() {
       }
 
       await _openDisclosure(tester, 'Keyboard');
-      expect(find.textContaining('no keyboard'), findsWidgets);
+      expect(
+        find.textContaining('One Tab stop for the whole set'),
+        findsWidgets,
+        reason: 'the Keyboard section states the contract the set now keeps',
+      );
     },
   );
 }

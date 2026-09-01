@@ -229,7 +229,7 @@ class _DashboardHero extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  StyledText('This week in motion', TextStyles.section),
+                  StyledText('This week in motion', TextStyles.small),
                   SizedBox(height: space(1)),
                   StyledText(
                     'One clear read on what your audience carried forward.',
@@ -248,7 +248,7 @@ class _DashboardHero extends StatelessWidget {
                 children: <Widget>[
                   const Icon.lucide(Lucide.refreshCw, size: IconSize.sm),
                   SizedBox(width: Button.gapFor(ButtonSize.sm)),
-                  StyledText('Refresh', TextStyles.buttonLabel),
+                  StyledText('Refresh', TextStyles.nav),
                 ],
               ),
             ),
@@ -259,7 +259,7 @@ class _DashboardHero extends StatelessWidget {
         SizedBox(height: space(2)),
         StyledText(
           'TOTAL QUALIFIED PLAYS · ${rangeLabel.toUpperCase()}',
-          TextStyles.eyebrow,
+          TextStyles.small,
         ),
         SizedBox(height: space(3)),
         const Badge(
@@ -340,7 +340,7 @@ class _MomentumFocus extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText('Momentum', TextStyles.section),
+          StyledText('Momentum', TextStyles.small),
           SizedBox(height: space(1)),
           StyledText('Qualified plays · $rangeLabel.', TextStyles.small),
           SizedBox(height: space(4)),
@@ -461,10 +461,7 @@ class _QueueItem extends StatelessWidget {
           size: ButtonSize.sm,
           variant: scheduled ? ButtonVariant.ghost : ButtonVariant.secondary,
           onPressed: () => onSchedule(id),
-          child: StyledText(
-            scheduled ? 'Undo' : 'Schedule',
-            TextStyles.buttonLabel,
-          ),
+          child: StyledText(scheduled ? 'Undo' : 'Schedule', TextStyles.nav),
         ),
       ],
     ),
@@ -501,7 +498,7 @@ class _StudioPulse extends StatelessWidget {
           variant: ButtonVariant.outline,
           size: ButtonSize.sm,
           onPressed: onShowUnavailable,
-          child: StyledText('Test recovery feedback', TextStyles.buttonLabel),
+          child: StyledText('Test recovery feedback', TextStyles.nav),
         ),
       ],
     ),
@@ -549,7 +546,7 @@ class _AudienceInsight extends StatelessWidget {
         'Insight saved',
         description: 'A reminder is waiting in your next planning session.',
       ),
-      child: StyledText('Save insight', TextStyles.buttonLabel),
+      child: StyledText('Save insight', TextStyles.nav),
     ),
   );
 }
@@ -620,7 +617,7 @@ class _OutlinedSection extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      StyledText(title, TextStyles.section),
+      StyledText(title, TextStyles.small),
       SizedBox(height: space(1)),
       StyledText(description, TextStyles.small),
       SizedBox(height: space(3)),
@@ -646,7 +643,7 @@ class _DashboardFailure extends StatelessWidget {
         variant: ButtonVariant.secondary,
         size: ButtonSize.sm,
         onPressed: onRetry,
-        child: StyledText('Retry', TextStyles.buttonLabel),
+        child: StyledText('Retry', TextStyles.nav),
       ),
     ),
   );

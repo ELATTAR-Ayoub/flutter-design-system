@@ -472,7 +472,7 @@ const String _usageBasicCode = '''DropdownMenu(
     label: 'Open menu',
     suppressPressScale: true,
     onPressed: () {},
-    child: const StyledText('Open menu', TextStyles.buttonLabel),
+    child: const StyledText('Open menu', TextStyles.nav),
   ),
   children: <MenuChild>[
     MenuItem(label: 'Edit', onSelect: () {}),
@@ -666,7 +666,7 @@ class _A11yRow extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            StyledText(label, TextStyles.section, color: theme.actionText),
+            StyledText(label, TextStyles.small, color: theme.actionText),
             SizedBox(height: space(1)),
             StyledText(body, TextStyles.small),
           ],
@@ -712,10 +712,21 @@ class _DropdownMenuPreviewState extends State<_DropdownMenuPreview> {
               onPressed: () {},
               child: Row(
                 mainAxisSize: MainAxisSize.min,
+                // `Flexible` + ellipsis rather than a bare `StyledText`: at
+                // 200% text scale on mobile the label alone needs more room
+                // than the trigger's available width, so it has to yield
+                // instead of pushing the trailing chevron off-screen.
                 children: <Widget>[
                   const Icon(IconGlyph.user, size: IconSize.sm),
                   SizedBox(width: space(2)),
-                  StyledText('Account menu', TextStyles.buttonLabel),
+                  Flexible(
+                    child: StyledText(
+                      'Account menu',
+                      TextStyles.nav,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
                   SizedBox(width: space(2)),
                   const Icon(IconGlyph.chevronDown, size: IconSize.sm),
                 ],
@@ -861,7 +872,7 @@ class _DropdownMenuExampleBasic extends StatelessWidget {
       label: 'Account',
       suppressPressScale: true,
       onPressed: () {},
-      child: StyledText('Account', TextStyles.buttonLabel),
+      child: StyledText('Account', TextStyles.nav),
     ),
     children: <MenuChild>[
       const MenuLabel('My Account'),
@@ -895,7 +906,7 @@ class _DropdownMenuExampleSubmenu extends StatelessWidget {
       label: 'Actions',
       suppressPressScale: true,
       onPressed: () {},
-      child: StyledText('Actions', TextStyles.buttonLabel),
+      child: StyledText('Actions', TextStyles.nav),
     ),
     children: <MenuChild>[
       MenuItem(label: 'Edit', onSelect: () {}),
@@ -923,7 +934,7 @@ class _DropdownMenuExampleShortcuts extends StatelessWidget {
       label: 'Account',
       suppressPressScale: true,
       onPressed: () {},
-      child: StyledText('Account', TextStyles.buttonLabel),
+      child: StyledText('Account', TextStyles.nav),
     ),
     children: <MenuChild>[
       MenuItem(label: 'Profile', shortcut: '⇧⌘P', onSelect: () {}),
@@ -944,7 +955,7 @@ class _DropdownMenuExampleIcons extends StatelessWidget {
       label: 'Account',
       suppressPressScale: true,
       onPressed: () {},
-      child: StyledText('Account', TextStyles.buttonLabel),
+      child: StyledText('Account', TextStyles.nav),
     ),
     children: <MenuChild>[
       MenuItem(label: 'Profile', icon: IconGlyph.user, onSelect: () {}),
@@ -977,7 +988,7 @@ class _DropdownMenuExampleCheckboxesState
       label: 'View',
       suppressPressScale: true,
       onPressed: () {},
-      child: StyledText('View', TextStyles.buttonLabel),
+      child: StyledText('View', TextStyles.nav),
     ),
     children: <MenuChild>[
       MenuCheckboxItem(
@@ -1017,7 +1028,7 @@ class _DropdownMenuExampleRadioGroupState
       label: 'Panel position',
       suppressPressScale: true,
       onPressed: () {},
-      child: StyledText('Panel position', TextStyles.buttonLabel),
+      child: StyledText('Panel position', TextStyles.nav),
     ),
     children: <MenuChild>[
       MenuRadioGroup(
@@ -1046,7 +1057,7 @@ class _DropdownMenuExampleDestructive extends StatelessWidget {
       label: 'Item',
       suppressPressScale: true,
       onPressed: () {},
-      child: StyledText('Item', TextStyles.buttonLabel),
+      child: StyledText('Item', TextStyles.nav),
     ),
     children: <MenuChild>[
       MenuItem(label: 'Edit', onSelect: () {}),

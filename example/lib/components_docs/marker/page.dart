@@ -417,24 +417,23 @@ class _DependenciesContent extends StatelessWidget {
   const _DependenciesContent();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => _bullets(ThemeScope.of(context), <String>[
-    'File: lib/src/components/ui/marker.dart, one file, holding Marker '
-        'and MarkerVariant and nothing private at all.',
-    'Flutter import: package:flutter/widgets.dart only.',
-    'Foundation imports: foundation/spacing.dart (space(), '
-        'BorderWidths.hairline), foundation/theme.dart (ThemeTokens), '
-        'foundation/typography.dart (ComponentTextStyles), theme_scope.dart '
-        '(StyledText, ThemeScope).',
-    'Component imports: none. This is the only one of the three '
-        'components split out of the old carousel page that depends on '
-        'no other component.',
-    'Registry dependencies: source-foundation, the shipped manifest\'s '
-        'own registryDependencies list, verbatim.',
-    'Assets: none. Fonts: none beyond the system type scale. Shaders: '
-        'none.',
-  ]);
+  Widget build(BuildContext context) =>
+      _bullets(ThemeScope.of(context), <String>[
+        'File: lib/src/components/ui/marker.dart, one file, holding Marker '
+            'and MarkerVariant and nothing private at all.',
+        'Flutter import: package:flutter/widgets.dart only.',
+        'Foundation imports: foundation/spacing.dart (space(), '
+            'BorderWidths.hairline), foundation/theme.dart (ThemeTokens), '
+            'foundation/typography.dart (TextStyles), theme_scope.dart '
+            '(StyledText, ThemeScope).',
+        'Component imports: none. This is the only one of the three '
+            'components split out of the old carousel page that depends on '
+            'no other component.',
+        'Registry dependencies: source-foundation, the shipped manifest\'s '
+            'own registryDependencies list, verbatim.',
+        'Assets: none. Fonts: none beyond the system type scale. Shaders: '
+            'none.',
+      ]);
 }
 
 class _ThemingContent extends StatelessWidget {
@@ -448,7 +447,7 @@ class _ThemingContent extends StatelessWidget {
             'the rules and for the bottom border of the border variant.',
         'No colour parameter exists. A caller cannot recolour the label '
             'or the rules without wrapping or forking the widget.',
-        'Type is TextStyles.bodySmall, fixed. There is no spec '
+        'Type is TextStyles.small, fixed. There is no spec '
             'parameter, so a marker cannot be made larger or bolder from '
             'a call site.',
         'Rule thickness is BorderWidths.hairline in both places it appears, '
@@ -484,7 +483,7 @@ const List<DocsApiFact> _markerFacts = <DocsApiFact>[
     type: 'String',
     description:
         'Required, no default. The whole of the row\'s text, drawn at '
-        'TextStyles.bodySmall in theme.mutedForeground. Centre-aligned '
+        'TextStyles.small in theme.mutedForeground. Centre-aligned '
         'under the separator variant, left-aligned under the other two.',
   ),
   DocsApiFact(

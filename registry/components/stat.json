@@ -1,7 +1,7 @@
 {
   "name": "stat",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/stat.tsx` — a labelled figure, an optional delta, an",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/stat.dart",
       "target": "@ui/stat.dart",
-      "sha256": "38b133d8275ce57083c48e4d806dd28bcbca5493255b4332c248982e7e345b96"
+      "sha256": "09db3763866408c41394a7a72723587465c51d45b831bd0cf961c5b1f73d29d7"
     }
   ],
   "registryDependencies": [
@@ -28,7 +28,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/stat",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/stat.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/stat.dart",
   "exports": [
     "Stat",
     "StatDelta",

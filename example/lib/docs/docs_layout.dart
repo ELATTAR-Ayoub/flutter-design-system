@@ -478,6 +478,27 @@ class _DocsLayoutState extends State<DocsLayout> {
 
   @override
   Widget build(BuildContext context) {
+    // The ambient ink every string on this page inherits.
+    //
+    // `shell.dart` sets the same style for the site, so a page reached by a
+    // route already has one. A documentation page is also mounted directly —
+    // by the component-doc tests, and by anything embedding one — and there the
+    // nearest `DefaultTextStyle` is `WidgetsApp`'s red fallback, which
+    // `StyledText` asserts on rather than quietly painting over. A page that
+    // only reads correctly inside one particular ancestor is not a page, it is
+    // a fragment. Wrapping here rather than inside covers the rails and the
+    // anchor strip too, which sit beside the article rather than in it.
+    return DefaultTextStyle(
+      style: StyledText.styleOf(
+        context,
+        TextStyles.body,
+        color: ThemeScope.of(context).foreground,
+      ),
+      child: Builder(builder: _buildPage),
+    );
+  }
+
+  Widget _buildPage(BuildContext context) {
     final double viewport = MediaQuery.sizeOf(context).width;
     final bool wide = viewport >= Breakpoints.lg;
     final bool extraWide = viewport >= Breakpoints.xl;
@@ -1201,19 +1222,10 @@ class _Article extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               if (eyebrow != null) ...<Widget>[
-                StyledText(
-                  eyebrow!,
-                  TextStyles.section,
-                  color: theme.actionText,
-                ),
+                StyledText(eyebrow!, TextStyles.small, color: theme.actionText),
                 SizedBox(height: space(2)),
               ],
-              StyledText(
-                intro.title,
-                TextStyles.h1,
-                fontSize: Fluid.h1(context),
-                color: theme.foreground,
-              ),
+              StyledText(intro.title, TextStyles.h1, color: theme.foreground),
               SizedBox(height: space(3)),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
@@ -1259,7 +1271,7 @@ class _TableOfContents extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText('ON THIS PAGE', TextStyles.section),
+          StyledText('ON THIS PAGE', TextStyles.small),
           SizedBox(height: space(3)),
           for (final DocsTocEntry entry in entries) ...<Widget>[
             _TocRow(entry: entry, onAnchor: onAnchor),
@@ -1392,7 +1404,7 @@ class _AnchorStrip extends StatelessWidget {
             size: ButtonSize.sm,
             label: 'Jump to ${entry.title}',
             onPressed: () => onAnchor(entry.anchor),
-            child: StyledText(entry.title, TextStyles.buttonLabel),
+            child: StyledText(entry.title, TextStyles.nav),
           );
         },
       ),
@@ -1456,7 +1468,7 @@ class _PageLinkCard extends StatelessWidget {
       onPressed: () => onNavigate(link!.route),
       expanded: true,
       contentAlignment: Alignment.centerLeft,
-      child: StyledText(link!.title, TextStyles.buttonLabel),
+      child: StyledText(link!.title, TextStyles.nav),
     );
   }
 }

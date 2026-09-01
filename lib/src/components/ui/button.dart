@@ -553,30 +553,46 @@ class Button extends StatefulWidget {
     ButtonSize.xl || ButtonSize.iconLg => 20,
   };
 
-  /// The `text-*` class a rung declares, or **null** where it declares none.
+  /// Medium is the weight a button label carries at every rung — heavy enough
+  /// to read as a target, light enough not to shout beside a heading.
+  static const double _labelWght = 500;
+
+  /// The extra weight and the letterspacing [ButtonEmphasis.caps] adds, so a
+  /// short uppercase run does not set solid.
+  static const double _capsWght = 600;
+  static const double _capsTracking = 0.09;
+
+  /// The type role a rung's label uses, or **null** where the rung owns no
+  /// text.
   ///
-  /// Null is not a missing case: the four `icon-*` rungs genuinely set no
-  /// font-size, so their label inherits whatever the page is set in — which is
-  /// what [_ButtonState.build] reproduces by merging only the ink into the
-  /// ambient [DefaultTextStyle] instead of replacing it.
+  /// Null is not a missing case: the four `icon-*` rungs are squares around a
+  /// glyph and carry no label, so a caller that puts text in one gets the
+  /// ambient style with only the button's ink merged in, rather than a size
+  /// this component invented.
   ///
-  /// [emphasis] is checked first because cva emits it last: `caps` overrides
-  /// every rung's own class, squares included.
+  /// Both label sizes come from the public scale — [TextStyles.small] for the
+  /// two compact rungs, [TextStyles.body] for the three reading rungs — and the
+  /// weight is derived rather than published, because "button label" is
+  /// anatomy, not a type role. [ButtonEmphasis.caps] keeps the rung's size and
+  /// leading and changes only weight and tracking; it never drops to a smaller
+  /// step.
   static TextStyleToken? typeFor(ButtonSize size, ButtonEmphasis emphasis) {
-    if (emphasis == ButtonEmphasis.caps) {
-      return TextStyles.buttonLabelCaps;
-    }
-    return switch (size) {
-      ButtonSize.xs => TextStyles.buttonLabelXs,
-      ButtonSize.sm => TextStyles.buttonLabelSm,
-      ButtonSize.md => TextStyles.buttonLabel,
-      ButtonSize.lg => TextStyles.buttonLabelLg,
-      ButtonSize.xl => TextStyles.buttonLabelXl,
+    final TextStyleToken? role = switch (size) {
+      ButtonSize.xs || ButtonSize.sm => TextStyles.small,
+      ButtonSize.md || ButtonSize.lg || ButtonSize.xl => TextStyles.body,
       ButtonSize.iconXs ||
       ButtonSize.iconSm ||
       ButtonSize.icon ||
       ButtonSize.iconLg => null,
     };
+    if (role == null) return null;
+    return emphasis == ButtonEmphasis.caps
+        ? role.derive(
+            name: 'button-label-caps',
+            wght: _capsWght,
+            tracking: _capsTracking,
+          )
+        : role.derive(name: 'button-label', wght: _labelWght);
   }
 
   /// Whether the size is one of the four squares.
@@ -877,7 +893,11 @@ class _ButtonState extends State<Button> {
       children: <Widget>[
         const Spinner(),
         SizedBox(width: Button.gapFor(widget.size)),
-        label,
+        // The spinner is the fixed part; the label is what gives. Without
+        // `Flexible` a loading button in a narrow box overflows by however
+        // much the label's natural width exceeds what is left beside the
+        // spinner — confirmed at 2x text scale, 986px on a 96px button.
+        Flexible(child: label),
       ],
     );
   }

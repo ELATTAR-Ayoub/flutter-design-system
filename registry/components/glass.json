@@ -1,7 +1,7 @@
 {
   "name": "glass",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Glass — `app/globals.css` L1560–1617.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -24,7 +24,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/glass",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/glass.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/glass.dart",
   "exports": [
     "Glass",
     "GlassVariant"

@@ -127,7 +127,10 @@ void main() {
       for (final StyledText widget in tester.widgetList<StyledText>(
         find.byType(StyledText),
       )) {
-        expect(widget.spec.uppercase, isFalse);
+        expect(
+          widget.spec.mobile.size,
+          greaterThanOrEqualTo(TextStyles.small.mobile.size),
+        );
       }
     },
   );

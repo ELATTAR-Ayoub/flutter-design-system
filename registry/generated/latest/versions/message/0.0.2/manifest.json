@@ -1,0 +1,30 @@
+{
+  "name": "message",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/message.tsx` — one turn, laid out.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/message.dart",
+      "target": "@ui/message.dart",
+      "sha256": "e5961d8dcb4ebabf566443dbcc3712267b8b710bd579249fda50f201feeb0240"
+    }
+  ],
+  "registryDependencies": [
+    "bubble",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "bubble"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/message",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/message.dart",
+  "deprecated": false
+}

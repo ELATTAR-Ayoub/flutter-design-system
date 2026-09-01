@@ -1,7 +1,7 @@
 {
   "name": "marker",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/marker.tsx` — *\\\"a note **about** a list, sitting in the",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/marker.dart",
       "target": "@ui/marker.dart",
-      "sha256": "171fb32aa1399863369a7bc9d1aa05b49fe01c4f59fea86e70f3c0f1391c5863"
+      "sha256": "1573f14febd1a26a44e2f0d8f839806193c77ef78dbe2d19dc219f22244bce81"
     }
   ],
   "registryDependencies": [
@@ -21,7 +21,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/marker",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/marker.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/marker.dart",
   "exports": [
     "Marker",
     "MarkerVariant"

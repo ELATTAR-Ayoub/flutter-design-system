@@ -364,7 +364,7 @@ void main() {
           findsNWidgets(2),
         );
         // Only the recognised fence prints a normalised language label —
-        // TextStyles.eyebrowSmall renders it visually uppercase (text-transform is
+        // TextStyles.small renders it visually uppercase (text-transform is
         // applied to the string StyledText paints, not to the source), so the
         // label reads "TYPESCRIPT" rather than "typescript".
         expect(

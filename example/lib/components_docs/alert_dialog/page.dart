@@ -453,7 +453,7 @@ const String _destructiveCode = '''Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          StyledText('Delete this workspace', TextStyles.section),
+          StyledText('Delete this workspace', TextStyles.small),
           SizedBox(height: space(1)),
           StyledText(
             'Every project, member, and file inside it is removed '
@@ -583,8 +583,13 @@ class _SizesSpecimen extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
+  // `Wrap`, not `Row`: two trigger buttons at a large accessibility text
+  // scale can outgrow the showcase frame's width; `Wrap` drops the second
+  // to its own line instead of overflowing, and sits on one line exactly
+  // like the `Row` it replaces whenever there is room.
+  Widget build(BuildContext context) => Wrap(
+    spacing: space(3),
+    runSpacing: space(3),
     children: <Widget>[
       _dialog(
         key: const ValueKey<String>('alert-dialog-example:size-normal'),
@@ -594,7 +599,6 @@ class _SizesSpecimen extends StatelessWidget {
             'AlertDialogSize.normal is the default: 384px maxWidth, the '
             'same as a plain dialog.',
       ),
-      SizedBox(width: space(3)),
       _dialog(
         key: const ValueKey<String>('alert-dialog-example:size-sm'),
         label: 'Small',
@@ -625,7 +629,7 @@ class _AlertDialogComposition extends StatelessWidget {
             children: <Widget>[
               StyledText(
                 'Delete this workspace',
-                TextStyles.section,
+                TextStyles.small,
                 color: theme.foreground,
               ),
               SizedBox(height: space(1)),
@@ -798,7 +802,7 @@ const List<DocsApiFact> _titleFacts = <DocsApiFact>[
     type: 'String',
     description:
         'Required, positional: AlertDialogTitle(text). Rendered at '
-        'TextStyles.overlayTitle with no leading override.',
+        'TextStyles.h4 with no leading override.',
   ),
 ];
 
@@ -1270,7 +1274,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(label, TextStyles.section, color: theme.actionText),
+          StyledText(label, TextStyles.small, color: theme.actionText),
           SizedBox(height: space(1)),
           StyledText(body, TextStyles.small),
         ],

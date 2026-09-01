@@ -1,0 +1,38 @@
+{
+  "name": "select",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "Generic typed select with grouped options, separators, labels, keyboard-friendly menu behavior, sizes, and scroll controls.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/select.dart",
+      "target": "@ui/select.dart",
+      "sha256": "f37cd76f2035e376e35903d5bbebc1ad311ee03cdfa95f018f5de8d9c49993b6"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "field",
+    "icon",
+    "surface",
+    "popover",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "field",
+    "icon",
+    "surface",
+    "popover"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/select",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/select.dart",
+  "deprecated": false
+}

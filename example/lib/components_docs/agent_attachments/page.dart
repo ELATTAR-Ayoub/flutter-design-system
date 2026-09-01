@@ -360,7 +360,7 @@ class _DeliveryBadgeSpecimen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            StyledText(label, TextStyles.section, color: theme.mutedForeground),
+            StyledText(label, TextStyles.small, color: theme.mutedForeground),
             SizedBox(height: space(2)),
             AgentDeliveryBadge(
               key: ValueKey<String>(key),

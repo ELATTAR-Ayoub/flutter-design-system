@@ -1,0 +1,112 @@
+Resolving dependencies...
+Downloading packages...
+  clock 1.1.2 (1.1.3 available)
+  matcher 0.12.19 (0.12.20 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.0 (1.19.0 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  test_api 0.7.11 (0.7.13 available)
+  vector_math 2.2.0 (2.4.2 available)
+  vm_service 15.2.0 (15.3.0 available)
+  yaml 3.1.3 (3.1.4 available)
+Got dependencies!
+9 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Resolving dependencies in `.\example`...
+Downloading packages...
+Got dependencies in `.\example`.
+00:00 +0: loading D:/DESIGN/Design-System-2026-8/flutter-design-system/test/overlay_menu_family_test.dart
+00:00 +0: Menu — DropdownMenu over MenuContent 1. opening moves focus INSIDE MenuContent, not merely off the trigger
+00:02 +1: Menu — DropdownMenu over MenuContent 2. Tab does not trap here — it CLOSES the menu (menu.dart:881-882), matching this consumer's own documented contract rather than a trap
+00:02 +2: Menu — DropdownMenu over MenuContent 3. ArrowDown/ArrowUp/Home/End move the highlight with NO wrap (menu.dart:738-750), and typeahead jumps to a matching row (menu.dart:758-783)
+00:02 +3: Menu — DropdownMenu over MenuContent 4. Escape closes it (menu.dart:879-880)
+00:03 +4: Menu — DropdownMenu over MenuContent 5. focus returns to the trigger on close
+00:03 +5: Menu — DropdownMenu over MenuContent 6. an outside tap closes the menu and returns focus to the trigger — DropdownMenu's Popover uses the default PopoverBarrier.modal (opaque; popover.dart:825-838), which intercepts every outside tap before it can land on any other widget, so the "focus already moved elsewhere" race popover.dart guards against cannot arise for this consumer — verified as the actual, always-restores behaviour
+00:04 +6: Menu — DropdownMenu over MenuContent 7. pumping the overlay away mid-open disposes cleanly
+00:05 +7: Menu — DropdownMenu over MenuContent 8. a disabled trigger does not open the menu
+
+Warning: A call to tap() with finder "Found 1 widget with text "Open menu": [
+  Text("Open menu", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, SelectionRegistrarScope]),
+]" derived an Offset (Offset(400.0, 300.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#6ab24 relayoutBoundary=up19
+The hit test result at that offset is: HitTestResult(_RenderInkFeatures#c7ba2@Offset(400.0, 300.0), RenderPhysicalModel#44ece@Offset(400.0, 300.0), RenderSemanticsAnnotations#adb4e@Offset(400.0, 300.0), RenderRepaintBoundary#2927a@Offset(400.0, 300.0), RenderIgnorePointer#e9f67@Offset(400.0, 300.0), RenderAnimatedOpacity#70ec3@Offset(400.0, 300.0), RenderAnimatedOpacity#d4d3c@Offset(400.0, 300.0), _RenderColoredBox#6a385@Offset(400.0, 300.0), RenderAnimatedOpacity#b26db@Offset(400.0, 300.0), RenderIgnorePointer#87f0e@Offset(400.0, 300.0), RenderAnimatedOpacity#037fb@Offset(400.0, 300.0), RenderRepaintBoundary#af566@Offset(400.0, 300.0), RenderSemanticsAnnotations#07e27@Offset(400.0, 300.0), RenderOffstage#abe8c@Offset(400.0, 300.0), RenderSemanticsAnnotations#3141b@Offset(400.0, 300.0), _RenderTheater#3d710@Offset(400.0, 300.0), RenderAbsorbPointer#0920f@Offset(400.0, 300.0), RenderPointerListener#7336d@Offset(400.0, 300.0), RenderSemanticsAnnotations#11ec1@Offset(400.0, 300.0), RenderSemanticsAnnotations#67f65@Offset(400.0, 300.0), RenderSemanticsAnnotations#0bb13@Offset(400.0, 300.0), RenderSemanticsAnnotations#591fa@Offset(400.0, 300.0), RenderTapRegionSurface#cbbb3@Offset(400.0, 300.0), RenderSemanticsAnnotations#22185@Offset(400.0, 300.0), RenderSemanticsAnnotations#6a68c@Offset(400.0, 300.0), HitTestEntry<HitTestTarget>#c095c(_ReusableRenderView#6bf7a), HitTestEntry<HitTestTarget>#aa781(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/test/overlay_menu_family_test.dart:358:15)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:05 +8: Menu — DropdownMenu over MenuContent 9. semantics — a row exposes a button role, its label, and enabled state (menu.dart:1395-1413); a checked row exposes selected:true
+00:05 +9: Select — its own OverlayEntry, not Popover 1. DEFECT — opening does NOT move focus into the menu content. select.dart:738 writes a bare `Focus(autofocus: true, …)` wrapping `SelectMenu`, with no imperative `.requestFocus()` fallback the way menu.dart:706-718's twin surface has. Flutter only honours autofocus while no other node in the tree already holds focus, and a mounted route's own FocusScopeNode always does — so this autofocus is silently skipped every time, confirmed here whether or not the trigger was explicitly pre-focused first. Proposed fix: give the menu its own FocusNode and call `.requestFocus()` from a post-frame callback in `_buildMenu`/`_openMenu`, mirroring menu.dart's `_MenuContentState.initState`.
+00:06 +10: Select — its own OverlayEntry, not Popover 2/3. DEFECT — the arrow/Home/End keys never reach _onMenuKey from a real keyboard interaction, because #1's defect means the menu never actually holds the focus: sendKeyEvent delivers to FocusManager.instance.primaryFocus, which stays on the trigger. select.dart's own switch at select.dart:451-467 (arrows/Home/End walk with wrap) is never reached in practice — verified here as the actual, unchanged highlight
+00:06 +11: Select — its own OverlayEntry, not Popover 4. DEFECT — Escape does not close the menu either, for the same reason: the trigger still holds the focus (select.dart:468-470 is never reached). Tab is a separate, odder case: it is not select.dart's own logic that ever runs, but Tab still visibly does something — see the comment inside this test
+00:06 +12: Select — its own OverlayEntry, not Popover 5. focus returns to the trigger on close — via a committed row (clicking is unaffected by the #1/#2-4 focus defect, since a click does not depend on the menu's Focus node ever having received keyboard focus)
+00:07 +13: Select — its own OverlayEntry, not Popover 6. an outside tap closes the menu and restores the trigger — Select's own full-screen scrim (select.dart:726-731, a Positioned.fill opaque GestureDetector under the WHOLE overlay theatre) intercepts every outside tap, so nothing else in the app can ever receive it and steal the focus first — the unconditional restore in #5 is therefore safe, verified rather than assumed
+00:07 +14: Select — its own OverlayEntry, not Popover 7. pumping the overlay away mid-open disposes cleanly (select.dart:380-385 removes the OverlayEntry in dispose)
+00:07 +15: Select — its own OverlayEntry, not Popover 8. a disabled trigger does not open the menu
+
+Warning: A call to tap() with finder "Found 1 widget with type "Select<String>": [
+  Select<String>(dependencies: [MediaQuery, ThemeScope], state: _SelectState<String>#ddf1f),
+]" derived an Offset (Offset(400.0, 300.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderSemanticsAnnotations#8f0ce relayoutBoundary=up1
+The hit test result at that offset is: HitTestResult(_RenderInkFeatures#5051e@Offset(400.0, 300.0), RenderPhysicalModel#d04cb@Offset(400.0, 300.0), RenderSemanticsAnnotations#b7bb9@Offset(400.0, 300.0), RenderRepaintBoundary#e79d5@Offset(400.0, 300.0), RenderIgnorePointer#e1b2e@Offset(400.0, 300.0), RenderAnimatedOpacity#43c93@Offset(400.0, 300.0), RenderAnimatedOpacity#8a59c@Offset(400.0, 300.0), _RenderColoredBox#85eb9@Offset(400.0, 300.0), RenderAnimatedOpacity#b41dc@Offset(400.0, 300.0), RenderIgnorePointer#3b554@Offset(400.0, 300.0), RenderAnimatedOpacity#090c1@Offset(400.0, 300.0), RenderRepaintBoundary#4d1c7@Offset(400.0, 300.0), RenderSemanticsAnnotations#638d4@Offset(400.0, 300.0), RenderOffstage#886b5@Offset(400.0, 300.0), RenderSemanticsAnnotations#8a87c@Offset(400.0, 300.0), _RenderTheater#30b63@Offset(400.0, 300.0), RenderAbsorbPointer#994ce@Offset(400.0, 300.0), RenderPointerListener#8b4b7@Offset(400.0, 300.0), RenderSemanticsAnnotations#6eaa3@Offset(400.0, 300.0), RenderSemanticsAnnotations#66073@Offset(400.0, 300.0), RenderSemanticsAnnotations#294b9@Offset(400.0, 300.0), RenderSemanticsAnnotations#a076f@Offset(400.0, 300.0), RenderTapRegionSurface#20a9f@Offset(400.0, 300.0), RenderSemanticsAnnotations#59f2c@Offset(400.0, 300.0), RenderSemanticsAnnotations#357e8@Offset(400.0, 300.0), HitTestEntry<HitTestTarget>#af2a2(_ReusableRenderView#6bf7a), HitTestEntry<HitTestTarget>#fa1e8(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/test/overlay_menu_family_test.dart:619:15)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:08 +16: Select — its own OverlayEntry, not Popover 9. semantics — the trigger exposes button/expanded/enabled (select.dart:636-644), and a row exposes button/selected (select.dart:1247-1261)
+00:08 +17: Combobox — Popover, but focus never leaves the input 1. N/A by this consumer's own documented contract — popover.dart's library doc: "the combobox keeps the caret in its input while its popup is open" (popover.dart:41-46). Verified: the input keeps the focus through the whole open, and the popup's rows carry no FocusNode at all (combobox.dart _ComboboxRow — GestureDetector only)
+00:10 +18: Combobox — Popover, but focus never leaves the input 2. Tab is NOT intercepted here — combobox.dart's _onKey (combobox.dart:362-388) has no Tab case, so default traversal moves focus off the input and nothing closes the popup. Verified as the actual behaviour and flagged as a defect candidate (see report): a combobox popup with no blur-close leaves a dangling open list once the reader has tabbed past it
+00:10 +19: Combobox — Popover, but focus never leaves the input 3. ArrowDown/ArrowUp open the popup, then move the highlight and wrap THROUGH the input at -1 (combobox.dart:341-360, loop:true, autoHighlight:false)
+00:11 +20: Combobox — Popover, but focus never leaves the input 4. Escape closes it while open (combobox.dart:381-383)
+00:12 +21: Combobox — Popover, but focus never leaves the input 5. focus is never taken, so there is nothing to restore — it stays on the input across the whole open/close cycle
+00:12 +22: Combobox — Popover, but focus never leaves the input 6. an outside tap closes the popup without moving the focus — same PopoverBarrier.modal reasoning as Menu/Select (Combobox passes no `barrier:` either, so it takes the same opaque default), and since the input held the focus the whole time (see #1/#5) there was nothing to steal in the first place
+00:12 +23: Combobox — Popover, but focus never leaves the input 7. pumping the overlay away mid-open disposes cleanly
+00:12 +24: Combobox — Popover, but focus never leaves the input 8. a disabled combobox does not open on a pointer or a key
+
+Warning: A call to tap() with finder "Found 1 widget with type "Combobox<String>": [
+  Combobox<String>(state: _ComboboxState<String>#a7859),
+]" derived an Offset (Offset(400.0, 300.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderSemanticsAnnotations#f1539 relayoutBoundary=up2
+The hit test result at that offset is: HitTestResult(_RenderInkFeatures#7dadf@Offset(400.0, 300.0), RenderPhysicalModel#1a90b@Offset(400.0, 300.0), RenderSemanticsAnnotations#00850@Offset(400.0, 300.0), RenderRepaintBoundary#470ad@Offset(400.0, 300.0), RenderIgnorePointer#409a8@Offset(400.0, 300.0), RenderAnimatedOpacity#3f848@Offset(400.0, 300.0), RenderAnimatedOpacity#7c0d5@Offset(400.0, 300.0), _RenderColoredBox#f9a52@Offset(400.0, 300.0), RenderAnimatedOpacity#37a47@Offset(400.0, 300.0), RenderIgnorePointer#1e3cf@Offset(400.0, 300.0), RenderAnimatedOpacity#4b77a@Offset(400.0, 300.0), RenderRepaintBoundary#32223@Offset(400.0, 300.0), RenderSemanticsAnnotations#0102b@Offset(400.0, 300.0), RenderOffstage#11736@Offset(400.0, 300.0), RenderSemanticsAnnotations#abbec@Offset(400.0, 300.0), _RenderTheater#b9bb8@Offset(400.0, 300.0), RenderAbsorbPointer#54cb2@Offset(400.0, 300.0), RenderPointerListener#b4f36@Offset(400.0, 300.0), RenderSemanticsAnnotations#64b6b@Offset(400.0, 300.0), RenderSemanticsAnnotations#9ba70@Offset(400.0, 300.0), RenderSemanticsAnnotations#177f0@Offset(400.0, 300.0), RenderSemanticsAnnotations#d8f5d@Offset(400.0, 300.0), RenderTapRegionSurface#551bf@Offset(400.0, 300.0), RenderSemanticsAnnotations#ae40d@Offset(400.0, 300.0), RenderSemanticsAnnotations#d1a09@Offset(400.0, 300.0), HitTestEntry<HitTestTarget>#59a11(_ReusableRenderView#6bf7a), HitTestEntry<HitTestTarget>#b3a5c(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/test/overlay_menu_family_test.dart:866:15)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:13 +25: Combobox — Popover, but focus never leaves the input 9. semantics — textField/expanded/enabled on the field (combobox.dart:479-487), and button/selected on a row (combobox.dart:672-686)
+00:13 +26: Command — inline, always open, neither kernel (command.dart:6-8) 3. ArrowDown/Up (no loop, command.dart:750-765), Home/End (command.dart:767-775), Ctrl+N/P vim bindings (command.dart:840-849) and Alt+Arrow group jump (command.dart:779-794) all move the selection as documented — once the search input holds the focus: command.dart:1038-1043 wraps the whole palette in a `Focus(canRequestFocus: false, onKeyEvent: _onKey)`, which only sees keys that bubble up from a focused descendant (the input), exactly like a real `<div cmdk-root tabIndex={-1}>`
+00:13 +27: Command — inline, always open, neither kernel (command.dart:6-8) 3b. Ctrl+N / Ctrl+P step exactly like ArrowDown / ArrowUp (command.dart:839-849)
+00:14 +28: Command — inline, always open, neither kernel (command.dart:6-8) 7. mounting and unmounting disposes cleanly
+00:14 +29: Command — inline, always open, neither kernel (command.dart:6-8) 9. semantics — the root is a labelled container (command.dart:1045: `Semantics(container: true, label: …)`), and the auto-selected first row exposes button/selected (command.dart:1376-1394)
+00:14 +30: All tests passed!

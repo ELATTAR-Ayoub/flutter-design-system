@@ -83,33 +83,23 @@ void main() {
     testWidgets('for every class the four foundation pages set', (
       WidgetTester tester,
     ) async {
-      final Map<String, (TextStyleToken, double)> classes =
-          <String, (TextStyleToken, double)>{
-            '.type-small': (TextStyles.small, 13),
-            '.type-h3': (TextStyles.h3, 21),
-            '.type-h4': (TextStyles.h4, 17),
-            '.type-lead': (TextStyles.lead, 17),
-            '.type-body': (TextStyles.body, 15),
-            '.type-micro': (TextStyles.eyebrowSmall, 10.5),
-            '.type-label': (TextStyles.eyebrow, 11),
-            '.type-num-sm': (TextStyles.numberSm, 12),
-            '.type-chip': (TextStyles.chip, 11.5),
-            '.type-caption': (TextStyles.caption, 10.5),
-          };
-
-      for (final MapEntry<String, (TextStyleToken, double)> entry
-          in classes.entries) {
-        final (TextStyleToken spec, double size) = entry.value;
+      for (final TextStyleToken role in TextStyles.all) {
+        // The scope pins the width the role resolves against, so the assertion
+        // does not depend on the test surface.
+        final TypeStep step = role.mobile;
         final Size box = await _measure(
           tester,
-          // allow-hardcoded: a specimen word, not copy.
-          StyledText('Hxg', spec, color: _ink, fontSize: size),
+          TypeWidthScope(
+            width: 600,
+            // allow-hardcoded: a specimen word, not copy.
+            child: StyledText('Hxg', role, color: _ink),
+          ),
           width: 600,
         );
         expect(
           box.height,
-          closeTo(size * spec.height!, 0.001),
-          reason: '${entry.key} is one line of ${size * spec.height!}px',
+          closeTo(step.leading, 0.001),
+          reason: '${role.name} is one line of ${step.leading}px',
         );
       }
     });
@@ -126,7 +116,7 @@ void main() {
         ),
         width: 260,
       );
-      final double line = TextStyles.small.size! * TextStyles.small.height!;
+      final double line = TextStyles.small.step.leading;
       expect(box.height % line, closeTo(0, 0.001));
       expect(box.height / line, greaterThan(1));
     });
@@ -146,7 +136,7 @@ void main() {
         tester,
         StyledText('globals.css', TextStyles.code, color: _ink, inline: true),
       );
-      expect(block.height, closeTo(12.5 * TextStyles.code.height!, 0.001));
+      expect(block.height, closeTo(TextStyles.code.step.leading, 0.001));
       expect(inline.height, lessThan(block.height));
     });
 

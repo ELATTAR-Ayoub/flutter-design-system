@@ -309,7 +309,7 @@ class _Captioned extends StatelessWidget {
       children: <Widget>[
         child,
         SizedBox(height: space(2)),
-        StyledText(caption, TextStyles.section, color: theme.mutedForeground),
+        StyledText(caption, TextStyles.small, color: theme.mutedForeground),
       ],
     );
   }

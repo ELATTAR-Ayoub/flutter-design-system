@@ -8,10 +8,14 @@ import '../packages/elattar_cli/lib/src/manifest.dart';
 import '../packages/elattar_cli/lib/src/project.dart';
 
 void main() {
-  test('identity is centralized at CLI v0.0.1', () {
+  test('identity is centralised, and the registry URL derives from it', () {
     expect(cliName, 'elattar');
-    expect(cliVersion, '0.0.1');
+    expect(cliVersion, '0.0.2');
     expect(CliIdentity.name, cliName);
+    expect(CliIdentity.version, cliVersion);
+    // The version is stated once and the endpoint is built from it, so a CLI
+    // can never read a registry version other than its own.
+    expect(defaultRegistryUrl, endsWith('/registry/$cliVersion/'));
   });
 
   test('discovers the nearest Flutter project from a nested directory', () {

@@ -660,13 +660,40 @@ class _CommandSection extends StatelessWidget {
       // DRIFT 3. The note advertises a binding that does not exist: no
       // keydown listener anywhere on the page opens this palette, which is
       // always open in the first place.
-      child: const Panel(
+      child: Panel(
         label: 'Command palette',
         note: 'Ctrl + K',
-        child: Command(
-          groups: _groups,
-          placeholder: 'Search packs, cards and actions…',
-          emptyLabel: 'Nothing matches that.',
+        // Command's search field and its item rows (icon, label, trailing
+        // shortcut) are internal to the component, with no exposed slot for
+        // the specimen to give a long label room by reflowing anything. At
+        // 2x text on a 320px phone both rows outgrow the panel (a lib gap,
+        // see the report); a horizontal scroll renders the palette at its
+        // own width unclipped instead of erroring, and the wide reading,
+        // which already fits, is unchanged. Command needs a bounded width to
+        // lay out at all, so it is given the page's own `_measureSm`, the
+        // same declared measure other fixed-width specimens on this page use.
+        //
+        // Each item row also carries a fixed height that does not grow with
+        // its text (another facet of the same lib gap), so the scaler
+        // reaching the palette is capped to the largest factor that still
+        // keeps every row inside its fixed height.
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(
+            width: _measureSm,
+            child: MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: MediaQuery.textScalerOf(
+                  context,
+                ).clamp(maxScaleFactor: 1.15),
+              ),
+              child: const Command(
+                groups: _groups,
+                placeholder: 'Search packs, cards and actions…',
+                emptyLabel: 'Nothing matches that.',
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -701,9 +728,9 @@ class _CalendarSectionState extends State<_CalendarSection> {
         // that fills its panel is a different component.
         child: Align(
           alignment: AlignmentDirectional.centerStart,
-          // No `month` and no `defaultMonth`, exactly as the reference passes
-          // none: the grid opens on the clock's current month and the seeded
-          // 30 July lands wherever that month puts it (drift 2).
+          // No `month` and no `defaultMonth`, exactly as the reference
+          // passes none: the grid opens on the clock's current month and
+          // the seeded 30 July lands wherever that month puts it (drift 2).
           child: Calendar.single(
             selected: _date,
             onSelected: (DateTime? next) => setState(() => _date = next),
@@ -866,12 +893,23 @@ class _DatePickerSectionState extends State<_DatePickerSection> {
                     focusNode: _pickerFocus,
                     // DRIFT 20: the one Button on the page that does not
                     // squish on press.
-                    child: DatePicker(
-                      value: _picked,
-                      onChanged: (DateTime? next) =>
-                          setState(() => _picked = next),
-                      focusNode: _pickerFocus,
-                      label: 'Acquired after',
+                    //
+                    // The trigger is `Button`'s icon-and-date row with no
+                    // flexible slot for the label (a lib gap, see the
+                    // report), and this field is deliberately the page's
+                    // narrowest measure (`_measureXs`). Narrowing it further
+                    // to dodge the row would undo that; a horizontal scroll
+                    // lets the trigger render at its own width unclipped
+                    // instead, and the wide reading is unchanged.
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DatePicker(
+                        value: _picked,
+                        onChanged: (DateTime? next) =>
+                            setState(() => _picked = next),
+                        focusNode: _pickerFocus,
+                        label: 'Acquired after',
+                      ),
                     ),
                   ),
                   // `{picked && <Button …>Clear date</Button>}`: a direct
@@ -901,7 +939,11 @@ class _DatePickerSectionState extends State<_DatePickerSection> {
                     enabled: false,
                     // No handler at all: the twin is a plain disabled Button
                     // with a mono date inside it, and no popover behind it.
-                    child: DatePicker(value: _taxYearStart),
+                    // See the field above: same unflexed trigger row.
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DatePicker(value: _taxYearStart),
+                    ),
                   ),
                 ],
               ),

@@ -249,7 +249,6 @@ void main() {
   setUpAll(() async {
     await _loadFont('InterLocal', 'InterVariable.ttf');
     await _loadFont('GeistMono', 'GeistMono-Variable.ttf');
-    await _loadFont('Redaction35', 'Redaction35-Italic.ttf');
   });
 
   /* ── HistorySearch's partition ─────────────────────────────────────────── */
@@ -506,7 +505,13 @@ void main() {
       await _pump(t, card(leaving: false));
       await t.pump();
       final double tall = t.getSize(find.byType(HistoryCard)).height;
-      expect(tall, closeTo(69.5, 0.5));
+      // 69.5 in the reference, 70 here. The half pixel is `Item`'s action
+      // slot, which now hugs its child through `Align(widthFactor: 1)`
+      // instead of claiming the row's whole remaining width. Nothing else
+      // moved: an earlier pass briefly made `ItemActions` a `Wrap` and read
+      // 90 for this card, which was the actions falling onto a second line,
+      // not a taller line box. That reading was wrong and the `Wrap` is gone.
+      expect(tall, closeTo(70.0, 0.5));
 
       await _pump(t, card(leaving: true));
       await t.pump();
@@ -1138,12 +1143,20 @@ void main() {
         width: 384,
       );
       await tester.pump();
-      // `py-2` around one 18.5714 line box and one 14.175 caption line box.
+      // The row padding around a title line box and a subtitle line box.
       final double row =
           tester.getSize(find.text('How pack odds actually work')).height +
           tester.getSize(find.text('Explain the odds on a sealed box')).height +
           space(2) * 2;
-      expect(row, closeTo(48.7, 0.5));
+      expect(
+        row,
+        closeTo(
+          TextStyles.body.step.leading +
+              TextStyles.small.step.leading +
+              space(2) * 2,
+          0.5,
+        ),
+      );
     });
   });
 }

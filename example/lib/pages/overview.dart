@@ -201,8 +201,8 @@ class _RuleRow extends StatelessWidget {
           TextStyles.small,
           color: theme.foreground,
         ).copyWith(
-          fontWeight: TextStyles.section.weight,
-          fontVariations: TextStyles.section.variations,
+          fontWeight: TextStyles.small.weight,
+          fontVariations: TextStyles.small.variations,
         );
 
     return Padding(

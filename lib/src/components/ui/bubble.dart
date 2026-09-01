@@ -17,7 +17,7 @@
 /// |---|---|
 /// | `BubbleContent` padding | `8px 12px` (`px-3 py-2`) |
 /// | radius | **16px** — `rounded-xl` is [Radii.xl] here, not Tailwind's 12 |
-/// | type | 13px / **21.125px** — `text-sm leading-relaxed` ([TextStyles.bubbleContent]) |
+/// | type | 13px / **21.125px** — `text-sm leading-relaxed` ([TextStyles.body]) |
 /// | border | 1px, transparent on six of seven variants |
 /// | one-line height | **39.13px** on every variant but `ghost`, which is 23.13 |
 /// | `Bubble` gap | 4px (`gap-1`) |
@@ -375,6 +375,31 @@ class _RenderMaxWidthFraction extends RenderProxyBox {
     );
     size = constraints.constrain(kid.size);
   }
+
+  // `RenderProxyBox`'s default intrinsic-height methods forward the
+  // *unconstrained* width straight to the child, but [performLayout] never
+  // gives the child that much: it narrows to `width * factor` first. Left
+  // unoverridden, an intrinsic query reports the height a full-width child
+  // would need, which is less than the height the narrowed child actually
+  // takes — any parent that measures intrinsics over a bubble under-reserves
+  // and the real layout pass then overflows. Applying the same cap here is
+  // what keeps the two passes honest with each other.
+  double _cappedWidth(double width) =>
+      width.isFinite ? width * _factor : double.infinity;
+
+  @override
+  double computeMinIntrinsicHeight(double width) {
+    final RenderBox? kid = child;
+    if (kid == null) return 0;
+    return kid.getMinIntrinsicHeight(_cappedWidth(width));
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    final RenderBox? kid = child;
+    if (kid == null) return 0;
+    return kid.getMaxIntrinsicHeight(_cappedWidth(width));
+  }
 }
 
 /// The variant and alignment a [BubbleContent] reads off its bubble — the
@@ -562,7 +587,7 @@ class _BubbleContentState extends State<BubbleContent> {
         curve: MotionCurves.enter,
         style: StyledText.styleOf(
           context,
-          TextStyles.bubbleContent,
+          TextStyles.body,
           color: _ink(theme, variant, hovered),
         ),
         // `[button]:text-left` — a control's copy is left-aligned even inside
@@ -749,7 +774,7 @@ class BubbleReactions extends StatelessWidget {
       child: DefaultTextStyle.merge(
         style: StyledText.styleOf(
           context,
-          TextStyles.bubbleReactions,
+          TextStyles.small,
           color: theme.foreground,
         ),
         child: Row(
@@ -891,7 +916,7 @@ class _ReactionPillState extends State<_ReactionPill> {
           ExcludeSemantics(
             child: StyledText(
               r.emoji,
-              TextStyles.bubbleReactions,
+              TextStyles.small,
               color: r.mine ? theme.actionText : theme.foreground,
             ),
           ),

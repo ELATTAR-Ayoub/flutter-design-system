@@ -255,7 +255,7 @@ class _PreviewColumn extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        StyledText(label, TextStyles.caption, color: theme.mutedForeground),
+        StyledText(label, TextStyles.small, color: theme.mutedForeground),
         SizedBox(height: space(3)),
         child,
       ],
@@ -266,27 +266,53 @@ class _PreviewColumn extends StatelessWidget {
 class _PreviewSpecimen extends StatelessWidget {
   const _PreviewSpecimen();
 
+  // Two side-by-side labeled columns fit comfortably at the desktop corner,
+  // but at 200% text scale on mobile the pair of labels alone outgrows the
+  // available width. `LayoutBuilder` stacks them instead of shrinking the
+  // gap, so desktop keeps its side-by-side comparison and mobile gets a
+  // narrow, non-overflowing column.
+  static const double _stackBreakpoint = 480;
+
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      _PreviewColumn(
-        label: 'Rolls',
-        child: KeyedSubtree(
-          key: const ValueKey<String>('icon-swap-preview:rolling'),
-          child: const _RollingToggleButton(),
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (BuildContext context, BoxConstraints constraints) {
+      final bool stacked = constraints.maxWidth < _stackBreakpoint;
+      final List<Widget> columns = <Widget>[
+        _PreviewColumn(
+          label: 'Rolls',
+          child: KeyedSubtree(
+            key: const ValueKey<String>('icon-swap-preview:rolling'),
+            child: const _RollingToggleButton(),
+          ),
         ),
-      ),
-      SizedBox(width: space(10)),
-      _PreviewColumn(
-        label: 'Swaps instantly',
-        child: KeyedSubtree(
-          key: const ValueKey<String>('icon-swap-preview:instant'),
-          child: const _InstantToggleButton(),
+        _PreviewColumn(
+          label: 'Swaps instantly',
+          child: KeyedSubtree(
+            key: const ValueKey<String>('icon-swap-preview:instant'),
+            child: const _InstantToggleButton(),
+          ),
         ),
-      ),
-    ],
+      ];
+      if (stacked) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            columns[0],
+            SizedBox(height: space(6)),
+            columns[1],
+          ],
+        );
+      }
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          columns[0],
+          SizedBox(width: space(10)),
+          columns[1],
+        ],
+      );
+    },
   );
 }
 

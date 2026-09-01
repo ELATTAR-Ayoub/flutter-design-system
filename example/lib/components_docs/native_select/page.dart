@@ -342,7 +342,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(label, TextStyles.section, color: theme.actionText),
+          StyledText(label, TextStyles.small, color: theme.actionText),
           SizedBox(height: space(1)),
           StyledText(body, TextStyles.small),
         ],
@@ -447,7 +447,7 @@ class _NativeSelectDisabledPreviewState
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        StyledText('Whole control disabled', TextStyles.section),
+        StyledText('Whole control disabled', TextStyles.small),
         SizedBox(height: space(3)),
         Field(
           key: const ValueKey<String>('native-select-disabled-preview'),
@@ -460,7 +460,7 @@ class _NativeSelectDisabledPreviewState
           ),
         ),
         SizedBox(height: space(7)),
-        StyledText('One option disabled', TextStyles.section),
+        StyledText('One option disabled', TextStyles.small),
         SizedBox(height: space(3)),
         Field(
           key: const ValueKey<String>('native-select-disabled-option-preview'),

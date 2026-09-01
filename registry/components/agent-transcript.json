@@ -1,7 +1,7 @@
 {
   "name": "agent-transcript",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/agent/parts/` — the transcript's own parts.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_transcript.dart",
       "target": "@ui/agent_transcript.dart",
-      "sha256": "852206791e35464d0639255a8c535b6d0fe2f40f21da0afa490cc7f746dc4732"
+      "sha256": "4b2d7ed9d754d047ba3b69ebfee247941ee240d3b2de5c78208975fee096a941"
     }
   ],
   "registryDependencies": [
@@ -34,7 +34,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent-transcript",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_transcript.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_transcript.dart",
   "exports": [
     "ActionChip",
     "AgentCapability",

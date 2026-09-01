@@ -860,38 +860,49 @@ void main() {
       TextStyleToken spec(ButtonSize size) =>
           Button.typeFor(size, ButtonEmphasis.none)!;
 
-      // Three sizes across five rungs: only `xs` is unique.
-      expect(spec(ButtonSize.xs).size, 12);
-      expect(spec(ButtonSize.sm).size, 13);
-      expect(spec(ButtonSize.md).size, 13);
-      expect(spec(ButtonSize.lg).size, 15);
-      expect(spec(ButtonSize.xl).size, 15);
+      // Two reading sizes across five rungs, both from the public scale.
+      expect(spec(ButtonSize.xs).step, TextStyles.small.step);
+      expect(spec(ButtonSize.sm).step, TextStyles.small.step);
+      expect(spec(ButtonSize.md).step, TextStyles.body.step);
+      expect(spec(ButtonSize.lg).step, TextStyles.body.step);
+      expect(spec(ButtonSize.xl).step, TextStyles.body.step);
 
-      // And the leadings do not agree with the sizes. `text-xs`, `text-sm` and
-      // `text-base` are Tailwind steps repointed at this scale, so their stock
-      // `--text-*--line-height` companions survive and apply to the new size;
-      // `text-small` and `text-body` are bespoke and have no companion, so
-      // their leading is **inherited** — from Preflight's `html { line-height:
-      // 1.5 }`, which nothing between `html` and a button overrides.
-      //
-      // CORRECTED (the sidebar family): those two shipped as `null`, which
-      // Flutter reads as "the face's own leading" rather than as "inherit". It
-      // was invisible for as long as every button had a fixed height and
-      // centred its label; `SidebarMenuButton` is the corpus's first `h-auto`
-      // button and it measures the difference — a default row is 37.5 tall on
-      // the reference and came out 34.
-      expect(spec(ButtonSize.xs).height, closeTo(1 / 0.75, 1e-12));
-      expect(spec(ButtonSize.sm).height, 1.5);
-      expect(spec(ButtonSize.md).height, closeTo(1.25 / 0.875, 1e-12));
-      expect(spec(ButtonSize.lg).height, 1.5);
-      expect(spec(ButtonSize.xl).height, closeTo(1.5 / 1, 1e-12));
+      // No rung publishes a new role, and none is smaller than `small`.
+      for (final ButtonSize size in <ButtonSize>[
+        ButtonSize.xs,
+        ButtonSize.sm,
+        ButtonSize.md,
+        ButtonSize.lg,
+        ButtonSize.xl,
+      ]) {
+        expect(TextStyles.all, isNot(contains(spec(size))));
+        expect(spec(size).step.size, greaterThanOrEqualTo(14));
+        expect(spec(size).wght, 500, reason: 'a label is medium at every rung');
+      }
 
-      // Computed line boxes: 16.0 / 19.5 / 18.571 / 22.5 / 22.5.
-      expect(spec(ButtonSize.xs).height! * 12, closeTo(16.0, 1e-9));
-      expect(spec(ButtonSize.sm).height! * 13, closeTo(19.5, 1e-9));
-      expect(spec(ButtonSize.md).height! * 13, closeTo(18.571, 1e-3));
-      expect(spec(ButtonSize.lg).height! * 15, closeTo(22.5, 1e-9));
-      expect(spec(ButtonSize.xl).height! * 15, closeTo(22.5, 1e-9));
+      // The four square rungs carry no label type at all.
+      for (final ButtonSize size in <ButtonSize>[
+        ButtonSize.iconXs,
+        ButtonSize.iconSm,
+        ButtonSize.icon,
+        ButtonSize.iconLg,
+      ]) {
+        expect(Button.typeFor(size, ButtonEmphasis.none), isNull);
+      }
+
+      // `caps` keeps the rung's step and changes only weight and tracking.
+      final TextStyleToken caps = Button.typeFor(
+        ButtonSize.md,
+        ButtonEmphasis.caps,
+      )!;
+      expect(caps.step, TextStyles.body.step);
+      expect(caps.wght, 600);
+      expect(caps.tracking, greaterThan(0));
+
+      // A label's leading is the role's, so a wrapping label in a height-auto
+      // button (a sidebar row) grows by whole line boxes.
+      expect(spec(ButtonSize.sm).step.leading, 20);
+      expect(spec(ButtonSize.md).step.leading, 24);
 
       // Every text rung is `font-medium`.
       for (final ButtonSize size in <ButtonSize>[
@@ -965,10 +976,14 @@ void main() {
         )
         .style;
 
-    testWidgets('is 12px / 600 / 0.09em on every rung, including default', (
+    testWidgets('keeps its rung and adds weight and tracking', (
       WidgetTester t,
     ) async {
       for (final ButtonSize size in ButtonSize.values) {
+        final TextStyleToken? role = Button.typeFor(size, ButtonEmphasis.none);
+        // The four square rungs own no label type, so there is no rung for
+        // caps to keep.
+        if (role == null) continue;
         await t.pumpWidget(
           host(
             Button(
@@ -982,12 +997,16 @@ void main() {
         );
 
         final TextStyle style = labelStyleOf(t);
-        expect(style.fontSize, 12, reason: '${size.name}: text-num-sm');
-        // `--tracking-cta: 0.09em`, resolved against the 12px size.
+        final double rung = role.step.size;
+        expect(
+          style.fontSize,
+          rung,
+          reason: '${size.name}: caps keeps the rung it is on',
+        );
         expect(
           style.letterSpacing,
-          closeTo(0.09 * 12, 1e-9),
-          reason: '${size.name}: tracking-cta',
+          closeTo(0.09 * rung, 1e-9),
+          reason: '${size.name}: caps tracking',
         );
         expect(
           style.fontVariations!
@@ -999,13 +1018,13 @@ void main() {
       }
     });
 
-    testWidgets('shrinks the default rung from 13px to 12 — drift 22', (
+    testWidgets('never shrinks the rung it is applied to', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(
         host(Button(onPressed: () {}, child: const Text('Open Pack'))),
       );
-      expect(labelStyleOf(t).fontSize, 13);
+      expect(labelStyleOf(t).fontSize, TextStyles.body.step.size);
 
       await t.pumpWidget(
         host(
@@ -1016,7 +1035,7 @@ void main() {
           ),
         ),
       );
-      expect(labelStyleOf(t).fontSize, 12);
+      expect(labelStyleOf(t).fontSize, TextStyles.body.step.size);
     });
 
     testWidgets('uppercases the glyphs and leaves the accessible name alone', (
@@ -1284,20 +1303,26 @@ void main() {
       ),
     );
 
-    testWidgets('is 32 tall with a 32 floor and a 12px radius — not a pill', (
-      WidgetTester t,
-    ) async {
-      await t.pumpWidget(toggle());
-      final Size box = t.getSize(find.byType(Toggle));
-      // `h-8 min-w-8 px-2.5` around a 16px glyph: 16 + 20 = 36 × 32.
-      expect(box.height, space(8));
-      expect(box.width, space(9));
-      expect(
-        surfaceOf(t).radius,
-        BorderRadius.circular(Radii.lg),
-        reason: 'rounded-lg — a Toggle is not a pill',
-      );
-    });
+    testWidgets(
+      'the reference reads 32 tall; TARGET SIZING floors the real layout '
+      'at the touch minimum, and the radius is still 12px — not a pill',
+      (WidgetTester t) async {
+        await t.pumpWidget(toggle());
+        final Size box = t.getSize(find.byType(Toggle));
+        // `h-8 min-w-8 px-2.5` around a 16px glyph reads 36 × 32 on the
+        // reference. This used to assert that number exactly; a Toggle is a
+        // real tap target, so its layout box — not an invisible margin
+        // around it, see `TapTarget` — is now floored at
+        // TouchTargets.minimum, and both dimensions clear it.
+        expect(box.height, TouchTargets.minimum);
+        expect(box.width, TouchTargets.minimum);
+        expect(
+          surfaceOf(t).radius,
+          BorderRadius.circular(Radii.lg),
+          reason: 'rounded-lg — a Toggle is not a pill',
+        );
+      },
+    );
 
     test('the ladder: 28 / 32 / 36, and sm clamps its own radius', () {
       expect(Toggle.heightFor(ToggleSize.sm), 28);
@@ -1413,7 +1438,9 @@ void main() {
       );
       await t.pump(MotionDurations.tick);
       final Size held = t.getSize(find.byType(Toggle));
-      expect(held.height, space(8));
+      // TARGET SIZING: the reference reads `h-8` (32); the real layout is
+      // floored at TouchTargets.minimum (44) — see the geometry test above.
+      expect(held.height, TouchTargets.minimum);
       await hold.up();
       await t.pump(MotionDurations.normal);
     });
@@ -1771,11 +1798,11 @@ void main() {
             ),
           )
           .style!;
-      expect(style.fontSize, 13);
+      expect(style.fontSize, TextStyles.nav.step.size);
       expect(style.fontFamily, contains('InterLocal'));
     });
 
-    testWidgets('className="type-num" renders 13px/500 mono — drift 16', (
+    testWidgets('a numeric cell keeps the numeric role whole', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(host(ButtonGroup(children: groupB())));
@@ -1788,25 +1815,27 @@ void main() {
             ),
           )
           .style!;
-      // The utilities beat `.type-num` on the two properties they share…
-      expect(style.fontSize, 13, reason: 'text-sm beats --text-body 15');
+      expect(style.fontSize, TextStyles.numberBase.step.size);
       expect(
         style.fontVariations!
             .firstWhere((FontVariation v) => v.axis == 'wght')
             .value,
-        500,
-        reason: 'font-medium beats .type-num\'s 600',
+        TextStyles.numberBase.wght,
+        reason: 'the numeric role arrives whole, weight included',
       );
       // …and everything they do not declare survives.
       expect(style.fontFamily, contains('GeistMono'));
-      expect(style.letterSpacing, closeTo(-0.01 * 13, 1e-9));
+      expect(
+        style.letterSpacing,
+        closeTo(-0.01 * TextStyles.numberBase.step.size, 1e-9),
+      );
       expect(style.fontFeatures, contains(const FontFeature.tabularFigures()));
     });
   });
 
   group('Kbd', () {
-    test('20 tall, 20 minimum wide, 4px padding, 4px gaps', () {
-      expect(Kbd.height, 20);
+    test('20 minimum tall and wide, 4px padding, 4px gaps', () {
+      expect(Kbd.minHeight, 20);
       expect(Kbd.minWidth, 20);
       expect(Kbd.paddingX, 4);
       expect(Kbd.gap, 4);
@@ -1832,21 +1861,21 @@ void main() {
       },
     );
 
-    testWidgets('is 20px tall and never narrower than 20', (
+    testWidgets('never smaller than 20 x 20, and grows with its legend', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(host(const Kbd('K')));
       final Size box = t.getSize(find.byType(Kbd));
-      expect(box.height, 20);
-      // A single narrow glyph plus 4+4 of padding is under the floor, so
-      // `min-w-5` decides.
-      expect(box.width, 20);
+      // A single narrow glyph plus its padding is under the floor, so the
+      // minimum decides both dimensions.
+      expect(box.height, greaterThanOrEqualTo(Kbd.minHeight));
+      expect(box.width, greaterThanOrEqualTo(Kbd.minWidth));
 
       await t.pumpWidget(host(const Kbd('Space')));
-      expect(t.getSize(find.byType(Kbd)).width, greaterThan(20));
+      expect(t.getSize(find.byType(Kbd)).width, greaterThan(box.width));
     });
 
-    testWidgets('the key label is 12px/500 at --muted-foreground', (
+    testWidgets('the key label is the code role at --muted-foreground', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(host(const Kbd('Ctrl')));
@@ -1855,7 +1884,8 @@ void main() {
             find.descendant(of: find.byType(Kbd), matching: find.byType(Text)),
           )
           .style!;
-      expect(style.fontSize, 12);
+      expect(style.fontSize, TextStyles.code.step.size);
+      expect(style.fontFamily, contains(Fonts.mono));
       expect(style.color, ThemeTokens.dark.mutedForeground);
     });
 

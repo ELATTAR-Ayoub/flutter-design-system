@@ -1,0 +1,30 @@
+{
+  "name": "alert",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/alert.tsx` — one surface, five meanings.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/alert.dart",
+      "target": "@ui/alert.dart",
+      "sha256": "ed1adb6990dbe07545100868bdd9bb9e49619e54bcfba491bcac2322cbb38e92"
+    }
+  ],
+  "registryDependencies": [
+    "feedback-surface",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "feedback-surface"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/alert",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/alert.dart",
+  "deprecated": false
+}

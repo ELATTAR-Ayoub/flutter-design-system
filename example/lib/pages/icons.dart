@@ -62,7 +62,7 @@
 /// 9. **`subtle` and `muted` are the same colour.** The tones grid ships two
 ///    identical swatches on purpose: see [_TonesSection] (ruling I-Q6).
 /// 10. Button labels are **13px**: `--text-sm` is aliased to `--text-small`.
-///     Stated once, in `TextStyles.buttonLabel`.
+///     Stated once, in `TextStyles.nav`.
 /// 11. Fonts: the prose says Space Grotesk, the tokens say Inter Local. Tokens
 ///     win, per the project's standing decision.
 /// 12. Three curated names, `Filter`, `HelpCircle`, `AlertTriangle`: are
@@ -616,7 +616,7 @@ class _LadderCell extends StatelessWidget {
         StyledText(size.label, TextStyles.numberSm, color: theme.actionText),
         SizedBox(height: space(1)),
         // `.type-micro` uppercases, which leaves digits and `px` untouched.
-        StyledText('${Icon.pxFor(size).toInt()}px', TextStyles.eyebrowSmall),
+        StyledText('${Icon.pxFor(size).toInt()}px', TextStyles.small),
       ],
     );
   }
@@ -818,8 +818,10 @@ class _PairedButton extends StatelessWidget {
           // A bare text node inside the button, exactly as
           // `<Button>…Open Pack</Button>` is: it inherits the button's own
           // `text-sm font-medium` and its animated ink from the
-          // `DefaultTextStyle` the component installs.
-          Text(label),
+          // `DefaultTextStyle` the component installs. Wrapped in Flexible
+          // so a doubled text scale wraps the label instead of pushing the
+          // row past the button's constrained width.
+          Flexible(child: Text(label)),
         ],
       ),
     );

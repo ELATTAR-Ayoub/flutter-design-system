@@ -125,7 +125,7 @@ class _DocsSnippetBody extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: StyledText(
                     label,
-                    TextStyles.caption,
+                    TextStyles.small,
                     color: theme.mutedForeground,
                   ),
                 ),

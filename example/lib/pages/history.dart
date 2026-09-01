@@ -276,7 +276,7 @@ class _HistoryListDemoState extends State<HistoryListDemo> {
                   activeTitle == null
                       ? 'New conversation'
                       : 'Open: $activeTitle',
-                  TextStyles.caption,
+                  TextStyles.small,
                   color: theme.mutedForeground,
                 ),
               ),
@@ -421,7 +421,7 @@ class _HistoryCardSpecimenState extends State<HistoryCardSpecimen> {
             Expanded(
               child: StyledText(
                 'Deleted.',
-                TextStyles.caption,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
             ),
@@ -765,7 +765,14 @@ class _HistorySearchDemoState extends State<HistorySearchDemo> {
               children: <Widget>[
                 const Icon.lucide(Lucide.search, size: IconSize.sm),
                 SizedBox(width: Button.gapFor(ButtonSize.md)),
-                const Text('Search conversations'),
+                // Flexible so 200% text shrinks the label instead of
+                // overflowing the button's own row.
+                const Flexible(
+                  child: Text(
+                    'Search conversations',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
           ),
@@ -793,7 +800,7 @@ class _HistorySearchDemoState extends State<HistorySearchDemo> {
                 ),
               ],
             ),
-            TextStyles.caption,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
           HistorySearch(

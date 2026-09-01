@@ -59,7 +59,7 @@ const String gitInstallCommand =
     '  --git-path packages/elattar_cli';
 
 const ReleaseFacts releaseFacts = ReleaseFacts(
-  version: '0.0.1',
-  registryUrl: 'https://flutter.elattar.dev/registry/0.0.1/',
+  version: '0.0.2',
+  registryUrl: 'https://flutter.elattar.dev/registry/0.0.2/',
   cliOnPubDev: true,
 );

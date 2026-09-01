@@ -648,7 +648,7 @@ class _InAPanelSpecimenState extends State<_InAPanelSpecimen> {
             onPressed: () => setState(() => _open = !_open),
             child: StyledText(
               _open ? 'Close search panel' : 'Open search panel',
-              TextStyles.buttonLabel,
+              TextStyles.nav,
             ),
           ),
           if (_open) ...<Widget>[
@@ -865,7 +865,7 @@ class _AccessibilityContent extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: StyledText(
           'Known gaps, reported rather than idealised.',
-          TextStyles.section,
+          TextStyles.small,
           color: ThemeScope.of(context).destructiveText,
         ),
       ),

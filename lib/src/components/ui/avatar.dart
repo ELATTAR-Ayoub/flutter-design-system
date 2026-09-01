@@ -118,14 +118,14 @@ class Avatar extends StatelessWidget {
 
   /// The fallback's resolved type.
   ///
-  /// Defaults to [TextStyles.bodySmall] — a bare `<AvatarFallback>` is
+  /// Defaults to [TextStyles.small] — a bare `<AvatarFallback>` is
   /// `text-sm` with no weight class, so it inherits `html`'s 400.
   ///
   /// The two other rungs override the size (`group-data-[size=sm]:text-tag`
   /// 10px, `group-data-[size=lg]:text-body` 15px) and neither has a consumer
   /// in the corpus, so neither is built into the default: a caller that wants
   /// one states it, exactly as `NavUser` states
-  /// [TextStyles.avatarFallback] for its own `.type-num-sm` collision.
+  /// [TextStyles.nav] for its own `.type-num-sm` collision.
   final TextStyleToken? fallbackSpec;
 
   /// `className="size-N"` — the box, when the class beats the attribute. The
@@ -166,7 +166,7 @@ class Avatar extends StatelessWidget {
       child: Center(
         child: StyledText(
           fallback,
-          fallbackSpec ?? TextStyles.bodySmall,
+          fallbackSpec ?? TextStyles.small,
           color: fallbackInk ?? theme.mutedForeground,
         ),
       ),
@@ -185,7 +185,24 @@ class Avatar extends StatelessWidget {
             // `aspect-square size-full rounded-full object-cover`.
             ClipRRect(
               borderRadius: radius,
-              child: Image(image: image!, fit: BoxFit.cover),
+              // Radix shows the fallback while the image is missing *or
+              // fails to decode* — a broken URL is not different from a
+              // missing one, from the user's point of view. Without
+              // `errorBuilder` a decode failure reports straight to
+              // [FlutterError] instead, with no way for a caller to route it
+              // anywhere; the fallback is already painted underneath in this
+              // [Stack] (`content`, above), so a transparent box here is all
+              // it takes to let it show through.
+              child: Image(
+                image: image!,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (
+                      BuildContext context,
+                      Object error,
+                      StackTrace? stackTrace,
+                    ) => const SizedBox.shrink(),
+              ),
             ),
           // `after:` — painted last, over both.
           IgnorePointer(
@@ -364,7 +381,7 @@ class AvatarGroupCount extends StatelessWidget {
         decoration: BoxDecoration(color: theme.muted, borderRadius: shape),
         child: StyledText(
           label,
-          spec ?? TextStyles.bodySmall,
+          spec ?? TextStyles.small,
           color: theme.mutedForeground,
         ),
       ),

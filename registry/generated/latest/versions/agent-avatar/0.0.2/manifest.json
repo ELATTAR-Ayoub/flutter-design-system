@@ -1,0 +1,32 @@
+{
+  "name": "agent-avatar",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/agent/avatar/` — the default face, whole.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/agent_avatar.dart",
+      "target": "@ui/agent_avatar.dart",
+      "sha256": "94e13258a17542457b86203aa2e9a9d9b5e1430a1a2b37a8451e02ad29c2f802"
+    }
+  ],
+  "registryDependencies": [
+    "agent-core",
+    "keyframes",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "agent-core",
+    "keyframes"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/agent_avatar",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_avatar.dart",
+  "deprecated": false
+}

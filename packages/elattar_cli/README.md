@@ -234,7 +234,7 @@ into your project's `LICENSES/` directory:
 | Installing | Puts in `LICENSES/` |
 | --- | --- |
 | anything (`init`) | `ELATTAR-MIT.txt` |
-| the foundation | `Inter-OFL-1.1.txt`, `Geist-Mono-OFL-1.1.txt`, `Redaction-OFL-1.1.txt` |
+| the foundation | `Inter-OFL-1.1.txt`, `Geist-Mono-OFL-1.1.txt` |
 | `icon`, and so most components | `Lucide-ISC.txt` |
 | `voice-indicator` | `ElevenLabs-UI-MIT.txt` |
 

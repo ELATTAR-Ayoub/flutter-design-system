@@ -604,7 +604,7 @@ class _ThemingContent extends StatelessWidget {
             'focus ring come from SidebarMenuButton, the avatar circle '
             'and its fallback from Avatar, and the menu surface from '
             'DropdownMenu.',
-        'Type is TextStyles.nav for the name and TextStyles.caption for the '
+        'Type is TextStyles.nav for the name and TextStyles.small for the '
             'email, matching the measured 13.5 and 10.5 of the reference '
             'footer. Neither is overridable.',
         'The destructive row takes its tone from '
@@ -739,7 +739,7 @@ const List<DocsApiFact> _accountFacts = <DocsApiFact>[
     name: 'email',
     type: 'String',
     description:
-        'Required, no default. Rendered as TextStyles.caption in '
+        'Required, no default. Rendered as TextStyles.small in '
         'theme.mutedForeground, one line, ellipsised.',
   ),
   DocsApiFact(

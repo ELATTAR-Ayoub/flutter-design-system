@@ -132,11 +132,12 @@ void main() {
         // forbidden on a documentation page (see the rollout brief).
         await tester.pump();
 
-        // The Preview specimen deliberately includes a corrupt-bytes
-        // Avatar: that specimen reports exactly the decode failure this
-        // page's state matrix describes, so it must be drained here rather
-        // than read as a real test failure.
-        expect(tester.takeException(), isNotNull);
+        // The Preview specimen deliberately includes a corrupt-bytes Avatar.
+        // It used to let the decode failure reach `FlutterError`, and this
+        // check drained it. `Avatar` now routes a failed decode to its own
+        // fallback through `Image.errorBuilder`, which is what a broken avatar
+        // URL should do in production, so nothing is thrown at all.
+        expect(tester.takeException(), isNull);
 
         expect(
           find.byKey(const ValueKey<String>('avatar-doc-article')),
@@ -402,8 +403,10 @@ void main() {
       );
       await tester.pump();
 
+      // The fallback initials, and no exception: `Avatar.errorBuilder` turns a
+      // decode failure into exactly this rather than into a thrown error.
       expect(find.text('ZZ'), findsOneWidget);
-      expect(tester.takeException(), isNotNull);
+      expect(tester.takeException(), isNull);
     },
   );
 }

@@ -1,7 +1,7 @@
 {
   "name": "agent-slash-palette",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/agent/parts/slash-palette.tsx` — the `/` menu.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_slash_palette.dart",
       "target": "@ui/agent_slash_palette.dart",
-      "sha256": "f8da166861f5c08e07468f2637f81271ec52e4e7adf9320a16f2c1d71970d379"
+      "sha256": "79c908560d4102a268552dfd148b3d869d1bbfda67742c6c6752751724a6572c"
     }
   ],
   "registryDependencies": [
@@ -24,7 +24,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent_slash_palette",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/agent_slash_palette.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_slash_palette.dart",
   "exports": [
     "AgentCommand",
     "AgentCommandGroup",

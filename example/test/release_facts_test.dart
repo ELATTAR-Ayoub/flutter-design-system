@@ -134,16 +134,28 @@ void main() {
               as Map<String, Object?>;
       final List<Object?> items = registry['items']! as List<Object?>;
       expect(items, isNotEmpty);
+      // Items are versioned individually: one that did not change keeps the
+      // version it was released under, and its source link keeps pointing at
+      // that release's tag — which is the commit its payload was taken from.
+      // Pinning every link to the newest tag would send a reader to source the
+      // item does not ship.
       for (final Object? entry in items) {
         final Map<String, Object?> item = entry! as Map<String, Object?>;
         final Object? link = item['sourceLink'];
         if (link == null) continue;
         expect(
           '$link',
-          contains('/blob/${releaseFacts.tag}/'),
-          reason: '${item['name']} links outside the release tag',
+          contains('/blob/v${item['version']}/'),
+          reason: '${item['name']} links outside its own version tag',
         );
       }
+      // …and the release this page documents is one of the tags in play.
+      expect(
+        items
+            .map((Object? e) => '${(e! as Map<String, Object?>)['version']}')
+            .toSet(),
+        contains(releaseFacts.version),
+      );
     });
   });
 

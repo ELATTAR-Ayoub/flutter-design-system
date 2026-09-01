@@ -338,7 +338,7 @@ class _AvatarTile extends StatelessWidget {
           ),
         ),
         SizedBox(height: space(2)),
-        StyledText(label, TextStyles.caption, color: theme.mutedForeground),
+        StyledText(label, TextStyles.small, color: theme.mutedForeground),
       ],
     );
   }
@@ -440,8 +440,9 @@ class _AccentSpecimen extends StatelessWidget {
   const _AccentSpecimen();
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
+  Widget build(BuildContext context) => Wrap(
+    spacing: space(6),
+    runSpacing: space(6),
     children: <Widget>[
       const _AvatarTile(
         keyValue: 'agent-avatar-example:accent-default',
@@ -449,7 +450,6 @@ class _AccentSpecimen extends StatelessWidget {
         state: AgentState.running,
         size: AgentAvatarSize.lg,
       ),
-      SizedBox(width: space(6)),
       _AvatarTile(
         keyValue: 'agent-avatar-example:accent-custom',
         label: 'custom',
@@ -473,17 +473,22 @@ class _SpeedSpecimen extends StatelessWidget {
   const _SpeedSpecimen();
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: <Widget>[
-      const _AvatarTile(
+  // `Wrap`, not `Row`: each tile's label sizes the tile's own column (see
+  // `_AvatarTile.build`), and at a large accessibility text scale
+  // "speed: 2.5" alone can widen its tile past half the showcase frame.
+  // `Wrap` drops the second tile to its own line rather than overflowing;
+  // at ordinary widths both sit on one line exactly as the `Row` did.
+  Widget build(BuildContext context) => Wrap(
+    spacing: space(6),
+    runSpacing: space(4),
+    children: const <Widget>[
+      _AvatarTile(
         keyValue: 'agent-avatar-example:speed-default',
         label: 'speed: 1',
         state: AgentState.searching,
         size: AgentAvatarSize.lg,
       ),
-      SizedBox(width: space(6)),
-      const _AvatarTile(
+      _AvatarTile(
         keyValue: 'agent-avatar-example:speed-fast',
         label: 'speed: 2.5',
         state: AgentState.searching,

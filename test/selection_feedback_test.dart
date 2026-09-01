@@ -743,10 +743,12 @@ void main() {
       expect(t.getSize(find.text('Free')), opened);
     });
 
-    testWidgets('a row is py-2 pl-3 pr-9 on a text-sm line box', (
-      WidgetTester t,
-    ) async {
-      expect(Select.itemHeight, closeTo(13 * (1.25 / 0.875) + 16, 0.001));
+    testWidgets('a row is py-2 pl-3 pr-9 on a text-sm line box, centred in the '
+        'touch-floored row', (WidgetTester t) async {
+      // TARGET SIZING: the reference reads `py-2` around one line box
+      // (40px total); the row's real layout is floored at
+      // TouchTargets.minimum (44) — see `lib/src/components/ui/select.dart`.
+      expect(Select.itemHeight, TouchTargets.minimum);
 
       await t.pumpWidget(select(null, (String _) {}));
       await t.tap(find.byType(Select<String>));
@@ -763,7 +765,11 @@ void main() {
       );
       expect(text.left - row.left, 12);
       expect(row.right - text.right, closeTo(36, 0.001));
-      expect(text.top - row.top, closeTo(8, 0.001));
+      // The row's padded box is forced to the floored row height, so the
+      // 4px of slack over the reference's 40px is split evenly above and
+      // below the line box by the row's own vertical centring: `py-2` (8)
+      // plus half of (44 − 40).
+      expect(text.top - row.top, closeTo(10, 0.001));
     });
 
     testWidgets('the keyboard walks it and Enter commits', (
@@ -943,15 +949,13 @@ void main() {
       final StyledText title = t.widget<StyledText>(
         find.byType(StyledText).first,
       );
-      expect(title.spec.size, 13);
-      expect(title.spec.variations.first.value, 500);
+      expect(title.spec, same(TextStyles.h4));
       expect(title.color, theme.cardForeground);
 
       final StyledText body = t.widget<StyledText>(
         find.byType(StyledText).last,
       );
-      expect(body.spec.size, 13);
-      expect(body.spec.variations.first.value, 400);
+      expect(body.spec.step, TextStyles.body.step);
       expect(body.color, theme.mutedForeground);
     });
 
@@ -2136,20 +2140,15 @@ void main() {
     ) async {
       // `<FieldLabel htmlFor={…} className="font-normal">` — probed on the
       // filter list at 13px, a 17.875px line box, weight 400, `--foreground`.
-      expect(FieldLabel.normal.family, TextStyles.fieldLabel.family);
+      expect(FieldLabel.normal.family, TextStyles.small.family);
       expect(
-        FieldLabel.normal.size,
-        TextStyles.fieldLabel.size,
-        reason: '`font-normal` declares one property: `text-sm` survives it',
-      );
-      expect(
-        FieldLabel.normal.height,
-        TextStyles.fieldLabel.height,
-        reason: '…and so does `leading-snug`, which is the whole point',
+        FieldLabel.normal.step,
+        TextStyles.small.step,
+        reason: 'a field label reads at the supporting-copy role',
       );
       expect(
         FieldLabel.normal.variations.first.value,
-        TextStyles.bodySmall.variations.first.value,
+        TextStyles.small.variations.first.value,
         reason:
             'the weight is borrowed from the token that already records '
             'the 400 `html` gives, never typed into this layer',
@@ -2171,12 +2170,12 @@ void main() {
         FontWeight.w400,
         reason: 'the resolved style, read off the tree',
       );
-      expect(overridden.fontSize, 13);
-      expect(overridden.height, closeTo(1.375, 0.000001));
+      expect(overridden.fontSize, TextStyles.small.step.size);
+      expect(overridden.height, closeTo(TextStyles.small.step.ratio, 1e-6));
       expect(
         t.getSize(find.byType(StyledText)).height,
-        closeTo(17.875, 0.001),
-        reason: 'the probed line box: 13 × 1.375',
+        closeTo(TextStyles.small.step.leading, 0.001),
+        reason: 'the supporting-copy line box',
       );
 
       // …and the default is what `Label` types itself in, unchanged.

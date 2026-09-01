@@ -210,7 +210,7 @@ class _SelectedFilePane extends StatelessWidget {
                     children: <Widget>[
                       StyledText(
                         file.title ?? file.path,
-                        TextStyles.section,
+                        TextStyles.small,
                         color: theme.foreground,
                       ),
                       if (file.description != null) ...<Widget>[
@@ -350,7 +350,7 @@ class _CopyFileButtonState extends State<_CopyFileButton>
         children: <Widget>[
           Icon.lucide(glyph, size: IconSize.sm),
           SizedBox(width: Button.gapFor(ButtonSize.sm)),
-          StyledText(text, TextStyles.buttonLabelSm),
+          StyledText(text, TextStyles.small),
         ],
       ),
     );
@@ -464,7 +464,7 @@ class _FileEntry extends StatelessWidget {
               // rung and, substituted into an auto-height left-aligned row
               // like this one, comes out short (typography.dart documents
               // the measured gap).
-              TextStyles.buttonLabelSm,
+              TextStyles.small,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

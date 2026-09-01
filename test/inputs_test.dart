@@ -752,18 +752,20 @@ void main() {
       );
     });
 
-    testWidgets('a type class collapses to 13px, keeping everything else', (
+    testWidgets('a numeric role renders whole: size, face, and figures', (
       WidgetTester t,
     ) async {
-      // Ruling I7 / inputs-map §4.3 and drift 8.
-      await t.pumpWidget(field(textSpec: TextStyles.inputNumber));
+      // The retired implementation dropped the role's size and kept only its
+      // face and figures. A role now arrives intact.
+      await t.pumpWidget(field(textSpec: TextStyles.numberBase));
       final TextStyle style = t
           .widget<EditableText>(find.byType(EditableText))
           .style;
-      expect(style.fontSize, 13, reason: 'text-sm beats .type-num, 15 → 13');
+      final TypeStep step = TextStyles.numberBase.step;
+      expect(style.fontSize, step.size);
       expect(style.fontFamily, contains('GeistMono'));
       expect(style.fontFeatures, contains(const FontFeature.tabularFigures()));
-      expect(style.letterSpacing, closeTo(-0.01 * 13, 1e-9));
+      expect(style.letterSpacing, closeTo(-0.01 * step.size, 1e-9));
     });
 
     testWidgets('bare paints no surface at all', (WidgetTester t) async {
@@ -869,12 +871,11 @@ void main() {
       final TextStyle style = t
           .widget<EditableText>(find.byType(EditableText))
           .style;
-      expect(style.fontSize, 13);
-      expect(style.height, TextStyles.textareaBody.height);
+      expect(style.fontSize, TextStyles.body.step.size);
       expect(
         style.fontSize! * style.height!,
-        closeTo(21.125, 1e-6),
-        reason: 'leading-relaxed 1.625 on 13px',
+        closeTo(TextStyles.body.step.leading, 1e-6),
+        reason: 'a textarea holds paragraphs at the body role',
       );
     });
 
@@ -1138,8 +1139,11 @@ void main() {
                 .first,
           )
           .style!;
-      expect(style.fontSize, 13);
-      expect(style.fontSize! * style.height!, closeTo(18.5714, 1e-3));
+      expect(style.fontSize, TextStyles.body.step.size);
+      expect(
+        style.fontSize! * style.height!,
+        closeTo(TextStyles.body.step.leading, 1e-3),
+      );
       expect(style.color, ThemeTokens.dark.mutedForeground);
     });
 
@@ -1149,7 +1153,7 @@ void main() {
       await t.pumpWidget(
         group(
           start: InputGroupAddon(
-            child: InputGroupText('+1', spec: TextStyles.inputNumber),
+            child: InputGroupText('+1', spec: TextStyles.numberBase),
           ),
         ),
       );
@@ -1163,9 +1167,10 @@ void main() {
                 .first,
           )
           .style!;
-      expect(style.fontSize, 13, reason: 'type-num-sm\'s 12 does not survive');
+      final TypeStep numeric = TextStyles.numberBase.step;
+      expect(style.fontSize, numeric.size);
       expect(style.fontFamily, contains('GeistMono'));
-      expect(style.fontSize! * style.height!, closeTo(18.5714, 1e-3));
+      expect(style.fontSize! * style.height!, closeTo(numeric.leading, 1e-3));
     });
 
     testWidgets('an addon click focuses the control', (WidgetTester t) async {
@@ -1442,7 +1447,7 @@ void main() {
           )
           .style!;
       expect(style.fontFamily, contains('InterLocal'));
-      expect(style.fontSize, 13);
+      expect(style.fontSize, TextStyles.body.step.size);
     });
   });
 
@@ -1575,11 +1580,11 @@ void main() {
       expect(textLeft - errorLeft, space(4), reason: 'ml-4 on the list');
 
       // EVERY item lands on the declared box, marker included — bare, each one
-      // quantized on its own and a four-message password error drifted by
-      // nearly two pixels. Two items at 18.5714 with one 4px gap between them.
+      // quantised on its own and a four-message password error drifted by
+      // nearly two pixels. Two supporting line boxes and one gap.
       expect(
         t.getSize(find.byType(FieldError)).height,
-        closeTo(18.5714 * 2 + space(1), 1e-3),
+        closeTo(TextStyles.small.step.leading * 2 + space(1), 1e-3),
         reason: 'the list is exactly its items plus its gaps',
       );
     });
@@ -1926,10 +1931,10 @@ void main() {
       /// The box that actually lays out.
       double rendered(Finder of) => t.getSize(of).height;
 
-      const Map<String, double> boxes = <String, double>{
-        'label': 17.875, // 13 × leading-snug 1.375
-        'description': 19.5, // 13 × leading-normal 1.5
-        'error': 18.5714, // 13 × text-sm's 1.428571
+      final Map<String, double> boxes = <String, double>{
+        'label': TextStyles.small.step.leading,
+        'description': TextStyles.small.step.leading,
+        'error': TextStyles.small.step.leading,
       };
       final Map<String, Finder> parts = <String, Finder>{
         'label': find.byType(FieldLabel),
@@ -2185,12 +2190,11 @@ void main() {
         reason: 'the content box keeps its gap-3',
       );
 
-      // The legend is the one spec composed at its call site rather than named
-      // in the foundation, so it is the easiest of the four to leave un-boxed:
-      // 13 × text-sm's 1.428571, rendered, not declared.
+      // The legend is composed at its call site rather than named in the
+      // foundation, so it is the easiest of the four to leave un-boxed.
       expect(
         t.getSize(find.byType(FieldLegend)).height,
-        closeTo(18.5714, 1e-3),
+        closeTo(TextStyles.small.step.leading, 1e-3),
       );
     });
 

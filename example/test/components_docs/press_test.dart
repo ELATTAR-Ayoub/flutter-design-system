@@ -38,7 +38,22 @@ import 'package:flutter_test/flutter_test.dart';
 Widget _harness({required Widget child, required ThemeController controller}) =>
     ThemeScope(
       controller: controller,
-      child: MaterialApp(home: SingleChildScrollView(child: child)),
+      child: MaterialApp(
+        home: Builder(
+          // The ambient ink every route inherits, as the docs shell sets it
+          // for the real app. Without it this subtree sits under WidgetsApp's
+          // red fallback style, which StyledText asserts on rather than
+          // quietly painting over.
+          builder: (BuildContext context) => DefaultTextStyle(
+            style: StyledText.styleOf(
+              context,
+              TextStyles.body,
+              color: ThemeScope.of(context).foreground,
+            ),
+            child: SingleChildScrollView(child: child),
+          ),
+        ),
+      ),
     );
 
 Finder _disclosureTrigger(String title) => find.descendant(
@@ -121,9 +136,11 @@ void main() {
       }
 
       // One live Press on Preview's wrapped chip, three more on the
-      // Custom Scale specimens: four in total. The right-hand Preview
-      // chip and none of the Custom Scale captions mount a second one.
-      expect(find.byType(Press), findsNWidgets(4));
+      // Custom Scale specimens, and one on the page's own breadcrumb link —
+      // `Breadcrumb` goes through `Press` now, which is how its links became
+      // keyboard-operable. Five in total. The right-hand Preview chip and
+      // none of the Custom Scale captions mount one.
+      expect(find.byType(Press), findsNWidgets(5));
 
       expect(pressDoc.name, 'press');
       expect(pressDoc.exports, containsAll(<String>['Press']));

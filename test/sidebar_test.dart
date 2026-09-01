@@ -80,7 +80,18 @@ extension on WidgetTester {
               ).copyWith(disableAnimations: !animate),
               child: Directionality(
                 textDirection: TextDirection.ltr,
-                child: Align(alignment: Alignment.topLeft, child: child),
+                // The ambient ink every route inherits, as `site_shell.dart`
+                // sets it for the real app. Without it this subtree sits under
+                // `WidgetsApp`'s red fallback style, which `StyledText` asserts
+                // on rather than quietly papering over.
+                child: DefaultTextStyle(
+                  style: StyledText.styleOf(
+                    context,
+                    TextStyles.body,
+                    color: ThemeScope.of(context).foreground,
+                  ),
+                  child: Align(alignment: Alignment.topLeft, child: child),
+                ),
               ),
             ),
           ),
@@ -381,15 +392,23 @@ void main() {
       expect(SidebarMenuSubButtonSize.md.button, ButtonSize.sm);
     });
 
-    testWidgets('a default row is 37.5 tall at h-auto px-2 py-2', (
+    testWidgets('a default row grows around its label', (
       WidgetTester tester,
     ) async {
       await tester.pumpDs(_shell(collapsible: SidebarCollapsible.none));
       final Size row = tester
           .renderObject<RenderBox>(find.byType(SidebarMenuButton).first)
           .size;
-      // 19.5 of line box, `py-2` twice, and a 1px border twice.
-      expect(row.height, closeTo(37.5, 0.01));
+      // One navigation line box, the row padding, and its hairline border.
+      expect(
+        row.height,
+        closeTo(
+          TextStyles.nav.step.leading +
+              space(2) * 2 +
+              BorderWidths.hairline * 2,
+          0.01,
+        ),
+      );
     });
 
     testWidgets('the row wears rounded-lg, not the pill', (
@@ -512,14 +531,14 @@ void main() {
       final Size badge = tester
           .renderObject<RenderBox>(find.byType(SidebarMenuBadge))
           .size;
-      expect(badge.height, Badge.height);
+      expect(badge.height, greaterThanOrEqualTo(Badge.minHeight));
       // The floor, not the width: a one-digit count measures narrower than
       // 20 in every face, and this file loads none — the page test carries the
       // rendered numbers.
       expect(badge.width, greaterThanOrEqualTo(SidebarMenuBadge.minWidth));
       expect(
         tester.widget<Badge>(find.byType(Badge)).spec,
-        TextStyles.sidebarMenuBadge,
+        TextStyles.numberSm,
       );
       // The chip is `pointer-events-none` — a click goes to the row under it.
       expect(find.byType(IgnorePointer), findsWidgets);
@@ -720,8 +739,7 @@ void main() {
             .height,
         SidebarGroupLabel.height,
       );
-      expect(TextStyles.navSm.size, 11.5);
-      expect(TextStyles.navSm.height, 1.2);
+      expect(TextStyles.nav.step, const TypeStep(16, 20));
     });
   });
 

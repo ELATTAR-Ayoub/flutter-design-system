@@ -46,7 +46,13 @@
 /// supply is the Escape key *when focus is already inside the popup* — key
 /// events travel up from the focused node, so a `Focus` wrapped around the
 /// content sees them, and a caller whose focus stays outside (the combobox)
-/// handles Escape where the focus is.
+/// handles Escape where the focus is. The same restraint holds for `Tab`: the
+/// content's `Focus` installs no `FocusScope`/`FocusTraversalGroup` of its
+/// own, so a plain, non-modal popover does **not** trap it — `Tab` is free to
+/// travel out of the popup subtree exactly the way it would if the popup were
+/// not there. A real menu traps it anyway, but that trap is `menu.dart`'s own
+/// content deciding to close on `Tab` rather than this kernel deciding to
+/// block it.
 ///
 /// ## What the `menus` family added (2026-08-16)
 ///
@@ -647,6 +653,7 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _animation.dispose();
+    _popupRoot.dispose();
     super.dispose();
   }
 
@@ -671,8 +678,25 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
     });
   }
 
+  /// Where the focus was standing when this popup opened.
+  ///
+  /// A popup that takes the focus has to give it back. Nothing else will: the
+  /// popup subtree is torn out on close, and a focus node that leaves the tree
+  /// leaves the focus nowhere — the next Tab would start again from the top of
+  /// the page rather than from the trigger the reader opened this with.
+  FocusNode? _restoreTo;
+
+  /// The popup's own node, held so the state can ask whether the focus is
+  /// still inside the popup at the moment it closes.
+  late final FocusNode _popupRoot = FocusNode(
+    debugLabel: 'Popover popup',
+    canRequestFocus: false,
+    skipTraversal: true,
+  );
+
   void _show() {
     if (_showing) return;
+    _restoreTo = FocusManager.instance.primaryFocus;
     _placement = null;
     _portal.show();
     _animation
@@ -686,8 +710,25 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
       ? effectiveMotionDuration(context, MotionDurations.overlayEnter)
       : Duration.zero;
 
+  /// Hands the focus back to whatever held it before the popup opened.
+  ///
+  /// Only while that node is still attached and still willing: a trigger the
+  /// popup itself removed is gone by now, and asking a detached node for the
+  /// focus throws rather than failing quietly. Only, too, while the focus is
+  /// still inside the popup — a popup dismissed by a click elsewhere has
+  /// already handed the focus to whatever that click landed on, and pulling it
+  /// back to the trigger would undo the reader's own move.
+  void _restoreFocus() {
+    final FocusNode? node = _restoreTo;
+    _restoreTo = null;
+    if (node == null || !node.canRequestFocus || node.context == null) return;
+    if (!_popupRoot.hasFocus) return;
+    node.requestFocus();
+  }
+
   void _hide() {
     if (!_showing) return;
+    _restoreFocus();
     // `MenubarContent` writes no `animate-out`: there is no exit to run, so the
     // controller is not reversed at all and the portal goes in this frame.
     if (!widget.animateOut) {
@@ -816,8 +857,7 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
               // resolved side names the axis and the sign.
               slide: widget.slideSides.contains(side) ? side : null,
               child: Focus(
-                canRequestFocus: false,
-                skipTraversal: true,
+                focusNode: _popupRoot,
                 onKeyEvent: _onKey,
                 child: Builder(
                   builder: (BuildContext context) =>

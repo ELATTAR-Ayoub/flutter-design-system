@@ -1,7 +1,7 @@
 {
   "name": "menubar",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/menubar.tsx` — a strip of triggers that pass one open menu",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/menubar.dart",
       "target": "@ui/menubar.dart",
-      "sha256": "16fee8e6e3350608b9530c3bf96bbfd07521c4e528957b599125b724e5c7925e"
+      "sha256": "8306a3bdf6b8bca899f2ea082ea9cfcbfb7d13e6e8b79f1dcb0ca4e051400c68"
     }
   ],
   "registryDependencies": [
@@ -26,7 +26,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/menubar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/menubar.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/menubar.dart",
   "exports": [
     "Menubar",
     "MenubarMenu"

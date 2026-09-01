@@ -1,0 +1,27 @@
+{
+  "name": "media-scrim",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "Bottom-up media contrast that keeps overlaid copy readable without adding",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/media_scrim.dart",
+      "target": "@ui/media_scrim.dart",
+      "sha256": "b5a7fd87bb344f1465e9ec8c19c8afc9450bb9d0ac54734fa01a69879d4250e0"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/media_scrim",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/media_scrim.dart",
+  "deprecated": false
+}

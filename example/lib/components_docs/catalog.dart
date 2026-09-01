@@ -275,7 +275,7 @@ enum ComponentDocFamily {
   /// The kicker a page in this family prints above its title.
   ///
   /// Written out rather than derived from [label] with `toUpperCase()`:
-  /// `TextStyles.section` upper-cases at render time, and
+  /// `TextStyles.small` upper-cases at render time, and
   /// `docs_no_uppercase_test.dart` fails any documentation source that
   /// upper-cases by hand. Components says only "COMPONENTS" — the second
   /// half would repeat the first.

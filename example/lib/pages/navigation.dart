@@ -38,7 +38,7 @@
 ///  5. **`text-nav` is not `.type-nav`.** The navigation-menu triggers wear the
 ///     utility (13.5px / **1.5** = 20.25) and the top-nav buttons the component
 ///     class (13.5px / **1.2** = 16.2). Both measured on this page, three
-///     sections apart. Carried by [TextStyles.navMenuTrigger].
+///     sections apart. Carried by [TextStyles.nav].
 ///  6. **The top-nav press SNAPS** (sweep item X1, the two sites on this page).
 ///     `press` declares the whole `transition` shorthand and `transition-colors
 ///     duration-fast` is emitted after it at equal specificity, so
@@ -174,10 +174,20 @@ Widget _menuStage({
   constraints: BoxConstraints(minHeight: minHeight),
   child: Padding(
     padding: EdgeInsets.fromLTRB(space(5), space(5), space(5), bottomPadding),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[child],
+    // The stage centers a [NavigationMenu], whose own trigger row is a
+    // toolbar the same way [Menubar]'s is: it scrolls horizontally rather
+    // than fighting the menu for room to shrink into. Unconditional, not
+    // width-gated: the top nav row's own width check still let a desktop
+    // width overflow at 200% text, so a fixed breakpoint is not trusted
+    // here either. The `child` here is the menu itself, not the panel it
+    // opens, so this never touches how a panel lays out.
+    child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[child],
+      ),
     ),
   ),
 );
@@ -280,6 +290,60 @@ class _TopNavRow extends StatelessWidget {
   /// `h-16`: the row's border box, `border-b` included.
   static double get height => space(16);
 
+  List<Widget> _items() => <Widget>[
+    // `className="mr-6"`.
+    Padding(
+      padding: EdgeInsets.only(right: space(6)),
+      child: const Logo(),
+    ),
+    if (signedIn)
+      for (final ({String label, IconGlyph icon, bool active}) item
+          in _nav) ...<Widget>[
+        _TopNavButton(label: item.label, glyph: item.icon, active: item.active),
+        // `gap-1`: the row's own, paid between every pair.
+        SizedBox(width: space(1)),
+      ]
+    else
+      for (final String label in _signedOut) ...<Widget>[
+        _TopNavButton(label: label),
+        SizedBox(width: space(1)),
+      ],
+    // The reference pushes the trailing group to the far edge with a flex
+    // spacer. `Spacer` needs a bounded row to resolve, and at 200% text even
+    // the desktop width is not always bounded enough — the wide layout
+    // overflowed by up to 999px in that configuration, well before this row
+    // was ever narrow. The whole strip is a horizontally scrolling one
+    // instead, unconditionally, with the same fixed gap the signed-in
+    // group already uses between its own buttons; a real top nav would
+    // collapse behind a menu long before this, which this specimen does not
+    // model.
+    SizedBox(width: space(6)),
+    if (signedIn) ...<Widget>[
+      const _BalanceChip(),
+      // `ml-auto flex items-center gap-3`.
+      SizedBox(width: space(3)),
+      Button(
+        size: ButtonSize.sm,
+        onPressed: () {},
+        child: const Text('Open Pack'),
+      ),
+    ] else ...<Widget>[
+      Button(
+        variant: ButtonVariant.ghost,
+        size: ButtonSize.sm,
+        onPressed: () {},
+        child: const Text('Log In'),
+      ),
+      // `ml-auto flex items-center gap-2`.
+      SizedBox(width: space(2)),
+      Button(
+        size: ButtonSize.sm,
+        onPressed: () {},
+        child: const Text('Create Account'),
+      ),
+    ],
+  ];
+
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
@@ -298,57 +362,11 @@ class _TopNavRow extends StatelessWidget {
             height: BorderWidths.hairline,
             child: ColoredBox(color: theme.border),
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: space(5)),
-            child: Row(
-              children: <Widget>[
-                // `className="mr-6"`.
-                Padding(
-                  padding: EdgeInsets.only(right: space(6)),
-                  child: const Logo(),
-                ),
-                if (signedIn)
-                  for (final ({String label, IconGlyph icon, bool active}) item
-                      in _nav) ...<Widget>[
-                    _TopNavButton(
-                      label: item.label,
-                      glyph: item.icon,
-                      active: item.active,
-                    ),
-                    // `gap-1`: the row's own, paid between every pair.
-                    SizedBox(width: space(1)),
-                  ]
-                else
-                  for (final String label in _signedOut) ...<Widget>[
-                    _TopNavButton(label: label),
-                    SizedBox(width: space(1)),
-                  ],
-                const Spacer(),
-                if (signedIn) ...<Widget>[
-                  const _BalanceChip(),
-                  // `ml-auto flex items-center gap-3`.
-                  SizedBox(width: space(3)),
-                  Button(
-                    size: ButtonSize.sm,
-                    onPressed: () {},
-                    child: const Text('Open Pack'),
-                  ),
-                ] else ...<Widget>[
-                  Button(
-                    variant: ButtonVariant.ghost,
-                    size: ButtonSize.sm,
-                    onPressed: () {},
-                    child: const Text('Log In'),
-                  ),
-                  // `ml-auto flex items-center gap-2`.
-                  SizedBox(width: space(2)),
-                  Button(
-                    size: ButtonSize.sm,
-                    onPressed: () {},
-                    child: const Text('Create Account'),
-                  ),
-                ],
-              ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: space(5)),
+              child: Row(children: _items()),
             ),
           ),
         ],
@@ -755,16 +773,26 @@ class _PaginationSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                const Pagination(
-                  children: <Widget>[
-                    PaginationStep.previous(),
-                    PaginationLink(label: '1'),
-                    PaginationLink(label: '2', isActive: true),
-                    PaginationLink(label: '3'),
-                    PaginationEllipsis(),
-                    PaginationLink(label: '12'),
-                    PaginationStep.next(),
-                  ],
+                // [Pagination] is `w-fit` by design and must size to its own
+                // content, not the panel's width; stretching the column onto
+                // it is what forced it to a tight width it could not honour
+                // at 200% text. Centered and independently scrollable keeps
+                // it `w-fit` while still reachable if it ever outgrows 320px.
+                Center(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: const Pagination(
+                      children: <Widget>[
+                        PaginationStep.previous(),
+                        PaginationLink(label: '1'),
+                        PaginationLink(label: '2', isActive: true),
+                        PaginationLink(label: '3'),
+                        PaginationEllipsis(),
+                        PaginationLink(label: '12'),
+                        PaginationStep.next(),
+                      ],
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: space(5)),
@@ -985,7 +1013,7 @@ class _IconLinkList extends StatelessWidget {
               children: <Widget>[
                 Icon(links[i].icon, size: IconSize.sm, tone: IconTone.subtle),
                 SizedBox(width: NavigationMenuLink.gap),
-                StyledText(links[i].title, TextStyles.bodySmall),
+                StyledText(links[i].title, TextStyles.small),
               ],
             ),
           ),
@@ -1011,7 +1039,7 @@ class _PlainLinkList extends StatelessWidget {
           if (i > 0) SizedBox(height: space(1)),
           NavigationMenuLink(
             onTap: () {},
-            child: StyledText(labels[i], TextStyles.bodySmall),
+            child: StyledText(labels[i], TextStyles.small),
           ),
         ],
       ],
@@ -1180,7 +1208,7 @@ class _DisclosureSectionState extends State<_DisclosureSection> {
                     'Every card in a pack is rolled independently against the '
                     'published rarity table. The table is shown on each '
                     'pack’s detail page before you buy.',
-                    TextStyles.bodySmall,
+                    TextStyles.small,
                   ),
                 ),
                 AccordionItem(
@@ -1189,7 +1217,7 @@ class _DisclosureSectionState extends State<_DisclosureSection> {
                     'Yes. Sell-back is offered at the card’s current listed '
                     'value, and the amount is credited to your available '
                     'balance immediately.',
-                    TextStyles.bodySmall,
+                    TextStyles.small,
                   ),
                 ),
                 AccordionItem(
@@ -1197,7 +1225,7 @@ class _DisclosureSectionState extends State<_DisclosureSection> {
                   content: StyledText(
                     'Request a shipment from your Stash. Cards are pulled from '
                     'the vault, graded, and dispatched together.',
-                    TextStyles.bodySmall,
+                    TextStyles.small,
                   ),
                 ),
               ],
@@ -1211,10 +1239,16 @@ class _DisclosureSectionState extends State<_DisclosureSection> {
                 variant: ButtonVariant.outline,
                 onPressed: () => setState(() => _filters = !_filters),
                 child: Row(
-                  // `className="w-full justify-between"`.
+                  // `className="w-full justify-between"`. The label is
+                  // Expanded with an ellipsis so 200% text shrinks it instead
+                  // of pushing the chevron past the button's own width.
                   children: <Widget>[
-                    const Text('Advanced filters'),
-                    const Spacer(),
+                    const Expanded(
+                      child: Text(
+                        'Advanced filters',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     Icon(
                       IconGlyph.chevronRight,
                       size: IconSize.sm,

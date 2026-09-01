@@ -449,10 +449,8 @@ class QuestionnaireProgress extends StatelessWidget {
   static double get minWidthChars => 14;
 
   /// `text-xs font-medium tabular-nums`.
-  static final TextStyleToken type = TextStyleToken(
-    family: Fonts.sans,
-    size: TextStyles.messageMetadata.size,
-    height: TextStyles.messageMetadata.height,
+  static final TextStyleToken type = TextStyles.small.derive(
+    name: 'questionnaire-progress',
     wght: 500,
     tabular: true,
   );
@@ -596,11 +594,8 @@ class QuestionnaireTitle extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => StyledText(
-    text,
-    TextStyles.cardTitle,
-    color: ThemeScope.of(context).foreground,
-  );
+  Widget build(BuildContext context) =>
+      StyledText(text, TextStyles.h4, color: ThemeScope.of(context).foreground);
 }
 
 /// `<QuestionnaireDescription>` — `text-sm text-pretty text-muted-foreground`.
@@ -612,7 +607,7 @@ class QuestionnaireDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StyledText(
     text,
-    TextStyles.bubbleReactions,
+    TextStyles.small,
     color: ThemeScope.of(context).mutedForeground,
   );
 }
@@ -800,15 +795,14 @@ class _QuestionnaireChoiceState extends State<QuestionnaireChoice> {
                     children: <Widget>[
                       StyledText(
                         widget.label,
-                        TextStyles.itemTitle,
+                        TextStyles.small,
                         color: theme.foreground,
-                        fontSize: TextStyles.small.size,
                       ),
                       if (widget.description != null) ...<Widget>[
                         SizedBox(height: QuestionnaireChoice.indicatorDrop),
                         StyledText(
                           widget.description!,
-                          TextStyles.itemTitle,
+                          TextStyles.body,
                           color: theme.mutedForeground,
                         ),
                       ],
@@ -977,7 +971,7 @@ class QuestionnaireInput extends StatelessWidget {
         boxHeight: height,
         padding: insets,
         radius: BorderRadius.circular(Radii.full),
-        textSpec: TextStyles.bubbleReactions,
+        textSpec: TextStyles.small,
         fill: theme.kind == ResolvedColorMode.dark
             ? theme.input.withValues(alpha: darkFillAlpha)
             : transparent,
@@ -1022,7 +1016,7 @@ class QuestionnaireError extends StatelessWidget {
         liveRegion: true,
         child: StyledText(
           text ?? (item.required ? requiredDefault : optionalDefault),
-          TextStyles.bubbleReactions,
+          TextStyles.small,
           color: theme.destructiveText,
         ),
       ),
@@ -1074,20 +1068,35 @@ class QuestionnaireActions extends StatelessWidget {
       }
     }
 
+    // A plain `Row` gives its non-flex children an *unbounded* main axis to
+    // measure themselves against — that is the budget an `Expanded`/
+    // `Flexible` sibling divides in the first place, and it is why the
+    // Approve/Decline family of fixes in this pass reaches for `Wrap`
+    // instead of a fixed `Row`. But nesting that `Wrap` back *inside* a
+    // `Row` (as a plain, non-flex child, the way this footer used to)
+    // hands the `Wrap` the same unbounded main axis: with nothing to wrap
+    // against, it just reports one un-wrapped line, exactly as the `Row`
+    // it replaced did, and the outer row still overflows once "Skip" and
+    // "Next" no longer both fit at large text scales. One flat `Wrap`,
+    // reachable directly from this box's own real (bounded) width, is what
+    // actually lets `middle`/`trailing` drop to a second line — `lead` on
+    // the left, the actions cluster pinned to the right for as long as
+    // both fit on one line, exactly like `justify-between`.
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: wide ? minHeightWide : minHeight),
-      child: Row(
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: gap,
+        runSpacing: gap,
         children: <Widget>[
-          Expanded(
-            child: Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: Row(mainAxisSize: MainAxisSize.min, children: lead),
-            ),
+          Row(mainAxisSize: MainAxisSize.min, children: lead),
+          Wrap(
+            spacing: gap,
+            runSpacing: gap,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[?middle, ?trailing],
           ),
-          SizedBox(width: gap),
-          ?middle,
-          SizedBox(width: gap),
-          ?trailing,
         ],
       ),
     );

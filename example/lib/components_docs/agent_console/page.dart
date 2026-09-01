@@ -484,7 +484,7 @@ class _HeightSpecimenState extends State<_HeightSpecimen> {
       children: <Widget>[
         StyledText(
           'height: 608 ("live")',
-          TextStyles.section,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
         SizedBox(height: space(2)),
@@ -497,7 +497,7 @@ class _HeightSpecimenState extends State<_HeightSpecimen> {
         SizedBox(height: space(6)),
         StyledText(
           'height: 320 ("minimal")',
-          TextStyles.section,
+          TextStyles.small,
           color: theme.mutedForeground,
         ),
         SizedBox(height: space(2)),

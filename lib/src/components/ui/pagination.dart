@@ -76,7 +76,20 @@ class Pagination extends StatelessWidget {
       // `role="navigation" aria-label="pagination"`.
       label: 'pagination',
       explicitChildNodes: true,
+      // **Not scrolled, deliberately.** A pager that outgrows its column is
+      // the page's problem, as it is in the reference: a scroll view here
+      // unbounds the width the cells measure against and changes what every
+      // specimen of this component measures. The consumer decides whether this
+      // row scrolls.
       child: Row(
+        // `w-fit`, spelled. The row was `MainAxisSize.max`, which contradicts
+        // the class it ports and made the component impossible to place in a
+        // horizontally scrolling parent: an unbounded main axis plus a `max`
+        // row is an infinite width, so the pager laid out to nothing at all
+        // and the specimen rendered blank. `min` is what `w-fit` means, and a
+        // caller that wants it centred wraps it in a [Center] exactly as the
+        // docs page does.
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[

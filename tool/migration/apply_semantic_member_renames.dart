@@ -207,10 +207,22 @@ void main() {
         );
       }
       text = text
-          .replaceAll(RegExp(r'validation_(?:validation_)+rule'), 'validation_rule')
-          .replaceAll(RegExp(r'validation-(?:validation-)+rule'), 'validation-rule')
-          .replaceAll(RegExp(r'(?:Validation)+RuleDocPage'), 'ValidationRuleDocPage')
-          .replaceAll(RegExp(r'validation(?:Validation)+RuleDoc'), 'validationRuleDoc');
+          .replaceAll(
+            RegExp(r'validation_(?:validation_)+rule'),
+            'validation_rule',
+          )
+          .replaceAll(
+            RegExp(r'validation-(?:validation-)+rule'),
+            'validation-rule',
+          )
+          .replaceAll(
+            RegExp(r'(?:Validation)+RuleDocPage'),
+            'ValidationRuleDocPage',
+          )
+          .replaceAll(
+            RegExp(r'validation(?:Validation)+RuleDoc'),
+            'validationRuleDoc',
+          );
       text = text.replaceAllMapped(
         RegExp(r'\b_El([A-Z][A-Za-z0-9_]*)'),
         (match) => '_${match.group(1)!}',

@@ -51,6 +51,7 @@ import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
+import '../../kit.dart';
 
 /// The declaration: every section this page shows, in TOC order. `final`,
 /// not `const`: `InstallSection.command` reads `buttonGroupDoc.command`, a
@@ -307,8 +308,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   int _count = 3;
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
+  Widget build(BuildContext context) => SpecimenScroll(
     child: ButtonGroup(
       children: <Widget>[
         Button(
@@ -316,7 +316,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           variant: ButtonVariant.outline,
           size: ButtonSize.sm,
           onPressed: () => setState(() => _count = (_count - 1).clamp(0, 99)),
-          child: StyledText('−', TextStyles.buttonLabel),
+          child: StyledText('−', TextStyles.nav),
         ),
         ButtonGroupText(
           _count.toString(),
@@ -328,7 +328,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           variant: ButtonVariant.outline,
           size: ButtonSize.sm,
           onPressed: () => setState(() => _count = (_count + 1).clamp(0, 99)),
-          child: StyledText('+', TextStyles.buttonLabel),
+          child: StyledText('+', TextStyles.nav),
         ),
       ],
     ),
@@ -392,7 +392,7 @@ class _ComposingOthersSpecimen extends StatelessWidget {
         Button(
           variant: ButtonVariant.outline,
           onPressed: () {},
-          child: StyledText('Send', TextStyles.buttonLabel),
+          child: StyledText('Send', TextStyles.nav),
         ),
       ],
     ),
@@ -415,25 +415,24 @@ class _SeparatorSpecimen extends StatelessWidget {
   const _SeparatorSpecimen();
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
+  Widget build(BuildContext context) => SpecimenScroll(
     child: ButtonGroup(
       children: <Widget>[
         Button(
           variant: ButtonVariant.ghost,
           onPressed: () {},
-          child: StyledText('Bold', TextStyles.buttonLabel),
+          child: StyledText('Bold', TextStyles.nav),
         ),
         Button(
           variant: ButtonVariant.ghost,
           onPressed: () {},
-          child: StyledText('Italic', TextStyles.buttonLabel),
+          child: StyledText('Italic', TextStyles.nav),
         ),
         const ButtonGroupSeparator(),
         Button(
           variant: ButtonVariant.ghost,
           onPressed: () {},
-          child: StyledText('Underline', TextStyles.buttonLabel),
+          child: StyledText('Underline', TextStyles.nav),
         ),
       ],
     ),
@@ -457,14 +456,10 @@ class _SplitSpecimen extends StatelessWidget {
   const _SplitSpecimen();
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
+  Widget build(BuildContext context) => SpecimenScroll(
     child: ButtonGroup(
       children: <Widget>[
-        Button(
-          onPressed: () {},
-          child: StyledText('Save', TextStyles.buttonLabel),
-        ),
+        Button(onPressed: () {}, child: StyledText('Save', TextStyles.nav)),
         const ButtonGroupSeparator(),
         Button(
           onPressed: () {},
@@ -498,8 +493,7 @@ class _NestedSpecimen extends StatelessWidget {
   const _NestedSpecimen();
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
+  Widget build(BuildContext context) => SpecimenScroll(
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -509,13 +503,13 @@ class _NestedSpecimen extends StatelessWidget {
               variant: ButtonVariant.outline,
               size: ButtonSize.sm,
               onPressed: () {},
-              child: StyledText('Cut', TextStyles.buttonLabel),
+              child: StyledText('Cut', TextStyles.nav),
             ),
             Button(
               variant: ButtonVariant.outline,
               size: ButtonSize.sm,
               onPressed: () {},
-              child: StyledText('Copy', TextStyles.buttonLabel),
+              child: StyledText('Copy', TextStyles.nav),
             ),
           ],
         ),
@@ -526,7 +520,7 @@ class _NestedSpecimen extends StatelessWidget {
               variant: ButtonVariant.outline,
               size: ButtonSize.sm,
               onPressed: () {},
-              child: StyledText('Paste', TextStyles.buttonLabel),
+              child: StyledText('Paste', TextStyles.nav),
             ),
           ],
         ),
@@ -572,27 +566,35 @@ class _RtlSpecimen extends StatelessWidget {
   const _RtlSpecimen();
 
   @override
-  Widget build(BuildContext context) => ButtonGroup(
-    children: <Widget>[
-      Button(
-        variant: ButtonVariant.outline,
-        size: ButtonSize.sm,
-        onPressed: () {},
-        child: StyledText('الكل', TextStyles.buttonLabel),
-      ),
-      Button(
-        variant: ButtonVariant.outline,
-        size: ButtonSize.sm,
-        onPressed: () {},
-        child: StyledText('نشط', TextStyles.buttonLabel),
-      ),
-      Button(
-        variant: ButtonVariant.outline,
-        size: ButtonSize.sm,
-        onPressed: () {},
-        child: StyledText('مؤرشف', TextStyles.buttonLabel),
-      ),
-    ],
+  // `ButtonGroup` is deliberately `w-fit` (see `button_group.dart`) and does
+  // not shrink its members, so a large accessibility text scale can widen
+  // three RTL labels past the showcase frame. The page, not the component,
+  // decides how to present that: a horizontal scroll rather than an
+  // overflow, the same call made for `ActiveIndicator`'s own intrinsically
+  // sized rows elsewhere in the docs.
+  Widget build(BuildContext context) => SpecimenScroll(
+    child: ButtonGroup(
+      children: <Widget>[
+        Button(
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
+          onPressed: () {},
+          child: StyledText('الكل', TextStyles.nav),
+        ),
+        Button(
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
+          onPressed: () {},
+          child: StyledText('نشط', TextStyles.nav),
+        ),
+        Button(
+          variant: ButtonVariant.outline,
+          size: ButtonSize.sm,
+          onPressed: () {},
+          child: StyledText('مؤرشف', TextStyles.nav),
+        ),
+      ],
+    ),
   );
 }
 
@@ -872,8 +874,8 @@ const List<DocsApiFact> _textFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to false. Renders with '
-        'TextStyles.buttonGroupNum (mono, tabular figures) instead '
-        'of TextStyles.buttonGroupText.',
+        'TextStyles.numberBase (mono, tabular figures) instead '
+        'of TextStyles.nav.',
   ),
   DocsApiFact(
     name: 'ButtonGroupText.paddingX',

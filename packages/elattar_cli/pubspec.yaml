@@ -2,7 +2,7 @@ name: elattar_cli
 description: >-
   Installs Elattar's Flutter design system into your project as source you own:
   components, foundation tokens, effects and motion, copied in and yours to edit.
-version: 0.0.1
+version: 0.0.2
 
 homepage: https://flutter.elattar.dev
 repository: https://github.com/ELATTAR-Ayoub/flutter-design-system

@@ -1,0 +1,20 @@
+00:00 +0: loading D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart
+../lib/src/components/ui/item.dart:269:18: Error: Member not found: 'itemTitle'.
+      TextStyles.itemTitle,
+                 ^^^^^^^^^
+../lib/src/components/ui/item.dart:287:16: Error: Member not found: 'itemDescription'.
+    TextStyles.itemDescription,
+               ^^^^^^^^^^^^^^^
+00:00 +0 -1: loading D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart [E]
+  Failed to load "D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart":
+  Compilation failed for testPath=D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart: ../lib/src/components/ui/item.dart:269:18: Error: Member not found: 'itemTitle'.
+        TextStyles.itemTitle,
+                   ^^^^^^^^^
+  ../lib/src/components/ui/item.dart:287:16: Error: Member not found: 'itemDescription'.
+      TextStyles.itemDescription,
+                 ^^^^^^^^^^^^^^^
+  .
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart: loading D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/responsive_text_scale_test.dart

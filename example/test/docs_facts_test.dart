@@ -33,7 +33,19 @@ Widget _harness(Widget child) => ThemeScope(
   controller: ThemeController(mode: ColorMode.dark),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: SingleChildScrollView(child: child),
+    home: Builder(
+      // The ambient ink every route inherits, as the shell sets it for the
+      // real app. These primitives are mounted bare here, outside `DocsLayout`,
+      // so this harness has to state it.
+      builder: (BuildContext context) => DefaultTextStyle(
+        style: StyledText.styleOf(
+          context,
+          TextStyles.body,
+          color: ThemeScope.of(context).foreground,
+        ),
+        child: SingleChildScrollView(child: child),
+      ),
+    ),
   ),
 );
 

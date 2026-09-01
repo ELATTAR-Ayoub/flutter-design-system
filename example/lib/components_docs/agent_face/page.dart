@@ -302,7 +302,7 @@ class _FaceTile extends StatelessWidget {
           ),
         ),
         SizedBox(height: space(2)),
-        StyledText(label, TextStyles.caption, color: theme.mutedForeground),
+        StyledText(label, TextStyles.small, color: theme.mutedForeground),
       ],
     );
   }
@@ -501,7 +501,7 @@ Widget _squareRenderer(
     ),
     child: StyledText(
       state.name.substring(0, 1),
-      TextStyles.chip,
+      TextStyles.badge,
       color: theme.background,
     ),
   );
@@ -533,7 +533,7 @@ class _CustomRendererSpecimen extends StatelessWidget {
             SizedBox(height: space(2)),
             StyledText(
               'default (AgentAvatar)',
-              TextStyles.caption,
+              TextStyles.small,
               color: ThemeScope.of(context).mutedForeground,
             ),
           ],
@@ -557,7 +557,7 @@ class _CustomRendererSpecimen extends StatelessWidget {
             SizedBox(height: space(2)),
             StyledText(
               'avatar: _squareRenderer',
-              TextStyles.caption,
+              TextStyles.small,
               color: ThemeScope.of(context).mutedForeground,
             ),
           ],

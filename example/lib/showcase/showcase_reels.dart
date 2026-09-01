@@ -413,7 +413,7 @@ class _ReelMenu extends StatelessWidget {
             Expanded(
               child: StyledText(
                 'Ari Rocha',
-                TextStyles.cardTitle,
+                TextStyles.h4,
                 color: MediaScrimTokens.foreground,
               ),
             ),
@@ -425,7 +425,7 @@ class _ReelMenu extends StatelessWidget {
               onPressed: onFollow,
               child: StyledText(
                 following ? 'Following' : 'Follow',
-                TextStyles.buttonLabel,
+                TextStyles.nav,
               ),
             ),
           ],
@@ -557,7 +557,7 @@ class _CommentsDialog extends StatelessWidget {
             Button(
               variant: ButtonVariant.secondary,
               onPressed: close,
-              child: StyledText('Close', TextStyles.buttonLabel),
+              child: StyledText('Close', TextStyles.nav),
             ),
           ],
         ),
@@ -589,7 +589,7 @@ class _Comment extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              StyledText(author, TextStyles.cardTitle),
+              StyledText(author, TextStyles.h4),
               StyledText(handle, TextStyles.small),
               SizedBox(height: space(1)),
               StyledText(body, TextStyles.body),
@@ -716,7 +716,7 @@ class _UnavailableReel extends StatelessWidget {
                       variant: ButtonVariant.secondary,
                       label: 'Retry reel',
                       onPressed: onRetry,
-                      child: StyledText('Retry', TextStyles.buttonLabelSm),
+                      child: StyledText('Retry', TextStyles.small),
                     ),
                   ],
                 ),

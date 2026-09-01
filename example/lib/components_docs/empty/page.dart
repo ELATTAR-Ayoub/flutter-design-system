@@ -491,7 +491,7 @@ class _ApiReferenceContent extends StatelessWidget {
             name: 'EmptyDescription.spec',
             type: 'static TextStyleToken',
             description:
-                'TextStyles.textareaBody: the resolved rung the '
+                'TextStyles.body: the resolved rung the '
                 'description renders with.',
           ),
         ],
@@ -598,7 +598,7 @@ class _DependenciesContent extends StatelessWidget {
             label: 'Imports',
             value:
                 'foundation/spacing.dart, foundation/theme.dart, '
-                'foundation/typography.dart (ComponentTextStyles, '
+                'foundation/typography.dart ('
                 'TextStyleToken), text_layout.dart (LineBox), '
                 'theme_scope.dart (StyledText, ThemeScope), icon.dart (Icon, '
                 'IconTone), icon_paths.dart (IconGlyph)',
@@ -773,7 +773,7 @@ class _ClearFiltersButton extends StatelessWidget {
     variant: ButtonVariant.secondary,
     size: ButtonSize.sm,
     onPressed: () {},
-    child: StyledText('Clear filters', TextStyles.buttonLabel),
+    child: StyledText('Clear filters', TextStyles.nav),
   );
 }
 
@@ -843,7 +843,7 @@ class _ClearFiltersArButton extends StatelessWidget {
     variant: ButtonVariant.secondary,
     size: ButtonSize.sm,
     onPressed: () {},
-    child: StyledText('مسح الفلاتر', TextStyles.buttonLabel),
+    child: StyledText('مسح الفلاتر', TextStyles.nav),
   );
 }
 
@@ -865,7 +865,7 @@ Empty(
           variant: ButtonVariant.secondary,
           size: ButtonSize.sm,
           onPressed: () {},
-          child: StyledText('Clear filters', TextStyles.buttonLabel),
+          child: StyledText('Clear filters', TextStyles.nav),
         ),
       ],
     ),
@@ -890,7 +890,7 @@ Empty(
           variant: ButtonVariant.secondary,
           size: ButtonSize.sm,
           onPressed: () {},
-          child: StyledText('Clear filters', TextStyles.buttonLabel),
+          child: StyledText('Clear filters', TextStyles.nav),
         ),
       ],
     ),
@@ -968,7 +968,7 @@ const String _rtlCode = '''Directionality(
             variant: ButtonVariant.secondary,
             size: ButtonSize.sm,
             onPressed: () {},
-            child: StyledText('مسح الفلاتر', TextStyles.buttonLabel),
+            child: StyledText('مسح الفلاتر', TextStyles.nav),
           ),
         ],
       ),

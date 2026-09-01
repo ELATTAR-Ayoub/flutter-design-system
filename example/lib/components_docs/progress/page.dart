@@ -472,7 +472,7 @@ class _ProgressLiveSpecimenState extends State<_ProgressLiveSpecimen> {
               onPressed: _advanceOrReset,
               child: StyledText(
                 atMax ? 'Reset' : 'Advance 20%',
-                TextStyles.buttonLabel,
+                TextStyles.nav,
               ),
             ),
           ],

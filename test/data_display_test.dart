@@ -264,12 +264,12 @@ void main() {
         ),
       );
       expect(caption.align, TextAlign.center);
-      expect(caption.spec, TextStyles.bodySmall);
+      expect(caption.spec, TextStyles.small);
 
-      // head 40 + one row 36 + mt-4 16 + an 18.5714 line box.
+      // head 40 + one row 36 + the caption's own gap and line box.
       expect(
         tester.getSize(find.byType(Table)).height,
-        closeTo(40 + 36 + 16 + 13 * (1.25 / 0.875), _fine),
+        closeTo(40 + 36 + 16 + TextStyles.small.step.leading, _fine),
       );
     });
 
@@ -472,8 +472,19 @@ void main() {
         ),
       );
 
-      // 1 + 10 + (17.875 + 4 + 19.5) + 10 + 1.
-      expect(tester.getSize(find.byType(Item)).height, closeTo(63.375, _fine));
+      // The border, the row padding, and a title line box over a description
+      // line box with the row's own gap between them.
+      expect(
+        tester.getSize(find.byType(Item)).height,
+        closeTo(
+          BorderWidths.hairline * 2 +
+              10 * 2 +
+              TextStyles.body.step.leading +
+              4 +
+              TextStyles.small.step.leading,
+          _fine,
+        ),
+      );
     });
 
     testWidgets('the media pins to the top and drops 2px', (
@@ -628,10 +639,13 @@ void main() {
           ),
         ),
       );
-      // 18.5714 + pb-2 + the 1px rule.
+      // One supporting line box, the bottom padding, and the rule.
       expect(
         tester.getSize(find.byType(Marker)).height,
-        closeTo(13 * (1.25 / 0.875) + space(2) + BorderWidths.hairline, _fine),
+        closeTo(
+          TextStyles.small.step.leading + space(2) + BorderWidths.hairline,
+          _fine,
+        ),
       );
     });
 
@@ -713,12 +727,18 @@ void main() {
         ),
       ];
 
+      // The footprint is whatever the first state occupies, and every other
+      // state has to match it — the point is that a card never reflows as a
+      // stat loads, not that the number is any particular number.
+      double? footprint;
       for (final Stat stat in states) {
         await tester.pumpWidget(statHost(stat));
         await tester.pump(MotionDurations.normal);
+        final double h = tester.getSize(find.byType(Stat)).height;
+        footprint ??= h;
         expect(
-          tester.getSize(find.byType(Stat)).height,
-          closeTo(75.89, _fine),
+          h,
+          closeTo(footprint, _fine),
           reason: '${stat.state} / disabled=${stat.disabled}',
         );
       }
@@ -856,7 +876,7 @@ void main() {
         glyph.left - chip.left,
         closeTo(Badge.horizontalPadding + BorderWidths.hairline, _fine),
       );
-      expect(chip.height, Badge.height);
+      expect(chip.height, greaterThanOrEqualTo(Badge.minHeight));
     });
   });
 

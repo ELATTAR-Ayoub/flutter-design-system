@@ -84,7 +84,8 @@ void main() {
       final exports = <String>{};
       for (final entry in manifestFiles) {
         final source = entry['source']! as String;
-        if (source.endsWith('.dart')) exports.addAll(_publicDeclarations(source));
+        if (source.endsWith('.dart'))
+          exports.addAll(_publicDeclarations(source));
       }
       json['exports'] = exports.toList()..sort();
     }

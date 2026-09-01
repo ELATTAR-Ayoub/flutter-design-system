@@ -198,7 +198,7 @@ class _OverviewPanel extends StatelessWidget {
             SizedBox(height: space(5)),
             StyledText(
               'WORKFLOW',
-              TextStyles.eyebrow,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
             SizedBox(height: space(3)),
@@ -350,7 +350,7 @@ class _RoutePanel extends StatelessWidget {
               children: <Widget>[
                 StyledText(
                   route.title,
-                  TextStyles.eyebrow,
+                  TextStyles.small,
                   color: theme.foreground,
                 ),
                 Badge(
@@ -408,7 +408,7 @@ class _RouteAction extends StatelessWidget {
         children: <Widget>[
           StyledText(
             label.toUpperCase(),
-            TextStyles.eyebrow,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
           SizedBox(height: space(2)),

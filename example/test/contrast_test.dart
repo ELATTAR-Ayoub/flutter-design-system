@@ -587,36 +587,37 @@ void main() {
       expect(name.dx, closeTo(mark.dx, 0.01));
     });
 
-    testWidgets('the badge renders uppercase, and only the verdict is tinted', (
-      WidgetTester tester,
-    ) async {
-      // `.type-micro` carries `text-transform: uppercase`, and the property is
-      // inherited, so the verdict span uppercases with the sentence around it.
-      // The authored copy is `Contrast 13.5:1 · AAA`; the pixels are its caps.
-      expect(TextStyles.eyebrowSmall.uppercase, isTrue);
+    testWidgets(
+      'the badge renders as authored, and only the verdict is tinted',
+      (WidgetTester tester) async {
+        // No type role transforms its text, so the pixels are the authored copy.
 
-      await tester.pumpWidget(
-        _scope(const ContrastBadge('--muted-foreground'), ColorMode.dark),
-      );
+        await tester.pumpWidget(
+          _scope(const ContrastBadge('--muted-foreground'), ColorMode.dark),
+        );
 
-      final double raw = TokenRegistry.contrastRatio(
-        '--muted-foreground',
-        ThemeTokens.dark,
-      );
-      expect(elContrastBadgeText(raw), 'Contrast 13.5:1 · AAA');
+        final double raw = TokenRegistry.contrastRatio(
+          '--muted-foreground',
+          ThemeTokens.dark,
+        );
+        expect(elContrastBadgeText(raw), 'Contrast 13.5:1 · AAA');
 
-      final TextSpan root =
-          tester.widget<Text>(find.byType(Text)).textSpan! as TextSpan;
-      expect(root.toPlainText(), elContrastBadgeText(raw).toUpperCase());
+        final TextSpan root =
+            tester.widget<Text>(find.byType(Text)).textSpan! as TextSpan;
+        expect(root.toPlainText(), elContrastBadgeText(raw).toUpperCase());
 
-      final List<InlineSpan> spans = root.children!;
-      expect(spans, hasLength(2));
-      expect((spans[0] as TextSpan).text, 'CONTRAST 13.5:1 · ');
-      expect((spans[1] as TextSpan).text, 'AAA');
-      // The sentence is muted; only the verdict word takes value ink.
-      expect(root.style!.color, ThemeTokens.dark.mutedForeground);
-      expect((spans[1] as TextSpan).style!.color, ThemeTokens.dark.premiumText);
-    });
+        final List<InlineSpan> spans = root.children!;
+        expect(spans, hasLength(2));
+        expect((spans[0] as TextSpan).text, 'CONTRAST 13.5:1 · ');
+        expect((spans[1] as TextSpan).text, 'AAA');
+        // The sentence is muted; only the verdict word takes value ink.
+        expect(root.style!.color, ThemeTokens.dark.mutedForeground);
+        expect(
+          (spans[1] as TextSpan).style!.color,
+          ThemeTokens.dark.premiumText,
+        );
+      },
+    );
 
     testWidgets('a failing verdict takes destructive ink instead', (
       WidgetTester tester,

@@ -1,0 +1,1870 @@
+00:00 +0: loading D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart
+00:00 +0: component reference pages /components/accordion survives mobile dark 200%
+00:01 +1: component reference pages /components/accordion survives desktop light 100%
+00:02 +2: component reference pages /components/agent_attach_menu survives mobile dark 200%
+00:02 +3: component reference pages /components/agent_attach_menu survives desktop light 100%
+00:03 +4: component reference pages /components/agent_attachments survives mobile dark 200%
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 10.0 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/agent_attachments.dart:207:18
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#0cbdb relayoutBoundary=up4 OVERFLOWING:
+  creator: Row ← Padding ← Column ← Padding ← AttachmentContent ← Expanded ← Row ← IntrinsicWidth ←
+    Padding ← Padding ← DecoratedBox ← _DashedBorderBox ← ⋯
+  parentData: offset=Offset(0.0, 2.0) (can use size)
+  constraints: BoxConstraints(w=266.0, 0.0<=h<=Infinity)
+  size: Size(266.0, 40.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 34 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/agent_attachments.dart:207:18
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#9b457 relayoutBoundary=up4 OVERFLOWING:
+  creator: Row ← Padding ← Column ← Padding ← AttachmentContent ← Expanded ← Row ← IntrinsicWidth ←
+    Padding ← Padding ← DecoratedBox ← _DashedBorderBox ← ⋯
+  parentData: offset=Offset(0.0, 2.0) (can use size)
+  constraints: BoxConstraints(w=242.0, 0.0<=h<=Infinity)
+  size: Size(242.0, 40.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: 'Multiple exceptions (2) were detected during the running of the current test, and at
+least one was unexpected.'
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart:155:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart line 155
+The test description was:
+  /components/agent_attachments survives mobile dark 200%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:04 +4 -1: component reference pages /components/agent_attachments survives mobile dark 200% [E]
+  Test failed. See exception logs above.
+  The test description was: /components/agent_attachments survives mobile dark 200%
+  
+00:04 +4 -1: component reference pages /components/agent_attachments survives desktop light 100%
+00:04 +5 -1: component reference pages /components/agent_avatar survives mobile dark 200%
+00:05 +6 -1: component reference pages /components/agent_avatar survives desktop light 100%
+00:05 +7 -1: component reference pages /components/agent-composer survives mobile dark 200%
+00:06 +8 -1: component reference pages /components/agent-composer survives desktop light 100%
+00:07 +9 -1: component reference pages /components/agent-console survives mobile dark 200%
+00:07 +10 -1: component reference pages /components/agent-console survives desktop light 100%
+00:07 +11 -1: component reference pages /components/agent-core survives mobile dark 200%
+00:08 +12 -1: component reference pages /components/agent-core survives desktop light 100%
+00:08 +13 -1: component reference pages /components/agent_face survives mobile dark 200%
+00:08 +14 -1: component reference pages /components/agent_face survives desktop light 100%
+00:08 +15 -1: component reference pages /components/agent_history survives mobile dark 200%
+00:09 +16 -1: component reference pages /components/agent_history survives desktop light 100%
+00:09 +17 -1: component reference pages /components/agent_launcher survives mobile dark 200%
+00:09 +18 -1: component reference pages /components/agent_launcher survives desktop light 100%
+00:10 +19 -1: component reference pages /components/agent_markdown survives mobile dark 200%
+00:10 +20 -1: component reference pages /components/agent_markdown survives desktop light 100%
+00:10 +21 -1: component reference pages /components/agent_slash_palette survives mobile dark 200%
+00:10 +22 -1: component reference pages /components/agent_slash_palette survives desktop light 100%
+00:11 +23 -1: component reference pages /components/agent-transcript survives mobile dark 200%
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: FlutterError:<A RenderFlex overflowed by 154 pixels on the right.>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart:155:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart line 155
+The test description was:
+  /components/agent-transcript survives mobile dark 200%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:12 +23 -2: component reference pages /components/agent-transcript survives mobile dark 200% [E]
+  Test failed. See exception logs above.
+  The test description was: /components/agent-transcript survives mobile dark 200%
+  
+00:12 +23 -2: component reference pages /components/agent-transcript survives desktop light 100%
+00:12 +24 -2: component reference pages /components/alert survives mobile dark 200%
+00:12 +25 -2: component reference pages /components/alert survives desktop light 100%
+00:13 +26 -2: component reference pages /components/alert-dialog survives mobile dark 200%
+00:13 +27 -2: component reference pages /components/alert-dialog survives desktop light 100%
+00:13 +28 -2: component reference pages /components/attachment survives mobile dark 200%
+00:14 +29 -2: component reference pages /components/attachment survives desktop light 100%
+00:14 +30 -2: component reference pages /components/avatar survives mobile dark 200%
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: _Exception:<Exception: Invalid image data>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart:155:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart line 155
+The test description was:
+  /components/avatar survives mobile dark 200%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:16 +30 -3: component reference pages /components/avatar survives mobile dark 200% [E]
+  Test failed. See exception logs above.
+  The test description was: /components/avatar survives mobile dark 200%
+  
+00:16 +30 -3: component reference pages /components/avatar survives desktop light 100%
+00:16 +31 -3: component reference pages /components/badge survives mobile dark 200%
+00:17 +32 -3: component reference pages /components/badge survives desktop light 100%
+00:17 +33 -3: component reference pages /components/breadcrumb survives mobile dark 200%
+00:17 +34 -3: component reference pages /components/breadcrumb survives desktop light 100%
+00:18 +35 -3: component reference pages /components/bubble survives mobile dark 200%
+00:18 +36 -3: component reference pages /components/bubble survives desktop light 100%
+00:19 +37 -3: component reference pages /components/button survives mobile dark 200%
+00:19 +38 -3: component reference pages /components/button survives desktop light 100%
+00:20 +39 -3: component reference pages /components/calendar survives mobile dark 200%
+00:20 +40 -3: component reference pages /components/calendar survives desktop light 100%
+00:21 +41 -3: component reference pages /components/card survives mobile dark 200%
+00:21 +42 -3: component reference pages /components/card survives desktop light 100%
+00:22 +43 -3: component reference pages /components/carousel survives mobile dark 200%
+00:22 +44 -3: component reference pages /components/carousel survives desktop light 100%
+00:22 +45 -3: component reference pages /components/chart survives mobile dark 200%
+00:23 +46 -3: component reference pages /components/chart survives desktop light 100%
+00:23 +47 -3: component reference pages /components/chart_cartesian survives mobile dark 200%
+00:23 +48 -3: component reference pages /components/chart_cartesian survives desktop light 100%
+00:24 +49 -3: component reference pages /components/chart_geometry survives mobile dark 200%
+00:24 +50 -3: component reference pages /components/chart_geometry survives desktop light 100%
+00:25 +51 -3: component reference pages /components/chart_polar survives mobile dark 200%
+00:25 +52 -3: component reference pages /components/chart_polar survives desktop light 100%
+00:26 +53 -3: component reference pages /components/checkbox survives mobile dark 200%
+00:26 +54 -3: component reference pages /components/checkbox survives desktop light 100%
+00:27 +55 -3: component reference pages /components/collapsible survives mobile dark 200%
+00:27 +56 -3: component reference pages /components/collapsible survives desktop light 100%
+00:27 +57 -3: component reference pages /components/command survives mobile dark 200%
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#4245c relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=82.0, 0.0<=h<=28.0)
+  size: Size(82.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#f833c relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#78654 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#742bf relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=82.0, 0.0<=h<=28.0)
+  size: Size(82.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#892b4 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#3f315 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 174 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1263:18
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#1cb8f OVERFLOWING:
+  creator: Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ← Builder ← Opacity ←
+    Listener ← _GestureSemantics ← RawGestureDetector ← GestureDetector ← ⋯
+  parentData: offset=Offset(12.0, 8.0) (can use size)
+  constraints: BoxConstraints(w=282.0, h=28.0)
+  size: Size(282.0, 28.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#dc8e8 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=82.0, 0.0<=h<=28.0)
+  size: Size(82.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#e0d55 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#ba69a relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#2f5d0 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#49ff5 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#8b9aa relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#dab7e relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#73ba6 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#1c7c8 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#ed083 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#c7ab8 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#cc9d7 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#a5c57 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#a4f01 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#5589a relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#40d90 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#4c0dd relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/command.dart:1297:18
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#78155 relayoutBoundary=up1 OVERFLOWING:
+  creator: Column ← Expanded ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ← DefaultTextStyle ←
+    Builder ← Opacity ← Listener ← _GestureSemantics ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.tight (can use size)
+  constraints: BoxConstraints(w=258.0, 0.0<=h<=28.0)
+  size: Size(258.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: stretch
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: 'Multiple exceptions (25) were detected during the running of the current test, and at
+least one was unexpected.'
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart:155:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart line 155
+The test description was:
+  /components/command survives mobile dark 200%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:29 +57 -4: component reference pages /components/command survives mobile dark 200% [E]
+  Test failed. See exception logs above.
+  The test description was: /components/command survives mobile dark 200%
+  
+00:29 +57 -4: component reference pages /components/command survives desktop light 100%
+00:29 +58 -4: component reference pages /components/dialog survives mobile dark 200%
+00:30 +59 -4: component reference pages /components/dialog survives desktop light 100%
+00:30 +60 -4: component reference pages /components/dropdown-menu survives mobile dark 200%
+00:30 +61 -4: component reference pages /components/dropdown-menu survives desktop light 100%
+00:30 +62 -4: component reference pages /components/field survives mobile dark 200%
+00:31 +63 -4: component reference pages /components/field survives desktop light 100%
+00:31 +64 -4: component reference pages /components/icon survives mobile dark 200%
+00:31 +65 -4: component reference pages /components/icon survives desktop light 100%
+00:32 +66 -4: component reference pages /components/input survives mobile dark 200%
+00:32 +67 -4: component reference pages /components/input survives desktop light 100%
+00:32 +68 -4: component reference pages /components/input_group survives mobile dark 200%
+00:32 +69 -4: component reference pages /components/input_group survives desktop light 100%
+00:33 +70 -4: component reference pages /components/native_select survives mobile dark 200%
+00:33 +71 -4: component reference pages /components/native_select survives desktop light 100%
+00:33 +72 -4: component reference pages /components/navigation-menu survives mobile dark 200%
+00:33 +73 -4: component reference pages /components/navigation-menu survives desktop light 100%
+00:33 +74 -4: component reference pages /components/pagination survives mobile dark 200%
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: FlutterError:<A RenderFlex overflowed by 142 pixels on the right.>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart:155:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart line 155
+The test description was:
+  /components/pagination survives mobile dark 200%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:35 +74 -5: component reference pages /components/pagination survives mobile dark 200% [E]
+  Test failed. See exception logs above.
+  The test description was: /components/pagination survives mobile dark 200%
+  
+00:35 +74 -5: component reference pages /components/pagination survives desktop light 100%
+00:35 +75 -5: component reference pages /components/popover survives mobile dark 200%
+00:35 +76 -5: component reference pages /components/popover survives desktop light 100%
+00:36 +77 -5: component reference pages /components/press survives mobile dark 200%
+00:36 +78 -5: component reference pages /components/press survives desktop light 100%
+00:36 +79 -5: component reference pages /components/progress survives mobile dark 200%
+00:36 +80 -5: component reference pages /components/progress survives desktop light 100%
+00:36 +81 -5: component reference pages /components/questionnaire survives mobile dark 200%
+00:36 +82 -5: component reference pages /components/questionnaire survives desktop light 100%
+00:37 +83 -5: component reference pages /components/radio survives mobile dark 200%
+00:37 +84 -5: component reference pages /components/radio survives desktop light 100%
+00:37 +85 -5: component reference pages /components/scroll_area survives mobile dark 200%
+00:37 +86 -5: component reference pages /components/scroll_area survives desktop light 100%
+00:38 +87 -5: component reference pages /components/select survives mobile dark 200%
+00:38 +88 -5: component reference pages /components/select survives desktop light 100%
+00:38 +89 -5: component reference pages /components/separator survives mobile dark 200%
+00:38 +90 -5: component reference pages /components/separator survives desktop light 100%
+00:38 +91 -5: component reference pages /components/sheet survives mobile dark 200%
+00:39 +92 -5: component reference pages /components/sheet survives desktop light 100%
+00:39 +93 -5: component reference pages /components/sidebar survives mobile dark 200%
+00:39 +94 -5: component reference pages /components/sidebar survives desktop light 100%
+00:40 +95 -5: component reference pages /components/slider survives mobile dark 200%
+00:40 +96 -5: component reference pages /components/slider survives desktop light 100%
+00:40 +97 -5: component reference pages /components/source_foundation survives mobile dark 200%
+00:40 +98 -5: component reference pages /components/source_foundation survives desktop light 100%
+00:41 +99 -5: component reference pages /components/stat survives mobile dark 200%
+00:41 +100 -5: component reference pages /components/stat survives desktop light 100%
+00:41 +101 -5: component reference pages /components/switch survives mobile dark 200%
+00:41 +102 -5: component reference pages /components/switch survives desktop light 100%
+00:42 +103 -5: component reference pages /components/table survives mobile dark 200%
+00:42 +104 -5: component reference pages /components/table survives desktop light 100%
+00:42 +105 -5: component reference pages /components/tabs survives mobile dark 200%
+00:43 +106 -5: component reference pages /components/tabs survives desktop light 100%
+00:43 +107 -5: component reference pages /components/textarea survives mobile dark 200%
+00:44 +108 -5: component reference pages /components/textarea survives desktop light 100%
+00:44 +109 -5: component reference pages /components/toaster survives mobile dark 200%
+00:44 +110 -5: component reference pages /components/toaster survives desktop light 100%
+00:45 +111 -5: component reference pages /components/toggle survives mobile dark 200%
+00:45 +112 -5: component reference pages /components/toggle survives desktop light 100%
+00:45 +113 -5: component reference pages /components/tooltip survives mobile dark 200%
+00:46 +114 -5: component reference pages /components/tooltip survives desktop light 100%
+00:46 +115 -5: component reference pages /components/aspect_ratio survives mobile dark 200%
+00:46 +116 -5: component reference pages /components/aspect_ratio survives desktop light 100%
+00:46 +117 -5: component reference pages /components/button_group survives mobile dark 200%
+00:47 +118 -5: component reference pages /components/button_group survives desktop light 100%
+00:47 +119 -5: component reference pages /components/combobox survives mobile dark 200%
+00:47 +120 -5: component reference pages /components/combobox survives desktop light 100%
+00:48 +121 -5: component reference pages /components/context-menu survives mobile dark 200%
+00:48 +122 -5: component reference pages /components/context-menu survives desktop light 100%
+00:48 +123 -5: component reference pages /components/drawer survives mobile dark 200%
+00:48 +124 -5: component reference pages /components/drawer survives desktop light 100%
+00:49 +125 -5: component reference pages /components/validation_rule survives mobile dark 200%
+00:49 +126 -5: component reference pages /components/validation_rule survives desktop light 100%
+00:49 +127 -5: component reference pages /components/safe_area survives mobile dark 200%
+00:49 +128 -5: component reference pages /components/safe_area survives desktop light 100%
+00:49 +129 -5: component reference pages /components/empty survives mobile dark 200%
+00:50 +130 -5: component reference pages /components/empty survives desktop light 100%
+00:50 +131 -5: component reference pages /components/premium_surface survives mobile dark 200%
+00:50 +132 -5: component reference pages /components/premium_surface survives desktop light 100%
+00:50 +133 -5: component reference pages /components/form survives mobile dark 200%
+00:51 +134 -5: component reference pages /components/form survives desktop light 100%
+00:51 +135 -5: component reference pages /components/glass survives mobile dark 200%
+00:51 +136 -5: component reference pages /components/glass survives desktop light 100%
+00:52 +137 -5: component reference pages /components/hover-card survives mobile dark 200%
+00:52 +138 -5: component reference pages /components/hover-card survives desktop light 100%
+00:52 +139 -5: component reference pages /components/input_otp survives mobile dark 200%
+00:53 +140 -5: component reference pages /components/input_otp survives desktop light 100%
+00:53 +141 -5: component reference pages /components/item survives mobile dark 200%
+00:53 +142 -5: component reference pages /components/item survives desktop light 100%
+00:54 +143 -5: component reference pages /components/kbd survives mobile dark 200%
+00:54 +144 -5: component reference pages /components/kbd survives desktop light 100%
+00:54 +145 -5: component reference pages /components/keyframes survives mobile dark 200%
+00:55 +146 -5: component reference pages /components/keyframes survives desktop light 100%
+00:55 +147 -5: component reference pages /components/surface survives mobile dark 200%
+00:55 +148 -5: component reference pages /components/surface survives desktop light 100%
+00:55 +149 -5: component reference pages /components/marker survives mobile dark 200%
+00:56 +150 -5: component reference pages /components/marker survives desktop light 100%
+00:56 +151 -5: component reference pages /components/media_scrim survives mobile dark 200%
+00:56 +152 -5: component reference pages /components/media_scrim survives desktop light 100%
+00:56 +153 -5: component reference pages /components/menu survives mobile dark 200%
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#62f05 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← Listener ← ⋯
+  parentData: offset=Offset(24.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=292.0, 0.0<=h<=28.0)
+  size: Size(224.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#01ac2 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← Listener ← ⋯
+  parentData: offset=Offset(24.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=384.0, 0.0<=h<=28.0)
+  size: Size(256.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#31231 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=384.0, 0.0<=h<=28.0)
+  size: Size(384.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#11d83 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← Listener ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=408.0, 0.0<=h<=28.0)
+  size: Size(224.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#e1a0f relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← Listener ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=160.0, 0.0<=h<=28.0)
+  size: Size(128.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#f9d47 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← Listener ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=224.0, 0.0<=h<=28.0)
+  size: Size(224.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#af0fe relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← Listener ← ⋯
+  parentData: offset=Offset(24.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=176.0, 0.0<=h<=28.0)
+  size: Size(160.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#d1835 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=672.0, 0.0<=h<=28.0)
+  size: Size(672.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#2c05d relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=672.0, 0.0<=h<=28.0)
+  size: Size(288.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#bf714 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=672.0, 0.0<=h<=28.0)
+  size: Size(288.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#62a43 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← Listener ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=300.0, 0.0<=h<=28.0)
+  size: Size(300.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#ce5c0 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← Listener ← ⋯
+  parentData: offset=Offset(24.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=212.0, 0.0<=h<=28.0)
+  size: Size(212.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#6c30e relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=276.0, 0.0<=h<=28.0)
+  size: Size(276.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#1f0ef relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=276.0, 0.0<=h<=28.0)
+  size: Size(224.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#739da relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=276.0, 0.0<=h<=28.0)
+  size: Size(224.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#7f75a relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← Listener ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=276.0, 0.0<=h<=28.0)
+  size: Size(276.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#c9806 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← Listener ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=300.0, 0.0<=h<=28.0)
+  size: Size(300.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#17f24 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=276.0, 0.0<=h<=28.0)
+  size: Size(276.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 20 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/lib/src/components/ui/menu.dart:1294:26
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#74c26 relayoutBoundary=up2 OVERFLOWING:
+  creator: Column ← Flexible ← Row ← Flexible ← Row ← Padding ← DecoratedBox ← Stack ← SizedBox ←
+    DefaultTextStyle ← Builder ← Opacity ← ⋯
+  parentData: offset=Offset(0.0, 0.0); flex=1; fit=FlexFit.loose (can use size)
+  constraints: BoxConstraints(0.0<=w<=276.0, 0.0<=h<=28.0)
+  size: Size(276.0, 28.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: min
+  crossAxisAlignment: start
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: 'Multiple exceptions (19) were detected during the running of the current test, and at
+least one was unexpected.'
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart:155:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart line 155
+The test description was:
+  /components/menu survives mobile dark 200%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:57 +153 -6: component reference pages /components/menu survives mobile dark 200% [E]
+  Test failed. See exception logs above.
+  The test description was: /components/menu survives mobile dark 200%
+  
+00:57 +153 -6: component reference pages /components/menu survives desktop light 100%
+00:57 +154 -6: component reference pages /components/menubar survives mobile dark 200%
+00:58 +155 -6: component reference pages /components/menubar survives desktop light 100%
+00:58 +156 -6: component reference pages /components/message survives mobile dark 200%
+00:58 +157 -6: component reference pages /components/message survives desktop light 100%
+00:58 +158 -6: component reference pages /components/message-scroller survives mobile dark 200%
+00:58 +159 -6: component reference pages /components/message-scroller survives desktop light 100%
+00:59 +160 -6: component reference pages /components/user_menu survives mobile dark 200%
+00:59 +161 -6: component reference pages /components/user_menu survives desktop light 100%
+00:59 +162 -6: component reference pages /components/resizable survives mobile dark 200%
+00:59 +163 -6: component reference pages /components/resizable survives desktop light 100%
+01:00 +164 -6: component reference pages /components/selection_control survives mobile dark 200%
+01:00 +165 -6: component reference pages /components/selection_control survives desktop light 100%
+01:00 +166 -6: component reference pages /components/skeleton survives mobile dark 200%
+01:01 +167 -6: component reference pages /components/skeleton survives desktop light 100%
+01:01 +168 -6: component reference pages /components/spinner survives mobile dark 200%
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: FlutterError:<A RenderFlex overflowed by 36 pixels on the right.>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart:155:11)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart line 155
+The test description was:
+  /components/spinner survives mobile dark 200%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+01:02 +168 -7: component reference pages /components/spinner survives mobile dark 200% [E]
+  Test failed. See exception logs above.
+  The test description was: /components/spinner survives mobile dark 200%
+  
+01:02 +168 -7: component reference pages /components/spinner survives desktop light 100%
+01:02 +169 -7: component reference pages /components/toggle-group survives mobile dark 200%
+01:03 +170 -7: component reference pages /components/toggle-group survives desktop light 100%
+01:03 +171 -7: component reference pages /components/voice survives mobile dark 200%
+01:03 +172 -7: component reference pages /components/voice survives desktop light 100%
+01:03 +173 -7: component reference pages /components/voice_indicator survives mobile dark 200%
+01:03 +174 -7: component reference pages /components/voice_indicator survives desktop light 100%
+01:04 +175 -7: component reference pages /components/icon_swap survives mobile dark 200%
+01:04 +176 -7: component reference pages /components/icon_swap survives desktop light 100%
+01:04 +177 -7: component reference pages /components/hover_builder survives mobile dark 200%
+01:04 +178 -7: component reference pages /components/hover_builder survives desktop light 100%
+01:04 +179 -7: component reference pages /components/active_indicator survives mobile dark 200%
+01:04 +180 -7: component reference pages /components/active_indicator survives desktop light 100%
+01:05 +181 -7: component reference pages /components/content_change survives mobile dark 200%
+01:05 +182 -7: component reference pages /components/content_change survives desktop light 100%
+01:05 +183 -7: component reference pages /components/feedback_surface survives mobile dark 200%
+01:05 +184 -7: component reference pages /components/feedback_surface survives desktop light 100%
+01:05 +185 -7: component reference pages /components/background_effect survives mobile dark 200%
+01:05 +186 -7: component reference pages /components/background_effect survives desktop light 100%
+01:05 +187 -7: component reference pages /components/action_feedback survives mobile dark 200%
+01:05 +188 -7: component reference pages /components/action_feedback survives desktop light 100%
+01:06 +189 -7: component reference pages /components/ambient_pattern survives mobile dark 200%
+01:06 +190 -7: component reference pages /components/ambient_pattern survives desktop light 100%
+01:06 +191 -7: site routes / survives mobile dark 200%
+01:06 +192 -7: site routes / survives mobile light 100%
+01:07 +193 -7: site routes / survives tablet dark 100%
+01:07 +194 -7: site routes / survives desktop light 200%
+01:07 +195 -7: site routes /docs survives mobile dark 200%
+01:07 +196 -7: site routes /docs survives mobile light 100%
+01:07 +197 -7: site routes /docs survives tablet dark 100%
+01:07 +198 -7: site routes /docs survives desktop light 200%
+01:07 +199 -7: site routes /docs/introduction survives mobile dark 200%
+01:07 +200 -7: site routes /docs/introduction survives mobile light 100%
+01:08 +201 -7: site routes /docs/introduction survives tablet dark 100%
+01:08 +202 -7: site routes /docs/introduction survives desktop light 200%
+01:08 +203 -7: site routes /components survives mobile dark 200%
+01:08 +204 -7: site routes /components survives mobile light 100%
+01:09 +205 -7: site routes /components survives tablet dark 100%
+01:09 +206 -7: site routes /components survives desktop light 200%
+01:09 +207 -7: site routes /docs/installation survives mobile dark 200%
+01:10 +208 -7: site routes /docs/installation survives mobile light 100%
+01:10 +209 -7: site routes /docs/installation survives tablet dark 100%
+01:10 +210 -7: site routes /docs/installation survives desktop light 200%
+01:11 +211 -7: site routes /docs/theming survives mobile dark 200%
+01:11 +212 -7: site routes /docs/theming survives mobile light 100%
+01:11 +213 -7: site routes /docs/theming survives tablet dark 100%
+01:12 +214 -7: site routes /docs/theming survives desktop light 200%
+01:12 +215 -7: site routes /docs/cli survives mobile dark 200%
+01:13 +216 -7: site routes /docs/cli survives mobile light 100%
+01:13 +217 -7: site routes /docs/cli survives tablet dark 100%
+01:13 +218 -7: site routes /docs/cli survives desktop light 200%
+01:14 +219 -7: site routes /docs/typeset survives mobile dark 200%
+01:15 +220 -7: site routes /docs/typeset survives mobile light 100%
+01:15 +221 -7: site routes /docs/typeset survives tablet dark 100%
+01:16 +222 -7: site routes /docs/typeset survives desktop light 200%
+01:17 +223 -7: site routes /docs/registry survives mobile dark 200%
+01:17 +224 -7: site routes /docs/registry survives mobile light 100%
+01:18 +225 -7: site routes /docs/registry survives tablet dark 100%
+01:18 +226 -7: site routes /docs/registry survives desktop light 200%
+01:18 +227 -7: site routes /docs/changelog survives mobile dark 200%
+01:19 +228 -7: site routes /docs/changelog survives mobile light 100%
+01:19 +229 -7: site routes /docs/changelog survives tablet dark 100%
+01:19 +230 -7: site routes /docs/changelog survives desktop light 200%
+01:19 +231 -7: site routes /skills survives mobile dark 200%
+01:19 +232 -7: site routes /skills survives mobile light 100%
+01:19 +233 -7: site routes /skills survives tablet dark 100%
+01:20 +234 -7: site routes /skills survives desktop light 200%
+01:20 +235 -7: Some tests failed.
+
+Failing tests:
+  D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart: component reference pages /components/agent-transcript survives mobile dark 200%
+  D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart: component reference pages /components/agent_attachments survives mobile dark 200%
+  D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart: component reference pages /components/avatar survives mobile dark 200%
+  D:/DESIGN/Design-System-2026-8/flutter-design-system/example/test/live_surface_matrix_test.dart: component reference pages /components/command survives mobile dark 200%
+  ... and 3 more

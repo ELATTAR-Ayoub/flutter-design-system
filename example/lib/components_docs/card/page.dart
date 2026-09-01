@@ -314,12 +314,17 @@ class _PreviewSpecimen extends StatelessWidget {
                     action: Badge(label: 'Live', variant: BadgeVariant.premium),
                   ),
                   CardContent(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // A label and a metric on one line where there is room,
+                    // and on two where there is not — a `Row` here clips the
+                    // figure the card exists to show as soon as the text
+                    // scales.
+                    child: Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: space(3),
+                      runSpacing: space(1),
                       children: <Widget>[
-                        StyledText('Prize pool', TextStyles.section),
+                        StyledText('Prize pool', TextStyles.small),
                         StyledText(
                           r'$24,000.00',
                           TextStyles.numberMd,
@@ -377,7 +382,7 @@ Card(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          StyledText('Prize pool', TextStyles.section),
+          StyledText('Prize pool', TextStyles.small),
           StyledText(r'\$24,000.00', TextStyles.numberMd, color: theme.premiumText),
         ],
       ),
@@ -496,7 +501,7 @@ class _ContentSpecimen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        StyledText(_figures[i].k, TextStyles.section),
+                        StyledText(_figures[i].k, TextStyles.small),
                         SizedBox(height: space(1.5)),
                         StyledText(
                           _figures[i].v,
@@ -524,8 +529,8 @@ Card(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(children: [StyledText('Total value', TextStyles.section), Text(r'\$12,480.65')]),
-          Column(children: [StyledText('Cards owned', TextStyles.section), Text('1,284')]),
+          Column(children: [StyledText('Total value', TextStyles.small), Text(r'\$12,480.65')]),
+          Column(children: [StyledText('Cards owned', TextStyles.small), Text('1,284')]),
         ],
       ),
     ),
@@ -780,8 +785,7 @@ const List<DocsApiFact> _cardTitleApiFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'text',
     type: 'String (positional)',
-    description:
-        'Required. Renders through StyledText at TextStyles.cardTitle.',
+    description: 'Required. Renders through StyledText at TextStyles.h4.',
   ),
 ];
 
@@ -790,7 +794,7 @@ const List<DocsApiFact> _cardDescriptionApiFacts = <DocsApiFact>[
     name: 'text',
     type: 'String (positional)',
     description:
-        'Required. Renders through StyledText at TextStyles.bodySmall, '
+        'Required. Renders through StyledText at TextStyles.small, '
         'coloured theme.mutedForeground.',
   ),
 ];
@@ -869,7 +873,7 @@ class _AccessibilityContent extends StatelessWidget {
             'of its own — a screen reader hears whatever its children '
             'announce, not a card-level container or region role.',
         'Heading structure: CardTitle renders through StyledText at '
-            'TextStyles.cardTitle, a styled Text — it carries no '
+            'TextStyles.h4, a styled Text — it carries no '
             'semantic heading level. A caller building a page outline needs '
             'to wrap it, or reach for a real heading widget instead.',
         'Interactivity is entirely opt-in: the Custom Fill and Ring '
@@ -931,7 +935,7 @@ class _DependenciesContent extends StatelessWidget {
         'Flutter imports: package:flutter/widgets.dart only.',
         'Foundation imports: foundation/shadows.dart (ShadowStyle, the '
             'ring), foundation/spacing.dart (space()), foundation/theme.dart, '
-            'foundation/typography.dart (TextStyles.cardTitle / '
+            'foundation/typography.dart (TextStyles.h4 / '
             'textSm), theme_scope.dart (StyledText, ThemeScope).',
         'No effect, motion, or sibling-component import: card.dart composes '
             'nothing else in the corpus.',

@@ -1,7 +1,7 @@
 {
   "name": "input",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Token-backed text input with semantic field surfaces, validation, focus, disabled, obscured, and visibility states.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/input.dart",
       "target": "@ui/input.dart",
-      "sha256": "ccac5da6b4a681f0765ed380d507d0d81644ed479b69e6ecb4d7f6868b63f4cb"
+      "sha256": "144ef4c7d1c018d6acc9c51e75d52058aa7136c9dd422332adbac87d63da53cb"
     }
   ],
   "registryDependencies": [
@@ -33,5 +33,5 @@
     "FieldVisibility"
   ],
   "documentationRoute": "/components/input",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/input.dart"
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/input.dart"
 }

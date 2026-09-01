@@ -4,7 +4,7 @@
 |---|---|
 | `generate_icons.mjs` | emits the full lucide glyph registry from the reference's own installed package |
 | `generate_perlin_texture/` | regenerates the voice orb's tiling noise field from a checked-in seed |
-| `registry_builder/` | builds and validates `registry/generated/latest` from the source manifests |
+| `registry_builder/` | builds and validates `registry/generated/latest` from the source manifests; reseals authored hashes, bumps item versions, and records what a release published |
 | `release_registry/` | stages a generated registry into the published site artifact |
 | `verify/` | the side-by-side pixel-parity rig — see `verify/README.md` |
 
@@ -60,6 +60,93 @@ Publish a new version instead.
 
 Re-staging *identical* bytes is a no-op and exits 0, so re-running a deploy is
 safe. If you meant to change what a version installs, that is a new version.
+
+## Items are versioned individually
+
+The registry has a version and so does every item, and they are not required to
+match. An item that did not change keeps the version it was released under and
+goes on serving the exact payload it published; only items that changed move.
+
+Two things move an item forward, and the second is the one that is easy to
+forget:
+
+1. its own payload bytes changed;
+2. something it depends on, transitively, moved.
+
+(2) matters because an item's version is a promise about what *installing it*
+does, not only about its own file. `form@0.0.1` installs `validation-rule` too.
+If `validation-rule` changed and `form` stayed at `0.0.1`, a consumer
+re-installing `form@0.0.1` would receive different sources than they received
+before — the same failure the immutability rule exists to prevent, one edge
+further out. `bump_version.dart` computes that closure; it is not a judgement
+call.
+
+A registry therefore holds a payload directory per item **per version**, and a
+newer registry keeps serving the older payloads that its own items still point
+at. `/registry/0.0.2/` contains `versions/form/0.0.1/` for exactly that reason.
+
+`_writePayloads` clears exactly one thing: the `<item>/<version>` directory it
+is about to write, so a payload dropped from a manifest does not survive as a
+stale file inside the version that no longer declares it. **Generation deletes
+nothing else, ever** — not another version of the same item, and not an item the
+current registry no longer has. Retiring an item removes it from the *index*; it
+does not unpublish the versions that already shipped, and an earlier release's
+dependency graph may still name it.
+
+Output that genuinely is obsolete — an unpublished version abandoned before
+release — is removed by `RegistryGenerator.pruneUnreleasedPayloads`, an explicit
+maintenance call that is never part of a build. It refuses to touch any version
+in the released set or the version the current registry declares, and it is a
+dry run unless told otherwise.
+
+## Recording what a release published
+
+```sh
+dart run tool/registry_builder/bin/snapshot_released.dart 0.0.1
+```
+
+Writes `registry/released/<version>.lock.json` — every payload path that
+version published, with its sha256. Run it once per release, from a tree
+verified identical to that release's tag. `test/registry_released_immutability_test.dart`
+holds every future generation to it, so a regeneration that would change a
+released payload fails in `flutter test` rather than at the release gate.
+
+The lock is also what `bump_version.dart` reads to decide which items changed,
+which is why it refuses to run when an authored hash is stale: a stale hash
+would make the changed set wrong, and a wrong changed set silently leaves an
+item behind.
+
+## Publishing a change, end to end
+
+```sh
+dart run tool/registry_builder/bin/reseal.dart --apply             # authored hashes
+dart run tool/registry_builder/bin/bump_version.dart \
+    --from 0.0.1 --to 0.0.2 --apply                                 # item versions
+dart run tool/registry_builder/bin/build.dart .                     # payloads
+dart run tool/registry_builder/bin/validate.dart \
+    registry/generated/latest/registry.json
+flutter test test/registry_released_immutability_test.dart          # 0.0.1 untouched
+dart run tool/release_audit/bin/verify.dart .                       # one version everywhere
+```
+
+`reseal.dart` moves the sha256 a manifest pins to match its source. The pins
+exist so a generation cannot distribute bytes nobody reviewed, which makes them
+deliberately annoying after an intentional edit — reading the list it prints is
+the review step, and a file in it you did not mean to change is the finding.
+
+The registry version itself lives in `RegistryGenerator.defaultRegistryVersion`
+and is one of the spellings `release_audit` holds against each other, so it
+moves with the release rather than on its own.
+
+## A CLI reads its own registry version
+
+`defaultRegistryUrl` is derived from `cliVersion`, so `elattar_cli 0.0.1` reads
+`/registry/0.0.1/` and `0.0.2` reads `/registry/0.0.2/`. That pairing is the
+supported one. Pointing a newer CLI at an older registry with `--registry` is
+not: `installSourceRewrites` anchors on exact runs of package source, and an
+older payload has an older shape, so the install fails loudly rather than
+shipping a file whose font families no longer resolve. Verify a released
+registry with the CLI from its own tag.
 
 ## What the validator checks
 

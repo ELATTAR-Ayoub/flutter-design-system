@@ -126,12 +126,23 @@ const double _measureLg = 512;
 ///
 /// The same shape `feedback.dart` names `_measured` and `selects.dart` wraps
 /// its calendars in.
-Widget _measured(double maxWidth, Widget child) => Align(
-  alignment: Alignment.centerLeft,
-  child: ConstrainedBox(
-    constraints: BoxConstraints(maxWidth: maxWidth),
-    child: child,
-  ),
+///
+/// The reference's `max-w-*` is a rem value, so a doubled text-size setting
+/// doubles the root font size and the same class measures twice as wide. A
+/// literal px cap does not follow along, and a row that fit its measure at
+/// 1x no longer fits at 2x. Scaling the cap by the active text scaler
+/// reproduces the rem behaviour instead of inventing new headroom.
+Widget _measured(double maxWidth, Widget child) => Builder(
+  builder: (BuildContext context) {
+    final double scale = MediaQuery.textScalerOf(context).scale(1.0);
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth * scale),
+        child: child,
+      ),
+    );
+  },
 );
 
 /// `w-40`: the three slider matrix cells.
@@ -503,18 +514,30 @@ class _FilterRow extends StatelessWidget {
         ),
         SizedBox(width: Field.gap),
         // `*:data-[slot=field-label]:flex-auto`: the label grows, which is
-        // what makes the rest of the row a target.
+        // what makes the rest of the row a target. The count used to sit
+        // outside this Expanded as a rigid trailing sibling, which is
+        // exactly what overflows once the label and the count both grow at
+        // 2x text: a `spaceBetween` Wrap keeps the count flush to the
+        // trailing edge (the `ml-auto` reading) at desktop width, same as
+        // the Row did, and only drops it under the label on its own line
+        // once the pair genuinely does not fit.
         Expanded(
-          child: FieldLabel(
-            label,
-            // `className="font-normal"`, probed at weight 400 with the
-            // label's own 1.375 leading intact.
-            spec: FieldLabel.normal,
-            onTap: toggle,
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[
+              FieldLabel(
+                label,
+                // `className="font-normal"`, probed at weight 400 with the
+                // label's own 1.375 leading intact.
+                spec: FieldLabel.normal,
+                onTap: toggle,
+              ),
+              // `type-num-sm ml-auto text-muted-foreground`.
+              StyledText(count, TextStyles.numberSm),
+            ],
           ),
         ),
-        // `type-num-sm ml-auto text-muted-foreground`.
-        StyledText(count, TextStyles.numberSm),
       ],
     );
   }
@@ -597,10 +620,22 @@ class _BulkRow extends StatelessWidget {
           children: <Widget>[
             checkbox,
             SizedBox(width: space(3)),
+            // `trailing` used to sit outside this Expanded as a rigid
+            // sibling, which is what overflows once the title and a
+            // trailing value (a price, on the header row) both grow at 2x
+            // text. A `spaceBetween` Wrap keeps trailing flush to the edge
+            // at desktop width, same as the Row did, and only drops it
+            // under the title once the pair genuinely does not fit.
             Expanded(
-              child: StyledText(title, TextStyles.small, color: titleColor),
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  StyledText(title, TextStyles.small, color: titleColor),
+                  ?trailing,
+                ],
+              ),
             ),
-            ?trailing,
           ],
         ),
       ),
@@ -1187,12 +1222,16 @@ class _Readout extends StatelessWidget {
     return Padding(
       // `mb-4`, 16px.
       padding: EdgeInsets.only(bottom: space(4)),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      // A Row with spaceBetween cannot give way: at 2x text scale the label
+      // and the value can outgrow a narrow matrix cell together. Wrap keeps
+      // the same spaceBetween reading at desktop width and drops the value
+      // to its own line only once the row genuinely runs out of room.
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        runSpacing: space(1),
         children: <Widget>[
-          StyledText(label, TextStyles.eyebrow),
+          StyledText(label, TextStyles.small),
           StyledText(value, TextStyles.numberBase, color: theme.foreground),
         ],
       ),

@@ -2,7 +2,7 @@
 /// hardest.
 ///
 /// A specimen sheet that quietly omits a role is worse than no sheet: a
-/// developer who cannot find `numMd` here concludes it does not exist and
+/// developer who cannot find `numberMd` here concludes it does not exist and
 /// writes a size instead. The first group therefore checks the catalog
 /// against `TextStyles.all` by identity — every role present, none twice, none
 /// invented — rather than checking that the page renders something.
@@ -71,9 +71,9 @@ Widget host(
 void main() {
   group('the catalog is the whole scale', () {
     test('it covers TextStyles.all exactly once, by identity', () {
-      // Identity, not equality: `TextStyleToken` declares no `==`, and two roles
-      // can hold the same values anyway. `badge` and `label` differ only in
-      // tracking, so value matching would happily accept a catalog that
+      // Identity, not equality: `TextStyleToken` declares no `==`, and two
+      // roles can hold the same steps anyway — `small` and `badge` are one
+      // weight apart — so value matching would happily accept a catalog that
       // listed one of them twice and called the job done.
       final List<TextStyleToken> catalogued = <TextStyleToken>[
         for (final TypesetRole role in typesetRoles) role.spec,
@@ -121,26 +121,47 @@ void main() {
       }
     });
 
-    test('only the three sizeless roles declare a size rule', () {
-      for (final TypesetRole role in typesetRoles) {
-        if (role.spec.size == null) {
-          expect(
-            role.sizeRule,
-            isNotNull,
-            reason:
-                '${role.name} has no intrinsic size, so the page cannot show '
-                'one without saying where it comes from',
-          );
-        } else {
-          expect(
-            role.sizeRule,
-            isNull,
-            reason:
-                '${role.name} carries its own size; a hand-written rule would '
-                'be a second source of truth',
-          );
-        }
+    test('it is seventeen roles, in the three published groups, in order', () {
+      expect(typesetRoles, hasLength(17));
+      expect(
+        typesetRoles.map((TypesetRole r) => r.name).toList(),
+        TextStyles.all.map((TextStyleToken r) => r.name).toList(),
+      );
+      expect(
+        typesetRoles.map((TypesetRole r) => r.group).toList(),
+        <TypeGroup>[
+          ...List<TypeGroup>.filled(10, TypeGroup.words),
+          ...List<TypeGroup>.filled(2, TypeGroup.code),
+          ...List<TypeGroup>.filled(5, TypeGroup.numerics),
+        ],
+        reason: 'Words, then Code and identifiers, then Numerics',
+      );
+    });
+
+    test('no retired role or group survives in the catalog', () {
+      const List<String> retired = <String>[
+        'navSm',
+        'eyebrow',
+        'section',
+        'chip',
+        'caption',
+        'eyebrowSmall',
+        'tag',
+        'wordmark',
+        'accent',
+        'numberXs',
+      ];
+      final Set<String> live = typesetRoles
+          .map((TypesetRole r) => r.name)
+          .toSet();
+      for (final String gone in retired) {
+        expect(live, isNot(contains(gone)), reason: gone);
       }
+      expect(
+        TypeGroup.values.map((TypeGroup g) => g.label).toList(),
+        <String>['Words', 'Code and identifiers', 'Numerics'],
+        reason: 'there is no Labels and furniture group and no Accent group',
+      );
     });
 
     test('every role has a usage sentence and a specimen', () {
@@ -151,7 +172,7 @@ void main() {
     });
 
     test('every group has at least one role', () {
-      for (final TypesetGroup group in TypesetGroup.values) {
+      for (final TypeGroup group in TypeGroup.values) {
         expect(typesetRolesIn(group), isNotEmpty, reason: group.name);
       }
     });
@@ -231,13 +252,11 @@ void main() {
       }
     });
 
-    testWidgets('the fluid roles are given a resolved size', (
+    testWidgets('no specimen overrides the size the role resolves', (
       WidgetTester tester,
     ) async {
-      // display, h1 and accent carry no intrinsic size. Rendering them
-      // without one would silently fall back to whatever the surrounding
-      // DefaultTextStyle happens to be, which is exactly the drift the page
-      // exists to prevent.
+      // A page that pinned a size would be publishing a number the role does
+      // not own, which is exactly the drift the page exists to prevent.
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -246,7 +265,6 @@ void main() {
       await tester.pumpAndSettle();
 
       for (final TypesetRole role in typesetRoles) {
-        if (role.spec.size != null) continue;
         final Iterable<StyledText> texts = tester
             .widgetList<StyledText>(find.byType(StyledText))
             .where(
@@ -255,38 +273,90 @@ void main() {
             );
         expect(texts, isNotEmpty, reason: role.name);
         expect(
-          texts.every((StyledText text) => text.fontSize != null),
+          texts.every((StyledText text) => text.fontSize == null),
           isTrue,
-          reason: '${role.name} must be rendered at an explicit size',
+          reason: '${role.name} must let its role resolve the size',
         );
       }
     });
 
-    testWidgets('display sizes track the viewport', (
+    testWidgets('every specimen in the preview renders in one inherited ink', (
       WidgetTester tester,
     ) async {
-      Future<double> displaySizeAt(double width) async {
-        tester.view.physicalSize = Size(width, 900);
+      // Colour is a second axis of meaning. A preview that tinted roles to
+      // tell them apart would teach the wrong lesson on the page whose whole
+      // subject is that type owns shape and the surface owns ink.
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(host(const TypesetDocsPage()));
+      await tester.pumpAndSettle();
+
+      for (final TypesetRole role in typesetRoles) {
+        final StyledText specimen = tester.widget<StyledText>(
+          find.descendant(
+            of: find.byKey(ValueKey<String>('typeset-preview-${role.name}')),
+            matching: find.byWidgetPredicate(
+              // The line also carries its own name label, which for `small`
+              // rides the very role being previewed — so match the specimen
+              // by its string as well as by its role.
+              (Widget widget) =>
+                  widget is StyledText &&
+                  identical(widget.spec, role.spec) &&
+                  widget.text == role.sample,
+            ),
+          ),
+        );
+        expect(
+          specimen.color,
+          isNull,
+          reason: '${role.name} is tinted in the preview',
+        );
+      }
+    });
+
+    testWidgets('the responsive roles step at 768 and again at 1024', (
+      WidgetTester tester,
+    ) async {
+      Future<double> renderedSizeAt(double width, TextStyleToken role) async {
+        tester.view.physicalSize = Size(width, 2400);
         tester.view.devicePixelRatio = 1;
         await tester.pumpWidget(
-          host(const TypesetDocsPage(), size: Size(width, 900)),
+          host(const TypesetDocsPage(), size: Size(width, 2400)),
         );
         await tester.pumpAndSettle();
-        final StyledText specimen = tester
-            .widgetList<StyledText>(find.byType(StyledText))
-            .firstWhere(
-              (StyledText text) => identical(text.spec, TextStyles.display),
-            );
-        return specimen.fontSize!;
+        final Element element = tester.element(
+          find
+              .byWidgetPredicate(
+                (Widget widget) =>
+                    widget is StyledText && identical(widget.spec, role),
+              )
+              .first,
+        );
+        return StyledText.styleOf(element, role).fontSize!;
       }
 
       addTearDown(tester.view.reset);
-      final double narrow = await displaySizeAt(430);
-      final double wide = await displaySizeAt(1600);
-
-      expect(narrow, TextStyles.displaySize(430));
-      expect(wide, TextStyles.displaySize(1600));
-      expect(wide, greaterThan(narrow));
+      for (final TextStyleToken role in TextStyles.all.where(
+        (TextStyleToken r) => !r.isStatic,
+      )) {
+        expect(
+          await renderedSizeAt(767, role),
+          role.mobile.size,
+          reason: '${role.name} at 767',
+        );
+        expect(
+          await renderedSizeAt(768, role),
+          role.tablet.size,
+          reason: '${role.name} at 768',
+        );
+        expect(
+          await renderedSizeAt(1024, role),
+          role.desktop.size,
+          reason: '${role.name} at 1024',
+        );
+      }
     });
   });
 
@@ -319,9 +389,9 @@ void main() {
           reason: '${role.name} is missing from the full scale',
         );
       }
-      // Counted, not just spot-checked: a preview that quietly grew a
-      // twenty-eighth line, or listed one role twice, would pass every
-      // per-role lookup above.
+      // Counted, not just spot-checked: a preview that quietly grew an
+      // eighteenth line, or listed one role twice, would pass every per-role
+      // lookup above.
       expect(
         previewLines().evaluate().length,
         TextStyles.all.length,
@@ -360,7 +430,7 @@ void main() {
     ) async {
       // The preview is the comparison surface; the reference blocks are what
       // a reader drops into after choosing. Reversed, the page opens with
-      // twenty-seven API blocks and buries the thing it exists to show.
+      // seventeen API blocks and buries the thing it exists to show.
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -385,12 +455,9 @@ void main() {
       expect(lastPreview, lessThan(firstReference));
     });
 
-    testWidgets('the fluid roles are sized in the preview too', (
+    testWidgets('each preview line shows its own role\'s specimen', (
       WidgetTester tester,
     ) async {
-      // display, h1 and accent carry no intrinsic size, and the preview is
-      // the one place they are shown without an accompanying size rule to
-      // explain a fallback.
       tester.view.physicalSize = const Size(1440, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -399,23 +466,19 @@ void main() {
       await tester.pumpAndSettle();
 
       for (final TypesetRole role in typesetRoles) {
-        if (role.spec.size != null) continue;
-        final Finder line = find.byKey(
-          ValueKey<String>('typeset-preview-${role.name}'),
-        );
         final StyledText specimen = tester.widget<StyledText>(
           find.descendant(
-            of: line,
+            of: find.byKey(ValueKey<String>('typeset-preview-${role.name}')),
             matching: find.byWidgetPredicate(
+              // The line also carries its own name label, which for `small`
+              // rides the very role being previewed — so match the specimen
+              // by its string as well as by its role.
               (Widget widget) =>
-                  widget is StyledText && identical(widget.spec, role.spec),
+                  widget is StyledText &&
+                  identical(widget.spec, role.spec) &&
+                  widget.text == role.sample,
             ),
           ),
-        );
-        expect(
-          specimen.fontSize,
-          isNotNull,
-          reason: '${role.name} is rendered without a resolved size',
         );
         expect(specimen.text, role.sample);
       }
@@ -601,7 +664,7 @@ void main() {
       await tester.pumpWidget(host(const TypesetDocsPage()));
       await tester.pumpAndSettle();
 
-      // Eight two-word rows in a column are meaningless read one at a time;
+      // Nine short rows in a column are meaningless read one at a time;
       // the group says what they are values of.
       expect(
         find.bySemanticsLabel(RegExp('Token values for TextStyles.body')),

@@ -373,7 +373,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
               key: const ValueKey<String>('form-preview-submit'),
               onPressed: _form.isSubmitting ? null : () => _form.submit(),
               loading: _form.isSubmitting,
-              child: StyledText('Submit', TextStyles.buttonLabel),
+              child: StyledText('Submit', TextStyles.nav),
             ),
           ],
         ),
@@ -456,7 +456,7 @@ class _ValidationTimingSpecimenState extends State<_ValidationTimingSpecimen> {
             Button(
               key: const ValueKey<String>('form-validation-timing-submit'),
               onPressed: () => _form.submit(),
-              child: StyledText('Submit', TextStyles.buttonLabel),
+              child: StyledText('Submit', TextStyles.nav),
             ),
           ],
         ),
@@ -559,7 +559,7 @@ class _FocusOnErrorSpecimenState extends State<_FocusOnErrorSpecimen> {
             Button(
               key: const ValueKey<String>('form-focus-submit'),
               onPressed: () => _form.submit(),
-              child: StyledText('Submit empty', TextStyles.buttonLabel),
+              child: StyledText('Submit empty', TextStyles.nav),
             ),
           ],
         ),
@@ -620,7 +620,7 @@ class _ServerErrorSpecimenState extends State<_ServerErrorSpecimen> {
             variant: ButtonVariant.destructive,
             onPressed: () =>
                 _form.setError('handle', 'This handle is already taken.'),
-            child: StyledText('Simulate server error', TextStyles.buttonLabel),
+            child: StyledText('Simulate server error', TextStyles.nav),
           ),
         ],
       ),
@@ -686,13 +686,13 @@ class _ResetSpecimenState extends State<_ResetSpecimen> {
               Button(
                 key: const ValueKey<String>('form-reset-submit'),
                 onPressed: () => _form.submit(),
-                child: StyledText('Submit', TextStyles.buttonLabel),
+                child: StyledText('Submit', TextStyles.nav),
               ),
               Button(
                 key: const ValueKey<String>('form-reset-trigger'),
                 variant: ButtonVariant.outline,
                 onPressed: _form.reset,
-                child: StyledText('Reset', TextStyles.buttonLabel),
+                child: StyledText('Reset', TextStyles.nav),
               ),
             ],
           ),

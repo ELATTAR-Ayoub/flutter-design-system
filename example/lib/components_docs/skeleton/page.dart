@@ -848,7 +848,7 @@ class _LoadingCardCompositionState extends State<_LoadingCardComposition> {
                     ? <Widget>[
                         StyledText(
                           'Amara Chen',
-                          TextStyles.section,
+                          TextStyles.small,
                           color: theme.foreground,
                         ),
                         SizedBox(height: space(1)),
@@ -876,7 +876,7 @@ class _LoadingCardCompositionState extends State<_LoadingCardComposition> {
           onPressed: () => setState(() => _loaded = !_loaded),
           child: StyledText(
             _loaded ? 'Show skeleton again' : 'Show loaded content',
-            TextStyles.buttonLabel,
+            TextStyles.nav,
           ),
         ),
       ],

@@ -465,7 +465,7 @@ class _InkChip extends StatelessWidget {
       color: fill.withValues(alpha: _tintAlpha),
       borderRadius: BorderRadius.circular(Radii.md),
     ),
-    child: StyledText(label, TextStyles.eyebrow, color: ink),
+    child: StyledText(label, TextStyles.small, color: ink),
   );
 }
 
@@ -521,7 +521,7 @@ class _Swatch extends StatelessWidget {
         ),
       ),
       SizedBox(height: space(1)),
-      StyledText(label, TextStyles.caption, color: theme.mutedForeground),
+      StyledText(label, TextStyles.small, color: theme.mutedForeground),
     ],
   );
 }
@@ -614,7 +614,7 @@ class _RoleGroups extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              StyledText(title, TextStyles.eyebrow),
+              StyledText(title, TextStyles.small),
               SizedBox(height: space(3)),
               for (final (String label, Color fill, Color ink) in rows)
                 Padding(
@@ -642,7 +642,7 @@ class _RoleGroups extends StatelessWidget {
         key: const ValueKey<String>('theming-role-group:Data'),
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          StyledText('Data', TextStyles.eyebrow),
+          StyledText('Data', TextStyles.small),
           SizedBox(height: space(3)),
           Wrap(
             spacing: space(4),
@@ -710,7 +710,7 @@ class _ThemeModeDemoState extends State<_ThemeModeDemo> {
                             ? ButtonVariant.primary
                             : ButtonVariant.outline,
                         size: ButtonSize.sm,
-                        child: StyledText(mode.name, TextStyles.buttonLabelSm),
+                        child: StyledText(mode.name, TextStyles.small),
                       ),
                     ),
                 ],

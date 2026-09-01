@@ -1,7 +1,7 @@
 {
   "name": "field",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Accessible field composition with labels, descriptions, errors, orientation, grouping, and validation wiring.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/field.dart",
       "target": "@ui/field.dart",
-      "sha256": "9b0064785343b314e9a2fa58d640cf25ca80b0a3c6b49dc2d61b0b5cc7e4b510"
+      "sha256": "ab6ace74846f0c7d53468b4b8ab5341177732b78517b5b6b720e34c1bfef3ff9"
     }
   ],
   "registryDependencies": [
@@ -24,7 +24,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/field",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/field.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/field.dart",
   "exports": [
     "Field",
     "FieldActivator",

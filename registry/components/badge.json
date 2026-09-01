@@ -1,7 +1,7 @@
 {
   "name": "badge",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/badge.tsx` — *\\\"a chip with depth, not a coloured",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/badge.dart",
       "target": "@ui/badge.dart",
-      "sha256": "4a32ef430a035f04b2494a345f90f36f3decafb0cdc59ba0792548140da63c1c"
+      "sha256": "6dd6be4a68ae5fb22c8663fb3d110bf97816678892ac4ba70c1030d977fc230a"
     }
   ],
   "registryDependencies": [
@@ -24,7 +24,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/badge",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/badge.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/badge.dart",
   "exports": [
     "Badge",
     "BadgeVariant"

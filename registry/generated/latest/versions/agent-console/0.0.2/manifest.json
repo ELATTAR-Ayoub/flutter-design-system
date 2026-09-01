@@ -1,0 +1,54 @@
+{
+  "name": "agent-console",
+  "type": "block",
+  "version": "0.0.2",
+  "description": "`components/agent/agent-console.tsx` — the whole component.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/blocks/agent_console/agent_console.dart",
+      "target": "@block/agent_console/agent_console.dart",
+      "sha256": "227815b7a63318e70a810e627c078616f906b5870044d3081b790340aa61efa5"
+    }
+  ],
+  "registryDependencies": [
+    "agent-avatar",
+    "agent-composer",
+    "agent-core",
+    "agent-face",
+    "agent-history",
+    "agent-slash-palette",
+    "agent-transcript",
+    "button",
+    "dropdown-menu",
+    "icon",
+    "marker",
+    "menu",
+    "popover",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "agent-avatar",
+    "agent-composer",
+    "agent-core",
+    "agent-face",
+    "agent-history",
+    "agent-slash-palette",
+    "agent-transcript",
+    "button",
+    "dropdown-menu",
+    "icon",
+    "marker",
+    "menu",
+    "popover"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/agent-console",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/blocks/agent_console/agent_console.dart",
+  "deprecated": false
+}

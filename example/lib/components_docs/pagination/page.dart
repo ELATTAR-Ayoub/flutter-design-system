@@ -55,6 +55,7 @@ import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
 import 'meta.dart';
+import '../../kit.dart';
 
 final ComponentDocSpec paginationDocSpec = ComponentDocSpec(
   name: 'pagination',
@@ -491,8 +492,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           // Horizontal scroll is this page's own mitigation for the Row
           // that Pagination itself never wraps or scrolls: see
           // Responsive.
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
+          SpecimenScroll(
             child: Pagination(
               children: <Widget>[
                 PaginationStep.previous(onTap: () => _goTo(_current - 1)),
@@ -537,8 +537,7 @@ class _ComposedWithPrimitivesSpecimen extends StatelessWidget {
           color: theme.mutedForeground,
         ),
         SizedBox(height: space(3)),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+        SpecimenScroll(
           child: const Pagination(
             children: <Widget>[
               PaginationStep.previous(),
@@ -562,8 +561,7 @@ class _FirstPageSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('pagination-preview:first-page'),
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+    child: SpecimenScroll(
       child: const Pagination(
         children: <Widget>[
           PaginationLink(label: '1', isActive: true),
@@ -584,8 +582,7 @@ class _LastPageSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('pagination-preview:last-page'),
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+    child: SpecimenScroll(
       child: const Pagination(
         children: <Widget>[
           PaginationStep.previous(),
@@ -618,14 +615,20 @@ class _SimpleSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('pagination-simple'),
-    child: const Pagination(
-      children: <Widget>[
-        PaginationLink(label: '1'),
-        PaginationLink(label: '2', isActive: true),
-        PaginationLink(label: '3'),
-        PaginationLink(label: '4'),
-        PaginationLink(label: '5'),
-      ],
+    // Same horizontal-scroll mitigation as Preview: Pagination is a
+    // deliberately `w-fit` library component (see Responsive) that never
+    // wraps or scrolls its own Row, so five links is already enough to
+    // overflow a narrow mobile column at 200% text scale.
+    child: SpecimenScroll(
+      child: Pagination(
+        children: <Widget>[
+          PaginationLink(label: '1'),
+          PaginationLink(label: '2', isActive: true),
+          PaginationLink(label: '3'),
+          PaginationLink(label: '4'),
+          PaginationLink(label: '5'),
+        ],
+      ),
     ),
   );
 }
@@ -636,8 +639,14 @@ class _IconsOnlySpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: const ValueKey<String>('pagination-icons-only'),
-    child: const Pagination(
-      children: <Widget>[PaginationStep.previous(), PaginationStep.next()],
+    // Same horizontal-scroll mitigation as Preview: despite the section
+    // name, `PaginationStep` always renders its chevron plus the word
+    // ("Previous"/"Next"), and that pair alone outgrows a narrow mobile
+    // column at 200% text scale.
+    child: SpecimenScroll(
+      child: Pagination(
+        children: <Widget>[PaginationStep.previous(), PaginationStep.next()],
+      ),
     ),
   );
 }
@@ -648,8 +657,7 @@ class _RtlSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Directionality(
     textDirection: TextDirection.rtl,
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+    child: SpecimenScroll(
       child: KeyedSubtree(
         key: ValueKey<String>('pagination-rtl'),
         child: Pagination(
@@ -678,8 +686,7 @@ final List<int?> range = _truncatedPageRange(
   currentPage: current,
 );
 
-SingleChildScrollView(
-  scrollDirection: Axis.horizontal,
+SpecimenScroll(
   child: Pagination(
     children: [
       PaginationStep.previous(onTap: () => goTo(current - 1)),

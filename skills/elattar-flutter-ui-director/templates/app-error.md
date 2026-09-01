@@ -204,7 +204,7 @@ Widget buildError(BuildContext context, AppError error, VoidCallback onRetry) {
             variant: ButtonVariant.outline,
             size: ButtonSize.sm,
             onPressed: onRetry,
-            child: StyledText(error.nextStep, TextStyles.buttonLabelSm),
+            child: StyledText(error.nextStep, TextStyles.small),
           )
         : null,
   );

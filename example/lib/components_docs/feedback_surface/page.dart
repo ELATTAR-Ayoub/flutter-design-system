@@ -251,7 +251,7 @@ Widget _bordered(ThemeTokens theme, BorderRadius radius, Widget child) =>
 
 Widget _caption(BuildContext context, String label) => StyledText(
   label,
-  TextStyles.caption,
+  TextStyles.small,
   color: ThemeScope.of(context).mutedForeground,
 );
 

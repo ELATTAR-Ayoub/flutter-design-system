@@ -106,7 +106,7 @@ void main() {
     expect(find.text('A pill-shaped control.'), findsOneWidget);
   });
 
-  testWidgets('nothing on the page uses an uppercase type role', (
+  testWidgets('no text on the page is set below the supporting-copy role', (
     WidgetTester tester,
   ) async {
     tester.view.physicalSize = const Size(1440, 4000);
@@ -119,7 +119,12 @@ void main() {
     for (final StyledText text in tester.widgetList<StyledText>(
       find.byType(StyledText),
     )) {
-      expect(text.spec.uppercase, isFalse, reason: text.text);
+      expect(text.text, text.text.trim(), reason: text.text);
+      expect(
+        text.spec.mobile.size,
+        greaterThanOrEqualTo(TextStyles.small.mobile.size),
+        reason: text.text,
+      );
     }
   });
 

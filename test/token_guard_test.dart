@@ -8,7 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 /// durations, curves, radii, shadow geometry). Every other file in `lib/` and
 /// `example/lib/` consumes those tokens and must not restate a number.
 ///
-/// Escape hatch: put `allow-hardcoded: <reason>` on the offending line.
+/// Escape hatch: put `allow-hardcoded: <reason>` on the offending line, or in
+/// the comment block directly above it — see [_notedAbove].
 /// Bare `0` / `0.0` and `transparent` are always legal.
 ///
 /// This is a raw text scan, comments included — a doc comment that spells out a
@@ -84,6 +85,24 @@ bool _isExempt(String posixPath) =>
 
 /// Scans one file's source and returns every literal that escaped the
 /// foundation layer. Pure function so the guard can be tested on itself.
+/// Whether the comment block directly above line [i] carries the note.
+///
+/// The note counts on the offending line or in the comment immediately above
+/// it. The formatter owns line breaks: a trailing note after an opening
+/// parenthesis is moved onto its own line the next time `dart format` runs,
+/// and a guard that only read the same line would start failing on a file
+/// nobody had changed. The walk stops at the first line that is not a comment,
+/// so the note has to belong to this statement rather than to something else
+/// further up.
+bool _notedAbove(List<String> lines, int i) {
+  for (int j = i - 1; j >= 0; j--) {
+    final String above = lines[j].trimLeft();
+    if (!above.startsWith('//')) return false;
+    if (above.contains('allow-hardcoded:')) return true;
+  }
+  return false;
+}
+
 List<TokenViolation> scanSource(String posixPath, String source) {
   if (_isExempt(posixPath)) return const <TokenViolation>[];
 
@@ -91,7 +110,13 @@ List<TokenViolation> scanSource(String posixPath, String source) {
   final List<String> lines = source.split('\n');
   for (int i = 0; i < lines.length; i++) {
     final String line = lines[i];
+    // The note counts on the offending line, or on the line directly above
+    // it. The formatter owns line breaks: a trailing note after an opening
+    // parenthesis is moved onto its own line the next time `dart format`
+    // runs, and a guard that only read the same line would fail on a file
+    // nobody had changed.
     if (line.contains('allow-hardcoded:')) continue;
+    if (_notedAbove(lines, i)) continue;
 
     for (final _Rule rule in _rules) {
       for (final RegExpMatch match in rule.regExp.allMatches(line)) {

@@ -323,7 +323,7 @@ class _PreviewSpecimen extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      StyledText('Typical trail', TextStyles.section),
+      StyledText('Typical trail', TextStyles.small),
       SizedBox(height: space(2)),
       const Breadcrumb(
         items: <BreadcrumbEntry>[
@@ -333,7 +333,7 @@ class _PreviewSpecimen extends StatelessWidget {
         ],
       ),
       SizedBox(height: space(6)),
-      StyledText('Single crumb: no separator to derive', TextStyles.section),
+      StyledText('Single crumb: no separator to derive', TextStyles.small),
       SizedBox(height: space(2)),
       const Breadcrumb(
         items: <BreadcrumbEntry>[BreadcrumbEntry.page('Only crumb')],
@@ -657,7 +657,7 @@ class _ThemingContent extends StatelessWidget {
       _bullets(ThemeScope.of(context), <String>[
         'Breadcrumb carries no fill, border, or surface of its own: it '
             'only sets type and ink. Every crumb, link and page alike, '
-            'renders at TextStyles.bodySmall; the weight never changes.',
+            'renders at TextStyles.small; the weight never changes.',
         'Ink is the whole story: theme.mutedForeground at rest, '
             'theme.foreground on hover or for the current page. Both come '
             'from the DefaultTextStyle that wraps the entire Wrap, and '
@@ -750,7 +750,7 @@ const List<DocsApiFact> _apiFacts = <DocsApiFact>[
 const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest (link crumb)',
-    treatment: 'TextStyles.bodySmall at theme.mutedForeground.',
+    treatment: 'TextStyles.small at theme.mutedForeground.',
     userSignal: 'Reads as secondary, quiet text until interacted with.',
   ),
   DocsStateFact(

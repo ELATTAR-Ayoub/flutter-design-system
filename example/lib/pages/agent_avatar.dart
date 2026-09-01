@@ -257,7 +257,7 @@ class _Matrix extends StatelessWidget {
                 SizedBox(height: space(3)),
                 StyledText(
                   state.label,
-                  TextStyles.eyebrowSmall,
+                  TextStyles.small,
                   color: theme.mutedForeground,
                   align: TextAlign.center,
                 ),
@@ -436,7 +436,7 @@ class _StatusLineState extends State<_StatusLine>
     final ThemeTokens theme = ThemeScope.of(context);
     final Widget label = StyledText(
       widget.state.label,
-      TextStyles.chip,
+      TextStyles.badge,
       color: theme.mutedForeground,
       // `truncate`, `overflow:hidden white-space:nowrap text-overflow:ellipsis`.
       maxLines: 1,

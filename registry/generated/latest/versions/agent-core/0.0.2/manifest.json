@@ -1,0 +1,30 @@
+{
+  "name": "agent-core",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/agent/core/*` — the vocabulary every agent family renders.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/agent_core.dart",
+      "target": "@ui/agent_core.dart",
+      "sha256": "a598b28e30cebbfe13e6322b1f692fda0c51b2cc84df0fe91ff861bea9bdfa68"
+    }
+  ],
+  "registryDependencies": [
+    "icon",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "icon"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/agent-core",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_core.dart",
+  "deprecated": false
+}

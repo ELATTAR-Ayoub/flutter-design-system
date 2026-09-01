@@ -35,6 +35,21 @@ import 'package:flutter/material.dart'
         Tooltip;
 import 'package:flutter_test/flutter_test.dart';
 
+/// The ambient ink every route inherits, as the shell sets it for the real app.
+///
+/// A surface mounted bare in a test has no shell above it, so the nearest
+/// `DefaultTextStyle` is `WidgetsApp`'s red fallback — which `StyledText`
+/// asserts on rather than quietly painting over. Threaded through
+/// `MaterialApp.builder` so it covers routes and overlays too, not just `home`.
+Widget _ambientInk(BuildContext context, Widget? child) => DefaultTextStyle(
+  style: StyledText.styleOf(
+    context,
+    TextStyles.body,
+    color: ThemeScope.of(context).foreground,
+  ),
+  child: child!,
+);
+
 Widget _harness(
   Widget child, {
   ColorMode mode = ColorMode.dark,
@@ -45,6 +60,7 @@ Widget _harness(
     child: AppRouterScope(
       router: router ?? AppRouter(),
       child: MaterialApp(
+        builder: _ambientInk,
         debugShowCheckedModeBanner: false,
         home: SingleChildScrollView(child: child),
       ),
@@ -141,16 +157,16 @@ void main() {
       );
 
       final TextStyle heading = _styleOf(tester, 'Monochrome — zinc');
-      expect(heading.fontSize, TextStyles.h3.size);
+      expect(heading.fontSize, TextStyles.h3.stepFor(800).size);
       expect(heading.color, ThemeTokens.dark.foreground);
       // …and not the class its element name would suggest.
-      expect(heading.fontSize, isNot(TextStyles.h2.size));
+      expect(heading.fontSize, isNot(TextStyles.h2.stepFor(800).size));
 
       final TextStyle description = _styleOf(
         tester,
         'Six steps on shadcn’s own token names.',
       );
-      expect(description.fontSize, TextStyles.small.size);
+      expect(description.fontSize, TextStyles.small.stepFor(800).size);
       expect(description.color, ThemeTokens.dark.mutedForeground);
     });
 
@@ -186,8 +202,11 @@ void main() {
         _styleOf(tester, 'FOUNDATIONS').color,
         ThemeTokens.dark.actionText,
       );
-      // `clamp(2rem, 2.8vw, 2.5rem)` against the test view's 800px width.
-      expect(_styleOf(tester, 'Colors').fontSize, TextStyles.h1Size(800));
+      // The tablet step, against the test view's 800px width.
+      expect(
+        _styleOf(tester, 'Colors').fontSize,
+        TextStyles.h1.stepFor(800).size,
+      );
       expect(
         _styleOf(tester, 'Zinc for everything structural.').color,
         ThemeTokens.dark.mutedForeground,
@@ -205,7 +224,7 @@ void main() {
   testWidgets('Code is a mono chip in muted ink', (WidgetTester tester) async {
     await tester.pumpWidget(_harness(const Code('app/globals.css')));
     final TextStyle style = _styleOf(tester, 'app/globals.css');
-    expect(style.fontSize, TextStyles.code.size);
+    expect(style.fontSize, TextStyles.code.stepFor(800).size);
     expect(style.color, ThemeTokens.dark.mutedForeground);
   });
 
@@ -289,9 +308,15 @@ void main() {
       ),
     );
 
-    expect(_styleOf(tester, 'Colors').fontSize, TextStyles.h4.size);
+    expect(
+      _styleOf(tester, 'Colors').fontSize,
+      TextStyles.h4.stepFor(800).size,
+    );
     // The group card's title is a step larger, over an action-ink label.
-    expect(_styleOf(tester, 'Base Components').fontSize, TextStyles.h3.size);
+    expect(
+      _styleOf(tester, 'Base Components').fontSize,
+      TextStyles.h3.stepFor(800).size,
+    );
     expect(_styleOf(tester, '14 SETS').color, ThemeTokens.dark.actionText);
 
     await tester.tap(find.text('Colors'));
@@ -314,7 +339,7 @@ void main() {
 
     expect(_styleOf(tester, 'TEXTURE').color, ThemeTokens.dark.mutedForeground);
     final TextStyle note = _styleOf(tester, 'max-w-(--width-prose) · 720px');
-    expect(note.fontSize, TextStyles.numberSm.size);
+    expect(note.fontSize, TextStyles.numberSm.stepFor(800).size);
     expect(note.color, ThemeTokens.dark.mutedForeground);
   });
 
@@ -451,7 +476,7 @@ void main() {
     );
 
     final TextStyle key = _styleOf(tester, '--width-prose');
-    expect(key.fontSize, TextStyles.numberSm.size);
+    expect(key.fontSize, TextStyles.numberSm.stepFor(800).size);
     expect(key.color, ThemeTokens.dark.actionText);
     expect(find.textContaining('720px', findRichText: true), findsOneWidget);
   });

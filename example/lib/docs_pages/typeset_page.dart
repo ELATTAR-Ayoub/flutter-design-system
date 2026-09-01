@@ -10,18 +10,18 @@
 ///
 /// **The scale comes before the reference.** The whole catalog renders once,
 /// in order, at real size, above the per-role blocks. Choosing between two
-/// neighbours is a comparison, and a reader cannot make it from twenty-seven
+/// neighbours is a comparison, and a reader cannot make it from seventeen
 /// separate cards.
 ///
-/// **Every specimen is the real token.** Nothing here restates a size or a
+/// **Every specimen is the real role.** Nothing here restates a size or a
 /// weight in prose. The metadata beside each role is read out of its
-/// `TextStyleToken` at build time, so a token that moves moves this page with it,
-/// and a page that disagrees with the system becomes impossible rather than
-/// merely unlikely.
+/// `TextStyleToken` at build time, so a role that moves moves this page with
+/// it, and a page that disagrees with the system becomes impossible rather
+/// than merely unlikely.
 ///
-/// **Names come from the catalog, values from the spec.** `TextStyleToken` has no
-/// name, and two roles can hold identical values, so nothing here tries to
-/// recover a name by matching on values — see `typeset_catalog.dart`.
+/// **One ink for the whole preview.** No role owns a colour, so nothing on
+/// this page uses colour to separate one role from another: the hierarchy a
+/// reader sees is the hierarchy the scale actually provides.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
@@ -70,14 +70,13 @@ class TypesetDocsPage extends StatelessWidget {
     toc: const <DocsTocEntry>[
       DocsTocEntry(title: 'Full type scale', anchor: 'scale'),
       DocsTocEntry(title: 'Choosing a role', anchor: 'choosing'),
-      DocsTocEntry(title: 'The five faces', anchor: 'faces'),
-      DocsTocEntry(title: 'What a spec records', anchor: 'anatomy'),
+      DocsTocEntry(title: 'Type shape, component ink', anchor: 'ink'),
+      DocsTocEntry(title: 'The two faces', anchor: 'faces'),
+      DocsTocEntry(title: 'What a role records', anchor: 'anatomy'),
       DocsTocEntry(title: 'Words', anchor: 'words'),
-      DocsTocEntry(title: 'Labels and furniture', anchor: 'labels'),
-      DocsTocEntry(title: 'Code and serials', anchor: 'code'),
+      DocsTocEntry(title: 'Code and identifiers', anchor: 'code'),
       DocsTocEntry(title: 'Numerics', anchor: 'numerics'),
-      DocsTocEntry(title: 'Accent', anchor: 'accent'),
-      DocsTocEntry(title: 'Sizes that are not fixed', anchor: 'fluid'),
+      DocsTocEntry(title: 'Responsive steps', anchor: 'responsive'),
       DocsTocEntry(title: 'Component typography', anchor: 'component-type'),
     ],
     previous: const DocsPageLink(title: 'CLI', route: docsCliRoute),
@@ -99,11 +98,11 @@ class _TypesetArticle extends StatelessWidget {
       children: <Widget>[
         _fullScale(),
         _choosing(theme),
+        _ink(theme),
         _faces(theme),
         _anatomy(theme),
-        for (final TypesetGroup group in TypesetGroup.values)
-          _groupSection(group),
-        _fluid(theme),
+        for (final TypeGroup group in TypeGroup.values) _groupSection(group),
+        _responsive(theme),
         _componentType(theme),
       ],
     );
@@ -126,9 +125,9 @@ class _TypesetArticle extends StatelessWidget {
     id: 'scale',
     title: 'Full type scale',
     description:
-        'Every role, once, in reading order, at its real size. Read down it '
-        'before you read about any single role: the choice between two '
-        'neighbours is easier to see than to describe.',
+        'Every role, once, in reading order, at its real size and in one ink. '
+        'Read down it before you read about any single role: the choice '
+        'between two neighbours is easier to see than to describe.',
     child: DocsShowcaseFrame(
       alignment: Alignment.topLeft,
       minHeight: space(96),
@@ -153,10 +152,11 @@ class _TypesetArticle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _prose(
-          'A role is a statement about meaning, not about size. h4 and lead '
-          'are the same size and are never interchangeable: one titles what '
-          'follows, the other introduces it. Pick by what the text is doing, '
-          'and let the scale decide how big it is.',
+          'A role is a statement about meaning, not about size. h4 titles what '
+          'follows it and lead introduces it; they are never interchangeable, '
+          'whatever their sizes happen to be at the width you are looking at. '
+          'Pick by what the text is doing, and let the scale decide how big '
+          'it is.',
         ),
         SizedBox(height: space(4)),
         _prose(
@@ -169,15 +169,49 @@ class _TypesetArticle extends StatelessWidget {
           code:
               "StyledText('Section heading', TextStyles.h2)\n"
               "StyledText('1,510', TextStyles.numberLg)\n"
-              "StyledText('Foundations', TextStyles.eyebrow)",
+              "StyledText('Foundations', TextStyles.small)",
         ),
         SizedBox(height: space(4)),
         _prose(
-          'The role carries family, size, leading, weight, tracking, casing, '
-          'tabular figures, and the colour it sets on itself. A call site '
-          'passes a colour only when the surface overrides it, and a size '
-          'only for the roles whose size is not fixed.',
-          spec: TextStyles.small,
+          'The role carries family, size, line height, weight, tracking and '
+          'numeric features, and resolves the size for the width it renders '
+          'at. A call site passes a colour when the surface calls for one, and '
+          'a size only for the rare anatomy that must match a container it '
+          'shares.',
+        ),
+      ],
+    ),
+  );
+
+  Widget _ink(ThemeTokens theme) => DocsSection(
+    id: 'ink',
+    title: 'Type shape, component ink',
+    description:
+        'Typography defines shape and rhythm. The component or the semantic '
+        'surface defines the ink.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        _prose(
+          'No role sets a colour on itself. small is a size, not a grey; lead '
+          'is a size, not a subtitle colour. Text inherits the foreground of '
+          'the surface it sits on, and a call site that means "secondary" says '
+          'so:',
+        ),
+        SizedBox(height: space(4)),
+        const DocsSnippet(
+          language: 'dart',
+          code:
+              "final ThemeTokens theme = ThemeScope.of(context);\n\n"
+              "StyledText('Order total', TextStyles.small)\n"
+              "StyledText('Includes tax', TextStyles.small,\n"
+              "    color: theme.mutedForeground)",
+        ),
+        SizedBox(height: space(4)),
+        _prose(
+          'This is why the scale above renders in one ink. Colour is a second '
+          'axis of meaning — muted, destructive, success, link — and using it '
+          'to tell two type roles apart would teach the wrong lesson twice.',
         ),
       ],
     ),
@@ -185,11 +219,10 @@ class _TypesetArticle extends StatelessWidget {
 
   Widget _faces(ThemeTokens theme) => DocsSection(
     id: 'faces',
-    title: 'The five faces',
+    title: 'The two faces',
     description:
-        'Three font files, five named roles in Fonts. sans and heading '
-        'resolve to the same face deliberately: they are separate tokens so '
-        'the two can diverge later without a rename.',
+        'Two font files. Words are set in Inter; anything read character by '
+        'character is set in Geist Mono.',
     child: DocsApiTable(
       title: 'Fonts',
       facts: <DocsApiFact>[
@@ -197,27 +230,16 @@ class _TypesetArticle extends StatelessWidget {
           name: 'Fonts.sans',
           type: Fonts.sans,
           description:
-              'The word face. Every prose and heading role except display '
-              'and accent.',
-        ),
-        DocsApiFact(
-          name: 'Fonts.heading',
-          type: Fonts.heading,
-          description:
-              'A separate token that resolves to the same face as sans '
-              'today. display is the only role that uses it.',
+              'The word face: every heading, every reading role, and the '
+              'interface words.',
         ),
         DocsApiFact(
           name: 'Fonts.mono',
           type: Fonts.mono,
           description:
-              'Code, serials, and all six numeric steps. Tabular figures '
-              'come from the numeric roles, not from the face.',
-        ),
-        DocsApiFact(
-          name: 'Fonts.accent',
-          type: Fonts.accent,
-          description: 'The italic serif. One role uses it.',
+              'Code, identifiers, and all five numeric roles — the text whose '
+              'characters must line up column to column. Tabular figures come '
+              'from the numeric roles, not from the face.',
         ),
         const DocsApiFact(
           name: 'Fonts.package',
@@ -233,16 +255,23 @@ class _TypesetArticle extends StatelessWidget {
 
   Widget _anatomy(ThemeTokens theme) => DocsSection(
     id: 'anatomy',
-    title: 'What a spec records',
+    title: 'What a role records',
     description:
         'TextStyleToken is a record of declared values, not a style. StyledText '
-        'resolves it against the theme and the size in play.',
+        'resolves it against the width in scope and the ink in play.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         const DocsApiTable(
           title: 'TextStyleToken',
           facts: <DocsApiFact>[
+            DocsApiFact(
+              name: 'name / group',
+              type: 'String, TypeGroup',
+              description:
+                  'The published name and the catalog group. This page reads '
+                  'both rather than restating them.',
+            ),
             DocsApiFact(
               name: 'family',
               type: 'String',
@@ -251,22 +280,16 @@ class _TypesetArticle extends StatelessWidget {
                   'resolve time, so call sites never think about it.',
             ),
             DocsApiFact(
-              name: 'size',
-              type: 'double?',
+              name: 'mobile / tablet / desktop',
+              type: 'TypeStep',
               description:
-                  'Fixed px, or null for the three roles whose size is '
-                  'decided elsewhere — see Sizes that are not fixed.',
+                  'A size and a line height, both in logical pixels, for each '
+                  'band. A role that reads the same at every width holds the '
+                  'same step three times.',
             ),
             DocsApiFact(
-              name: 'height',
-              type: 'double?',
-              description:
-                  'Leading as a unitless ratio, or null where the role '
-                  'inherits it.',
-            ),
-            DocsApiFact(
-              name: 'variations / weight',
-              type: 'List<FontVariation>, FontWeight?',
+              name: 'wght / weight',
+              type: 'double, FontWeight',
               description:
                   'The exact wght axis value, plus the nearest static step '
                   'below it as a fallback. h2 asks for 650, which no '
@@ -276,50 +299,41 @@ class _TypesetArticle extends StatelessWidget {
               name: 'tracking',
               type: 'double?',
               description:
-                  'Letter spacing in em. Converted to px against the '
-                  'resolved size, which is what a browser does.',
-            ),
-            DocsApiFact(
-              name: 'uppercase',
-              type: 'bool',
-              description:
-                  'A flag. The foundation performs no string transform; '
-                  'StyledText does, so the value you pass stays the value you '
-                  'wrote.',
+                  'Letter spacing in em, converted to logical pixels against '
+                  'the resolved size so it stays proportionate at every step.',
             ),
             DocsApiFact(
               name: 'tabular',
               type: 'bool',
               description:
                   'Tabular figures, so a column of numbers aligns on the '
-                  'digit. True for all six numeric roles.',
+                  'digit. True for all five numeric roles.',
             ),
             DocsApiFact(
-              name: 'defaultColor',
-              type: 'TextColorRole',
+              name: 'derive(...)',
+              type: 'TextStyleToken',
               description:
-                  'The colour the role sets on itself. Five roles are muted; '
-                  'every other role inherits from the surface it sits on.',
+                  'A component-internal variation — a button label at medium '
+                  'weight, a cell with tabular figures. It keeps the role\'s '
+                  'steps and publishes nothing new.',
             ),
           ],
         ),
         SizedBox(height: space(5)),
         _prose(
-          'StyledText resolves colour in the order a cascade would: an explicit '
-          'color wins, then the role\'s own defaultColor, then whatever the '
-          'surrounding DefaultTextStyle provides. Pass inline: true where the '
-          'text is a chip inside a sentence rather than a line of its own — '
-          'that drops the leading, which is what an inline box does.',
+          'Pass inline: true where the text is a chip inside a sentence rather '
+          'than a line of its own. That drops the line height, which is what '
+          'an inline box does: the sentence around it keeps owning the line.',
           spec: TextStyles.small,
         ),
       ],
     ),
   );
 
-  Widget _groupSection(TypesetGroup group) => DocsSection(
+  Widget _groupSection(TypeGroup group) => DocsSection(
     id: _anchorFor(group),
-    title: group.title,
-    description: group.description,
+    title: group.label,
+    description: _descriptionFor(group),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -331,42 +345,60 @@ class _TypesetArticle extends StatelessWidget {
     ),
   );
 
-  static String _anchorFor(TypesetGroup group) => switch (group) {
-    TypesetGroup.words => 'words',
-    TypesetGroup.labels => 'labels',
-    TypesetGroup.code => 'code',
-    TypesetGroup.numerics => 'numerics',
-    TypesetGroup.accent => 'accent',
+  static String _anchorFor(TypeGroup group) => switch (group) {
+    TypeGroup.words => 'words',
+    TypeGroup.code => 'code',
+    TypeGroup.numerics => 'numerics',
   };
 
-  Widget _fluid(ThemeTokens theme) => DocsSection(
-    id: 'fluid',
-    title: 'Sizes that are not fixed',
+  static String _descriptionFor(TypeGroup group) => switch (group) {
+    TypeGroup.words =>
+      'Headings, reading copy, and the interface words a person taps. Ten '
+          'roles, six of which step up as the window widens.',
+    TypeGroup.code =>
+      'Monospace. Code that is skimmed, and identifiers that are compared '
+          'character by character.',
+    TypeGroup.numerics =>
+      'Five steps of tabular monospace, so a column of figures aligns on the '
+          'digit rather than on the glyph. All five share face, weight and '
+          'tabular figures; the three largest step with the window.',
+  };
+
+  Widget _responsive(ThemeTokens theme) => DocsSection(
+    id: 'responsive',
+    title: 'Responsive steps',
     description:
-        'Three roles carry no px size, for three different reasons. Each '
-        'needs an explicit fontSize at the call site, and the foundation '
-        'provides the value.',
+        'Headings and the large metrics step up at 768 and again at 1024. '
+        'Reading and interface text does not move.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
+        _prose(
+          'A role resolves its own size, so a call site never does viewport '
+          'arithmetic. display is 44px on a phone, 52 on a tablet and 64 on a '
+          'desktop, and the line that renders it is the same line at all '
+          'three widths.',
+        ),
+        SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'dart',
           code:
-              "// Grows with the viewport, clamped at both ends.\n"
-              "StyledText('Build the interface you mean.', TextStyles.display,\n"
-              "    fontSize: Fluid.display(context))\n\n"
-              "StyledText('Typeset', TextStyles.h1, fontSize: Fluid.h1(context))\n\n"
-              "// Relative to whatever it sits inside.\n"
-              "StyledText('mean', TextStyles.accent,\n"
-              "    fontSize: TextStyles.accentSize(TextStyles.body.size!))",
+              "// Resolves against the viewport.\n"
+              "StyledText('Build the interface you mean.', TextStyles.display)\n\n"
+              "// Resolves against a region instead, for a heading inside a\n"
+              "// narrow panel on a wide window.\n"
+              "TypeWidthScope(\n"
+              "  width: constraints.maxWidth,\n"
+              "  child: StyledText('Filters', TextStyles.h3),\n"
+              ")",
         ),
         SizedBox(height: space(5)),
         _prose(
-          'Fluid reads the viewport width from MediaQuery and applies the '
-          'clamp, so a hero stays proportionate without a breakpoint. accent '
-          'is different: it is a multiple of its context, which is why an '
-          'accent word inside a fluid display rides that clamp for free. It '
-          'inherits its leading for the same reason.',
+          'Width steps are a layout decision and never a substitute for '
+          'accessibility. Flutter\'s text scaler applies on top of whichever '
+          'step is resolved, and every component in the system is built to '
+          'grow with text at 200% rather than clip it.',
+          spec: TextStyles.small,
         ),
       ],
     ),
@@ -380,24 +412,23 @@ class _TypesetArticle extends StatelessWidget {
       children: <Widget>[
         _prose(
           'A button label, a dialog title and a table header each have a type '
-          'contract too, and none of them is on this page. They live in '
-          'ComponentTextStyles, and the components that own them apply them '
-          'themselves.',
+          'contract too, and none of them is a role on this page. Each is '
+          'derived from the role closest to its meaning by the component that '
+          'owns it — a Button label is TextStyles.body at medium weight — so '
+          'the catalog stays seventeen entries long however much anatomy the '
+          'system grows.',
         ),
         SizedBox(height: space(4)),
         _prose(
-          'The split is deliberate. TextStyles is the vocabulary you compose a '
-          'screen from; ComponentTextStyles is internal detail of components you '
-          'do not restyle. If you find yourself reaching for a component '
-          'role to set some text, the answer is almost always the component '
-          'itself.',
+          'If you find yourself wanting a component\'s internal type to set '
+          'some text, the answer is almost always the component itself.',
         ),
         SizedBox(height: space(4)),
         const DocsSnippet(
           language: 'dart',
           code:
               "// Not this.\n"
-              "StyledText('Continue', TextStyles.buttonLabel)\n\n"
+              "StyledText('Continue', TextStyles.nav)\n\n"
               "// This.\n"
               "Button(onPressed: onPressed, child: const Text('Continue'))",
         ),
@@ -411,7 +442,7 @@ class _TypesetArticle extends StatelessWidget {
 class _ScaleDivider extends StatelessWidget {
   const _ScaleDivider({required this.group, required this.first});
 
-  final TypesetGroup group;
+  final TypeGroup group;
 
   /// The first group opens the stage, so it takes the title without the rule
   /// above it.
@@ -424,7 +455,7 @@ class _ScaleDivider extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         if (!first) ...<Widget>[const Separator(), SizedBox(height: space(4))],
-        StyledText(group.title, TextStyles.eyebrow),
+        StyledText(group.label, TextStyles.small),
       ],
     ),
   );
@@ -435,7 +466,7 @@ class _ScaleDivider extends StatelessWidget {
 ///
 /// The name is a scanning cue, not a heading. The reference blocks below own
 /// the heading semantics, and repeating them here would give a screen-reader
-/// user twenty-seven duplicate landmarks to walk past.
+/// user seventeen duplicate landmarks to walk past.
 class _ScaleLine extends StatelessWidget {
   const _ScaleLine({required this.role});
 
@@ -448,7 +479,7 @@ class _ScaleLine extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        StyledText('TextStyles.${role.name}', TextStyles.eyebrowSmall),
+        StyledText('TextStyles.${role.name}', TextStyles.small),
         SizedBox(height: space(2)),
         _Specimen(role: role),
       ],
@@ -494,8 +525,8 @@ class _RoleEntry extends StatelessWidget {
         // Wide: metadata beside the usage sentence, each in its own column.
         // Narrow: stacked, metadata last. The metadata is a list of short
         // pairs rather than a table, so it stays readable at any width — a
-        // nine-column table squeezed into 390px is why the reflow is a
-        // restructure rather than a shrink.
+        // table squeezed into 390px is why the reflow is a restructure rather
+        // than a shrink.
         if (wide)
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,43 +552,21 @@ class _RoleEntry extends StatelessWidget {
   /// The line a reader copies. Real, and pasteable as written.
   static String _callSite(TypesetRole role) {
     final String escaped = role.sample.replaceAll("'", r"\'");
-    if (identical(role.spec, TextStyles.display)) {
-      return "StyledText('$escaped', TextStyles.display,\n"
-          '    fontSize: Fluid.display(context))';
-    }
-    if (identical(role.spec, TextStyles.h1)) {
-      return "StyledText('$escaped', TextStyles.h1, fontSize: Fluid.h1(context))";
-    }
-    if (identical(role.spec, TextStyles.accent)) {
-      return "StyledText('$escaped', TextStyles.accent,\n"
-          '    fontSize: TextStyles.accentSize(TextStyles.body.size!))';
-    }
     return "StyledText('$escaped', TextStyles.${role.name})";
   }
 }
 
-/// The role, rendered at its real size.
+/// The role, rendered at its real size for the width it is in.
 class _Specimen extends StatelessWidget {
   const _Specimen({required this.role});
 
   final TypesetRole role;
 
   @override
-  Widget build(BuildContext context) =>
-      StyledText(role.sample, role.spec, fontSize: _size(context, role));
-
-  /// The three roles with no intrinsic size get theirs from the foundation.
-  static double? _size(BuildContext context, TypesetRole role) {
-    if (identical(role.spec, TextStyles.display)) return Fluid.display(context);
-    if (identical(role.spec, TextStyles.h1)) return Fluid.h1(context);
-    if (identical(role.spec, TextStyles.accent)) {
-      return TextStyles.accentSize(TextStyles.body.size!);
-    }
-    return null;
-  }
+  Widget build(BuildContext context) => StyledText(role.sample, role.spec);
 }
 
-/// Everything measurable about a role, read out of its spec.
+/// Everything measurable about a role, read out of the role itself.
 ///
 /// Nothing here is typed out by hand. That is the point: a metadata column
 /// written in prose is a second source of truth, and this page's whole claim
@@ -570,19 +579,21 @@ class _Metadata extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextStyleToken spec = role.spec;
+    final TypeStep here = StyledText.stepOf(context, spec);
 
     final List<(String, String)> rows = <(String, String)>[
       ('Family', _familyName(spec.family)),
-      ('Size', role.sizeRule ?? '${_number(spec.size)} px'),
-      ('Leading', spec.height == null ? 'inherits' : _number(spec.height)),
+      ('Here', _step(here)),
+      ('Mobile', _step(spec.mobile)),
+      ('Tablet', _step(spec.tablet)),
+      ('Desktop', _step(spec.desktop)),
       ('Weight', _weight(spec)),
       (
         'Tracking',
         spec.tracking == null ? 'none' : '${_number(spec.tracking)} em',
       ),
-      ('Case', spec.uppercase ? 'uppercase' : 'as written'),
       ('Figures', spec.tabular ? 'tabular' : 'proportional'),
-      ('Colour', _colour(spec.defaultColor)),
+      ('Ink', 'inherits'),
     ];
 
     return Semantics(
@@ -595,11 +606,10 @@ class _Metadata extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 // From the spacing scale, not a new foundation token: one
-                // page does not earn a width in `LayoutWidths`, and `space(18)`
-                // clears the longest label at micro's tracking.
+                // page does not earn a width in `LayoutWidths`.
                 SizedBox(
                   width: space(18),
-                  child: StyledText(row.$1, TextStyles.eyebrowSmall),
+                  child: StyledText(row.$1, TextStyles.small),
                 ),
                 SizedBox(width: space(3)),
                 Expanded(child: StyledText(row.$2, TextStyles.small)),
@@ -612,32 +622,23 @@ class _Metadata extends StatelessWidget {
     );
   }
 
+  /// Size over line height, both in logical pixels — the way the contract
+  /// table states them.
+  static String _step(TypeStep step) =>
+      '${_number(step.size)} / ${_number(step.leading)}';
+
   /// `InterLocal` is the file; "Inter" is what a person calls it.
-  static String _familyName(String family) {
-    if (family == Fonts.mono) return 'Geist Mono';
-    if (family == Fonts.accent) return 'Redaction 35';
-    return 'Inter';
-  }
+  static String _familyName(String family) =>
+      family == Fonts.mono ? 'Geist Mono' : 'Inter';
 
-  /// The declared axis value where there is one, because that is the number
-  /// the role actually asks for — h2's 650 is invisible in `FontWeight`.
+  /// The declared axis value, because that is the number the role actually
+  /// asks for — h2's 650 is invisible in `FontWeight`.
   static String _weight(TextStyleToken spec) {
-    if (spec.variations.isEmpty) return 'inherits';
-    final double wght = spec.variations.first.value;
-    final FontWeight? fallback = spec.weight;
-    final String step = fallback == null
-        ? ''
-        : ' (w${fallback.value} fallback)';
-    return '${_number(wght)}$step';
+    final String step = ' (w${spec.weight.value} fallback)';
+    return '${_number(spec.wght)}$step';
   }
 
-  static String _colour(TextColorRole colour) => switch (colour) {
-    TextColorRole.none => 'inherits',
-    TextColorRole.foreground => 'foreground',
-    TextColorRole.muted => 'muted foreground',
-  };
-
-  /// `15.0` is a value; `15` is a number a person reads.
+  /// `16.0` is a value; `16` is a number a person reads.
   static String _number(double? value) {
     if (value == null) return '—';
     if (value == value.roundToDouble()) return value.toStringAsFixed(0);

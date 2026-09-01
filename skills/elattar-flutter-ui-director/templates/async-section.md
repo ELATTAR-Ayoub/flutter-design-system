@@ -74,7 +74,7 @@ class InvoicesSection extends StatelessWidget {
           children: <Widget>[
             Button(
               onPressed: onCreate,
-              child: const StyledText('Create invoice', TextStyles.buttonLabel),
+              child: const StyledText('Create invoice', TextStyles.nav),
             ),
           ],
         ),
@@ -96,7 +96,7 @@ class InvoicesSection extends StatelessWidget {
             Button(
               variant: ButtonVariant.outline,
               onPressed: onClearFilters,
-              child: const StyledText('Clear filters', TextStyles.buttonLabel),
+              child: const StyledText('Clear filters', TextStyles.nav),
             ),
           ],
         ),
@@ -145,7 +145,7 @@ class _Failed extends StatelessWidget {
               variant: ButtonVariant.outline,
               size: ButtonSize.sm,
               onPressed: onRetry,
-              child: StyledText(error.nextStep, TextStyles.buttonLabelSm),
+              child: StyledText(error.nextStep, TextStyles.small),
             )
           : null,
     );

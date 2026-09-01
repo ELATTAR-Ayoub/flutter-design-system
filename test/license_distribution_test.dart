@@ -26,7 +26,6 @@ import '../tool/registry_builder/lib/generator.dart' show sha256Hex;
 const Map<String, String> _noticeFiles = <String, String>{
   'third_party/fonts/inter/OFL.txt': 'SIL OPEN FONT LICENSE',
   'third_party/fonts/geist-mono/OFL.txt': 'SIL OPEN FONT LICENSE',
-  'third_party/fonts/redaction/OFL.txt': 'SIL OPEN FONT LICENSE',
   'third_party/lucide/LICENSE': 'ISC License',
   'third_party/elevenlabs-ui/LICENSE': 'MIT License',
 };
@@ -40,7 +39,6 @@ const Map<String, String> _noticeFiles = <String, String>{
 const Map<String, String> _redistributed = <String, String>{
   'assets/fonts/InterVariable.ttf': 'third_party/fonts/inter/OFL.txt',
   'assets/fonts/GeistMono-Variable.ttf': 'third_party/fonts/geist-mono/OFL.txt',
-  'assets/fonts/Redaction35-Italic.ttf': 'third_party/fonts/redaction/OFL.txt',
   'lib/src/components/ui/icon_paths.g.dart': 'third_party/lucide/LICENSE',
   'lib/src/components/ui/icon_paths.g.index.dart': 'third_party/lucide/LICENSE',
   'shaders/orb.frag': 'third_party/elevenlabs-ui/LICENSE',
@@ -289,14 +287,13 @@ void main() {
         (entry as Map<String, Object?>)['target']! as String,
     ];
 
-    test('source-foundation ships all three font notices', () {
+    test('source-foundation ships both font notices, and no others', () {
       expect(
         licenseTargets(manifest('registry/foundations/source.json')),
-        containsAll(<String>[
+        <String>[
           '@license/Inter-OFL-1.1.txt',
           '@license/Geist-Mono-OFL-1.1.txt',
-          '@license/Redaction-OFL-1.1.txt',
-        ]),
+        ],
       );
     });
 
@@ -343,25 +340,53 @@ void main() {
     });
 
     test('the generated registry stages every notice payload', () {
-      const Map<String, String> payloads = <String, String>{
-        'registry/generated/latest/versions/source-foundation/0.0.1/logical/license/Inter-OFL-1.1.txt':
-            'third_party/fonts/inter/OFL.txt',
-        'registry/generated/latest/versions/source-foundation/0.0.1/logical/license/Geist-Mono-OFL-1.1.txt':
-            'third_party/fonts/geist-mono/OFL.txt',
-        'registry/generated/latest/versions/source-foundation/0.0.1/logical/license/Redaction-OFL-1.1.txt':
-            'third_party/fonts/redaction/OFL.txt',
-        'registry/generated/latest/versions/icon/0.0.1/logical/license/Lucide-ISC.txt':
-            'third_party/lucide/LICENSE',
-        'registry/generated/latest/versions/voice-indicator/0.0.1/logical/license/ElevenLabs-UI-MIT.txt':
-            'third_party/elevenlabs-ui/LICENSE',
+      // Items are versioned individually, so the payload directory an item
+      // uses is the version the index says it is at — not the registry
+      // version, and not a path written down here that goes stale the first
+      // time one of them is republished.
+      final Map<String, Object?> index =
+          jsonDecode(
+                File('registry/generated/latest/index.json').readAsStringSync(),
+              )
+              as Map<String, Object?>;
+      final Map<String, String> versions = <String, String>{
+        for (final Object? raw in index['items']! as List<Object?>)
+          '${(raw! as Map<String, Object?>)['name']}':
+              '${(raw as Map<String, Object?>)['version']}',
       };
-      payloads.forEach((String staged, String origin) {
+
+      const Map<String, ({String item, String origin})> notices =
+          <String, ({String item, String origin})>{
+            'Inter-OFL-1.1.txt': (
+              item: 'source-foundation',
+              origin: 'third_party/fonts/inter/OFL.txt',
+            ),
+            'Geist-Mono-OFL-1.1.txt': (
+              item: 'source-foundation',
+              origin: 'third_party/fonts/geist-mono/OFL.txt',
+            ),
+            'Lucide-ISC.txt': (
+              item: 'icon',
+              origin: 'third_party/lucide/LICENSE',
+            ),
+            'ElevenLabs-UI-MIT.txt': (
+              item: 'voice-indicator',
+              origin: 'third_party/elevenlabs-ui/LICENSE',
+            ),
+          };
+
+      notices.forEach((String notice, ({String item, String origin}) entry) {
+        final String? version = versions[entry.item];
+        expect(version, isNotNull, reason: '${entry.item} is not in the index');
+        final String staged =
+            'registry/generated/latest/versions/${entry.item}/$version/'
+            'logical/license/$notice';
         final File file = File(staged);
         expect(file.existsSync(), isTrue, reason: '$staged was not staged');
         expect(
           file.readAsBytesSync(),
-          File(origin).readAsBytesSync(),
-          reason: '$staged is not a byte copy of $origin',
+          File(entry.origin).readAsBytesSync(),
+          reason: '$staged is not a byte copy of ${entry.origin}',
         );
       });
     });

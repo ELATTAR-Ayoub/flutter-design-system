@@ -1,0 +1,36 @@
+{
+  "name": "alert-dialog",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "Confirmation dialog support component for consequential actions, composed with the dialog, button, and tooltip contracts.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/alert_dialog.dart",
+      "target": "@ui/alert_dialog.dart",
+      "sha256": "fa6e8916ed36e24c8c38ed65422e29f863e6f339b6179fe6802179ad2b92bd08"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "dialog",
+    "surface",
+    "source-foundation",
+    "tooltip"
+  ],
+  "semanticDependencies": [
+    "button",
+    "dialog",
+    "surface",
+    "tooltip"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/alert-dialog",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/alert_dialog.dart",
+  "deprecated": false
+}

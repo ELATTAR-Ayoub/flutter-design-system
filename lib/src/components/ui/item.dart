@@ -180,6 +180,23 @@ class Item extends StatelessWidget {
               SizedBox(width: gap),
               Align(
                 alignment: alignStart ? Alignment.topCenter : Alignment.center,
+                // A bare `Align` claims the row's whole remaining width
+                // instead of shrink-wrapping `actions!`, and the CSS this
+                // ports never asks for that: `items-center` and `self-start`
+                // move the slot, they do not size it. `widthFactor: 1` makes
+                // the box hug its child, so whatever the caller passed into
+                // [actions] governs the row's real width.
+                //
+                // Deliberately NOT `Flexible` as well. A [Row] offers a
+                // non-flexible child an unbounded main axis, so a `Wrap`
+                // inside [actions] never sees a width to wrap against, and
+                // adding the bound here would look like the fix. It is not:
+                // it moves this row's measured geometry, and `HistoryCard`
+                // reads 90 instead of its recorded 70 the moment it lands.
+                // The measurements are the authoritative ones. A surface whose
+                // actions genuinely cannot fit at a given width constrains
+                // them where it knows that width, which is the page, not here.
+                widthFactor: 1,
                 child: actions!,
               ),
             ],
@@ -266,7 +283,7 @@ class ItemTitle extends StatelessWidget {
     alignment: AlignmentDirectional.centerStart,
     child: StyledText(
       text,
-      TextStyles.itemTitle,
+      TextStyles.body,
       // `line-clamp-1`.
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
@@ -284,7 +301,7 @@ class ItemDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StyledText(
     text,
-    TextStyles.itemDescription,
+    TextStyles.small,
     color: ThemeScope.of(context).mutedForeground,
     maxLines: 2,
     overflow: TextOverflow.ellipsis,

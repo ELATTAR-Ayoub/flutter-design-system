@@ -85,7 +85,7 @@
 ///   after `SelectItem`'s `focus:bg-accent` and `ComboboxItem`'s
 ///   `data-highlighted:bg-accent`.
 /// - **6** — the heading is the weight-**500** member of the three-way group
-///   label split ([TextStyles.menuHeading]).
+///   label split ([TextStyles.small]).
 /// - **7** — `-mx-2` with **no `my-*`**: 1px of separator and not one pixel of
 ///   air, where `SelectSeparator` takes 17.
 /// - **13** — the trailing check is `display:none` on all four items, because
@@ -360,8 +360,8 @@ class CommandItem {
   /// Trailing metadata that is **not** a `CommandShortcut` —
   /// `<span className="type-caption shrink-0 text-muted-foreground">`.
   ///
-  /// The distinction is load-bearing twice. It rides [TextStyles.caption] rather
-  /// than [TextStyles.menuShortcut], and because it carries no
+  /// The distinction is load-bearing twice. It rides [TextStyles.small] rather
+  /// than [TextStyles.small], and because it carries no
   /// `data-slot="command-shortcut"` it does **not** trigger
   /// `group-has-data-[slot=command-shortcut]/command-item:hidden` — so the
   /// trailing check indicator is still rendered, at `opacity-0`, and still
@@ -427,7 +427,7 @@ class CommandGroup {
 
   final List<CommandItem> items;
 
-  /// `heading` — rendered `px-3 py-2` at [TextStyles.menuHeading].
+  /// `heading` — rendered `px-3 py-2` at [TextStyles.small].
   ///
   /// Nullable because cmdk's `Group` only renders the heading element when the
   /// prop is set, while `p-2` applies either way. Both of the page's groups
@@ -462,6 +462,24 @@ class _ResolvedGroup {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /// The command palette — inline, always open.
+///
+/// **Needs a bounded width.** The root is a `Column(crossAxisAlignment:
+/// stretch)`, and `_CommandInput`'s search field sits in an `Expanded` beside
+/// its leading glyph — precisely the shape [AGENTS.md]'s Row rule asks for:
+/// the icon stays fixed and the input is the part that gives. Both of those
+/// need a real `maxWidth` to divide, and an *unbounded* one (a `Command`
+/// dropped straight into a horizontally-scrolling row, for instance) throws
+/// `RenderFlex children have non-zero flex but incoming width constraints are
+/// unbounded` — the same requirement `Row`, `ListView` and `Table` all state
+/// for exactly the same reason. This is judged a legitimate requirement to
+/// document rather than a defect to route around: every real call site
+/// (inline on a page, inside `CommandDialog`, in the tests below) already
+/// gives it one, `stretch` is what makes the search field and every row's
+/// highlight span the palette's full width instead of shrink-wrapping their
+/// own content, and rebuilding the shape around `IntrinsicWidth` would trade
+/// one documented constraint for the exact intrinsic-vs-real mismatch fixed
+/// elsewhere in this pass (see `attachment.dart`'s `_WidthOnlyIntrinsic`).
+/// Give it a `SizedBox`, an `Expanded`, or any other bounded-width ancestor.
 class Command extends StatefulWidget {
   const Command({
     super.key,
@@ -563,23 +581,47 @@ class Command extends StatefulWidget {
   /// `data-[disabled=true]:opacity-50`.
   static const double disabledOpacity = SurfaceOpacity.disabled;
 
-  /// `px-3 py-2` around one `text-sm` line box — **34.5625px** *(measured)*.
-  static double get itemHeight {
-    final TextStyleToken spec = TextStyles.bodyCompact;
-    return (spec.size ?? 0) * (spec.height ?? 1) + space(2) * 2;
-  }
+  /// A group heading: the supporting-copy role at medium weight, so a heading
+  /// separates from the rows under it without a second size.
+  static final TextStyleToken headingSpec = TextStyles.small.derive(
+    name: 'command-group-heading',
+    wght: 500,
+  );
+
+  /// `px-3 py-2` around one `text-sm` line box, floored at
+  /// [TouchTargets.minimum].
+  ///
+  /// TARGET SIZING: the measured 34.5625px reading is below the platform's
+  /// 44px touch-target floor, so the floor is applied to the row's own
+  /// layout height — [_CommandRow] sizes itself to exactly this number
+  /// rather than relying on a grown, invisible hit box.
+  static double get itemHeight => math.max(
+    TextStyles.body.step.leading + space(2) * 2,
+    TouchTargets.minimum,
+  );
+
+  /// [itemHeight], scaled by the ambient [TextScaler] — see
+  /// [Menu.itemHeightOf], the same fix for the same species of bug: a static
+  /// getter over `TextStyles.body.step.leading` never hears the reader's text
+  /// size, so at 200% the row's line box outgrows the fixed height built from
+  /// it. Nothing outside this file multiplies [Command.itemHeight] for
+  /// placement or scroll math — `Command` is inline with no overlay to
+  /// position — so this accessor only has one call site to keep honest: the
+  /// row's own box, below.
+  static double itemHeightOf(BuildContext context) => math.max(
+    MediaQuery.textScalerOf(
+          context,
+        ).scale(StyledText.stepOf(context, TextStyles.body).leading) +
+        space(2) * 2,
+    TouchTargets.minimum,
+  );
 
   /// `px-3 py-2` around one `text-xs` line box — **32px** *(measured)*.
-  static double get headingHeight {
-    final TextStyleToken spec = TextStyles.menuHeading;
-    return (spec.size ?? 0) * (spec.height ?? 1) + space(2) * 2;
-  }
+  static double get headingHeight =>
+      TextStyles.small.step.leading + space(2) * 2;
 
   /// `py-6` around one `text-sm` line box — **66.5625px** *(measured)*.
-  static double get emptyHeight {
-    final TextStyleToken spec = TextStyles.bodyCompact;
-    return (spec.size ?? 0) * (spec.height ?? 1) + space(6) * 2;
-  }
+  static double get emptyHeight => TextStyles.body.step.leading + space(6) * 2;
 
   /// **Items re-sort; groups do not.** The asymmetry is cmdk's, not the port's.
   ///
@@ -1176,14 +1218,14 @@ class _CommandGroupBlock extends StatelessWidget {
           children: <Widget>[
             if (heading != null)
               Padding(
-                // `px-3 py-2` — 32px tall around a 16px line box.
+                // One supporting line box inside the row padding.
                 padding: EdgeInsets.symmetric(
                   horizontal: space(3),
                   vertical: space(2),
                 ),
                 child: StyledText(
                   heading!,
-                  TextStyles.menuHeading,
+                  Command.headingSpec,
                   color: theme.mutedForeground,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -1292,7 +1334,7 @@ class _CommandRow extends StatelessWidget {
             children: <Widget>[
               StyledText(
                 item.label,
-                TextStyles.bodyCompact,
+                TextStyles.body,
                 color: ink,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1301,7 +1343,7 @@ class _CommandRow extends StatelessWidget {
               if (item.subtitle != null)
                 StyledText(
                   item.subtitle!,
-                  TextStyles.caption,
+                  TextStyles.small,
                   color: theme.mutedForeground,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -1314,22 +1356,36 @@ class _CommandRow extends StatelessWidget {
           SizedBox(width: space(2)),
           // `shrink-0 text-muted-foreground`, and muted whether or not the row
           // is selected — the span's own class beats `data-selected:text-*`.
-          StyledText(
-            item.meta!,
-            TextStyles.caption,
-            color: theme.mutedForeground,
-            maxLines: 1,
-            softWrap: false,
+          //
+          // `shrink-0` holds right up until there is genuinely no room: at 200%
+          // text on a phone the label has already ellipsized to nothing and the
+          // trailing pair alone is wider than the row. A last-resort ellipsis
+          // is what the reader wants there, because the alternative is a row
+          // that paints 174px past its own edge and shows the metadata cut in
+          // half by the panel instead of by a glyph that says it was cut.
+          Flexible(
+            child: StyledText(
+              item.meta!,
+              TextStyles.small,
+              color: theme.mutedForeground,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+            ),
           ),
         ],
         if (item.shortcut != null)
           // `ml-auto` — the shortcut is pushed to the trailing edge, which the
-          // Expanded above already does.
-          StyledText(
-            item.shortcut!,
-            TextStyles.menuShortcut,
-            color: meta,
-            maxLines: 1,
+          // Expanded above already does. Flexible for the same last-resort
+          // reason the meta above is.
+          Flexible(
+            child: StyledText(
+              item.shortcut!,
+              TextStyles.small,
+              color: meta,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           )
         else
         // The trailing check, and the whole of drift 13. It is
@@ -1368,6 +1424,28 @@ class _CommandRow extends StatelessWidget {
       fit: StackFit.passthrough,
       children: <Widget>[row],
     );
+
+    // TARGET SIZING: [Command.itemHeight] is floored at
+    // [TouchTargets.minimum], above what the `px-3 py-2` padding alone
+    // produces. Sizing the row itself keeps the selected-row fill, the hit
+    // box and the palette's total height all agreeing on one number; `Row`'s
+    // default cross-axis centring lands the content in the middle of the
+    // taller box for free.
+    //
+    // A row carrying [CommandItem.subtitle] is exempt: its two line boxes
+    // plus `py-2` already total well past the floor on their own (title +
+    // subtitle + 16 of padding), so forcing it down to the one-line floor
+    // would clip the subtitle rather than grow anything — the floor is a
+    // minimum, not a fixed height.
+    if (item.subtitle == null) {
+      // `minHeight`, not a fixed `height` — see [Command.itemHeightOf]. A
+      // tight `SizedBox` clipped the label the instant its line box grew
+      // past the unscaled number, at any text scale over 100%.
+      row = ConstrainedBox(
+        constraints: BoxConstraints(minHeight: Command.itemHeightOf(context)),
+        child: row,
+      );
+    }
 
     row = DefaultTextStyle.merge(
       style: TextStyle(color: ink),
@@ -1418,7 +1496,7 @@ class _CommandEmpty extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: space(6)),
       child: StyledText(
         label,
-        TextStyles.bodyCompact,
+        TextStyles.body,
         color: theme.popoverForeground,
         align: TextAlign.center,
       ),

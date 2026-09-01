@@ -144,15 +144,12 @@ void main() {
       ];
     }
 
-    expect(assetsByFamily, hasLength(3));
+    expect(assetsByFamily, hasLength(2));
     expect(assetsByFamily['InterLocal'], <String>[
       'assets/elattar/fonts/InterVariable.ttf',
     ]);
     expect(assetsByFamily['GeistMono'], <String>[
       'assets/elattar/fonts/GeistMono-Variable.ttf',
-    ]);
-    expect(assetsByFamily['Redaction35'], <String>[
-      'assets/elattar/fonts/Redaction35-Italic.ttf',
     ]);
     for (final List<String> assets in assetsByFamily.values) {
       for (final String asset in assets) {
@@ -165,14 +162,12 @@ void main() {
     }
   });
 
-  test('the italic face keeps its style declaration', () {
-    final YamlMap redaction =
-        _declaredFonts(pubspec()).firstWhere(
-              (Object? entry) => (entry! as YamlMap)['family'] == 'Redaction35',
-            )!
-            as YamlMap;
-    final YamlMap face = (redaction['fonts'] as YamlList).first as YamlMap;
-    expect(face['style'], 'italic');
+  test('only the two shipped faces are declared', () {
+    final List<Object?> declared = _declaredFonts(pubspec());
+    expect(declared.map((Object? e) => (e! as YamlMap)['family']), <String>[
+      'InterLocal',
+      'GeistMono',
+    ]);
   });
 
   test('installed typography carries no package prefix', () {

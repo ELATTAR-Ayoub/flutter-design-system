@@ -281,7 +281,7 @@ class _VoiceDemoState extends State<_VoiceDemo> {
                 padding: EdgeInsets.only(bottom: space(2)),
                 child: StyledText(
                   'Heard',
-                  TextStyles.eyebrow,
+                  TextStyles.small,
                   color: theme.mutedForeground,
                 ),
               ),
@@ -378,7 +378,7 @@ class _OrbCell extends StatelessWidget {
           // uppercases, because a Flutter TextStyle cannot.
           StyledText(
             label.toUpperCase(),
-            TextStyles.eyebrowSmall,
+            TextStyles.small,
             color: theme.mutedForeground,
           ),
         ],

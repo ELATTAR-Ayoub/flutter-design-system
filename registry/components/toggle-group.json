@@ -1,7 +1,7 @@
 {
   "name": "toggle-group",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/toggle-group.tsx` — three mutually exclusive options and one",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/toggle_group.dart",
       "target": "@ui/toggle_group.dart",
-      "sha256": "6816d8946cb051b4a2d80f34552208c679bf256e86cb0595ba3676b13cac439a"
+      "sha256": "988f58db05b1d3c8dbc3cce4f931b4e547a6c58625f58f706cdec14f173ef134"
     }
   ],
   "registryDependencies": [
@@ -28,7 +28,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/toggle-group",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/toggle_group.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/toggle_group.dart",
   "exports": [
     "ToggleGroup",
     "ToggleGroupItem"

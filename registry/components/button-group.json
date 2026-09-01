@@ -1,7 +1,7 @@
 {
   "name": "button-group",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/button-group.tsx` — the segmented control.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/button_group.dart",
       "target": "@ui/button_group.dart",
-      "sha256": "4802b13e894bc1fbf6aceb79450e27fa831d92a784133ebb6b66067bb05a7fde"
+      "sha256": "31a65db18dc9e884dd68e710adb0d730e09b12591c5ac8f9eba696c4c2a960fe"
     }
   ],
   "registryDependencies": [
@@ -24,7 +24,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/button_group",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/button_group.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/button_group.dart",
   "exports": [
     "ButtonGroup",
     "ButtonGroupSeparator",

@@ -185,13 +185,11 @@ const Duration _promiseLatency = Duration(
 /// read off [TextStyles.small]: the one spec that already transcribes that pair —
 /// so the only number written here is the weight.
 ///
-/// It is deliberately **not** `TextStyles.buttonLabel`, which is the same
+/// It is deliberately **not** `TextStyles.nav`, which is the same
 /// 13/500 at `text-sm`'s 1.428571. On a five-toast stack that ratio is 8.4px of
 /// accumulated shortfall, and it is the whole of drift 4's leading column.
-final TextStyleToken _toastMedium = TextStyleToken(
-  family: Fonts.sans,
-  size: TextStyles.small.size,
-  height: TextStyles.small.height,
+final TextStyleToken _toastMedium = TextStyles.small.derive(
+  name: 'toast-title',
   wght: _medium,
 );
 
@@ -1084,15 +1082,42 @@ class _SkeletonSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const Grid(
-            lg: 2,
-            children: <Widget>[
-              Panel(label: 'Pack card skeleton', child: _PackCardSkeleton()),
-              Panel(
+          // Not `Grid`: its multi-cell row wraps in `IntrinsicHeight` to
+          // give both panels one shared height, and `IntrinsicHeight`'s
+          // dry-layout pass disagrees with an animated `Surface` (the
+          // skeleton shimmer is one) about how tall it needs to be — real
+          // layout then wants more room than the dry pass reserved, and the
+          // panel overflows its own frame. Two panels that do not need to
+          // match height exactly is a smaller loss than that.
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              const Widget packCard = Panel(
+                label: 'Pack card skeleton',
+                child: _PackCardSkeleton(),
+              );
+              const Widget pullRow = Panel(
                 label: 'Live pull row skeleton',
                 child: _PullRowSkeletons(),
-              ),
-            ],
+              );
+              if (constraints.maxWidth < Breakpoints.lg) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    packCard,
+                    SizedBox(height: space(4)),
+                    pullRow,
+                  ],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const Expanded(child: packCard),
+                  SizedBox(width: space(4)),
+                  const Expanded(child: pullRow),
+                ],
+              );
+            },
           ),
           SizedBox(height: space(4)),
           Panel(
@@ -1481,11 +1506,24 @@ class _ProgressSection extends StatelessWidget {
                       style: TextStyle(color: theme.actionText),
                       child: Spinner(size: space(6)),
                     ),
-                    const Button(loading: true, child: Text('Opening pack')),
+                    // Only the ellipsis is stated here. [Button] flexes a
+                    // loading label itself now, so a `Flexible` passed as the
+                    // child would be a second one over the same render object
+                    // and the framework rejects that outright.
+                    const Button(
+                      loading: true,
+                      child: Text(
+                        'Opening pack',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     const Button(
                       variant: ButtonVariant.premium,
                       loading: true,
-                      child: Text('Processing deposit'),
+                      child: Text(
+                        'Processing deposit',
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
@@ -1532,22 +1570,32 @@ class _ProgressReading extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
 
+    final Widget readoutText = StyledText(
+      readout,
+      TextStyles.numberSm,
+      color: readoutColor ?? theme.mutedForeground,
+    );
+    final Widget labelText = StyledText(
+      label,
+      TextStyles.small,
+      overflow: TextOverflow.ellipsis,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            StyledText(label, TextStyles.eyebrow),
-            StyledText(
-              readout,
-              TextStyles.numberSm,
-              color: readoutColor ?? theme.mutedForeground,
-            ),
-          ],
+        // RULES asks every bar to keep its figure legible, and some of these
+        // readouts are real numbers ("3,480 / 5,000") that stay wide even
+        // once the label has shrunk to nothing — wide enough, at 200% text,
+        // to still overflow a fixed-threshold two-column split. `Wrap` drops
+        // the readout to its own line whenever it needs to, at whatever
+        // width that turns out to be, instead of guessing one.
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          runSpacing: space(0.5),
+          children: <Widget>[labelText, readoutText],
         ),
         // `mb-2.5`, 10px.
         SizedBox(height: space(2.5)),
@@ -1672,10 +1720,15 @@ class _EmptySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Grid(
-            lg: 2,
-            children: <Widget>[
-              Panel(
+          // Not `Grid`: its multi-cell row wraps in `IntrinsicHeight`, and
+          // at 200% text the dry-layout pass under-measures at least one of
+          // these two panels (`kit.dart`'s own `Grid`/`IntrinsicHeight` +
+          // scaled-text combination — the same family of bug the skeleton
+          // panels above hit, not this page's content). Two panels that do
+          // not share an exact height is a smaller loss than overflowing.
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final Widget firstRun = Panel(
                 // U+2014 in both labels.
                 label: 'Empty Stash — first-time user',
                 child: Empty(
@@ -1704,8 +1757,8 @@ class _EmptySection extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-              Panel(
+              );
+              final Widget narrowFilters = Panel(
                 label: 'No search results — filters too narrow',
                 child: Empty(
                   children: <Widget>[
@@ -1733,8 +1786,26 @@ class _EmptySection extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-            ],
+              );
+              if (constraints.maxWidth < Breakpoints.lg) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    firstRun,
+                    SizedBox(height: space(4)),
+                    narrowFilters,
+                  ],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(child: firstRun),
+                  SizedBox(width: space(4)),
+                  Expanded(child: narrowFilters),
+                ],
+              );
+            },
           ),
           SizedBox(height: space(4)),
           StyledText(

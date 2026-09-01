@@ -414,7 +414,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        StyledText('Vertical, with a live error', TextStyles.section),
+        StyledText('Vertical, with a live error', TextStyles.small),
         SizedBox(height: space(3)),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: Containers.sm),
@@ -445,13 +445,13 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           onPressed: () => setState(() => _emailInvalid = !_emailInvalid),
           child: StyledText(
             _emailInvalid ? 'Clear the error' : 'Show an error',
-            TextStyles.buttonLabel,
+            TextStyles.nav,
           ),
         ),
         SizedBox(height: space(7)),
         StyledText(
           'Horizontal, around a checkbox: tap the box or the words',
-          TextStyles.section,
+          TextStyles.small,
         ),
         SizedBox(height: space(3)),
         ConstrainedBox(
@@ -470,7 +470,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
         SizedBox(height: space(7)),
         StyledText(
           'Disabled: the field wins over the control',
-          TextStyles.section,
+          TextStyles.small,
         ),
         SizedBox(height: space(3)),
         ConstrainedBox(
@@ -489,7 +489,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
         SizedBox(height: space(7)),
         StyledText(
           'Separable: invalid and errors are two different switches',
-          TextStyles.section,
+          TextStyles.small,
         ),
         SizedBox(height: space(3)),
         const _ValidationSpecimen(),
@@ -1174,7 +1174,7 @@ const List<DocsApiFact> _fieldLabelFacts = <DocsApiFact>[
     name: 'spec',
     type: 'TextStyleToken?',
     description:
-        'Overrides TextStyles.fieldLabel. FieldLabel.normal is '
+        'Overrides TextStyles.small. FieldLabel.normal is '
         'the one built-in override — see statics.',
   ),
   DocsApiFact(
@@ -1435,7 +1435,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(label, TextStyles.section, color: theme.actionText),
+          StyledText(label, TextStyles.small, color: theme.actionText),
           SizedBox(height: space(1)),
           StyledText(body, TextStyles.small),
         ],
@@ -1613,8 +1613,8 @@ class _ThemingContent extends StatelessWidget {
       DocsInstallFact(
         label: 'Type specs',
         value:
-            'TextStyles.fieldLabel, TextStyles.small, '
-            'TextStyles.bodySmall',
+            'TextStyles.small, TextStyles.small, '
+            'TextStyles.small',
         description:
             'The label, description, and error each carry their own '
             'fixed type spec: none configurable per instance except '

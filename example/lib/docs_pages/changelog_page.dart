@@ -308,8 +308,12 @@ class _RichBlockState extends State<_RichBlock> {
     }
     _recognizers.clear();
 
-    final double size = widget.base.size ?? TextStyles.body.size!;
-    final TextStyle baseStyle = widget.base.resolve(size, theme.foreground);
+    final TextStyle baseStyle = StyledText.styleOf(
+      context,
+      widget.base,
+      color: theme.foreground,
+    );
+    final double size = baseStyle.fontSize!;
 
     // No `SelectionArea` here: `shell.dart` already wraps the whole docs
     // article in one, so every block is selectable as part of a single
@@ -357,9 +361,11 @@ class _RichBlockState extends State<_RichBlock> {
     if (span.code) {
       return TextSpan(
         text: span.text,
-        style: TextStyles.code.resolveInline(
-          TextStyles.code.size!,
-          theme.foreground,
+        style: StyledText.styleOf(
+          context,
+          TextStyles.code,
+          color: theme.foreground,
+          inline: true,
         ),
       );
     }

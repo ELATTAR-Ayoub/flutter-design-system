@@ -39,16 +39,11 @@ class PlaceholderPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         if (eyebrow != null) ...<Widget>[
-          StyledText(eyebrow!, TextStyles.eyebrow, color: theme.actionText),
+          StyledText(eyebrow!, TextStyles.small, color: theme.actionText),
           // `mt-4`.
           SizedBox(height: space(4)),
         ],
-        StyledText(
-          title,
-          TextStyles.h1,
-          fontSize: Fluid.h1(context),
-          color: theme.foreground,
-        ),
+        StyledText(title, TextStyles.h1, color: theme.foreground),
         SizedBox(height: space(4)),
         StyledText('Not ported yet', TextStyles.small),
       ],

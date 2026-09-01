@@ -1,0 +1,30 @@
+{
+  "name": "bubble",
+  "type": "component",
+  "version": "0.0.2",
+  "description": "`components/ui/bubble.tsx` — the surface a message sits on.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/bubble.dart",
+      "target": "@ui/bubble.dart",
+      "sha256": "f844114186dd41e8c3c347cf9505c9c073654b3b0c5ca332a5c01736d8365128"
+    }
+  ],
+  "registryDependencies": [
+    "press",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "press"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/bubble",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/bubble.dart",
+  "deprecated": false
+}

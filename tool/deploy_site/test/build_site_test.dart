@@ -65,7 +65,10 @@ ELATTAR_SITE_BASE_HREF=/sub/
 
   group('validateOrigin', () {
     test('accepts a bare https origin', () {
-      expect(() => validateOrigin('https://flutter.elattar.dev'), returnsNormally);
+      expect(
+        () => validateOrigin('https://flutter.elattar.dev'),
+        returnsNormally,
+      );
     });
 
     test('rejects an empty value', () {
@@ -100,7 +103,10 @@ ELATTAR_SITE_BASE_HREF=/sub/
     });
 
     test('accepts a subpath', () {
-      expect(() => validateBaseHref('/flutter-design-system/'), returnsNormally);
+      expect(
+        () => validateBaseHref('/flutter-design-system/'),
+        returnsNormally,
+      );
     });
 
     test('rejects a value missing the leading slash', () {
@@ -133,16 +139,21 @@ ELATTAR_SITE_BASE_HREF=/sub/
       expect(config.baseHref, defaultBaseHref);
     });
 
-    test('throws BuildConfigException on a malformed origin rather than building', () {
-      expect(
-        () => SiteBuildConfig.resolve(
-          processEnv: const <String, String>{'ELATTAR_SITE_ORIGIN': 'not a url'},
-          dotEnv: const <String, String>{},
-          registryVersion: '0.0.1',
-        ),
-        throwsA(isA<BuildConfigException>()),
-      );
-    });
+    test(
+      'throws BuildConfigException on a malformed origin rather than building',
+      () {
+        expect(
+          () => SiteBuildConfig.resolve(
+            processEnv: const <String, String>{
+              'ELATTAR_SITE_ORIGIN': 'not a url',
+            },
+            dotEnv: const <String, String>{},
+            registryVersion: '0.0.1',
+          ),
+          throwsA(isA<BuildConfigException>()),
+        );
+      },
+    );
   });
 
   group('extractCliVersion', () {

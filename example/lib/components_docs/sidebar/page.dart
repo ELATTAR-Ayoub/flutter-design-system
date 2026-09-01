@@ -79,8 +79,8 @@ import '../../docs/docs_code.dart' show DocsSelectableCodeBlock;
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
-import '../../kit.dart' show Note, NoteTone, Panel;
 import 'meta.dart';
+import '../../kit.dart';
 
 final ComponentDocSpec sidebarDocSpec = ComponentDocSpec(
   name: 'sidebar',
@@ -1143,7 +1143,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(label, TextStyles.section, color: theme.actionText),
+          StyledText(label, TextStyles.small, color: theme.actionText),
           SizedBox(height: space(1)),
           StyledText(body, TextStyles.small),
         ],
@@ -2243,7 +2243,7 @@ const List<DocsApiFact> _groupFacts = <DocsApiFact>[
     name: 'SidebarGroupLabel(label)',
     type: 'String, positional',
     description:
-        'Required. 32px tall, typed TextStyles.navSm at full strength: '
+        'Required. 32px tall, typed TextStyles.nav at full strength: '
         'dimming it to 70% would measure 2.76:1 against the 4.5:1 it '
         'owes.',
   ),
@@ -2646,7 +2646,7 @@ const List<DocsApiFact> _apiRegionsFacts = <DocsApiFact>[
     name: 'SidebarGroupLabel(label)',
     type: 'String, positional',
     description:
-        'Required. 32px tall, typed TextStyles.navSm at full strength: '
+        'Required. 32px tall, typed TextStyles.nav at full strength: '
         'dimming it to 70% would measure 2.76:1 against the 4.5:1 it '
         'owes.',
   ),

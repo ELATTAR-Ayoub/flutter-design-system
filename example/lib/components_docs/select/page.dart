@@ -490,7 +490,7 @@ class _TogglePill extends StatelessWidget {
       size: ButtonSize.sm,
       label: label,
       onPressed: onPressed,
-      child: StyledText(label, TextStyles.buttonLabel),
+      child: StyledText(label, TextStyles.nav),
     );
   }
 }

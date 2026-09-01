@@ -3,757 +3,524 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Value-for-value transcript of the reference's type + motion tokens.
-///
-/// Source of truth: `design-system/app/globals.css`
-///   * typography tokens  L169–216
-///   * `.type-*` classes  L1018–1292
-///   * motion tokens      L395–432
-///
-/// 1 CSS `rem` = 16px. `tracking` is kept in CSS **em** and multiplied by the
-/// resolved font size only inside [TextStyleToken.resolve].
+/// The public type contract and the motion tokens, asserted against the
+/// foundation rather than against any former implementation.
 
 /// A colour to resolve against; the value is irrelevant to these assertions.
 const Color _ink = Color(0xFF92C2FC);
 
-/// Asserts one `.type-*` class field by field.
-void expectSpec(
-  String css,
-  TextStyleToken spec, {
-  required String family,
-  required double? size,
-  required double? height,
-  required FontWeight? weight,
-  required double? wght,
-  required double? tracking,
-  required bool uppercase,
-  required bool tabular,
-  required TextColorRole defaultColor,
-  FontStyle fontStyle = FontStyle.normal,
-}) {
-  expect(spec.family, family, reason: '$css font-family');
-  expect(spec.size, size, reason: '$css font-size');
-  expect(spec.height, height, reason: '$css line-height');
-  expect(spec.weight, weight, reason: '$css font-weight');
-  expect(
-    spec.variations,
-    wght == null ? isEmpty : <FontVariation>[FontVariation('wght', wght)],
-    reason: '$css wght axis',
-  );
-  expect(spec.tracking, tracking, reason: '$css letter-spacing (em)');
-  expect(spec.uppercase, uppercase, reason: '$css text-transform');
-  expect(spec.tabular, tabular, reason: '$css font-variant-numeric');
-  expect(spec.defaultColor, defaultColor, reason: '$css color');
-  expect(spec.fontStyle, fontStyle, reason: '$css font-style');
+/// One representative width inside each responsive band.
+const double _phone = 390;
+const double _tablet = 834;
+const double _desktop = 1440;
+
+/// The final catalog, role by role: name, group, face, weight, tracking,
+/// tabular figures, and the three steps.
+///
+/// Written out here on purpose. A test that read the sizes back off
+/// `TextStyles` could not fail, and this table is the contract the
+/// documentation, the registry, and every consumer are entitled to.
+final List<_Role> _catalog = <_Role>[
+  _Role(
+    'display',
+    TypeGroup.words,
+    Fonts.sans,
+    600,
+    -0.03,
+    m: (44, 48),
+    t: (52, 56),
+    d: (64, 68),
+  ),
+  _Role(
+    'h1',
+    TypeGroup.words,
+    Fonts.sans,
+    700,
+    -0.02,
+    m: (36, 40),
+    t: (40, 44),
+    d: (48, 52),
+  ),
+  _Role(
+    'h2',
+    TypeGroup.words,
+    Fonts.sans,
+    650,
+    -0.015,
+    m: (30, 36),
+    t: (32, 38),
+    d: (36, 42),
+  ),
+  _Role(
+    'h3',
+    TypeGroup.words,
+    Fonts.sans,
+    600,
+    -0.01,
+    m: (24, 30),
+    t: (26, 32),
+    d: (28, 36),
+  ),
+  _Role(
+    'h4',
+    TypeGroup.words,
+    Fonts.sans,
+    600,
+    null,
+    m: (20, 26),
+    t: (22, 28),
+    d: (24, 30),
+  ),
+  _Role(
+    'lead',
+    TypeGroup.words,
+    Fonts.sans,
+    400,
+    null,
+    m: (18, 28),
+    t: (20, 30),
+    d: (20, 30),
+  ),
+  _Role('body', TypeGroup.words, Fonts.sans, 400, null, m: (16, 24)),
+  _Role('small', TypeGroup.words, Fonts.sans, 400, null, m: (14, 20)),
+  _Role('nav', TypeGroup.words, Fonts.sans, 500, null, m: (16, 20)),
+  _Role('badge', TypeGroup.words, Fonts.sans, 600, null, m: (14, 18)),
+  _Role('code', TypeGroup.code, Fonts.mono, 400, null, m: (14, 20)),
+  _Role('identifier', TypeGroup.code, Fonts.mono, 400, -0.01, m: (16, 24)),
+  _Role(
+    'numberSm',
+    TypeGroup.numerics,
+    Fonts.mono,
+    600,
+    -0.01,
+    m: (14, 18),
+    tabular: true,
+  ),
+  _Role(
+    'numberBase',
+    TypeGroup.numerics,
+    Fonts.mono,
+    600,
+    -0.01,
+    m: (16, 20),
+    tabular: true,
+  ),
+  _Role(
+    'numberMd',
+    TypeGroup.numerics,
+    Fonts.mono,
+    600,
+    -0.01,
+    m: (24, 28),
+    t: (26, 30),
+    d: (28, 32),
+    tabular: true,
+  ),
+  _Role(
+    'numberLg',
+    TypeGroup.numerics,
+    Fonts.mono,
+    600,
+    -0.01,
+    m: (32, 36),
+    t: (36, 40),
+    d: (40, 44),
+    tabular: true,
+  ),
+  _Role(
+    'numberXl',
+    TypeGroup.numerics,
+    Fonts.mono,
+    600,
+    -0.02,
+    m: (40, 44),
+    t: (48, 52),
+    d: (56, 60),
+    tabular: true,
+  ),
+];
+
+/// One expected row of the catalog.
+class _Role {
+  _Role(
+    this.name,
+    this.group,
+    this.family,
+    this.wght,
+    this.tracking, {
+    required (double, double) m,
+    (double, double)? t,
+    (double, double)? d,
+    this.tabular = false,
+  }) : mobile = TypeStep(m.$1, m.$2),
+       tablet = TypeStep((t ?? m).$1, (t ?? m).$2),
+       desktop = TypeStep((d ?? t ?? m).$1, (d ?? t ?? m).$2);
+
+  final String name;
+  final TypeGroup group;
+  final String family;
+  final double wght;
+  final double? tracking;
+  final bool tabular;
+  final TypeStep mobile;
+  final TypeStep tablet;
+  final TypeStep desktop;
 }
+
+/// Names the retired catalog published that must no longer resolve.
+const List<String> _retired = <String>[
+  'navSm',
+  'eyebrow',
+  'section',
+  'chip',
+  'caption',
+  'eyebrowSmall',
+  'tag',
+  'wordmark',
+  'accent',
+  'numberXs',
+  'buttonLabel',
+  'buttonLabelXs',
+  'buttonLabelSm',
+  'buttonLabelLg',
+  'buttonLabelXl',
+  'buttonLabelCaps',
+  'toggleLabel',
+  'buttonGroupText',
+  'buttonGroupNum',
+  'kbdKey',
+  'menuLabel',
+  'menuHeading',
+  'menuShortcut',
+  'navMenuTrigger',
+  'bodyCompact',
+  'bodySmall',
+  'dialogTitle',
+  'overlayTitle',
+  'popoverTitle',
+  'tooltipLabel',
+  'badgeLabel',
+  'sidebarMenuBadge',
+  'avatarFallback',
+  'avatarInitials',
+  'fieldLabel',
+  'textareaBody',
+  'inputNumber',
+  'inputSerial',
+  'bubbleContent',
+  'bubbleReactions',
+  'messageMetadata',
+  'attachmentTitle',
+  'attachmentTitleSmall',
+  'attachmentDescription',
+  'tableHead',
+  'cardTitle',
+  'itemTitle',
+  'itemDescription',
+  'sheetBody',
+  'label',
+  'micro',
+  'serial',
+];
 
 void main() {
   // ─── typography ──────────────────────────────────────────────────────────
 
-  group('Fonts — the three faces (globals.css L169–172)', () {
-    test('families follow the tokens, not the Space Grotesk prose', () {
+  group('Fonts', () {
+    test('the system ships exactly two faces', () {
       expect(Fonts.sans, 'InterLocal');
-      expect(Fonts.heading, 'InterLocal');
       expect(Fonts.mono, 'GeistMono');
-      expect(Fonts.accent, 'Redaction35');
-    });
-
-    test('package name is the asset prefix flutter_tools registers', () {
       expect(Fonts.package, 'elattar_design_system');
     });
   });
 
-  group('TextStyles — fluid sizes (clamp)', () {
-    test(
-      'displaySize is clamp(2.75rem, 4.4vw, 4rem) = clamp(44, 4.4vw, 64)',
-      () {
-        expect(
-          TextStyles.displaySize(1000),
-          44,
-        ); // 4.4vw of 1000 = 44 — the min edge
-        expect(TextStyles.displaySize(700), 44); // 30.8 → floored at 44
-        expect(TextStyles.displaySize(1280), closeTo(56.32, 1e-9));
-        expect(TextStyles.displaySize(1440), closeTo(63.36, 1e-9));
-        expect(
-          TextStyles.displaySize(1600),
-          64,
-        ); // 70.4 → clamped at the 64 max
-        expect(TextStyles.displaySize(2560), 64);
-      },
-    );
-
-    test('h1Size is clamp(2rem, 2.8vw, 2.5rem) = clamp(32, 2.8vw, 40)', () {
-      expect(TextStyles.h1Size(1440), 40); // 40.32 → clamped at the 40 max
-      expect(TextStyles.h1Size(1000), 32); // 28 → floored at 32
-      expect(TextStyles.h1Size(1280), closeTo(35.84, 1e-9));
-      expect(TextStyles.h1Size(1200), closeTo(33.6, 1e-9));
+  group('TextStyles.all — the public catalog', () {
+    test('holds seventeen roles, once each, in catalog order', () {
+      expect(TextStyles.all, hasLength(17));
+      expect(
+        TextStyles.all.map((TextStyleToken r) => r.name).toList(),
+        _catalog.map((_Role r) => r.name).toList(),
+      );
+      expect(
+        TextStyles.all.map((TextStyleToken r) => r.name).toSet(),
+        hasLength(17),
+      );
     });
 
-    test('accentSize is 1.055em — it rides the size it is set inside', () {
-      expect(TextStyles.accentSize(64), closeTo(67.52, 1e-9));
+    test('groups are ten Words, two Code and identifiers, five Numerics', () {
+      expect(TextStyles.wordRoles, hasLength(10));
+      expect(TextStyles.codeRoles, hasLength(2));
+      expect(TextStyles.numericRoles, hasLength(5));
+      // The catalog is the three sets, in order, and nothing else.
+      expect(TextStyles.all, <TextStyleToken>[
+        ...TextStyles.wordRoles,
+        ...TextStyles.codeRoles,
+        ...TextStyles.numericRoles,
+      ]);
+      // Each set holds only its own group, so a role cannot be filed twice.
+      for (final TextStyleToken r in TextStyles.wordRoles) {
+        expect(r.group, TypeGroup.words, reason: r.name);
+      }
+      for (final TextStyleToken r in TextStyles.codeRoles) {
+        expect(r.group, TypeGroup.code, reason: r.name);
+      }
+      for (final TextStyleToken r in TextStyles.numericRoles) {
+        expect(r.group, TypeGroup.numerics, reason: r.name);
+      }
       expect(
-        TextStyles.accentSize(TextStyles.displaySize(1000)),
-        closeTo(46.42, 1e-9),
+        TextStyles.all.map((TextStyleToken r) => r.group).toList(),
+        <TypeGroup>[
+          ...List<TypeGroup>.filled(10, TypeGroup.words),
+          ...List<TypeGroup>.filled(2, TypeGroup.code),
+          ...List<TypeGroup>.filled(5, TypeGroup.numerics),
+        ],
       );
+    });
+
+    test('group labels are the published headings', () {
+      expect(TypeGroup.words.label, 'Words');
+      expect(TypeGroup.code.label, 'Code and identifiers');
+      expect(TypeGroup.numerics.label, 'Numerics');
+    });
+
+    test('no retired role survives in the catalog', () {
+      final Set<String> live = TextStyles.all
+          .map((TextStyleToken r) => r.name)
+          .toSet();
+      for (final String gone in _retired) {
+        expect(live, isNot(contains(gone)), reason: '$gone must be retired');
+      }
     });
   });
 
-  group(
-    'TextStyles — every .type-* class, value for value (globals.css §5)',
-    () {
-      test(
-        '.type-display — heading face, clamp 44–64/1, 500, -0.03em (L1019)',
-        () {
-          expectSpec(
-            '.type-display',
-            TextStyles.display,
-            family: 'InterLocal',
-            size: null, // clamp() — resolved from the viewport
-            height: 1,
-            weight: FontWeight.w500,
-            wght: 500,
-            tracking: -0.03,
-            uppercase: false,
-            tabular: false,
-            defaultColor: TextColorRole.none,
-          );
-        },
-      );
-
-      test(
-        '.type-accent — Redaction 35, 1.055em italic, 400, -0.03em (L1046)',
-        () {
-          expectSpec(
-            '.type-accent',
-            TextStyles.accent,
-            family: 'Redaction35',
-            size: null, // 1.055em — relative to the inherited size
-            height: null, // no line-height declared: inherits
-            weight: FontWeight.w400,
-            wght: 400,
-            tracking: -0.03,
-            uppercase: false,
-            tabular: false,
-            defaultColor: TextColorRole.none,
-            fontStyle: FontStyle.italic,
-          );
-        },
-      );
-
-      test('.type-h1 — clamp 32–40/1.1, 700, -0.02em (L1070)', () {
-        expectSpec(
-          '.type-h1',
-          TextStyles.h1,
-          family: 'InterLocal',
-          size: null, // clamp()
-          height: 1.1,
-          weight: FontWeight.w700,
-          wght: 700,
-          tracking: -0.02,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
+  group('every role, field by field', () {
+    for (final _Role expected in _catalog) {
+      test(expected.name, () {
+        final TextStyleToken role = TextStyles.all.firstWhere(
+          (TextStyleToken r) => r.name == expected.name,
         );
+        expect(role.group, expected.group, reason: 'group');
+        expect(role.family, expected.family, reason: 'face');
+        expect(role.wght, expected.wght, reason: 'weight axis');
+        expect(role.tracking, expected.tracking, reason: 'tracking (em)');
+        expect(role.tabular, expected.tabular, reason: 'tabular figures');
+        expect(role.fontStyle, FontStyle.normal, reason: 'no role is italic');
+        expect(role.mobile, expected.mobile, reason: 'mobile step');
+        expect(role.tablet, expected.tablet, reason: 'tablet step');
+        expect(role.desktop, expected.desktop, reason: 'desktop step');
       });
+    }
+  });
 
-      test('.type-h2 — 28/1.2, weight 650 via wght axis, -0.015em (L1077)', () {
-        expectSpec(
-          '.type-h2',
-          TextStyles.h2,
-          family: 'InterLocal',
-          size: 28, // 1.75rem
-          height: 1.2,
-          weight:
-              FontWeight.w600, // non-variable fallback; 650 has no FontWeight
-          wght: 650,
-          tracking: -0.015,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-h2 renders wght 650 through variations, not weight', () {
-        expect(TextStyles.h2.variations, hasLength(1));
-        expect(TextStyles.h2.variations.single.axis, 'wght');
-        expect(TextStyles.h2.variations.single.value, 650);
-        // resolve() adds the browser's `font-optical-sizing: auto`: opsz = the
-        // CSS px size, clamped to Inter's 14–32 axis range.
-        expect(TextStyles.h2.resolve(28, _ink).fontVariations, <FontVariation>[
-          FontVariation('wght', 650),
-          FontVariation('opsz', 28),
-        ]);
-      });
-
-      test('optical sizing mirrors the browser: sans only, clamped 14–32', () {
-        // 13px body-adjacent text → opsz 14 (clamped up from 13).
+  group('responsive resolution', () {
+    test('steps switch exactly at the 768 and 1024 boundaries', () {
+      for (final TextStyleToken role in TextStyles.all) {
+        expect(role.stepFor(767), role.mobile, reason: '${role.name} at 767');
+        expect(role.stepFor(768), role.tablet, reason: '${role.name} at 768');
+        expect(role.stepFor(1023), role.tablet, reason: '${role.name} at 1023');
         expect(
-          TextStyles.small.resolve(13, _ink).fontVariations,
-          contains(const FontVariation('opsz', 14)),
+          role.stepFor(1024),
+          role.desktop,
+          reason: '${role.name} at 1024',
         );
-        // 40px h1 → opsz 32 (clamped down from 40).
-        expect(
-          TextStyles.h1.resolve(40, _ink).fontVariations,
-          contains(const FontVariation('opsz', 32)),
-        );
-        // 17px lead → opsz tracks the size exactly inside the range.
-        expect(
-          TextStyles.lead.resolve(17, _ink).fontVariations,
-          contains(const FontVariation('opsz', 17)),
-        );
-        // Geist Mono has no opsz axis — mono classes must not carry one.
-        final List<FontVariation>? mono = TextStyles.numberSm
-            .resolve(12, _ink)
-            .fontVariations;
-        expect(mono!.where((FontVariation v) => v.axis == 'opsz'), isEmpty);
-      });
-
-      test('.type-h3 — 21/1.3, 600, -0.01em (L1084)', () {
-        expectSpec(
-          '.type-h3',
-          TextStyles.h3,
-          family: 'InterLocal',
-          size: 21, // 1.3125rem
-          height: 1.3,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: -0.01,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-h4 — 17/1.4, 600, no tracking (L1091)', () {
-        expectSpec(
-          '.type-h4',
-          TextStyles.h4,
-          family: 'InterLocal',
-          size: 17, // 1.0625rem
-          height: 1.4,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: null,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-lead — 17/1.65, 400, muted-foreground (L1099)', () {
-        expectSpec(
-          '.type-lead',
-          TextStyles.lead,
-          family: 'InterLocal',
-          size: 17, // 1.0625rem
-          height: 1.65,
-          weight: FontWeight.w400,
-          wght: 400,
-          tracking: null,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.muted,
-        );
-      });
-
-      test('.type-body — 15/1.6, 400 (L1105)', () {
-        expectSpec(
-          '.type-body',
-          TextStyles.body,
-          family: 'InterLocal',
-          size: 15, // --text-body
-          height: 1.6,
-          weight: FontWeight.w400,
-          wght: 400,
-          tracking: null,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-small — 13/1.5, 400, muted-foreground (L1120)', () {
-        expectSpec(
-          '.type-small',
-          TextStyles.small,
-          family: 'InterLocal',
-          size: 13, // --text-small
-          height: 1.5,
-          weight: FontWeight.w400,
-          wght: 400,
-          tracking: null,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.muted,
-        );
-      });
-
-      test('.type-nav — 13.5/1.2, 500 (L1128)', () {
-        expectSpec(
-          '.type-nav',
-          TextStyles.nav,
-          family: 'InterLocal',
-          size: 13.5, // --text-nav
-          height: 1.2,
-          weight: FontWeight.w500,
-          wght: 500,
-          tracking: null,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-nav-sm — 11.5/1.2, 500 (L1139)', () {
-        expectSpec(
-          '.type-nav-sm',
-          TextStyles.navSm,
-          family: 'InterLocal',
-          size: 11.5, // --text-chip
-          height: 1.2,
-          weight: FontWeight.w500,
-          wght: 500,
-          tracking: null,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-chip — 11.5/1.2, 500 (L1145)', () {
-        expectSpec(
-          '.type-chip',
-          TextStyles.chip,
-          family: 'InterLocal',
-          size: 11.5, // --text-chip
-          height: 1.2,
-          weight: FontWeight.w500,
-          wght: 500,
-          tracking: null,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-caption — 10.5/1.35, 500 (L1151)', () {
-        expectSpec(
-          '.type-caption',
-          TextStyles.caption,
-          family: 'InterLocal',
-          size: 10.5, // --text-micro
-          height: 1.35,
-          weight: FontWeight.w500,
-          wght: 500,
-          tracking: null,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-code — mono 12.5/1.4, NO font-weight declared (L1157)', () {
-        expectSpec(
-          '.type-code',
-          TextStyles.code,
-          family: 'GeistMono',
-          size: 12.5, // --text-code
-          height: 1.4,
-          weight: null, // inherits — globals.css declares none
-          wght: null,
-          tracking: null,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test(
-        '.type-label — 11/1, 600 uppercase 0.16em muted-foreground (L1164)',
-        () {
-          expect(TextStyles.eyebrow.uppercase, isTrue);
-          expect(TextStyles.eyebrow.size, 11);
-          expect(TextStyles.eyebrow.tracking, 0.16);
-          expectSpec(
-            '.type-label',
-            TextStyles.eyebrow,
-            family: 'InterLocal',
-            size: 11, // --text-label
-            height: 1,
-            weight: FontWeight.w600,
-            wght: 600,
-            tracking: 0.16, // --tracking-label
-            uppercase: true,
-            tabular: false,
-            defaultColor: TextColorRole.muted,
-          );
-        },
-      );
-
-      test('.type-section — 13/1.4, 600, muted-foreground (L1192)', () {
-        expectSpec(
-          '.type-section',
-          TextStyles.section,
-          family: 'InterLocal',
-          size: 13, // --text-small
-          height: 1.4,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: null,
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.muted,
-        );
-      });
-
-      test('.type-wordmark — 15/1, 700, -0.01em (L1201)', () {
-        expectSpec(
-          '.type-wordmark',
-          TextStyles.wordmark,
-          family: 'InterLocal',
-          size: 15, // --text-body
-          height: 1,
-          weight: FontWeight.w700,
-          wght: 700,
-          tracking: -0.01, // --tracking-num
-          uppercase: false,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test(
-        '.type-serial — mono 15/1.4 uppercase -0.01em, NO weight (L1211)',
-        () {
-          expectSpec(
-            '.type-serial',
-            TextStyles.identifier,
-            family: 'GeistMono',
-            size: 15, // --text-body
-            height: 1.4,
-            weight: null, // inherits — globals.css declares none
-            wght: null,
-            tracking: -0.01, // --tracking-num
-            uppercase: true,
-            tabular: false, // .type-serial is NOT part of the numeric rule
-            defaultColor: TextColorRole.none,
-          );
-        },
-      );
-
-      test('.type-micro — 10.5/1, 600 uppercase 0.18em muted (L1218)', () {
-        expectSpec(
-          '.type-micro',
-          TextStyles.eyebrowSmall,
-          family: 'InterLocal',
-          size: 10.5, // --text-micro
-          height: 1,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: 0.18, // --tracking-micro
-          uppercase: true,
-          tabular: false,
-          defaultColor: TextColorRole.muted,
-        );
-      });
-
-      test('.type-tag — 10/1, 600 uppercase 0.12em (L1238)', () {
-        expectSpec(
-          '.type-tag',
-          TextStyles.tag,
-          family: 'InterLocal',
-          size: 10, // --text-tag
-          height: 1,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: 0.12, // --tracking-tag
-          uppercase: true,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-badge — 11/1, 600 uppercase 0.14em (L1246)', () {
-        expectSpec(
-          '.type-badge',
-          TextStyles.badge,
-          family: 'InterLocal',
-          size: 11, // --text-label
-          height: 1,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: 0.14, // --tracking-badge
-          uppercase: true,
-          tabular: false,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-num-xs — mono 11/1.2, 600 tabular -0.01em (L1267)', () {
-        expectSpec(
-          '.type-num-xs',
-          TextStyles.numberXs,
-          family: 'GeistMono',
-          size: 11, // --text-label
-          height: 1.2,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: -0.01, // --tracking-num, from the shared rule L1256–1266
-          uppercase: false,
-          tabular: true,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-num-sm — mono 12/1.2, 600 tabular -0.01em (L1271)', () {
-        expect(TextStyles.numberSm.family, Fonts.mono);
-        expect(TextStyles.numberSm.size, 12);
-        expect(TextStyles.numberSm.height, 1.2);
-        expect(TextStyles.numberSm.weight, FontWeight.w600);
-        expect(TextStyles.numberSm.tabular, isTrue);
-        expect(TextStyles.numberSm.tracking, -0.01);
-        expectSpec(
-          '.type-num-sm',
-          TextStyles.numberSm,
-          family: 'GeistMono',
-          size: 12, // --text-num-sm
-          height: 1.2,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: -0.01,
-          uppercase: false,
-          tabular: true,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-num — mono 15/1.2, 600 tabular -0.01em (L1275)', () {
-        expectSpec(
-          '.type-num',
-          TextStyles.numberBase,
-          family: 'GeistMono',
-          size: 15, // --text-body
-          height: 1.2,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: -0.01,
-          uppercase: false,
-          tabular: true,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-num-md — mono 20/1.15, 600 tabular -0.01em (L1279)', () {
-        expectSpec(
-          '.type-num-md',
-          TextStyles.numberMd,
-          family: 'GeistMono',
-          size: 20, // 1.25rem
-          height: 1.15,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: -0.01,
-          uppercase: false,
-          tabular: true,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-num-lg — mono 28/1.05, 600 tabular -0.01em (L1283)', () {
-        expectSpec(
-          '.type-num-lg',
-          TextStyles.numberLg,
-          family: 'GeistMono',
-          size: 28, // 1.75rem
-          height: 1.05,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: -0.01,
-          uppercase: false,
-          tabular: true,
-          defaultColor: TextColorRole.none,
-        );
-      });
-
-      test('.type-num-xl — mono 40/1, 600 tabular, tracking overridden to '
-          '-0.025em (L1287)', () {
-        expectSpec(
-          '.type-num-xl',
-          TextStyles.numberXl,
-          family: 'GeistMono',
-          size: 40, // 2.5rem
-          height: 1,
-          weight: FontWeight.w600,
-          wght: 600,
-          tracking: -0.025, // the one numeric that leaves --tracking-num
-          uppercase: false,
-          tabular: true,
-          defaultColor: TextColorRole.none,
-        );
-      });
-    },
-  );
-
-  group('TextStyles — cross-class invariants', () {
-    test('exactly five classes set their own colour, all muted-foreground', () {
-      final List<TextStyleToken> muted = <TextStyleToken>[
-        TextStyles.lead,
-        TextStyles.small,
-        TextStyles.eyebrow,
-        TextStyles.eyebrowSmall,
-        TextStyles.section,
-      ];
-      for (final TextStyleToken spec in muted) {
-        expect(spec.defaultColor, TextColorRole.muted);
-      }
-      expect(
-        TextStyles.all.where(
-          (TextStyleToken s) => s.defaultColor != TextColorRole.none,
-        ),
-        hasLength(5),
-      );
-    });
-
-    test(
-      'exactly five classes uppercase: label, serial, micro, tag, badge',
-      () {
-        expect(
-          TextStyles.all.where((TextStyleToken s) => s.uppercase),
-          hasLength(5),
-        );
-        for (final TextStyleToken spec in <TextStyleToken>[
-          TextStyles.eyebrow,
-          TextStyles.identifier,
-          TextStyles.eyebrowSmall,
-          TextStyles.tag,
-          TextStyles.badge,
-        ]) {
-          expect(spec.uppercase, isTrue);
-        }
-      },
-    );
-
-    test('exactly the six .type-num-* classes are tabular, all mono', () {
-      final Iterable<TextStyleToken> tabular = TextStyles.all.where(
-        (TextStyleToken s) => s.tabular,
-      );
-      expect(tabular, hasLength(6));
-      for (final TextStyleToken spec in tabular) {
-        expect(spec.family, Fonts.mono);
-        expect(spec.weight, FontWeight.w600);
+        expect(role.stepFor(0), role.mobile, reason: '${role.name} at 0');
       }
     });
 
-    test('the mono face carries the numerics, code and serials only', () {
+    test('the responsive roles are the headings and the large metrics', () {
       expect(
-        TextStyles.all.where((TextStyleToken s) => s.family == Fonts.mono),
-        hasLength(8),
-      ); // 6 numerics + code + serial
+        TextStyles.all
+            .where((TextStyleToken r) => !r.isStatic)
+            .map((TextStyleToken r) => r.name)
+            .toList(),
+        <String>[
+          'display',
+          'h1',
+          'h2',
+          'h3',
+          'h4',
+          'lead',
+          'numberMd',
+          'numberLg',
+          'numberXl',
+        ],
+      );
     });
 
-    test('.type-accent is the only class off the two foundation faces', () {
-      expect(
-        TextStyles.all.where((TextStyleToken s) => s.family == Fonts.accent),
-        <TextStyleToken>[TextStyles.accent],
-      );
-      expect(
-        TextStyles.all.where(
-          (TextStyleToken s) => s.fontStyle == FontStyle.italic,
-        ),
-        <TextStyleToken>[TextStyles.accent],
-      );
+    test('reading and interface roles are stable across every width', () {
+      for (final String name in <String>[
+        'body',
+        'small',
+        'nav',
+        'badge',
+        'code',
+        'identifier',
+        'numberSm',
+        'numberBase',
+      ]) {
+        final TextStyleToken role = TextStyles.all.firstWhere(
+          (TextStyleToken r) => r.name == name,
+        );
+        expect(role.isStatic, isTrue, reason: name);
+        expect(role.step, role.mobile, reason: name);
+      }
     });
 
-    test('all 27 classes are registered', () {
-      expect(TextStyles.all, hasLength(27));
+    test('asking a responsive role for a single step is an error', () {
+      expect(() => TextStyles.display.step, throwsA(isA<AssertionError>()));
     });
   });
 
-  group('TextStyleToken.resolve', () {
-    test('prefixes the family with the package so call sites never do', () {
-      final TextStyle style = TextStyles.numberSm.resolve(12, _ink);
-      expect(style.fontFamily, 'packages/elattar_design_system/GeistMono');
-    });
-
-    test(
-      'converts em tracking to px letterSpacing against the resolved size',
-      () {
-        expect(
-          TextStyles.numberSm.resolve(12, _ink).letterSpacing,
-          closeTo(-0.12, 1e-9),
-        ); // -0.01em × 12
-        expect(
-          TextStyles.eyebrow.resolve(11, _ink).letterSpacing,
-          closeTo(1.76, 1e-9),
-        ); // 0.16em × 11
-        expect(
-          TextStyles.display.resolve(64, _ink).letterSpacing,
-          closeTo(-1.92, 1e-9),
-        ); // -0.03em × 64
-        expect(
-          TextStyles.numberXl.resolve(40, _ink).letterSpacing,
-          closeTo(-1, 1e-9),
-        ); // -0.025em × 40
-      },
-    );
-
-    test('a class with no letter-spacing resolves to none', () {
-      expect(TextStyles.body.resolve(15, _ink).letterSpacing, isNull);
-      expect(TextStyles.h4.resolve(17, _ink).letterSpacing, isNull);
-    });
-
-    test('a tabular class carries FontFeature.tabularFigures()', () {
-      final TextStyle style = TextStyles.numberBase.resolve(15, _ink);
-      expect(style.fontFeatures, contains(const FontFeature.tabularFigures()));
-      expect(
-        TextStyles.body.resolve(15, _ink).fontFeatures,
-        anyOf(isNull, isEmpty),
-      );
-    });
-
-    test('carries size, height, weight, style and colour through', () {
-      final TextStyle style = TextStyles.lead.resolve(17, _ink);
-      expect(style.fontSize, 17);
-      expect(style.height, 1.65);
-      expect(style.fontWeight, FontWeight.w400);
-      expect(style.fontStyle, FontStyle.normal);
+  group('resolveWidth', () {
+    test('carries size, the leading as a ratio, face, and ink', () {
+      final TextStyle style = TextStyles.h2.resolveWidth(_desktop, _ink);
+      expect(style.fontSize, 36);
+      expect(style.height, 42 / 36);
       expect(style.color, _ink);
-
-      final TextStyle accent = TextStyles.accent.resolve(67.52, _ink);
-      expect(accent.fontStyle, FontStyle.italic);
-      expect(accent.height, isNull); // no line-height declared
+      expect(style.fontFamily, contains(Fonts.sans));
+      expect(style.leadingDistribution, TextLeadingDistribution.even);
     });
 
-    test('an inherited font-weight stays unset', () {
-      expect(TextStyles.code.resolve(12.5, _ink).fontWeight, isNull);
+    test('the same role resolves smaller on a phone', () {
+      expect(TextStyles.h2.resolveWidth(_phone, _ink).fontSize, 30);
+      expect(TextStyles.h2.resolveWidth(_tablet, _ink).fontSize, 32);
+    });
+
+    test('tracking is em converted against the resolved size', () {
       expect(
-        TextStyles.code.resolve(12.5, _ink).fontVariations,
-        anyOf(isNull, isEmpty),
+        TextStyles.display.resolveWidth(_phone, _ink).letterSpacing,
+        closeTo(-0.03 * 44, 1e-9),
       );
-      expect(TextStyles.identifier.resolve(15, _ink).fontWeight, isNull);
-    });
-
-    test('an explicit size overrides a fixed-size class', () {
-      expect(TextStyles.body.size, 15);
-      final TextStyle style = TextStyles.body.resolve(24, _ink);
-      expect(style.fontSize, 24);
-      expect(TextStyles.h2.resolve(24, _ink).fontSize, 24);
-    });
-
-    test('uppercase is a flag only — resolve applies no transform', () {
-      expect(TextStyles.eyebrow.uppercase, isTrue);
       expect(
-        TextStyles.eyebrow.resolve(11, _ink).fontFeatures,
-        anyOf(isNull, isEmpty),
+        TextStyles.display.resolveWidth(_desktop, _ink).letterSpacing,
+        closeTo(-0.03 * 64, 1e-9),
       );
     });
 
-    test('the fluid classes resolve at whatever the viewport hands them', () {
+    test('a role with no tracking sets none', () {
+      expect(TextStyles.body.resolveWidth(_phone, _ink).letterSpacing, isNull);
+    });
+
+    test('every numeric role asks for tabular figures; no word role does', () {
+      for (final TextStyleToken role in TextStyles.all) {
+        final TextStyle style = role.resolveWidth(_desktop, _ink);
+        expect(
+          style.fontFeatures,
+          role.group == TypeGroup.numerics
+              ? const <FontFeature>[FontFeature.tabularFigures()]
+              : isNull,
+          reason: role.name,
+        );
+      }
+    });
+
+    test('the weight reaches both the axis and the static fallback', () {
+      final TextStyle h2 = TextStyles.h2.resolveWidth(_desktop, _ink);
+      expect(h2.fontVariations, contains(const FontVariation('wght', 650)));
+      expect(h2.fontWeight, FontWeight.w600);
       expect(
-        TextStyles.display.resolve(TextStyles.displaySize(1440), _ink).fontSize,
-        closeTo(63.36, 1e-9),
+        TextStyles.h1.resolveWidth(_desktop, _ink).fontWeight,
+        FontWeight.w700,
       );
-      expect(TextStyles.h1.resolve(TextStyles.h1Size(1440), _ink).fontSize, 40);
+    });
+
+    test('Inter carries an optical size clamped to its axis', () {
+      expect(
+        TextStyles.small.resolveWidth(_phone, _ink).fontVariations,
+        contains(const FontVariation('opsz', 14)),
+      );
+      expect(
+        TextStyles.display.resolveWidth(_desktop, _ink).fontVariations,
+        contains(const FontVariation('opsz', 32)),
+      );
+      expect(
+        TextStyles.code
+            .resolveWidth(_desktop, _ink)
+            .fontVariations!
+            .map((FontVariation v) => v.axis),
+        isNot(contains('opsz')),
+      );
+    });
+
+    test('an explicit size keeps the step leading ratio', () {
+      final TextStyle style = TextStyles.body.resolveWidth(
+        _phone,
+        _ink,
+        fontSize: 32,
+      );
+      expect(style.fontSize, 32);
+      expect(style.height, 24 / 16);
+    });
+
+    test('inline drops the line height and stands outside inheritance', () {
+      final TextStyle style = TextStyles.code.resolveInline(_desktop, _ink);
+      expect(style.height, isNull);
+      expect(style.inherit, isFalse);
+      expect(style.fontSize, 14);
+    });
+  });
+
+  group('no role owns ink', () {
+    test('a role only ever paints the colour it is handed', () {
+      const Color other = Color(0xFF010203);
+      for (final TextStyleToken role in TextStyles.all) {
+        expect(
+          role.resolveWidth(_desktop, _ink).color,
+          _ink,
+          reason: role.name,
+        );
+        expect(
+          role.resolveWidth(_desktop, other).color,
+          other,
+          reason: role.name,
+        );
+      }
+    });
+  });
+
+  group('derive — component anatomy', () {
+    test('keeps every step and changes only what it is asked to', () {
+      final TextStyleToken label = TextStyles.body.derive(
+        name: 'button-label',
+        wght: 500,
+      );
+      expect(label.name, 'button-label');
+      expect(label.mobile, TextStyles.body.mobile);
+      expect(label.tablet, TextStyles.body.tablet);
+      expect(label.desktop, TextStyles.body.desktop);
+      expect(label.family, TextStyles.body.family);
+      expect(label.wght, 500);
+      expect(label.weight, FontWeight.w500);
+      expect(TextStyles.body.wght, 400, reason: 'the role is not mutated');
+    });
+
+    test('a derived role is not in the public catalog', () {
+      final TextStyleToken derived = TextStyles.small.derive(wght: 700);
+      expect(TextStyles.all, isNot(contains(derived)));
+      expect(TextStyles.all, hasLength(17));
+    });
+
+    test('can slant for rendered emphasis', () {
+      final TextStyleToken em = TextStyles.body.derive(
+        fontStyle: FontStyle.italic,
+      );
+      expect(em.resolveWidth(_phone, _ink).fontStyle, FontStyle.italic);
+      expect(
+        TextStyles.body.resolveWidth(_phone, _ink).fontStyle,
+        FontStyle.normal,
+      );
+    });
+  });
+
+  group('TypeStep', () {
+    test('reports its leading as a ratio', () {
+      expect(const TypeStep(16, 24).ratio, 1.5);
+      expect(const TypeStep(44, 48).ratio, closeTo(48 / 44, 1e-12));
+    });
+
+    test('compares by value', () {
+      expect(const TypeStep(16, 24), const TypeStep(16, 24));
+      expect(const TypeStep(16, 24), isNot(const TypeStep(16, 20)));
     });
   });
 

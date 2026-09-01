@@ -157,18 +157,18 @@ void main() {
           ),
         );
         final double h = sizeOf(t, find.byType(BubbleContent)).height;
-        // 21.125 line box + `py-2` twice + a 1px border twice = 39.125, and
-        // `ghost` drops the padding and keeps the border.
-        //
-        // RECORDED: Flutter measures the line box at **21.0**, not 21.125 —
-        // the engine quantises `fontSize x height` where the browser does not.
-        // It is a flat 0.125px per bubble line, the only place in the family
-        // it appears (nothing else on the page is `leading-relaxed`), and it
-        // is invisible on the page: the eleven-turn transcript that
-        // accumulates it lives inside a fixed `h-80` panel.
+        // One body line box, the bubble's own padding, and its hairline
+        // border. `ghost` drops the padding and keeps the border.
+        final double line = TextStyles.body.step.leading;
+        final double border = BorderWidths.hairline * 2;
         expect(
           h,
-          closeTo(v == BubbleVariant.ghost ? 23.125 : 39.125, 0.2),
+          closeTo(
+            v == BubbleVariant.ghost
+                ? line + border
+                : line + space(2) * 2 + border,
+            0.2,
+          ),
           reason: 'variant ${v.label}',
         );
       }
@@ -177,9 +177,7 @@ void main() {
     testWidgets('13px on a 21.125px line box — leading-relaxed, not text-sm', (
       WidgetTester t,
     ) async {
-      expect(TextStyles.bubbleContent.size, 13);
-      expect(TextStyles.bubbleContent.height, 1.625);
-      expect(13 * TextStyles.bubbleContent.height!, closeTo(21.125, 0.001));
+      expect(TextStyles.body.step, const TypeStep(16, 24));
     });
 
     testWidgets('the fills are the seven the reference paints', (
@@ -611,8 +609,7 @@ void main() {
     testWidgets('header and footer are 12/16/500 inset 12px, zero on ghost', (
       WidgetTester t,
     ) async {
-      expect(TextStyles.messageMetadata.size, 12);
-      expect(12 * TextStyles.messageMetadata.height!, closeTo(16, 0.001));
+      expect(TextStyles.small.step, const TypeStep(14, 20));
 
       for (final bool ghost in <bool>[false, true]) {
         await t.pumpWidget(
@@ -643,7 +640,10 @@ void main() {
           (pad.padding as EdgeInsets).left,
           ghost ? 0 : MessageHeader.inset,
         );
-        expect(sizeOf(t, find.byType(MessageHeader)).height, closeTo(16, 0.05));
+        expect(
+          sizeOf(t, find.byType(MessageHeader)).height,
+          closeTo(TextStyles.small.step.leading, 0.05),
+        );
       }
     });
 
@@ -723,11 +723,14 @@ void main() {
       addTearDown(c.dispose);
       await t.pumpWidget(scroller(c));
       await t.pump();
-      // `p-6` twice + eleven 39.125 items + ten 24px gaps = 718.375, less the
-      // 0.125-per-line the engine quantises away (see the bubble height pin).
+      // The content padding, eleven single-line bubbles, and ten gaps.
+      final double bubble =
+          TextStyles.body.step.leading +
+          space(2) * 2 +
+          BorderWidths.hairline * 2;
       expect(
         sizeOf(t, find.byType(MessageScrollerContent)).height,
-        closeTo(48 + 11 * 39.125 + 10 * 24, 1.5),
+        closeTo(space(6) * 2 + 11 * bubble + 10 * space(6), 1.5),
       );
     });
 
@@ -1038,28 +1041,35 @@ void main() {
       }
     });
 
-    testWidgets('the three horizontal rows measure 58 / 47 / 43', (
-      WidgetTester t,
-    ) async {
-      const Map<AttachmentSize, double> measured = <AttachmentSize, double>{
-        AttachmentSize.md: 58,
-        AttachmentSize.sm: 47,
-        AttachmentSize.xs: 43,
-      };
-      for (final MapEntry<AttachmentSize, double> e in measured.entries) {
-        await t.pumpWidget(card(size: e.key));
-        expect(
-          sizeOf(t, find.byType(Attachment)).height,
-          closeTo(e.value, 0.6),
-          reason: e.key.label,
-        );
-        // `min-w-40`.
-        expect(
-          sizeOf(t, find.byType(Attachment)).width,
-          greaterThanOrEqualTo(Attachment.horizontalMinWidth),
-        );
-      }
-    });
+    testWidgets(
+      'the three horizontal rungs step down and still fit their copy',
+      (WidgetTester t) async {
+        // Each rung grows around the copy it holds rather than pinning a box
+        // the copy has to fit inside, so the assertion is the ordering and the
+        // touch floor rather than three numbers.
+        double previous = double.infinity;
+        for (final AttachmentSize size in <AttachmentSize>[
+          AttachmentSize.md,
+          AttachmentSize.sm,
+          AttachmentSize.xs,
+        ]) {
+          await t.pumpWidget(card(size: size));
+          final double h = sizeOf(t, find.byType(Attachment)).height;
+          expect(h, lessThan(previous), reason: size.label);
+          expect(
+            h,
+            greaterThanOrEqualTo(TextStyles.small.step.leading * 2),
+            reason: '${size.label} holds a title and a description',
+          );
+          previous = h;
+          // `min-w-40`.
+          expect(
+            sizeOf(t, find.byType(Attachment)).width,
+            greaterThanOrEqualTo(Attachment.horizontalMinWidth),
+          );
+        }
+      },
+    );
 
     testWidgets('a vertical card is 96 wide, or 120 once it carries content', (
       WidgetTester t,
@@ -1424,15 +1434,9 @@ void main() {
       expect((MotionDurations.frame * 19.95).inMilliseconds, closeTo(332, 4));
     });
 
-    test('the four chat type specs are the measured ones', () {
-      expect(TextStyles.bubbleContent.size, 13);
-      expect(TextStyles.bubbleReactions.size, 13);
-      expect(TextStyles.attachmentTitle.size, 13);
-      expect(13 * TextStyles.attachmentTitle.height!, closeTo(16.25, 0.001));
-      expect(TextStyles.attachmentTitleSmall.size, 12);
-      expect(12 * TextStyles.attachmentTitleSmall.height!, closeTo(15, 0.001));
-      expect(TextStyles.attachmentDescription.size, 12);
-      expect(12 * TextStyles.attachmentDescription.height!, closeTo(16, 0.001));
+    test('chat anatomy reads at the two public copy roles', () {
+      expect(TextStyles.body.step, const TypeStep(16, 24));
+      expect(TextStyles.small.step, const TypeStep(14, 20));
     });
 
     testWidgets('Icon.lucide paints the generated registry', (

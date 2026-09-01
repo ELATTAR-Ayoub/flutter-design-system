@@ -49,8 +49,16 @@ class RegistryGenerator {
     required this.repositoryRoot,
     this.registryRoot,
     this.outputRoot,
-    this.registryVersion = '0.0.1',
+    this.registryVersion = defaultRegistryVersion,
   });
+
+  /// The version a generation is published under.
+  ///
+  /// One of the spellings `tool/release_audit` holds against each other, so it
+  /// moves with the release rather than on its own. Items keep their own
+  /// versions: an item that did not change stays where it was released, which
+  /// is what makes the released payloads reproducible byte for byte.
+  static const String defaultRegistryVersion = '0.0.2';
 
   final Directory repositoryRoot;
   final Directory? registryRoot;
@@ -225,15 +233,43 @@ class RegistryGenerator {
     }
   }
 
+  /// Writes this generation, and deletes nothing that another version owns.
+  ///
+  /// **Generation is not a deletion tool.** The tree holds one directory per
+  /// item *per version*, and a consumer pinned to an older version installs out
+  /// of the directory that version published. Exactly one thing is cleared
+  /// here: the directory for the precise `<item>/<version>` about to be
+  /// written, so a payload dropped from a manifest does not survive as a stale
+  /// file inside the version that no longer declares it.
+  ///
+  /// Everything else is left alone, including two cases that look like garbage
+  /// and are not:
+  ///
+  ///   * **an item's other versions.** Rebuilding `button@0.0.2` has no
+  ///     business touching `button@0.0.1`, which `/registry/0.0.1/` still
+  ///     serves.
+  ///   * **an item the current registry no longer has.** Removing a manifest
+  ///     retires an item from the *index*; it does not unpublish the versions
+  ///     that already shipped. An earlier version's `registryDependencies` may
+  ///     still name it, and a consumer pinned there still fetches its payload.
+  ///     Deleting the directory would break that install and would be
+  ///     irreversible from this tree.
+  ///
+  /// Output that genuinely is obsolete — an unpublished version abandoned
+  /// before release — is removed by [pruneUnreleasedPayloads], which is an
+  /// explicit maintenance call and never part of a build.
+  /// `test/registry_released_immutability_test.dart` holds the result to the
+  /// bytes each release actually published.
   void _writePayloads(RegistryDocument document) {
-    if (_output.existsSync()) {
-      _output.deleteSync(recursive: true);
-    }
     _output.createSync(recursive: true);
+    final Directory versionsRoot = Directory(_join(_output.path, 'versions'));
+    versionsRoot.createSync(recursive: true);
+
     for (final RegistryItem item in document.items) {
       final Directory itemOutput = Directory(
         _join(_output.path, 'versions', item.name, item.version),
       );
+      if (itemOutput.existsSync()) itemOutput.deleteSync(recursive: true);
       itemOutput.createSync(recursive: true);
       for (final RegistryFile file in item.files) {
         _copyPayload(item, file.source, file.target, itemOutput);
@@ -269,6 +305,53 @@ class RegistryGenerator {
       ],
     });
   }
+
+  /// Removes payload directories for versions that were never released.
+  ///
+  /// **Separate from [build] on purpose.** Generation must never delete
+  /// history: a build that tidies up is a build that can unpublish something
+  /// by accident, which is how a pinned consumer's install starts 404ing. This
+  /// is the other half — an explicit call a maintainer makes, having decided
+  /// that a particular unreleased version is abandoned.
+  ///
+  /// [releasedVersions] is the set of versions that have been published and are
+  /// therefore untouchable — read from the locks in `registry/released/`, not
+  /// guessed. A version directory is removed only when it is **not** in that
+  /// set and **not** the version the current registry declares for that item.
+  /// Anything released, and anything current, survives.
+  ///
+  /// Returns the directories it removed (or would remove, when [dryRun]).
+  List<String> pruneUnreleasedPayloads({
+    required RegistryDocument document,
+    required Set<String> releasedVersions,
+    bool dryRun = true,
+  }) {
+    final Directory versionsRoot = Directory(_join(_output.path, 'versions'));
+    if (!versionsRoot.existsSync()) return const <String>[];
+
+    final Map<String, String> current = <String, String>{
+      for (final RegistryItem item in document.items) item.name: item.version,
+    };
+
+    final List<String> removed = <String>[];
+    for (final Directory itemDirectory
+        in versionsRoot.listSync().whereType<Directory>()) {
+      final String item = _leafName(itemDirectory.path);
+      for (final Directory versionDirectory
+          in itemDirectory.listSync().whereType<Directory>()) {
+        final String version = _leafName(versionDirectory.path);
+        if (releasedVersions.contains(version)) continue;
+        if (current[item] == version) continue;
+        removed.add('versions/$item/$version');
+        if (!dryRun) versionDirectory.deleteSync(recursive: true);
+      }
+    }
+    removed.sort();
+    return removed;
+  }
+
+  static String _leafName(String path) =>
+      path.replaceAll(r'\', '/').split('/').last;
 
   void _copyPayload(
     RegistryItem item,
@@ -322,11 +405,7 @@ ImportTransformationPlan planImportTransformations(
       ),
     );
   }
-  for (final String family in <String>[
-    'InterLocal',
-    'GeistMono',
-    'Redaction35',
-  ]) {
+  for (final String family in <String>['InterLocal', 'GeistMono']) {
     if (!source.contains("'$family'")) continue;
     final String replacement = foundationMode == 'package'
         ? 'packages/elattar_core/$family'

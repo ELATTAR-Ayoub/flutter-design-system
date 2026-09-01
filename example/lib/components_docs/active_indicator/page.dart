@@ -258,7 +258,7 @@ class ActiveIndicatorDocPage extends StatelessWidget {
 
 Widget _pillCaption(BuildContext context, String label) => StyledText(
   label,
-  TextStyles.caption,
+  TextStyles.small,
   color: ThemeScope.of(context).mutedForeground,
 );
 
@@ -431,29 +431,36 @@ class _ToggleGroupSpecimenState extends State<_ToggleGroupSpecimen> {
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
-    return KeyedSubtree(
-      key: const ValueKey<String>('active-indicator-example:toggle-group'),
-      child: ActiveIndicator(
-        activeIndex: _selected ?? -1,
-        gap: space(2),
-        padding: EdgeInsets.all(space(1)),
-        indicator: Surface(
-          spec: Shadows.compactControl,
-          radius: BorderRadius.circular(Radii.full),
-          fill: theme.primary,
-          child: const SizedBox.expand(),
+    // A segmented strip is a row of targets, and three scaled labels do not
+    // fit a phone. Scrolling keeps every option reachable; shrinking the type
+    // or clipping the last option would not.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: KeyedSubtree(
+        key: const ValueKey<String>('active-indicator-example:toggle-group'),
+        child: ActiveIndicator(
+          activeIndex: _selected ?? -1,
+          gap: space(2),
+          padding: EdgeInsets.all(space(1)),
+          indicator: Surface(
+            spec: Shadows.compactControl,
+            radius: BorderRadius.circular(Radii.full),
+            fill: theme.primary,
+            child: const SizedBox.expand(),
+          ),
+          children: <Widget>[
+            for (int i = 0; i < _labels.length; i++)
+              Toggle(
+                pressed: i == _selected,
+                onChanged: (bool on) =>
+                    setState(() => _selected = on ? i : null),
+                inExclusiveGroup: true,
+                pressedFill: transparent,
+                pressedInk: theme.primaryForeground,
+                child: Text(_labels[i]),
+              ),
+          ],
         ),
-        children: <Widget>[
-          for (int i = 0; i < _labels.length; i++)
-            Toggle(
-              pressed: i == _selected,
-              onChanged: (bool on) => setState(() => _selected = on ? i : null),
-              inExclusiveGroup: true,
-              pressedFill: transparent,
-              pressedInk: theme.primaryForeground,
-              child: Text(_labels[i]),
-            ),
-        ],
       ),
     );
   }
@@ -498,46 +505,55 @@ class _TabsLineSpecimenState extends State<_TabsLineSpecimen> {
     final ThemeTokens theme = ThemeScope.of(context);
     return KeyedSubtree(
       key: const ValueKey<String>('active-indicator-example:tabs-line'),
+      // `ActiveIndicator` lays its children out in a `Row` with
+      // `mainAxisSize: min` (see `active_indicator.dart`'s `build`) because
+      // the sliding pill needs each item's real geometry — it cannot shrink
+      // to fit. At a large accessibility text scale two tab labels can still
+      // outgrow the showcase frame, so a horizontal scroll is the last resort
+      // here rather than a reflow the component itself cannot offer.
       child: SizedBox(
         height: Tabs.trackHeight,
-        child: ActiveIndicator(
-          activeIndex: _selected,
-          gap: Tabs.gapFor(TabsVariant.line),
-          padding: EdgeInsets.symmetric(
-            vertical: (Tabs.trackHeight - Tabs.triggerHeight) / 2,
-          ),
-          jellyAlignment: Alignment.bottomCenter,
-          indicator: Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
-              height: Tabs.ruleHeight,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: theme.actionText,
-                  borderRadius: BorderRadius.circular(Radii.full),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ActiveIndicator(
+            activeIndex: _selected,
+            gap: Tabs.gapFor(TabsVariant.line),
+            padding: EdgeInsets.symmetric(
+              vertical: (Tabs.trackHeight - Tabs.triggerHeight) / 2,
+            ),
+            jellyAlignment: Alignment.bottomCenter,
+            indicator: Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                height: Tabs.ruleHeight,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: theme.actionText,
+                    borderRadius: BorderRadius.circular(Radii.full),
+                  ),
+                  child: const SizedBox.expand(),
                 ),
-                child: const SizedBox.expand(),
               ),
             ),
-          ),
-          children: <Widget>[
-            for (int i = 0; i < _labels.length; i++)
-              GestureDetector(
-                onTap: () => setState(() => _selected = i),
-                child: SizedBox(
-                  height: Tabs.triggerHeight,
-                  child: Center(
-                    child: StyledText(
-                      _labels[i],
-                      TextStyles.small,
-                      color: i == _selected
-                          ? theme.foreground
-                          : theme.mutedForeground,
+            children: <Widget>[
+              for (int i = 0; i < _labels.length; i++)
+                GestureDetector(
+                  onTap: () => setState(() => _selected = i),
+                  child: SizedBox(
+                    height: Tabs.triggerHeight,
+                    child: Center(
+                      child: StyledText(
+                        _labels[i],
+                        TextStyles.small,
+                        color: i == _selected
+                            ? theme.foreground
+                            : theme.mutedForeground,
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -581,30 +597,38 @@ class _DeselectionSpecimenState extends State<_DeselectionSpecimen> {
     final ThemeTokens theme = ThemeScope.of(context);
     return KeyedSubtree(
       key: const ValueKey<String>('active-indicator-example:deselection'),
-      child: ActiveIndicator(
-        activeIndex: _selected ?? -1,
-        gap: space(2),
-        padding: EdgeInsets.all(space(1)),
-        indicator: Surface(
-          spec: Shadows.compactControl,
-          radius: BorderRadius.circular(Radii.full),
-          fill: theme.primary,
-          child: const SizedBox.expand(),
+      // Same reasoning as `_TabsLineSpecimen` above: `ActiveIndicator`'s
+      // internal `Row` cannot shrink its three toggles, so a large
+      // accessibility text scale gets a horizontal scroll rather than an
+      // overflow.
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: ActiveIndicator(
+          activeIndex: _selected ?? -1,
+          gap: space(2),
+          padding: EdgeInsets.all(space(1)),
+          indicator: Surface(
+            spec: Shadows.compactControl,
+            radius: BorderRadius.circular(Radii.full),
+            fill: theme.primary,
+            child: const SizedBox.expand(),
+          ),
+          children: <Widget>[
+            for (int i = 0; i < _labels.length; i++)
+              Toggle(
+                pressed: i == _selected,
+                // Tapping the already-selected option clears it — the group
+                // resolves activeIndex to -1, and the pill fades where it
+                // stands rather than sliding to the group origin.
+                onChanged: (bool on) =>
+                    setState(() => _selected = on ? i : null),
+                inExclusiveGroup: true,
+                pressedFill: transparent,
+                pressedInk: theme.primaryForeground,
+                child: Text(_labels[i]),
+              ),
+          ],
         ),
-        children: <Widget>[
-          for (int i = 0; i < _labels.length; i++)
-            Toggle(
-              pressed: i == _selected,
-              // Tapping the already-selected option clears it — the group
-              // resolves activeIndex to -1, and the pill fades where it
-              // stands rather than sliding to the group origin.
-              onChanged: (bool on) => setState(() => _selected = on ? i : null),
-              inExclusiveGroup: true,
-              pressedFill: transparent,
-              pressedInk: theme.primaryForeground,
-              child: Text(_labels[i]),
-            ),
-        ],
       ),
     );
   }

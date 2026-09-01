@@ -147,15 +147,18 @@ class _PayoutCardState extends State<PayoutCard> {
                   ),
                 ),
                 SizedBox(height: space(4)),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                // A label/value pair, `Wrap` rather than `Row`: at a large
+                // accessibility text scale the big `numberLg` figure alone
+                // can outgrow the card, so the value drops to its own line
+                // under the label instead of forcing the row wider than the
+                // card. At ordinary widths both fit on one line, same as the
+                // `Row` this replaces.
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.end,
+                  runSpacing: space(1),
                   children: <Widget>[
-                    Expanded(
-                      child: StyledText(
-                        'Minimum payout amount',
-                        TextStyles.small,
-                      ),
-                    ),
+                    StyledText('Minimum payout amount', TextStyles.small),
                     StyledText(_formatAmount(_amount), TextStyles.numberLg),
                   ],
                 ),
@@ -173,17 +176,23 @@ class _PayoutCardState extends State<PayoutCard> {
                   }),
                 ),
                 SizedBox(height: space(2)),
-                Row(
+                // `Wrap`, not `Row` + `Spacer`: at 200% text scale the two
+                // labels alone can exceed the card's width, and a `Spacer`
+                // gives nothing back when that happens. `Wrap` keeps them on
+                // one line whenever there is room and drops the second to
+                // its own line otherwise.
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  runSpacing: space(1),
                   children: <Widget>[
                     StyledText(
                       '\$50 (min)',
-                      TextStyles.caption,
+                      TextStyles.small,
                       color: theme.mutedForeground,
                     ),
-                    const Spacer(),
                     StyledText(
                       '\$10,000 (max)',
-                      TextStyles.caption,
+                      TextStyles.small,
                       color: theme.mutedForeground,
                     ),
                   ],
@@ -218,8 +227,12 @@ class _PayoutCardState extends State<PayoutCard> {
                   ),
                   SizedBox(height: space(3)),
                 ],
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                // The actions wrap rather than clip: two labels at a large
+                // text scale do not share one line on a phone.
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: space(2),
+                  runSpacing: space(2),
                   children: <Widget>[
                     Button(
                       key: const ValueKey<String>('home-payout-reset'),
@@ -227,7 +240,6 @@ class _PayoutCardState extends State<PayoutCard> {
                       onPressed: _saving ? null : _reset,
                       child: const Text('Reset'),
                     ),
-                    SizedBox(width: space(2)),
                     Button(
                       key: const ValueKey<String>('home-payout-save'),
                       loading: _saving,

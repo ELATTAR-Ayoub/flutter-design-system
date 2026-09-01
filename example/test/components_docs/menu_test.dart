@@ -390,7 +390,10 @@ void main() {
     testWidgets(
       'the Preview dropdown column commits an item and toggles a check row',
       (WidgetTester tester) async {
-        await _pumpMenuDoc(tester);
+        // A taller view than the default matrix: the dropdown opens under a
+        // trigger partway down a long article, and its rows are real text — at
+        // 900 the last item lands below the fold rather than being clipped.
+        await _pumpMenuDoc(tester, size: const Size(1440, 1600));
 
         expect(find.text('Last action: Nothing yet'), findsOneWidget);
 

@@ -121,8 +121,11 @@ Run the matrix over both `ColorMode` values, both sizes, and text scale 1 and 2,
 then `expect(tester.takeException(), isNull)`.
 
 **`pumpAndSettle` does not work on these pages.** `Skeleton` and `Spinner`
-animate perpetually and do not honour `MediaQuery.disableAnimations`, so the
-tree never reaches a quiet frame and the call times out. Pump a fixed number of
+animate perpetually, so the tree never reaches a quiet frame and the call times
+out. Both *do* honour `MediaQuery.disableAnimations` — each routes its duration
+through `effectiveMotionDuration`, and a reduced-motion `Spinner` holds still
+while a reduced-motion `Skeleton` freezes its shimmer — so a test that installs
+reduced motion can settle normally. Everywhere else, pump a fixed number of
 `MotionDurations` beats instead:
 
 ```dart

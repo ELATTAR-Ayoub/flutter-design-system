@@ -1,7 +1,7 @@
 {
   "name": "kbd",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/kbd.tsx` — the keyboard hint, and the one object in the",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/kbd.dart",
       "target": "@ui/kbd.dart",
-      "sha256": "2c24ae5e9b5d3bd6102a6725bb6095916e0e0d143e06e50b687784dd554d5d66"
+      "sha256": "5db9c96949cac2afaab9edb0114c2f69d98a21f5f4356e4d89130225e44e7ad2"
     }
   ],
   "registryDependencies": [
@@ -24,7 +24,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/kbd",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/kbd.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/kbd.dart",
   "exports": [
     "Kbd",
     "KbdGroup"

@@ -172,10 +172,15 @@ class StatDeltaMark extends StatelessWidget {
             tone: IconTone.inherit,
           ),
           SizedBox(width: gap),
-          StyledText(
-            '${delta.direction.sign}${delta.value}',
-            TextStyles.numberSm,
-            color: color,
+          // The arrow is fixed and the number gives: a mark inside a `Wrap`
+          // is offered the run's remaining width, and at 200% text a long
+          // delta is wider than what is left of it.
+          Flexible(
+            child: StyledText(
+              '${delta.direction.sign}${delta.value}',
+              TextStyles.numberSm,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -234,9 +239,16 @@ class Stat extends StatelessWidget {
   /// `gap-1.5` between the error glyph and its message.
   static double get messageGap => space(1.5);
 
-  /// The `.type-num-lg` line box the figure slot always holds.
-  static double get figureHeight =>
-      TextStyles.numberLg.size! * TextStyles.numberLg.height!;
+  /// The room the figure slot reserves, so a skeleton, a number, and an error
+  /// message occupy the same space and the card never reflows as a stat loads.
+  ///
+  /// A **minimum**, not a height: it is one `numberLg` line box at the current
+  /// width, scaled by the reader's text scale, and the slot grows past it when
+  /// the content is taller.
+  static double figureMinHeightOf(BuildContext context) =>
+      MediaQuery.textScalerOf(
+        context,
+      ).scale(StyledText.stepOf(context, TextStyles.numberLg).leading);
 
   @override
   Widget build(BuildContext context) {
@@ -276,11 +288,12 @@ class Stat extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        StyledText(label, TextStyles.eyebrow),
+        StyledText(label, TextStyles.small),
         SizedBox(height: rowGap),
-        // The slot holds the line box whatever is in it — see the library doc.
-        SizedBox(
-          height: figureHeight,
+        // The slot reserves the line box whatever is in it, and grows past it
+        // when the content is taller — see the library doc.
+        ConstrainedBox(
+          constraints: BoxConstraints(minHeight: figureMinHeightOf(context)),
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             child: figure,
@@ -288,43 +301,55 @@ class Stat extends StatelessWidget {
         ),
         if (hasDeltaRow) ...<Widget>[
           SizedBox(height: rowGap),
-          Wrap(
-            spacing: deltaGap,
-            runSpacing: deltaGap,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: <Widget>[
-              if (delta != null)
-                if (loading)
-                  Skeleton(
-                    width: deltaSkeleton.width,
-                    height: deltaSkeleton.height,
-                  )
-                else if (!blank)
-                  StatDeltaMark(delta: delta!, betterWhen: betterWhen),
-              if (state == StatState.error && message != null)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Icon.lucide(
-                      Lucide.triangleAlert,
-                      size: IconSize.xs,
-                      tone: IconTone.inherit,
-                    ),
-                    SizedBox(width: messageGap),
-                    StyledText(
-                      message!,
-                      TextStyles.small,
-                      color: theme.destructiveText,
-                    ),
-                  ],
-                )
-              else if (state == StatState.empty && message != null)
-                StyledText(message!, TextStyles.small)
-              else if (hint != null)
-                StyledText(hint!, TextStyles.small),
-            ],
-          ),
+          if (state == StatState.error && message != null)
+            // Not put through the `Wrap` below: `Wrap` hands every child
+            // *unbounded* main-axis constraints — that is how a run decides
+            // what fits — so a `Flexible`/ellipsis inside one never actually
+            // gets to shrink; the row just paints past a narrow cell at any
+            // text scale. A direct `Column` child gets the card's real width
+            // instead, which is what the glyph-fixed, message-gives shape
+            // needs to work at all.
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon.lucide(
+                  Lucide.triangleAlert,
+                  size: IconSize.xs,
+                  tone: IconTone.inherit,
+                ),
+                SizedBox(width: messageGap),
+                Flexible(
+                  child: StyledText(
+                    message!,
+                    TextStyles.small,
+                    color: theme.destructiveText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            )
+          else
+            Wrap(
+              spacing: deltaGap,
+              runSpacing: deltaGap,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: <Widget>[
+                if (delta != null)
+                  if (loading)
+                    Skeleton(
+                      width: deltaSkeleton.width,
+                      height: deltaSkeleton.height,
+                    )
+                  else if (!blank)
+                    StatDeltaMark(delta: delta!, betterWhen: betterWhen),
+                if (state == StatState.empty && message != null)
+                  StyledText(message!, TextStyles.small)
+                else if (hint != null)
+                  StyledText(hint!, TextStyles.small),
+              ],
+            ),
         ],
       ],
     );

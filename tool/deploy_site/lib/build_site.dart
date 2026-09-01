@@ -171,9 +171,7 @@ class SiteBuildConfig {
 /// constant no longer matches the expected shape, rather than silently
 /// staging under a guessed version.
 String extractCliVersion(String identityDartSource) {
-  final RegExp pattern = RegExp(
-    r"""const String cliVersion = '([^']+)';""",
-  );
+  final RegExp pattern = RegExp(r"""const String cliVersion = '([^']+)';""");
   final RegExpMatch? match = pattern.firstMatch(identityDartSource);
   if (match == null) {
     throw BuildConfigException(

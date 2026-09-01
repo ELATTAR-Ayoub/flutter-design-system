@@ -1,7 +1,7 @@
 {
   "name": "command",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/command.tsx` — the command palette, and the port's only",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/command.dart",
       "target": "@ui/command.dart",
-      "sha256": "b472bbfbb19f9b50c6bdc0ed27c79674133f07fb648b546d84b11b641b8742eb"
+      "sha256": "271e6d1ed54648815f3af3d21092be3c59886303d2fee9a9767f96c32437456c"
     }
   ],
   "registryDependencies": [
@@ -28,7 +28,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/command",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/command.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/command.dart",
   "exports": [
     "Command",
     "CommandGroup",

@@ -55,7 +55,6 @@ const List<String> forbiddenLicenseWords = <String>[
 const Map<String, String> noticeFiles = <String, String>{
   'third_party/fonts/inter/OFL.txt': 'SIL OPEN FONT LICENSE',
   'third_party/fonts/geist-mono/OFL.txt': 'SIL OPEN FONT LICENSE',
-  'third_party/fonts/redaction/OFL.txt': 'SIL OPEN FONT LICENSE',
   'third_party/lucide/LICENSE': 'ISC License',
   'third_party/elevenlabs-ui/LICENSE': 'MIT License',
 };
@@ -69,7 +68,6 @@ const Map<String, String> noticeFiles = <String, String>{
 const Map<String, bool> redistributedFiles = <String, bool>{
   'assets/fonts/InterVariable.ttf': true,
   'assets/fonts/GeistMono-Variable.ttf': true,
-  'assets/fonts/Redaction35-Italic.ttf': true,
   'shaders/orb.frag': true,
   'assets/textures/perlin-noise.png': true,
   'lib/src/components/ui/icon_paths.g.dart': false,
@@ -366,25 +364,87 @@ List<String> indexRegistryFindings(
 /// A `sourceLink` on a moving branch is the failure the baseline audit found:
 /// every link would keep resolving while silently describing different source
 /// than the one the release shipped.
+/// A semver triple as three integers, for ordering. Null when unparseable.
+List<int>? _triple(Object? version) {
+  if (version is! String) return null;
+  final RegExpMatch? m = RegExp(r'^(\d+)\.(\d+)\.(\d+)$').firstMatch(version);
+  if (m == null) return null;
+  return <int>[
+    int.parse(m.group(1)!),
+    int.parse(m.group(2)!),
+    int.parse(m.group(3)!),
+  ];
+}
+
+/// Whether [a] is at or below [b].
+bool _atOrBelow(List<int> a, List<int> b) {
+  for (int i = 0; i < 3; i++) {
+    if (a[i] != b[i]) return a[i] < b[i];
+  }
+  return true;
+}
+
+/// Every item declares a version this registry can serve, and pins its own tag.
+///
+/// **Items are versioned individually, and that is the point.** A released
+/// version is immutable, so an item whose sources did not change keeps the
+/// version it was released under and goes on serving the exact payload it
+/// published; only items that changed — and the items downstream of them, whose
+/// installation therefore changed too — move to the new one. A registry that
+/// forced every item to the registry version would have to republish 99 items
+/// to fix one, and every one of those republications would be a lie about what
+/// changed.
+///
+/// So the invariants are:
+///
+///   * an item's version parses as a semver triple and is **at or below** the
+///     registry version — an item cannot claim a version this registry has not
+///     reached;
+///   * its `sourceLink` pins **its own** version's tag, because that is the
+///     commit its payload was taken from;
+///   * at least one item is actually at the registry version, or the registry
+///     version describes nothing.
 List<String> registryPinningFindings(
   Map<String, Object?> registry,
   String version,
 ) {
   final List<String> found = <String>[];
-  final String tag = 'v$version';
+  final List<int>? registryTriple = _triple(version);
+  if (registryTriple == null) {
+    return <String>['the registry version $version is not a semver triple.'];
+  }
+
+  bool anyAtRegistryVersion = false;
   for (final Object? raw
       in (registry['items'] as List<Object?>? ?? const <Object?>[])) {
     final Map<String, Object?> item = raw! as Map<String, Object?>;
     final String name = '${item['name']}';
-    if (item['version'] != version) {
-      found.add('$name declares version ${jsonEncode(item['version'])}.');
+    final Object? declared = item['version'];
+    final List<int>? itemTriple = _triple(declared);
+
+    if (itemTriple == null) {
+      found.add('$name declares version ${jsonEncode(declared)}.');
+      continue;
     }
+    if (!_atOrBelow(itemTriple, registryTriple)) {
+      found.add(
+        '$name declares version ${jsonEncode(declared)}, which is ahead of the '
+        'registry version $version.',
+      );
+    }
+    if (declared == version) anyAtRegistryVersion = true;
+
+    final String tag = 'v$declared';
     final Object? link = item['sourceLink'];
     if (link is! String || link.isEmpty) {
       found.add('$name has no sourceLink.');
     } else if (!link.contains('/blob/$tag/')) {
       found.add('$name.sourceLink does not pin /blob/$tag/: $link');
     }
+  }
+
+  if (!anyAtRegistryVersion) {
+    found.add('no item is at the registry version $version.');
   }
   return found;
 }
@@ -581,7 +641,7 @@ AuditReport auditRelease(String repoRoot, {required Sha256Hex sha256Hex}) {
     );
 
     recorder.findings(
-      'every item pins version $version and the v$version source tag',
+      'every item is at or below $version and pins its own source tag',
       registryPinningFindings(registry, version),
     );
 

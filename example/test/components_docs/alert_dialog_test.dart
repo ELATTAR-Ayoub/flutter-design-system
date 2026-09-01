@@ -464,18 +464,26 @@ void main() {
         reason: 'focus must not stay on a control behind the overlay',
       );
 
-      // Verified, not assumed: `FocusScope(autofocus: true)` with no
-      // previously-focused descendant makes the FocusScopeNode ITSELF the
-      // primary focus: not a leaf control such as Cancel. `FocusScope.of`
-      // from inside the panel recovers that same scope node for comparison.
+      // The panel's scope takes the focus and hands it straight on to the
+      // first tabbable child, which is what Radix does and what the dialog's
+      // own source has always said it does. It did not, before: a
+      // `FocusScope(autofocus: true)` is honoured only while the enclosing
+      // scope has no focused child, and the trigger that opened the modal is
+      // that child every time a keyboard opened it. The scope now requests the
+      // focus itself on the frame after the panel exists.
       final FocusScopeNode panelScope = FocusScope.of(
         tester.element(find.text('Keep')),
       );
       expect(
+        panelScope.hasFocus,
+        isTrue,
+        reason: 'the focus is inside the panel — observed: $focused',
+      );
+      expect(
         focused,
-        same(panelScope),
+        isNot(same(panelScope)),
         reason:
-            'expected autofocus to land on the panel\'s own FocusScopeNode '
+            'and on a control rather than resting on the scope itself '
             '— observed: $focused',
       );
     });

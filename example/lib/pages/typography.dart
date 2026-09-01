@@ -166,7 +166,6 @@ class _RuleSection extends StatelessWidget {
                   specimen: StyledText(
                     'Aa',
                     TextStyles.display,
-                    fontSize: Fluid.display(context),
                     color: theme.foreground,
                   ),
                 ),
@@ -335,7 +334,6 @@ class _WordScaleSection extends StatelessWidget {
             child: StyledText(
               'Pull something legendary',
               TextStyles.display,
-              fontSize: Fluid.display(context),
               color: theme.foreground,
             ),
           ),
@@ -345,7 +343,6 @@ class _WordScaleSection extends StatelessWidget {
             child: StyledText(
               'Pack Marketplace',
               TextStyles.h1,
-              fontSize: Fluid.h1(context),
               color: theme.foreground,
             ),
           ),
@@ -412,13 +409,13 @@ class _WordScaleSection extends StatelessWidget {
           _Spec(
             cls: 'type-label',
             use: 'Section eyebrows, panel labels, field labels, rarity names.',
-            child: StyledText('Remaining supply', TextStyles.eyebrow),
+            child: StyledText('Remaining supply', TextStyles.small),
           ),
           _Spec(
             cls: 'type-micro',
             use:
                 'The floor. Badge text, pip captions, chart axes. Never smaller.',
-            child: StyledText('Limited edition', TextStyles.eyebrowSmall),
+            child: StyledText('Limited edition', TextStyles.small),
           ),
         ],
       ),
@@ -525,7 +522,7 @@ class _NumericScaleSection extends StatelessWidget {
                 _FigureColumn(
                   heading: 'Proportional — rejected',
                   headingInk: theme.destructiveText,
-                  spec: TextStyles.section,
+                  spec: TextStyles.small,
                   caption:
                       'Proportional figures do not align, and every live update '
                       'nudges the layout.',
@@ -568,7 +565,7 @@ class _FigureColumn extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        StyledText(heading, TextStyles.eyebrow, color: headingInk),
+        StyledText(heading, TextStyles.small, color: headingInk),
         SizedBox(height: space(3)),
         for (int i = 0; i < _tabularValues.length; i++) ...<Widget>[
           // `space-y-1.5`.
@@ -583,9 +580,15 @@ class _FigureColumn extends StatelessWidget {
                 ),
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // A Row with spaceBetween cannot give way: at 2x text scale a
+            // mono figure like `1,284.00` outgrows the narrow grid column
+            // before the label does. Wrap keeps the same spaceBetween
+            // reading at desktop width and drops the value to its own line
+            // only once the row genuinely runs out of room.
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.start,
+              runSpacing: space(1),
               children: <Widget>[
                 StyledText('Row', TextStyles.small),
                 StyledText(_tabularValues[i], spec, color: valueColor),
@@ -694,7 +697,7 @@ class _PairingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(label, TextStyles.eyebrow),
+          StyledText(label, TextStyles.small),
           SizedBox(height: space(2)),
           figure,
           SizedBox(height: space(1)),
@@ -1012,7 +1015,7 @@ class _Prose extends StatelessWidget {
         bottom: space(2),
         child: StyledText(
           'An explicit class still wins inside prose',
-          TextStyles.eyebrow,
+          TextStyles.small,
         ),
       ),
       (
@@ -1294,7 +1297,7 @@ class _ProseTable extends StatelessWidget {
                 decoration: BoxDecoration(color: theme.muted),
                 children: <Widget>[
                   for (final String head in _head)
-                    cell(StyledText(head, TextStyles.eyebrow)),
+                    cell(StyledText(head, TextStyles.small)),
                 ],
               ),
               for (final List<String> row in _rows)

@@ -59,8 +59,8 @@ class RegistryResource {
 ///
 /// [family] is authoritative and travels with the asset. It is NOT derivable
 /// from the file name: `InterVariable.ttf` is registered as `InterLocal`,
-/// `GeistMono-Variable.ttf` as `GeistMono`, `Redaction35-Italic.ttf` as
-/// `Redaction35`. Those are the names `lib/src/foundation/typography.dart`
+/// `GeistMono-Variable.ttf` as `GeistMono`. Those are the names
+/// `lib/src/foundation/typography.dart`
 /// asks for, so a guessed name silently renders every glyph in the platform
 /// fallback face — a failure no analyzer can see, because a font family is a
 /// string.

@@ -485,7 +485,7 @@ class _SizesSpecimen extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      StyledText('basis: 0.5, two per view', TextStyles.section),
+      StyledText('basis: 0.5, two per view', TextStyles.small),
       SizedBox(height: space(3)),
       KeyedSubtree(
         key: const ValueKey<String>('carousel-example:basis-half'),
@@ -498,7 +498,7 @@ class _SizesSpecimen extends StatelessWidget {
         ),
       ),
       SizedBox(height: space(6)),
-      StyledText('basis: 0.333, three per view', TextStyles.section),
+      StyledText('basis: 0.333, three per view', TextStyles.small),
       SizedBox(height: space(3)),
       KeyedSubtree(
         key: const ValueKey<String>('carousel-example:basis-third'),

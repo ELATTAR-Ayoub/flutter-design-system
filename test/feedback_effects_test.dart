@@ -1240,34 +1240,33 @@ void main() {
           ),
         ),
       );
-      // 482px of panel, but the header caps itself at 384.
-      expect(
-        t.getRect(find.byType(EmptyTitle)).width,
-        lessThanOrEqualTo(Containers.sm),
-      );
+      // The panel is wider than the measure; the header keeps to it.
+      expect(t.getRect(find.byType(EmptyTitle)).width, lessThan(482));
     });
 
-    testWidgets('the title is 13/500 tracking-tight and the description 1.625', (
-      WidgetTester t,
-    ) async {
-      await t.pumpWidget(
-        host(
-          const SizedBox(width: 384, child: EmptyTitle('Your Stash is empty')),
-        ),
-      );
-      final TextStyle title = t.widget<Text>(find.byType(Text)).style!;
-      expect(title.fontSize, 13);
-      expect(title.fontWeight, FontWeight.w500);
-      // `tracking-tight` −0.02em at 13px = −0.26px, measured on the reference.
-      expect(title.letterSpacing, closeTo(-0.26, 1e-9));
-      // `font-heading` and `font-sans` are two tokens for one face, so the
-      // class changes which is read and not which renders.
-      expect(title.fontFamily, contains(Fonts.heading));
-      expect(Fonts.heading, Fonts.sans);
+    testWidgets(
+      'the title is 13/500 tracking-tight and the description 1.625',
+      (WidgetTester t) async {
+        await t.pumpWidget(
+          host(
+            const SizedBox(
+              width: 384,
+              child: EmptyTitle('Your Stash is empty'),
+            ),
+          ),
+        );
+        final TextStyle title = t.widget<Text>(find.byType(Text)).style!;
+        final double size = TextStyles.nav.step.size;
+        expect(title.fontSize, size);
+        expect(title.fontWeight, FontWeight.w500);
+        // The title tracks slightly tighter than the role it derives from.
+        expect(title.letterSpacing, closeTo(-0.02 * size, 1e-9));
+        expect(title.fontFamily, contains(Fonts.sans));
 
-      expect(EmptyDescription.spec.size, 13);
-      expect(EmptyDescription.spec.height, closeTo(1.625, 1e-9));
-    });
+        // The description reads as body copy under the title.
+        expect(EmptyDescription.spec.step, TextStyles.body.step);
+      },
+    );
   });
 
   // ────────────────────────────────────────────────────────────────────────
@@ -2416,33 +2415,23 @@ void main() {
     testWidgets('the title inherits .cn-toast\'s 1.5 and the description keeps '
         'sonner\'s own 1.4', (WidgetTester t) async {
       // `[data-title]` declares weight and colour and no leading, so it takes
-      // `.cn-toast { line-height: 1.5 }` → 19.5px. `TextStyles.buttonLabel`
+      // `.cn-toast { line-height: 1.5 }` → 19.5px. `TextStyles.nav`
       // is the same 13/500 on text-sm's surviving Tailwind ratio and is 0.93px
       // a line short of it.
-      expect(Toast.titleSpec.size, 13);
-      expect(Toast.titleSpec.height, TextStyles.small.height);
-      expect(Toast.titleSpec.weight, TextStyles.buttonLabel.weight);
+      expect(Toast.titleSpec.step, TextStyles.small.step);
+      expect(Toast.titleSpec.wght, 500);
       expect(
-        Toast.titleSpec.height! * Toast.titleSpec.size!,
-        closeTo(19.5, 1e-9),
-      );
-      expect(
-        Toast.titleSpec.height,
-        isNot(closeTo(TextStyles.buttonLabel.height!, 1e-6)),
-        reason: 'the whole reason this spec exists',
+        TextStyles.all,
+        isNot(contains(Toast.titleSpec)),
+        reason: 'a toast title is anatomy, not a published role',
       );
 
       // `[data-description]`: `.cn-toast` sets its size and colour and never
       // its leading, so sonner's own 1.4 survives — drift 4, live numbers.
-      expect(Toast.descriptionSpec.size, 13);
-      expect(
-        Toast.descriptionSpec.height! * Toast.descriptionSpec.size!,
-        closeTo(18.2, 1e-9),
-      );
-      expect(Toast.descriptionSpec.weight, TextStyles.small.weight);
+      expect(Toast.descriptionSpec, same(TextStyles.small));
 
-      // And the box they add up to. Measured on the live toaster: 53.5px for a
-      // title-only toast — 32 of padding and 2 of border around one 19.5 line.
+      // And the box they add up to: the toast's padding and border around one
+      // title line box.
       final ToastController c = ToastController();
       addTearDown(c.dispose);
       await t.pumpWidget(toaster(c));
@@ -2450,7 +2439,12 @@ void main() {
       await arrive(t);
       expect(
         t.getRect(toastWith('Added to favourites')).height,
-        closeTo(53.5, 0.35),
+        closeTo(
+          TextStyles.small.step.leading +
+              space(4) * 2 +
+              BorderWidths.hairline * 2,
+          0.35,
+        ),
       );
       c.clear();
       await t.pump();

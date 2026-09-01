@@ -307,7 +307,7 @@ class _StudioHeader extends StatelessWidget {
                     children: <Widget>[
                       Icon.lucide(Lucide.arrowLeft, size: IconSize.sm),
                       SizedBox(width: Button.gapFor(ButtonSize.sm)),
-                      StyledText('System', TextStyles.buttonLabel),
+                      StyledText('System', TextStyles.nav),
                     ],
                   ),
           ),
@@ -465,7 +465,7 @@ class _DestinationNavigation extends StatelessWidget {
                 children: <Widget>[
                   Icon.lucide(item.glyph, size: IconSize.lg),
                   SizedBox(height: space(1)),
-                  StyledText(item.label, TextStyles.buttonLabelSm),
+                  StyledText(item.label, TextStyles.small),
                 ],
               )
             : Row(
@@ -474,7 +474,7 @@ class _DestinationNavigation extends StatelessWidget {
                 children: <Widget>[
                   Icon.lucide(item.glyph, size: IconSize.sm),
                   SizedBox(width: Button.gapFor(ButtonSize.md)),
-                  StyledText(item.label, TextStyles.buttonLabel),
+                  StyledText(item.label, TextStyles.nav),
                 ],
               ),
       ),

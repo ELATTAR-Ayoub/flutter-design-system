@@ -854,7 +854,7 @@ class _AccessibilityContent extends StatelessWidget {
       SizedBox(height: space(3)),
       StyledText(
         'Known gaps, reported not idealised',
-        TextStyles.section,
+        TextStyles.small,
         color: ThemeScope.of(context).actionText,
       ),
       SizedBox(height: space(2)),

@@ -458,7 +458,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      StyledText(caption, TextStyles.section, color: theme.mutedForeground),
+      StyledText(caption, TextStyles.small, color: theme.mutedForeground),
       SizedBox(height: space(2)),
       child,
     ],
@@ -603,13 +603,13 @@ class _SurfaceKindsSpecimen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        StyledText(caption, TextStyles.section, color: theme.mutedForeground),
+        StyledText(caption, TextStyles.small, color: theme.mutedForeground),
         SizedBox(height: space(2)),
         MenuSurface(
           kind: kind,
           child: Padding(
             padding: EdgeInsets.all(space(4)),
-            child: StyledText('Sample content', TextStyles.bodyCompact),
+            child: StyledText('Sample content', TextStyles.body),
           ),
         ),
       ],
@@ -659,7 +659,7 @@ class _IndicatorSideSpecimenState extends State<_IndicatorSideSpecimen> {
           children: <Widget>[
             StyledText(
               'end — dropdown & context menu',
-              TextStyles.section,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
             SizedBox(height: space(2)),
@@ -682,7 +682,7 @@ class _IndicatorSideSpecimenState extends State<_IndicatorSideSpecimen> {
           children: <Widget>[
             StyledText(
               'start — menubar, alone',
-              TextStyles.section,
+              TextStyles.small,
               color: theme.mutedForeground,
             ),
             SizedBox(height: space(2)),

@@ -353,7 +353,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
         ),
         if (_sent.isNotEmpty) ...<Widget>[
           SizedBox(height: space(3)),
-          StyledText('Sent', TextStyles.section, color: theme.mutedForeground),
+          StyledText('Sent', TextStyles.small, color: theme.mutedForeground),
           SizedBox(height: space(1)),
           for (final String message in _sent)
             StyledText(message, TextStyles.small, color: theme.foreground),

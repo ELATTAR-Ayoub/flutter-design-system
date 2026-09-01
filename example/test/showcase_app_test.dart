@@ -378,7 +378,7 @@ class _ProfileStateProbeState extends State<_ProfileStateProbe> {
         Button(
           label: 'Increase profile draft',
           onPressed: () => setState(() => _draft += 1),
-          child: StyledText('Increase', TextStyles.buttonLabel),
+          child: StyledText('Increase', TextStyles.nav),
         ),
       ],
     ),

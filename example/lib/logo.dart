@@ -99,7 +99,7 @@ class Logo extends StatelessWidget {
           const LogoMark(),
           SizedBox(width: space(2.5)),
         ],
-        StyledText('ELATTAR', TextStyles.wordmark, color: theme.foreground),
+        StyledText('ELATTAR', TextStyles.h4, color: theme.foreground),
       ],
     );
   }

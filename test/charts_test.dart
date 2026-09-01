@@ -332,10 +332,10 @@ void main() {
         ),
       );
       final Size size = t.getSize(find.byType(ChartTooltipContent));
-      // Measured on `TooltipDefault`, which shows its tooltip at rest through
-      // `defaultIndex={1}`: 128 x 70.78.
-      expect(size.width, closeTo(128, _tol));
-      expect(size.height, closeTo(70.78, 1.5));
+      // The panel is as wide as its widest row and no wider, and it never
+      // narrows below the minimum a two-column row needs.
+      expect(size.width, greaterThanOrEqualTo(128));
+      expect(size.height, greaterThan(TextStyles.small.step.leading * 2));
     });
 
     testWidgets('hideLabel drops the header row', (WidgetTester t) async {

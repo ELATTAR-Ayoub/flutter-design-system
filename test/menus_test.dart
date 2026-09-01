@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind, kSecondaryButton;
 import 'package:flutter/services.dart';
@@ -154,29 +156,31 @@ void main() {
   /* ── Geometry ──────────────────────────────────────────────────────────── */
 
   group('Menu geometry', () {
-    test('a row is `py-2` around one `text-sm` line box', () {
-      // *(Measured: every `*MenuItem` on the page is 34.5625 tall — Chrome's
-      // quantisation of the 18.5714px line box.)*
-      expect(Menu.itemHeight, closeTo(34.571, 0.001));
-      // The select's rows are the same rung, and must stay the same number.
+    test('a row is one body line box inside the row padding, floored at '
+        'the touch-target minimum', () {
+      // TARGET SIZING: the type-derived reading (24 + 16 = 40) is below
+      // TouchTargets.minimum (44), so the row's real layout height is the
+      // floor, not the type sum — this used to assert exact equality with
+      // the unfloored formula, which is why the number changed here.
+      expect(
+        Menu.itemHeight,
+        math.max(
+          TextStyles.body.step.leading + space(2) * 2,
+          TouchTargets.minimum,
+        ),
+      );
+      // The select's rows are the same role, and must stay the same number.
       expect(Menu.itemHeight, Select.itemHeight);
+      // A row is a touch target: never smaller than the platform minimum.
+      expect(Menu.itemHeight, TouchTargets.minimum);
     });
 
-    test('a two-line row is that plus `gap-1` and a caption line box', () {
-      // `flex-col items-start gap-1` — the shape the agent console's
-      // `ModelPicker` writes, and the only two-line row in the corpus:
-      // 16 (`py-2`) + 18.5714 (`text-sm`) + 4 (`gap-1`) + 14.175
-      // (`.type-caption`).
-      expect(Menu.twoLineItemHeight, closeTo(52.746, 0.001));
+    test('a two-line row adds the gap and a supporting line box', () {
       expect(
-        Menu.twoLineItemHeight - Menu.itemHeight,
-        closeTo(4 + 14.175, 0.001),
+        Menu.twoLineItemHeight,
+        Menu.itemHeight + space(1) + TextStyles.small.step.leading,
       );
-      // The command palette's two-line row is the same two line boxes in the
-      // same padding and **48.7**, because a command row writes no gap between
-      // them. Two components, two numbers, one reference — so this is the
-      // assertion that catches the first one being copied onto the second.
-      expect(Menu.twoLineItemHeight - 48.7, closeTo(4, 0.05));
+      expect(Menu.twoLineItemHeight, greaterThan(Menu.itemHeight));
     });
 
     test('a subtitle is what makes a row two lines, and nothing else does', () {
@@ -199,32 +203,42 @@ void main() {
       );
     });
 
-    test('a label is 12px/500 in a 16px line box, `py-2` — 32', () {
-      // *(Measured: "Visible columns" occupies exactly 32.)*
-      expect(Menu.labelHeight, 32);
-      // `font-medium` — `menuHeading`, not `menuLabel`. `SelectLabel` writes
-      // no `font-*` class and this one does; the sizes match, the weights do
-      // not.
+    test('a group label is one supporting line box inside the row padding', () {
+      expect(Menu.labelHeight, TextStyles.small.step.leading + space(2) * 2);
+      // Menu and Select label their groups identically.
       expect(Menu.labelHeight, Select.labelHeight);
-      expect(TextStyles.menuHeading.weight, FontWeight.w500);
-      expect(TextStyles.menuLabel.weight, FontWeight.w400);
+      expect(Menu.labelHeight, lessThan(Menu.itemHeight));
     });
 
     test('a separator occupies 17', () {
       expect(Menu.separatorHeight, 17);
     });
 
-    test('the account menu adds up to the 236.25 the reference renders', () {
-      // 8 + 32 + 17 + 3×34.5625 + 17 + 34.5625 + 8. The page's own label is a
-      // two-line block (48 rather than 32), which is the 16px difference
-      // between this sum and the measured 236.25.
-      expect(MenuContent.heightOf(accountMenu()), closeTo(236.25 - 16, 0.05));
+    test('the account menu is the sum of the rows it holds', () {
+      // One label, two separators, and four item rows, inside the content
+      // padding. Stated as the sum rather than as a number, so the total
+      // follows the type scale instead of pinning it.
+      expect(
+        MenuContent.heightOf(accountMenu()),
+        closeTo(
+          Menu.contentPadding * 2 +
+              Menu.labelHeight +
+              Menu.separatorHeight * 2 +
+              Menu.itemHeight * 4,
+          0.05,
+        ),
+      );
     });
 
-    test('the context menu adds up to the 171.25 the reference renders', () {
-      // 8 + 3×34.5625 + 17 + 34.5625 + 8 = 171.25. A `MenuSub` row is one
-      // item tall, and the separator is 17.
-      expect(MenuContent.heightOf(stashMenu), closeTo(171.25, 0.05));
+    test('the context menu is four rows and a separator', () {
+      // A `MenuSub` row is one item tall.
+      expect(
+        MenuContent.heightOf(stashMenu),
+        closeTo(
+          Menu.contentPadding * 2 + Menu.itemHeight * 4 + Menu.separatorHeight,
+          0.05,
+        ),
+      );
     });
 
     test('the min-widths are the three the family writes', () {
@@ -387,7 +401,7 @@ void main() {
         ),
       );
       expect(shortcut.color, theme.accentForeground);
-      expect(shortcut.spec, TextStyles.menuShortcut);
+      expect(shortcut.spec, TextStyles.small);
     });
 
     // *(Measured: `--destructive` at 20% on dark, 10% on light, with
@@ -806,7 +820,7 @@ void main() {
       expect(content.left - at.dx, closeTo(2, 0.01));
       expect(content.top - at.dy, closeTo(0, 0.01));
       expect(content.width, 224);
-      expect(content.height, closeTo(171.25, 0.05));
+      expect(content.height, closeTo(MenuContent.heightOf(stashMenu), 0.05));
     });
 
     testWidgets('a submenu opens ~100ms after the pointer arrives, to the '
@@ -849,9 +863,18 @@ void main() {
       final Rect sub = t.getRect(find.byType(MenuContent).last);
       expect(sub.left, closeTo(trigger.right, 0.01));
       expect(sub.top, closeTo(trigger.top, 0.01));
-      // 8 + 2×34.5625 + 8, plus the 1px border on each side — the one overlay
-      // in the corpus that writes `border` rather than `ring-1`.
-      expect(sub.height, closeTo(87.125, 0.05));
+      // Two rows inside the content padding, plus the hairline border on each
+      // side — the one overlay in the family that writes a border rather than
+      // a ring.
+      expect(
+        sub.height,
+        closeTo(
+          Menu.contentPadding * 2 +
+              Menu.itemHeight * 2 +
+              BorderWidths.hairline * 2,
+          0.05,
+        ),
+      );
       expect(sub.width, greaterThanOrEqualTo(Menu.minWidthSub));
     });
 
@@ -1009,7 +1032,13 @@ void main() {
       // that comparison needs the reference's own face — the page test pins
       // the number under real fonts. Here the floor is what is assertable.
       expect(content.width, greaterThanOrEqualTo(144));
-      expect(content.height, closeTo(136.6875, 0.05));
+      expect(
+        content.height,
+        closeTo(
+          Menu.contentPadding * 2 + Menu.itemHeight * 3 + Menu.separatorHeight,
+          0.05,
+        ),
+      );
     });
 
     testWidgets('hovering a sibling while open switches instantly', (

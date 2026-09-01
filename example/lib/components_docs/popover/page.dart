@@ -304,7 +304,7 @@ const String _previewCode = '''Popover(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText('Update dimensions', TextStyles.section),
+          StyledText('Update dimensions', TextStyles.small),
           SizedBox(height: space(1)),
           StyledText(
             'Set the exact width and height for the selection.',
@@ -347,7 +347,7 @@ class _ShareButtonState extends State<_ShareButton> {
         variant: ButtonVariant.outline,
         label: 'Share',
         onPressed: () => setState(() => _open = !_open),
-        child: const StyledText('Share', TextStyles.buttonLabel),
+        child: const StyledText('Share', TextStyles.nav),
       ),
       content: (BuildContext context, PopoverAnchorMetrics metrics) =>
           PopoverSurface(
@@ -556,7 +556,7 @@ class _PopoverPreviewState extends State<_PopoverPreview> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        StyledText('Bottom side, start aligned', TextStyles.section),
+        StyledText('Bottom side, start aligned', TextStyles.small),
         SizedBox(height: space(3)),
         Popover(
           open: _open,
@@ -571,7 +571,7 @@ class _PopoverPreviewState extends State<_PopoverPreview> {
             size: ButtonSize.md,
             label: 'Open popover',
             onPressed: () => setState(() => _open = !_open),
-            child: StyledText('Open popover', TextStyles.buttonLabel),
+            child: StyledText('Open popover', TextStyles.nav),
           ),
           content: (BuildContext context, PopoverAnchorMetrics metrics) =>
               PopoverSurface(
@@ -587,7 +587,7 @@ class _PopoverPreviewState extends State<_PopoverPreview> {
                     children: <Widget>[
                       StyledText(
                         'Update dimensions',
-                        TextStyles.section,
+                        TextStyles.small,
                         color: theme.popoverForeground,
                       ),
                       SizedBox(height: space(1)),
@@ -607,7 +607,7 @@ class _PopoverPreviewState extends State<_PopoverPreview> {
                         expanded: true,
                         label: 'Done',
                         onPressed: () => setState(() => _open = false),
-                        child: StyledText('Done', TextStyles.buttonLabel),
+                        child: StyledText('Done', TextStyles.nav),
                       ),
                     ],
                   ),
@@ -1433,7 +1433,7 @@ class _A11yRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(label, TextStyles.section, color: theme.actionText),
+          StyledText(label, TextStyles.small, color: theme.actionText),
           SizedBox(height: space(1)),
           StyledText(body, TextStyles.small),
         ],

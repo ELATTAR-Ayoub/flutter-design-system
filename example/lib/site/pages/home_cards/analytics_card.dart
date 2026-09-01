@@ -181,15 +181,34 @@ class _AnalyticsCardState extends State<AnalyticsCard> {
 
     return Card(
       children: <Widget>[
-        CardHeader(
-          title: const CardTitle('Analytics'),
-          action: Button(
-            key: const ValueKey<String>('home-analytics-switch'),
-            variant: ButtonVariant.outline,
-            size: ButtonSize.sm,
-            onPressed: _cycle,
-            child: const Text('Switch metric'),
-          ),
+        // `CardHeader`'s action sits in a plain `Row` child with no `Expanded`
+        // of its own (see `card.dart`'s `CardHeader.build`), so at a large
+        // accessibility text scale "Switch metric" can outgrow what is left
+        // beside the title. Bounding it to half the header's own width and
+        // letting `FittedBox` shrink it to fit is derived from the header's
+        // measured width, not a guessed literal, so desktop at 100% — where
+        // the button never needs the room — renders identically.
+        LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) =>
+              CardHeader(
+                title: const CardTitle('Analytics'),
+                action: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: constraints.maxWidth * 0.5,
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Button(
+                      key: const ValueKey<String>('home-analytics-switch'),
+                      variant: ButtonVariant.outline,
+                      size: ButtonSize.sm,
+                      onPressed: _cycle,
+                      child: const Text('Switch metric'),
+                    ),
+                  ),
+                ),
+              ),
         ),
         CardContent(
           child: Column(

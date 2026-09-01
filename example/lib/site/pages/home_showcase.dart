@@ -616,11 +616,14 @@ class _SettingsCardState extends State<_SettingsCard> {
                 color: theme.mutedForeground,
               ),
               SizedBox(height: space(3)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              // The actions wrap rather than clip: two labels at a large
+              // text scale do not share one line on a phone.
+              Wrap(
+                alignment: WrapAlignment.end,
+                spacing: space(2),
+                runSpacing: space(2),
                 children: <Widget>[
                   _cancel(),
-                  SizedBox(width: space(2)),
                   Button(
                     key: const ValueKey<String>('home-settings-save'),
                     loading: _saving,
@@ -774,7 +777,7 @@ class _SignInCardState extends State<_SignInCard> {
                     Expanded(
                       child: StyledText(
                         authError,
-                        TextStyles.bodySmall,
+                        TextStyles.small,
                         color: theme.destructiveText,
                       ),
                     ),
@@ -919,7 +922,7 @@ class _DashboardCardState extends State<_DashboardCard> {
               SizedBox(height: space(1)),
               StyledText(
                 stat.delta,
-                TextStyles.caption,
+                TextStyles.small,
                 color: theme.mutedForeground,
               ),
             ],
@@ -978,7 +981,7 @@ class _DashboardCardState extends State<_DashboardCard> {
             Expanded(
               child: StyledText(
                 entry.title,
-                TextStyles.bodySmall,
+                TextStyles.small,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

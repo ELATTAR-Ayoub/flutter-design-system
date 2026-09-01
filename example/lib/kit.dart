@@ -58,6 +58,30 @@ final double _arrowSlide = space(0.5);
 /* ── Page header ─────────────────────────────────────────────────────────── */
 
 /// `header.mb-14.border-b.border-border.pb-10`.
+/// A short label rendered in caps.
+///
+/// The uppercasing is a treatment, not a type role: no role in the foundation
+/// transforms its text. The glyphs are uppercased and the authored string is
+/// what a screen reader says, which is why the visible run is excluded from
+/// semantics rather than left to be read as shouting.
+class CapsLabel extends StatelessWidget {
+  const CapsLabel(this.text, {super.key, this.color});
+
+  /// The label, as authored.
+  final String text;
+
+  /// The ink. Omit to inherit.
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: text,
+    child: ExcludeSemantics(
+      child: StyledText(text.toUpperCase(), TextStyles.small, color: color),
+    ),
+  );
+}
+
 class PageHeader extends StatelessWidget {
   const PageHeader({
     super.key,
@@ -94,18 +118,17 @@ class PageHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(eyebrow, TextStyles.eyebrow, color: theme.actionText),
+          CapsLabel(eyebrow, color: theme.actionText),
           SizedBox(height: space(4)),
-          StyledText(
-            title,
-            TextStyles.h1,
-            fontSize: Fluid.h1(context),
-            color: theme.foreground,
-          ),
+          StyledText(title, TextStyles.h1, color: theme.foreground),
           SizedBox(height: space(4)),
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: _measure2xl),
-            child: StyledText(blurb, TextStyles.lead),
+            child: StyledText(
+              blurb,
+              TextStyles.lead,
+              color: theme.mutedForeground,
+            ),
           ),
           if (chips.isNotEmpty) ...<Widget>[
             SizedBox(height: space(7)),
@@ -139,7 +162,7 @@ class _HeaderChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(Radii.full),
         border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
-      child: StyledText(label, TextStyles.chip, color: theme.mutedForeground),
+      child: StyledText(label, TextStyles.badge, color: theme.mutedForeground),
     );
   }
 }
@@ -319,7 +342,7 @@ class _PanelStrip extends StatelessWidget {
     final ThemeTokens theme = ThemeScope.of(context);
     final Widget? labelText = label == null
         ? null
-        : StyledText(label!, TextStyles.eyebrow, color: theme.mutedForeground);
+        : CapsLabel(label!, color: theme.mutedForeground);
     final Widget? noteText = note == null
         ? null
         // `.type-num-*` declares no colour of its own; the strip states it.
@@ -340,7 +363,7 @@ class _PanelStrip extends StatelessWidget {
       children: <Widget>[
         if (labelText != null)
           Flexible(
-            flex: _basis(context, label!, TextStyles.eyebrow),
+            flex: _basis(context, label!, TextStyles.small),
             child: labelText,
           ),
         if (labelText != null && noteText != null) SizedBox(width: space(4)),
@@ -382,7 +405,7 @@ class _PanelStrip extends StatelessWidget {
   ) {
     final TextPainter painter = TextPainter(
       text: TextSpan(
-        text: spec.uppercase ? text.toUpperCase() : text,
+        text: text,
         // Colour cannot move a glyph, so the strip's own `text-*` override is
         // left off and the class resolves its metrics alone.
         style: StyledText.styleOf(context, spec),
@@ -462,10 +485,14 @@ class StateGrid extends StatelessWidget {
   ///
   /// Every one of them is 2-up on a phone; they part company at `sm:` and
   /// again at `lg:`. The buttons page passes 4 (variants) and 5 (states).
-  const StateGrid({super.key, required this.children, this.cols = 4})
-    : base = null,
-      sm = null,
-      lg = null;
+  const StateGrid({
+    super.key,
+    required this.children,
+    this.cols = 4,
+    this.matchHeights = true,
+  }) : base = null,
+       sm = null,
+       lg = null;
 
   /// A lattice with a column map of its own.
   ///
@@ -479,6 +506,7 @@ class StateGrid extends StatelessWidget {
     this.base = 1,
     this.sm,
     this.lg,
+    this.matchHeights = true,
   }) : cols = null;
 
   final List<Widget> children;
@@ -490,6 +518,9 @@ class StateGrid extends StatelessWidget {
   final int? base;
   final int? sm;
   final int? lg;
+
+  /// Forwarded to the internal [Grid] — see [Grid.matchHeights].
+  final bool matchHeights;
 
   @override
   Widget build(BuildContext context) {
@@ -524,6 +555,7 @@ class StateGrid extends StatelessWidget {
             sm: map.$2,
             lg: map.$3,
             gap: BorderWidths.hairline,
+            matchHeights: matchHeights,
             children: children,
           ),
         ),
@@ -604,7 +636,7 @@ class StateCell extends StatelessWidget {
           ),
           StyledText(
             label!,
-            TextStyles.eyebrowSmall,
+            TextStyles.small,
             color: theme.mutedForeground,
             align: TextAlign.center,
           ),
@@ -612,7 +644,7 @@ class StateCell extends StatelessWidget {
             SizedBox(height: space(1.5)),
             StyledText(
               note!,
-              TextStyles.caption,
+              TextStyles.small,
               color: theme.mutedForeground,
               align: TextAlign.center,
             ),
@@ -904,7 +936,7 @@ class _ChipFrame extends CustomPainter {
 ///   number: and `leading-relaxed` is a utility, so the utility's 1.625 wins:
 ///   20.3125px per line. That override is why the style is assembled here
 ///   rather than handed to [StyledText], which renders a `.type-*` class as
-///   declared. The ratio is read off [TextStyles.textareaBody], which
+///   declared. The ratio is read off [TextStyles.body], which
 ///   resolves the same utility on `Textarea`: one spelling of one number,
 ///   not a second literal that can drift from it.
 /// * **`.type-code` sets no `font-weight`**, so a sample inherits 400. It is
@@ -943,7 +975,7 @@ class _DsCodeBlockState extends State<CodeBlock> {
       context,
       TextStyles.code,
       color: theme.mutedForeground,
-    ).copyWith(height: TextStyles.textareaBody.height);
+    ).copyWith(height: TextStyles.body.step.ratio);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -1054,7 +1086,7 @@ class _DoDontPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StyledText(heading, TextStyles.eyebrow, color: ink),
+          CapsLabel(heading, color: ink),
           SizedBox(height: space(3)),
           for (int i = 0; i < items.length; i++) ...<Widget>[
             if (i > 0) SizedBox(height: space(2.5)),
@@ -1125,9 +1157,7 @@ class Note extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           if (title != null) ...<Widget>[
-            // No colour override: `.type-label` brings its own
-            // `--muted-foreground`, which is what the browser renders here.
-            StyledText(title!, TextStyles.eyebrow),
+            CapsLabel(title!, color: ThemeScope.of(context).mutedForeground),
             SizedBox(height: space(2)),
           ],
           DefaultTextStyle(
@@ -1166,6 +1196,7 @@ class Grid extends StatelessWidget {
     this.lg,
     this.xl,
     this.gap,
+    this.matchHeights = true,
   });
 
   final List<Widget> children;
@@ -1177,6 +1208,21 @@ class Grid extends StatelessWidget {
 
   /// Defaults to `gap-4`.
   final double? gap;
+
+  /// Whether a multi-cell row wraps in `IntrinsicHeight` to give every cell
+  /// in it one shared height.
+  ///
+  /// True everywhere by default, matching the reference's own `items-stretch`
+  /// grids. `IntrinsicHeight`'s dry-layout pass can disagree with a cell that
+  /// answers the intrinsic-dimension protocol differently than it sizes
+  /// during real layout — a known instance is `Bubble`'s `_MaxWidthFraction`,
+  /// which forwards the *unconstrained* width to its child on that pass
+  /// instead of `width * factor`, under-reporting the height a wrapped
+  /// caption really needs (`lib/src/components/ui/bubble.dart`). A caller
+  /// that knows its cells hit this sets `matchHeights: false` rather than
+  /// the whole grid failing to lay out at all; cells then keep their own
+  /// natural height instead of a shared one.
+  final bool matchHeights;
 
   int _columns(double viewport) {
     int columns = base;
@@ -1206,23 +1252,49 @@ class Grid extends StatelessWidget {
       children: <Widget>[
         for (int r = 0; r < rows.length; r++) ...<Widget>[
           if (r > 0) SizedBox(height: layoutGap),
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          // A row of exactly one cell (every row, at `columns == 1`) has
+          // nothing to sync its height against, so it skips the
+          // `IntrinsicHeight` wrapper below rather than paying for it. The
+          // wrapper is not just wasted work there: `IntrinsicHeight`
+          // computes a child's height through the intrinsic-dimension
+          // protocol, which some subtrees (a horizontally scrolling child,
+          // an animated `Surface`) answer differently than they size during
+          // real layout, and a lone cell has no sibling that needs the
+          // synchronised number in the first place.
+          if (rows[r].length == 1)
+            rows[r][0]
+          else if (!matchHeights)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 for (int c = 0; c < columns; c++) ...<Widget>[
                   if (c > 0) SizedBox(width: layoutGap),
                   Expanded(
                     child: c < rows[r].length
                         ? rows[r][c]
-                        // The trailing cells of a short last row: empty, so
-                        // the row's cards keep their column width.
                         : const SizedBox.shrink(),
                   ),
                 ],
               ],
+            )
+          else
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  for (int c = 0; c < columns; c++) ...<Widget>[
+                    if (c > 0) SizedBox(width: layoutGap),
+                    Expanded(
+                      child: c < rows[r].length
+                          ? rows[r][c]
+                          // The trailing cells of a short last row: empty, so
+                          // the row's cards keep their column width.
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ],
+              ),
             ),
-          ),
         ],
       ],
     );
@@ -1291,11 +1363,7 @@ class IndexCard extends StatelessWidget {
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                StyledText(
-                                  label!,
-                                  TextStyles.eyebrow,
-                                  color: theme.actionText,
-                                ),
+                                CapsLabel(label!, color: theme.actionText),
                                 SizedBox(height: space(3)),
                                 StyledText(
                                   title,
@@ -1422,11 +1490,7 @@ class _CardChip extends StatelessWidget {
         color: theme.muted,
         borderRadius: BorderRadius.circular(Radii.sm),
       ),
-      child: StyledText(
-        label,
-        TextStyles.caption,
-        color: theme.mutedForeground,
-      ),
+      child: CapsLabel(label, color: theme.mutedForeground),
     );
   }
 }
@@ -1513,10 +1577,14 @@ class _FootNavCardState extends State<_FootNavCard> {
           : CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        StyledText(
-          widget.isNext ? 'Next' : 'Previous',
-          TextStyles.eyebrowSmall,
-          align: widget.isNext ? TextAlign.right : TextAlign.left,
+        Align(
+          alignment: widget.isNext
+              ? AlignmentDirectional.centerEnd
+              : AlignmentDirectional.centerStart,
+          child: CapsLabel(
+            widget.isNext ? 'Next' : 'Previous',
+            color: theme.mutedForeground,
+          ),
         ),
         SizedBox(height: space(1)),
         StyledText(
@@ -1644,4 +1712,63 @@ class DividedList extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A specimen that keeps its own width, centred while it fits and scrolled
+/// when it does not.
+///
+/// The naive way to rescue a `w-fit` component from a narrow column is to drop
+/// it in a horizontal [SingleChildScrollView]. That breaks it: a horizontal
+/// scroll view hands its child an unbounded width, so a [Row] that centred
+/// itself with `MainAxisAlignment.center` has nothing to centre against and
+/// lands hard against the leading edge. `Pagination` and `ButtonGroup` both
+/// read as broken that way, which is how this class came to exist.
+///
+/// The fix is the standard recipe: give the scrolled child a minimum width
+/// equal to the viewport, so it is exactly as wide as the column whenever it
+/// fits and its own natural width whenever it does not. The centring then has
+/// something to work with, and the scroll only engages when there is genuinely
+/// something to scroll to.
+class SpecimenScroll extends StatelessWidget {
+  const SpecimenScroll({super.key, required this.child, this.centred = true});
+
+  final Widget child;
+
+  /// Whether the specimen centres in the column while it fits. False for a
+  /// rail that reads from the leading edge, such as a row of cards.
+  final bool centred;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (BuildContext context, BoxConstraints constraints) {
+      // No viewport to centre against: fall back to a plain scroller rather
+      // than to the bare child, which would lose the scroll altogether and
+      // hand the overflow straight back to whatever is above.
+      if (!constraints.hasBoundedWidth) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: child,
+        );
+      }
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        // A [Row], not an [Align]. Align takes the largest size its
+        // constraints allow, and a horizontal scroll view offers an INFINITE
+        // maximum, so an Align here expands to infinity and paints nothing at
+        // all. That is what made the pagination specimen render as an empty
+        // box. A `MainAxisSize.min` row hugs its child, still honours the
+        // minimum width below, and centres inside whatever is left.
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minWidth: constraints.maxWidth),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: centred
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
+            children: <Widget>[child],
+          ),
+        ),
+      );
+    },
+  );
 }

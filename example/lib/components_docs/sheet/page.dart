@@ -328,7 +328,7 @@ const String _compositionCode = '''SheetContent(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          StyledText('Price range', TextStyles.section),
+          StyledText('Price range', TextStyles.small),
           SizedBox(height: space(4)),
           Slider(
             values: price,
@@ -446,13 +446,18 @@ class _SheetSidesPreview extends StatelessWidget {
 /// `mainAxisSize.max`, which asserts if the incoming height is unbounded —
 /// as it is here, one level inside the showcase stage's own scroll body — so
 /// this wraps it in a fixed-height [SizedBox] first, the same way a bounded
-/// viewport height would in the real, portal-mounted case.
+/// viewport height would in the real, portal-mounted case. That stand-in
+/// height is scaled by the ambient [TextScaler]: a real, portal-mounted
+/// sheet gets the actual device viewport, dwarfing this fixed box, so it is
+/// this specimen's artificially small height — not the title/description
+/// text — that is the synthetic constraint. Scaling it keeps the header
+/// readable instead of overflowing as the text grows.
 class _NoCloseButtonPreview extends StatelessWidget {
   const _NoCloseButtonPreview();
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: space(64),
+    height: space(64) * MediaQuery.textScalerOf(context).scale(1),
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
       child: const SheetContent(
@@ -483,7 +488,8 @@ class _RtlPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: space(64),
+    // Same textScaler-scaled stand-in height as [_NoCloseButtonPreview].
+    height: space(64) * MediaQuery.textScalerOf(context).scale(1),
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
       child: const Directionality(
