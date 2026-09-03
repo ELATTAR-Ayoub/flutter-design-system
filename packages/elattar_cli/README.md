@@ -1,7 +1,12 @@
 # elattar_cli
 
-Installs [Elattar](https://github.com/ELATTAR-Ayoub/flutter-design-system)'s
-Flutter design system into your project **as source you own**.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ELATTAR-Ayoub/flutter-design-system/main/docs/assets/readme/hero.png" alt="Elattar source, foundation, and agent tooling" width="100%" />
+</p>
+
+Install production-ready Flutter components **as source you own**. Elattar
+brings the component, its accessible behavior, and its foundation dependencies
+into your project, where your team can inspect, change, and ship them.
 
 There is no `elattar_design_system` dependency to add. `elattar add button`
 copies `button.dart` into `lib/components/ui/`, rewrites its imports to point
@@ -15,6 +20,17 @@ cd my_flutter_app
 elattar init --foundation source
 elattar add button
 ```
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ELATTAR-Ayoub/flutter-design-system/main/docs/assets/launch/elattar-quickstart.webp" alt="Elattar installs its foundation and button source, then shows the resulting component gallery" width="720" />
+</p>
+
+That produces local component and foundation barrels under `lib/`; it does not
+add an `elattar_design_system` runtime dependency. Explore the [live component
+gallery](https://flutter.elattar.dev/components), follow the [installation
+guide](https://flutter.elattar.dev/docs/installation), watch the [45-second
+quickstart](https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/docs/assets/launch/elattar-quickstart.mp4),
+or read the [source-owned model](https://flutter.elattar.dev/docs/introduction).
 
 ## Install
 

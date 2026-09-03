@@ -1,59 +1,13 @@
-# GATED. Deployment is manual until the release gates below are closed.
-#
-# The original `push: branches: [main]` trigger was removed during the Phase I
-# audit because one merge would have published, publicly and simultaneously,
-# every blocker that audit found. Most of them are now closed — see
-# `docs/superpowers/reports/public-release/v0.0.1-public-release-baseline.md`,
-# which classifies each one against the commit it was fixed in rather than
-# repeating the original list.
-#
-# Closed since the gate was written: the placeholder LICENSE (a real MIT
-# license with the confirmed copyright line), the three unlicensed font
-# binaries, the unattributed Lucide geometry, the unattributed shader, the
-# texture of unknown provenance (regenerated deterministically), the broken
-# quickstart command, the false "OPEN SOURCE" badge, and the developer toast
-# shipped to public readers.
-#
-# Also closed since: docs routing. All seven /docs guide cards resolve, the
-# three declared routes (Typeset, Registry, Changelog) have pages, and
-# `example/test/docs_pages_routing_test.dart` fails if a catalog entry ever
-# stops resolving through routing, sidebar, pager, breadcrumbs and search.
-#
-# STILL OPEN, and each one blocks restoring an automatic trigger:
-#
-#   1. The repository is not public. Every registry `sourceLink`, every plugin
-#      install command on /skills, and every clone URL in the docs is a 404 to
-#      an anonymous reader, so deploying now publishes a site whose links do
-#      not work. (The /skills page's `/plugin marketplace add ...` commands are
-#      a consequence of this one, not a separate blocker: they become correct
-#      the moment the repository is readable.)
-#   2. `main` does not contain this branch. Every `sourceLink` now pins
-#      `blob/v0.0.1/`, so the links resolve from the tag rather than from a
-#      moving branch — but the tag does not exist yet, and creating it is the
-#      owner's Task 12 step 4.
-#
-# Until then: Actions -> "Deploy Docs" -> "Run workflow", deliberately.
-#
-# When both are closed, Task 12 step 12 restores the automatic path by adding
-# this to the `on:` block below. It deploys only from a green CI run on `main`,
-# never from a push directly:
-#
-#   workflow_run:
-#     workflows: [CI]
-#     types: [completed]
-#     branches: [main]
-#
-# and gating the `build` job on it:
-#
-#   if: >-
-#     github.event_name == 'workflow_dispatch' ||
-#     github.event.workflow_run.conclusion == 'success'
-#
-# It is written out here rather than left as an intention so that step 12 is a
-# review of an exact diff, not a design decision made under release pressure.
+# Deploy manually when rehearsing a release, and automatically only after CI
+# completes successfully on main. The workflow-run gate prevents a push from
+# publishing a site that failed the repository, registry, CLI, or web checks.
 name: Deploy Docs
 
 on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       stage_registry:
@@ -62,9 +16,9 @@ on:
         type: boolean
         default: true
       registry_version:
-        description: The immutable registry version to publish.
+        description: The immutable registry version to publish; blank uses the current CLI version.
         type: string
-        default: 0.0.1
+        default: ''
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -77,12 +31,17 @@ permissions:
 
 jobs:
   build:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -115,6 +74,16 @@ jobs:
         working-directory: example
         run: flutter build web --release --base-href /flutter-design-system/
 
+      - name: Resolve registry version
+        id: release
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ inputs.registry_version }}
+        run: |
+          current_version="$(sed -n "s/^const String cliVersion = '\([^']*\)';$/\1/p" packages/elattar_cli/lib/src/identity.dart)"
+          test -n "$current_version"
+          echo "version=${INPUT_VERSION:-$current_version}" >> "$GITHUB_OUTPUT"
+
       # The registry is staged INTO the built site, so the CLI's default
       # registry URL and the documentation share one origin and one
       # deployment. Staging after the build is deliberate: `flutter build web`
@@ -122,19 +91,19 @@ jobs:
       #
       # `stage.dart` refuses to overwrite an already-published version with
       # different bytes. That refusal is the whole guarantee behind the CLI
-      # pinning `/registry/0.0.1/` — a released CLI must not start installing
+      # pinning `/registry/<version>/` — a released CLI must not start installing
       # different sources because a later deploy reused the path.
       - name: Stage the versioned registry
-        if: ${{ inputs.stage_registry }}
+        if: ${{ github.event_name == 'workflow_run' || inputs.stage_registry }}
         run: >-
           dart run tool/release_registry/bin/stage.dart
-          --version ${{ inputs.registry_version }}
+          --version ${{ steps.release.outputs.version }}
           --web-root example/build/web
-          --commit ${{ github.sha }}
+          --commit ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Show what will be published
-        if: ${{ inputs.stage_registry }}
-        run: cat example/build/web/registry/${{ inputs.registry_version }}/release.json
+        if: ${{ github.event_name == 'workflow_run' || inputs.stage_registry }}
+        run: cat example/build/web/registry/${{ steps.release.outputs.version }}/release.json
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

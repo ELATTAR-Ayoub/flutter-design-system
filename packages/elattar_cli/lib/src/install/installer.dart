@@ -76,8 +76,9 @@ class Installer {
           overwrite,
         );
         if (file.target.startsWith('@ui/')) uiFiles.add(destination);
-        if (file.target.startsWith('@foundation/'))
+        if (file.target.startsWith('@foundation/')) {
           foundationFiles.add(destination);
+        }
       }
       for (final InstallResource resource in item.assets) {
         final String destination = mapper.destination(
@@ -233,10 +234,11 @@ class Installer {
   }
 
   void apply(InstallPlan plan) {
-    if (!plan.canApply)
+    if (!plan.canApply) {
       throw StateError(
         'Install plan has conflicts; pass overwrite or resolve them first.',
       );
+    }
     for (final InstallOperation operation in plan.operations) {
       final File file = File(operation.destination);
       file.parent.createSync(recursive: true);
@@ -322,8 +324,9 @@ class Installer {
       if (staged != null) return staged;
     }
     final File file = File(_join(root.path, source));
-    if (!file.existsSync())
+    if (!file.existsSync()) {
       throw StateError('Missing registry resource: $source');
+    }
     return file.readAsBytesSync();
   }
 
@@ -337,8 +340,9 @@ class Installer {
     final List<int>? staged = payloads.bytesFor(item, target);
     if (staged != null) return utf8.decode(staged);
     final File file = File(_join(root.path, source));
-    if (!file.existsSync())
+    if (!file.existsSync()) {
       throw StateError('Missing registry source: $source');
+    }
     return file.readAsStringSync();
   }
 

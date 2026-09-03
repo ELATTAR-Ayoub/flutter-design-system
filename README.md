@@ -4,8 +4,13 @@
 
 # Elattar Design System
 
-A native Flutter design system with source-owned components, a versioned CLI
-registry, and an agent skill that knows how to use both.
+Production-ready Flutter components delivered as source you own. Start with a
+native foundation, copy only the components you need, and keep every design
+decision visible in your codebase.
+
+[![CI](https://github.com/ELATTAR-Ayoub/flutter-design-system/actions/workflows/ci.yml/badge.svg)](https://github.com/ELATTAR-Ayoub/flutter-design-system/actions/workflows/ci.yml)
+[![pub package](https://img.shields.io/pub/v/elattar_cli.svg)](https://pub.dev/packages/elattar_cli)
+[![license: MIT](https://img.shields.io/badge/license-MIT-2563eb.svg)](LICENSE)
 
 `0.0.2`, the current public release.
 
@@ -13,11 +18,13 @@ registry, and an agent skill that knows how to use both.
 [Components](https://flutter.elattar.dev/components) ·
 [Installation](https://flutter.elattar.dev/docs/installation) ·
 [Skills](https://flutter.elattar.dev/skills) ·
-[Changelog](CHANGELOG.md)
+[Changelog](CHANGELOG.md) ·
+[0.1.0 milestone](docs/launch/0.1.0-release-contract.md) ·
+[Adoption](docs/ADOPTION.md)
 
-## Install
+## Own your first component
 
-Install the CLI, then run it inside your Flutter project:
+Run three commands inside a Flutter project:
 
 ```bash
 dart install elattar_cli
@@ -26,8 +33,21 @@ elattar init --foundation source
 elattar add button
 ```
 
-`elattar add button` copies the component and its dependencies into your
-project. The installed source is yours to read, change, and ship.
+<p align="center">
+  <img src="docs/assets/launch/elattar-quickstart.webp" alt="Elattar installs its foundation and button source, then shows the resulting component gallery" width="720" />
+</p>
+
+That is the whole quickstart. `elattar add button` copies the component and its
+foundation dependencies into your project. The installed source is yours to
+inspect, change, and ship—there is no design-system runtime dependency hiding
+the implementation.
+
+The current registry contains 99 integrity-checked items, including accessible
+controls, navigation, data display, charts, agent UI, effects, motion, and one
+complete application block. Browse the [live component
+gallery](https://flutter.elattar.dev/components) or watch the [45-second
+quickstart](docs/assets/launch/elattar-quickstart.mp4) before installing
+anything.
 
 Use `elattar add --all` for the complete registry and `elattar doctor` to check
 the installation. Windows PATH help, offline use, and every CLI option live in

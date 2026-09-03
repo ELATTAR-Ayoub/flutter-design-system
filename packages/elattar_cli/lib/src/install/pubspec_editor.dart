@@ -31,8 +31,9 @@ class PubspecEditor {
         .toList();
     if (additions.isEmpty) return source;
     final Match? match = _flutterBlock.firstMatch(source);
-    if (match == null)
+    if (match == null) {
       return '$source\nflutter:\n  assets:\n${additions.map((String v) => '    - $v\n').join()}';
+    }
     final String body = match.group(1) ?? '';
     if (body.contains(RegExp(r'^  assets:\s*$', multiLine: true))) {
       final int end = _sectionEnd(body, '  assets:');
@@ -82,8 +83,9 @@ class PubspecEditor {
         .toList();
     if (additions.isEmpty) return source;
     final Match? match = _flutterBlock.firstMatch(source);
-    if (match == null)
+    if (match == null) {
       return '$source\nflutter:\n  shaders:\n${additions.map((String v) => '    - $v\n').join()}';
+    }
     final String body = match.group(1) ?? '';
     if (body.contains(RegExp(r'^  shaders:\s*$', multiLine: true))) {
       final int end = _sectionEnd(body, '  shaders:');

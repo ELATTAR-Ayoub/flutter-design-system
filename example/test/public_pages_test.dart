@@ -4,6 +4,7 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/catalog.dart';
 import 'package:example/docs/docs_code.dart';
 import 'package:example/docs/docs_disclosure.dart';
+import 'package:example/docs_pages/catalog.dart' show docsInstallationRoute;
 import 'package:example/main.dart';
 import 'package:example/skills_docs/catalog.dart';
 import 'package:example/skills_docs/skills_page.dart';
@@ -84,9 +85,19 @@ void main() {
   ) async {
     await tester.pumpWidget(_harness(const PublicHomePage()));
 
+    expect(find.textContaining('documented registry items'), findsOneWidget);
+    expect(find.text('Own your Flutter\ninterface.'), findsOneWidget);
+    expect(find.text('Install Elattar'), findsOneWidget);
     expect(find.text('Browse components'), findsOneWidget);
-    expect(find.text('Build the interface\nyou mean.'), findsOneWidget);
-    expect(find.text('Start building'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is DocsSelectableCodeBlock &&
+            widget.code.contains('elattar add button'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('99'), findsOneWidget);
     // The grid is the point: a live composition's own card title, not a
     // screenshot or a description of one.
     expect(find.text('Building blocks'), findsOneWidget);
@@ -133,23 +144,37 @@ void main() {
     }
   });
 
+  testWidgets('the home remains readable at narrow width and 200% text', (
+    WidgetTester tester,
+  ) async {
+    _sizeTo(tester, const Size(390, 6000));
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(_harness(const PublicHomePage()));
+    await tester.pump();
+
+    expect(find.text('Install Elattar'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('public page actions report their route without owning routing', (
     WidgetTester tester,
   ) async {
     final List<String> routes = <String>[];
     await tester.pumpWidget(_harness(PublicHomePage(onNavigate: routes.add)));
 
-    final Finder startBuilding = find.text('Start building');
-    await tester.ensureVisible(startBuilding);
-    await tester.tap(startBuilding);
+    final Finder installElattar = find.text('Install Elattar');
+    await tester.ensureVisible(installElattar);
+    await tester.tap(installElattar);
     await tester.pump();
-    expect(routes, <String>[publicDocsRoute]);
+    expect(routes, <String>[docsInstallationRoute]);
 
-    final Finder browseGrid = find.text('Browse components');
-    await tester.ensureVisible(browseGrid);
-    await tester.tap(browseGrid);
+    final Finder browseComponents = find.text('Browse components');
+    await tester.ensureVisible(browseComponents);
+    await tester.tap(browseComponents);
     await tester.pump();
-    expect(routes, <String>[publicDocsRoute, publicComponentsRoute]);
+    expect(routes, <String>[docsInstallationRoute, publicComponentsRoute]);
   });
 
   testWidgets('components page renders the four taxonomy sections', (

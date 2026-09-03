@@ -37,7 +37,13 @@ const String packageModeUnavailable =
     'it produces. Use `--foundation source`, which copies the foundation into '
     'your project.';
 
+/// Dispatches Elattar CLI commands against a Flutter project and registry.
+///
+/// The optional sinks, fetcher, cache, and working directory keep the command
+/// embeddable and deterministic in tools and tests. Omitted values use the
+/// current process environment.
 class ElattarCli {
+  /// Creates a command dispatcher.
   ElattarCli({
     void Function(String line)? stdoutSink,
     void Function(String line)? stderrSink,
@@ -104,6 +110,10 @@ class ElattarCli {
     );
   }
 
+  /// Runs one command and returns a documented process exit code.
+  ///
+  /// Passing no arguments prints the usage summary. Command failures are
+  /// translated to concise messages on the configured error sink.
   Future<int> run(List<String> arguments) async {
     final _ArgCursor cursor = _ArgCursor(arguments);
     if (!cursor.hasNext) {

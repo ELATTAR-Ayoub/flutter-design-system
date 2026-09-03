@@ -29,7 +29,6 @@ on:
   push:
     branches:
       - main
-      - public-release-v0.0.1
   workflow_dispatch:
 
 concurrency:
@@ -95,7 +94,7 @@ jobs:
 
       - name: Check formatting — tool packages
         run: |
-          for package in registry_builder release_registry generate_perlin_texture release_audit; do
+          for package in registry_builder release_registry generate_perlin_texture release_audit adoption_metrics; do
             (cd "tool/$package" && dart format --output=none --set-exit-if-changed bin lib test)
           done
 
@@ -110,7 +109,7 @@ jobs:
       # invoked separately or they are analysed and tested by nothing at all.
       - name: Analyze and test tool packages
         run: |
-          for package in registry_builder release_registry generate_perlin_texture release_audit; do
+          for package in registry_builder release_registry generate_perlin_texture release_audit adoption_metrics; do
             echo "::group::tool/$package"
             (cd "tool/$package" && dart pub get && dart analyze && dart test --reporter expanded)
             echo "::endgroup::"
@@ -238,7 +237,11 @@ jobs:
         run: dart run tool/deploy_site/bin/build_site.dart
 
       - name: Validate the staged registry
-        run: dart run tool/registry_builder/bin/validate.dart example/build/web/registry/0.0.1/registry.json
+        shell: bash
+        run: |
+          registry_version="$(sed -n "s/^const String cliVersion = '\([^']*\)';$/\1/p" packages/elattar_cli/lib/src/identity.dart)"
+          test -n "$registry_version"
+          dart run tool/registry_builder/bin/validate.dart "example/build/web/registry/$registry_version/registry.json"
 
       - name: Upload Flutter test reports
         if: failure()

@@ -46,8 +46,9 @@ class FileRegistryCache extends RegistryCache {
   /// capability the user does not have.
   factory FileRegistryCache.open({Directory? directory}) {
     final Directory? resolved = directory ?? defaultCacheDirectory();
-    if (resolved == null)
+    if (resolved == null) {
       return FileRegistryCache._(null, <String, List<int>>{});
+    }
     try {
       resolved.createSync(recursive: true);
       // Prove writability now rather than at the first download, when the

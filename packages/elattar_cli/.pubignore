@@ -2,8 +2,8 @@
 #
 # `.pubignore` replaces `.gitignore` for packaging, so anything not listed here
 # is uploaded. The rule applied below: ship what the command needs at runtime,
-# plus the three files a person reads before installing it — README, CHANGELOG
-# and LICENSE — and nothing else.
+# plus the files a person or pub.dev reads before installing it — README,
+# CHANGELOG, LICENSE, and the runnable example — and nothing else.
 
 # The test suite. It is 3,000 lines and it needs a checkout to run against:
 # `remote_registry_test.dart` serves `../../registry/generated/latest`, and
@@ -11,6 +11,9 @@
 # Neither path exists inside the archive, so shipping them would only give a
 # consumer tests that cannot pass.
 test/
+
+# `example/` stays in the archive. pub.dev uses it as the runnable library
+# example and awards the package-page documentation check for it.
 
 # Resolution output. `pubspec.lock` is not a lock for a published package —
 # pub resolves against the consumer's constraints — and `.dart_tool/` is this

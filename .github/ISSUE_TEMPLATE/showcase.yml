@@ -1,0 +1,45 @@
+name: Share a project using Elattar
+description: Help us understand where Elattar works and where adoption is difficult.
+title: "[Showcase]: "
+labels:
+  - showcase
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share only information you are comfortable making public. A private project description is enough; a repository link is optional.
+  - type: input
+    id: project
+    attributes:
+      label: What are you building?
+      description: A short product category is enough, such as finance app or internal dashboard.
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How far did you get?
+      options:
+        - Installed the foundation and at least one component
+        - Evaluated the docs or component gallery
+        - Tried the quickstart but could not finish
+    validations:
+      required: true
+  - type: textarea
+    id: useful
+    attributes:
+      label: What was useful?
+    validations:
+      required: true
+  - type: textarea
+    id: friction
+    attributes:
+      label: What nearly stopped you?
+      description: Include the next step you expected, but remove private paths and credentials.
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Public link
+      description: Optional repository, screenshot, or deployed application.

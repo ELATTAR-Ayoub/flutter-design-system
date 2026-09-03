@@ -15,6 +15,7 @@ analyzer:
     - tool/generate_perlin_texture/**
     - tool/release_registry/**
     - tool/release_audit/**
+    - tool/adoption_metrics/**
     - tool/verify/out/**
     - test/project_config_test.dart
     - test/registry_builder_test.dart

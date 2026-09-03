@@ -1,0 +1,41 @@
+name: Adoption metrics
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 1 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Resolve report dependencies
+        working-directory: tool/adoption_metrics
+        run: dart pub get
+
+      - name: Build aggregate adoption snapshot
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          dart run tool/adoption_metrics/bin/report.dart
+          --output reports/adoption/weekly.md
+
+      - name: Upload weekly snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: adoption-metrics-${{ github.run_id }}
+          path: reports/adoption/weekly.md
+          retention-days: 90

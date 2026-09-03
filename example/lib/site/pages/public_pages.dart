@@ -36,6 +36,7 @@ import 'package:flutter/material.dart'
 
 import '../../kit.dart';
 import '../../components_docs/catalog.dart';
+import '../../docs/docs_code.dart';
 // `/docs` and `/components` are documentation pages, so they render in the
 // same [DocsLayout] shell every other documentation page uses, which is where
 // the shared left rail and the in-page right rail come from.
@@ -49,6 +50,7 @@ import '../../docs_pages/catalog.dart'
         docsRegistryRoute,
         docsThemingRoute,
         docsTypesetRoute;
+import '../../docs_pages/release_facts.dart';
 import '../site_routes.dart' show componentsRoute, docsRoute, skillsRoute;
 import 'home_showcase.dart';
 
@@ -87,7 +89,7 @@ class PublicHomePage extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: Containers.xl2),
               child: StyledText(
-                'Build the interface\nyou mean.',
+                'Own your Flutter\ninterface.',
                 TextStyles.display,
                 align: TextAlign.center,
                 color: theme.foreground,
@@ -99,9 +101,9 @@ class PublicHomePage extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: Containers.md),
               child: StyledText(
-                'A copy-first design system for Flutter. Start with the '
-                'foundation, add only the pieces you need, and keep every '
-                'decision visible in your own codebase.',
+                'Production-ready Flutter components delivered as source you '
+                'own. Start with the foundation, add only what you need, and '
+                'keep every design decision in your codebase.',
                 TextStyles.lead,
                 align: TextAlign.center,
               ),
@@ -109,12 +111,44 @@ class PublicHomePage extends StatelessWidget {
           ),
           SizedBox(height: space(7)),
           Center(
-            child: Button(
-              size: ButtonSize.lg,
-              onPressed: onNavigate == null
-                  ? null
-                  : () => onNavigate!(publicDocsRoute),
-              child: const Text('Start building'),
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: space(3),
+              runSpacing: space(3),
+              children: <Widget>[
+                Button(
+                  size: ButtonSize.lg,
+                  onPressed: onNavigate == null
+                      ? null
+                      : () => onNavigate!(docsInstallationRoute),
+                  child: const Text('Install Elattar'),
+                ),
+                Button(
+                  size: ButtonSize.lg,
+                  variant: ButtonVariant.outline,
+                  onPressed: onNavigate == null
+                      ? null
+                      : () => onNavigate!(publicComponentsRoute),
+                  child: const Text('Browse components'),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: space(10)),
+          const _ProofGrid(),
+          SizedBox(height: space(8)),
+          const DocsCodeExample(
+            title: 'Own your first component',
+            description:
+                'Run three commands in a Flutter project. Button and its '
+                'foundation dependencies become local source you can inspect, '
+                'change, and ship.',
+            command: DocsCodeCommand(
+              label: 'Three-command quickstart',
+              command:
+                  'dart install elattar_cli\n'
+                  'elattar init --foundation source\n'
+                  'elattar add button',
             ),
           ),
           SizedBox(height: space(16)),
@@ -149,8 +183,11 @@ class _HeroPill extends StatelessWidget {
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const Flexible(
-          child: Text('Browse components', overflow: TextOverflow.ellipsis),
+        Flexible(
+          child: Text(
+            'v${releaseFacts.version} · ${componentDocs.length} documented registry items',
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         SizedBox(width: space(1.5)),
         const Icon(
@@ -161,6 +198,74 @@ class _HeroPill extends StatelessWidget {
       ],
     ),
   );
+}
+
+/// Three compact reasons to trust the quickstart before the live specimen
+/// wall asks for a reader's time. The values describe release artifacts, not
+/// marketing estimates: the published registry, dependency graph, and source
+/// install contract are all checked by CI.
+class _ProofGrid extends StatelessWidget {
+  const _ProofGrid();
+
+  @override
+  Widget build(BuildContext context) => Grid(
+    sm: 3,
+    gap: space(3),
+    children: <Widget>[
+      _ProofPoint(
+        value: '${componentDocs.length}',
+        label: 'registry items',
+        detail: 'Components, one app block, and the complete foundation.',
+      ),
+      const _ProofPoint(
+        value: '1',
+        label: 'runtime dependency',
+        detail: 'The CLI stays small; installed UI becomes your source.',
+      ),
+      const _ProofPoint(
+        value: 'SHA-256',
+        label: 'verified payloads',
+        detail: 'Every download is checked before the first file is written.',
+      ),
+    ],
+  );
+}
+
+class _ProofPoint extends StatelessWidget {
+  const _ProofPoint({
+    required this.value,
+    required this.label,
+    required this.detail,
+  });
+
+  final String value;
+  final String label;
+  final String detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Card(
+      children: <Widget>[
+        CardContent(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              StyledText(value, TextStyles.numberLg, color: theme.foreground),
+              SizedBox(height: space(1)),
+              StyledText(label, TextStyles.nav, color: theme.actionText),
+              SizedBox(height: space(2)),
+              StyledText(
+                detail,
+                TextStyles.small,
+                color: theme.mutedForeground,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class PublicDocsPage extends StatelessWidget {
@@ -225,7 +330,9 @@ class PublicComponentsPage extends StatelessWidget {
         description: 'Every component available in the library, in one place.',
       ),
       toc: <DocsTocEntry>[
-        for (final ComponentDocFamily family in ComponentDocFamily.values)
+        for (final ComponentDocFamily family
+            in ComponentDocFamily
+                .values) // ui-check: ignore — the non-empty enum is the catalog source of truth.
           DocsTocEntry(title: family.label, anchor: _familyAnchor(family)),
       ],
       onNavigate: onNavigate,
