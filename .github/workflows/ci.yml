@@ -173,7 +173,7 @@ jobs:
       # shipped since 9c48294.
       - name: Test CLI against the generated registry
         working-directory: packages/elattar_cli
-        run: dart test --reporter expanded --file-reporter=json:reports/cli-tests.json
+        run: dart test --concurrency=1 --reporter github --file-reporter=json:reports/cli-tests.json
 
       - name: Upload CLI test report
         if: failure()
