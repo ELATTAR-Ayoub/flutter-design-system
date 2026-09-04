@@ -74,47 +74,43 @@ List<String> _writtenPaths(ProcessResult result) {
 }
 
 void main() {
-  test(
-    '--all matches the explicit installable inventory surface',
-    () async {
-      final Directory root = _flutterProject();
-      addTearDown(() => root.deleteSync(recursive: true));
+  test('--all matches the explicit installable inventory surface', () async {
+    final Directory root = _flutterProject();
+    addTearDown(() => root.deleteSync(recursive: true));
 
-      final ProcessResult init = await _run(root, <String>[
-        'init',
-        '--registry',
-        _registryPath,
-      ]);
-      expect(init.exitCode, 0, reason: '${init.stdout}${init.stderr}');
+    final ProcessResult init = await _run(root, <String>[
+      'init',
+      '--registry',
+      _registryPath,
+    ]);
+    expect(init.exitCode, 0, reason: '${init.stdout}${init.stderr}');
 
-      final ProcessResult allResult = await _run(root, <String>[
-        'add',
-        '--all',
-        '--dry-run',
-        '--registry',
-        _registryPath,
-      ]);
-      expect(
-        allResult.exitCode,
-        0,
-        reason: '${allResult.stdout}${allResult.stderr}',
-      );
+    final ProcessResult allResult = await _run(root, <String>[
+      'add',
+      '--all',
+      '--dry-run',
+      '--registry',
+      _registryPath,
+    ]);
+    expect(
+      allResult.exitCode,
+      0,
+      reason: '${allResult.stdout}${allResult.stderr}',
+    );
 
-      final ProcessResult explicitResult = await _run(root, <String>[
-        'add',
-        ..._installableOwners(),
-        '--dry-run',
-        '--registry',
-        _registryPath,
-      ]);
-      expect(
-        explicitResult.exitCode,
-        0,
-        reason: '${explicitResult.stdout}${explicitResult.stderr}',
-      );
+    final ProcessResult explicitResult = await _run(root, <String>[
+      'add',
+      ..._installableOwners(),
+      '--dry-run',
+      '--registry',
+      _registryPath,
+    ]);
+    expect(
+      explicitResult.exitCode,
+      0,
+      reason: '${explicitResult.stdout}${explicitResult.stderr}',
+    );
 
-      expect(_writtenPaths(allResult), _writtenPaths(explicitResult));
-    },
-    timeout: const Timeout(Duration(minutes: 2)),
-  );
+    expect(_writtenPaths(allResult), _writtenPaths(explicitResult));
+  }, timeout: const Timeout(Duration(minutes: 2)));
 }

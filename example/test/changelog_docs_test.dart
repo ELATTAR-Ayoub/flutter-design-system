@@ -102,14 +102,10 @@ void main() {
       );
 
       final List<ChangelogBlock> blocks = document.releases.single.blocks;
-      expect(
-        blocks.map((ChangelogBlock b) => b.kind),
-        <ChangelogBlockKind>[
-          ChangelogBlockKind.bullet,
-          ChangelogBlockKind.bullet,
-        ],
-        reason: 'the wrapped line must join its bullet, not become a block',
-      );
+      expect(blocks.map((ChangelogBlock b) => b.kind), <ChangelogBlockKind>[
+        ChangelogBlockKind.bullet,
+        ChangelogBlockKind.bullet,
+      ], reason: 'the wrapped line must join its bullet, not become a block');
       final String joined = blocks.first.spans
           .map((ChangelogSpan s) => s.text)
           .join();

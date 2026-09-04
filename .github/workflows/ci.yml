@@ -83,19 +83,19 @@ jobs:
       # Formatting was previously checked on the CLI alone. Root, example and
       # the tool packages were checked by nothing.
       - name: Check formatting — package
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: dart format --language-version 3.12 --output=none --set-exit-if-changed lib test
 
       - name: Check formatting — example
-        run: dart format --output=none --set-exit-if-changed example/lib example/test
+        run: dart format --language-version 3.12 --output=none --set-exit-if-changed example/lib example/test
 
       - name: Check formatting — CLI
         working-directory: packages/elattar_cli
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart format --language-version 3.12 --output=none --set-exit-if-changed .
 
       - name: Check formatting — tool packages
         run: |
           for package in registry_builder release_registry generate_perlin_texture release_audit adoption_metrics; do
-            (cd "tool/$package" && dart format --output=none --set-exit-if-changed bin lib test)
+            (cd "tool/$package" && dart format --language-version 3.12 --output=none --set-exit-if-changed bin lib test)
           done
 
       - name: Analyze CLI

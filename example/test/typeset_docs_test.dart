@@ -127,15 +127,11 @@ void main() {
         typesetRoles.map((TypesetRole r) => r.name).toList(),
         TextStyles.all.map((TextStyleToken r) => r.name).toList(),
       );
-      expect(
-        typesetRoles.map((TypesetRole r) => r.group).toList(),
-        <TypeGroup>[
-          ...List<TypeGroup>.filled(10, TypeGroup.words),
-          ...List<TypeGroup>.filled(2, TypeGroup.code),
-          ...List<TypeGroup>.filled(5, TypeGroup.numerics),
-        ],
-        reason: 'Words, then Code and identifiers, then Numerics',
-      );
+      expect(typesetRoles.map((TypesetRole r) => r.group).toList(), <TypeGroup>[
+        ...List<TypeGroup>.filled(10, TypeGroup.words),
+        ...List<TypeGroup>.filled(2, TypeGroup.code),
+        ...List<TypeGroup>.filled(5, TypeGroup.numerics),
+      ], reason: 'Words, then Code and identifiers, then Numerics');
     });
 
     test('no retired role or group survives in the catalog', () {
@@ -157,11 +153,11 @@ void main() {
       for (final String gone in retired) {
         expect(live, isNot(contains(gone)), reason: gone);
       }
-      expect(
-        TypeGroup.values.map((TypeGroup g) => g.label).toList(),
-        <String>['Words', 'Code and identifiers', 'Numerics'],
-        reason: 'there is no Labels and furniture group and no Accent group',
-      );
+      expect(TypeGroup.values.map((TypeGroup g) => g.label).toList(), <String>[
+        'Words',
+        'Code and identifiers',
+        'Numerics',
+      ], reason: 'there is no Labels and furniture group and no Accent group');
     });
 
     test('every role has a usage sentence and a specimen', () {
