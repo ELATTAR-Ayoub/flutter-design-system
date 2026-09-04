@@ -32,6 +32,19 @@ void main(List<String> arguments) {
   stdout.write(report.render());
 
   if (!report.ok) {
+    if (Platform.environment['GITHUB_ACTIONS'] == 'true') {
+      for (final Check failure in report.failures) {
+        final String title = _escapeWorkflowCommand(
+          'Release audit: ${failure.group}',
+        );
+        final String detail = failure.detail.isEmpty
+            ? failure.name
+            : '${failure.name}\n${failure.detail}';
+        stdout.writeln(
+          '::error title=$title::${_escapeWorkflowCommand(detail)}',
+        );
+      }
+    }
     stderr.writeln(
       'Release audit failed. Nothing above is a style preference: each '
       'failure is a statement the release would publish and could not '
@@ -40,3 +53,10 @@ void main(List<String> arguments) {
     exit(1);
   }
 }
+
+String _escapeWorkflowCommand(String value) => value
+    .replaceAll('%', '%25')
+    .replaceAll('\r', '%0D')
+    .replaceAll('\n', '%0A')
+    .replaceAll(':', '%3A')
+    .replaceAll(',', '%2C');
