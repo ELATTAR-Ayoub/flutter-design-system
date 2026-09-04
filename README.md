@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme/hero.png" alt="Blueprint tiles for Elattar source, foundation, and agent tooling" width="100%" />
+  <img src="docs/assets/readme/hero.png" alt="Elattar wordmark beneath blueprint tiles for source, foundation, and agent tooling" width="100%" />
 </p>
 
 # Elattar Design System
