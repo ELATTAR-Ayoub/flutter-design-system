@@ -175,6 +175,11 @@ jobs:
         working-directory: packages/elattar_cli
         run: dart test --concurrency=1 --reporter github --file-reporter=json:reports/cli-tests.json
 
+      - name: Report CLI test failures
+        if: failure()
+        working-directory: packages/elattar_cli
+        run: dart run ../../tool/report_test_failures.dart reports/cli-tests.json
+
       - name: Upload CLI test report
         if: failure()
         uses: actions/upload-artifact@v4
