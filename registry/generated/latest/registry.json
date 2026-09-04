@@ -149,7 +149,7 @@
         {
           "source": "lib/src/components/ui/agent_attachments.dart",
           "target": "@ui/agent_attachments.dart",
-          "sha256": "fd8278b57e87f25461d249bca16dd0ec5bf8ac62fd913c50c05c3094171d0981"
+          "sha256": "ca5ca5413aa7aee3e2139366ce96d74468f199dc7ddbddb4c9e616a10c93e571"
         }
       ],
       "registryDependencies": [
@@ -1259,7 +1259,7 @@
         {
           "source": "lib/src/components/ui/command.dart",
           "target": "@ui/command.dart",
-          "sha256": "ff5d890a35faf9c7e1777ee0672c7d180d7ed5c77191dad441e965459c18b15b"
+          "sha256": "2fae51d83b5dfb5da148282082717d298803e2dfa131df26055d04abefbb1937"
         }
       ],
       "registryDependencies": [
@@ -2189,7 +2189,7 @@
         {
           "source": "lib/src/components/ui/pagination.dart",
           "target": "@ui/pagination.dart",
-          "sha256": "f6567cedcb9e0bbb23f26cf77f811e82ce354f3a0baf5e8d1d3dd6f0da0b7fa5"
+          "sha256": "2edf1ff861c91ca9c845e957ab1fae71cacb45a0565bf9d6f58adc484f5e3cf2"
         }
       ],
       "registryDependencies": [
@@ -2338,7 +2338,7 @@
         {
           "source": "lib/src/components/ui/questionnaire.dart",
           "target": "@ui/questionnaire.dart",
-          "sha256": "8ee2e9238ffc9af53759af1abd599cbcc25c1add5562f786ff806957ae4312ce"
+          "sha256": "6f4b14f7bf8484add229e507628500ba41e74af6fd610407bf83f83b4470d385"
         }
       ],
       "registryDependencies": [
@@ -2462,7 +2462,7 @@
         {
           "source": "lib/src/components/ui/scroll_area.dart",
           "target": "@ui/scroll_area.dart",
-          "sha256": "ab340806b9459a5ab42a778fc24fc04e3f831e46e6766bba653c3f4e16a05a3e"
+          "sha256": "c946f6bbeb2b85d451ac0947762167829b02d74334d6de606708fdb274c83e07"
         }
       ],
       "registryDependencies": [

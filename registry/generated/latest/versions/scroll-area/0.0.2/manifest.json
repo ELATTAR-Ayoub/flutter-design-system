@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/scroll_area.dart",
       "target": "@ui/scroll_area.dart",
-      "sha256": "ab340806b9459a5ab42a778fc24fc04e3f831e46e6766bba653c3f4e16a05a3e"
+      "sha256": "c946f6bbeb2b85d451ac0947762167829b02d74334d6de606708fdb274c83e07"
     }
   ],
   "registryDependencies": [
