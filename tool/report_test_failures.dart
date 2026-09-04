@@ -29,7 +29,10 @@ void main(List<String> arguments) {
         if (event['isFailure'] != true) continue;
         final test = tests[event['testID']! as int];
         final name = test?['name'] as String? ?? 'unknown test';
-        stdout.writeln('::error title=CLI test failure::${_escape(name)}');
+        final stage = _knownStage(event['error'] as String? ?? '');
+        stdout.writeln(
+          '::error title=CLI test failure::${_escape(name)} [$stage]',
+        );
         reported++;
     }
   }
@@ -40,6 +43,25 @@ void main(List<String> arguments) {
       'report contained no test failure event.',
     );
   }
+}
+
+String _knownStage(String error) {
+  const stages = <(String, String)>[
+    ('init\n', 'init'),
+    ('add button\n', 'add button'),
+    ('pub get\n', 'dependency resolution'),
+    ('doctor\n', 'doctor'),
+    ('the CLI never fetched the served index', 'registry index fetch'),
+    ('button\'s payload was not fetched', 'button payload fetch'),
+    ('was not installed', 'installed-file check'),
+    ('analyze\n', 'consumer analysis'),
+    ('flutter test\n', 'consumer widget test'),
+    ('silently-empty test directory', 'consumer test report'),
+  ];
+  for (final (marker, label) in stages) {
+    if (error.contains(marker)) return label;
+  }
+  return 'assertion';
 }
 
 String _escape(String value) => value
