@@ -104,6 +104,15 @@ jobs:
           dart pub get
           dart analyze
 
+      # pub.dev scores with pana, not just `dart analyze`. Keep the exact
+      # scorer version visible so documentation coverage, the runnable
+      # example, archive formatting, and every other point are release gates.
+      - name: Require the full pub.dev score
+        working-directory: packages/elattar_cli
+        run: |
+          dart pub global activate pana 0.23.19
+          dart pub global run pana --exit-code-threshold 0 --project-root ../.. .
+
       # `analysis_options.yaml` at the root EXCLUDES every one of these
       # packages, because each has its own analysis context. They must be
       # invoked separately or they are analysed and tested by nothing at all.
