@@ -166,6 +166,7 @@ void main() {
       'Usage',
       'Validation timing',
       'Focus on error',
+      'Disabled submit',
       'Server errors',
       'Resetting',
       'API Reference',
@@ -310,7 +311,9 @@ void main() {
     expect(find.textContaining('Focused field: none'), findsOneWidget);
 
     await tester.tap(submit);
-    await tester.pump();
+    // A failed submit scrolls the first invalid field to the centre before
+    // focusing it, so let the scroll finish.
+    await tester.pumpAndSettle();
 
     expect(find.textContaining('Focused field: name'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -355,12 +358,15 @@ void main() {
         const ValueKey<String>('form-reset-submit'),
       );
       await tester.tap(submit);
-      await tester.pump();
+      // The failed submit scrolls the field to the centre; settle, then bring
+      // the reset trigger back on screen before tapping it.
+      await tester.pumpAndSettle();
       expect(find.textContaining('At least 3 characters.'), findsOneWidget);
 
       final Finder reset = find.byKey(
         const ValueKey<String>('form-reset-trigger'),
       );
+      await tester.ensureVisible(reset);
       await tester.tap(reset);
       await tester.pump();
 

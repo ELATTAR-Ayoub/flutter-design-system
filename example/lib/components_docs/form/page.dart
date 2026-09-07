@@ -131,6 +131,20 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
       label: 'Focus on error specimen view',
     ),
     ShowcaseSection(
+      id: 'disabled-submit',
+      title: 'Disabled submit',
+      description:
+          'A submit that stays disabled until the form is complete says why: '
+          'disabledReason shows as a tooltip on hover (pointer) or tap '
+          '(touch). Inside a FormScope, clicking the disabled button calls '
+          'Form.revealFirstError(), which validates, scrolls the first '
+          'invalid field to the centre of the screen and focuses it, so the '
+          'reader sees exactly what is missing.',
+      specimen: _DisabledSubmitSpecimen(),
+      code: _disabledSubmitCode,
+      label: 'Disabled submit specimen view',
+    ),
+    ShowcaseSection(
       id: 'server-errors',
       title: 'Server errors',
       description:
@@ -567,6 +581,100 @@ class _FocusOnErrorSpecimenState extends State<_FocusOnErrorSpecimen> {
       ),
     );
   }
+}
+
+const String _disabledSubmitCode = '''FormScope(
+  form: form,
+  child: Column(children: <Widget>[
+    Field(label: 'Name', /* … */),
+    Field(label: 'Email', /* … */),
+    Button(
+      // Disabled until every field passes; the reason explains why.
+      onPressed: form.isComplete ? () => form.submit() : null,
+      disabledReason: 'Fill in your name and a valid email first',
+      child: const Text('Create account'),
+    ),
+  ]),
+)''';
+
+class _DisabledSubmitSpecimen extends StatefulWidget {
+  const _DisabledSubmitSpecimen();
+
+  @override
+  State<_DisabledSubmitSpecimen> createState() =>
+      _DisabledSubmitSpecimenState();
+}
+
+class _DisabledSubmitSpecimenState extends State<_DisabledSubmitSpecimen> {
+  late final Form _form;
+
+  @override
+  void initState() {
+    super.initState();
+    _form = Form(
+      fields: <FormFieldBase>[
+        TextFormField(
+          name: 'name',
+          rules: <ValidationRule<String>>[
+            ValidationRule.minLength(1, 'Enter your name.'),
+          ],
+        ),
+        TextFormField(
+          name: 'email',
+          rules: <ValidationRule<String>>[
+            ValidationRule.email('That is not a valid email address.'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _form.dispose();
+    super.dispose();
+  }
+
+  bool get _complete =>
+      _form.fields.every((FormFieldBase f) => f.issues().isEmpty);
+
+  @override
+  Widget build(BuildContext context) => FormScope(
+    form: _form,
+    child: ListenableBuilder(
+      listenable: _form,
+      builder: (BuildContext context, Widget? _) => ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: Containers.sm),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Field(
+              key: const ValueKey<String>('form-disabled-name-field'),
+              label: 'Name',
+              errors: _form.field<String>('name').errors,
+              focusNode: _form['name'].focusNode,
+              child: Input(controller: _form.text('name').controller),
+            ),
+            SizedBox(height: space(3)),
+            Field(
+              key: const ValueKey<String>('form-disabled-email-field'),
+              label: 'Email',
+              errors: _form.field<String>('email').errors,
+              focusNode: _form['email'].focusNode,
+              child: Input(controller: _form.text('email').controller),
+            ),
+            SizedBox(height: space(3)),
+            Button(
+              key: const ValueKey<String>('form-disabled-submit'),
+              onPressed: _complete ? () => _form.submit() : null,
+              disabledReason: 'Fill in your name and a valid email first',
+              child: StyledText('Create account', TextStyles.nav),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 const String _serverErrorCode =

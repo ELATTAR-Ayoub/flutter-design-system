@@ -97,7 +97,7 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(find.text('99'), findsOneWidget);
+    expect(find.text('100'), findsOneWidget);
     // The grid is the point: a live composition's own card title, not a
     // screenshot or a description of one.
     expect(find.text('Building blocks'), findsOneWidget);

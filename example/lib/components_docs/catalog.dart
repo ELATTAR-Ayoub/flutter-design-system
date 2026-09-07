@@ -32,6 +32,7 @@ import 'checkbox/meta.dart' as checkbox;
 import 'collapsible/meta.dart' as collapsible;
 import 'command/meta.dart' as command;
 import 'dialog/meta.dart' as dialog;
+import 'disabled/meta.dart' as disabled;
 import 'dropdown_menu/meta.dart' as dropdown_menu;
 import 'field/meta.dart' as field;
 import 'icon/meta.dart' as icon;
@@ -170,6 +171,7 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
   collapsible.collapsibleDoc,
   command.commandDoc,
   dialog.dialogDoc,
+  disabled.disabledDoc,
   dropdown_menu.dropdownMenuDoc,
   field.fieldDoc,
   icon.iconDoc,

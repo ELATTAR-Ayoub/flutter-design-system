@@ -116,6 +116,8 @@ import 'components_docs/command/meta.dart' as command;
 import 'components_docs/command/page.dart';
 import 'components_docs/dialog/meta.dart' as dialog;
 import 'components_docs/dialog/page.dart';
+import 'components_docs/disabled/meta.dart' as disabled;
+import 'components_docs/disabled/page.dart';
 import 'components_docs/dropdown_menu/meta.dart' as dropdown_menu;
 import 'components_docs/dropdown_menu/page.dart';
 import 'components_docs/field/meta.dart' as field;
@@ -861,6 +863,8 @@ final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
           AmbientPatternDocPage(onNavigate: onNavigate),
       press.pressDoc.route: ({onNavigate}) =>
           PressDocPage(onNavigate: onNavigate),
+      disabled.disabledDoc.route: ({onNavigate}) =>
+          DisabledDocPage(onNavigate: onNavigate),
       keyframes.keyframesDoc.route: ({onNavigate}) =>
           KeyframesDocPage(onNavigate: onNavigate),
       safe_area.safeAreaDoc.route: ({onNavigate}) =>
