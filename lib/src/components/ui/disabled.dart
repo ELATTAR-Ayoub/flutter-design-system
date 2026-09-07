@@ -4,6 +4,19 @@
 /// around an `IgnorePointer`, and four of them forgot one half. This widget is
 /// the shared `.disabled` class: the fade, the pointer block, the cursor, the
 /// reason tooltip and the tap hook live here and nowhere else.
+///
+/// **The tree shape never changes when [disabled] toggles** — only whether
+/// [reason] is non-null (fixed per call site, since it is set once by the
+/// caller) can add or remove the outer [Tooltip]. `GestureDetector` and
+/// `MouseRegion` are always present, with their behaviour and cursor
+/// swapping in place instead of being inserted or removed, and a present
+/// [Tooltip] hides via its own `hidden` flag rather than being unmounted.
+/// Flutter matches widgets by (type, key) at the same tree position on every
+/// rebuild, so a stable shape means the `TweenAnimationBuilder` — and the
+/// child's own `State` (focus, hover, scroll position, …) — survives a
+/// disabled/enabled toggle instead of being torn down and rebuilt: the fade
+/// animates instead of jumping to its end value, and the wrapped control
+/// keeps its state.
 library;
 
 import 'package:flutter/foundation.dart' show clampDouble;
@@ -59,19 +72,17 @@ class Disabled extends StatelessWidget {
       child: IgnorePointer(ignoring: disabled && blockPointer, child: child),
     );
 
-    if (!disabled) return result;
-
     result = MouseRegion(
-      cursor: SystemMouseCursors.basic,
+      cursor: disabled ? SystemMouseCursors.basic : MouseCursor.defer,
       child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onDisabledTap,
+        behavior: disabled ? HitTestBehavior.opaque : HitTestBehavior.deferToChild,
+        onTap: disabled ? onDisabledTap : null,
         child: result,
       ),
     );
 
     final String? label = reason;
     if (label == null || label.isEmpty) return result;
-    return Tooltip(label: label, child: result);
+    return Tooltip(label: label, hidden: !disabled, child: result);
   }
 }

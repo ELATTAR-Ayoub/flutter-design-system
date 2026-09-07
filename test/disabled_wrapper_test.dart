@@ -127,6 +127,56 @@ void main() {
       reason: 'never',
       child: SizedBox(width: 80, height: 40),
     )));
-    expect(find.byType(Tooltip), findsNothing);
+    final TestGesture mouse = await t.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: Offset.zero);
+    addTearDown(mouse.removePointer);
+    await mouse.moveTo(t.getCenter(find.byType(SizedBox)));
+    await t.pump(MotionDurations.tooltipShowDelay + MotionDurations.overlayEnter);
+    await t.pumpAndSettle();
+    expect(find.text('never'), findsNothing);
   });
+
+  testWidgets('toggling disabled keeps the child State alive', (WidgetTester t) async {
+    Widget build(bool disabled) => _host(Disabled(
+      disabled: disabled,
+      child: const _CounterChild(),
+    ));
+
+    await t.pumpWidget(build(false));
+    final _CounterChildState state = t.state<_CounterChildState>(find.byType(_CounterChild));
+    state.bump();
+    expect(state.count, 1);
+
+    await t.pumpWidget(build(true));
+    await t.pumpAndSettle();
+    expect(
+      t.state<_CounterChildState>(find.byType(_CounterChild)).count,
+      1,
+    );
+
+    await t.pumpWidget(build(false));
+    await t.pumpAndSettle();
+    expect(
+      t.state<_CounterChildState>(find.byType(_CounterChild)).count,
+      1,
+    );
+  });
+}
+
+/// A child whose [State] holds a counter, used to prove [Disabled] keeps the
+/// same element (and therefore the same State) alive across a toggle.
+class _CounterChild extends StatefulWidget {
+  const _CounterChild();
+
+  @override
+  State<_CounterChild> createState() => _CounterChildState();
+}
+
+class _CounterChildState extends State<_CounterChild> {
+  int count = 0;
+
+  void bump() => setState(() => count++);
+
+  @override
+  Widget build(BuildContext context) => const SizedBox(width: 80, height: 40);
 }

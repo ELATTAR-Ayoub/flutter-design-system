@@ -668,7 +668,7 @@ void main() {
       expect(alpha(), closeTo(0.5, 1e-9));
     });
 
-    testWidgets('B11 — the disabled opacity reaches the resting 0.45 value', (
+    testWidgets('B11 — the disabled opacity springs, undershooting to 0.397', (
       WidgetTester t,
     ) async {
       Widget button({required bool enabled}) => host(
@@ -694,17 +694,22 @@ void main() {
       await t.pumpWidget(button(enabled: true));
       expect(opacity(), 1.0);
 
-      // Going enabled -> disabled inserts [Disabled]'s own MouseRegion and
-      // GestureDetector ahead of the fade's TweenAnimationBuilder, so that
-      // element is torn down and rebuilt rather than continued: the B11
-      // spring/undershoot this test used to measure on Button's own
-      // TweenAnimationBuilder no longer has anything to animate from, and the
-      // opacity lands on the resting disabled value immediately. Recorded
-      // here as a known behaviour change from adopting the shared [Disabled]
-      // widget (task-3-report.md), not something this task's file scope can
-      // fix inside disabled.dart.
       await t.pumpWidget(button(enabled: false));
-      await t.pump(const Duration(milliseconds: 16));
+      double lowest = 1;
+      for (int i = 0; i < 20; i++) {
+        await t.pump(const Duration(milliseconds: 16));
+        if (opacity() < lowest) lowest = opacity();
+      }
+      // `opacity` IS in btn-spring's transition list, so it springs like the
+      // colours: measured 1 → 0.3969 at Δ~180 → 0.45 at Δ~280 when the resting
+      // value was 0.45, an undershoot of (0.45 − 0.3969) / (1 − 0.45) = 9.65%
+      // of the travel. The fraction is what btn-spring owns; the resting value
+      // is `SurfaceOpacity.disabled`, so the undershoot is expressed against it
+      // rather than re-measured by hand whenever the token moves.
+      const double undershoot =
+          SurfaceOpacity.disabled - 0.0965 * (1 - SurfaceOpacity.disabled);
+      expect(lowest, closeTo(undershoot, 0.005));
+      await t.pump(const Duration(milliseconds: 250));
       expect(opacity(), closeTo(SurfaceOpacity.disabled, 1e-9));
     });
 
@@ -757,11 +762,13 @@ void main() {
           child: const Icon(IconGlyph.menu),
         ),
       );
-      // [Disabled] (Task 3) adds its own outer MouseRegion while disabled, so
-      // look through it to the frontmost one — [find.byType]'s `.first`,
-      // which is the one `MouseTracker` actually resolves the cursor from.
-      MouseRegion region() =>
-          t.widget<MouseRegion>(find.byType(MouseRegion).first);
+      // [Disabled] (Task 3) always wraps an outer MouseRegion around the
+      // control, deferring its cursor (`MouseCursor.defer`) while enabled so
+      // Button's own MouseRegion still wins. Skip past any deferring region
+      // to the first one that actually claims a cursor.
+      MouseRegion region() => t
+          .widgetList<MouseRegion>(find.byType(MouseRegion))
+          .firstWhere((MouseRegion r) => r.cursor != MouseCursor.defer);
 
       await t.pumpWidget(button(enabled: true));
       expect(region().cursor, SystemMouseCursors.click);
