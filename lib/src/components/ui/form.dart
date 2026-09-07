@@ -66,6 +66,8 @@ import 'package:flutter/widgets.dart'
         Table,
         TableColumnWidth;
 
+import '../../design_system/foundation/motion.dart';
+import '../../design_system/foundation/theme_scope.dart';
 import './validation_rule.dart';
 
 /// RHF's `mode` / `reValidateMode`, as far as this page reaches them.
@@ -299,27 +301,49 @@ class Form extends ChangeNotifier {
     return valid;
   }
 
-  /// `shouldFocusError: true` — the first invalid field in registration order.
-  ///
-  /// See this library's doc: correct for **every** field type, which is where
-  /// it diverges from the reference. Ruling F4.
-  void focusFirstError() {
+  /// The first invalid field in registration order, or null.
+  FormFieldBase? get firstInvalid {
     for (final FormFieldBase field in fields) {
-      if (!field.invalid) continue;
-      field.focusNode.requestFocus();
-      return;
+      if (field.invalid) return field;
     }
+    return null;
+  }
+
+  /// `shouldFocusError: true` — focuses the first invalid field. Kept for
+  /// callers that only want focus; [revealFirstError] is what a submit does.
+  void focusFirstError() => firstInvalid?.focusNode.requestFocus();
+
+  /// Shows the reader exactly what is missing.
+  ///
+  /// Runs the rules (so the field's error text appears), scrolls the first
+  /// invalid field to the centre of every scroll view between it and the
+  /// root, then focuses it. A disabled submit button inside a [FormScope]
+  /// calls this when tapped, and so does a failed [submit].
+  Future<void> revealFirstError({bool validateFirst = true}) async {
+    if (validateFirst) validate();
+    final FormFieldBase? field = firstInvalid;
+    if (field == null) return;
+    final BuildContext? context = field.focusNode.context;
+    if (context != null && context.mounted) {
+      await Scrollable.ensureVisible(
+        context,
+        alignment: 0.5,
+        duration: effectiveMotionDuration(context, MotionDurations.normal),
+        curve: MotionCurves.emphasized,
+      );
+    }
+    field.focusNode.requestFocus();
   }
 
   /// `handleSubmit(onValid)`.
   ///
-  /// Validates, focuses the first error and stops on failure; otherwise runs
+  /// Validates, reveals the first error and stops on failure; otherwise runs
   /// [onValid] with [isSubmitting] held true for its duration — which is what
   /// puts the spinner in the submit button.
   Future<bool> submit([FutureOr<void> Function()? onValid]) async {
     _submitCount++;
     if (!validate()) {
-      focusFirstError();
+      await revealFirstError(validateFirst: false);
       return false;
     }
     _submitting = true;
@@ -376,4 +400,18 @@ class Form extends ChangeNotifier {
     }
     super.dispose();
   }
+}
+
+/// Puts a [Form] in the tree so a disabled submit [Button] below it can call
+/// [Form.revealFirstError] without being handed the form by hand.
+///
+/// An [InheritedNotifier], so dependents rebuild when the form notifies.
+class FormScope extends InheritedNotifier<Form> {
+  const FormScope({super.key, required Form form, required super.child})
+      : super(notifier: form);
+
+  Form get form => notifier!;
+
+  static Form? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<FormScope>()?.notifier;
 }
