@@ -130,4 +130,53 @@ void main() {
     )));
     expect(identical(seen, form), isTrue);
   });
+
+  testWidgets('a disabled Button inside FormScope reveals the first error on tap', (WidgetTester t) async {
+    final Form form = _form();
+    addTearDown(form.dispose);
+    await t.pumpWidget(_page(form, cta: const Button(onPressed: null, child: Text('Submit'))));
+    await t.ensureVisible(find.text('Submit'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Submit'), warnIfMissed: false);
+    await t.pumpAndSettle();
+    expect(find.text('Enter your email'), findsOneWidget);
+    expect(form['email'].focusNode.hasFocus, isTrue);
+  });
+
+  testWidgets('onDisabledPressed wins over the FormScope default', (WidgetTester t) async {
+    final Form form = _form();
+    addTearDown(form.dispose);
+    int hits = 0;
+    await t.pumpWidget(_page(form, cta: Button(onPressed: null, onDisabledPressed: () => hits++, child: const Text('Submit'))));
+    await t.ensureVisible(find.text('Submit'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Submit'), warnIfMissed: false);
+    await t.pumpAndSettle();
+    expect(hits, 1);
+    expect(find.text('Enter your email'), findsNothing);
+  });
+
+  testWidgets('a loading Button does not reveal errors', (WidgetTester t) async {
+    final Form form = _form();
+    addTearDown(form.dispose);
+    await t.pumpWidget(_page(form, cta: Button(onPressed: () {}, loading: true, child: const Text('Submit'))));
+    // Not pumpAndSettle: the spinner [loading] shows repeats forever, so
+    // settling would never return. ensureVisible's own scroll animation is
+    // bounded, so a fixed pump after it is enough.
+    await t.ensureVisible(find.text('Submit'));
+    await t.pump(const Duration(milliseconds: 500));
+    await t.tap(find.text('Submit'), warnIfMissed: false);
+    await t.pump();
+    expect(find.text('Enter your email'), findsNothing);
+  });
+
+  testWidgets('Field.disabledReason reaches the control tooltip', (WidgetTester t) async {
+    await t.pumpWidget(_host(Center(child: Field(
+      label: 'Email',
+      enabled: false,
+      disabledReason: 'Locked after verification',
+      child: Input(controller: TextEditingController()),
+    ))));
+    expect(find.byWidgetPredicate((Widget w) => w is Tooltip && w.label == 'Locked after verification'), findsOneWidget);
+  }, skip: true); // Task 4: waiting on Input's Disabled wrap.
 }
