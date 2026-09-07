@@ -268,7 +268,10 @@ final ComponentDocSpec buttonDocSpec = ComponentDocSpec(
           'Button takes exactly one child: an icon-and-label composition '
           'is the caller\'s own Row, spaced by Button.gapFor(size), the '
           'same gap the loading spinner uses in front of its own label.',
-      specimen: _WithIconSpecimen(),
+      specimen: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: _WithIconSpecimen(),
+      ),
       code: _withIconCode,
       label: 'With Icon specimen view',
     ),

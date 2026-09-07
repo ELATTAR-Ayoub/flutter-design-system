@@ -457,7 +457,7 @@ class _NoCloseButtonPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: space(64) * MediaQuery.textScalerOf(context).scale(1),
+    height: (space(64) + space(24)) * MediaQuery.textScalerOf(context).scale(1),
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
       child: const SheetContent(
@@ -489,7 +489,7 @@ class _RtlPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     // Same textScaler-scaled stand-in height as [_NoCloseButtonPreview].
-    height: space(64) * MediaQuery.textScalerOf(context).scale(1),
+    height: (space(64) + space(24)) * MediaQuery.textScalerOf(context).scale(1),
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
       child: const Directionality(

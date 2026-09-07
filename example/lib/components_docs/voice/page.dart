@@ -272,9 +272,10 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
   bool _listening = false;
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.center,
+  Widget build(BuildContext context) => Wrap(
+    spacing: space(6),
+    runSpacing: space(6),
+    crossAxisAlignment: WrapCrossAlignment.center,
     children: <Widget>[
       KeyedSubtree(
         key: const ValueKey<String>('voice-preview:mic'),
@@ -283,12 +284,10 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
           onToggle: () => setState(() => _listening = !_listening),
         ),
       ),
-      SizedBox(width: space(6)),
       const KeyedSubtree(
         key: ValueKey<String>('voice-preview:waveform'),
         child: LiveWaveform(width: 160, height: 40),
       ),
-      SizedBox(width: space(6)),
       const KeyedSubtree(
         key: ValueKey<String>('voice-preview:bars'),
         child: BarVisualizer(),

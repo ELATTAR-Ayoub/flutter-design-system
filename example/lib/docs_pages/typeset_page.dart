@@ -602,8 +602,10 @@ class _Metadata extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           for (final (String label, String value) row in rows) ...<Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.start,
+              spacing: space(3),
+              runSpacing: space(1),
               children: <Widget>[
                 // From the spacing scale, not a new foundation token: one
                 // page does not earn a width in `LayoutWidths`.
@@ -611,8 +613,7 @@ class _Metadata extends StatelessWidget {
                   width: space(18),
                   child: StyledText(row.$1, TextStyles.small),
                 ),
-                SizedBox(width: space(3)),
-                Expanded(child: StyledText(row.$2, TextStyles.small)),
+                StyledText(row.$2, TextStyles.small),
               ],
             ),
             SizedBox(height: space(2)),

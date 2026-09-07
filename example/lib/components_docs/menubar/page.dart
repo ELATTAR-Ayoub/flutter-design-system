@@ -68,7 +68,10 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description: 'Click or hover a trigger to cycle between menus.',
-      specimen: _MenubarSpecimen(),
+      specimen: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: IntrinsicWidth(child: _MenubarSpecimen()),
+      ),
       code: _menubarCode,
       label: 'Preview specimen view',
     ),
@@ -174,7 +177,10 @@ final ComponentDocSpec menubarDocSpec = ComponentDocSpec(
           "row's start edge in both directions, because it is a drift "
           "in the reference's own class list (drift 5), not a property "
           'of direction.',
-      specimen: _MenubarRtl(),
+      specimen: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: IntrinsicWidth(child: _MenubarRtl()),
+      ),
       code: _menubarRtlCode,
       label: 'RTL specimen view',
     ),

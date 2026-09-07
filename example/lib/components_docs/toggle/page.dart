@@ -454,8 +454,10 @@ class _OutlineSpecimenState extends State<_OutlineSpecimen> {
   bool _italic = false;
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
+  Widget build(BuildContext context) => Wrap(
+    spacing: Toggle.gap,
+    runSpacing: Toggle.gap,
+    crossAxisAlignment: WrapCrossAlignment.center,
     children: <Widget>[
       Toggle(
         key: const ValueKey<String>('toggle-outline-bold-specimen'),
@@ -465,7 +467,6 @@ class _OutlineSpecimenState extends State<_OutlineSpecimen> {
         onChanged: (bool next) => setState(() => _bold = next),
         child: const Text('B'),
       ),
-      SizedBox(width: Toggle.gap),
       Toggle(
         variant: ToggleVariant.outline,
         pressed: _italic,
@@ -500,11 +501,11 @@ class _WithTextSpecimenState extends State<_WithTextSpecimen> {
     key: const ValueKey<String>('toggle-with-text-specimen'),
     pressed: _favorite,
     onChanged: (bool next) => setState(() => _favorite = next),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
+    child: Wrap(
+      spacing: Toggle.gap,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
         Icon(IconGlyph.heart, size: Toggle.iconSizeFor(ToggleSize.md)),
-        SizedBox(width: Toggle.gap),
         const Text('Favorite'),
       ],
     ),

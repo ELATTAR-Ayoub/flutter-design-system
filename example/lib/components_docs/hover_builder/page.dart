@@ -410,8 +410,8 @@ class _BareHoverBuilderSpecimen extends StatelessWidget {
       key: const ValueKey<String>('hover-builder-example:bare'),
       child: HoverBuilder(
         cursor: SystemMouseCursors.click,
-        builder: (BuildContext context, bool hovered) => Row(
-          mainAxisSize: MainAxisSize.min,
+        builder: (BuildContext context, bool hovered) => Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
             StyledText(
               'Learn more',

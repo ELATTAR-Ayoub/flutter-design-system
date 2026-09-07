@@ -126,6 +126,12 @@ class _SiteShellState extends State<SiteShell> {
     );
   }
 
+  /// Every route except the homepage renders through [DocsLayout], which
+  /// already lays out its own left rail, article, and right rail as a Row
+  /// and wants the full viewport width to do it in. The homepage is the one
+  /// public page that still reads as a single, capped column.
+  bool get _docs => widget.route != homeRoute;
+
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
@@ -171,18 +177,27 @@ class _SiteShellState extends State<SiteShell> {
             child: SafeArea(
               top: false,
               bottom: false,
-              child: Center(
-                child: SizedBox(
-                  width: LayoutWidths.shell,
-                  child: _SiteBody(
-                    controller: _main,
-                    header: header,
-                    desktop: desktop,
-                    footer: _SiteFooter(onNavigate: _navigate),
-                    child: widget.child,
-                  ),
-                ),
-              ),
+              child: _docs
+                  ? _SiteBody(
+                      controller: _main,
+                      header: header,
+                      desktop: desktop,
+                      fullBleed: true,
+                      footer: _SiteFooter(onNavigate: _navigate),
+                      child: widget.child,
+                    )
+                  : Center(
+                      child: SizedBox(
+                        width: LayoutWidths.shell,
+                        child: _SiteBody(
+                          controller: _main,
+                          header: header,
+                          desktop: desktop,
+                          footer: _SiteFooter(onNavigate: _navigate),
+                          child: widget.child,
+                        ),
+                      ),
+                    ),
             ),
           ),
           Positioned(
@@ -226,6 +241,7 @@ class _SiteBody extends StatelessWidget {
     required this.desktop,
     required this.child,
     required this.footer,
+    this.fullBleed = false,
   });
 
   final ScrollController controller;
@@ -234,45 +250,48 @@ class _SiteBody extends StatelessWidget {
   final Widget child;
   final Widget footer;
 
+  /// True for every documentation route: `DocsLayout` lays out its own left
+  /// rail, article, and right rail as a `Row` and places its rails against
+  /// the edges of whatever box it is given, so this skips the horizontal
+  /// padding, the centering `Align`, and the `LayoutWidths.shell` cap that
+  /// every other public page still wants. The vertical padding and the
+  /// footer stay either way.
+  final bool fullBleed;
+
   @override
   Widget build(BuildContext context) {
+    final Widget column = SelectionArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[child, SizedBox(height: space(12)), footer],
+      ),
+    );
     return SingleChildScrollView(
       controller: controller,
       padding: SafeArea.scrollPaddingOf(
         context,
         base: EdgeInsets.only(top: header),
       ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: desktop ? space(12) : space(6),
-          vertical: space(12),
-        ),
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            // The SHELL's measure, not the narrower page column.
-            //
-            // `DocsLayout` lays out three columns — rail, article, rail — and
-            // used to reach past this box to place the outer two, which broke
-            // hit-testing on every row in the overhang. It no longer reaches;
-            // it needs the room instead. Pages that want the narrower column
-            // still cap themselves (`_PublicPage` at `Breakpoints.xl`, and
-            // `DocsLayout`'s own article at `LayoutWidths.article`), so this
-            // widens only what was relying on this box to do the capping.
-            constraints: const BoxConstraints(maxWidth: LayoutWidths.shell),
-            child: SelectionArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  child,
-                  SizedBox(height: space(12)),
-                  footer,
-                ],
+      child: fullBleed
+          ? Padding(
+              padding: EdgeInsets.symmetric(vertical: space(12)),
+              child: column,
+            )
+          : Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: desktop ? space(12) : space(6),
+                vertical: space(12),
+              ),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: LayoutWidths.shell,
+                  ),
+                  child: column,
+                ),
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }
