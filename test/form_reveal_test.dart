@@ -178,5 +178,5 @@ void main() {
       child: Input(controller: TextEditingController()),
     ))));
     expect(find.byWidgetPredicate((Widget w) => w is Tooltip && w.label == 'Locked after verification'), findsOneWidget);
-  }, skip: true); // Task 4: waiting on Input's Disabled wrap.
+  });
 }

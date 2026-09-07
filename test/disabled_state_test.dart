@@ -42,6 +42,30 @@ Widget _host(Widget child) => MediaQuery(
   ),
 );
 
+// A real [Overlay] ancestor is required here: [Tooltip] shows its content
+// through an [OverlayPortal], which asserts one exists. Routing `home`
+// through [WidgetsApp] (rather than `Overlay(initialEntries: …)`, which only
+// reads its entries once) keeps every rebuild live — see
+// `disabled_wrapper_test.dart`'s identical host.
+Widget _hostWithOverlay(Widget child) => MediaQuery(
+  data: const MediaQueryData(size: Size(1440, 900)),
+  child: Directionality(
+    textDirection: TextDirection.ltr,
+    child: ThemeScope(
+      controller: ThemeController(mode: ColorMode.dark),
+      child: WidgetsApp(
+        color: const Color(0xFF000000),
+        pageRouteBuilder: <T>(RouteSettings settings, WidgetBuilder builder) =>
+            PageRouteBuilder<T>(
+              settings: settings,
+              pageBuilder: (BuildContext context, Animation<double> a, Animation<double> b) => builder(context),
+            ),
+        home: Center(child: child),
+      ),
+    ),
+  ),
+);
+
 /// The outermost [Opacity] a component wraps itself in when disabled.
 double _dim(WidgetTester tester, Type of) => tester
     .widgetList<Opacity>(
@@ -141,6 +165,67 @@ void main() {
       await tester.pumpWidget(_host(const Button(child: Text('Save'))));
       await tester.pumpAndSettle();
       expect(_dim(tester, Button), closeTo(SurfaceOpacity.disabled, 0.001));
+    });
+
+    Finder tip(String s) =>
+        find.byWidgetPredicate((Widget w) => w is Tooltip && w.label == s);
+
+    testWidgets('Input, Textarea, InputOtp and InputGroup carry a reason', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_hostWithOverlay(Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Input(
+            controller: TextEditingController(),
+            enabled: false,
+            disabledReason: 'r-input',
+          ),
+          Textarea(
+            controller: TextEditingController(),
+            enabled: false,
+            disabledReason: 'r-textarea',
+          ),
+          InputOtp(
+            maxLength: 4,
+            groups: const <int>[4],
+            enabled: false,
+            disabledReason: 'r-otp',
+          ),
+          InputGroup(
+            enabled: false,
+            disabledReason: 'r-group',
+            child: Input(controller: TextEditingController()),
+          ),
+        ],
+      )));
+      await tester.pumpAndSettle();
+      for (final String s in <String>['r-input', 'r-textarea', 'r-otp', 'r-group']) {
+        expect(tip(s), findsOneWidget, reason: s);
+      }
+      expect(_dim(tester, Textarea), SurfaceOpacity.disabled);
+    });
+
+    testWidgets('a disabled Textarea still takes the tap, per the reference', (
+      WidgetTester tester,
+    ) async {
+      // `disabled:opacity-45` with no `pointer-events-none` in the class
+      // list (textarea.dart:82-84) — unlike `Input`, a disabled `Textarea`
+      // still receives the pointer, fading only through `Disabled`'s dim and
+      // marking itself with `cursor-not-allowed`. So `blockPointer: false`.
+      await tester.pumpWidget(
+        _host(Textarea(controller: TextEditingController(), enabled: false)),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.descendant(
+          of: find.byType(Textarea),
+          matching: find.byWidgetPredicate(
+            (Widget w) => w is IgnorePointer && w.ignoring,
+          ),
+        ),
+        findsNothing,
+      );
     });
   });
 }

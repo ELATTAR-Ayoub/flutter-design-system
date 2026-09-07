@@ -888,14 +888,18 @@ void main() {
       await t.pumpWidget(
         host(const SizedBox(width: 512, child: Textarea(enabled: false))),
       );
-      final MouseRegion region = t.widget<MouseRegion>(
-        find
-            .descendant(
+      // `Disabled` now wraps the field in its own outer `MouseRegion`
+      // (cursor: basic while disabled, index 0). The textarea's own — the
+      // one carrying the `cursor-not-allowed` reading this test is after —
+      // is the next one in, before `EditableText`'s internal region.
+      final MouseRegion region = t
+          .widgetList<MouseRegion>(
+            find.descendant(
               of: find.byType(Textarea),
               matching: find.byType(MouseRegion),
-            )
-            .first,
-      );
+            ),
+          )
+          .elementAt(1);
       expect(region.cursor, SystemMouseCursors.forbidden);
       expect(
         t
