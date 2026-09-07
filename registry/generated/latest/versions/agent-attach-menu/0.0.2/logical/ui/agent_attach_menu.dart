@@ -69,6 +69,7 @@ class AgentAttachMenu extends StatelessWidget {
     this.commands,
     required this.onRunCommand,
     this.disabled = false,
+    this.disabledReason,
   });
 
   /// *"Opens the file picker. Omitted when attachments are off."*
@@ -81,6 +82,9 @@ class AgentAttachMenu extends StatelessWidget {
   final ValueChanged<AgentCommand> onRunCommand;
 
   final bool disabled;
+
+  /// Why the menu is disabled. Shown as a tooltip on the trigger.
+  final String? disabledReason;
 
   /// `size-8` on the trigger — `size="icon"` asks for 40 and twMerge keeps 32.
   static ButtonSize get triggerSize => ButtonSize.iconSm;
@@ -129,6 +133,7 @@ class AgentAttachMenu extends StatelessWidget {
       skills: skills,
       onRunCommand: onRunCommand,
       disabled: disabled,
+      disabledReason: disabledReason,
     );
   }
 }
@@ -139,12 +144,14 @@ class _AttachMenu extends StatefulWidget {
     required this.skills,
     required this.onRunCommand,
     required this.disabled,
+    this.disabledReason,
   });
 
   final VoidCallback? onPickFiles;
   final List<AgentCommand> skills;
   final ValueChanged<AgentCommand> onRunCommand;
   final bool disabled;
+  final String? disabledReason;
 
   @override
   State<_AttachMenu> createState() => _AttachMenuState();
@@ -189,6 +196,10 @@ class _AttachMenuState extends State<_AttachMenu> {
         onPointerDown: _toggle,
         child: MenuTriggerScope(
           open: _isOpen,
+          // A `Button` built with `onPressed: null` while disabled already
+          // renders its own fade and tooltip through [Button.disabledReason]
+          // — see the identical note on [DropdownMenu.disabledReason].
+          // Wrapping it in another [Disabled] here would double the dim.
           child: Button(
             variant: ButtonVariant.ghost,
             size: AgentAttachMenu.triggerSize,
@@ -198,6 +209,7 @@ class _AttachMenuState extends State<_AttachMenu> {
             suppressPressScale: true,
             label: 'Add files or use a skill',
             onPressed: widget.disabled ? null : () {},
+            disabledReason: widget.disabledReason,
             child: Icon.lucide(Lucide.plus, sizePx: AgentAttachMenu.glyphSize),
           ),
         ),

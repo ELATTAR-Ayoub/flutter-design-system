@@ -114,6 +114,7 @@ import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
+import './disabled.dart';
 import './icon.dart';
 import './icon_paths.dart';
 import './icon_paths.g.dart';
@@ -342,6 +343,7 @@ class CommandItem {
     this.value,
     this.keywords = const <String>[],
     this.enabled = true,
+    this.disabledReason,
     this.onSelect,
   });
 
@@ -401,6 +403,9 @@ class CommandItem {
 
   /// `data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50`.
   final bool enabled;
+
+  /// Why the row is disabled. Shown as a tooltip while [enabled] is false.
+  final String? disabledReason;
 
   /// `onSelect` — fired by Enter, by a click, and by nothing else. The page
   /// binds none, which is why its palette does nothing when you commit a row.
@@ -1452,12 +1457,7 @@ class _CommandRow extends StatelessWidget {
       child: row,
     );
 
-    row = Opacity(
-      opacity: item.enabled ? 1 : Command.disabledOpacity,
-      child: row,
-    );
-
-    return Semantics(
+    row = Semantics(
       button: true,
       selected: selected,
       enabled: item.enabled,
@@ -1475,6 +1475,13 @@ class _CommandRow extends StatelessWidget {
           child: row,
         ),
       ),
+    );
+
+    return Disabled(
+      disabled: !item.enabled,
+      blockPointer: false,
+      reason: item.disabledReason,
+      child: row,
     );
   }
 }

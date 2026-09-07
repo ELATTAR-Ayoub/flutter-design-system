@@ -9,15 +9,17 @@
     {
       "source": "lib/src/components/ui/field.dart",
       "target": "@ui/field.dart",
-      "sha256": "df72ae3e434a21d20f1f24d3d7bcbdaccb43a1748c2e646ce14bf71a9c44b8bc"
+      "sha256": "9f85c3895cab5a4ca7f97f62f05dea7b9c74f225f68a8775f50ee7267c0bda9a"
     }
   ],
   "registryDependencies": [
     "validation-rule",
-    "source-foundation"
+    "source-foundation",
+    "disabled"
   ],
   "semanticDependencies": [
-    "validation-rule"
+    "validation-rule",
+    "disabled"
   ],
   "pubDependencies": {},
   "assets": [],

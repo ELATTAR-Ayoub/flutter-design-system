@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/combobox.dart",
       "target": "@ui/combobox.dart",
-      "sha256": "8f622116d8a97d2eb9b25af0c7120633d6d31f72905714791b747a22c0b8292f"
+      "sha256": "0f7557ba43889513ad79327b321d72b0241845224ecdbdf8a6cf66801c8dd557"
     }
   ],
   "registryDependencies": [
@@ -18,14 +18,16 @@
     "input-group",
     "popover",
     "select",
-    "source-foundation"
+    "source-foundation",
+    "disabled"
   ],
   "semanticDependencies": [
     "field",
     "icon",
     "input-group",
     "popover",
-    "select"
+    "select",
+    "disabled"
   ],
   "pubDependencies": {},
   "assets": [],

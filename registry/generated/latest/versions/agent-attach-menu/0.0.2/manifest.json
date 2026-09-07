@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_attach_menu.dart",
       "target": "@ui/agent_attach_menu.dart",
-      "sha256": "56d3e27fa577342805a696f2bad85ca5aa78f5a816ac4861c700f3d3f06e463f"
+      "sha256": "3b3b52a5d726da84a5ed49406245719a32ba9906864759c27435692994b8264c"
     }
   ],
   "registryDependencies": [

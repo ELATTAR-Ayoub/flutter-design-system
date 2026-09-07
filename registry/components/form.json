@@ -1,7 +1,7 @@
 {
   "name": "form",
   "type": "component",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "`components/ui/form.tsx` — the wiring, with no styling at all.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/form.dart",
       "target": "@ui/form.dart",
-      "sha256": "0ca8a89f2c9a90647a0319d0dd8957ba1603ae8f060ed4175a859274c57850cc"
+      "sha256": "55baa9ee205ac8e33d9dcbea2c8d4dd7731f602ab27fee3dddcd0d5003d27e0c"
     }
   ],
   "registryDependencies": [
@@ -23,7 +23,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/form",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/form.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/form.dart",
   "exports": [
     "Form",
     "FormField",

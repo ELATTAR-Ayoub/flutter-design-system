@@ -274,6 +274,11 @@
       "classification": "dependency"
     },
     {
+      "source": "lib/src/components/ui/disabled.dart",
+      "owner": "disabled",
+      "classification": "dependency"
+    },
+    {
       "source": "lib/src/components/ui/drawer.dart",
       "owner": "drawer",
       "classification": "installable"

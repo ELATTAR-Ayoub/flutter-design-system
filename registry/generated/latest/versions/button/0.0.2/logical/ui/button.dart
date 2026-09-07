@@ -58,6 +58,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
+        Form,
         Icon,
         OverlayPortal,
         RichText,
@@ -69,11 +70,12 @@ import 'package:flutter/widgets.dart'
 import './premium_surface.dart';
 import './surface.dart';
 import './action_feedback.dart';
+import './disabled.dart';
+import './form.dart';
 import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
-import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -355,6 +357,8 @@ class Button extends StatefulWidget {
     this.radius,
     this.autoHeight = false,
     this.contentAlignment,
+    this.disabledReason,
+    this.onDisabledPressed,
   });
 
   /// Overrides the base list's `rounded-pill`.
@@ -489,6 +493,14 @@ class Button extends StatefulWidget {
   /// consumer needs and the shape [Padding] takes; the vertical component is
   /// always zero in the reference, the height being fixed by the rung.
   final EdgeInsets? padding;
+
+  /// Why the button is disabled. Shown as a tooltip on hover (pointer) or
+  /// tap (touch) while disabled; null shows nothing.
+  final String? disabledReason;
+
+  /// Called when a pointer taps the button while `onPressed` is null and it is
+  /// not loading. Null inside a [FormScope] means [Form.revealFirstError].
+  final VoidCallback? onDisabledPressed;
 
   /// `h-*` / `size-*`.
   static double heightFor(ButtonSize size) => switch (size) {
@@ -1141,25 +1153,20 @@ class _ButtonState extends State<Button> {
       child: button,
     );
 
-    // B11 — `disabled:opacity-45`, and `opacity` IS in `btn-spring`'s
-    // transition list. Measured by adding `disabled` live: 1 → **0.3969** at
-    // Δ~180 → 0.45 at Δ~280, an undershoot of (0.45 − 0.3969) / (1 − 0.45) =
-    // +9.65% — `--ease-spring` on opacity, exactly as the utility declares.
-    //
-    // `pointer-events: none` is not on that clock: the reference kills input in
-    // the same frame the attribute lands, so [IgnorePointer] stays instant.
-    button = TweenAnimationBuilder<double>(
-      tween: Tween<double>(end: _enabled ? 1 : SurfaceOpacity.disabled),
+    // B11 — `disabled:opacity-45` on `btn-spring`'s clock (see [Disabled]).
+    // `pointer-events: none` is not on that clock: [Disabled] keeps the
+    // IgnorePointer instant.
+    final Form? form = FormScope.maybeOf(context);
+    final bool idleDisabled = widget.onPressed == null && !widget.loading;
+    button = Disabled(
+      disabled: !_enabled,
       duration: transition,
-      curve: MotionCurves.emphasized,
-      builder: (BuildContext context, double value, Widget? child) => Opacity(
-        // The spring overshoots past 1 on the way back to enabled. CSS clamps
-        // `opacity` to 0..1 for its used value, so a browser cannot show that
-        // either — this is the reference's own ceiling, not Flutter's.
-        opacity: clampDouble(value, 0, 1),
-        child: child,
-      ),
-      child: IgnorePointer(ignoring: !_enabled, child: button),
+      reason: widget.disabledReason,
+      onDisabledTap: !idleDisabled
+          ? null
+          : widget.onDisabledPressed ??
+              (form == null ? null : () => form.revealFirstError()),
+      child: button,
     );
 
     // `<button>` — the element carries button semantics whether or not it also

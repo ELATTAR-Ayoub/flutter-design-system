@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `Disabled` — the one wrapper every control dims through (`SurfaceOpacity.disabled`, pointer block, cursor, reason tooltip, disabled-tap hook).
+- `disabledReason` on every disableable component and on `Field`; shows as a tooltip on hover or touch tap while disabled.
+- `Form.revealFirstError()` validates, scrolls the first invalid field to the centre of the screen and focuses it. `Form.submit()` now uses it.
+- `FormScope`; a disabled `Button` below it reveals the first error when tapped. `Button.onDisabledPressed` overrides that.
+
+### Changed
+- Textarea, Stat and AgentAttachMenu now dim and block input like every other disabled control.
+
 ## 0.0.2
 
 The type layer becomes a Flutter contract rather than a transcript of a

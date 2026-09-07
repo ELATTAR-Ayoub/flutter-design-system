@@ -9,19 +9,21 @@
     {
       "source": "lib/src/components/ui/command.dart",
       "target": "@ui/command.dart",
-      "sha256": "2fae51d83b5dfb5da148282082717d298803e2dfa131df26055d04abefbb1937"
+      "sha256": "3952abe21814befa8320560f7fde834e824b4b3b5c46c22f3c56837406b92e45"
     }
   ],
   "registryDependencies": [
     "icon",
     "input",
     "input-group",
-    "source-foundation"
+    "source-foundation",
+    "disabled"
   ],
   "semanticDependencies": [
     "icon",
     "input",
-    "input-group"
+    "input-group",
+    "disabled"
   ],
   "pubDependencies": {},
   "assets": [],

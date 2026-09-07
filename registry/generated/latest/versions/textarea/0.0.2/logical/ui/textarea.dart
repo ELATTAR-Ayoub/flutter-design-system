@@ -43,10 +43,10 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import '../../design_system/foundation/spacing.dart';
-import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
+import './disabled.dart';
 import './field.dart';
 import './input.dart';
 
@@ -64,6 +64,7 @@ class Textarea extends StatefulWidget {
     this.invalid = false,
     this.label,
     this.hint,
+    this.disabledReason,
   }) : assert(
          controller == null || initialValue == null,
          'A controller already carries the value — seed it there instead.',
@@ -92,6 +93,10 @@ class Textarea extends StatefulWidget {
 
   final String? label;
   final String? hint;
+
+  /// Why the field is disabled. Shown as a tooltip while [enabled] is false;
+  /// falls back to the enclosing [FieldScope]'s when unset.
+  final String? disabledReason;
 
   /// `min-h-20` — 80px, the floor. There is no ceiling: `field-sizing: content`
   /// grows the box with the value and the class list declares no `max-h`.
@@ -253,10 +258,15 @@ class _TextareaState extends State<Textarea> {
       ),
     );
 
-    // `disabled:opacity-45` — and **no** `IgnorePointer`. The class list omits
-    // `pointer-events-none` where the input's carries it, so a disabled
-    // textarea still receives the pointer and shows `cursor-not-allowed` for it.
-    body = Opacity(opacity: enabled ? 1 : SurfaceOpacity.disabled, child: body);
+    // `disabled:opacity-45` — the reference's class list omits
+    // `pointer-events-none` here, but this system blocks the pointer on
+    // every disabled control uniformly, so `Disabled`'s default
+    // (`blockPointer: true`) is used rather than following that omission.
+    body = Disabled(
+      disabled: !enabled,
+      reason: widget.disabledReason ?? scope?.disabledReason,
+      child: body,
+    );
 
     if (label != null || hint != null || invalid) {
       body = Semantics(

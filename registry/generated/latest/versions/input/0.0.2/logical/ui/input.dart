@@ -72,11 +72,11 @@ import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
-import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
+import './disabled.dart';
 import './field.dart';
 
 /// `focus-visible:border-primary/50`.
@@ -121,6 +121,7 @@ class Input extends StatefulWidget {
     this.fill,
     this.flat = false,
     this.radius,
+    this.disabledReason,
   }) : assert(
          controller == null || initialValue == null,
          'A controller already carries the value — seed it there instead.',
@@ -262,6 +263,10 @@ class Input extends StatefulWidget {
   /// inside a 12px-cornered row, which is the same argument `SidebarMenuButton`
   /// makes against [Button.radius].
   final BorderRadius? radius;
+
+  /// Why the field is disabled. Shown as a tooltip while [enabled] is false;
+  /// falls back to the enclosing [FieldScope]'s when unset.
+  final String? disabledReason;
 
   /// `h-10` — 40px, deliberately level with a default `Button`.
   static double get height => space(10);
@@ -454,9 +459,10 @@ class _InputState extends State<Input> {
       ),
     );
 
-    field = Opacity(
-      opacity: enabled ? 1 : SurfaceOpacity.disabled,
-      child: IgnorePointer(ignoring: !enabled, child: field),
+    field = Disabled(
+      disabled: !enabled,
+      reason: widget.disabledReason ?? scope?.disabledReason,
+      child: field,
     );
 
     if (label != null || hint != null || invalid) {

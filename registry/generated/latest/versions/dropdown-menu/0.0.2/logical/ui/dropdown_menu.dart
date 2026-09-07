@@ -56,6 +56,7 @@ import 'package:flutter/widgets.dart'
 
 import '../../design_system/foundation/spacing.dart';
 import './button.dart';
+import './disabled.dart';
 import './menu.dart';
 import './popover.dart';
 
@@ -106,6 +107,7 @@ class DropdownMenu extends StatefulWidget {
     this.align = PopoverAlign.start,
     this.side = PopoverSide.bottom,
     this.enabled = true,
+    this.disabledReason,
   });
 
   /// `DropdownMenuTrigger asChild` — the caller's own control, rendered as
@@ -135,6 +137,14 @@ class DropdownMenu extends StatefulWidget {
   final PopoverSide side;
 
   final bool enabled;
+
+  /// Why the trigger is disabled.
+  ///
+  /// Applies only when [trigger] does not already dim itself — a [Button]
+  /// trigger built with `onPressed: null` while disabled already renders its
+  /// own fade and tooltip through [Button.disabledReason], and wrapping it a
+  /// second time here would double the dim. See [_DropdownMenuState.build].
+  final String? disabledReason;
 
   /// `sideOffset={4}` — one spacing unit.
   static double get sideOffset => space(1);
@@ -172,8 +182,26 @@ class _DropdownMenuState extends State<DropdownMenu> {
 
   void _toggle() => setState(() => _open = !_open);
 
+  /// Whether [DropdownMenu.trigger] already dims and tooltips itself — a
+  /// [Button] built with `onPressed: null` while disabled. Wrapping such a
+  /// trigger in a second [Disabled] would fade it twice; see
+  /// [DropdownMenu.disabledReason].
+  bool get _triggerSelfDims {
+    final Widget trigger = widget.trigger;
+    return trigger is Button && trigger.onPressed == null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    Widget trigger = MenuTriggerScope(open: _isOpen, child: widget.trigger);
+    if (!_triggerSelfDims) {
+      trigger = Disabled(
+        disabled: !widget.enabled,
+        reason: widget.disabledReason,
+        child: trigger,
+      );
+    }
+
     return Popover(
       open: _isOpen,
       side: widget.side,
@@ -187,7 +215,7 @@ class _DropdownMenuState extends State<DropdownMenu> {
         onPointerDown: _toggle,
         // GAP CLOSED 2 — `aria-expanded`, handed down to whatever the call
         // site authored.
-        child: MenuTriggerScope(open: _isOpen, child: widget.trigger),
+        child: trigger,
       ),
       content: (BuildContext context, PopoverAnchorMetrics metrics) =>
           MenuContent(

@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_composer.dart",
       "target": "@ui/agent_composer.dart",
-      "sha256": "1b19fb02a80c3285572ba9adf7048893208b1c233961e29348dfc98589203d40"
+      "sha256": "4d63c620f963e2e41efcbf04aca4b70a502777c105f681689d225295483abb53"
     }
   ],
   "registryDependencies": [
@@ -21,7 +21,8 @@
     "icon",
     "input",
     "surface",
-    "source-foundation"
+    "source-foundation",
+    "disabled"
   ],
   "semanticDependencies": [
     "agent-attach-menu",
@@ -31,7 +32,8 @@
     "button",
     "icon",
     "input",
-    "surface"
+    "surface",
+    "disabled"
   ],
   "pubDependencies": {},
   "assets": [],

@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/switch.dart",
       "target": "@ui/switch.dart",
-      "sha256": "e4c528929fda14a9f5c03f01d93571d9846714b3d713ab975ebba40df2b7a1c0"
+      "sha256": "537e7e9c8496e9a86daaede35636ebad9c77206ecdf44935ebce4de118713f40"
     }
   ],
   "registryDependencies": [

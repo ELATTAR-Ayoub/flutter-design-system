@@ -69,12 +69,12 @@ import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
-import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import './press.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
+import './disabled.dart';
 import './field.dart';
 import './input.dart';
 
@@ -132,6 +132,7 @@ class InputGroup extends StatefulWidget {
     this.invalid = false,
     this.enabled = true,
     this.focusNode,
+    this.disabledReason,
   });
 
   /// The control. `InputGroupInput` in every case on the ported pages.
@@ -162,6 +163,10 @@ class InputGroup extends StatefulWidget {
   /// focus-on-error lands inside the group, and only owns one when there is no
   /// field above it.
   final FocusNode? focusNode;
+
+  /// Why the group is disabled. Shown as a tooltip while [enabled] is false;
+  /// falls back to the enclosing [FieldScope]'s when unset.
+  final String? disabledReason;
 
   /// `h-10` — level with a bare `Input` and a default `Button`.
   static double get height => Input.height;
@@ -297,9 +302,10 @@ class _InputGroupState extends State<InputGroup> {
     // `disabled:opacity-45` as well — two opacities that multiply, exactly as
     // the two class lists do. Unreachable on both ported pages; neither has a
     // disabled group.
-    group = Opacity(
-      opacity: enabled ? 1 : SurfaceOpacity.disabled,
-      child: IgnorePointer(ignoring: !enabled, child: group),
+    group = Disabled(
+      disabled: !enabled,
+      reason: widget.disabledReason ?? field?.disabledReason,
+      child: group,
     );
 
     // `has-[[data-slot=input-group-control]:focus-visible]` — a node that never
@@ -579,6 +585,7 @@ class InputGroupButton extends StatefulWidget {
     this.focusNode,
     this.size = InputGroupButtonSize.xs,
     this.cancelPressFill = false,
+    this.disabledReason,
   });
 
   final Widget child;
@@ -607,6 +614,10 @@ class InputGroupButton extends StatefulWidget {
   /// moves. Kept as a flag rather than a colour, because the reference names a
   /// behaviour and not a value.
   final bool cancelPressFill;
+
+  /// Why the button is disabled ([onPressed] is null). Shown as a tooltip
+  /// while disabled.
+  final String? disabledReason;
 
   /// `h-6` / `size-6` — 24px, both rungs.
   static double get height => space(6);
@@ -748,9 +759,10 @@ class _InputGroupButtonState extends State<InputGroupButton> {
       child: button,
     );
 
-    button = Opacity(
-      opacity: _enabled ? 1 : SurfaceOpacity.disabled,
-      child: IgnorePointer(ignoring: !_enabled, child: button),
+    button = Disabled(
+      disabled: !_enabled,
+      reason: widget.disabledReason,
+      child: button,
     );
 
     if (widget.label == null && widget.toggled == null) return button;

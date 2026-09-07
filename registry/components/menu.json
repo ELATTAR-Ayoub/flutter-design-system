@@ -9,17 +9,19 @@
     {
       "source": "lib/src/components/ui/menu.dart",
       "target": "@ui/menu.dart",
-      "sha256": "27c1f5ba7ced2644e423fa45be0652ecdca08bf13fd95aea9de7587ea9849010"
+      "sha256": "726c827ca5de153b3d876f7f17f59a015528ea30ed85d7dd65cac65cfb78c1d1"
     }
   ],
   "registryDependencies": [
     "icon",
     "popover",
-    "source-foundation"
+    "source-foundation",
+    "disabled"
   ],
   "semanticDependencies": [
     "icon",
-    "popover"
+    "popover",
+    "disabled"
   ],
   "pubDependencies": {},
   "assets": [],

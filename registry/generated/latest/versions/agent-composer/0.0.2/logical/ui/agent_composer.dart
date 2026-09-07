@@ -144,6 +144,7 @@ import './agent_attach_menu.dart';
 import './agent_core.dart';
 import './agent_slash_palette.dart';
 import './button.dart';
+import './disabled.dart';
 import './icon.dart';
 import './icon_paths.g.dart';
 import './input.dart';
@@ -157,6 +158,7 @@ class AgentComposer extends StatefulWidget {
     required this.onSubmit,
     this.onStop,
     this.disabled = false,
+    this.disabledReason,
     this.busy = false,
     this.placeholder,
     this.commands,
@@ -179,6 +181,9 @@ class AgentComposer extends StatefulWidget {
 
   /// *"The transport is not ready to carry a message at all."*
   final bool disabled;
+
+  /// Why the composer is disabled. Shown as a tooltip while [disabled].
+  final String? disabledReason;
 
   /// *"The agent is answering"* — send becomes stop.
   final bool busy;
@@ -500,6 +505,7 @@ class _AgentComposerState extends State<AgentComposer> {
             controller: widget.controller,
             focusNode: _focusNode,
             enabled: !widget.disabled,
+            disabledReason: widget.disabledReason,
             placeholder: _dragging
                 ? AgentComposer.dropPlaceholder
                 : (widget.placeholder ?? AgentComposer.defaultPlaceholder),
@@ -519,6 +525,7 @@ class _AgentComposerState extends State<AgentComposer> {
                   commands: widget.commands,
                   onRunCommand: _applyCommand,
                   disabled: widget.disabled,
+                  disabledReason: widget.disabledReason,
                 ),
                 SizedBox(width: AgentComposer.controlGap),
                 if (widget.accessory != null) ...<Widget>[
@@ -551,6 +558,9 @@ class _AgentComposerState extends State<AgentComposer> {
                     size: AgentComposer.controlSize,
                     label: 'Send',
                     onPressed: canSend ? widget.onSubmit : null,
+                    disabledReason: widget.disabled
+                        ? widget.disabledReason
+                        : null,
                     child: Icon.lucide(
                       Lucide.arrowUp,
                       sizePx: AgentComposer.sendGlyphSize,
@@ -662,6 +672,7 @@ class _ComposerInput extends StatefulWidget {
     required this.controller,
     required this.focusNode,
     required this.enabled,
+    this.disabledReason,
     required this.placeholder,
   });
 
@@ -669,6 +680,7 @@ class _ComposerInput extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool enabled;
+  final String? disabledReason;
   final String placeholder;
 
   @override
@@ -764,9 +776,12 @@ class _ComposerInputState extends State<_ComposerInput> {
     );
 
     // `disabled:opacity-60` — the input's own, and nothing else in the shell
-    // dims with it.
-    return Opacity(
-      opacity: widget.enabled ? 1 : AgentComposer.disabledInputOpacity,
+    // dims with it. `blockPointer: false` keeps the existing read-only
+    // tap-to-focus behaviour above.
+    return Disabled(
+      disabled: !widget.enabled,
+      blockPointer: false,
+      reason: widget.disabledReason,
       child: Semantics(
         textField: true,
         multiline: true,

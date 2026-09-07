@@ -9,19 +9,21 @@
     {
       "source": "lib/src/components/ui/slider.dart",
       "target": "@ui/slider.dart",
-      "sha256": "b56e11bd644c1d041a922c8e624281ff32b64f8fd7e3e5d589b13b8b7c741052"
+      "sha256": "33e28cd7155118deefa2166911c38eb9812c3ae80f7503b5e345648aacf98093"
     }
   ],
   "registryDependencies": [
     "button",
     "surface",
     "selection-control",
-    "source-foundation"
+    "source-foundation",
+    "disabled"
   ],
   "semanticDependencies": [
     "button",
     "surface",
-    "selection-control"
+    "selection-control",
+    "disabled"
   ],
   "pubDependencies": {},
   "assets": [],

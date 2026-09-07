@@ -109,7 +109,7 @@
         {
           "source": "lib/src/components/ui/agent_attach_menu.dart",
           "target": "@ui/agent_attach_menu.dart",
-          "sha256": "56d3e27fa577342805a696f2bad85ca5aa78f5a816ac4861c700f3d3f06e463f"
+          "sha256": "3b3b52a5d726da84a5ed49406245719a32ba9906864759c27435692994b8264c"
         }
       ],
       "registryDependencies": [
@@ -221,7 +221,7 @@
         {
           "source": "lib/src/components/ui/agent_composer.dart",
           "target": "@ui/agent_composer.dart",
-          "sha256": "1b19fb02a80c3285572ba9adf7048893208b1c233961e29348dfc98589203d40"
+          "sha256": "4d63c620f963e2e41efcbf04aca4b70a502777c105f681689d225295483abb53"
         }
       ],
       "registryDependencies": [
@@ -233,7 +233,8 @@
         "icon",
         "input",
         "surface",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "agent-attach-menu",
@@ -243,7 +244,8 @@
         "button",
         "icon",
         "input",
-        "surface"
+        "surface",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -265,7 +267,7 @@
         {
           "source": "lib/src/blocks/agent_console/agent_console.dart",
           "target": "@block/agent_console/agent_console.dart",
-          "sha256": "227815b7a63318e70a810e627c078616f906b5870044d3081b790340aa61efa5"
+          "sha256": "fc9d805f868f546ceb740708a5a1dab59593e3d7128071a0a155db704e26be4a"
         }
       ],
       "registryDependencies": [
@@ -540,7 +542,7 @@
         {
           "source": "lib/src/components/ui/agent_transcript.dart",
           "target": "@ui/agent_transcript.dart",
-          "sha256": "c79b14c36229c14eb3bb3eb2608aa2faddbbbe178578d243b0c812cc5b9dbf29"
+          "sha256": "aac3add72021e45d1f83db457f8db2e0cfb8c2122ebfdb3d267fd05f41381fb5"
         }
       ],
       "registryDependencies": [
@@ -881,7 +883,7 @@
         {
           "source": "lib/src/components/ui/button.dart",
           "target": "@ui/button.dart",
-          "sha256": "1cf91fbeeaf35827ba72072abfba92925abd7b527c5326ffeace7506cc406244"
+          "sha256": "1ae63c6728aaef83891ab3320915b02a294c5d4bb2b822d70b81dfc02a783905"
         }
       ],
       "registryDependencies": [
@@ -889,13 +891,15 @@
         "surface",
         "action-feedback",
         "source-foundation",
-        "spinner"
+        "spinner",
+        "disabled"
       ],
       "semanticDependencies": [
         "premium-surface",
         "surface",
         "action-feedback",
-        "spinner"
+        "spinner",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -1158,7 +1162,7 @@
         {
           "source": "lib/src/components/ui/checkbox.dart",
           "target": "@ui/checkbox.dart",
-          "sha256": "7ebed80a059ddf2c78f1005cc4de01d44b230325c2ce3397a12d572801b3c0c2"
+          "sha256": "9467a331873baa8a67bb83c7513d8ba8a1d1600fe061f499c2a2c35b641b8347"
         }
       ],
       "registryDependencies": [
@@ -1221,7 +1225,7 @@
         {
           "source": "lib/src/components/ui/combobox.dart",
           "target": "@ui/combobox.dart",
-          "sha256": "8f622116d8a97d2eb9b25af0c7120633d6d31f72905714791b747a22c0b8292f"
+          "sha256": "0f7557ba43889513ad79327b321d72b0241845224ecdbdf8a6cf66801c8dd557"
         }
       ],
       "registryDependencies": [
@@ -1230,14 +1234,16 @@
         "input-group",
         "popover",
         "select",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "field",
         "icon",
         "input-group",
         "popover",
-        "select"
+        "select",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -1259,19 +1265,21 @@
         {
           "source": "lib/src/components/ui/command.dart",
           "target": "@ui/command.dart",
-          "sha256": "2fae51d83b5dfb5da148282082717d298803e2dfa131df26055d04abefbb1937"
+          "sha256": "3952abe21814befa8320560f7fde834e824b4b3b5c46c22f3c56837406b92e45"
         }
       ],
       "registryDependencies": [
         "icon",
         "input",
         "input-group",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "icon",
         "input",
-        "input-group"
+        "input-group",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -1379,6 +1387,36 @@
       "deprecated": false
     },
     {
+      "name": "disabled",
+      "type": "component",
+      "version": "0.0.2",
+      "description": "The shared disabled-state wrapper: dims through the surface opacity token, blocks pointer input, swaps the cursor and shows a reason tooltip on hover or touch tap.",
+      "minDart": ">=3.12.2 <4.0.0",
+      "minFlutter": ">=3.44.8",
+      "files": [
+        {
+          "source": "lib/src/components/ui/disabled.dart",
+          "target": "@ui/disabled.dart",
+          "sha256": "0d9df018cf82eb65518f20e5bc7f100c18bc64a2cf5886ac3b859dc6cd0125b8"
+        }
+      ],
+      "registryDependencies": [
+        "tooltip",
+        "source-foundation"
+      ],
+      "semanticDependencies": [
+        "tooltip"
+      ],
+      "pubDependencies": {},
+      "assets": [],
+      "fonts": [],
+      "shaders": [],
+      "licenses": [],
+      "documentationRoute": "/components/disabled",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/disabled.dart",
+      "deprecated": false
+    },
+    {
       "name": "drawer",
       "type": "component",
       "version": "0.0.2",
@@ -1419,19 +1457,21 @@
         {
           "source": "lib/src/components/ui/dropdown_menu.dart",
           "target": "@ui/dropdown_menu.dart",
-          "sha256": "981c286ce69209c9770529a81c3787b7a9a02febf2de5861fbfb27bb5719dc51"
+          "sha256": "05a59f15aea4f7edeaec6afef25dbe98958f3aea96d5786b148510f343431185"
         }
       ],
       "registryDependencies": [
         "button",
         "menu",
         "popover",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "button",
         "menu",
-        "popover"
+        "popover",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -1515,15 +1555,17 @@
         {
           "source": "lib/src/components/ui/field.dart",
           "target": "@ui/field.dart",
-          "sha256": "df72ae3e434a21d20f1f24d3d7bcbdaccb43a1748c2e646ce14bf71a9c44b8bc"
+          "sha256": "9f85c3895cab5a4ca7f97f62f05dea7b9c74f225f68a8775f50ee7267c0bda9a"
         }
       ],
       "registryDependencies": [
         "validation-rule",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
-        "validation-rule"
+        "validation-rule",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -1537,7 +1579,7 @@
     {
       "name": "form",
       "type": "component",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "description": "`components/ui/form.tsx` — the wiring, with no styling at all.",
       "minDart": ">=3.12.2 <4.0.0",
       "minFlutter": ">=3.44.8",
@@ -1545,7 +1587,7 @@
         {
           "source": "lib/src/components/ui/form.dart",
           "target": "@ui/form.dart",
-          "sha256": "0ca8a89f2c9a90647a0319d0dd8957ba1603ae8f060ed4175a859274c57850cc"
+          "sha256": "55baa9ee205ac8e33d9dcbea2c8d4dd7731f602ab27fee3dddcd0d5003d27e0c"
         }
       ],
       "registryDependencies": [
@@ -1560,7 +1602,7 @@
       "shaders": [],
       "licenses": [],
       "documentationRoute": "/components/form",
-      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.1/lib/src/components/ui/form.dart",
+      "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/form.dart",
       "deprecated": false
     },
     {
@@ -1739,19 +1781,21 @@
         {
           "source": "lib/src/components/ui/input.dart",
           "target": "@ui/input.dart",
-          "sha256": "144ef4c7d1c018d6acc9c51e75d52058aa7136c9dd422332adbac87d63da53cb"
+          "sha256": "c36f2d4fb233c8575872cb7584769b6cac41e5ba50149a7f105d0cf7b9ac35d7"
         }
       ],
       "registryDependencies": [
         "button",
         "field",
         "surface",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "button",
         "field",
-        "surface"
+        "surface",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -1773,7 +1817,7 @@
         {
           "source": "lib/src/components/ui/input_group.dart",
           "target": "@ui/input_group.dart",
-          "sha256": "36fbbdeb9525f25b0c920759cc8d332079e0952db550fbc2c09b62b43a3e8443"
+          "sha256": "5e081dfc9796348fa43bd2dd1502ae4aeb99b2807fab0f93a35c47a97a7248cb"
         }
       ],
       "registryDependencies": [
@@ -1782,14 +1826,16 @@
         "input",
         "surface",
         "press",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "button",
         "field",
         "input",
         "surface",
-        "press"
+        "press",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -1811,7 +1857,7 @@
         {
           "source": "lib/src/components/ui/input_otp.dart",
           "target": "@ui/input_otp.dart",
-          "sha256": "1fcabb7955578eacc602e58af3c2fa109b264c8e4661829a5f763b2d421f1213"
+          "sha256": "64743df901f4ddefcf251f516649a61abc7ebf4c6280699d78f67b3a4c9c75b0"
         }
       ],
       "registryDependencies": [
@@ -1821,7 +1867,8 @@
         "input",
         "keyframes",
         "surface",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "button",
@@ -1829,7 +1876,8 @@
         "icon",
         "input",
         "keyframes",
-        "surface"
+        "surface",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -1989,17 +2037,19 @@
         {
           "source": "lib/src/components/ui/menu.dart",
           "target": "@ui/menu.dart",
-          "sha256": "27c1f5ba7ced2644e423fa45be0652ecdca08bf13fd95aea9de7587ea9849010"
+          "sha256": "726c827ca5de153b3d876f7f17f59a015528ea30ed85d7dd65cac65cfb78c1d1"
         }
       ],
       "registryDependencies": [
         "icon",
         "popover",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "icon",
-        "popover"
+        "popover",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -2115,7 +2165,7 @@
         {
           "source": "lib/src/components/ui/native_select.dart",
           "target": "@ui/native_select.dart",
-          "sha256": "e57c9831853b9fabb27de7d4834f73a090d6e8d6cf8cdf35d11c25422cc50f90"
+          "sha256": "275fc25e9e1bc4b1cc21a74aca1113be90f8d51c1870fffad564b03aeb69b53b"
         }
       ],
       "registryDependencies": [
@@ -2125,7 +2175,8 @@
         "surface",
         "popover",
         "select",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "button",
@@ -2133,7 +2184,8 @@
         "icon",
         "surface",
         "popover",
-        "select"
+        "select",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -2338,7 +2390,7 @@
         {
           "source": "lib/src/components/ui/questionnaire.dart",
           "target": "@ui/questionnaire.dart",
-          "sha256": "6f4b14f7bf8484add229e507628500ba41e74af6fd610407bf83f83b4470d385"
+          "sha256": "82c372f9dbbac537ec524389594a6fb5fb52c0d7dfc7fe6fc2dc387425a85fc2"
         }
       ],
       "registryDependencies": [
@@ -2346,13 +2398,15 @@
         "input",
         "kbd",
         "keyframes",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "button",
         "input",
         "kbd",
-        "keyframes"
+        "keyframes",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -2374,7 +2428,7 @@
         {
           "source": "lib/src/components/ui/radio.dart",
           "target": "@ui/radio.dart",
-          "sha256": "fa775232a5652f475c1bd6b920776b28059d5806719fdafdfe0302e5f1ee9056"
+          "sha256": "e83967bb8cf0fde8dc30b96570f232bcabc409e55c8708c9406b3fd84e169455"
         }
       ],
       "registryDependencies": [
@@ -2489,7 +2543,7 @@
         {
           "source": "lib/src/components/ui/select.dart",
           "target": "@ui/select.dart",
-          "sha256": "46cd1c1c959ba778af4e1daaf12dfb39237b038ea0cde1b85b5e45022a8c99b9"
+          "sha256": "79a0d7afd552ed2fd9458d9ed574ff18e4809ccadd5db5effde96260e8be778a"
         }
       ],
       "registryDependencies": [
@@ -2498,14 +2552,16 @@
         "icon",
         "surface",
         "popover",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "button",
         "field",
         "icon",
         "surface",
-        "popover"
+        "popover",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -2527,19 +2583,21 @@
         {
           "source": "lib/src/components/ui/selection_control.dart",
           "target": "@ui/selection_control.dart",
-          "sha256": "26281dbad6602f04d2c5fb8672c59912f12455b0e0783ded55e949491fa53db2"
+          "sha256": "6d48fd2335236946ac010aa2766b6f6c32b23e59099d7fd987fe501b82e33102"
         }
       ],
       "registryDependencies": [
         "button",
         "keyframes",
         "surface",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "button",
         "keyframes",
-        "surface"
+        "surface",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -2704,19 +2762,21 @@
         {
           "source": "lib/src/components/ui/slider.dart",
           "target": "@ui/slider.dart",
-          "sha256": "b56e11bd644c1d041a922c8e624281ff32b64f8fd7e3e5d589b13b8b7c741052"
+          "sha256": "33e28cd7155118deefa2166911c38eb9812c3ae80f7503b5e345648aacf98093"
         }
       ],
       "registryDependencies": [
         "button",
         "surface",
         "selection-control",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "button",
         "surface",
-        "selection-control"
+        "selection-control",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -2867,19 +2927,21 @@
         {
           "source": "lib/src/components/ui/stat.dart",
           "target": "@ui/stat.dart",
-          "sha256": "07e6a64472a4c7ad7b4a5ecc2e6a66b954a3930c6ae989b7fbf7e4d8137db4a5"
+          "sha256": "e51786938958c142a9417daa268002f686e58aad3ccc4c7d4bbaa97ef2f1f2d8"
         }
       ],
       "registryDependencies": [
         "icon",
         "skeleton",
         "source-foundation",
-        "content-change"
+        "content-change",
+        "disabled"
       ],
       "semanticDependencies": [
         "icon",
         "skeleton",
-        "content-change"
+        "content-change",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -2928,7 +2990,7 @@
         {
           "source": "lib/src/components/ui/switch.dart",
           "target": "@ui/switch.dart",
-          "sha256": "e4c528929fda14a9f5c03f01d93571d9846714b3d713ab975ebba40df2b7a1c0"
+          "sha256": "537e7e9c8496e9a86daaede35636ebad9c77206ecdf44935ebce4de118713f40"
         }
       ],
       "registryDependencies": [
@@ -3023,17 +3085,19 @@
         {
           "source": "lib/src/components/ui/textarea.dart",
           "target": "@ui/textarea.dart",
-          "sha256": "6ebaa368af33c9c81afb1b2328d1f04e9c4f5569263dff2353be9d83c735a992"
+          "sha256": "a166949ce01975721dcd7f8557d92803330e405e58be4701c9446ab9132e8a93"
         }
       ],
       "registryDependencies": [
         "field",
         "input",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "field",
-        "input"
+        "input",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -3091,19 +3155,21 @@
         {
           "source": "lib/src/components/ui/toggle.dart",
           "target": "@ui/toggle.dart",
-          "sha256": "484fb04a079f439559c3fddfdc22d75a4bb03a8b02cf648c6dcae624b75859ef"
+          "sha256": "fd44d87fad3891058305b9c23b0960890c476c5aca4b6fcea8f39f98bc820cb4"
         }
       ],
       "registryDependencies": [
         "button",
         "icon",
         "surface",
-        "source-foundation"
+        "source-foundation",
+        "disabled"
       ],
       "semanticDependencies": [
         "button",
         "icon",
-        "surface"
+        "surface",
+        "disabled"
       ],
       "pubDependencies": {},
       "assets": [],
@@ -3125,7 +3191,7 @@
         {
           "source": "lib/src/components/ui/toggle_group.dart",
           "target": "@ui/toggle_group.dart",
-          "sha256": "e8555632ba09123e56bf1cdd2e24fb10f1ac87083290416ca16d7e7df406dfc9"
+          "sha256": "f0ab1dc7036db2e593e156e55e59cda4cacf399e49257101bc8dfd1efa436458"
         }
       ],
       "registryDependencies": [
@@ -3251,7 +3317,7 @@
         {
           "source": "lib/src/components/ui/voice.dart",
           "target": "@ui/voice.dart",
-          "sha256": "74c8a206bbd85d77f79b8c114d7412318e4673103f544de6be925239e5d09168"
+          "sha256": "a8ee6a8c9e1afe52164e176e9a47b05ff421023a4a3ddde57a295101456ba6f4"
         }
       ],
       "registryDependencies": [

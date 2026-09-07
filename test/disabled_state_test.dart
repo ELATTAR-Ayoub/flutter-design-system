@@ -125,6 +125,76 @@ void main() {
             '${offenders.join('\n')}',
       );
     });
+
+    test('no component dims itself outside Disabled', () {
+      // `Opacity(opacity: enabled ? 1 : SurfaceOpacity.disabled)` was the
+      // pattern that drifted; now it is a build failure.
+      final RegExp dim = RegExp(
+        r'opacity:\s*[^,;)]*(SurfaceOpacity\.disabled|[Dd]isabledOpacity|disabledInputOpacity)',
+      );
+      final List<String> offenders = <String>[];
+      for (final File file in Directory(
+        'lib/src',
+      ).listSync(recursive: true).whereType<File>()) {
+        if (!file.path.endsWith('.dart') || file.path.endsWith('disabled.dart')) {
+          continue;
+        }
+        final List<String> lines = file.readAsLinesSync();
+        for (int i = 0; i < lines.length; i++) {
+          if (dim.hasMatch(lines[i])) offenders.add('${file.path}:${i + 1}');
+        }
+      }
+      expect(offenders, isEmpty, reason: 'dim through Disabled, not a private Opacity');
+    });
+
+    test('every disableable component takes disabledReason', () {
+      // File -> class marker. Most components declare `disabledReason`
+      // themselves; Combobox's rows are `ComboboxItem<T>`, a typedef for
+      // `SelectOption<T>` (`combobox.dart`), so the field that covers them
+      // lives on `SelectOption` in `select.dart`, not in combobox.dart's own
+      // source text — hence the second `select.dart` entry below.
+      const List<MapEntry<String, String>> classes = <MapEntry<String, String>>[
+        MapEntry<String, String>('button.dart', 'class Button '),
+        MapEntry<String, String>('input.dart', 'class Input '),
+        MapEntry<String, String>('textarea.dart', 'class Textarea '),
+        MapEntry<String, String>('input_otp.dart', 'class InputOtp '),
+        MapEntry<String, String>('input_group.dart', 'class InputGroup '),
+        MapEntry<String, String>('checkbox.dart', 'class Checkbox '),
+        MapEntry<String, String>('switch.dart', 'class Switch '),
+        MapEntry<String, String>('radio.dart', 'class RadioGroupItem'),
+        MapEntry<String, String>('toggle.dart', 'class Toggle '),
+        MapEntry<String, String>('toggle_group.dart', 'class ToggleGroupItem'),
+        MapEntry<String, String>('slider.dart', 'class Slider '),
+        MapEntry<String, String>('stat.dart', 'class Stat '),
+        MapEntry<String, String>('select.dart', 'class Select<'),
+        MapEntry<String, String>('native_select.dart', 'class NativeSelect<'),
+        MapEntry<String, String>('select.dart', 'class SelectOption'),
+        MapEntry<String, String>('command.dart', 'class CommandItem'),
+        MapEntry<String, String>('menu.dart', 'class MenuItem '),
+        MapEntry<String, String>('dropdown_menu.dart', 'class DropdownMenu '),
+        MapEntry<String, String>('agent_composer.dart', 'class AgentComposer '),
+        MapEntry<String, String>('agent_attach_menu.dart', 'class AgentAttachMenu '),
+        MapEntry<String, String>('questionnaire.dart', 'class QuestionnaireChoice '),
+        MapEntry<String, String>('voice.dart', 'class MicControl'),
+        MapEntry<String, String>('agent_transcript.dart', 'class WelcomeCard'),
+        MapEntry<String, String>('field.dart', 'class Field '),
+      ];
+      final List<String> missing = <String>[];
+      for (final MapEntry<String, String> entry in classes) {
+        final String file = entry.key;
+        final String marker = entry.value;
+        final String src = File(
+          'lib/src/components/ui/$file',
+        ).readAsStringSync();
+        final int at = src.indexOf(marker);
+        final int end = src.indexOf('\nclass ', at + 1);
+        final String body = src.substring(at, end < 0 ? src.length : end);
+        if (!body.contains('final String? disabledReason;')) {
+          missing.add('$file:$marker');
+        }
+      }
+      expect(missing, isEmpty, reason: missing.join('\n'));
+    });
   });
 
   group('the controls a reader meets', () {
