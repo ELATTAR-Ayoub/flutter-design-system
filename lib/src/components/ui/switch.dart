@@ -96,6 +96,7 @@ class Switch extends StatelessWidget {
     this.onChanged,
     this.size = SwitchSize.md,
     this.enabled = true,
+    this.disabledReason,
     this.invalid = false,
     this.focusNode,
     this.label,
@@ -114,6 +115,10 @@ class Switch extends StatelessWidget {
   /// can dim a switch that still carries its handler. ANDed with the enclosing
   /// [FieldScope]'s.
   final bool enabled;
+
+  /// Why the control is disabled, shown as a tooltip. Falls back to the
+  /// enclosing [FieldScope]'s.
+  final String? disabledReason;
 
   /// `aria-invalid="true"`. ORed with the enclosing [FieldScope]'s.
   final bool invalid;
@@ -165,6 +170,7 @@ class Switch extends StatelessWidget {
       duration: MotionDurations.normal,
       jellyState: value,
       enabled: isEnabled,
+      disabledReason: disabledReason ?? scope?.disabledReason,
       invalid: isInvalid,
       focusNode: node,
       onTap: toggle,

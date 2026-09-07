@@ -82,10 +82,10 @@ import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
-import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
+import './disabled.dart';
 import './selection_control.dart';
 
 /// `data-horizontal:h-2.5` — the track, and therefore the root.
@@ -141,6 +141,7 @@ class Slider extends StatefulWidget {
     this.max = _defaultMax,
     this.step = _defaultStep,
     this.enabled = true,
+    this.disabledReason,
     this.label,
   });
 
@@ -171,6 +172,9 @@ class Slider extends StatefulWidget {
   /// `disabled` — separate from a null [onChanged] so a disabled surface can
   /// dim a slider that still carries its handler.
   final bool enabled;
+
+  /// Why the control is disabled, shown as a tooltip.
+  final String? disabledReason;
 
   /// `aria-label`. Radix puts `role="slider"` on each **thumb**, so a
   /// single-value control announces this name and a range announces it on both
@@ -538,9 +542,11 @@ class _SliderState extends State<Slider> {
     // JavaScript rather than through `pointer-events`, which is why the probe
     // reads `pointer-events: auto` on a disabled root and the value still does
     // not move.
-    slider = Opacity(
-      opacity: widget.enabled ? 1 : SurfaceOpacity.disabled,
-      child: IgnorePointer(ignoring: !_operable, child: slider),
+    slider = IgnorePointer(ignoring: widget.enabled && !_operable, child: slider);
+    slider = Disabled(
+      disabled: !widget.enabled,
+      reason: widget.disabledReason,
+      child: slider,
     );
 
     // Outermost, so nothing above it rejects a pointer aimed at a knob that

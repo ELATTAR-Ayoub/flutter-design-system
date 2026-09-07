@@ -647,10 +647,15 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(host(const Switch(value: false)));
+      // `Disabled` now wraps every control in its own
+      // `TweenAnimationBuilder<double>` (the fade, always present so the
+      // tree shape never changes), so the thumb's own is picked out by its
+      // duration — `MotionDurations.normal`, not `Disabled`'s `.fast`.
       final TweenAnimationBuilder<double> thumb = t
-          .widget<TweenAnimationBuilder<double>>(
+          .widgetList<TweenAnimationBuilder<double>>(
             find.byType(TweenAnimationBuilder<double>),
-          );
+          )
+          .firstWhere((TweenAnimationBuilder<double> w) => w.duration == MotionDurations.normal);
       expect(thumb.curve, MotionCurves.emphasized);
       expect(thumb.duration, MotionDurations.normal);
 
@@ -1745,17 +1750,18 @@ void main() {
         )
         .opacity;
 
-    /// Whether a pointer reaches the control at all.
+    /// Whether a pointer reaches the control at all. `Disabled` now
+    /// contributes its own outer `IgnorePointer` (blocking on `!enabled`)
+    /// ahead of `SelectionControl`'s inner one (blocking on `enabled &&
+    /// !_enabled`), so a pointer is stopped if either ignores it.
     bool ignoresPointer(WidgetTester t) => t
-        .widget<IgnorePointer>(
-          find
-              .descendant(
-                of: find.byType(Checkbox),
-                matching: find.byType(IgnorePointer),
-              )
-              .first,
+        .widgetList<IgnorePointer>(
+          find.descendant(
+            of: find.byType(Checkbox),
+            matching: find.byType(IgnorePointer),
+          ),
         )
-        .ignoring;
+        .any((IgnorePointer w) => w.ignoring);
 
     /// What the control hands its own [Semantics] — read off the widget for the
     /// reason the adoption group records: the annotation sits *inside*

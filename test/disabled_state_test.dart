@@ -206,6 +206,80 @@ void main() {
       expect(_dim(tester, Textarea), SurfaceOpacity.disabled);
     });
 
+    testWidgets('selection controls, Toggle, Slider and Stat carry a reason', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_hostWithOverlay(Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Checkbox(
+            state: CheckboxState.unchecked,
+            onChanged: (_) {},
+            enabled: false,
+            disabledReason: 'r-checkbox',
+          ),
+          Switch(
+            value: false,
+            onChanged: (_) {},
+            enabled: false,
+            disabledReason: 'r-switch',
+          ),
+          RadioGroup<int>(
+            value: 1,
+            onChanged: (_) {},
+            children: <Widget>[
+              RadioGroupItem<int>(
+                value: 1,
+                enabled: false,
+                disabledReason: 'r-radio',
+              ),
+            ],
+          ),
+          Toggle(
+            pressed: false,
+            onChanged: null,
+            disabledReason: 'r-toggle',
+            child: const Text('t'),
+          ),
+          ToggleGroup(
+            items: const <ToggleGroupItem>[
+              ToggleGroupItem(
+                label: 'a',
+                enabled: false,
+                disabledReason: 'r-tgi',
+              ),
+            ],
+            selectedIndex: null,
+            onChanged: (_) {},
+          ),
+          Slider(
+            values: const <double>[0.5],
+            onChanged: (_) {},
+            enabled: false,
+            disabledReason: 'r-slider',
+          ),
+          const Stat(
+            label: 'x',
+            value: '1',
+            disabled: true,
+            disabledReason: 'r-stat',
+          ),
+        ],
+      )));
+      await tester.pumpAndSettle();
+      for (final String s in <String>[
+        'r-checkbox',
+        'r-switch',
+        'r-radio',
+        'r-toggle',
+        'r-tgi',
+        'r-slider',
+        'r-stat',
+      ]) {
+        expect(tip(s), findsOneWidget, reason: s);
+      }
+    });
+
     testWidgets('a disabled Textarea no longer takes the tap', (
       WidgetTester tester,
     ) async {

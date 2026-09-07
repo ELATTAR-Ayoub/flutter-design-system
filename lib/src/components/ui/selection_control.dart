@@ -43,8 +43,8 @@ import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
-import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
+import './disabled.dart';
 import './keyframes.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
@@ -295,6 +295,7 @@ class SelectionControl extends StatefulWidget {
     required this.child,
     this.onTap,
     this.enabled = true,
+    this.disabledReason,
     this.inert = false,
     this.invalid = false,
     this.forceFocusRing,
@@ -345,6 +346,10 @@ class SelectionControl extends StatefulWidget {
   /// still has a handler, and `Switch` spells its own disabled state
   /// `data-disabled` rather than `:disabled` (forms-map drift 14).
   final bool enabled;
+
+  /// Why the control is disabled, shown as a tooltip. Passed through from
+  /// `Checkbox`/`Switch`/`RadioGroupItem`, falling back to `FieldScope`.
+  final String? disabledReason;
 
   /// `checked="indeterminate"` with **no** `onCheckedChange` — a control Radix
   /// holds at the value it was handed, forever.
@@ -556,9 +561,11 @@ class _SelectionControlState extends State<SelectionControl> {
       ),
     );
 
-    control = Opacity(
-      opacity: widget.enabled ? 1 : SurfaceOpacity.disabled,
-      child: IgnorePointer(ignoring: !_enabled, child: control),
+    control = IgnorePointer(ignoring: widget.enabled && !_enabled, child: control);
+    control = Disabled(
+      disabled: !widget.enabled,
+      reason: widget.disabledReason,
+      child: control,
     );
 
     if (widget.semantics != null) control = widget.semantics!(control);
