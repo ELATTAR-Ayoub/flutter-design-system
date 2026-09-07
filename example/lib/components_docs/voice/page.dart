@@ -580,7 +580,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Mic · disabled',
     treatment:
         'disabled: true forces a null onPressed on the inner Button, '
-        'which takes over: 45% opacity, no pointer events, no focus.',
+        'which takes over: 50% opacity, no pointer events, no focus.',
     userSignal: 'Faded and inert, whatever listening says.',
   ),
   DocsStateFact(

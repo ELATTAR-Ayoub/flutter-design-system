@@ -101,10 +101,10 @@
 /// 15. **`Icon size="sm"` renders at 16px, not 14.** The container's
 ///     `[&_svg:not([class*='size-'])]:size-4` beats the SVG's own attributes
 ///     while `strokeWidth` stays at the 14px-derived 2.4. Four sites here.
-/// 16. **Two dim levels inside one disabled field.** `<Field data-disabled>`
-///     dims the label to 0.50; the disabled Button dims itself to 0.45; the
-///     description is dimmed by neither: which is exactly what its own copy
-///     claims, while the first two are reconciled nowhere.
+/// 16. **One dim level inside a disabled field, now reconciled.**
+///     `<Field data-disabled>` dims the label to 0.50; the disabled Button
+///     dims itself to 0.50 too; the description is dimmed by neither: which
+///     is exactly what its own copy claims, and the first two now agree.
 /// 17. **`aria-invalid` beats focus-visible** on both selects. Unreachable
 ///     from this page: nothing validates.
 /// 18. **The "Disabled" state cell ships an empty `<SelectContent />`**: a
@@ -928,9 +928,10 @@ class _DatePickerSectionState extends State<_DatePickerSection> {
                         child: const Text('Clear date'),
                       ),
                     ),
-                  // `<Field data-disabled>`, DRIFT 16. The field dims the
-                  // label to 0.50, the disabled trigger dims itself to 0.45,
-                  // and the description is dimmed by neither.
+                  // `<Field data-disabled>`, DRIFT 16 (now reconciled). The
+                  // field dims the label to 0.50, the disabled trigger dims
+                  // itself to 0.50 too, and the description is dimmed by
+                  // neither.
                   Field(
                     label: 'Locked to the tax year',
                     description:

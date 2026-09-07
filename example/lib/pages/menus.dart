@@ -319,7 +319,7 @@ class _AccountTrigger extends StatelessWidget {
       // `MenuPointerDown`: Radix's trigger never waits for the click. This
       // handler is the `asChild` arrangement itself: the page's `<Button>` has
       // no `onClick` of its own and is enabled all the same, and a `null` here
-      // would dim it to 45% and stop the press ever reaching the trigger.
+      // would dim it to 50% and stop the press ever reaching the trigger.
       onPressed: () {},
       child: Row(
         mainAxisSize: MainAxisSize.min,

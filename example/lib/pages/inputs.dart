@@ -64,8 +64,9 @@
 ///    ring at `--destructive`/20 in both themes; `InputGroup` and the OTP group
 ///    ring at 20 light and **40 dark**. Visible side by side in `#validation`,
 ///    fields 1 and 2. Carried by `input.dart` and `input_group.dart`.
-/// 7. **Disabled opacity differs by wrapper**, 45% on `Input`/`Textarea`, 50%
-///    on `InputGroup`/`InputOTP`.
+/// 7. **Disabled opacity is the same across every wrapper**: 50%, via the
+///    shared `SurfaceOpacity.disabled`, on `Input`/`Textarea` and
+///    `InputGroup`/`InputOTP` alike.
 /// 8. **"the numerical mono foundation" is 13px, not 15**: the collapse above.
 ///    Three places on this page assert the foundation is in use: the Quantity
 ///    field's description, the `#otp` section description, and Do #2.
@@ -338,7 +339,7 @@ class _StatesSection extends StatelessWidget {
           ),
           const StateCell(
             label: 'Disabled',
-            note: '45% opacity',
+            note: '50% opacity',
             child: Input(
               placeholder: 'Unavailable',
               enabled: false,
@@ -750,7 +751,7 @@ class _TypesSectionState extends State<_TypesSection> {
                     child: InputGroupButton(
                       // No `onClick` in the reference either: it is an enabled
                       // `type="button"` that does nothing. `null` would disable
-                      // it and fade it to 45%.
+                      // it and fade it to 50%.
                       onPressed: () {},
                       child: const Text('Apply'),
                     ),

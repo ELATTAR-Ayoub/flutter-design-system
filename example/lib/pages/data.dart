@@ -1112,7 +1112,7 @@ class _StatSection extends StatelessWidget {
             ),
             StateCell(
               label: 'disabled',
-              note: 'opacity-45, aria-disabled',
+              note: 'opacity-50, aria-disabled',
               child: Stat(
                 label: 'Revenue',
                 value: r'$12,480',

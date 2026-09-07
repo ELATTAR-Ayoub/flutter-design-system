@@ -1468,7 +1468,8 @@ class _KeyboardContent extends StatelessWidget {
             'to a key event: it is the node a tapped FieldLabel calls '
             '.requestFocus() on (the last rung of the tap-activation '
             'ladder, see Accessibility), and the node a failed Form '
-            'submit lands on via focusFirstError().',
+            'submit scrolls to the centre of the screen and lands on via '
+            'revealFirstError().',
         'The wrapped control\'s own keyboard behaviour (Enter/Space on '
             'Checkbox and Switch, arrow keys on a RadioGroup, typed '
             'characters on Input and Textarea) is entirely that '

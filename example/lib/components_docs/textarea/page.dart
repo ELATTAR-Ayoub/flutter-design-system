@@ -144,7 +144,7 @@ final ComponentDocSpec textareaDocSpec = ComponentDocSpec(
           'instead of a fixed 40px; the padding is 14px / 10px instead of '
           '16px / 4px; and the line height is 1.625 rather than '
           'inheriting the ambient default. One more difference is '
-          'behavioural, not visual: disabling a textarea drops it to 45% '
+          'behavioural, not visual: disabling a textarea drops it to 50% '
           'opacity but never blocks the pointer, while a disabled input '
           'additionally refuses hit-testing.',
       code: _vsInputCode,
@@ -166,7 +166,7 @@ final ComponentDocSpec textareaDocSpec = ComponentDocSpec(
       id: 'disabled',
       title: 'Disabled',
       description:
-          'enabled: false drops the field to 45% opacity and forces '
+          'enabled: false drops the field to 50% opacity and forces '
           'readOnly, but unlike Input the class list adds no '
           'pointer-events-none of its own: the cursor becomes '
           '"forbidden" and a tap still lands on the GestureDetector '
@@ -809,7 +809,7 @@ class _ApiReferenceContent extends StatelessWidget {
               name: 'enabled',
               type: 'bool',
               description:
-                  'Defaults to true. false drops the control to 45% '
+                  'Defaults to true. false drops the control to 50% '
                   'opacity and makes it non-editable: but, unlike '
                   'Input, does not add pointer-events-none, so it still '
                   'receives the pointer and shows a "forbidden" cursor '
@@ -940,7 +940,7 @@ class _StatesContent extends StatelessWidget {
             DocsStateFact(
               state: 'Disabled',
               treatment:
-                  'enabled: false drops opacity to 45% and forces '
+                  'enabled: false drops opacity to 50% and forces '
                   'readOnly, but the widget adds no pointer-events block '
                   'of its own: the cursor becomes "forbidden" and a tap '
                   'still lands on the GestureDetector underneath.',

@@ -20,8 +20,9 @@
 /// ## Divergences: reproduced behaviour the reference does not have
 ///
 /// * **Focus-on-error lands on every field (ruling F4).** `Form.submit`
-///   focuses the first invalid field in registration order whatever its shape,
-///   so submitting the composed form untouched puts focus on the Plan trigger.
+///   scrolls to and focuses the first invalid field in registration order
+///   whatever its shape, so submitting the composed form untouched puts
+///   focus on the Plan trigger.
 ///   The reference focuses nothing at all there: see drift 7: because RHF
 ///   needs a DOM ref and all three failing fields are hand-wired. An invisible
 ///   accessibility regression is the one drift class this port does not ship.
@@ -101,10 +102,10 @@
 /// 12. **Three line-heights on three consecutive lines.** Label 1.375,
 ///    description 1.5, error 1.428571: and none of them is `.type-small`'s
 ///    1.5-at-13px used everywhere else in the kit.
-/// 13. **The textarea deviates from its siblings on three axes.**
-///    `border-primary/50` not `border-ring`, `ring-ring/35` not `/50`,
-///    `opacity-45` not `-50`: it follows `Input` where the other four follow
-///    the shadcn default.
+/// 13. **The textarea deviates from its siblings on two axes.**
+///    `border-primary/50` not `border-ring`, `ring-ring/35` not `/50`:
+///    disabled opacity is no longer one of them, since every field now
+///    fades to the same shared `opacity-50`.
 /// 14. **`Switch` disables on `data-disabled:`; `Checkbox`, `Radio` and
 ///    `Select` on `disabled:`.** Same intent, two selector families.
 /// 15. **`Checkbox` carries `group-has-disabled/field:opacity-50` and
@@ -1337,7 +1338,7 @@ class _SubmitStatesState extends State<_SubmitStates> {
           child: Button(onPressed: () {}, child: const Text('Save Account')),
         ),
         // Static, but animating: the spinner never stops and `loading` implies
-        // `disabled`, so the cell also shows the 45% dim.
+        // `disabled`, so the cell also shows the 50% dim.
         StateCell(
           label: 'Pending',
           note: 'isSubmitting',

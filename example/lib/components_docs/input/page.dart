@@ -523,7 +523,7 @@ const List<DocsApiFact> _inputFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to true. ANDed with the enclosing '
-        'FieldScope\'s. Opacity drops to 45% and input is ignored '
+        'FieldScope\'s. Opacity drops to 50% and input is ignored '
         'when false.',
   ),
   DocsApiFact(
@@ -732,7 +732,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   ),
   DocsStateFact(
     state: 'Disabled',
-    treatment: 'Opacity drops to 45%; IgnorePointer kills input.',
+    treatment: 'Opacity drops to 50%; IgnorePointer kills input.',
     userSignal: 'The control cannot be changed in the current context.',
   ),
   DocsStateFact(

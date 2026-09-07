@@ -61,9 +61,9 @@
 ///    colour with no border, and a hover ink the element already inherits.
 /// 11. **Two press feels on one page.** A Button springs and scales; a Toggle
 ///    and a ToggleGroupItem cross-fade every property and do not scale at all.
-/// 12. **Disabled opacity differs by component**, 45% on a Button, 50% on a
-///    Toggle. The `#states` cell note says "45% opacity", which is true of the
-///    Button three sections above the disabled Toggle.
+/// 12. **Disabled opacity agrees across components**: 50% on both a Button
+///    and a Toggle, via the shared `SurfaceOpacity.disabled`. The `#states`
+///    cell note says "50% opacity", true of both.
 /// 13. **The "Hover" state cell does not show hover.** `className="bg-action"`
 ///    repaints the colour `--primary` already is, so the cell is
 ///    pixel-identical to "Default": see [_StatesSection].
@@ -580,7 +580,7 @@ class _StatesSection extends StatelessWidget {
               ),
               const StateCell(
                 label: 'Disabled',
-                note: '45% opacity',
+                note: '50% opacity',
                 child: Button(child: Text('Open Pack')),
               ),
             ],

@@ -311,7 +311,7 @@ final ComponentDocSpec buttonDocSpec = ComponentDocSpec(
       title: 'Disabled',
       description:
           'onPressed: null is the only disabled switch Button has: there '
-          'is no separate enabled flag. Opacity springs to 45% on the same '
+          'is no separate enabled flag. Opacity springs to 50% on the same '
           'clock the colour legs use; IgnorePointer kills input in the same '
           'frame, unanimated.',
       specimen: _DisabledSpecimen(),
@@ -1331,7 +1331,7 @@ const List<DocsApiFact> _buttonApiFacts = <DocsApiFact>[
     type: 'bool',
     description:
         'Optional. Defaults to false. Prepends a Spinner, and, ORed '
-        'with a null onPressed: disables the button: 45% opacity, no '
+        'with a null onPressed: disables the button: 50% opacity, no '
         'pointer events, no focus.',
   ),
   DocsApiFact(
@@ -1670,7 +1670,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        'onPressed: null. Opacity springs to 45% over the same clock; '
+        'onPressed: null. Opacity springs to 50% over the same clock; '
         'IgnorePointer kills input in the same frame, unanimated.',
     userSignal: 'Faded and inert, with no perceptible click.',
   ),

@@ -119,12 +119,13 @@ final ComponentDocSpec formDocSpec = ComponentDocSpec(
       id: 'focus-on-error',
       title: 'Focus on error',
       description:
-          'A failed submit calls focusFirstError(), which focuses the '
-          'first invalid field in registration order — whatever type it '
+          'A failed submit calls Form.revealFirstError(), which scrolls '
+          'the first invalid field to the centre of the screen before '
+          'focusing it, in registration order — whatever type it '
           'is. This is a deliberate behavioural fix over the reference '
           '(ruling F4): react-hook-form\'s shouldFocusError only reaches a '
           'field whose ref exposes .focus(), which is a no-op for a '
-          'hand-wired control; Form.focusFirstError has no such gap.',
+          'hand-wired control; Form.revealFirstError has no such gap.',
       specimen: _FocusOnErrorSpecimen(),
       code: _focusOnErrorCode,
       label: 'Focus on error specimen view',
@@ -801,9 +802,9 @@ const List<DocsApiFact> _elFormFacts = <DocsApiFact>[
     name: 'submit([onValid])',
     type: 'Future<bool> Function([FutureOr<void> Function()?])',
     description:
-        'Validates, focuses the first error, and stops on failure; '
-        'otherwise runs onValid with isSubmitting held true for its '
-        'duration.',
+        'Validates, scrolls to and focuses the first error, and stops on '
+        'failure; otherwise runs onValid with isSubmitting held true for '
+        'its duration.',
   ),
   DocsApiFact(
     name: 'setError(name, message)',
@@ -999,8 +1000,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'submitCount > 0 and at least one field.invalid is true; '
         'reValidateMode now governs further edits.',
     userSignal:
-        'Errors render under the failing fields; focus has moved to '
-        'the first of them.',
+        'Errors render under the failing fields; the first of them has '
+        'been scrolled to the centre of the screen and focused.',
   ),
   DocsStateFact(
     state: 'Server error',
@@ -1034,11 +1035,11 @@ class _AccessibilityContent extends StatelessWidget {
       ),
       DocsInstallFact(
         label: 'Field focus',
-        value: 'focusFirstError()',
+        value: 'revealFirstError()',
         description:
-            'Focuses the first invalid field in registration order: '
-            'any field type, not just text inputs — see Focus on error '
-            'above.',
+            'Scrolls to and focuses the first invalid field in '
+            'registration order: any field type, not just text inputs — '
+            'see Focus on error above.',
       ),
       DocsInstallFact(
         label: 'Announcements',
@@ -1052,7 +1053,7 @@ class _AccessibilityContent extends StatelessWidget {
 }
 
 /// `Form` owns no widget tree, so this section is entirely about the one
-/// keyboard-relevant behaviour it does own — `focusFirstError()`, called
+/// keyboard-relevant behaviour it does own — `revealFirstError()`, called
 /// from `submit()` — read off `lib/src/components/ui/form.dart` directly.
 class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
@@ -1064,12 +1065,13 @@ class _KeyboardContent extends StatelessWidget {
             'Focus.onKeyEvent and owns no FocusNode of its own — every '
             'FocusNode belongs to a field (FormFieldBase.focusNode), '
             'not to the form.',
-        'focusFirstError() is programmatic, not a key listener: submit() '
+        'revealFirstError() is programmatic, not a key listener: submit() '
             'calls it on a failed validate(), and it walks fields in '
-            'registration order calling field.focusNode.requestFocus() on '
-            'the first invalid one. Nothing here responds to a key press '
-            'directly; it responds to the RESULT of one (activating a '
-            'Submit button).',
+            'registration order, scrolling the first invalid one to the '
+            'centre of the screen before calling '
+            'field.focusNode.requestFocus() on it. Nothing here responds '
+            'to a key press directly; it responds to the RESULT of one '
+            '(activating a Submit button).',
         'Tab order across fields is whatever the bound page\'s own widget '
             'tree declares — usually the same order fields is written in, '
             'since that is also each field\'s registration order, but '

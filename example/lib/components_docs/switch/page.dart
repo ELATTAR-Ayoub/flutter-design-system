@@ -689,9 +689,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        "enabled: false. Opacity drops to 50% (this five-control family's "
-        'own default, Button and Input use 45%) and the control leaves '
-        'the tab order.',
+        'enabled: false. Opacity drops to 50% (the shared '
+        'SurfaceOpacity.disabled, the same fade Button and Input use) and '
+        'the control leaves the tab order.',
     userSignal:
         'Dimmed and inert; pointer and keyboard are both ignored, on or '
         'off.',

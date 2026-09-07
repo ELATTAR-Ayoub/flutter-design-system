@@ -742,10 +742,9 @@ class _ThemingContent extends StatelessWidget {
         'Addons inherit text colour from theme.mutedForeground '
             '(DefaultTextStyle.merge), which a Icon at IconTone.inherit '
             'reads too.',
-        'Disabled: opacity to 50% (has-disabled:opacity-50), five points '
-            'weaker than a bare Input\'s own 45%: an addon button inside a '
-            'disabled group still fades at the button\'s own 45%, so the two '
-            'opacities multiply.',
+        'Disabled: opacity to 50% (has-disabled:opacity-50), the same as a '
+            'bare Input\'s own fade: an addon button inside a disabled group '
+            'fades at the button\'s own 50% too, so the two agree.',
         'No colour overrides on InputGroup itself: every value comes from '
             'ThemeScope.of(context). InputGroupButton.cancelPressFill is a '
             'behaviour flag, not a colour override.',
@@ -962,7 +961,7 @@ const List<DocsApiFact> _buttonFacts = <DocsApiFact>[
     name: 'onPressed',
     type: 'VoidCallback?',
     description:
-        'Optional. Defaults to null, which disables the button: 45% '
+        'Optional. Defaults to null, which disables the button: 50% '
         'opacity, no pointer events, no focus.',
   ),
   DocsApiFact(
@@ -1086,8 +1085,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'Disabled',
     treatment:
         'Opacity drops to 50% (has-disabled:opacity-50); IgnorePointer '
-        'kills input. An addon button inside keeps its own 45% opacity, '
-        'so the two multiply.',
+        'kills input. An addon button inside fades to the same 50%, '
+        'so the two agree.',
     userSignal: 'Faded pill, no response to taps.',
   ),
   DocsStateFact(

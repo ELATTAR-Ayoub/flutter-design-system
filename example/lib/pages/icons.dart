@@ -806,7 +806,7 @@ class _PairedButton extends StatelessWidget {
     return Button(
       variant: variant,
       // Live, and deliberately inert: these are specimens on a docs page, and
-      // a null callback would disable them down to `opacity-45`.
+      // a null callback would disable them down to `opacity-50`.
       onPressed: () {},
       child: Row(
         mainAxisSize: MainAxisSize.min,

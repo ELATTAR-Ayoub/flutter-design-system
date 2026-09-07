@@ -459,7 +459,7 @@ class _InUseSection extends StatelessWidget {
 ///
 /// `onPressed` is a no-op rather than `null`: the reference renders five
 /// *enabled* `<button>`s with no `onClick`, and `null` here would mean
-/// `disabled:pointer-events-none disabled:opacity-45`: which would take the
+/// `disabled:pointer-events-none disabled:opacity-50`: which would take the
 /// press states the section is written about off the page.
 class _LiveButton extends StatelessWidget {
   const _LiveButton(this.variant, this.label);

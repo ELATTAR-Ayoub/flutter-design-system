@@ -123,7 +123,7 @@ final ComponentDocSpec agentAttachMenuDocSpec = ComponentDocSpec(
           'disabled: true does two things at once: MenuPointerDown stops '
           'calling onPointerDown at all (enabled: !disabled), and the '
           'trigger Button itself receives onPressed: null, which is '
-          "Button's own disabled switch — 45% opacity, no pointer "
+          "Button's own disabled switch — 50% opacity, no pointer "
           'events, on the same clock every disabled button uses.',
       specimen: _DisabledSpecimen(),
       code: _disabledCode,
@@ -678,7 +678,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'MenuPointerDown.enabled is !disabled (the menu cannot '
         'be toggled open) and the trigger Button itself gets onPressed: '
-        'null, so it also paints 45% opacity and ignores pointer events.',
+        'null, so it also paints 50% opacity and ignores pointer events.',
     userSignal: 'See Disabled above.',
   ),
 ];

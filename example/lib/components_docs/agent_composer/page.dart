@@ -152,9 +152,9 @@ final ComponentDocSpec agentComposerDocSpec = ComponentDocSpec(
       title: 'Disabled',
       description:
           'disabled: true — "the transport is not ready to carry a '
-          'message at all" — dims the input to 60% opacity (not the 45% '
-          'the button family dims to) and disables send regardless of '
-          'canSend.',
+          'message at all" — dims the input to the shared '
+          'SurfaceOpacity.disabled, 50%, the same fade the button family '
+          'uses, and disables send regardless of canSend.',
       specimen: _DisabledSpecimen(),
       code: _disabledCode,
       label: 'Disabled specimen view',
@@ -846,7 +846,7 @@ const List<DocsApiFact> _composerStaticFacts = <DocsApiFact>[
     name: 'AgentComposer.disabledInputOpacity',
     type: 'static const double',
     description:
-        '0.60 — the input alone, deliberately not the 45% the button '
+        '0.50 — SurfaceOpacity.disabled, the same fade the button '
         'family dims to.',
   ),
   DocsApiFact(
@@ -901,9 +901,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Disabled',
     treatment:
-        'disabled: true dims the input to 60% opacity (disabledInputOpacity, '
-        'not the button family\'s 45%) and forces canSend false regardless '
-        'of content.',
+        'disabled: true dims the input to 50% opacity (disabledInputOpacity, '
+        'the same as the button family\'s) and forces canSend false '
+        'regardless of content.',
     userSignal: 'Faded input, an unresponsive send.',
   ),
   DocsStateFact(

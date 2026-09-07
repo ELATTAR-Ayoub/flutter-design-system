@@ -636,7 +636,7 @@ class _ApiReferenceContent extends StatelessWidget {
               name: 'disabled',
               type: 'bool',
               description:
-                  'Optional. Defaults to false. Sets 45% opacity and '
+                  'Optional. Defaults to false. Sets 50% opacity and '
                   'Semantics(enabled: false) when true.',
             ),
           ],
@@ -777,7 +777,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   ),
   DocsStateFact(
     state: 'Disabled',
-    treatment: '45% opacity, Semantics(enabled: false).',
+    treatment: '50% opacity, Semantics(enabled: false).',
     userSignal: 'Faded and marked unavailable to assistive tech.',
   ),
   DocsStateFact(
@@ -817,7 +817,7 @@ class _AccessibilityContent extends StatelessWidget {
         'Blank states: Stat.build renders Semantics(label: "No value") '
             'around the em dash when state is error or empty, so the '
             'absence announces itself.',
-        'Disabled: opacity 45% plus Semantics(enabled: false) makes '
+        'Disabled: opacity 50% plus Semantics(enabled: false) makes '
             'disabled clear to assistive tech.',
         'Known platform differences: none observed.',
       ]);

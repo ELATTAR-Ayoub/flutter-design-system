@@ -949,8 +949,8 @@ const List<DocsApiFact> _radioGroupFacts = <DocsApiFact>[
     name: 'focusNode',
     type: 'FocusNode?',
     description:
-        'The node a failed form submit lands on, adopted from the '
-        'enclosing FieldScope when null. The group itself never keeps '
+        'The node a failed form submit scrolls to and lands on, adopted '
+        'from the enclosing FieldScope when null. The group itself never keeps '
         'this focus: it forwards it straight to the roving tab-stop item, '
         'so a keyboard user always lands on a real, operable radio and '
         'never on the group container.',
