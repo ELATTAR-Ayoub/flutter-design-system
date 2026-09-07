@@ -262,6 +262,10 @@ class Form extends ChangeNotifier {
   final ValidateMode reValidateMode;
 
   int _submitCount = 0;
+
+  /// Whether [revealFirstError] has shown messages without a submit; from then
+  /// on edits re-validate under [reValidateMode], as after a submit.
+  bool _revealed = false;
   bool _submitting = false;
 
   /// How many times submit has run. `mode` governs edits while this is 0 and
@@ -320,7 +324,13 @@ class Form extends ChangeNotifier {
   /// root, then focuses it. A disabled submit button inside a [FormScope]
   /// calls this when tapped, and so does a failed [submit].
   Future<void> revealFirstError({bool validateFirst = true}) async {
-    if (validateFirst) validate();
+    if (validateFirst) {
+      validate();
+      // Messages the reader has now been shown must clear as they type, the
+      // same way they would after a failed submit — otherwise a field that is
+      // fixed keeps its error until the next reveal.
+      _revealed = true;
+    }
     final FormFieldBase? field = firstInvalid;
     if (field == null) return;
     final BuildContext? context = field.focusNode.context;
@@ -381,13 +391,16 @@ class Form extends ChangeNotifier {
       field.reset();
     }
     _submitCount = 0;
+    _revealed = false;
     notifyListeners();
   }
 
   void _onEdit(FormFieldBase field) {
     // `mode` decides the first ask; once the form has been submitted,
     // `reValidateMode` decides every one after it.
-    final ValidateMode active = _submitCount == 0 ? mode : reValidateMode;
+    final ValidateMode active = _submitCount == 0 && !_revealed
+        ? mode
+        : reValidateMode;
     if (active == ValidateMode.onChange) field.validate();
     notifyListeners();
   }

@@ -179,4 +179,24 @@ void main() {
     ))));
     expect(find.byWidgetPredicate((Widget w) => w is Tooltip && w.label == 'Locked after verification'), findsOneWidget);
   });
+
+  testWidgets('after a reveal, fixing a field clears its message as you type', (WidgetTester t) async {
+    final Form form = _form();
+    addTearDown(form.dispose);
+    await t.pumpWidget(_page(form));
+    final Future<void> reveal = form.revealFirstError();
+    await t.pumpAndSettle();
+    await reveal;
+    expect(form['email'].invalid, isTrue);
+
+    form.text('email').controller.text = 'a@b.c';
+    await t.pump();
+    expect(form['email'].invalid, isFalse);
+
+    form.reset();
+    form.text('email').controller.text = '';
+    await t.pump();
+    // Reset restores the pre-reveal mode: no message until the next submit.
+    expect(form['email'].invalid, isFalse);
+  });
 }
