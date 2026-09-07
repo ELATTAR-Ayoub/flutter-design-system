@@ -16,6 +16,7 @@ library;
 import 'dart:io';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
@@ -293,6 +294,259 @@ void main() {
           matching: find.byWidgetPredicate(
             (Widget w) => w is IgnorePointer && w.ignoring,
           ),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('Select and NativeSelect triggers carry a reason', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_hostWithOverlay(Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Select<int>(
+            value: null,
+            onChanged: (_) {},
+            enabled: false,
+            disabledReason: 'r-select',
+            options: const <SelectOption<int>>[
+              SelectOption<int>(value: 1, label: 'one'),
+            ],
+          ),
+          NativeSelect<int>(
+            value: null,
+            onChanged: (_) {},
+            enabled: false,
+            disabledReason: 'r-native',
+            options: const <SelectOption<int>>[
+              SelectOption<int>(value: 1, label: 'one'),
+            ],
+          ),
+        ],
+      )));
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate(
+          (Widget w) => w is Tooltip && w.label == 'r-select',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (Widget w) => w is Tooltip && w.label == 'r-native',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+      'a disabled Select option keeps its row hittable for hover and '
+      'carries a reason',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(_hostWithOverlay(
+          Select<int>(
+            value: null,
+            onChanged: (_) {},
+            options: const <SelectOption<int>>[
+              SelectOption<int>(value: 1, label: 'one'),
+              SelectOption<int>(
+                value: 2,
+                label: 'two',
+                enabled: false,
+                disabledReason: 'r-opt',
+              ),
+            ],
+          ),
+        ));
+        await tester.tap(find.byType(Select<int>));
+        await tester.pumpAndSettle();
+        final Finder wrapper = find.ancestor(
+          of: find.text('two'),
+          matching: find.byType(Disabled),
+        );
+        expect(wrapper, findsOneWidget);
+        expect(tester.widget<Disabled>(wrapper).blockPointer, isFalse);
+        expect(
+          find.byWidgetPredicate(
+            (Widget w) => w is Tooltip && w.label == 'r-opt',
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'a disabled Combobox item keeps its row hittable for hover and '
+      'carries a reason',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(_hostWithOverlay(
+          SizedBox(
+            width: 320,
+            child: Combobox<int>(
+              value: null,
+              onChanged: (_) {},
+              items: const <ComboboxItem<int>>[
+                ComboboxItem<int>(value: 1, label: 'one'),
+                ComboboxItem<int>(
+                  value: 2,
+                  label: 'two',
+                  enabled: false,
+                  disabledReason: 'r-combo',
+                ),
+              ],
+            ),
+          ),
+        ));
+        await tester.tap(find.byType(InputGroupInput));
+        await tester.pumpAndSettle();
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pumpAndSettle();
+        // Two `Disabled` ancestors are expected here: InputGroup's own
+        // field-level one (always mounted, inert while the combobox itself
+        // is enabled) and the row's — see `input_group.dart:305`. Only the
+        // row's carries `disabled: true` and `blockPointer: false`.
+        final Finder wrapper = find.ancestor(
+          of: find.text('two'),
+          matching: find.byType(Disabled),
+        );
+        final Disabled rowWrapper = tester
+            .widgetList<Disabled>(wrapper)
+            .singleWhere((Disabled d) => d.disabled);
+        expect(rowWrapper.blockPointer, isFalse);
+        expect(
+          find.byWidgetPredicate(
+            (Widget w) => w is Tooltip && w.label == 'r-combo',
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'a disabled CommandItem keeps its row hittable for hover and '
+      'carries a reason',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(_hostWithOverlay(
+          SizedBox(
+            width: 320,
+            height: 300,
+            child: Command(
+              groups: const <CommandGroup>[
+                CommandGroup(
+                  items: <CommandItem>[
+                    CommandItem(label: 'one'),
+                    CommandItem(
+                      label: 'two',
+                      enabled: false,
+                      disabledReason: 'r-command',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ));
+        await tester.pumpAndSettle();
+        final Finder wrapper = find.ancestor(
+          of: find.text('two'),
+          matching: find.byType(Disabled),
+        );
+        expect(wrapper, findsOneWidget);
+        expect(tester.widget<Disabled>(wrapper).blockPointer, isFalse);
+        expect(
+          find.byWidgetPredicate(
+            (Widget w) => w is Tooltip && w.label == 'r-command',
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'the MenuItem family keeps its rows hittable for hover and carries a '
+      'reason',
+      (WidgetTester tester) async {
+        final FocusNode trigger = FocusNode(debugLabel: 'menu trigger');
+        addTearDown(trigger.dispose);
+        await tester.pumpWidget(_hostWithOverlay(
+          DropdownMenu(
+            trigger: Button(
+              focusNode: trigger,
+              onPressed: () {},
+              child: const Text('Open'),
+            ),
+            children: const <MenuChild>[
+              MenuItem(
+                label: 'item',
+                enabled: false,
+                disabledReason: 'r-item',
+              ),
+              MenuCheckboxItem(
+                label: 'checkbox',
+                checked: false,
+                enabled: false,
+                disabledReason: 'r-checkbox',
+              ),
+              MenuSub(
+                label: 'sub',
+                enabled: false,
+                disabledReason: 'r-sub',
+                children: <MenuChild>[MenuItem(label: 'nested')],
+              ),
+            ],
+          ),
+        ));
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
+
+        for (final (String label, String reason) in <(String, String)>[
+          ('item', 'r-item'),
+          ('checkbox', 'r-checkbox'),
+          ('sub', 'r-sub'),
+        ]) {
+          final Finder wrapper = find.ancestor(
+            of: find.text(label),
+            matching: find.byType(Disabled),
+          );
+          expect(wrapper, findsOneWidget, reason: label);
+          expect(
+            tester.widget<Disabled>(wrapper).blockPointer,
+            isFalse,
+            reason: label,
+          );
+          expect(
+            find.byWidgetPredicate(
+              (Widget w) => w is Tooltip && w.label == reason,
+            ),
+            findsOneWidget,
+            reason: reason,
+          );
+        }
+      },
+    );
+
+    testWidgets('a disabled DropdownMenu trigger carries a reason', (
+      WidgetTester tester,
+    ) async {
+      final FocusNode trigger = FocusNode(debugLabel: 'dropdown trigger');
+      addTearDown(trigger.dispose);
+      await tester.pumpWidget(_hostWithOverlay(
+        DropdownMenu(
+          enabled: false,
+          disabledReason: 'r-dropdown',
+          trigger: Button(
+            focusNode: trigger,
+            onPressed: () {},
+            child: const Text('Open'),
+          ),
+          children: const <MenuChild>[MenuItem(label: 'row')],
+        ),
+      ));
+      await tester.pumpAndSettle();
+      expect(
+        find.byWidgetPredicate(
+          (Widget w) => w is Tooltip && w.label == 'r-dropdown',
         ),
         findsOneWidget,
       );

@@ -96,7 +96,6 @@ import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
-import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -105,6 +104,7 @@ import './field.dart';
 import './icon.dart';
 import './icon_paths.dart';
 import './popover.dart';
+import './disabled.dart';
 
 /// `focus-visible:ring-ring/50`.
 const double _focusRingAlpha = 0.50;
@@ -172,6 +172,7 @@ class SelectOption<T> extends SelectChild<T> {
     required this.value,
     required this.label,
     this.enabled = true,
+    this.disabledReason,
   });
 
   final T value;
@@ -181,6 +182,9 @@ class SelectOption<T> extends SelectChild<T> {
 
   /// `data-disabled:pointer-events-none data-disabled:opacity-50`.
   final bool enabled;
+
+  /// Why the row is disabled. Shown as a tooltip while [enabled] is false.
+  final String? disabledReason;
 }
 
 /// `SelectGroup` + the `SelectLabel` inside it (`select.tsx:16`, `:94`).
@@ -227,6 +231,7 @@ class Select<T> extends StatefulWidget {
     this.placeholder,
     this.size = SelectSize.md,
     this.enabled = true,
+    this.disabledReason,
     this.invalid = false,
     this.expand = false,
     this.width,
@@ -257,6 +262,10 @@ class Select<T> extends StatefulWidget {
 
   /// `disabled`. ANDed with the enclosing [FieldScope]'s.
   final bool enabled;
+
+  /// Why the trigger is disabled. Falls back to the enclosing
+  /// [FieldScope]'s.
+  final String? disabledReason;
 
   /// `aria-invalid="true"`. ORed with the enclosing [FieldScope]'s.
   final bool invalid;
@@ -661,9 +670,14 @@ class _SelectState<T> extends State<Select<T>> {
       child: trigger,
     );
 
-    trigger = Opacity(
-      opacity: _fieldEnabled ? 1 : SurfaceOpacity.disabled,
-      child: IgnorePointer(ignoring: !_enabled, child: trigger),
+    trigger = IgnorePointer(
+      ignoring: _fieldEnabled && !_enabled,
+      child: trigger,
+    );
+    trigger = Disabled(
+      disabled: !_fieldEnabled,
+      reason: widget.disabledReason ?? _scope?.disabledReason,
+      child: trigger,
     );
 
     return Semantics(
@@ -1297,12 +1311,7 @@ class _SelectItem<T> extends StatelessWidget {
       style: TextStyle(color: ink),
       child: row,
     );
-    row = Opacity(
-      opacity: option.enabled ? 1 : SurfaceOpacity.disabled,
-      child: row,
-    );
-
-    return Semantics(
+    row = Semantics(
       button: true,
       selected: checked,
       enabled: option.enabled,
@@ -1316,6 +1325,13 @@ class _SelectItem<T> extends StatelessWidget {
           child: row,
         ),
       ),
+    );
+
+    return Disabled(
+      disabled: !option.enabled,
+      blockPointer: false,
+      reason: option.disabledReason,
+      child: row,
     );
   }
 }

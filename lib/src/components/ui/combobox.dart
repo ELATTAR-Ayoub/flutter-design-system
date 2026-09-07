@@ -98,10 +98,10 @@ import 'package:flutter/widgets.dart' as flutter show ScrollPosition;
 
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/spacing.dart';
-import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
+import './disabled.dart';
 import './field.dart';
 import './icon.dart';
 import './icon_paths.dart';
@@ -731,12 +731,7 @@ class _ComboboxRow<T> extends StatelessWidget {
       style: TextStyle(color: ink),
       child: row,
     );
-    row = Opacity(
-      opacity: item.enabled ? 1 : SurfaceOpacity.disabled,
-      child: row,
-    );
-
-    return Semantics(
+    row = Semantics(
       button: true,
       selected: checked,
       enabled: item.enabled,
@@ -750,6 +745,13 @@ class _ComboboxRow<T> extends StatelessWidget {
           child: row,
         ),
       ),
+    );
+
+    return Disabled(
+      disabled: !item.enabled,
+      blockPointer: false,
+      reason: item.disabledReason,
+      child: row,
     );
   }
 }
