@@ -551,5 +551,64 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets(
+      'a disabled DropdownMenu trigger blocks pointer events and does not '
+      'invoke its callback',
+      (WidgetTester tester) async {
+        int taps = 0;
+        await tester.pumpWidget(_hostWithOverlay(
+          DropdownMenu(
+            enabled: false,
+            disabledReason: 'r-dd',
+            trigger: Button(onPressed: () => taps++, child: const Text('open')),
+            children: const <MenuChild>[MenuItem(label: 'row')],
+          ),
+        ));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('open'));
+        await tester.pumpAndSettle();
+        expect(taps, 0);
+
+        expect(
+          find.byWidgetPredicate(
+            (Widget w) => w is Tooltip && w.label == 'r-dd',
+          ),
+          findsOneWidget,
+        );
+
+        final Finder wrappers = find.ancestor(
+          of: find.text('open'),
+          matching: find.byType(Disabled),
+        );
+        expect(
+          tester
+              .widgetList<Disabled>(wrappers)
+              .any((Disabled d) => d.disabled),
+          isTrue,
+          reason: 'the DropdownMenu-level Disabled wrapper should be '
+              'disabled',
+        );
+      },
+    );
+
+    testWidgets(
+      'an enabled DropdownMenu trigger still invokes its callback on tap',
+      (WidgetTester tester) async {
+        int taps = 0;
+        await tester.pumpWidget(_hostWithOverlay(
+          DropdownMenu(
+            trigger: Button(onPressed: () => taps++, child: const Text('open')),
+            children: const <MenuChild>[MenuItem(label: 'row')],
+          ),
+        ));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('open'));
+        await tester.pumpAndSettle();
+        expect(taps, 1);
+      },
+    );
   });
 }

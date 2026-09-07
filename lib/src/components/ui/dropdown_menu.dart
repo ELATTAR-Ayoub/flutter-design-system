@@ -197,7 +197,6 @@ class _DropdownMenuState extends State<DropdownMenu> {
     if (!_triggerSelfDims) {
       trigger = Disabled(
         disabled: !widget.enabled,
-        blockPointer: false,
         reason: widget.disabledReason,
         child: trigger,
       );
