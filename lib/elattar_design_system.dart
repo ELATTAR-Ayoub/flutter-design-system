@@ -59,6 +59,7 @@ export './src/components/ui/combobox.dart';
 export './src/components/ui/command.dart';
 export './src/components/ui/context_menu.dart';
 export './src/components/ui/dialog.dart';
+export './src/components/ui/disabled.dart';
 export './src/components/ui/drawer.dart';
 export './src/components/ui/validation_rule.dart';
 export './src/components/ui/safe_area.dart';
