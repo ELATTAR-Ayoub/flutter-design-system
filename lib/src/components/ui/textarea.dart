@@ -258,14 +258,13 @@ class _TextareaState extends State<Textarea> {
       ),
     );
 
-    // `disabled:opacity-45` — and **no** `pointer-events-none`. The class
-    // list omits it where the input's carries it, so a disabled textarea
-    // still receives the pointer and shows `cursor-not-allowed` for it;
-    // `blockPointer: false` keeps that fidelity through `Disabled`.
+    // `disabled:opacity-45` — the reference's class list omits
+    // `pointer-events-none` here, but this system blocks the pointer on
+    // every disabled control uniformly, so `Disabled`'s default
+    // (`blockPointer: true`) is used rather than following that omission.
     body = Disabled(
       disabled: !enabled,
       reason: widget.disabledReason ?? scope?.disabledReason,
-      blockPointer: false,
       child: body,
     );
 

@@ -206,13 +206,9 @@ void main() {
       expect(_dim(tester, Textarea), SurfaceOpacity.disabled);
     });
 
-    testWidgets('a disabled Textarea still takes the tap, per the reference', (
+    testWidgets('a disabled Textarea no longer takes the tap', (
       WidgetTester tester,
     ) async {
-      // `disabled:opacity-45` with no `pointer-events-none` in the class
-      // list (textarea.dart:82-84) — unlike `Input`, a disabled `Textarea`
-      // still receives the pointer, fading only through `Disabled`'s dim and
-      // marking itself with `cursor-not-allowed`. So `blockPointer: false`.
       await tester.pumpWidget(
         _host(Textarea(controller: TextEditingController(), enabled: false)),
       );
@@ -224,7 +220,7 @@ void main() {
             (Widget w) => w is IgnorePointer && w.ignoring,
           ),
         ),
-        findsNothing,
+        findsOneWidget,
       );
     });
   });

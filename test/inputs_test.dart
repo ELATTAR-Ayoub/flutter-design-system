@@ -879,19 +879,22 @@ void main() {
       );
     });
 
-    testWidgets('disabled keeps the pointer — no pointer-events-none', (
+    testWidgets('disabled blocks the pointer — cursor reads basic, uniformly', (
       WidgetTester t,
     ) async {
-      // inputs-map §5.1: the textarea's disabled list omits what the input's
-      // carries, so it still shows `cursor-not-allowed` for a pointer the
-      // input would have refused.
+      // inputs-map §5.1 has the reference showing `cursor-not-allowed` here
+      // (no `pointer-events-none` in its class list), but this system blocks
+      // the pointer on every disabled control the same way. `Disabled` wraps
+      // the field in its own outer `MouseRegion` (cursor: basic while
+      // disabled) and, via `IgnorePointer(ignoring: true)`, makes the
+      // textarea's own inner `MouseRegion` (still carrying `forbidden`)
+      // unreachable to hover — a pointer over the field only ever hits the
+      // outer region. Assert the frontmost region whose cursor actually
+      // participates (skipping `MouseCursor.defer`, which defers to
+      // whatever is beneath it) — that is what the user sees.
       await t.pumpWidget(
         host(const SizedBox(width: 512, child: Textarea(enabled: false))),
       );
-      // `Disabled` now wraps the field in its own outer `MouseRegion`
-      // (cursor: basic while disabled, index 0). The textarea's own — the
-      // one carrying the `cursor-not-allowed` reading this test is after —
-      // is the next one in, before `EditableText`'s internal region.
       final MouseRegion region = t
           .widgetList<MouseRegion>(
             find.descendant(
@@ -899,8 +902,8 @@ void main() {
               matching: find.byType(MouseRegion),
             ),
           )
-          .elementAt(1);
-      expect(region.cursor, SystemMouseCursors.forbidden);
+          .firstWhere((MouseRegion r) => r.cursor != MouseCursor.defer);
+      expect(region.cursor, SystemMouseCursors.basic);
       expect(
         t
             .widget<Opacity>(
