@@ -281,6 +281,38 @@ void main() {
       }
     });
 
+    testWidgets('agent surfaces carry a reason', (WidgetTester tester) async {
+      await tester.pumpWidget(_hostWithOverlay(Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          AgentComposer(
+            controller: TextEditingController(),
+            onSubmit: () {},
+            disabled: true,
+            disabledReason: 'r-composer',
+          ),
+          AgentAttachMenu(
+            onPickFiles: () {},
+            onRunCommand: (_) {},
+            disabled: true,
+            disabledReason: 'r-attach',
+          ),
+          MicControl(
+            listening: false,
+            disabled: true,
+            disabledReason: 'r-mic',
+          ),
+        ],
+      )));
+      await tester.pumpAndSettle();
+      // At least one: the composer carries its reason on both the input and
+      // the send button (both disabled controls, both explaining the same
+      // thing), so more than one Tooltip sharing the text is legitimate.
+      for (final String s in <String>['r-composer', 'r-attach', 'r-mic']) {
+        expect(tip(s), findsWidgets, reason: s);
+      }
+    });
+
     testWidgets('a disabled Textarea no longer takes the tap', (
       WidgetTester tester,
     ) async {

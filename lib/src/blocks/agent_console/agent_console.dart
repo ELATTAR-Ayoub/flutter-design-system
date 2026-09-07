@@ -226,6 +226,10 @@ class AgentConsole extends StatefulWidget {
     this.height,
   });
 
+  /// Shown as a tooltip on the composer, model picker and welcome card while
+  /// the transport is not ready.
+  static const String notReadyReason = 'Connecting to the agent…';
+
   final AgentTransport transport;
   final AgentPersona? persona;
   final ToolStateMap? toolStates;
@@ -550,6 +554,9 @@ class _AgentConsoleState extends State<AgentConsole> {
               onSubmit: () => _send(_draft.text),
               onStop: _stop,
               disabled: !transport.isReady,
+              disabledReason: !transport.isReady
+                  ? AgentConsole.notReadyReason
+                  : null,
               busy: state.isBusy,
               placeholder: widget.persona?.placeholder,
               commands: _allCommands,
@@ -573,6 +580,9 @@ class _AgentConsoleState extends State<AgentConsole> {
                       modelId: _modelId,
                       onSelect: (String id) => setState(() => _chosen = id),
                       disabled: !transport.isReady,
+                      disabledReason: !transport.isReady
+                          ? AgentConsole.notReadyReason
+                          : null,
                     )
                   : null,
             ),
@@ -682,6 +692,9 @@ class _AgentConsoleState extends State<AgentConsole> {
             ),
           ),
           disabled: !transport.isReady,
+          disabledReason: !transport.isReady
+              ? AgentConsole.notReadyReason
+              : null,
           avatar: _avatarSlot,
         ),
       for (final AgentTurn turn in transport.turns) ..._turn(context, turn),
@@ -831,12 +844,19 @@ class _ModelPicker extends StatelessWidget {
     required this.modelId,
     required this.onSelect,
     required this.disabled,
+    this.disabledReason,
   });
 
   final List<AgentModel> models;
   final String? modelId;
   final ValueChanged<String> onSelect;
   final bool disabled;
+
+  /// Why the picker is disabled. [DropdownMenu.disabledReason] is a no-op
+  /// here because [trigger] is a `Button(onPressed: null)` while disabled,
+  /// which already dims and tooltips itself — so this is passed straight to
+  /// the trigger [Button] instead.
+  final String? disabledReason;
 
   /// `w-80` on the content — *"wide enough for the hint to sit on one or two
   /// lines. A model menu whose descriptions wrap to four lines each is harder
@@ -867,6 +887,7 @@ class _ModelPicker extends StatelessWidget {
         // the press scale — `dropdown_menu.dart`'s GAP CLOSED 1.
         suppressPressScale: true,
         onPressed: disabled ? null : () {},
+        disabledReason: disabledReason,
         child: StyledText(
           current?.label ?? 'Model',
           TextStyles.badge,

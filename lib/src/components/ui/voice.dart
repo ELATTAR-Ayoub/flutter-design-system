@@ -442,6 +442,7 @@ class MicControl extends StatelessWidget {
     required this.listening,
     this.onToggle,
     this.disabled = false,
+    this.disabledReason,
   });
 
   /// `dictation.isListening` — the only thing that changes the pill's fill.
@@ -452,6 +453,9 @@ class MicControl extends StatelessWidget {
 
   /// `disabled`.
   final bool disabled;
+
+  /// Why the mic is disabled. Shown as a tooltip while [disabled].
+  final String? disabledReason;
 
   /// `border-agent/45`.
   static const double liveBorderAlpha = 0.45;
@@ -486,6 +490,7 @@ class MicControl extends StatelessWidget {
         listening: listening,
         onToggle: onToggle,
         disabled: disabled,
+        disabledReason: disabledReason,
       ),
     );
   }
@@ -498,11 +503,13 @@ class _MicButton extends StatefulWidget {
     required this.listening,
     required this.onToggle,
     required this.disabled,
+    this.disabledReason,
   });
 
   final bool listening;
   final VoidCallback? onToggle;
   final bool disabled;
+  final String? disabledReason;
 
   @override
   State<_MicButton> createState() => _MicButtonState();
@@ -562,6 +569,7 @@ class _MicButtonState extends State<_MicButton>
       radius: BorderRadius.circular(Radii.full),
       onPressed: widget.disabled ? null : widget.onToggle,
       label: widget.listening ? 'Stop dictation' : 'Dictate',
+      disabledReason: widget.disabledReason,
       child: const Icon.lucide(Lucide.mic, sizePx: _glyphPx),
     );
 
