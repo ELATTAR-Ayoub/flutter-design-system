@@ -1,3 +1,22 @@
+/// Covers `/components/chart` — one of four routes that now render the
+/// same consolidated chart-family page
+/// (`example/lib/components_docs/chart/consolidated.dart`). See that
+/// file's doc comment, and `example/test/docs/docs_install_test.dart`'s
+/// "several registry names may legitimately share one documentation page"
+/// test, for why four routes converging on one body is deliberate rather
+/// than a drift to catch.
+///
+/// What this test dropped from the pre-consolidation `chart_test.dart`,
+/// and why: the per-export API assertion used to loop over every name in
+/// `chartDoc.exports` (thirteen, including `ChartScope`, `ChartMotion`,
+/// `ChartText` — internals a consumer never constructs directly) and
+/// require each to appear as a table title. The consolidated page
+/// documents the condensed surface a caller actually touches instead (see
+/// `_condensedApiNames` below); the full export list stays true as
+/// `chartDoc.exports` and stays enforced there, it just is not what this
+/// page enumerates row by row any more.
+library;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/chart/meta.dart';
 import 'package:example/components_docs/chart/page.dart';
@@ -40,10 +59,6 @@ Widget _harness({required Widget child, required ThemeController controller}) =>
       controller: controller,
       child: MaterialApp(
         home: Builder(
-          // The ambient ink every route inherits, as the docs shell sets it
-          // for the real app. Without it this subtree sits under WidgetsApp's
-          // red fallback style, which StyledText asserts on rather than
-          // quietly painting over.
           builder: (BuildContext context) => DefaultTextStyle(
             style: StyledText.styleOf(
               context,
@@ -56,9 +71,6 @@ Widget _harness({required Widget child, required ThemeController controller}) =>
       ),
     );
 
-/// The single `DocsDisclosure` whose title is [title], matching the kit's own
-/// convention (`DocsDisclosure.triggerKey` is one constant shared by every
-/// instance on the page).
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
     (Widget widget) => widget is DocsDisclosure && widget.title == title,
@@ -66,13 +78,44 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
+/// The condensed API surface the consolidated page documents — the types a
+/// consumer actually touches building or theming a chart, not one row per
+/// export. See `consolidated.dart`'s `_ApiReferenceContent`.
+const List<String> _condensedApiNames = <String>[
+  'ChartConfig',
+  'ChartContainer',
+  'ChartTooltipContent',
+  'ChartLegendContent',
+  'CartesianChart',
+  'ChartSeriesSpec',
+  'Axes & Grid',
+  'PieChart',
+  'RadarChart',
+  'RadialBarChart',
+  'chartNumber',
+];
+
+const List<String> _sectionTitles = <String>[
+  'Preview',
+  'Installation',
+  'Usage',
+  'API Reference',
+  'States',
+  'Accessibility',
+  'Keyboard',
+  'Responsive',
+  'Dependencies',
+  'Theming',
+  'Source',
+];
+
 void main() {
-  group('chart docs page', () {
+  group('chart docs page (consolidated chart family)', () {
     testWidgets(
-      'renders the article and the full API table for every exported class, '
-      'enum and function this page claims to document',
+      'renders the article and the condensed API surface, with its own '
+      'install command',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.physicalSize = const Size(1440, 4000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
@@ -85,7 +128,6 @@ void main() {
             ),
           ),
         );
-        // One frame is enough: nothing on this page loops.
         await tester.pump();
 
         expect(
@@ -100,66 +142,42 @@ void main() {
         await tester.pump();
         await tester.pump(MotionDurations.open);
 
-        // Every exported class, enum, and function chart.dart's own barrel
-        // carries is named somewhere in the API Reference disclosure.
-        for (final String export in chartDoc.exports) {
-          expect(find.text(export), findsWidgets, reason: 'missing $export');
+        for (final String name in _condensedApiNames) {
+          expect(find.text(name), findsWidgets, reason: 'missing $name');
         }
 
-        // Every ChartIndicator and ChartLegendAlign enum value the
-        // ChartIndicator / ChartLegendAlign tables claim to document.
-        for (final ChartIndicator value in ChartIndicator.values) {
-          expect(
-            find.text(value.name),
-            findsWidgets,
-            reason: 'ChartIndicator.${value.name} missing from API table',
-          );
-        }
-        for (final ChartLegendAlign value in ChartLegendAlign.values) {
-          expect(
-            find.text(value.name),
-            findsWidgets,
-            reason: 'ChartLegendAlign.${value.name} missing from API table',
-          );
-        }
-
-        // Live specimens actually mount: ChartTooltipContent in all three
-        // ChartIndicator styles, and both wrap: false / wrap: true legends.
-        final Set<ChartIndicator> mountedIndicators = tester
-            .widgetList<ChartTooltipContent>(find.byType(ChartTooltipContent))
-            .map((ChartTooltipContent w) => w.indicator)
-            .toSet();
-        expect(mountedIndicators, containsAll(ChartIndicator.values));
-
-        final Set<bool> mountedWrap = tester
-            .widgetList<ChartLegendContent>(find.byType(ChartLegendContent))
-            .map((ChartLegendContent w) => w.wrap)
-            .toSet();
-        expect(mountedWrap, containsAll(<bool>[true, false]));
-
-        // Every example specimen this page's own source keys carries its key
-        // on the page.
-        for (final String key in <String>[
-          'chart-preview:tooltip',
-          'chart-preview:legend',
-          'chart-example:container-default',
-          'chart-example:container-custom-height',
-          'chart-example:tooltip-dot',
-          'chart-example:tooltip-line',
-          'chart-example:tooltip-dashed',
-          'chart-example:legend-row',
-          'chart-example:legend-wrap',
-        ]) {
-          expect(
-            find.byKey(ValueKey<String>(key)),
-            findsOneWidget,
-            reason: 'missing example specimen $key',
-          );
-        }
+        expect(
+          find.byKey(const ValueKey<String>('chart-family-preview:area')),
+          findsOneWidget,
+        );
 
         expect(chartDoc.name, 'chart');
         expect(chartDoc.command, 'elattar add chart');
         expect(destination, isNull);
+      },
+    );
+
+    testWidgets(
+      'the CLI pane on /components/chart prints this item\'s own command',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ThemeController(mode: ColorMode.dark),
+            child: const ChartDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        expect(
+          tester
+              .widget<DocsInstall>(find.byType(DocsInstall))
+              .command,
+          'elattar add chart',
+        );
       },
     );
 
@@ -178,9 +196,8 @@ void main() {
       );
       await tester.pump();
 
-      // Five specimen stages: Preview, Container, Tooltip, Legend, Number
-      // formatting.
-      expect(find.byType(DocsShowcase), findsNWidgets(5));
+      // One specimen stage: Preview.
+      expect(find.byType(DocsShowcase), findsNWidgets(1));
       expect(find.byType(DocsInstall), findsOneWidget);
       // Eight collapsed sections: API Reference, States, Accessibility,
       // Keyboard, Responsive, Dependencies, Theming, Source.
@@ -190,30 +207,14 @@ void main() {
     test('the table of contents matches the declared sections', () {
       expect(
         chartDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
-        <String>[
-          'Preview',
-          'Installation',
-          'Usage',
-          'Container',
-          'Tooltip',
-          'Legend',
-          'Number formatting',
-          'API Reference',
-          'States',
-          'Accessibility',
-          'Keyboard',
-          'Responsive',
-          'Dependencies',
-          'Theming',
-          'Source',
-        ],
+        _sectionTitles,
       );
     });
 
     testWidgets('sections render in declaration order', (
       WidgetTester tester,
     ) async {
-      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.physicalSize = const Size(1440, 4000);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
@@ -228,23 +229,7 @@ void main() {
           .map((DocsSection section) => section.title)
           .toList();
 
-      expect(titles, <String>[
-        'Preview',
-        'Installation',
-        'Usage',
-        'Container',
-        'Tooltip',
-        'Legend',
-        'Number formatting',
-        'API Reference',
-        'States',
-        'Accessibility',
-        'Keyboard',
-        'Responsive',
-        'Dependencies',
-        'Theming',
-        'Source',
-      ]);
+      expect(titles, _sectionTitles);
     });
 
     testWidgets(
@@ -279,7 +264,7 @@ void main() {
 
     testWidgets(
       'survives a live theme flip in place, at desktop width, without '
-      'losing any example specimen',
+      'losing the preview specimen',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -311,15 +296,10 @@ void main() {
         expect(lightTheme.background, isNot(darkTheme.background));
         expect(lightTheme.foreground, isNot(darkTheme.foreground));
 
-        for (final String key in <String>[
-          'chart-preview:tooltip',
-          'chart-preview:legend',
-          'chart-example:container-default',
-          'chart-example:tooltip-dot',
-          'chart-example:legend-row',
-        ]) {
-          expect(find.byKey(ValueKey<String>(key)), findsOneWidget);
-        }
+        expect(
+          find.byKey(const ValueKey<String>('chart-family-preview:area')),
+          findsOneWidget,
+        );
       },
     );
   });
