@@ -999,11 +999,16 @@ class _MenuContentState extends State<MenuContent> {
       child: _sized(
         MenuSurface(
           kind: widget.kind,
-          child: Padding(
-            // `p-2`, vertical here and per-row horizontally, so a separator's
-            // `-mx-2` has something to cancel.
-            padding: EdgeInsets.symmetric(vertical: Menu.contentPadding),
-            child: column,
+          // The popover clamps the surface to the room left in the viewport. A
+          // menu taller than that room scrolls inside it rather than painting
+          // past its own bottom edge.
+          child: SingleChildScrollView(
+            child: Padding(
+              // `p-2`, vertical here and per-row horizontally, so a separator's
+              // `-mx-2` has something to cancel.
+              padding: EdgeInsets.symmetric(vertical: Menu.contentPadding),
+              child: column,
+            ),
           ),
         ),
       ),

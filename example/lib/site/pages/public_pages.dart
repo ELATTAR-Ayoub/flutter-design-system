@@ -87,7 +87,7 @@ class PublicHomePage extends StatelessWidget {
           SizedBox(height: space(6)),
           Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: Containers.xl2),
+              constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
               child: StyledText(
                 'Own your Flutter\ninterface.',
                 TextStyles.display,
@@ -99,7 +99,7 @@ class PublicHomePage extends StatelessWidget {
           SizedBox(height: space(5)),
           Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: Containers.md),
+              constraints: const BoxConstraints(maxWidth: Containers.xl2),
               child: StyledText(
                 'Production-ready Flutter components delivered as source you '
                 'own. Start with the foundation, add only what you need, and '
