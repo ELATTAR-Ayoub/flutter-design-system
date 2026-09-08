@@ -30,13 +30,13 @@ String shortDate(Object? value) {
 }
 
 /// …with `year: "numeric"`: the two interactive tooltips.
-String shortDateYear(Object? value) {
+String _shortDateYear(Object? value) {
   final DateTime d = DateTime.parse('$value');
   return '${DateFormat.monthsShort[d.month - 1]} ${d.day}, ${d.year}';
 }
 
 String shortDateYearLabel(String label, List<ChartTooltipItem> items) =>
-    shortDateYear(label);
+    _shortDateYear(label);
 
 /// The bar's corner radius, off the ladder.
 ///
@@ -257,7 +257,7 @@ class _SeriesStripState extends State<SeriesStrip> {
                 ),
                 children: <Widget>[
                   for (int i = 0; i < SeriesStrip.series.length; i++)
-                    SeriesTile(
+                    _SeriesTile(
                       label: i == 0 ? 'Desktop' : 'Mobile',
                       value: chartNumber(
                         SeriesStrip.total(SeriesStrip.series[i]),
@@ -280,9 +280,8 @@ class _SeriesStripState extends State<SeriesStrip> {
 }
 
 /// One tile: a `Stat` and a swatch, in a control.
-class SeriesTile extends StatelessWidget {
-  const SeriesTile({
-    super.key,
+class _SeriesTile extends StatelessWidget {
+  const _SeriesTile({
     required this.label,
     required this.value,
     required this.swatch,

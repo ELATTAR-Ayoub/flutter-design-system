@@ -118,6 +118,7 @@ import '../charts/chart_specimen.dart';
 import '../charts/chart_states.dart';
 import '../charts/specimens_area.dart';
 import '../charts/specimens_bar.dart';
+import '../charts/specimens_line.dart';
 import '../kit.dart';
 import '../nav.dart';
 import '../token_swatch.dart';
@@ -163,218 +164,6 @@ const double _stackRadius = Radii.sm;
 
 String _longDateLabel(String label, List<ChartTooltipItem> items) =>
     _longDate(label);
-
-/* ── Line, `components/space/charts/line.tsx` ──────────────────────────────── */
-
-/// The one line every `dot={false}` variant draws.
-ChartSeriesSpec _lineSeries(
-  Color colour,
-  String key,
-  CurveType curve, {
-  ChartDot? dot,
-  List<ChartLabelList> labels = const <ChartLabelList>[],
-}) => ChartSeriesSpec(
-  kind: ChartSeriesKind.line,
-  dataKey: key,
-  curve: curve,
-  stroke: colour,
-  strokeWidth: 2,
-  dot: dot,
-  labels: labels,
-);
-
-Widget _lineChart(
-  ChartConfig config,
-  List<Map<String, Object?>> data,
-  List<ChartSeriesSpec> series, {
-  ChartAxis? xAxis,
-  ChartMargin margin = const ChartMargin(left: 12, right: 12),
-  ChartTooltipSpec tooltip = const ChartTooltipSpec(
-    cursor: false,
-    hideLabel: true,
-  ),
-}) => plot(
-  config,
-  CartesianChart(
-    data: data,
-    margin: margin,
-    grid: const ChartGrid(vertical: false),
-    xAxis: xAxis,
-    tooltip: tooltip,
-    series: series,
-  ),
-);
-
-Widget _lineDefault(ChartInk ink) => _lineChart(
-  ink.desktop,
-  monthsDesktop,
-  <ChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', CurveType.natural)],
-  xAxis: monthAxis(),
-);
-
-Widget _lineLinear(ChartInk ink) => _lineChart(
-  ink.desktop,
-  monthsDesktop,
-  <ChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', CurveType.linear)],
-  xAxis: monthAxis(),
-);
-
-Widget _lineStep(ChartInk ink) => _lineChart(
-  ink.desktop,
-  monthsDesktop,
-  <ChartSeriesSpec>[_lineSeries(ink.slot(1), 'desktop', CurveType.step)],
-  xAxis: monthAxis(),
-);
-
-Widget _lineMultiple(ChartInk ink) => _lineChart(
-  ink.desktopMobile,
-  monthsDesktopMobile,
-  <ChartSeriesSpec>[
-    _lineSeries(ink.slot(1), 'desktop', CurveType.monotone),
-    _lineSeries(ink.slot(2), 'mobile', CurveType.monotone),
-  ],
-  xAxis: monthAxis(),
-  tooltip: const ChartTooltipSpec(),
-);
-
-Widget _lineDots(ChartInk ink) =>
-    _lineChart(ink.desktopMobile, monthsDesktopMobile, <ChartSeriesSpec>[
-      _lineSeries(
-        ink.slot(1),
-        'desktop',
-        CurveType.natural,
-        dot: ChartDot(fill: ink.slot(1)),
-      ),
-    ], xAxis: monthAxis());
-
-/// The registry hardcodes 24 for the glyph's box; `line.tsx` reads it off the
-/// icon ladder instead, *"so `xl` is 24 in one place only"*.
-Widget _lineDotsCustom(ChartInk ink, ThemeTokens theme) =>
-    _lineChart(ink.desktopMobile, monthsDesktopMobile, <ChartSeriesSpec>[
-      _lineSeries(
-        ink.slot(1),
-        'desktop',
-        CurveType.natural,
-        dot: ChartDot(
-          radius: Icon.pxFor(IconSize.xl) / 2,
-          fill: theme.background,
-          stroke: ink.slot(1),
-        ),
-      ),
-    ], xAxis: monthAxis());
-
-/// One line through five categorical points, coloured from each row rather than
-/// from a series palette: five rows, five tokens, no cycling.
-Widget _lineDotsColors(ChartInk ink) => _lineChart(
-  ink.browser,
-  browsers,
-  <ChartSeriesSpec>[
-    ChartSeriesSpec(
-      kind: ChartSeriesKind.line,
-      dataKey: 'visitors',
-      curve: CurveType.natural,
-      // `visitors` is the value key and carries no colour of its own, so
-      // the stroke is the plain `--color-chart-2` the registry's config
-      // resolves to, not a lookup through it.
-      stroke: ink.slot(2),
-      strokeWidth: 2,
-      dot: const ChartDot(radius: 5),
-      cellFills: <Color>[
-        for (final Map<String, Object?> row in browsers) ink.ofRow(row),
-      ],
-    ),
-  ],
-  margin: const ChartMargin(top: 24, left: 24, right: 24),
-  tooltip: const ChartTooltipSpec(
-    cursor: false,
-    indicator: ChartIndicator.line,
-    nameKey: 'visitors',
-    hideLabel: true,
-  ),
-);
-
-Widget _lineLabel(ChartInk ink, ThemeTokens theme) => _lineChart(
-  ink.desktopMobile,
-  monthsDesktopMobile,
-  <ChartSeriesSpec>[
-    _lineSeries(
-      ink.slot(1),
-      'desktop',
-      CurveType.natural,
-      dot: ChartDot(fill: ink.slot(1)),
-      labels: <ChartLabelList>[
-        ChartLabelList(offset: 12, color: theme.foreground),
-      ],
-    ),
-  ],
-  xAxis: monthAxis(),
-  margin: const ChartMargin(top: 20, left: 12, right: 12),
-  tooltip: const ChartTooltipSpec(
-    cursor: false,
-    indicator: ChartIndicator.line,
-  ),
-);
-
-Widget _lineLabelCustom(ChartInk ink, ThemeTokens theme) => _lineChart(
-  ink.browser,
-  browsers,
-  <ChartSeriesSpec>[
-    _lineSeries(
-      ink.slot(2),
-      'visitors',
-      CurveType.natural,
-      dot: ChartDot(fill: ink.slot(2)),
-      labels: <ChartLabelList>[
-        ChartLabelList(
-          dataKey: 'browser',
-          offset: 12,
-          color: theme.foreground,
-          formatter: _browserLabelOf,
-        ),
-      ],
-    ),
-  ],
-  margin: const ChartMargin(top: 24, left: 24, right: 24),
-  tooltip: const ChartTooltipSpec(
-    cursor: false,
-    indicator: ChartIndicator.line,
-    nameKey: 'visitors',
-    hideLabel: true,
-  ),
-);
-
-String _browserLabelOf(Object? value) => browserLabel('$value');
-
-Widget _lineInteractive(BuildContext context, ChartInk ink) {
-  final String active = SeriesScope.of(context);
-  return plot(
-    ink.desktopMobile.plus(<String, ChartSeries>{
-      'views': const ChartSeries(label: 'Page Views'),
-    }),
-    CartesianChart(
-      data: dailyVisits,
-      margin: const ChartMargin(left: 12, right: 12),
-      grid: const ChartGrid(vertical: false),
-      xAxis: const ChartAxis(
-        dataKey: 'date',
-        tickLine: false,
-        axisLine: false,
-        tickMargin: 8,
-        minTickGap: 32,
-        tickFormatter: shortDate,
-      ),
-      tooltip: ChartTooltipSpec(
-        nameKey: 'views',
-        labelFormatter: shortDateYearLabel,
-        // `className="w-40"`.
-        width: space(40),
-      ),
-      series: <ChartSeriesSpec>[
-        _lineSeries(seriesColour(ink, active), active, CurveType.monotone),
-      ],
-    ),
-  );
-}
 
 /* ── Pie, `components/space/charts/pie.tsx` ────────────────────────────────── */
 
@@ -2604,7 +2393,7 @@ class _LineSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Default — chart state',
               skeleton: ChartSkeletonKind.line,
-              child: _lineDefault(ink),
+              child: lineDefault(ink),
             ),
           ),
           Panel(
@@ -2613,7 +2402,7 @@ class _LineSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Linear — chart state',
               skeleton: ChartSkeletonKind.line,
-              child: _lineLinear(ink),
+              child: lineLinear(ink),
             ),
           ),
           Panel(
@@ -2622,7 +2411,7 @@ class _LineSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Step — chart state',
               skeleton: ChartSkeletonKind.line,
-              child: _lineStep(ink),
+              child: lineStep(ink),
             ),
           ),
           Panel(
@@ -2631,7 +2420,7 @@ class _LineSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Multi-series — chart state',
               skeleton: ChartSkeletonKind.line,
-              child: _lineMultiple(ink),
+              child: lineMultiple(ink),
             ),
           ),
           Panel(
@@ -2640,7 +2429,7 @@ class _LineSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Dots — chart state',
               skeleton: ChartSkeletonKind.line,
-              child: _lineDots(ink),
+              child: lineDots(ink),
             ),
           ),
           Panel(
@@ -2649,7 +2438,7 @@ class _LineSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Custom dots — chart state',
               skeleton: ChartSkeletonKind.line,
-              child: _lineDotsCustom(ink, theme),
+              child: lineDotsCustom(ink, theme),
             ),
           ),
           Panel(
@@ -2658,7 +2447,7 @@ class _LineSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Dot colours — chart state',
               skeleton: ChartSkeletonKind.line,
-              child: _lineDotsColors(ink),
+              child: lineDotsColors(ink),
             ),
           ),
           Panel(
@@ -2667,7 +2456,7 @@ class _LineSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Label — chart state',
               skeleton: ChartSkeletonKind.line,
-              child: _lineLabel(ink, theme),
+              child: lineLabel(ink, theme),
             ),
           ),
           Panel(
@@ -2676,7 +2465,7 @@ class _LineSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Custom label — chart state',
               skeleton: ChartSkeletonKind.line,
-              child: _lineLabelCustom(ink, theme),
+              child: lineLabelCustom(ink, theme),
             ),
           ),
           Panel(
@@ -2692,7 +2481,7 @@ class _LineSection extends StatelessWidget {
               ),
               child: Builder(
                 builder: (BuildContext context) =>
-                    _lineInteractive(context, ink),
+                    lineInteractive(context, ink),
               ),
             ),
           ),
