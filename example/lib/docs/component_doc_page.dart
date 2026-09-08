@@ -216,7 +216,7 @@ class DocsPageHeader extends StatelessWidget {
         children: <Widget>[
           StyledText(title, TextStyles.h1, color: theme.foreground),
           SizedBox(height: space(3)),
-          StyledText(description, TextStyles.lead),
+          StyledText(description, TextStyles.body),
         ],
       ),
     );

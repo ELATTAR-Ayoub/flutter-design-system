@@ -992,7 +992,7 @@ class _Article extends StatelessWidget {
               SizedBox(height: space(3)),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
-                child: StyledText(intro.description, TextStyles.lead),
+                child: StyledText(intro.description, TextStyles.body),
               ),
             ],
           ),

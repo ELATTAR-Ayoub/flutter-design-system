@@ -126,7 +126,7 @@ class PageHeader extends StatelessWidget {
             constraints: BoxConstraints(maxWidth: _measure2xl),
             child: StyledText(
               blurb,
-              TextStyles.lead,
+              TextStyles.body,
               color: theme.mutedForeground,
             ),
           ),
