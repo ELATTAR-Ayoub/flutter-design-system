@@ -210,7 +210,7 @@ class _LiveSection extends StatelessWidget {
         'as a single object; the fill is what changes when it goes live.',
     child: Panel(
       label: 'MicControl · LiveWaveform · BarVisualizer',
-      child: _VoiceDemo(),
+      child: VoiceDemo(),
     ),
   );
 }
@@ -221,14 +221,14 @@ class _LiveSection extends StatelessWidget {
 /// (`useDictation`). Here the hook is the seam that does not cross, so the
 /// state is the arm switch alone: see the divergence note in the library
 /// comment. Every visual state the demo has is still reachable: press the mic.
-class _VoiceDemo extends StatefulWidget {
-  const _VoiceDemo();
+class VoiceDemo extends StatefulWidget {
+  const VoiceDemo({super.key});
 
   @override
-  State<_VoiceDemo> createState() => _VoiceDemoState();
+  State<VoiceDemo> createState() => _VoiceDemoState();
 }
 
-class _VoiceDemoState extends State<_VoiceDemo> {
+class _VoiceDemoState extends State<VoiceDemo> {
   bool _listening = false;
 
   @override

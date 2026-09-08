@@ -286,6 +286,7 @@ import 'pages/typography.dart';
 import 'shell.dart';
 import 'skills_docs/catalog.dart';
 import 'skills_docs/skills_page.dart';
+import 'site/pages/agent_gallery_page.dart';
 import 'site/pages/charts_gallery_page.dart';
 import 'site/pages/public_pages.dart';
 import 'site/site_routes.dart';
@@ -907,14 +908,13 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
     docsChangelogRoute => ChangelogDocsPage(onNavigate: onNavigate),
     componentsRoute => PublicComponentsPage(onNavigate: onNavigate),
     chartsRoute => ChartsGalleryPage(onNavigate: onNavigate),
-    // Same page `componentsRoute` renders, opened straight to the Agent
-    // family section — see `DocsLayout.initialAnchor` and
-    // `PublicComponentsPage.initialAnchor`. Not a distinct page: the header
-    // link is a shortcut into `/components`, not a fifth index.
-    agentRoute => PublicComponentsPage(
-      onNavigate: onNavigate,
-      initialAnchor: 'agent',
-    ),
+    // The agent, live: a visitor can talk to it, not just read about it.
+    // Mirrors `chartsRoute` above — same shape, `/components/agent_core` is
+    // its own Documentation link. Previously this route reused
+    // `PublicComponentsPage` scrolled to the Agent family anchor (see
+    // `DocsLayout.initialAnchor` / `PublicComponentsPage.initialAnchor`,
+    // still present for any other page that wants an anchored index).
+    agentRoute => AgentGalleryPage(onNavigate: onNavigate),
     '/components/button' => const ButtonDocPage(),
     // The deliberate fallback. Every route the site declares now resolves
     // above — `site_routes_test.dart` asserts that every entry in

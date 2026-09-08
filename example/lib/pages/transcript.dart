@@ -617,7 +617,7 @@ class _QuestionnaireSection extends StatelessWidget {
           label: 'Questionnaire',
           note:
               'unanswered · answered · skipped · invalid · submitting · complete',
-          child: _QuestionnaireDemo(),
+          child: QuestionnaireDemo(),
         ),
         _mt(
           6,
@@ -692,16 +692,16 @@ class _ShortcutsNoteBody extends StatelessWidget {
 }
 
 /// The full flow, live. All six states are reachable by clicking through it.
-class _QuestionnaireDemo extends StatefulWidget {
-  const _QuestionnaireDemo();
+class QuestionnaireDemo extends StatefulWidget {
+  const QuestionnaireDemo({super.key});
 
   @override
-  State<_QuestionnaireDemo> createState() => _QuestionnaireDemoState();
+  State<QuestionnaireDemo> createState() => _QuestionnaireDemoState();
 }
 
 enum _Phase { form, submitting, complete }
 
-class _QuestionnaireDemoState extends State<_QuestionnaireDemo> {
+class _QuestionnaireDemoState extends State<QuestionnaireDemo> {
   _Phase _phase = _Phase.form;
   int _generation = 0;
 

@@ -11,6 +11,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs_pages/catalog.dart';
 import 'package:example/main.dart';
+import 'package:example/site/pages/agent_gallery_page.dart';
 import 'package:example/site/pages/charts_gallery_page.dart';
 import 'package:example/site/pages/public_pages.dart';
 import 'package:example/site/site_routes.dart';
@@ -152,17 +153,18 @@ void main() {
   });
 
   testWidgets(
-    '$agentRoute resolves to the components index, opened on the Agent '
-    'family section',
+    '$agentRoute resolves to the live agent gallery, not the components '
+    'index',
     (WidgetTester tester) async {
       _sizeTo(tester, const Size(1440, 900));
       await tester.pumpWidget(_harness(publicPageFor(agentRoute)));
-      await tester.pumpAndSettle();
+      // Not `pumpAndSettle`: the page's launcher and voice demos each carry
+      // a repeating decorative `AnimationController`, so the tree never
+      // truly settles (`agent_gallery_test.dart` documents the same thing).
+      await tester.pump();
+      await tester.pump();
 
-      final PublicComponentsPage page = tester.widget<PublicComponentsPage>(
-        find.byType(PublicComponentsPage),
-      );
-      expect(page.initialAnchor, 'agent');
+      expect(find.byType(AgentGalleryPage), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
