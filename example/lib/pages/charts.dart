@@ -113,6 +113,7 @@ import 'package:flutter/widgets.dart'
 
 import '../charts/chart_data.dart';
 import '../charts/chart_ink.dart';
+import '../charts/chart_plot.dart';
 import '../charts/chart_specimen.dart';
 import '../charts/chart_states.dart';
 import '../charts/specimens_area.dart';
@@ -134,15 +135,6 @@ const double _measureXl = 576;
 MetaItem _meta(String k, String v) => (k: k, v: TextSpan(text: v));
 
 /* ── Formatters ──────────────────────────────────────────────────────────── */
-
-/// `value.slice(0, 3)`: the three-letter month every cartesian axis prints.
-String month3(Object? value) => '$value'.substring(0, 3);
-
-/// `new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric" })`.
-String shortDate(Object? value) {
-  final DateTime d = DateTime.parse('$value');
-  return '${DateFormat.monthsShort[d.month - 1]} ${d.day}';
-}
 
 /// …with `year: "numeric"`: the two interactive tooltips.
 String _shortDateYear(Object? value) {
@@ -199,81 +191,11 @@ const double _stackRadius = Radii.sm;
 
 /* ── Area, `components/space/charts/area.tsx` ──────────────────────────────── */
 
-/// The plot, in the container every specimen shares.
-Widget plot(ChartConfig config, Widget chart) =>
-    ChartContainer(config: config, child: chart);
-
-/// The X axis nine of the ten area variants share, byte for byte.
-ChartAxis monthAxis() => const ChartAxis(
-  dataKey: 'month',
-  tickLine: false,
-  axisLine: false,
-  tickMargin: 8,
-  tickFormatter: month3,
-);
-
 String _shortDateYearLabel(String label, List<ChartTooltipItem> items) =>
     _shortDateYear(label);
 
 String _longDateLabel(String label, List<ChartTooltipItem> items) =>
     _longDate(label);
-
-/// The `Select` strip, rendering unconditionally with `children` exactly once —
-/// the two obligations `state.tsx` puts on anything passed to `controls`.
-class RangeStrip extends StatelessWidget {
-  const RangeStrip({
-    super.key,
-    required this.value,
-    required this.onChanged,
-    required this.child,
-    this.width,
-    this.label = 'Select a range',
-    this.placeholder = 'Last 3 months',
-    this.options = _rangeOptions,
-  });
-
-  final String value;
-  final ValueChanged<String> onChanged;
-  final Widget child;
-  final double? width;
-  final String label;
-  final String placeholder;
-  final List<SelectOption<String>> options;
-
-  /// `w-40` on the area strip.
-  static double get rangeWidth => space(40);
-
-  /// `w-36` on the pie strip.
-  static double get monthWidth => space(36);
-
-  static const List<SelectOption<String>> _rangeOptions =
-      <SelectOption<String>>[
-        SelectOption<String>(value: '90d', label: 'Last 3 months'),
-        SelectOption<String>(value: '30d', label: 'Last 30 days'),
-        SelectOption<String>(value: '7d', label: 'Last 7 days'),
-      ];
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: <Widget>[
-      Align(
-        alignment: Alignment.centerRight,
-        child: Select<String>(
-          width: width ?? rangeWidth,
-          label: label,
-          placeholder: placeholder,
-          value: value,
-          onChanged: onChanged,
-          options: options,
-        ),
-      ),
-      // `mb-5`.
-      SizedBox(height: space(5)),
-      child,
-    ],
-  );
-}
 
 /* ── Bar, `components/space/charts/bar.tsx` ────────────────────────────────── */
 

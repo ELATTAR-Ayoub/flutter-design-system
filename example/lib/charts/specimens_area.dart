@@ -20,9 +20,9 @@ import 'package:flutter/widgets.dart'
         Table,
         TableColumnWidth;
 
-import '../pages/charts.dart' show monthAxis, plot, RangeStrip, shortDate;
 import 'chart_data.dart';
 import 'chart_ink.dart';
+import 'chart_plot.dart';
 import 'chart_specimen.dart';
 
 /// `chart-area-default`: one series, natural curve.
