@@ -263,7 +263,44 @@ void main() {
   /* ── The dropdown ──────────────────────────────────────────────────────── */
 
   group('DropdownMenu', () {
-    testWidgets('a menu row reads at the supporting-copy role', (WidgetTester t) async {
+    testWidgets('scrolling the page under an open menu dismisses it', (
+      WidgetTester t,
+    ) async {
+      final ScrollController page = ScrollController();
+      addTearDown(page.dispose);
+      await t.pumpWidget(
+        overlayHost(
+          SingleChildScrollView(
+            controller: page,
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: space(50)),
+                DropdownMenu(
+                  trigger: const _Trigger(width: 111),
+                  children: accountMenu(),
+                ),
+                SizedBox(height: space(200)),
+              ],
+            ),
+          ),
+        ),
+      );
+      await t.tap(find.byType(DropdownMenu));
+      await settleOverlay(t);
+      expect(find.byType(MenuContent), findsOneWidget);
+
+      page.jumpTo(space(10));
+      await settleOverlay(t);
+      expect(
+        find.byType(MenuContent),
+        findsNothing,
+        reason: 'a popup left behind by a scroll floats over nothing',
+      );
+    });
+
+    testWidgets('a menu row reads at the supporting-copy role', (
+      WidgetTester t,
+    ) async {
       useFrame(t);
       await t.pumpWidget(
         overlayHost(
