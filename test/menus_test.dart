@@ -165,7 +165,7 @@ void main() {
       expect(
         Menu.itemHeight,
         math.max(
-          TextStyles.nav.step.leading + space(2) * 2,
+          TextStyles.small.step.leading + space(2) * 2,
           TouchTargets.minimum,
         ),
       );
@@ -263,7 +263,7 @@ void main() {
   /* ── The dropdown ──────────────────────────────────────────────────────── */
 
   group('DropdownMenu', () {
-    testWidgets('a menu row reads at the field role', (WidgetTester t) async {
+    testWidgets('a menu row reads at the supporting-copy role', (WidgetTester t) async {
       useFrame(t);
       await t.pumpWidget(
         overlayHost(
@@ -281,7 +281,7 @@ void main() {
           (Widget w) => w is StyledText && w.text == 'Wallet',
         ),
       );
-      expect(identical(label.spec, Input.textSpecDefault), isTrue);
+      expect(identical(label.spec, TextStyles.small), isTrue);
     });
 
     testWidgets('opens on pointer-DOWN, not on the tap', (

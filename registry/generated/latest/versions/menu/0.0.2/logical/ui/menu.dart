@@ -94,7 +94,6 @@ import './disabled.dart';
 import './icon.dart';
 import './icon_paths.dart';
 import './icon_paths.g.dart';
-import './input.dart';
 import './popover.dart';
 
 /// `data-[variant=destructive]:focus:bg-destructive/10` and its
@@ -396,7 +395,7 @@ abstract final class Menu {
   /// the floor here keeps the popup's height and scroll math self-consistent
   /// with what actually paints.
   static double get itemHeight => math.max(
-    Input.textSpecDefault.step.leading + space(2) * 2,
+    TextStyles.small.step.leading + space(2) * 2,
     TouchTargets.minimum,
   );
 
@@ -413,7 +412,7 @@ abstract final class Menu {
   static double itemHeightOf(BuildContext context) => math.max(
     MediaQuery.textScalerOf(
           context,
-        ).scale(StyledText.stepOf(context, Input.textSpecDefault).leading) +
+        ).scale(StyledText.stepOf(context, TextStyles.small).leading) +
         space(2) * 2,
     TouchTargets.minimum,
   );
@@ -1384,7 +1383,7 @@ class _MenuRow extends StatelessWidget {
                         label,
                         // The field role: a row reads like the input that
                         // filters it, not like a paragraph or a nav link.
-                        Input.textSpecDefault,
+                        TextStyles.small,
                         color: ink,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
