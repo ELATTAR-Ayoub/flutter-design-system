@@ -11,9 +11,9 @@
 /// the same unit as the size is what makes the vertical rhythm legible in this
 /// file. [TextStyleToken.resolveWidth] converts to Flutter's ratio.
 ///
-/// Ten of the seventeen roles are one size at every width. Headings and the two
-/// largest metrics step up at [Breakpoints.md] and [Breakpoints.lg], because a
-/// 64px display line that is right on a desktop column is wrong on a phone.
+/// Every role steps up at [Breakpoints.md] and again at [Breakpoints.lg]: a
+/// 64px display line that is right on a desktop column is wrong on a phone,
+/// and body copy earns two extra pixels on a desktop reading column.
 /// Viewport steps are a layout decision and are **not** a substitute for
 /// accessibility text scaling: Flutter's text scaler applies on top of whatever
 /// step is resolved, and every text-bearing component must survive 200%.
@@ -176,21 +176,13 @@ class TextStyleToken {
   /// True when the role reads the same at every width.
   bool get isStatic => mobile == tablet && tablet == desktop;
 
-  /// The single step of a role that does not respond to width.
+  /// The phone step: the smallest size the role ever renders at.
   ///
-  /// For the places that must know a line box before there is a
-  /// [BuildContext] to resolve against — overlay placement that counts rows
-  /// before the menu is laid out. A responsive role has no such answer, so
-  /// asking one for it is a programming error: resolve it with
-  /// `StyledText.stepOf(context, role)` instead.
-  TypeStep get step {
-    assert(
-      isStatic,
-      'Role "$name" resolves differently by width. Use '
-      'StyledText.stepOf(context, role) or stepFor(width).',
-    );
-    return mobile;
-  }
+  /// A width-independent floor for the few places that must size a box
+  /// before there is a [BuildContext] to resolve against. Anywhere a context
+  /// exists, use `StyledText.stepOf(context, role)` or [stepFor], which
+  /// return the step the role actually renders at on that screen.
+  TypeStep get step => mobile;
 
   static const List<FontFeature> _tabularFigures = <FontFeature>[
     FontFeature.tabularFigures(),
@@ -367,7 +359,7 @@ class TextStyles {
     family: Fonts.sans,
     mobile: const TypeStep(18, 28),
     tablet: const TypeStep(20, 30),
-    desktop: const TypeStep(20, 30),
+    desktop: const TypeStep(22, 32),
     wght: 400,
   );
 
@@ -377,6 +369,8 @@ class TextStyles {
     group: TypeGroup.words,
     family: Fonts.sans,
     mobile: const TypeStep(16, 24),
+    tablet: const TypeStep(17, 26),
+    desktop: const TypeStep(18, 28),
     wght: 400,
   );
 
@@ -388,6 +382,8 @@ class TextStyles {
     group: TypeGroup.words,
     family: Fonts.sans,
     mobile: const TypeStep(14, 20),
+    tablet: const TypeStep(15, 22),
+    desktop: const TypeStep(16, 24),
     wght: 400,
   );
 
@@ -397,7 +393,9 @@ class TextStyles {
     name: 'nav',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(16, 20),
+    mobile: const TypeStep(14, 18),
+    tablet: const TypeStep(15, 20),
+    desktop: const TypeStep(16, 20),
     wght: 500,
   );
 
@@ -408,6 +406,8 @@ class TextStyles {
     group: TypeGroup.words,
     family: Fonts.sans,
     mobile: const TypeStep(14, 18),
+    tablet: const TypeStep(15, 20),
+    desktop: const TypeStep(16, 20),
     wght: 600,
   );
 
@@ -419,6 +419,8 @@ class TextStyles {
     group: TypeGroup.code,
     family: Fonts.mono,
     mobile: const TypeStep(14, 20),
+    tablet: const TypeStep(15, 22),
+    desktop: const TypeStep(16, 24),
     wght: 400,
   );
 
@@ -428,7 +430,9 @@ class TextStyles {
     name: 'identifier',
     group: TypeGroup.code,
     family: Fonts.mono,
-    mobile: const TypeStep(16, 24),
+    mobile: const TypeStep(15, 22),
+    tablet: const TypeStep(16, 24),
+    desktop: const TypeStep(17, 26),
     wght: 400,
     tracking: -0.01,
   );
@@ -441,6 +445,8 @@ class TextStyles {
     group: TypeGroup.numerics,
     family: Fonts.mono,
     mobile: const TypeStep(14, 18),
+    tablet: const TypeStep(15, 20),
+    desktop: const TypeStep(16, 20),
     wght: 600,
     tracking: -0.01,
     tabular: true,
@@ -452,6 +458,8 @@ class TextStyles {
     group: TypeGroup.numerics,
     family: Fonts.mono,
     mobile: const TypeStep(16, 20),
+    tablet: const TypeStep(17, 22),
+    desktop: const TypeStep(18, 24),
     wght: 600,
     tracking: -0.01,
     tabular: true,

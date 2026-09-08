@@ -578,14 +578,22 @@ class _DocsLayoutState extends State<DocsLayout> {
           if (wide)
             Stack(
               children: <Widget>[
-                // The article, with a rail's worth of margin on each pinned
-                // side. Not capped: it fills whatever is between the rails.
+                // The article, centred between the rails and held to its
+                // reading measure. The rails' margins are what keeps it clear
+                // of them.
                 Padding(
                   padding: EdgeInsets.only(
                     left: railWidth + space(8),
                     right: (extraWide ? railWidth : 0) + space(8),
                   ),
-                  child: article,
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: LayoutWidths.article,
+                      ),
+                      child: article,
+                    ),
+                  ),
                 ),
                 // Each rail is pinned to its screen edge and spans the full
                 // article height, so [_StickyRail] can slide it down without

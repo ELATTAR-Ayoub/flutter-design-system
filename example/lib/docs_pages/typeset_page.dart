@@ -354,29 +354,31 @@ class _TypesetArticle extends StatelessWidget {
   static String _descriptionFor(TypeGroup group) => switch (group) {
     TypeGroup.words =>
       'Headings, reading copy, and the interface words a person taps. Ten '
-          'roles, six of which step up as the window widens.',
+          'roles, and every one of them steps up as the window widens.',
     TypeGroup.code =>
       'Monospace. Code that is skimmed, and identifiers that are compared '
-          'character by character.',
+          'character by character — both step with the window too.',
     TypeGroup.numerics =>
       'Five steps of tabular monospace, so a column of figures aligns on the '
           'digit rather than on the glyph. All five share face, weight and '
-          'tabular figures; the three largest step with the window.',
+          'tabular figures, and all five step with the window.',
   };
 
   Widget _responsive(ThemeTokens theme) => DocsSection(
     id: 'responsive',
     title: 'Responsive steps',
     description:
-        'Headings and the large metrics step up at 768 and again at 1024. '
-        'Reading and interface text does not move.',
+        'Every role steps up at 768 and again at 1024 — headings and large '
+        'metrics move the most, and reading and interface text moves too, by '
+        'a smaller amount.',
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         _prose(
           'A role resolves its own size, so a call site never does viewport '
           'arithmetic. display is 44px on a phone, 52 on a tablet and 64 on a '
-          'desktop, and the line that renders it is the same line at all '
+          'desktop; body is 16px on a phone, 17 on a tablet and 18 on a '
+          'desktop. The line that renders either is the same line at all '
           'three widths.',
         ),
         SizedBox(height: space(4)),

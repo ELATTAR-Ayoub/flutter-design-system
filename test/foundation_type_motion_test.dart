@@ -79,14 +79,68 @@ final List<_Role> _catalog = <_Role>[
     null,
     m: (18, 28),
     t: (20, 30),
-    d: (20, 30),
+    d: (22, 32),
   ),
-  _Role('body', TypeGroup.words, Fonts.sans, 400, null, m: (16, 24)),
-  _Role('small', TypeGroup.words, Fonts.sans, 400, null, m: (14, 20)),
-  _Role('nav', TypeGroup.words, Fonts.sans, 500, null, m: (16, 20)),
-  _Role('badge', TypeGroup.words, Fonts.sans, 600, null, m: (14, 18)),
-  _Role('code', TypeGroup.code, Fonts.mono, 400, null, m: (14, 20)),
-  _Role('identifier', TypeGroup.code, Fonts.mono, 400, -0.01, m: (16, 24)),
+  _Role(
+    'body',
+    TypeGroup.words,
+    Fonts.sans,
+    400,
+    null,
+    m: (16, 24),
+    t: (17, 26),
+    d: (18, 28),
+  ),
+  _Role(
+    'small',
+    TypeGroup.words,
+    Fonts.sans,
+    400,
+    null,
+    m: (14, 20),
+    t: (15, 22),
+    d: (16, 24),
+  ),
+  _Role(
+    'nav',
+    TypeGroup.words,
+    Fonts.sans,
+    500,
+    null,
+    m: (14, 18),
+    t: (15, 20),
+    d: (16, 20),
+  ),
+  _Role(
+    'badge',
+    TypeGroup.words,
+    Fonts.sans,
+    600,
+    null,
+    m: (14, 18),
+    t: (15, 20),
+    d: (16, 20),
+  ),
+  _Role(
+    'code',
+    TypeGroup.code,
+    Fonts.mono,
+    400,
+    null,
+    m: (14, 20),
+    t: (15, 22),
+    d: (16, 24),
+  ),
+  _Role(
+    'identifier',
+    TypeGroup.code,
+    Fonts.mono,
+    400,
+    -0.01,
+    m: (15, 22),
+    t: (16, 24),
+    d: (17, 26),
+  ),
   _Role(
     'numberSm',
     TypeGroup.numerics,
@@ -94,6 +148,8 @@ final List<_Role> _catalog = <_Role>[
     600,
     -0.01,
     m: (14, 18),
+    t: (15, 20),
+    d: (16, 20),
     tabular: true,
   ),
   _Role(
@@ -103,6 +159,8 @@ final List<_Role> _catalog = <_Role>[
     600,
     -0.01,
     m: (16, 20),
+    t: (17, 22),
+    d: (18, 24),
     tabular: true,
   ),
   _Role(
@@ -327,7 +385,7 @@ void main() {
       }
     });
 
-    test('the responsive roles are the headings and the large metrics', () {
+    test('every role steps', () {
       expect(
         TextStyles.all
             .where((TextStyleToken r) => !r.isStatic)
@@ -340,6 +398,14 @@ void main() {
           'h3',
           'h4',
           'lead',
+          'body',
+          'small',
+          'nav',
+          'badge',
+          'code',
+          'identifier',
+          'numberSm',
+          'numberBase',
           'numberMd',
           'numberLg',
           'numberXl',
@@ -347,28 +413,34 @@ void main() {
       );
     });
 
-    test('reading and interface roles are stable across every width', () {
-      for (final String name in <String>[
-        'body',
-        'small',
-        'nav',
-        'badge',
-        'code',
-        'identifier',
-        'numberSm',
-        'numberBase',
-      ]) {
-        final TextStyleToken role = TextStyles.all.firstWhere(
-          (TextStyleToken r) => r.name == name,
-        );
-        expect(role.isStatic, isTrue, reason: name);
-        expect(role.step, role.mobile, reason: name);
+    test('step is the phone floor for every role', () {
+      for (final TextStyleToken role in TextStyles.all) {
+        expect(role.step, role.mobile, reason: role.name);
       }
     });
 
-    test('asking a responsive role for a single step is an error', () {
-      expect(() => TextStyles.display.step, throwsA(isA<AssertionError>()));
-    });
+    test(
+      'reading roles step at 768 and again at 1024, same as every role',
+      () {
+        for (final String name in <String>[
+          'body',
+          'small',
+          'nav',
+          'badge',
+          'code',
+          'identifier',
+          'numberSm',
+          'numberBase',
+        ]) {
+          final TextStyleToken role = TextStyles.all.firstWhere(
+            (TextStyleToken r) => r.name == name,
+          );
+          expect(role.stepFor(767), role.mobile, reason: name);
+          expect(role.stepFor(768), role.tablet, reason: name);
+          expect(role.stepFor(1024), role.desktop, reason: name);
+        }
+      },
+    );
   });
 
   group('resolveWidth', () {
@@ -456,7 +528,7 @@ void main() {
       final TextStyle style = TextStyles.code.resolveInline(_desktop, _ink);
       expect(style.height, isNull);
       expect(style.inherit, isFalse);
-      expect(style.fontSize, 14);
+      expect(style.fontSize, 16);
     });
   });
 

@@ -225,6 +225,17 @@ class Combobox<T> extends StatefulWidget {
   /// in every dimension but its padding.
   static double get emptyHeight => TextStyles.body.step.leading + space(2) * 2;
 
+  /// [itemHeight] at the step and text scale the row actually renders at.
+  /// The static getter is the phone floor; the list, the scroll maths and the
+  /// row box all size from this one so a desktop row fits its own line.
+  static double itemHeightOf(BuildContext context) => math.max(
+    MediaQuery.textScalerOf(
+          context,
+        ).scale(StyledText.stepOf(context, TextStyles.body).leading) +
+        space(1) * 2,
+    TouchTargets.minimum,
+  );
+
   @override
   State<Combobox<T>> createState() => _ComboboxState<T>();
 }
@@ -576,9 +587,9 @@ class _ComboboxPopupState<T> extends State<_ComboboxPopup<T>> {
   void _reveal() {
     if (!_scroll.hasClients || widget.highlighted < 0) return;
     final flutter.ScrollPosition at = _scroll.position;
-    final double top =
-        space(1) + widget.highlighted * Combobox.itemHeight - space(1);
-    final double bottom = top + Combobox.itemHeight + space(1) * 2;
+    final double itemHeight = Combobox.itemHeightOf(context);
+    final double top = space(1) + widget.highlighted * itemHeight - space(1);
+    final double bottom = top + itemHeight + space(1) * 2;
     final double ceiling = at.maxScrollExtent < 0 ? 0 : at.maxScrollExtent;
     if (top < at.pixels) {
       at.jumpTo(top.clamp(0, ceiling));
@@ -725,7 +736,7 @@ class _ComboboxRow<T> extends StatelessWidget {
     // fill, the hit box and [_ComboboxPopupState._reveal]'s scroll math all
     // agreeing on one number; the row's own `Row`/`Stack` content centres
     // vertically inside the taller box for free.
-    row = SizedBox(height: Combobox.itemHeight, child: row);
+    row = SizedBox(height: Combobox.itemHeightOf(context), child: row);
 
     row = DefaultTextStyle.merge(
       style: TextStyle(color: ink),
