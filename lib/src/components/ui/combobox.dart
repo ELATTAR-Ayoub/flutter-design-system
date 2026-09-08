@@ -218,13 +218,13 @@ class Combobox<T> extends StatefulWidget {
   /// keeps the scroll-into-view arithmetic self-consistent with what
   /// actually renders.
   static double get itemHeight => math.max(
-    TextStyles.body.step.leading + space(1) * 2,
+    Input.textSpecDefault.step.leading + space(1) * 2,
     TouchTargets.minimum,
   );
 
   /// `ComboboxEmpty`'s `py-2` around the same line box — 34.571px, an item row
   /// in every dimension but its padding.
-  static double get emptyHeight => TextStyles.body.step.leading + space(2) * 2;
+  static double get emptyHeight => TextStyles.small.step.leading + space(2) * 2;
 
   /// [itemHeight] at the step and text scale the row actually renders at.
   /// The static getter is the phone floor; the list, the scroll maths and the
@@ -232,7 +232,7 @@ class Combobox<T> extends StatefulWidget {
   static double itemHeightOf(BuildContext context) => math.max(
     MediaQuery.textScalerOf(
           context,
-        ).scale(StyledText.stepOf(context, TextStyles.body).leading) +
+        ).scale(StyledText.stepOf(context, Input.textSpecDefault).leading) +
         space(1) * 2,
     TouchTargets.minimum,
   );
@@ -787,7 +787,7 @@ class _ComboboxEmpty extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: space(2)),
       child: StyledText(
         label!,
-        TextStyles.body,
+        TextStyles.small,
         color: theme.mutedForeground,
         align: TextAlign.center,
       ),

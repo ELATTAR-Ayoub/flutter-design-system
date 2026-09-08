@@ -405,6 +405,16 @@ class _FieldState extends State<Field> {
         // it. Same reason `focusNode` has always been passed here.
         : FieldLabel(
             label,
+            // Horizontal orientation is the shape a checkbox, radio or switch
+            // field takes (control first, label growing into the row beside
+            // it) — never a text input's. The words beside those controls are
+            // what the person is choosing, so they read as primary content —
+            // [Input.textSpecDefault] — and not as the name of a field. A
+            // vertical field's label stays [FieldLabel.medium], TextStyles.small
+            // at medium weight.
+            spec: widget.orientation == FieldOrientation.horizontal
+                ? TextStyles.body
+                : null,
             focusNode: widget.focusNode,
             activator: _activator,
             enabled: widget.enabled,

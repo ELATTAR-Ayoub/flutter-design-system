@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/form.dart",
       "target": "@ui/form.dart",
-      "sha256": "680799ae32efe9b46af9eced85b2be19fa528562d8c1414f41b6c68cc86ef98f"
+      "sha256": "77cb3cff110407e9dbf765ebc7c8ce12579a58b83d23e78058c1454e845963be"
     }
   ],
   "registryDependencies": [

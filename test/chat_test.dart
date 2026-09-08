@@ -180,7 +180,7 @@ void main() {
     testWidgets('13px on a 21.125px line box — leading-relaxed, not text-sm', (
       WidgetTester t,
     ) async {
-      expect(TextStyles.body.step, const TypeStep(16, 24));
+      expect(TextStyles.body.stepFor(1440), TextStyles.body.desktop);
     });
 
     testWidgets('the fills are the seven the reference paints', (
@@ -695,7 +695,7 @@ void main() {
     testWidgets('header and footer are 12/16/500 inset 12px, zero on ghost', (
       WidgetTester t,
     ) async {
-      expect(TextStyles.small.step, const TypeStep(14, 20));
+      expect(TextStyles.small.stepFor(1440), TextStyles.small.desktop);
 
       for (final bool ghost in <bool>[false, true]) {
         await t.pumpWidget(
@@ -1527,8 +1527,8 @@ void main() {
     });
 
     test('chat anatomy reads at the two public copy roles', () {
-      expect(TextStyles.body.step, const TypeStep(16, 24));
-      expect(TextStyles.small.step, const TypeStep(14, 20));
+      expect(TextStyles.body.stepFor(1440), TextStyles.body.desktop);
+      expect(TextStyles.small.stepFor(1440), TextStyles.small.desktop);
     });
 
     testWidgets('Icon.lucide paints the generated registry', (

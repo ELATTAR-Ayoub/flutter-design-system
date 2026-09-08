@@ -2187,6 +2187,117 @@ void main() {
     });
   });
 
+  group('fields read like Input', () {
+    // The reading-role split: a field's own name (the label above a text
+    // input, a description, an error, a legend) stays the supporting-copy
+    // role, `TextStyles.small`. What a person is entering or choosing — an
+    // Input's own text, an InputGroup addon, a Checkbox/Radio/Switch label —
+    // reads at [Input.textSpecDefault] instead, so the words next to a
+    // control are the same size as the words inside one.
+    testWidgets('InputGroup addon text and addon button label default to '
+        'Input.textSpecDefault', (WidgetTester t) async {
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 512,
+            child: InputGroup(
+              startAddon: const InputGroupAddon(
+                child: InputGroupText(r'$'),
+              ),
+              endAddon: InputGroupAddon(
+                align: InputGroupAlign.end,
+                child: InputGroupButton(
+                  onPressed: () {},
+                  child: const Text('Copy'),
+                ),
+              ),
+              child: const InputGroupInput(placeholder: 'x'),
+            ),
+          ),
+        ),
+      );
+
+      final BuildContext dollarCtx = t.element(find.text(r'$'));
+      final BuildContext copyCtx = t.element(find.text('Copy'));
+      final ThemeTokens theme = ThemeScope.of(dollarCtx);
+
+      // `InputGroupText` styles itself; the addon button's label is typed
+      // through the ambient `DefaultTextStyle` its addon wraps it in.
+      expect(
+        t.widget<StyledText>(find.ancestor(
+          of: find.text(r'$'),
+          matching: find.byType(StyledText),
+        )).spec,
+        same(Input.textSpecDefault),
+      );
+      expect(
+        DefaultTextStyle.of(copyCtx).style,
+        StyledText.styleOf(
+          copyCtx,
+          Input.textSpecDefault,
+          color: theme.mutedForeground,
+        ),
+      );
+    });
+
+    testWidgets('Field label reads TextStyles.small', (WidgetTester t) async {
+      await t.pumpWidget(
+        host(
+          const SizedBox(
+            width: 448,
+            child: Field(label: 'Email', child: SizedBox()),
+          ),
+        ),
+      );
+
+      expect(
+        t.widget<StyledText>(find.byType(StyledText)).spec,
+        same(FieldLabel.medium),
+      );
+      expect(FieldLabel.medium.step, TextStyles.small.step);
+    });
+
+    testWidgets('Checkbox, Radio and Switch labels read '
+        'Input.textSpecDefault through their horizontal Field', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        host(
+          SizedBox(
+            width: 448,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Field(
+                  label: 'I accept the terms',
+                  orientation: FieldOrientation.horizontal,
+                  child: Checkbox(
+                    state: CheckboxState.unchecked,
+                    onChanged: (CheckboxState _) {},
+                  ),
+                ),
+                Field(
+                  label: 'Price alerts',
+                  orientation: FieldOrientation.horizontal,
+                  child: Switch(value: false, onChanged: (bool _) {}),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      final Iterable<StyledText> labels = t
+          .widgetList<StyledText>(find.byType(StyledText))
+          .where((StyledText w) =>
+              w.text == 'I accept the terms' || w.text == 'Price alerts');
+      expect(labels, hasLength(2));
+      for (final StyledText w in labels) {
+        expect(w.spec, same(Input.textSpecDefault));
+      }
+    });
+  });
+
   group('FieldSet', () {
     testWidgets('a leading legend clears by 6, not by 6 plus the set\'s gap', (
       WidgetTester t,

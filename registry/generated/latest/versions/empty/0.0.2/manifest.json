@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/empty.dart",
       "target": "@ui/empty.dart",
-      "sha256": "dee42194ee51f85a3ee464be4df3aca08033230b803e7d4cddb54212426b7050"
+      "sha256": "96caaa6c9809f0897f90595bf6d474a60e078f90b2430273b9b77335d0f6b6b4"
     }
   ],
   "registryDependencies": [

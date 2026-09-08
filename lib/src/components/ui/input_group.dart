@@ -455,7 +455,7 @@ class InputGroupAddon extends StatelessWidget {
     addon = DefaultTextStyle.merge(
       style: StyledText.styleOf(
         context,
-        TextStyles.nav,
+        Input.textSpecDefault,
         color: theme.mutedForeground,
       ),
       child: addon,
@@ -717,7 +717,7 @@ class _InputGroupButtonState extends State<InputGroupButton> {
                           child: DefaultTextStyle(
                             style: StyledText.styleOf(
                               context,
-                              TextStyles.nav,
+                              Input.textSpecDefault,
                               color: c ?? ink,
                             ),
                             child: widget.child,

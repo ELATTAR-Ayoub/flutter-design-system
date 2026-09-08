@@ -884,7 +884,10 @@ void main() {
         ButtonSize.xl,
       ]) {
         expect(TextStyles.all, isNot(contains(spec(size))));
-        expect(spec(size).step.size, greaterThanOrEqualTo(14));
+        expect(
+          spec(size).step.size,
+          greaterThanOrEqualTo(TextStyles.small.step.size),
+        );
         expect(spec(size).wght, 500, reason: 'a label is medium at every rung');
       }
 

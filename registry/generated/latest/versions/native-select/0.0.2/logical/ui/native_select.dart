@@ -91,12 +91,12 @@ import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
-import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
 import './field.dart';
 import './icon.dart';
 import './icon_paths.dart';
+import './input.dart';
 import './popover.dart';
 import './select.dart';
 import './disabled.dart';
@@ -480,7 +480,8 @@ class _NativeSelectState<T> extends State<NativeSelect<T>> {
               alignment: AlignmentDirectional.centerStart,
               child: StyledText(
                 shown?.label ?? '',
-                TextStyles.body,
+                // The field's own role: the trigger reads exactly like Input.
+                Input.textSpecDefault,
                 color: theme.foreground,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

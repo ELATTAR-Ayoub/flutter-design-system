@@ -650,7 +650,9 @@ class _NavigationMenuTriggerState extends State<_NavigationMenuTrigger> {
                   children: <Widget>[
                     StyledText(
                       widget.label,
-                      TextStyles.nav,
+                      // Reads as the row's own content, not as a nav word —
+                      // [Input.textSpecDefault], i.e. TextStyles.body.
+                      TextStyles.body,
                       color: lit ? theme.foreground : theme.mutedForeground,
                       softWrap: false,
                     ),
@@ -784,11 +786,14 @@ class _NavigationMenuLinkState extends State<NavigationMenuLink> {
                 vertical: NavigationMenuLink.paddingY,
               ),
               child: DefaultTextStyle(
-                // `text-sm text-muted-foreground` — ambient, so the row's own
-                // children (and any `tone: inherit` glyph in them) read it.
+                // Ambient, so the row's own children (and any `tone: inherit`
+                // glyph in them) read it. This is the row's title — primary
+                // content, [Input.textSpecDefault] — and not a field's name;
+                // a caller adding a second, description line overrides it
+                // explicitly with [TextStyles.small].
                 style: StyledText.styleOf(
                   context,
-                  TextStyles.small,
+                  TextStyles.body,
                   color: lit ? theme.accentForeground : theme.mutedForeground,
                 ),
                 child: widget.child,

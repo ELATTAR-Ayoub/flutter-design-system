@@ -377,7 +377,7 @@ class _TypesetArticle extends StatelessWidget {
         _prose(
           'A role resolves its own size, so a call site never does viewport '
           'arithmetic. display is 44px on a phone, 52 on a tablet and 64 on a '
-          'desktop; body is 16px on a phone, 17 on a tablet and 18 on a '
+          'desktop; body is 14px on a phone, 15 on a tablet and 16 on a '
           'desktop. The line that renders either is the same line at all '
           'three widths.',
         ),

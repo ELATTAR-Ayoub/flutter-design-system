@@ -103,6 +103,7 @@ import './button.dart';
 import './field.dart';
 import './icon.dart';
 import './icon_paths.dart';
+import './input.dart';
 import './popover.dart';
 import './disabled.dart';
 
@@ -316,7 +317,7 @@ class Select<T> extends StatefulWidget {
   /// the item-aligned placement math and the scroll-into-view math
   /// self-consistent with what actually renders.
   static double get itemHeight => math.max(
-    TextStyles.body.step.leading + space(2) * 2,
+    Input.textSpecDefault.step.leading + space(2) * 2,
     TouchTargets.minimum,
   );
 
@@ -637,7 +638,8 @@ class _SelectState<T> extends State<Select<T>> {
           Flexible(
             child: StyledText(
               chosen?.label ?? widget.placeholder ?? '',
-              TextStyles.body,
+              // The field's own role: the trigger reads exactly like Input.
+              Input.textSpecDefault,
               color: chosen == null ? theme.mutedForeground : theme.foreground,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -1289,7 +1291,8 @@ class _SelectItem<T> extends StatelessWidget {
             Expanded(
               child: StyledText(
                 option.label,
-                TextStyles.body,
+                // The field's own role: an option reads exactly like Input.
+                Input.textSpecDefault,
                 color: ink,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

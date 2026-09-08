@@ -637,17 +637,30 @@ void main() {
       expect(NavigationMenu.chevronPx, 14);
     });
 
-    test('every navigation word is one role, at one size', () {
-      // The retired catalog carried two spellings of a navigation label four
-      // pixels of leading apart. A trigger, a plain link, and a panel title
-      // now read identically — one role, stepping mobile 14/18, tablet
-      // 15/20, desktop 16/20. `.step` is the mobile floor, not a
-      // width-resolved size.
-      expect(TextStyles.nav.step, const TypeStep(14, 18));
-      expect(TextStyles.nav.weight, FontWeight.w500);
-      // nav now steps by breakpoint (14/18 → 15/20 → 16/20), so it is no
-      // longer a single static size across the responsive table.
-      expect(TextStyles.nav.isStatic, isFalse);
+    testWidgets('every navigation word is one role, at one size', (
+      WidgetTester tester,
+    ) async {
+      // A trigger and a plain link now read the row's own content role —
+      // [Input.textSpecDefault], the same `TextStyles.body` a field's text
+      // reads at — not the navigation-chrome role reserved for buttons and
+      // top navigation.
+      await tester.pumpWidget(overlayHost(NavigationMenu(items: items())));
+      await tester.pump();
+
+      StyledText specOf(String text) => tester.widget<StyledText>(
+        find.byWidgetPredicate((Widget w) => w is StyledText && w.text == text),
+      );
+
+      expect(
+        identical(specOf('Packs').spec, Input.textSpecDefault),
+        isTrue,
+        reason: 'a trigger label reads the field role',
+      );
+      expect(
+        identical(specOf('Leaderboard').spec, Input.textSpecDefault),
+        isTrue,
+        reason: 'a plain link reads the field role',
+      );
     });
 
     testWidgets('a tap opens the shared viewport and a second tap closes it', (
@@ -843,6 +856,79 @@ void main() {
       // right of the bar's own edge.
       expect(panelLeft, greaterThan(barLeft));
       expect(panelLeft, lessThan(itemLeft));
+    });
+
+    testWidgets('the trigger label and a link title read '
+        'Input.textSpecDefault; a link description reads TextStyles.small', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(overlayHost(NavigationMenu(items: items())));
+      await tester.pump();
+
+      expect(
+        tester.widget<StyledText>(find.byType(StyledText).first).spec,
+        same(Input.textSpecDefault),
+        reason: 'the "Packs" trigger label',
+      );
+
+      await tester.pumpWidget(
+        overlayHost(
+          const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              NavigationMenuLink(
+                child: Text('Browse all'), // reads the row's ambient default
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final BuildContext linkCtx = tester.element(find.text('Browse all'));
+      final ThemeTokens theme = ThemeScope.of(linkCtx);
+      expect(
+        DefaultTextStyle.of(linkCtx).style,
+        StyledText.styleOf(
+          linkCtx,
+          Input.textSpecDefault,
+          color: theme.mutedForeground,
+        ),
+        reason: 'a link with no explicit style reads as the row\'s title',
+      );
+
+      await tester.pumpWidget(
+        overlayHost(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              NavigationMenuLink(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    StyledText('Packs', TextStyles.body),
+                    StyledText('Ready-made card sets.', TextStyles.small),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(
+        tester
+            .widget<StyledText>(
+              find.ancestor(
+                of: find.text('Ready-made card sets.'),
+                matching: find.byType(StyledText),
+              ),
+            )
+            .spec,
+        same(TextStyles.small),
+      );
     });
   });
 

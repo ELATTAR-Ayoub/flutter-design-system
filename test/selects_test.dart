@@ -1126,7 +1126,10 @@ void main() {
         ),
       );
       expect(Combobox.itemHeight, TouchTargets.minimum);
-      expect(Combobox.emptyHeight, TextStyles.body.step.leading + space(2) * 2);
+      expect(
+        Combobox.emptyHeight,
+        TextStyles.small.step.leading + space(2) * 2,
+      );
       expect(Combobox.listMaxHeight, 252);
 
       await t.pumpWidget(combobox(value: 'golden'));
@@ -1278,7 +1281,15 @@ void main() {
   group('the menu family reads at one role', () {
     test('a menu group label is the supporting-copy role', () {
       final TextStyleToken spec = TextStyles.small;
-      expect(spec.mobile, const TypeStep(14, 20));
+      // `small` reads two points under `body` and four points shorter in
+      // leading, at every breakpoint.
+      expect(
+        spec.mobile,
+        TypeStep(
+          TextStyles.body.mobile.size - 2,
+          TextStyles.body.mobile.leading - 4,
+        ),
+      );
       expect(spec.weight, FontWeight.w400);
       expect(spec.tracking, isNull);
       expect(spec.family, Fonts.sans);
@@ -1293,8 +1304,205 @@ void main() {
     });
 
     test('a shortcut column reads at the same role, never smaller', () {
-      expect(TextStyles.small.step.size, greaterThanOrEqualTo(14));
+      expect(
+        TextStyles.small.step.size,
+        greaterThanOrEqualTo(TextStyles.badge.step.size),
+      );
     });
+  });
+
+  group('pickers read like Input', () {
+    StyledText specOf(WidgetTester t, String text) => t.widget<StyledText>(
+      find.byWidgetPredicate((Widget w) => w is StyledText && w.text == text),
+    );
+
+    testWidgets('Select — trigger value and option label are Input.textSpecDefault', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        overlayHost(
+          Select<String>(
+            value: 'a',
+            onChanged: (_) {},
+            options: const <SelectChild<String>>[
+              SelectOption<String>(value: 'a', label: 'Newest'),
+              SelectOption<String>(value: 'b', label: 'Volatility'),
+            ],
+          ),
+        ),
+      );
+      await t.pump();
+      expect(
+        identical(specOf(t, 'Newest').spec, Input.textSpecDefault),
+        isTrue,
+        reason: 'the trigger value must read the field role',
+      );
+
+      await t.tap(find.byType(Select<String>));
+      await t.pumpAndSettle();
+      expect(
+        identical(
+          specOf(t, 'Volatility').spec,
+          Input.textSpecDefault,
+        ),
+        isTrue,
+        reason: 'an option label must read the field role',
+      );
+    });
+
+    testWidgets('Select — a placeholder trigger still reads Input.textSpecDefault', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        overlayHost(
+          Select<String>(
+            value: null,
+            onChanged: (_) {},
+            placeholder: 'Pick a sort',
+            options: const <SelectChild<String>>[
+              SelectOption<String>(value: 'a', label: 'Newest'),
+            ],
+          ),
+        ),
+      );
+      await t.pump();
+      expect(
+        identical(specOf(t, 'Pick a sort').spec, Input.textSpecDefault),
+        isTrue,
+      );
+    });
+
+    testWidgets('Select — a group label stays TextStyles.small', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        overlayHost(
+          Select<String>(value: 'popular', onChanged: (_) {}, options: sortMenu()),
+        ),
+      );
+      await t.tap(find.byType(Select<String>));
+      await t.pumpAndSettle();
+      expect(identical(specOf(t, 'Activity').spec, TextStyles.small), isTrue);
+    });
+
+    testWidgets('NativeSelect — trigger reads Input.textSpecDefault', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        overlayHost(
+          NativeSelect<String>(
+            options: const <SelectChild<String>>[
+              SelectOption<String>(value: 'us', label: 'United States'),
+            ],
+            value: 'us',
+            onChanged: (String _) {},
+          ),
+        ),
+      );
+      await t.pump();
+      expect(
+        identical(specOf(t, 'United States').spec, Input.textSpecDefault),
+        isTrue,
+      );
+    });
+
+    testWidgets('Combobox — field and item label are Input.textSpecDefault', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        overlayHost(
+          SizedBox(
+            width: 384,
+            child: _ComboboxProbe(
+              items: const <ComboboxItem<String>>[
+                ComboboxItem<String>(value: 'eclipse', label: 'Eclipse Vault'),
+                ComboboxItem<String>(value: 'golden', label: 'Golden Rift'),
+              ],
+              value: null,
+              onChanged: (_) {},
+            ),
+          ),
+          align: Alignment.topCenter,
+        ),
+      );
+      await t.tap(find.byType(InputGroupInput));
+      await settleOverlay(t);
+      await runOverlay(t);
+
+      final Input field = t.widget<Input>(find.byType(Input));
+      expect(field.textSpec ?? Input.textSpecDefault, Input.textSpecDefault);
+      expect(
+        identical(specOf(t, 'Golden Rift').spec, Input.textSpecDefault),
+        isTrue,
+        reason: 'a combobox item label must read the field role',
+      );
+    });
+
+    testWidgets('Combobox — the empty-state label stays TextStyles.small', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        overlayHost(
+          SizedBox(
+            width: 384,
+            child: _ComboboxProbe(
+              items: const <ComboboxItem<String>>[
+                ComboboxItem<String>(value: 'eclipse', label: 'Eclipse Vault'),
+              ],
+              value: null,
+              onChanged: (_) {},
+            ),
+          ),
+          align: Alignment.topCenter,
+        ),
+      );
+      await t.tap(find.byType(InputGroupInput));
+      await settleOverlay(t);
+      await runOverlay(t);
+      await t.enterText(find.byType(EditableText), 'zzzz');
+      await t.pump();
+      expect(
+        identical(specOf(t, 'No matching set.').spec, TextStyles.small),
+        isTrue,
+      );
+    });
+
+    testWidgets('Command — search input and item label are Input.textSpecDefault', (
+      WidgetTester t,
+    ) async {
+      await pumpPalette(t);
+      final Input field = t.widget<Input>(find.byType(Input));
+      expect(field.textSpec ?? Input.textSpecDefault, Input.textSpecDefault);
+      expect(
+        identical(
+          specOf(t, 'Eclipse Vault').spec,
+          Input.textSpecDefault,
+        ),
+        isTrue,
+        reason: 'a palette item label must read the field role',
+      );
+    });
+
+    testWidgets(
+      'Command — group heading, shortcut and empty text stay TextStyles.small',
+      (WidgetTester t) async {
+        final TextEditingController c = TextEditingController();
+        addTearDown(c.dispose);
+        await pumpPalette(t, controller: c);
+        expect(identical(specOf(t, 'Packs').spec, Command.headingSpec), isTrue);
+        expect(Command.headingSpec.family, TextStyles.small.family);
+
+        c.text = 'zzz';
+        await t.pump();
+        expect(
+          identical(
+            specOf(t, 'Nothing matches that.').spec,
+            TextStyles.small,
+          ),
+          isTrue,
+        );
+      },
+    );
   });
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -1506,7 +1714,10 @@ void main() {
         Command.headingHeight,
         TextStyles.small.step.leading + space(2) * 2,
       );
-      expect(Command.emptyHeight, TextStyles.body.step.leading + space(6) * 2);
+      expect(
+        Command.emptyHeight,
+        TextStyles.small.step.leading + space(6) * 2,
+      );
       expect(Command.inputHeight, 32);
       expect(Command.listMaxHeight, 288);
     });
@@ -1998,11 +2209,11 @@ void main() {
       // `ComboboxEmpty` declares `text-muted-foreground` for itself.
       expect(empty.style!.color, theme.popoverForeground);
       expect(empty.textAlign, TextAlign.center);
-      // The empty state paints intrinsically — `TextStyles.body` at the width
-      // in scope — not the placement-only `Command.emptyHeight` estimate,
-      // which stays pinned to the mobile rung.
+      // The empty state paints intrinsically — `TextStyles.small` at the
+      // width in scope — not the placement-only `Command.emptyHeight`
+      // estimate, which stays pinned to the mobile rung.
       final double emptyRowHeight =
-          TextStyles.body.stepFor(hostWidth).leading + space(6) * 2;
+          TextStyles.small.stepFor(hostWidth).leading + space(6) * 2;
       expect(
         t
             .getSize(
@@ -2256,7 +2467,13 @@ void main() {
     test('a group heading and a group label are one role', () {
       // The retired catalog spelled the same role three ways across Select,
       // Combobox, and Command. There is one now.
-      expect(TextStyles.small.step, const TypeStep(14, 20));
+      expect(
+        TextStyles.small.step,
+        TypeStep(
+          TextStyles.body.step.size - 2,
+          TextStyles.body.step.leading - 4,
+        ),
+      );
       expect(TextStyles.small.family, Fonts.sans);
       expect(TextStyles.small.tracking, isNull);
     });

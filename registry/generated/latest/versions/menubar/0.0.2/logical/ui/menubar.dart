@@ -45,8 +45,8 @@ import 'package:flutter/widgets.dart'
 
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
-import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
+import './input.dart';
 import './menu.dart';
 import './popover.dart';
 
@@ -221,9 +221,9 @@ class _MenubarTriggerState extends State<_MenubarTrigger> {
             widthFactor: 1,
             child: StyledText(
               widget.menu.label,
-              // `text-sm font-medium` — 13px / 500, which is the button label
-              // rung and not a spec of its own.
-              TextStyles.nav,
+              // The field role: the trigger reads like the input it fronts,
+              // not like a paragraph or a nav link.
+              Input.textSpecDefault,
               color: theme.foreground,
               maxLines: 1,
               softWrap: false,

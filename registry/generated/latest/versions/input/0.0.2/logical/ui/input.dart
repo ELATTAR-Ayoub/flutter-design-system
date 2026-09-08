@@ -76,6 +76,7 @@ import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
+import './button_group.dart';
 import './disabled.dart';
 import './field.dart';
 
@@ -271,6 +272,11 @@ class Input extends StatefulWidget {
   /// `h-10` — 40px, deliberately level with a default `Button`.
   static double get height => space(10);
 
+  /// The role a field's text renders at when [textSpec] is left null. The
+  /// rows of a [Combobox] and a [Command] read this same token, so a list
+  /// under a field can never drift from the field's own type.
+  static final TextStyleToken textSpecDefault = TextStyles.body;
+
   /// `px-4 py-1` — the field's own padding, before any clearance override.
   static EdgeInsets get insets =>
       EdgeInsets.symmetric(horizontal: space(4), vertical: space(1));
@@ -373,7 +379,7 @@ class _InputState extends State<Input> {
     final String? label = widget.label ?? scope?.label;
     final String? hint = widget.hint ?? scope?.describedBy;
 
-    final TextStyleToken spec = widget.textSpec ?? TextStyles.body;
+    final TextStyleToken spec = widget.textSpec ?? Input.textSpecDefault;
 
     // `input { color: inherit }` (Preflight L243–252), never overridden by the
     // component. Passing no colour is how [StyledText.styleOf] spells that, and it
@@ -439,7 +445,8 @@ class _InputState extends State<Input> {
         padding: padding,
         fill: widget.fill,
         flat: widget.flat,
-        radius: widget.radius,
+        // Inside a [ButtonGroup] the group decides which corners stay round.
+        radius: widget.radius ?? ButtonGroup.memberRadiusOf(context),
         child: line,
       );
       field = SizedBox(height: widget.boxHeight ?? Input.height, child: field);

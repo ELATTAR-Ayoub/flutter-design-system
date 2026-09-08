@@ -118,14 +118,13 @@ class Avatar extends StatelessWidget {
 
   /// The fallback's resolved type.
   ///
-  /// Defaults to [TextStyles.small] — a bare `<AvatarFallback>` is
-  /// `text-sm` with no weight class, so it inherits `html`'s 400.
-  ///
-  /// The two other rungs override the size (`group-data-[size=sm]:text-tag`
-  /// 10px, `group-data-[size=lg]:text-body` 15px) and neither has a consumer
-  /// in the corpus, so neither is built into the default: a caller that wants
-  /// one states it, exactly as `NavUser` states
-  /// [TextStyles.nav] for its own `.type-num-sm` collision.
+  /// Null (the default) sizes the initials off the circle itself: no role in
+  /// [TextStyles] goes small enough to sit inside a 24px `sm` disc with air
+  /// to spare, so [Avatar] derives a font size from [diameter] instead — see
+  /// [_fallbackDiameterRatio]. A caller that wants a named role instead
+  /// states one, exactly as `NavUser` states [TextStyles.nav] for its own
+  /// `.type-num-sm` collision; that override always wins over the derived
+  /// size.
   final TextStyleToken? fallbackSpec;
 
   /// `className="size-N"` — the box, when the class beats the attribute. The
@@ -146,6 +145,16 @@ class Avatar extends StatelessWidget {
 
   /// The resolved diameter: the class, or the attribute's rung.
   double get diameter => sizePx ?? size.px;
+
+  /// The fallback's font size as a fraction of [diameter], used whenever
+  /// [fallbackSpec] is left null.
+  ///
+  /// 0.4 keeps two initials plus a visible ring of air inside the disc at
+  /// every rung this system ships: 24px `sm` → 9.6px, 32px `md` → 12.8px,
+  /// 40px `lg` → 16px — each noticeably smaller than the next, and all of
+  /// them smaller than [TextStyles.small]'s own 14–16px, which is what made
+  /// `sm`'s initials read as oversized before this existed.
+  static const double _fallbackDiameterRatio = 0.4;
 
   @override
   Widget build(BuildContext context) {
@@ -168,6 +177,9 @@ class Avatar extends StatelessWidget {
           fallback,
           fallbackSpec ?? TextStyles.small,
           color: fallbackInk ?? theme.mutedForeground,
+          // A named role always wins; otherwise the size is derived off the
+          // circle itself, per [_fallbackDiameterRatio].
+          fontSize: fallbackSpec == null ? px * _fallbackDiameterRatio : null,
         ),
       ),
     );
@@ -379,10 +391,21 @@ class AvatarGroupCount extends StatelessWidget {
         height: diameter,
         alignment: Alignment.center,
         decoration: BoxDecoration(color: theme.muted, borderRadius: shape),
-        child: StyledText(
-          label,
-          spec ?? TextStyles.small,
-          color: theme.mutedForeground,
+        // Sized to the disc like an [Avatar] fallback, and scaled down
+        // rather than wrapped when a long count ("+248") outgrows it: an
+        // overflow indicator is one line by definition.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: StyledText(
+            label,
+            spec ?? TextStyles.small,
+            color: theme.mutedForeground,
+            fontSize: spec == null
+                ? diameter * Avatar._fallbackDiameterRatio
+                : null,
+            maxLines: 1,
+            softWrap: false,
+          ),
         ),
       ),
     );

@@ -103,6 +103,7 @@ import './button.dart';
 import './field.dart';
 import './icon.dart';
 import './icon_paths.dart';
+import './input.dart';
 import './popover.dart';
 import './disabled.dart';
 
@@ -316,16 +317,27 @@ class Select<T> extends StatefulWidget {
   /// the item-aligned placement math and the scroll-into-view math
   /// self-consistent with what actually renders.
   static double get itemHeight => math.max(
-    TextStyles.body.step.leading + space(2) * 2,
+    Input.textSpecDefault.step.leading + space(2) * 2,
     TouchTargets.minimum,
   );
 
-  /// `SelectLabel`'s `px-3 py-2 text-xs` — 12px in a 16px line box, so **32**.
+  /// `SelectLabel`'s `px-3 py-2 text-xs` — 12px in a 16px line box, so **32**
+  /// at the mobile rung.
   ///
   /// Derived from [TextStyles.small] for the same reason [itemHeight]
   /// is derived from `sheetBody`: the placement counts this height before the
-  /// row exists.
+  /// row exists. Unscaled, so a caller that already has the [BuildContext]
+  /// the menu is placed in should reach for [labelHeightOf] instead — `small`
+  /// steps with the width in scope like every other role now, and this flat
+  /// getter agrees with it only at the phone rung.
   static double get labelHeight => TextStyles.small.step.leading + space(2) * 2;
+
+  /// [labelHeight], resolved against the width [context] is in scope for —
+  /// see [_MenuGeometry], which threads this through the item-aligned
+  /// placement math so the box lands where the label row actually renders
+  /// rather than where its mobile-rung estimate says it should.
+  static double labelHeightOf(BuildContext context) =>
+      StyledText.stepOf(context, TextStyles.small).leading + space(2) * 2;
 
   /// `SelectSeparator`'s `my-2 h-px` — 8 + 1 + 8 = **17**.
   static double get separatorHeight => BorderWidths.hairline + space(2) * 2;
@@ -396,7 +408,7 @@ class _SelectState<T> extends State<Select<T>> {
   _MenuGeometry<T>? _cachedMenu;
 
   _MenuGeometry<T> get _menu =>
-      _cachedMenu ??= _MenuGeometry<T>(widget.options);
+      _cachedMenu ??= _MenuGeometry<T>(widget.options, context);
 
   @override
   void didUpdateWidget(Select<T> old) {
@@ -626,7 +638,8 @@ class _SelectState<T> extends State<Select<T>> {
           Flexible(
             child: StyledText(
               chosen?.label ?? widget.placeholder ?? '',
-              TextStyles.body,
+              // The field's own role: the trigger reads exactly like Input.
+              Input.textSpecDefault,
               color: chosen == null ? theme.mutedForeground : theme.foreground,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -812,11 +825,14 @@ class _SelectState<T> extends State<Select<T>> {
 /// placement (before the menu exists), by the keyboard (which walks only the
 /// selectable rows) and by the scroll-into-view (which needs a row's box).
 class _MenuGeometry<T> {
-  _MenuGeometry(List<SelectChild<T>> children) {
+  /// [context] is the width a label row's height is resolved against — see
+  /// [_Row.heightOf]. Null falls back to the mobile-rung estimate, for a
+  /// caller that genuinely has no context yet, such as [SelectMenu.heightOf].
+  _MenuGeometry(List<SelectChild<T>> children, [this.context]) {
     void add(_Row<T> row) {
       offsets.add(_height);
       rows.add(row);
-      _height += row.height;
+      _height += row.heightOf(context);
     }
 
     for (final SelectChild<T> child in children) {
@@ -855,6 +871,12 @@ class _MenuGeometry<T> {
 
   final List<int> _rowOfOption = <int>[];
 
+  /// The width every label row in [rows] is sized against — see
+  /// [_Row.heightOf]. Threaded through from the constructor rather than read
+  /// again per row, so every row in one menu agrees on one width even if the
+  /// scope changes mid-build.
+  final BuildContext? context;
+
   double _height = 0;
 
   /// The height of the rows alone.
@@ -874,7 +896,7 @@ class _MenuGeometry<T> {
     final double margin = rows[row].scrollMargin;
     return (
       top: space(2) + offsets[row] - margin,
-      bottom: space(2) + offsets[row] + rows[row].height + margin,
+      bottom: space(2) + offsets[row] + rows[row].heightOf(context) + margin,
     );
   }
 }
@@ -918,9 +940,13 @@ class _Row<T> {
   /// `scroll-my-2` on the enclosing `SelectGroup`.
   final double scrollMargin;
 
-  double get height => switch (kind) {
+  /// The row's own height, for a caller that has to add the menu up before it
+  /// is laid out. Null [context] falls back to the mobile-rung estimate —
+  /// see [Select.labelHeight] — for a caller that genuinely cannot reach one.
+  double heightOf(BuildContext? context) => switch (kind) {
     _RowKind.option => Select.itemHeight,
-    _RowKind.label => Select.labelHeight,
+    _RowKind.label =>
+      context == null ? Select.labelHeight : Select.labelHeightOf(context),
     _RowKind.separator => Select.separatorHeight,
   };
 }
@@ -979,7 +1005,7 @@ class _SelectMenuState<T> extends State<SelectMenu<T>> {
     initialScrollOffset: widget.initialScrollOffset,
   );
 
-  late _MenuGeometry<T> _menu = _MenuGeometry<T>(widget.children);
+  late _MenuGeometry<T> _menu = _MenuGeometry<T>(widget.children, context);
 
   /// `canScrollUp` / `canScrollDown` — Radix mounts each button only while the
   /// viewport can move that way, which is why a menu at rest shows the down
@@ -999,7 +1025,7 @@ class _SelectMenuState<T> extends State<SelectMenu<T>> {
   void didUpdateWidget(SelectMenu<T> old) {
     super.didUpdateWidget(old);
     if (!identical(old.children, widget.children)) {
-      _menu = _MenuGeometry<T>(widget.children);
+      _menu = _MenuGeometry<T>(widget.children, context);
     }
     if (old.highlighted != widget.highlighted) {
       _revealHighlighted();
@@ -1265,7 +1291,8 @@ class _SelectItem<T> extends StatelessWidget {
             Expanded(
               child: StyledText(
                 option.label,
-                TextStyles.body,
+                // The field's own role: an option reads exactly like Input.
+                Input.textSpecDefault,
                 color: ink,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

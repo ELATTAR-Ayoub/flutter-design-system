@@ -368,9 +368,9 @@ class TextStyles {
     name: 'body',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(16, 24),
-    tablet: const TypeStep(17, 26),
-    desktop: const TypeStep(18, 28),
+    mobile: const TypeStep(14, 20),
+    tablet: const TypeStep(15, 22),
+    desktop: const TypeStep(16, 24),
     wght: 400,
   );
 
@@ -381,9 +381,9 @@ class TextStyles {
     name: 'small',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(14, 20),
-    tablet: const TypeStep(15, 22),
-    desktop: const TypeStep(16, 24),
+    mobile: const TypeStep(12, 16),
+    tablet: const TypeStep(13, 18),
+    desktop: const TypeStep(14, 20),
     wght: 400,
   );
 
@@ -393,9 +393,9 @@ class TextStyles {
     name: 'nav',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(14, 18),
-    tablet: const TypeStep(15, 20),
-    desktop: const TypeStep(16, 20),
+    mobile: const TypeStep(12, 16),
+    tablet: const TypeStep(13, 18),
+    desktop: const TypeStep(14, 18),
     wght: 500,
   );
 
@@ -405,9 +405,9 @@ class TextStyles {
     name: 'badge',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(12, 16),
-    tablet: const TypeStep(13, 16),
-    desktop: const TypeStep(14, 18),
+    mobile: const TypeStep(10, 14),
+    tablet: const TypeStep(11, 14),
+    desktop: const TypeStep(12, 16),
     wght: 600,
   );
 
@@ -418,9 +418,9 @@ class TextStyles {
     name: 'code',
     group: TypeGroup.code,
     family: Fonts.mono,
-    mobile: const TypeStep(14, 20),
-    tablet: const TypeStep(15, 22),
-    desktop: const TypeStep(16, 24),
+    mobile: const TypeStep(12, 18),
+    tablet: const TypeStep(13, 18),
+    desktop: const TypeStep(14, 20),
     wght: 400,
   );
 
@@ -430,9 +430,9 @@ class TextStyles {
     name: 'identifier',
     group: TypeGroup.code,
     family: Fonts.mono,
-    mobile: const TypeStep(15, 22),
-    tablet: const TypeStep(16, 24),
-    desktop: const TypeStep(17, 26),
+    mobile: const TypeStep(13, 18),
+    tablet: const TypeStep(14, 20),
+    desktop: const TypeStep(15, 22),
     wght: 400,
     tracking: -0.01,
   );

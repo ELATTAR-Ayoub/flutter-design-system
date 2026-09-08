@@ -263,6 +263,27 @@ void main() {
   /* ── The dropdown ──────────────────────────────────────────────────────── */
 
   group('DropdownMenu', () {
+    testWidgets('a menu row reads at the field role', (WidgetTester t) async {
+      useFrame(t);
+      await t.pumpWidget(
+        overlayHost(
+          DropdownMenu(
+            trigger: const _Trigger(width: 111),
+            children: accountMenu(),
+          ),
+        ),
+      );
+      await t.tap(find.byType(DropdownMenu));
+      await settleOverlay(t);
+
+      final StyledText label = t.widget<StyledText>(
+        find.byWidgetPredicate(
+          (Widget w) => w is StyledText && w.text == 'Wallet',
+        ),
+      );
+      expect(identical(label.spec, Input.textSpecDefault), isTrue);
+    });
+
     testWidgets('opens on pointer-DOWN, not on the tap', (
       WidgetTester t,
     ) async {
@@ -979,6 +1000,21 @@ void main() {
         ],
       ),
     ];
+
+    testWidgets('a Menubar trigger reads at the field role', (
+      WidgetTester t,
+    ) async {
+      useFrame(t);
+      await t.pumpWidget(overlayHost(const Menubar(menus: admin)));
+      await t.pump();
+
+      final StyledText label = t.widget<StyledText>(
+        find.byWidgetPredicate(
+          (Widget w) => w is StyledText && w.text == 'Packs',
+        ),
+      );
+      expect(identical(label.spec, Input.textSpecDefault), isTrue);
+    });
 
     testWidgets('DRIFT 1 — the 32px triggers overflow the 32px bar', (
       WidgetTester t,

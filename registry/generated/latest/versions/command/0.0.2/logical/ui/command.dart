@@ -601,7 +601,7 @@ class Command extends StatefulWidget {
   /// layout height — [_CommandRow] sizes itself to exactly this number
   /// rather than relying on a grown, invisible hit box.
   static double get itemHeight => math.max(
-    TextStyles.body.step.leading + space(2) * 2,
+    Input.textSpecDefault.step.leading + space(2) * 2,
     TouchTargets.minimum,
   );
 
@@ -616,7 +616,7 @@ class Command extends StatefulWidget {
   static double itemHeightOf(BuildContext context) => math.max(
     MediaQuery.textScalerOf(
           context,
-        ).scale(StyledText.stepOf(context, TextStyles.body).leading) +
+        ).scale(StyledText.stepOf(context, Input.textSpecDefault).leading) +
         space(2) * 2,
     TouchTargets.minimum,
   );
@@ -626,7 +626,7 @@ class Command extends StatefulWidget {
       TextStyles.small.step.leading + space(2) * 2;
 
   /// `py-6` around one `text-sm` line box — **66.5625px** *(measured)*.
-  static double get emptyHeight => TextStyles.body.step.leading + space(6) * 2;
+  static double get emptyHeight => TextStyles.small.step.leading + space(6) * 2;
 
   /// **Items re-sort; groups do not.** The asymmetry is cmdk's, not the port's.
   ///
@@ -1339,7 +1339,8 @@ class _CommandRow extends StatelessWidget {
             children: <Widget>[
               StyledText(
                 item.label,
-                TextStyles.body,
+                // The search field's own role: a row reads exactly like it.
+                Input.textSpecDefault,
                 color: ink,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1503,7 +1504,7 @@ class _CommandEmpty extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: space(6)),
       child: StyledText(
         label,
-        TextStyles.body,
+        TextStyles.small,
         color: theme.popoverForeground,
         align: TextAlign.center,
       ),

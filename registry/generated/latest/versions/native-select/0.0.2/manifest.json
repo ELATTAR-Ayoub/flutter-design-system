@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/native_select.dart",
       "target": "@ui/native_select.dart",
-      "sha256": "275fc25e9e1bc4b1cc21a74aca1113be90f8d51c1870fffad564b03aeb69b53b"
+      "sha256": "b19ed14dddc79f4ceb9cd5019a672bd1155ef0bf6c23ab091b519ec1df674f9d"
     }
   ],
   "registryDependencies": [

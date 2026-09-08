@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/select.dart",
       "target": "@ui/select.dart",
-      "sha256": "79a0d7afd552ed2fd9458d9ed574ff18e4809ccadd5db5effde96260e8be778a"
+      "sha256": "39fdd373adb3ac65537bc6725a0bf124fb4374b92527366481445c46855319d2"
     }
   ],
   "registryDependencies": [

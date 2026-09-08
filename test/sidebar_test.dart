@@ -742,9 +742,16 @@ void main() {
             .height,
         SidebarGroupLabel.height,
       );
-      // `.step` is now always the mobile floor (14/18); the group label is
-      // typed at nav's desktop step, unchanged by the table at 16/20.
-      expect(TextStyles.nav.desktop, const TypeStep(16, 20));
+      // Group labels are supporting copy, not navigation chrome: the row
+      // reads at `small`, the same role every other group label, subtitle
+      // and shortcut column uses.
+      final StyledText text = tester.widget<StyledText>(
+        find.descendant(
+          of: find.byType(SidebarGroupLabel),
+          matching: find.byType(StyledText),
+        ),
+      );
+      expect(identical(text.spec, TextStyles.small), isTrue);
     });
   });
 

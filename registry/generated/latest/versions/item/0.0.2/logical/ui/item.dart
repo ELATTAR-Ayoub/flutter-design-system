@@ -23,9 +23,13 @@
 ///   on this page along with the rest.
 /// * `ItemMedia` at `variant="icon"` forces its glyph to `size-4` (16px) and,
 ///   whenever the row has a description, takes `self-start` plus
-///   `translate-y-0.5` — a 2px nudge that lines the glyph up with the title's
-///   cap height rather than with the row's centre. *(Measured: media top 2px
-///   below content top.)*
+///   `translate-y-0.5` — a nudge that lines the glyph up with the title's
+///   cap height rather than with the row's centre. Ported as that intent,
+///   [ItemMedia.nudgeFor], rather than the flat 2px `translate-y-0.5`
+///   computes to on the one specimen it was measured against: the offset is
+///   half the gap between [ItemTitle]'s own rendered line box and the 16px
+///   glyph, so it tracks the title's role at every width instead of only the
+///   one that was measured.
 /// * `ItemContent` is `flex-1 flex-col gap-1`.
 ///
 /// **Not ported:** `asChild` and with it the whole `[a]:hover:bg-muted` /
@@ -215,20 +219,41 @@ class Item extends StatelessWidget {
 /// with `[&_svg:not([class*='size-'])]:size-4`.
 ///
 /// [nudged] is `group-has-data-[slot=item-description]/item:self-start` plus
-/// `:translate-y-0.5`: when the row carries a description, the glyph leaves the
-/// row's centre line, pins to the top and drops 2px.
+/// `:translate-y-0.5`, ported as a measured intent rather than the literal
+/// 2px the class computes to on one specimen: when the row carries a
+/// description, the glyph leaves the row's centre line and pins to the top of
+/// the content column, offset so its own centre lands on the centre of
+/// [ItemTitle]'s line box — the CSS rule's purpose ("lines up with the
+/// title's cap height", per the library doc) rather than its one measured
+/// number, which only happened to fit [TextStyles.body] at the width it was
+/// read at. [nudgeFor] reads that line box's height off
+/// [StyledText.stepOf], the same source [ItemTitle] itself renders from, so
+/// the two can never drift apart at a width the flat constant did not cover.
 class ItemMedia extends StatelessWidget {
   const ItemMedia({super.key, required this.child, this.nudged = true});
 
   final Widget child;
 
+  /// True (default): pin to the top of the content column and centre on the
+  /// title's own first line box — see [nudgeFor]. False: centre on the whole
+  /// (stretched) slot, which is what a title with no description wants, since
+  /// there the content column's height already equals the title's line box.
   final bool nudged;
 
   /// `size-4` — the glyph box the variant forces.
   static double get size => space(4);
 
-  /// `translate-y-0.5`.
-  static double get nudge => space(0.5);
+  /// The top-of-content offset [nudged] applies in [context]: half the gap
+  /// between [ItemTitle]'s rendered line box ([TextStyles.body], the role
+  /// [ItemTitle] itself renders) and the forced 16px glyph square, so the
+  /// glyph's centre lands on the title's centre rather than on the row's.
+  /// Zero, never negative, on a width where the glyph is taller than the
+  /// line box it is centring on.
+  static double nudgeFor(BuildContext context) {
+    final double leading = StyledText.stepOf(context, TextStyles.body).leading;
+    final double gap = leading - size;
+    return gap > 0 ? gap / 2 : 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -236,13 +261,14 @@ class ItemMedia extends StatelessWidget {
     // Inside [Item] this sits in a stretched slot, so the alignment has a
     // row height to work against; standing alone it fills whatever it is
     // given, which is what `self-start` on a flex item does too.
+    if (!nudged) {
+      return Align(alignment: Alignment.center, child: box);
+    }
+    final double offset = nudgeFor(context);
     return Align(
-      alignment: nudged ? Alignment.topCenter : Alignment.center,
-      child: nudged
-          ? Padding(
-              padding: EdgeInsets.only(top: nudge),
-              child: box,
-            )
+      alignment: Alignment.topCenter,
+      child: offset > 0
+          ? Padding(padding: EdgeInsets.only(top: offset), child: box)
           : box,
     );
   }

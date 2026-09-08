@@ -87,9 +87,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.sans,
     400,
     null,
-    m: (16, 24),
-    t: (17, 26),
-    d: (18, 28),
+    m: (14, 20),
+    t: (15, 22),
+    d: (16, 24),
   ),
   _Role(
     'small',
@@ -97,9 +97,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.sans,
     400,
     null,
-    m: (14, 20),
-    t: (15, 22),
-    d: (16, 24),
+    m: (12, 16),
+    t: (13, 18),
+    d: (14, 20),
   ),
   _Role(
     'nav',
@@ -107,9 +107,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.sans,
     500,
     null,
-    m: (14, 18),
-    t: (15, 20),
-    d: (16, 20),
+    m: (12, 16),
+    t: (13, 18),
+    d: (14, 18),
   ),
   _Role(
     'badge',
@@ -117,9 +117,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.sans,
     600,
     null,
-    m: (12, 16),
-    t: (13, 16),
-    d: (14, 18),
+    m: (10, 14),
+    t: (11, 14),
+    d: (12, 16),
   ),
   _Role(
     'code',
@@ -127,9 +127,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.mono,
     400,
     null,
-    m: (14, 20),
-    t: (15, 22),
-    d: (16, 24),
+    m: (12, 18),
+    t: (13, 18),
+    d: (14, 20),
   ),
   _Role(
     'identifier',
@@ -137,9 +137,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.mono,
     400,
     -0.01,
-    m: (15, 22),
-    t: (16, 24),
-    d: (17, 26),
+    m: (13, 18),
+    t: (14, 20),
+    d: (15, 22),
   ),
   _Role(
     'numberSm',
@@ -521,14 +521,14 @@ void main() {
         fontSize: 32,
       );
       expect(style.fontSize, 32);
-      expect(style.height, 24 / 16);
+      expect(style.height, 20 / 14);
     });
 
     test('inline drops the line height and stands outside inheritance', () {
       final TextStyle style = TextStyles.code.resolveInline(_desktop, _ink);
       expect(style.height, isNull);
       expect(style.inherit, isFalse);
-      expect(style.fontSize, 16);
+      expect(style.fontSize, 14);
     });
   });
 

@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/navigation_menu.dart",
       "target": "@ui/navigation_menu.dart",
-      "sha256": "35f274f80126cc406cf6f3e4407b76066624581b16687a3713f536ec07f9fe77"
+      "sha256": "a8956a9ab7189590f376910f37e878cc5b850722d31714b3af948a37b82a96cf"
     }
   ],
   "registryDependencies": [
