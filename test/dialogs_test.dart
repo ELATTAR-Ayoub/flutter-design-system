@@ -767,7 +767,8 @@ void main() {
       expect(content.bottom, closeTo(trigger.top, 0.5));
       expect(content.center.dx, closeTo(trigger.center.dx, 0.5));
       // One supporting line box in the pill's own padding, plus the lane.
-      final double pill = TextStyles.small.step.leading + space(1.5) * 2;
+      final double pill =
+          TextStyles.small.stepFor(1440).leading + space(1.5) * 2;
       expect(content.height, closeTo(pill + Tooltip.arrowSize, 1));
     });
 
@@ -877,7 +878,7 @@ void main() {
       // The lane is the row's leading column, not its height.
       expect(
         content.height,
-        closeTo(TextStyles.small.step.leading + space(1.5) * 2, 1),
+        closeTo(TextStyles.small.stepFor(1440).leading + space(1.5) * 2, 1),
       );
       expect(content.left, closeTo(trigger.right, 0.5));
       expect(content.center.dy, closeTo(trigger.center.dy, 0.5));

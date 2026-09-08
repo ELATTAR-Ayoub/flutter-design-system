@@ -159,7 +159,10 @@ void main() {
         final double h = sizeOf(t, find.byType(BubbleContent)).height;
         // One body line box, the bubble's own padding, and its hairline
         // border. `ghost` drops the padding and keeps the border.
-        final double line = TextStyles.body.step.leading;
+        final double line = StyledText.stepOf(
+          t.element(find.byType(BubbleContent)),
+          TextStyles.body,
+        ).leading;
         final double border = BorderWidths.hairline * 2;
         expect(
           h,
@@ -642,7 +645,13 @@ void main() {
         );
         expect(
           sizeOf(t, find.byType(MessageHeader)).height,
-          closeTo(TextStyles.small.step.leading, 0.05),
+          closeTo(
+            StyledText.stepOf(
+              t.element(find.byType(MessageHeader)),
+              TextStyles.small,
+            ).leading,
+            0.05,
+          ),
         );
       }
     });
@@ -725,7 +734,10 @@ void main() {
       await t.pump();
       // The content padding, eleven single-line bubbles, and ten gaps.
       final double bubble =
-          TextStyles.body.step.leading +
+          StyledText.stepOf(
+            t.element(find.byType(BubbleContent).first),
+            TextStyles.body,
+          ).leading +
           space(2) * 2 +
           BorderWidths.hairline * 2;
       expect(

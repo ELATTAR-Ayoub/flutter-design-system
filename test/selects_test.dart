@@ -27,6 +27,14 @@ import 'package:flutter_test/flutter_test.dart';
 /// `localhost:3000/design-system/components/base/selects` on 2026-08-15 with
 /// `getComputedStyle` / `getBoundingClientRect`, not derived from the map.
 
+/// The width every `host`/`overlayHost` call defaults to, and so the width
+/// [TypeWidthScope] resolves every role's step against unless a test opens a
+/// narrower one. Type steps at breakpoints now — see `typography.dart` — so an
+/// expectation built from a role's flat `.step` (the mobile rung) drifts from
+/// what actually paints here; `TextStyles.x.stepFor(hostWidth)` is the desktop
+/// rung this file renders at.
+const double hostWidth = 1440;
+
 Widget host(
   Widget child, {
   ColorMode mode = ColorMode.dark,
@@ -269,6 +277,10 @@ void main() {
           TouchTargets.minimum,
         ),
       );
+      // `Select.labelHeight` is the placement math's own (mobile-rung, hence
+      // no `stepFor`) estimate of a label row's height — not what actually
+      // paints once the role steps with the breakpoint. See the rendered-row
+      // assertions below for that number.
       expect(Select.labelHeight, TextStyles.small.step.leading + space(2) * 2);
       expect(Select.separatorHeight, BorderWidths.hairline + space(2) * 2);
       expect(Select.scrollButtonHeight, 32);
@@ -317,7 +329,12 @@ void main() {
 
       expect(find.text('Activity'), findsOneWidget);
       expect(find.text('Price'), findsOneWidget);
-      expect(rowRect(t, 'Activity').height, Select.labelHeight);
+      // The label paints intrinsically — `TextStyles.small` at the width in
+      // scope, not the placement math's flat `Select.labelHeight` estimate.
+      expect(
+        rowRect(t, 'Activity').height,
+        TextStyles.small.stepFor(hostWidth).leading + space(2) * 2,
+      );
       expect(
         rowRect(t, 'Most popular').height,
         closeTo(Select.itemHeight, 0.001),
@@ -437,11 +454,15 @@ void main() {
       final Rect content = t.getRect(find.byType(SelectMenu<String>));
       final Rect chosen = rowRect(t, 'Most popular');
 
+      // The label paints intrinsically at the width in scope — see the
+      // rendered-row assertion above — so the real box the chosen row starts
+      // after is `TextStyles.small`'s step, not the placement math's flat
+      // estimate.
+      final double labelRowHeight =
+          TextStyles.small.stepFor(hostWidth).leading + space(2) * 2;
+
       // The viewport's padding plus one group label, and nothing else.
-      expect(
-        chosen.top - content.top,
-        closeTo(space(2) + Select.labelHeight, 0.001),
-      );
+      expect(chosen.top - content.top, closeTo(space(2) + labelRowHeight, 0.001));
 
       // …which is what puts its middle on the trigger's middle.
       expect(chosen.center.dy, closeTo(trigger.center.dy, 0.001));
@@ -454,7 +475,7 @@ void main() {
       expect(chosen.center.dy - content.top, isNot(closeTo(shipped, 0.001)));
       expect(
         chosen.center.dy - content.top,
-        closeTo(space(2) + Select.labelHeight + Select.itemHeight / 2, 0.001),
+        closeTo(space(2) + labelRowHeight + Select.itemHeight / 2, 0.001),
       );
     });
 
@@ -1257,11 +1278,18 @@ void main() {
   group('the menu family reads at one role', () {
     test('a menu group label is the supporting-copy role', () {
       final TextStyleToken spec = TextStyles.small;
-      expect(spec.step, const TypeStep(14, 20));
+      expect(spec.mobile, const TypeStep(14, 20));
       expect(spec.weight, FontWeight.w400);
       expect(spec.tracking, isNull);
       expect(spec.family, Fonts.sans);
-      expect(spec.isStatic, isTrue, reason: 'furniture does not resize');
+      // Every role now steps at the same breakpoints — furniture included —
+      // so `small` is no longer the one flat exception `isStatic` used to
+      // pin; it steps like `body`, `nav` and the rest.
+      expect(
+        spec.isStatic,
+        isFalse,
+        reason: 'furniture now resizes with the breakpoint like every role',
+      );
     });
 
     test('a shortcut column reads at the same role, never smaller', () {
@@ -1487,13 +1515,34 @@ void main() {
       WidgetTester t,
     ) async {
       await pumpPalette(t);
+      // The heading paints intrinsically — `Command.headingSpec` at the width
+      // in scope — not the placement-only `Command.headingHeight` estimate,
+      // which stays pinned to the mobile rung; see the `every row kind`
+      // test above.
+      final double headingRowHeight =
+          Command.headingSpec.stepFor(hostWidth).leading + space(2) * 2;
       // The list: two groups of a heading and two rows, with a rule between.
       final double group =
-          Command.headingHeight + Command.itemHeight * 2 + space(2) * 2;
+          headingRowHeight + Command.itemHeight * 2 + space(2) * 2;
       final double listHeight = t
           .getSize(find.byType(SingleChildScrollView))
           .height;
-      expect(listHeight, closeTo(group * 2 + BorderWidths.hairline, 0.01));
+      // At the mobile rung this content sat under `max-h-72`; stepped up to
+      // the desktop rung, two groups of a heading and two touch-target rows
+      // now total one pixel past that cap, so the viewport itself is what
+      // caps `listHeight` — `SingleChildScrollView` never grows past
+      // `Command.listMaxHeight`, however tall its content wants to be.
+      expect(
+        listHeight,
+        closeTo(
+          math.min(
+            group * 2 + BorderWidths.hairline,
+            Command.listMaxHeight,
+          ),
+          0.01,
+        ),
+      );
+
       // The palette is that list, the input above it, and the shell around
       // both.
       expect(
@@ -1610,10 +1659,14 @@ void main() {
       await pumpPalette(t);
       final ThemeTokens theme = themeIn(t, Command);
       final Text heading = t.widget<Text>(find.text('Packs'));
-      expect(heading.style!.fontSize, TextStyles.small.step.size);
+      expect(
+        heading.style!.fontSize,
+        Command.headingSpec.stepFor(hostWidth).size,
+      );
       expect(heading.style!.fontWeight, FontWeight.w500);
       expect(heading.style!.color, theme.mutedForeground);
-      // One supporting line box inside the row padding.
+      // One supporting line box inside the row padding — intrinsic, at the
+      // width in scope, not the placement-only `Command.headingHeight`.
       expect(
         t
             .getSize(
@@ -1625,7 +1678,7 @@ void main() {
                   .first,
             )
             .height,
-        Command.headingHeight,
+        Command.headingSpec.stepFor(hostWidth).leading + space(2) * 2,
       );
     });
 
@@ -1634,7 +1687,7 @@ void main() {
     ) async {
       await pumpPalette(t);
       final Text price = t.widget<Text>(find.text(r'$48.00'));
-      expect(price.style!.fontSize, TextStyles.small.step.size);
+      expect(price.style!.fontSize, TextStyles.small.stepFor(hostWidth).size);
       expect(price.style!.fontFamily, contains(Fonts.sans));
       // The retired role tracked this column wide enough to read as a caption
       // rather than as a value. It tracks naturally now.
@@ -1780,7 +1833,8 @@ void main() {
       expect(
         t.getSize(find.byType(Command)).height,
         closeTo(
-          Command.headingHeight +
+          Command.headingSpec.stepFor(hostWidth).leading +
+              space(2) * 2 +
               Command.itemHeight +
               space(2) * 2 +
               Command.inputHeight +
@@ -1857,15 +1911,34 @@ void main() {
       expect(rule, findsOneWidget);
       final double whole = t.getSize(find.byType(Command)).height;
 
+      // The list's own `max-h-72` (`Command.listMaxHeight`) caps the
+      // `SingleChildScrollView`, and at the desktop rung two groups of a
+      // heading and two touch-target rows plus the rule already sit right at
+      // that cap — see "the palette totals what the reference renders". So
+      // the rule's own `BorderWidths.hairline` only shows up as a swing in
+      // the *content* the viewport wants, not necessarily in what the
+      // (already-capped) viewport paints.
+      final double headingRowHeight =
+          Command.headingSpec.stepFor(hostWidth).leading + space(2) * 2;
+      final double group =
+          headingRowHeight + Command.itemHeight * 2 + space(2) * 2;
+      final double listWithRule = math.min(
+        group * 2 + BorderWidths.hairline,
+        Command.listMaxHeight,
+      );
+      final double listWithoutRule = math.min(
+        group * 2,
+        Command.listMaxHeight,
+      );
+
       // cmdk's `Separator` renders only when `!state.search` — *(measured)* it
-      // leaves the DOM on the first keystroke and comes back on clearing, a
-      // 1px swing in the palette's height.
+      // leaves the DOM on the first keystroke and comes back on clearing.
       c.text = 't';
       await t.pump();
       expect(rule, findsNothing);
       expect(
         t.getSize(find.byType(Command)).height,
-        closeTo(whole - BorderWidths.hairline, 0.001),
+        closeTo(whole - (listWithRule - listWithoutRule), 0.001),
       );
 
       c.text = '';
@@ -1925,6 +1998,11 @@ void main() {
       // `ComboboxEmpty` declares `text-muted-foreground` for itself.
       expect(empty.style!.color, theme.popoverForeground);
       expect(empty.textAlign, TextAlign.center);
+      // The empty state paints intrinsically — `TextStyles.body` at the width
+      // in scope — not the placement-only `Command.emptyHeight` estimate,
+      // which stays pinned to the mobile rung.
+      final double emptyRowHeight =
+          TextStyles.body.stepFor(hostWidth).leading + space(6) * 2;
       expect(
         t
             .getSize(
@@ -1936,12 +2014,12 @@ void main() {
                   .first,
             )
             .height,
-        closeTo(Command.emptyHeight, 0.001),
+        closeTo(emptyRowHeight, 0.001),
       );
       expect(
         t.getSize(find.byType(Command)).height,
         closeTo(
-          Command.emptyHeight +
+          emptyRowHeight +
               Command.inputHeight +
               BorderWidths.hairline * 2 +
               space(2) * 3,

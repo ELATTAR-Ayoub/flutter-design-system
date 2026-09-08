@@ -220,10 +220,21 @@ class _PartStage extends StatelessWidget {
     );
     // `min-h-0` on the provider, and nothing else to give the row a height:
     // a CSS flex row is as tall as its tallest item, which is what
-    // [IntrinsicHeight] says here. Only the stages that state an `h-*` skip it.
+    // [IntrinsicHeight] says here — for every stage, not only the one that
+    // hugs its content. A stage that states an `h-*` wraps the hugged result
+    // in a floor rather than an exact height: `h-*` is the desktop reading,
+    // but the fixture's own content — header, menu, footer — grows with the
+    // type role's step and with `textScaler`, and no fixed pixel count stays
+    // ahead of both at once. `ConstrainedBox.minHeight` keeps the stated
+    // desktop height when the content fits it and lets the content win,
+    // never clipped, when it does not.
+    final Widget hugged = IntrinsicHeight(child: stage);
     return height == null
-        ? IntrinsicHeight(child: stage)
-        : SizedBox(height: height, child: stage);
+        ? hugged
+        : ConstrainedBox(
+            constraints: BoxConstraints(minHeight: height!),
+            child: hugged,
+          );
   }
 }
 

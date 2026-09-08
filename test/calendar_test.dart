@@ -185,10 +185,11 @@ Matcher isColor(Color expected) => isA<Color>()
     .having((Color c) => (c.g * 255).round(), 'g', (expected.g * 255).round())
     .having((Color c) => (c.b * 255).round(), 'b', (expected.b * 255).round());
 
-/// `13 × calc(1.25 / .875)` — the weekday row's line box.
+/// The weekday row's line box: `.small`'s leading.
 ///
-/// *(Chrome: 18.563. The ¹⁄₆₄px grid is the only difference.)*
-final double _weekdayRow = TextStyles.small.step.leading;
+/// The whole file hosts at 1440×900 (desktop, >= Breakpoints.lg), so this is
+/// `TextStyles.small.desktop.leading` — 24, not the mobile floor's 20.
+final double _weekdayRow = TextStyles.small.desktop.leading;
 
 /// `--cell-size`, `--cell-radius`, and the two paddings.
 const double _cell = 28;
@@ -197,7 +198,8 @@ const double _popoverPad = 8;
 
 /// The whole calendar's outer height for [rows], on a Panel surface.
 ///
-/// `28 (caption) + 16 (gap) + 18.5714 (header) + rows × 36 + 24 (p-3) + 2`.
+/// `28 (caption) + 16 (gap) + 24 (header, desktop small step) + rows × 36 +
+/// 24 (p-3) + 2`.
 double _panelHeight(int rows) =>
     _cell + 16 + _weekdayRow + rows * 36 + 2 * _panelPad + 2;
 
@@ -539,8 +541,9 @@ void main() {
   // ─── rendered geometry ───────────────────────────────────────────────────
 
   group('the box — every §8.5 derivation, against the browser', () {
-    testWidgets('196px of content, 222 × 304.5714 on a Panel *(measured '
-        '222 × 304.563)*', (WidgetTester t) async {
+    testWidgets('196px of content, 222 × 310 on a Panel', (
+      WidgetTester t,
+    ) async {
       await t.pumpWidget(host(const Calendar.single(), clock: _frozen));
       await t.pump();
       final Size size = t.getSize(find.byType(Calendar));
@@ -626,7 +629,7 @@ void main() {
     });
 
     testWidgets(
-      'the weekday header is a 18.5714px line box *(Chrome 18.563)*',
+      'the weekday header is a 24px line box — .small at the desktop step',
       (WidgetTester t) async {
         await t.pumpWidget(host(const Calendar.single(), clock: _frozen));
         await t.pump();

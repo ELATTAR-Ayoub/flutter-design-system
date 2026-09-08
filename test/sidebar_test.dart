@@ -399,11 +399,14 @@ void main() {
       final Size row = tester
           .renderObject<RenderBox>(find.byType(SidebarMenuButton).first)
           .size;
-      // One navigation line box, the row padding, and its hairline border.
+      // SidebarMenuButtonSize.md is ButtonSize.sm, which Button.typeFor types
+      // as TextStyles.small (not nav). The stage is 1000px wide (tablet band,
+      // >= Breakpoints.md), so small's tablet leading (22) applies: one line
+      // box, the row padding, and its hairline border.
       expect(
         row.height,
         closeTo(
-          TextStyles.nav.step.leading +
+          TextStyles.small.stepFor(_stage.width).leading +
               space(2) * 2 +
               BorderWidths.hairline * 2,
           0.01,
@@ -739,7 +742,9 @@ void main() {
             .height,
         SidebarGroupLabel.height,
       );
-      expect(TextStyles.nav.step, const TypeStep(16, 20));
+      // `.step` is now always the mobile floor (14/18); the group label is
+      // typed at nav's desktop step, unchanged by the table at 16/20.
+      expect(TextStyles.nav.desktop, const TypeStep(16, 20));
     });
   });
 

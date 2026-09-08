@@ -116,7 +116,11 @@ void main() {
         ),
         width: 260,
       );
-      final double line = TextStyles.small.step.leading;
+      // TypeWidthScope falls back to MediaQuery's width, and _measure never
+      // sets one, so the role resolves against the test surface's default
+      // 800×600 viewport — between Breakpoints.md (768) and .lg (1024), the
+      // tablet step (15/22).
+      final double line = TextStyles.small.tablet.leading;
       expect(box.height % line, closeTo(0, 0.001));
       expect(box.height / line, greaterThan(1));
     });
@@ -136,7 +140,9 @@ void main() {
         tester,
         StyledText('globals.css', TextStyles.code, color: _ink, inline: true),
       );
-      expect(block.height, closeTo(TextStyles.code.step.leading, 0.001));
+      // Same default 800×600 test surface as above: code resolves to its
+      // tablet step (15/22), not the mobile floor.
+      expect(block.height, closeTo(TextStyles.code.tablet.leading, 0.001));
       expect(inline.height, lessThan(block.height));
     });
 

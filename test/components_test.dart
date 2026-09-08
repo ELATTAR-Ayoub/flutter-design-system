@@ -909,8 +909,8 @@ void main() {
 
       // A label's leading is the role's, so a wrapping label in a height-auto
       // button (a sidebar row) grows by whole line boxes.
-      expect(spec(ButtonSize.sm).step.leading, 20);
-      expect(spec(ButtonSize.md).step.leading, 24);
+      expect(spec(ButtonSize.sm).step.leading, TextStyles.small.step.leading);
+      expect(spec(ButtonSize.md).step.leading, TextStyles.body.step.leading);
 
       // Every text rung is `font-medium`.
       for (final ButtonSize size in <ButtonSize>[
@@ -1005,7 +1005,7 @@ void main() {
         );
 
         final TextStyle style = labelStyleOf(t);
-        final double rung = role.step.size;
+        final double rung = role.stepFor(1440).size;
         expect(
           style.fontSize,
           rung,
@@ -1032,7 +1032,7 @@ void main() {
       await t.pumpWidget(
         host(Button(onPressed: () {}, child: const Text('Open Pack'))),
       );
-      expect(labelStyleOf(t).fontSize, TextStyles.body.step.size);
+      expect(labelStyleOf(t).fontSize, TextStyles.body.stepFor(1440).size);
 
       await t.pumpWidget(
         host(
@@ -1043,7 +1043,7 @@ void main() {
           ),
         ),
       );
-      expect(labelStyleOf(t).fontSize, TextStyles.body.step.size);
+      expect(labelStyleOf(t).fontSize, TextStyles.body.stepFor(1440).size);
     });
 
     testWidgets('uppercases the glyphs and leaves the accessible name alone', (
@@ -1806,7 +1806,7 @@ void main() {
             ),
           )
           .style!;
-      expect(style.fontSize, TextStyles.nav.step.size);
+      expect(style.fontSize, TextStyles.nav.stepFor(1440).size);
       expect(style.fontFamily, contains('InterLocal'));
     });
 
@@ -1823,7 +1823,7 @@ void main() {
             ),
           )
           .style!;
-      expect(style.fontSize, TextStyles.numberBase.step.size);
+      expect(style.fontSize, TextStyles.numberBase.stepFor(1440).size);
       expect(
         style.fontVariations!
             .firstWhere((FontVariation v) => v.axis == 'wght')
@@ -1835,7 +1835,7 @@ void main() {
       expect(style.fontFamily, contains('GeistMono'));
       expect(
         style.letterSpacing,
-        closeTo(-0.01 * TextStyles.numberBase.step.size, 1e-9),
+        closeTo(-0.01 * TextStyles.numberBase.stepFor(1440).size, 1e-9),
       );
       expect(style.fontFeatures, contains(const FontFeature.tabularFigures()));
     });
@@ -1892,7 +1892,7 @@ void main() {
             find.descendant(of: find.byType(Kbd), matching: find.byType(Text)),
           )
           .style!;
-      expect(style.fontSize, TextStyles.code.step.size);
+      expect(style.fontSize, TextStyles.code.stepFor(1440).size);
       expect(style.fontFamily, contains(Fonts.mono));
       expect(style.color, ThemeTokens.dark.mutedForeground);
     });

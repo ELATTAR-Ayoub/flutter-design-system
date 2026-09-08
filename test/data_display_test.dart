@@ -269,7 +269,7 @@ void main() {
       // head 40 + one row 36 + the caption's own gap and line box.
       expect(
         tester.getSize(find.byType(Table)).height,
-        closeTo(40 + 36 + 16 + TextStyles.small.step.leading, _fine),
+        closeTo(40 + 36 + 16 + TextStyles.small.stepFor(1440).leading, _fine),
       );
     });
 
@@ -479,9 +479,9 @@ void main() {
         closeTo(
           BorderWidths.hairline * 2 +
               10 * 2 +
-              TextStyles.body.step.leading +
+              TextStyles.body.stepFor(1440).leading +
               4 +
-              TextStyles.small.step.leading,
+              TextStyles.small.stepFor(1440).leading,
           _fine,
         ),
       );
@@ -643,7 +643,7 @@ void main() {
       expect(
         tester.getSize(find.byType(Marker)).height,
         closeTo(
-          TextStyles.small.step.leading + space(2) + BorderWidths.hairline,
+          TextStyles.small.stepFor(1440).leading + space(2) + BorderWidths.hairline,
           _fine,
         ),
       );

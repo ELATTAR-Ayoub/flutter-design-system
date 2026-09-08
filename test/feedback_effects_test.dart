@@ -1256,15 +1256,17 @@ void main() {
           ),
         );
         final TextStyle title = t.widget<Text>(find.byType(Text)).style!;
-        final double size = TextStyles.nav.step.size;
+        // host() pumps at 1440 wide, so nav resolves its desktop step (16/20),
+        // not the mobile-pinned TextStyleToken.step (14/18).
+        final double size = TextStyles.nav.stepFor(1440).size;
         expect(title.fontSize, size);
         expect(title.fontWeight, FontWeight.w500);
         // The title tracks slightly tighter than the role it derives from.
         expect(title.letterSpacing, closeTo(-0.02 * size, 1e-9));
         expect(title.fontFamily, contains(Fonts.sans));
 
-        // The description reads as body copy under the title.
-        expect(EmptyDescription.spec.step, TextStyles.body.step);
+        // The description reads as body copy under the title, at the same width.
+        expect(EmptyDescription.spec.stepFor(1440), TextStyles.body.stepFor(1440));
       },
     );
   });
@@ -2440,7 +2442,9 @@ void main() {
       expect(
         t.getRect(toastWith('Added to favourites')).height,
         closeTo(
-          TextStyles.small.step.leading +
+          // toaster() hosts at 1440 wide, so small resolves its desktop
+          // leading (24), not the mobile-pinned TextStyleToken.step (20).
+          TextStyles.small.stepFor(1440).leading +
               space(4) * 2 +
               BorderWidths.hairline * 2,
           0.35,

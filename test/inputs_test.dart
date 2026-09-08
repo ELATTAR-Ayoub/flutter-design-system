@@ -761,7 +761,10 @@ void main() {
       final TextStyle style = t
           .widget<EditableText>(find.byType(EditableText))
           .style;
-      final TypeStep step = TextStyles.numberBase.step;
+      final TypeStep step = StyledText.stepOf(
+        t.element(find.byType(EditableText)),
+        TextStyles.numberBase,
+      );
       expect(style.fontSize, step.size);
       expect(style.fontFamily, contains('GeistMono'));
       expect(style.fontFeatures, contains(const FontFeature.tabularFigures()));
@@ -871,10 +874,14 @@ void main() {
       final TextStyle style = t
           .widget<EditableText>(find.byType(EditableText))
           .style;
-      expect(style.fontSize, TextStyles.body.step.size);
+      final TypeStep step = StyledText.stepOf(
+        t.element(find.byType(EditableText)),
+        TextStyles.body,
+      );
+      expect(style.fontSize, step.size);
       expect(
         style.fontSize! * style.height!,
-        closeTo(TextStyles.body.step.leading, 1e-6),
+        closeTo(step.leading, 1e-6),
         reason: 'a textarea holds paragraphs at the body role',
       );
     });
@@ -1146,10 +1153,14 @@ void main() {
                 .first,
           )
           .style!;
-      expect(style.fontSize, TextStyles.body.step.size);
+      final TypeStep step = StyledText.stepOf(
+        t.element(find.byType(InputGroupText)),
+        TextStyles.body,
+      );
+      expect(style.fontSize, step.size);
       expect(
         style.fontSize! * style.height!,
-        closeTo(TextStyles.body.step.leading, 1e-3),
+        closeTo(step.leading, 1e-3),
       );
       expect(style.color, ThemeTokens.dark.mutedForeground);
     });
@@ -1174,7 +1185,10 @@ void main() {
                 .first,
           )
           .style!;
-      final TypeStep numeric = TextStyles.numberBase.step;
+      final TypeStep numeric = StyledText.stepOf(
+        t.element(find.byType(InputGroupText)),
+        TextStyles.numberBase,
+      );
       expect(style.fontSize, numeric.size);
       expect(style.fontFamily, contains('GeistMono'));
       expect(style.fontSize! * style.height!, closeTo(numeric.leading, 1e-3));
@@ -1454,7 +1468,18 @@ void main() {
           )
           .style!;
       expect(style.fontFamily, contains('InterLocal'));
-      expect(style.fontSize, TextStyles.body.step.size);
+      expect(
+        style.fontSize,
+        StyledText.stepOf(
+          t.element(
+            find.descendant(
+              of: find.byType(InputOtpSlot),
+              matching: find.text('4'),
+            ),
+          ),
+          TextStyles.body,
+        ).size,
+      );
     });
   });
 
@@ -1591,7 +1616,15 @@ void main() {
       // nearly two pixels. Two supporting line boxes and one gap.
       expect(
         t.getSize(find.byType(FieldError)).height,
-        closeTo(TextStyles.small.step.leading * 2 + space(1), 1e-3),
+        closeTo(
+          StyledText.stepOf(
+                t.element(find.byType(FieldError)),
+                TextStyles.small,
+              ).leading *
+                  2 +
+              space(1),
+          1e-3,
+        ),
         reason: 'the list is exactly its items plus its gaps',
       );
     });
@@ -1938,11 +1971,6 @@ void main() {
       /// The box that actually lays out.
       double rendered(Finder of) => t.getSize(of).height;
 
-      final Map<String, double> boxes = <String, double>{
-        'label': TextStyles.small.step.leading,
-        'description': TextStyles.small.step.leading,
-        'error': TextStyles.small.step.leading,
-      };
       final Map<String, Finder> parts = <String, Finder>{
         'label': find.byType(FieldLabel),
         'description': find.byType(FieldDescription),
@@ -1950,9 +1978,13 @@ void main() {
       };
 
       for (final MapEntry<String, Finder> part in parts.entries) {
+        final double leading = StyledText.stepOf(
+          t.element(part.value),
+          TextStyles.small,
+        ).leading;
         expect(
           rendered(part.value),
-          closeTo(boxes[part.key]!, 1e-3),
+          closeTo(leading, 1e-3),
           reason: part.key,
         );
         // …and it is the box its own spec declares, not a rounding that lands
@@ -2201,7 +2233,13 @@ void main() {
       // foundation, so it is the easiest of the four to leave un-boxed.
       expect(
         t.getSize(find.byType(FieldLegend)).height,
-        closeTo(TextStyles.small.step.leading, 1e-3),
+        closeTo(
+          StyledText.stepOf(
+            t.element(find.byType(FieldLegend)),
+            TextStyles.small,
+          ).leading,
+          1e-3,
+        ),
       );
     });
 

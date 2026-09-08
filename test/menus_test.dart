@@ -355,14 +355,16 @@ void main() {
       expect(hint.top - label.bottom, closeTo(space(1), 0.2));
 
       // …and the popup really is two tall rows and its own `p-2`, rather than
-      // two short rows with an overflowing child.
+      // two short rows with an overflowing child. `MenuContent.heightOf` has
+      // no context to scale by, so the expectation is rebuilt from the
+      // context-aware measure the row itself renders at, `twoLineItemHeightOf`.
+      final BuildContext menuContext = t.element(find.byType(MenuContent));
       expect(
         t.getSize(find.byType(MenuContent)).height,
-        closeTo(MenuContent.heightOf(models), 0.05),
-      );
-      expect(
-        t.getSize(find.byType(MenuContent)).height,
-        closeTo(Menu.contentPadding * 2 + Menu.twoLineItemHeight * 2, 0.05),
+        closeTo(
+          Menu.contentPadding * 2 + Menu.twoLineItemHeightOf(menuContext) * 2,
+          0.05,
+        ),
       );
       expect(t.takeException(), isNull);
     });

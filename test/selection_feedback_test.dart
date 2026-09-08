@@ -768,13 +768,16 @@ void main() {
       final Rect text = t.getRect(
         find.ancestor(of: find.text('Free'), matching: find.byType(StyledText)),
       );
-      expect(text.left - row.left, 12);
-      expect(row.right - text.right, closeTo(36, 0.001));
-      // The row's padded box is forced to the floored row height, so the
-      // 4px of slack over the reference's 40px is split evenly above and
-      // below the line box by the row's own vertical centring: `py-2` (8)
-      // plus half of (44 − 40).
-      expect(text.top - row.top, closeTo(10, 0.001));
+      expect(text.left - row.left, space(3));
+      expect(row.right - text.right, closeTo(space(9), 0.001));
+      // The row's padded box is forced to the floored row height, so any
+      // slack over the line box (`py-2` plus body's leading) is split
+      // evenly above and below the line box by the row's own vertical
+      // centring: `py-2` (space(2)) plus half of whatever remains after
+      // Select.itemHeight floors to TouchTargets.minimum.
+      final double bodyLeading = TextStyles.body.stepFor(1440).leading;
+      final double slack = Select.itemHeight - (bodyLeading + space(2) * 2);
+      expect(text.top - row.top, closeTo(space(2) + slack / 2, 0.001));
     });
 
     testWidgets('the keyboard walks it and Enter commits', (
@@ -954,13 +957,13 @@ void main() {
       final StyledText title = t.widget<StyledText>(
         find.byType(StyledText).first,
       );
-      expect(title.spec, same(TextStyles.h4));
+      expect(title.spec, same(TextStyles.nav));
       expect(title.color, theme.cardForeground);
 
       final StyledText body = t.widget<StyledText>(
         find.byType(StyledText).last,
       );
-      expect(body.spec.step, TextStyles.body.step);
+      expect(body.spec, same(TextStyles.small));
       expect(body.color, theme.mutedForeground);
     });
 
@@ -2176,11 +2179,16 @@ void main() {
         FontWeight.w400,
         reason: 'the resolved style, read off the tree',
       );
-      expect(overridden.fontSize, TextStyles.small.step.size);
-      expect(overridden.height, closeTo(TextStyles.small.step.ratio, 1e-6));
+      // The label reads at the screen's own width (1440, from `host`'s
+      // MediaQuery), not the local SizedBox constraint — so the resolved
+      // step is the desktop one, not `.step` (which is only the mobile
+      // default).
+      final TypeStep smallStep = TextStyles.small.stepFor(1440);
+      expect(overridden.fontSize, smallStep.size);
+      expect(overridden.height, closeTo(smallStep.ratio, 1e-6));
       expect(
         t.getSize(find.byType(StyledText)).height,
-        closeTo(TextStyles.small.step.leading, 0.001),
+        closeTo(smallStep.leading, 0.001),
         reason: 'the supporting-copy line box',
       );
 

@@ -214,6 +214,8 @@ void main() {
       final Finder previewMic = find.byKey(
         const ValueKey<String>('voice-preview:mic'),
       );
+      await tester.ensureVisible(previewMic);
+      await tester.pump();
       expect(
         tester
             .widget<MicControl>(

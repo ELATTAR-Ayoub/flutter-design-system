@@ -249,7 +249,9 @@ void main() {
     testWidgets('renders the role metrics', (WidgetTester t) async {
       final Text text = await render(t, StyledText('x', TextStyles.numberSm));
       final TextStyle style = text.style!;
-      final TypeStep step = TextStyles.numberSm.step;
+      // The host renders at 1440 logical pixels (>= Breakpoints.lg), so
+      // numberSm resolves to its desktop step (16/20), not the mobile floor.
+      final TypeStep step = TextStyles.numberSm.desktop;
       expect(style.fontSize, step.size);
       expect(style.height, step.ratio);
       expect(
@@ -296,7 +298,10 @@ void main() {
         StyledText('x', TextStyles.body, fontSize: 40),
       );
       expect(text.style!.fontSize, 40);
-      expect(text.style!.height, TextStyles.body.step.ratio);
+      // The host renders at 1440 logical pixels (>= Breakpoints.lg), so body
+      // resolves to its desktop step (18/28) and that step's ratio applies,
+      // even though the explicit fontSize overrides the size itself.
+      expect(text.style!.height, TextStyles.body.desktop.ratio);
     });
 
     testWidgets('styleOf resolves the same style for spans', (
@@ -319,7 +324,9 @@ void main() {
         ThemeTokens.dark.foreground,
         reason: 'no role owns ink; small inherits the surface foreground',
       );
-      expect(style.fontSize, TextStyles.small.step.size);
+      // The host renders at 1440 logical pixels (>= Breakpoints.lg), so
+      // small resolves to its desktop step (16/24), not the mobile floor.
+      expect(style.fontSize, TextStyles.small.desktop.size);
     });
 
     testWidgets('stepOf reports the step a role resolves to', (

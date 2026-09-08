@@ -445,13 +445,24 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      // The row's own travel is 73.5 — one 69.5 card plus the group's `gap-1`
-      // — and it arrives as a single-frame teleport, exactly as measured.
-      expect(flip.travel['c-hold']!.dy, closeTo(73.5, 0.5));
+      // The row's own travel is one card's height plus the group's `gap-1`,
+      // and it arrives as a single-frame teleport, exactly as measured.
+      final TypeStep small = StyledText.stepOf(
+        tester.element(find.byType(HistoryCard).at(2)),
+        TextStyles.small,
+      );
+      final double cardHeight =
+          Item.padding.vertical +
+          BorderWidths.hairline * 2 +
+          HistoryCard.titleHeight +
+          ItemContent.gap +
+          small.leading;
+      final double travel = cardHeight + space(1);
+      expect(flip.travel['c-hold']!.dy, closeTo(travel, 0.5));
       expect(flip.travel['c-hold']!.dx, 0);
       expect(
         before - tester.getTopLeft(find.byType(HistoryCard).at(2)).dy,
-        closeTo(73.5, 0.5),
+        closeTo(travel, 0.5),
       );
       // No row carries a paint transform: `anim-row-in`'s fill-both keeps
       // `transform: none` in the animation origin, which outranks it.
@@ -505,13 +516,28 @@ void main() {
       await _pump(t, card(leaving: false));
       await t.pump();
       final double tall = t.getSize(find.byType(HistoryCard)).height;
-      // 69.5 in the reference, 70 here. The half pixel is `Item`'s action
-      // slot, which now hugs its child through `Align(widthFactor: 1)`
-      // instead of claiming the row's whole remaining width. Nothing else
-      // moved: an earlier pass briefly made `ItemActions` a `Wrap` and read
-      // 90 for this card, which was the actions falling onto a second line,
-      // not a taller line box. That reading was wrong and the `Wrap` is gone.
-      expect(tall, closeTo(70.0, 0.5));
+      // 69.5 in the reference, half a pixel taller here. The half pixel is
+      // `Item`'s action slot, which now hugs its child through
+      // `Align(widthFactor: 1)` instead of claiming the row's whole
+      // remaining width. Nothing else moved: an earlier pass briefly made
+      // `ItemActions` a `Wrap` and read 90 for this card, which was the
+      // actions falling onto a second line, not a taller line box. That
+      // reading was wrong and the `Wrap` is gone.
+      //
+      // The row is `Item`'s padding plus its hairline border top and bottom,
+      // the title's fixed slot, the content gap, and one line of the preview
+      // at whatever step this width resolves to.
+      final TypeStep small = StyledText.stepOf(
+        t.element(find.byType(HistoryCard)),
+        TextStyles.small,
+      );
+      final double expectedTall =
+          Item.padding.vertical +
+          BorderWidths.hairline * 2 +
+          HistoryCard.titleHeight +
+          ItemContent.gap +
+          small.leading;
+      expect(tall, closeTo(expectedTall, 0.5));
 
       await _pump(t, card(leaving: true));
       await t.pump();
@@ -1148,15 +1174,13 @@ void main() {
           tester.getSize(find.text('How pack odds actually work')).height +
           tester.getSize(find.text('Explain the odds on a sealed box')).height +
           space(2) * 2;
-      expect(
-        row,
-        closeTo(
-          TextStyles.body.step.leading +
-              TextStyles.small.step.leading +
-              space(2) * 2,
-          0.5,
-        ),
+      final Element commandElement = tester.element(find.byType(Command));
+      final TypeStep body = StyledText.stepOf(commandElement, TextStyles.body);
+      final TypeStep small = StyledText.stepOf(
+        commandElement,
+        TextStyles.small,
       );
+      expect(row, closeTo(body.leading + small.leading + space(2) * 2, 0.5));
     });
   });
 }

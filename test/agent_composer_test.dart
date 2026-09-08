@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart'
@@ -216,6 +218,40 @@ Finder get _palette => find.byType(AgentSlashPalette);
 double _heightOf(WidgetTester tester, Finder finder) =>
     tester.getSize(finder).height;
 
+/// The body role's rendered leading in [tester]'s host — the desktop step at
+/// 1440px, not [TextStyleToken.step]'s phone floor.
+double _bodyLeading(WidgetTester tester) => StyledText.stepOf(
+  tester.element(find.byType(AgentComposer)),
+  TextStyles.body,
+).leading;
+
+/// Same, for the small role — palette subtitles, tray headings, the
+/// dictation line.
+double _smallLeading(WidgetTester tester) => StyledText.stepOf(
+  tester.element(find.byType(AgentComposer)),
+  TextStyles.small,
+).leading;
+
+/// The composer's own vertical anatomy outside the input's content box: the
+/// drift-1 line-box gap, the control row, and the shell's own hairline top
+/// and bottom borders. Independent of any text role's leading.
+double _chromeHeight() =>
+    AgentComposer.inlineGap +
+    AgentComposer.controlInsets.bottom +
+    space(8) +
+    BorderWidths.hairline * 2;
+
+/// The shell's height over an input holding [lines] lines of `.type-body`,
+/// capped at [AgentComposer.maxRowsPx] exactly as the input's own
+/// `ConstrainedBox` caps it.
+double _shellHeightFor(double bodyLeading, int lines) {
+  final double inputBox = math.min(
+    AgentComposer.inputInsets.vertical + bodyLeading * lines,
+    AgentComposer.maxRowsPx,
+  );
+  return inputBox + _chromeHeight();
+}
+
 /// Types [text] into the field the way a keyboard does, so the controller's
 /// listener and the composer's caret both run.
 Future<void> _type(WidgetTester tester, String text) async {
@@ -315,17 +351,22 @@ void main() {
       await tester.pumpComposer(const _Specimen());
       await tester.pump();
 
-      expect(_heightOf(tester, _shell), closeTo(96, _tolerance));
+      final double bodyLeading = _bodyLeading(tester);
+      expect(
+        _heightOf(tester, _shell),
+        closeTo(_shellHeightFor(bodyLeading, 1), _tolerance),
+      );
       expect(tester.getSize(_shell).width, _width);
 
-      // 1 + 48 + 6 + 40 + 1. The control row is `px-2 pb-2` around a 32px
-      // square, so it is 40 with no top padding at all.
+      // 1px border + input (`py-3` over one `.type-body` line box) + 6px
+      // inline gap + control row (`px-2 pb-2` around a 32px square, so 40
+      // with no top padding at all) + 1px border.
       expect(
         tester.getSize(find.byType(EditableText)).height,
-        closeTo(24, _tolerance),
+        closeTo(bodyLeading, _tolerance),
         reason: 'one `.type-body` line box inside the input\'s `py-3`',
       );
-      expect(AgentComposer.inputInsets.vertical, 24);
+      expect(AgentComposer.inputInsets.vertical, space(3) * 2);
       expect(AgentComposer.controlInsets.bottom, 8);
       expect(AgentComposer.controlInsets.top, 0);
     });
@@ -375,9 +416,13 @@ void main() {
       await tester.pumpComposer(const _Specimen());
       await tester.pump();
       // Nothing declares it: the `<textarea>` is `inline-block` and the
-      // parent's strut adds its descent. 1 + 48 + 6 + 40 + 1 = 96.
-      expect(AgentComposer.inlineGap, 6);
-      expect(_heightOf(tester, _shell), closeTo(96, _tolerance));
+      // parent's strut adds its descent. Border + input + inline gap +
+      // control row + border, the shell's whole vertical anatomy.
+      expect(AgentComposer.inlineGap, space(1.5));
+      expect(
+        _heightOf(tester, _shell),
+        closeTo(_shellHeightFor(_bodyLeading(tester), 1), _tolerance),
+      );
     });
   });
 
@@ -389,19 +434,34 @@ void main() {
     ) async {
       await tester.pumpComposer(const _Specimen());
       await tester.pump();
-      expect(_heightOf(tester, _shell), closeTo(96, _tolerance));
+      final double bodyLeading = _bodyLeading(tester);
+      expect(
+        _heightOf(tester, _shell),
+        closeTo(_shellHeightFor(bodyLeading, 1), _tolerance),
+      );
 
       await _type(tester, 'one\ntwo');
-      expect(_heightOf(tester, _shell), closeTo(120, _tolerance));
+      expect(
+        _heightOf(tester, _shell),
+        closeTo(_shellHeightFor(bodyLeading, 2), _tolerance),
+      );
 
       await _type(tester, 'one\ntwo\nthree\nfour\nfive\nsix\nseven');
-      // Seven lines: 24 × 7 + 24 of padding = 192, plus 48 of chrome.
-      expect(_heightOf(tester, _shell), closeTo(240, _tolerance));
+      // Seven lines of `.type-body` plus the input's own `py-3`, plus the
+      // shell's chrome.
+      expect(
+        _heightOf(tester, _shell),
+        closeTo(_shellHeightFor(bodyLeading, 7), _tolerance),
+      );
 
-      // Twelve lines would want 312; the cap holds the box at 200.
+      // Twelve lines would want well past the cap; it holds the box at
+      // maxRowsPx regardless.
       await _type(tester, 'a\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl');
-      expect(AgentComposer.maxRowsPx, 200);
-      expect(_heightOf(tester, _shell), closeTo(248, _tolerance));
+      expect(AgentComposer.maxRowsPx, space(50));
+      expect(
+        _heightOf(tester, _shell),
+        closeTo(_shellHeightFor(bodyLeading, 12), _tolerance),
+      );
     });
 
     testWidgets('submitting empties the box and it returns to 96', (
@@ -416,7 +476,10 @@ void main() {
       await tester.pump();
       expect(sent, 1);
       expect(tester.widget<EditableText>(_input).controller.text, '');
-      expect(_heightOf(tester, _shell), closeTo(96, _tolerance));
+      expect(
+        _heightOf(tester, _shell),
+        closeTo(_shellHeightFor(_bodyLeading(tester), 1), _tolerance),
+      );
     });
 
     testWidgets('Shift-Enter breaks the line instead of sending', (
@@ -463,8 +526,12 @@ void main() {
       expect(opacities, contains(AgentComposer.disabledInputOpacity));
 
       expect(tester.widget<Button>(find.byType(Button).last).onPressed, isNull);
-      // The geometry does not move: a disabled composer is 96 too.
-      expect(_heightOf(tester, _shell), closeTo(96, _tolerance));
+      // The geometry does not move: a disabled composer is the same
+      // single-line rest height.
+      expect(
+        _heightOf(tester, _shell),
+        closeTo(_shellHeightFor(_bodyLeading(tester), 1), _tolerance),
+      );
     });
 
     testWidgets('a disabled composer does not send on Enter', (
@@ -525,7 +592,10 @@ void main() {
       await tester.pump();
 
       expect(find.text('collection-export.csv'), findsNothing);
-      expect(_heightOf(tester, _shell), closeTo(96, _tolerance));
+      expect(
+        _heightOf(tester, _shell),
+        closeTo(_shellHeightFor(_bodyLeading(tester), 1), _tolerance),
+      );
     });
   });
 
@@ -577,7 +647,7 @@ void main() {
       await _type(tester, '/');
       await tester.pump();
 
-      // `px-3 pt-3 pb-1` around a 14.175px caption line.
+      // `px-3 pt-3 pb-1` around a caption line box.
       final double heading = tester
           .getSize(
             find
@@ -590,7 +660,7 @@ void main() {
           .height;
       expect(
         heading,
-        closeTo(TextStyles.small.step.leading + space(2) * 2, _tolerance),
+        closeTo(_smallLeading(tester) + space(2) * 2, _tolerance),
       );
 
       // The row padding around a title line box, a gap, and a subtitle.
@@ -607,9 +677,7 @@ void main() {
       expect(
         row,
         closeTo(
-          TextStyles.body.step.leading +
-              TextStyles.small.step.leading +
-              space(2) * 2,
+          _bodyLeading(tester) + _smallLeading(tester) + space(2) * 2,
           _tolerance,
         ),
       );
@@ -660,11 +728,9 @@ void main() {
       expect(find.text('Balance and recent movement'), findsOneWidget);
       expect(find.text('What is in stock'), findsNothing);
       // 1 heading + 1 row + the two hairlines.
-      final double heading = TextStyles.small.step.leading + space(2) * 2;
+      final double heading = _smallLeading(tester) + space(2) * 2;
       final double row =
-          TextStyles.body.step.leading +
-          TextStyles.small.step.leading +
-          space(2) * 2;
+          _bodyLeading(tester) + _smallLeading(tester) + space(2) * 2;
       expect(
         tester.getSize(_palette).height,
         closeTo(heading + row + BorderWidths.hairline * 2, 1),
@@ -915,9 +981,7 @@ void main() {
       expect(
         paletteRow,
         closeTo(
-          TextStyles.body.step.leading +
-              TextStyles.small.step.leading +
-              space(2) * 2,
+          _bodyLeading(tester) + _smallLeading(tester) + space(2) * 2,
           _tolerance,
         ),
       );
@@ -942,7 +1006,7 @@ void main() {
       // The row padding around two line boxes, and no gap at all.
       expect(
         menuRow,
-        closeTo(TextStyles.small.step.leading * 2 + space(2) * 2, _tolerance),
+        closeTo(_smallLeading(tester) * 2 + space(2) * 2, _tolerance),
       );
       expect(paletteRow - menuRow, closeTo(space(1), 0.01));
     });
@@ -1103,7 +1167,9 @@ void main() {
       expect(
         tester.getSize(find.byType(AgentComposer)).height,
         closeTo(
-          96 + AgentComposer.messageTopGap + TextStyles.small.step.leading,
+          _shellHeightFor(_bodyLeading(tester), 1) +
+              AgentComposer.messageTopGap +
+              _smallLeading(tester),
           1,
         ),
       );

@@ -1653,41 +1653,65 @@ class _SeparatorSection extends StatelessWidget {
                 // since `Wrap` cannot bound one — only when it does not.
                 LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
+                    const List<String> figures = <String>[
+                      '412 packs',
+                      '1,284 cards',
+                      '8 sets',
+                    ];
                     final Widget ruled = SizedBox(
                       // `flex h-6 items-center gap-4`.
                       height: space(6),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
-                          figure('412 packs'),
-                          SizedBox(width: _panelGap),
-                          const Separator.vertical(),
-                          SizedBox(width: _panelGap),
-                          figure('1,284 cards'),
-                          SizedBox(width: _panelGap),
-                          const Separator.vertical(),
-                          SizedBox(width: _panelGap),
-                          figure('8 sets'),
+                          for (int i = 0; i < figures.length; i++) ...<Widget>[
+                            if (i > 0) ...<Widget>[
+                              SizedBox(width: _panelGap),
+                              const Separator.vertical(),
+                              SizedBox(width: _panelGap),
+                            ],
+                            figure(figures[i]),
+                          ],
                         ],
                       ),
                     );
-                    // The 360 threshold alone is a viewport-width read; it
-                    // missed that this column's own `_measureMd` cap (448)
-                    // never grows, so at 200% text even a desktop-wide page
-                    // still overflowed inside it. What three figures and two
-                    // rules need scales with the text, not the viewport, so
-                    // the threshold scales with `textScaler` too.
-                    final double textScale = MediaQuery.textScalerOf(
+                    // A fixed threshold read off the viewport misses that the
+                    // figures' own type role steps up with context width
+                    // (`TextStyles.numberSm` at [Breakpoints.md]/[lg]) quite
+                    // apart from what `textScaler` is doing, and this
+                    // column's own `_measureMd` cap (448) never grows to
+                    // match. Measuring what the row actually needs — its
+                    // three figures at the size they render here, plus the
+                    // rules and gaps between them — replaces the guess with
+                    // the real number, at any width, any step, any scale.
+                    final TextStyle figureStyle = StyledText.styleOf(
                       context,
-                    ).scale(1);
-                    if (constraints.maxWidth >= 360 * textScale) return ruled;
+                      TextStyles.numberSm,
+                      color: theme.mutedForeground,
+                    );
+                    final TextScaler scaler = MediaQuery.textScalerOf(context);
+                    double widthOf(String text) {
+                      final TextPainter painter = TextPainter(
+                        text: TextSpan(text: text, style: figureStyle),
+                        textDirection: TextDirection.ltr,
+                        textScaler: scaler,
+                      )..layout();
+                      return painter.width;
+                    }
+
+                    final double needed =
+                        figures.fold(
+                          0.0,
+                          (double sum, String text) => sum + widthOf(text),
+                        ) +
+                        (_panelGap * 2 + Separator.thickness) *
+                            (figures.length - 1);
+                    if (constraints.maxWidth >= needed) return ruled;
                     return Wrap(
                       spacing: _panelGap,
                       runSpacing: space(2),
                       children: <Widget>[
-                        figure('412 packs'),
-                        figure('1,284 cards'),
-                        figure('8 sets'),
+                        for (final String text in figures) figure(text),
                       ],
                     );
                   },

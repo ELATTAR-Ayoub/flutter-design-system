@@ -640,10 +640,14 @@ void main() {
     test('every navigation word is one role, at one size', () {
       // The retired catalog carried two spellings of a navigation label four
       // pixels of leading apart. A trigger, a plain link, and a panel title
-      // now read identically.
-      expect(TextStyles.nav.step, const TypeStep(16, 20));
+      // now read identically — one role, stepping mobile 14/18, tablet
+      // 15/20, desktop 16/20. `.step` is the mobile floor, not a
+      // width-resolved size.
+      expect(TextStyles.nav.step, const TypeStep(14, 18));
       expect(TextStyles.nav.weight, FontWeight.w500);
-      expect(TextStyles.nav.isStatic, isTrue);
+      // nav now steps by breakpoint (14/18 → 15/20 → 16/20), so it is no
+      // longer a single static size across the responsive table.
+      expect(TextStyles.nav.isStatic, isFalse);
     });
 
     testWidgets('a tap opens the shared viewport and a second tap closes it', (
