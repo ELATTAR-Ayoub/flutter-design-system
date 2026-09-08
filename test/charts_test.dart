@@ -23,6 +23,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart'
     hide
         AspectRatio,
@@ -495,6 +496,158 @@ void main() {
         },
       );
     }
+  });
+
+  /* ── Polar hover ─────────────────────────────────────────────────────── */
+
+  group('PieChart / RadialBarChart — hover tooltip', () {
+    // The measured frame every polar specimen shares: 482 × 256, centre
+    // (241, 128) — see chart_polar.dart's own library doc.
+    const Offset centre = Offset(241, 128);
+
+    Future<void> hoverAt(
+      WidgetTester t,
+      TestGesture mouse,
+      Finder chart,
+      Offset local,
+    ) async {
+      await mouse.moveTo(t.getTopLeft(chart) + local);
+      await t.pump();
+    }
+
+    Future<TestGesture> startMouse(WidgetTester t) async {
+      final TestGesture mouse = await t.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await mouse.addPointer(location: Offset.zero);
+      addTearDown(mouse.removePointer);
+      await t.pump();
+      return mouse;
+    }
+
+    const List<Map<String, Object?>> pieData = <Map<String, Object?>>[
+      <String, Object?>{'name': 'Alpha', 'value': 10, 'fill': Color(0xFF1A6EF4)},
+      <String, Object?>{'name': 'Beta', 'value': 10, 'fill': Color(0xFF2ECC71)},
+      <String, Object?>{'name': 'Gamma', 'value': 10, 'fill': Color(0xFFF39C12)},
+    ];
+
+    Widget pie({int? defaultIndex}) => _scoped(
+      SizedBox(
+        width: _plot.width,
+        height: _plot.height,
+        child: PieChart(
+          pies: <PieSpec>[
+            const PieSpec(
+              data: pieData,
+              dataKey: 'value',
+              innerRadius: 40,
+              outerRadius: 100,
+            ),
+          ],
+          tooltip: ChartTooltipSpec(defaultIndex: defaultIndex),
+        ),
+      ),
+    );
+
+    // Three equal slices of 120° each, starting at 0°: Alpha 0..120 (mid
+    // 60°), Beta 120..240 (mid 180°), Gamma 240..360 (mid 300°).
+    final Offset alphaPoint = polarToCartesian(centre.dx, centre.dy, 70, 60);
+    final Offset betaPoint = polarToCartesian(centre.dx, centre.dy, 70, 180);
+
+    testWidgets('hovering a sector shows THAT sector — two different '
+        'sectors, two different tooltips', (WidgetTester t) async {
+      await t.pumpWidget(pie());
+      final TestGesture mouse = await startMouse(t);
+      final Finder chart = find.byType(PieChart);
+
+      await hoverAt(t, mouse, chart, alphaPoint);
+      expect(find.text('Alpha'), findsOneWidget);
+      expect(find.text('Beta'), findsNothing);
+      expect(find.text('Gamma'), findsNothing);
+
+      await hoverAt(t, mouse, chart, betaPoint);
+      expect(find.text('Beta'), findsOneWidget);
+      expect(find.text('Alpha'), findsNothing);
+      expect(find.text('Gamma'), findsNothing);
+    });
+
+    testWidgets('the donut hole shows no tooltip', (WidgetTester t) async {
+      await t.pumpWidget(pie());
+      final TestGesture mouse = await startMouse(t);
+      // Dead centre: radius 0, inside the 40px hole.
+      await hoverAt(t, mouse, find.byType(PieChart), centre);
+      expect(find.byType(ChartTooltipContent), findsNothing);
+    });
+
+    testWidgets('a point outside the outer radius shows no tooltip', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(pie());
+      final TestGesture mouse = await startMouse(t);
+      final Offset outside = polarToCartesian(centre.dx, centre.dy, 150, 60);
+      await hoverAt(t, mouse, find.byType(PieChart), outside);
+      expect(find.byType(ChartTooltipContent), findsNothing);
+    });
+
+    testWidgets(
+      'defaultIndex shows at rest and is restored once the pointer leaves',
+      (WidgetTester t) async {
+        await t.pumpWidget(pie(defaultIndex: 1));
+        // No pointer has moved yet — Beta (index 1) shows at rest.
+        expect(find.text('Beta'), findsOneWidget);
+
+        final TestGesture mouse = await startMouse(t);
+        final Finder chart = find.byType(PieChart);
+        await hoverAt(t, mouse, chart, alphaPoint);
+        expect(find.text('Alpha'), findsOneWidget);
+        expect(find.text('Beta'), findsNothing);
+
+        // Leave the chart entirely.
+        await mouse.moveTo(t.getTopLeft(chart) - const Offset(50, 50));
+        await t.pump();
+        expect(find.text('Beta'), findsOneWidget);
+        expect(find.text('Alpha'), findsNothing);
+      },
+    );
+
+    testWidgets('a radial chart shows a tooltip for the hovered arc', (
+      WidgetTester t,
+    ) async {
+      // Two rings 30..100, one row per ring: bandSize 35, a 10% gap each
+      // side leaves a 28px ring — row 0 at 33.5..61.5, row 1 at 68.5..96.5.
+      // Row 0's value (5 of a 10 domain) sweeps only the first half of its
+      // ring; row 1's (10 of 10) sweeps the whole ring.
+      await t.pumpWidget(
+        _scoped(
+          SizedBox(
+            width: _plot.width,
+            height: _plot.height,
+            child: RadialBarChart(
+              data: const <Map<String, Object?>>[
+                <String, Object?>{'value': 5},
+                <String, Object?>{'value': 10},
+              ],
+              series: const <RadialBarSpec>[RadialBarSpec(dataKey: 'value')],
+              innerRadius: 30,
+              outerRadius: 100,
+              tooltip: const ChartTooltipSpec(),
+            ),
+          ),
+        ),
+      );
+      final TestGesture mouse = await startMouse(t);
+      final Finder chart = find.byType(RadialBarChart);
+
+      final Offset row0 = polarToCartesian(centre.dx, centre.dy, 47.5, 90);
+      await hoverAt(t, mouse, chart, row0);
+      expect(find.byType(ChartTooltipContent), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
+
+      final Offset row1 = polarToCartesian(centre.dx, centre.dy, 82.5, 180);
+      await hoverAt(t, mouse, chart, row1);
+      expect(find.byType(ChartTooltipContent), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+    });
   });
 
   /* ── Rendered pixels ──────────────────────────────────────────────────── */

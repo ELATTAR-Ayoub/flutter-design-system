@@ -25,6 +25,7 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart' show PointerHoverEvent;
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
@@ -209,6 +210,20 @@ class PieSpec {
   final String? chipLabelKey;
 }
 
+/// Whether [angle] — read off the pointer in `polarToCartesian`'s own
+/// convention — falls inside a sweep of [sweep] degrees starting at [start].
+/// A positive sweep runs counter-clockwise, a negative one clockwise,
+/// mirroring the `angle += sweep` accumulation every polar hit-test below
+/// walks (`_PieChartState._pieIndexAt`, `_RadialBarChartState._radialIndexAt`).
+/// Shared by both, since a donut slice and a radial bar's arc are the same
+/// "does this angle fall between a start and an end" question once the
+/// radius band has already narrowed it to one ring.
+bool _angleWithinSweep(double angle, double start, double sweep) {
+  if (sweep == 0) return false;
+  final double delta = (angle - start) % 360;
+  return sweep > 0 ? delta <= sweep + 1e-6 : delta - 360 >= sweep - 1e-6;
+}
+
 /// `PieChart`.
 class PieChart extends StatefulWidget {
   const PieChart({
@@ -247,6 +262,10 @@ class _PieChartState extends State<PieChart>
     vsync: this,
     duration: ChartMotion.duration,
   );
+
+  /// The slice the pointer is over, or null when it is nowhere (or has never
+  /// moved) — mirrors `_CartesianChartState._hover` in `chart_cartesian.dart`.
+  int? _hover;
 
   @override
   void initState() {
@@ -293,68 +312,115 @@ class _PieChartState extends State<PieChart>
         for (final PieSpec pie in widget.pies) {
           _buildPie(pie, centre, maxRadius, wedges, chips, outside, theme);
         }
-        return AnimatedBuilder(
-          animation: _entrance,
-          builder: (BuildContext context, Widget? _) => Stack(
-            children: <Widget>[
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: _PiePainter(
-                    wedges: wedges,
-                    outside: outside,
-                    theme: theme,
-                    t: ChartMotion.curve.transform(_entrance.value),
-                    centre: centre,
+        final int? active = _hover ?? widget.tooltip?.defaultIndex;
+        return MouseRegion(
+          onHover: (PointerHoverEvent e) =>
+              _onHover(centre, maxRadius, e.localPosition),
+          onExit: (_) {
+            if (_hover != null) setState(() => _hover = null);
+          },
+          child: AnimatedBuilder(
+            animation: _entrance,
+            builder: (BuildContext context, Widget? _) => Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _PiePainter(
+                      wedges: wedges,
+                      outside: outside,
+                      theme: theme,
+                      t: ChartMotion.curve.transform(_entrance.value),
+                      centre: centre,
+                    ),
                   ),
                 ),
-              ),
-              for (final _OutsideLabel label in outside)
-                _positioned(
-                  label.anchor,
-                  plot,
-                  _PolarText(
-                    text: label.text,
-                    color: widget.labelColor ?? theme.foreground,
-                    align: label.align,
+                for (final _OutsideLabel label in outside)
+                  _positioned(
+                    label.anchor,
+                    plot,
+                    _PolarText(
+                      text: label.text,
+                      color: widget.labelColor ?? theme.foreground,
+                      align: label.align,
+                    ),
                   ),
-                ),
-              for (final _ChipLabel chip in chips)
-                _positioned(chip.anchor, plot, _ArcChip(text: chip.text)),
-              if (widget.centerLabel != null)
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  width: plot.width,
-                  height: plot.height,
-                  child: Center(child: widget.centerLabel!(context)),
-                ),
-              if (widget.legend != null)
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: widget.legend!.offset,
-                  child: ChartLegendContent(
-                    config: config,
-                    wrap: widget.legend!.wrap,
-                    gap: widget.legend!.gap,
-                    items: <ChartLegendItem>[
-                      for (final Map<String, Object?> row
-                          in widget.pies.first.data)
-                        ChartLegendItem(
-                          name:
-                              '${row[widget.legend!.nameKey ?? widget.pies.first.nameKey ?? 'name'] ?? ''}',
-                          color: row['fill'] as Color?,
-                        ),
-                    ],
+                for (final _ChipLabel chip in chips)
+                  _positioned(chip.anchor, plot, _ArcChip(text: chip.text)),
+                if (widget.centerLabel != null)
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    width: plot.width,
+                    height: plot.height,
+                    child: Center(child: widget.centerLabel!(context)),
                   ),
-                ),
-              if (widget.tooltip?.defaultIndex != null)
-                _pieTooltip(context, config, plot, centre),
-            ],
+                if (widget.legend != null)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: widget.legend!.offset,
+                    child: ChartLegendContent(
+                      config: config,
+                      wrap: widget.legend!.wrap,
+                      gap: widget.legend!.gap,
+                      items: <ChartLegendItem>[
+                        for (final Map<String, Object?> row
+                            in widget.pies.first.data)
+                          ChartLegendItem(
+                            name:
+                                '${row[widget.legend!.nameKey ?? widget.pies.first.nameKey ?? 'name'] ?? ''}',
+                            color: row['fill'] as Color?,
+                          ),
+                      ],
+                    ),
+                  ),
+                if (active != null && widget.tooltip != null)
+                  _pieTooltip(context, config, plot, centre, active),
+              ],
+            ),
           ),
         );
       },
     );
+  }
+
+  void _onHover(Offset centre, double maxRadius, Offset local) {
+    final int? index = widget.pies.isEmpty
+        ? null
+        : _pieIndexAt(widget.pies.first, centre, maxRadius, local);
+    if (index != _hover) setState(() => _hover = index);
+  }
+
+  /// Which slice of [pie] a pointer at [local] is over — the polar analogue
+  /// of `_CartesianLayout.indexAt`. Converts to a vector from [centre], reads
+  /// off the radius and the angle (`polarToCartesian`'s own convention,
+  /// inverted), then walks the same `angle += sweep` accumulation
+  /// `_buildPie` uses to find which slice's angular range contains it.
+  /// Outside `[innerRadius, outerRadius]` — including the donut hole — is not
+  /// over any slice.
+  int? _pieIndexAt(PieSpec pie, Offset centre, double maxRadius, Offset local) {
+    final double outer = pie.outerRadius ?? maxRadius * 0.8;
+    final double inner = pie.innerRadius ?? 0;
+    final double dx = local.dx - centre.dx;
+    final double dy = local.dy - centre.dy;
+    final double radius = math.sqrt(dx * dx + dy * dy);
+    if (radius < inner || radius > outer) return null;
+    final double total = pie.data.fold<double>(
+      0,
+      (double a, Map<String, Object?> r) =>
+          a + ((r[pie.dataKey] as num?) ?? 0).toDouble(),
+    );
+    if (total == 0) return null;
+    final double angle = -math.atan2(dy, dx) * 180 / math.pi;
+    final double sweepTotal = pie.endAngle - pie.startAngle;
+    double a = pie.startAngle;
+    for (int i = 0; i < pie.data.length; i++) {
+      final double v = ((pie.data[i][pie.dataKey] as num?) ?? 0).toDouble();
+      final double sweep = v / total * sweepTotal;
+      if (_angleWithinSweep(angle, a, sweep)) return i;
+      a += sweep;
+    }
+    return null;
   }
 
   Widget _positioned(Offset at, Size plot, Widget child) => Positioned(
@@ -383,10 +449,11 @@ class _PieChartState extends State<PieChart>
     ChartConfig config,
     Size plot,
     Offset centre,
+    int index,
   ) {
     final ChartTooltipSpec spec = widget.tooltip!;
     final PieSpec pie = widget.pies.first;
-    final int i = spec.defaultIndex!.clamp(0, pie.data.length - 1);
+    final int i = index.clamp(0, pie.data.length - 1);
     final Map<String, Object?> row = pie.data[i];
     return Positioned(
       left: centre.dx,
@@ -1144,6 +1211,9 @@ class _RadialBarChartState extends State<RadialBarChart>
     duration: ChartMotion.duration,
   );
 
+  /// The row the pointer is over — mirrors `_PieChartState._hover`.
+  int? _hover;
+
   @override
   void initState() {
     super.initState();
@@ -1173,6 +1243,7 @@ class _RadialBarChartState extends State<RadialBarChart>
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
+    final ChartConfig config = ChartScope.of(context);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints c) {
         final Offset centre = Offset(c.maxWidth / 2, c.maxHeight / 2);
@@ -1200,6 +1271,7 @@ class _RadialBarChartState extends State<RadialBarChart>
 
         final List<_Arc> arcs = <_Arc>[];
         final List<_ChipLabel> chips = <_ChipLabel>[];
+        final List<_RadialHitRegion> regions = <_RadialHitRegion>[];
         final double sweepTotal = widget.endAngle - widget.startAngle;
         for (int i = 0; i < rows; i++) {
           final Map<String, Object?> row = widget.data[i];
@@ -1240,6 +1312,15 @@ class _RadialBarChartState extends State<RadialBarChart>
                 background: false,
               ),
             );
+            regions.add(
+              _RadialHitRegion(
+                rowIndex: i,
+                inner: inner,
+                outer: outer,
+                start: from,
+                sweep: to - from,
+              ),
+            );
             if (s.chipLabelKey != null) {
               chips.add(
                 _ChipLabel(
@@ -1257,42 +1338,133 @@ class _RadialBarChartState extends State<RadialBarChart>
           }
         }
 
-        return AnimatedBuilder(
-          animation: _entrance,
-          builder: (BuildContext context, Widget? _) => Stack(
-            children: <Widget>[
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: _RadialPainter(
-                    arcs: arcs,
-                    grid: widget.grid,
-                    centre: centre,
-                    theme: theme,
-                    t: ChartMotion.curve.transform(_entrance.value),
-                  ),
-                ),
-              ),
-              for (final _ChipLabel chip in chips)
-                Positioned(
-                  left: chip.anchor.dx,
-                  top: chip.anchor.dy,
-                  child: FractionalTranslation(
-                    translation: const Offset(-0.5, -0.5),
-                    child: _ArcChip(text: chip.text),
-                  ),
-                ),
-              if (widget.radiusAxis?.centerLabel != null)
+        final int? active = _hover ?? widget.tooltip?.defaultIndex;
+        return MouseRegion(
+          onHover: (PointerHoverEvent e) =>
+              _onHover(regions, centre, e.localPosition),
+          onExit: (_) {
+            if (_hover != null) setState(() => _hover = null);
+          },
+          child: AnimatedBuilder(
+            animation: _entrance,
+            builder: (BuildContext context, Widget? _) => Stack(
+              children: <Widget>[
                 Positioned.fill(
-                  child: Center(
-                    child: widget.radiusAxis!.centerLabel!(context),
+                  child: CustomPaint(
+                    painter: _RadialPainter(
+                      arcs: arcs,
+                      grid: widget.grid,
+                      centre: centre,
+                      theme: theme,
+                      t: ChartMotion.curve.transform(_entrance.value),
+                    ),
                   ),
                 ),
-            ],
+                for (final _ChipLabel chip in chips)
+                  Positioned(
+                    left: chip.anchor.dx,
+                    top: chip.anchor.dy,
+                    child: FractionalTranslation(
+                      translation: const Offset(-0.5, -0.5),
+                      child: _ArcChip(text: chip.text),
+                    ),
+                  ),
+                if (widget.radiusAxis?.centerLabel != null)
+                  Positioned.fill(
+                    child: Center(
+                      child: widget.radiusAxis!.centerLabel!(context),
+                    ),
+                  ),
+                if (active != null && widget.tooltip != null)
+                  _radialTooltip(context, config, centre, active),
+              ],
+            ),
           ),
         );
       },
     );
   }
+
+  void _onHover(List<_RadialHitRegion> regions, Offset centre, Offset local) {
+    final int? index = _radialIndexAt(regions, centre, local);
+    if (index != _hover) setState(() => _hover = index);
+  }
+
+  /// Which row's arc a pointer at [local] is over. Radial bands are
+  /// concentric rather than angular like a pie's slices, so the radius alone
+  /// narrows it to one row's ring; the angle then has to fall inside that
+  /// row's own filled arc (`from` to `to`) rather than the ring's whole
+  /// unfilled track, so hovering the background portion of a ring shows no
+  /// tooltip — matching a pie, which has no background to hover at all.
+  int? _radialIndexAt(
+    List<_RadialHitRegion> regions,
+    Offset centre,
+    Offset local,
+  ) {
+    final double dx = local.dx - centre.dx;
+    final double dy = local.dy - centre.dy;
+    final double radius = math.sqrt(dx * dx + dy * dy);
+    final double angle = -math.atan2(dy, dx) * 180 / math.pi;
+    for (final _RadialHitRegion r in regions) {
+      if (radius < r.inner || radius > r.outer) continue;
+      if (_angleWithinSweep(angle, r.start, r.sweep)) return r.rowIndex;
+    }
+    return null;
+  }
+
+  Widget _radialTooltip(
+    BuildContext context,
+    ChartConfig config,
+    Offset centre,
+    int index,
+  ) {
+    final ChartTooltipSpec spec = widget.tooltip!;
+    final int i = index.clamp(0, widget.data.length - 1);
+    final Map<String, Object?> row = widget.data[i];
+    final List<ChartTooltipItem> items = <ChartTooltipItem>[
+      for (final RadialBarSpec s in widget.series)
+        if (!s.background)
+          ChartTooltipItem(
+            name: s.dataKey,
+            dataKey: s.dataKey,
+            value: row[s.dataKey] as num?,
+            color: s.fill ?? (row['fill'] as Color?),
+            payload: row,
+          ),
+    ];
+    return Positioned(
+      left: centre.dx,
+      top: space(2),
+      child: ChartTooltipContent(
+        config: config,
+        items: items,
+        indicator: spec.indicator,
+        hideLabel: spec.hideLabel,
+        hideIndicator: spec.hideIndicator,
+        nameKey: spec.nameKey,
+      ),
+    );
+  }
+}
+
+/// One row's radial hit-test band — the polar-bar analogue of a pie's own
+/// per-slice angular range, narrowed first by [inner]/[outer] (the ring)
+/// and then by [start]/[sweep] (the filled arc within it).
+@immutable
+class _RadialHitRegion {
+  const _RadialHitRegion({
+    required this.rowIndex,
+    required this.inner,
+    required this.outer,
+    required this.start,
+    required this.sweep,
+  });
+
+  final int rowIndex;
+  final double inner;
+  final double outer;
+  final double start;
+  final double sweep;
 }
 
 @immutable
