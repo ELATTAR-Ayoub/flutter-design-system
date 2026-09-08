@@ -1107,8 +1107,17 @@ class _CartesianLayout {
   /// `cartesian/getTicks.js` — `interval="preserveEnd"`, recharts' own default.
   ///
   /// It walks from the LAST tick backwards, keeps a label only when it clears
-  /// the previously kept one by [minTickGap], and clamps the final label so its
-  /// right edge lands on the surface's own edge rather than on the plot's.
+  /// the previously kept one by [minTickGap], and clamps BOTH ends so their
+  /// outer edge lands on the surface's own edge rather than on the plot's:
+  /// the last label's right edge is pulled in to `viewportEnd`, the first
+  /// label's left edge is pushed in to 0. Without the first-end clamp, a
+  /// point-scale category axis (Area/Line — no bars) whose first category
+  /// sits exactly on `frame.left` fails the plain visibility test whenever
+  /// `margin.left` is smaller than half the label's own rendered width, and
+  /// the label is dropped rather than nudged inward — recharts' own
+  /// `preserveEnd` special-cases the last tick only, but a band scale's
+  /// `bandwidth / 2` offset normally hides the same gap on the first tick, so
+  /// the asymmetry never showed up there.
   ///
   /// **The viewport is the whole SVG, not the plot box** — measured, and it is
   /// the one part of this that cannot be reasoned out. `AreaInteractive` (plot
@@ -1131,6 +1140,10 @@ class _CartesianLayout {
       if (i == labels.length - 1) {
         final double gap = coord + width / 2 - end;
         if (gap > 0) coord -= gap;
+      }
+      if (i == 0) {
+        final double gap = width / 2 - coord;
+        if (gap > 0) coord += gap;
       }
       final bool visible = coord - width / 2 >= 0 && coord + width / 2 <= end;
       if (!visible) continue;

@@ -382,6 +382,121 @@ void main() {
     });
   });
 
+  group('CartesianChart — X axis, first and last tick preservation', () {
+    // Six months, a 12px left/right margin — `AreaDefault`'s own shape. Any
+    // narrower and `_preserveEndTicks` used to drop 'Jan' outright: `frame.left`
+    // sits at exactly `margin.left` on a point scale (no bars), and `ChartText.xs`
+    // resolves wide enough at every breakpoint this system ships that half of a
+    // 3-letter month exceeds a 12px margin.
+    const List<Map<String, Object?>> months = <Map<String, Object?>>[
+      <String, Object?>{'month': 'Jan', 'value': 186},
+      <String, Object?>{'month': 'Feb', 'value': 305},
+      <String, Object?>{'month': 'Mar', 'value': 237},
+      <String, Object?>{'month': 'Apr', 'value': 73},
+      <String, Object?>{'month': 'May', 'value': 209},
+      <String, Object?>{'month': 'Jun', 'value': 214},
+    ];
+    const List<String> monthLabels = <String>[
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+    ];
+    const ChartAxis monthAxis = ChartAxis(
+      dataKey: 'month',
+      tickLine: false,
+      axisLine: false,
+      tickMargin: 8,
+    );
+
+    // The 2026-08-26 spec's own overflow defect was correct at one width and
+    // broken at another, and a single-width test missed it. Sweep a range —
+    // desktop down to a narrow mobile rail — so a width-dependent regression
+    // in either direction cannot hide again.
+    const List<double> widths = <double>[1600, 1200, 900, 600, 400, 280];
+
+    // `ChartText.xs` resolves off `TypeWidthScope`, which falls back to
+    // `MediaQuery.sizeOf(context).width` — the SCREEN width, not the chart's
+    // own constraint. Pinning it to a desktop screen (>= Breakpoints.lg)
+    // reproduces the diagnosis's own precondition (14px `TextStyles.small`)
+    // at every chart width swept below, so the sweep exercises the tick
+    // algorithm's own width-dependence rather than the font's.
+    Widget scopedAt(double chartWidth, Widget child) => ThemeScope(
+      controller: ThemeController(mode: ColorMode.light),
+      child: MediaQuery(
+        data: const MediaQueryData(
+          size: Size(1440, 900),
+          disableAnimations: true,
+        ),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(width: chartWidth, child: child),
+          ),
+        ),
+      ),
+    );
+
+    Widget pointScaleChart() => ChartContainer(
+      config: const ChartConfig(<String, ChartSeries>{}),
+      child: CartesianChart(
+        data: months,
+        margin: const ChartMargin(left: 12, right: 12),
+        xAxis: monthAxis,
+        series: const <ChartSeriesSpec>[
+          ChartSeriesSpec(kind: ChartSeriesKind.area, dataKey: 'value'),
+        ],
+      ),
+    );
+
+    Widget bandScaleChart() => ChartContainer(
+      config: const ChartConfig(<String, ChartSeries>{}),
+      child: CartesianChart(
+        data: months,
+        margin: const ChartMargin(left: 12, right: 12),
+        xAxis: monthAxis,
+        series: const <ChartSeriesSpec>[
+          ChartSeriesSpec(kind: ChartSeriesKind.bar, dataKey: 'value'),
+        ],
+      ),
+    );
+
+    for (final double width in widths) {
+      testWidgets(
+        'point scale (area) keeps all six labels at ${width}px',
+        (WidgetTester t) async {
+          await t.pumpWidget(scopedAt(width, pointScaleChart()));
+          for (final String label in monthLabels) {
+            expect(
+              find.text(label),
+              findsOneWidget,
+              reason: '$label missing at width $width',
+            );
+          }
+        },
+      );
+    }
+
+    for (final double width in widths) {
+      testWidgets(
+        'band scale (bar) is unaffected at ${width}px',
+        (WidgetTester t) async {
+          await t.pumpWidget(scopedAt(width, bandScaleChart()));
+          for (final String label in monthLabels) {
+            expect(
+              find.text(label),
+              findsOneWidget,
+              reason: '$label missing at width $width',
+            );
+          }
+        },
+      );
+    }
+  });
+
   /* ── Rendered pixels ──────────────────────────────────────────────────── */
 
   group('rendered pixels — the standing painter rule', () {
