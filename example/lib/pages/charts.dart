@@ -117,6 +117,7 @@ import '../charts/chart_plot.dart';
 import '../charts/chart_specimen.dart';
 import '../charts/chart_states.dart';
 import '../charts/specimens_area.dart';
+import '../charts/specimens_bar.dart';
 import '../kit.dart';
 import '../nav.dart';
 import '../token_swatch.dart';
@@ -136,12 +137,6 @@ MetaItem _meta(String k, String v) => (k: k, v: TextSpan(text: v));
 
 /* ── Formatters ──────────────────────────────────────────────────────────── */
 
-/// …with `year: "numeric"`: the two interactive tooltips.
-String _shortDateYear(Object? value) {
-  final DateTime d = DateTime.parse('$value');
-  return '${DateFormat.monthsShort[d.month - 1]} ${d.day}, ${d.year}';
-}
-
 /// `{ weekday: "short" }`: the tooltip family's whole X axis.
 ///
 /// `DateFormat` carries the long names and the narrow ones; en-US's short
@@ -158,31 +153,6 @@ String _longDate(Object? value) {
   return '${DateFormat.monthsLong[d.month - 1]} ${d.day}, ${d.year}';
 }
 
-/// The bar's corner radius, off the ladder.
-///
-/// `bar.tsx` reads `--radius-sm` from the live stylesheet rather than typing
-/// the registry's 8 / 5 / 4, and says why at length: *"§0's radius family, 2 ·
-/// 6 · 10 · 12 · 16 · 20 · 24 · 999: has no 8, no 5 and no 4 in it… The
-/// registry's 8 / 5 / 4 are not a considered distinction: they are the same
-/// bar drawn three ways across ten files: and 6px is where they average."*
-/// The port names the rung instead of reading it, which is the same single
-/// source of truth with one fewer indirection.
-const double _barRadius = Radii.sm;
-
-/// `[0, 0, r, r]`: the bottom of a stack.
-const List<double> _radiiBottom = <double>[0, 0, _barRadius, _barRadius];
-
-/// `[r, r, 0, 0]`: the top of one.
-const List<double> _radiiTop = <double>[_barRadius, _barRadius, 0, 0];
-
-/// All four corners.
-const List<double> _radiiAll = <double>[
-  _barRadius,
-  _barRadius,
-  _barRadius,
-  _barRadius,
-];
-
 /// `radial.tsx`'s two rungs. *"`10` is exactly the `md` rung already, on a
 /// 30px-thick single ring… `5` is not a rung at all and moves to `sm` (6), the
 /// same rung every bar corner in this system already takes."*
@@ -191,585 +161,8 @@ const double _stackRadius = Radii.sm;
 
 /* ── Area, `components/space/charts/area.tsx` ──────────────────────────────── */
 
-String _shortDateYearLabel(String label, List<ChartTooltipItem> items) =>
-    _shortDateYear(label);
-
 String _longDateLabel(String label, List<ChartTooltipItem> items) =>
     _longDate(label);
-
-/* ── Bar, `components/space/charts/bar.tsx` ────────────────────────────────── */
-
-/// The X axis six of the ten bar variants share (`tickMargin` 10, not 8).
-const ChartAxis _barMonthAxis = ChartAxis(
-  dataKey: 'month',
-  tickLine: false,
-  axisLine: false,
-  tickMargin: 10,
-  tickFormatter: month3,
-);
-
-Widget _barDefault(ChartInk ink) => plot(
-  ink.desktop,
-  CartesianChart(
-    data: monthsDesktop,
-    grid: const ChartGrid(vertical: false),
-    xAxis: _barMonthAxis,
-    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
-    series: <ChartSeriesSpec>[
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'desktop',
-        fill: ink.slot(1),
-        radii: _radiiAll,
-      ),
-    ],
-  ),
-);
-
-/// `layout="vertical"`, `YAxis type="category"`: the same chart rotated, and
-/// the one the page warns *"reads backwards until you have hit it once"*.
-Widget _barHorizontal(ChartInk ink) => plot(
-  ink.desktop,
-  CartesianChart(
-    data: monthsDesktop,
-    layout: ChartLayout.vertical,
-    margin: const ChartMargin(left: -20),
-    xAxis: const ChartAxis(
-      type: ChartAxisType.number,
-      dataKey: 'desktop',
-      hide: true,
-    ),
-    yAxis: const ChartAxis(
-      dataKey: 'month',
-      tickLine: false,
-      axisLine: false,
-      tickMargin: 10,
-      tickFormatter: month3,
-    ),
-    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
-    series: <ChartSeriesSpec>[
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'desktop',
-        fill: ink.slot(1),
-        radii: _radiiAll,
-      ),
-    ],
-  ),
-);
-
-Widget _barMultiple(ChartInk ink) => plot(
-  ink.desktopMobile,
-  CartesianChart(
-    data: monthsDesktopMobile,
-    grid: const ChartGrid(vertical: false),
-    xAxis: _barMonthAxis,
-    tooltip: const ChartTooltipSpec(
-      cursor: false,
-      indicator: ChartIndicator.dashed,
-    ),
-    series: <ChartSeriesSpec>[
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'desktop',
-        fill: ink.slot(1),
-        radii: _radiiAll,
-      ),
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'mobile',
-        fill: ink.slot(2),
-        radii: _radiiAll,
-      ),
-    ],
-  ),
-);
-
-/// Two bars sharing a `stackId`. Only the zeros' position is geometry: the
-/// radius itself is `--radius-sm`, one rung for the whole family.
-Widget _barStacked(ChartInk ink) => plot(
-  ink.desktopMobile,
-  CartesianChart(
-    data: monthsDesktopMobile,
-    grid: const ChartGrid(vertical: false),
-    xAxis: _barMonthAxis,
-    tooltip: const ChartTooltipSpec(hideLabel: true),
-    legend: const ChartLegendSpec(),
-    series: <ChartSeriesSpec>[
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'desktop',
-        stackId: 'a',
-        fill: ink.slot(1),
-        radii: _radiiBottom,
-      ),
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'mobile',
-        stackId: 'a',
-        fill: ink.slot(2),
-        radii: _radiiTop,
-      ),
-    ],
-  ),
-);
-
-/// The registry sets `fontSize={12}` on this `LabelList`: a raw SVG number
-/// for a value the type scale already owns. `text-xs` reaches the same size
-/// through CSS; here it is [ChartText.xs], which is the same statement.
-Widget _barLabel(ChartInk ink, ThemeTokens theme) => plot(
-  ink.desktop,
-  CartesianChart(
-    data: monthsDesktop,
-    margin: const ChartMargin(top: 20),
-    grid: const ChartGrid(vertical: false),
-    xAxis: _barMonthAxis,
-    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
-    series: <ChartSeriesSpec>[
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'desktop',
-        fill: ink.slot(1),
-        radii: _radiiAll,
-        labels: <ChartLabelList>[
-          ChartLabelList(offset: 12, color: theme.foreground),
-        ],
-      ),
-    ],
-  ),
-);
-
-/// The registry mints a per-container `--color-label` so the in-bar month text
-/// can contrast against the bar's own fill; `bar.tsx` replaces it with
-/// `fill-background`, which is a themed utility rather than a runtime mint.
-Widget _barLabelCustom(ChartInk ink, ThemeTokens theme) => plot(
-  ink.desktop,
-  CartesianChart(
-    data: monthsDesktop,
-    layout: ChartLayout.vertical,
-    margin: const ChartMargin(right: 16),
-    grid: const ChartGrid(horizontal: false),
-    yAxis: const ChartAxis(
-      dataKey: 'month',
-      tickLine: false,
-      axisLine: false,
-      hide: true,
-    ),
-    xAxis: const ChartAxis(
-      dataKey: 'desktop',
-      type: ChartAxisType.number,
-      hide: true,
-    ),
-    tooltip: const ChartTooltipSpec(
-      cursor: false,
-      indicator: ChartIndicator.line,
-    ),
-    series: <ChartSeriesSpec>[
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'desktop',
-        fill: ink.slot(1),
-        radii: _radiiAll,
-        labels: <ChartLabelList>[
-          ChartLabelList(
-            dataKey: 'month',
-            position: ChartLabelPosition.insideLeft,
-            offset: 8,
-            color: theme.background,
-          ),
-          ChartLabelList(
-            dataKey: 'desktop',
-            position: ChartLabelPosition.right,
-            offset: 8,
-            color: theme.foreground,
-          ),
-        ],
-      ),
-    ],
-  ),
-);
-
-/// One `Bar`, a colour per datum. No `fill` on the series: each row in
-/// `BROWSERS` already carries its own.
-Widget _barMixed(ChartInk ink) => plot(
-  ink.browser,
-  CartesianChart(
-    data: browsers,
-    layout: ChartLayout.vertical,
-    margin: const ChartMargin(left: 0),
-    yAxis: ChartAxis(
-      dataKey: 'browser',
-      tickLine: false,
-      axisLine: false,
-      tickMargin: 10,
-      tickFormatter: (Object? v) => _browserLabel('$v'),
-    ),
-    xAxis: const ChartAxis(
-      dataKey: 'visitors',
-      type: ChartAxisType.number,
-      hide: true,
-    ),
-    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
-    series: <ChartSeriesSpec>[
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'visitors',
-        radii: _radiiAll,
-        cellFills: <Color>[
-          for (final Map<String, Object?> row in browsers) ink.ofRow(row),
-        ],
-      ),
-    ],
-  ),
-);
-
-/// `BROWSER_CONFIG`'s labels, as a formatter: the registry writes the same
-/// lookup inline on three axes.
-String _browserLabel(String key) => switch (key) {
-  'chrome' => 'Chrome',
-  'safari' => 'Safari',
-  'firefox' => 'Firefox',
-  'edge' => 'Edge',
-  'other' => 'Other',
-  _ => key,
-};
-
-/// `data.ts` names this shape as one of the eight kept local: `BROWSERS`
-/// reordered, so the "active" third bar lands on firefox rather than chrome.
-const List<Map<String, Object?>> _barActiveData = <Map<String, Object?>>[
-  <String, Object?>{'browser': 'chrome', 'visitors': 187, 'slot': 1},
-  <String, Object?>{'browser': 'safari', 'visitors': 200, 'slot': 2},
-  <String, Object?>{'browser': 'firefox', 'visitors': 275, 'slot': 3},
-  <String, Object?>{'browser': 'edge', 'visitors': 173, 'slot': 4},
-  <String, Object?>{'browser': 'other', 'visitors': 90, 'slot': 5},
-];
-
-/// `activeIndex` moved off `Bar` between recharts v2 and v3: it is now
-/// `Tooltip`'s `defaultIndex`, which is why this specimen shows a panel with no
-/// pointer anywhere near it.
-Widget _barActive(ChartInk ink) => plot(
-  ink.browser,
-  CartesianChart(
-    data: _barActiveData,
-    grid: const ChartGrid(vertical: false),
-    xAxis: ChartAxis(
-      dataKey: 'browser',
-      tickLine: false,
-      axisLine: false,
-      tickMargin: 10,
-      tickFormatter: (Object? v) => _browserLabel('$v'),
-    ),
-    tooltip: const ChartTooltipSpec(
-      cursor: false,
-      defaultIndex: 2,
-      hideLabel: true,
-    ),
-    series: <ChartSeriesSpec>[
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'visitors',
-        radii: _radiiAll,
-        cellFills: <Color>[
-          for (final Map<String, Object?> row in _barActiveData) ink.ofRow(row),
-        ],
-      ),
-    ],
-  ),
-);
-
-/// Kept local per `data.ts`, `{ month, visitors }` with two negative rows.
-const List<Map<String, Object?>> _barNegativeData = <Map<String, Object?>>[
-  <String, Object?>{'month': 'January', 'visitors': 186},
-  <String, Object?>{'month': 'February', 'visitors': 205},
-  <String, Object?>{'month': 'March', 'visitors': -207},
-  <String, Object?>{'month': 'April', 'visitors': 173},
-  <String, Object?>{'month': 'May', 'visitors': -209},
-  <String, Object?>{'month': 'June', 'visitors': 214},
-];
-
-/// §1.4 / §5, *a delta is a shape before it is a hue*. A figure that can fall
-/// is not an error, so the falling half does not reach for `destructive`: the
-/// direction is already legible from each bar's own position above or below the
-/// zero baseline, and the registry's own choice separates the two with
-/// `--chart-1` / `--chart-2`, both neutral action-ramp hues.
-Widget _barNegative(ChartInk ink, ThemeTokens theme) => plot(
-  ChartConfig(<String, ChartSeries>{
-    'visitors': const ChartSeries(label: 'Visitors'),
-  }),
-  CartesianChart(
-    data: _barNegativeData,
-    grid: const ChartGrid(vertical: false),
-    tooltip: const ChartTooltipSpec(
-      cursor: false,
-      hideLabel: true,
-      hideIndicator: true,
-    ),
-    series: <ChartSeriesSpec>[
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'visitors',
-        cellFills: <Color>[
-          for (final Map<String, Object?> row in _barNegativeData)
-            (row['visitors']! as num) > 0 ? ink.slot(1) : ink.slot(2),
-        ],
-        labels: <ChartLabelList>[
-          // No explicit fill in the registry means recharts' own untokenised
-          // grey paints the month labels: the same class of failure
-          // `ui/chart.tsx` measured on the axis ticks. `fill-foreground`
-          // closes it.
-          ChartLabelList(dataKey: 'month', color: theme.foreground),
-        ],
-      ),
-    ],
-  ),
-);
-
-/// The two clickable totals, and the series they switch between.
-///
-/// Inline, this strip made the panel 94px taller in `ready` than in the other
-/// two states: measured 393.39 → 487.78: which is §5's *"a layout jump is
-/// worse than the spinner it was meant to avoid"*.
-///
-/// **The selection travels.** §4: *"a group of options owns ONE pill that
-/// physically slides from the old selection to the new one… Options never own
-/// their own selected background… Applies to `ToggleGroup` and `Tabs`, and to
-/// anything like them you add later."* `ToggleGroup` itself does not drop in —
-/// its variants are built for label-sized items and these tiles carry a
-/// `Stat`-sized figure: but the travel is [ActiveIndicator]'s, and that is
-/// reusable on its own.
-///
-/// **The pill carries the series' colour, and only below the text.** `bar.tsx`
-/// derives it in full: `--muted-foreground` measures 4.83:1 on `--card`, so the
-/// only flat tint of a chart token that keeps an 11px `type-label` above AA is
-/// 4%, and at 4% the two active states are the same colour. So the tint stops
-/// before it reaches the text: the bottom half of the pill carries it, the top
-/// half, where the label sits, carries none.
-class _SeriesStrip extends StatefulWidget {
-  const _SeriesStrip({
-    required this.ink,
-    required this.slot,
-    required this.child,
-  });
-
-  final ChartInk ink;
-
-  /// Which key the strip is for, `bar-series-option` or `line-series-option`.
-  final String slot;
-
-  final Widget child;
-
-  /// `desktop` / `mobile`, in the registry's order.
-  static const List<String> series = <String>['desktop', 'mobile'];
-
-  /// The running totals over all 91 days.
-  static int total(String key) => dailyVisits.fold<int>(
-    0,
-    (int acc, Map<String, Object?> row) => acc + (row[key]! as int),
-  );
-
-  @override
-  State<_SeriesStrip> createState() => _SeriesStripState();
-}
-
-class _SeriesStripState extends State<_SeriesStrip> {
-  int _active = 0;
-
-  /// `to-50%`: the tint reaches exactly halfway and no further, which is what
-  /// keeps the `type-label` on `--card` rather than on `--muted`.
-  static const double _tintStop = 0.5;
-
-  /// `from-chart-N/40`.
-  static const double _tintAlpha = 0.4;
-
-  /// `border-b-2`: full saturation where no text sits.
-  static const double _ruleHeight = 2;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    final Color colour = widget.ink.slot(_active + 1);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: theme.card,
-            borderRadius: BorderRadius.circular(Radii.lg),
-            border: Border.all(
-              color: theme.border,
-              width: BorderWidths.hairline,
-            ),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(Radii.lg),
-            // Two `Stat` tiles at 200% text can outgrow the strip's own
-            // width; [ActiveIndicator]'s row is intrinsically sized (it has
-            // to be, to track the sliding fill under whichever tile is
-            // active), so it scrolls horizontally rather than compressing
-            // the figures it is tracking.
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: ActiveIndicator(
-                activeIndex: _active,
-                indicator: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      stops: const <double>[0, _tintStop],
-                      colors: <Color>[
-                        colour.withValues(alpha: _tintAlpha),
-                        colour.withValues(alpha: 0),
-                      ],
-                    ),
-                    border: Border(
-                      bottom: BorderSide(color: colour, width: _ruleHeight),
-                    ),
-                  ),
-                  child: const SizedBox.expand(),
-                ),
-                children: <Widget>[
-                  for (int i = 0; i < _SeriesStrip.series.length; i++)
-                    _SeriesTile(
-                      label: i == 0 ? 'Desktop' : 'Mobile',
-                      value: chartNumber(
-                        _SeriesStrip.total(_SeriesStrip.series[i]),
-                      ),
-                      swatch: widget.ink.slot(i + 1),
-                      leadingBorder: i > 0,
-                      onTap: () => setState(() => _active = i),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        // `mb-5`.
-        SizedBox(height: space(5)),
-        _SeriesScope(series: _SeriesStrip.series[_active], child: widget.child),
-      ],
-    );
-  }
-}
-
-/// One tile: a `Stat` and a swatch, in a control.
-class _SeriesTile extends StatelessWidget {
-  const _SeriesTile({
-    required this.label,
-    required this.value,
-    required this.swatch,
-    required this.leadingBorder,
-    required this.onTap,
-  });
-
-  final String label;
-  final String value;
-  final Color swatch;
-  final bool leadingBorder;
-  final VoidCallback onTap;
-
-  /// `size-3 rounded-xs`: the same swatch `PieInteractiveControls` uses, so
-  /// the two interactive pickers share one idiom rather than inventing a
-  /// second.
-  static double get swatchSize => space(3);
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: leadingBorder
-              ? Border(
-                  left: BorderSide(
-                    color: theme.border,
-                    width: BorderWidths.hairline,
-                  ),
-                )
-              : null,
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: space(4),
-            vertical: space(3),
-          ),
-          child: Stack(
-            children: <Widget>[
-              Stat(label: label, value: value),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  width: swatchSize,
-                  height: swatchSize,
-                  decoration: BoxDecoration(
-                    color: swatch,
-                    borderRadius: BorderRadius.circular(Radii.xs),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The context the series strip hands down through the keyed slot.
-class _SeriesScope extends InheritedWidget {
-  const _SeriesScope({required this.series, required super.child});
-
-  final String series;
-
-  static String of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_SeriesScope>()?.series ??
-      'desktop';
-
-  @override
-  bool updateShouldNotify(_SeriesScope old) => old.series != series;
-}
-
-/// The registry writes ``fill={`var(--color-${activeChart})`}``: at runtime
-/// exactly `var(--color-desktop)`, the `--color-<seriesKey>` pattern rule 1
-/// forbids. A lookup keeps the per-series colour without assembling that string.
-Color _seriesColour(ChartInk ink, String key) =>
-    key == 'desktop' ? ink.slot(1) : ink.slot(2);
-
-Widget _barInteractive(BuildContext context, ChartInk ink) {
-  final String active = _SeriesScope.of(context);
-  return plot(
-    ink.desktopMobile.plus(<String, ChartSeries>{
-      'views': const ChartSeries(label: 'Page Views'),
-    }),
-    CartesianChart(
-      data: dailyVisits,
-      margin: const ChartMargin(left: 12, right: 12),
-      grid: const ChartGrid(vertical: false),
-      xAxis: const ChartAxis(
-        dataKey: 'date',
-        tickLine: false,
-        axisLine: false,
-        tickMargin: 8,
-        minTickGap: 32,
-        tickFormatter: shortDate,
-      ),
-      tooltip: const ChartTooltipSpec(
-        nameKey: 'views',
-        labelFormatter: _shortDateYearLabel,
-      ),
-      series: <ChartSeriesSpec>[
-        ChartSeriesSpec(
-          kind: ChartSeriesKind.bar,
-          dataKey: active,
-          fill: _seriesColour(ink, active),
-        ),
-      ],
-    ),
-  );
-}
 
 /* ── Line, `components/space/charts/line.tsx` ──────────────────────────────── */
 
@@ -950,10 +343,10 @@ Widget _lineLabelCustom(ChartInk ink, ThemeTokens theme) => _lineChart(
   ),
 );
 
-String _browserLabelOf(Object? value) => _browserLabel('$value');
+String _browserLabelOf(Object? value) => browserLabel('$value');
 
 Widget _lineInteractive(BuildContext context, ChartInk ink) {
-  final String active = _SeriesScope.of(context);
+  final String active = SeriesScope.of(context);
   return plot(
     ink.desktopMobile.plus(<String, ChartSeries>{
       'views': const ChartSeries(label: 'Page Views'),
@@ -972,12 +365,12 @@ Widget _lineInteractive(BuildContext context, ChartInk ink) {
       ),
       tooltip: ChartTooltipSpec(
         nameKey: 'views',
-        labelFormatter: _shortDateYearLabel,
+        labelFormatter: shortDateYearLabel,
         // `className="w-40"`.
         width: space(40),
       ),
       series: <ChartSeriesSpec>[
-        _lineSeries(_seriesColour(ink, active), active, CurveType.monotone),
+        _lineSeries(seriesColour(ink, active), active, CurveType.monotone),
       ],
     ),
   );
@@ -1773,14 +1166,14 @@ Widget _tooltipChart(
         dataKey: 'running',
         stackId: 'a',
         fill: ink.slot(1),
-        radii: _radiiBottom,
+        radii: radiiBottom,
       ),
       ChartSeriesSpec(
         kind: ChartSeriesKind.bar,
         dataKey: 'swimming',
         stackId: 'a',
         fill: ink.slot(2),
-        radii: _radiiTop,
+        radii: radiiTop,
       ),
     ],
   ),
@@ -3007,7 +2400,7 @@ class _BarSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Default — chart state',
               skeleton: ChartSkeletonKind.bar,
-              child: _barDefault(ink),
+              child: barDefault(ink),
             ),
           ),
           Panel(
@@ -3016,7 +2409,7 @@ class _BarSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Horizontal — chart state',
               skeleton: ChartSkeletonKind.bar,
-              child: _barHorizontal(ink),
+              child: barHorizontal(ink),
             ),
           ),
           Panel(
@@ -3025,7 +2418,7 @@ class _BarSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Multiple — chart state',
               skeleton: ChartSkeletonKind.bar,
-              child: _barMultiple(ink),
+              child: barMultiple(ink),
             ),
           ),
           Panel(
@@ -3034,7 +2427,7 @@ class _BarSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Stacked — chart state',
               skeleton: ChartSkeletonKind.bar,
-              child: _barStacked(ink),
+              child: barStacked(ink),
             ),
           ),
           Panel(
@@ -3043,7 +2436,7 @@ class _BarSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Label — chart state',
               skeleton: ChartSkeletonKind.bar,
-              child: _barLabel(ink, theme),
+              child: barLabel(ink, theme),
             ),
           ),
           Panel(
@@ -3052,7 +2445,7 @@ class _BarSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Custom label — chart state',
               skeleton: ChartSkeletonKind.bar,
-              child: _barLabelCustom(ink, theme),
+              child: barLabelCustom(ink, theme),
             ),
           ),
           Panel(
@@ -3061,7 +2454,7 @@ class _BarSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Mixed — chart state',
               skeleton: ChartSkeletonKind.bar,
-              child: _barMixed(ink),
+              child: barMixed(ink),
             ),
           ),
           Panel(
@@ -3070,7 +2463,7 @@ class _BarSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Active — chart state',
               skeleton: ChartSkeletonKind.bar,
-              child: _barActive(ink),
+              child: barActive(ink),
             ),
           ),
           Panel(
@@ -3079,7 +2472,7 @@ class _BarSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Negative — chart state',
               skeleton: ChartSkeletonKind.bar,
-              child: _barNegative(ink, theme),
+              child: barNegative(ink, theme),
             ),
           ),
           Panel(
@@ -3088,14 +2481,13 @@ class _BarSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Interactive — chart state',
               skeleton: ChartSkeletonKind.bar,
-              controls: (BuildContext context, Widget child) => _SeriesStrip(
+              controls: (BuildContext context, Widget child) => SeriesStrip(
                 ink: ink,
                 slot: 'bar-series-option',
                 child: child,
               ),
               child: Builder(
-                builder: (BuildContext context) =>
-                    _barInteractive(context, ink),
+                builder: (BuildContext context) => barInteractive(context, ink),
               ),
             ),
           ),
@@ -3293,7 +2685,7 @@ class _LineSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Interactive — chart state',
               skeleton: ChartSkeletonKind.line,
-              controls: (BuildContext context, Widget child) => _SeriesStrip(
+              controls: (BuildContext context, Widget child) => SeriesStrip(
                 ink: ink,
                 slot: 'line-series-option',
                 child: child,
