@@ -523,7 +523,7 @@ class InputGroupText extends StatelessWidget {
     final ThemeTokens theme = ThemeScope.of(context);
     return StyledText(
       text,
-      spec ?? TextStyles.body,
+      spec ?? Input.textSpecDefault,
       color: theme.mutedForeground,
     );
   }

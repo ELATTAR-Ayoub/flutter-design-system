@@ -95,6 +95,7 @@ import './press.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './icon.dart';
 import './icon_paths.dart';
+import './input.dart';
 import './popover.dart';
 
 /// Radix's `delayDuration` — how long a pointer must rest on a trigger before
@@ -652,7 +653,7 @@ class _NavigationMenuTriggerState extends State<_NavigationMenuTrigger> {
                       widget.label,
                       // Reads as the row's own content, not as a nav word —
                       // [Input.textSpecDefault], i.e. TextStyles.body.
-                      TextStyles.body,
+                      Input.textSpecDefault,
                       color: lit ? theme.foreground : theme.mutedForeground,
                       softWrap: false,
                     ),
@@ -793,7 +794,7 @@ class _NavigationMenuLinkState extends State<NavigationMenuLink> {
                 // explicitly with [TextStyles.small].
                 style: StyledText.styleOf(
                   context,
-                  TextStyles.body,
+                  Input.textSpecDefault,
                   color: lit ? theme.accentForeground : theme.mutedForeground,
                 ),
                 child: widget.child,

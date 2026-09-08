@@ -419,28 +419,25 @@ void main() {
       }
     });
 
-    test(
-      'reading roles step at 768 and again at 1024, same as every role',
-      () {
-        for (final String name in <String>[
-          'body',
-          'small',
-          'nav',
-          'badge',
-          'code',
-          'identifier',
-          'numberSm',
-          'numberBase',
-        ]) {
-          final TextStyleToken role = TextStyles.all.firstWhere(
-            (TextStyleToken r) => r.name == name,
-          );
-          expect(role.stepFor(767), role.mobile, reason: name);
-          expect(role.stepFor(768), role.tablet, reason: name);
-          expect(role.stepFor(1024), role.desktop, reason: name);
-        }
-      },
-    );
+    test('reading roles step at 768 and again at 1024, same as every role', () {
+      for (final String name in <String>[
+        'body',
+        'small',
+        'nav',
+        'badge',
+        'code',
+        'identifier',
+        'numberSm',
+        'numberBase',
+      ]) {
+        final TextStyleToken role = TextStyles.all.firstWhere(
+          (TextStyleToken r) => r.name == name,
+        );
+        expect(role.stepFor(767), role.mobile, reason: name);
+        expect(role.stepFor(768), role.tablet, reason: name);
+        expect(role.stepFor(1024), role.desktop, reason: name);
+      }
+    });
   });
 
   group('resolveWidth', () {
@@ -521,14 +518,17 @@ void main() {
         fontSize: 32,
       );
       expect(style.fontSize, 32);
-      expect(style.height, 20 / 14);
+      expect(
+        style.height,
+        TextStyles.body.mobile.leading / TextStyles.body.mobile.size,
+      );
     });
 
     test('inline drops the line height and stands outside inheritance', () {
       final TextStyle style = TextStyles.code.resolveInline(_desktop, _ink);
       expect(style.height, isNull);
       expect(style.inherit, isFalse);
-      expect(style.fontSize, 14);
+      expect(style.fontSize, TextStyles.code.desktop.size);
     });
   });
 

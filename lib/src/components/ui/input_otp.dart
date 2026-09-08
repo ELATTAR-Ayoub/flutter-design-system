@@ -62,7 +62,6 @@ import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
-import '../../design_system/foundation/typography.dart';
 import './keyframes.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
@@ -326,7 +325,11 @@ class _InputOtpState extends State<InputOtp> {
       controller: _controller,
       focusNode: _focusNode,
       readOnly: !enabled,
-      style: StyledText.styleOf(context, TextStyles.body, color: transparent),
+      style: StyledText.styleOf(
+        context,
+        Input.textSpecDefault,
+        color: transparent,
+      ),
       cursorColor: transparent,
       backgroundCursorColor: transparent,
       selectionColor: transparent,
@@ -588,7 +591,7 @@ class InputOtpSlot extends StatelessWidget {
       children: <Widget>[
         if (char != null)
           // `text-sm` — Inter 13/400 at `--foreground`. Not mono; see drift 13.
-          StyledText(char!, TextStyles.body, color: theme.foreground),
+          StyledText(char!, Input.textSpecDefault, color: theme.foreground),
         if (showsCaret) const _FakeCaret(),
       ],
     );
