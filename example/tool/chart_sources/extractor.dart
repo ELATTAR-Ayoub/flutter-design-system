@@ -12,7 +12,11 @@ final RegExp _marker = RegExp(r'^\s*//\s*specimen:\s*([a-z0-9-]+)\s*$');
 /// Every marked declaration in [source], keyed by its specimen id, in the
 /// order the file declares them.
 Map<String, String> extractSpecimens(String source) {
-  final List<String> lines = source.split('\n');
+  // Normalise CRLF to LF: `split('\n')` alone leaves a trailing '\r' on every
+  // interior line under CRLF input, which would leak into captured
+  // multi-line specimens. Tracked files are LF via .gitattributes, but the
+  // extractor should not depend on that.
+  final List<String> lines = source.replaceAll('\r\n', '\n').split('\n');
   final Map<String, String> out = <String, String>{};
 
   for (int i = 0; i < lines.length; i++) {
@@ -42,7 +46,13 @@ int _declarationEnd(List<String> lines, int start, String id) {
   String quote = '';
   bool tripleQuoted = false;
   bool rawString = false;
-  final List<int> interpolation = <int>[];
+  // Each entry captures the enclosing string's (depth, quote, tripleQuoted,
+  // rawString) at the point a `${` opened an interpolation. `quote` etc. are
+  // single mutable locals, so a `${...}` that opens a string with a
+  // different quote character must restore the outer string's state when it
+  // closes, rather than leaving the scanner hunting for the inner quote.
+  final List<(int, String, bool, bool)> interpolation =
+      <(int, String, bool, bool)>[];
 
   for (int line = start; line < lines.length; line++) {
     final String text = lines[line];
@@ -65,7 +75,7 @@ int _declarationEnd(List<String> lines, int start, String id) {
           continue;
         }
         if (!rawString && c == r'$' && next == '{') {
-          interpolation.add(depth);
+          interpolation.add((depth, quote, tripleQuoted, rawString));
           depth++;
           mode = _Mode.code;
           i++;
@@ -109,8 +119,11 @@ int _declarationEnd(List<String> lines, int start, String id) {
       }
       if (c == ')' || c == ']' || c == '}') {
         depth--;
-        if (interpolation.isNotEmpty && depth == interpolation.last) {
-          interpolation.removeLast();
+        if (interpolation.isNotEmpty && depth == interpolation.last.$1) {
+          final (int, String, bool, bool) restored = interpolation.removeLast();
+          quote = restored.$2;
+          tripleQuoted = restored.$3;
+          rawString = restored.$4;
           mode = _Mode.string;
           continue;
         }

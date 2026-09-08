@@ -152,6 +152,37 @@ Widget b() => const Text('b');
       expect(extractSpecimens(source).keys, <String>['chart-a', 'chart-b']);
     });
 
+    test(
+      'a differing quote character inside an interpolation does not leak '
+      "into the outer string's quote state",
+      () {
+        const String source = r'''
+// specimen: chart-quote-mismatch
+Widget f() => Text("${'x'}");
+''';
+        expect(
+          extractSpecimens(source)['chart-quote-mismatch'],
+          r'Widget f() => Text("${' "'x'" r'}");',
+        );
+      },
+    );
+
+    test(
+      'a quote mismatch inside one specimen does not over-capture the next',
+      () {
+        const String source = r'''
+// specimen: chart-quote-mismatch
+Widget f() => Text("${'x'}");
+
+// specimen: chart-after-mismatch
+Widget g() => const Text('y');
+''';
+        final Map<String, String> out = extractSpecimens(source);
+        expect(out.keys, <String>['chart-quote-mismatch', 'chart-after-mismatch']);
+        expect(out['chart-quote-mismatch'], isNot(contains('g()')));
+      },
+    );
+
     test('an unterminated declaration is an error naming the id', () {
       const String source = '''
 // specimen: chart-broken
