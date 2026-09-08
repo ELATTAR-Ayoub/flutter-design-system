@@ -117,7 +117,7 @@ class _Hero extends StatelessWidget {
               variant: ButtonVariant.secondary,
               onPressed: onNavigate == null
                   ? null
-                  : () => onNavigate!('/components/agent_core'),
+                  : () => onNavigate!(componentDoc('agent-core').route),
               child: const Text('Documentation'),
             ),
           ],

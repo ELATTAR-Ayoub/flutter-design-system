@@ -83,7 +83,7 @@ void main() {
     await tester.tap(find.text('Documentation'));
     await tester.pump();
 
-    expect(routes, <String>['/components/agent_core']);
+    expect(routes, <String>[componentDoc('agent-core').route]);
   });
 
   testWidgets(
