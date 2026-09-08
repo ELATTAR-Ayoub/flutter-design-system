@@ -391,10 +391,21 @@ class AvatarGroupCount extends StatelessWidget {
         height: diameter,
         alignment: Alignment.center,
         decoration: BoxDecoration(color: theme.muted, borderRadius: shape),
-        child: StyledText(
-          label,
-          spec ?? TextStyles.small,
-          color: theme.mutedForeground,
+        // Sized to the disc like an [Avatar] fallback, and scaled down
+        // rather than wrapped when a long count ("+248") outgrows it: an
+        // overflow indicator is one line by definition.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: StyledText(
+            label,
+            spec ?? TextStyles.small,
+            color: theme.mutedForeground,
+            fontSize: spec == null
+                ? diameter * Avatar._fallbackDiameterRatio
+                : null,
+            maxLines: 1,
+            softWrap: false,
+          ),
         ),
       ),
     );

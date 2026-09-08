@@ -380,7 +380,6 @@ const String _previewCode = '''Wrap(
     Avatar(
       fallback: 'AB',
       size: AvatarSize.sm,
-      fallbackSpec: TextStyles.nav,
     ),
     Avatar(fallback: 'AB'), // size: AvatarSize.md, the default
     const Avatar(fallback: 'AB', size: AvatarSize.lg),
@@ -448,7 +447,6 @@ const String _avatarGroupCode = '''AvatarGroup(
     for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
       Avatar(
         fallback: initials,
-        fallbackSpec: TextStyles.nav,
         ring: AvatarGroup.ringOf(context),
       ),
   ],
@@ -459,7 +457,6 @@ const String _avatarGroupCountCode = '''AvatarGroup(
     for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
       Avatar(
         fallback: initials,
-        fallbackSpec: TextStyles.nav,
         ring: AvatarGroup.ringOf(context),
       ),
     const AvatarGroupCount('+248'),
@@ -473,7 +470,6 @@ Avatar(fallback: 'AB', size: AvatarSize.lg)''';
 const String _dropdownCode = '''DropdownMenu(
   trigger: const Avatar(
     fallback: 'AB',
-    fallbackSpec: TextStyles.nav,
   ),
   children: <MenuChild>[
     const MenuLabel('My Account'),
@@ -489,7 +485,7 @@ const String _rtlCode = '''Directionality(
   textDirection: TextDirection.rtl,
   child: Row(
     children: <Widget>[
-      Avatar(fallback: 'أف', fallbackSpec: TextStyles.nav),
+      Avatar(fallback: 'أف'),
       // name and email column, same as the LTR identity row
     ],
   ),
@@ -727,12 +723,8 @@ class _PreviewSpecimen extends StatelessWidget {
               runSpacing: space(3),
               crossAxisAlignment: WrapCrossAlignment.center,
               children: <Widget>[
-                Avatar(
-                  fallback: 'AB',
-                  size: AvatarSize.sm,
-                  fallbackSpec: TextStyles.nav,
-                ),
-                Avatar(fallback: 'AB', fallbackSpec: TextStyles.nav),
+                Avatar(fallback: 'AB', size: AvatarSize.sm),
+                Avatar(fallback: 'AB'),
                 const Avatar(fallback: 'AB', size: AvatarSize.lg),
                 Avatar(
                   fallback: '#1',
@@ -865,11 +857,7 @@ class _AvatarGroupPreview extends StatelessWidget {
     builder: (BuildContext context) => AvatarGroup(
       children: <Widget>[
         for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
-          Avatar(
-            fallback: initials,
-            fallbackSpec: TextStyles.nav,
-            ring: AvatarGroup.ringOf(context),
-          ),
+          Avatar(fallback: initials, ring: AvatarGroup.ringOf(context)),
       ],
     ),
   );
@@ -883,11 +871,7 @@ class _AvatarGroupCountPreview extends StatelessWidget {
     builder: (BuildContext context) => AvatarGroup(
       children: <Widget>[
         for (final String initials in <String>['VW', 'EM', 'TC', 'SW'])
-          Avatar(
-            fallback: initials,
-            fallbackSpec: TextStyles.nav,
-            ring: AvatarGroup.ringOf(context),
-          ),
+          Avatar(fallback: initials, ring: AvatarGroup.ringOf(context)),
         const AvatarGroupCount('+248'),
       ],
     ),
@@ -903,8 +887,8 @@ class _SizesPreview extends StatelessWidget {
     runSpacing: space(3),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: <Widget>[
-      Avatar(fallback: 'AB', size: AvatarSize.sm, fallbackSpec: TextStyles.nav),
-      Avatar(fallback: 'AB', fallbackSpec: TextStyles.nav),
+      Avatar(fallback: 'AB', size: AvatarSize.sm),
+      Avatar(fallback: 'AB'),
       const Avatar(fallback: 'AB', size: AvatarSize.lg),
     ],
   );
@@ -916,7 +900,7 @@ class _DropdownPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DropdownMenu(
     width: space(52),
-    trigger: Avatar(fallback: 'AB', fallbackSpec: TextStyles.nav),
+    trigger: Avatar(fallback: 'AB'),
     children: <MenuChild>[
       const MenuLabel('My Account'),
       const MenuSeparator(),
@@ -939,7 +923,7 @@ class _RtlPreview extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Avatar(fallback: 'أف', fallbackSpec: TextStyles.nav),
+          Avatar(fallback: 'أف'),
           SizedBox(width: space(2)),
           // `Flexible`, not a bare `Column`: at a large accessibility text
           // scale the email alone can outgrow the showcase frame, and a

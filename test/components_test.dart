@@ -1745,42 +1745,39 @@ void main() {
       expect(ButtonGroup.hasLeftBorder(a, 2), isFalse);
     });
 
-    test(
-      'an Input member is reshaped the same as a Button, bare or wrapped '
-      'in Expanded',
-      () {
-        // The docs "Composing other members" specimen: a field that fills the
-        // row, joined to a trailing outline Button.
-        final List<Widget> field = <Widget>[
-          Expanded(child: Input(placeholder: 'Email address')),
-          Button(
-            variant: ButtonVariant.outline,
-            onPressed: () {},
-            child: const Text('Send'),
-          ),
-        ];
-        expect(ButtonGroup.radiiOf(field, 0).topLeft.x, Radii.full);
-        expect(ButtonGroup.radiiOf(field, 0).topRight.x, 0);
-        expect(ButtonGroup.radiiOf(field, 1).topLeft.x, 0);
-        expect(ButtonGroup.radiiOf(field, 1).topRight.x, Radii.lg);
-        expect(ButtonGroup.hasLeftBorder(field, 0), isTrue);
-        expect(ButtonGroup.hasLeftBorder(field, 1), isFalse);
+    test('an Input member is reshaped the same as a Button, bare or wrapped '
+        'in Expanded', () {
+      // The docs "Composing other members" specimen: a field that fills the
+      // row, joined to a trailing outline Button.
+      final List<Widget> field = <Widget>[
+        Expanded(child: Input(placeholder: 'Email address')),
+        Button(
+          variant: ButtonVariant.outline,
+          onPressed: () {},
+          child: const Text('Send'),
+        ),
+      ];
+      expect(ButtonGroup.radiiOf(field, 0).topLeft.x, Radii.full);
+      expect(ButtonGroup.radiiOf(field, 0).topRight.x, 0);
+      expect(ButtonGroup.radiiOf(field, 1).topLeft.x, 0);
+      expect(ButtonGroup.radiiOf(field, 1).topRight.x, Radii.lg);
+      expect(ButtonGroup.hasLeftBorder(field, 0), isTrue);
+      expect(ButtonGroup.hasLeftBorder(field, 1), isFalse);
 
-        // Bare (unwrapped) Input reads the same.
-        final List<Widget> bare = <Widget>[
-          Input(placeholder: 'Email address'),
-          Button(
-            variant: ButtonVariant.outline,
-            onPressed: () {},
-            child: const Text('Send'),
-          ),
-        ];
-        expect(ButtonGroup.radiiOf(bare, 0).topLeft.x, Radii.full);
-      },
-    );
+      // Bare (unwrapped) Input reads the same.
+      final List<Widget> bare = <Widget>[
+        Input(placeholder: 'Email address'),
+        Button(
+          variant: ButtonVariant.outline,
+          onPressed: () {},
+          child: const Text('Send'),
+        ),
+      ];
+      expect(ButtonGroup.radiiOf(bare, 0).topLeft.x, Radii.full);
+    });
 
     testWidgets(
-      'an Input member is bled and clipped like a Button, not left flush',
+      'an Input member squares its inner corner and keeps its leading text',
       (WidgetTester t) async {
         await t.pumpWidget(
           host(
@@ -1800,19 +1797,21 @@ void main() {
           ),
         );
 
-        // Reshaped members are wrapped in the bled slot the same way a
-        // Button is; an unrecognised member never gets one.
-        expect(find.byType(Input), findsOneWidget);
-        expect(
-          find.ancestor(of: find.byType(Input), matching: find.byType(Row)),
-          findsWidgets,
+        final BorderRadius? given = ButtonGroup.memberRadiusOf(
+          t.element(find.byType(Input)),
         );
-        // The Expanded shell survives the reshape — the field still fills
-        // the row rather than shrinking to its own content width.
-        final Expanded expandedField = t.widgetList<Expanded>(
-          find.byType(Expanded),
-        ).first;
-        expect(expandedField.child, isNot(isA<Input>()));
+        expect(given, isNotNull);
+        expect(given!.topLeft.x, Radii.full);
+        expect(given.topRight.x, 0);
+        // The field is not bled: its box starts where the group's row
+        // starts, so nothing of the placeholder is cut off.
+        final Rect field = t.getRect(find.byType(Input));
+        final Rect group = t.getRect(find.byType(ButtonGroup));
+        expect(field.left, closeTo(group.left, BorderWidths.hairline));
+        expect(
+          t.getRect(find.text('Email address')).left,
+          greaterThan(field.left),
+        );
       },
     );
 

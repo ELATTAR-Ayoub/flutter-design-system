@@ -859,6 +859,14 @@ const List<DocsApiFact> _buttonGroupFacts = <DocsApiFact>[
         'is squared.',
   ),
   DocsApiFact(
+    name: 'ButtonGroup.memberRadiusOf',
+    type: 'static BorderRadius? Function(BuildContext)',
+    description:
+        'The corners the group gives the member built at a context, or '
+        'null outside a group. Input reads it, so a field composed beside a '
+        'button squares the corner they share.',
+  ),
+  DocsApiFact(
     name: 'ButtonGroup.hasLeftBorder',
     type: 'static bool Function(List<Widget>, int)',
     description:

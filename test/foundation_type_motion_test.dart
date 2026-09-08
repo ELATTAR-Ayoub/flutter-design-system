@@ -117,9 +117,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.sans,
     600,
     null,
-    m: (14, 18),
-    t: (15, 20),
-    d: (16, 20),
+    m: (12, 16),
+    t: (13, 16),
+    d: (14, 18),
   ),
   _Role(
     'code',

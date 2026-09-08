@@ -405,9 +405,9 @@ class TextStyles {
     name: 'badge',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(14, 18),
-    tablet: const TypeStep(15, 20),
-    desktop: const TypeStep(16, 20),
+    mobile: const TypeStep(12, 16),
+    tablet: const TypeStep(13, 16),
+    desktop: const TypeStep(14, 18),
     wght: 600,
   );
 

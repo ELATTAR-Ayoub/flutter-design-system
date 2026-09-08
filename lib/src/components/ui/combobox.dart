@@ -105,6 +105,7 @@ import './disabled.dart';
 import './field.dart';
 import './icon.dart';
 import './icon_paths.dart';
+import './input.dart';
 import './input_group.dart';
 import './popover.dart';
 import './select.dart';
@@ -696,7 +697,8 @@ class _ComboboxRow<T> extends StatelessWidget {
             Expanded(
               child: StyledText(
                 item.label,
-                TextStyles.body,
+                // The field's own role: a row reads exactly like the input.
+                Input.textSpecDefault,
                 color: ink,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

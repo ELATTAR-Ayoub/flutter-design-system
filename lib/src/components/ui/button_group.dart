@@ -243,6 +243,12 @@ class ButtonGroup extends StatelessWidget {
   static BorderRadius radiiOf(List<Widget> children, int index) =>
       _shapeOf(children, index).radii;
 
+  /// The corners the group gives the member built at [context], or null
+  /// outside a group. [Input] reads this so a field composed beside a button
+  /// squares the corner it shares with it.
+  static BorderRadius? memberRadiusOf(BuildContext context) =>
+      _Slot.maybeOf(context)?.radii;
+
   /// Whether the member at [index] keeps its left border — false for every
   /// member but the first (`border-l-0`).
   @visibleForTesting
@@ -337,13 +343,11 @@ class ButtonGroup extends StatelessWidget {
       );
     }
     if (target is Input) {
-      // `border-input` — Input's own resting frame colour, unconditionally:
-      // unlike Button it has no transparent-border variant to check against.
-      return _BledSlot(
-        shape: shape,
-        frame: theme.input,
-        child: target,
-      );
+      // Not bled: a field's text starts at its leading edge, so cutting a
+      // band off the sides (what the bleed does to a centred button label)
+      // would cut the first characters. The field keeps its own frame and
+      // reads the slot's corners through [ButtonGroup.memberRadiusOf].
+      return _Slot(shape: shape, child: target);
     }
     // A separator has no corners to square and no border to drop; anything
     // else is not ours to reshape.

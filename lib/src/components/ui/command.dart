@@ -1339,7 +1339,8 @@ class _CommandRow extends StatelessWidget {
             children: <Widget>[
               StyledText(
                 item.label,
-                TextStyles.body,
+                // The search field's own role: a row reads exactly like it.
+                Input.textSpecDefault,
                 color: ink,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

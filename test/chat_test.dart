@@ -419,47 +419,86 @@ void main() {
       }
     });
 
-    testWidgets(
-      'the rail hugs the bubble edge, not the wide row it sits in',
-      (WidgetTester t) async {
-        // The docs "Reactions" specimen: a short, short-align-start `Bubble`
-        // inside a `Column` that is itself much wider (a `Wrap` cell). The
-        // rail must anchor to the BUBBLE's own trailing/leading edge, not to
-        // the far edge of whatever row it happens to sit in.
-        Widget wideBubble(BubbleAlign railAlign) => SizedBox(
-          width: 400,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Bubble(
-                reactions: BubbleReactions(
-                  align: railAlign,
-                  children: const <Widget>[Text('A')],
-                ),
-                child: const BubbleContent(child: Text('Hi')),
+    testWidgets('the rail hugs the bubble edge, not the wide row it sits in', (
+      WidgetTester t,
+    ) async {
+      // The docs "Reactions" specimen: a short, short-align-start `Bubble`
+      // inside a `Column` that is itself much wider (a `Wrap` cell). The
+      // rail must anchor to the BUBBLE's own trailing/leading edge, not to
+      // the far edge of whatever row it happens to sit in.
+      Widget wideBubble(BubbleAlign railAlign) => SizedBox(
+        width: 400,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Bubble(
+              reactions: BubbleReactions(
+                align: railAlign,
+                children: const <Widget>[Text('A')],
               ),
-            ],
+              child: const BubbleContent(child: Text('Hi')),
+            ),
+          ],
+        ),
+      );
+
+      await t.pumpWidget(host(wideBubble(BubbleAlign.end)));
+      final Rect bubbleEnd = t.getRect(find.byType(BubbleContent));
+      final Rect railEnd = t.getRect(find.byType(BubbleReactions));
+      expect(
+        railEnd.right,
+        closeTo(bubbleEnd.right - BubbleReactions.inset, 1),
+        reason:
+            'an `end` rail on a short, start-aligned bubble must sit near '
+            "the bubble's own right edge, not the wide row's",
+      );
+
+      await t.pumpWidget(host(wideBubble(BubbleAlign.start)));
+      final Rect bubbleStart = t.getRect(find.byType(BubbleContent));
+      final Rect railStart = t.getRect(find.byType(BubbleReactions));
+      expect(
+        railStart.left,
+        closeTo(bubbleStart.left + BubbleReactions.inset, 1),
+      );
+    });
+
+    testWidgets(
+      'a rail wider than its bubble anchors to the sender side, never past '
+      'the parent edge',
+      (WidgetTester t) async {
+        // Five pills under a two-letter bubble: the rail is wider than the
+        // bubble, so whichever corner was asked for, it must grow into the
+        // open half of the row — from the bubble's own start edge for an
+        // incoming (start-aligned) message, from its end edge for an
+        // outgoing one.
+        Widget wide(BubbleAlign bubbleAlign, BubbleAlign railAlign) => SizedBox(
+          width: 400,
+          child: Bubble(
+            align: bubbleAlign,
+            reactions: BubbleReactions(
+              align: railAlign,
+              children: const <Widget>[
+                Text('AAAA'),
+                Text('BBBB'),
+                Text('CCCC'),
+                Text('DDDD'),
+                Text('EEEE'),
+              ],
+            ),
+            child: const BubbleContent(child: Text('Hi')),
           ),
         );
 
-        await t.pumpWidget(host(wideBubble(BubbleAlign.end)));
-        final Rect bubbleEnd = t.getRect(find.byType(BubbleContent));
-        final Rect railEnd = t.getRect(find.byType(BubbleReactions));
-        expect(
-          railEnd.right,
-          closeTo(bubbleEnd.right - BubbleReactions.inset, 1),
-          reason:
-              'an `end` rail on a short, start-aligned bubble must sit near '
-              "the bubble's own right edge, not the wide row's",
-        );
+        await t.pumpWidget(host(wide(BubbleAlign.start, BubbleAlign.end)));
+        Rect bubble = t.getRect(find.byType(BubbleContent));
+        Rect rail = t.getRect(find.byType(BubbleReactions));
+        expect(rail.width, greaterThan(bubble.width));
+        expect(rail.left, closeTo(bubble.left, 1));
 
-        await t.pumpWidget(host(wideBubble(BubbleAlign.start)));
-        final Rect bubbleStart = t.getRect(find.byType(BubbleContent));
-        final Rect railStart = t.getRect(find.byType(BubbleReactions));
-        expect(
-          railStart.left,
-          closeTo(bubbleStart.left + BubbleReactions.inset, 1),
-        );
+        await t.pumpWidget(host(wide(BubbleAlign.end, BubbleAlign.start)));
+        bubble = t.getRect(find.byType(BubbleContent));
+        rail = t.getRect(find.byType(BubbleReactions));
+        expect(rail.right, closeTo(bubble.right, 1));
       },
     );
 
