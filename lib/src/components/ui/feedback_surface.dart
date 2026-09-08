@@ -408,6 +408,8 @@ Color _success(ThemeTokens t) => Palette.success;
 Color _warning(ThemeTokens t) => Palette.warning;
 Color _info(ThemeTokens t) => Palette.info;
 Color _destructive(ThemeTokens t) => t.destructive;
+Color _warningDeep(ThemeTokens t) => Palette.warningDeep;
+Color _destructiveDeep(ThemeTokens t) => Palette.destructiveDeep;
 
 /// The three working colours a bloom resolves to, for one theme and one pair,
 /// plus the two things the theme's blend split decides.
@@ -495,12 +497,13 @@ class FeedbackSurface extends StatefulWidget {
     FeedbackVariant.error => _destructive,
   };
 
+  /// The core. Success, warning and error each glow in shades of their own
+  /// colour; only the neutral, loading and info surfaces carry the accent.
   Color Function(ThemeTokens) get bloom2 => switch (variant) {
     FeedbackVariant.success || FeedbackVariant.loading => _value,
-    FeedbackVariant.neutral ||
-    FeedbackVariant.info ||
-    FeedbackVariant.warning ||
-    FeedbackVariant.error => _action,
+    FeedbackVariant.warning => _warningDeep,
+    FeedbackVariant.error => _destructiveDeep,
+    FeedbackVariant.neutral || FeedbackVariant.info => _action,
   };
 
   /// The surface's own corner. `overflow: hidden` clips to the padding box, so

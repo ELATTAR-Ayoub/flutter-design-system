@@ -1029,7 +1029,7 @@ void main() {
         child: child,
       );
       expect(destructive.bloom1(theme), theme.destructive);
-      expect(destructive.bloom2(theme), Palette.action);
+      expect(destructive.bloom2(theme), Palette.destructiveDeep);
 
       final FeedbackSurface success = FeedbackSurface(
         variant: FeedbackVariant.success,
@@ -1047,7 +1047,7 @@ void main() {
         child: child,
       );
       expect(warning.bloom1(theme), Palette.warning);
-      expect(warning.bloom2(theme), Palette.action);
+      expect(warning.bloom2(theme), Palette.warningDeep);
     });
   });
 
