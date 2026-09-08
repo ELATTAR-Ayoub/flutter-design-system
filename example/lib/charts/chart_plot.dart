@@ -84,6 +84,22 @@ Color seriesColour(ChartInk ink, String key) =>
 Widget plot(ChartConfig config, Widget chart) =>
     ChartContainer(config: config, child: chart);
 
+/// The centred donut text: on the panel background rather than on any wedge
+/// fill, which is the slot `RadialText` already proved clears AA in both
+/// themes. `type-num-xl` replaces the registry's `text-3xl font-bold`, the
+/// weight already living in the class.
+Widget donutCentre(BuildContext context, String figure, String caption) {
+  final ThemeTokens theme = ThemeScope.of(context);
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      StyledText(figure, TextStyles.numberXl, color: theme.foreground),
+      SizedBox(height: space(1)),
+      StyledText(caption, ChartText.xs, color: theme.mutedForeground),
+    ],
+  );
+}
+
 /// The X axis nine of the ten area variants share, byte for byte.
 ChartAxis monthAxis() => const ChartAxis(
   dataKey: 'month',

@@ -119,6 +119,7 @@ import '../charts/chart_states.dart';
 import '../charts/specimens_area.dart';
 import '../charts/specimens_bar.dart';
 import '../charts/specimens_line.dart';
+import '../charts/specimens_pie.dart';
 import '../kit.dart';
 import '../nav.dart';
 import '../token_swatch.dart';
@@ -167,215 +168,6 @@ String _longDateLabel(String label, List<ChartTooltipItem> items) =>
 
 /* ── Pie, `components/space/charts/pie.tsx` ────────────────────────────────── */
 
-/// The bare `Pie` eight of the eleven variants start from.
-PieSpec _browserPie(
-  ChartInk ink, {
-  double? innerRadius,
-  double strokeWidth = 1,
-  int? activeIndex,
-  double activeGrow = 0,
-  bool activeRing = false,
-  bool outsideLabel = false,
-  bool labelLine = true,
-  String Function(Map<String, Object?>)? labelBuilder,
-  String? chipLabelKey,
-  List<Map<String, Object?>>? data,
-}) => PieSpec(
-  data: ink.rows(data ?? browsers),
-  dataKey: 'visitors',
-  nameKey: 'browser',
-  innerRadius: innerRadius,
-  strokeWidth: strokeWidth,
-  activeIndex: activeIndex,
-  activeGrow: activeGrow,
-  activeRing: activeRing,
-  outsideLabel: outsideLabel,
-  labelLine: labelLine,
-  labelBuilder: labelBuilder,
-  chipLabelKey: chipLabelKey,
-);
-
-Widget _pieSimple(ChartInk ink) => plot(
-  ink.browser,
-  PieChart(
-    pies: <PieSpec>[_browserPie(ink)],
-    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
-  ),
-);
-
-/// `stroke="0"` is the registry's own value, kept verbatim: the wedge
-/// separator is a stroke WIDTH here, not a hue, and there is nothing in it for
-/// a token to own.
-Widget _pieSeparatorNone(ChartInk ink) => plot(
-  ink.browser,
-  PieChart(
-    pies: <PieSpec>[_browserPie(ink, strokeWidth: 0)],
-    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
-  ),
-);
-
-/// The label sits OUTSIDE the wedge, on the panel background, so this is a
-/// background-contrast case rather than the on-fill one `PieLabelList` answers.
-Widget _pieLabel(ChartInk ink, ThemeTokens theme) => plot(
-  ink.browser,
-  PieChart(
-    pies: <PieSpec>[_browserPie(ink, outsideLabel: true)],
-    labelColor: theme.foreground,
-    tooltip: const ChartTooltipSpec(hideLabel: true),
-  ),
-);
-
-/// The registry's custom `label` render function, swept once:
-/// `fill="hsla(var(--foreground))"` → `--foreground`. It still lands outside
-/// the wedge, so this is background contrast again.
-Widget _pieLabelCustom(ChartInk ink, ThemeTokens theme) => plot(
-  ink.browser,
-  PieChart(
-    pies: <PieSpec>[
-      _browserPie(
-        ink,
-        outsideLabel: true,
-        labelLine: false,
-        labelBuilder: (Map<String, Object?> row) =>
-            chartNumber(row['visitors']! as num),
-      ),
-    ],
-    labelColor: theme.foreground,
-    tooltip: const ChartTooltipSpec(nameKey: 'visitors', hideLabel: true),
-  ),
-);
-
-/// This family's real AA question, and the one the arithmetic decides —
-/// see the chip widget in `chart_polar.dart` for the full derivation.
-Widget _pieLabelList(ChartInk ink) => plot(
-  ink.browser,
-  PieChart(
-    pies: <PieSpec>[_browserPie(ink, chipLabelKey: 'browser')],
-    tooltip: const ChartTooltipSpec(nameKey: 'visitors', hideLabel: true),
-  ),
-);
-
-/// No tooltip in this variant: the legend is the whole point.
-Widget _pieLegend(ChartInk ink) => plot(
-  ink.browser,
-  PieChart(
-    pies: <PieSpec>[_browserPie(ink)],
-    legend: const ChartLegendSpec(
-      nameKey: 'browser',
-      wrap: true,
-      // `-translate-y-2`.
-      offset: 8,
-    ),
-  ),
-);
-
-/// `innerRadius={60}` is the registry's own pixel value, kept rather than
-/// reinstated as a percentage (drift 4: the panel's note still says
-/// "percentage").
-Widget _pieDonut(ChartInk ink) => plot(
-  ink.browser,
-  PieChart(
-    pies: <PieSpec>[_browserPie(ink, innerRadius: 60)],
-    tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
-  ),
-);
-
-Widget _pieDonutActive(ChartInk ink) => plot(
-  ink.browser,
-  PieChart(
-    pies: <PieSpec>[
-      _browserPie(
-        ink,
-        innerRadius: 60,
-        strokeWidth: 5,
-        activeIndex: 0,
-        activeGrow: 10,
-      ),
-    ],
-    tooltip: const ChartTooltipSpec(
-      cursor: false,
-      defaultIndex: 0,
-      hideLabel: true,
-    ),
-  ),
-);
-
-/// Drift 5: `data.ts` calls this "+12 firefox / +100 other" and both raised
-/// rows are +100. `pie.tsx` flags it and does not reconcile it.
-const List<Map<String, Object?>> _pieDonutTextData = <Map<String, Object?>>[
-  <String, Object?>{'browser': 'chrome', 'visitors': 275, 'slot': 1},
-  <String, Object?>{'browser': 'safari', 'visitors': 200, 'slot': 2},
-  <String, Object?>{'browser': 'firefox', 'visitors': 287, 'slot': 3},
-  <String, Object?>{'browser': 'edge', 'visitors': 173, 'slot': 4},
-  <String, Object?>{'browser': 'other', 'visitors': 190, 'slot': 5},
-];
-
-/// The centred donut text: on the panel background rather than on any wedge
-/// fill, which is the slot `RadialText` already proved clears AA in both
-/// themes. `type-num-xl` replaces the registry's `text-3xl font-bold`, the
-/// weight already living in the class.
-Widget _donutCentre(BuildContext context, String figure, String caption) {
-  final ThemeTokens theme = ThemeScope.of(context);
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    children: <Widget>[
-      StyledText(figure, TextStyles.numberXl, color: theme.foreground),
-      SizedBox(height: space(1)),
-      StyledText(caption, ChartText.xs, color: theme.mutedForeground),
-    ],
-  );
-}
-
-Widget _pieDonutText(ChartInk ink) {
-  final int total = _pieDonutTextData.fold<int>(
-    0,
-    (int acc, Map<String, Object?> row) => acc + (row['visitors']! as int),
-  );
-  return plot(
-    ink.browser,
-    PieChart(
-      pies: <PieSpec>[
-        _browserPie(
-          ink,
-          innerRadius: 60,
-          strokeWidth: 5,
-          data: _pieDonutTextData,
-        ),
-      ],
-      centerLabel: (BuildContext context) =>
-          _donutCentre(context, chartNumber(total), 'Visitors'),
-      tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
-    ),
-  );
-}
-
-/// Two rings, one dataset each.
-Widget _pieStacked(ChartInk ink) => plot(
-  ink.pieMonths,
-  PieChart(
-    pies: <PieSpec>[
-      PieSpec(
-        data: ink.rows(pieMonthsDesktop),
-        dataKey: 'desktop',
-        nameKey: 'month',
-        outerRadius: 60,
-      ),
-      PieSpec(
-        data: ink.rows(pieMonthsMobile),
-        dataKey: 'mobile',
-        nameKey: 'month',
-        innerRadius: 70,
-        outerRadius: 90,
-      ),
-    ],
-    tooltip: const ChartTooltipSpec(
-      labelKey: 'visitors',
-      nameKey: 'month',
-      indicator: ChartIndicator.line,
-    ),
-  ),
-);
-
 /// The slice picker. `defaultIndex` is what makes the `Select`'s choice
 /// reactive, `Tooltip.js` re-dispatches whenever the prop's value changes,
 /// which is also what moves `activeShape` from one wedge to the next.
@@ -422,35 +214,6 @@ class _PieInteractiveState extends State<_PieInteractive> {
 }
 
 String _monthLabel(String key) => '${key[0].toUpperCase()}${key.substring(1)}';
-
-Widget _pieInteractive(BuildContext context, ChartInk ink, int activeIndex) =>
-    plot(
-      ink.pieMonths,
-      PieChart(
-        pies: <PieSpec>[
-          PieSpec(
-            data: ink.rows(pieMonthsDesktop),
-            dataKey: 'desktop',
-            nameKey: 'month',
-            innerRadius: 60,
-            strokeWidth: 5,
-            activeIndex: activeIndex,
-            activeGrow: 10,
-            activeRing: true,
-          ),
-        ],
-        centerLabel: (BuildContext context) => _donutCentre(
-          context,
-          chartNumber(pieMonthsDesktop[activeIndex]['desktop']! as num),
-          'Visitors',
-        ),
-        tooltip: ChartTooltipSpec(
-          cursor: false,
-          defaultIndex: activeIndex,
-          hideLabel: true,
-        ),
-      ),
-    );
 
 /* ── Radar, `components/space/charts/radar.tsx` ────────────────────────────── */
 
@@ -833,7 +596,7 @@ Widget _radialText(ChartInk ink, ThemeTokens theme) => plot(
       tick: false,
       axisLine: false,
       centerLabel: (BuildContext context) =>
-          _donutCentre(context, chartNumber(200), 'Visitors'),
+          donutCentre(context, chartNumber(200), 'Visitors'),
     ),
   ),
 );
@@ -856,7 +619,7 @@ Widget _radialShape(ChartInk ink, ThemeTokens theme) => plot(
       tick: false,
       axisLine: false,
       centerLabel: (BuildContext context) =>
-          _donutCentre(context, chartNumber(1260), 'Visitors'),
+          donutCentre(context, chartNumber(1260), 'Visitors'),
     ),
   ),
 );
@@ -2544,7 +2307,7 @@ class _PieSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Simple — chart state',
               skeleton: ChartSkeletonKind.pie,
-              child: _pieSimple(ink),
+              child: pieSimple(ink),
             ),
           ),
           Panel(
@@ -2553,7 +2316,7 @@ class _PieSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'No separator — chart state',
               skeleton: ChartSkeletonKind.pie,
-              child: _pieSeparatorNone(ink),
+              child: pieSeparatorNone(ink),
             ),
           ),
           Panel(
@@ -2562,7 +2325,7 @@ class _PieSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Label — chart state',
               skeleton: ChartSkeletonKind.pie,
-              child: _pieLabel(ink, theme),
+              child: pieLabel(ink, theme),
             ),
           ),
           Panel(
@@ -2571,7 +2334,7 @@ class _PieSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Custom label — chart state',
               skeleton: ChartSkeletonKind.pie,
-              child: _pieLabelCustom(ink, theme),
+              child: pieLabelCustom(ink, theme),
             ),
           ),
           Panel(
@@ -2580,7 +2343,7 @@ class _PieSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Label list — chart state',
               skeleton: ChartSkeletonKind.pie,
-              child: _pieLabelList(ink),
+              child: pieLabelList(ink),
             ),
           ),
           Panel(
@@ -2589,7 +2352,7 @@ class _PieSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Legend — chart state',
               skeleton: ChartSkeletonKind.pie,
-              child: _pieLegend(ink),
+              child: pieLegend(ink),
             ),
           ),
           Panel(
@@ -2598,7 +2361,7 @@ class _PieSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Donut — chart state',
               skeleton: ChartSkeletonKind.pie,
-              child: _pieDonut(ink),
+              child: pieDonut(ink),
             ),
           ),
           Panel(
@@ -2607,7 +2370,7 @@ class _PieSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Donut, active — chart state',
               skeleton: ChartSkeletonKind.pie,
-              child: _pieDonutActive(ink),
+              child: pieDonutActive(ink),
             ),
           ),
           Panel(
@@ -2616,7 +2379,7 @@ class _PieSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Donut with text — chart state',
               skeleton: ChartSkeletonKind.pie,
-              child: _pieDonutText(ink),
+              child: pieDonutText(ink),
             ),
           ),
           Panel(
@@ -2625,7 +2388,7 @@ class _PieSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Stacked — chart state',
               skeleton: ChartSkeletonKind.pie,
-              child: _pieStacked(ink),
+              child: pieStacked(ink),
             ),
           ),
           Panel(
@@ -2637,11 +2400,11 @@ class _PieSection extends StatelessWidget {
               controls: (BuildContext context, Widget child) => _PieInteractive(
                 ink: ink,
                 builder: (BuildContext context, int index) =>
-                    _PieActiveScope(index: index, child: child),
+                    PieActiveScope(index: index, child: child),
               ),
               child: Builder(
                 builder: (BuildContext context) =>
-                    _pieInteractive(context, ink, _PieActiveScope.of(context)),
+                    pieInteractive(context, ink, PieActiveScope.of(context)),
               ),
             ),
           ),
@@ -2679,19 +2442,6 @@ class _PieSection extends StatelessWidget {
       ],
     ),
   );
-}
-
-/// The active slice, handed down through the keyed slot.
-class _PieActiveScope extends InheritedWidget {
-  const _PieActiveScope({required this.index, required super.child});
-
-  final int index;
-
-  static int of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_PieActiveScope>()?.index ?? 0;
-
-  @override
-  bool updateShouldNotify(_PieActiveScope old) => old.index != index;
 }
 
 class _RadarSection extends StatelessWidget {
