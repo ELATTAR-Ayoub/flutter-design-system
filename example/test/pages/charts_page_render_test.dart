@@ -74,4 +74,35 @@ void main() {
     }
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('every state toggle carries the panel it belongs to', (
+    WidgetTester tester,
+  ) async {
+    // A regression guard for the accessibility drop the ChartStateSwitch
+    // refactor introduced: a null `ToggleGroup.label` emits no `Semantics`
+    // container at all, so 72 identical Empty/Loading/Ready triples would
+    // otherwise be indistinguishable to a screen reader.
+    final SemanticsHandle handle = tester.ensureSemantics();
+    await _pumpChartsPage(tester);
+
+    // Every toggle group on the page carries a non-empty accessible name —
+    // one per panel, 72 in total.
+    final Finder namedToggleGroups = find.byWidgetPredicate(
+      (Widget widget) =>
+          widget is ToggleGroup &&
+          widget.label != null &&
+          widget.label!.isNotEmpty,
+    );
+    expect(namedToggleGroups, findsNWidgets(72));
+
+    // A known specimen carries the exact accessible name the pre-refactor
+    // page produced: '${panel label} — chart state'.
+    expect(
+      find.bySemanticsLabel('Weekly activity — chart state'),
+      findsOneWidget,
+    );
+
+    expect(tester.takeException(), isNull);
+    handle.dispose();
+  });
 }

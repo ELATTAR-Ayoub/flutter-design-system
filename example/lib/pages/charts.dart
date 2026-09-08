@@ -3340,6 +3340,7 @@ class _AreaSection extends StatelessWidget {
             label: 'Default',
             note: 'one series, natural curve',
             child: ChartStateSwitch(
+              groupLabel: 'Default — chart state',
               skeleton: ChartSkeletonKind.area,
               child: _areaDefault(ink),
             ),
@@ -3348,6 +3349,7 @@ class _AreaSection extends StatelessWidget {
             label: 'Linear',
             note: 'type=linear',
             child: ChartStateSwitch(
+              groupLabel: 'Linear — chart state',
               skeleton: ChartSkeletonKind.area,
               child: _areaLinear(ink),
             ),
@@ -3356,6 +3358,7 @@ class _AreaSection extends StatelessWidget {
             label: 'Step',
             note: 'type=step',
             child: ChartStateSwitch(
+              groupLabel: 'Step — chart state',
               skeleton: ChartSkeletonKind.area,
               child: _areaStep(ink),
             ),
@@ -3364,6 +3367,7 @@ class _AreaSection extends StatelessWidget {
             label: 'Stacked',
             note: 'shared stackId',
             child: ChartStateSwitch(
+              groupLabel: 'Stacked — chart state',
               skeleton: ChartSkeletonKind.area,
               child: _areaStacked(ink),
             ),
@@ -3372,6 +3376,7 @@ class _AreaSection extends StatelessWidget {
             label: 'Stacked, expanded',
             note: 'stackOffset=expand — shares, not totals',
             child: ChartStateSwitch(
+              groupLabel: 'Stacked, expanded — chart state',
               skeleton: ChartSkeletonKind.area,
               child: _areaStackedExpand(ink),
             ),
@@ -3380,6 +3385,7 @@ class _AreaSection extends StatelessWidget {
             label: 'Legend',
             note: 'ChartLegendContent',
             child: ChartStateSwitch(
+              groupLabel: 'Legend — chart state',
               skeleton: ChartSkeletonKind.area,
               child: _areaLegend(ink),
             ),
@@ -3388,6 +3394,7 @@ class _AreaSection extends StatelessWidget {
             label: 'Icons',
             note: 'config icons in the legend',
             child: ChartStateSwitch(
+              groupLabel: 'Icons — chart state',
               skeleton: ChartSkeletonKind.area,
               child: _areaIcons(ink),
             ),
@@ -3396,6 +3403,7 @@ class _AreaSection extends StatelessWidget {
             label: 'Gradient fill',
             note: 'a linearGradient in defs, both stops on the token',
             child: ChartStateSwitch(
+              groupLabel: 'Gradient fill — chart state',
               skeleton: ChartSkeletonKind.area,
               child: _areaGradient(ink),
             ),
@@ -3404,6 +3412,7 @@ class _AreaSection extends StatelessWidget {
             label: 'Axes',
             note: 'both axes labelled',
             child: ChartStateSwitch(
+              groupLabel: 'Axes — chart state',
               skeleton: ChartSkeletonKind.area,
               child: _areaAxes(ink),
             ),
@@ -3412,6 +3421,7 @@ class _AreaSection extends StatelessWidget {
             label: 'Interactive',
             note: 'range picker, above the plot',
             child: ChartStateSwitch(
+              groupLabel: 'Interactive — chart state',
               skeleton: ChartSkeletonKind.area,
               controls: (BuildContext context, Widget child) =>
                   _AreaInteractive(ink: ink, child: child),
@@ -3481,6 +3491,7 @@ class _BarSection extends StatelessWidget {
             label: 'Default',
             note: 'one series',
             child: ChartStateSwitch(
+              groupLabel: 'Default — chart state',
               skeleton: ChartSkeletonKind.bar,
               child: _barDefault(ink),
             ),
@@ -3489,6 +3500,7 @@ class _BarSection extends StatelessWidget {
             label: 'Horizontal',
             note: 'layout=vertical, YAxis type=category',
             child: ChartStateSwitch(
+              groupLabel: 'Horizontal — chart state',
               skeleton: ChartSkeletonKind.bar,
               child: _barHorizontal(ink),
             ),
@@ -3497,6 +3509,7 @@ class _BarSection extends StatelessWidget {
             label: 'Multiple',
             note: 'two Bars, no stackId',
             child: ChartStateSwitch(
+              groupLabel: 'Multiple — chart state',
               skeleton: ChartSkeletonKind.bar,
               child: _barMultiple(ink),
             ),
@@ -3505,6 +3518,7 @@ class _BarSection extends StatelessWidget {
             label: 'Stacked',
             note: 'three Bars sharing a stackId',
             child: ChartStateSwitch(
+              groupLabel: 'Stacked — chart state',
               skeleton: ChartSkeletonKind.bar,
               child: _barStacked(ink),
             ),
@@ -3513,6 +3527,7 @@ class _BarSection extends StatelessWidget {
             label: 'Label',
             note: 'LabelList on the bar',
             child: ChartStateSwitch(
+              groupLabel: 'Label — chart state',
               skeleton: ChartSkeletonKind.bar,
               child: _barLabel(ink, theme),
             ),
@@ -3521,6 +3536,7 @@ class _BarSection extends StatelessWidget {
             label: 'Custom label',
             note: 'LabelList with a render function',
             child: ChartStateSwitch(
+              groupLabel: 'Custom label — chart state',
               skeleton: ChartSkeletonKind.bar,
               child: _barLabelCustom(ink, theme),
             ),
@@ -3529,6 +3545,7 @@ class _BarSection extends StatelessWidget {
             label: 'Mixed',
             note: 'one Bar, a colour per datum',
             child: ChartStateSwitch(
+              groupLabel: 'Mixed — chart state',
               skeleton: ChartSkeletonKind.bar,
               child: _barMixed(ink),
             ),
@@ -3537,6 +3554,7 @@ class _BarSection extends StatelessWidget {
             label: 'Active',
             note: 'activeIndex highlights one',
             child: ChartStateSwitch(
+              groupLabel: 'Active — chart state',
               skeleton: ChartSkeletonKind.bar,
               child: _barActive(ink),
             ),
@@ -3545,6 +3563,7 @@ class _BarSection extends StatelessWidget {
             label: 'Negative',
             note: 'values below zero — direction by position, not by red',
             child: ChartStateSwitch(
+              groupLabel: 'Negative — chart state',
               skeleton: ChartSkeletonKind.bar,
               child: _barNegative(ink, theme),
             ),
@@ -3553,6 +3572,7 @@ class _BarSection extends StatelessWidget {
             label: 'Interactive',
             note: 'series picker, travelling pill',
             child: ChartStateSwitch(
+              groupLabel: 'Interactive — chart state',
               skeleton: ChartSkeletonKind.bar,
               controls: (BuildContext context, Widget child) => _SeriesStrip(
                 ink: ink,
@@ -3676,6 +3696,7 @@ class _LineSection extends StatelessWidget {
             label: 'Default',
             note: 'dot={false}',
             child: ChartStateSwitch(
+              groupLabel: 'Default — chart state',
               skeleton: ChartSkeletonKind.line,
               child: _lineDefault(ink),
             ),
@@ -3684,6 +3705,7 @@ class _LineSection extends StatelessWidget {
             label: 'Linear',
             note: 'type=linear',
             child: ChartStateSwitch(
+              groupLabel: 'Linear — chart state',
               skeleton: ChartSkeletonKind.line,
               child: _lineLinear(ink),
             ),
@@ -3692,6 +3714,7 @@ class _LineSection extends StatelessWidget {
             label: 'Step',
             note: 'type=step',
             child: ChartStateSwitch(
+              groupLabel: 'Step — chart state',
               skeleton: ChartSkeletonKind.line,
               child: _lineStep(ink),
             ),
@@ -3700,6 +3723,7 @@ class _LineSection extends StatelessWidget {
             label: 'Multi-series',
             note: 'three lines, three tokens',
             child: ChartStateSwitch(
+              groupLabel: 'Multi-series — chart state',
               skeleton: ChartSkeletonKind.line,
               child: _lineMultiple(ink),
             ),
@@ -3708,6 +3732,7 @@ class _LineSection extends StatelessWidget {
             label: 'Dots',
             note: 'a dot on every point',
             child: ChartStateSwitch(
+              groupLabel: 'Dots — chart state',
               skeleton: ChartSkeletonKind.line,
               child: _lineDots(ink),
             ),
@@ -3716,6 +3741,7 @@ class _LineSection extends StatelessWidget {
             label: 'Custom dots',
             note: 'dot as a render function',
             child: ChartStateSwitch(
+              groupLabel: 'Custom dots — chart state',
               skeleton: ChartSkeletonKind.line,
               child: _lineDotsCustom(ink, theme),
             ),
@@ -3724,6 +3750,7 @@ class _LineSection extends StatelessWidget {
             label: 'Dot colours',
             note: 'a token per dot',
             child: ChartStateSwitch(
+              groupLabel: 'Dot colours — chart state',
               skeleton: ChartSkeletonKind.line,
               child: _lineDotsColors(ink),
             ),
@@ -3732,6 +3759,7 @@ class _LineSection extends StatelessWidget {
             label: 'Label',
             note: 'LabelList above the line',
             child: ChartStateSwitch(
+              groupLabel: 'Label — chart state',
               skeleton: ChartSkeletonKind.line,
               child: _lineLabel(ink, theme),
             ),
@@ -3740,6 +3768,7 @@ class _LineSection extends StatelessWidget {
             label: 'Custom label',
             note: 'LabelList with a render function',
             child: ChartStateSwitch(
+              groupLabel: 'Custom label — chart state',
               skeleton: ChartSkeletonKind.line,
               child: _lineLabelCustom(ink, theme),
             ),
@@ -3748,6 +3777,7 @@ class _LineSection extends StatelessWidget {
             label: 'Interactive',
             note: 'series picker, travelling pill',
             child: ChartStateSwitch(
+              groupLabel: 'Interactive — chart state',
               skeleton: ChartSkeletonKind.line,
               controls: (BuildContext context, Widget child) => _SeriesStrip(
                 ink: ink,
@@ -3817,6 +3847,7 @@ class _PieSection extends StatelessWidget {
             label: 'Simple',
             note: 'fill carried on each datum',
             child: ChartStateSwitch(
+              groupLabel: 'Simple — chart state',
               skeleton: ChartSkeletonKind.pie,
               child: _pieSimple(ink),
             ),
@@ -3825,6 +3856,7 @@ class _PieSection extends StatelessWidget {
             label: 'No separator',
             note: 'paddingAngle={0}',
             child: ChartStateSwitch(
+              groupLabel: 'No separator — chart state',
               skeleton: ChartSkeletonKind.pie,
               child: _pieSeparatorNone(ink),
             ),
@@ -3833,6 +3865,7 @@ class _PieSection extends StatelessWidget {
             label: 'Label',
             note: 'labels outside, with leader lines',
             child: ChartStateSwitch(
+              groupLabel: 'Label — chart state',
               skeleton: ChartSkeletonKind.pie,
               child: _pieLabel(ink, theme),
             ),
@@ -3841,6 +3874,7 @@ class _PieSection extends StatelessWidget {
             label: 'Custom label',
             note: 'label as a render function',
             child: ChartStateSwitch(
+              groupLabel: 'Custom label — chart state',
               skeleton: ChartSkeletonKind.pie,
               child: _pieLabelCustom(ink, theme),
             ),
@@ -3849,6 +3883,7 @@ class _PieSection extends StatelessWidget {
             label: 'Label list',
             note: 'on a card chip — the fill cannot clear AA',
             child: ChartStateSwitch(
+              groupLabel: 'Label list — chart state',
               skeleton: ChartSkeletonKind.pie,
               child: _pieLabelList(ink),
             ),
@@ -3857,6 +3892,7 @@ class _PieSection extends StatelessWidget {
             label: 'Legend',
             note: 'ChartLegendContent, no tooltip',
             child: ChartStateSwitch(
+              groupLabel: 'Legend — chart state',
               skeleton: ChartSkeletonKind.pie,
               child: _pieLegend(ink),
             ),
@@ -3865,6 +3901,7 @@ class _PieSection extends StatelessWidget {
             label: 'Donut',
             note: 'innerRadius as a percentage',
             child: ChartStateSwitch(
+              groupLabel: 'Donut — chart state',
               skeleton: ChartSkeletonKind.pie,
               child: _pieDonut(ink),
             ),
@@ -3873,6 +3910,7 @@ class _PieSection extends StatelessWidget {
             label: 'Donut, active',
             note: 'activeIndex grows one slice',
             child: ChartStateSwitch(
+              groupLabel: 'Donut, active — chart state',
               skeleton: ChartSkeletonKind.pie,
               child: _pieDonutActive(ink),
             ),
@@ -3881,6 +3919,7 @@ class _PieSection extends StatelessWidget {
             label: 'Donut with text',
             note: 'the total in the hole',
             child: ChartStateSwitch(
+              groupLabel: 'Donut with text — chart state',
               skeleton: ChartSkeletonKind.pie,
               child: _pieDonutText(ink),
             ),
@@ -3889,6 +3928,7 @@ class _PieSection extends StatelessWidget {
             label: 'Stacked',
             note: 'two rings, one chart',
             child: ChartStateSwitch(
+              groupLabel: 'Stacked — chart state',
               skeleton: ChartSkeletonKind.pie,
               child: _pieStacked(ink),
             ),
@@ -3897,6 +3937,7 @@ class _PieSection extends StatelessWidget {
             label: 'Interactive',
             note: 'slice picker, travelling pill',
             child: ChartStateSwitch(
+              groupLabel: 'Interactive — chart state',
               skeleton: ChartSkeletonKind.pie,
               controls: (BuildContext context, Widget child) => _PieInteractive(
                 ink: ink,
@@ -3980,6 +4021,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Default',
             note: 'polygon grid, radial lines on',
             child: ChartStateSwitch(
+              groupLabel: 'Default — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarDefault(ink),
             ),
@@ -3988,6 +4030,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Dots',
             note: 'a dot at every vertex',
             child: ChartStateSwitch(
+              groupLabel: 'Dots — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarDots(ink),
             ),
@@ -3996,6 +4039,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Lines only',
             note: 'stroke, no fill',
             child: ChartStateSwitch(
+              groupLabel: 'Lines only — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarLinesOnly(ink),
             ),
@@ -4004,6 +4048,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Custom label',
             note: 'PolarAngleAxis tick as a render function',
             child: ChartStateSwitch(
+              groupLabel: 'Custom label — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarLabelCustom(ink),
             ),
@@ -4012,6 +4057,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Custom grid',
             note: 'PolarGrid with its own stroke',
             child: ChartStateSwitch(
+              groupLabel: 'Custom grid — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarGridCustom(ink),
             ),
@@ -4020,6 +4066,7 @@ class _RadarSection extends StatelessWidget {
             label: 'No grid',
             note: 'PolarGrid omitted',
             child: ChartStateSwitch(
+              groupLabel: 'No grid — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarGridNone(ink),
             ),
@@ -4028,6 +4075,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Circle grid',
             note: 'gridType=circle',
             child: ChartStateSwitch(
+              groupLabel: 'Circle grid — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarGridCircle(ink),
             ),
@@ -4036,6 +4084,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Circle, no lines',
             note: 'circle grid, radialLines={false}',
             child: ChartStateSwitch(
+              groupLabel: 'Circle, no lines — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarGridCircleNoLines(ink),
             ),
@@ -4044,6 +4093,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Circle, filled',
             note: 'circle grid with a fill',
             child: ChartStateSwitch(
+              groupLabel: 'Circle, filled — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarGridCircleFill(ink),
             ),
@@ -4052,6 +4102,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Polygon, filled',
             note: 'polygon grid with a fill',
             child: ChartStateSwitch(
+              groupLabel: 'Polygon, filled — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarGridFill(ink),
             ),
@@ -4060,6 +4111,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Multiple',
             note: 'two profiles overlaid',
             child: ChartStateSwitch(
+              groupLabel: 'Multiple — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarMultiple(ink),
             ),
@@ -4068,6 +4120,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Legend',
             note: 'ChartLegendContent under the web',
             child: ChartStateSwitch(
+              groupLabel: 'Legend — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarLegend(ink),
             ),
@@ -4076,6 +4129,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Icons',
             note: 'config icons in the legend',
             child: ChartStateSwitch(
+              groupLabel: 'Icons — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarIcons(ink),
             ),
@@ -4084,6 +4138,7 @@ class _RadarSection extends StatelessWidget {
             label: 'Radius axis',
             note: 'PolarRadiusAxis shown',
             child: ChartStateSwitch(
+              groupLabel: 'Radius axis — chart state',
               skeleton: ChartSkeletonKind.radar,
               child: _radarRadius(ink, theme),
             ),
@@ -4149,6 +4204,7 @@ class _RadialSection extends StatelessWidget {
             label: 'Simple',
             note: 'background rings, one bar per tier',
             child: ChartStateSwitch(
+              groupLabel: 'Simple — chart state',
               skeleton: ChartSkeletonKind.radial,
               child: _radialSimple(ink),
             ),
@@ -4157,6 +4213,7 @@ class _RadialSection extends StatelessWidget {
             label: 'Grid',
             note: 'PolarGrid inside the ring',
             child: ChartStateSwitch(
+              groupLabel: 'Grid — chart state',
               skeleton: ChartSkeletonKind.radial,
               child: _radialGrid(ink),
             ),
@@ -4165,6 +4222,7 @@ class _RadialSection extends StatelessWidget {
             label: 'Label',
             note: 'on a card chip — the arc cannot clear AA',
             child: ChartStateSwitch(
+              groupLabel: 'Label — chart state',
               skeleton: ChartSkeletonKind.radial,
               child: _radialLabel(ink),
             ),
@@ -4173,6 +4231,7 @@ class _RadialSection extends StatelessWidget {
             label: 'Text',
             note: 'the total in the hole',
             child: ChartStateSwitch(
+              groupLabel: 'Text — chart state',
               skeleton: ChartSkeletonKind.radial,
               child: _radialText(ink, theme),
             ),
@@ -4181,6 +4240,7 @@ class _RadialSection extends StatelessWidget {
             label: 'Shape',
             note: 'a custom activeShape',
             child: ChartStateSwitch(
+              groupLabel: 'Shape — chart state',
               skeleton: ChartSkeletonKind.radial,
               child: _radialShape(ink, theme),
             ),
@@ -4189,6 +4249,7 @@ class _RadialSection extends StatelessWidget {
             label: 'Stacked half-gauge',
             note: 'startAngle 180 → endAngle 0',
             child: ChartStateSwitch(
+              groupLabel: 'Stacked half-gauge — chart state',
               skeleton: ChartSkeletonKind.radial,
               child: _radialStacked(ink),
             ),
@@ -4307,6 +4368,7 @@ class _TooltipSection extends StatelessWidget {
             label: 'Default',
             note: 'ChartTooltipContent, dot indicator',
             child: ChartStateSwitch(
+              groupLabel: 'Default — chart state',
               skeleton: ChartSkeletonKind.tooltip,
               child: _tooltipDefault(ink),
             ),
@@ -4315,6 +4377,7 @@ class _TooltipSection extends StatelessWidget {
             label: 'Line indicator',
             note: 'indicator=line',
             child: ChartStateSwitch(
+              groupLabel: 'Line indicator — chart state',
               skeleton: ChartSkeletonKind.tooltip,
               child: _tooltipIndicatorLine(ink),
             ),
@@ -4323,6 +4386,7 @@ class _TooltipSection extends StatelessWidget {
             label: 'No indicator',
             note: 'hideIndicator',
             child: ChartStateSwitch(
+              groupLabel: 'No indicator — chart state',
               skeleton: ChartSkeletonKind.tooltip,
               child: _tooltipIndicatorNone(ink),
             ),
@@ -4331,6 +4395,7 @@ class _TooltipSection extends StatelessWidget {
             label: 'Custom label',
             note: 'labelKey plus a config label',
             child: ChartStateSwitch(
+              groupLabel: 'Custom label — chart state',
               skeleton: ChartSkeletonKind.tooltip,
               child: _tooltipLabelCustom(ink),
             ),
@@ -4339,6 +4404,7 @@ class _TooltipSection extends StatelessWidget {
             label: 'Label formatter',
             note: 'labelFormatter',
             child: ChartStateSwitch(
+              groupLabel: 'Label formatter — chart state',
               skeleton: ChartSkeletonKind.tooltip,
               child: _tooltipLabelFormatter(ink),
             ),
@@ -4347,6 +4413,7 @@ class _TooltipSection extends StatelessWidget {
             label: 'No label',
             note: 'hideLabel',
             child: ChartStateSwitch(
+              groupLabel: 'No label — chart state',
               skeleton: ChartSkeletonKind.tooltip,
               child: _tooltipLabelNone(ink),
             ),
@@ -4355,6 +4422,7 @@ class _TooltipSection extends StatelessWidget {
             label: 'Formatter',
             note: 'formatter render function',
             child: ChartStateSwitch(
+              groupLabel: 'Formatter — chart state',
               skeleton: ChartSkeletonKind.tooltip,
               child: _tooltipFormatter(ink),
             ),
@@ -4363,6 +4431,7 @@ class _TooltipSection extends StatelessWidget {
             label: 'Icons',
             note: 'config icons in the rows',
             child: ChartStateSwitch(
+              groupLabel: 'Icons — chart state',
               skeleton: ChartSkeletonKind.tooltip,
               child: _tooltipIcons(ink),
             ),
@@ -4371,6 +4440,7 @@ class _TooltipSection extends StatelessWidget {
             label: 'Advanced',
             note: 'formatter with a running total',
             child: ChartStateSwitch(
+              groupLabel: 'Advanced — chart state',
               skeleton: ChartSkeletonKind.tooltip,
               child: _tooltipAdvanced(ink),
             ),
@@ -5244,6 +5314,7 @@ class _UnitActivitySection extends StatelessWidget {
           label: 'Weekly activity',
           note: 'current and previous periods',
           child: ChartStateSwitch(
+            groupLabel: 'Weekly activity — chart state',
             skeleton: ChartSkeletonKind.bar,
             child: _UnitActivityChart(),
           ),
@@ -5292,6 +5363,7 @@ class _ConversionFunnelSection extends StatelessWidget {
           label: 'Stage conversion',
           note: 'distribution strip and exact totals',
           child: ChartStateSwitch(
+            groupLabel: 'Stage conversion — chart state',
             skeleton: ChartSkeletonKind.bar,
             child: _ConversionFunnelChart(),
           ),

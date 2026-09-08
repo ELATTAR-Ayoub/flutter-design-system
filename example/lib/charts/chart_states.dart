@@ -29,8 +29,9 @@ import 'chart_specimen.dart';
 ///
 /// `state.tsx`'s own header carries the four rulings this reproduces:
 ///
-///  * **It renders its own `Panel`.** A family section is a grid of
-///    `ChartStates`, never a grid of `Panel`s containing them.
+///  * **The call site renders the `Panel`.** `ChartStateSwitch` returns only
+///    the toggle strip and the state slot; `pages/charts.dart` wraps each one
+///    in `Panel(label:, note:)` itself.
 ///  * **The buttons are a `ToggleGroup`, and that is a rule not a preference.**
 ///    §4: a group with an active option owns one pill that travels.
 ///  * **The swap is one event.** `anim-content-change` on the arriving content and
@@ -46,10 +47,20 @@ import 'chart_specimen.dart';
 class ChartStateSwitch extends StatefulWidget {
   const ChartStateSwitch({
     super.key,
+    this.groupLabel,
     required this.skeleton,
     this.controls,
     required this.child,
   });
+
+  /// The accessible name for the `Empty` / `Loading` / `Ready` toggle group.
+  ///
+  /// The call site owns both framing and naming: it wraps this widget in its
+  /// own `Panel` and knows that panel's heading, so it passes that same
+  /// string here (e.g. `'$panelLabel — chart state'`) rather than this widget
+  /// inventing one. A null label means [ToggleGroup] emits no `Semantics`
+  /// container at all, so every call site must supply one.
+  final String? groupLabel;
 
   final ChartSkeletonKind skeleton;
 
@@ -90,6 +101,7 @@ class _ChartStateSwitchState extends State<ChartStateSwitch> {
           alignment: Alignment.centerLeft,
           child: ToggleGroup(
             size: ToggleSize.sm,
+            label: widget.groupLabel,
             items: const <ToggleGroupItem>[
               ToggleGroupItem(label: 'Empty'),
               ToggleGroupItem(label: 'Loading'),
