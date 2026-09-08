@@ -129,7 +129,7 @@ import './ambient_pattern.dart';
 /// and it moves with [FeedbackSurface.blendFor] rather than with the theme's
 /// token list.
 const double _darkOpacity = 0.75;
-const double _lightOpacity = 0.34;
+const double _lightOpacity = 0.9;
 
 // ── `::before` — the deep field ─────────────────────────────────────────────
 // `inset: -95% -4.5rem -95% auto; width: min(95%, 26rem)`.
@@ -533,7 +533,9 @@ class FeedbackSurface extends StatefulWidget {
   /// reason the ramps end on `--bloom-void`: white and black are the two
   /// blends' identity operands.
   static BlendMode blendFor(ResolvedColorMode kind) => switch (kind) {
-    ResolvedColorMode.light => BlendMode.multiply,
+    // Light no longer multiplies: a multiplied ramp over white reads as a
+    // grey-brown wash. It paints the ramp straight, masked to the corner.
+    ResolvedColorMode.light => BlendMode.srcOver,
     ResolvedColorMode.dark => BlendMode.screen,
   };
 

@@ -994,9 +994,11 @@ void main() {
       expect(FeedbackSurface.voidFor(ResolvedColorMode.dark).g, 0);
       expect(FeedbackSurface.voidFor(ResolvedColorMode.dark).b, 0);
 
+      // Light paints its ramp straight rather than multiplying it into the
+      // white card; the ramp still ends on the void so the edge fades clean.
       expect(
         FeedbackSurface.blendFor(ResolvedColorMode.light),
-        BlendMode.multiply,
+        BlendMode.srcOver,
       );
       expect(FeedbackSurface.voidFor(ResolvedColorMode.light).r, 1);
       expect(FeedbackSurface.voidFor(ResolvedColorMode.light).g, 1);
