@@ -224,6 +224,63 @@ bool _angleWithinSweep(double angle, double start, double sweep) {
   return sweep > 0 ? delta <= sweep + 1e-6 : delta - 360 >= sweep - 1e-6;
 }
 
+/// Places a polar tooltip against its own MEASURED size, the same mechanism
+/// `_HoverCardLayout` uses in `hover_card.dart:223` (and `popover.dart:879`):
+/// a `CustomSingleChildLayout` hands `getPositionForChild` the child's real
+/// `childSize`, so the clamp bounds the tooltip's actual width and height
+/// rather than a stand-in constant. No `minWidth`/`minHeight` token is
+/// needed on either axis.
+///
+/// With no [pointer] — nothing hovered, `defaultIndex` showing at rest —
+/// this is the pre-hover resting spot both charts always used: centred over
+/// [centre]'s x, [space]\(2\) down from the plot's top, untouched by the
+/// child's measured size exactly as it was before pointer-following.
+///
+/// With a [pointer], this mirrors `_CartesianChartState._tooltip` in
+/// `chart_cartesian.dart`: a [space]\(3\) gap off the cursor on each axis,
+/// then `math.min(math.max(v + gap, 0), bound - childSize)` on that axis —
+/// the same clamp shape cartesian applies to its tooltip's `left`, now fed
+/// the child's real extent instead of `ChartTooltipContent.minWidth`.
+/// Clamping the low end at 0 and the high end at `bound - childSize` is what
+/// keeps the panel on-screen near an edge: past the clamp point the
+/// tooltip's anchor stops advancing with the cursor and effectively sits on
+/// the cursor's other side instead of overflowing. Cartesian only clamps x
+/// (its tooltip's `top` is fixed at the plot's vertical middle, since every
+/// category shares one column); polar has no such column, so the identical
+/// formula runs on y too — against the child's measured height, so a
+/// tooltip hovered near the plot's bottom edge still tracks the cursor
+/// instead of stopping at a fixed fraction of the plot's height.
+class _PolarTooltipLayout extends SingleChildLayoutDelegate {
+  const _PolarTooltipLayout({required this.pointer, required this.centre});
+
+  final Offset? pointer;
+  final Offset centre;
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
+      constraints.loosen();
+
+  @override
+  Offset getPositionForChild(Size plot, Size childSize) {
+    final Offset? p = pointer;
+    if (p == null) return Offset(centre.dx, space(2));
+    final double gap = space(3);
+    final double left = math.min(
+      math.max(p.dx + gap, 0),
+      math.max(plot.width - childSize.width, 0),
+    );
+    final double top = math.min(
+      math.max(p.dy + gap, 0),
+      math.max(plot.height - childSize.height, 0),
+    );
+    return Offset(left, top);
+  }
+
+  @override
+  bool shouldRelayout(_PolarTooltipLayout old) =>
+      old.pointer != pointer || old.centre != centre;
+}
+
 /// `PieChart`.
 class PieChart extends StatefulWidget {
   const PieChart({
@@ -266,6 +323,15 @@ class _PieChartState extends State<PieChart>
   /// The slice the pointer is over, or null when it is nowhere (or has never
   /// moved) — mirrors `_CartesianChartState._hover` in `chart_cartesian.dart`.
   int? _hover;
+
+  /// The pointer's own local offset, kept alongside [_hover] so the tooltip
+  /// can follow it. Cartesian charts anchor a tooltip to `categoryCoord`
+  /// (the hovered datum's own x, not the raw pointer) because every category
+  /// shares one column; a donut slice has no such column, so the polar
+  /// tooltip tracks the raw cursor instead — updated on every hover event,
+  /// not only when [_hover] changes, or two points inside the same slice
+  /// would render the tooltip at the same spot.
+  Offset? _hoverLocal;
 
   @override
   void initState() {
@@ -317,7 +383,12 @@ class _PieChartState extends State<PieChart>
           onHover: (PointerHoverEvent e) =>
               _onHover(centre, maxRadius, e.localPosition),
           onExit: (_) {
-            if (_hover != null) setState(() => _hover = null);
+            if (_hover != null || _hoverLocal != null) {
+              setState(() {
+                _hover = null;
+                _hoverLocal = null;
+              });
+            }
           },
           child: AnimatedBuilder(
             animation: _entrance,
@@ -375,7 +446,14 @@ class _PieChartState extends State<PieChart>
                     ),
                   ),
                 if (active != null && widget.tooltip != null)
-                  _pieTooltip(context, config, plot, centre, active),
+                  _pieTooltip(
+                    context,
+                    config,
+                    plot,
+                    centre,
+                    active,
+                    _hover != null ? _hoverLocal : null,
+                  ),
               ],
             ),
           ),
@@ -388,7 +466,12 @@ class _PieChartState extends State<PieChart>
     final int? index = widget.pies.isEmpty
         ? null
         : _pieIndexAt(widget.pies.first, centre, maxRadius, local);
-    if (index != _hover) setState(() => _hover = index);
+    if (index != _hover || local != _hoverLocal) {
+      setState(() {
+        _hover = index;
+        _hoverLocal = local;
+      });
+    }
   }
 
   /// Which slice of [pie] a pointer at [local] is over — the polar analogue
@@ -450,29 +533,35 @@ class _PieChartState extends State<PieChart>
     Size plot,
     Offset centre,
     int index,
+    Offset? pointer,
   ) {
     final ChartTooltipSpec spec = widget.tooltip!;
     final PieSpec pie = widget.pies.first;
     final int i = index.clamp(0, pie.data.length - 1);
     final Map<String, Object?> row = pie.data[i];
     return Positioned(
-      left: centre.dx,
-      top: space(2),
-      child: ChartTooltipContent(
-        config: config,
-        items: <ChartTooltipItem>[
-          ChartTooltipItem(
-            name: '${row[pie.nameKey ?? 'name'] ?? pie.dataKey}',
-            value: row[pie.dataKey] as num?,
-            color: row['fill'] as Color?,
-            payload: row,
-            dataKey: pie.dataKey,
-          ),
-        ],
-        indicator: spec.indicator,
-        hideLabel: spec.hideLabel,
-        hideIndicator: spec.hideIndicator,
-        nameKey: spec.nameKey,
+      left: 0,
+      top: 0,
+      width: plot.width,
+      height: plot.height,
+      child: CustomSingleChildLayout(
+        delegate: _PolarTooltipLayout(pointer: pointer, centre: centre),
+        child: ChartTooltipContent(
+          config: config,
+          items: <ChartTooltipItem>[
+            ChartTooltipItem(
+              name: '${row[pie.nameKey ?? 'name'] ?? pie.dataKey}',
+              value: row[pie.dataKey] as num?,
+              color: row['fill'] as Color?,
+              payload: row,
+              dataKey: pie.dataKey,
+            ),
+          ],
+          indicator: spec.indicator,
+          hideLabel: spec.hideLabel,
+          hideIndicator: spec.hideIndicator,
+          nameKey: spec.nameKey,
+        ),
       ),
     );
   }
@@ -1214,6 +1303,9 @@ class _RadialBarChartState extends State<RadialBarChart>
   /// The row the pointer is over — mirrors `_PieChartState._hover`.
   int? _hover;
 
+  /// The pointer's own local offset — mirrors `_PieChartState._hoverLocal`.
+  Offset? _hoverLocal;
+
   @override
   void initState() {
     super.initState();
@@ -1343,7 +1435,12 @@ class _RadialBarChartState extends State<RadialBarChart>
           onHover: (PointerHoverEvent e) =>
               _onHover(regions, centre, e.localPosition),
           onExit: (_) {
-            if (_hover != null) setState(() => _hover = null);
+            if (_hover != null || _hoverLocal != null) {
+              setState(() {
+                _hover = null;
+                _hoverLocal = null;
+              });
+            }
           },
           child: AnimatedBuilder(
             animation: _entrance,
@@ -1376,7 +1473,14 @@ class _RadialBarChartState extends State<RadialBarChart>
                     ),
                   ),
                 if (active != null && widget.tooltip != null)
-                  _radialTooltip(context, config, centre, active),
+                  _radialTooltip(
+                    context,
+                    config,
+                    Size(c.maxWidth, c.maxHeight),
+                    centre,
+                    active,
+                    _hover != null ? _hoverLocal : null,
+                  ),
               ],
             ),
           ),
@@ -1387,7 +1491,12 @@ class _RadialBarChartState extends State<RadialBarChart>
 
   void _onHover(List<_RadialHitRegion> regions, Offset centre, Offset local) {
     final int? index = _radialIndexAt(regions, centre, local);
-    if (index != _hover) setState(() => _hover = index);
+    if (index != _hover || local != _hoverLocal) {
+      setState(() {
+        _hover = index;
+        _hoverLocal = local;
+      });
+    }
   }
 
   /// Which row's arc a pointer at [local] is over. Radial bands are
@@ -1415,8 +1524,10 @@ class _RadialBarChartState extends State<RadialBarChart>
   Widget _radialTooltip(
     BuildContext context,
     ChartConfig config,
+    Size plot,
     Offset centre,
     int index,
+    Offset? pointer,
   ) {
     final ChartTooltipSpec spec = widget.tooltip!;
     final int i = index.clamp(0, widget.data.length - 1);
@@ -1433,15 +1544,20 @@ class _RadialBarChartState extends State<RadialBarChart>
           ),
     ];
     return Positioned(
-      left: centre.dx,
-      top: space(2),
-      child: ChartTooltipContent(
-        config: config,
-        items: items,
-        indicator: spec.indicator,
-        hideLabel: spec.hideLabel,
-        hideIndicator: spec.hideIndicator,
-        nameKey: spec.nameKey,
+      left: 0,
+      top: 0,
+      width: plot.width,
+      height: plot.height,
+      child: CustomSingleChildLayout(
+        delegate: _PolarTooltipLayout(pointer: pointer, centre: centre),
+        child: ChartTooltipContent(
+          config: config,
+          items: items,
+          indicator: spec.indicator,
+          hideLabel: spec.hideLabel,
+          hideIndicator: spec.hideIndicator,
+          nameKey: spec.nameKey,
+        ),
       ),
     );
   }

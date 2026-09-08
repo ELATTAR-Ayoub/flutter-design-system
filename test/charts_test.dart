@@ -648,6 +648,122 @@ void main() {
       expect(find.byType(ChartTooltipContent), findsOneWidget);
       expect(find.text('10'), findsOneWidget);
     });
+
+    testWidgets(
+      'two positions inside the SAME sector place the tooltip at '
+      'DIFFERENT screen positions — it follows the pointer, not a fixed '
+      'anchor',
+      (WidgetTester t) async {
+        await t.pumpWidget(pie());
+        final TestGesture mouse = await startMouse(t);
+        final Finder chart = find.byType(PieChart);
+        final Offset origin = t.getTopLeft(chart);
+
+        // Both points sit inside Alpha's 0..120° sector (mid 60°) and
+        // between the 40..100 ring, so both hover the same slice.
+        final Offset near = polarToCartesian(centre.dx, centre.dy, 55, 20);
+        final Offset far = polarToCartesian(centre.dx, centre.dy, 95, 100);
+
+        await hoverAt(t, mouse, chart, near);
+        expect(find.text('Alpha'), findsOneWidget);
+        final Offset nearTooltip =
+            t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
+
+        await hoverAt(t, mouse, chart, far);
+        expect(find.text('Alpha'), findsOneWidget);
+        final Offset farTooltip =
+            t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
+
+        expect(nearTooltip, isNot(equals(farTooltip)));
+      },
+    );
+
+    testWidgets(
+      'hovering near the right/bottom edge keeps the tooltip within the '
+      'chart bounds',
+      (WidgetTester t) async {
+        // A big enough ring that a point on it sits close to the plot's
+        // right and bottom edges.
+        await t.pumpWidget(
+          _scoped(
+            SizedBox(
+              width: _plot.width,
+              height: _plot.height,
+              child: PieChart(
+                pies: <PieSpec>[
+                  const PieSpec(
+                    data: pieData,
+                    dataKey: 'value',
+                    innerRadius: 40,
+                    outerRadius: 120,
+                  ),
+                ],
+                tooltip: const ChartTooltipSpec(),
+              ),
+            ),
+          ),
+        );
+        final TestGesture mouse = await startMouse(t);
+        final Finder chart = find.byType(PieChart);
+        final Offset origin = t.getTopLeft(chart);
+
+        // 10° is inside Alpha's 0..120° sector and, at radius 118, close
+        // enough to the plot's right edge (482) to push the unclamped
+        // anchor (357 + the space(3) gap) past `plot.width - minWidth`.
+        final Offset corner = polarToCartesian(centre.dx, centre.dy, 118, 10);
+        await hoverAt(t, mouse, chart, corner);
+        expect(find.text('Alpha'), findsOneWidget);
+
+        final Rect tooltip =
+            (t.getTopLeft(find.byType(ChartTooltipContent)) - origin) &
+            t.getSize(find.byType(ChartTooltipContent));
+        expect(tooltip.left, greaterThanOrEqualTo(0));
+        expect(tooltip.top, greaterThanOrEqualTo(0));
+        expect(tooltip.right, lessThanOrEqualTo(_plot.width));
+        // The vertical clamp is bounded by the tooltip's own MEASURED height
+        // (via the `CustomSingleChildLayout` delegate), not a stand-in
+        // width constant, so the bottom edge is held in-bounds too.
+        expect(tooltip.bottom, lessThanOrEqualTo(_plot.height));
+      },
+    );
+
+    testWidgets(
+      'hovering a sector near the BOTTOM of the plot places the tooltip in '
+      'the lower half — the vertical clamp must bound the real measured '
+      'height, not a width constant standing in for one',
+      (WidgetTester t) async {
+        await t.pumpWidget(pie());
+        final TestGesture mouse = await startMouse(t);
+        final Finder chart = find.byType(PieChart);
+        final Offset origin = t.getTopLeft(chart);
+
+        // Gamma's sector is 240..360°, mid 300° — polarToCartesian's
+        // convention (screen y = cy + sin(300°)·r = cy + 0.866·r) puts this
+        // well below the plot's vertical centre, near the bottom edge of
+        // the 256px-tall plot.
+        final Offset bottom = polarToCartesian(centre.dx, centre.dy, 95, 300);
+        await hoverAt(t, mouse, chart, bottom);
+        expect(find.text('Gamma'), findsOneWidget);
+
+        final Offset tooltipTopLeft =
+            t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
+        expect(tooltipTopLeft.dy, greaterThan(_plot.height / 2));
+      },
+    );
+
+    testWidgets(
+      "defaultIndex's resting position — no pointer, tooltip at rest — is "
+      'unchanged from before pointer-following was added: centred on the '
+      "pie's own centre x, space(2) down from the plot's top",
+      (WidgetTester t) async {
+        await t.pumpWidget(pie(defaultIndex: 1));
+        final Finder chart = find.byType(PieChart);
+        final Offset origin = t.getTopLeft(chart);
+        final Offset resting =
+            t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
+        expect(resting, const Offset(241, 8));
+      },
+    );
   });
 
   /* ── Rendered pixels ──────────────────────────────────────────────────── */
