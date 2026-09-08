@@ -291,37 +291,44 @@ class Bubble extends StatelessWidget {
     final BubbleAlign resolved = BubbleAlignScope.resolve(context, align);
     final bool ghost = variant == BubbleVariant.ghost;
 
-    Widget bubble = _BubbleScope(
+    // `w-fit max-w-[80%]`: shrink-wrap, capped at a fraction of whatever
+    // column it is in. A [LayoutBuilder] would express that too and cannot
+    // be used — it refuses to answer an intrinsic query, and the kit's own
+    // `Grid` asks one of every cell through [IntrinsicHeight].
+    Widget box = _MaxWidthFraction(
+      factor: ghost ? 1 : maxWidthFraction,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: resolved == BubbleAlign.end
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
+        children: <Widget>[child],
+      ),
+    );
+
+    if (reactions != null) {
+      // `position: absolute` against the bubble, which is `relative`. The
+      // stack is built around [box] — the bubble's own measured shrink-wrapped
+      // shape — rather than the outer `Align` below, which expands to fill
+      // whatever row it sits in. Sizing the stack on the expanded `Align`
+      // would anchor `end` at the row's far edge instead of the bubble's own
+      // trailing edge; sizing it on [box] keeps the rail hugging the bubble
+      // regardless of how short it is. The rail also overflows the bubble's
+      // box by three quarters of its own height, so the stack must neither
+      // clip nor bounds-check a pointer — see [_ReactionStack].
+      box = _ReactionStack(children: <Widget>[box, reactions!]);
+    }
+
+    final Widget bubble = _BubbleScope(
       variant: variant,
       align: resolved,
       child: Align(
         alignment: resolved == BubbleAlign.end
             ? AlignmentDirectional.centerEnd
             : AlignmentDirectional.centerStart,
-        // `w-fit max-w-[80%]`: shrink-wrap, capped at a fraction of whatever
-        // column it is in. A [LayoutBuilder] would express that too and cannot
-        // be used — it refuses to answer an intrinsic query, and the kit's own
-        // `Grid` asks one of every cell through [IntrinsicHeight].
-        child: _MaxWidthFraction(
-          factor: ghost ? 1 : maxWidthFraction,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: resolved == BubbleAlign.end
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start,
-            children: <Widget>[child],
-          ),
-        ),
+        child: box,
       ),
     );
-
-    if (reactions != null) {
-      // `position: absolute` against the bubble, which is `relative`. The rail
-      // overflows the bubble's box by three quarters of its own height, so the
-      // stack must neither clip nor bounds-check a pointer — see
-      // [_ReactionStack].
-      bubble = _ReactionStack(children: <Widget>[bubble, reactions!]);
-    }
 
     return bubble;
   }

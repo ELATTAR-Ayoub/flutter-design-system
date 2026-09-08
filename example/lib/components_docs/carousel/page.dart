@@ -559,12 +559,19 @@ class _DummySlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.secondary,
-        borderRadius: BorderRadius.circular(Radii.md),
+    // Square, at whatever width _Track's own SizedBox hands this slide:
+    // AspectRatio reads that fixed width and fixes the height to match,
+    // rather than the old short pill shrink-wrapping the label's own
+    // text height.
+    return AspectRatio(
+      ratio: 1,
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.secondary,
+          borderRadius: BorderRadius.circular(Radii.md),
+        ),
+        child: Center(child: StyledText(label, TextStyles.body)),
       ),
-      child: Center(child: StyledText(label, TextStyles.body)),
     );
   }
 }

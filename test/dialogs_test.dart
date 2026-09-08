@@ -484,20 +484,29 @@ void main() {
       );
     });
 
-    testWidgets('the unfilled variants take neither ramp nor shadow', (
+    testWidgets('no variant paints a gradient or a shadow, filled or not', (
       WidgetTester t,
     ) async {
       for (final BadgeVariant v in BadgeVariant.values) {
         _useFrame(t);
         await t.pumpWidget(_host(Badge(label: 'x', variant: v)));
-        expect(
-          find.descendant(
-            of: find.byType(Badge),
-            matching: find.byType(Surface),
-          ),
-          v.filled ? findsOneWidget : findsNothing,
-          reason: '$v',
-        );
+        final Iterable<BoxDecoration> decorations = t
+            .widgetList<DecoratedBox>(
+              find.descendant(
+                of: find.byType(Badge),
+                matching: find.byType(DecoratedBox),
+              ),
+            )
+            .map((DecoratedBox box) => box.decoration)
+            .whereType<BoxDecoration>();
+        for (final BoxDecoration decoration in decorations) {
+          expect(decoration.gradient, isNull, reason: '$v');
+          expect(
+            decoration.boxShadow == null || decoration.boxShadow!.isEmpty,
+            isTrue,
+            reason: '$v',
+          );
+        }
       }
     });
   });

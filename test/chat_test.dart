@@ -420,6 +420,50 @@ void main() {
     });
 
     testWidgets(
+      'the rail hugs the bubble edge, not the wide row it sits in',
+      (WidgetTester t) async {
+        // The docs "Reactions" specimen: a short, short-align-start `Bubble`
+        // inside a `Column` that is itself much wider (a `Wrap` cell). The
+        // rail must anchor to the BUBBLE's own trailing/leading edge, not to
+        // the far edge of whatever row it happens to sit in.
+        Widget wideBubble(BubbleAlign railAlign) => SizedBox(
+          width: 400,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Bubble(
+                reactions: BubbleReactions(
+                  align: railAlign,
+                  children: const <Widget>[Text('A')],
+                ),
+                child: const BubbleContent(child: Text('Hi')),
+              ),
+            ],
+          ),
+        );
+
+        await t.pumpWidget(host(wideBubble(BubbleAlign.end)));
+        final Rect bubbleEnd = t.getRect(find.byType(BubbleContent));
+        final Rect railEnd = t.getRect(find.byType(BubbleReactions));
+        expect(
+          railEnd.right,
+          closeTo(bubbleEnd.right - BubbleReactions.inset, 1),
+          reason:
+              'an `end` rail on a short, start-aligned bubble must sit near '
+              "the bubble's own right edge, not the wide row's",
+        );
+
+        await t.pumpWidget(host(wideBubble(BubbleAlign.start)));
+        final Rect bubbleStart = t.getRect(find.byType(BubbleContent));
+        final Rect railStart = t.getRect(find.byType(BubbleReactions));
+        expect(
+          railStart.left,
+          closeTo(bubbleStart.left + BubbleReactions.inset, 1),
+        );
+      },
+    );
+
+    testWidgets(
       'the count opens over 250ms on ease-out — the duration-fast no-op',
       (WidgetTester t) async {
         await t.pumpWidget(

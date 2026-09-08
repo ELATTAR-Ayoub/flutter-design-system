@@ -689,17 +689,12 @@ class _DependenciesContent extends StatelessWidget {
     children: <Widget>[
       _bullets(ThemeScope.of(context), <String>[
         'File: lib/src/components/ui/badge.dart (one file, no companion parts).',
-        'Foundation imports: foundation/colors.dart (hslColor, Palette), '
-            'foundation/shadows.dart (Shadows.compactControl, Shadows.controlPremium), '
+        'Foundation imports: foundation/colors.dart (Palette), '
             'foundation/spacing.dart (space()), foundation/theme.dart '
             '(ThemeTokens), foundation/typography.dart (TextStyles).',
-        'Effect import: effects/surface.dart (Surface), '
-            'paints the fill, border, and shadow together for every filled '
-            'variant.',
         'Scope import: theme_scope.dart (StyledText, ThemeScope).',
         'Assets: none. Fonts: none beyond the system type scale every StyledText '
-            'call already depends on. Shaders: none: the ramp-chip highlight '
-            'is a LinearGradient, not a fragment shader.',
+            'call already depends on. Shaders: none.',
       ]),
       SizedBox(height: space(2)),
       ConstrainedBox(
@@ -709,7 +704,6 @@ class _DependenciesContent extends StatelessWidget {
             DocsLink(label: 'Button', route: '/components/button'),
             DocsLink(label: 'Icon', route: '/components/icon'),
             DocsLink(label: 'Kbd', route: '/components/kbd'),
-            DocsLink(label: 'Surface', route: '/components/surface'),
             DocsLink(label: 'Sidebar', route: '/components/sidebar'),
           ],
         ),
@@ -731,14 +725,9 @@ class _ThemingContent extends StatelessWidget {
         'six semantic tints, and the matching *Ink getters for text. '
         'Flipping ThemeController between light and dark re-resolves '
         'every one: nothing is cached.',
-    'The ramp-chip highlight is NOT theme-aware: it is a fixed white-to-'
-        'black alpha gradient (18% white top, 5% white mid, 14% black '
-        'bottom) painted as its own layer over the fill in both themes, '
-        'a deliberate port of the reference\'s own utility, not a token '
-        'gap.',
-    'The two shadow specs, Shadows.compactControl and, for premium only, '
-        'Shadows.controlPremium: are the badge entries in the machine-shadow '
-        'family. Overriding them is not exposed as a Badge parameter.',
+    'Every fill is flat: no gradient and no shadow paint over or under '
+        'it, on any variant, premium included. A badge reads as a '
+        'label, not a raised control.',
     'Badge declares no colour-override parameter of its own (no fill '
         'or color argument): every fill is variant-derived. A call site '
         'that needs a colour outside the eleven variants is a signal to '
@@ -769,8 +758,8 @@ const List<DocsApiFact> _badgeApiFacts = <DocsApiFact>[
     name: 'variant',
     type: 'BadgeVariant',
     description:
-        'Defaults to primary. Selects the fill, ink, and shadow: see '
-        'BadgeVariant below.',
+        'Defaults to primary. Selects the fill and ink: see BadgeVariant '
+        'below.',
   ),
   DocsApiFact(
     name: 'spec',
@@ -832,79 +821,68 @@ const List<DocsApiFact> _variantFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'primary',
     type: 'filled',
-    description:
-        'Fills with theme.primary. ramp-chip highlight + shadow-chip. The '
-        'constructor default.',
+    description: 'A flat fill of theme.primary. The constructor default.',
   ),
   DocsApiFact(
     name: 'secondary',
     type: 'filled',
-    description: 'Fills with theme.secondary. ramp-chip + shadow-chip.',
+    description: 'A flat fill of theme.secondary.',
   ),
   DocsApiFact(
     name: 'destructive',
     type: 'filled',
-    description:
-        'A 12%-alpha tint of theme.destructive. ramp-chip + shadow-chip.',
+    description: 'A flat 12%-alpha tint of theme.destructive.',
   ),
   DocsApiFact(
     name: 'outline',
     type: 'unfilled',
     description:
-        'No fill, no ramp, no shadow. A 1px border in theme.input; ink is '
+        'No fill. A 1px border in theme.input; ink is '
         'theme.mutedForeground.',
   ),
   DocsApiFact(
     name: 'ghost',
     type: 'unfilled',
     description:
-        'No fill, no border, no ramp, no shadow. Ink is '
-        'theme.mutedForeground: same ink as outline.',
+        'No fill, no border. Ink is theme.mutedForeground: same ink as '
+        'outline.',
   ),
   DocsApiFact(
     name: 'link',
     type: 'unfilled',
     description:
-        'No fill, no ramp, no shadow. Ink is theme.actionText, coloured '
-        'text in a pill-shaped box.',
+        'No fill. Ink is theme.actionText, coloured text in a pill-shaped '
+        'box.',
   ),
   DocsApiFact(
     name: 'action',
     type: 'filled',
     description:
-        'Added for this system (not in the original shadcn set). A '
+        'Added for this system (not in the original shadcn set). A flat '
         '12%-alpha tint of Palette.action; ink is theme.actionText, same '
-        'ink as link. ramp-chip + shadow-chip. The media dialog\'s "New '
-        'release".',
+        'ink as link. The media dialog\'s "New release".',
   ),
   DocsApiFact(
     name: 'premium',
     type: 'filled',
     description:
-        'A 12%-alpha tint of Palette.value; ink is theme.premiumText. The '
-        'one variant using shadow-btn-value instead of shadow-chip: used '
-        'for Featured, Limited, and anything carrying value.',
+        'A flat 12%-alpha tint of Palette.value; ink is theme.premiumText. '
+        'Used for Featured, Limited, and anything carrying value.',
   ),
   DocsApiFact(
     name: 'success',
     type: 'filled',
-    description:
-        'A 12%-alpha tint of Palette.success; ink is theme.successText. '
-        'ramp-chip + shadow-chip.',
+    description: 'A flat 12%-alpha tint of Palette.success; ink is theme.successText.',
   ),
   DocsApiFact(
     name: 'warning',
     type: 'filled',
-    description:
-        'A 12%-alpha tint of Palette.warning; ink is theme.warningText. '
-        'ramp-chip + shadow-chip.',
+    description: 'A flat 12%-alpha tint of Palette.warning; ink is theme.warningText.',
   ),
   DocsApiFact(
     name: 'info',
     type: 'filled',
-    description:
-        'A 12%-alpha tint of Palette.info; ink is theme.infoText. '
-        'ramp-chip + shadow-chip.',
+    description: 'A flat 12%-alpha tint of Palette.info; ink is theme.infoText.',
   ),
 ];
 
@@ -912,10 +890,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Rest',
     treatment:
-        'Filled variants paint their fill under ramp-chip (a '
-        'light-from-above gradient) and shadow-chip (shadow-btn-value for '
-        'premium). Unfilled variants (outline, ghost, link) paint no ramp '
-        'and no shadow.',
+        'Filled variants paint a flat fill and nothing else. Unfilled '
+        'variants (outline, ghost, link) paint no fill at all.',
     userSignal: 'The resting paint is the only paint: see below.',
   ),
   DocsStateFact(

@@ -519,9 +519,10 @@ const List<DocsApiFact> _dsAvatarFacts = <DocsApiFact>[
     name: 'fallbackSpec',
     type: 'TextStyleToken?',
     description:
-        'The fallback text\'s type. Defaults to TextStyles.small; '
-        'avatarFallback and avatarInitials are the two named specs the '
-        'corpus reaches for instead.',
+        'The fallback text\'s type. Left null (the default), the font size '
+        'is derived from the circle\'s own diameter instead, so the '
+        'initials stay legible at sm without overflowing it; pass a named '
+        'role like TextStyles.nav to opt back into a fixed size.',
   ),
   DocsApiFact(
     name: 'sizePx',

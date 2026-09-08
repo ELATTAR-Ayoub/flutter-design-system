@@ -1,21 +1,14 @@
-/// `components/ui/badge.tsx` — *"a chip with depth, not a coloured
-/// rectangle."*
+/// `components/ui/badge.tsx` — a chip, not a button.
 ///
-/// Its own docstring is the spec, and it is worth quoting because two of the
-/// three things it asks for are paint the port has to build rather than
-/// tokens it can name:
-///
-/// > Every filled variant carries `ramp-chip` (a light-from-above gradient)
-/// > and `shadow-chip` (the badge entry in the machine shadow family). Stock
-/// > shadcn ships a flat fill; next to buttons that have an inner highlight
-/// > and a real shadow, a flat chip looks like a sticker someone pasted on.
-/// >
-/// > `shadow-chip` deliberately reads as *raised but not pressable* — it has
-/// > the inner top highlight of a control but none of the travel. A badge is a
-/// > label, not a button, and it must not invite a click.
-/// >
-/// > Unfilled variants (outline, ghost, link) get neither: there is no surface
-/// > to light, and a shadow under transparent text is just dirt.
+/// **Simplified, deliberately, from the reference.** The reference's own
+/// `badge.tsx` docstring called for `ramp-chip` (a light-from-above
+/// gradient) and `shadow-chip` (the machine shadow family's badge entry) on
+/// every filled variant, `premium` wearing `shadow-btn-value` instead. This
+/// port shipped that once; the project owner asked for it gone — *"no need
+/// for the gradient and shadow for the badges, make them simple"* — so every
+/// variant, `premium` included, is now a flat fill in its own colour with no
+/// ramp layer and no elevation. `Shadows`/`Surface` no longer factor into
+/// this file at all.
 ///
 /// Measured open on the dialogs page's media dialog (2026-08-16, 1440x900):
 /// `h-5` is a **hard 20px border box**, `px-2 py-0.5` inside a 1px transparent
@@ -46,50 +39,29 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import '../../design_system/foundation/colors.dart';
-import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
-import './surface.dart';
 import '../../design_system/foundation/theme_scope.dart';
 
 /// `bg-<hue>/12` — the tint every semantic variant is filled with.
 const double _tintAlpha = 0.12;
 
-/// `@utility ramp-chip` (globals.css L1531–1538):
-/// `linear-gradient(to bottom, rgb(255 255 255 / .18) 0%,`
-/// `rgb(255 255 255 / .05) 48%, rgb(0 0 0 / .14) 100%)`.
-///
-/// A `background-image` over the `background-color`, so it composites on top
-/// of the fill rather than replacing it — which is what a [DecoratedBox] with
-/// both a `color` and a `gradient` cannot do (the gradient wins outright).
-/// Painted as its own layer here for that reason.
-final LinearGradient _rampChip = LinearGradient(
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
-  colors: <Color>[
-    hslColor(0, 0, 100).withValues(alpha: 0.18),
-    hslColor(0, 0, 100).withValues(alpha: 0.05),
-    hslColor(0, 0, 0).withValues(alpha: 0.14),
-  ],
-  stops: const <double>[0, 0.48, 1],
-);
-
 /// `badgeVariants` — the cva's ten, in its own order.
 enum BadgeVariant {
-  /// `ramp-chip bg-primary text-primary-foreground shadow-chip`.
+  /// `bg-primary text-primary-foreground`, a flat fill.
   ///
   /// Named [primary] because `default` is a Dart keyword, the same rename
   /// `ButtonVariant.primary` carries.
   primary,
 
-  /// `ramp-chip bg-secondary text-secondary-foreground shadow-chip`.
+  /// `bg-secondary text-secondary-foreground`, a flat fill.
   secondary,
 
-  /// `ramp-chip bg-destructive/12 text-destructive-ink shadow-chip`.
+  /// `bg-destructive/12 text-destructive-ink`, a flat fill.
   destructive,
 
-  /// `border-input text-muted-foreground` — no ramp, no shadow, no fill.
+  /// `border-input text-muted-foreground` — no fill.
   outline,
 
   /// `text-muted-foreground` and nothing else at rest.
@@ -99,27 +71,26 @@ enum BadgeVariant {
   /// at rest this is coloured text in a pill-shaped box.
   link,
 
-  /// *"Added for this system."* `ramp-chip bg-action/12 text-action-ink
-  /// shadow-chip` — the media dialog's "New release".
+  /// *"Added for this system."* `bg-action/12 text-action-ink`, a flat fill —
+  /// the media dialog's "New release".
   action,
 
-  /// `ramp-chip bg-value/12 text-value-ink shadow-btn-value` — *"the lime one,
-  /// used for Featured, Limited and anything carrying value — the only badge
-  /// that gets the lime cast under it, because lime is worth."* The one
-  /// variant that does **not** wear `shadow-chip`.
+  /// `bg-value/12 text-value-ink` — *"the lime one, used for Featured,
+  /// Limited and anything carrying value — the only badge that gets the lime
+  /// cast under it, because lime is worth."*
   premium,
 
-  /// `ramp-chip bg-success/12 text-success-ink shadow-chip`.
+  /// `bg-success/12 text-success-ink`, a flat fill.
   success,
 
-  /// `ramp-chip bg-warning/12 text-warning-ink shadow-chip`.
+  /// `bg-warning/12 text-warning-ink`, a flat fill.
   warning,
 
-  /// `ramp-chip bg-info/12 text-info-ink shadow-chip`.
+  /// `bg-info/12 text-info-ink`, a flat fill.
   info;
 
-  /// Whether the variant is filled — and therefore whether it carries the ramp
-  /// and a shadow at all.
+  /// Whether the variant is filled — and therefore whether it carries a
+  /// `_fill` colour at all.
   bool get filled => switch (this) {
     BadgeVariant.outline || BadgeVariant.ghost || BadgeVariant.link => false,
     _ => true,
@@ -216,11 +187,6 @@ class Badge extends StatelessWidget {
     BadgeVariant.info => theme.infoText,
   };
 
-  /// `shadow-chip` everywhere but `premium`, which takes `shadow-btn-value`.
-  ShadowStyle _shadow() => variant == BadgeVariant.premium
-      ? Shadows.controlPremium
-      : Shadows.compactControl;
-
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
@@ -240,7 +206,7 @@ class Badge extends StatelessWidget {
       color: _ink(theme),
     );
 
-    Widget content = Padding(
+    final Widget content = Padding(
       padding: EdgeInsets.symmetric(horizontal: paddingX ?? horizontalPadding),
       child: Center(
         widthFactor: 1,
@@ -262,25 +228,6 @@ class Badge extends StatelessWidget {
       ),
     );
 
-    if (variant.filled) {
-      // `background-image` over `background-color`: the ramp is a separate
-      // layer, painted between the fill and the label.
-      content = Stack(
-        fit: StackFit.passthrough,
-        children: <Widget>[
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: _rampChip,
-                borderRadius: radius,
-              ),
-            ),
-          ),
-          content,
-        ],
-      );
-    }
-
     // `overflow-hidden` — the 16px line box in a 14px content box is clipped,
     // not accommodated.
     final Widget box = ClipRRect(borderRadius: radius, child: content);
@@ -292,25 +239,24 @@ class Badge extends StatelessWidget {
       widthFactor: 1,
       heightFactor: 1,
       // The floor is the BORDER box: the hairline is paid out of it, which is
-      // why the constraint sits outside the surface rather than inside it.
+      // why the constraint sits outside the fill rather than inside it.
       // `minWidth` is the same box, so it sits here too.
       child: ConstrainedBox(
         constraints: BoxConstraints(
           minWidth: minWidth ?? 0,
           minHeight: minHeight,
         ),
-        child: variant.filled
-            ? Surface(
-                spec: _shadow(),
-                radius: radius,
-                fill: _fill(theme),
-                border: border,
-                child: box,
-              )
-            : DecoratedBox(
-                decoration: BoxDecoration(border: border, borderRadius: radius),
-                child: Padding(padding: border.dimensions, child: box),
-              ),
+        // A flat fill, no gradient and no shadow — every variant, `premium`
+        // included: *"no need for the gradient and shadow for the badges,
+        // make them simple."*
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: _fill(theme),
+            border: border,
+            borderRadius: radius,
+          ),
+          child: Padding(padding: border.dimensions, child: box),
+        ),
       ),
     );
   }

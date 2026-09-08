@@ -1230,8 +1230,13 @@ void main() {
 
       await t.pumpWidget(
         host(
-          SizedBox(
-            width: 482,
+          // A loose 482px ceiling, not a tight one: [SizedBox] would force
+          // the header to exactly 482 regardless of its own [maxWidth],
+          // since a tight incoming constraint always wins over a looser
+          // descendant constraint. [ConstrainedBox] here stays loose, so the
+          // header's own 384px cap is what actually decides its width.
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 482),
             child: EmptyHeader(
               children: <Widget>[
                 const EmptyTitle('No packs match those filters'),
@@ -1241,11 +1246,15 @@ void main() {
         ),
       );
       // The panel is wider than the measure; the header keeps to it.
-      expect(t.getRect(find.byType(EmptyTitle)).width, lessThan(482));
+      expect(
+        t.getRect(find.byType(EmptyTitle)).width,
+        lessThanOrEqualTo(EmptyHeader.maxWidth),
+      );
     });
 
     testWidgets(
-      'the title is 13/500 tracking-tight and the description 1.625',
+      'the title is body-sized at nav weight, tracking-tight, larger than '
+      'the description',
       (WidgetTester t) async {
         await t.pumpWidget(
           host(
@@ -1256,17 +1265,21 @@ void main() {
           ),
         );
         final TextStyle title = t.widget<Text>(find.byType(Text)).style!;
-        // host() pumps at 1440 wide, so nav resolves its desktop step (16/20),
-        // not the mobile-pinned TextStyleToken.step (14/18).
-        final double size = TextStyles.nav.stepFor(1440).size;
+        // host() pumps at 1440 wide, so body resolves its desktop step
+        // (18/28), not the mobile-pinned TextStyleToken.step (16/24).
+        final double size = TextStyles.body.stepFor(1440).size;
         expect(title.fontSize, size);
         expect(title.fontWeight, FontWeight.w500);
         // The title tracks slightly tighter than the role it derives from.
         expect(title.letterSpacing, closeTo(-0.02 * size, 1e-9));
         expect(title.fontFamily, contains(Fonts.sans));
 
-        // The description reads as body copy under the title, at the same width.
-        expect(EmptyDescription.spec.stepFor(1440), TextStyles.body.stepFor(1440));
+        // The description reads smaller than the title, at the same width.
+        expect(EmptyDescription.spec.stepFor(1440), TextStyles.small.stepFor(1440));
+        expect(
+          EmptyDescription.spec.stepFor(1440).size,
+          lessThan(TextStyles.body.stepFor(1440).size),
+        );
       },
     );
   });

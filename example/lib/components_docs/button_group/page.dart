@@ -106,12 +106,13 @@ final ComponentDocSpec buttonGroupDocSpec = ComponentDocSpec(
       id: 'composing-others',
       title: 'Composing other members',
       description:
-          'children accepts any widget, not only Button and '
-          'ButtonGroupText: only those two types get corner reshaping and '
-          'border synthesis. An unrecognised member is placed flush with its '
-          'own corners untouched, which covers a plain field, a dropdown '
-          'trigger, a select, or a popover trigger composed alongside a '
-          'button, all the same mechanism regardless of which widget.',
+          'children accepts any widget, not only Button, ButtonGroupText '
+          'and Input: those three types get corner reshaping and border '
+          'synthesis — Input may also arrive wrapped in an Expanded or '
+          'Flexible, so a field can grow to fill the row, as it does below. '
+          'An unrecognised member (a dropdown trigger, a select, a popover '
+          'trigger composed alongside a button) is placed flush with its '
+          'own corners untouched.',
       specimen: _ComposingOthersSpecimen(),
       code: _composingOthersCode,
       label: 'Composing other members specimen view',
@@ -843,9 +844,10 @@ const List<DocsApiFact> _buttonGroupFacts = <DocsApiFact>[
     name: 'children',
     type: 'List<Widget>',
     description:
-        'Required. The members, in source order: Button, '
-        'ButtonGroupText, ButtonGroupSeparator, or any other widget, '
-        'placed flush and left unreshaped.',
+        'Required. The members, in source order: Button, ButtonGroupText '
+        'and Input (bare, or wrapped in Expanded/Flexible) all get corner '
+        'reshaping and border synthesis; ButtonGroupSeparator or any other '
+        'widget is placed flush and left unreshaped.',
   ),
   DocsApiFact(
     name: 'ButtonGroup.radiiOf',

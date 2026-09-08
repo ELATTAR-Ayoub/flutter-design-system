@@ -127,6 +127,7 @@ import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
+import './input.dart';
 
 /// `border-destructive/25` — the resting border alpha of
 /// [ButtonVariant.destructive] (`button.tsx`, and `button.dart:115`).
@@ -222,6 +223,13 @@ class ButtonGroup extends StatelessWidget {
   /// A member this file does not recognise is placed flush and left entirely
   /// alone: its corners are its own and no frame is synthesised for it. The
   /// group can only reshape what it can measure the shape of.
+  ///
+  /// [Button], [ButtonGroupText] and [Input] all get corner reshaping and
+  /// border synthesis — an [Input] may also arrive wrapped in an [Expanded]
+  /// or [Flexible] (so a field can grow to fill the row, as the "Composing
+  /// other members" specimen does with `Expanded(child: Input(...))`); the
+  /// group looks through that shell to find the field underneath and keeps
+  /// the flex wrapper around the reshaped result.
   final List<Widget> children;
 
   /// The corner radii the group's rules give the member at [index].
@@ -241,10 +249,19 @@ class ButtonGroup extends StatelessWidget {
   static bool hasLeftBorder(List<Widget> children, int index) =>
       _shapeOf(children, index).leftBorder;
 
+  /// Looks through an `Expanded`/`Flexible` shell to the flex child underneath
+  /// — e.g. the `Input` in `Expanded(child: Input(...))` — so the group can
+  /// read what the member actually is. Anything else is returned unchanged.
+  static Widget _flexInner(Widget child) {
+    if (child is Expanded) return child.child;
+    if (child is Flexible) return child.child;
+    return child;
+  }
+
   /// `[&>[data-slot]…]` — every member in the reference carries a `data-slot`
   /// except `ButtonGroupText`, which is buttons-map **drift 8** and the reason
   /// the `rounded-r-lg!` rule can reach past it.
-  static bool _hasDataSlot(Widget child) => child is! ButtonGroupText;
+  static bool _hasDataSlot(Widget child) => _flexInner(child) is! ButtonGroupText;
 
   /// The index `[&>[data-slot]:not(:has(~[data-slot]))]:rounded-r-lg!` lands
   /// on: the last member with a `data-slot`, which is not necessarily the last
@@ -260,8 +277,11 @@ class ButtonGroup extends StatelessWidget {
 
   /// The radius a member paints when nothing overrides it.
   static double _ownRadius(Widget child) {
-    if (child is Button) return Radii.full;
-    if (child is ButtonGroupText) return Radii.lg;
+    final Widget inner = _flexInner(child);
+    if (inner is Button) return Radii.full;
+    if (inner is ButtonGroupText) return Radii.lg;
+    // `rounded-pill` — Input's own resting corner, same as Button's.
+    if (inner is Input) return Radii.full;
     // A rule has no corners, and an unrecognised member is never reshaped.
     return 0;
   }
@@ -302,22 +322,54 @@ class ButtonGroup extends StatelessWidget {
     }
   }
 
-  Widget _member(ThemeTokens theme, int index) {
-    final Widget child = children[index];
-    final _SlotShape shape = _shapeOf(children, index);
-    if (child is ButtonGroupText) {
-      return _Slot(shape: shape, child: child);
+  /// Reshapes [target] to [shape] — the type check the whole family shares,
+  /// whether [target] arrived bare or was pulled out of an `Expanded`/
+  /// `Flexible` shell by [_member].
+  Widget _reshape(ThemeTokens theme, Widget target, _SlotShape shape) {
+    if (target is ButtonGroupText) {
+      return _Slot(shape: shape, child: target);
     }
-    if (child is Button) {
+    if (target is Button) {
       return _BledSlot(
         shape: shape,
-        frame: _frameOf(theme, child.variant),
-        child: child,
+        frame: _frameOf(theme, target.variant),
+        child: target,
+      );
+    }
+    if (target is Input) {
+      // `border-input` — Input's own resting frame colour, unconditionally:
+      // unlike Button it has no transparent-border variant to check against.
+      return _BledSlot(
+        shape: shape,
+        frame: theme.input,
+        child: target,
       );
     }
     // A separator has no corners to square and no border to drop; anything
     // else is not ours to reshape.
-    return child;
+    return target;
+  }
+
+  Widget _member(ThemeTokens theme, int index) {
+    final Widget child = children[index];
+    final _SlotShape shape = _shapeOf(children, index);
+    // `Expanded(child: Input(...))` — the row-fill shell the "Composing other
+    // members" specimen uses so a field can grow. The shell itself is not a
+    // member the rules know about; what is inside it is.
+    if (child is Expanded) {
+      return Expanded(
+        flex: child.flex,
+        child: _reshape(theme, child.child, shape),
+      );
+    }
+    if (child is Flexible) {
+      return Flexible(
+        flex: child.flex,
+        fit: child.fit,
+        child: _reshape(theme, child.child, shape),
+      );
+    }
+    return _reshape(theme, child, shape);
   }
 
   @override

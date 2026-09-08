@@ -847,9 +847,9 @@ class _ApiReferenceContent extends StatelessWidget {
               type: 'bool',
               description:
                   'Optional. Defaults to true. When the row carries a '
-                  "description, pins the media to the top and drops it 2px "
-                  "so it lines up with the title's cap height instead of "
-                  "the row's centre.",
+                  'description, pins the media to the top of the content '
+                  "column and centres it on the title's own first line box "
+                  "instead of the row's centre.",
             ),
             DocsApiFact(
               name: 'ItemMedia.size',
@@ -857,9 +857,12 @@ class _ApiReferenceContent extends StatelessWidget {
               description: '16px, the forced glyph/avatar square.',
             ),
             DocsApiFact(
-              name: 'ItemMedia.nudge',
-              type: 'static double',
-              description: '2px, the top offset nudged applies.',
+              name: 'ItemMedia.nudgeFor',
+              type: 'static double Function(BuildContext)',
+              description:
+                  "The top-of-content offset nudged applies: half the gap "
+                  "between ItemTitle's rendered line box and the 16px "
+                  'glyph, so the glyph centres on the title at every width.',
             ),
           ],
         ),

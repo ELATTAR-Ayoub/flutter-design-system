@@ -290,82 +290,82 @@ class _PreviewSpecimen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: space(2)),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-              key: const ValueKey<String>('card-preview:action'),
-              // space(80) (320px) overflows this row's 'Prize pool' label
-              // against the 'numMd' price by 53px once the card's own
-              // 32px of horizontal padding is subtracted — widened to
-              // space(96) (384px), the same measure DocsShowcase.tallMinHeight
-              // uses, rather than shrinking the type or the copy.
-              width: space(96),
-              child: Card(
-                children: <Widget>[
-                  const CardHeader(
-                    title: CardTitle('Weekly competition'),
-                    description: CardDescription('Ends in 2 days, 14 hours.'),
-                    action: Badge(label: 'Live', variant: BadgeVariant.premium),
-                  ),
-                  CardContent(
-                    // A label and a metric on one line where there is room,
-                    // and on two where there is not — a `Row` here clips the
-                    // figure the card exists to show as soon as the text
-                    // scales.
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: space(3),
-                      runSpacing: space(1),
-                      children: <Widget>[
-                        StyledText('Prize pool', TextStyles.small),
-                        StyledText(
-                          r'$24,000.00',
-                          TextStyles.numberMd,
-                          color: theme.premiumText,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+    // Stacked rather than side by side: two space(96)/space(80) cards next
+    // to each other overflow a narrow preview frame horizontally, clipping
+    // the second card at the frame's own right edge. A vertical Column has
+    // no such ceiling — DocsShowcaseFrame sets only a minHeight, so the
+    // frame simply grows to fit both cards fully, at desktop and phone
+    // widths alike.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        SizedBox(
+          key: const ValueKey<String>('card-preview:action'),
+          // space(80) (320px) overflows this row's 'Prize pool' label
+          // against the 'numMd' price by 53px once the card's own
+          // 32px of horizontal padding is subtracted — widened to
+          // space(96) (384px), the same measure DocsShowcase.tallMinHeight
+          // uses, rather than shrinking the type or the copy.
+          width: space(96),
+          child: Card(
+            children: <Widget>[
+              const CardHeader(
+                title: CardTitle('Weekly competition'),
+                description: CardDescription('Ends in 2 days, 14 hours.'),
+                action: Badge(label: 'Live', variant: BadgeVariant.premium),
               ),
-            ),
-            SizedBox(width: space(6)),
-            SizedBox(
-              key: const ValueKey<String>('card-preview:footer'),
-              width: space(80),
-              child: Card(
-                children: <Widget>[
-                  const CardHeader(
-                    title: CardTitle('Account'),
-                    description: CardDescription(
-                      'Manage your account settings.',
+              CardContent(
+                // A label and a metric on one line where there is room,
+                // and on two where there is not — a `Row` here clips the
+                // figure the card exists to show as soon as the text
+                // scales.
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: space(3),
+                  runSpacing: space(1),
+                  children: <Widget>[
+                    StyledText('Prize pool', TextStyles.small),
+                    StyledText(
+                      r'$24,000.00',
+                      TextStyles.numberMd,
+                      color: theme.premiumText,
                     ),
-                  ),
-                  const CardContent(
-                    child: Text(
-                      'Your profile and security settings live here.',
-                    ),
-                  ),
-                  CardFooter(
-                    child: Button(
-                      expanded: true,
-                      onPressed: () {},
-                      child: const Text('Save changes'),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+        SizedBox(height: space(4)),
+        SizedBox(
+          key: const ValueKey<String>('card-preview:footer'),
+          width: space(80),
+          child: Card(
+            children: <Widget>[
+              const CardHeader(
+                title: CardTitle('Account'),
+                description: CardDescription(
+                  'Manage your account settings.',
+                ),
+              ),
+              const CardContent(
+                child: Text(
+                  'Your profile and security settings live here.',
+                ),
+              ),
+              CardFooter(
+                child: Button(
+                  expanded: true,
+                  onPressed: () {},
+                  child: const Text('Save changes'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
