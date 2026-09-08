@@ -129,10 +129,11 @@ spec note from `pages/charts.dart`, which carries real information
 description repeats one sentence seventy times. **Footer** is shadcn's trend
 and range copy, harvested from the seventy view pages rather than invented.
 
-The toolbar sits above the card, outside it, where shadcn puts it. `Card` in
-this system has no `CardAction` slot, and the interactive variants already
-need the header area for their range picker, so the toolbar has nowhere else
-to go.
+The toolbar sits above the card, outside it, where shadcn puts it.
+`CardHeader` does have an `action` slot, but the interactive variants need it
+for their range picker; putting a toolbar there on the other sixty-six would
+leave the two kinds of card disagreeing about what the top-right corner
+means.
 
 The Empty/Loading/Ready toggle is kept on every card. shadcn has no such
 control; this system documents its states, and the loading skeleton is sized
