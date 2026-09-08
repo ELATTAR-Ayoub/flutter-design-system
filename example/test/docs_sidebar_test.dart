@@ -1,5 +1,6 @@
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/catalog.dart';
+import 'package:example/docs/docs_layout.dart' show defaultSidebarGroups;
 import 'package:example/docs/docs_sidebar.dart';
 import 'package:example/main.dart';
 import 'package:flutter/material.dart'
@@ -84,6 +85,32 @@ List<DocsSidebarGroup> _groups() => const <DocsSidebarGroup>[
 ];
 
 void main() {
+  test('the Charts rail group lists the gallery, not the four engine pages', () {
+    final List<DocsSidebarGroup> groups = defaultSidebarGroups('/charts');
+    final DocsSidebarGroup charts = groups.firstWhere(
+      (DocsSidebarGroup g) => g.label == 'Charts',
+    );
+
+    expect(charts.items.map((DocsSidebarEntry e) => e.route), <String>[
+      '/charts',
+    ]);
+  });
+
+  test('the four chart component docs stay in the flat catalog', () {
+    for (final String name in <String>[
+      'chart',
+      'chart_cartesian',
+      'chart_geometry',
+      'chart_polar',
+    ]) {
+      expect(
+        componentDocs.any((ComponentDocEntry e) => e.name == name),
+        isTrue,
+        reason: name,
+      );
+    }
+  });
+
   testWidgets(
     'both groups render with their labels, and every supplied item appears',
     (WidgetTester tester) async {
@@ -274,9 +301,9 @@ void main() {
 
   group('the default rail a documentation page falls back to', () {
     /// The `docs-sidebar-group:<label>` keys in the order `DocsSidebar` laid
-    /// them out. Read from a real page, because `_defaultSidebarGroups` is
-    /// private to `docs_layout.dart` on purpose: the rail's shape is a
-    /// rendering fact, not an exported list.
+    /// them out. Read from a real page rather than by calling
+    /// `defaultSidebarGroups` directly: this group asserts the rail as a
+    /// reader actually sees it, rendered inside `DocsLayout`.
     List<String> groupOrder(WidgetTester tester) => find
         .byWidgetPredicate((Widget widget) {
           final Key? key = widget.key;
@@ -351,43 +378,58 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('every catalog entry appears exactly once, in its own group', (
-      WidgetTester tester,
-    ) async {
-      _setViewSize(tester, const Size(1440, 900));
-      await tester.pumpWidget(page('/components/button'));
-      await tester.pump();
+    testWidgets(
+      'every catalog entry appears exactly once, in its own group — except '
+      'Charts, which shows its landing page instead of its four entries',
+      (WidgetTester tester) async {
+        _setViewSize(tester, const Size(1440, 900));
+        await tester.pumpWidget(page('/components/button'));
+        await tester.pump();
 
-      final Map<String, List<String>> byGroup = <String, List<String>>{
-        for (final ComponentDocFamily family in ComponentDocFamily.values)
-          family.label: routesIn(tester, family.label),
-      };
-      final List<String> all = <String>[
-        for (final List<String> routes in byGroup.values) ...routes,
-      ];
+        final Map<String, List<String>> byGroup = <String, List<String>>{
+          for (final ComponentDocFamily family in ComponentDocFamily.values)
+            family.label: routesIn(tester, family.label),
+        };
+        final List<String> all = <String>[
+          for (final List<String> routes in byGroup.values) ...routes,
+        ];
 
-      expect(all.toSet(), hasLength(all.length));
-      expect(
-        all.toSet(),
-        componentDocs.map((ComponentDocEntry entry) => entry.route).toSet(),
-      );
+        expect(all.toSet(), hasLength(all.length));
 
-      // The four the required outcome names, each in one group and no other.
-      expect(byGroup['Components'], contains('/components/button'));
-      expect(byGroup['Effects'], contains('/components/premium_surface'));
-      expect(byGroup['Agent'], contains('/components/agent-composer'));
-      expect(byGroup['Charts'], contains('/components/chart'));
-      expect(byGroup['Effects'], isNot(contains('/components/button')));
-      expect(byGroup['Components'], isNot(contains('/components/chart')));
-      expect(
-        byGroup['Components'],
-        isNot(contains('/components/premium_surface')),
-      );
-      expect(
-        byGroup['Components'],
-        isNot(contains('/components/agent-composer')),
-      );
-    });
+        // `all` is `componentDocs`' routes, minus the four `chart*` entries
+        // (`showInRail: false`), plus `/charts`, their landing page.
+        final Set<String> chartRoutes = <String>{
+          for (final String name in <String>[
+            'chart',
+            'chart_cartesian',
+            'chart_geometry',
+            'chart_polar',
+          ])
+            componentDoc(name).route,
+        };
+        final Set<String> expected =
+            componentDocs.map((ComponentDocEntry entry) => entry.route).toSet()
+              ..removeAll(chartRoutes)
+              ..add('/charts');
+        expect(all.toSet(), expected);
+
+        // The four the required outcome names, each in one group and no other.
+        expect(byGroup['Components'], contains('/components/button'));
+        expect(byGroup['Effects'], contains('/components/premium_surface'));
+        expect(byGroup['Agent'], contains('/components/agent-composer'));
+        expect(byGroup['Charts'], <String>['/charts']);
+        expect(byGroup['Effects'], isNot(contains('/components/button')));
+        expect(byGroup['Components'], isNot(contains('/components/chart')));
+        expect(
+          byGroup['Components'],
+          isNot(contains('/components/premium_surface')),
+        );
+        expect(
+          byGroup['Components'],
+          isNot(contains('/components/agent-composer')),
+        );
+      },
+    );
 
     testWidgets('the active item stays selected inside its owning group', (
       WidgetTester tester,

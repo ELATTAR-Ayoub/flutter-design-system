@@ -40,4 +40,7 @@ const ComponentDocEntry chartDoc = ComponentDocEntry(
     'chartNumber',
   ],
   sourcePath: 'lib/src/components/ui/chart.dart',
+  // The Charts rail group is led by `/charts` now; see
+  // `ComponentDocFamily.charts` in `../catalog.dart`.
+  showInRail: false,
 );

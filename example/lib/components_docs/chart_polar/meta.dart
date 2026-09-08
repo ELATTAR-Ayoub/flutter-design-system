@@ -39,4 +39,7 @@ const ComponentDocEntry chartPolarDoc = ComponentDocEntry(
     'RadialBarChart',
   ],
   sourcePath: 'lib/src/components/ui/chart_polar.dart',
+  // The Charts rail group is led by `/charts` now; see
+  // `ComponentDocFamily.charts` in `../catalog.dart`.
+  showInRail: false,
 );

@@ -3,7 +3,7 @@
 /// `main.dart`'s `publicPageFor` actually dispatches their route to their
 /// widget, and that the documentation shell's "Sections" group — the first
 /// of the five the rail now has (`docs/docs_layout.dart`'s
-/// `_defaultSidebarGroups`, read from `site/site_routes.dart`'s
+/// `defaultSidebarGroups`, read from `site/site_routes.dart`'s
 /// `siteRoutes`, neither file touched here) — lists them in the required
 /// reading order.
 library;
@@ -11,6 +11,7 @@ library;
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/docs_pages/catalog.dart';
 import 'package:example/main.dart';
+import 'package:example/site/pages/charts_gallery_page.dart';
 import 'package:example/site/pages/public_pages.dart';
 import 'package:example/site/site_routes.dart';
 import 'package:flutter/material.dart'
@@ -138,6 +139,16 @@ void main() {
         expect(tester.takeException(), isNull);
       });
     }
+  });
+
+  testWidgets('$chartsRoute resolves to the charts gallery, not the four '
+      'engine reference pages', (WidgetTester tester) async {
+    _sizeTo(tester, const Size(1440, 900));
+    await tester.pumpWidget(_harness(publicPageFor(chartsRoute)));
+    await tester.pump();
+
+    expect(find.byType(ChartsGalleryPage), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('an unknown path falls back to the homepage, deliberately', (

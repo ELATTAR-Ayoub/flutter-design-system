@@ -39,4 +39,7 @@ const ComponentDocEntry chartCartesianDoc = ComponentDocEntry(
     'BarSeriesPainter',
   ],
   sourcePath: 'lib/src/components/ui/chart_cartesian.dart',
+  // The Charts rail group is led by `/charts` now; see
+  // `ComponentDocFamily.charts` in `../catalog.dart`.
+  showInRail: false,
 );
