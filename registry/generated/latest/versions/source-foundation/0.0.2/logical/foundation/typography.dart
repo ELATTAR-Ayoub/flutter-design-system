@@ -12,7 +12,7 @@
 /// file. [TextStyleToken.resolveWidth] converts to Flutter's ratio.
 ///
 /// Every role steps up at [Breakpoints.md] and again at [Breakpoints.lg]: a
-/// 64px display line that is right on a desktop column is wrong on a phone,
+/// 48px display line that is right on a desktop column is wrong on a phone,
 /// and body copy earns two extra pixels on a desktop reading column.
 /// Viewport steps are a layout decision and are **not** a substitute for
 /// accessibility text scaling: Flutter's text scaler applies on top of whatever
@@ -298,9 +298,9 @@ class TextStyles {
     name: 'display',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(44, 48),
-    tablet: const TypeStep(52, 56),
-    desktop: const TypeStep(64, 68),
+    mobile: const TypeStep(36, 40),
+    tablet: const TypeStep(42, 44),
+    desktop: const TypeStep(48, 48),
     wght: 600,
     tracking: -0.03,
   );
@@ -310,9 +310,9 @@ class TextStyles {
     name: 'h1',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(36, 40),
-    tablet: const TypeStep(40, 44),
-    desktop: const TypeStep(48, 52),
+    mobile: const TypeStep(30, 36),
+    tablet: const TypeStep(32, 38),
+    desktop: const TypeStep(36, 40),
     wght: 700,
     tracking: -0.02,
   );
@@ -322,9 +322,9 @@ class TextStyles {
     name: 'h2',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(30, 36),
-    tablet: const TypeStep(32, 38),
-    desktop: const TypeStep(36, 42),
+    mobile: const TypeStep(26, 32),
+    tablet: const TypeStep(28, 34),
+    desktop: const TypeStep(30, 36),
     wght: 650,
     tracking: -0.015,
   );
@@ -334,9 +334,9 @@ class TextStyles {
     name: 'h3',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(24, 30),
-    tablet: const TypeStep(26, 32),
-    desktop: const TypeStep(28, 36),
+    mobile: const TypeStep(20, 28),
+    tablet: const TypeStep(22, 30),
+    desktop: const TypeStep(24, 32),
     wght: 600,
     tracking: -0.01,
   );
@@ -346,9 +346,9 @@ class TextStyles {
     name: 'h4',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(20, 26),
-    tablet: const TypeStep(22, 28),
-    desktop: const TypeStep(24, 30),
+    mobile: const TypeStep(18, 24),
+    tablet: const TypeStep(19, 26),
+    desktop: const TypeStep(20, 28),
     wght: 600,
   );
 
@@ -358,8 +358,8 @@ class TextStyles {
     group: TypeGroup.words,
     family: Fonts.sans,
     mobile: const TypeStep(18, 28),
-    tablet: const TypeStep(20, 30),
-    desktop: const TypeStep(22, 32),
+    tablet: const TypeStep(19, 28),
+    desktop: const TypeStep(20, 28),
     wght: 400,
   );
 
@@ -430,9 +430,9 @@ class TextStyles {
     name: 'identifier',
     group: TypeGroup.code,
     family: Fonts.mono,
-    mobile: const TypeStep(13, 18),
-    tablet: const TypeStep(14, 20),
-    desktop: const TypeStep(15, 22),
+    mobile: const TypeStep(12, 18),
+    tablet: const TypeStep(13, 18),
+    desktop: const TypeStep(14, 20),
     wght: 400,
     tracking: -0.01,
   );
