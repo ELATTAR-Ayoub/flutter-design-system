@@ -19,6 +19,7 @@
 - **Every specimen keeps its existing behaviour.** This is a re-housing, not a redesign. No chart is re-authored, no fixture value changes, no curve or colour changes.
 - **`example/lib/pages/charts.dart` must render identically before and after.** Task 2's characterization test is the control and must stay green through Tasks 4 to 11.
 - **Test command:** `flutter test` from the `example/` directory. It runs natively on Windows; there is no WSL mirror.
+- **Pumping a themed widget in a test** uses `ThemeScope(controller: ThemeController(mode: ColorMode.light), child: …)`. There is no `lightTokens` and `ThemeScope` takes no `tokens:` argument; the token set is resolved by `ThemeScope.of(context)`, which returns `ThemeTokens.light` or `ThemeTokens.dark`. `ThemeController(...)` is not const, so the `ThemeScope` wrapping it cannot be `const` either. `example/test/docs/component_doc_page_test.dart` and `example/test/pages/charts_page_render_test.dart` are the working examples. Established by Task 2, whose brief had this wrong.
 - **Analyzer:** `flutter analyze` from `example/` must be clean before each commit.
 - **Commit messages** end with:
   ```
@@ -190,7 +191,7 @@ Future<void> _pumpChartsPage(WidgetTester tester) async {
 
   await tester.pumpWidget(
     ThemeScope(
-      tokens: lightTokens,
+      controller: ThemeController(mode: ColorMode.light),
       child: const Directionality(
         textDirection: TextDirection.ltr,
         child: MediaQuery(
@@ -1278,7 +1279,7 @@ Future<void> _pump(WidgetTester tester) async {
 
   await tester.pumpWidget(
     ThemeScope(
-      tokens: lightTokens,
+      controller: ThemeController(mode: ColorMode.light),
       child: const Directionality(
         textDirection: TextDirection.ltr,
         child: MediaQuery(
@@ -1347,7 +1348,7 @@ void main() {
 
     await tester.pumpWidget(
       ThemeScope(
-        tokens: lightTokens,
+        controller: ThemeController(mode: ColorMode.light),
         child: Directionality(
           textDirection: TextDirection.ltr,
           child: MediaQuery(
