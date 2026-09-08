@@ -165,7 +165,7 @@ void main() {
       expect(
         Menu.itemHeight,
         math.max(
-          TextStyles.body.step.leading + space(2) * 2,
+          TextStyles.nav.step.leading + space(2) * 2,
           TouchTargets.minimum,
         ),
       );

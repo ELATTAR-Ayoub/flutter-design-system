@@ -395,7 +395,7 @@ abstract final class Menu {
   /// the floor here keeps the popup's height and scroll math self-consistent
   /// with what actually paints.
   static double get itemHeight => math.max(
-    TextStyles.body.step.leading + space(2) * 2,
+    TextStyles.nav.step.leading + space(2) * 2,
     TouchTargets.minimum,
   );
 
@@ -412,7 +412,7 @@ abstract final class Menu {
   static double itemHeightOf(BuildContext context) => math.max(
     MediaQuery.textScalerOf(
           context,
-        ).scale(StyledText.stepOf(context, TextStyles.body).leading) +
+        ).scale(StyledText.stepOf(context, TextStyles.nav).leading) +
         space(2) * 2,
     TouchTargets.minimum,
   );
@@ -1376,7 +1376,9 @@ class _MenuRow extends StatelessWidget {
                     children: <Widget>[
                       StyledText(
                         label,
-                        TextStyles.body,
+                        // The trigger's own role: a row reads like the button
+                        // that opened it, not like a paragraph.
+                        TextStyles.nav,
                         color: ink,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
