@@ -310,9 +310,15 @@ class PublicDocsPage extends StatelessWidget {
 /// test fails. Every entry still opens `/components/<name>`; splitting the
 /// index changed no route.
 class PublicComponentsPage extends StatelessWidget {
-  const PublicComponentsPage({super.key, this.onNavigate});
+  const PublicComponentsPage({super.key, this.onNavigate, this.initialAnchor});
 
   final PublicNavigate? onNavigate;
+
+  /// Forwarded to [DocsLayout.initialAnchor]. `/agent` renders this same
+  /// page with `'agent'` here, so it opens already scrolled to the Agent
+  /// family section instead of the top of the index — see `main.dart`'s
+  /// `publicPageFor`.
+  final String? initialAnchor;
 
   /// Lists only the documented components, each of which has its own page
   /// under `/components/<name>`.
@@ -324,6 +330,7 @@ class PublicComponentsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DocsLayout(
       route: componentsRoute,
+      initialAnchor: initialAnchor,
       intro: const DocsPageIntro(
         eyebrow: 'COMPONENT LIBRARY',
         title: 'Components',

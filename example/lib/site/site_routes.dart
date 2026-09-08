@@ -77,6 +77,7 @@ const String homeRoute = '/';
 const String docsRoute = '/docs';
 const String componentsRoute = '/components';
 const String chartsRoute = '/charts';
+const String agentRoute = '/agent';
 const String skillsRoute = '/skills';
 
 /// Public website destinations, in header/navigation order.
@@ -146,6 +147,21 @@ const List<SiteRoute> siteRoutes = <SiteRoute>[
     // entry; listing it again under "Sections" would put it in the rail
     // twice. The same trade `docsRoute` makes below, for the same reason:
     // still resolvable, still searchable, absent only from "Sections".
+    showInSidebar: false,
+  ),
+  SiteRoute(
+    path: agentRoute,
+    section: SiteSection.components,
+    title: 'Agent',
+    description:
+        'Every agent component this system ships, from console to voice, '
+        'grouped on the components index.',
+    keywords: <String>['agent', 'ai', 'chat', 'console', 'assistant'],
+    // Same trade as `chartsRoute` just above: the Agent family group on
+    // `/components` (`ComponentDocFamily.agent`) is already this route's
+    // landing entry, so listing it again under "Sections" would duplicate
+    // it in the rail. Still resolvable, still searchable, absent only from
+    // "Sections".
     showInSidebar: false,
   ),
   SiteRoute(

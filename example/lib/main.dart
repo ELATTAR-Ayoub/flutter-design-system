@@ -907,6 +907,14 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
     docsChangelogRoute => ChangelogDocsPage(onNavigate: onNavigate),
     componentsRoute => PublicComponentsPage(onNavigate: onNavigate),
     chartsRoute => ChartsGalleryPage(onNavigate: onNavigate),
+    // Same page `componentsRoute` renders, opened straight to the Agent
+    // family section — see `DocsLayout.initialAnchor` and
+    // `PublicComponentsPage.initialAnchor`. Not a distinct page: the header
+    // link is a shortcut into `/components`, not a fifth index.
+    agentRoute => PublicComponentsPage(
+      onNavigate: onNavigate,
+      initialAnchor: 'agent',
+    ),
     '/components/button' => const ButtonDocPage(),
     // The deliberate fallback. Every route the site declares now resolves
     // above — `site_routes_test.dart` asserts that every entry in

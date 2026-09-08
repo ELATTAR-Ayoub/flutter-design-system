@@ -258,6 +258,7 @@ class DocsLayout extends StatefulWidget {
     this.previous,
     this.next,
     this.onNavigate,
+    this.initialAnchor,
   });
 
   final String route;
@@ -283,6 +284,18 @@ class DocsLayout extends StatefulWidget {
   /// Opens another **route**. Never receives an anchor id — see the library
   /// note.
   final ValueChanged<String>? onNavigate;
+
+  /// An anchor to scroll to once, on this page's first frame — the same
+  /// target [docsAnchorKey] marks and [DocsTocEntry.anchor] links to, just
+  /// triggered by the route itself instead of a reader's tap. `/agent`
+  /// resolves to the same page as `/components` but passes `'agent'` here
+  /// so it lands on that family's section instead of the top of the index.
+  ///
+  /// Null, the default, leaves the page at its top — every existing caller's
+  /// behaviour is unchanged. An anchor nothing marks is handled exactly like
+  /// [_scrollToAnchor] handles one from a tap: nothing happens, rather than
+  /// throwing.
+  final String? initialAnchor;
 
   @override
   State<DocsLayout> createState() => _DocsLayoutState();
@@ -324,6 +337,11 @@ class _DocsLayoutState extends State<DocsLayout> {
   /// decision is made once per mounted page, not once per rebuild.
   bool _railPlaced = false;
 
+  /// Whether [DocsLayout.initialAnchor] has already been acted on. Guards
+  /// the same way [_railPlaced] does: once per mounted page, not once per
+  /// rebuild, so a reader who scrolls away is never yanked back to it.
+  bool _initialAnchorHandled = false;
+
   void _rememberRailOffset() {
     if (!_sidebarScroll.hasClients) return;
     _railStore?.offset = _sidebarScroll.position.pixels;
@@ -351,6 +369,13 @@ class _DocsLayoutState extends State<DocsLayout> {
     WidgetsBinding.instance.addPostFrameCallback(
       (Duration _) => _restoreOrRevealRail(),
     );
+    final String? anchor = widget.initialAnchor;
+    if (anchor != null && !_initialAnchorHandled) {
+      _initialAnchorHandled = true;
+      WidgetsBinding.instance.addPostFrameCallback(
+        (Duration _) => _scrollToAnchor(anchor),
+      );
+    }
   }
 
   /// Puts the rail where the reader left it, or — the first time in a

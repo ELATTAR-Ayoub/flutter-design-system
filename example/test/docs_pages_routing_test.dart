@@ -151,6 +151,22 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets(
+    '$agentRoute resolves to the components index, opened on the Agent '
+    'family section',
+    (WidgetTester tester) async {
+      _sizeTo(tester, const Size(1440, 900));
+      await tester.pumpWidget(_harness(publicPageFor(agentRoute)));
+      await tester.pumpAndSettle();
+
+      final PublicComponentsPage page = tester.widget<PublicComponentsPage>(
+        find.byType(PublicComponentsPage),
+      );
+      expect(page.initialAnchor, 'agent');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('an unknown path falls back to the homepage, deliberately', (
     WidgetTester tester,
   ) async {

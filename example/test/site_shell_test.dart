@@ -96,12 +96,15 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // The header carries exactly two destinations. Introduction, Installation,
-    // Theming, CLI and Skills are all documentation pages, so they live in the
-    // documentation shell's left rail, not beside `Documentation` as its
-    // peers. Home is reachable from the wordmark.
+    // The header carries exactly four destinations, in order: Documentation,
+    // Components, Charts, Agent. Introduction, Installation, Theming, CLI and
+    // Skills are all documentation pages, so they live in the documentation
+    // shell's left rail, not beside `Documentation` as its peers. Home is
+    // reachable from the wordmark.
     expect(find.text('Documentation'), findsWidgets);
     expect(find.text('Components'), findsWidgets);
+    expect(find.text('Charts'), findsWidgets);
+    expect(find.text('Agent'), findsWidgets);
     expect(find.text('Skills'), findsNothing);
     expect(find.text('Installation'), findsNothing);
   });
@@ -253,7 +256,9 @@ void main() {
 
     // Skills is a documentation page now, so it is reached from the
     // documentation shell's left rail rather than from the site navigation
-    // sheet. The sheet carries the same two destinations the header does.
+    // sheet. The sheet carries the same four destinations the header does.
+    expect(find.text('Charts'), findsWidgets);
+    expect(find.text('Agent'), findsWidgets);
     await tester.tap(find.text('Components').last);
     await tester.pumpAndSettle();
     expect(router.route, componentsRoute);
