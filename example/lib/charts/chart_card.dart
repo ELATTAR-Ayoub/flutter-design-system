@@ -152,12 +152,35 @@ class _Toolbar extends StatelessWidget {
             side: SheetSide.right,
             width: _sheetWidth(context),
             onClose: close,
+            // No [SheetHeader]/[SheetFooter] band here to carry padding of
+            // its own, so the body pays it directly — same `px-4` convention
+            // as the sheet doc page's and dialogs page's own bare-content
+            // rows (`example/lib/components_docs/sheet/page.dart`,
+            // `example/lib/pages/dialogs.dart`), with a top/bottom edge
+            // added since there is no header/footer band to supply it.
             children: <Widget>[
-              StyledText(title, TextStyles.h4),
-              StyledText(id, TextStyles.code, color: theme.mutedForeground),
+              Padding(
+                padding: EdgeInsets.fromLTRB(space(4), space(4), space(4), 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    StyledText(title, TextStyles.h4),
+                    SizedBox(height: space(1)),
+                    StyledText(
+                      id,
+                      TextStyles.code,
+                      color: theme.mutedForeground,
+                    ),
+                  ],
+                ),
+              ),
               Expanded(
-                child: SingleChildScrollView(
-                  child: DocsSnippet(code: source, language: 'dart'),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(space(4), 0, space(4), space(4)),
+                  child: SingleChildScrollView(
+                    child: DocsSnippet(code: source, language: 'dart'),
+                  ),
                 ),
               ),
             ],

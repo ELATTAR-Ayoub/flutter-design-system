@@ -1846,9 +1846,24 @@ class Toast extends StatelessWidget {
     }
 
     // The glyph is `color: var(--<type>-ink)` and nothing else in the toast is
-    // coloured by its type at all.
-    content = DefaultTextStyle.merge(
-      style: TextStyle(color: message.type.inkOf(theme)),
+    // coloured by its type at all: [Icon]'s `IconTone.inherit` reads this
+    // [DefaultTextStyle]'s colour (see `icon.dart`'s `_resolveColor`).
+    //
+    // A real [DefaultTextStyle] here, not `.merge`: a toast is hosted in
+    // `MaterialApp.builder` beside the routed page rather than inside it (see
+    // `example/lib/main.dart`), so the ambient style this subtree would
+    // otherwise merge onto is `WidgetsApp`'s own root style, not the app
+    // shell's. `.merge` chained the toast's colour onto whatever that ambient
+    // carried; a plain [DefaultTextStyle] replaces it outright with the same
+    // complete, token-built style the shell installs at its own root
+    // (`example/lib/shell.dart`'s `DefaultTextStyle` over `StyledText.styleOf`),
+    // so nothing the toast never asked for can leak through.
+    content = DefaultTextStyle(
+      style: StyledText.styleOf(
+        context,
+        TextStyles.small,
+        color: message.type.inkOf(theme),
+      ),
       child: content,
     );
 
