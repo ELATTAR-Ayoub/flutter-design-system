@@ -121,6 +121,7 @@ import '../charts/specimens_bar.dart';
 import '../charts/specimens_line.dart';
 import '../charts/specimens_pie.dart';
 import '../charts/specimens_radar.dart';
+import '../charts/specimens_radial.dart';
 import '../kit.dart';
 import '../nav.dart';
 import '../token_swatch.dart';
@@ -155,12 +156,6 @@ String _longDate(Object? value) {
   final DateTime d = DateTime.parse('$value');
   return '${DateFormat.monthsLong[d.month - 1]} ${d.day}, ${d.year}';
 }
-
-/// `radial.tsx`'s two rungs. *"`10` is exactly the `md` rung already, on a
-/// 30px-thick single ring… `5` is not a rung at all and moves to `sm` (6), the
-/// same rung every bar corner in this system already takes."*
-const double _ringRadius = Radii.md;
-const double _stackRadius = Radii.sm;
 
 /* ── Area, `components/space/charts/area.tsx` ──────────────────────────────── */
 
@@ -215,205 +210,6 @@ class _PieInteractiveState extends State<_PieInteractive> {
 }
 
 String _monthLabel(String key) => '${key[0].toUpperCase()}${key.substring(1)}';
-
-/* ── Radial, `components/space/charts/radial.tsx` ──────────────────────────── */
-
-Widget _radialSimple(ChartInk ink) => plot(
-  ink.browser,
-  RadialBarChart(
-    data: ink.rows(browsers),
-    innerRadius: 30,
-    outerRadius: 110,
-    series: const <RadialBarSpec>[
-      RadialBarSpec(dataKey: 'visitors', background: true),
-    ],
-    tooltip: const ChartTooltipSpec(
-      cursor: false,
-      hideLabel: true,
-      nameKey: 'browser',
-    ),
-  ),
-);
-
-Widget _radialGrid(ChartInk ink) => plot(
-  ink.browser,
-  RadialBarChart(
-    data: ink.rows(browsers),
-    innerRadius: 30,
-    outerRadius: 100,
-    grid: const PolarGrid(gridType: PolarGridType.circle),
-    series: const <RadialBarSpec>[RadialBarSpec(dataKey: 'visitors')],
-    tooltip: const ChartTooltipSpec(
-      cursor: false,
-      hideLabel: true,
-      nameKey: 'browser',
-    ),
-  ),
-);
-
-/// The labels sit at each arc's START angle, which is both the registry's own
-/// position and the only placement where five of them cannot collide: at the
-/// mid-angle they came out 19.9px apart for labels 48px wide.
-Widget _radialLabel(ChartInk ink) => plot(
-  ink.browser,
-  RadialBarChart(
-    data: ink.rows(browsers),
-    startAngle: -90,
-    endAngle: 380,
-    innerRadius: 30,
-    outerRadius: 110,
-    series: const <RadialBarSpec>[
-      RadialBarSpec(
-        dataKey: 'visitors',
-        background: true,
-        chipLabelKey: 'browser',
-      ),
-    ],
-    tooltip: const ChartTooltipSpec(
-      cursor: false,
-      hideLabel: true,
-      nameKey: 'browser',
-    ),
-  ),
-);
-
-/// A single browser row, used by nothing else.
-const List<Map<String, Object?>> _radialTextData = <Map<String, Object?>>[
-  <String, Object?>{'browser': 'safari', 'visitors': 200, 'slot': 2},
-];
-
-/// Drift 6: the panel's note calls this "a custom activeShape" and the vendored
-/// source has none: it is `chart-radial-text` with a different sweep and a
-/// different number (1260 rather than 200).
-const List<Map<String, Object?>> _radialShapeData = <Map<String, Object?>>[
-  <String, Object?>{'browser': 'safari', 'visitors': 1260, 'slot': 2},
-];
-
-PolarGrid _radialPlate(ThemeTokens theme) => PolarGrid(
-  gridType: PolarGridType.circle,
-  radialLines: false,
-  // `className="first:fill-muted last:fill-background"`.
-  fills: <Color>[theme.muted, theme.background],
-  polarRadius: const <double>[86, 74],
-);
-
-Widget _radialText(ChartInk ink, ThemeTokens theme) => plot(
-  ChartConfig(<String, ChartSeries>{
-    'visitors': const ChartSeries(label: 'Visitors'),
-    'safari': ChartSeries(label: 'Safari', color: ink.slot(2)),
-  }),
-  RadialBarChart(
-    data: ink.rows(_radialTextData),
-    startAngle: 0,
-    endAngle: 250,
-    innerRadius: 80,
-    outerRadius: 110,
-    grid: _radialPlate(theme),
-    series: const <RadialBarSpec>[
-      RadialBarSpec(
-        dataKey: 'visitors',
-        background: true,
-        cornerRadius: _ringRadius,
-      ),
-    ],
-    radiusAxis: PolarRadiusAxis(
-      tick: false,
-      axisLine: false,
-      centerLabel: (BuildContext context) =>
-          donutCentre(context, chartNumber(200), 'Visitors'),
-    ),
-  ),
-);
-
-Widget _radialShape(ChartInk ink, ThemeTokens theme) => plot(
-  ChartConfig(<String, ChartSeries>{
-    'visitors': const ChartSeries(label: 'Visitors'),
-    'safari': ChartSeries(label: 'Safari', color: ink.slot(2)),
-  }),
-  RadialBarChart(
-    data: ink.rows(_radialShapeData),
-    endAngle: 100,
-    innerRadius: 80,
-    outerRadius: 140,
-    grid: _radialPlate(theme),
-    series: const <RadialBarSpec>[
-      RadialBarSpec(dataKey: 'visitors', background: true),
-    ],
-    radiusAxis: PolarRadiusAxis(
-      tick: false,
-      axisLine: false,
-      centerLabel: (BuildContext context) =>
-          donutCentre(context, chartNumber(1260), 'Visitors'),
-    ),
-  ),
-);
-
-/// A single `{ month, desktop, mobile }` row. The registry names it
-/// `"january"`; kept, though it plays no visual role: there is no category
-/// axis rendering it.
-const List<Map<String, Object?>> _radialStackedData = <Map<String, Object?>>[
-  <String, Object?>{'month': 'january', 'desktop': 1260, 'mobile': 570},
-];
-
-/// The explicit `PolarAngleAxis domain` is the fix for this family's headline
-/// error: left alone the angle-axis domain runs to the largest SINGLE series
-/// rather than to the stack total, so the first ring fills the whole sweep and
-/// the one behind it is clipped to nothing: no error, no warning.
-Widget _radialStacked(ChartInk ink) {
-  const int total = 1260 + 570;
-  return plot(
-    ink.desktopMobile,
-    RadialBarChart(
-      data: _radialStackedData,
-      endAngle: 180,
-      innerRadius: 80,
-      outerRadius: 130,
-      angleAxis: PolarAngleAxis(
-        tick: false,
-        axisLine: false,
-        domain: (min: 0, max: total.toDouble()),
-      ),
-      radiusAxis: PolarRadiusAxis(
-        tick: false,
-        axisLine: false,
-        centerLabel: (BuildContext context) {
-          final ThemeTokens theme = ThemeScope.of(context);
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              StyledText(
-                chartNumber(total),
-                TextStyles.numberLg,
-                color: theme.foreground,
-              ),
-              SizedBox(height: space(1)),
-              StyledText(
-                'Visitors',
-                ChartText.xs,
-                color: theme.mutedForeground,
-              ),
-            ],
-          );
-        },
-      ),
-      series: <RadialBarSpec>[
-        RadialBarSpec(
-          dataKey: 'desktop',
-          stackId: 'a',
-          cornerRadius: _stackRadius,
-          fill: ink.slot(1),
-        ),
-        RadialBarSpec(
-          dataKey: 'mobile',
-          stackId: 'a',
-          cornerRadius: _stackRadius,
-          fill: ink.slot(2),
-        ),
-      ],
-      tooltip: const ChartTooltipSpec(cursor: false, hideLabel: true),
-    ),
-  );
-}
 
 /* ── Tooltips, `components/space/charts/tooltip.tsx` ───────────────────────── */
 
@@ -2375,7 +2171,7 @@ class _RadialSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Simple — chart state',
               skeleton: ChartSkeletonKind.radial,
-              child: _radialSimple(ink),
+              child: radialSimple(ink),
             ),
           ),
           Panel(
@@ -2384,7 +2180,7 @@ class _RadialSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Grid — chart state',
               skeleton: ChartSkeletonKind.radial,
-              child: _radialGrid(ink),
+              child: radialGrid(ink),
             ),
           ),
           Panel(
@@ -2393,7 +2189,7 @@ class _RadialSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Label — chart state',
               skeleton: ChartSkeletonKind.radial,
-              child: _radialLabel(ink),
+              child: radialLabel(ink),
             ),
           ),
           Panel(
@@ -2402,7 +2198,7 @@ class _RadialSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Text — chart state',
               skeleton: ChartSkeletonKind.radial,
-              child: _radialText(ink, theme),
+              child: radialText(ink, theme),
             ),
           ),
           Panel(
@@ -2411,7 +2207,7 @@ class _RadialSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Shape — chart state',
               skeleton: ChartSkeletonKind.radial,
-              child: _radialShape(ink, theme),
+              child: radialShape(ink, theme),
             ),
           ),
           Panel(
@@ -2420,7 +2216,7 @@ class _RadialSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Stacked half-gauge — chart state',
               skeleton: ChartSkeletonKind.radial,
-              child: _radialStacked(ink),
+              child: radialStacked(ink),
             ),
           ),
         ]),
