@@ -83,9 +83,14 @@ class ChartSpecimenCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Row(
-                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        StyledText(specimen.copy.trend, TextStyles.small),
+                        Flexible(
+                          child: StyledText(
+                            specimen.copy.trend,
+                            TextStyles.small,
+                          ),
+                        ),
                         SizedBox(width: space(2)),
                         Icon.lucide(Lucide.trendingUp, size: IconSize.sm),
                       ],
