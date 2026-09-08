@@ -122,6 +122,7 @@ import '../charts/specimens_line.dart';
 import '../charts/specimens_pie.dart';
 import '../charts/specimens_radar.dart';
 import '../charts/specimens_radial.dart';
+import '../charts/specimens_tooltip.dart';
 import '../kit.dart';
 import '../nav.dart';
 import '../token_swatch.dart';
@@ -138,29 +139,6 @@ const double _measureXl = 576;
 /// `MetaItem` is a record typedef, so a plain string value has to be wrapped
 /// in the [InlineSpan] the row renders.
 MetaItem _meta(String k, String v) => (k: k, v: TextSpan(text: v));
-
-/* ── Formatters ──────────────────────────────────────────────────────────── */
-
-/// `{ weekday: "short" }`: the tooltip family's whole X axis.
-///
-/// `DateFormat` carries the long names and the narrow ones; en-US's short
-/// weekday is the long name's first three letters, so this derives rather than
-/// declaring a seventh list.
-String _weekdayShort(Object? value) {
-  final DateTime d = DateTime.parse('$value');
-  return DateFormat.weekdaysLong[d.weekday % 7].substring(0, 3);
-}
-
-/// `{ day: "numeric", month: "long", year: "numeric" }`, `TooltipLabelFormatter`.
-String _longDate(Object? value) {
-  final DateTime d = DateTime.parse('$value');
-  return '${DateFormat.monthsLong[d.month - 1]} ${d.day}, ${d.year}';
-}
-
-/* ── Area, `components/space/charts/area.tsx` ──────────────────────────────── */
-
-String _longDateLabel(String label, List<ChartTooltipItem> items) =>
-    _longDate(label);
 
 /* ── Pie, `components/space/charts/pie.tsx` ────────────────────────────────── */
 
@@ -210,321 +188,6 @@ class _PieInteractiveState extends State<_PieInteractive> {
 }
 
 String _monthLabel(String key) => '${key[0].toUpperCase()}${key.substring(1)}';
-
-/* ── Tooltips, `components/space/charts/tooltip.tsx` ───────────────────────── */
-
-/// Every one of the nine is the SAME two-series stacked bar chart, because the
-/// family's whole point is that only the tooltip's configuration changes. No
-/// `CartesianGrid`, no `YAxis`: the registry source for all nine omits both.
-Widget _tooltipChart(
-  ChartInk ink,
-  ChartConfig config,
-  ChartTooltipSpec tooltip,
-) => plot(
-  config,
-  CartesianChart(
-    data: sportDays,
-    xAxis: const ChartAxis(
-      dataKey: 'date',
-      tickLine: false,
-      tickMargin: 10,
-      axisLine: false,
-      tickFormatter: _weekdayShort,
-    ),
-    tooltip: tooltip,
-    series: <ChartSeriesSpec>[
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'running',
-        stackId: 'a',
-        fill: ink.slot(1),
-        radii: radiiBottom,
-      ),
-      ChartSeriesSpec(
-        kind: ChartSeriesKind.bar,
-        dataKey: 'swimming',
-        stackId: 'a',
-        fill: ink.slot(2),
-        radii: radiiTop,
-      ),
-    ],
-  ),
-);
-
-Widget _tooltipDefault(ChartInk ink) => _tooltipChart(
-  ink,
-  ink.sport,
-  const ChartTooltipSpec(cursor: false, defaultIndex: 1),
-);
-
-Widget _tooltipIndicatorLine(ChartInk ink) => _tooltipChart(
-  ink,
-  ink.sport,
-  const ChartTooltipSpec(
-    cursor: false,
-    defaultIndex: 1,
-    indicator: ChartIndicator.line,
-  ),
-);
-
-Widget _tooltipIndicatorNone(ChartInk ink) => _tooltipChart(
-  ink,
-  ink.sport,
-  const ChartTooltipSpec(cursor: false, defaultIndex: 1, hideIndicator: true),
-);
-
-/// The registry's one extra config key: a label that never comes from the
-/// hovered row at all, so the header always reads "Activities" rather than the
-/// day. `labelKey` routes the lookup at it, and the fallback in
-/// `getPayloadConfigFromPayload` is what makes a key naming no field work.
-Widget _tooltipLabelCustom(ChartInk ink) => _tooltipChart(
-  ink,
-  ink.sport.plus(<String, ChartSeries>{
-    'activities': const ChartSeries(label: 'Activities'),
-  }),
-  const ChartTooltipSpec(
-    cursor: false,
-    defaultIndex: 1,
-    labelKey: 'activities',
-    indicator: ChartIndicator.line,
-  ),
-);
-
-Widget _tooltipLabelFormatter(ChartInk ink) => _tooltipChart(
-  ink,
-  ink.sport,
-  const ChartTooltipSpec(
-    cursor: false,
-    defaultIndex: 1,
-    labelFormatter: _longDateLabel,
-  ),
-);
-
-Widget _tooltipLabelNone(ChartInk ink) => _tooltipChart(
-  ink,
-  ink.sport,
-  const ChartTooltipSpec(
-    cursor: false,
-    defaultIndex: 1,
-    hideIndicator: true,
-    hideLabel: true,
-  ),
-);
-
-/// Supplying `formatter` opts a row out of the default renderer entirely, so
-/// this one rebuilds by hand what the default already does: which is why
-/// `min-w-[130px]` in the registry becomes `min-w-32`, the exact width the
-/// default box opens with.
-Widget _tooltipFormatter(ChartInk ink) => _tooltipChart(
-  ink,
-  ink.sport,
-  ChartTooltipSpec(
-    cursor: false,
-    defaultIndex: 1,
-    hideLabel: true,
-    formatter: (BuildContext context, ChartTooltipItem item, int index) =>
-        _KcalRow(item: item),
-  ),
-);
-
-/// `flex min-w-32 items-center text-xs text-muted-foreground`, with the figure
-/// and its unit pushed to the end.
-class _KcalRow extends StatelessWidget {
-  const _KcalRow({required this.item, this.showTotal = false, this.total = 0});
-
-  final ChartTooltipItem item;
-  final bool showTotal;
-  final int total;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        ConstrainedBox(
-          constraints: BoxConstraints(minWidth: ChartTooltipContent.minWidth),
-          // `Wrap`, not a `Row`: the advanced tooltip fixes its own width at
-          // `w-44` (a spec value, not a layout column), and at 200% text a
-          // sport name plus its figure can still outgrow that regardless of
-          // which side gives room. `Wrap` drops the figure to its own line
-          // rather than asserting when even that is not enough.
-          child: Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: space(2),
-            runSpacing: space(0.5),
-            children: <Widget>[
-              StyledText(
-                item.name == 'running' ? 'Running' : 'Swimming',
-                ChartText.xs,
-                color: theme.mutedForeground,
-              ),
-              _Kcal(value: item.value ?? 0),
-            ],
-          ),
-        ),
-        if (showTotal) ...<Widget>[
-          SizedBox(height: space(1.5)),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: theme.border,
-                  width: BorderWidths.hairline,
-                ),
-              ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(top: space(1.5)),
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: space(2),
-                runSpacing: space(0.5),
-                children: <Widget>[
-                  StyledText(
-                    'Total',
-                    ChartText.xsMedium,
-                    color: theme.foreground,
-                  ),
-                  _Kcal(value: total),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _Kcal extends StatelessWidget {
-  const _Kcal({required this.value});
-
-  final num value;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.baseline,
-      textBaseline: TextBaseline.alphabetic,
-      children: <Widget>[
-        // Flexible so a tooltip squeezed to its `min-w` at 200% text can
-        // still shrink the figure instead of asserting; `mainAxisSize.min`
-        // alone only affects how much of the *given* space this row claims,
-        // not whether the given space is enough.
-        Flexible(
-          child: StyledText(
-            chartNumber(value),
-            TextStyles.numberSm,
-            color: theme.foreground,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        SizedBox(width: space(0.5)),
-        // `font-normal text-muted-foreground`: the unit steps down out of the
-        // figure's own weight.
-        StyledText('kcal', ChartText.xs, color: theme.mutedForeground),
-      ],
-    );
-  }
-}
-
-/// Faithful to the registry's own pairing, `Footprints`/running,
-/// `Waves`/swimming. `tooltip.tsx` routes both through `Icon` by wrapping them
-/// in a zero-arg component; the builder slot here needs no such wrapper.
-Widget _tooltipIcons(ChartInk ink) => _tooltipChart(
-  ink,
-  ChartConfig(<String, ChartSeries>{
-    'running': ChartSeries(
-      label: 'Running',
-      color: ink.slot(1),
-      icon: (BuildContext context) => const Icon.lucide(
-        Lucide.footprints,
-        size: IconSize.xs,
-        tone: IconTone.muted,
-      ),
-    ),
-    'swimming': ChartSeries(
-      label: 'Swimming',
-      color: ink.slot(2),
-      icon: (BuildContext context) => const Icon.lucide(
-        Lucide.wavesHorizontal,
-        size: IconSize.xs,
-        tone: IconTone.muted,
-      ),
-    ),
-  }),
-  const ChartTooltipSpec(cursor: false, defaultIndex: 1, hideLabel: true),
-);
-
-/// The most involved of the nine: a swatch, the series label, the value with
-/// its unit, and: after the last row: a totalled line.
-Widget _tooltipAdvanced(ChartInk ink) => _tooltipChart(
-  ink,
-  ink.sport,
-  ChartTooltipSpec(
-    cursor: false,
-    defaultIndex: 1,
-    hideLabel: true,
-    // `className="w-44"`, 176px, the nearest rung of the same scale
-    // `min-w-32` uses, close enough that the fixed-width Total row does not
-    // reflow between the two hovered series.
-    width: space(44),
-    formatter: (BuildContext context, ChartTooltipItem item, int index) =>
-        _AdvancedRow(item: item, index: index, ink: ink),
-  ),
-);
-
-class _AdvancedRow extends StatelessWidget {
-  const _AdvancedRow({
-    required this.item,
-    required this.index,
-    required this.ink,
-  });
-
-  final ChartTooltipItem item;
-  final int index;
-  final ChartInk ink;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    final Map<String, Object?> row = item.payload ?? const <String, Object?>{};
-    final int total =
-        ((row['running'] as num?) ?? 0).toInt() +
-        ((row['swimming'] as num?) ?? 0).toInt();
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(top: space(0.5)),
-          child: Container(
-            width: space(2.5),
-            height: space(2.5),
-            decoration: BoxDecoration(
-              color: ink.slot(item.name == 'running' ? 1 : 2),
-              borderRadius: BorderRadius.circular(Radii.xs),
-            ),
-          ),
-        ),
-        SizedBox(width: space(2)),
-        Expanded(
-          child: DefaultTextStyle(
-            style: StyledText.styleOf(
-              context,
-              ChartText.xs,
-              color: theme.mutedForeground,
-            ),
-            child: _KcalRow(item: item, showTotal: index == 1, total: total),
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 /* ── Unit activity, `components/space/charts/unit-activity.tsx` ────────────── */
 
@@ -2335,7 +1998,7 @@ class _TooltipSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Default — chart state',
               skeleton: ChartSkeletonKind.tooltip,
-              child: _tooltipDefault(ink),
+              child: tooltipDefault(ink),
             ),
           ),
           Panel(
@@ -2344,7 +2007,7 @@ class _TooltipSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Line indicator — chart state',
               skeleton: ChartSkeletonKind.tooltip,
-              child: _tooltipIndicatorLine(ink),
+              child: tooltipIndicatorLine(ink),
             ),
           ),
           Panel(
@@ -2353,7 +2016,7 @@ class _TooltipSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'No indicator — chart state',
               skeleton: ChartSkeletonKind.tooltip,
-              child: _tooltipIndicatorNone(ink),
+              child: tooltipIndicatorNone(ink),
             ),
           ),
           Panel(
@@ -2362,7 +2025,7 @@ class _TooltipSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Custom label — chart state',
               skeleton: ChartSkeletonKind.tooltip,
-              child: _tooltipLabelCustom(ink),
+              child: tooltipLabelCustom(ink),
             ),
           ),
           Panel(
@@ -2371,7 +2034,7 @@ class _TooltipSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Label formatter — chart state',
               skeleton: ChartSkeletonKind.tooltip,
-              child: _tooltipLabelFormatter(ink),
+              child: tooltipLabelFormatter(ink),
             ),
           ),
           Panel(
@@ -2380,7 +2043,7 @@ class _TooltipSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'No label — chart state',
               skeleton: ChartSkeletonKind.tooltip,
-              child: _tooltipLabelNone(ink),
+              child: tooltipLabelNone(ink),
             ),
           ),
           Panel(
@@ -2389,7 +2052,7 @@ class _TooltipSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Formatter — chart state',
               skeleton: ChartSkeletonKind.tooltip,
-              child: _tooltipFormatter(ink),
+              child: tooltipFormatter(ink),
             ),
           ),
           Panel(
@@ -2398,7 +2061,7 @@ class _TooltipSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Icons — chart state',
               skeleton: ChartSkeletonKind.tooltip,
-              child: _tooltipIcons(ink),
+              child: tooltipIcons(ink),
             ),
           ),
           Panel(
@@ -2407,7 +2070,7 @@ class _TooltipSection extends StatelessWidget {
             child: ChartStateSwitch(
               groupLabel: 'Advanced — chart state',
               skeleton: ChartSkeletonKind.tooltip,
-              child: _tooltipAdvanced(ink),
+              child: tooltipAdvanced(ink),
             ),
           ),
         ]),
