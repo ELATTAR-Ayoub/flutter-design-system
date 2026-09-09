@@ -40,6 +40,7 @@ import 'package:flutter/widgets.dart'
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/theme_scope.dart';
+import '../../design_system/foundation/typography.dart';
 import './chart.dart';
 import './chart_cartesian.dart';
 import './chart_geometry.dart';
@@ -416,7 +417,11 @@ class _PieChartState extends State<PieChart>
                     ),
                   ),
                 for (final _ChipLabel chip in chips)
-                  _positioned(chip.anchor, plot, _ArcChip(text: chip.text)),
+                  _positioned(
+                    chip.anchor,
+                    plot,
+                    _ArcChip(text: chip.text, isNumeric: chip.isNumeric),
+                  ),
                 if (widget.centerLabel != null)
                   Positioned(
                     left: 0,
@@ -616,15 +621,17 @@ class _PieChartState extends State<PieChart>
       }
       final double mid = angle + sweep / 2;
       if (pie.chipLabelKey != null) {
+        final Object? chipRaw = row[pie.chipLabelKey];
         chips.add(
           _ChipLabel(
-            text: '${row[pie.chipLabelKey] ?? ''}',
+            text: '${chipRaw ?? ''}',
             anchor: polarToCartesian(
               centre.dx,
               centre.dy,
               (inner + outer) / 2,
               mid,
             ),
+            isNumeric: chipRaw is num,
           ),
         );
       }
@@ -681,9 +688,18 @@ class _Wedge {
 
 @immutable
 class _ChipLabel {
-  const _ChipLabel({required this.text, required this.anchor});
+  const _ChipLabel({
+    required this.text,
+    required this.anchor,
+    required this.isNumeric,
+  });
   final String text;
   final Offset anchor;
+
+  /// Whether `chipLabelKey` named a `num` field on the row. Both call sites
+  /// on the page point it at a name (`browser`), which stays prose, but the
+  /// slot is generic — a caller pointing it at a value gets `numberSm`.
+  final bool isNumeric;
 }
 
 @immutable
@@ -989,7 +1005,13 @@ class _RadarChartState extends State<RadarChart>
                 )
               : StyledText(
                   '${widget.data[i][axis.dataKey] ?? ''}',
-                  ChartText.xs,
+                  // The angle axis is the categorical one (a month, a
+                  // subject) except when a caller's `dataKey` happens to
+                  // name a numeric field — the same `is num` hook every
+                  // other axis in the family reads.
+                  widget.data[i][axis.dataKey] is num
+                      ? TextStyles.numberSm
+                      : ChartText.xs,
                   color: theme.mutedForeground,
                 ),
         ),
@@ -1015,9 +1037,11 @@ class _RadarChartState extends State<RadarChart>
             axis.angle,
           ),
           angle: axis.angle,
+          // The radius axis's own ticks are `scale.ticks()` — always a
+          // `num`, so this is `numberSm` unconditionally.
           child: StyledText(
             chartNumber(v),
-            ChartText.xs,
+            TextStyles.numberSm,
             color: theme.mutedForeground,
           ),
         ),
@@ -1414,15 +1438,17 @@ class _RadialBarChartState extends State<RadialBarChart>
               ),
             );
             if (s.chipLabelKey != null) {
+              final Object? chipRaw = row[s.chipLabelKey];
               chips.add(
                 _ChipLabel(
-                  text: '${row[s.chipLabelKey] ?? ''}',
+                  text: '${chipRaw ?? ''}',
                   anchor: polarToCartesian(
                     centre.dx,
                     centre.dy,
                     (inner + outer) / 2,
                     from,
                   ),
+                  isNumeric: chipRaw is num,
                 ),
               );
             }
@@ -1463,7 +1489,10 @@ class _RadialBarChartState extends State<RadialBarChart>
                     top: chip.anchor.dy,
                     child: FractionalTranslation(
                       translation: const Offset(-0.5, -0.5),
-                      child: _ArcChip(text: chip.text),
+                      child: _ArcChip(
+                        text: chip.text,
+                        isNumeric: chip.isNumeric,
+                      ),
                     ),
                   ),
                 if (widget.radiusAxis?.centerLabel != null)
@@ -1698,9 +1727,15 @@ class _RadialPainter extends CustomPainter {
 /// broken behind it. Measured after the change: **16.97:1** dark, **19.90:1**
 /// light, for all five slots instead of ten separate ratios.
 class _ArcChip extends StatelessWidget {
-  const _ArcChip({required this.text});
+  const _ArcChip({required this.text, required this.isNumeric});
 
   final String text;
+
+  /// Whether `chipLabelKey` named a `num` field. Both specimens on the page
+  /// point it at `browser` — a name, which stays prose — but a caller
+  /// pointing it at a value gets `numberSm`, same as every other number
+  /// surface in the family.
+  final bool isNumeric;
 
   @override
   Widget build(BuildContext context) {
@@ -1714,7 +1749,7 @@ class _ArcChip extends StatelessWidget {
       child: StyledText(
         // `capitalize`.
         text.isEmpty ? text : '${text[0].toUpperCase()}${text.substring(1)}',
-        ChartText.xs,
+        isNumeric ? TextStyles.numberSm : ChartText.xs,
         color: theme.cardForeground,
       ),
     );
@@ -1722,6 +1757,12 @@ class _ArcChip extends StatelessWidget {
 }
 
 /// A pie's outside label — `<text>` on `--foreground`, never on the slice.
+///
+/// Always a value: `_buildPie` prints `chartNumber(row[pie.dataKey])` by
+/// default, and the one specimen that overrides it with `labelBuilder`
+/// (`pieLabelCustom`) still runs the number through `chartNumber` itself —
+/// so this is `numberSm` unconditionally, the "pie value labels" case the
+/// numeric-role rule names by name.
 class _PolarText extends StatelessWidget {
   const _PolarText({
     required this.text,
@@ -1735,5 +1776,5 @@ class _PolarText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StyledText(text, ChartText.xs, color: color, align: align);
+      StyledText(text, TextStyles.numberSm, color: color, align: align);
 }

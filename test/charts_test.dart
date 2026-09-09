@@ -498,6 +498,150 @@ void main() {
     }
   });
 
+  /* ── Numeric role ─────────────────────────────────────────────────────── */
+
+  group('CartesianChart — numeric role on number surfaces', () {
+    // Task 28: numerals get `TextStyles.numberSm`, category text keeps the
+    // chart's own prose role (`ChartText.xs`, which is `TextStyles.small`).
+    // A fixed >= Breakpoints.lg viewport resolves both roles to their
+    // desktop steps, so the two are guaranteed distinct sizes to compare.
+    const List<Map<String, Object?>> months = <Map<String, Object?>>[
+      <String, Object?>{'month': 'Jan', 'value': 186},
+      <String, Object?>{'month': 'Feb', 'value': 305},
+    ];
+
+    Widget scoped(Widget child) => ThemeScope(
+      controller: ThemeController(mode: ColorMode.light),
+      child: MediaQuery(
+        data: const MediaQueryData(
+          size: Size(1440, 900),
+          disableAnimations: true,
+        ),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(width: 480, height: 260, child: child),
+          ),
+        ),
+      ),
+    );
+
+    testWidgets('a numeric Y axis tick renders numberSm', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        scoped(
+          ChartContainer(
+            config: const ChartConfig(<String, ChartSeries>{}),
+            child: CartesianChart(
+              data: months,
+              xAxis: const ChartAxis(dataKey: 'month'),
+              yAxis: const ChartAxis(type: ChartAxisType.number),
+              series: const <ChartSeriesSpec>[
+                ChartSeriesSpec(kind: ChartSeriesKind.bar, dataKey: 'value'),
+              ],
+            ),
+          ),
+        ),
+      );
+      // `chartNiceTicks(0, 305)` always keeps 0 among its five stops.
+      final Text tick = t.widget<Text>(find.text('0'));
+      expect(tick.style!.fontSize, TextStyles.numberSm.desktop.size);
+    });
+
+    testWidgets(
+      'a CATEGORY X axis tick keeps the prose role, not numberSm',
+      (WidgetTester t) async {
+        await t.pumpWidget(
+          scoped(
+            ChartContainer(
+              config: const ChartConfig(<String, ChartSeries>{}),
+              child: CartesianChart(
+                data: months,
+                xAxis: const ChartAxis(dataKey: 'month'),
+                yAxis: const ChartAxis(type: ChartAxisType.number),
+                series: const <ChartSeriesSpec>[
+                  ChartSeriesSpec(
+                    kind: ChartSeriesKind.bar,
+                    dataKey: 'value',
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        final Text tick = t.widget<Text>(find.text('Jan'));
+        expect(tick.style!.fontSize, TextStyles.small.desktop.size);
+        expect(
+          tick.style!.fontSize,
+          isNot(TextStyles.numberSm.desktop.size),
+        );
+      },
+    );
+
+    testWidgets('a LabelList value renders numberSm', (WidgetTester t) async {
+      await t.pumpWidget(
+        scoped(
+          ChartContainer(
+            config: const ChartConfig(<String, ChartSeries>{}),
+            child: CartesianChart(
+              data: months,
+              xAxis: const ChartAxis(dataKey: 'month', hide: true),
+              yAxis: const ChartAxis(type: ChartAxisType.number, hide: true),
+              series: const <ChartSeriesSpec>[
+                ChartSeriesSpec(
+                  kind: ChartSeriesKind.bar,
+                  dataKey: 'value',
+                  labels: <ChartLabelList>[ChartLabelList()],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      final Text label = t.widget<Text>(find.text('186'));
+      expect(label.style!.fontSize, TextStyles.numberSm.desktop.size);
+    });
+
+    testWidgets(
+      "a LabelList pointed at a category field keeps the prose role",
+      (WidgetTester t) async {
+        await t.pumpWidget(
+          scoped(
+            ChartContainer(
+              config: const ChartConfig(<String, ChartSeries>{}),
+              child: CartesianChart(
+                data: months,
+                layout: ChartLayout.vertical,
+                xAxis: const ChartAxis(
+                  dataKey: 'value',
+                  type: ChartAxisType.number,
+                  hide: true,
+                ),
+                yAxis: const ChartAxis(dataKey: 'month', hide: true),
+                series: const <ChartSeriesSpec>[
+                  ChartSeriesSpec(
+                    kind: ChartSeriesKind.bar,
+                    dataKey: 'value',
+                    labels: <ChartLabelList>[
+                      ChartLabelList(
+                        dataKey: 'month',
+                        position: ChartLabelPosition.insideLeft,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        final Text label = t.widget<Text>(find.text('Jan'));
+        expect(label.style!.fontSize, TextStyles.small.desktop.size);
+      },
+    );
+  });
+
   /* ── Polar hover ─────────────────────────────────────────────────────── */
 
   group('PieChart / RadialBarChart — hover tooltip', () {
