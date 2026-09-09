@@ -49,14 +49,17 @@
 ///
 /// ## Divergences, by construction
 ///
-///  1. **No speech, no dictation.** `useBrowserSpeech` and `useDictation` are
-///     Web Speech API hooks; Flutter ships no equivalent and this port invents
-///     none. The consequence is exact and bounded: [AgentFeatures.speech] and
-///     [AgentFeatures.microphone] are honoured as flags, [AgentVoice] is
-///     always at rest, and the built-in `voice` command — gated on
-///     `features.speech && speech.isSupported` — never appears. A browser
-///     without the API reaches the same state, so this is a *reachable* state
-///     of the reference; it is simply the only one the port can reach.
+///  1. **No speech, no dictation capture.** `useBrowserSpeech` and
+///     `useDictation` are Web Speech API hooks; Flutter ships no equivalent
+///     and this port invents none. [AgentFeatures.speech] stays a flag only —
+///     [AgentVoice] on the face is always at rest, and the built-in `voice`
+///     command, gated on `features.speech && speech.isSupported`, never
+///     appears. [AgentFeatures.microphone] now delivers a real control (see
+///     [_DictationControl]): pressing it arms and disarms [MicControl] and
+///     drives [BarVisualizer] the same way the voice components drive their
+///     own demos — there is no audio behind either signal, on this port or
+///     the browser's own build without the API, which is why this remains a
+///     *reachable* state of the reference rather than a divergence from it.
 ///  2. ~~**The model menu's rows are one line, not two.**~~ **CLOSED.**
 ///     `ModelPicker` writes `flex-col items-start gap-1` and stacks the label
 ///     over its hint; [MenuItem] had `label` and `shortcut` and no child slot,
@@ -130,6 +133,7 @@ import '../../components/ui/icon_paths.g.dart';
 import '../../components/ui/marker.dart';
 import '../../components/ui/menu.dart';
 import '../../components/ui/popover.dart';
+import '../../components/ui/voice.dart';
 
 /// `AgentConsoleFeatures` — *"nine switches, all on by default. A console with
 /// everything turned off is still a console — which is the test that the parts
@@ -349,6 +353,11 @@ class _AgentConsoleState extends State<AgentConsole> {
   /// Zero on every desktop frame, where the whole adaptation costs one
   /// comparison and builds nothing.
   double _keyboardInset = 0;
+
+  /// Whether [_DictationControl]'s [MicControl] is armed. Console-local, like
+  /// [_stopped] above — there is no transport-level concept of dictation, so
+  /// nothing outside this widget needs to see it.
+  bool _dictationListening = false;
 
   @override
   void initState() {
@@ -583,6 +592,18 @@ class _AgentConsoleState extends State<AgentConsole> {
                       disabledReason: !transport.isReady
                           ? AgentConsole.notReadyReason
                           : null,
+                    )
+                  : null,
+              micControl: widget.features.microphone
+                  ? _DictationControl(
+                      listening: _dictationListening,
+                      disabled: !transport.isReady,
+                      disabledReason: !transport.isReady
+                          ? AgentConsole.notReadyReason
+                          : null,
+                      onToggle: () => setState(
+                        () => _dictationListening = !_dictationListening,
+                      ),
                     )
                   : null,
             ),
@@ -832,6 +853,49 @@ const double _errorFillAlpha = 0.08;
 
 /// `border-destructive/30`.
 const double _errorBorderAlpha = 0.3;
+
+/// [AgentFeatures.microphone]'s control — *"supplied by the console because it
+/// also carries the speech settings"* ([AgentComposer.micControl]'s own
+/// words). Console-owned rather than built into the composer because the
+/// composer knows nothing about dictation state; the console is where
+/// [_dictationListening] already lives, alongside every other piece of local
+/// UI state (the stopped set, the chosen model).
+///
+/// There is no Web Speech API in Flutter (see the divergence at the top of
+/// this file), so [onToggle] arms and disarms [MicControl] without capturing
+/// any audio. While armed, a [BarVisualizer] appears beside it, driven by
+/// `active: true` — the same signal-not-a-reading the voice components' own
+/// specimens use when they have no analyser to draw from either.
+class _DictationControl extends StatelessWidget {
+  const _DictationControl({
+    required this.listening,
+    required this.onToggle,
+    required this.disabled,
+    this.disabledReason,
+  });
+
+  final bool listening;
+  final VoidCallback onToggle;
+  final bool disabled;
+  final String? disabledReason;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      if (listening) ...<Widget>[
+        const BarVisualizer(active: true),
+        SizedBox(width: AgentComposer.controlGap),
+      ],
+      MicControl(
+        listening: listening,
+        onToggle: disabled ? null : onToggle,
+        disabled: disabled,
+        disabledReason: disabledReason,
+      ),
+    ],
+  );
+}
 
 /// `ModelPicker` — *"lives beside the other two and shares their one rule: hide
 /// when there is nothing to choose."*

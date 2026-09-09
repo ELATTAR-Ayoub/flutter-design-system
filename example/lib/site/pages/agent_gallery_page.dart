@@ -7,14 +7,11 @@
 /// with [AgentFeatures.all], with a conversation history rail folded into the
 /// same surface rather than shown as a separate demo beside it.
 ///
-/// **The microphone is turned on, not yet rendered.** `AgentFeatures.microphone`
-/// is set — `agent_console.dart`'s own library note ("Divergences, by
-/// construction") calls this port's speech and dictation flags "honoured as
-/// flags" only, since Flutter has no Web Speech API equivalent: no
-/// `micControl` reaches [AgentComposer] from [AgentConsole] today regardless
-/// of the flag, and that wiring lives under `lib/src/`, out of reach from
-/// this example-only page. The flag is on here so the control appears the
-/// moment that gap closes, with no change to this page.
+/// **The microphone is on, and renders.** `AgentFeatures.microphone` is set;
+/// `agent_console.dart` wires it to a real `MicControl` beside send. There is
+/// still no capture behind it — Flutter has no Web Speech API equivalent,
+/// per that file's own "Divergences, by construction" note — pressing it
+/// only arms and disarms the control's own resting/live states.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';

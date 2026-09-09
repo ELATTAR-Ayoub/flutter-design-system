@@ -82,18 +82,9 @@ void main() {
     expect(console.features, AgentFeatures.all);
     expect(console.features.microphone, isTrue);
 
-    // KNOWN GAP, not introduced by this page: `agent_console.dart`'s own
-    // library note ("Divergences, by construction" — no speech, no
-    // dictation) documents `AgentFeatures.microphone` as honoured only as
-    // a flag — the console never passes a `micControl` to `AgentComposer`
-    // (confirmed: `micControl:` is not passed anywhere under `lib/`), so
-    // no mic renders next to send regardless of this flag. Fixing that is
-    // a `lib/src/blocks/agent_console/agent_console.dart` change, out of
-    // scope for this example-only page (see the task's own "never edit
-    // lib/src" constraint) — flagged separately for a dedicated fix. This
-    // assertion pins today's real, honest state: absent, and turned on
-    // here so the mic appears the moment that gap closes, with no page
-    // change required.
+    // `agent_console.dart` now wires `AgentFeatures.microphone` to
+    // `AgentComposer.micControl`, so a `MicControl` renders next to send on
+    // this page with no page-level change required.
     final Finder composer = find.descendant(
       of: liveConsole,
       matching: find.byType(AgentComposer),
@@ -101,12 +92,7 @@ void main() {
     expect(composer, findsOneWidget);
     expect(
       find.descendant(of: composer, matching: find.byType(MicControl)),
-      findsNothing,
-      reason:
-          'no MicControl renders yet — agent_console.dart does not wire '
-          'AgentFeatures.microphone to AgentComposer.micControl. Update '
-          'this expectation to findsOneWidget once that lib/src gap is '
-          'closed.',
+      findsOneWidget,
     );
     expect(tester.takeException(), isNull);
   });
@@ -132,6 +118,16 @@ void main() {
 
       await tester.tap(sidebarToggle);
       await tester.pump();
+      // `ChatHistory`'s drawer slides in behind `_PanelIn`
+      // (`translateX(-100%) → none` over `ChatHistory.panelIn`, 320ms) — one
+      // bare `pump()` catches it mid-slide, off to the left of its resting
+      // rect, which is a transient animation frame rather than a defect in
+      // where the drawer is laid out (`_surfaceRect` itself resolves to the
+      // console's own rect correctly throughout, confirmed by probing it
+      // directly). Waiting out the same duration a real pointer would (a
+      // person cannot click a row before it has visually arrived either)
+      // settles the transform before the tap below.
+      await tester.pump(ChatHistory.panelIn);
 
       // "Sealed inventory check" is the seeded store's active conversation;
       // "Thirty-day activity export" is a different, pinned one.
@@ -139,21 +135,11 @@ void main() {
       final Finder nextConversation = find.text('Thirty-day activity export');
       expect(nextConversation, findsOneWidget);
 
-      // `ChatHistory`'s drawer paints through an `OverlayPortal` positioned
-      // from a `surfaceKey` rect (`agent_history.dart`'s `_surfaceRect`); at
-      // this page's position in the scroll view that rect resolves off the
-      // visible viewport, so a simulated pointer tap on the row's own screen
-      // position cannot reliably hit it (reproduced identically with the
-      // untouched `ConsoleWithHistory` demo in `pages/history.dart`, so this
-      // is a pre-existing library defect, not something this page
-      // introduced — out of scope here since it lives under `lib/src/`).
-      // The row's own `onOpen` callback is invoked directly instead: the
-      // exact call a working tap would make, exercising every step after
-      // the pointer event for real.
-      final HistoryCard card = tester.widget<HistoryCard>(
-        find.ancestor(of: nextConversation, matching: find.byType(HistoryCard)),
-      );
-      card.onOpen(card.conversation.id);
+      // A real pointer tap on the row's own screen position — no callback
+      // shortcut. `warnIfMissed` stays on (its default): if this ever
+      // regresses to hitting nothing, the test fails loudly rather than
+      // silently passing on a miss.
+      await tester.tap(nextConversation);
       await tester.pump();
 
       // Selecting closes the drawer: the sidebar's own conversation list is

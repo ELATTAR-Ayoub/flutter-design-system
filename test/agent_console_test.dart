@@ -872,6 +872,82 @@ void main() {
     });
   });
 
+  /* ── microphone ────────────────────────────────────────────────────────── */
+
+  /// `AgentComposer.micControl` — *"supplied by the console because it also
+  /// carries the speech settings. Rendered immediately left of send."* The
+  /// console never filled it; these pin that it now does, exactly on the
+  /// flag, and nowhere else when the flag is off.
+  group('AgentConsole microphone', () {
+    testWidgets('a mic control renders next to send, not the attach control', (
+      WidgetTester tester,
+    ) async {
+      final _FakeTransport transport = _FakeTransport();
+      addTearDown(transport.dispose);
+
+      await _pump(
+        tester,
+        AgentConsole(transport: transport, persona: _persona, height: 600),
+      );
+
+      expect(find.byType(MicControl), findsOneWidget);
+      final double micLeft = tester.getRect(find.byType(MicControl)).left;
+      final double sendLeft = tester
+          .getRect(find.byType(AgentAttachMenu))
+          .left;
+      final double attachLeft = tester
+          .getRect(find.byType(AgentAttachMenu))
+          .right;
+      // The mic sits to the right of the flex spacer, beside send — not
+      // beside the plus/attach control on the far left.
+      expect(micLeft, greaterThan(attachLeft));
+      expect(micLeft, greaterThan(sendLeft));
+    });
+
+    testWidgets('microphone off draws no mic control at all — compatibility', (
+      WidgetTester tester,
+    ) async {
+      final _FakeTransport transport = _FakeTransport();
+      addTearDown(transport.dispose);
+
+      await _pump(
+        tester,
+        AgentConsole(
+          transport: transport,
+          persona: _persona,
+          features: const AgentFeatures(microphone: false),
+          height: 600,
+        ),
+      );
+
+      expect(find.byType(MicControl), findsNothing);
+    });
+
+    testWidgets('pressing the mic arms it, and pressing again disarms it', (
+      WidgetTester tester,
+    ) async {
+      final _FakeTransport transport = _FakeTransport();
+      addTearDown(transport.dispose);
+
+      await _pump(
+        tester,
+        AgentConsole(transport: transport, persona: _persona, height: 600),
+      );
+
+      MicControl mic() => tester.widget<MicControl>(find.byType(MicControl));
+
+      expect(mic().listening, isFalse);
+
+      await tester.tap(find.byType(MicControl));
+      await tester.pump();
+      expect(mic().listening, isTrue);
+
+      await tester.tap(find.byType(MicControl));
+      await tester.pump();
+      expect(mic().listening, isFalse);
+    });
+  });
+
   /* ── switchPhase ───────────────────────────────────────────────────────── */
 
   /// `agent-console.tsx` puts `blurClass(switchPhase)` on the `overflow-y-auto`
