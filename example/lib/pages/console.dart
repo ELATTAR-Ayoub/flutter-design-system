@@ -81,6 +81,7 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/agent/mock_transport.dart';
 import 'package:example/kit.dart';
 import 'package:example/nav.dart';
+import 'package:example/shell.dart';
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
@@ -270,6 +271,22 @@ class LiveConsole extends StatefulWidget {
   State<LiveConsole> createState() => _LiveConsoleState();
 }
 
+/// **`Saving`, never `Saved`.** Same wording, same reasoning, as
+/// `transcript.dart`'s own `_saving`: a plain `download` anchor gives the
+/// page no completion event, so claiming the bytes reached disk would
+/// assert a capability this mock does not have. `export_activity`'s CSV
+/// carries a real `data:` url with the CSV's own bytes on it (see
+/// `mock_transport.dart`), so a browser that did wire this up to an anchor
+/// would hand back the genuine file — every scripted console on this site
+/// just narrates that rather than doing it, [AgentConsole.onDownload]'s only
+/// job on a mock transport.
+void savingAttachmentToast(String name) => docsToasts.show(
+  ToastMessage(
+    title: 'Saving $name',
+    description: 'Your browser is handling the download.',
+  ),
+);
+
 class _LiveConsoleState extends State<LiveConsole> {
   final MockTransport _transport = MockTransport();
 
@@ -288,6 +305,7 @@ class _LiveConsoleState extends State<LiveConsole> {
     models: kVaultModels,
     describeApproval: describeVaultApproval,
     height: LiveConsole.height,
+    onDownload: savingAttachmentToast,
   );
 }
 
@@ -571,6 +589,7 @@ class _LauncherDemoState extends State<LauncherDemo> {
                 commands: kVaultCommands,
                 models: kVaultModels,
                 describeApproval: describeVaultApproval,
+                onDownload: savingAttachmentToast,
               ),
             ),
           ],

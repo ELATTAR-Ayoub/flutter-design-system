@@ -930,6 +930,108 @@ void main() {
     });
   });
 
+  /* ── onDownload ────────────────────────────────────────────────────────── */
+
+  /// `AgentAttachmentCard` shows a download action whenever a turn's
+  /// attachment carries a url and has no `onRemove` — true of every
+  /// already-sent transcript row, console features aside. Before this pin
+  /// the console had no `onDownload` field at all: `AgentTranscript`'s own
+  /// widgets (`UserMessage`, `AgentMessage`, `ToolChip`) took the callback,
+  /// but `AgentConsole` never had one to forward, so no caller could ever
+  /// make the button — visible whenever a produced or sent file carried a
+  /// url — do anything. Asserted end to end from the console, not the
+  /// transcript row directly, because the console is where the wiring broke.
+  group('AgentConsole onDownload', () {
+    final AgentAttachment csv = const AgentAttachment(
+      id: 'a1',
+      name: 'activity-30d.csv',
+      mime: 'text/csv',
+      kind: AgentAttachmentKind.data,
+      size: 4821,
+      url: 'data:text/csv,date,event\n',
+      delivery: AgentDelivery.produced(),
+    );
+
+    testWidgets(
+      'a url and onDownload: the card shows a download action, and pressing '
+      "it invokes the console's callback with the file name",
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport(
+          turns: <AgentTurn>[
+            TextTurn(
+              id: 't1',
+              text: 'Here you go.',
+              attachments: <AgentAttachment>[csv],
+            ),
+          ],
+        );
+        addTearDown(transport.dispose);
+
+        final List<String> downloaded = <String>[];
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            height: 600,
+            onDownload: downloaded.add,
+          ),
+        );
+
+        final Finder action = find.byType(AttachmentAction);
+        expect(action, findsOneWidget);
+
+        await tester.tap(action);
+        await tester.pump();
+
+        expect(downloaded, <String>['activity-30d.csv']);
+
+        // `AttachmentAction`'s own saving swap — settle its timer before the
+        // tree is torn down, or the binding flags a pending timer as a leak.
+        await tester.pump(AttachmentAction.savingWindow);
+        await tester.pump();
+      },
+    );
+
+    testWidgets(
+      'no url on the attachment: no download action appears, onDownload '
+      "supplied or not — AgentAttachmentCard's own rule, and the "
+      'compatibility line every console rendered to before this field '
+      "existed, since the mock transport's own attachments carried no url",
+      (WidgetTester tester) async {
+        final AgentAttachment noUrl = AgentAttachment(
+          id: csv.id,
+          name: csv.name,
+          mime: csv.mime,
+          kind: csv.kind,
+          size: csv.size,
+          delivery: csv.delivery,
+        );
+        final _FakeTransport transport = _FakeTransport(
+          turns: <AgentTurn>[
+            TextTurn(
+              id: 't1',
+              text: 'Here you go.',
+              attachments: <AgentAttachment>[noUrl],
+            ),
+          ],
+        );
+        addTearDown(transport.dispose);
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            height: 600,
+            onDownload: (String _) {},
+          ),
+        );
+
+        expect(find.byType(AttachmentAction), findsNothing);
+      },
+    );
+  });
+
   /* ── microphone ────────────────────────────────────────────────────────── */
 
   /// `AgentComposer.micControl` — *"supplied by the console because it also
@@ -950,9 +1052,7 @@ void main() {
 
       expect(find.byType(MicControl), findsOneWidget);
       final double micLeft = tester.getRect(find.byType(MicControl)).left;
-      final double sendLeft = tester
-          .getRect(find.byType(AgentAttachMenu))
-          .left;
+      final double sendLeft = tester.getRect(find.byType(AgentAttachMenu)).left;
       final double attachLeft = tester
           .getRect(find.byType(AgentAttachMenu))
           .right;

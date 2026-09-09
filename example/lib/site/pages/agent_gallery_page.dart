@@ -42,7 +42,8 @@ import '../../pages/console.dart'
         kVaultCommands,
         kVaultModels,
         kVaultPersona,
-        kVaultToolStates;
+        kVaultToolStates,
+        savingAttachmentToast;
 import '../../pages/history.dart' show MockConversationStore;
 
 class AgentGalleryPage extends StatefulWidget {
@@ -253,6 +254,7 @@ class _IntegratedAgentSurfaceState extends State<_IntegratedAgentSurface> {
         height: _IntegratedAgentSurface.height,
         switchPhase: _switch.phase,
         voiceSource: _voiceSource,
+        onDownload: savingAttachmentToast,
         headerSlot: ListenableBuilder(
           listenable: _store!,
           builder: (BuildContext context, Widget? _) => ChatHistory(

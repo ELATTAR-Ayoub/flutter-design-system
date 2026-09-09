@@ -246,6 +246,7 @@ class AgentConsole extends StatefulWidget {
     this.switchPhase = SwitchPhase.idle,
     this.height,
     this.voiceSource,
+    this.onDownload,
   });
 
   /// Shown as a tooltip on the composer, model picker and welcome card while
@@ -324,6 +325,18 @@ class AgentConsole extends StatefulWidget {
   /// console only [VoiceSource.dispose]s a source it built itself — one
   /// handed in here outlives this widget and is the caller's to dispose.
   final VoiceSource? voiceSource;
+
+  /// Fired with a file's name when its download action is pressed, in either
+  /// direction — a file the agent produced or one the user sent that carries
+  /// a [AgentAttachment.url]. Forwarded verbatim to every transcript row that
+  /// can show that action ([UserMessage], [AgentMessage], [ToolChip]), the
+  /// same shape [AgentAttachmentCard.onDownload] already takes: not a flag,
+  /// because the action's own visibility is already decided per-attachment,
+  /// by [AgentAttachmentCard]'s own rule — a url and no [AgentAttachmentCard.
+  /// onRemove]. Left null, as it is by default, no transcript attachment's
+  /// download action becomes functional, and no console that does not pass
+  /// this renders differently than it did before this field existed.
+  final void Function(String name)? onDownload;
 
   /// `p-5` — *"the console owns its own inset."*
   ///
@@ -708,7 +721,8 @@ class _AgentConsoleState extends State<AgentConsole> {
                   ? _DictationControl(
                       listening: _dictationListening,
                       spectrum: _voiceSource?.spectrum,
-                      disabled: !transport.isReady || _micUnavailableReason != null,
+                      disabled:
+                          !transport.isReady || _micUnavailableReason != null,
                       disabledReason:
                           _micUnavailableReason ??
                           (!transport.isReady
@@ -886,11 +900,13 @@ class _AgentConsoleState extends State<AgentConsole> {
   List<Widget> _turn(BuildContext context, AgentTurn turn) {
     switch (turn) {
       case UserTurn():
-        return <Widget>[UserMessage(turn: turn)];
+        return <Widget>[UserMessage(turn: turn, onDownload: widget.onDownload)];
 
       case TextTurn():
         if (!_stopped.contains(turn.id)) {
-          return <Widget>[AgentMessage(turn: turn)];
+          return <Widget>[
+            AgentMessage(turn: turn, onDownload: widget.onDownload),
+          ];
         }
         // *"A transport is not obliged to emit `done` on abort — the mock one
         // doesn't, so `turn.streaming` would still read `true` here and
@@ -899,7 +915,10 @@ class _AgentConsoleState extends State<AgentConsole> {
         // what it renders instead. Do not delete this as 'redundant' — without
         // it the cursor and the marker contradict each other on screen."*
         return <Widget>[
-          AgentMessage(turn: turn.notStreaming()),
+          AgentMessage(
+            turn: turn.notStreaming(),
+            onDownload: widget.onDownload,
+          ),
           SizedBox(height: AgentConsole.turnGap),
           const Marker(
             variant: MarkerVariant.separator,
@@ -919,6 +938,7 @@ class _AgentConsoleState extends State<AgentConsole> {
                   turn: turn,
                   toolStates: widget.toolStates,
                   renderResult: widget.renderToolResult,
+                  onDownload: widget.onDownload,
                 ),
               ]
             : const <Widget>[];
