@@ -223,6 +223,8 @@ import 'components_docs/voice/meta.dart' as voice;
 import 'components_docs/voice/page.dart';
 import 'components_docs/voice_indicator/meta.dart' as voice_indicator;
 import 'components_docs/voice_indicator/page.dart';
+import 'components_docs/voice_source/meta.dart' as voice_source;
+import 'components_docs/voice_source/page.dart';
 import 'components_docs/icon_swap/meta.dart' as icon_swap;
 import 'components_docs/icon_swap/page.dart';
 import 'components_docs/hover_builder/meta.dart' as hover_builder;
@@ -839,6 +841,8 @@ final Map<String, _ComponentDocPageBuilder> _componentDocPageBuilders =
           VoiceDocPage(onNavigate: onNavigate),
       voice_indicator.voiceIndicatorDoc.route: ({onNavigate}) =>
           VoiceIndicatorDocPage(onNavigate: onNavigate),
+      voice_source.voiceSourceDoc.route: ({onNavigate}) =>
+          VoiceSourceDocPage(onNavigate: onNavigate),
       icon_swap.iconSwapDoc.route: ({onNavigate}) =>
           IconSwapDocPage(onNavigate: onNavigate),
       hover_builder.hoverBuilderDoc.route: ({onNavigate}) =>

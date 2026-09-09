@@ -910,6 +910,74 @@ void main() {
     );
   });
 
+  group('PieChart / RadialBarChart — no tooltip installs no hover handling', () {
+    // widget.tooltip == null gates rendering already (see
+    // `if (active != null && widget.tooltip != null)` in chart_polar.dart);
+    // this proves the MouseRegion that drives it is gated the same way, so a
+    // chart with no tooltip spec pays no setState on pointer move.
+    testWidgets('PieChart with no tooltip has no MouseRegion', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        _scoped(
+          SizedBox(
+            width: _plot.width,
+            height: _plot.height,
+            child: PieChart(
+              pies: <PieSpec>[
+                const PieSpec(
+                  data: <Map<String, Object?>>[
+                    <String, Object?>{'name': 'Alpha', 'value': 10},
+                    <String, Object?>{'name': 'Beta', 'value': 10},
+                  ],
+                  dataKey: 'value',
+                  innerRadius: 40,
+                  outerRadius: 100,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(
+        find.descendant(
+          of: find.byType(PieChart),
+          matching: find.byType(MouseRegion),
+        ),
+        findsNothing,
+      );
+    });
+
+    testWidgets('RadialBarChart with no tooltip has no MouseRegion', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        _scoped(
+          SizedBox(
+            width: _plot.width,
+            height: _plot.height,
+            child: RadialBarChart(
+              data: const <Map<String, Object?>>[
+                <String, Object?>{'value': 5},
+                <String, Object?>{'value': 10},
+              ],
+              series: const <RadialBarSpec>[RadialBarSpec(dataKey: 'value')],
+              innerRadius: 30,
+              outerRadius: 100,
+            ),
+          ),
+        ),
+      );
+      expect(
+        find.descendant(
+          of: find.byType(RadialBarChart),
+          matching: find.byType(MouseRegion),
+        ),
+        findsNothing,
+      );
+    });
+  });
+
   /* ── Rendered pixels ──────────────────────────────────────────────────── */
 
   group('rendered pixels — the standing painter rule', () {

@@ -18,7 +18,7 @@
   "assets": [],
   "fonts": [],
   "shaders": [],
-  "documentationRoute": "/components/voice-source",
+  "documentationRoute": "/components/voice_source",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/voice_source.dart",
   "exports": [
     "VoiceSource",

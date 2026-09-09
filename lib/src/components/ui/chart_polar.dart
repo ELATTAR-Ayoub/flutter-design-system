@@ -380,6 +380,82 @@ class _PieChartState extends State<PieChart>
           _buildPie(pie, centre, maxRadius, wedges, chips, outside, theme);
         }
         final int? active = _hover ?? widget.tooltip?.defaultIndex;
+        final Widget stack = AnimatedBuilder(
+          animation: _entrance,
+          builder: (BuildContext context, Widget? _) => Stack(
+            children: <Widget>[
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _PiePainter(
+                    wedges: wedges,
+                    outside: outside,
+                    theme: theme,
+                    t: ChartMotion.curve.transform(_entrance.value),
+                    centre: centre,
+                  ),
+                ),
+              ),
+              for (final _OutsideLabel label in outside)
+                _positioned(
+                  label.anchor,
+                  plot,
+                  _PolarText(
+                    text: label.text,
+                    color: widget.labelColor ?? theme.foreground,
+                    align: label.align,
+                  ),
+                ),
+              for (final _ChipLabel chip in chips)
+                _positioned(
+                  chip.anchor,
+                  plot,
+                  _ArcChip(text: chip.text, isNumeric: chip.isNumeric),
+                ),
+              if (widget.centerLabel != null)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  width: plot.width,
+                  height: plot.height,
+                  child: Center(child: widget.centerLabel!(context)),
+                ),
+              if (widget.legend != null)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: widget.legend!.offset,
+                  child: ChartLegendContent(
+                    config: config,
+                    wrap: widget.legend!.wrap,
+                    gap: widget.legend!.gap,
+                    items: <ChartLegendItem>[
+                      for (final Map<String, Object?> row
+                          in widget.pies.first.data)
+                        ChartLegendItem(
+                          name:
+                              '${row[widget.legend!.nameKey ?? widget.pies.first.nameKey ?? 'name'] ?? ''}',
+                          color: row['fill'] as Color?,
+                        ),
+                    ],
+                  ),
+                ),
+              if (active != null && widget.tooltip != null)
+                _pieTooltip(
+                  context,
+                  config,
+                  plot,
+                  centre,
+                  active,
+                  _hover != null ? _hoverLocal : null,
+                ),
+            ],
+          ),
+        );
+        // MouseRegion — with its own setState on every pointer move — is
+        // installed only when there is a tooltip to drive; a chart with no
+        // widget.tooltip pays nothing for hover it can never render (see
+        // `if (active != null && widget.tooltip != null)` above).
+        if (widget.tooltip == null) return stack;
         return MouseRegion(
           onHover: (PointerHoverEvent e) =>
               _onHover(centre, maxRadius, e.localPosition),
@@ -391,77 +467,7 @@ class _PieChartState extends State<PieChart>
               });
             }
           },
-          child: AnimatedBuilder(
-            animation: _entrance,
-            builder: (BuildContext context, Widget? _) => Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: _PiePainter(
-                      wedges: wedges,
-                      outside: outside,
-                      theme: theme,
-                      t: ChartMotion.curve.transform(_entrance.value),
-                      centre: centre,
-                    ),
-                  ),
-                ),
-                for (final _OutsideLabel label in outside)
-                  _positioned(
-                    label.anchor,
-                    plot,
-                    _PolarText(
-                      text: label.text,
-                      color: widget.labelColor ?? theme.foreground,
-                      align: label.align,
-                    ),
-                  ),
-                for (final _ChipLabel chip in chips)
-                  _positioned(
-                    chip.anchor,
-                    plot,
-                    _ArcChip(text: chip.text, isNumeric: chip.isNumeric),
-                  ),
-                if (widget.centerLabel != null)
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    width: plot.width,
-                    height: plot.height,
-                    child: Center(child: widget.centerLabel!(context)),
-                  ),
-                if (widget.legend != null)
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: widget.legend!.offset,
-                    child: ChartLegendContent(
-                      config: config,
-                      wrap: widget.legend!.wrap,
-                      gap: widget.legend!.gap,
-                      items: <ChartLegendItem>[
-                        for (final Map<String, Object?> row
-                            in widget.pies.first.data)
-                          ChartLegendItem(
-                            name:
-                                '${row[widget.legend!.nameKey ?? widget.pies.first.nameKey ?? 'name'] ?? ''}',
-                            color: row['fill'] as Color?,
-                          ),
-                      ],
-                    ),
-                  ),
-                if (active != null && widget.tooltip != null)
-                  _pieTooltip(
-                    context,
-                    config,
-                    plot,
-                    centre,
-                    active,
-                    _hover != null ? _hoverLocal : null,
-                  ),
-              ],
-            ),
-          ),
+          child: stack,
         );
       },
     );
@@ -1457,6 +1463,54 @@ class _RadialBarChartState extends State<RadialBarChart>
         }
 
         final int? active = _hover ?? widget.tooltip?.defaultIndex;
+        final Widget stack = AnimatedBuilder(
+          animation: _entrance,
+          builder: (BuildContext context, Widget? _) => Stack(
+            children: <Widget>[
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _RadialPainter(
+                    arcs: arcs,
+                    grid: widget.grid,
+                    centre: centre,
+                    theme: theme,
+                    t: ChartMotion.curve.transform(_entrance.value),
+                  ),
+                ),
+              ),
+              for (final _ChipLabel chip in chips)
+                Positioned(
+                  left: chip.anchor.dx,
+                  top: chip.anchor.dy,
+                  child: FractionalTranslation(
+                    translation: const Offset(-0.5, -0.5),
+                    child: _ArcChip(
+                      text: chip.text,
+                      isNumeric: chip.isNumeric,
+                    ),
+                  ),
+                ),
+              if (widget.radiusAxis?.centerLabel != null)
+                Positioned.fill(
+                  child: Center(
+                    child: widget.radiusAxis!.centerLabel!(context),
+                  ),
+                ),
+              if (active != null && widget.tooltip != null)
+                _radialTooltip(
+                  context,
+                  config,
+                  Size(c.maxWidth, c.maxHeight),
+                  centre,
+                  active,
+                  _hover != null ? _hoverLocal : null,
+                ),
+            ],
+          ),
+        );
+        // See PieChart's build above: MouseRegion only when a tooltip can
+        // actually use the hover it drives.
+        if (widget.tooltip == null) return stack;
         return MouseRegion(
           onHover: (PointerHoverEvent e) =>
               _onHover(regions, centre, e.localPosition),
@@ -1468,51 +1522,7 @@ class _RadialBarChartState extends State<RadialBarChart>
               });
             }
           },
-          child: AnimatedBuilder(
-            animation: _entrance,
-            builder: (BuildContext context, Widget? _) => Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: _RadialPainter(
-                      arcs: arcs,
-                      grid: widget.grid,
-                      centre: centre,
-                      theme: theme,
-                      t: ChartMotion.curve.transform(_entrance.value),
-                    ),
-                  ),
-                ),
-                for (final _ChipLabel chip in chips)
-                  Positioned(
-                    left: chip.anchor.dx,
-                    top: chip.anchor.dy,
-                    child: FractionalTranslation(
-                      translation: const Offset(-0.5, -0.5),
-                      child: _ArcChip(
-                        text: chip.text,
-                        isNumeric: chip.isNumeric,
-                      ),
-                    ),
-                  ),
-                if (widget.radiusAxis?.centerLabel != null)
-                  Positioned.fill(
-                    child: Center(
-                      child: widget.radiusAxis!.centerLabel!(context),
-                    ),
-                  ),
-                if (active != null && widget.tooltip != null)
-                  _radialTooltip(
-                    context,
-                    config,
-                    Size(c.maxWidth, c.maxHeight),
-                    centre,
-                    active,
-                    _hover != null ? _hoverLocal : null,
-                  ),
-              ],
-            ),
-          ),
+          child: stack,
         );
       },
     );
