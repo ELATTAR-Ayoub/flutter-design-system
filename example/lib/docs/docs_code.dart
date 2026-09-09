@@ -19,6 +19,7 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import '../kit.dart';
+import 'docs_theme_syntax.dart';
 
 /// Writes [text] to the clipboard.
 typedef DocsClipboardWriter = Future<void> Function(String text);
@@ -36,12 +37,29 @@ class DocsCodeFile {
     required this.code,
     this.title,
     this.description,
+    this.language,
   });
 
   final String path;
   final String code;
   final String? title;
   final String? description;
+
+  /// A language [tokeniseThemedCode] recognises. Null defers to
+  /// [docsCodeFileLanguage], which reads it off [path]'s extension.
+  final String? language;
+}
+
+/// [file]'s highlighting language: [DocsCodeFile.language] when the caller
+/// set one, otherwise a guess from [DocsCodeFile.path]'s extension. Only
+/// `.dart` is guessed as `dart` — every other extension (`.yaml`, `.md`, an
+/// extensionless name) comes back `text`, a language `tokeniseThemedCode`
+/// does not know, so it renders intact and uncoloured rather than being
+/// mis-read as Dart.
+String docsCodeFileLanguage(DocsCodeFile file) {
+  final String? explicit = file.language;
+  if (explicit != null) return explicit;
+  return file.path.endsWith('.dart') ? 'dart' : 'text';
 }
 
 /// One copyable command line.
@@ -349,6 +367,9 @@ class _CommandPane extends StatelessWidget {
         _CopyableCodeBlock(
           codeKey: const ValueKey<String>('docs-command-code'),
           code: command.command,
+          // Every `DocsCodeCommand` is a shell line — `dart install …`,
+          // `elattar init …` — never Dart.
+          language: 'bash',
           pending: pending,
           copied: copied,
           onCopy: onCopy,
@@ -432,6 +453,7 @@ class _ManualFileCard extends StatelessWidget {
         _CopyableCodeBlock(
           codeKey: ValueKey<String>('docs-file:${file.path}'),
           code: file.code,
+          language: docsCodeFileLanguage(file),
           pending: pending,
           copied: copied,
           onCopy: onCopy,
@@ -455,6 +477,7 @@ class _CopyableCodeBlock extends StatelessWidget {
     required this.onCopy,
     required this.copyLabel,
     required this.copiedLabel,
+    this.language = 'dart',
     this.codeKey,
   });
 
@@ -465,6 +488,9 @@ class _CopyableCodeBlock extends StatelessWidget {
   final String copyLabel;
   final String copiedLabel;
 
+  /// Forwarded onto the [DocsSelectableCodeBlock] itself.
+  final String language;
+
   /// Forwarded onto the [DocsSelectableCodeBlock] itself, not this wrapper,
   /// so every existing lookup by that key still finds the same block.
   final Key? codeKey;
@@ -473,7 +499,7 @@ class _CopyableCodeBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        DocsSelectableCodeBlock(key: codeKey, code: code),
+        DocsSelectableCodeBlock(key: codeKey, code: code, language: language),
         Positioned(
           top: space(2),
           right: space(2),
@@ -536,10 +562,16 @@ class DocsSelectableCodeBlock extends StatefulWidget {
   const DocsSelectableCodeBlock({
     super.key,
     required this.code,
+    this.language = 'dart',
     this.maxHeight,
   });
 
   final String code;
+
+  /// A language [tokeniseThemedCode] recognises. `dart` (the default) and
+  /// `bash`/`sh`/`shell` are highlighted; anything else renders intact but
+  /// uncoloured rather than failing.
+  final String language;
 
   /// Caps the block's height, making it its own vertical viewport.
   ///
@@ -602,24 +634,30 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
     final List<String> sourceLines = widget.code.split('\n');
     final bool multiline = sourceLines.length > 1;
 
-    // A small, honest tokeniser (`_tokeniseDartLine` below): it covers
-    // keywords, strings, line comments, numbers, annotations and
-    // `PascalCase` type names, and nothing else. Every colour comes from this
-    // system's own semantic palette (`Palette.action/.value/.success/
-    // .warning/.info`, `--foreground`, `--muted-foreground`) rather than a
-    // fixed third-party theme, so the block stays correct under a rebrand and
-    // flips with light/dark the way the rest of the page does. Concatenated
-    // back into one paragraph (a plain `'\n'` span between lines) rather than
-    // a Column of lines, so `widget.code` is still what a reader selects and
-    // copies, matching a plain [Text] exactly as before.
+    // A small, honest tokeniser (`tokeniseThemedCode`, `docs_theme_syntax.
+    // dart`): it covers keywords, strings, line comments, numbers,
+    // annotations and `PascalCase` type names for Dart, and command names,
+    // flags, strings and comments for shell — nothing else. Every colour
+    // comes from this system's own semantic palette (`Palette.action/.value/
+    // .success/.warning/.info`, `--foreground`, `--muted-foreground`) rather
+    // than a fixed third-party theme, so the block stays correct under a
+    // rebrand and flips with light/dark the way the rest of the page does.
+    // Concatenated back into one paragraph (a plain `'\n'` span between
+    // lines) rather than a Column of lines, so `widget.code` is still what a
+    // reader selects and copies, matching a plain [Text] exactly as before.
+    final List<List<CodeToken>> tokenisedLines = tokeniseThemedCode(
+      widget.code,
+      widget.language,
+      theme,
+    );
     final List<InlineSpan> spans = <InlineSpan>[];
-    for (int i = 0; i < sourceLines.length; i++) {
+    for (int i = 0; i < tokenisedLines.length; i++) {
       if (i > 0) spans.add(const TextSpan(text: '\n'));
-      for (final _DsCodeToken token in _tokeniseDartLine(sourceLines[i])) {
+      for (final CodeToken token in tokenisedLines[i]) {
         spans.add(
           TextSpan(
             text: token.text,
-            style: style.copyWith(color: _dsCodeTokenColor(token.kind, theme)),
+            style: style.copyWith(color: token.color),
           ),
         );
       }
@@ -754,258 +792,3 @@ class _DocsSelectableCodeBlockState extends State<DocsSelectableCodeBlock> {
   }
 }
 
-/* ── Dart source tokeniser ───────────────────────────────────────────────
- *
- * A grep of both `lib/` and `example/lib/` for an existing highlighter found
- * exactly one: `tokenise`/`CodeToken`/`PrismPalette` in
- * `package:elattar_design_system`'s `agent_markdown.dart`, reused by the
- * agent chat transcript. It was not reusable here for two independent
- * reasons: its registered grammars are typescript/tsx/javascript/jsx/css/
- * sql/json/python/bash/markdown — Dart is not one of them — and its palette
- * (`PrismPalette`) is a verbatim copy of `react-syntax-highlighter`'s fixed
- * VS Code Dark Plus theme, deliberately marked `allow-hardcoded` in that file
- * because it is reproducing a third-party theme span-for-span, not this
- * system's own tokens. A docs code block has to answer to light *and* dark
- * and to a rebrand, so painting it from a frozen dark palette would be wrong
- * regardless of the language gap.
- *
- * What follows is a small tokeniser for Dart instead, structured the same
- * way `tokenise`'s C-like grammar is (a single per-line scan, no state
- * carried across a newline). It is a scanner, not a parser — see
- * `_tokeniseDartLine`'s doc comment for exactly what it does and does not
- * recognise.
- */
-
-/// What kind of run a token is, for [_dsCodeTokenColor] to paint.
-enum _DsCodeTokenKind {
-  plain,
-  keyword,
-  string,
-  comment,
-  number,
-  type,
-  annotation,
-}
-
-/// One classified run inside a line of Dart-ish source.
-class _DsCodeToken {
-  const _DsCodeToken(this.text, this.kind);
-  final String text;
-  final _DsCodeTokenKind kind;
-}
-
-/// This system's own semantic colours, not a fixed syntax theme: every hue is
-/// one already defined for state (`Palette.action/.value/.success/.warning/
-/// .info`) or for text (`--foreground`/`--muted-foreground`), so a block
-/// painted from it stays correct under a rebrand and flips with light/dark
-/// exactly as the rest of the page does.
-Color _dsCodeTokenColor(_DsCodeTokenKind kind, ThemeTokens theme) =>
-    switch (kind) {
-      _DsCodeTokenKind.keyword => Palette.action,
-      _DsCodeTokenKind.string => Palette.success,
-      _DsCodeTokenKind.number => Palette.warning,
-      _DsCodeTokenKind.type => Palette.info,
-      _DsCodeTokenKind.annotation => Palette.value,
-      _DsCodeTokenKind.comment => theme.mutedForeground,
-      _DsCodeTokenKind.plain => theme.foreground,
-    };
-
-/// Dart's reserved and built-in-identifier words — the only vocabulary this
-/// tokeniser recognises as a keyword. Anything else identifier-shaped falls
-/// through to plain text, or, if it starts with an uppercase letter, to
-/// [_DsCodeTokenKind.type] — real Dart style's own convention for a type
-/// name, and the only signal a per-line scanner has for one.
-const Set<String> _dsDartKeywords = <String>{
-  'abstract',
-  'as',
-  'assert',
-  'async',
-  'await',
-  'base',
-  'break',
-  'case',
-  'catch',
-  'class',
-  'const',
-  'continue',
-  'covariant',
-  'default',
-  'deferred',
-  'do',
-  'dynamic',
-  'else',
-  'enum',
-  'export',
-  'extends',
-  'extension',
-  'external',
-  'factory',
-  'false',
-  'final',
-  'finally',
-  'for',
-  'Function',
-  'get',
-  'hide',
-  'if',
-  'implements',
-  'import',
-  'in',
-  'interface',
-  'is',
-  'late',
-  'library',
-  'mixin',
-  'new',
-  'null',
-  'on',
-  'operator',
-  'part',
-  'required',
-  'rethrow',
-  'return',
-  'sealed',
-  'set',
-  'show',
-  'static',
-  'super',
-  'switch',
-  'sync',
-  'this',
-  'throw',
-  'true',
-  'try',
-  'typedef',
-  'var',
-  'void',
-  'when',
-  'while',
-  'with',
-  'yield',
-};
-
-final RegExp _dsIdentStart = RegExp(r'[A-Za-z_$]');
-final RegExp _dsIdentPart = RegExp(r'[A-Za-z0-9_$]');
-final RegExp _dsDigit = RegExp(r'[0-9]');
-// Equivalent to the old `word[0].toUpperCase() == word[0] &&
-// word[0].toLowerCase() != word[0]` pair: that conjunction is true only when
-// the leading character is an actual cased uppercase letter — a digit,
-// underscore or `$` fails the second half because lower-casing them is a
-// no-op, so they never qualify. A leading `[A-Z]` match captures exactly the
-// same set.
-final RegExp _upperStart = RegExp(r'^[A-Z]');
-
-/// Tokenises one line of Dart-ish source.
-///
-/// **What this covers**: line comments (`//` and `///`, to end of line),
-/// single- and double-quoted strings with backslash escapes, decimal
-/// numbers, `@annotation`s, the reserved-word list above, and identifiers
-/// read as a **type** on the one heuristic a per-line scan can afford —
-/// `PascalCase`. Everything else — punctuation, operators, unmatched
-/// identifiers — is plain text in `--foreground`.
-///
-/// **What it does not cover, plainly**: this is a scanner, not a parser, and
-/// it carries no state across a newline. A `/* block comment */`, a raw
-/// string (`r'...'`), or a `'''triple-quoted'''` string that spans more than
-/// one line is not recognised as such — each line is coloured on its own,
-/// so a mid-string line can read as plain code. String interpolation
-/// (`'$name'`, `'${expr}'`) is not parsed inside a string; the whole quoted
-/// run is just string-coloured throughout. A line with none of the above —
-/// a CLI command, for instance — tokenises to plain text end to end, which
-/// is also why the reference's own package-manager commands read as plain
-/// text rather than highlighted code.
-List<_DsCodeToken> _tokeniseDartLine(String line) {
-  final List<_DsCodeToken> out = <_DsCodeToken>[];
-  final StringBuffer plain = StringBuffer();
-
-  void flush() {
-    if (plain.isEmpty) return;
-    out.add(_DsCodeToken(plain.toString(), _DsCodeTokenKind.plain));
-    plain.clear();
-  }
-
-  int i = 0;
-  while (i < line.length) {
-    final String c = line[i];
-
-    // A line comment runs to the end of the line, `///` included.
-    if (c == '/' && i + 1 < line.length && line[i + 1] == '/') {
-      flush();
-      out.add(_DsCodeToken(line.substring(i), _DsCodeTokenKind.comment));
-      return out;
-    }
-
-    if (c == '@' &&
-        i + 1 < line.length &&
-        _dsIdentStart.hasMatch(line[i + 1])) {
-      flush();
-      final int start = i;
-      i += 1;
-      while (i < line.length && _dsIdentPart.hasMatch(line[i])) {
-        i += 1;
-      }
-      out.add(
-        _DsCodeToken(line.substring(start, i), _DsCodeTokenKind.annotation),
-      );
-      continue;
-    }
-
-    if (c == '"' || c == "'") {
-      flush();
-      final int start = i;
-      i += 1;
-      while (i < line.length) {
-        if (line[i] == r'\' && i + 1 < line.length) {
-          i += 2;
-          continue;
-        }
-        if (line[i] == c) {
-          i += 1;
-          break;
-        }
-        i += 1;
-      }
-      out.add(
-        _DsCodeToken(
-          line.substring(start, i.clamp(0, line.length)),
-          _DsCodeTokenKind.string,
-        ),
-      );
-      continue;
-    }
-
-    if (_dsDigit.hasMatch(c)) {
-      flush();
-      final int start = i;
-      while (i < line.length &&
-          (_dsDigit.hasMatch(line[i]) || line[i] == '.' || line[i] == '_')) {
-        i += 1;
-      }
-      out.add(_DsCodeToken(line.substring(start, i), _DsCodeTokenKind.number));
-      continue;
-    }
-
-    if (_dsIdentStart.hasMatch(c)) {
-      flush();
-      final int start = i;
-      while (i < line.length && _dsIdentPart.hasMatch(line[i])) {
-        i += 1;
-      }
-      final String word = line.substring(start, i);
-      if (_dsDartKeywords.contains(word)) {
-        out.add(_DsCodeToken(word, _DsCodeTokenKind.keyword));
-      } else if (word.isNotEmpty && _upperStart.hasMatch(word)) {
-        out.add(_DsCodeToken(word, _DsCodeTokenKind.type));
-      } else {
-        out.add(_DsCodeToken(word, _DsCodeTokenKind.plain));
-      }
-      continue;
-    }
-
-    plain.write(c);
-    i += 1;
-  }
-
-  flush();
-  return out;
-}

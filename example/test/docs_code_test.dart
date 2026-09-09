@@ -163,4 +163,67 @@ void main() {
       );
     },
   );
+
+  testWidgets(
+    'a DocsCodeCommand renders more than one distinct colour for a shell '
+    'snippet — proof the block is actually tokenised, not passed through a '
+    'no-op highlighter',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _harness(
+          const DocsCodeExample(
+            title: 'Own your first component',
+            command: DocsCodeCommand(
+              command: 'elattar init --foundation source',
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final Set<Color> colors = <Color>{};
+      for (final Text text in tester.widgetList<Text>(find.byType(Text))) {
+        final InlineSpan? span = text.textSpan;
+        if (span == null) continue;
+        span.visitChildren((InlineSpan child) {
+          final Color? color = child.style?.color;
+          if (child is TextSpan && child.text != null && color != null) {
+            colors.add(color);
+          }
+          return true;
+        });
+      }
+
+      expect(
+        colors.length,
+        greaterThan(1),
+        reason:
+            'a shell command with a leading word and a --flag must paint in '
+            'more than one colour; one colour means the tokeniser handed '
+            'back a single plain run for the whole line',
+      );
+    },
+  );
+
+  testWidgets(
+    'an unrecognised language renders the code intact and uncoloured '
+    'rather than throwing',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _harness(
+          const DocsSelectableCodeBlock(
+            code: 'not a real language at all',
+            language: 'cobol',
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(
+        find.text('not a real language at all'),
+        findsOneWidget,
+      );
+    },
+  );
 }
