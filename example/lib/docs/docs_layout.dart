@@ -141,7 +141,16 @@ double _railStickyGutter() => space(6);
 /// disagree — with whichever entry matches [route] marked
 /// [DocsSidebarEntry.selected]. One long alphabetical list became four
 /// scannable ones; no component route changed.
-List<DocsSidebarGroup> _defaultSidebarGroups(String route) {
+///
+/// A family with a [ComponentDocFamily.landingRoute] — only [charts] has
+/// one — puts that entry first in its group, then lists
+/// [componentDocsIn] filtered to [ComponentDocEntry.showInRail]: today that
+/// drops the four `chart*` entries, which `/charts` already links from its
+/// own body. See the enum doc on [ComponentDocFamily.charts] for why.
+///
+/// Public, not private, so `docs_sidebar_test.dart` can assert the rail's
+/// shape directly instead of only through a rendered [DocsSidebar].
+List<DocsSidebarGroup> defaultSidebarGroups(String route) {
   return <DocsSidebarGroup>[
     DocsSidebarGroup(
       label: 'Sections',
@@ -159,12 +168,19 @@ List<DocsSidebarGroup> _defaultSidebarGroups(String route) {
       DocsSidebarGroup(
         label: family.label,
         items: <DocsSidebarEntry>[
-          for (final ComponentDocEntry component in componentDocsIn(family))
+          if (family.landingRoute != null)
             DocsSidebarEntry(
-              title: component.title,
-              route: component.route,
-              selected: component.route == route,
+              title: family.landingTitle!,
+              route: family.landingRoute!,
+              selected: family.landingRoute == route,
             ),
+          for (final ComponentDocEntry component in componentDocsIn(family))
+            if (component.showInRail)
+              DocsSidebarEntry(
+                title: component.title,
+                route: component.route,
+                selected: component.route == route,
+              ),
         ],
       ),
   ];
@@ -257,7 +273,7 @@ class DocsLayout extends StatefulWidget {
 
   /// The grouped left rail — "Sections" then the four component families
   /// in the reference layout. Takes priority over [sidebar] whenever it is non-empty. A page
-  /// that supplies neither this nor [sidebar] gets [_defaultSidebarGroups]
+  /// that supplies neither this nor [sidebar] gets [defaultSidebarGroups]
   /// instead of an empty rail — see that function.
   final List<DocsSidebarGroup> sidebarGroups;
   final List<DocsTocEntry> toc;
@@ -537,7 +553,7 @@ class _DocsLayoutState extends State<DocsLayout> {
     // list, which is why the rail used to change shape as you navigated. Those
     // two parameters stay on the constructor so the forty call sites keep
     // compiling, and are documented as ignored.
-    final List<DocsSidebarGroup> sidebarGroups = _defaultSidebarGroups(
+    final List<DocsSidebarGroup> sidebarGroups = defaultSidebarGroups(
       widget.route,
     );
 

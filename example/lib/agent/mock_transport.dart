@@ -103,19 +103,30 @@ class _Fail extends _Beat {
 
 /// The CSV `export_activity` hands back, *"so the attachment renderer has
 /// something to draw in the direction that is easy to forget: agent to user."*
+final String _activityCsvText = <String>[
+  'date,event,item,value',
+  '2026-07-08,pull,Eclipse Vault,129.00',
+  '2026-07-11,sale,Aurora Prism,84.50',
+  '2026-07-19,pull,Cobalt Run,72.00',
+  '2026-08-02,sale,Eclipse Vault,240.00',
+].join('\n');
+
+/// A `data:` URL carrying the CSV's own bytes — so `AgentAttachmentCard`'s
+/// download action, once wired to a real handler, has something genuine to
+/// hand off rather than a filename with nothing behind it. See
+/// `example/lib/pages/console.dart`'s `LiveConsole` for what actually happens
+/// when it is pressed.
+final String _activityCsvUrl =
+    'data:text/csv;charset=utf-8,${Uri.encodeComponent(_activityCsvText)}';
+
 final AgentAttachment _activityCsv = AgentAttachment(
   id: 'mock-activity-csv',
   name: 'activity-30d.csv',
   mime: 'text/csv',
   kind: AgentAttachmentKind.data,
   size: 4821,
-  text: <String>[
-    'date,event,item,value',
-    '2026-07-08,pull,Eclipse Vault,129.00',
-    '2026-07-11,sale,Aurora Prism,84.50',
-    '2026-07-19,pull,Cobalt Run,72.00',
-    '2026-08-02,sale,Eclipse Vault,240.00',
-  ].join('\n'),
+  url: _activityCsvUrl,
+  text: _activityCsvText,
   delivery: const AgentDelivery.produced(),
 );
 

@@ -27,9 +27,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.sans,
     600,
     -0.03,
-    m: (44, 48),
-    t: (52, 56),
-    d: (64, 68),
+    m: (36, 40),
+    t: (42, 44),
+    d: (48, 48),
   ),
   _Role(
     'h1',
@@ -37,9 +37,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.sans,
     700,
     -0.02,
-    m: (36, 40),
-    t: (40, 44),
-    d: (48, 52),
+    m: (30, 36),
+    t: (32, 38),
+    d: (36, 40),
   ),
   _Role(
     'h2',
@@ -47,9 +47,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.sans,
     650,
     -0.015,
-    m: (30, 36),
-    t: (32, 38),
-    d: (36, 42),
+    m: (26, 32),
+    t: (28, 34),
+    d: (30, 36),
   ),
   _Role(
     'h3',
@@ -57,9 +57,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.sans,
     600,
     -0.01,
-    m: (24, 30),
-    t: (26, 32),
-    d: (28, 36),
+    m: (20, 28),
+    t: (22, 30),
+    d: (24, 32),
   ),
   _Role(
     'h4',
@@ -67,9 +67,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.sans,
     600,
     null,
-    m: (20, 26),
-    t: (22, 28),
-    d: (24, 30),
+    m: (18, 24),
+    t: (19, 26),
+    d: (20, 28),
   ),
   _Role(
     'lead',
@@ -78,8 +78,8 @@ final List<_Role> _catalog = <_Role>[
     400,
     null,
     m: (18, 28),
-    t: (20, 30),
-    d: (22, 32),
+    t: (19, 28),
+    d: (20, 28),
   ),
   _Role(
     'body',
@@ -137,9 +137,9 @@ final List<_Role> _catalog = <_Role>[
     Fonts.mono,
     400,
     -0.01,
-    m: (13, 18),
-    t: (14, 20),
-    d: (15, 22),
+    m: (12, 18),
+    t: (13, 18),
+    d: (14, 20),
   ),
   _Role(
     'numberSm',
@@ -443,26 +443,26 @@ void main() {
   group('resolveWidth', () {
     test('carries size, the leading as a ratio, face, and ink', () {
       final TextStyle style = TextStyles.h2.resolveWidth(_desktop, _ink);
-      expect(style.fontSize, 36);
-      expect(style.height, 42 / 36);
+      expect(style.fontSize, 30);
+      expect(style.height, 36 / 30);
       expect(style.color, _ink);
       expect(style.fontFamily, contains(Fonts.sans));
       expect(style.leadingDistribution, TextLeadingDistribution.even);
     });
 
     test('the same role resolves smaller on a phone', () {
-      expect(TextStyles.h2.resolveWidth(_phone, _ink).fontSize, 30);
-      expect(TextStyles.h2.resolveWidth(_tablet, _ink).fontSize, 32);
+      expect(TextStyles.h2.resolveWidth(_phone, _ink).fontSize, 26);
+      expect(TextStyles.h2.resolveWidth(_tablet, _ink).fontSize, 28);
     });
 
     test('tracking is em converted against the resolved size', () {
       expect(
         TextStyles.display.resolveWidth(_phone, _ink).letterSpacing,
-        closeTo(-0.03 * 44, 1e-9),
+        closeTo(-0.03 * 36, 1e-9),
       );
       expect(
         TextStyles.display.resolveWidth(_desktop, _ink).letterSpacing,
-        closeTo(-0.03 * 64, 1e-9),
+        closeTo(-0.03 * 48, 1e-9),
       );
     });
 
@@ -587,7 +587,7 @@ void main() {
   group('TypeStep', () {
     test('reports its leading as a ratio', () {
       expect(const TypeStep(16, 24).ratio, 1.5);
-      expect(const TypeStep(44, 48).ratio, closeTo(48 / 44, 1e-12));
+      expect(const TypeStep(36, 40).ratio, closeTo(40 / 36, 1e-12));
     });
 
     test('compares by value', () {

@@ -46,6 +46,7 @@ import '../../docs/component_doc_page.dart';
 import '../../docs/docs_facts.dart';
 import '../../docs/docs_layout.dart';
 import '../../docs/docs_section.dart' show DocsAnchor;
+import '../../pages/console.dart' show savingAttachmentToast;
 import 'meta.dart';
 
 final ComponentDocSpec agentConsoleDocSpec = ComponentDocSpec(
@@ -335,6 +336,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
     ],
     commands: _demoCommands,
     height: space(152),
+    onDownload: savingAttachmentToast,
   );
 }
 

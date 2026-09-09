@@ -286,6 +286,8 @@ import 'pages/typography.dart';
 import 'shell.dart';
 import 'skills_docs/catalog.dart';
 import 'skills_docs/skills_page.dart';
+import 'site/pages/agent_gallery_page.dart';
+import 'site/pages/charts_gallery_page.dart';
 import 'site/pages/public_pages.dart';
 import 'site/site_routes.dart';
 import 'site/site_shell.dart';
@@ -905,6 +907,12 @@ Widget publicPageFor(String route, {PublicNavigate? onNavigate}) {
     docsRegistryRoute => RegistryDocsPage(onNavigate: onNavigate),
     docsChangelogRoute => ChangelogDocsPage(onNavigate: onNavigate),
     componentsRoute => PublicComponentsPage(onNavigate: onNavigate),
+    chartsRoute => ChartsGalleryPage(onNavigate: onNavigate),
+    // The agent, live: a visitor can talk to it, not just read about it.
+    // Mirrors `chartsRoute` above — same shape, `/components/agent_core` is
+    // its own Documentation link. Previously this route reused
+    // `PublicComponentsPage` scrolled to the Agent family anchor.
+    agentRoute => AgentGalleryPage(onNavigate: onNavigate),
     '/components/button' => const ButtonDocPage(),
     // The deliberate fallback. Every route the site declares now resolves
     // above — `site_routes_test.dart` asserts that every entry in

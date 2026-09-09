@@ -40,4 +40,7 @@ const ComponentDocEntry chartGeometryDoc = ComponentDocEntry(
     'polarPolygonPath',
   ],
   sourcePath: 'lib/src/components/ui/chart_geometry.dart',
+  // The Charts rail group is led by `/charts` now; see
+  // `ComponentDocFamily.charts` in `../catalog.dart`.
+  showInRail: false,
 );

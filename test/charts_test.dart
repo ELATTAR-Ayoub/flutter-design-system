@@ -23,6 +23,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart'
     hide
         AspectRatio,
@@ -379,6 +380,601 @@ void main() {
       );
       expect(find.text('Desktop'), findsOneWidget);
       expect(find.text('Mobile'), findsOneWidget);
+    });
+  });
+
+  group('CartesianChart — X axis, first and last tick preservation', () {
+    // Six months, a 12px left/right margin — `AreaDefault`'s own shape. Any
+    // narrower and `_preserveEndTicks` used to drop 'Jan' outright: `frame.left`
+    // sits at exactly `margin.left` on a point scale (no bars), and `ChartText.xs`
+    // resolves wide enough at every breakpoint this system ships that half of a
+    // 3-letter month exceeds a 12px margin.
+    const List<Map<String, Object?>> months = <Map<String, Object?>>[
+      <String, Object?>{'month': 'Jan', 'value': 186},
+      <String, Object?>{'month': 'Feb', 'value': 305},
+      <String, Object?>{'month': 'Mar', 'value': 237},
+      <String, Object?>{'month': 'Apr', 'value': 73},
+      <String, Object?>{'month': 'May', 'value': 209},
+      <String, Object?>{'month': 'Jun', 'value': 214},
+    ];
+    const List<String> monthLabels = <String>[
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+    ];
+    const ChartAxis monthAxis = ChartAxis(
+      dataKey: 'month',
+      tickLine: false,
+      axisLine: false,
+      tickMargin: 8,
+    );
+
+    // The 2026-08-26 spec's own overflow defect was correct at one width and
+    // broken at another, and a single-width test missed it. Sweep a range —
+    // desktop down to a narrow mobile rail — so a width-dependent regression
+    // in either direction cannot hide again.
+    const List<double> widths = <double>[1600, 1200, 900, 600, 400, 280];
+
+    // `ChartText.xs` resolves off `TypeWidthScope`, which falls back to
+    // `MediaQuery.sizeOf(context).width` — the SCREEN width, not the chart's
+    // own constraint. Pinning it to a desktop screen (>= Breakpoints.lg)
+    // reproduces the diagnosis's own precondition (14px `TextStyles.small`)
+    // at every chart width swept below, so the sweep exercises the tick
+    // algorithm's own width-dependence rather than the font's.
+    Widget scopedAt(double chartWidth, Widget child) => ThemeScope(
+      controller: ThemeController(mode: ColorMode.light),
+      child: MediaQuery(
+        data: const MediaQueryData(
+          size: Size(1440, 900),
+          disableAnimations: true,
+        ),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(width: chartWidth, child: child),
+          ),
+        ),
+      ),
+    );
+
+    Widget pointScaleChart() => ChartContainer(
+      config: const ChartConfig(<String, ChartSeries>{}),
+      child: CartesianChart(
+        data: months,
+        margin: const ChartMargin(left: 12, right: 12),
+        xAxis: monthAxis,
+        series: const <ChartSeriesSpec>[
+          ChartSeriesSpec(kind: ChartSeriesKind.area, dataKey: 'value'),
+        ],
+      ),
+    );
+
+    Widget bandScaleChart() => ChartContainer(
+      config: const ChartConfig(<String, ChartSeries>{}),
+      child: CartesianChart(
+        data: months,
+        margin: const ChartMargin(left: 12, right: 12),
+        xAxis: monthAxis,
+        series: const <ChartSeriesSpec>[
+          ChartSeriesSpec(kind: ChartSeriesKind.bar, dataKey: 'value'),
+        ],
+      ),
+    );
+
+    for (final double width in widths) {
+      testWidgets(
+        'point scale (area) keeps all six labels at ${width}px',
+        (WidgetTester t) async {
+          await t.pumpWidget(scopedAt(width, pointScaleChart()));
+          for (final String label in monthLabels) {
+            expect(
+              find.text(label),
+              findsOneWidget,
+              reason: '$label missing at width $width',
+            );
+          }
+        },
+      );
+    }
+
+    for (final double width in widths) {
+      testWidgets(
+        'band scale (bar) is unaffected at ${width}px',
+        (WidgetTester t) async {
+          await t.pumpWidget(scopedAt(width, bandScaleChart()));
+          for (final String label in monthLabels) {
+            expect(
+              find.text(label),
+              findsOneWidget,
+              reason: '$label missing at width $width',
+            );
+          }
+        },
+      );
+    }
+  });
+
+  /* ── Numeric role ─────────────────────────────────────────────────────── */
+
+  group('CartesianChart — numeric role on number surfaces', () {
+    // Task 28: numerals get `TextStyles.numberSm`, category text keeps the
+    // chart's own prose role (`ChartText.xs`, which is `TextStyles.small`).
+    // A fixed >= Breakpoints.lg viewport resolves both roles to their
+    // desktop steps, so the two are guaranteed distinct sizes to compare.
+    const List<Map<String, Object?>> months = <Map<String, Object?>>[
+      <String, Object?>{'month': 'Jan', 'value': 186},
+      <String, Object?>{'month': 'Feb', 'value': 305},
+    ];
+
+    Widget scoped(Widget child) => ThemeScope(
+      controller: ThemeController(mode: ColorMode.light),
+      child: MediaQuery(
+        data: const MediaQueryData(
+          size: Size(1440, 900),
+          disableAnimations: true,
+        ),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(width: 480, height: 260, child: child),
+          ),
+        ),
+      ),
+    );
+
+    testWidgets('a numeric Y axis tick renders numberSm', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        scoped(
+          ChartContainer(
+            config: const ChartConfig(<String, ChartSeries>{}),
+            child: CartesianChart(
+              data: months,
+              xAxis: const ChartAxis(dataKey: 'month'),
+              yAxis: const ChartAxis(type: ChartAxisType.number),
+              series: const <ChartSeriesSpec>[
+                ChartSeriesSpec(kind: ChartSeriesKind.bar, dataKey: 'value'),
+              ],
+            ),
+          ),
+        ),
+      );
+      // `chartNiceTicks(0, 305)` always keeps 0 among its five stops.
+      final Text tick = t.widget<Text>(find.text('0'));
+      expect(tick.style!.fontSize, TextStyles.numberSm.desktop.size);
+    });
+
+    testWidgets(
+      'a CATEGORY X axis tick keeps the prose role, not numberSm',
+      (WidgetTester t) async {
+        await t.pumpWidget(
+          scoped(
+            ChartContainer(
+              config: const ChartConfig(<String, ChartSeries>{}),
+              child: CartesianChart(
+                data: months,
+                xAxis: const ChartAxis(dataKey: 'month'),
+                yAxis: const ChartAxis(type: ChartAxisType.number),
+                series: const <ChartSeriesSpec>[
+                  ChartSeriesSpec(
+                    kind: ChartSeriesKind.bar,
+                    dataKey: 'value',
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        final Text tick = t.widget<Text>(find.text('Jan'));
+        expect(tick.style!.fontSize, TextStyles.small.desktop.size);
+        expect(
+          tick.style!.fontSize,
+          isNot(TextStyles.numberSm.desktop.size),
+        );
+      },
+    );
+
+    testWidgets('a LabelList value renders numberSm', (WidgetTester t) async {
+      await t.pumpWidget(
+        scoped(
+          ChartContainer(
+            config: const ChartConfig(<String, ChartSeries>{}),
+            child: CartesianChart(
+              data: months,
+              xAxis: const ChartAxis(dataKey: 'month', hide: true),
+              yAxis: const ChartAxis(type: ChartAxisType.number, hide: true),
+              series: const <ChartSeriesSpec>[
+                ChartSeriesSpec(
+                  kind: ChartSeriesKind.bar,
+                  dataKey: 'value',
+                  labels: <ChartLabelList>[ChartLabelList()],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      final Text label = t.widget<Text>(find.text('186'));
+      expect(label.style!.fontSize, TextStyles.numberSm.desktop.size);
+    });
+
+    testWidgets(
+      "a LabelList pointed at a category field keeps the prose role",
+      (WidgetTester t) async {
+        await t.pumpWidget(
+          scoped(
+            ChartContainer(
+              config: const ChartConfig(<String, ChartSeries>{}),
+              child: CartesianChart(
+                data: months,
+                layout: ChartLayout.vertical,
+                xAxis: const ChartAxis(
+                  dataKey: 'value',
+                  type: ChartAxisType.number,
+                  hide: true,
+                ),
+                yAxis: const ChartAxis(dataKey: 'month', hide: true),
+                series: const <ChartSeriesSpec>[
+                  ChartSeriesSpec(
+                    kind: ChartSeriesKind.bar,
+                    dataKey: 'value',
+                    labels: <ChartLabelList>[
+                      ChartLabelList(
+                        dataKey: 'month',
+                        position: ChartLabelPosition.insideLeft,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        final Text label = t.widget<Text>(find.text('Jan'));
+        expect(label.style!.fontSize, TextStyles.small.desktop.size);
+      },
+    );
+  });
+
+  /* ── Polar hover ─────────────────────────────────────────────────────── */
+
+  group('PieChart / RadialBarChart — hover tooltip', () {
+    // The measured frame every polar specimen shares: 482 × 256, centre
+    // (241, 128) — see chart_polar.dart's own library doc.
+    const Offset centre = Offset(241, 128);
+
+    Future<void> hoverAt(
+      WidgetTester t,
+      TestGesture mouse,
+      Finder chart,
+      Offset local,
+    ) async {
+      await mouse.moveTo(t.getTopLeft(chart) + local);
+      await t.pump();
+    }
+
+    Future<TestGesture> startMouse(WidgetTester t) async {
+      final TestGesture mouse = await t.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await mouse.addPointer(location: Offset.zero);
+      addTearDown(mouse.removePointer);
+      await t.pump();
+      return mouse;
+    }
+
+    const List<Map<String, Object?>> pieData = <Map<String, Object?>>[
+      <String, Object?>{'name': 'Alpha', 'value': 10, 'fill': Color(0xFF1A6EF4)},
+      <String, Object?>{'name': 'Beta', 'value': 10, 'fill': Color(0xFF2ECC71)},
+      <String, Object?>{'name': 'Gamma', 'value': 10, 'fill': Color(0xFFF39C12)},
+    ];
+
+    Widget pie({int? defaultIndex}) => _scoped(
+      SizedBox(
+        width: _plot.width,
+        height: _plot.height,
+        child: PieChart(
+          pies: <PieSpec>[
+            const PieSpec(
+              data: pieData,
+              dataKey: 'value',
+              innerRadius: 40,
+              outerRadius: 100,
+            ),
+          ],
+          tooltip: ChartTooltipSpec(defaultIndex: defaultIndex),
+        ),
+      ),
+    );
+
+    // Three equal slices of 120° each, starting at 0°: Alpha 0..120 (mid
+    // 60°), Beta 120..240 (mid 180°), Gamma 240..360 (mid 300°).
+    final Offset alphaPoint = polarToCartesian(centre.dx, centre.dy, 70, 60);
+    final Offset betaPoint = polarToCartesian(centre.dx, centre.dy, 70, 180);
+
+    testWidgets('hovering a sector shows THAT sector — two different '
+        'sectors, two different tooltips', (WidgetTester t) async {
+      await t.pumpWidget(pie());
+      final TestGesture mouse = await startMouse(t);
+      final Finder chart = find.byType(PieChart);
+
+      await hoverAt(t, mouse, chart, alphaPoint);
+      expect(find.text('Alpha'), findsOneWidget);
+      expect(find.text('Beta'), findsNothing);
+      expect(find.text('Gamma'), findsNothing);
+
+      await hoverAt(t, mouse, chart, betaPoint);
+      expect(find.text('Beta'), findsOneWidget);
+      expect(find.text('Alpha'), findsNothing);
+      expect(find.text('Gamma'), findsNothing);
+    });
+
+    testWidgets('the donut hole shows no tooltip', (WidgetTester t) async {
+      await t.pumpWidget(pie());
+      final TestGesture mouse = await startMouse(t);
+      // Dead centre: radius 0, inside the 40px hole.
+      await hoverAt(t, mouse, find.byType(PieChart), centre);
+      expect(find.byType(ChartTooltipContent), findsNothing);
+    });
+
+    testWidgets('a point outside the outer radius shows no tooltip', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(pie());
+      final TestGesture mouse = await startMouse(t);
+      final Offset outside = polarToCartesian(centre.dx, centre.dy, 150, 60);
+      await hoverAt(t, mouse, find.byType(PieChart), outside);
+      expect(find.byType(ChartTooltipContent), findsNothing);
+    });
+
+    testWidgets(
+      'defaultIndex shows at rest and is restored once the pointer leaves',
+      (WidgetTester t) async {
+        await t.pumpWidget(pie(defaultIndex: 1));
+        // No pointer has moved yet — Beta (index 1) shows at rest.
+        expect(find.text('Beta'), findsOneWidget);
+
+        final TestGesture mouse = await startMouse(t);
+        final Finder chart = find.byType(PieChart);
+        await hoverAt(t, mouse, chart, alphaPoint);
+        expect(find.text('Alpha'), findsOneWidget);
+        expect(find.text('Beta'), findsNothing);
+
+        // Leave the chart entirely.
+        await mouse.moveTo(t.getTopLeft(chart) - const Offset(50, 50));
+        await t.pump();
+        expect(find.text('Beta'), findsOneWidget);
+        expect(find.text('Alpha'), findsNothing);
+      },
+    );
+
+    testWidgets('a radial chart shows a tooltip for the hovered arc', (
+      WidgetTester t,
+    ) async {
+      // Two rings 30..100, one row per ring: bandSize 35, a 10% gap each
+      // side leaves a 28px ring — row 0 at 33.5..61.5, row 1 at 68.5..96.5.
+      // Row 0's value (5 of a 10 domain) sweeps only the first half of its
+      // ring; row 1's (10 of 10) sweeps the whole ring.
+      await t.pumpWidget(
+        _scoped(
+          SizedBox(
+            width: _plot.width,
+            height: _plot.height,
+            child: RadialBarChart(
+              data: const <Map<String, Object?>>[
+                <String, Object?>{'value': 5},
+                <String, Object?>{'value': 10},
+              ],
+              series: const <RadialBarSpec>[RadialBarSpec(dataKey: 'value')],
+              innerRadius: 30,
+              outerRadius: 100,
+              tooltip: const ChartTooltipSpec(),
+            ),
+          ),
+        ),
+      );
+      final TestGesture mouse = await startMouse(t);
+      final Finder chart = find.byType(RadialBarChart);
+
+      final Offset row0 = polarToCartesian(centre.dx, centre.dy, 47.5, 90);
+      await hoverAt(t, mouse, chart, row0);
+      expect(find.byType(ChartTooltipContent), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
+
+      final Offset row1 = polarToCartesian(centre.dx, centre.dy, 82.5, 180);
+      await hoverAt(t, mouse, chart, row1);
+      expect(find.byType(ChartTooltipContent), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+    });
+
+    testWidgets(
+      'two positions inside the SAME sector place the tooltip at '
+      'DIFFERENT screen positions — it follows the pointer, not a fixed '
+      'anchor',
+      (WidgetTester t) async {
+        await t.pumpWidget(pie());
+        final TestGesture mouse = await startMouse(t);
+        final Finder chart = find.byType(PieChart);
+        final Offset origin = t.getTopLeft(chart);
+
+        // Both points sit inside Alpha's 0..120° sector (mid 60°) and
+        // between the 40..100 ring, so both hover the same slice.
+        final Offset near = polarToCartesian(centre.dx, centre.dy, 55, 20);
+        final Offset far = polarToCartesian(centre.dx, centre.dy, 95, 100);
+
+        await hoverAt(t, mouse, chart, near);
+        expect(find.text('Alpha'), findsOneWidget);
+        final Offset nearTooltip =
+            t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
+
+        await hoverAt(t, mouse, chart, far);
+        expect(find.text('Alpha'), findsOneWidget);
+        final Offset farTooltip =
+            t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
+
+        expect(nearTooltip, isNot(equals(farTooltip)));
+      },
+    );
+
+    testWidgets(
+      'hovering near the right/bottom edge keeps the tooltip within the '
+      'chart bounds',
+      (WidgetTester t) async {
+        // A big enough ring that a point on it sits close to the plot's
+        // right and bottom edges.
+        await t.pumpWidget(
+          _scoped(
+            SizedBox(
+              width: _plot.width,
+              height: _plot.height,
+              child: PieChart(
+                pies: <PieSpec>[
+                  const PieSpec(
+                    data: pieData,
+                    dataKey: 'value',
+                    innerRadius: 40,
+                    outerRadius: 120,
+                  ),
+                ],
+                tooltip: const ChartTooltipSpec(),
+              ),
+            ),
+          ),
+        );
+        final TestGesture mouse = await startMouse(t);
+        final Finder chart = find.byType(PieChart);
+        final Offset origin = t.getTopLeft(chart);
+
+        // 10° is inside Alpha's 0..120° sector and, at radius 118, close
+        // enough to the plot's right edge (482) to push the unclamped
+        // anchor (357 + the space(3) gap) past `plot.width - minWidth`.
+        final Offset corner = polarToCartesian(centre.dx, centre.dy, 118, 10);
+        await hoverAt(t, mouse, chart, corner);
+        expect(find.text('Alpha'), findsOneWidget);
+
+        final Rect tooltip =
+            (t.getTopLeft(find.byType(ChartTooltipContent)) - origin) &
+            t.getSize(find.byType(ChartTooltipContent));
+        expect(tooltip.left, greaterThanOrEqualTo(0));
+        expect(tooltip.top, greaterThanOrEqualTo(0));
+        expect(tooltip.right, lessThanOrEqualTo(_plot.width));
+        // The vertical clamp is bounded by the tooltip's own MEASURED height
+        // (via the `CustomSingleChildLayout` delegate), not a stand-in
+        // width constant, so the bottom edge is held in-bounds too.
+        expect(tooltip.bottom, lessThanOrEqualTo(_plot.height));
+      },
+    );
+
+    testWidgets(
+      'hovering a sector near the BOTTOM of the plot places the tooltip in '
+      'the lower half — the vertical clamp must bound the real measured '
+      'height, not a width constant standing in for one',
+      (WidgetTester t) async {
+        await t.pumpWidget(pie());
+        final TestGesture mouse = await startMouse(t);
+        final Finder chart = find.byType(PieChart);
+        final Offset origin = t.getTopLeft(chart);
+
+        // Gamma's sector is 240..360°, mid 300° — polarToCartesian's
+        // convention (screen y = cy + sin(300°)·r = cy + 0.866·r) puts this
+        // well below the plot's vertical centre, near the bottom edge of
+        // the 256px-tall plot.
+        final Offset bottom = polarToCartesian(centre.dx, centre.dy, 95, 300);
+        await hoverAt(t, mouse, chart, bottom);
+        expect(find.text('Gamma'), findsOneWidget);
+
+        final Offset tooltipTopLeft =
+            t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
+        expect(tooltipTopLeft.dy, greaterThan(_plot.height / 2));
+      },
+    );
+
+    testWidgets(
+      "defaultIndex's resting position — no pointer, tooltip at rest — is "
+      'unchanged from before pointer-following was added: centred on the '
+      "pie's own centre x, space(2) down from the plot's top",
+      (WidgetTester t) async {
+        await t.pumpWidget(pie(defaultIndex: 1));
+        final Finder chart = find.byType(PieChart);
+        final Offset origin = t.getTopLeft(chart);
+        final Offset resting =
+            t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
+        expect(resting, const Offset(241, 8));
+      },
+    );
+  });
+
+  group('PieChart / RadialBarChart — no tooltip installs no hover handling', () {
+    // widget.tooltip == null gates rendering already (see
+    // `if (active != null && widget.tooltip != null)` in chart_polar.dart);
+    // this proves the MouseRegion that drives it is gated the same way, so a
+    // chart with no tooltip spec pays no setState on pointer move.
+    testWidgets('PieChart with no tooltip has no MouseRegion', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        _scoped(
+          SizedBox(
+            width: _plot.width,
+            height: _plot.height,
+            child: PieChart(
+              pies: <PieSpec>[
+                const PieSpec(
+                  data: <Map<String, Object?>>[
+                    <String, Object?>{'name': 'Alpha', 'value': 10},
+                    <String, Object?>{'name': 'Beta', 'value': 10},
+                  ],
+                  dataKey: 'value',
+                  innerRadius: 40,
+                  outerRadius: 100,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(
+        find.descendant(
+          of: find.byType(PieChart),
+          matching: find.byType(MouseRegion),
+        ),
+        findsNothing,
+      );
+    });
+
+    testWidgets('RadialBarChart with no tooltip has no MouseRegion', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        _scoped(
+          SizedBox(
+            width: _plot.width,
+            height: _plot.height,
+            child: RadialBarChart(
+              data: const <Map<String, Object?>>[
+                <String, Object?>{'value': 5},
+                <String, Object?>{'value': 10},
+              ],
+              series: const <RadialBarSpec>[RadialBarSpec(dataKey: 'value')],
+              innerRadius: 30,
+              outerRadius: 100,
+            ),
+          ),
+        ),
+      );
+      expect(
+        find.descendant(
+          of: find.byType(RadialBarChart),
+          matching: find.byType(MouseRegion),
+        ),
+        findsNothing,
+      );
     });
   });
 

@@ -426,6 +426,7 @@ class _CommandBlock extends StatelessWidget {
         DocsSelectableCodeBlock(
           key: ValueKey<String>('skill-command:${docsCommand.command}'),
           code: docsCommand.command,
+          language: 'bash',
         ),
       ],
     );

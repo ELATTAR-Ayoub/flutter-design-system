@@ -9,7 +9,17 @@
     {
       "source": "lib/src/blocks/agent_console/agent_console.dart",
       "target": "@block/agent_console/agent_console.dart",
-      "sha256": "fc9d805f868f546ceb740708a5a1dab59593e3d7128071a0a155db704e26be4a"
+      "sha256": "b6a7f25c0ccdee0f3e47a464332f63781b2e8c8fe37aa14e85e917e66b7937f7"
+    },
+    {
+      "source": "lib/src/components/ui/voice_source_base.dart",
+      "target": "@ui/voice_source_base.dart",
+      "sha256": "5767ba5fe02025ef1c0156639ef8cc5b0df3a238179fa175a5e7143b14411295"
+    },
+    {
+      "source": "lib/src/components/ui/voice_source_stub.dart",
+      "target": "@ui/voice_source_stub.dart",
+      "sha256": "492fcef75abafb550817dbb817cafad840b0f3cfcc2272864e61023c60bfcec9"
     }
   ],
   "registryDependencies": [
@@ -53,6 +63,9 @@
     "AgentConsole",
     "AgentFeatures",
     "AgentModel",
-    "AgentPersona"
+    "AgentPersona",
+    "VoiceSource",
+    "VoiceSourceStatus",
+    "createVoiceSource"
   ]
 }

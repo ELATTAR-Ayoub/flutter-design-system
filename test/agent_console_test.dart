@@ -98,6 +98,64 @@ class _FakeTransport extends ChangeNotifier implements AgentTransport {
   }
 }
 
+/* ── A voice source with dials on it ─────────────────────────────────────── */
+
+/// [VoiceSource] a test can drive: [onStart] decides what [start] transitions
+/// [status] to (a working platform's [VoiceSourceStatus.active] by default),
+/// and [startCalls]/[stopCalls]/[disposeCalls] are what let a test assert the
+/// console actually released a stream rather than merely dropping the flag
+/// that used to mean "armed" — a real leak in `voice_source_web.dart` has
+/// nothing here to be caught by, which is exactly why the console's own
+/// calls into this seam are what get pinned instead.
+class _FakeVoiceSource implements VoiceSource {
+  final ValueNotifier<VoiceSourceStatus> _status =
+      ValueNotifier<VoiceSourceStatus>(VoiceSourceStatus.idle);
+  final ValueNotifier<Float32List> _samples = ValueNotifier<Float32List>(
+    Float32List(0),
+  );
+  final ValueNotifier<Float32List> _spectrum = ValueNotifier<Float32List>(
+    Float32List(0),
+  );
+
+  VoiceSourceStatus onStart = VoiceSourceStatus.active;
+
+  int startCalls = 0;
+  int stopCalls = 0;
+  int disposeCalls = 0;
+
+  @override
+  ValueListenable<VoiceSourceStatus> get status => _status;
+
+  @override
+  ValueListenable<Float32List> get samples => _samples;
+
+  @override
+  ValueListenable<Float32List> get spectrum => _spectrum;
+
+  @override
+  Future<void> start() async {
+    startCalls += 1;
+    _status.value = onStart;
+  }
+
+  @override
+  void stop() {
+    stopCalls += 1;
+    if (_status.value == VoiceSourceStatus.active ||
+        _status.value == VoiceSourceStatus.requesting) {
+      _status.value = VoiceSourceStatus.idle;
+    }
+  }
+
+  @override
+  void dispose() {
+    disposeCalls += 1;
+    _status.dispose();
+    _samples.dispose();
+    _spectrum.dispose();
+  }
+}
+
 const ToolStateMap _toolStates = <String, AgentState>{
   'search_inventory': AgentState.searching,
   'export_activity': AgentState.writing,
@@ -870,6 +928,310 @@ void main() {
         agentFaceSize(AgentAvatarSize.lg),
       });
     });
+  });
+
+  /* ── onDownload ────────────────────────────────────────────────────────── */
+
+  /// `AgentAttachmentCard` shows a download action whenever a turn's
+  /// attachment carries a url and has no `onRemove` — true of every
+  /// already-sent transcript row, console features aside. Before this pin
+  /// the console had no `onDownload` field at all: `AgentTranscript`'s own
+  /// widgets (`UserMessage`, `AgentMessage`, `ToolChip`) took the callback,
+  /// but `AgentConsole` never had one to forward, so no caller could ever
+  /// make the button — visible whenever a produced or sent file carried a
+  /// url — do anything. Asserted end to end from the console, not the
+  /// transcript row directly, because the console is where the wiring broke.
+  group('AgentConsole onDownload', () {
+    final AgentAttachment csv = const AgentAttachment(
+      id: 'a1',
+      name: 'activity-30d.csv',
+      mime: 'text/csv',
+      kind: AgentAttachmentKind.data,
+      size: 4821,
+      url: 'data:text/csv,date,event\n',
+      delivery: AgentDelivery.produced(),
+    );
+
+    testWidgets(
+      'a url and onDownload: the card shows a download action, and pressing '
+      "it invokes the console's callback with the file name",
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport(
+          turns: <AgentTurn>[
+            TextTurn(
+              id: 't1',
+              text: 'Here you go.',
+              attachments: <AgentAttachment>[csv],
+            ),
+          ],
+        );
+        addTearDown(transport.dispose);
+
+        final List<String> downloaded = <String>[];
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            height: 600,
+            onDownload: downloaded.add,
+          ),
+        );
+
+        final Finder action = find.byType(AttachmentAction);
+        expect(action, findsOneWidget);
+
+        await tester.tap(action);
+        await tester.pump();
+
+        expect(downloaded, <String>['activity-30d.csv']);
+
+        // `AttachmentAction`'s own saving swap — settle its timer before the
+        // tree is torn down, or the binding flags a pending timer as a leak.
+        await tester.pump(AttachmentAction.savingWindow);
+        await tester.pump();
+      },
+    );
+
+    testWidgets(
+      'no url on the attachment: no download action appears, onDownload '
+      "supplied or not — AgentAttachmentCard's own rule, and the "
+      'compatibility line every console rendered to before this field '
+      "existed, since the mock transport's own attachments carried no url",
+      (WidgetTester tester) async {
+        final AgentAttachment noUrl = AgentAttachment(
+          id: csv.id,
+          name: csv.name,
+          mime: csv.mime,
+          kind: csv.kind,
+          size: csv.size,
+          delivery: csv.delivery,
+        );
+        final _FakeTransport transport = _FakeTransport(
+          turns: <AgentTurn>[
+            TextTurn(
+              id: 't1',
+              text: 'Here you go.',
+              attachments: <AgentAttachment>[noUrl],
+            ),
+          ],
+        );
+        addTearDown(transport.dispose);
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            height: 600,
+            onDownload: (String _) {},
+          ),
+        );
+
+        expect(find.byType(AttachmentAction), findsNothing);
+      },
+    );
+  });
+
+  /* ── microphone ────────────────────────────────────────────────────────── */
+
+  /// `AgentComposer.micControl` — *"supplied by the console because it also
+  /// carries the speech settings. Rendered immediately left of send."* The
+  /// console never filled it; these pin that it now does, exactly on the
+  /// flag, and nowhere else when the flag is off.
+  group('AgentConsole microphone', () {
+    testWidgets('a mic control renders next to send, not the attach control', (
+      WidgetTester tester,
+    ) async {
+      final _FakeTransport transport = _FakeTransport();
+      addTearDown(transport.dispose);
+
+      await _pump(
+        tester,
+        AgentConsole(transport: transport, persona: _persona, height: 600),
+      );
+
+      expect(find.byType(MicControl), findsOneWidget);
+      final double micLeft = tester.getRect(find.byType(MicControl)).left;
+      final double sendLeft = tester.getRect(find.byType(AgentAttachMenu)).left;
+      final double attachLeft = tester
+          .getRect(find.byType(AgentAttachMenu))
+          .right;
+      // The mic sits to the right of the flex spacer, beside send — not
+      // beside the plus/attach control on the far left.
+      expect(micLeft, greaterThan(attachLeft));
+      expect(micLeft, greaterThan(sendLeft));
+    });
+
+    testWidgets('microphone off draws no mic control at all — compatibility', (
+      WidgetTester tester,
+    ) async {
+      final _FakeTransport transport = _FakeTransport();
+      addTearDown(transport.dispose);
+
+      await _pump(
+        tester,
+        AgentConsole(
+          transport: transport,
+          persona: _persona,
+          features: const AgentFeatures(microphone: false),
+          height: 600,
+        ),
+      );
+
+      expect(find.byType(MicControl), findsNothing);
+    });
+
+    testWidgets('pressing the mic arms it, and pressing again disarms it', (
+      WidgetTester tester,
+    ) async {
+      final _FakeTransport transport = _FakeTransport();
+      addTearDown(transport.dispose);
+
+      await _pump(
+        tester,
+        AgentConsole(transport: transport, persona: _persona, height: 600),
+      );
+
+      MicControl mic() => tester.widget<MicControl>(find.byType(MicControl));
+
+      expect(mic().listening, isFalse);
+
+      await tester.tap(find.byType(MicControl));
+      await tester.pump();
+      expect(mic().listening, isTrue);
+
+      await tester.tap(find.byType(MicControl));
+      await tester.pump();
+      expect(mic().listening, isFalse);
+    });
+
+    testWidgets(
+      'arming calls the injected source\'s start, disarming calls stop',
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport();
+        addTearDown(transport.dispose);
+        final _FakeVoiceSource source = _FakeVoiceSource();
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            persona: _persona,
+            height: 600,
+            voiceSource: source,
+          ),
+        );
+
+        expect(source.startCalls, 0);
+        expect(source.stopCalls, 0);
+
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+        expect(source.startCalls, 1);
+        expect(source.stopCalls, 0);
+
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+        expect(source.startCalls, 1);
+        expect(source.stopCalls, 1);
+      },
+    );
+
+    testWidgets(
+      'disposing the console stops the source — a leaked stream fails this',
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport();
+        addTearDown(transport.dispose);
+        final _FakeVoiceSource source = _FakeVoiceSource();
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            persona: _persona,
+            height: 600,
+            voiceSource: source,
+          ),
+        );
+
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+        expect(source.startCalls, 1);
+        expect(source.stopCalls, 0);
+
+        // Tear the console out of the tree without ever disarming it by
+        // hand — the same shape as a user navigating away mid-recording.
+        await tester.pumpWidget(const SizedBox());
+        expect(source.stopCalls, 1);
+
+        // An injected source is the caller's, not the console's, to
+        // dispose — only one this widget built itself gets that call.
+        expect(source.disposeCalls, 0);
+      },
+    );
+
+    testWidgets(
+      'while armed with a real source, the bar visualizer reads its actual spectrum',
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport();
+        addTearDown(transport.dispose);
+        final _FakeVoiceSource source = _FakeVoiceSource();
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            persona: _persona,
+            height: 600,
+            voiceSource: source,
+          ),
+        );
+
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+
+        final BarVisualizer bars = tester.widget<BarVisualizer>(
+          find.byType(BarVisualizer),
+        );
+        expect(bars.spectrum, same(source.spectrum));
+      },
+    );
+
+    testWidgets(
+      'a denied permission un-arms the mic and disables it with a reason, '
+      'rather than leaving it armed and silent',
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport();
+        addTearDown(transport.dispose);
+        final _FakeVoiceSource source = _FakeVoiceSource()
+          ..onStart = VoiceSourceStatus.denied;
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            persona: _persona,
+            height: 600,
+            voiceSource: source,
+          ),
+        );
+
+        MicControl mic() => tester.widget<MicControl>(find.byType(MicControl));
+
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+
+        expect(mic().listening, isFalse);
+        expect(mic().disabled, isTrue);
+        expect(mic().disabledReason, isNotNull);
+
+        // Sticky: a second attempt cannot re-arm it, because a denied
+        // permission does not clear itself.
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+        expect(mic().listening, isFalse);
+      },
+    );
   });
 
   /* ── switchPhase ───────────────────────────────────────────────────────── */

@@ -25,6 +25,7 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart' show PointerHoverEvent;
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
@@ -39,6 +40,7 @@ import 'package:flutter/widgets.dart'
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/theme_scope.dart';
+import '../../design_system/foundation/typography.dart';
 import './chart.dart';
 import './chart_cartesian.dart';
 import './chart_geometry.dart';
@@ -209,6 +211,77 @@ class PieSpec {
   final String? chipLabelKey;
 }
 
+/// Whether [angle] — read off the pointer in `polarToCartesian`'s own
+/// convention — falls inside a sweep of [sweep] degrees starting at [start].
+/// A positive sweep runs counter-clockwise, a negative one clockwise,
+/// mirroring the `angle += sweep` accumulation every polar hit-test below
+/// walks (`_PieChartState._pieIndexAt`, `_RadialBarChartState._radialIndexAt`).
+/// Shared by both, since a donut slice and a radial bar's arc are the same
+/// "does this angle fall between a start and an end" question once the
+/// radius band has already narrowed it to one ring.
+bool _angleWithinSweep(double angle, double start, double sweep) {
+  if (sweep == 0) return false;
+  final double delta = (angle - start) % 360;
+  return sweep > 0 ? delta <= sweep + 1e-6 : delta - 360 >= sweep - 1e-6;
+}
+
+/// Places a polar tooltip against its own MEASURED size, the same mechanism
+/// `_HoverCardLayout` uses in `hover_card.dart:223` (and `popover.dart:879`):
+/// a `CustomSingleChildLayout` hands `getPositionForChild` the child's real
+/// `childSize`, so the clamp bounds the tooltip's actual width and height
+/// rather than a stand-in constant. No `minWidth`/`minHeight` token is
+/// needed on either axis.
+///
+/// With no [pointer] — nothing hovered, `defaultIndex` showing at rest —
+/// this is the pre-hover resting spot both charts always used: centred over
+/// [centre]'s x, [space]\(2\) down from the plot's top, untouched by the
+/// child's measured size exactly as it was before pointer-following.
+///
+/// With a [pointer], this mirrors `_CartesianChartState._tooltip` in
+/// `chart_cartesian.dart`: a [space]\(3\) gap off the cursor on each axis,
+/// then `math.min(math.max(v + gap, 0), bound - childSize)` on that axis —
+/// the same clamp shape cartesian applies to its tooltip's `left`, now fed
+/// the child's real extent instead of `ChartTooltipContent.minWidth`.
+/// Clamping the low end at 0 and the high end at `bound - childSize` is what
+/// keeps the panel on-screen near an edge: past the clamp point the
+/// tooltip's anchor stops advancing with the cursor and effectively sits on
+/// the cursor's other side instead of overflowing. Cartesian only clamps x
+/// (its tooltip's `top` is fixed at the plot's vertical middle, since every
+/// category shares one column); polar has no such column, so the identical
+/// formula runs on y too — against the child's measured height, so a
+/// tooltip hovered near the plot's bottom edge still tracks the cursor
+/// instead of stopping at a fixed fraction of the plot's height.
+class _PolarTooltipLayout extends SingleChildLayoutDelegate {
+  const _PolarTooltipLayout({required this.pointer, required this.centre});
+
+  final Offset? pointer;
+  final Offset centre;
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
+      constraints.loosen();
+
+  @override
+  Offset getPositionForChild(Size plot, Size childSize) {
+    final Offset? p = pointer;
+    if (p == null) return Offset(centre.dx, space(2));
+    final double gap = space(3);
+    final double left = math.min(
+      math.max(p.dx + gap, 0),
+      math.max(plot.width - childSize.width, 0),
+    );
+    final double top = math.min(
+      math.max(p.dy + gap, 0),
+      math.max(plot.height - childSize.height, 0),
+    );
+    return Offset(left, top);
+  }
+
+  @override
+  bool shouldRelayout(_PolarTooltipLayout old) =>
+      old.pointer != pointer || old.centre != centre;
+}
+
 /// `PieChart`.
 class PieChart extends StatefulWidget {
   const PieChart({
@@ -247,6 +320,19 @@ class _PieChartState extends State<PieChart>
     vsync: this,
     duration: ChartMotion.duration,
   );
+
+  /// The slice the pointer is over, or null when it is nowhere (or has never
+  /// moved) — mirrors `_CartesianChartState._hover` in `chart_cartesian.dart`.
+  int? _hover;
+
+  /// The pointer's own local offset, kept alongside [_hover] so the tooltip
+  /// can follow it. Cartesian charts anchor a tooltip to `categoryCoord`
+  /// (the hovered datum's own x, not the raw pointer) because every category
+  /// shares one column; a donut slice has no such column, so the polar
+  /// tooltip tracks the raw cursor instead — updated on every hover event,
+  /// not only when [_hover] changes, or two points inside the same slice
+  /// would render the tooltip at the same spot.
+  Offset? _hoverLocal;
 
   @override
   void initState() {
@@ -293,7 +379,8 @@ class _PieChartState extends State<PieChart>
         for (final PieSpec pie in widget.pies) {
           _buildPie(pie, centre, maxRadius, wedges, chips, outside, theme);
         }
-        return AnimatedBuilder(
+        final int? active = _hover ?? widget.tooltip?.defaultIndex;
+        final Widget stack = AnimatedBuilder(
           animation: _entrance,
           builder: (BuildContext context, Widget? _) => Stack(
             children: <Widget>[
@@ -319,7 +406,11 @@ class _PieChartState extends State<PieChart>
                   ),
                 ),
               for (final _ChipLabel chip in chips)
-                _positioned(chip.anchor, plot, _ArcChip(text: chip.text)),
+                _positioned(
+                  chip.anchor,
+                  plot,
+                  _ArcChip(text: chip.text, isNumeric: chip.isNumeric),
+                ),
               if (widget.centerLabel != null)
                 Positioned(
                   left: 0,
@@ -348,13 +439,82 @@ class _PieChartState extends State<PieChart>
                     ],
                   ),
                 ),
-              if (widget.tooltip?.defaultIndex != null)
-                _pieTooltip(context, config, plot, centre),
+              if (active != null && widget.tooltip != null)
+                _pieTooltip(
+                  context,
+                  config,
+                  plot,
+                  centre,
+                  active,
+                  _hover != null ? _hoverLocal : null,
+                ),
             ],
           ),
         );
+        // MouseRegion — with its own setState on every pointer move — is
+        // installed only when there is a tooltip to drive; a chart with no
+        // widget.tooltip pays nothing for hover it can never render (see
+        // `if (active != null && widget.tooltip != null)` above).
+        if (widget.tooltip == null) return stack;
+        return MouseRegion(
+          onHover: (PointerHoverEvent e) =>
+              _onHover(centre, maxRadius, e.localPosition),
+          onExit: (_) {
+            if (_hover != null || _hoverLocal != null) {
+              setState(() {
+                _hover = null;
+                _hoverLocal = null;
+              });
+            }
+          },
+          child: stack,
+        );
       },
     );
+  }
+
+  void _onHover(Offset centre, double maxRadius, Offset local) {
+    final int? index = widget.pies.isEmpty
+        ? null
+        : _pieIndexAt(widget.pies.first, centre, maxRadius, local);
+    if (index != _hover || local != _hoverLocal) {
+      setState(() {
+        _hover = index;
+        _hoverLocal = local;
+      });
+    }
+  }
+
+  /// Which slice of [pie] a pointer at [local] is over — the polar analogue
+  /// of `_CartesianLayout.indexAt`. Converts to a vector from [centre], reads
+  /// off the radius and the angle (`polarToCartesian`'s own convention,
+  /// inverted), then walks the same `angle += sweep` accumulation
+  /// `_buildPie` uses to find which slice's angular range contains it.
+  /// Outside `[innerRadius, outerRadius]` — including the donut hole — is not
+  /// over any slice.
+  int? _pieIndexAt(PieSpec pie, Offset centre, double maxRadius, Offset local) {
+    final double outer = pie.outerRadius ?? maxRadius * 0.8;
+    final double inner = pie.innerRadius ?? 0;
+    final double dx = local.dx - centre.dx;
+    final double dy = local.dy - centre.dy;
+    final double radius = math.sqrt(dx * dx + dy * dy);
+    if (radius < inner || radius > outer) return null;
+    final double total = pie.data.fold<double>(
+      0,
+      (double a, Map<String, Object?> r) =>
+          a + ((r[pie.dataKey] as num?) ?? 0).toDouble(),
+    );
+    if (total == 0) return null;
+    final double angle = -math.atan2(dy, dx) * 180 / math.pi;
+    final double sweepTotal = pie.endAngle - pie.startAngle;
+    double a = pie.startAngle;
+    for (int i = 0; i < pie.data.length; i++) {
+      final double v = ((pie.data[i][pie.dataKey] as num?) ?? 0).toDouble();
+      final double sweep = v / total * sweepTotal;
+      if (_angleWithinSweep(angle, a, sweep)) return i;
+      a += sweep;
+    }
+    return null;
   }
 
   Widget _positioned(Offset at, Size plot, Widget child) => Positioned(
@@ -383,29 +543,36 @@ class _PieChartState extends State<PieChart>
     ChartConfig config,
     Size plot,
     Offset centre,
+    int index,
+    Offset? pointer,
   ) {
     final ChartTooltipSpec spec = widget.tooltip!;
     final PieSpec pie = widget.pies.first;
-    final int i = spec.defaultIndex!.clamp(0, pie.data.length - 1);
+    final int i = index.clamp(0, pie.data.length - 1);
     final Map<String, Object?> row = pie.data[i];
     return Positioned(
-      left: centre.dx,
-      top: space(2),
-      child: ChartTooltipContent(
-        config: config,
-        items: <ChartTooltipItem>[
-          ChartTooltipItem(
-            name: '${row[pie.nameKey ?? 'name'] ?? pie.dataKey}',
-            value: row[pie.dataKey] as num?,
-            color: row['fill'] as Color?,
-            payload: row,
-            dataKey: pie.dataKey,
-          ),
-        ],
-        indicator: spec.indicator,
-        hideLabel: spec.hideLabel,
-        hideIndicator: spec.hideIndicator,
-        nameKey: spec.nameKey,
+      left: 0,
+      top: 0,
+      width: plot.width,
+      height: plot.height,
+      child: CustomSingleChildLayout(
+        delegate: _PolarTooltipLayout(pointer: pointer, centre: centre),
+        child: ChartTooltipContent(
+          config: config,
+          items: <ChartTooltipItem>[
+            ChartTooltipItem(
+              name: '${row[pie.nameKey ?? 'name'] ?? pie.dataKey}',
+              value: row[pie.dataKey] as num?,
+              color: row['fill'] as Color?,
+              payload: row,
+              dataKey: pie.dataKey,
+            ),
+          ],
+          indicator: spec.indicator,
+          hideLabel: spec.hideLabel,
+          hideIndicator: spec.hideIndicator,
+          nameKey: spec.nameKey,
+        ),
       ),
     );
   }
@@ -460,15 +627,17 @@ class _PieChartState extends State<PieChart>
       }
       final double mid = angle + sweep / 2;
       if (pie.chipLabelKey != null) {
+        final Object? chipRaw = row[pie.chipLabelKey];
         chips.add(
           _ChipLabel(
-            text: '${row[pie.chipLabelKey] ?? ''}',
+            text: '${chipRaw ?? ''}',
             anchor: polarToCartesian(
               centre.dx,
               centre.dy,
               (inner + outer) / 2,
               mid,
             ),
+            isNumeric: chipRaw is num,
           ),
         );
       }
@@ -525,9 +694,18 @@ class _Wedge {
 
 @immutable
 class _ChipLabel {
-  const _ChipLabel({required this.text, required this.anchor});
+  const _ChipLabel({
+    required this.text,
+    required this.anchor,
+    required this.isNumeric,
+  });
   final String text;
   final Offset anchor;
+
+  /// Whether `chipLabelKey` named a `num` field on the row. Both call sites
+  /// on the page point it at a name (`browser`), which stays prose, but the
+  /// slot is generic — a caller pointing it at a value gets `numberSm`.
+  final bool isNumeric;
 }
 
 @immutable
@@ -833,7 +1011,13 @@ class _RadarChartState extends State<RadarChart>
                 )
               : StyledText(
                   '${widget.data[i][axis.dataKey] ?? ''}',
-                  ChartText.xs,
+                  // The angle axis is the categorical one (a month, a
+                  // subject) except when a caller's `dataKey` happens to
+                  // name a numeric field — the same `is num` hook every
+                  // other axis in the family reads.
+                  widget.data[i][axis.dataKey] is num
+                      ? TextStyles.numberSm
+                      : ChartText.xs,
                   color: theme.mutedForeground,
                 ),
         ),
@@ -859,9 +1043,11 @@ class _RadarChartState extends State<RadarChart>
             axis.angle,
           ),
           angle: axis.angle,
+          // The radius axis's own ticks are `scale.ticks()` — always a
+          // `num`, so this is `numberSm` unconditionally.
           child: StyledText(
             chartNumber(v),
-            ChartText.xs,
+            TextStyles.numberSm,
             color: theme.mutedForeground,
           ),
         ),
@@ -1144,6 +1330,12 @@ class _RadialBarChartState extends State<RadialBarChart>
     duration: ChartMotion.duration,
   );
 
+  /// The row the pointer is over — mirrors `_PieChartState._hover`.
+  int? _hover;
+
+  /// The pointer's own local offset — mirrors `_PieChartState._hoverLocal`.
+  Offset? _hoverLocal;
+
   @override
   void initState() {
     super.initState();
@@ -1173,6 +1365,7 @@ class _RadialBarChartState extends State<RadialBarChart>
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
+    final ChartConfig config = ChartScope.of(context);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints c) {
         final Offset centre = Offset(c.maxWidth / 2, c.maxHeight / 2);
@@ -1200,6 +1393,7 @@ class _RadialBarChartState extends State<RadialBarChart>
 
         final List<_Arc> arcs = <_Arc>[];
         final List<_ChipLabel> chips = <_ChipLabel>[];
+        final List<_RadialHitRegion> regions = <_RadialHitRegion>[];
         final double sweepTotal = widget.endAngle - widget.startAngle;
         for (int i = 0; i < rows; i++) {
           final Map<String, Object?> row = widget.data[i];
@@ -1240,16 +1434,27 @@ class _RadialBarChartState extends State<RadialBarChart>
                 background: false,
               ),
             );
+            regions.add(
+              _RadialHitRegion(
+                rowIndex: i,
+                inner: inner,
+                outer: outer,
+                start: from,
+                sweep: to - from,
+              ),
+            );
             if (s.chipLabelKey != null) {
+              final Object? chipRaw = row[s.chipLabelKey];
               chips.add(
                 _ChipLabel(
-                  text: '${row[s.chipLabelKey] ?? ''}',
+                  text: '${chipRaw ?? ''}',
                   anchor: polarToCartesian(
                     centre.dx,
                     centre.dy,
                     (inner + outer) / 2,
                     from,
                   ),
+                  isNumeric: chipRaw is num,
                 ),
               );
             }
@@ -1257,7 +1462,8 @@ class _RadialBarChartState extends State<RadialBarChart>
           }
         }
 
-        return AnimatedBuilder(
+        final int? active = _hover ?? widget.tooltip?.defaultIndex;
+        final Widget stack = AnimatedBuilder(
           animation: _entrance,
           builder: (BuildContext context, Widget? _) => Stack(
             children: <Widget>[
@@ -1278,7 +1484,10 @@ class _RadialBarChartState extends State<RadialBarChart>
                   top: chip.anchor.dy,
                   child: FractionalTranslation(
                     translation: const Offset(-0.5, -0.5),
-                    child: _ArcChip(text: chip.text),
+                    child: _ArcChip(
+                      text: chip.text,
+                      isNumeric: chip.isNumeric,
+                    ),
                   ),
                 ),
               if (widget.radiusAxis?.centerLabel != null)
@@ -1287,12 +1496,130 @@ class _RadialBarChartState extends State<RadialBarChart>
                     child: widget.radiusAxis!.centerLabel!(context),
                   ),
                 ),
+              if (active != null && widget.tooltip != null)
+                _radialTooltip(
+                  context,
+                  config,
+                  Size(c.maxWidth, c.maxHeight),
+                  centre,
+                  active,
+                  _hover != null ? _hoverLocal : null,
+                ),
             ],
           ),
+        );
+        // See PieChart's build above: MouseRegion only when a tooltip can
+        // actually use the hover it drives.
+        if (widget.tooltip == null) return stack;
+        return MouseRegion(
+          onHover: (PointerHoverEvent e) =>
+              _onHover(regions, centre, e.localPosition),
+          onExit: (_) {
+            if (_hover != null || _hoverLocal != null) {
+              setState(() {
+                _hover = null;
+                _hoverLocal = null;
+              });
+            }
+          },
+          child: stack,
         );
       },
     );
   }
+
+  void _onHover(List<_RadialHitRegion> regions, Offset centre, Offset local) {
+    final int? index = _radialIndexAt(regions, centre, local);
+    if (index != _hover || local != _hoverLocal) {
+      setState(() {
+        _hover = index;
+        _hoverLocal = local;
+      });
+    }
+  }
+
+  /// Which row's arc a pointer at [local] is over. Radial bands are
+  /// concentric rather than angular like a pie's slices, so the radius alone
+  /// narrows it to one row's ring; the angle then has to fall inside that
+  /// row's own filled arc (`from` to `to`) rather than the ring's whole
+  /// unfilled track, so hovering the background portion of a ring shows no
+  /// tooltip — matching a pie, which has no background to hover at all.
+  int? _radialIndexAt(
+    List<_RadialHitRegion> regions,
+    Offset centre,
+    Offset local,
+  ) {
+    final double dx = local.dx - centre.dx;
+    final double dy = local.dy - centre.dy;
+    final double radius = math.sqrt(dx * dx + dy * dy);
+    final double angle = -math.atan2(dy, dx) * 180 / math.pi;
+    for (final _RadialHitRegion r in regions) {
+      if (radius < r.inner || radius > r.outer) continue;
+      if (_angleWithinSweep(angle, r.start, r.sweep)) return r.rowIndex;
+    }
+    return null;
+  }
+
+  Widget _radialTooltip(
+    BuildContext context,
+    ChartConfig config,
+    Size plot,
+    Offset centre,
+    int index,
+    Offset? pointer,
+  ) {
+    final ChartTooltipSpec spec = widget.tooltip!;
+    final int i = index.clamp(0, widget.data.length - 1);
+    final Map<String, Object?> row = widget.data[i];
+    final List<ChartTooltipItem> items = <ChartTooltipItem>[
+      for (final RadialBarSpec s in widget.series)
+        if (!s.background)
+          ChartTooltipItem(
+            name: s.dataKey,
+            dataKey: s.dataKey,
+            value: row[s.dataKey] as num?,
+            color: s.fill ?? (row['fill'] as Color?),
+            payload: row,
+          ),
+    ];
+    return Positioned(
+      left: 0,
+      top: 0,
+      width: plot.width,
+      height: plot.height,
+      child: CustomSingleChildLayout(
+        delegate: _PolarTooltipLayout(pointer: pointer, centre: centre),
+        child: ChartTooltipContent(
+          config: config,
+          items: items,
+          indicator: spec.indicator,
+          hideLabel: spec.hideLabel,
+          hideIndicator: spec.hideIndicator,
+          nameKey: spec.nameKey,
+        ),
+      ),
+    );
+  }
+}
+
+/// One row's radial hit-test band — the polar-bar analogue of a pie's own
+/// per-slice angular range, narrowed first by [inner]/[outer] (the ring)
+/// and then by [start]/[sweep] (the filled arc within it).
+@immutable
+class _RadialHitRegion {
+  const _RadialHitRegion({
+    required this.rowIndex,
+    required this.inner,
+    required this.outer,
+    required this.start,
+    required this.sweep,
+  });
+
+  final int rowIndex;
+  final double inner;
+  final double outer;
+  final double start;
+  final double sweep;
 }
 
 @immutable
@@ -1410,9 +1737,15 @@ class _RadialPainter extends CustomPainter {
 /// broken behind it. Measured after the change: **16.97:1** dark, **19.90:1**
 /// light, for all five slots instead of ten separate ratios.
 class _ArcChip extends StatelessWidget {
-  const _ArcChip({required this.text});
+  const _ArcChip({required this.text, required this.isNumeric});
 
   final String text;
+
+  /// Whether `chipLabelKey` named a `num` field. Both specimens on the page
+  /// point it at `browser` — a name, which stays prose — but a caller
+  /// pointing it at a value gets `numberSm`, same as every other number
+  /// surface in the family.
+  final bool isNumeric;
 
   @override
   Widget build(BuildContext context) {
@@ -1426,7 +1759,7 @@ class _ArcChip extends StatelessWidget {
       child: StyledText(
         // `capitalize`.
         text.isEmpty ? text : '${text[0].toUpperCase()}${text.substring(1)}',
-        ChartText.xs,
+        isNumeric ? TextStyles.numberSm : ChartText.xs,
         color: theme.cardForeground,
       ),
     );
@@ -1434,6 +1767,12 @@ class _ArcChip extends StatelessWidget {
 }
 
 /// A pie's outside label — `<text>` on `--foreground`, never on the slice.
+///
+/// Always a value: `_buildPie` prints `chartNumber(row[pie.dataKey])` by
+/// default, and the one specimen that overrides it with `labelBuilder`
+/// (`pieLabelCustom`) still runs the number through `chartNumber` itself —
+/// so this is `numberSm` unconditionally, the "pie value labels" case the
+/// numeric-role rule names by name.
 class _PolarText extends StatelessWidget {
   const _PolarText({
     required this.text,
@@ -1447,5 +1786,5 @@ class _PolarText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StyledText(text, ChartText.xs, color: color, align: align);
+      StyledText(text, TextStyles.numberSm, color: color, align: align);
 }

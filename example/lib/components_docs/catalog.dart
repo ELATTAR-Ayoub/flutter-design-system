@@ -110,6 +110,7 @@ class ComponentDocEntry {
     required this.dependencies,
     required this.exports,
     required this.sourcePath,
+    this.showInRail = true,
   });
 
   final String name;
@@ -118,6 +119,21 @@ class ComponentDocEntry {
   final List<String> dependencies;
   final List<String> exports;
   final String sourcePath;
+
+  /// Whether the documentation shell's left rail (`../docs/docs_layout.dart`)
+  /// lists this entry under its family group.
+  ///
+  /// The same trade [SiteRoute.showInSidebar] already makes for `/docs`:
+  /// routable, searchable, and listed on `/components`, absent only from the
+  /// rail. The four `chart*` entries set this `false` because
+  /// [ComponentDocFamily.charts] now has a [ComponentDocFamily.landingRoute]
+  /// — `/charts` — that leads the group and links all four from its own body;
+  /// repeating them one line down would be the group listing its own
+  /// contents twice. They stay in [componentDocs] and in [componentDocsIn],
+  /// so the invariant this file states above the family enum — the rail and
+  /// the `/components` index read one list — still holds; only the rail's
+  /// own rendering of that one list narrows.
+  final bool showInRail;
 
   String get route => '/components/$name';
   String get command => 'elattar add ${name.replaceAll('_', '-')}';
@@ -259,6 +275,18 @@ ComponentDocEntry componentDoc(String name) =>
 /// (`../site/pages/public_pages.dart`) both read the families from here, so a
 /// component can never appear in one and not the other, or land in two groups.
 ///
+/// One family bends that rule, deliberately: [charts] carries a
+/// [landingRoute]. `/charts` is a gallery, not a `ComponentDocEntry` — it has
+/// no registry item, no `elattar add` command, nothing for `/components` to
+/// list — so it cannot live in [componentDocs] itself. It leads the Charts
+/// rail group instead, ahead of that family's entries, and links all four of
+/// them from its own body and its Documentation button. The four
+/// `chart*` entries then set [ComponentDocEntry.showInRail] `false`, the same
+/// trade [SiteRoute.showInSidebar] already makes for `/docs`: still in
+/// [componentDocs], still on `/components`, still searchable, just not
+/// repeated one line under the page that already links them. The rail is the
+/// only view this narrows.
+///
 /// The names are the site's, not the registry's: `effects` collects the
 /// reusable visual, interaction, and motion surfaces, which may be static,
 /// animated, or both — hence "Effects" rather than "Animations", a label that
@@ -267,9 +295,19 @@ enum ComponentDocFamily {
   components('Components', 'COMPONENTS'),
   effects('Effects', 'COMPONENTS / EFFECTS'),
   agent('Agent', 'COMPONENTS / AGENT'),
-  charts('Charts', 'COMPONENTS / CHARTS');
+  charts(
+    'Charts',
+    'COMPONENTS / CHARTS',
+    landingRoute: '/charts',
+    landingTitle: 'Charts',
+  );
 
-  const ComponentDocFamily(this.label, this.eyebrow);
+  const ComponentDocFamily(
+    this.label,
+    this.eyebrow, {
+    this.landingRoute,
+    this.landingTitle,
+  });
 
   /// The sidebar and index heading for this family.
   final String label;
@@ -282,6 +320,14 @@ enum ComponentDocFamily {
   /// upper-cases by hand. Components says only "COMPONENTS" — the second
   /// half would repeat the first.
   final String eyebrow;
+
+  /// A page that leads this family in the rail, ahead of its
+  /// [componentDocsIn] entries. Null for every family but [charts]; see the
+  /// enum doc above for why.
+  final String? landingRoute;
+
+  /// The rail label for [landingRoute]. Null exactly when [landingRoute] is.
+  final String? landingTitle;
 }
 
 /// Reusable visual, interaction, and motion effects.

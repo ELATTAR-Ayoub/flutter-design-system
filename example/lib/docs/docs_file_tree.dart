@@ -246,6 +246,7 @@ class _SelectedFilePane extends StatelessWidget {
           DocsSelectableCodeBlock(
             key: ValueKey<String>('docs-file-tree-code:${file.path}'),
             code: file.code,
+            language: docsCodeFileLanguage(file),
             // A whole source file, not a command: capped, so its horizontal
             // scrollbar sits on the bottom edge of the visible pane instead of
             // hundreds of pixels below the fold. See the field's own note for

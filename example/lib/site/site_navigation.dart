@@ -33,18 +33,25 @@ class SiteNavGroup {
 
 /// The top-level public destinations, in header order.
 ///
-/// Exactly two: `Documentation` and `Components`. Everything else a reader can
-/// reach lives in the left rail of the documentation shell, never in the
-/// header. Introduction, Installation, Theming, CLI and Skills are all
-/// documentation pages, so putting them beside `Documentation` in the header
-/// listed a section and its own children as peers.
+/// Exactly four: `Documentation`, `Components`, `Charts` and `Agent`.
+/// Everything else a reader can reach lives in the left rail of the
+/// documentation shell, never in the header. Introduction, Installation,
+/// Theming, CLI and Skills are all documentation pages, so putting them
+/// beside `Documentation` in the header listed a section and its own
+/// children as peers. Charts and Agent are each one family of the
+/// `/components` index, surfaced as their own short header links because
+/// each is deep enough on its own to be worth a direct route rather than a
+/// scroll from `Components`.
 ///
 /// This filters [siteRoutes] rather than restating it, so a route added there
-/// cannot silently reappear in the header: only the two section landings do.
+/// cannot silently reappear in the header: only these four destinations do.
 final List<SiteNavEntry> primarySiteNavigation =
     List<SiteNavEntry>.unmodifiable(<SiteNavEntry>[
       for (final SiteRoute route in siteRoutes)
-        if (route.path == docsRoute || route.path == componentsRoute)
+        if (route.path == docsRoute ||
+            route.path == componentsRoute ||
+            route.path == chartsRoute ||
+            route.path == agentRoute)
           SiteNavEntry(
             title: route.title,
             path: route.path,

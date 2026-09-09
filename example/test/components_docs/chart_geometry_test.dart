@@ -1,3 +1,22 @@
+/// Covers `/components/chart` — one of four routes that now render the
+/// same consolidated chart-family page
+/// (`example/lib/components_docs/chart/consolidated.dart`). See that
+/// file's doc comment, and `example/test/docs/docs_install_test.dart`'s
+/// "several registry names may legitimately share one documentation page"
+/// test, for why four routes converging on one body is deliberate rather
+/// than a drift to catch.
+///
+/// What this test dropped from the pre-consolidation `chart_test.dart`,
+/// and why: the per-export API assertion used to loop over every name in
+/// `chartDoc.exports` (thirteen, including `ChartScope`, `ChartMotion`,
+/// `ChartText` — internals a consumer never constructs directly) and
+/// require each to appear as a table title. The consolidated page
+/// documents the condensed surface a caller actually touches instead (see
+/// `_condensedApiNames` below); the full export list stays true as
+/// `chartDoc.exports` and stays enforced there, it just is not what this
+/// page enumerates row by row any more.
+library;
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/components_docs/chart_geometry/meta.dart';
 import 'package:example/components_docs/chart_geometry/page.dart';
@@ -40,10 +59,6 @@ Widget _harness({required Widget child, required ThemeController controller}) =>
       controller: controller,
       child: MaterialApp(
         home: Builder(
-          // The ambient ink every route inherits, as the docs shell sets it
-          // for the real app. Without it this subtree sits under WidgetsApp's
-          // red fallback style, which StyledText asserts on rather than
-          // quietly painting over.
           builder: (BuildContext context) => DefaultTextStyle(
             style: StyledText.styleOf(
               context,
@@ -56,9 +71,6 @@ Widget _harness({required Widget child, required ThemeController controller}) =>
       ),
     );
 
-/// The single `DocsDisclosure` whose title is [title], matching the kit's own
-/// convention (`DocsDisclosure.triggerKey` is one constant shared by every
-/// instance on the page).
 Finder _disclosureTrigger(String title) => find.descendant(
   of: find.byWidgetPredicate(
     (Widget widget) => widget is DocsDisclosure && widget.title == title,
@@ -66,38 +78,27 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every field `BandScale`, `PointScale`, `LinearScale` and
-/// `BarSlot` declare (`lib/src/components/ui/chart_geometry.dart`), plus
-/// every `CurveType` value — this file has no widget, so there is no
-/// constructor parameter list to assert against; these are the equivalent
-/// completeness check for a file of pure functions and value classes.
-const List<String> _fieldsAndValues = <String>[
-  'count',
-  'start',
-  'extent',
-  'reversed',
-  'bandwidth',
-  'step',
-  'domainMin',
-  'domainMax',
-  'rangeStart',
-  'rangeEnd',
-  'offset',
-  'size',
-  'linear',
-  'natural',
-  'monotone',
+/// The condensed API surface the consolidated page documents — the types a
+/// consumer actually touches building or theming a chart, not one row per
+/// export. See `consolidated.dart`'s `_ApiReferenceContent`.
+const List<String> _condensedApiNames = <String>[
+  'ChartConfig',
+  'ChartContainer',
+  'ChartTooltipContent',
+  'ChartLegendContent',
+  'CartesianChart',
+  'ChartSeriesSpec',
+  'Axes & Grid',
+  'PieChart',
+  'RadarChart',
+  'RadialBarChart',
+  'chartNumber',
 ];
 
 const List<String> _sectionTitles = <String>[
   'Preview',
   'Installation',
   'Usage',
-  'Ticks & scales',
-  'Band & point',
-  'Bar layout',
-  'Curves',
-  'Polar',
   'API Reference',
   'States',
   'Accessibility',
@@ -109,67 +110,81 @@ const List<String> _sectionTitles = <String>[
 ];
 
 void main() {
-  group('chart-geometry docs page', () {
-    testWidgets('renders the article and the full API table for every exported '
-        'class, function and value this page claims to document', (
-      WidgetTester tester,
-    ) async {
-      tester.view.physicalSize = const Size(1440, 4000);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
+  group('chart-geometry docs page (consolidated chart family)', () {
+    testWidgets(
+      'renders the article and the condensed API surface, with its own '
+      'install command',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
 
-      String? destination;
-      await tester.pumpWidget(
-        _harness(
-          controller: ThemeController(mode: ColorMode.dark),
-          child: ChartGeometryDocPage(
-            onNavigate: (String route) => destination = route,
+        String? destination;
+        await tester.pumpWidget(
+          _harness(
+            controller: ThemeController(mode: ColorMode.dark),
+            child: ChartGeometryDocPage(
+              onNavigate: (String route) => destination = route,
+            ),
           ),
-        ),
-      );
-      await tester.pump();
-
-      expect(
-        find.byKey(const ValueKey<String>('chart-geometry-doc-article')),
-        findsOneWidget,
-      );
-
-      final Finder apiTrigger = _disclosureTrigger('API Reference');
-      await tester.ensureVisible(apiTrigger);
-      await tester.pump();
-      await tester.tap(apiTrigger);
-      await tester.pump();
-      await tester.pump(MotionDurations.open);
-
-      // Every exported class and top-level function
-      // chart_geometry.dart's own barrel carries is named somewhere in
-      // the API Reference disclosure.
-      for (final String export in chartGeometryDoc.exports) {
-        expect(find.text(export), findsWidgets, reason: 'missing $export');
-      }
-
-      for (final String field in _fieldsAndValues) {
-        expect(
-          find.text(field),
-          findsWidgets,
-          reason: '$field is a field or enum value and must be documented',
         );
-      }
+        await tester.pump();
 
-      // Six live specimens actually paint: chartNiceTicks/LinearScale,
-      // BandScale/PointScale, barSlots/barRRect, the four curve
-      // interpolators, and the polar family, all as CustomPaint.
-      expect(find.byType(CustomPaint), findsWidgets);
+        expect(
+          find.byKey(const ValueKey<String>('chart-geometry-doc-article')),
+          findsOneWidget,
+        );
 
-      expect(chartGeometryDoc.name, 'chart_geometry');
-      expect(chartGeometryDoc.command, 'elattar add chart-geometry');
-      expect(destination, isNull);
-    });
+        final Finder apiTrigger = _disclosureTrigger('API Reference');
+        await tester.ensureVisible(apiTrigger);
+        await tester.pump();
+        await tester.tap(apiTrigger);
+        await tester.pump();
+        await tester.pump(MotionDurations.open);
+
+        for (final String name in _condensedApiNames) {
+          expect(find.text(name), findsWidgets, reason: 'missing $name');
+        }
+
+        expect(
+          find.byKey(const ValueKey<String>('chart-family-preview:area')),
+          findsOneWidget,
+        );
+
+        expect(chartGeometryDoc.name, 'chart_geometry');
+        expect(chartGeometryDoc.command, 'elattar add chart-geometry');
+        expect(destination, isNull);
+      },
+    );
+
+    testWidgets(
+      'the CLI pane on /components/chart-geometry prints this item\'s own command',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ThemeController(mode: ColorMode.dark),
+            child: const ChartGeometryDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        expect(
+          tester
+              .widget<DocsInstall>(find.byType(DocsInstall))
+              .command,
+          'elattar add chart-geometry',
+        );
+      },
+    );
 
     testWidgets('the page is declared, and every section is a kit component', (
       WidgetTester tester,
     ) async {
-      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.physicalSize = const Size(1440, 4000);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
@@ -181,18 +196,17 @@ void main() {
       );
       await tester.pump();
 
-      // Six specimen stages: Preview, Ticks & scales, Band & point, Bar
-      // layout, Curves, Polar.
-      expect(find.byType(DocsShowcase), findsNWidgets(6));
+      // One specimen stage: Preview.
+      expect(find.byType(DocsShowcase), findsNWidgets(1));
       expect(find.byType(DocsInstall), findsOneWidget);
+      // Eight collapsed sections: API Reference, States, Accessibility,
+      // Keyboard, Responsive, Dependencies, Theming, Source.
       expect(find.byType(DocsDisclosure), findsNWidgets(8));
     });
 
     test('the table of contents matches the declared sections', () {
       expect(
-        chartGeometryDocSpec.toc
-            .map((DocsTocEntry entry) => entry.title)
-            .toList(),
+        chartGeometryDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
         _sectionTitles,
       );
     });
@@ -200,7 +214,7 @@ void main() {
     testWidgets('sections render in declaration order', (
       WidgetTester tester,
     ) async {
-      tester.view.physicalSize = const Size(1440, 6000);
+      tester.view.physicalSize = const Size(1440, 4000);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
@@ -250,9 +264,9 @@ void main() {
 
     testWidgets(
       'survives a live theme flip in place, at desktop width, without '
-      'throwing',
+      'losing the preview specimen',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 4000);
+        tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
 
@@ -281,8 +295,9 @@ void main() {
 
         expect(lightTheme.background, isNot(darkTheme.background));
         expect(lightTheme.foreground, isNot(darkTheme.foreground));
+
         expect(
-          find.byKey(const ValueKey<String>('chart-geometry-doc-article')),
+          find.byKey(const ValueKey<String>('chart-family-preview:area')),
           findsOneWidget,
         );
       },

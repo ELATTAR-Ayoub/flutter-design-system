@@ -30,6 +30,7 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import 'docs/docs_section.dart';
+import 'docs/docs_theme_syntax.dart';
 import 'nav.dart';
 import 'shell.dart';
 
@@ -947,11 +948,18 @@ class _ChipFrame extends CustomPainter {
 /// `<pre>` neither wraps nor reflows: it keeps the line breaks it was authored
 /// with and hands anything too wide for the column to `overflow-x-auto`.
 class CodeBlock extends StatefulWidget {
-  const CodeBlock(this.code, {super.key});
+  const CodeBlock(this.code, {super.key, this.language = 'dart'});
 
   /// The sample, exactly as authored: newlines included, blank lines
   /// included, and never re-broken to fit.
   final String code;
+
+  /// A language [tokeniseThemedCode] recognises. `dart` (the default) and
+  /// `bash`/`sh`/`shell` are highlighted, through this system's own
+  /// semantic palette rather than a fixed syntax theme — matching the fill
+  /// note above, the block still has to answer to light *and* dark. Any
+  /// other language renders intact but uncoloured rather than failing.
+  final String language;
 
   @override
   State<CodeBlock> createState() => _DsCodeBlockState();
@@ -976,6 +984,29 @@ class _DsCodeBlockState extends State<CodeBlock> {
       TextStyles.code,
       color: theme.mutedForeground,
     ).copyWith(height: TextStyles.body.step.ratio);
+
+    // Highlighted through the same theme-adaptive scanner
+    // `DocsSelectableCodeBlock` (`docs/docs_code.dart`) uses — see
+    // `docs_theme_syntax.dart` — rather than a second, private copy.
+    final List<List<CodeToken>> tokenisedLines = tokeniseThemedCode(
+      widget.code,
+      widget.language,
+      theme,
+    );
+    final List<InlineSpan> spans = <InlineSpan>[];
+    for (int i = 0; i < tokenisedLines.length; i++) {
+      if (i > 0) spans.add(const TextSpan(text: '\n'));
+      for (final CodeToken token in tokenisedLines[i]) {
+        spans.add(
+          TextSpan(text: token.text, style: style.copyWith(color: token.color)),
+        );
+      }
+    }
+    final Widget code = Text.rich(
+      TextSpan(children: spans),
+      style: style,
+      softWrap: false,
+    );
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -1006,8 +1037,9 @@ class _DsCodeBlockState extends State<CodeBlock> {
                 style: style,
                 // `softWrap: false` in a horizontally unbounded port is
                 // `white-space: pre`: the sample is laid out at its own
-                // width and the port scrolls to reach the rest of it.
-                child: Text(widget.code, style: style, softWrap: false),
+                // width and the port scrolls to reach the rest of it —
+                // already true of `code` above.
+                child: code,
               ),
             ),
           ),

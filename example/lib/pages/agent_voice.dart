@@ -20,7 +20,7 @@
 ///  1. **`MicControl` renders as a single 34 × 34 button, never a pair.** The
 ///     component's whole doc-comment is about *"one pill, always"* with a
 ///     chevron half beside the mic, and `hasMenu` gates that half on
-///     `devices.length > 1 || canPickVoice || canToggleSpeech`. `VoiceDemo`
+///     `devices.length > 1 || canPickVoice || canToggleSpeech`. `_VoiceDemo`
 ///     passes no voices, no speech toggle and no device list, so the branch is
 ///     dead on this page: measured 34 × 34, 1px border, a 32px button, 1px
 ///     border: with one child. A pair would have been 59 wide.

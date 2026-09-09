@@ -146,13 +146,36 @@ void main() {
         );
       }
 
+      // The four chart engine pages deliberately left the rail — the Charts
+      // family now shows a single `/charts` landing entry instead of its
+      // four component routes (see `docs_sidebar_test.dart` and
+      // `site_routes_test.dart`, updated the same way). Pinned by route
+      // string, looked up by name via `componentDoc`, so a fifth entry
+      // silently dropped from the rail would still fail this loop.
+      final Set<String> chartRoutes = <String>{
+        for (final String name in <String>[
+          'chart',
+          'chart_cartesian',
+          'chart_geometry',
+          'chart_polar',
+        ])
+          componentDoc(name).route,
+      };
       for (final ComponentDocEntry entry in componentDocs) {
+        if (chartRoutes.contains(entry.route)) {
+          continue;
+        }
         expect(
           find.byKey(ValueKey<String>('docs-sidebar:${entry.route}')),
           findsOneWidget,
           reason: '${entry.route} missing from the component sidebar group',
         );
       }
+      // The replacement is verified positively, not just excused above.
+      expect(
+        find.byKey(const ValueKey<String>('docs-sidebar:/charts')),
+        findsOneWidget,
+      );
 
       final Finder active = find.byKey(
         const ValueKey<String>('docs-sidebar:/components/button'),

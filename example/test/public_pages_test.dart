@@ -203,6 +203,18 @@ void main() {
       expect(find.text(family.label), findsWidgets, reason: family.label);
     }
     expect(find.text('Button'), findsWidgets);
+    // The Charts rail group collapsed to one entry (`/charts`), but this
+    // index reads `componentDocsIn` directly, with no `showInRail` filter —
+    // see `ComponentDocFamily.charts` in `components_docs/catalog.dart`. All
+    // four `chart*` reference pages must still be listed here.
+    for (final String title in <String>[
+      'Chart',
+      'Chart Cartesian',
+      'Chart Geometry',
+      'Chart Polar',
+    ]) {
+      expect(find.text(title), findsWidgets, reason: title);
+    }
     // Reshaped to match https://ui.shadcn.com/docs/components: a dense list
     // of plain-name links, not a card with a description and a command
     // caption. `elattar add button` is no longer printed on this page (it

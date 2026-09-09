@@ -464,7 +464,7 @@ class _ComponentSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const Panel(label: 'Usage', child: CodeBlock(_usage)),
+          const Panel(label: 'Usage', child: CodeBlock(_usage, language: 'dart')),
           SizedBox(height: space(4)),
           Meta(
             items: <MetaItem>[

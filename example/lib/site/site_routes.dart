@@ -39,7 +39,7 @@ class SiteRoute {
   final List<String> keywords;
 
   /// Whether the documentation shell's "Sections" rail
-  /// (`docs/docs_layout.dart`'s `_defaultSidebarGroups`) lists this
+  /// (`docs/docs_layout.dart`'s `defaultSidebarGroups`) lists this
   /// destination. Defaults to `true`; only [docsRoute] sets it to `false`, so
   /// `/docs` stays a resolvable route, including for quick search, without
   /// also appearing as a sidebar entry above the six sub-pages it groups.
@@ -76,6 +76,8 @@ class SearchRoute {
 const String homeRoute = '/';
 const String docsRoute = '/docs';
 const String componentsRoute = '/components';
+const String chartsRoute = '/charts';
+const String agentRoute = '/agent';
 const String skillsRoute = '/skills';
 
 /// Public website destinations, in header/navigation order.
@@ -86,7 +88,7 @@ const String skillsRoute = '/skills';
 /// [docsChangelogRoute]. They reach
 /// both the header/footer navigation (`site_navigation.dart`'s
 /// `primarySiteNavigation`) and the documentation shell's "Sections" rail
-/// (`docs/docs_layout.dart`'s `_defaultSidebarGroups`, which reads this list
+/// (`docs/docs_layout.dart`'s `defaultSidebarGroups`, which reads this list
 /// directly and is not modified here). Their position below is deliberate:
 /// interleaved with the existing [docsRoute], [componentsRoute] and
 /// [skillsRoute] entries so that, read in order and skipping [docsRoute]
@@ -131,6 +133,36 @@ const List<SiteRoute> siteRoutes = <SiteRoute>[
     title: 'Components',
     description: 'Browse every component and copy it into your Flutter app.',
     keywords: <String>['widgets', 'ui', 'components', 'copy'],
+  ),
+  SiteRoute(
+    path: chartsRoute,
+    section: SiteSection.components,
+    title: 'Charts',
+    description:
+        'Every chart this system draws, as cards you can copy: area, bar, '
+        'line, pie, radar, radial and tooltips.',
+    keywords: <String>['charts', 'graph', 'plot', 'recharts', 'dashboard'],
+    // The Charts family group (`../components_docs/catalog.dart`'s
+    // `ComponentDocFamily.charts`) already lists this route as its landing
+    // entry; listing it again under "Sections" would put it in the rail
+    // twice. The same trade `docsRoute` makes below, for the same reason:
+    // still resolvable, still searchable, absent only from "Sections".
+    showInSidebar: false,
+  ),
+  SiteRoute(
+    path: agentRoute,
+    section: SiteSection.components,
+    title: 'Agent',
+    description:
+        'Every agent component this system ships, from console to voice, '
+        'grouped on the components index.',
+    keywords: <String>['agent', 'ai', 'chat', 'console', 'assistant'],
+    // Same trade as `chartsRoute` just above: the Agent family group on
+    // `/components` (`ComponentDocFamily.agent`) is already this route's
+    // landing entry, so listing it again under "Sections" would duplicate
+    // it in the rail. Still resolvable, still searchable, absent only from
+    // "Sections".
+    showInSidebar: false,
   ),
   SiteRoute(
     path: docsInstallationRoute,

@@ -84,6 +84,7 @@ import 'package:flutter/widgets.dart'
 import '../agent/mock_transport.dart';
 import '../kit.dart';
 import '../nav.dart';
+import 'console.dart' show savingAttachmentToast;
 
 /* ═══════════════════════════════════════════════════════════════════════════
    The page
@@ -968,6 +969,7 @@ class _ConsoleWithHistoryState extends State<ConsoleWithHistory> {
       models: agentModels,
       describeApproval: describeAgentApproval,
       height: ConsoleWithHistory.height,
+      onDownload: savingAttachmentToast,
       headerSlot: ListenableBuilder(
         listenable: _switch,
         builder: (BuildContext context, Widget? _) => ChatHistory(

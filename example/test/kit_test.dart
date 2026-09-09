@@ -480,4 +480,81 @@ void main() {
     expect(key.color, ThemeTokens.dark.actionText);
     expect(find.textContaining('720px', findRichText: true), findsOneWidget);
   });
+
+  group('CodeBlock', () {
+    /// True if [span]'s subtree contains a leaf [TextSpan] with exactly
+    /// [text] painted in exactly [color].
+    bool hasColoredSpan(InlineSpan span, String text, Color color) {
+      bool found = false;
+      span.visitChildren((InlineSpan child) {
+        if (child is TextSpan &&
+            child.text == text &&
+            child.style?.color == color) {
+          found = true;
+        }
+        return true;
+      });
+      return found;
+    }
+
+    Iterable<Text> richTexts(WidgetTester tester) => tester
+        .widgetList<Text>(find.byType(Text))
+        .where((Text t) => t.textSpan != null);
+
+    testWidgets('highlights Dart by default, through this system\'s own '
+        'semantic palette', (WidgetTester tester) async {
+      await tester.pumpWidget(_harness(const CodeBlock('final int a = 1;')));
+      await tester.pump();
+
+      final bool hasKeyword = richTexts(
+        tester,
+      ).any((Text t) => hasColoredSpan(t.textSpan!, 'final', Palette.action));
+
+      expect(
+        hasKeyword,
+        isTrue,
+        reason:
+            'a Dart keyword must be coloured Palette.action — this is the '
+            'assertion that would have caught the block rendering a bare, '
+            'untokenised Text',
+      );
+    });
+
+    testWidgets('honours a non-Dart language', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _harness(
+          const CodeBlock('elattar init --foundation source', language: 'bash'),
+        ),
+      );
+      await tester.pump();
+
+      final bool hasCommandKeyword = richTexts(
+        tester,
+      ).any((Text t) => hasColoredSpan(t.textSpan!, 'elattar', Palette.action));
+      final bool hasFlag = richTexts(tester).any(
+        (Text t) =>
+            hasColoredSpan(t.textSpan!, '--foundation', Palette.value),
+      );
+
+      expect(hasCommandKeyword, isTrue);
+      expect(hasFlag, isTrue);
+    });
+
+    testWidgets(
+      'an unrecognised language renders the code intact rather than '
+      'throwing',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _harness(const CodeBlock('not a real language', language: 'cobol')),
+        );
+        await tester.pump();
+
+        expect(tester.takeException(), isNull);
+        expect(
+          find.textContaining('not a real language', findRichText: true),
+          findsOneWidget,
+        );
+      },
+    );
+  });
 }

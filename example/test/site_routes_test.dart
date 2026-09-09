@@ -13,6 +13,14 @@ void main() {
         docsRoute,
         docsIntroductionRoute,
         componentsRoute,
+        // `/charts` sits right after `/components`: it is the Charts family's
+        // landing page, `showInSidebar: false` (see the entry's own comment),
+        // so it does not join the "Sections" reading order tested below.
+        chartsRoute,
+        // `/agent` sits right after `/charts` for the same reason: it is the
+        // Agent family's landing shortcut into `/components`,
+        // `showInSidebar: false`, and does not join "Sections" either.
+        agentRoute,
         docsInstallationRoute,
         docsThemingRoute,
         docsCliRoute,
@@ -26,6 +34,8 @@ void main() {
         'Documentation',
         'Introduction',
         'Components',
+        'Charts',
+        'Agent',
         'Installation',
         'Theming',
         'CLI',
@@ -127,6 +137,10 @@ void main() {
     test('lookup is exact and unknown paths return null', () {
       expect(siteRouteFor('/docs')?.section, SiteSection.docs);
       expect(siteRouteFor('/docs')?.showInSidebar, isFalse);
+      expect(siteRouteFor(chartsRoute)?.section, SiteSection.components);
+      expect(siteRouteFor(chartsRoute)?.showInSidebar, isFalse);
+      expect(siteRouteFor(agentRoute)?.section, SiteSection.components);
+      expect(siteRouteFor(agentRoute)?.showInSidebar, isFalse);
       expect(siteRouteFor(docsIntroductionRoute)?.section, SiteSection.docs);
       expect(siteRouteFor(docsInstallationRoute)?.section, SiteSection.docs);
       expect(siteRouteFor(docsThemingRoute)?.section, SiteSection.docs);
