@@ -353,15 +353,11 @@ class AgentStatusText extends StatelessWidget {
   static const Duration period = MotionDurations.shimmerText;
 
   /// `background-size: 220% 100%`.
-  static const double tileFactor = 2.2; // allow-hardcoded: background-size
+  static const double tileFactor = 2.2;
 
   /// The gradient's three stops: `--muted-foreground 30%, --agent 50%,
   /// --muted-foreground 70%`.
-  static const List<double> stops = <double>[
-    0.30, // allow-hardcoded: anim-shimmer-text gradient stop
-    0.50, // allow-hardcoded: anim-shimmer-text gradient stop
-    0.70, // allow-hardcoded: anim-shimmer-text gradient stop
-  ];
+  static const List<double> stops = <double>[0.30, 0.50, 0.70];
 
   final Widget child;
 

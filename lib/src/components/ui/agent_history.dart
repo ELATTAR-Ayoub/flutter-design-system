@@ -144,12 +144,12 @@ class RowMotion extends StatefulWidget {
   final bool leaving;
 
   /// `translateX(-10px)` — `pulls-row-in`'s only travel.
-  // allow-hardcoded: a keyframe offset from globals.css L3079, not a spacing
-  // token — `--spacing * 2.5` would be a coincidence, not a derivation.
+  //
+  // A keyframe offset from globals.css L3079, not a spacing token —
+  // `--spacing * 2.5` would be a coincidence, not a derivation.
   static const double enterShift = -10;
 
   /// `translateX(-24px)` at the 45% stop of `pulls-row-out`.
-  // allow-hardcoded: globals.css L3088, same reason as [enterShift].
   static const double exitShift = -24;
 
   /// The keyframe stop where `pulls-row-out` hands over from the slide to the
@@ -307,12 +307,12 @@ class BlurSwitch extends StatefulWidget {
   final Widget child;
 
   /// `blur(6px)` — where `pulls-blur-out` ends.
-  // allow-hardcoded: a keyframe filter radius from globals.css L3357; the
-  // `--blur-*` scale does not carry it.
+  //
+  // A keyframe filter radius from globals.css L3357; the `--blur-*` scale
+  // does not carry it.
   static const double outRadius = 6;
 
   /// `blur(8px)` — where `pulls-blur-in` starts.
-  // allow-hardcoded: globals.css L3360, same reason as [outRadius].
   static const double inRadius = 8;
 
   @override

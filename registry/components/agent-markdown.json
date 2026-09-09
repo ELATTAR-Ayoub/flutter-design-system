@@ -10,6 +10,11 @@
       "source": "lib/src/components/ui/agent_markdown.dart",
       "target": "@ui/agent_markdown.dart",
       "sha256": "e2a141d9c1e91a3167eaf3cb6e3906b83ba37ff9d5d6dd67db2d47db937accdb"
+    },
+    {
+      "source": "lib/src/components/ui/agent_markdown_prism_theme.dart",
+      "target": "@ui/agent_markdown_prism_theme.dart",
+      "sha256": "c44bbceb6d27b26be539ea49fbfc35d01a01a3a17a226c7f5fc2fa29ed8fde43"
     }
   ],
   "registryDependencies": [

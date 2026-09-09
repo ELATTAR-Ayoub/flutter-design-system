@@ -88,6 +88,23 @@ Color _hex(int argb) => Color(argb);
 /// the absence of a colour, not a colour choice.
 const Color transparent = Color(0x00000000);
 
+/// Pure white at full alpha — `oklch(1 0 0)`.
+///
+/// Not a palette choice: it is the resolution `oklch(from currentColor
+/// max(.8, calc(l + .4)) c h / …)` reaches whenever the source colour is
+/// already near-white, which clamps `l` to its ceiling of 1. Named here so a
+/// call site that measures that resolution reads a token, not a hex.
+const Color white = Color(0xFFFFFFFF);
+
+/// Opaque black at full alpha — the `#000` stop CSS `mask-image` gradients
+/// use for "fully visible."
+///
+/// A mask stencil, not a colour choice: a `ShaderMask` with
+/// `BlendMode.dstIn` reads only the alpha channel of these stops, so the hue
+/// is inert and only the alpha (`0xFF` here, `0x00` on [transparent]) does
+/// anything.
+const Color opaqueBlack = Color(0xFF000000);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // OKLab / OKLCH
 // ─────────────────────────────────────────────────────────────────────────────

@@ -54,7 +54,6 @@ final Map<TextStyle, double> _engineLineCache = <TextStyle, double>{};
 double engineLineHeight(TextStyle style) {
   return _engineLineCache.putIfAbsent(style, () {
     final TextPainter painter = TextPainter(
-      // allow-hardcoded: a probe glyph, not copy.
       text: TextSpan(text: 'x', style: style),
       textDirection: TextDirection.ltr,
     )..layout();
@@ -73,7 +72,6 @@ final Map<TextStyle, double> _contentAreaCache = <TextStyle, double>{};
 double contentAreaHeight(TextStyle style) {
   return _contentAreaCache.putIfAbsent(style, () {
     final TextPainter painter = TextPainter(
-      // allow-hardcoded: a probe glyph, not copy.
       text: TextSpan(text: 'x', style: style),
       textDirection: TextDirection.ltr,
     )..layout();

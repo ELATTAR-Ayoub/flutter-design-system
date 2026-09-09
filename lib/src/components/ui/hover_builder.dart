@@ -26,7 +26,6 @@ import 'package:flutter/widgets.dart'
         Table,
         TableColumnWidth;
 
-import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
@@ -171,8 +170,7 @@ class _LiftCardState extends State<InteractiveCard>
     if (t <= 0) return const <BoxShadow>[];
     if (t >= 1) return lifted;
     final List<BoxShadow> none = <BoxShadow>[
-      for (int i = 0; i < lifted.length; i++)
-        const BoxShadow(color: transparent), // allow-hardcoded: CSS `none`
+      for (int i = 0; i < lifted.length; i++) Shadows.invisible,
     ];
     return BoxShadow.lerpList(none, lifted, t)!;
   }

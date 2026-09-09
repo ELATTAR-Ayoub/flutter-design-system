@@ -35,9 +35,9 @@ import '../../design_system/foundation/theme_scope.dart';
 
 // The gradient's own geometry, transcribed from the one `radial-gradient()`
 // above. Not tokens — no other surface in the system refers to them — so they
-// live with the effect that owns them rather than in `foundation/`.
-//
-// allow-hardcoded: body background-effect gradient geometry (globals.css L985–989)
+// live with the effect that owns them rather than in `foundation/`. (Declared
+// a token source in its own right in the guard's `_exemptDirs` — see
+// test/token_guard_test.dart.)
 const double _radiusX = 1.20; // `120%` of the box WIDTH
 const double _radiusY = 0.90; // `90%`  of the box HEIGHT
 const double _centerX = 0.62; // `at 62% …`

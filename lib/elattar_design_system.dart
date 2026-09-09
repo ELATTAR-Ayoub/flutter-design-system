@@ -34,6 +34,7 @@ export './src/components/ui/agent_face.dart';
 export './src/components/ui/agent_history.dart';
 export './src/components/ui/agent_launcher.dart';
 export './src/components/ui/agent_markdown.dart';
+export './src/components/ui/agent_markdown_prism_theme.dart';
 export './src/components/ui/agent_slash_palette.dart';
 export './src/components/ui/agent_transcript.dart';
 export './src/components/ui/alert.dart';

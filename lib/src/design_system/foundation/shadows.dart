@@ -143,6 +143,15 @@ class Shadows {
   /// of special-casing null.
   static const ShadowStyle none = ShadowStyle(<ShadowLayer>[]);
 
+  /// A single [BoxShadow] with zero geometry and [transparent] ink — the
+  /// `BoxShadow` equivalent of [none].
+  ///
+  /// `box-shadow: none` interpolates as a fully transparent shadow of zero
+  /// size, not as the *absence* of a shadow — so a lerp target that should
+  /// fade a shadow in from nothing needs this, not an empty list: lerping
+  /// from `[]` snaps to full ink at zero blur instead of fading in.
+  static const BoxShadow invisible = BoxShadow(color: transparent);
+
   /// Elevation for large overlay panels such as sheets and menus.
   static const ShadowStyle overlay = ShadowStyle(<ShadowLayer>[
     ShadowLayer(0, 10, 15, -3, _overlayShadowInk),

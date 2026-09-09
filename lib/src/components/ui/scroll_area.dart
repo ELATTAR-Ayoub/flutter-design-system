@@ -99,8 +99,6 @@ const double _railPadding = BorderWidths.hairline;
 
 /// Radix's own floor on the thumb, in pixels — not a token, and not stated
 /// anywhere in the reference's source.
-// allow-hardcoded: a third-party library's constant, with no token to read it
-// from.
 const double _minThumbLength = 18;
 
 /// The key on [_Rail]'s [ExcludeSemantics] wrap — public so a test can find

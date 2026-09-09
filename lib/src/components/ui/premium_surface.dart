@@ -120,9 +120,8 @@ final Color _white = hslColor(0, 0, 100);
 // Angles, sizes and stop positions belonging to this one effect. No other
 // surface in the system refers to them, so they live with the effect that owns
 // them rather than in `foundation/` — the same call `background_effect.dart` makes for
-// the body glow.
-//
-// allow-hardcoded: premium-surface gradient geometry (globals.css L1964–2030)
+// the body glow. (Declared a token source in its own right in the guard's
+// `_exemptDirs` — see test/token_guard_test.dart.)
 
 /// `background-image: linear-gradient(176deg, …)` — the metal ramp
 /// (L1964–1973).
@@ -309,10 +308,8 @@ class PremiumSurface extends StatefulWidget {
   /// (`(box − image) × percentage`, see [_imageRect]) a rising percentage walks
   /// them left.
   @visibleForTesting
-  // allow-hardcoded: value-foil-drift keyframes (globals.css L1915–1928)
   static const List<double> driftFrom = <double>[0, -0.60, 0.50];
   @visibleForTesting
-  // allow-hardcoded: value-foil-drift keyframes (globals.css L1915–1928)
   static const List<double> driftTo = <double>[1.40, 1.60, 0.50];
 
   /// Where background layer [layer] sits at drift progress [t].
@@ -349,9 +346,7 @@ class PremiumSurface extends StatefulWidget {
   @visibleForTesting
   static final Animatable<double> glintPosition = TweenSequence<double>(
     <TweenSequenceItem<double>>[
-      // allow-hardcoded: value-glint keyframes (globals.css L1930–1946)
       TweenSequenceItem<double>(tween: ConstantTween<double>(1.35), weight: 54),
-      // allow-hardcoded: value-glint keyframes
       _glintStep(1.35, -0.55, 46),
     ],
   );
@@ -364,18 +359,13 @@ class PremiumSurface extends StatefulWidget {
   /// `animation-timing-function` does — it eases *between* keyframes, not
   /// across the run.
   @visibleForTesting
-  static final Animatable<double> glintOpacity = TweenSequence<double>(
-    <TweenSequenceItem<double>>[
-      // allow-hardcoded: value-glint keyframes (globals.css L1930–1946)
-      TweenSequenceItem<double>(tween: ConstantTween<double>(0), weight: 54),
-      // allow-hardcoded: value-glint keyframes
-      _glintStep(0, 1, 6),
-      // allow-hardcoded: value-glint keyframes
-      TweenSequenceItem<double>(tween: ConstantTween<double>(1), weight: 34),
-      // allow-hardcoded: value-glint keyframes
-      _glintStep(1, 0, 6),
-    ],
-  );
+  static final Animatable<double> glintOpacity =
+      TweenSequence<double>(<TweenSequenceItem<double>>[
+        TweenSequenceItem<double>(tween: ConstantTween<double>(0), weight: 54),
+        _glintStep(0, 1, 6),
+        TweenSequenceItem<double>(tween: ConstantTween<double>(1), weight: 34),
+        _glintStep(1, 0, 6),
+      ]);
 
   /// Where an `infinite` animation stands after [elapsed], at the duration it
   /// is *currently* declared at — the B10b ruling, as arithmetic.
