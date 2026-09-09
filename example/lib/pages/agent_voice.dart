@@ -20,7 +20,7 @@
 ///  1. **`MicControl` renders as a single 34 × 34 button, never a pair.** The
 ///     component's whole doc-comment is about *"one pill, always"* with a
 ///     chevron half beside the mic, and `hasMenu` gates that half on
-///     `devices.length > 1 || canPickVoice || canToggleSpeech`. `VoiceDemo`
+///     `devices.length > 1 || canPickVoice || canToggleSpeech`. `_VoiceDemo`
 ///     passes no voices, no speech toggle and no device list, so the branch is
 ///     dead on this page: measured 34 × 34, 1px border, a 32px button, 1px
 ///     border: with one child. A pair would have been 59 wide.
@@ -210,7 +210,7 @@ class _LiveSection extends StatelessWidget {
         'as a single object; the fill is what changes when it goes live.',
     child: Panel(
       label: 'MicControl · LiveWaveform · BarVisualizer',
-      child: VoiceDemo(),
+      child: _VoiceDemo(),
     ),
   );
 }
@@ -221,14 +221,14 @@ class _LiveSection extends StatelessWidget {
 /// (`useDictation`). Here the hook is the seam that does not cross, so the
 /// state is the arm switch alone: see the divergence note in the library
 /// comment. Every visual state the demo has is still reachable: press the mic.
-class VoiceDemo extends StatefulWidget {
-  const VoiceDemo({super.key});
+class _VoiceDemo extends StatefulWidget {
+  const _VoiceDemo();
 
   @override
-  State<VoiceDemo> createState() => _VoiceDemoState();
+  State<_VoiceDemo> createState() => _VoiceDemoState();
 }
 
-class _VoiceDemoState extends State<VoiceDemo> {
+class _VoiceDemoState extends State<_VoiceDemo> {
   bool _listening = false;
 
   @override

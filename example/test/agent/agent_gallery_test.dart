@@ -41,17 +41,16 @@ Future<void> _pump(
       controller: ThemeController(mode: ColorMode.light),
       child: WidgetsApp(
         color: const Color(0xFFFFFFFF),
-        pageRouteBuilder:
-            <T>(RouteSettings settings, WidgetBuilder builder) =>
-                PageRouteBuilder<T>(
-                  settings: settings,
-                  pageBuilder:
-                      (
-                        BuildContext context,
-                        Animation<double> animation,
-                        Animation<double> secondaryAnimation,
-                      ) => builder(context),
-                ),
+        pageRouteBuilder: <T>(RouteSettings settings, WidgetBuilder builder) =>
+            PageRouteBuilder<T>(
+              settings: settings,
+              pageBuilder:
+                  (
+                    BuildContext context,
+                    Animation<double> animation,
+                    Animation<double> secondaryAnimation,
+                  ) => builder(context),
+            ),
         home: AgentGalleryPage(onNavigate: onNavigate),
       ),
     ),
@@ -74,6 +73,118 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('the console is configured with every feature on, including the '
+      'microphone', (WidgetTester tester) async {
+    await _pump(tester);
+
+    final Finder liveConsole = find.byType(AgentConsole).first;
+    final AgentConsole console = tester.widget<AgentConsole>(liveConsole);
+    expect(console.features, AgentFeatures.all);
+    expect(console.features.microphone, isTrue);
+
+    // KNOWN GAP, not introduced by this page: `agent_console.dart`'s own
+    // library note ("Divergences, by construction" — no speech, no
+    // dictation) documents `AgentFeatures.microphone` as honoured only as
+    // a flag — the console never passes a `micControl` to `AgentComposer`
+    // (confirmed: `micControl:` is not passed anywhere under `lib/`), so
+    // no mic renders next to send regardless of this flag. Fixing that is
+    // a `lib/src/blocks/agent_console/agent_console.dart` change, out of
+    // scope for this example-only page (see the task's own "never edit
+    // lib/src" constraint) — flagged separately for a dedicated fix. This
+    // assertion pins today's real, honest state: absent, and turned on
+    // here so the mic appears the moment that gap closes, with no page
+    // change required.
+    final Finder composer = find.descendant(
+      of: liveConsole,
+      matching: find.byType(AgentComposer),
+    );
+    expect(composer, findsOneWidget);
+    expect(
+      find.descendant(of: composer, matching: find.byType(MicControl)),
+      findsNothing,
+      reason:
+          'no MicControl renders yet — agent_console.dart does not wire '
+          'AgentFeatures.microphone to AgentComposer.micControl. Update '
+          'this expectation to findsOneWidget once that lib/src gap is '
+          'closed.',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'a history sidebar is folded into the console surface, and selecting '
+    'a conversation closes the drawer and blurs the transcript',
+    (WidgetTester tester) async {
+      await _pump(tester);
+
+      final Finder liveConsole = find.byType(AgentConsole).first;
+      final Finder sidebarToggle = find.descendant(
+        of: liveConsole,
+        matching: find.byWidgetPredicate(
+          (Widget w) => w is Button && w.label == 'Open sidebar',
+        ),
+      );
+      expect(
+        sidebarToggle,
+        findsOneWidget,
+        reason: 'AgentHistory should be reachable from the console itself',
+      );
+
+      await tester.tap(sidebarToggle);
+      await tester.pump();
+
+      // "Sealed inventory check" is the seeded store's active conversation;
+      // "Thirty-day activity export" is a different, pinned one.
+      expect(find.text('Sealed inventory check'), findsOneWidget);
+      final Finder nextConversation = find.text('Thirty-day activity export');
+      expect(nextConversation, findsOneWidget);
+
+      // `ChatHistory`'s drawer paints through an `OverlayPortal` positioned
+      // from a `surfaceKey` rect (`agent_history.dart`'s `_surfaceRect`); at
+      // this page's position in the scroll view that rect resolves off the
+      // visible viewport, so a simulated pointer tap on the row's own screen
+      // position cannot reliably hit it (reproduced identically with the
+      // untouched `ConsoleWithHistory` demo in `pages/history.dart`, so this
+      // is a pre-existing library defect, not something this page
+      // introduced — out of scope here since it lives under `lib/src/`).
+      // The row's own `onOpen` callback is invoked directly instead: the
+      // exact call a working tap would make, exercising every step after
+      // the pointer event for real.
+      final HistoryCard card = tester.widget<HistoryCard>(
+        find.ancestor(of: nextConversation, matching: find.byType(HistoryCard)),
+      );
+      card.onOpen(card.conversation.id);
+      await tester.pump();
+
+      // Selecting closes the drawer: the sidebar's own conversation list is
+      // no longer in the tree.
+      expect(find.text('Sealed inventory check'), findsNothing);
+
+      // Selecting also drives `BlurSwitchController.switchTo`, which the
+      // console wears on its transcript as `switchPhase`: the transcript's
+      // `BlurSwitch` leaves `SwitchPhase.idle` for the transition, which is
+      // the visible, on-console change a selection makes.
+      final BlurSwitch transcriptBlur = tester.widget<BlurSwitch>(
+        find.descendant(of: liveConsole, matching: find.byType(BlurSwitch)),
+      );
+      expect(transcriptBlur.phase, isNot(SwitchPhase.idle));
+
+      // Let the switch's own out/blur-in timers finish inside this test's
+      // zone so no timer is left pending at teardown.
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('does not render the removed "Try the surfaces around it" '
+      'section', (WidgetTester tester) async {
+    await _pump(tester);
+
+    expect(find.text('Try the surfaces around it'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('the Documentation button navigates to /components/agent_core', (
     WidgetTester tester,
   ) async {
@@ -86,34 +197,31 @@ void main() {
     expect(routes, <String>[componentDoc('agent-core').route]);
   });
 
-  testWidgets(
-    'the component reference lists every agent-family entry from the '
-    'catalog, alphabetically',
-    (WidgetTester tester) async {
-      await _pump(tester);
+  testWidgets('the component reference lists every agent-family entry from the '
+      'catalog, alphabetically', (WidgetTester tester) async {
+    await _pump(tester);
 
-      final List<ComponentDocEntry> entries = componentDocsIn(
-        ComponentDocFamily.agent,
+    final List<ComponentDocEntry> entries = componentDocsIn(
+      ComponentDocFamily.agent,
+    );
+    // Not hardcoded: whatever `componentDocsIn` returns today is what the
+    // foot reference must show, so a thirteenth agent component (or a
+    // twelfth, or a change to which two voice surfaces the family
+    // includes) is picked up here without touching this test.
+    expect(entries, isNotEmpty);
+    final Finder reference = find.byKey(
+      const ValueKey<String>('agent-gallery-component-reference'),
+    );
+    expect(reference, findsOneWidget);
+    for (final ComponentDocEntry entry in entries) {
+      expect(
+        find.descendant(of: reference, matching: find.text(entry.title)),
+        findsOneWidget,
+        reason: 'missing component-reference row for ${entry.title}',
       );
-      // Not hardcoded: whatever `componentDocsIn` returns today is what the
-      // foot reference must show, so a thirteenth agent component (or a
-      // twelfth, or a change to which two voice surfaces the family
-      // includes) is picked up here without touching this test.
-      expect(entries, isNotEmpty);
-      final Finder reference = find.byKey(
-        const ValueKey<String>('agent-gallery-component-reference'),
-      );
-      expect(reference, findsOneWidget);
-      for (final ComponentDocEntry entry in entries) {
-        expect(
-          find.descendant(of: reference, matching: find.text(entry.title)),
-          findsOneWidget,
-          reason: 'missing component-reference row for ${entry.title}',
-        );
-      }
-      expect(tester.takeException(), isNull);
-    },
-  );
+    }
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'typing into the live console and submitting produces a visible turn '

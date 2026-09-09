@@ -3,13 +3,22 @@
 ///
 /// Mirrors `/charts`'s shape — a hero with two buttons, a component-reference
 /// block at the foot read from `componentDocs` — but the body is not a
-/// gallery of copyable cards. It is a working [AgentConsole] a visitor can
-/// type into and watch answer, plus the surfaces around it (history, voice,
-/// the launcher, a structured transcript turn) each as something the visitor
-/// operates rather than a screenshot of it.
+/// gallery of copyable cards. It is one working [AgentConsole], configured
+/// with [AgentFeatures.all], with a conversation history rail folded into the
+/// same surface rather than shown as a separate demo beside it.
+///
+/// **The microphone is turned on, not yet rendered.** `AgentFeatures.microphone`
+/// is set — `agent_console.dart`'s own library note ("Divergences, by
+/// construction") calls this port's speech and dictation flags "honoured as
+/// flags" only, since Flutter has no Web Speech API equivalent: no
+/// `micControl` reaches [AgentComposer] from [AgentConsole] today regardless
+/// of the flag, and that wiring lives under `lib/src/`, out of reach from
+/// this example-only page. The flag is on here so the control appears the
+/// moment that gap closes, with no change to this page.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:example/agent/mock_transport.dart';
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
@@ -26,10 +35,14 @@ import 'package:flutter/widgets.dart'
 
 import '../../components_docs/catalog.dart';
 import '../../kit.dart';
-import '../../pages/agent_voice.dart' show VoiceDemo;
-import '../../pages/console.dart' show LauncherDemo, LiveConsole;
-import '../../pages/history.dart' show HistoryListDemo;
-import '../../pages/transcript.dart' show QuestionnaireDemo;
+import '../../pages/console.dart'
+    show
+        describeVaultApproval,
+        kVaultCommands,
+        kVaultModels,
+        kVaultPersona,
+        kVaultToolStates;
+import '../../pages/history.dart' show MockConversationStore;
 
 class AgentGalleryPage extends StatefulWidget {
   const AgentGalleryPage({super.key, this.onNavigate});
@@ -69,8 +82,6 @@ class _AgentGalleryPageState extends State<AgentGalleryPage> {
             _Hero(onTry: _browse, onNavigate: widget.onNavigate),
             SizedBox(height: space(10)),
             _LiveSection(consoleKey: _consoleKey),
-            SizedBox(height: space(12)),
-            const _SupportingSurfaces(),
             SizedBox(height: space(14)),
             _ComponentReference(onNavigate: widget.onNavigate),
           ],
@@ -100,9 +111,9 @@ class _Hero extends StatelessWidget {
         ConstrainedBox(
           constraints: BoxConstraints(maxWidth: Containers.xl2),
           child: StyledText(
-            'One console, on a scripted transport, with the same history, '
-            'voice and launcher surfaces a real deployment carries — type '
-            'into it below, no reading required first.',
+            'One console, on a scripted transport, every feature switched '
+            'on — history folded into the same surface — type into it '
+            'below, no reading required first.',
             TextStyles.body,
             color: theme.mutedForeground,
           ),
@@ -144,107 +155,107 @@ class _LiveSection extends StatelessWidget {
         CapsLabel('Live agent', color: theme.mutedForeground),
         SizedBox(height: space(2)),
         StyledText(
-          'Vault, on a mock transport — ask what is in stock, ask it to '
-          'export your activity, ask it to buy a pack. Every answer, tool '
-          'call and approval gate is the real component.',
+          'Vault, on a mock transport, every feature switched on — ask '
+          'what is in stock, ask it to export your activity, ask it to buy '
+          'a pack, open the sidebar and switch conversations. Every '
+          'answer, tool call and approval gate is the real component.',
           TextStyles.small,
           color: theme.mutedForeground,
         ),
         SizedBox(height: space(4)),
         KeyedSubtree(
           key: consoleKey,
-          child: const Panel(label: 'AgentConsole', child: LiveConsole()),
+          child: const Panel(
+            label: 'AgentConsole',
+            flush: true,
+            child: _IntegratedAgentSurface(),
+          ),
         ),
       ],
     );
   }
 }
 
-/* ── Supporting surfaces ─────────────────────────────────────────────────── */
+/// One [AgentConsole], [AgentFeatures.all] switched on, with history folded
+/// into its `headerSlot` rather than shown beside it as a separate demo.
+/// Opening the sidebar (the panel-left icon in the console's header)
+/// and choosing a conversation calls [BlurSwitchController.switchTo]: the
+/// transcript blurs out, `store.open` runs mid-blur, the console's own
+/// `switchPhase` blurs it back in, and the sidebar's own title row swaps to
+/// the chosen conversation — the same visible switch `ConsoleWithHistory`
+/// demonstrates on `/design-system/components/agent/history`, wired here
+/// with every other feature also turned on.
+class _IntegratedAgentSurface extends StatefulWidget {
+  const _IntegratedAgentSurface();
 
-class _SupportingSurfaces extends StatelessWidget {
-  const _SupportingSurfaces();
+  /// `h-152`, 608px — the same fixed height every other live console on the
+  /// site carries, so the document's height does not depend on the mock
+  /// transport's own reply length.
+  static double get height => space(152);
 
   @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        CapsLabel('Try the surfaces around it', color: theme.mutedForeground),
-        SizedBox(height: space(4)),
-        Grid(
-          base: 1,
-          lg: 2,
-          gap: space(6),
-          matchHeights: false,
-          children: <Widget>[
-            _SurfaceCard(
-              title: 'History',
-              description:
-                  'Open, rename, pin and delete conversations — the same '
-                  'list a returning visitor sees.',
-              child: SizedBox(
-                height: space(96),
-                child: SingleChildScrollView(child: HistoryListDemo()),
-              ),
-            ),
-            _SurfaceCard(
-              title: 'Voice',
-              description:
-                  'Arm the microphone; the waveform and level meter answer '
-                  'to the toggle.',
-              child: const VoiceDemo(),
-            ),
-            _SurfaceCard(
-              title: 'Launcher',
-              description:
-                  'How the agent sits on a working page: an avatar in the '
-                  'corner that opens the console in a dialog. Click it, '
-                  'bottom-right of the viewport.',
-              child: const LauncherDemo(),
-            ),
-            _SurfaceCard(
-              title: 'Transcript',
-              description:
-                  'A structured turn inside the transcript — answer with the '
-                  'mouse or press A, B or C.',
-              child: const QuestionnaireDemo(),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  State<_IntegratedAgentSurface> createState() =>
+      _IntegratedAgentSurfaceState();
 }
 
-class _SurfaceCard extends StatelessWidget {
-  const _SurfaceCard({
-    required this.title,
-    required this.description,
-    required this.child,
-  });
+class _IntegratedAgentSurfaceState extends State<_IntegratedAgentSurface> {
+  /// The console's own root — the box the history drawer lays itself over.
+  final GlobalKey _surface = GlobalKey();
+  final MockTransport _transport = MockTransport();
 
-  final String title;
-  final String description;
-  final Widget child;
+  MockConversationStore? _store;
+  late final BlurSwitchController _switch = BlurSwitchController(
+    open: (String id) => _store!.open(id),
+  );
 
   @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        StyledText(title, TextStyles.h4, color: theme.foreground),
-        SizedBox(height: space(1)),
-        StyledText(description, TextStyles.small, color: theme.mutedForeground),
-        SizedBox(height: space(3)),
-        Panel(label: title, child: child),
-      ],
-    );
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _store ??= MockConversationStore(now: Clock.nowOf(context));
   }
+
+  @override
+  void dispose() {
+    _switch.dispose();
+    _store?.dispose();
+    _transport.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    key: _surface,
+    height: _IntegratedAgentSurface.height,
+    // Listens to `_switch` itself, not just the header slot below: the
+    // console's own `switchPhase` prop has to rebuild on every phase change
+    // too, or the blur it wears on the transcript never leaves whatever
+    // phase was current the one time this widget happened to build.
+    child: ListenableBuilder(
+      listenable: _switch,
+      builder: (BuildContext context, Widget? _) => AgentConsole(
+        transport: _transport,
+        persona: kVaultPersona,
+        toolStates: kVaultToolStates,
+        commands: kVaultCommands,
+        models: kVaultModels,
+        describeApproval: describeVaultApproval,
+        features: AgentFeatures.all,
+        height: _IntegratedAgentSurface.height,
+        switchPhase: _switch.phase,
+        headerSlot: ListenableBuilder(
+          listenable: _store!,
+          builder: (BuildContext context, Widget? _) => ChatHistory(
+            store: _store!,
+            title: kVaultPersona.name,
+            surfaceKey: _surface,
+            // `{ ...store, open: switchTo }`: the drawer opens through the
+            // blur rather than through the store directly.
+            onOpenConversation: _switch.switchTo,
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 /* ── Component reference ─────────────────────────────────────────────────── */
@@ -301,7 +312,11 @@ class _ComponentReferenceRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  StyledText(entry.title, TextStyles.h4, color: theme.foreground),
+                  StyledText(
+                    entry.title,
+                    TextStyles.h4,
+                    color: theme.foreground,
+                  ),
                   SizedBox(height: space(1)),
                   StyledText(
                     entry.description,
