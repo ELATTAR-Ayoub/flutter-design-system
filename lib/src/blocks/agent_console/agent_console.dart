@@ -49,17 +49,29 @@
 ///
 /// ## Divergences, by construction
 ///
-///  1. **No speech, no dictation capture.** `useBrowserSpeech` and
-///     `useDictation` are Web Speech API hooks; Flutter ships no equivalent
-///     and this port invents none. [AgentFeatures.speech] stays a flag only —
-///     [AgentVoice] on the face is always at rest, and the built-in `voice`
-///     command, gated on `features.speech && speech.isSupported`, never
-///     appears. [AgentFeatures.microphone] now delivers a real control (see
-///     [_DictationControl]): pressing it arms and disarms [MicControl] and
-///     drives [BarVisualizer] the same way the voice components drive their
-///     own demos — there is no audio behind either signal, on this port or
-///     the browser's own build without the API, which is why this remains a
-///     *reachable* state of the reference rather than a divergence from it.
+///  1. **No speech, still.** `useBrowserSpeech` and `useDictation` are Web
+///     Speech API hooks; Flutter ships no equivalent and this port invents
+///     none. [AgentFeatures.speech] stays a flag only — [AgentVoice] on the
+///     face is always at rest, and the built-in `voice` command, gated on
+///     `features.speech && speech.isSupported`, never appears.
+///     [AgentFeatures.microphone] does now capture real audio, given a real
+///     [VoiceSource] — see [_DictationControl] and `voice_source.dart`.
+///     Pressing the mic arms [MicControl] and calls [VoiceSource.start];
+///     [BarVisualizer] draws the real `AnalyserNode` frames a capturing
+///     source produces once they start arriving, falling back to its own
+///     oscillator until they do, or if they never do. This package's own
+///     default [VoiceSource] (built lazily via `createVoiceSource()` when
+///     [AgentConsole.voiceSource] is not supplied) is an honest no-op on
+///     every platform it ships to on its own — real `getUserMedia` capture
+///     needs `dart:js_interop`, and `test/flutter_authority_test.dart` pins
+///     this package's `lib/` as free of any browser runtime seam, so that
+///     implementation cannot live here. A consuming web app supplies its own
+///     real [VoiceSource] through [AgentConsole.voiceSource] instead — this
+///     repository's own example gallery does (`example/lib/voice_source_web.dart`).
+///     Whichever source is in play: while a permission prompt is denied,
+///     dismissed, or has nothing to ask (an insecure origin, no
+///     `mediaDevices` at all), the control un-arms with an honest reason
+///     rather than staying lit with nothing behind it.
 ///  2. ~~**The model menu's rows are one line, not two.**~~ **CLOSED.**
 ///     `ModelPicker` writes `flex-col items-start gap-1` and stacks the label
 ///     over its hint; [MenuItem] had `label` and `shortcut` and no child slot,
@@ -99,6 +111,10 @@
 /// console builds the identical tree it built before.
 library;
 
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
@@ -134,6 +150,7 @@ import '../../components/ui/marker.dart';
 import '../../components/ui/menu.dart';
 import '../../components/ui/popover.dart';
 import '../../components/ui/voice.dart';
+import '../../components/ui/voice_source.dart';
 
 /// `AgentConsoleFeatures` — *"nine switches, all on by default. A console with
 /// everything turned off is still a console — which is the test that the parts
@@ -228,6 +245,7 @@ class AgentConsole extends StatefulWidget {
     this.headerSlot,
     this.switchPhase = SwitchPhase.idle,
     this.height,
+    this.voiceSource,
   });
 
   /// Shown as a tooltip on the composer, model picker and welcome card while
@@ -288,6 +306,24 @@ class AgentConsole extends StatefulWidget {
   /// (320). Null lets the console fill the box it is given, which is what
   /// `min-h-0 flex-1` does inside the launcher's dialog.
   final double? height;
+
+  /// The microphone data source behind [_DictationControl]. Null builds
+  /// this package's own default — [createVoiceSource]'s honest no-op, the
+  /// same on every platform the package ships to on its own, since real
+  /// `getUserMedia` capture cannot live inside this package (see
+  /// `voice_source.dart`) — the first time [AgentFeatures.microphone] needs
+  /// it. A web app that wants a working microphone supplies its own real
+  /// [VoiceSource] here (this repository's example gallery does, see
+  /// `example/lib/voice_source_web.dart`); a test supplies a fake one,
+  /// which is what makes arming, disarming, disposal and a denied
+  /// permission testable at all: a widget test cannot open a real
+  /// microphone, but it can inject a fake [VoiceSource] and assert the
+  /// console called [VoiceSource.start] and [VoiceSource.stop] at the right
+  /// moments, and that [VoiceSourceStatus.denied] snaps the control back to
+  /// an honest, disabled state rather than leaving it armed and silent. The
+  /// console only [VoiceSource.dispose]s a source it built itself — one
+  /// handed in here outlives this widget and is the caller's to dispose.
+  final VoiceSource? voiceSource;
 
   /// `p-5` — *"the console owns its own inset."*
   ///
@@ -359,11 +395,33 @@ class _AgentConsoleState extends State<AgentConsole> {
   /// nothing outside this widget needs to see it.
   bool _dictationListening = false;
 
+  /// Why [MicControl] is refusing to arm again — [VoiceSourceStatus.denied],
+  /// [VoiceSourceStatus.unavailable] or [VoiceSourceStatus.error], put into
+  /// words. Sticky for the rest of this console's life once set: none of
+  /// those three is a transient failure a bare retry would fix (a denied
+  /// permission needs a browser settings change; an insecure origin and a
+  /// missing device don't change under this widget), so there is no path
+  /// back to null. Null is the difference between "never asked" and "asked
+  /// once and the platform said no."
+  String? _micUnavailableReason;
+
+  /// Built once, lazily, only if [AgentFeatures.microphone] is on — a
+  /// console with the feature off must not so much as construct a
+  /// [VoiceSource], per the compatibility line this feature shipped under.
+  /// [widget.voiceSource] wins when supplied, which is what makes this seam
+  /// testable at all (see that field's docs).
+  VoiceSource? _voiceSource;
+
   @override
   void initState() {
     super.initState();
     widget.transport.addListener(_onTransport);
     _draft.addListener(_onDraft);
+    if (widget.features.microphone) {
+      final VoiceSource source = widget.voiceSource ?? createVoiceSource();
+      source.status.addListener(_onVoiceStatus);
+      _voiceSource = source;
+    }
   }
 
   @override
@@ -395,10 +453,62 @@ class _AgentConsoleState extends State<AgentConsole> {
       ..dispose();
     _composerFocus.dispose();
     _scroller.dispose();
+    // A live stream nobody stops leaves the browser's own recording
+    // indicator lit after this console is gone — stop() before dispose(),
+    // always, not only on a clean disarm.
+    final VoiceSource? voiceSource = _voiceSource;
+    if (voiceSource != null) {
+      voiceSource.status.removeListener(_onVoiceStatus);
+      voiceSource.stop();
+      // Only a source this console built is this console's to dispose —
+      // one injected through [AgentConsole.voiceSource] outlives it.
+      if (widget.voiceSource == null) voiceSource.dispose();
+    }
     super.dispose();
   }
 
   void _onDraft() => setState(() {});
+
+  /// [_voiceSource]'s [VoiceSourceStatus] changed. Only the three terminal
+  /// failures are this widget's business: [VoiceSourceStatus.requesting]
+  /// and [VoiceSourceStatus.active] are exactly what an armed
+  /// [_dictationListening] already means, so there is nothing to
+  /// resynchronise. The other three are the platform saying capture will
+  /// never happen here — and *"the control must end in an honest state the
+  /// user can understand rather than sitting armed with a flat line
+  /// pretending to listen,"* so this un-arms it and turns the reason into a
+  /// tooltip [MicControl] already knows how to show, via
+  /// [_DictationControl]'s `disabledReason`.
+  void _onVoiceStatus() {
+    final String? reason = switch (_voiceSource?.status.value) {
+      VoiceSourceStatus.denied => 'Microphone access was denied.',
+      VoiceSourceStatus.unavailable => 'Microphone unavailable.',
+      VoiceSourceStatus.error => 'Could not start the microphone.',
+      _ => null,
+    };
+    if (reason == null) return;
+    if (!mounted) return;
+    setState(() {
+      _dictationListening = false;
+      _micUnavailableReason = reason;
+    });
+  }
+
+  /// [MicControl.onToggle] — arms or disarms [_dictationListening]
+  /// immediately (the pill answers a press instantly, same as before this
+  /// source existed) and starts or stops [_voiceSource] alongside it.
+  /// [VoiceSource.start] never throws (see its docs); every failure arrives
+  /// later, asynchronously, through [_onVoiceStatus].
+  void _toggleDictation() {
+    final VoiceSource? source = _voiceSource;
+    if (_dictationListening) {
+      source?.stop();
+      setState(() => _dictationListening = false);
+    } else {
+      setState(() => _dictationListening = true);
+      unawaited(source?.start());
+    }
+  }
 
   void _onTransport() {
     if (!mounted) return;
@@ -597,13 +707,14 @@ class _AgentConsoleState extends State<AgentConsole> {
               micControl: widget.features.microphone
                   ? _DictationControl(
                       listening: _dictationListening,
-                      disabled: !transport.isReady,
-                      disabledReason: !transport.isReady
-                          ? AgentConsole.notReadyReason
-                          : null,
-                      onToggle: () => setState(
-                        () => _dictationListening = !_dictationListening,
-                      ),
+                      spectrum: _voiceSource?.spectrum,
+                      disabled: !transport.isReady || _micUnavailableReason != null,
+                      disabledReason:
+                          _micUnavailableReason ??
+                          (!transport.isReady
+                              ? AgentConsole.notReadyReason
+                              : null),
+                      onToggle: _toggleDictation,
                     )
                   : null,
             ),
@@ -872,6 +983,7 @@ class _DictationControl extends StatelessWidget {
     required this.onToggle,
     required this.disabled,
     this.disabledReason,
+    this.spectrum,
   });
 
   final bool listening;
@@ -879,12 +991,18 @@ class _DictationControl extends StatelessWidget {
   final bool disabled;
   final String? disabledReason;
 
+  /// Real frequency bins from [AgentConsole._voiceSource], or null off the
+  /// web. [BarVisualizer] already degrades from this to its own `active`
+  /// oscillator while it is null or empty — see `voice.dart` — so this
+  /// control does not need to know which situation it is in.
+  final ValueListenable<Float32List>? spectrum;
+
   @override
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       if (listening) ...<Widget>[
-        const BarVisualizer(active: true),
+        BarVisualizer(active: true, spectrum: spectrum),
         SizedBox(width: AgentComposer.controlGap),
       ],
       MicControl(

@@ -7,15 +7,19 @@
 /// with [AgentFeatures.all], with a conversation history rail folded into the
 /// same surface rather than shown as a separate demo beside it.
 ///
-/// **The microphone is on, and renders.** `AgentFeatures.microphone` is set;
-/// `agent_console.dart` wires it to a real `MicControl` beside send. There is
-/// still no capture behind it — Flutter has no Web Speech API equivalent,
-/// per that file's own "Divergences, by construction" note — pressing it
-/// only arms and disarms the control's own resting/live states.
+/// **The microphone is on, and captures real audio on the web.**
+/// `AgentFeatures.microphone` is set; `agent_console.dart` wires it to a real
+/// `MicControl` beside send. `_IntegratedAgentSurfaceState` builds and owns a
+/// real [VoiceSource] (`../../voice_source.dart`) and hands it to
+/// `AgentConsole.voiceSource` — the package's own default is an honest no-op
+/// (real capture cannot live inside the package itself, see
+/// `voice_source_web.dart`'s own docs), so this is what makes pressing the
+/// mic here actually ask the browser for the microphone.
 library;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:example/agent/mock_transport.dart';
+import 'package:example/voice_source.dart';
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
@@ -200,6 +204,13 @@ class _IntegratedAgentSurfaceState extends State<_IntegratedAgentSurface> {
   final GlobalKey _surface = GlobalKey();
   final MockTransport _transport = MockTransport();
 
+  /// Real microphone capture on the web, the package's own no-op everywhere
+  /// else — see `voice_source.dart`. Built once, here, rather than left for
+  /// `AgentConsole` to default: the console never disposes an injected
+  /// source (it may outlive the widget), so this page — which built it —
+  /// is the one that has to.
+  final VoiceSource _voiceSource = createExampleVoiceSource();
+
   MockConversationStore? _store;
   late final BlurSwitchController _switch = BlurSwitchController(
     open: (String id) => _store!.open(id),
@@ -216,6 +227,8 @@ class _IntegratedAgentSurfaceState extends State<_IntegratedAgentSurface> {
     _switch.dispose();
     _store?.dispose();
     _transport.dispose();
+    _voiceSource.stop();
+    _voiceSource.dispose();
     super.dispose();
   }
 
@@ -239,6 +252,7 @@ class _IntegratedAgentSurfaceState extends State<_IntegratedAgentSurface> {
         features: AgentFeatures.all,
         height: _IntegratedAgentSurface.height,
         switchPhase: _switch.phase,
+        voiceSource: _voiceSource,
         headerSlot: ListenableBuilder(
           listenable: _store!,
           builder: (BuildContext context, Widget? _) => ChatHistory(

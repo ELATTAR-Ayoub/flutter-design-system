@@ -98,6 +98,64 @@ class _FakeTransport extends ChangeNotifier implements AgentTransport {
   }
 }
 
+/* ── A voice source with dials on it ─────────────────────────────────────── */
+
+/// [VoiceSource] a test can drive: [onStart] decides what [start] transitions
+/// [status] to (a working platform's [VoiceSourceStatus.active] by default),
+/// and [startCalls]/[stopCalls]/[disposeCalls] are what let a test assert the
+/// console actually released a stream rather than merely dropping the flag
+/// that used to mean "armed" — a real leak in `voice_source_web.dart` has
+/// nothing here to be caught by, which is exactly why the console's own
+/// calls into this seam are what get pinned instead.
+class _FakeVoiceSource implements VoiceSource {
+  final ValueNotifier<VoiceSourceStatus> _status =
+      ValueNotifier<VoiceSourceStatus>(VoiceSourceStatus.idle);
+  final ValueNotifier<Float32List> _samples = ValueNotifier<Float32List>(
+    Float32List(0),
+  );
+  final ValueNotifier<Float32List> _spectrum = ValueNotifier<Float32List>(
+    Float32List(0),
+  );
+
+  VoiceSourceStatus onStart = VoiceSourceStatus.active;
+
+  int startCalls = 0;
+  int stopCalls = 0;
+  int disposeCalls = 0;
+
+  @override
+  ValueListenable<VoiceSourceStatus> get status => _status;
+
+  @override
+  ValueListenable<Float32List> get samples => _samples;
+
+  @override
+  ValueListenable<Float32List> get spectrum => _spectrum;
+
+  @override
+  Future<void> start() async {
+    startCalls += 1;
+    _status.value = onStart;
+  }
+
+  @override
+  void stop() {
+    stopCalls += 1;
+    if (_status.value == VoiceSourceStatus.active ||
+        _status.value == VoiceSourceStatus.requesting) {
+      _status.value = VoiceSourceStatus.idle;
+    }
+  }
+
+  @override
+  void dispose() {
+    disposeCalls += 1;
+    _status.dispose();
+    _samples.dispose();
+    _spectrum.dispose();
+  }
+}
+
 const ToolStateMap _toolStates = <String, AgentState>{
   'search_inventory': AgentState.searching,
   'export_activity': AgentState.writing,
@@ -946,6 +1004,134 @@ void main() {
       await tester.pump();
       expect(mic().listening, isFalse);
     });
+
+    testWidgets(
+      'arming calls the injected source\'s start, disarming calls stop',
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport();
+        addTearDown(transport.dispose);
+        final _FakeVoiceSource source = _FakeVoiceSource();
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            persona: _persona,
+            height: 600,
+            voiceSource: source,
+          ),
+        );
+
+        expect(source.startCalls, 0);
+        expect(source.stopCalls, 0);
+
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+        expect(source.startCalls, 1);
+        expect(source.stopCalls, 0);
+
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+        expect(source.startCalls, 1);
+        expect(source.stopCalls, 1);
+      },
+    );
+
+    testWidgets(
+      'disposing the console stops the source — a leaked stream fails this',
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport();
+        addTearDown(transport.dispose);
+        final _FakeVoiceSource source = _FakeVoiceSource();
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            persona: _persona,
+            height: 600,
+            voiceSource: source,
+          ),
+        );
+
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+        expect(source.startCalls, 1);
+        expect(source.stopCalls, 0);
+
+        // Tear the console out of the tree without ever disarming it by
+        // hand — the same shape as a user navigating away mid-recording.
+        await tester.pumpWidget(const SizedBox());
+        expect(source.stopCalls, 1);
+
+        // An injected source is the caller's, not the console's, to
+        // dispose — only one this widget built itself gets that call.
+        expect(source.disposeCalls, 0);
+      },
+    );
+
+    testWidgets(
+      'while armed with a real source, the bar visualizer reads its actual spectrum',
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport();
+        addTearDown(transport.dispose);
+        final _FakeVoiceSource source = _FakeVoiceSource();
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            persona: _persona,
+            height: 600,
+            voiceSource: source,
+          ),
+        );
+
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+
+        final BarVisualizer bars = tester.widget<BarVisualizer>(
+          find.byType(BarVisualizer),
+        );
+        expect(bars.spectrum, same(source.spectrum));
+      },
+    );
+
+    testWidgets(
+      'a denied permission un-arms the mic and disables it with a reason, '
+      'rather than leaving it armed and silent',
+      (WidgetTester tester) async {
+        final _FakeTransport transport = _FakeTransport();
+        addTearDown(transport.dispose);
+        final _FakeVoiceSource source = _FakeVoiceSource()
+          ..onStart = VoiceSourceStatus.denied;
+
+        await _pump(
+          tester,
+          AgentConsole(
+            transport: transport,
+            persona: _persona,
+            height: 600,
+            voiceSource: source,
+          ),
+        );
+
+        MicControl mic() => tester.widget<MicControl>(find.byType(MicControl));
+
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+
+        expect(mic().listening, isFalse);
+        expect(mic().disabled, isTrue);
+        expect(mic().disabledReason, isNotNull);
+
+        // Sticky: a second attempt cannot re-arm it, because a denied
+        // permission does not clear itself.
+        await tester.tap(find.byType(MicControl));
+        await tester.pump();
+        expect(mic().listening, isFalse);
+      },
+    );
   });
 
   /* ── switchPhase ───────────────────────────────────────────────────────── */

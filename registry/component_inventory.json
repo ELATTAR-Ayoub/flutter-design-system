@@ -572,6 +572,11 @@
       "source": "lib/src/components/ui/voice_indicator.dart",
       "owner": "voice-indicator",
       "classification": "installable"
+    },
+    {
+      "source": "lib/src/components/ui/voice_source.dart",
+      "owner": "voice-source",
+      "classification": "dependency"
     }
   ]
 }
