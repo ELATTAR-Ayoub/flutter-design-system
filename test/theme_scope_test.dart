@@ -250,7 +250,7 @@ void main() {
       final Text text = await render(t, StyledText('x', TextStyles.numberSm));
       final TextStyle style = text.style!;
       // The host renders at 1440 logical pixels (>= Breakpoints.lg), so
-      // numberSm resolves to its desktop step (16/20), not the mobile floor.
+      // numberSm resolves to its desktop step (14/20), not the mobile floor.
       final TypeStep step = TextStyles.numberSm.desktop;
       expect(style.fontSize, step.size);
       expect(style.height, step.ratio);

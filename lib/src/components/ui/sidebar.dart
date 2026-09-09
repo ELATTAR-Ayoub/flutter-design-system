@@ -531,6 +531,7 @@ class Sidebar extends StatelessWidget {
         variant: variant,
         collapsible: null,
         child: _panelInk(
+          context,
           theme,
           SizedBox(
             width: expand ? null : LayoutWidths.sidebar,
@@ -585,6 +586,7 @@ class Sidebar extends StatelessWidget {
       variant: variant,
       collapsible: mode,
       child: _panelInk(
+        context,
         theme,
         TweenAnimationBuilder<double>(
           tween: Tween<double>(end: gapWidth),
@@ -642,10 +644,13 @@ class Sidebar extends StatelessWidget {
   }
 
   /// `text-sidebar-foreground` — the ambient ink every region inherits.
-  Widget _panelInk(ThemeTokens theme, Widget child) => DefaultTextStyle.merge(
-    style: TextStyle(color: theme.sidebarForeground),
-    child: child,
-  );
+  Widget _panelInk(BuildContext context, ThemeTokens theme, Widget child) =>
+      DefaultTextStyle.merge(
+        style: DefaultTextStyle.of(
+          context,
+        ).style.copyWith(color: theme.sidebarForeground),
+        child: child,
+      );
 
   /// `sidebar-container` + `sidebar-inner`.
   Widget _container(ThemeTokens theme, {required bool framed}) {

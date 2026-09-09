@@ -1271,7 +1271,9 @@ class _CellSurface extends StatelessWidget {
                   borderRadius: radius,
                 ),
                 child: DefaultTextStyle.merge(
-                  style: TextStyle(color: animatedInk ?? ink),
+                  style: DefaultTextStyle.of(
+                    context,
+                  ).style.copyWith(color: animatedInk ?? ink),
                   child: IconTheme.merge(
                     data: IconThemeData(color: animatedInk ?? ink),
                     child: child,

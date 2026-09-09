@@ -1050,7 +1050,9 @@ class _CommandState extends State<Command> {
     // group inside it. Both resolve to the same value in both themes today;
     // both are written, because the reference writes both.
     palette = DefaultTextStyle.merge(
-      style: TextStyle(color: theme.popoverForeground),
+      style: DefaultTextStyle.of(
+        context,
+      ).style.copyWith(color: theme.popoverForeground),
       child: palette,
     );
 
@@ -1216,7 +1218,7 @@ class _CommandGroupBlock extends StatelessWidget {
       child: DefaultTextStyle.merge(
         // `text-foreground` — the group re-declares the ink the root already
         // set to `--popover-foreground`. Two tokens, one value, both written.
-        style: TextStyle(color: theme.foreground),
+        style: DefaultTextStyle.of(context).style.copyWith(color: theme.foreground),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
@@ -1454,7 +1456,7 @@ class _CommandRow extends StatelessWidget {
     }
 
     row = DefaultTextStyle.merge(
-      style: TextStyle(color: ink),
+      style: DefaultTextStyle.of(context).style.copyWith(color: ink),
       child: row,
     );
 

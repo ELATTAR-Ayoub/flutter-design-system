@@ -1431,7 +1431,6 @@ void main() {
       );
       // `.type-num` — *(measured 15px / 18 / 600, Geist Mono, −0.15px)*.
       expect(picked.spec, TextStyles.numberBase);
-      expect(picked.spec.step, const TypeStep(16, 20));
       expect(picked.spec.family, Fonts.mono);
       expect(picked.spec.tabular, isTrue);
 

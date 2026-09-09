@@ -67,6 +67,7 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 import 'package:flutter/widgets.dart' as flutter show ScrollPosition;
 
+import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -113,9 +114,7 @@ const Key thumbSemanticsKey = ValueKey<String>(
 ///
 /// Not a motion token: `globals.css` never names it, and nothing else in the
 /// system waits this long. It is a third-party library's own constant.
-const Duration _hideDelay = Duration(
-  milliseconds: 600, // allow-hardcoded: Radix's own `scrollHideDelay`.
-);
+const Duration _hideDelay = MotionDurations.scrollAreaHideDelay;
 
 /// A styled scroll container: the reference's `ScrollArea`.
 ///

@@ -641,7 +641,9 @@ class AttachmentMedia extends StatelessWidget {
       // `overflow-hidden`.
       clipBehavior: Clip.antiAlias,
       child: DefaultTextStyle.merge(
-        style: TextStyle(
+        style: StyledText.styleOf(
+          context,
+          scope.size == AttachmentSize.md ? TextStyles.body : TextStyles.small,
           color: error ? theme.destructiveText : theme.foreground,
         ),
         child: content,
@@ -877,7 +879,7 @@ class AttachmentStatusText extends StatefulWidget {
   const AttachmentStatusText({super.key, required this.child});
 
   /// `--shimmer-duration: 2s`.
-  static const Duration period = Duration(seconds: 2);
+  static const Duration period = MotionDurations.attachmentStatusShimmer;
 
   /// `calc(3ch + 40px)` — the `ch` half is font-relative, so the widget
   /// measures it rather than pinning 63.2383.

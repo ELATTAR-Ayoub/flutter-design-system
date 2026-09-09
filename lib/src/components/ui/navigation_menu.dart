@@ -107,18 +107,14 @@ import './popover.dart';
 /// component. Measured on the live reference: a first hover opened the panel
 /// 281ms after the pointer landed, against a ~230–280ms expectation once
 /// puppeteer's own move latency is allowed for.
-const Duration _openDelay = Duration(
-  milliseconds: 200,
-); // allow-hardcoded: Radix's delayDuration, a library default, not a --duration-* token
+const Duration _openDelay = MotionDurations.navigationMenuOpenDelay;
 
 /// Radix's own close timer — how long a panel stays open after the pointer
 /// leaves the menu.
 ///
 /// Measured at ~186ms from a real `pointerleave`, which is this plus the
 /// sampler's slop.
-const Duration _closeDelay = Duration(
-  milliseconds: 150,
-); // allow-hardcoded: Radix's close timer, a library default, not a --duration-* token
+const Duration _closeDelay = MotionDurations.navigationMenuCloseDelay;
 
 /// Radix's `skipDelayDuration` — the window after a panel closes during which
 /// the **next** trigger opens with no delay at all.
@@ -126,9 +122,7 @@ const Duration _closeDelay = Duration(
 /// Measured: travelling from *Packs* to *Marketplace* flipped `data-state` 78ms
 /// after the pointer moved, i.e. on the next frame plus latency, while a
 /// re-entry more than a second later took the full [_openDelay] again.
-const Duration _skipDelay = Duration(
-  milliseconds: 300,
-); // allow-hardcoded: Radix's skipDelayDuration, a library default
+const Duration _skipDelay = MotionDurations.navigationMenuSkipDelay;
 
 /// One item in the bar: a trigger with a panel, or a plain link.
 @immutable
@@ -356,7 +350,9 @@ class _NavigationMenuState extends State<NavigationMenu> {
       child: Padding(
         padding: EdgeInsets.all(NavigationMenu.panelPadding),
         child: DefaultTextStyle.merge(
-          style: TextStyle(color: theme.popoverForeground),
+          style: DefaultTextStyle.of(
+            context,
+          ).style.copyWith(color: theme.popoverForeground),
           child: content,
         ),
       ),
@@ -690,7 +686,9 @@ class _Chevron extends StatelessWidget {
     return DefaultTextStyle.merge(
       // `Icon` strokes `currentColor`, which on this trigger is whatever the
       // label resolved to — so the glyph's `tone: inherit` reads this.
-      style: TextStyle(color: lit ? theme.foreground : theme.mutedForeground),
+      style: DefaultTextStyle.of(context).style.copyWith(
+        color: lit ? theme.foreground : theme.mutedForeground,
+      ),
       child: TweenAnimationBuilder<double>(
         tween: Tween<double>(end: open ? 1 : 0),
         duration: effectiveMotionDuration(context, MotionDurations.normal),

@@ -202,7 +202,7 @@ const double _mobileBreakpoint = 600;
 const int _visible = 3;
 
 /// sonner's `TOAST_LIFETIME`.
-const Duration _lifetime = Duration(seconds: 4);
+const Duration _lifetime = MotionDurations.toastLifetime;
 
 /// sonner's `SWIPE_THRESHOLD` — how far a drag must travel to dismiss.
 const double _swipeThreshold = 45;
@@ -237,9 +237,7 @@ const double _collapsedExitTravel = 0.40;
 /// mistake: sonner's own comment calls it *"Equal to exit animation duration"*
 /// and it is equal to only one of the four. The visible consequence is that
 /// every exit is cut off partway.
-const Duration _unmount = Duration(
-  milliseconds: 200,
-); // allow-hardcoded: sonner's TIME_BEFORE_UNMOUNT, a runtime constant, not a --duration-* token
+const Duration _unmount = MotionDurations.toastUnmountDelay;
 
 /// `transition: transform 400ms, opacity 400ms, height 400ms` — the window
 /// almost every leg of the choreography runs in.
@@ -247,28 +245,21 @@ const Duration _unmount = Duration(
 /// Numerically `--duration-slow` and deliberately not spelled as it: this is a
 /// third-party stylesheet's own literal, and retiming the design system's slow
 /// window must not retime a foreign component. Same argument as [_unmount].
-const Duration _transition = Duration(
-  milliseconds: 400,
-); // allow-hardcoded: sonner styles.css L89, a foreign runtime constant
+const Duration _transition = MotionDurations.toastTransition;
 
 /// `[data-removed][data-front=false][data-expanded=false] { transition:
 /// transform 500ms, opacity 200ms }` — the transform half of the one exit that
 /// does not use [_transition]. Its opacity half is [_unmount]'s number.
-const Duration _collapsedExitTransform = Duration(
-  milliseconds: 500,
-); // allow-hardcoded: sonner styles.css L338, a foreign runtime constant
+const Duration _collapsedExitTransform =
+    MotionDurations.toastCollapsedExitTransform;
 
 /// `animation-duration: 200ms; animation-timing-function: ease-out` on the four
 /// `swipe-out-*` keyframes.
-const Duration _swipeOutDuration = Duration(
-  milliseconds: 200,
-); // allow-hardcoded: sonner styles.css L356, a foreign runtime constant
+const Duration _swipeOutDuration = MotionDurations.toastSwipeOutDuration;
 
 /// `[data-promise=true] [data-icon] > svg { animation: sonner-fade-in 300ms
 /// ease forwards }` — the settled glyph arriving over the loader it replaces.
-const Duration _promiseSwapIn = Duration(
-  milliseconds: 300,
-); // allow-hardcoded: sonner styles.css L163, a foreign runtime constant
+const Duration _promiseSwapIn = MotionDurations.toastPromiseSwapIn;
 
 /// `.sonner-loader { transition: opacity 200ms, transform 200ms }` — the
 /// loader leaving under it. Shorter than [_promiseSwapIn], so the two glyphs

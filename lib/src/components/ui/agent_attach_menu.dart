@@ -355,7 +355,9 @@ class _MenuRowState extends State<_MenuRow> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   DefaultTextStyle.merge(
-                    style: TextStyle(color: theme.agentAccent),
+                    style: DefaultTextStyle.of(
+                      context,
+                    ).style.copyWith(color: theme.agentAccent),
                     child: Icon.lucide(
                       widget.glyph,
                       sizePx: AgentAttachMenu.glyphSize,

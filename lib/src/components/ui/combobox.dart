@@ -741,7 +741,7 @@ class _ComboboxRow<T> extends StatelessWidget {
     row = SizedBox(height: Combobox.itemHeightOf(context), child: row);
 
     row = DefaultTextStyle.merge(
-      style: TextStyle(color: ink),
+      style: DefaultTextStyle.of(context).style.copyWith(color: ink),
       child: row,
     );
     row = Semantics(

@@ -135,9 +135,7 @@ double get _viewportMargin => space(2);
 /// `SelectScrollButtonImpl` starts a `window.setInterval(onAutoScroll, 50)` on
 /// `pointerMove` and clears it on `pointerLeave`; each tick scrolls by one
 /// item's height. A dependency's own timer, not a `--duration-*` token.
-const Duration _autoScrollTick = Duration(
-  milliseconds: 50,
-); // allow-hardcoded: Radix's own scroll interval
+const Duration _autoScrollTick = MotionDurations.selectAutoScrollTick;
 
 /// The two rungs of `data-size` on the trigger.
 enum SelectSize {
@@ -1335,7 +1333,7 @@ class _SelectItem<T> extends StatelessWidget {
     // The tick is `tone="inherit"` — `text-current` — so it takes whatever the
     // row's own colour resolves to, highlighted or not.
     row = DefaultTextStyle.merge(
-      style: TextStyle(color: ink),
+      style: DefaultTextStyle.of(context).style.copyWith(color: ink),
       child: row,
     );
     row = Semantics(

@@ -485,7 +485,9 @@ class _FieldState extends State<Field> {
       // description, the error and the placeholder all state theirs and do not
       // (forms-map §3.2).
       field = DefaultTextStyle.merge(
-        style: TextStyle(color: theme.destructiveText),
+        style: DefaultTextStyle.of(
+          context,
+        ).style.copyWith(color: theme.destructiveText),
         child: field,
       );
     }

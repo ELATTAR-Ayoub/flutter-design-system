@@ -491,7 +491,9 @@ class _PaletteRow extends StatelessWidget {
                       // `IconTone.inherit` reads off the ambient text style
                       // exactly as `text-current` does.
                       child: DefaultTextStyle.merge(
-                        style: TextStyle(color: theme.agentAccent),
+                        style: DefaultTextStyle.of(
+                          context,
+                        ).style.copyWith(color: theme.agentAccent),
                         child: Icon.lucide(
                           glyph,
                           sizePx: AgentSlashPalette.glyphSize,
