@@ -55,7 +55,7 @@
 ///     face is always at rest, and the built-in `voice` command, gated on
 ///     `features.speech && speech.isSupported`, never appears.
 ///     [AgentFeatures.microphone] does now capture real audio, given a real
-///     [VoiceSource] — see [_DictationControl] and `voice_source.dart`.
+///     [VoiceSource] — see [_DictationControl] and `voice_source_base.dart`.
 ///     Pressing the mic arms [MicControl] and calls [VoiceSource.start];
 ///     [BarVisualizer] draws the real `AnalyserNode` frames a capturing
 ///     source produces once they start arriving, falling back to its own
@@ -111,6 +111,14 @@
 /// console builds the identical tree it built before.
 library;
 
+// `voice_source.dart` used to be its own top-level export and its own
+// registry item; agent-console is its only consumer, so the export moved
+// here rather than staying a component with one caller. The underlying
+// files are unchanged — see `voice_source_base.dart` and
+// `voice_source_stub.dart` for the actual interface and no-op default.
+export '../../components/ui/voice_source_base.dart';
+export '../../components/ui/voice_source_stub.dart' show createVoiceSource;
+
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -150,7 +158,8 @@ import '../../components/ui/marker.dart';
 import '../../components/ui/menu.dart';
 import '../../components/ui/popover.dart';
 import '../../components/ui/voice.dart';
-import '../../components/ui/voice_source.dart';
+import '../../components/ui/voice_source_base.dart';
+import '../../components/ui/voice_source_stub.dart' show createVoiceSource;
 
 /// `AgentConsoleFeatures` — *"nine switches, all on by default. A console with
 /// everything turned off is still a console — which is the test that the parts
@@ -312,7 +321,7 @@ class AgentConsole extends StatefulWidget {
   /// this package's own default — [createVoiceSource]'s honest no-op, the
   /// same on every platform the package ships to on its own, since real
   /// `getUserMedia` capture cannot live inside this package (see
-  /// `voice_source.dart`) — the first time [AgentFeatures.microphone] needs
+  /// `voice_source_stub.dart`) — the first time [AgentFeatures.microphone] needs
   /// it. A web app that wants a working microphone supplies its own real
   /// [VoiceSource] here (this repository's example gallery does, see
   /// `example/lib/voice_source_web.dart`); a test supplies a fake one,

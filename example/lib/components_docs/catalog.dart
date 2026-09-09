@@ -93,7 +93,6 @@ import 'spinner/meta.dart' as spinner;
 import 'toggle_group/meta.dart' as toggle_group;
 import 'voice/meta.dart' as voice;
 import 'voice_indicator/meta.dart' as voice_indicator;
-import 'voice_source/meta.dart' as voice_source;
 import 'icon_swap/meta.dart' as icon_swap;
 import 'hover_builder/meta.dart' as hover_builder;
 import 'active_indicator/meta.dart' as active_indicator;
@@ -248,7 +247,6 @@ const List<ComponentDocEntry> componentDocs = <ComponentDocEntry>[
   toggle_group.toggleGroupDoc,
   voice.voiceDoc,
   voice_indicator.voiceIndicatorDoc,
-  voice_source.voiceSourceDoc,
   icon_swap.iconSwapDoc,
   hover_builder.hoverBuilderDoc,
   active_indicator.activeIndicatorDoc,
@@ -353,7 +351,7 @@ const Set<String> effectsDocNames = <String>{
   'surface',
 };
 
-/// The agent family, plus the three voice surfaces that only exist for it.
+/// The agent family, plus the two voice surfaces that only exist for it.
 ///
 /// Generic conversation primitives — Attachment, Bubble, Message,
 /// MessageScroller, Questionnaire — stay under Components: they are useful
@@ -373,7 +371,6 @@ const Set<String> agentDocNames = <String>{
   'agent_transcript',
   'voice',
   'voice_indicator',
-  'voice_source',
 };
 
 /// The charts family.

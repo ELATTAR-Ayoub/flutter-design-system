@@ -110,7 +110,6 @@ export './src/components/ui/toggle.dart';
 export './src/components/ui/toggle_group.dart';
 export './src/components/ui/tooltip.dart';
 export './src/components/ui/voice.dart';
-export './src/components/ui/voice_source.dart';
 
 // ── effects ─────────────────────────────────────────────────────────────────
 export './src/components/ui/feedback_surface.dart';
