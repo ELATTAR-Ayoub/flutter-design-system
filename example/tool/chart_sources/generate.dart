@@ -44,7 +44,7 @@ String renderGenerated(Map<String, String> sources) {
     ..writeln()
     ..writeln('const Map<String, String> chartSources = <String, String>{');
   for (final MapEntry<String, String> entry in sources.entries) {
-    out.writeln('  ${dartStringLiteral(entry.key)}: ');
+    out.writeln('  ${dartStringLiteral(entry.key)}:');
     out.writeln('      ${dartStringLiteral(entry.value)},');
   }
   out.writeln('};');
