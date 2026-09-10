@@ -51,7 +51,10 @@ jobs:
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
         with:
-          sdk: stable
+          # Keep the formatter implementation aligned with the package's
+          # declared 3.12 language floor. `--language-version` controls syntax,
+          # but newer SDKs may still rewrite already-formatted source.
+          sdk: 3.12.2
 
       - name: Cache pub dependencies
         uses: actions/cache@v4
