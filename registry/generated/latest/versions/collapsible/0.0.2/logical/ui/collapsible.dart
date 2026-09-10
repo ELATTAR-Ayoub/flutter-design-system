@@ -130,7 +130,7 @@ class _UnfoldState extends State<Unfold> with SingleTickerProviderStateMixin {
         final double t = _curve.value;
         return ClipRect(
           child: Align(
-            alignment: AlignmentDirectional.topStart,
+            alignment: Alignment.topCenter,
             // `--ease-spring` overshoots, and `height` takes the overshoot:
             // above 1 the box is taller than its content and `overflow-hidden`
             // shows the extra as breathing room under it, which is the whole

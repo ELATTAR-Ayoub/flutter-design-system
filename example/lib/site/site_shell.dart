@@ -263,7 +263,11 @@ class _SiteBody extends StatelessWidget {
     final Widget column = SelectionArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[child, SizedBox(height: space(12)), footer],
+        children: <Widget>[
+          child,
+          SizedBox(height: space(12)),
+          footer,
+        ],
       ),
     );
     return SingleChildScrollView(

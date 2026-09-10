@@ -1,6 +1,6 @@
 {
   "name": "elattar-design-system",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Builds and reviews Flutter UI with Elattar's installed components and foundation tokens, using project-aware API discovery, responsive and accessible composition, relevant state coverage, and verification proportional to the task.",
   "author": {
     "name": "ELATTAR Ayoub",

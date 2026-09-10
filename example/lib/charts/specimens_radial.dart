@@ -278,8 +278,7 @@ const List<ChartSpecimen> radialSpecimens = <ChartSpecimen>[
 
 Widget _radialSimpleBuild(BuildContext context, ChartInk ink) =>
     radialSimple(ink);
-Widget _radialGridBuild(BuildContext context, ChartInk ink) =>
-    radialGrid(ink);
+Widget _radialGridBuild(BuildContext context, ChartInk ink) => radialGrid(ink);
 Widget _radialLabelBuild(BuildContext context, ChartInk ink) =>
     radialLabel(ink);
 Widget _radialTextBuild(BuildContext context, ChartInk ink) =>

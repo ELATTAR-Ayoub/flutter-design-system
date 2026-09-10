@@ -532,29 +532,25 @@ void main() {
         tester,
       ).any((Text t) => hasColoredSpan(t.textSpan!, 'elattar', Palette.action));
       final bool hasFlag = richTexts(tester).any(
-        (Text t) =>
-            hasColoredSpan(t.textSpan!, '--foundation', Palette.value),
+        (Text t) => hasColoredSpan(t.textSpan!, '--foundation', Palette.value),
       );
 
       expect(hasCommandKeyword, isTrue);
       expect(hasFlag, isTrue);
     });
 
-    testWidgets(
-      'an unrecognised language renders the code intact rather than '
-      'throwing',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(
-          _harness(const CodeBlock('not a real language', language: 'cobol')),
-        );
-        await tester.pump();
+    testWidgets('an unrecognised language renders the code intact rather than '
+        'throwing', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _harness(const CodeBlock('not a real language', language: 'cobol')),
+      );
+      await tester.pump();
 
-        expect(tester.takeException(), isNull);
-        expect(
-          find.textContaining('not a real language', findRichText: true),
-          findsOneWidget,
-        );
-      },
-    );
+      expect(tester.takeException(), isNull);
+      expect(
+        find.textContaining('not a real language', findRichText: true),
+        findsOneWidget,
+      );
+    });
   });
 }

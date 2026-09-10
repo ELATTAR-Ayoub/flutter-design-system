@@ -1772,9 +1772,7 @@ class _BuiltOnNoteBody extends StatelessWidget {
  * `--muted`. Carried across from the reference's own `agent-demo.tsx`, which
  * states exactly this reasoning above the same three values.
  */
-const Color _photoBase = Color(
-  0xFF1E293B,
-);
+const Color _photoBase = Color(0xFF1E293B);
 const Color _photoSubject = Color(0xFF1A6EF4);
 const Color _photoCaption = Color(0xFFE2E8F0);
 

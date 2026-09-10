@@ -197,27 +197,19 @@ class EmptyMedia extends StatelessWidget {
 }
 
 /// `EmptyTitle` — `font-heading text-sm font-medium tracking-tight`.
-///
-/// The title is the larger, heavier of the two lines — [EmptyDescription]
-/// sits under it at [TextStyles.small]. Sized off [TextStyles.body] rather
-/// than [TextStyles.nav] so the hierarchy actually reads title over
-/// description at every breakpoint; [TextStyles.nav]'s weight is kept, since
-/// this is still an interface word rather than reading prose.
 class EmptyTitle extends StatelessWidget {
   const EmptyTitle(this.text, {super.key});
 
   final String text;
 
-  /// The title's anatomy: the body step at the nav role's weight, tracked
-  /// slightly tighter so a short centred line does not read as loose beside
-  /// the description under it.
+  /// The title's anatomy: the interface-word role, tracked slightly tighter so
+  /// a short centred line does not read as loose beside the body under it.
   ///
   /// Derived rather than published — an empty state's title is anatomy, not a
   /// type role — and exposed so a caller composing its own empty state can
   /// match it exactly.
-  static final TextStyleToken spec = TextStyles.body.derive(
+  static final TextStyleToken spec = TextStyles.nav.derive(
     name: 'empty-title',
-    wght: TextStyles.nav.wght,
     tracking: _tracking,
   );
 
@@ -242,9 +234,14 @@ class EmptyTitle extends StatelessWidget {
 class EmptyDescription extends StatelessWidget {
   const EmptyDescription(this.text, {super.key});
 
-  /// The supporting-copy role — one step under [EmptyTitle]'s [TextStyles.body]
-  /// step, so the title reads larger than the description under it.
-  static TextStyleToken get spec => TextStyles.small;
+  /// 13 / 400 / **1.625** — the same resolved rung
+  /// [TextStyles.body] carries.
+  ///
+  /// Named for the textarea because that is the class list it was transcribed
+  /// from, and reused here rather than duplicated: `text-sm/relaxed` and
+  /// `text-sm leading-relaxed` are two spellings of one declaration, and a
+  /// second spec would be two names for one style.
+  static TextStyleToken get spec => TextStyles.body;
 
   final String text;
 

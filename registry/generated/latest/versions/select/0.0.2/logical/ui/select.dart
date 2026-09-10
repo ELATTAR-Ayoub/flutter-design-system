@@ -96,6 +96,7 @@ import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -103,9 +104,7 @@ import './button.dart';
 import './field.dart';
 import './icon.dart';
 import './icon_paths.dart';
-import './input.dart';
 import './popover.dart';
-import './disabled.dart';
 
 /// `focus-visible:ring-ring/50`.
 const double _focusRingAlpha = 0.50;
@@ -173,7 +172,6 @@ class SelectOption<T> extends SelectChild<T> {
     required this.value,
     required this.label,
     this.enabled = true,
-    this.disabledReason,
   });
 
   final T value;
@@ -183,9 +181,6 @@ class SelectOption<T> extends SelectChild<T> {
 
   /// `data-disabled:pointer-events-none data-disabled:opacity-50`.
   final bool enabled;
-
-  /// Why the row is disabled. Shown as a tooltip while [enabled] is false.
-  final String? disabledReason;
 }
 
 /// `SelectGroup` + the `SelectLabel` inside it (`select.tsx:16`, `:94`).
@@ -232,7 +227,6 @@ class Select<T> extends StatefulWidget {
     this.placeholder,
     this.size = SelectSize.md,
     this.enabled = true,
-    this.disabledReason,
     this.invalid = false,
     this.expand = false,
     this.width,
@@ -263,10 +257,6 @@ class Select<T> extends StatefulWidget {
 
   /// `disabled`. ANDed with the enclosing [FieldScope]'s.
   final bool enabled;
-
-  /// Why the trigger is disabled. Falls back to the enclosing
-  /// [FieldScope]'s.
-  final String? disabledReason;
 
   /// `aria-invalid="true"`. ORed with the enclosing [FieldScope]'s.
   final bool invalid;
@@ -317,27 +307,16 @@ class Select<T> extends StatefulWidget {
   /// the item-aligned placement math and the scroll-into-view math
   /// self-consistent with what actually renders.
   static double get itemHeight => math.max(
-    Input.textSpecDefault.step.leading + space(2) * 2,
+    TextStyles.body.step.leading + space(2) * 2,
     TouchTargets.minimum,
   );
 
-  /// `SelectLabel`'s `px-3 py-2 text-xs` — 12px in a 16px line box, so **32**
-  /// at the mobile rung.
+  /// `SelectLabel`'s `px-3 py-2 text-xs` — 12px in a 16px line box, so **32**.
   ///
   /// Derived from [TextStyles.small] for the same reason [itemHeight]
   /// is derived from `sheetBody`: the placement counts this height before the
-  /// row exists. Unscaled, so a caller that already has the [BuildContext]
-  /// the menu is placed in should reach for [labelHeightOf] instead — `small`
-  /// steps with the width in scope like every other role now, and this flat
-  /// getter agrees with it only at the phone rung.
+  /// row exists.
   static double get labelHeight => TextStyles.small.step.leading + space(2) * 2;
-
-  /// [labelHeight], resolved against the width [context] is in scope for —
-  /// see [_MenuGeometry], which threads this through the item-aligned
-  /// placement math so the box lands where the label row actually renders
-  /// rather than where its mobile-rung estimate says it should.
-  static double labelHeightOf(BuildContext context) =>
-      StyledText.stepOf(context, TextStyles.small).leading + space(2) * 2;
 
   /// `SelectSeparator`'s `my-2 h-px` — 8 + 1 + 8 = **17**.
   static double get separatorHeight => BorderWidths.hairline + space(2) * 2;
@@ -408,7 +387,7 @@ class _SelectState<T> extends State<Select<T>> {
   _MenuGeometry<T>? _cachedMenu;
 
   _MenuGeometry<T> get _menu =>
-      _cachedMenu ??= _MenuGeometry<T>(widget.options, context);
+      _cachedMenu ??= _MenuGeometry<T>(widget.options);
 
   @override
   void didUpdateWidget(Select<T> old) {
@@ -638,8 +617,7 @@ class _SelectState<T> extends State<Select<T>> {
           Flexible(
             child: StyledText(
               chosen?.label ?? widget.placeholder ?? '',
-              // The field's own role: the trigger reads exactly like Input.
-              Input.textSpecDefault,
+              TextStyles.body,
               color: chosen == null ? theme.mutedForeground : theme.foreground,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -683,14 +661,9 @@ class _SelectState<T> extends State<Select<T>> {
       child: trigger,
     );
 
-    trigger = IgnorePointer(
-      ignoring: _fieldEnabled && !_enabled,
-      child: trigger,
-    );
-    trigger = Disabled(
-      disabled: !_fieldEnabled,
-      reason: widget.disabledReason ?? _scope?.disabledReason,
-      child: trigger,
+    trigger = Opacity(
+      opacity: _fieldEnabled ? 1 : SurfaceOpacity.disabled,
+      child: IgnorePointer(ignoring: !_enabled, child: trigger),
     );
 
     return Semantics(
@@ -825,14 +798,11 @@ class _SelectState<T> extends State<Select<T>> {
 /// placement (before the menu exists), by the keyboard (which walks only the
 /// selectable rows) and by the scroll-into-view (which needs a row's box).
 class _MenuGeometry<T> {
-  /// [context] is the width a label row's height is resolved against — see
-  /// [_Row.heightOf]. Null falls back to the mobile-rung estimate, for a
-  /// caller that genuinely has no context yet, such as [SelectMenu.heightOf].
-  _MenuGeometry(List<SelectChild<T>> children, [this.context]) {
+  _MenuGeometry(List<SelectChild<T>> children) {
     void add(_Row<T> row) {
       offsets.add(_height);
       rows.add(row);
-      _height += row.heightOf(context);
+      _height += row.height;
     }
 
     for (final SelectChild<T> child in children) {
@@ -871,12 +841,6 @@ class _MenuGeometry<T> {
 
   final List<int> _rowOfOption = <int>[];
 
-  /// The width every label row in [rows] is sized against — see
-  /// [_Row.heightOf]. Threaded through from the constructor rather than read
-  /// again per row, so every row in one menu agrees on one width even if the
-  /// scope changes mid-build.
-  final BuildContext? context;
-
   double _height = 0;
 
   /// The height of the rows alone.
@@ -896,7 +860,7 @@ class _MenuGeometry<T> {
     final double margin = rows[row].scrollMargin;
     return (
       top: space(2) + offsets[row] - margin,
-      bottom: space(2) + offsets[row] + rows[row].heightOf(context) + margin,
+      bottom: space(2) + offsets[row] + rows[row].height + margin,
     );
   }
 }
@@ -940,13 +904,9 @@ class _Row<T> {
   /// `scroll-my-2` on the enclosing `SelectGroup`.
   final double scrollMargin;
 
-  /// The row's own height, for a caller that has to add the menu up before it
-  /// is laid out. Null [context] falls back to the mobile-rung estimate —
-  /// see [Select.labelHeight] — for a caller that genuinely cannot reach one.
-  double heightOf(BuildContext? context) => switch (kind) {
+  double get height => switch (kind) {
     _RowKind.option => Select.itemHeight,
-    _RowKind.label =>
-      context == null ? Select.labelHeight : Select.labelHeightOf(context),
+    _RowKind.label => Select.labelHeight,
     _RowKind.separator => Select.separatorHeight,
   };
 }
@@ -1005,7 +965,7 @@ class _SelectMenuState<T> extends State<SelectMenu<T>> {
     initialScrollOffset: widget.initialScrollOffset,
   );
 
-  late _MenuGeometry<T> _menu = _MenuGeometry<T>(widget.children, context);
+  late _MenuGeometry<T> _menu = _MenuGeometry<T>(widget.children);
 
   /// `canScrollUp` / `canScrollDown` — Radix mounts each button only while the
   /// viewport can move that way, which is why a menu at rest shows the down
@@ -1025,7 +985,7 @@ class _SelectMenuState<T> extends State<SelectMenu<T>> {
   void didUpdateWidget(SelectMenu<T> old) {
     super.didUpdateWidget(old);
     if (!identical(old.children, widget.children)) {
-      _menu = _MenuGeometry<T>(widget.children, context);
+      _menu = _MenuGeometry<T>(widget.children);
     }
     if (old.highlighted != widget.highlighted) {
       _revealHighlighted();
@@ -1291,8 +1251,7 @@ class _SelectItem<T> extends StatelessWidget {
             Expanded(
               child: StyledText(
                 option.label,
-                // The field's own role: an option reads exactly like Input.
-                Input.textSpecDefault,
+                TextStyles.body,
                 color: ink,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1338,7 +1297,12 @@ class _SelectItem<T> extends StatelessWidget {
       style: TextStyle(color: ink),
       child: row,
     );
-    row = Semantics(
+    row = Opacity(
+      opacity: option.enabled ? 1 : SurfaceOpacity.disabled,
+      child: row,
+    );
+
+    return Semantics(
       button: true,
       selected: checked,
       enabled: option.enabled,
@@ -1352,13 +1316,6 @@ class _SelectItem<T> extends StatelessWidget {
           child: row,
         ),
       ),
-    );
-
-    return Disabled(
-      disabled: !option.enabled,
-      blockPointer: false,
-      reason: option.disabledReason,
-      child: row,
     );
   }
 }

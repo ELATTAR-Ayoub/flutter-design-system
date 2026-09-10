@@ -1,7 +1,7 @@
 {
   "name": "accordion",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "`components/ui/accordion.tsx` — a set of related disclosures where only one",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -30,7 +30,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/accordion",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/accordion.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/accordion.dart",
   "exports": [
     "Accordion",
     "AccordionItem"

@@ -1,7 +1,7 @@
 {
   "name": "tooltip",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Accessible hover and focus explanation surface with semantic side and transition behavior.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -21,7 +21,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/tooltip",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/tooltip.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/tooltip.dart",
   "exports": [
     "Tooltip",
     "TooltipContent",

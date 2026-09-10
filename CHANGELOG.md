@@ -1,15 +1,93 @@
 # Changelog
 
-## Unreleased
+## 0.0.3
 
-### Added
-- `Disabled` — the one wrapper every control dims through (`SurfaceOpacity.disabled`, pointer block, cursor, reason tooltip, disabled-tap hook).
-- `disabledReason` on every disableable component and on `Field`; shows as a tooltip on hover or touch tap while disabled.
-- `Form.revealFirstError()` validates, scrolls the first invalid field to the centre of the screen and focuses it. `Form.submit()` now uses it.
-- `FormScope`; a disabled `Button` below it reveals the first error when tapped. `Button.onDisabledPressed` overrides that.
+This release turns the new disabled-state contract, responsive type scale,
+chart gallery, and agent console into one versioned source release. It covers
+the 90 commits in the full graph from `v0.0.2` through the pre-release `main`
+snapshot (45 first-parent commits before this release commit).
 
-### Changed
-- Textarea, Stat and AgentAttachMenu now dim and block input like every other disabled control.
+### Disabled controls and form recovery
+
+* **One disabled-state contract.** The new public `Disabled` wrapper owns
+  `SurfaceOpacity.disabled`, pointer blocking, the disabled cursor, an optional
+  reason tooltip, and a disabled-tap hook. Controls no longer invent their own
+  fade or leave a disabled surface interactive.
+* **Reasons travel with controls.** `disabledReason` is available across
+  buttons, fields, text inputs, selection controls, toggles, sliders, stats,
+  pickers, menu rows, and agent surfaces. A reason appears on hover or touch
+  without making the disabled action executable.
+* **Invalid forms lead users to the fix.** `Form.revealFirstError()` validates,
+  scrolls the first invalid field to the centre, and focuses it. `Form.submit()`
+  uses the same path, and edits revalidate once errors have been revealed.
+  `FormScope` lets a disabled submit `Button` trigger that recovery;
+  `Button.onDisabledPressed` remains the explicit override.
+
+### Typography, tokens, and component polish
+
+* **Every public type role responds at the system breakpoints.** Roles resolve
+  mobile, tablet, and desktop steps at 768 and 1024 logical pixels. Numeric
+  roles scale with their metric surfaces, while prose, field, menu, and
+  documentation text use the intended reading roles.
+* **Components consume tokens without exceptions.** Motion and typography
+  literals were moved into the foundation, the token guard no longer accepts
+  line-level bypasses, and the documentation site now reads from the same
+  system contracts.
+* **Core components were tightened.** Accordion, Avatar, Badge, Bubble,
+  ButtonGroup, Card, Carousel, Empty, Item, Input, menus, and selection
+  surfaces received sizing, wrapping, typography, and state corrections.
+  Warning and error feedback now glow in their own semantic shades in both
+  themes.
+* **Popover dismissal follows its trigger.** A popover now closes when an
+  ancestor scrollable moves, preventing a floating panel from becoming
+  detached from its anchor.
+
+### Charts and documentation
+
+* **A copyable charts gallery ships at `/charts`.** Area, bar, line, pie,
+  radar, radial, and tooltip specimens share fixtures and state models, and
+  their displayed source is generated and guarded against drift.
+* **Polar interaction matches cartesian interaction.** Pie and radial charts
+  show pointer-following tooltips, clamp the measured tooltip to the plot, and
+  avoid claiming hover behavior when no tooltip is configured. Point-scale
+  category axes retain their first tick and chart footer copy wraps safely.
+* **Chart documentation is consolidated.** The four component routes retain
+  their URLs but share one complete chart reference. Code blocks use one syntax
+  theme, and the site navigation exposes Charts and Agent directly.
+
+### Agent console and voice
+
+* **`AgentConsole` is one integrated working surface.** History, transcript,
+  composer, attachment flow, documentation navigation, downloads, and feature
+  switches are coordinated by the block instead of assembled as disconnected
+  demos. `onDownload` now reaches the transcript.
+* **Microphone support is real.** `AgentFeatures.microphone` drives an actual
+  browser microphone source with permission, recording, cancellation, error,
+  and disposal handling. The voice source interface, stub, and web
+  implementation ship with the `agent-console` registry item and have their own
+  documentation page.
+* **Breaking pre-release cleanup.** The unused `AgentConsole.initialAnchor`
+  entry point was removed. Delete the argument; history positioning now belongs
+  to the integrated console.
+
+### Registry, CLI, site, and release engineering
+
+* **Registry `0.0.3` publishes 96 changed installation contracts.** Sixty
+  items changed by their own payload bytes and the dependency closure moves 36
+  more. `aspect-ratio`, `chart-geometry`, `safe-area`, and `validation-rule`
+  remain at `0.0.1` because their effective installations did not change.
+* **`elattar_cli 0.0.3` reads `/registry/0.0.3/` by default.** Earlier CLI
+  releases keep their immutable registry URLs and behavior.
+* **Release checks are clearer and stricter.** CI reports the failing release
+  or consumer stage, serializes CLI integration tests, uses deterministic Dart
+  formatting, normalizes registry hashes across platforms, and requires the
+  full pub.dev score in the publication rehearsal.
+* **The public docs were refreshed.** The README, installation copy, adoption
+  notes, launch assets, component navigation, and release facts now describe
+  the source-owned package and the 0.0.3 artifacts consistently.
+
+For a focused migration and release inventory, see
+[`docs/releases/0.0.3.md`](docs/releases/0.0.3.md).
 
 ## 0.0.2
 

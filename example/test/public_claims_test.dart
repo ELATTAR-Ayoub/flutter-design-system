@@ -160,8 +160,8 @@ void main() {
         'lib/docs_pages/installation_page.dart',
       ).readAsStringSync();
 
-      expect(rootReadme, contains('`0.0.2`, the current public release.'));
-      expect(rootReadme, contains('/registry/0.0.2/'));
+      expect(rootReadme, contains('`0.0.3`, the current public release.'));
+      expect(rootReadme, contains('/registry/0.0.3/'));
       expect(rootReadme, isNot(contains('`0.0.1`, the first public release.')));
 
       for (final String source in <String>[cliReadme, installation]) {

@@ -1,7 +1,7 @@
 {
   "name": "source-foundation",
   "type": "foundation",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "The copy-first Flutter foundation: semantic colors, themes, typography, spacing, motion, shadows, surfaces, dates, and text layout.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/design_system/foundation/colors.dart",
       "target": "@foundation/colors.dart",
-      "sha256": "d67140147b368e5286743537d3862fcc3b591e3d2e022f1529e8cc6649af525e"
+      "sha256": "8c66ad22f79902c10128293f2bca3b0b68760e77e929a325bc454a7c759f5a1e"
     },
     {
       "source": "lib/src/design_system/foundation/date_format.dart",
@@ -24,17 +24,17 @@
     {
       "source": "lib/src/design_system/foundation/motion.dart",
       "target": "@foundation/motion.dart",
-      "sha256": "13324529cbbeb81efb6d548138333e2efc487710a568c8f5ddcef3bf05f28bb1"
+      "sha256": "224bb14b8a0d769e389e9496ca943bf1ea71e7ef9a9dea9b61b35ee45154ba56"
     },
     {
       "source": "lib/src/design_system/foundation/shadows.dart",
       "target": "@foundation/shadows.dart",
-      "sha256": "33f1af3814d68d35ed7dce3803f11ccd94902c128faa9ffb895529a7cc51c959"
+      "sha256": "f29f1af1484b444009f0e0136d1ca312c86f61c945bba3301fbbac94aa01394d"
     },
     {
       "source": "lib/src/design_system/foundation/spacing.dart",
       "target": "@foundation/spacing.dart",
-      "sha256": "5298f7b2078648a3ff514784ad9cc265ade2effad284c6d9a53661786d5c828d"
+      "sha256": "2f71d5a63b72b776aeca7a6bdfd5ce88ae4e335292a32485f2a8c1c4018dfd33"
     },
     {
       "source": "lib/src/design_system/foundation/surfaces.dart",
@@ -54,7 +54,7 @@
     {
       "source": "lib/src/design_system/foundation/text_layout.dart",
       "target": "@foundation/text_layout.dart",
-      "sha256": "c0fa1abb49f92c038c4c4ee80bb084d5b4d143571e950b18675b551f0a41fb0d"
+      "sha256": "0d9548b66a59d857b144669fb0dc548fed1542396258f9556e7d1e44fc691a3a"
     },
     {
       "source": "lib/src/design_system/foundation/theme_scope.dart",
@@ -94,7 +94,7 @@
     }
   ],
   "documentationRoute": "/components/source_foundation",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/elattar_design_system.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/elattar_design_system.dart",
   "deprecated": false,
   "exports": [
     "AgentCubeTokens",

@@ -1,0 +1,40 @@
+{
+  "name": "combobox",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`components/ui/combobox.tsx` — a select the user can type into, and **the",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/combobox.dart",
+      "target": "@ui/combobox.dart",
+      "sha256": "80affbd9946ad57467e7c6286f57a4c4fe38bc01fe913e8b366e78bab0167eb3"
+    }
+  ],
+  "registryDependencies": [
+    "field",
+    "icon",
+    "input-group",
+    "popover",
+    "select",
+    "source-foundation",
+    "disabled"
+  ],
+  "semanticDependencies": [
+    "field",
+    "icon",
+    "input-group",
+    "popover",
+    "select",
+    "disabled"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/combobox",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/combobox.dart",
+  "deprecated": false
+}

@@ -85,16 +85,19 @@ List<DocsSidebarGroup> _groups() => const <DocsSidebarGroup>[
 ];
 
 void main() {
-  test('the Charts rail group lists the gallery, not the four engine pages', () {
-    final List<DocsSidebarGroup> groups = defaultSidebarGroups('/charts');
-    final DocsSidebarGroup charts = groups.firstWhere(
-      (DocsSidebarGroup g) => g.label == 'Charts',
-    );
+  test(
+    'the Charts rail group lists the gallery, not the four engine pages',
+    () {
+      final List<DocsSidebarGroup> groups = defaultSidebarGroups('/charts');
+      final DocsSidebarGroup charts = groups.firstWhere(
+        (DocsSidebarGroup g) => g.label == 'Charts',
+      );
 
-    expect(charts.items.map((DocsSidebarEntry e) => e.route), <String>[
-      '/charts',
-    ]);
-  });
+      expect(charts.items.map((DocsSidebarEntry e) => e.route), <String>[
+        '/charts',
+      ]);
+    },
+  );
 
   test('the four chart component docs stay in the flat catalog', () {
     for (final String name in <String>[

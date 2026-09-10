@@ -10,7 +10,7 @@
 /// cannot describe one release while the artifacts are another.
 ///
 /// **[cliOnPubDev] is a release-ordering switch, not a preference.** It is
-/// true for the 0.0.2 release, which publishes the CLI before the site is
+/// true for the 0.0.3 release, which publishes the CLI before the site is
 /// deployed. Deploying a build with it true while the package is unpublished
 /// prints a command that does not resolve, and a reader cannot tell that
 /// apart from a broken setup of their own. If the publish is deferred, flip
@@ -59,7 +59,7 @@ const String gitInstallCommand =
     '  --git-path packages/elattar_cli';
 
 const ReleaseFacts releaseFacts = ReleaseFacts(
-  version: '0.0.2',
-  registryUrl: 'https://flutter.elattar.dev/registry/0.0.2/',
+  version: '0.0.3',
+  registryUrl: 'https://flutter.elattar.dev/registry/0.0.3/',
   cliOnPubDev: true,
 );

@@ -170,15 +170,10 @@ class _BubbleAlpha {
 /// and do nothing here. Measured: the reveal never fired and the press never
 /// landed until this existed.
 class _ReactionStack extends MultiChildRenderObjectWidget {
-  const _ReactionStack({required this.align, required super.children});
-
-  /// The bubble's own alignment: the side a rail wider than the bubble
-  /// anchors to, so it grows into the row rather than past the parent's edge.
-  final BubbleAlign align;
+  const _ReactionStack({required super.children});
 
   @override
   RenderStack createRenderObject(BuildContext context) => _RenderReactionStack(
-    anchorEnd: align == BubbleAlign.end,
     alignment: AlignmentDirectional.topStart,
     textDirection: Directionality.of(context),
     fit: StackFit.loose,
@@ -186,12 +181,8 @@ class _ReactionStack extends MultiChildRenderObjectWidget {
   );
 
   @override
-  void updateRenderObject(
-    BuildContext context,
-    covariant _RenderReactionStack renderObject,
-  ) {
+  void updateRenderObject(BuildContext context, RenderStack renderObject) {
     renderObject
-      ..anchorEnd = align == BubbleAlign.end
       ..alignment = AlignmentDirectional.topStart
       ..textDirection = Directionality.of(context)
       ..fit = StackFit.loose
@@ -201,38 +192,11 @@ class _ReactionStack extends MultiChildRenderObjectWidget {
 
 class _RenderReactionStack extends RenderStack {
   _RenderReactionStack({
-    required bool anchorEnd,
     required super.alignment,
     super.textDirection,
     required super.fit,
     required super.clipBehavior,
-  }) : _anchorEnd = anchorEnd; // ignore: prefer_initializing_formals
-
-  bool _anchorEnd;
-  set anchorEnd(bool value) {
-    if (value == _anchorEnd) return;
-    _anchorEnd = value;
-    markNeedsLayout();
-  }
-
-  @override
-  void performLayout() {
-    super.performLayout();
-    final RenderBox? bubble = firstChild;
-    final RenderBox? rail = bubble == null ? null : childAfter(bubble);
-    if (bubble == null || rail == null) return;
-    if (rail.size.width <= bubble.size.width) return;
-    // The requested corner would push the rail past the bubble on the side
-    // that faces the parent's edge; anchor it to the bubble's own side
-    // instead, so the overflow runs into the open half of the row.
-    final bool rtl = textDirection == TextDirection.rtl;
-    final bool right = _anchorEnd != rtl;
-    final StackParentData data = rail.parentData! as StackParentData;
-    data.offset = Offset(
-      right ? bubble.size.width - rail.size.width : 0,
-      data.offset.dy,
-    );
-  }
+  });
 
   @override
   bool hitTest(BoxHitTestResult result, {required Offset position}) {
@@ -327,47 +291,37 @@ class Bubble extends StatelessWidget {
     final BubbleAlign resolved = BubbleAlignScope.resolve(context, align);
     final bool ghost = variant == BubbleVariant.ghost;
 
-    // `w-fit max-w-[80%]`: shrink-wrap, capped at a fraction of whatever
-    // column it is in. A [LayoutBuilder] would express that too and cannot
-    // be used — it refuses to answer an intrinsic query, and the kit's own
-    // `Grid` asks one of every cell through [IntrinsicHeight].
-    Widget box = _MaxWidthFraction(
-      factor: ghost ? 1 : maxWidthFraction,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: resolved == BubbleAlign.end
-            ? CrossAxisAlignment.end
-            : CrossAxisAlignment.start,
-        children: <Widget>[child],
-      ),
-    );
-
-    if (reactions != null) {
-      // `position: absolute` against the bubble, which is `relative`. The
-      // stack is built around [box] — the bubble's own measured shrink-wrapped
-      // shape — rather than the outer `Align` below, which expands to fill
-      // whatever row it sits in. Sizing the stack on the expanded `Align`
-      // would anchor `end` at the row's far edge instead of the bubble's own
-      // trailing edge; sizing it on [box] keeps the rail hugging the bubble
-      // regardless of how short it is. The rail also overflows the bubble's
-      // box by three quarters of its own height, so the stack must neither
-      // clip nor bounds-check a pointer — see [_ReactionStack].
-      box = _ReactionStack(
-        align: resolved,
-        children: <Widget>[box, reactions!],
-      );
-    }
-
-    final Widget bubble = _BubbleScope(
+    Widget bubble = _BubbleScope(
       variant: variant,
       align: resolved,
       child: Align(
         alignment: resolved == BubbleAlign.end
             ? AlignmentDirectional.centerEnd
             : AlignmentDirectional.centerStart,
-        child: box,
+        // `w-fit max-w-[80%]`: shrink-wrap, capped at a fraction of whatever
+        // column it is in. A [LayoutBuilder] would express that too and cannot
+        // be used — it refuses to answer an intrinsic query, and the kit's own
+        // `Grid` asks one of every cell through [IntrinsicHeight].
+        child: _MaxWidthFraction(
+          factor: ghost ? 1 : maxWidthFraction,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: resolved == BubbleAlign.end
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
+            children: <Widget>[child],
+          ),
+        ),
       ),
     );
+
+    if (reactions != null) {
+      // `position: absolute` against the bubble, which is `relative`. The rail
+      // overflows the bubble's box by three quarters of its own height, so the
+      // stack must neither clip nor bounds-check a pointer — see
+      // [_ReactionStack].
+      bubble = _ReactionStack(children: <Widget>[bubble, reactions!]);
+    }
 
     return bubble;
   }

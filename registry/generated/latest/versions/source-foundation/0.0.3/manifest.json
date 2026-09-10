@@ -1,0 +1,99 @@
+{
+  "name": "source-foundation",
+  "type": "foundation",
+  "version": "0.0.3",
+  "description": "The copy-first Flutter foundation: semantic colors, themes, typography, spacing, motion, shadows, surfaces, dates, and text layout.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/design_system/foundation/colors.dart",
+      "target": "@foundation/colors.dart",
+      "sha256": "8c66ad22f79902c10128293f2bca3b0b68760e77e929a325bc454a7c759f5a1e"
+    },
+    {
+      "source": "lib/src/design_system/foundation/date_format.dart",
+      "target": "@foundation/date_format.dart",
+      "sha256": "f2b90aa01e4bc80e519852b78bdb5dd6e680f11ff051a5bb37a08be6d3b2b2b3"
+    },
+    {
+      "source": "lib/src/design_system/foundation/media.dart",
+      "target": "@foundation/media.dart",
+      "sha256": "864e18ce30c82f872f94af2b0bb59332da386a287a7dd8b77a7b102419b54394"
+    },
+    {
+      "source": "lib/src/design_system/foundation/motion.dart",
+      "target": "@foundation/motion.dart",
+      "sha256": "224bb14b8a0d769e389e9496ca943bf1ea71e7ef9a9dea9b61b35ee45154ba56"
+    },
+    {
+      "source": "lib/src/design_system/foundation/shadows.dart",
+      "target": "@foundation/shadows.dart",
+      "sha256": "f29f1af1484b444009f0e0136d1ca312c86f61c945bba3301fbbac94aa01394d"
+    },
+    {
+      "source": "lib/src/design_system/foundation/spacing.dart",
+      "target": "@foundation/spacing.dart",
+      "sha256": "2f71d5a63b72b776aeca7a6bdfd5ce88ae4e335292a32485f2a8c1c4018dfd33"
+    },
+    {
+      "source": "lib/src/design_system/foundation/surfaces.dart",
+      "target": "@foundation/surfaces.dart",
+      "sha256": "366223ac02c1c710f9f02ed8b957b93151effc58e699e3ba58ea37fd5731a65c"
+    },
+    {
+      "source": "lib/src/design_system/foundation/theme.dart",
+      "target": "@foundation/theme.dart",
+      "sha256": "bd700fe367ebe05e465529c1e8d09d6136f368c5ab65b408f8588c92ffce02f1"
+    },
+    {
+      "source": "lib/src/design_system/foundation/typography.dart",
+      "target": "@foundation/typography.dart",
+      "sha256": "01989f1d06335089d0937a026bd7bc1cb954a0e4f85547317115b26c3ed4f845"
+    },
+    {
+      "source": "lib/src/design_system/foundation/text_layout.dart",
+      "target": "@foundation/text_layout.dart",
+      "sha256": "0d9548b66a59d857b144669fb0dc548fed1542396258f9556e7d1e44fc691a3a"
+    },
+    {
+      "source": "lib/src/design_system/foundation/theme_scope.dart",
+      "target": "@foundation/theme_scope.dart",
+      "sha256": "0733b6343b76f23927238bfdcfc620f8ebd4369377d652a813719499ea36ad49"
+    }
+  ],
+  "registryDependencies": [],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [
+    {
+      "source": "assets/fonts/InterVariable.ttf",
+      "target": "@foundation/fonts/InterVariable.ttf",
+      "sha256": "5f27757f43f9e9d371851c372ee2e70c5ac5c65fb915d603667c253de8d3f65a",
+      "family": "InterLocal"
+    },
+    {
+      "source": "assets/fonts/GeistMono-Variable.ttf",
+      "target": "@foundation/fonts/GeistMono-Variable.ttf",
+      "sha256": "0e1af3f507a1c8dfbb03d13ffad585834cd45ed7ccb78c756c7ce7873d180d30",
+      "family": "GeistMono"
+    }
+  ],
+  "shaders": [],
+  "licenses": [
+    {
+      "source": "third_party/fonts/inter/OFL.txt",
+      "target": "@license/Inter-OFL-1.1.txt",
+      "sha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a"
+    },
+    {
+      "source": "third_party/fonts/geist-mono/OFL.txt",
+      "target": "@license/Geist-Mono-OFL-1.1.txt",
+      "sha256": "c683bfbcc7e087f5d37a54ef628f10387c451a83ddc459b151403a164ac46c90"
+    }
+  ],
+  "documentationRoute": "/components/source_foundation",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/elattar_design_system.dart",
+  "deprecated": false
+}

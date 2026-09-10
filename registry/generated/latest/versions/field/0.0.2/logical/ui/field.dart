@@ -70,7 +70,6 @@ import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/text_layout.dart';
 import '../../design_system/foundation/theme_scope.dart';
-import './disabled.dart';
 import './validation_rule.dart';
 
 /// What activating a field **does** — a one-slot holder a control fills in.
@@ -112,7 +111,6 @@ class FieldScope extends InheritedWidget {
     this.enabled = true,
     this.focusNode,
     this.activator,
-    this.disabledReason,
     required super.child,
   });
 
@@ -140,10 +138,6 @@ class FieldScope extends InheritedWidget {
   /// own and takes the tap with a handler of its own instead.
   final FieldActivator? activator;
 
-  /// Why the field is disabled. Shown as a tooltip on hover (pointer) or
-  /// tap (touch) while disabled; null shows nothing.
-  final String? disabledReason;
-
   static FieldScope? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<FieldScope>();
 
@@ -154,7 +148,6 @@ class FieldScope extends InheritedWidget {
       old.invalid != invalid ||
       old.enabled != enabled ||
       old.focusNode != focusNode ||
-      old.disabledReason != disabledReason ||
       !identical(old.activator, activator);
 }
 
@@ -317,7 +310,6 @@ class Field extends StatefulWidget {
     this.enabled = true,
     this.focusNode,
     this.orientation = FieldOrientation.vertical,
-    this.disabledReason,
   });
 
   /// The control.
@@ -348,10 +340,6 @@ class Field extends StatefulWidget {
   final FocusNode? focusNode;
 
   final FieldOrientation orientation;
-
-  /// Why the field is disabled. Shown as a tooltip on hover (pointer) or
-  /// tap (touch) while disabled; null shows nothing.
-  final String? disabledReason;
 
   /// `gap-2` — 8px between label, control and what follows.
   static double get gap => space(2);
@@ -394,7 +382,6 @@ class _FieldState extends State<Field> {
       enabled: widget.enabled,
       focusNode: widget.focusNode,
       activator: _activator,
-      disabledReason: widget.disabledReason,
       child: widget.child,
     );
 
@@ -405,16 +392,6 @@ class _FieldState extends State<Field> {
         // it. Same reason `focusNode` has always been passed here.
         : FieldLabel(
             label,
-            // Horizontal orientation is the shape a checkbox, radio or switch
-            // field takes (control first, label growing into the row beside
-            // it) — never a text input's. The words beside those controls are
-            // what the person is choosing, so they read as primary content —
-            // [Input.textSpecDefault] — and not as the name of a field. A
-            // vertical field's label stays [FieldLabel.medium], TextStyles.small
-            // at medium weight.
-            spec: widget.orientation == FieldOrientation.horizontal
-                ? TextStyles.body
-                : null,
             focusNode: widget.focusNode,
             activator: _activator,
             enabled: widget.enabled,
@@ -636,7 +613,7 @@ class FieldLabel extends StatelessWidget {
     }
 
     if (!enabled) {
-      label = Disabled(disabled: true, blockPointer: false, child: label);
+      label = Opacity(opacity: disabledOpacity, child: label);
     }
 
     return Align(

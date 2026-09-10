@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/collapsible.dart",
       "target": "@ui/collapsible.dart",
-      "sha256": "df7a2814ffd0671a5e1a2b4cf35cbd536e520d8ae81592ee4be04b06847f1a45"
+      "sha256": "1855a087e72b23e72bb71b8099917563f719c567f73fc5299d9065532c0add2d"
     }
   ],
   "registryDependencies": [

@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/button.dart",
       "target": "@ui/button.dart",
-      "sha256": "1ae63c6728aaef83891ab3320915b02a294c5d4bb2b822d70b81dfc02a783905"
+      "sha256": "1cf91fbeeaf35827ba72072abfba92925abd7b527c5326ffeace7506cc406244"
     }
   ],
   "registryDependencies": [
@@ -17,15 +17,13 @@
     "surface",
     "action-feedback",
     "source-foundation",
-    "spinner",
-    "disabled"
+    "spinner"
   ],
   "semanticDependencies": [
     "premium-surface",
     "surface",
     "action-feedback",
-    "spinner",
-    "disabled"
+    "spinner"
   ],
   "pubDependencies": {},
   "assets": [],

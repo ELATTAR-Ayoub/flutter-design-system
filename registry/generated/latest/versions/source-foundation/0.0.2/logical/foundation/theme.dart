@@ -475,13 +475,10 @@ class ThemeTokens {
     // axis rather than as an ARGB literal, so this block states no colour the
     // rest of it would not.
     bloomVoid: hslColor(0, 0, 100),
-    // Light paints its own light, not a multiply wash: the ramp keeps the
-    // variant colour's lightness and chroma and lifts a hot core, the same
-    // shape as dark, so the corner reads as a clean glow on the white card.
-    bloomL: 0.92,
-    bloomC: 1.15,
-    bloomLift: 0.55,
-    bloomHotC: 0.7,
+    bloomL: 0.6,
+    bloomC: 1.55,
+    bloomLift: 0,
+    bloomHotC: 1,
     starGlowSize: 3,
     starGlowMix: 0.85,
   );

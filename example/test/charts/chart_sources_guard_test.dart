@@ -121,8 +121,7 @@ void main() {
       'chart-tooltip-': 9,
     };
 
-    for (final MapEntry<String, int> family
-        in expectedFamilyCounts.entries) {
+    for (final MapEntry<String, int> family in expectedFamilyCounts.entries) {
       final int actual = chartSources.keys
           .where((String key) => key.startsWith(family.key))
           .length;

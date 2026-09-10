@@ -1,0 +1,42 @@
+{
+  "name": "input-otp",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`components/ui/input-otp.tsx` + the `input-otp` package it is markup for.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/input_otp.dart",
+      "target": "@ui/input_otp.dart",
+      "sha256": "a808093c54475c2451c53fd3e2cc748021cc951915a98b2cfe54888b9cc7e946"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "field",
+    "icon",
+    "input",
+    "keyframes",
+    "surface",
+    "source-foundation",
+    "disabled"
+  ],
+  "semanticDependencies": [
+    "button",
+    "field",
+    "icon",
+    "input",
+    "keyframes",
+    "surface",
+    "disabled"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/input_otp",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/input_otp.dart",
+  "deprecated": false
+}

@@ -670,31 +670,11 @@ const List<DocsApiFact> _prismPaletteFacts = <DocsApiFact>[
         '#d4d4d4, the theme\'s plain-text '
         'colour.',
   ),
-  DocsApiFact(
-    name: 'keyword',
-    type: 'Color',
-    description: '#569cd6.',
-  ),
-  DocsApiFact(
-    name: 'string',
-    type: 'Color',
-    description: '#ce9178.',
-  ),
-  DocsApiFact(
-    name: 'number',
-    type: 'Color',
-    description: '#b5cea8.',
-  ),
-  DocsApiFact(
-    name: 'function',
-    type: 'Color',
-    description: '#dcdcaa.',
-  ),
-  DocsApiFact(
-    name: 'comment',
-    type: 'Color',
-    description: '#6a9955.',
-  ),
+  DocsApiFact(name: 'keyword', type: 'Color', description: '#569cd6.'),
+  DocsApiFact(name: 'string', type: 'Color', description: '#ce9178.'),
+  DocsApiFact(name: 'number', type: 'Color', description: '#b5cea8.'),
+  DocsApiFact(name: 'function', type: 'Color', description: '#dcdcaa.'),
+  DocsApiFact(name: 'comment', type: 'Color', description: '#6a9955.'),
   DocsApiFact(
     name: 'type',
     type: 'Color',

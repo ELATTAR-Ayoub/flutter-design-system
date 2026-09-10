@@ -129,10 +129,10 @@ Run `elattar` with no arguments for the same summary.
 By default this CLI reads a **hosted, version-pinned registry**:
 
 ```
-https://flutter.elattar.dev/registry/0.0.2/
+https://flutter.elattar.dev/registry/0.0.3/
 ```
 
-That path is immutable. `elattar_cli 0.0.2` will install the same sources in a
+That path is immutable. `elattar_cli 0.0.3` will install the same sources in a
 year that it installs today, because a later release publishes a new versioned
 path rather than changing this one. Nothing you install can change under you
 without you changing the CLI version.
@@ -140,7 +140,7 @@ without you changing the CLI version.
 Point somewhere else with `--registry`:
 
 ```bash
-elattar add button --registry https://mirror.example.com/elattar/0.0.2/
+elattar add button --registry https://mirror.example.com/elattar/0.0.3/
 elattar add button --registry ../flutter-design-system/registry/generated/latest
 ```
 

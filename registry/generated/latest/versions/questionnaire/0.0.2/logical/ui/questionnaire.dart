@@ -64,7 +64,6 @@ import '../../design_system/foundation/typography.dart';
 import './keyframes.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
-import './disabled.dart';
 import './input.dart';
 import './kbd.dart';
 
@@ -672,7 +671,6 @@ class QuestionnaireChoice extends StatefulWidget {
     this.description,
     this.defaultChecked = false,
     this.disabled = false,
-    this.disabledReason,
   });
 
   /// `min-h-11`.
@@ -708,9 +706,6 @@ class QuestionnaireChoice extends StatefulWidget {
   final String? description;
   final bool defaultChecked;
   final bool disabled;
-
-  /// Why the choice is disabled. Shown as a tooltip while [disabled].
-  final String? disabledReason;
 
   @override
   State<QuestionnaireChoice> createState() => _QuestionnaireChoiceState();
@@ -766,10 +761,8 @@ class _QuestionnaireChoiceState extends State<QuestionnaireChoice> {
         onTap: widget.disabled
             ? null
             : () => scope.controller.setValue(item.name, widget.value),
-        child: Disabled(
-          disabled: widget.disabled,
-          blockPointer: false,
-          reason: widget.disabledReason,
+        child: Opacity(
+          opacity: widget.disabled ? QuestionnaireChoice.disabledOpacity : 1,
           child: AnimatedContainer(
             duration: effectiveMotionDuration(context, MotionDurations.normal),
             curve: MotionCurves.enter,

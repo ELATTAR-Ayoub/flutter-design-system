@@ -66,11 +66,11 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import './content_change.dart';
 import '../../design_system/foundation/theme_scope.dart';
-import './disabled.dart';
 import './icon.dart';
 import './icon_paths.g.dart';
 import './skeleton.dart';
@@ -200,7 +200,6 @@ class Stat extends StatelessWidget {
     this.state = StatState.ready,
     this.message,
     this.disabled = false,
-    this.disabledReason,
   });
 
   final String label;
@@ -224,9 +223,6 @@ class Stat extends StatelessWidget {
   final String? message;
 
   final bool disabled;
-
-  /// Why the control is disabled, shown as a tooltip.
-  final String? disabledReason;
 
   /// `mt-2` — under the label, and under the figure.
   static double get rowGap => space(2);
@@ -358,7 +354,9 @@ class Stat extends StatelessWidget {
       ],
     );
 
-    body = Disabled(disabled: disabled, reason: disabledReason, child: body);
+    if (disabled) {
+      body = Opacity(opacity: SurfaceOpacity.disabled, child: body);
+    }
     return Semantics(enabled: !disabled, child: body);
   }
 }

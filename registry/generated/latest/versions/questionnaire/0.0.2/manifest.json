@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/questionnaire.dart",
       "target": "@ui/questionnaire.dart",
-      "sha256": "82c372f9dbbac537ec524389594a6fb5fb52c0d7dfc7fe6fc2dc387425a85fc2"
+      "sha256": "8ee2e9238ffc9af53759af1abd599cbcc25c1add5562f786ff806957ae4312ce"
     }
   ],
   "registryDependencies": [
@@ -17,15 +17,13 @@
     "input",
     "kbd",
     "keyframes",
-    "source-foundation",
-    "disabled"
+    "source-foundation"
   ],
   "semanticDependencies": [
     "button",
     "input",
     "kbd",
-    "keyframes",
-    "disabled"
+    "keyframes"
   ],
   "pubDependencies": {},
   "assets": [],

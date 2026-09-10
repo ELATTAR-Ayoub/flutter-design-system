@@ -6,8 +6,8 @@
 /// then the wrong bytes have been in the repository for however long it took.
 /// This suite moves the same check earlier, into `flutter test`.
 ///
-/// It reads `registry/released/0.0.1.lock.json`, recorded once from a generated
-/// tree verified byte-identical to tag `v0.0.1`
+/// It reads every lock under `registry/released/`, each recorded from a
+/// generated tree verified byte-identical to its matching release tag
 /// (`tool/registry_builder/bin/snapshot_released.dart`).
 ///
 /// **Three findings, reported apart, because they mean different things.**
@@ -237,6 +237,45 @@ void main() {
             '${findings.join('\n')}',
       );
     });
+  });
+
+  group('every recorded release is immutable', () {
+    final List<File> releaseLocks =
+        Directory('registry/released')
+            .listSync()
+            .whereType<File>()
+            .where((File file) => file.path.endsWith('.lock.json'))
+            .toList()
+          ..sort((File a, File b) => a.path.compareTo(b.path));
+
+    test('at least one release lock is recorded', () {
+      expect(releaseLocks, isNotEmpty);
+    });
+
+    for (final File releaseLock in releaseLocks) {
+      final Map<String, Object?> release =
+          jsonDecode(releaseLock.readAsStringSync()) as Map<String, Object?>;
+      final String releaseVersion = '${release['version']}';
+      final Map<String, String> releasePayloads = _lockedPayloads(release);
+
+      test(releaseVersion, () {
+        expect(releasePayloads, hasLength(release['payloadCount']));
+        expect(releasePayloads, isNotEmpty);
+        for (final String path in releasePayloads.keys) {
+          expect(path, startsWith('versions/'));
+          expect(path, contains('/$releaseVersion/'));
+        }
+
+        final ReleasedPayloadAudit audit = auditReleasedPayloads(
+          generatedRoot: _generated,
+          locked: releasePayloads,
+          version: releaseVersion,
+        );
+        expect(audit.missing, isEmpty);
+        expect(audit.changed, isEmpty);
+        expect(audit.unexpected, isEmpty);
+      });
+    }
   });
 
   group('the guard catches each failure, seeded', () {

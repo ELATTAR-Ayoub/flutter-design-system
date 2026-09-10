@@ -1,0 +1,32 @@
+{
+  "name": "message-scroller",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`components/ui/message-scroller.tsx` — a transcript viewport that manages",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/message_scroller.dart",
+      "target": "@ui/message_scroller.dart",
+      "sha256": "b2cb5b7439edd75e593aaa89b29fb76dc4f207300d996b524031167e23b7ca6e"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "icon",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "icon"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/message-scroller",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/message_scroller.dart",
+  "deprecated": false
+}

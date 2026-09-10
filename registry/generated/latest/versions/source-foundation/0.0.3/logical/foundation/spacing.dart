@@ -1,0 +1,267 @@
+/// Distance, measure and corner — the geometry half of the token set.
+///
+/// This Flutter foundation file is the source of truth. Historical CSS names
+/// below are provenance for the initial values only. Logical pixels are used
+/// throughout.
+library;
+
+import 'dart:ui' show Size;
+
+/// Tailwind's spacing unit, in logical pixels.
+///
+/// `--spacing` is never redeclared in `globals.css`, so it keeps Tailwind v4's
+/// default `0.25rem` = 4px, and every gap in that file is
+/// `calc(var(--spacing) * n)`. [space] is that multiplication: `space(6)` is `gap-6`
+/// is 24px.
+double space(num n) => n.toDouble() * 4.0;
+
+/// The measures the shell and its pages are built on — globals.css L228–322.
+///
+/// These are the widths that are neither a component's own size nor a fraction
+/// of the viewport; each is a `--width-*` / `--height-*` token in the reference.
+class LayoutWidths {
+  /// `--width-shell: 1680px` — globals.css L228. The outer frame the sidebar
+  /// and the main column share.
+  static const double shell = 1680;
+
+  /// `--width-content: 1080px` — globals.css L229. The documentation reading
+  /// column inside the shell, held to roughly 90 characters at body size.
+  static const double content = 1080;
+
+  /// `--width-page: 1200px` — globals.css L244. The cap for customer-facing
+  /// pages.
+  ///
+  /// DOCUMENTED DRIFT: `/design-system/spacing` has described this measure in
+  /// prose as "1320px" since before the token existed (L230–243). The copy
+  /// ships as written and the token renders 1200; both sides are kept.
+  static const double page = 1200;
+
+  /// `--width-prose: 720px` — globals.css L245. A column carrying nothing but
+  /// sentences. Deliberately not interchangeable with [content].
+  static const double prose = 720;
+
+  /// `--width-rail: 15rem` = 240px — globals.css L251. The reading rail: a
+  /// table of contents, an anchor list, an article's metadata column.
+  static const double rail = 240;
+
+  /// **640px.** Not a `globals.css` token: this project's own reference has
+  /// no rung between [prose] (720) and [rail] (240). Recorded here because
+  /// it is a real measure read off a live page, not a guess — the shadcn
+  /// docs site's own article column (`max-w-160` on
+  /// `https://ui.shadcn.com/docs/installation`, confirmed via its own
+  /// rendered layout) caps at exactly this width, distinct from both
+  /// [content] (the wider three-column shell measure) and [prose] (this
+  /// port's own plain-text column). The documentation article reads at
+  /// this width, not [content], to match that reference.
+  static const double article = 640;
+
+  /// `--width-sidebar: 16rem` = 256px — globals.css L320. The app shell's
+  /// navigation panel.
+  static const double sidebar = 256;
+
+  /// `--width-sidebar-icon: 3rem` = 48px — globals.css L322. The collapsed
+  /// rail; also the hit-target floor.
+  static const double sidebarCollapsed = 48;
+
+  /// `--width-sidebar-mobile: 18rem` = 288px — globals.css L321. Wider than
+  /// [sidebar] on purpose: a sheet has no rail beside it competing for the eye.
+  static const double sidebarMobile = 288;
+}
+
+class LayoutHeights {
+  const LayoutHeights._();
+
+  /// `--height-site-header: 4rem` = 64px — globals.css L290.
+  static const double siteHeader = 64;
+}
+
+class BorderWidths {
+  const BorderWidths._();
+
+  /// The width Tailwind's bare `border` utility gives an element: 1px.
+  static const double hairline = 1;
+
+  /// The focus ring's stroke.
+  ///
+  /// Three logical pixels, which is what every focused control in the package
+  /// already draws — stated here so a control that has to paint its own ring
+  /// reads the same number rather than choosing one.
+  static const double focusRing = 3;
+
+  /// How far the focus ring sits outside the box it rings.
+  ///
+  /// A ring drawn flush against a filled control is hard to see against the
+  /// fill; a small offset separates the two without moving anything, because
+  /// the ring is painted rather than laid out.
+  static const double focusRingOffset = 2;
+}
+
+class ScrollOffsets {
+  const ScrollOffsets._();
+
+  /// Header clearance plus one 32px spacing step.
+  static const double anchoredHeading = LayoutHeights.siteHeader + 32;
+}
+
+/// The corner ladder — globals.css L324–339.
+///
+/// Both theme blocks also set `--radius: 10px` (L605 / L814), which is
+/// numerically [md]; it is exposed per theme as `ThemeTokens.radius`.
+class Radii {
+  /// `--radius-xs: 2px` — L324. Tips and swatches only: a tooltip arrow, a
+  /// chart legend key. Nothing with content in it should be this sharp.
+  static const double xs = 2;
+
+  /// `--radius-sm: 6px` — L325.
+  static const double sm = 6;
+
+  /// `--radius-md: 10px` — L326.
+  static const double md = 10;
+
+  /// `--radius-lg: 12px` — L327.
+  static const double lg = 12;
+
+  /// `--radius-xl: 16px` — L328.
+  static const double xl = 16;
+
+  /// `--radius-2xl: 20px` — L329.
+  static const double xl2 = 20;
+
+  /// `--radius-3xl: 24px` — L330.
+  static const double xl3 = 24;
+
+  /// `--radius-4xl: 32px` — L338. The soft-slab step, outside the container
+  /// ladder's normal range (L331–337).
+  static const double xl4 = 32;
+
+  /// `--radius-indicator: 999px` — L339.
+  static const double full = 999;
+
+  /// The `- 3px` in `calc(var(--radius) - 3px)`.
+  static const double _addonButtonInset = 3;
+
+  /// `calc(var(--radius) - 3px)` = **7px** — the corner an `InputGroupButton`
+  /// wears at its `xs` size (`components/ui/input-group.tsx:73`).
+  ///
+  /// The only non-pill, non-ladder radius in the system: a 24px control sitting
+  /// inside a 999px pill. It is a **derived getter** rather than a ninth rung
+  /// because the stylesheet writes arithmetic, and the relationship is the
+  /// point — retune `--radius` and the addon button follows, which is exactly
+  /// what `calc()` says. A frozen literal would silently stop tracking.
+  ///
+  /// The base is [md] because `--radius` resolves to 10px in *both* theme
+  /// blocks (globals.css L605 / L814) — numerically the same 10 the
+  /// `--radius-md` rung carries. [ThemeTokens.radius] is the per-theme reading
+  /// of `--radius`; if the two themes ever disagree, that is what this should
+  /// be derived from instead, and this getter is the one place to change.
+  static double get addonButton => md - _addonButtonInset;
+}
+
+/// Tailwind's stock blur ladder — the `--blur-*` scale, which `globals.css`
+/// never redeclares, so the framework defaults render.
+///
+/// CSS `filter: blur(<length>)` takes the length as the Gaussian **standard
+/// deviation** (Filter Effects §8.4), unlike `box-shadow`, whose blur radius
+/// is twice sigma. These values therefore go straight into
+/// `ImageFilter.blur(sigmaX:, sigmaY:)` with no conversion.
+class Blurs {
+  const Blurs._();
+
+  /// `--blur-xs: 4px` — `backdrop-blur-xs` on the sheet overlay.
+  static const double xs = 4;
+
+  /// `--blur-xl: 24px` — `backdrop-blur-xl` on the sticky docs header and on
+  /// the `glass-panel` utility.
+  static const double xl = 24;
+}
+
+/// Tailwind's stock container ladder — the `--container-*` scale, which
+/// `globals.css` never redeclares, so the framework defaults render.
+///
+/// Only the rungs the port actually reaches for are transcribed, on [Blurs]'s
+/// precedent: a ladder with no consumer is a guess about what the reference
+/// will need next.
+class Containers {
+  const Containers._();
+
+  /// `--container-sm: 24rem` = **384px** — `max-w-sm`.
+  ///
+  /// The measure `EmptyHeader` and `EmptyContent` both cap themselves at
+  /// (`components/ui/empty.tsx` L20 / L96), which is what keeps an empty
+  /// state's title and its description on the same short column while the
+  /// panel around them is 482px wide.
+  static const double sm = 384;
+
+  /// `--container-xs: 20rem` = **320px** — `max-w-xs`.
+  ///
+  /// `AlertDialogContent`'s base cap, which `sm:max-w-sm` overrules at every
+  /// width the port renders at; `PopoverContent w-80` and `TooltipContent
+  /// max-w-xs` both land on the same 320.
+  static const double xs = 320;
+
+  /// `--container-md: 28rem` = **448px** — `max-w-md`.
+  ///
+  /// `DialogContent variant="media"`'s `sm:max-w-md`, and the `max-w-md` the
+  /// danger zone's description column is held to.
+  static const double md = 448;
+
+  /// `--container-lg: 32rem` = **512px** — `max-w-lg`.
+  ///
+  /// The measure the inputs page holds a field column to, and the one the
+  /// selection page caps its longest control row at. Added when those two
+  /// reached for it: a rung earns its place here by having a consumer, which
+  /// is the same bar every other rung on this ladder met.
+  static const double lg = 512;
+
+  /// `--container-xl: 36rem` = **576px** — `max-w-xl`.
+  ///
+  /// The floor the charts page's unit-activity scroller holds itself to, so a
+  /// dense figure never compresses below the width its own labels need.
+  static const double xl = 576;
+
+  /// `--container-3xl: 48rem` = **768px** — `max-w-3xl`.
+  ///
+  /// The measure every prose block in the charts page's animation section is
+  /// held to: long-form explanation, capped where a line stops being readable.
+  static const double xl3 = 768;
+
+  /// `--container-2xl: 42rem` = **672px** — `max-w-2xl`, the settings column
+  /// the dialogs page centres its first danger zone in.
+  static const double xl2 = 672;
+}
+
+/// The smallest an interactive target may effectively be.
+///
+/// A control may *look* smaller — a 20px checkbox, a 24px icon button, a dense
+/// menu row — but the area that answers a finger may not. 44 logical pixels is
+/// the floor both platform guidelines converge on, and it is a floor on the
+/// **hit test**, not on layout: growing the widget would push its neighbours
+/// around and change a design that is otherwise correct. `TapTarget` (press.dart)
+/// is what applies it.
+class TouchTargets {
+  const TouchTargets._();
+
+  /// The minimum effective width and height of anything a finger can hit.
+  static const double minimum = 44;
+
+  /// [minimum] as a square.
+  static const Size minimumSize = Size(minimum, minimum);
+}
+
+/// Tailwind's stock breakpoints, in logical pixels.
+///
+/// `globals.css` never redeclares `--breakpoint-*`, so the framework defaults
+/// stand; the shell is desktop-first and shows its sidebar from [lg] up.
+class Breakpoints {
+  /// 640px.
+  static const double sm = 640;
+
+  /// 768px.
+  static const double md = 768;
+
+  /// 1024px.
+  static const double lg = 1024;
+
+  /// 1280px.
+  static const double xl = 1280;
+}

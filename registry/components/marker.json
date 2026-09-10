@@ -1,7 +1,7 @@
 {
   "name": "marker",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "`components/ui/marker.tsx` — *\\\"a note **about** a list, sitting in the",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -21,7 +21,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/marker",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/marker.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/marker.dart",
   "exports": [
     "Marker",
     "MarkerVariant"

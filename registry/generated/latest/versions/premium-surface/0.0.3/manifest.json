@@ -1,0 +1,30 @@
+{
+  "name": "premium-surface",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "Rationed value foil effect for premium and reward surfaces.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/premium_surface.dart",
+      "target": "@ui/premium_surface.dart",
+      "sha256": "c57e4a92ffd4cebde271c28fa4909eebd9b1ab3e944d8fb75c226d4b2a9e08b9"
+    }
+  ],
+  "registryDependencies": [
+    "surface",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "surface"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/premium_surface",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/premium_surface.dart",
+  "deprecated": false
+}

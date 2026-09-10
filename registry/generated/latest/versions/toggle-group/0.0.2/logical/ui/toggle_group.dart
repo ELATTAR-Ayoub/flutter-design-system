@@ -87,12 +87,7 @@ const int _deselected = -1;
 /// same resolved skin without a lookup.
 @immutable
 class ToggleGroupItem {
-  const ToggleGroupItem({
-    required this.label,
-    this.child,
-    this.enabled = true,
-    this.disabledReason,
-  });
+  const ToggleGroupItem({required this.label, this.child, this.enabled = true});
 
   /// The option's name — both what it says and what a screen reader announces.
   ///
@@ -109,9 +104,6 @@ class ToggleGroupItem {
   /// the primitive declares it, and because a disabled option in a live group
   /// is a real state rather than a hypothetical one.
   final bool enabled;
-
-  /// Why the option is disabled, shown as a tooltip.
-  final String? disabledReason;
 }
 
 /// A segmented control: three or more options, one selected at a time, one
@@ -215,7 +207,6 @@ class ToggleGroup extends StatelessWidget {
             onChanged: items[i].enabled
                 ? (bool on) => onChanged(on ? i : null)
                 : null,
-            disabledReason: items[i].disabledReason,
             variant: variant,
             size: size,
             label: items[i].label,

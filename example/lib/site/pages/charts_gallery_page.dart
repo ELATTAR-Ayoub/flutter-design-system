@@ -186,10 +186,7 @@ class _Hero extends StatelessWidget {
           spacing: space(3),
           runSpacing: space(3),
           children: <Widget>[
-            Button(
-              onPressed: onBrowse,
-              child: const Text('Browse Charts'),
-            ),
+            Button(onPressed: onBrowse, child: const Text('Browse Charts')),
             Button(
               variant: ButtonVariant.secondary,
               onPressed: onNavigate == null
@@ -255,7 +252,11 @@ class _ComponentReferenceRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  StyledText(entry.title, TextStyles.h4, color: theme.foreground),
+                  StyledText(
+                    entry.title,
+                    TextStyles.h4,
+                    color: theme.foreground,
+                  ),
                   SizedBox(height: space(1)),
                   StyledText(
                     entry.description,

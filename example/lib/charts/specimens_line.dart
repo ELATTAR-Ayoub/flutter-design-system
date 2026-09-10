@@ -312,8 +312,7 @@ const List<ChartSpecimen> lineSpecimens = <ChartSpecimen>[
 
 Widget _lineDefaultBuild(BuildContext context, ChartInk ink) =>
     lineDefault(ink);
-Widget _lineLinearBuild(BuildContext context, ChartInk ink) =>
-    lineLinear(ink);
+Widget _lineLinearBuild(BuildContext context, ChartInk ink) => lineLinear(ink);
 Widget _lineStepBuild(BuildContext context, ChartInk ink) => lineStep(ink);
 Widget _lineMultipleBuild(BuildContext context, ChartInk ink) =>
     lineMultiple(ink);

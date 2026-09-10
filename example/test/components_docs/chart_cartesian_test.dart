@@ -173,9 +173,7 @@ void main() {
         await tester.pump();
 
         expect(
-          tester
-              .widget<DocsInstall>(find.byType(DocsInstall))
-              .command,
+          tester.widget<DocsInstall>(find.byType(DocsInstall)).command,
           'elattar add chart-cartesian',
         );
       },
@@ -206,7 +204,9 @@ void main() {
 
     test('the table of contents matches the declared sections', () {
       expect(
-        chartCartesianDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        chartCartesianDocSpec.toc
+            .map((DocsTocEntry entry) => entry.title)
+            .toList(),
         _sectionTitles,
       );
     });
@@ -274,7 +274,10 @@ void main() {
           mode: ColorMode.dark,
         );
         await tester.pumpWidget(
-          _harness(controller: controller, child: const ChartCartesianDocPage()),
+          _harness(
+            controller: controller,
+            child: const ChartCartesianDocPage(),
+          ),
         );
         await tester.pump();
 

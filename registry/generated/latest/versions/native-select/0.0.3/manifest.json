@@ -1,0 +1,42 @@
+{
+  "name": "native-select",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`components/ui/native-select.tsx` — a real `<select>`, and **the one place",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/native_select.dart",
+      "target": "@ui/native_select.dart",
+      "sha256": "b19ed14dddc79f4ceb9cd5019a672bd1155ef0bf6c23ab091b519ec1df674f9d"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "field",
+    "icon",
+    "surface",
+    "popover",
+    "select",
+    "source-foundation",
+    "disabled"
+  ],
+  "semanticDependencies": [
+    "button",
+    "field",
+    "icon",
+    "surface",
+    "popover",
+    "select",
+    "disabled"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/native_select",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/native_select.dart",
+  "deprecated": false
+}

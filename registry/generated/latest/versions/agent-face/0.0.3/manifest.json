@@ -1,0 +1,38 @@
+{
+  "name": "agent-face",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`components/agent/parts/agent-face.tsx` — what the assistant looks like",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/agent_face.dart",
+      "target": "@ui/agent_face.dart",
+      "sha256": "3e42557095c009e9911e12eae51e158f6c068fd370a62682a191f1d21e411d67"
+    }
+  ],
+  "registryDependencies": [
+    "agent-avatar",
+    "agent-core",
+    "keyframes",
+    "source-foundation",
+    "voice",
+    "voice-indicator"
+  ],
+  "semanticDependencies": [
+    "agent-avatar",
+    "agent-core",
+    "keyframes",
+    "voice",
+    "voice-indicator"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/agent_face",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/agent_face.dart",
+  "deprecated": false
+}

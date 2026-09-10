@@ -173,9 +173,7 @@ void main() {
         await tester.pump();
 
         expect(
-          tester
-              .widget<DocsInstall>(find.byType(DocsInstall))
-              .command,
+          tester.widget<DocsInstall>(find.byType(DocsInstall)).command,
           'elattar add chart-polar',
         );
       },

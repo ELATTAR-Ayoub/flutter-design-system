@@ -1,7 +1,7 @@
 {
   "name": "keyframes",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "`@keyframes` — the reference's fourteen, transcribed whole.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/keyframes.dart",
       "target": "@ui/keyframes.dart",
-      "sha256": "86b5d9a43c4477af5fe0c5202ba43580c97395f7145888a75d4546305d7c5ded"
+      "sha256": "959708e2685fc8ad6ab621339b51026f61c829c8908c11914b9ad3f0c76e219b"
     }
   ],
   "registryDependencies": [
@@ -21,7 +21,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/keyframes",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/keyframes.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/keyframes.dart",
   "exports": [
     "CheckmarkDrawMotion",
     "ContentSwapMotion",

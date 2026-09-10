@@ -9,21 +9,19 @@
     {
       "source": "lib/src/components/ui/toggle.dart",
       "target": "@ui/toggle.dart",
-      "sha256": "fd44d87fad3891058305b9c23b0960890c476c5aca4b6fcea8f39f98bc820cb4"
+      "sha256": "484fb04a079f439559c3fddfdc22d75a4bb03a8b02cf648c6dcae624b75859ef"
     }
   ],
   "registryDependencies": [
     "button",
     "icon",
     "surface",
-    "source-foundation",
-    "disabled"
+    "source-foundation"
   ],
   "semanticDependencies": [
     "button",
     "icon",
-    "surface",
-    "disabled"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],

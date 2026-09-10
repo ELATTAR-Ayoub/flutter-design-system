@@ -1,7 +1,7 @@
 {
   "name": "chart-polar",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "The three polar families — `PieChart`, `RadarChart` and `RadialBarChart`.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/chart_polar.dart",
       "target": "@ui/chart_polar.dart",
-      "sha256": "325b52a06dd39563311de76a8af5257903afd781df42bd5b37ef77fe6a310f21"
+      "sha256": "2455e2dcacf0c6ac19ac359adc93cafc63c4cc7793a65c6d96457e7a6f2510c7"
     }
   ],
   "registryDependencies": [
@@ -28,7 +28,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/chart_polar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/chart_polar.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/chart_polar.dart",
   "exports": [
     "ChartDotSpec",
     "PieChart",

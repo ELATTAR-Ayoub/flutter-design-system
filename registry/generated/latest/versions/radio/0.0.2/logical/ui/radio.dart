@@ -303,7 +303,6 @@ class RadioGroupItem<T> extends StatefulWidget {
     super.key,
     required this.value,
     this.enabled = true,
-    this.disabledReason,
     this.invalid = false,
     this.forceFocusRing,
     this.label,
@@ -316,10 +315,6 @@ class RadioGroupItem<T> extends StatefulWidget {
   /// `disabled` on the item itself; the group disables every item by passing a
   /// null `onChanged`.
   final bool enabled;
-
-  /// Why the item is disabled, shown as a tooltip. Falls back to its own
-  /// nested [FieldScope]'s.
-  final String? disabledReason;
 
   /// `aria-invalid="true"`.
   final bool invalid;
@@ -449,7 +444,6 @@ class _RadioGroupItemState<T> extends State<RadioGroupItem<T>> {
       duration: MotionDurations.normal,
       jellyState: checked,
       enabled: enabled,
-      disabledReason: widget.disabledReason ?? field?.disabledReason,
       invalid: invalid,
       forceFocusRing: widget.forceFocusRing,
       focusNode: focusNode,

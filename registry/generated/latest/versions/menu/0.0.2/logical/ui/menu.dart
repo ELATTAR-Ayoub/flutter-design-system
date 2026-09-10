@@ -87,10 +87,10 @@ import 'package:flutter/widgets.dart'
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
-import './disabled.dart';
 import './icon.dart';
 import './icon_paths.dart';
 import './icon_paths.g.dart';
@@ -153,7 +153,6 @@ class MenuItem extends MenuChild {
     this.shortcut,
     this.variant = MenuItemVariant.normal,
     this.enabled = true,
-    this.disabledReason,
     this.inset = false,
     this.onSelect,
   });
@@ -199,9 +198,6 @@ class MenuItem extends MenuChild {
   /// `data-disabled` — `pointer-events-none opacity-50`.
   final bool enabled;
 
-  /// Why the row is disabled. Shown as a tooltip while [enabled] is false.
-  final String? disabledReason;
-
   /// `data-inset:pl-9` — a 36px leading gutter, for a row that has to line up
   /// under rows that carry icons. Unreachable from the menus page; built
   /// because it is one number.
@@ -226,7 +222,6 @@ class MenuCheckboxItem extends MenuChild {
     required this.label,
     required this.checked,
     this.enabled = true,
-    this.disabledReason,
     this.inset = false,
     this.onSelect,
   });
@@ -238,9 +233,6 @@ class MenuCheckboxItem extends MenuChild {
   final bool checked;
 
   final bool enabled;
-
-  /// Why the row is disabled. Shown as a tooltip while [enabled] is false.
-  final String? disabledReason;
   final bool inset;
 
   /// `onCheckedChange`, called with what the row would become. Null is the
@@ -255,15 +247,11 @@ class MenuRadioItem {
     required this.value,
     required this.label,
     this.enabled = true,
-    this.disabledReason,
   });
 
   final String value;
   final String label;
   final bool enabled;
-
-  /// Why the row is disabled. Shown as a tooltip while [enabled] is false.
-  final String? disabledReason;
 }
 
 /// `*MenuRadioGroup` — a `value` and the rows that answer to it.
@@ -342,7 +330,6 @@ class MenuSub extends MenuChild {
     required this.children,
     this.icon,
     this.enabled = true,
-    this.disabledReason,
     this.inset = false,
   });
 
@@ -353,10 +340,6 @@ class MenuSub extends MenuChild {
 
   final IconGlyph? icon;
   final bool enabled;
-
-  /// Why the sub-trigger is disabled. Shown as a tooltip while [enabled] is
-  /// false.
-  final String? disabledReason;
   final bool inset;
 }
 
@@ -395,7 +378,7 @@ abstract final class Menu {
   /// the floor here keeps the popup's height and scroll math self-consistent
   /// with what actually paints.
   static double get itemHeight => math.max(
-    TextStyles.small.step.leading + space(2) * 2,
+    TextStyles.body.step.leading + space(2) * 2,
     TouchTargets.minimum,
   );
 
@@ -412,7 +395,7 @@ abstract final class Menu {
   static double itemHeightOf(BuildContext context) => math.max(
     MediaQuery.textScalerOf(
           context,
-        ).scale(StyledText.stepOf(context, TextStyles.small).leading) +
+        ).scale(StyledText.stepOf(context, TextStyles.body).leading) +
         space(2) * 2,
     TouchTargets.minimum,
   );
@@ -998,16 +981,11 @@ class _MenuContentState extends State<MenuContent> {
       child: _sized(
         MenuSurface(
           kind: widget.kind,
-          // The popover clamps the surface to the room left in the viewport. A
-          // menu taller than that room scrolls inside it rather than painting
-          // past its own bottom edge.
-          child: SingleChildScrollView(
-            child: Padding(
-              // `p-2`, vertical here and per-row horizontally, so a separator's
-              // `-mx-2` has something to cancel.
-              padding: EdgeInsets.symmetric(vertical: Menu.contentPadding),
-              child: column,
-            ),
+          child: Padding(
+            // `p-2`, vertical here and per-row horizontally, so a separator's
+            // `-mx-2` has something to cancel.
+            padding: EdgeInsets.symmetric(vertical: Menu.contentPadding),
+            child: column,
           ),
         ),
       ),
@@ -1055,7 +1033,6 @@ class _MenuContentState extends State<MenuContent> {
             shortcut: item.shortcut,
             variant: item.variant,
             enabled: item.enabled,
-            disabledReason: item.disabledReason,
             inset: item.inset,
             highlighted: row.focusable && row.index == _highlighted,
             onHover: row.focusable ? () => _jump(row.index) : null,
@@ -1071,7 +1048,6 @@ class _MenuContentState extends State<MenuContent> {
             checked: item.checked,
             indicatorSide: widget.indicatorSide,
             enabled: item.enabled,
-            disabledReason: item.disabledReason,
             inset: item.inset,
             highlighted: row.focusable && row.index == _highlighted,
             onHover: row.focusable ? () => _jump(row.index) : null,
@@ -1087,7 +1063,6 @@ class _MenuContentState extends State<MenuContent> {
             checked: row.radioGroup!.value == item.value,
             indicatorSide: widget.indicatorSide,
             enabled: item.enabled,
-            disabledReason: item.disabledReason,
             highlighted: row.focusable && row.index == _highlighted,
             onHover: row.focusable ? () => _jump(row.index) : null,
             onTap: row.focusable ? () => _commit(row) : null,
@@ -1107,7 +1082,6 @@ class _MenuContentState extends State<MenuContent> {
           leading: sub.icon,
           trailing: IconGlyph.chevronRight,
           enabled: sub.enabled,
-          disabledReason: sub.disabledReason,
           inset: sub.inset,
           // `data-open:bg-accent data-open:text-accent-foreground` — an open
           // sub-trigger is highlighted whether or not the pointer is on it.
@@ -1238,7 +1212,6 @@ class _MenuRow extends StatelessWidget {
     required this.label,
     required this.highlighted,
     required this.enabled,
-    this.disabledReason,
     this.leading,
     this.leadingLucide,
     this.trailing,
@@ -1256,9 +1229,6 @@ class _MenuRow extends StatelessWidget {
   final String label;
   final bool highlighted;
   final bool enabled;
-
-  /// Why the row is disabled. Shown as a tooltip while [enabled] is false.
-  final String? disabledReason;
 
   /// The leading `Icon`, forced to 16px by the row's own class list.
   final IconGlyph? leading;
@@ -1381,9 +1351,7 @@ class _MenuRow extends StatelessWidget {
                     children: <Widget>[
                       StyledText(
                         label,
-                        // The field role: a row reads like the input that
-                        // filters it, not like a paragraph or a nav link.
-                        TextStyles.small,
+                        TextStyles.body,
                         color: ink,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1500,7 +1468,9 @@ class _MenuRow extends StatelessWidget {
       style: TextStyle(color: ink),
       child: row,
     );
-    row = Semantics(
+    row = Opacity(opacity: enabled ? 1 : SurfaceOpacity.disabled, child: row);
+
+    return Semantics(
       button: true,
       selected: checked,
       enabled: enabled,
@@ -1518,13 +1488,6 @@ class _MenuRow extends StatelessWidget {
           child: row,
         ),
       ),
-    );
-
-    return Disabled(
-      disabled: !enabled,
-      blockPointer: false,
-      reason: disabledReason,
-      child: row,
     );
   }
 }

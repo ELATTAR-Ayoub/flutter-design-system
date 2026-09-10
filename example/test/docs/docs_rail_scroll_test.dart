@@ -76,13 +76,9 @@ void main() {
             matching: find.byType(SingleChildScrollView),
           ),
         );
-    final SingleChildScrollView tocView = tester
-        .widget<SingleChildScrollView>(
-          find.descendant(
-            of: tocKey,
-            matching: find.byType(SingleChildScrollView),
-          ),
-        );
+    final SingleChildScrollView tocView = tester.widget<SingleChildScrollView>(
+      find.descendant(of: tocKey, matching: find.byType(SingleChildScrollView)),
+    );
     final ScrollController sidebarController = sidebarView.controller!;
     final ScrollController tocController = tocView.controller!;
 
@@ -106,7 +102,8 @@ void main() {
     expect(
       sidebarController.offset,
       greaterThan(sidebarResting),
-      reason: 'a wheel event over the sidebar rail did not move its own '
+      reason:
+          'a wheel event over the sidebar rail did not move its own '
           'ScrollController',
     );
     expect(
@@ -128,7 +125,8 @@ void main() {
     expect(
       tocController.offset,
       greaterThan(tocResting),
-      reason: 'a wheel event over the toc rail did not move its own '
+      reason:
+          'a wheel event over the toc rail did not move its own '
           'ScrollController',
     );
     expect(

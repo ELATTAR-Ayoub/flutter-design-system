@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/input_otp.dart",
       "target": "@ui/input_otp.dart",
-      "sha256": "a808093c54475c2451c53fd3e2cc748021cc951915a98b2cfe54888b9cc7e946"
+      "sha256": "1fcabb7955578eacc602e58af3c2fa109b264c8e4661829a5f763b2d421f1213"
     }
   ],
   "registryDependencies": [
@@ -19,8 +19,7 @@
     "input",
     "keyframes",
     "surface",
-    "source-foundation",
-    "disabled"
+    "source-foundation"
   ],
   "semanticDependencies": [
     "button",
@@ -28,8 +27,7 @@
     "icon",
     "input",
     "keyframes",
-    "surface",
-    "disabled"
+    "surface"
   ],
   "pubDependencies": {},
   "assets": [],

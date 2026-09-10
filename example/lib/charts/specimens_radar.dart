@@ -425,7 +425,6 @@ Widget _radarMultipleBuild(BuildContext context, ChartInk ink) =>
     radarMultiple(ink);
 Widget _radarLegendBuild(BuildContext context, ChartInk ink) =>
     radarLegend(ink);
-Widget _radarIconsBuild(BuildContext context, ChartInk ink) =>
-    radarIcons(ink);
+Widget _radarIconsBuild(BuildContext context, ChartInk ink) => radarIcons(ink);
 Widget _radarRadiusBuild(BuildContext context, ChartInk ink) =>
     radarRadius(ink, ThemeScope.of(context));

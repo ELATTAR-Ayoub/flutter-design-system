@@ -1,0 +1,32 @@
+{
+  "name": "voice",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`components/agent/voice/` — the listening surface.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/voice.dart",
+      "target": "@ui/voice.dart",
+      "sha256": "3d0f5b2afb8cc72d3c78ccb727b7086dcd6927f26aebda5bfe4b9ec341c814d9"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "icon",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "button",
+    "icon"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/voice",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/voice.dart",
+  "deprecated": false
+}

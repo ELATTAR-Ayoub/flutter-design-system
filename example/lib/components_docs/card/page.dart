@@ -346,14 +346,10 @@ class _PreviewSpecimen extends StatelessWidget {
             children: <Widget>[
               const CardHeader(
                 title: CardTitle('Account'),
-                description: CardDescription(
-                  'Manage your account settings.',
-                ),
+                description: CardDescription('Manage your account settings.'),
               ),
               const CardContent(
-                child: Text(
-                  'Your profile and security settings live here.',
-                ),
+                child: Text('Your profile and security settings live here.'),
               ),
               CardFooter(
                 child: Button(

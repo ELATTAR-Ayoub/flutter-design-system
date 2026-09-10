@@ -487,41 +487,38 @@ void main() {
       );
     });
 
-    testWidgets(
-      'the media pins to the top and centres on the title line box',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(
-          host(
-            SizedBox(
-              width: 600,
-              child: Item(
-                media: const ItemMedia(
-                  child: Icon.lucide(Lucide.arrowUpRight),
-                ),
-                content: const ItemContent(
-                  children: <Widget>[
-                    ItemTitle('Visa'),
-                    ItemDescription('Expires 04/29'),
-                  ],
-                ),
+    testWidgets('the media pins to the top and centres on the title line box', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          SizedBox(
+            width: 600,
+            child: Item(
+              media: const ItemMedia(child: Icon.lucide(Lucide.arrowUpRight)),
+              content: const ItemContent(
+                children: <Widget>[
+                  ItemTitle('Visa'),
+                  ItemDescription('Expires 04/29'),
+                ],
               ),
             ),
           ),
-        );
+        ),
+      );
 
-        // The media slot is stretched to the row; the GLYPH inside it is what
-        // `self-start` plus the title-centring offset places. `host` always
-        // sizes the MediaQuery at 1440×900 regardless of the SizedBox above,
-        // so the title role steps at 1440 — the same width every other
-        // TextStyles.body.stepFor(1440) expectation in this file uses.
-        final double titleLeading = TextStyles.body.stepFor(1440).leading;
-        final double expectedOffset = (titleLeading - ItemMedia.size) / 2;
-        final Rect glyph = tester.getRect(find.byType(Icon));
-        final Rect content = tester.getRect(find.byType(ItemContent));
-        expect(glyph.top - content.top, closeTo(expectedOffset, _fine));
-        expect(glyph.height, ItemMedia.size);
-      },
-    );
+      // The media slot is stretched to the row; the GLYPH inside it is what
+      // `self-start` plus the title-centring offset places. `host` always
+      // sizes the MediaQuery at 1440×900 regardless of the SizedBox above,
+      // so the title role steps at 1440 — the same width every other
+      // TextStyles.body.stepFor(1440) expectation in this file uses.
+      final double titleLeading = TextStyles.body.stepFor(1440).leading;
+      final double expectedOffset = (titleLeading - ItemMedia.size) / 2;
+      final Rect glyph = tester.getRect(find.byType(Icon));
+      final Rect content = tester.getRect(find.byType(ItemContent));
+      expect(glyph.top - content.top, closeTo(expectedOffset, _fine));
+      expect(glyph.height, ItemMedia.size);
+    });
   });
 
   group('Avatar', () {
@@ -651,7 +648,9 @@ void main() {
       expect(
         tester.getSize(find.byType(Marker)).height,
         closeTo(
-          TextStyles.small.stepFor(1440).leading + space(2) + BorderWidths.hairline,
+          TextStyles.small.stepFor(1440).leading +
+              space(2) +
+              BorderWidths.hairline,
           _fine,
         ),
       );

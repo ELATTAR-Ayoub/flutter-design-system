@@ -1,7 +1,7 @@
 {
   "name": "calendar",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "`components/ui/calendar.tsx` — the month grid, in three arrangements.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/calendar.dart",
       "target": "@ui/calendar.dart",
-      "sha256": "908dfe9897071d2c940efb4f225b1818a26529eb4d27dc505cb744cbc6778712"
+      "sha256": "940ba433d9e0d65be13776188432cc2d828276ec78acba7b3eba5498c5833874"
     }
   ],
   "registryDependencies": [
@@ -28,7 +28,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/calendar",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/calendar.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/calendar.dart",
   "exports": [
     "Calendar",
     "CalendarBandPainter",

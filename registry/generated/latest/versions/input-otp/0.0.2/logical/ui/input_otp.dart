@@ -61,11 +61,12 @@ import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
+import '../../design_system/foundation/typography.dart';
 import './keyframes.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
-import './disabled.dart';
 import './field.dart';
 import './icon.dart';
 import './icon_paths.dart';
@@ -113,7 +114,6 @@ class InputOtp extends StatefulWidget {
     this.enabled = true,
     this.invalid = false,
     this.label,
-    this.disabledReason,
   }) : assert(
          controller == null || initialValue == null,
          'A controller already carries the value — seed it there instead.',
@@ -153,10 +153,6 @@ class InputOtp extends StatefulWidget {
   final bool invalid;
 
   final String? label;
-
-  /// Why the field is disabled. Shown as a tooltip while [enabled] is false;
-  /// falls back to the enclosing [FieldScope]'s when unset.
-  final String? disabledReason;
 
   /// `size-8` on the slot — 32px, `box-sizing: border-box`.
   static double get slotSize => space(8);
@@ -325,11 +321,7 @@ class _InputOtpState extends State<InputOtp> {
       controller: _controller,
       focusNode: _focusNode,
       readOnly: !enabled,
-      style: StyledText.styleOf(
-        context,
-        Input.textSpecDefault,
-        color: transparent,
-      ),
+      style: StyledText.styleOf(context, TextStyles.body, color: transparent),
       cursorColor: transparent,
       backgroundCursorColor: transparent,
       selectionColor: transparent,
@@ -376,10 +368,9 @@ class _InputOtpState extends State<InputOtp> {
       ),
     );
 
-    field = Disabled(
-      disabled: !enabled,
-      reason: widget.disabledReason ?? scope?.disabledReason,
-      child: field,
+    field = Opacity(
+      opacity: enabled ? 1 : SurfaceOpacity.disabled,
+      child: IgnorePointer(ignoring: !enabled, child: field),
     );
 
     // The strip is intrinsically sized; giving it its own width keeps a caller
@@ -591,7 +582,7 @@ class InputOtpSlot extends StatelessWidget {
       children: <Widget>[
         if (char != null)
           // `text-sm` — Inter 13/400 at `--foreground`. Not mono; see drift 13.
-          StyledText(char!, Input.textSpecDefault, color: theme.foreground),
+          StyledText(char!, TextStyles.body, color: theme.foreground),
         if (showsCaret) const _FakeCaret(),
       ],
     );

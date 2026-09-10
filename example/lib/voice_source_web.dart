@@ -92,9 +92,7 @@ extension type _MediaStreamTrack._(JSObject _) implements JSObject {
 extension type _AudioContext._(JSObject _) implements JSObject {
   external factory _AudioContext();
   external _AnalyserNode createAnalyser();
-  external _MediaStreamAudioSourceNode createMediaStreamSource(
-    JSObject stream,
-  );
+  external _MediaStreamAudioSourceNode createMediaStreamSource(JSObject stream);
   external JSPromise<JSAny?> close();
 }
 
@@ -202,8 +200,8 @@ class _WebVoiceSource implements VoiceSource {
       if (_disposed || myGeneration != _generation) return;
       _status.value = switch (_domExceptionName(error)) {
         'NotAllowedError' || 'SecurityError' => VoiceSourceStatus.denied,
-        'NotFoundError' || 'OverconstrainedError' =>
-          VoiceSourceStatus.unavailable,
+        'NotFoundError' ||
+        'OverconstrainedError' => VoiceSourceStatus.unavailable,
         _ => VoiceSourceStatus.error,
       };
     }

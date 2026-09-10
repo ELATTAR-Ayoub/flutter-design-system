@@ -1,0 +1,29 @@
+{
+  "name": "form",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`components/ui/form.tsx` — the wiring, with no styling at all.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/form.dart",
+      "target": "@ui/form.dart",
+      "sha256": "9c29d9f6f652e8b0424201076786272c9ca9f692c845a23a174f8112b5bf6e1b"
+    }
+  ],
+  "registryDependencies": [
+    "validation-rule"
+  ],
+  "semanticDependencies": [
+    "validation-rule"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/form",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/form.dart",
+  "deprecated": false
+}

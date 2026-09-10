@@ -7,15 +7,15 @@
 /// **Which command this page leads with is not decided here.** It comes from
 /// `release_facts.dart`, whose `cliOnPubDev` says whether `elattar_cli`
 /// resolves on pub.dev for a reader of this build, and whose guard fails if
-/// the pages and that answer disagree. The 0.0.2 release publishes the CLI
+/// the pages and that answer disagree. The 0.0.3 release publishes the CLI
 /// before it deploys the site, so the published spelling leads and the
 /// from-source spelling stays documented beneath it.
 ///
 /// Both routes were driven end to end against the hosted registry, with
 /// nothing local in the picture, before being written down:
 ///
-///  * install the CLI -> `Installed elattar_cli 0.0.2`
-///  * `elattar --version` -> `0.0.2`
+///  * install the CLI -> `Installed elattar_cli 0.0.3`
+///  * `elattar --version` -> `0.0.3`
 ///  * `elattar init --foundation source` -> foundation, fonts, `elattar.yaml`,
 ///    `.elattar/manifest.json` and four license notices, exit 0
 ///  * `elattar add button` -> seven items and a fifth notice, exit 0
@@ -221,7 +221,7 @@ class _InstallationArticle extends StatelessWidget {
                   r'& "$env:LOCALAPPDATA\Dart\install\bin\elattar.bat" --version',
               description:
                   'Runs the launcher before PATH is fixed. It should print '
-                  '0.0.2.',
+                  '0.0.3.',
             ),
             DocsInstallFact(
               label: 'Legacy activation',
@@ -291,7 +291,7 @@ class _InstallationArticle extends StatelessWidget {
         const DocsSnippet(
           language: 'bash',
           code:
-              'elattar add button --registry https://example.com/elattar/0.0.2/',
+              'elattar add button --registry https://example.com/elattar/0.0.3/',
         ),
         SizedBox(height: space(4)),
         _see(

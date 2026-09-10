@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/popover.dart",
       "target": "@ui/popover.dart",
-      "sha256": "41a7f48c37da3dc3c59a8eb51be66afede89ad048e8f0ad26f67767b296e7598"
+      "sha256": "4b3427922ba320654d2ba0a27731306dec44eaa843a0c3c557a009d107dec671"
     }
   ],
   "registryDependencies": [

@@ -1,0 +1,40 @@
+{
+  "name": "input-group",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`components/ui/input-group.tsx` — the socket, and the control stripped bare",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/input_group.dart",
+      "target": "@ui/input_group.dart",
+      "sha256": "4ef4f7cd1f8f6de3eb93ac5260a56a3daeb07358175afa5c2210be97aefb6c38"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "field",
+    "input",
+    "surface",
+    "press",
+    "source-foundation",
+    "disabled"
+  ],
+  "semanticDependencies": [
+    "button",
+    "field",
+    "input",
+    "surface",
+    "press",
+    "disabled"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/input_group",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/input_group.dart",
+  "deprecated": false
+}

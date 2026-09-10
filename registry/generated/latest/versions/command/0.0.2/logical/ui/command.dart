@@ -114,7 +114,6 @@ import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
-import './disabled.dart';
 import './icon.dart';
 import './icon_paths.dart';
 import './icon_paths.g.dart';
@@ -343,7 +342,6 @@ class CommandItem {
     this.value,
     this.keywords = const <String>[],
     this.enabled = true,
-    this.disabledReason,
     this.onSelect,
   });
 
@@ -403,9 +401,6 @@ class CommandItem {
 
   /// `data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50`.
   final bool enabled;
-
-  /// Why the row is disabled. Shown as a tooltip while [enabled] is false.
-  final String? disabledReason;
 
   /// `onSelect` — fired by Enter, by a click, and by nothing else. The page
   /// binds none, which is why its palette does nothing when you commit a row.
@@ -601,7 +596,7 @@ class Command extends StatefulWidget {
   /// layout height — [_CommandRow] sizes itself to exactly this number
   /// rather than relying on a grown, invisible hit box.
   static double get itemHeight => math.max(
-    Input.textSpecDefault.step.leading + space(2) * 2,
+    TextStyles.body.step.leading + space(2) * 2,
     TouchTargets.minimum,
   );
 
@@ -616,7 +611,7 @@ class Command extends StatefulWidget {
   static double itemHeightOf(BuildContext context) => math.max(
     MediaQuery.textScalerOf(
           context,
-        ).scale(StyledText.stepOf(context, Input.textSpecDefault).leading) +
+        ).scale(StyledText.stepOf(context, TextStyles.body).leading) +
         space(2) * 2,
     TouchTargets.minimum,
   );
@@ -626,7 +621,7 @@ class Command extends StatefulWidget {
       TextStyles.small.step.leading + space(2) * 2;
 
   /// `py-6` around one `text-sm` line box — **66.5625px** *(measured)*.
-  static double get emptyHeight => TextStyles.small.step.leading + space(6) * 2;
+  static double get emptyHeight => TextStyles.body.step.leading + space(6) * 2;
 
   /// **Items re-sort; groups do not.** The asymmetry is cmdk's, not the port's.
   ///
@@ -1339,8 +1334,7 @@ class _CommandRow extends StatelessWidget {
             children: <Widget>[
               StyledText(
                 item.label,
-                // The search field's own role: a row reads exactly like it.
-                Input.textSpecDefault,
+                TextStyles.body,
                 color: ink,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1458,7 +1452,12 @@ class _CommandRow extends StatelessWidget {
       child: row,
     );
 
-    row = Semantics(
+    row = Opacity(
+      opacity: item.enabled ? 1 : Command.disabledOpacity,
+      child: row,
+    );
+
+    return Semantics(
       button: true,
       selected: selected,
       enabled: item.enabled,
@@ -1476,13 +1475,6 @@ class _CommandRow extends StatelessWidget {
           child: row,
         ),
       ),
-    );
-
-    return Disabled(
-      disabled: !item.enabled,
-      blockPointer: false,
-      reason: item.disabledReason,
-      child: row,
     );
   }
 }
@@ -1504,7 +1496,7 @@ class _CommandEmpty extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: space(6)),
       child: StyledText(
         label,
-        TextStyles.small,
+        TextStyles.body,
         color: theme.popoverForeground,
         align: TextAlign.center,
       ),

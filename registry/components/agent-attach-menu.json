@@ -1,7 +1,7 @@
 {
   "name": "agent-attach-menu",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "`components/agent/parts/attach-menu.tsx` — the plus.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_attach_menu.dart",
       "target": "@ui/agent_attach_menu.dart",
-      "sha256": "3b3b52a5d726da84a5ed49406245719a32ba9906864759c27435692994b8264c"
+      "sha256": "1fcccefb8994c48137eebda16e621f5bfc9e837d9f3529c30c55dc72d193ede6"
     }
   ],
   "registryDependencies": [
@@ -34,7 +34,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent_attach_menu",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_attach_menu.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/agent_attach_menu.dart",
   "exports": [
     "AgentAttachMenu"
   ]

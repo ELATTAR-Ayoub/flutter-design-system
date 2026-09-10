@@ -466,35 +466,33 @@ void main() {
     );
 
     for (final double width in widths) {
-      testWidgets(
-        'point scale (area) keeps all six labels at ${width}px',
-        (WidgetTester t) async {
-          await t.pumpWidget(scopedAt(width, pointScaleChart()));
-          for (final String label in monthLabels) {
-            expect(
-              find.text(label),
-              findsOneWidget,
-              reason: '$label missing at width $width',
-            );
-          }
-        },
-      );
+      testWidgets('point scale (area) keeps all six labels at ${width}px', (
+        WidgetTester t,
+      ) async {
+        await t.pumpWidget(scopedAt(width, pointScaleChart()));
+        for (final String label in monthLabels) {
+          expect(
+            find.text(label),
+            findsOneWidget,
+            reason: '$label missing at width $width',
+          );
+        }
+      });
     }
 
     for (final double width in widths) {
-      testWidgets(
-        'band scale (bar) is unaffected at ${width}px',
-        (WidgetTester t) async {
-          await t.pumpWidget(scopedAt(width, bandScaleChart()));
-          for (final String label in monthLabels) {
-            expect(
-              find.text(label),
-              findsOneWidget,
-              reason: '$label missing at width $width',
-            );
-          }
-        },
-      );
+      testWidgets('band scale (bar) is unaffected at ${width}px', (
+        WidgetTester t,
+      ) async {
+        await t.pumpWidget(scopedAt(width, bandScaleChart()));
+        for (final String label in monthLabels) {
+          expect(
+            find.text(label),
+            findsOneWidget,
+            reason: '$label missing at width $width',
+          );
+        }
+      });
     }
   });
 
@@ -550,40 +548,36 @@ void main() {
       expect(tick.style!.fontSize, TextStyles.numberSm.desktop.size);
     });
 
-    testWidgets(
-      'a CATEGORY X axis tick keeps the prose role, not numberSm',
-      (WidgetTester t) async {
-        await t.pumpWidget(
-          scoped(
-            ChartContainer(
-              config: const ChartConfig(<String, ChartSeries>{}),
-              child: CartesianChart(
-                data: months,
-                xAxis: const ChartAxis(dataKey: 'month'),
-                yAxis: const ChartAxis(type: ChartAxisType.number),
-                series: const <ChartSeriesSpec>[
-                  ChartSeriesSpec(
-                    kind: ChartSeriesKind.bar,
-                    dataKey: 'value',
-                  ),
-                ],
-              ),
+    testWidgets('a CATEGORY X axis tick keeps the prose role, not numberSm', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        scoped(
+          ChartContainer(
+            config: const ChartConfig(<String, ChartSeries>{}),
+            child: CartesianChart(
+              data: months,
+              xAxis: const ChartAxis(dataKey: 'month'),
+              yAxis: const ChartAxis(type: ChartAxisType.number),
+              series: const <ChartSeriesSpec>[
+                ChartSeriesSpec(kind: ChartSeriesKind.bar, dataKey: 'value'),
+              ],
             ),
           ),
-        );
-        final Text tick = t.widget<Text>(find.text('Jan'));
-        expect(tick.style!.fontSize, TextStyles.small.desktop.size);
-        // numberSm and small can share a size, so size alone does not separate
-        // them. The typeface does, and both sides read from the tokens: a
-        // category tick is prose (Fonts.sans), never the numeric role
-        // (Fonts.mono).
-        expect(tick.style!.fontFamily, contains(TextStyles.small.family));
-        expect(
-          tick.style!.fontFamily,
-          isNot(contains(TextStyles.numberSm.family)),
-        );
-      },
-    );
+        ),
+      );
+      final Text tick = t.widget<Text>(find.text('Jan'));
+      expect(tick.style!.fontSize, TextStyles.small.desktop.size);
+      // numberSm and small can share a size, so size alone does not separate
+      // them. The typeface does, and both sides read from the tokens: a
+      // category tick is prose (Fonts.sans), never the numeric role
+      // (Fonts.mono).
+      expect(tick.style!.fontFamily, contains(TextStyles.small.family));
+      expect(
+        tick.style!.fontFamily,
+        isNot(contains(TextStyles.numberSm.family)),
+      );
+    });
 
     testWidgets('a LabelList value renders numberSm', (WidgetTester t) async {
       await t.pumpWidget(
@@ -675,9 +669,17 @@ void main() {
     }
 
     const List<Map<String, Object?>> pieData = <Map<String, Object?>>[
-      <String, Object?>{'name': 'Alpha', 'value': 10, 'fill': Color(0xFF1A6EF4)},
+      <String, Object?>{
+        'name': 'Alpha',
+        'value': 10,
+        'fill': Color(0xFF1A6EF4),
+      },
       <String, Object?>{'name': 'Beta', 'value': 10, 'fill': Color(0xFF2ECC71)},
-      <String, Object?>{'name': 'Gamma', 'value': 10, 'fill': Color(0xFFF39C12)},
+      <String, Object?>{
+        'name': 'Gamma',
+        'value': 10,
+        'fill': Color(0xFFF39C12),
+      },
     ];
 
     Widget pie({int? defaultIndex}) => _scoped(
@@ -798,34 +800,31 @@ void main() {
       expect(find.text('10'), findsOneWidget);
     });
 
-    testWidgets(
-      'two positions inside the SAME sector place the tooltip at '
-      'DIFFERENT screen positions — it follows the pointer, not a fixed '
-      'anchor',
-      (WidgetTester t) async {
-        await t.pumpWidget(pie());
-        final TestGesture mouse = await startMouse(t);
-        final Finder chart = find.byType(PieChart);
-        final Offset origin = t.getTopLeft(chart);
+    testWidgets('two positions inside the SAME sector place the tooltip at '
+        'DIFFERENT screen positions — it follows the pointer, not a fixed '
+        'anchor', (WidgetTester t) async {
+      await t.pumpWidget(pie());
+      final TestGesture mouse = await startMouse(t);
+      final Finder chart = find.byType(PieChart);
+      final Offset origin = t.getTopLeft(chart);
 
-        // Both points sit inside Alpha's 0..120° sector (mid 60°) and
-        // between the 40..100 ring, so both hover the same slice.
-        final Offset near = polarToCartesian(centre.dx, centre.dy, 55, 20);
-        final Offset far = polarToCartesian(centre.dx, centre.dy, 95, 100);
+      // Both points sit inside Alpha's 0..120° sector (mid 60°) and
+      // between the 40..100 ring, so both hover the same slice.
+      final Offset near = polarToCartesian(centre.dx, centre.dy, 55, 20);
+      final Offset far = polarToCartesian(centre.dx, centre.dy, 95, 100);
 
-        await hoverAt(t, mouse, chart, near);
-        expect(find.text('Alpha'), findsOneWidget);
-        final Offset nearTooltip =
-            t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
+      await hoverAt(t, mouse, chart, near);
+      expect(find.text('Alpha'), findsOneWidget);
+      final Offset nearTooltip =
+          t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
 
-        await hoverAt(t, mouse, chart, far);
-        expect(find.text('Alpha'), findsOneWidget);
-        final Offset farTooltip =
-            t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
+      await hoverAt(t, mouse, chart, far);
+      expect(find.text('Alpha'), findsOneWidget);
+      final Offset farTooltip =
+          t.getTopLeft(find.byType(ChartTooltipContent)) - origin;
 
-        expect(nearTooltip, isNot(equals(farTooltip)));
-      },
-    );
+      expect(nearTooltip, isNot(equals(farTooltip)));
+    });
 
     testWidgets(
       'hovering near the right/bottom edge keeps the tooltip within the '
@@ -915,73 +914,76 @@ void main() {
     );
   });
 
-  group('PieChart / RadialBarChart — no tooltip installs no hover handling', () {
-    // widget.tooltip == null gates rendering already (see
-    // `if (active != null && widget.tooltip != null)` in chart_polar.dart);
-    // this proves the MouseRegion that drives it is gated the same way, so a
-    // chart with no tooltip spec pays no setState on pointer move.
-    testWidgets('PieChart with no tooltip has no MouseRegion', (
-      WidgetTester t,
-    ) async {
-      await t.pumpWidget(
-        _scoped(
-          SizedBox(
-            width: _plot.width,
-            height: _plot.height,
-            child: PieChart(
-              pies: <PieSpec>[
-                const PieSpec(
-                  data: <Map<String, Object?>>[
-                    <String, Object?>{'name': 'Alpha', 'value': 10},
-                    <String, Object?>{'name': 'Beta', 'value': 10},
-                  ],
-                  dataKey: 'value',
-                  innerRadius: 40,
-                  outerRadius: 100,
-                ),
-              ],
+  group(
+    'PieChart / RadialBarChart — no tooltip installs no hover handling',
+    () {
+      // widget.tooltip == null gates rendering already (see
+      // `if (active != null && widget.tooltip != null)` in chart_polar.dart);
+      // this proves the MouseRegion that drives it is gated the same way, so a
+      // chart with no tooltip spec pays no setState on pointer move.
+      testWidgets('PieChart with no tooltip has no MouseRegion', (
+        WidgetTester t,
+      ) async {
+        await t.pumpWidget(
+          _scoped(
+            SizedBox(
+              width: _plot.width,
+              height: _plot.height,
+              child: PieChart(
+                pies: <PieSpec>[
+                  const PieSpec(
+                    data: <Map<String, Object?>>[
+                      <String, Object?>{'name': 'Alpha', 'value': 10},
+                      <String, Object?>{'name': 'Beta', 'value': 10},
+                    ],
+                    dataKey: 'value',
+                    innerRadius: 40,
+                    outerRadius: 100,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      );
-      expect(
-        find.descendant(
-          of: find.byType(PieChart),
-          matching: find.byType(MouseRegion),
-        ),
-        findsNothing,
-      );
-    });
+        );
+        expect(
+          find.descendant(
+            of: find.byType(PieChart),
+            matching: find.byType(MouseRegion),
+          ),
+          findsNothing,
+        );
+      });
 
-    testWidgets('RadialBarChart with no tooltip has no MouseRegion', (
-      WidgetTester t,
-    ) async {
-      await t.pumpWidget(
-        _scoped(
-          SizedBox(
-            width: _plot.width,
-            height: _plot.height,
-            child: RadialBarChart(
-              data: const <Map<String, Object?>>[
-                <String, Object?>{'value': 5},
-                <String, Object?>{'value': 10},
-              ],
-              series: const <RadialBarSpec>[RadialBarSpec(dataKey: 'value')],
-              innerRadius: 30,
-              outerRadius: 100,
+      testWidgets('RadialBarChart with no tooltip has no MouseRegion', (
+        WidgetTester t,
+      ) async {
+        await t.pumpWidget(
+          _scoped(
+            SizedBox(
+              width: _plot.width,
+              height: _plot.height,
+              child: RadialBarChart(
+                data: const <Map<String, Object?>>[
+                  <String, Object?>{'value': 5},
+                  <String, Object?>{'value': 10},
+                ],
+                series: const <RadialBarSpec>[RadialBarSpec(dataKey: 'value')],
+                innerRadius: 30,
+                outerRadius: 100,
+              ),
             ),
           ),
-        ),
-      );
-      expect(
-        find.descendant(
-          of: find.byType(RadialBarChart),
-          matching: find.byType(MouseRegion),
-        ),
-        findsNothing,
-      );
-    });
-  });
+        );
+        expect(
+          find.descendant(
+            of: find.byType(RadialBarChart),
+            matching: find.byType(MouseRegion),
+          ),
+          findsNothing,
+        );
+      });
+    },
+  );
 
   /* ── Rendered pixels ──────────────────────────────────────────────────── */
 

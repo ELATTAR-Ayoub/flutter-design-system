@@ -12,13 +12,14 @@ decision visible in your codebase.
 [![pub package](https://img.shields.io/pub/v/elattar_cli.svg)](https://pub.dev/packages/elattar_cli)
 [![license: MIT](https://img.shields.io/badge/license-MIT-2563eb.svg)](LICENSE)
 
-`0.0.2`, the current public release.
+`0.0.3`, the current public release.
 
 [Documentation](https://flutter.elattar.dev) ·
 [Components](https://flutter.elattar.dev/components) ·
 [Installation](https://flutter.elattar.dev/docs/installation) ·
 [Skills](https://flutter.elattar.dev/skills) ·
 [Changelog](CHANGELOG.md) ·
+[0.0.3 release notes](docs/releases/0.0.3.md) ·
 [0.1.0 milestone](docs/launch/0.1.0-release-contract.md) ·
 [Adoption](docs/ADOPTION.md)
 
@@ -42,7 +43,7 @@ foundation dependencies into your project. The installed source is yours to
 inspect, change, and ship—there is no design-system runtime dependency hiding
 the implementation.
 
-The current registry contains 99 integrity-checked items, including accessible
+The current registry contains 100 integrity-checked items, including accessible
 controls, navigation, data display, charts, agent UI, effects, motion, and one
 complete application block. Browse the [live component
 gallery](https://flutter.elattar.dev/components) or watch the [45-second
@@ -78,7 +79,7 @@ distribution route is `elattar_cli` and the source registry.
   <img src="docs/assets/readme/foundation.png" alt="A luminous violet blueprint tile for foundation tokens" width="100%" />
 </p>
 
-The `0.0.2` registry contains 99 items: 97 components, one application block,
+The `0.0.3` registry contains 100 items: 98 components, one application block,
 and one foundation bundle.
 
 - **Foundation:** semantic color, responsive typography, spacing, radii,
@@ -123,8 +124,8 @@ system.
 | `elattar info <name>` | Inspect one item |
 | `elattar doctor` | Check the project, manifest, dependencies, and registry |
 
-The published CLI is `elattar_cli 0.0.2`. It reads the immutable
-[`0.0.2` registry](https://flutter.elattar.dev/registry/0.0.2/) by default.
+The published CLI is `elattar_cli 0.0.3`. It reads the immutable
+[`0.0.3` registry](https://flutter.elattar.dev/registry/0.0.3/) by default.
 
 ## Agent skill
 
@@ -149,7 +150,25 @@ example prompts, updates, and removal.
 
 ## Releases
 
-### 0.0.2 — current
+### 0.0.3 — current
+
+- Added one disabled-state contract across controls, including reason
+  tooltips, disabled-tap recovery, `FormScope`, and first-error reveal/focus.
+- Made every typography role responsive at the system breakpoints and removed
+  visual and motion literals from components and documentation.
+- Added the copyable charts gallery, shared specimens, and pointer-following
+  pie/radial tooltips.
+- Reworked `AgentConsole` into an integrated surface with history,
+  attachments, downloads, documentation navigation, and browser microphone
+  support.
+- Published 96 changed installation contracts through the immutable `0.0.3`
+  registry; four unchanged items retain their 0.0.1 payloads.
+- Published `elattar_cli 0.0.3` against `/registry/0.0.3/`.
+
+Read the focused [0.0.3 release notes](docs/releases/0.0.3.md) for migration
+guidance and the registry inventory.
+
+### 0.0.2
 
 - Replaced the inherited stylesheet transcript with a native Flutter
   foundation.

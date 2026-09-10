@@ -1,7 +1,7 @@
 {
   "name": "agent-attachments",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "`components/agent/parts/attachments.tsx` — files, going both ways.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -34,7 +34,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent_attachments",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_attachments.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/agent_attachments.dart",
   "exports": [
     "AgentAttachmentCard",
     "AgentAttachmentList",

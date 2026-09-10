@@ -1158,10 +1158,7 @@ void main() {
         TextStyles.body,
       );
       expect(style.fontSize, step.size);
-      expect(
-        style.fontSize! * style.height!,
-        closeTo(step.leading, 1e-3),
-      );
+      expect(style.fontSize! * style.height!, closeTo(step.leading, 1e-3));
       expect(style.color, ThemeTokens.dark.mutedForeground);
     });
 
@@ -1618,9 +1615,9 @@ void main() {
         t.getSize(find.byType(FieldError)).height,
         closeTo(
           StyledText.stepOf(
-                t.element(find.byType(FieldError)),
-                TextStyles.small,
-              ).leading *
+                    t.element(find.byType(FieldError)),
+                    TextStyles.small,
+                  ).leading *
                   2 +
               space(1),
           1e-3,
@@ -1982,11 +1979,7 @@ void main() {
           t.element(part.value),
           TextStyles.small,
         ).leading;
-        expect(
-          rendered(part.value),
-          closeTo(leading, 1e-3),
-          reason: part.key,
-        );
+        expect(rendered(part.value), closeTo(leading, 1e-3), reason: part.key);
         // …and it is the box its own spec declares, not a rounding that lands
         // near it.
         expect(
@@ -2201,9 +2194,7 @@ void main() {
           SizedBox(
             width: 512,
             child: InputGroup(
-              startAddon: const InputGroupAddon(
-                child: InputGroupText(r'$'),
-              ),
+              startAddon: const InputGroupAddon(child: InputGroupText(r'$')),
               endAddon: InputGroupAddon(
                 align: InputGroupAlign.end,
                 child: InputGroupButton(
@@ -2224,10 +2215,14 @@ void main() {
       // `InputGroupText` styles itself; the addon button's label is typed
       // through the ambient `DefaultTextStyle` its addon wraps it in.
       expect(
-        t.widget<StyledText>(find.ancestor(
-          of: find.text(r'$'),
-          matching: find.byType(StyledText),
-        )).spec,
+        t
+            .widget<StyledText>(
+              find.ancestor(
+                of: find.text(r'$'),
+                matching: find.byType(StyledText),
+              ),
+            )
+            .spec,
         same(Input.textSpecDefault),
       );
       expect(
@@ -2289,8 +2284,10 @@ void main() {
 
       final Iterable<StyledText> labels = t
           .widgetList<StyledText>(find.byType(StyledText))
-          .where((StyledText w) =>
-              w.text == 'I accept the terms' || w.text == 'Price alerts');
+          .where(
+            (StyledText w) =>
+                w.text == 'I accept the terms' || w.text == 'Price alerts',
+          );
       expect(labels, hasLength(2));
       for (final StyledText w in labels) {
         expect(w.spec, same(Input.textSpecDefault));

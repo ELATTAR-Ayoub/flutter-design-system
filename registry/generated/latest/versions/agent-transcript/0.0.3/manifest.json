@@ -1,0 +1,40 @@
+{
+  "name": "agent-transcript",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`components/agent/parts/` — the transcript's own parts.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/agent_transcript.dart",
+      "target": "@ui/agent_transcript.dart",
+      "sha256": "7c08c8ac943441e1740c18fb2eb1b9f976123f251101bab3dea920411fa034ba"
+    }
+  ],
+  "registryDependencies": [
+    "agent-attachments",
+    "agent-core",
+    "agent-markdown",
+    "button",
+    "icon",
+    "keyframes",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "agent-attachments",
+    "agent-core",
+    "agent-markdown",
+    "button",
+    "icon",
+    "keyframes"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/agent-transcript",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/agent_transcript.dart",
+  "deprecated": false
+}

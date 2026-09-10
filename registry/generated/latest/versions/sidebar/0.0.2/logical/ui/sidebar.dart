@@ -1074,7 +1074,7 @@ class SidebarGroupLabel extends StatelessWidget {
           alignment: AlignmentDirectional.centerStart,
           child: StyledText(
             label,
-            TextStyles.small,
+            TextStyles.nav,
             color: theme.sidebarForeground,
           ),
         ),

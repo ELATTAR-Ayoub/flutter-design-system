@@ -86,9 +86,7 @@ import 'package:flutter/widgets.dart'
         ScrollPosition,
         Table,
         TableColumnWidth;
-import 'package:flutter/widgets.dart'
-    as flutter
-    show OverlayPortal, ScrollPosition;
+import 'package:flutter/widgets.dart' as flutter show OverlayPortal;
 
 import './surface.dart';
 import '../../design_system/foundation/motion.dart';
@@ -654,41 +652,9 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    _unwatchScrolls();
     _animation.dispose();
     _popupRoot.dispose();
     super.dispose();
-  }
-
-  /// The scroll positions of every scrollable above the trigger, watched
-  /// while the popup is open. A page that scrolls under an open popup leaves
-  /// the popup, and every submenu it opened, floating over nothing; the
-  /// first scroll dismisses the whole tree instead. Radix does the same
-  /// through its `onScroll` outside-interaction.
-  final List<flutter.ScrollPosition> _watched = <flutter.ScrollPosition>[];
-
-  void _watchScrolls() {
-    _unwatchScrolls();
-    BuildContext host = context;
-    ScrollableState? scrollable = Scrollable.maybeOf(host);
-    while (scrollable != null) {
-      _watched.add(scrollable.position);
-      scrollable.position.addListener(_onAncestorScroll);
-      host = scrollable.context;
-      scrollable = Scrollable.maybeOf(host);
-    }
-  }
-
-  void _unwatchScrolls() {
-    for (final flutter.ScrollPosition position in _watched) {
-      position.removeListener(_onAncestorScroll);
-    }
-    _watched.clear();
-  }
-
-  void _onAncestorScroll() {
-    if (!widget.open) return;
-    widget.onDismiss?.call();
   }
 
   /// Brings the portal into line with [Popover.open], at the frame boundary.
@@ -730,7 +696,6 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
 
   void _show() {
     if (_showing) return;
-    _watchScrolls();
     _restoreTo = FocusManager.instance.primaryFocus;
     _placement = null;
     _portal.show();
@@ -763,7 +728,6 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
 
   void _hide() {
     if (!_showing) return;
-    _unwatchScrolls();
     _restoreFocus();
     // `MenubarContent` writes no `animate-out`: there is no exit to run, so the
     // controller is not reversed at all and the portal goes in this frame.

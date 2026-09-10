@@ -72,12 +72,11 @@ import './surface.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
-import './button_group.dart';
-import './disabled.dart';
 import './field.dart';
 
 /// `focus-visible:border-primary/50`.
@@ -122,7 +121,6 @@ class Input extends StatefulWidget {
     this.fill,
     this.flat = false,
     this.radius,
-    this.disabledReason,
   }) : assert(
          controller == null || initialValue == null,
          'A controller already carries the value — seed it there instead.',
@@ -265,17 +263,8 @@ class Input extends StatefulWidget {
   /// makes against [Button.radius].
   final BorderRadius? radius;
 
-  /// Why the field is disabled. Shown as a tooltip while [enabled] is false;
-  /// falls back to the enclosing [FieldScope]'s when unset.
-  final String? disabledReason;
-
   /// `h-10` — 40px, deliberately level with a default `Button`.
   static double get height => space(10);
-
-  /// The role a field's text renders at when [textSpec] is left null. The
-  /// rows of a [Combobox] and a [Command] read this same token, so a list
-  /// under a field can never drift from the field's own type.
-  static final TextStyleToken textSpecDefault = TextStyles.body;
 
   /// `px-4 py-1` — the field's own padding, before any clearance override.
   static EdgeInsets get insets =>
@@ -379,7 +368,7 @@ class _InputState extends State<Input> {
     final String? label = widget.label ?? scope?.label;
     final String? hint = widget.hint ?? scope?.describedBy;
 
-    final TextStyleToken spec = widget.textSpec ?? Input.textSpecDefault;
+    final TextStyleToken spec = widget.textSpec ?? TextStyles.body;
 
     // `input { color: inherit }` (Preflight L243–252), never overridden by the
     // component. Passing no colour is how [StyledText.styleOf] spells that, and it
@@ -445,8 +434,7 @@ class _InputState extends State<Input> {
         padding: padding,
         fill: widget.fill,
         flat: widget.flat,
-        // Inside a [ButtonGroup] the group decides which corners stay round.
-        radius: widget.radius ?? ButtonGroup.memberRadiusOf(context),
+        radius: widget.radius,
         child: line,
       );
       field = SizedBox(height: widget.boxHeight ?? Input.height, child: field);
@@ -466,10 +454,9 @@ class _InputState extends State<Input> {
       ),
     );
 
-    field = Disabled(
-      disabled: !enabled,
-      reason: widget.disabledReason ?? scope?.disabledReason,
-      child: field,
+    field = Opacity(
+      opacity: enabled ? 1 : SurfaceOpacity.disabled,
+      child: IgnorePointer(ignoring: !enabled, child: field),
     );
 
     if (label != null || hint != null || invalid) {

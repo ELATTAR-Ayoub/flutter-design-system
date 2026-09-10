@@ -1275,7 +1275,10 @@ void main() {
         expect(title.fontFamily, contains(Fonts.sans));
 
         // The description reads smaller than the title, at the same width.
-        expect(EmptyDescription.spec.stepFor(1440), TextStyles.small.stepFor(1440));
+        expect(
+          EmptyDescription.spec.stepFor(1440),
+          TextStyles.small.stepFor(1440),
+        );
         expect(
           EmptyDescription.spec.stepFor(1440).size,
           lessThan(TextStyles.body.stepFor(1440).size),

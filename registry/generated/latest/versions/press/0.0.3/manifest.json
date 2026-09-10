@@ -1,0 +1,27 @@
+{
+  "name": "press",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "The shared activation contract for anything clickable that is not a Button: keyboard operation, focus ring, button or link semantics, a 44px minimum target, and the token-backed press squish. Inert without onTap.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/press.dart",
+      "target": "@ui/press.dart",
+      "sha256": "ef2aa4231021c177a030a53d1dec0fe53434e595c1947c4a228955a627726067"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/press",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/press.dart",
+  "deprecated": false
+}

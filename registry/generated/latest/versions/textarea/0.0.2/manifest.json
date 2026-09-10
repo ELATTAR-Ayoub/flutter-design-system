@@ -9,19 +9,17 @@
     {
       "source": "lib/src/components/ui/textarea.dart",
       "target": "@ui/textarea.dart",
-      "sha256": "a166949ce01975721dcd7f8557d92803330e405e58be4701c9446ab9132e8a93"
+      "sha256": "6ebaa368af33c9c81afb1b2328d1f04e9c4f5569263dff2353be9d83c735a992"
     }
   ],
   "registryDependencies": [
     "field",
     "input",
-    "source-foundation",
-    "disabled"
+    "source-foundation"
   ],
   "semanticDependencies": [
     "field",
-    "input",
-    "disabled"
+    "input"
   ],
   "pubDependencies": {},
   "assets": [],

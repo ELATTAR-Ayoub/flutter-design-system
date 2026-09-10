@@ -11,9 +11,9 @@
 /// the same unit as the size is what makes the vertical rhythm legible in this
 /// file. [TextStyleToken.resolveWidth] converts to Flutter's ratio.
 ///
-/// Every role steps up at [Breakpoints.md] and again at [Breakpoints.lg]: a
-/// 48px display line that is right on a desktop column is wrong on a phone,
-/// and body copy earns two extra pixels on a desktop reading column.
+/// Ten of the seventeen roles are one size at every width. Headings and the two
+/// largest metrics step up at [Breakpoints.md] and [Breakpoints.lg], because a
+/// 64px display line that is right on a desktop column is wrong on a phone.
 /// Viewport steps are a layout decision and are **not** a substitute for
 /// accessibility text scaling: Flutter's text scaler applies on top of whatever
 /// step is resolved, and every text-bearing component must survive 200%.
@@ -176,13 +176,21 @@ class TextStyleToken {
   /// True when the role reads the same at every width.
   bool get isStatic => mobile == tablet && tablet == desktop;
 
-  /// The phone step: the smallest size the role ever renders at.
+  /// The single step of a role that does not respond to width.
   ///
-  /// A width-independent floor for the few places that must size a box
-  /// before there is a [BuildContext] to resolve against. Anywhere a context
-  /// exists, use `StyledText.stepOf(context, role)` or [stepFor], which
-  /// return the step the role actually renders at on that screen.
-  TypeStep get step => mobile;
+  /// For the places that must know a line box before there is a
+  /// [BuildContext] to resolve against — overlay placement that counts rows
+  /// before the menu is laid out. A responsive role has no such answer, so
+  /// asking one for it is a programming error: resolve it with
+  /// `StyledText.stepOf(context, role)` instead.
+  TypeStep get step {
+    assert(
+      isStatic,
+      'Role "$name" resolves differently by width. Use '
+      'StyledText.stepOf(context, role) or stepFor(width).',
+    );
+    return mobile;
+  }
 
   static const List<FontFeature> _tabularFigures = <FontFeature>[
     FontFeature.tabularFigures(),
@@ -298,9 +306,9 @@ class TextStyles {
     name: 'display',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(36, 40),
-    tablet: const TypeStep(42, 44),
-    desktop: const TypeStep(48, 48),
+    mobile: const TypeStep(44, 48),
+    tablet: const TypeStep(52, 56),
+    desktop: const TypeStep(64, 68),
     wght: 600,
     tracking: -0.03,
   );
@@ -310,9 +318,9 @@ class TextStyles {
     name: 'h1',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(30, 36),
-    tablet: const TypeStep(32, 38),
-    desktop: const TypeStep(36, 40),
+    mobile: const TypeStep(36, 40),
+    tablet: const TypeStep(40, 44),
+    desktop: const TypeStep(48, 52),
     wght: 700,
     tracking: -0.02,
   );
@@ -322,9 +330,9 @@ class TextStyles {
     name: 'h2',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(26, 32),
-    tablet: const TypeStep(28, 34),
-    desktop: const TypeStep(30, 36),
+    mobile: const TypeStep(30, 36),
+    tablet: const TypeStep(32, 38),
+    desktop: const TypeStep(36, 42),
     wght: 650,
     tracking: -0.015,
   );
@@ -334,9 +342,9 @@ class TextStyles {
     name: 'h3',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(20, 28),
-    tablet: const TypeStep(22, 30),
-    desktop: const TypeStep(24, 32),
+    mobile: const TypeStep(24, 30),
+    tablet: const TypeStep(26, 32),
+    desktop: const TypeStep(28, 36),
     wght: 600,
     tracking: -0.01,
   );
@@ -346,9 +354,9 @@ class TextStyles {
     name: 'h4',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(18, 24),
-    tablet: const TypeStep(19, 26),
-    desktop: const TypeStep(20, 28),
+    mobile: const TypeStep(20, 26),
+    tablet: const TypeStep(22, 28),
+    desktop: const TypeStep(24, 30),
     wght: 600,
   );
 
@@ -358,8 +366,8 @@ class TextStyles {
     group: TypeGroup.words,
     family: Fonts.sans,
     mobile: const TypeStep(18, 28),
-    tablet: const TypeStep(19, 28),
-    desktop: const TypeStep(20, 28),
+    tablet: const TypeStep(20, 30),
+    desktop: const TypeStep(20, 30),
     wght: 400,
   );
 
@@ -368,9 +376,7 @@ class TextStyles {
     name: 'body',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(14, 20),
-    tablet: const TypeStep(15, 22),
-    desktop: const TypeStep(16, 24),
+    mobile: const TypeStep(16, 24),
     wght: 400,
   );
 
@@ -381,9 +387,7 @@ class TextStyles {
     name: 'small',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(12, 16),
-    tablet: const TypeStep(13, 18),
-    desktop: const TypeStep(14, 20),
+    mobile: const TypeStep(14, 20),
     wght: 400,
   );
 
@@ -393,9 +397,7 @@ class TextStyles {
     name: 'nav',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(12, 16),
-    tablet: const TypeStep(13, 18),
-    desktop: const TypeStep(14, 18),
+    mobile: const TypeStep(16, 20),
     wght: 500,
   );
 
@@ -405,9 +407,7 @@ class TextStyles {
     name: 'badge',
     group: TypeGroup.words,
     family: Fonts.sans,
-    mobile: const TypeStep(10, 14),
-    tablet: const TypeStep(11, 14),
-    desktop: const TypeStep(12, 16),
+    mobile: const TypeStep(14, 18),
     wght: 600,
   );
 
@@ -418,9 +418,7 @@ class TextStyles {
     name: 'code',
     group: TypeGroup.code,
     family: Fonts.mono,
-    mobile: const TypeStep(12, 18),
-    tablet: const TypeStep(13, 18),
-    desktop: const TypeStep(14, 20),
+    mobile: const TypeStep(14, 20),
     wght: 400,
   );
 
@@ -430,9 +428,7 @@ class TextStyles {
     name: 'identifier',
     group: TypeGroup.code,
     family: Fonts.mono,
-    mobile: const TypeStep(12, 18),
-    tablet: const TypeStep(13, 18),
-    desktop: const TypeStep(14, 20),
+    mobile: const TypeStep(16, 24),
     wght: 400,
     tracking: -0.01,
   );
@@ -444,9 +440,7 @@ class TextStyles {
     name: 'numberSm',
     group: TypeGroup.numerics,
     family: Fonts.mono,
-    mobile: const TypeStep(12, 16),
-    tablet: const TypeStep(13, 18),
-    desktop: const TypeStep(14, 20),
+    mobile: const TypeStep(14, 18),
     wght: 600,
     tracking: -0.01,
     tabular: true,
@@ -457,9 +451,7 @@ class TextStyles {
     name: 'numberBase',
     group: TypeGroup.numerics,
     family: Fonts.mono,
-    mobile: const TypeStep(14, 20),
-    tablet: const TypeStep(15, 22),
-    desktop: const TypeStep(16, 24),
+    mobile: const TypeStep(16, 20),
     wght: 600,
     tracking: -0.01,
     tabular: true,
@@ -470,9 +462,9 @@ class TextStyles {
     name: 'numberMd',
     group: TypeGroup.numerics,
     family: Fonts.mono,
-    mobile: const TypeStep(20, 28),
-    tablet: const TypeStep(22, 30),
-    desktop: const TypeStep(24, 32),
+    mobile: const TypeStep(24, 28),
+    tablet: const TypeStep(26, 30),
+    desktop: const TypeStep(28, 32),
     wght: 600,
     tracking: -0.01,
     tabular: true,
@@ -483,9 +475,9 @@ class TextStyles {
     name: 'numberLg',
     group: TypeGroup.numerics,
     family: Fonts.mono,
-    mobile: const TypeStep(30, 36),
-    tablet: const TypeStep(32, 38),
-    desktop: const TypeStep(36, 40),
+    mobile: const TypeStep(32, 36),
+    tablet: const TypeStep(36, 40),
+    desktop: const TypeStep(40, 44),
     wght: 600,
     tracking: -0.01,
     tabular: true,
@@ -496,9 +488,9 @@ class TextStyles {
     name: 'numberXl',
     group: TypeGroup.numerics,
     family: Fonts.mono,
-    mobile: const TypeStep(36, 40),
-    tablet: const TypeStep(42, 44),
-    desktop: const TypeStep(48, 48),
+    mobile: const TypeStep(40, 44),
+    tablet: const TypeStep(48, 52),
+    desktop: const TypeStep(56, 60),
     wght: 600,
     tracking: -0.02,
     tabular: true,

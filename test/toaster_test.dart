@@ -93,10 +93,14 @@ void main() {
       await t.pump(Toaster.transition);
       await t.pump();
 
-      final TextStyle? title =
-          _paragraphFor(t, 'Sold 3 cards for \$2,481.00').text.style;
-      final TextStyle? description =
-          _paragraphFor(t, 'Credited to your available balance.').text.style;
+      final TextStyle? title = _paragraphFor(
+        t,
+        'Sold 3 cards for \$2,481.00',
+      ).text.style;
+      final TextStyle? description = _paragraphFor(
+        t,
+        'Credited to your available balance.',
+      ).text.style;
 
       for (final TextStyle? style in <TextStyle?>[title, description]) {
         expect(
@@ -111,7 +115,8 @@ void main() {
         expect(
           style?.color,
           isNotNull,
-          reason: 'a toast must resolve its own colour, not defer to no '
+          reason:
+              'a toast must resolve its own colour, not defer to no '
               'colour at all',
         );
         expect(

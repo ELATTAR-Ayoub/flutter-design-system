@@ -173,9 +173,7 @@ void main() {
         await tester.pump();
 
         expect(
-          tester
-              .widget<DocsInstall>(find.byType(DocsInstall))
-              .command,
+          tester.widget<DocsInstall>(find.byType(DocsInstall)).command,
           'elattar add chart-geometry',
         );
       },
@@ -206,7 +204,9 @@ void main() {
 
     test('the table of contents matches the declared sections', () {
       expect(
-        chartGeometryDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
+        chartGeometryDocSpec.toc
+            .map((DocsTocEntry entry) => entry.title)
+            .toList(),
         _sectionTitles,
       );
     });

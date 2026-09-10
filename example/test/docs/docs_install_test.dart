@@ -210,75 +210,67 @@ void main() {
     );
   });
 
-  test(
-    'several registry names may legitimately share one documentation page, '
-    'declared explicitly rather than left to be discovered',
-    () {
-      // `chart`, `chart-cartesian`, `chart-geometry` and `chart-polar` are
-      // four real, installable registry items — `elattar add chart-polar`
-      // is a real command — so the test above requires all four to resolve
-      // to *some* page. Since the /charts gallery took over teaching by
-      // example, all four now resolve to the SAME consolidated page body
-      // (`components_docs/chart/consolidated.dart`), each keeping only its
-      // own install command and source path. That is a deliberate,
-      // reviewed choice, not a silent collapse — so it is named here,
-      // once, and checked structurally: every one of these four specs
-      // must carry the same section shape (same ids, same order) that
-      // `buildChartFamilySpec` produces. A future change that quietly
-      // forked one of the four pages, or that reused this page for an
-      // item never listed here, fails this test either way.
-      const Set<String> sharedChartFamilyPage = <String>{
-        'chart',
-        'chart_cartesian',
-        'chart_geometry',
-        'chart_polar',
-      };
+  test('several registry names may legitimately share one documentation page, '
+      'declared explicitly rather than left to be discovered', () {
+    // `chart`, `chart-cartesian`, `chart-geometry` and `chart-polar` are
+    // four real, installable registry items — `elattar add chart-polar`
+    // is a real command — so the test above requires all four to resolve
+    // to *some* page. Since the /charts gallery took over teaching by
+    // example, all four now resolve to the SAME consolidated page body
+    // (`components_docs/chart/consolidated.dart`), each keeping only its
+    // own install command and source path. That is a deliberate,
+    // reviewed choice, not a silent collapse — so it is named here,
+    // once, and checked structurally: every one of these four specs
+    // must carry the same section shape (same ids, same order) that
+    // `buildChartFamilySpec` produces. A future change that quietly
+    // forked one of the four pages, or that reused this page for an
+    // item never listed here, fails this test either way.
+    const Set<String> sharedChartFamilyPage = <String>{
+      'chart',
+      'chart_cartesian',
+      'chart_geometry',
+      'chart_polar',
+    };
 
-      // The set above must itself line up with the catalog: nothing
-      // invented, nothing missing.
-      final Set<String> catalogChartNames = <String>{
-        for (final ComponentDocEntry entry in componentDocs)
-          if (entry.name.replaceAll('_', '-').startsWith('chart'))
-            entry.name,
-      };
+    // The set above must itself line up with the catalog: nothing
+    // invented, nothing missing.
+    final Set<String> catalogChartNames = <String>{
+      for (final ComponentDocEntry entry in componentDocs)
+        if (entry.name.replaceAll('_', '-').startsWith('chart')) entry.name,
+    };
+    expect(
+      sharedChartFamilyPage,
+      catalogChartNames,
+      reason:
+          'the declared shared-page family must match the catalog\'s own '
+          'chart* entries exactly — neither side may drift from the '
+          'other silently',
+    );
+
+    List<String> sectionIds(List<DocsPageSection> sections) =>
+        sections.map((DocsPageSection s) => s.id).toList();
+
+    final List<String> reference = sectionIds(chart.chartDocSpec.sections);
+
+    expect(
+      reference,
+      isNotEmpty,
+      reason: 'the guard checks nothing if the reference page is empty',
+    );
+
+    for (final MapEntry<String, List<DocsPageSection>> candidate
+        in <String, List<DocsPageSection>>{
+          'chart_cartesian': chart_cartesian.chartCartesianDocSpec.sections,
+          'chart_geometry': chart_geometry.chartGeometryDocSpec.sections,
+          'chart_polar': chart_polar.chartPolarDocSpec.sections,
+        }.entries) {
       expect(
-        sharedChartFamilyPage,
-        catalogChartNames,
-        reason:
-            'the declared shared-page family must match the catalog\'s own '
-            'chart* entries exactly — neither side may drift from the '
-            'other silently',
-      );
-
-      List<String> sectionIds(List<DocsPageSection> sections) =>
-          sections.map((DocsPageSection s) => s.id).toList();
-
-      final List<String> reference = sectionIds(
-        chart.chartDocSpec.sections,
-      );
-
-      expect(
+        sectionIds(candidate.value),
         reference,
-        isNotEmpty,
-        reason: 'the guard checks nothing if the reference page is empty',
+        reason:
+            '${candidate.key} is declared as sharing the chart family '
+            'page but its own section shape has drifted from it',
       );
-
-      for (final MapEntry<String, List<DocsPageSection>> candidate in <
-        String,
-        List<DocsPageSection>
-      >{
-        'chart_cartesian': chart_cartesian.chartCartesianDocSpec.sections,
-        'chart_geometry': chart_geometry.chartGeometryDocSpec.sections,
-        'chart_polar': chart_polar.chartPolarDocSpec.sections,
-      }.entries) {
-        expect(
-          sectionIds(candidate.value),
-          reference,
-          reason:
-              '${candidate.key} is declared as sharing the chart family '
-              'page but its own section shape has drifted from it',
-        );
-      }
-    },
-  );
+    }
+  });
 }

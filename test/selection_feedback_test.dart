@@ -655,7 +655,10 @@ void main() {
           .widgetList<TweenAnimationBuilder<double>>(
             find.byType(TweenAnimationBuilder<double>),
           )
-          .firstWhere((TweenAnimationBuilder<double> w) => w.duration == MotionDurations.normal);
+          .firstWhere(
+            (TweenAnimationBuilder<double> w) =>
+                w.duration == MotionDurations.normal,
+          );
       expect(thumb.curve, MotionCurves.emphasized);
       expect(thumb.duration, MotionDurations.normal);
 

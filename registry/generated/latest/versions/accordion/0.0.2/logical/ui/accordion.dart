@@ -147,17 +147,7 @@ class Accordion extends StatelessWidget {
                 Unfold(
                   open: i == openIndex,
                   child: Padding(
-                    // `left: BorderWidths.hairline` matches the trigger's own
-                    // left inset: `Surface` pays for its `border.dimensions`
-                    // out of the box it wraps (see surface.dart), so the
-                    // title's Row sits one hairline right of the item's own
-                    // left edge. The content has no such border above it, so
-                    // without this it would sit a hairline left of the title
-                    // instead of flush with it.
-                    padding: EdgeInsets.only(
-                      left: BorderWidths.hairline,
-                      bottom: contentPaddingBottom,
-                    ),
+                    padding: EdgeInsets.only(bottom: contentPaddingBottom),
                     child: DefaultTextStyle.merge(
                       // `text-sm` on the content — ambient, so a paragraph
                       // inside it inherits rather than being handed a style.

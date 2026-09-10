@@ -42,7 +42,6 @@ import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/theme_scope.dart';
-import '../../design_system/foundation/typography.dart';
 import './chart.dart';
 import './chart_geometry.dart';
 
@@ -505,7 +504,6 @@ class _CartesianChartState extends State<CartesianChart>
             text: label.text,
             x: label.x,
             baseline: label.baseline,
-            isNumeric: label.isNumeric,
           ),
           color: label.color ?? theme.foreground,
           anchor: label.anchor,
@@ -598,18 +596,11 @@ class _AxisTick {
     required this.text,
     required this.x,
     required this.baseline,
-    required this.isNumeric,
   });
 
   final String text;
   final double x;
   final double baseline;
-
-  /// Whether the value this tick prints is a `num` — the branch
-  /// `_format` itself reads. A numeral gets `TextStyles.numberSm`; a
-  /// category label (a month, a browser name) keeps the chart's own
-  /// prose role.
-  final bool isNumeric;
 }
 
 enum _TickAnchor { start, middle, end }
@@ -622,7 +613,6 @@ class _SeriesLabel {
     required this.x,
     required this.baseline,
     required this.anchor,
-    required this.isNumeric,
     this.color,
   });
 
@@ -630,12 +620,6 @@ class _SeriesLabel {
   final double x;
   final double baseline;
   final _TickAnchor anchor;
-
-  /// Whether this `LabelList` entry prints a `num` — `numberSm` when it
-  /// does, the chart's own prose role when the `dataKey` it names is a
-  /// category (`barLabelCustom`'s `month` column beside its `desktop`
-  /// figures, for one).
-  final bool isNumeric;
   final Color? color;
 }
 
@@ -850,10 +834,6 @@ class _CartesianLayout {
               for (int i = 0; i < n; i++)
                 _format(xAxis.tickFormatter, widget.data[i][categoryKey]),
             ],
-            isNumeric: <bool>[
-              for (int i = 0; i < n; i++)
-                widget.data[i][categoryKey] is num,
-            ],
             coords: categoryCoords,
             minTickGap: xAxis.minTickGap,
             viewportEnd: size.width,
@@ -867,8 +847,6 @@ class _CartesianLayout {
               text: _format(xAxis.tickFormatter, v),
               x: value.scale(v),
               baseline: baseline,
-              // The value axis: every tick here is a `num` by construction.
-              isNumeric: true,
             ),
           );
         }
@@ -883,20 +861,16 @@ class _CartesianLayout {
               text: _format(yAxis.tickFormatter, v),
               x: x,
               baseline: value.scale(v) + _midOffset,
-              // The value axis: every tick here is a `num` by construction.
-              isNumeric: true,
             ),
           );
         }
       } else {
         for (int i = 0; i < n; i++) {
-          final Object? raw = widget.data[i][categoryKey];
           yTicks.add(
             _AxisTick(
-              text: _format(yAxis.tickFormatter, raw),
+              text: _format(yAxis.tickFormatter, widget.data[i][categoryKey]),
               x: x,
               baseline: band.center(i) + _midOffset,
-              isNumeric: raw is num,
             ),
           );
         }
@@ -1081,10 +1055,9 @@ class _CartesianLayout {
         final Object? raw = spec.dataKey != null
             ? data[i][spec.dataKey]
             : values[i];
-        final bool numeric = raw is num;
         final String text = spec.formatter != null
             ? spec.formatter!(raw)
-            : (numeric ? chartNumber(raw) : '${raw ?? ''}');
+            : (raw is num ? chartNumber(raw) : '${raw ?? ''}');
         switch (spec.position) {
           case ChartLabelPosition.top:
             out.add(
@@ -1093,7 +1066,6 @@ class _CartesianLayout {
                 x: anchors[i].dx,
                 baseline: anchors[i].dy - spec.offset,
                 anchor: _TickAnchor.middle,
-                isNumeric: numeric,
                 color: spec.color,
               ),
             );
@@ -1104,7 +1076,6 @@ class _CartesianLayout {
                 x: anchors[i].dx + spec.offset,
                 baseline: anchors[i].dy + _midOffset,
                 anchor: _TickAnchor.start,
-                isNumeric: numeric,
                 color: spec.color,
               ),
             );
@@ -1115,7 +1086,6 @@ class _CartesianLayout {
                 x: (barStart?[i] ?? anchors[i].dx) + spec.offset,
                 baseline: anchors[i].dy + _midOffset,
                 anchor: _TickAnchor.start,
-                isNumeric: numeric,
                 color: spec.color,
               ),
             );
@@ -1126,7 +1096,6 @@ class _CartesianLayout {
                 x: anchors[i].dx - spec.offset,
                 baseline: anchors[i].dy + _midOffset,
                 anchor: _TickAnchor.end,
-                isNumeric: numeric,
                 color: spec.color,
               ),
             );
@@ -1138,17 +1107,8 @@ class _CartesianLayout {
   /// `cartesian/getTicks.js` — `interval="preserveEnd"`, recharts' own default.
   ///
   /// It walks from the LAST tick backwards, keeps a label only when it clears
-  /// the previously kept one by [minTickGap], and clamps BOTH ends so their
-  /// outer edge lands on the surface's own edge rather than on the plot's:
-  /// the last label's right edge is pulled in to `viewportEnd`, the first
-  /// label's left edge is pushed in to 0. Without the first-end clamp, a
-  /// point-scale category axis (Area/Line — no bars) whose first category
-  /// sits exactly on `frame.left` fails the plain visibility test whenever
-  /// `margin.left` is smaller than half the label's own rendered width, and
-  /// the label is dropped rather than nudged inward — recharts' own
-  /// `preserveEnd` special-cases the last tick only, but a band scale's
-  /// `bandwidth / 2` offset normally hides the same gap on the first tick, so
-  /// the asymmetry never showed up there.
+  /// the previously kept one by [minTickGap], and clamps the final label so its
+  /// right edge lands on the surface's own edge rather than on the plot's.
   ///
   /// **The viewport is the whole SVG, not the plot box** — measured, and it is
   /// the one part of this that cannot be reasoned out. `AreaInteractive` (plot
@@ -1158,7 +1118,6 @@ class _CartesianLayout {
   static List<_AxisTick> _preserveEndTicks({
     required BuildContext context,
     required List<String> labels,
-    required List<bool> isNumeric,
     required List<double> coords,
     required double minTickGap,
     required double viewportEnd,
@@ -1167,47 +1126,28 @@ class _CartesianLayout {
     final List<_AxisTick> kept = <_AxisTick>[];
     double end = viewportEnd;
     for (int i = labels.length - 1; i >= 0; i--) {
-      final double width = _measure(context, labels[i], isNumeric[i]);
+      final double width = _measure(context, labels[i]);
       double coord = coords[i];
       if (i == labels.length - 1) {
         final double gap = coord + width / 2 - end;
         if (gap > 0) coord -= gap;
       }
-      if (i == 0) {
-        final double gap = width / 2 - coord;
-        if (gap > 0) coord += gap;
-      }
       final bool visible = coord - width / 2 >= 0 && coord + width / 2 <= end;
       if (!visible) continue;
       end = coord - (width / 2 + minTickGap);
-      kept.add(
-        _AxisTick(
-          text: labels[i],
-          x: coord,
-          baseline: baseline,
-          isNumeric: isNumeric[i],
-        ),
-      );
+      kept.add(_AxisTick(text: labels[i], x: coord, baseline: baseline));
     }
     return kept.reversed.toList();
   }
 
   static final Map<String, double> _widths = <String, double>{};
 
-  /// Measured against the same role the tick will actually render in — a
-  /// numeric category axis (rare, but `type: ChartAxisType.number` on an X
-  /// axis is a real call shape) is wider or narrower in `numberSm` than in
-  /// `ChartText.xs`, and `preserveEnd` has to clamp against the real width
-  /// or a tick can be kept (or dropped) that the render then disagrees with.
-  static double _measure(BuildContext context, String text, bool isNumeric) =>
-      _widths.putIfAbsent('${isNumeric ? 'n' : 'c'}:$text', () {
+  static double _measure(BuildContext context, String text) =>
+      _widths.putIfAbsent(text, () {
         final TextPainter painter = TextPainter(
           text: TextSpan(
             text: text,
-            style: StyledText.styleOf(
-              context,
-              isNumeric ? TextStyles.numberSm : ChartText.xs,
-            ),
+            style: StyledText.styleOf(context, ChartText.xs),
           ),
           textDirection: TextDirection.ltr,
         )..layout();
@@ -1484,11 +1424,7 @@ class _TickLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget text = StyledText(
-      tick.text,
-      tick.isNumeric ? TextStyles.numberSm : ChartText.xs,
-      color: color,
-    );
+    final Widget text = StyledText(tick.text, ChartText.xs, color: color);
     return Transform.translate(
       offset: Offset(0, tick.baseline),
       child: Row(

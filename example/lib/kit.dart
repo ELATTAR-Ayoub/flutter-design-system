@@ -998,7 +998,10 @@ class _DsCodeBlockState extends State<CodeBlock> {
       if (i > 0) spans.add(const TextSpan(text: '\n'));
       for (final CodeToken token in tokenisedLines[i]) {
         spans.add(
-          TextSpan(text: token.text, style: style.copyWith(color: token.color)),
+          TextSpan(
+            text: token.text,
+            style: style.copyWith(color: token.color),
+          ),
         );
       }
     }

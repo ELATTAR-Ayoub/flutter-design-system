@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/native_select.dart",
       "target": "@ui/native_select.dart",
-      "sha256": "b19ed14dddc79f4ceb9cd5019a672bd1155ef0bf6c23ab091b519ec1df674f9d"
+      "sha256": "e57c9831853b9fabb27de7d4834f73a090d6e8d6cf8cdf35d11c25422cc50f90"
     }
   ],
   "registryDependencies": [
@@ -19,8 +19,7 @@
     "surface",
     "popover",
     "select",
-    "source-foundation",
-    "disabled"
+    "source-foundation"
   ],
   "semanticDependencies": [
     "button",
@@ -28,8 +27,7 @@
     "icon",
     "surface",
     "popover",
-    "select",
-    "disabled"
+    "select"
   ],
   "pubDependencies": {},
   "assets": [],

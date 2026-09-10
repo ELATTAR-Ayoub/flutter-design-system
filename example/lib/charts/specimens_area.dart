@@ -516,15 +516,13 @@ const List<ChartSpecimen> areaSpecimens = <ChartSpecimen>[
 
 Widget _areaDefaultBuild(BuildContext context, ChartInk ink) =>
     areaDefault(ink);
-Widget _areaLinearBuild(BuildContext context, ChartInk ink) =>
-    areaLinear(ink);
+Widget _areaLinearBuild(BuildContext context, ChartInk ink) => areaLinear(ink);
 Widget _areaStepBuild(BuildContext context, ChartInk ink) => areaStep(ink);
 Widget _areaStackedBuild(BuildContext context, ChartInk ink) =>
     areaStacked(ink);
 Widget _areaStackedExpandBuild(BuildContext context, ChartInk ink) =>
     areaStackedExpand(ink);
-Widget _areaLegendBuild(BuildContext context, ChartInk ink) =>
-    areaLegend(ink);
+Widget _areaLegendBuild(BuildContext context, ChartInk ink) => areaLegend(ink);
 Widget _areaIconsBuild(BuildContext context, ChartInk ink) => areaIcons(ink);
 Widget _areaGradientBuild(BuildContext context, ChartInk ink) =>
     areaGradient(ink);

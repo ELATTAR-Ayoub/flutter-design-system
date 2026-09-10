@@ -29,11 +29,7 @@
 library;
 
 class ChartCardCopy {
-  const ChartCardCopy({
-    required this.title,
-    this.trend = '',
-    this.range = '',
-  });
+  const ChartCardCopy({required this.title, this.trend = '', this.range = ''});
 
   /// `<CardTitle>`, e.g. `Area Chart - Step`.
   final String title;

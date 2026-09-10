@@ -1,0 +1,27 @@
+{
+  "name": "keyframes",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`@keyframes` — the reference's fourteen, transcribed whole.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/keyframes.dart",
+      "target": "@ui/keyframes.dart",
+      "sha256": "959708e2685fc8ad6ab621339b51026f61c829c8908c11914b9ad3f0c76e219b"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/keyframes",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/keyframes.dart",
+  "deprecated": false
+}

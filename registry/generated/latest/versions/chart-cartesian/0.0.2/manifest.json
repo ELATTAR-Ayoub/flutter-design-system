@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/chart_cartesian.dart",
       "target": "@ui/chart_cartesian.dart",
-      "sha256": "9d767a4bfa36c9232be5bab4a0a9d85f8f10e0b4ac0d43aa76c585cf72661397"
+      "sha256": "3556705b9efddf877f5c172355fed779d496825e110c468a2239544bdd6fba06"
     }
   ],
   "registryDependencies": [

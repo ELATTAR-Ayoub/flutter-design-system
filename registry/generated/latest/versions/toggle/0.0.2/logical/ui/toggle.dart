@@ -70,11 +70,11 @@ import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
-import './disabled.dart';
 import './icon.dart';
 
 /// The two `cva` variants (`toggle.tsx` L13–16).
@@ -178,7 +178,6 @@ class Toggle extends StatefulWidget {
     this.pressedFill,
     this.pressedInk,
     this.inExclusiveGroup = false,
-    this.disabledReason,
   });
 
   /// The content — a label, an icon, or a row of both spaced by [gap].
@@ -242,9 +241,6 @@ class Toggle extends StatefulWidget {
   /// is why a screen reader announces the group's three items as a set rather
   /// than as three independent switches.
   final bool inExclusiveGroup;
-
-  /// Why the control is disabled, shown as a tooltip.
-  final String? disabledReason;
 
   /// `h-7` / `h-8` / `h-9`.
   static double heightFor(ToggleSize size) => switch (size) {
@@ -503,10 +499,9 @@ class _ToggleState extends State<Toggle> {
     // `disabled:pointer-events-none disabled:opacity-50`. The [IgnorePointer]
     // is what makes the first half true, and it takes the hover with it: a
     // disabled control is never in the hit-test path, so `onEnter` cannot run.
-    toggle = Disabled(
-      disabled: !_enabled,
-      reason: widget.disabledReason,
-      child: toggle,
+    toggle = Opacity(
+      opacity: _enabled ? 1 : SurfaceOpacity.disabled,
+      child: IgnorePointer(ignoring: !_enabled, child: toggle),
     );
 
     // TARGET SIZING, was `if (!widget.inExclusiveGroup) toggle =

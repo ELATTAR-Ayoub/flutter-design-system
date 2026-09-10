@@ -132,11 +132,7 @@ class _Toolbar extends StatelessWidget {
     return Row(
       children: <Widget>[
         Expanded(
-          child: StyledText(
-            id,
-            TextStyles.code,
-            color: theme.mutedForeground,
-          ),
+          child: StyledText(id, TextStyles.code, color: theme.mutedForeground),
         ),
         DocsCopyButton(text: source, writer: writer),
         SizedBox(width: space(2)),

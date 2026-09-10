@@ -1,7 +1,7 @@
 {
   "name": "item",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "`components/ui/item.tsx` — a structured list row: media, content, actions.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/item.dart",
       "target": "@ui/item.dart",
-      "sha256": "56d00c0825e636f5f766933698ea70fd0435b994899fd297f658568b967a7fda"
+      "sha256": "9e4e7ffbc98319c3d7bffb1aed173d9e2f994bcc9f8fb485a1b2a8fc72a639b8"
     }
   ],
   "registryDependencies": [
@@ -21,7 +21,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/item",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/item.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/item.dart",
   "exports": [
     "Item",
     "ItemActions",

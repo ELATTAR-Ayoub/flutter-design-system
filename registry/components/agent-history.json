@@ -1,7 +1,7 @@
 {
   "name": "agent-history",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "`components/agent/parts/{history-card,chat-history,history-search}.tsx` —",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_history.dart",
       "target": "@ui/agent_history.dart",
-      "sha256": "8a495479130059d1b3a820451cc2a2e6ec5d7244a146bea4169422331b08284e"
+      "sha256": "1b1ddc2f6425db15400324e45af66aacfe6ebf8d18786e454004ae4322fbc3b8"
     }
   ],
   "registryDependencies": [
@@ -54,7 +54,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/agent_history",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/agent_history.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/agent_history.dart",
   "exports": [
     "BlurSwitch",
     "ChatHistory",

@@ -70,224 +70,213 @@ const List<Map<String, Object?>> _monthlyVisitors = <Map<String, Object?>>[
 /// parameterised only by the calling route's own [ComponentDocEntry] —
 /// which supplies the install command, source path, and page title each
 /// route must still show as its own.
-ComponentDocSpec buildChartFamilySpec({required ComponentDocEntry entry}) =>
-    ComponentDocSpec(
-      name: entry.name,
-      title: entry.title,
-      description: entry.description,
-      sections: <DocsPageSection>[
-        ShowcaseSection(
-          id: 'preview',
-          title: 'Preview',
+ComponentDocSpec buildChartFamilySpec({
+  required ComponentDocEntry entry,
+}) => ComponentDocSpec(
+  name: entry.name,
+  title: entry.title,
+  description: entry.description,
+  sections: <DocsPageSection>[
+    ShowcaseSection(
+      id: 'preview',
+      title: 'Preview',
+      description:
+          'One wrapper (`chart`) and three plot engines '
+          '(`chart-cartesian`, `chart-geometry`, `chart-polar`) behind '
+          'one API: a themed config, a fixed-height container, and a '
+          'widget per plot family. This specimen is the smallest real '
+          'one — a two-series area chart with its legend — not a tour; '
+          'for seventy copyable charts across every family see the '
+          '/charts gallery, linked again under Dependencies below.',
+      specimen: const _PreviewSpecimen(),
+      code: _previewCode,
+      label: 'Preview specimen view',
+      minHeight: space(160),
+    ),
+    InstallSection(
+      id: 'install',
+      title: 'Installation',
+      description:
+          'Four separate registry items make up the chart engine, and '
+          'a project can install only what it needs:\n\n'
+          '•  elattar add chart — the wrapper: ChartConfig, '
+          'ChartContainer, the tooltip panel, the legend row, '
+          'chartNumber. Every other chart item depends on this one.\n'
+          '•  elattar add chart-cartesian — CartesianChart: area, bar '
+          'and line, one widget with a different ChartSeriesKind.\n'
+          '•  elattar add chart-geometry — the scale, tick and path '
+          'maths chart-cartesian and chart-polar both draw through. No '
+          'dependencies of its own.\n'
+          '•  elattar add chart-polar — PieChart, RadarChart and '
+          'RadialBarChart, three widgets sharing one polar convention.\n\n'
+          'This page\'s own command, below, installs ${entry.sourcePath} '
+          'and resolves that item\'s registryDependencies automatically. '
+          'The Manual tab is for a project not using the CLI.',
+      command: entry.command,
+      manualFiles: <DocsCodeFile>[
+        DocsCodeFile(
+          path: 'lib/components/ui/${entry.sourcePath.split('/').last}',
+          title: '1. Copy the source',
           description:
-              'One wrapper (`chart`) and three plot engines '
-              '(`chart-cartesian`, `chart-geometry`, `chart-polar`) behind '
-              'one API: a themed config, a fixed-height container, and a '
-              'widget per plot family. This specimen is the smallest real '
-              'one — a two-series area chart with its legend — not a tour; '
-              'for seventy copyable charts across every family see the '
-              '/charts gallery, linked again under Dependencies below.',
-          specimen: const _PreviewSpecimen(),
-          code: _previewCode,
-          label: 'Preview specimen view',
-          minHeight: space(160),
+              "Copy ${entry.sourcePath}'s generated payload into "
+              'components/ui.',
+          code:
+              "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+              '// Copy the generated source here when using manual mode.',
         ),
-        InstallSection(
-          id: 'install',
-          title: 'Installation',
+        DocsCodeFile(
+          path: 'lib/components/ui/ui.dart',
+          title: '2. Export it from your barrel',
           description:
-              'Four separate registry items make up the chart engine, and '
-              'a project can install only what it needs:\n\n'
-              '•  elattar add chart — the wrapper: ChartConfig, '
-              'ChartContainer, the tooltip panel, the legend row, '
-              'chartNumber. Every other chart item depends on this one.\n'
-              '•  elattar add chart-cartesian — CartesianChart: area, bar '
-              'and line, one widget with a different ChartSeriesKind.\n'
-              '•  elattar add chart-geometry — the scale, tick and path '
-              'maths chart-cartesian and chart-polar both draw through. No '
-              'dependencies of its own.\n'
-              '•  elattar add chart-polar — PieChart, RadarChart and '
-              'RadialBarChart, three widgets sharing one polar convention.\n\n'
-              'This page\'s own command, below, installs ${entry.sourcePath} '
-              'and resolves that item\'s registryDependencies automatically. '
-              'The Manual tab is for a project not using the CLI.',
-          command: entry.command,
-          manualFiles: <DocsCodeFile>[
-            DocsCodeFile(
-              path: 'lib/components/ui/${entry.sourcePath.split('/').last}',
-              title: '1. Copy the source',
-              description:
-                  "Copy ${entry.sourcePath}'s generated payload into "
-                  'components/ui.',
-              code:
-                  "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-                  '// Copy the generated source here when using manual mode.',
-            ),
-            DocsCodeFile(
-              path: 'lib/components/ui/ui.dart',
-              title: '2. Export it from your barrel',
-              description:
-                  'Add the export line so this item\'s exports are '
-                  'reachable the same way the CLI path already makes them.',
-              code: "export '${entry.sourcePath.split('/').last}';",
-            ),
-          ],
-        ),
-        SnippetSection(
-          id: 'usage',
-          title: 'Usage',
-          description:
-              'The smallest correct chart: a config, a container, and one '
-              'CartesianChart series. PieChart, RadarChart and '
-              'RadialBarChart (chart-polar) construct the same way — data, '
-              'a list of specs, the same ChartContainer.',
-          code: _usageCode,
-        ),
-        DisclosureSection(
-          id: 'api',
-          title: 'API Reference',
-          description:
-              'The types a consumer actually touches building or theming a '
-              'chart — not an exhaustive row per export. The scale, tick '
-              'and path maths under all of this (chart-geometry) is '
-              'documented in the source and the registry manifest, not '
-              'enumerated here; see Dependencies below.',
-          children: const <DocsTocEntry>[
-            DocsTocEntry(title: 'ChartConfig', anchor: 'api-elchartconfig'),
-            DocsTocEntry(
-              title: 'ChartContainer',
-              anchor: 'api-elchartcontainer',
-            ),
-            DocsTocEntry(
-              title: 'ChartTooltipContent',
-              anchor: 'api-elcharttooltipcontent',
-            ),
-            DocsTocEntry(
-              title: 'ChartLegendContent',
-              anchor: 'api-elchartlegendcontent',
-            ),
-            DocsTocEntry(
-              title: 'CartesianChart',
-              anchor: 'api-elcartesianchart',
-            ),
-            DocsTocEntry(
-              title: 'ChartSeriesSpec',
-              anchor: 'api-elchartseriesspec',
-            ),
-            DocsTocEntry(title: 'Axes & Grid', anchor: 'api-elaxesgrid'),
-            DocsTocEntry(title: 'PieChart', anchor: 'api-elpiechart'),
-            DocsTocEntry(title: 'RadarChart', anchor: 'api-elradarchart'),
-            DocsTocEntry(
-              title: 'RadialBarChart',
-              anchor: 'api-elradialbarchart',
-            ),
-            DocsTocEntry(title: 'chartNumber', anchor: 'api-elchartnumber'),
-          ],
-          child: const _ApiReferenceContent(),
-        ),
-        DisclosureSection(
-          id: 'states',
-          title: 'States',
-          description:
-              'The chart family owns exactly one interactive state — which '
-              'datum the pointer is over — and one caller-set one — which '
-              'wedge or bar `activeIndex` names. Everything else below is '
-              'configuration passed in at construction, never a state a '
-              'widget reaches on its own.',
-          child: DocsStateMatrix(facts: _stateFacts),
-        ),
-        DisclosureSection(
-          id: 'accessibility',
-          title: 'Accessibility',
-          description:
-              'Read straight off the source, all four files: no '
-              '`Semantics` node anywhere in `chart.dart`, '
-              '`chart_cartesian.dart`, `chart_geometry.dart` or '
-              '`chart_polar.dart` — checked with '
-              '`grep -rn "Semantics" lib/src/components/ui/chart*.dart`, '
-              'zero matches.',
-          child: const _AccessibilityContent(),
-        ),
-        DisclosureSection(
-          id: 'keyboard',
-          title: 'Keyboard',
-          description:
-              'No `FocusNode`, no `Focus` widget, no key handler anywhere '
-              'in the family: none of `CartesianChart`, `PieChart`, '
-              '`RadarChart` or `RadialBarChart` can take keyboard focus or '
-              'answer a key.',
-          child: const _KeyboardContent(),
-        ),
-        DisclosureSection(
-          id: 'responsive',
-          title: 'Responsive',
-          child: const _ResponsiveContent(),
-        ),
-        DisclosureSection(
-          id: 'dependencies',
-          title: 'Dependencies',
-          child: const _DependenciesContent(),
-        ),
-        DisclosureSection(
-          id: 'theming',
-          title: 'Theming',
-          description:
-              'The one thing the owner asked for by name. Five tokens, '
-              'read live off `ThemeScope.of(context)` at build time — '
-              'change the theme and every chart on the page repaints with '
-              'it, with no chart-specific configuration required.',
-          child: const _ThemingContent(),
-        ),
-        DisclosureSection(
-          id: 'source',
-          title: 'Source',
-          child: DocsInstallFacts(
-            title: 'Reference',
-            facts: <DocsInstallFact>[
-              DocsInstallFact(
-                label: 'Source',
-                value: entry.sourcePath,
-                description:
-                    'Authoritative implementation: the truth this page was '
-                    'written from.',
-              ),
-              const DocsInstallFact(
-                label: 'Wrapper source',
-                value: 'lib/src/components/ui/chart.dart',
-                description: 'ChartConfig, ChartContainer, tooltip, legend.',
-              ),
-              const DocsInstallFact(
-                label: 'Cartesian engine source',
-                value: 'lib/src/components/ui/chart_cartesian.dart',
-                description: 'CartesianChart: area, bar, line.',
-              ),
-              const DocsInstallFact(
-                label: 'Geometry source',
-                value: 'lib/src/components/ui/chart_geometry.dart',
-                description: 'Scale, tick and path maths.',
-              ),
-              const DocsInstallFact(
-                label: 'Polar engine source',
-                value: 'lib/src/components/ui/chart_polar.dart',
-                description: 'PieChart, RadarChart, RadialBarChart.',
-              ),
-              const DocsInstallFact(
-                label: 'Docs test',
-                value: 'example/test/components_docs/chart_test.dart',
-                description:
-                    'Covers this consolidated page — mounted from each of '
-                    'the four routes.',
-              ),
-              const DocsInstallFact(
-                label: 'Edit these docs',
-                value: 'example/lib/components_docs/chart/consolidated.dart',
-                description: 'The shared page body every route renders.',
-              ),
-            ],
-          ),
+              'Add the export line so this item\'s exports are '
+              'reachable the same way the CLI path already makes them.',
+          code: "export '${entry.sourcePath.split('/').last}';",
         ),
       ],
-    );
+    ),
+    SnippetSection(
+      id: 'usage',
+      title: 'Usage',
+      description:
+          'The smallest correct chart: a config, a container, and one '
+          'CartesianChart series. PieChart, RadarChart and '
+          'RadialBarChart (chart-polar) construct the same way — data, '
+          'a list of specs, the same ChartContainer.',
+      code: _usageCode,
+    ),
+    DisclosureSection(
+      id: 'api',
+      title: 'API Reference',
+      description:
+          'The types a consumer actually touches building or theming a '
+          'chart — not an exhaustive row per export. The scale, tick '
+          'and path maths under all of this (chart-geometry) is '
+          'documented in the source and the registry manifest, not '
+          'enumerated here; see Dependencies below.',
+      children: const <DocsTocEntry>[
+        DocsTocEntry(title: 'ChartConfig', anchor: 'api-elchartconfig'),
+        DocsTocEntry(title: 'ChartContainer', anchor: 'api-elchartcontainer'),
+        DocsTocEntry(
+          title: 'ChartTooltipContent',
+          anchor: 'api-elcharttooltipcontent',
+        ),
+        DocsTocEntry(
+          title: 'ChartLegendContent',
+          anchor: 'api-elchartlegendcontent',
+        ),
+        DocsTocEntry(title: 'CartesianChart', anchor: 'api-elcartesianchart'),
+        DocsTocEntry(title: 'ChartSeriesSpec', anchor: 'api-elchartseriesspec'),
+        DocsTocEntry(title: 'Axes & Grid', anchor: 'api-elaxesgrid'),
+        DocsTocEntry(title: 'PieChart', anchor: 'api-elpiechart'),
+        DocsTocEntry(title: 'RadarChart', anchor: 'api-elradarchart'),
+        DocsTocEntry(title: 'RadialBarChart', anchor: 'api-elradialbarchart'),
+        DocsTocEntry(title: 'chartNumber', anchor: 'api-elchartnumber'),
+      ],
+      child: const _ApiReferenceContent(),
+    ),
+    DisclosureSection(
+      id: 'states',
+      title: 'States',
+      description:
+          'The chart family owns exactly one interactive state — which '
+          'datum the pointer is over — and one caller-set one — which '
+          'wedge or bar `activeIndex` names. Everything else below is '
+          'configuration passed in at construction, never a state a '
+          'widget reaches on its own.',
+      child: DocsStateMatrix(facts: _stateFacts),
+    ),
+    DisclosureSection(
+      id: 'accessibility',
+      title: 'Accessibility',
+      description:
+          'Read straight off the source, all four files: no '
+          '`Semantics` node anywhere in `chart.dart`, '
+          '`chart_cartesian.dart`, `chart_geometry.dart` or '
+          '`chart_polar.dart` — checked with '
+          '`grep -rn "Semantics" lib/src/components/ui/chart*.dart`, '
+          'zero matches.',
+      child: const _AccessibilityContent(),
+    ),
+    DisclosureSection(
+      id: 'keyboard',
+      title: 'Keyboard',
+      description:
+          'No `FocusNode`, no `Focus` widget, no key handler anywhere '
+          'in the family: none of `CartesianChart`, `PieChart`, '
+          '`RadarChart` or `RadialBarChart` can take keyboard focus or '
+          'answer a key.',
+      child: const _KeyboardContent(),
+    ),
+    DisclosureSection(
+      id: 'responsive',
+      title: 'Responsive',
+      child: const _ResponsiveContent(),
+    ),
+    DisclosureSection(
+      id: 'dependencies',
+      title: 'Dependencies',
+      child: const _DependenciesContent(),
+    ),
+    DisclosureSection(
+      id: 'theming',
+      title: 'Theming',
+      description:
+          'The one thing the owner asked for by name. Five tokens, '
+          'read live off `ThemeScope.of(context)` at build time — '
+          'change the theme and every chart on the page repaints with '
+          'it, with no chart-specific configuration required.',
+      child: const _ThemingContent(),
+    ),
+    DisclosureSection(
+      id: 'source',
+      title: 'Source',
+      child: DocsInstallFacts(
+        title: 'Reference',
+        facts: <DocsInstallFact>[
+          DocsInstallFact(
+            label: 'Source',
+            value: entry.sourcePath,
+            description:
+                'Authoritative implementation: the truth this page was '
+                'written from.',
+          ),
+          const DocsInstallFact(
+            label: 'Wrapper source',
+            value: 'lib/src/components/ui/chart.dart',
+            description: 'ChartConfig, ChartContainer, tooltip, legend.',
+          ),
+          const DocsInstallFact(
+            label: 'Cartesian engine source',
+            value: 'lib/src/components/ui/chart_cartesian.dart',
+            description: 'CartesianChart: area, bar, line.',
+          ),
+          const DocsInstallFact(
+            label: 'Geometry source',
+            value: 'lib/src/components/ui/chart_geometry.dart',
+            description: 'Scale, tick and path maths.',
+          ),
+          const DocsInstallFact(
+            label: 'Polar engine source',
+            value: 'lib/src/components/ui/chart_polar.dart',
+            description: 'PieChart, RadarChart, RadialBarChart.',
+          ),
+          const DocsInstallFact(
+            label: 'Docs test',
+            value: 'example/test/components_docs/chart_test.dart',
+            description:
+                'Covers this consolidated page — mounted from each of '
+                'the four routes.',
+          ),
+          const DocsInstallFact(
+            label: 'Edit these docs',
+            value: 'example/lib/components_docs/chart/consolidated.dart',
+            description: 'The shared page body every route renders.',
+          ),
+        ],
+      ),
+    ),
+  ],
+);
 
 /// The article frame every route wraps [buildChartFamilySpec]'s output in.
 /// Identical across all four routes except the entry, the article key (for
@@ -456,10 +445,7 @@ class _ApiReferenceContent extends StatelessWidget {
       SizedBox(height: space(5)),
       const DocsAnchor(
         id: 'api-elchartseriesspec',
-        child: DocsApiTable(
-          title: 'ChartSeriesSpec',
-          facts: _seriesSpecFacts,
-        ),
+        child: DocsApiTable(title: 'ChartSeriesSpec', facts: _seriesSpecFacts),
       ),
       SizedBox(height: space(5)),
       const DocsAnchor(
@@ -821,7 +807,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'PieSpec names one wedge; activeGrow and activeRing then change '
         'how that wedge alone paints.',
-    userSignal: 'Caller-set — there is no hover-to-activate wiring in the '
+    userSignal:
+        'Caller-set — there is no hover-to-activate wiring in the '
         'source.',
   ),
   DocsStateFact(
@@ -861,14 +848,13 @@ class _KeyboardContent extends StatelessWidget {
   const _KeyboardContent();
 
   @override
-  Widget build(BuildContext context) => _bullets(ThemeScope.of(context), <
-    String
-  >[
-    'No FocusNode, no Focus widget, no key handling in any of the four '
-        'files. None of ChartTooltipContent, ChartLegendContent, '
-        'CartesianChart, PieChart, RadarChart or RadialBarChart can take '
-        'keyboard focus, and none answers a key.',
-  ]);
+  Widget build(BuildContext context) =>
+      _bullets(ThemeScope.of(context), <String>[
+        'No FocusNode, no Focus widget, no key handling in any of the four '
+            'files. None of ChartTooltipContent, ChartLegendContent, '
+            'CartesianChart, PieChart, RadarChart or RadialBarChart can take '
+            'keyboard focus, and none answers a key.',
+      ]);
 }
 
 class _ResponsiveContent extends StatelessWidget {
@@ -922,7 +908,10 @@ class _DependenciesContent extends StatelessWidget {
       SizedBox(height: space(4)),
       const DocsLinkRow(
         links: <DocsLink>[
-          DocsLink(label: 'Charts gallery — 70 copyable charts', route: '/charts'),
+          DocsLink(
+            label: 'Charts gallery — 70 copyable charts',
+            route: '/charts',
+          ),
         ],
       ),
     ],

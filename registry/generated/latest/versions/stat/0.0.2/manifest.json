@@ -9,21 +9,19 @@
     {
       "source": "lib/src/components/ui/stat.dart",
       "target": "@ui/stat.dart",
-      "sha256": "e51786938958c142a9417daa268002f686e58aad3ccc4c7d4bbaa97ef2f1f2d8"
+      "sha256": "07e6a64472a4c7ad7b4a5ecc2e6a66b954a3930c6ae989b7fbf7e4d8137db4a5"
     }
   ],
   "registryDependencies": [
     "icon",
     "skeleton",
     "source-foundation",
-    "content-change",
-    "disabled"
+    "content-change"
   ],
   "semanticDependencies": [
     "icon",
     "skeleton",
-    "content-change",
-    "disabled"
+    "content-change"
   ],
   "pubDependencies": {},
   "assets": [],

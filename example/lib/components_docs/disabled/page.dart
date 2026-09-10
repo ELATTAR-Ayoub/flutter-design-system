@@ -431,32 +431,40 @@ const List<DocsApiFact> _apiFacts = <DocsApiFact>[
 const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Enabled',
-    treatment: 'TweenAnimationBuilder settles at opacity 1; pointer input '
+    treatment:
+        'TweenAnimationBuilder settles at opacity 1; pointer input '
         'passes straight through to child.',
-    userSignal: 'The control looks and behaves exactly as if Disabled were '
+    userSignal:
+        'The control looks and behaves exactly as if Disabled were '
         'not there.',
   ),
   DocsStateFact(
     state: 'Disabled',
-    treatment: 'The tween animates to SurfaceOpacity.disabled over '
+    treatment:
+        'The tween animates to SurfaceOpacity.disabled over '
         'duration (or MotionDurations.fast) eased by '
         'MotionCurves.emphasized; blockPointer wraps child in an '
         'IgnorePointer; the cursor swaps to SystemMouseCursors.basic.',
-    userSignal: 'The control fades to a dimmed, inert look and the cursor '
+    userSignal:
+        'The control fades to a dimmed, inert look and the cursor '
         'stops hinting that it is clickable.',
   ),
   DocsStateFact(
     state: 'Disabled with reason',
-    treatment: 'A Tooltip wraps the faded result, hidden while enabled and '
+    treatment:
+        'A Tooltip wraps the faded result, hidden while enabled and '
         'shown while disabled — on hover for a mouse, on tap for touch.',
-    userSignal: 'Hovering or tapping the dimmed control surfaces why it is '
+    userSignal:
+        'Hovering or tapping the dimmed control surfaces why it is '
         'inert.',
   ),
   DocsStateFact(
     state: 'Tapped while disabled',
-    treatment: 'The GestureDetector\'s onTap is wired to onDisabledTap only '
+    treatment:
+        'The GestureDetector\'s onTap is wired to onDisabledTap only '
         'while disabled; the wrapped child never receives the gesture.',
-    userSignal: 'A tap on the dimmed control fires the caller\'s hook '
+    userSignal:
+        'A tap on the dimmed control fires the caller\'s hook '
         'instead of doing nothing.',
   ),
 ];

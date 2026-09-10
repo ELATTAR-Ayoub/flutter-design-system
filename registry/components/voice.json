@@ -1,7 +1,7 @@
 {
   "name": "voice",
   "type": "component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "`components/agent/voice/` — the listening surface.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/voice.dart",
       "target": "@ui/voice.dart",
-      "sha256": "a8ee6a8c9e1afe52164e176e9a47b05ff421023a4a3ddde57a295101456ba6f4"
+      "sha256": "3d0f5b2afb8cc72d3c78ccb727b7086dcd6927f26aebda5bfe4b9ec341c814d9"
     }
   ],
   "registryDependencies": [
@@ -26,7 +26,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/voice",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.2/lib/src/components/ui/voice.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/voice.dart",
   "exports": [
     "BarVisualizer",
     "LiveWaveform",

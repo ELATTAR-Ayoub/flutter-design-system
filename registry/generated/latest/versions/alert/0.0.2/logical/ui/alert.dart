@@ -167,16 +167,13 @@ class Alert extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        // A label, not a heading: the `nav` role (500 weight, 14/15/16 across
-        // the steps) sits on the card without shouting over the page's h-roles.
-        StyledText(title, TextStyles.nav, color: theme.cardForeground),
+        StyledText(title, TextStyles.h4, color: theme.cardForeground),
         if (description != null) ...<Widget>[
           // `gap-1` — the grid's row gap.
           SizedBox(height: space(1)),
-          // `text-sm` on the reference: the small role, one rung under body.
           StyledText(
             description!,
-            TextStyles.small,
+            TextStyles.body,
             color: theme.mutedForeground,
           ),
         ],

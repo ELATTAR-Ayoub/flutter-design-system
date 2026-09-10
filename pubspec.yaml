@@ -1,6 +1,6 @@
 name: elattar_design_system
 description: "Flutter design system package: foundation tokens, components, effects, and motion primitives, with an unprefixed public API."
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/ELATTAR-Ayoub/flutter-design-system
 repository: https://github.com/ELATTAR-Ayoub/flutter-design-system
 issue_tracker: https://github.com/ELATTAR-Ayoub/flutter-design-system/issues

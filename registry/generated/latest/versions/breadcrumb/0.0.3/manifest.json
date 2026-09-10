@@ -1,0 +1,30 @@
+{
+  "name": "breadcrumb",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "`components/ui/breadcrumb.tsx` — the trail back out of a detail page.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/breadcrumb.dart",
+      "target": "@ui/breadcrumb.dart",
+      "sha256": "42260e5fbfa3585eeeeaf1519da07d91fbaccdad3ed4c706f5fa546e0fc67dad"
+    }
+  ],
+  "registryDependencies": [
+    "icon",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "icon"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/breadcrumb",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/breadcrumb.dart",
+  "deprecated": false
+}

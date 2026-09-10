@@ -294,7 +294,7 @@ const SkillDocEntry _elattarFlutterUiDirector = SkillDocEntry(
       'consumer apps with elattar.yaml when work touches screens, flows, '
       'components, responsive behavior, theming, accessibility, feedback, or '
       'UI documentation.',
-  version: '0.0.2',
+  version: '0.0.3',
   pluginName: 'elattar-design-system',
   marketplaceName: 'elattar',
   repository: 'https://github.com/ELATTAR-Ayoub/flutter-design-system',

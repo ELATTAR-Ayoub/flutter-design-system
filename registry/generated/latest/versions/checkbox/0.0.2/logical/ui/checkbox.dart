@@ -110,7 +110,6 @@ class Checkbox extends StatefulWidget {
     this.state = CheckboxState.unchecked,
     this.onChanged,
     this.enabled = true,
-    this.disabledReason,
     this.inert = false,
     this.invalid = false,
     this.forceFocusRing,
@@ -133,10 +132,6 @@ class Checkbox extends StatefulWidget {
   /// [FieldScope]'s: a disabled field disables its control and the control
   /// cannot opt back in.
   final bool enabled;
-
-  /// Why the control is disabled, shown as a tooltip. Falls back to the
-  /// enclosing [FieldScope]'s.
-  final String? disabledReason;
 
   /// `<Checkbox checked="indeterminate"/>` with no `onCheckedChange` — the
   /// state matrix's Indeterminate cell, and the bulk header's select-all box.
@@ -293,7 +288,6 @@ class _CheckboxState extends State<Checkbox> {
       duration: MotionDurations.normal,
       jellyState: widget.state,
       enabled: enabled,
-      disabledReason: widget.disabledReason ?? scope?.disabledReason,
       inert: widget.inert,
       invalid: invalid,
       forceFocusRing: widget.forceFocusRing,

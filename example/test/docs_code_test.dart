@@ -205,25 +205,19 @@ void main() {
     },
   );
 
-  testWidgets(
-    'an unrecognised language renders the code intact and uncoloured '
-    'rather than throwing',
-    (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _harness(
-          const DocsSelectableCodeBlock(
-            code: 'not a real language at all',
-            language: 'cobol',
-          ),
+  testWidgets('an unrecognised language renders the code intact and uncoloured '
+      'rather than throwing', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      _harness(
+        const DocsSelectableCodeBlock(
+          code: 'not a real language at all',
+          language: 'cobol',
         ),
-      );
-      await tester.pump();
+      ),
+    );
+    await tester.pump();
 
-      expect(tester.takeException(), isNull);
-      expect(
-        find.text('not a real language at all'),
-        findsOneWidget,
-      );
-    },
-  );
+    expect(tester.takeException(), isNull);
+    expect(find.text('not a real language at all'), findsOneWidget);
+  });
 }

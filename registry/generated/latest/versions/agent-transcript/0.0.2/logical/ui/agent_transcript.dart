@@ -1153,7 +1153,6 @@ class WelcomeCard extends StatelessWidget {
     required this.onPick,
     this.onUseCapability,
     this.disabled = false,
-    this.disabledReason,
     this.avatar,
   });
 
@@ -1206,10 +1205,6 @@ class WelcomeCard extends StatelessWidget {
   final void Function(AgentCapability capability)? onUseCapability;
 
   final bool disabled;
-
-  /// Why the card's controls are disabled. Shown as a tooltip while
-  /// [disabled].
-  final String? disabledReason;
 
   /// The live face, at the size the card asks for.
   ///
@@ -1277,7 +1272,6 @@ class WelcomeCard extends StatelessWidget {
                   _CapabilityGrid(
                     capabilities: shown,
                     disabled: disabled,
-                    disabledReason: disabledReason,
                     onUse: onUseCapability,
                   ),
                 ],
@@ -1307,7 +1301,6 @@ class WelcomeCard extends StatelessWidget {
                             onPressed: disabled
                                 ? null
                                 : () => onPick(suggestions[i]),
-                            disabledReason: disabled ? disabledReason : null,
                             child: StyledText(
                               suggestions[i],
                               suggestionLabel,
@@ -1334,13 +1327,11 @@ class _CapabilityGrid extends StatelessWidget {
   const _CapabilityGrid({
     required this.capabilities,
     required this.disabled,
-    this.disabledReason,
     required this.onUse,
   });
 
   final List<AgentCapability> capabilities;
   final bool disabled;
-  final String? disabledReason;
   final void Function(AgentCapability)? onUse;
 
   @override
@@ -1379,7 +1370,6 @@ class _CapabilityGrid extends StatelessWidget {
             hoverInk: theme.foreground,
           ),
           onPressed: disabled ? null : () => onUse?.call(capability),
-          disabledReason: disabled ? disabledReason : null,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[

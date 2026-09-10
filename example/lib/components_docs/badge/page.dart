@@ -716,23 +716,22 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => _bullets(ThemeScope.of(context), <String>[
-    'Every colour Badge paints comes from the live theme: '
-        'ThemeScope.of(context).primary/secondary/destructive for the base '
-        'three fills, Palette.action/value/success/warning/info for the '
-        'six semantic tints, and the matching *Ink getters for text. '
-        'Flipping ThemeController between light and dark re-resolves '
-        'every one: nothing is cached.',
-    'Every fill is flat: no gradient and no shadow paint over or under '
-        'it, on any variant, premium included. A badge reads as a '
-        'label, not a raised control.',
-    'Badge declares no colour-override parameter of its own (no fill '
-        'or color argument): every fill is variant-derived. A call site '
-        'that needs a colour outside the eleven variants is a signal to '
-        'add a new BadgeVariant, not to bypass the token system.',
-  ]);
+  Widget build(BuildContext context) =>
+      _bullets(ThemeScope.of(context), <String>[
+        'Every colour Badge paints comes from the live theme: '
+            'ThemeScope.of(context).primary/secondary/destructive for the base '
+            'three fills, Palette.action/value/success/warning/info for the '
+            'six semantic tints, and the matching *Ink getters for text. '
+            'Flipping ThemeController between light and dark re-resolves '
+            'every one: nothing is cached.',
+        'Every fill is flat: no gradient and no shadow paint over or under '
+            'it, on any variant, premium included. A badge reads as a '
+            'label, not a raised control.',
+        'Badge declares no colour-override parameter of its own (no fill '
+            'or color argument): every fill is variant-derived. A call site '
+            'that needs a colour outside the eleven variants is a signal to '
+            'add a new BadgeVariant, not to bypass the token system.',
+      ]);
 }
 
 Widget _bullets(ThemeTokens theme, List<String> lines) => ConstrainedBox(
@@ -872,17 +871,20 @@ const List<DocsApiFact> _variantFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'success',
     type: 'filled',
-    description: 'A flat 12%-alpha tint of Palette.success; ink is theme.successText.',
+    description:
+        'A flat 12%-alpha tint of Palette.success; ink is theme.successText.',
   ),
   DocsApiFact(
     name: 'warning',
     type: 'filled',
-    description: 'A flat 12%-alpha tint of Palette.warning; ink is theme.warningText.',
+    description:
+        'A flat 12%-alpha tint of Palette.warning; ink is theme.warningText.',
   ),
   DocsApiFact(
     name: 'info',
     type: 'filled',
-    description: 'A flat 12%-alpha tint of Palette.info; ink is theme.infoText.',
+    description:
+        'A flat 12%-alpha tint of Palette.info; ink is theme.infoText.',
   ),
 ];
 

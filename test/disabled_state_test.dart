@@ -59,7 +59,12 @@ Widget _hostWithOverlay(Widget child) => MediaQuery(
         pageRouteBuilder: <T>(RouteSettings settings, WidgetBuilder builder) =>
             PageRouteBuilder<T>(
               settings: settings,
-              pageBuilder: (BuildContext context, Animation<double> a, Animation<double> b) => builder(context),
+              pageBuilder:
+                  (
+                    BuildContext context,
+                    Animation<double> a,
+                    Animation<double> b,
+                  ) => builder(context),
             ),
         home: Center(child: child),
       ),
@@ -136,7 +141,8 @@ void main() {
       for (final File file in Directory(
         'lib/src',
       ).listSync(recursive: true).whereType<File>()) {
-        if (!file.path.endsWith('.dart') || file.path.endsWith('disabled.dart')) {
+        if (!file.path.endsWith('.dart') ||
+            file.path.endsWith('disabled.dart')) {
           continue;
         }
         final List<String> lines = file.readAsLinesSync();
@@ -144,7 +150,11 @@ void main() {
           if (dim.hasMatch(lines[i])) offenders.add('${file.path}:${i + 1}');
         }
       }
-      expect(offenders, isEmpty, reason: 'dim through Disabled, not a private Opacity');
+      expect(
+        offenders,
+        isEmpty,
+        reason: 'dim through Disabled, not a private Opacity',
+      );
     });
 
     test('every disableable component takes disabledReason', () {
@@ -173,8 +183,14 @@ void main() {
         MapEntry<String, String>('menu.dart', 'class MenuItem '),
         MapEntry<String, String>('dropdown_menu.dart', 'class DropdownMenu '),
         MapEntry<String, String>('agent_composer.dart', 'class AgentComposer '),
-        MapEntry<String, String>('agent_attach_menu.dart', 'class AgentAttachMenu '),
-        MapEntry<String, String>('questionnaire.dart', 'class QuestionnaireChoice '),
+        MapEntry<String, String>(
+          'agent_attach_menu.dart',
+          'class AgentAttachMenu ',
+        ),
+        MapEntry<String, String>(
+          'questionnaire.dart',
+          'class QuestionnaireChoice ',
+        ),
         MapEntry<String, String>('voice.dart', 'class MicControl'),
         MapEntry<String, String>('agent_transcript.dart', 'class WelcomeCard'),
         MapEntry<String, String>('field.dart', 'class Field '),
@@ -244,34 +260,43 @@ void main() {
     testWidgets('Input, Textarea, InputOtp and InputGroup carry a reason', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_hostWithOverlay(Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Input(
-            controller: TextEditingController(),
-            enabled: false,
-            disabledReason: 'r-input',
+      await tester.pumpWidget(
+        _hostWithOverlay(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Input(
+                controller: TextEditingController(),
+                enabled: false,
+                disabledReason: 'r-input',
+              ),
+              Textarea(
+                controller: TextEditingController(),
+                enabled: false,
+                disabledReason: 'r-textarea',
+              ),
+              InputOtp(
+                maxLength: 4,
+                groups: const <int>[4],
+                enabled: false,
+                disabledReason: 'r-otp',
+              ),
+              InputGroup(
+                enabled: false,
+                disabledReason: 'r-group',
+                child: Input(controller: TextEditingController()),
+              ),
+            ],
           ),
-          Textarea(
-            controller: TextEditingController(),
-            enabled: false,
-            disabledReason: 'r-textarea',
-          ),
-          InputOtp(
-            maxLength: 4,
-            groups: const <int>[4],
-            enabled: false,
-            disabledReason: 'r-otp',
-          ),
-          InputGroup(
-            enabled: false,
-            disabledReason: 'r-group',
-            child: Input(controller: TextEditingController()),
-          ),
-        ],
-      )));
+        ),
+      );
       await tester.pumpAndSettle();
-      for (final String s in <String>['r-input', 'r-textarea', 'r-otp', 'r-group']) {
+      for (final String s in <String>[
+        'r-input',
+        'r-textarea',
+        'r-otp',
+        'r-group',
+      ]) {
         expect(tip(s), findsOneWidget, reason: s);
       }
       expect(_dim(tester, Textarea), SurfaceOpacity.disabled);
@@ -280,63 +305,67 @@ void main() {
     testWidgets('selection controls, Toggle, Slider and Stat carry a reason', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_hostWithOverlay(Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Checkbox(
-            state: CheckboxState.unchecked,
-            onChanged: (_) {},
-            enabled: false,
-            disabledReason: 'r-checkbox',
-          ),
-          Switch(
-            value: false,
-            onChanged: (_) {},
-            enabled: false,
-            disabledReason: 'r-switch',
-          ),
-          RadioGroup<int>(
-            value: 1,
-            onChanged: (_) {},
+      await tester.pumpWidget(
+        _hostWithOverlay(
+          Column(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              RadioGroupItem<int>(
+              Checkbox(
+                state: CheckboxState.unchecked,
+                onChanged: (_) {},
+                enabled: false,
+                disabledReason: 'r-checkbox',
+              ),
+              Switch(
+                value: false,
+                onChanged: (_) {},
+                enabled: false,
+                disabledReason: 'r-switch',
+              ),
+              RadioGroup<int>(
                 value: 1,
+                onChanged: (_) {},
+                children: <Widget>[
+                  RadioGroupItem<int>(
+                    value: 1,
+                    enabled: false,
+                    disabledReason: 'r-radio',
+                  ),
+                ],
+              ),
+              Toggle(
+                pressed: false,
+                onChanged: null,
+                disabledReason: 'r-toggle',
+                child: const Text('t'),
+              ),
+              ToggleGroup(
+                items: const <ToggleGroupItem>[
+                  ToggleGroupItem(
+                    label: 'a',
+                    enabled: false,
+                    disabledReason: 'r-tgi',
+                  ),
+                ],
+                selectedIndex: null,
+                onChanged: (_) {},
+              ),
+              Slider(
+                values: const <double>[0.5],
+                onChanged: (_) {},
                 enabled: false,
-                disabledReason: 'r-radio',
+                disabledReason: 'r-slider',
+              ),
+              const Stat(
+                label: 'x',
+                value: '1',
+                disabled: true,
+                disabledReason: 'r-stat',
               ),
             ],
           ),
-          Toggle(
-            pressed: false,
-            onChanged: null,
-            disabledReason: 'r-toggle',
-            child: const Text('t'),
-          ),
-          ToggleGroup(
-            items: const <ToggleGroupItem>[
-              ToggleGroupItem(
-                label: 'a',
-                enabled: false,
-                disabledReason: 'r-tgi',
-              ),
-            ],
-            selectedIndex: null,
-            onChanged: (_) {},
-          ),
-          Slider(
-            values: const <double>[0.5],
-            onChanged: (_) {},
-            enabled: false,
-            disabledReason: 'r-slider',
-          ),
-          const Stat(
-            label: 'x',
-            value: '1',
-            disabled: true,
-            disabledReason: 'r-stat',
-          ),
-        ],
-      )));
+        ),
+      );
       await tester.pumpAndSettle();
       for (final String s in <String>[
         'r-checkbox',
@@ -352,28 +381,32 @@ void main() {
     });
 
     testWidgets('agent surfaces carry a reason', (WidgetTester tester) async {
-      await tester.pumpWidget(_hostWithOverlay(Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          AgentComposer(
-            controller: TextEditingController(),
-            onSubmit: () {},
-            disabled: true,
-            disabledReason: 'r-composer',
+      await tester.pumpWidget(
+        _hostWithOverlay(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              AgentComposer(
+                controller: TextEditingController(),
+                onSubmit: () {},
+                disabled: true,
+                disabledReason: 'r-composer',
+              ),
+              AgentAttachMenu(
+                onPickFiles: () {},
+                onRunCommand: (_) {},
+                disabled: true,
+                disabledReason: 'r-attach',
+              ),
+              MicControl(
+                listening: false,
+                disabled: true,
+                disabledReason: 'r-mic',
+              ),
+            ],
           ),
-          AgentAttachMenu(
-            onPickFiles: () {},
-            onRunCommand: (_) {},
-            disabled: true,
-            disabledReason: 'r-attach',
-          ),
-          MicControl(
-            listening: false,
-            disabled: true,
-            disabledReason: 'r-mic',
-          ),
-        ],
-      )));
+        ),
+      );
       await tester.pumpAndSettle();
       // At least one: the composer carries its reason on both the input and
       // the send button (both disabled controls, both explaining the same
@@ -404,29 +437,33 @@ void main() {
     testWidgets('Select and NativeSelect triggers carry a reason', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_hostWithOverlay(Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Select<int>(
-            value: null,
-            onChanged: (_) {},
-            enabled: false,
-            disabledReason: 'r-select',
-            options: const <SelectOption<int>>[
-              SelectOption<int>(value: 1, label: 'one'),
+      await tester.pumpWidget(
+        _hostWithOverlay(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Select<int>(
+                value: null,
+                onChanged: (_) {},
+                enabled: false,
+                disabledReason: 'r-select',
+                options: const <SelectOption<int>>[
+                  SelectOption<int>(value: 1, label: 'one'),
+                ],
+              ),
+              NativeSelect<int>(
+                value: null,
+                onChanged: (_) {},
+                enabled: false,
+                disabledReason: 'r-native',
+                options: const <SelectOption<int>>[
+                  SelectOption<int>(value: 1, label: 'one'),
+                ],
+              ),
             ],
           ),
-          NativeSelect<int>(
-            value: null,
-            onChanged: (_) {},
-            enabled: false,
-            disabledReason: 'r-native',
-            options: const <SelectOption<int>>[
-              SelectOption<int>(value: 1, label: 'one'),
-            ],
-          ),
-        ],
-      )));
+        ),
+      );
       await tester.pumpAndSettle();
       expect(
         find.byWidgetPredicate(
@@ -442,11 +479,10 @@ void main() {
       );
     });
 
-    testWidgets(
-      'a disabled Select option keeps its row hittable for hover and '
-      'carries a reason',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(_hostWithOverlay(
+    testWidgets('a disabled Select option keeps its row hittable for hover and '
+        'carries a reason', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _hostWithOverlay(
           Select<int>(
             value: null,
             onChanged: (_) {},
@@ -460,29 +496,28 @@ void main() {
               ),
             ],
           ),
-        ));
-        await tester.tap(find.byType(Select<int>));
-        await tester.pumpAndSettle();
-        final Finder wrapper = find.ancestor(
-          of: find.text('two'),
-          matching: find.byType(Disabled),
-        );
-        expect(wrapper, findsOneWidget);
-        expect(tester.widget<Disabled>(wrapper).blockPointer, isFalse);
-        expect(
-          find.byWidgetPredicate(
-            (Widget w) => w is Tooltip && w.label == 'r-opt',
-          ),
-          findsOneWidget,
-        );
-      },
-    );
+        ),
+      );
+      await tester.tap(find.byType(Select<int>));
+      await tester.pumpAndSettle();
+      final Finder wrapper = find.ancestor(
+        of: find.text('two'),
+        matching: find.byType(Disabled),
+      );
+      expect(wrapper, findsOneWidget);
+      expect(tester.widget<Disabled>(wrapper).blockPointer, isFalse);
+      expect(
+        find.byWidgetPredicate(
+          (Widget w) => w is Tooltip && w.label == 'r-opt',
+        ),
+        findsOneWidget,
+      );
+    });
 
-    testWidgets(
-      'a disabled Combobox item keeps its row hittable for hover and '
-      'carries a reason',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(_hostWithOverlay(
+    testWidgets('a disabled Combobox item keeps its row hittable for hover and '
+        'carries a reason', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _hostWithOverlay(
           SizedBox(
             width: 320,
             child: Combobox<int>(
@@ -499,37 +534,36 @@ void main() {
               ],
             ),
           ),
-        ));
-        await tester.tap(find.byType(InputGroupInput));
-        await tester.pumpAndSettle();
-        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-        await tester.pumpAndSettle();
-        // Two `Disabled` ancestors are expected here: InputGroup's own
-        // field-level one (always mounted, inert while the combobox itself
-        // is enabled) and the row's — see `input_group.dart:305`. Only the
-        // row's carries `disabled: true` and `blockPointer: false`.
-        final Finder wrapper = find.ancestor(
-          of: find.text('two'),
-          matching: find.byType(Disabled),
-        );
-        final Disabled rowWrapper = tester
-            .widgetList<Disabled>(wrapper)
-            .singleWhere((Disabled d) => d.disabled);
-        expect(rowWrapper.blockPointer, isFalse);
-        expect(
-          find.byWidgetPredicate(
-            (Widget w) => w is Tooltip && w.label == 'r-combo',
-          ),
-          findsOneWidget,
-        );
-      },
-    );
+        ),
+      );
+      await tester.tap(find.byType(InputGroupInput));
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      // Two `Disabled` ancestors are expected here: InputGroup's own
+      // field-level one (always mounted, inert while the combobox itself
+      // is enabled) and the row's — see `input_group.dart:305`. Only the
+      // row's carries `disabled: true` and `blockPointer: false`.
+      final Finder wrapper = find.ancestor(
+        of: find.text('two'),
+        matching: find.byType(Disabled),
+      );
+      final Disabled rowWrapper = tester
+          .widgetList<Disabled>(wrapper)
+          .singleWhere((Disabled d) => d.disabled);
+      expect(rowWrapper.blockPointer, isFalse);
+      expect(
+        find.byWidgetPredicate(
+          (Widget w) => w is Tooltip && w.label == 'r-combo',
+        ),
+        findsOneWidget,
+      );
+    });
 
-    testWidgets(
-      'a disabled CommandItem keeps its row hittable for hover and '
-      'carries a reason',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(_hostWithOverlay(
+    testWidgets('a disabled CommandItem keeps its row hittable for hover and '
+        'carries a reason', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _hostWithOverlay(
           SizedBox(
             width: 320,
             height: 300,
@@ -548,22 +582,22 @@ void main() {
               ],
             ),
           ),
-        ));
-        await tester.pumpAndSettle();
-        final Finder wrapper = find.ancestor(
-          of: find.text('two'),
-          matching: find.byType(Disabled),
-        );
-        expect(wrapper, findsOneWidget);
-        expect(tester.widget<Disabled>(wrapper).blockPointer, isFalse);
-        expect(
-          find.byWidgetPredicate(
-            (Widget w) => w is Tooltip && w.label == 'r-command',
-          ),
-          findsOneWidget,
-        );
-      },
-    );
+        ),
+      );
+      await tester.pumpAndSettle();
+      final Finder wrapper = find.ancestor(
+        of: find.text('two'),
+        matching: find.byType(Disabled),
+      );
+      expect(wrapper, findsOneWidget);
+      expect(tester.widget<Disabled>(wrapper).blockPointer, isFalse);
+      expect(
+        find.byWidgetPredicate(
+          (Widget w) => w is Tooltip && w.label == 'r-command',
+        ),
+        findsOneWidget,
+      );
+    });
 
     testWidgets(
       'the MenuItem family keeps its rows hittable for hover and carries a '
@@ -571,34 +605,36 @@ void main() {
       (WidgetTester tester) async {
         final FocusNode trigger = FocusNode(debugLabel: 'menu trigger');
         addTearDown(trigger.dispose);
-        await tester.pumpWidget(_hostWithOverlay(
-          DropdownMenu(
-            trigger: Button(
-              focusNode: trigger,
-              onPressed: () {},
-              child: const Text('Open'),
+        await tester.pumpWidget(
+          _hostWithOverlay(
+            DropdownMenu(
+              trigger: Button(
+                focusNode: trigger,
+                onPressed: () {},
+                child: const Text('Open'),
+              ),
+              children: const <MenuChild>[
+                MenuItem(
+                  label: 'item',
+                  enabled: false,
+                  disabledReason: 'r-item',
+                ),
+                MenuCheckboxItem(
+                  label: 'checkbox',
+                  checked: false,
+                  enabled: false,
+                  disabledReason: 'r-checkbox',
+                ),
+                MenuSub(
+                  label: 'sub',
+                  enabled: false,
+                  disabledReason: 'r-sub',
+                  children: <MenuChild>[MenuItem(label: 'nested')],
+                ),
+              ],
             ),
-            children: const <MenuChild>[
-              MenuItem(
-                label: 'item',
-                enabled: false,
-                disabledReason: 'r-item',
-              ),
-              MenuCheckboxItem(
-                label: 'checkbox',
-                checked: false,
-                enabled: false,
-                disabledReason: 'r-checkbox',
-              ),
-              MenuSub(
-                label: 'sub',
-                enabled: false,
-                disabledReason: 'r-sub',
-                children: <MenuChild>[MenuItem(label: 'nested')],
-              ),
-            ],
           ),
-        ));
+        );
         await tester.tap(find.text('Open'));
         await tester.pumpAndSettle();
 
@@ -633,18 +669,20 @@ void main() {
     ) async {
       final FocusNode trigger = FocusNode(debugLabel: 'dropdown trigger');
       addTearDown(trigger.dispose);
-      await tester.pumpWidget(_hostWithOverlay(
-        DropdownMenu(
-          enabled: false,
-          disabledReason: 'r-dropdown',
-          trigger: Button(
-            focusNode: trigger,
-            onPressed: () {},
-            child: const Text('Open'),
+      await tester.pumpWidget(
+        _hostWithOverlay(
+          DropdownMenu(
+            enabled: false,
+            disabledReason: 'r-dropdown',
+            trigger: Button(
+              focusNode: trigger,
+              onPressed: () {},
+              child: const Text('Open'),
+            ),
+            children: const <MenuChild>[MenuItem(label: 'row')],
           ),
-          children: const <MenuChild>[MenuItem(label: 'row')],
         ),
-      ));
+      );
       await tester.pumpAndSettle();
       expect(
         find.byWidgetPredicate(
@@ -659,14 +697,19 @@ void main() {
       'invoke its callback',
       (WidgetTester tester) async {
         int taps = 0;
-        await tester.pumpWidget(_hostWithOverlay(
-          DropdownMenu(
-            enabled: false,
-            disabledReason: 'r-dd',
-            trigger: Button(onPressed: () => taps++, child: const Text('open')),
-            children: const <MenuChild>[MenuItem(label: 'row')],
+        await tester.pumpWidget(
+          _hostWithOverlay(
+            DropdownMenu(
+              enabled: false,
+              disabledReason: 'r-dd',
+              trigger: Button(
+                onPressed: () => taps++,
+                child: const Text('open'),
+              ),
+              children: const <MenuChild>[MenuItem(label: 'row')],
+            ),
           ),
-        ));
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('open'));
@@ -685,11 +728,10 @@ void main() {
           matching: find.byType(Disabled),
         );
         expect(
-          tester
-              .widgetList<Disabled>(wrappers)
-              .any((Disabled d) => d.disabled),
+          tester.widgetList<Disabled>(wrappers).any((Disabled d) => d.disabled),
           isTrue,
-          reason: 'the DropdownMenu-level Disabled wrapper should be '
+          reason:
+              'the DropdownMenu-level Disabled wrapper should be '
               'disabled',
         );
       },
@@ -699,12 +741,17 @@ void main() {
       'an enabled DropdownMenu trigger still invokes its callback on tap',
       (WidgetTester tester) async {
         int taps = 0;
-        await tester.pumpWidget(_hostWithOverlay(
-          DropdownMenu(
-            trigger: Button(onPressed: () => taps++, child: const Text('open')),
-            children: const <MenuChild>[MenuItem(label: 'row')],
+        await tester.pumpWidget(
+          _hostWithOverlay(
+            DropdownMenu(
+              trigger: Button(
+                onPressed: () => taps++,
+                child: const Text('open'),
+              ),
+              children: const <MenuChild>[MenuItem(label: 'row')],
+            ),
           ),
-        ));
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('open'));

@@ -98,14 +98,13 @@ import 'package:flutter/widgets.dart' as flutter show ScrollPosition;
 
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/surfaces.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
-import './disabled.dart';
 import './field.dart';
 import './icon.dart';
 import './icon_paths.dart';
-import './input.dart';
 import './input_group.dart';
 import './popover.dart';
 import './select.dart';
@@ -218,24 +217,13 @@ class Combobox<T> extends StatefulWidget {
   /// keeps the scroll-into-view arithmetic self-consistent with what
   /// actually renders.
   static double get itemHeight => math.max(
-    Input.textSpecDefault.step.leading + space(1) * 2,
+    TextStyles.body.step.leading + space(1) * 2,
     TouchTargets.minimum,
   );
 
   /// `ComboboxEmpty`'s `py-2` around the same line box — 34.571px, an item row
   /// in every dimension but its padding.
-  static double get emptyHeight => TextStyles.small.step.leading + space(2) * 2;
-
-  /// [itemHeight] at the step and text scale the row actually renders at.
-  /// The static getter is the phone floor; the list, the scroll maths and the
-  /// row box all size from this one so a desktop row fits its own line.
-  static double itemHeightOf(BuildContext context) => math.max(
-    MediaQuery.textScalerOf(
-          context,
-        ).scale(StyledText.stepOf(context, Input.textSpecDefault).leading) +
-        space(1) * 2,
-    TouchTargets.minimum,
-  );
+  static double get emptyHeight => TextStyles.body.step.leading + space(2) * 2;
 
   @override
   State<Combobox<T>> createState() => _ComboboxState<T>();
@@ -588,9 +576,9 @@ class _ComboboxPopupState<T> extends State<_ComboboxPopup<T>> {
   void _reveal() {
     if (!_scroll.hasClients || widget.highlighted < 0) return;
     final flutter.ScrollPosition at = _scroll.position;
-    final double itemHeight = Combobox.itemHeightOf(context);
-    final double top = space(1) + widget.highlighted * itemHeight - space(1);
-    final double bottom = top + itemHeight + space(1) * 2;
+    final double top =
+        space(1) + widget.highlighted * Combobox.itemHeight - space(1);
+    final double bottom = top + Combobox.itemHeight + space(1) * 2;
     final double ceiling = at.maxScrollExtent < 0 ? 0 : at.maxScrollExtent;
     if (top < at.pixels) {
       at.jumpTo(top.clamp(0, ceiling));
@@ -697,8 +685,7 @@ class _ComboboxRow<T> extends StatelessWidget {
             Expanded(
               child: StyledText(
                 item.label,
-                // The field's own role: a row reads exactly like the input.
-                Input.textSpecDefault,
+                TextStyles.body,
                 color: ink,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -738,13 +725,18 @@ class _ComboboxRow<T> extends StatelessWidget {
     // fill, the hit box and [_ComboboxPopupState._reveal]'s scroll math all
     // agreeing on one number; the row's own `Row`/`Stack` content centres
     // vertically inside the taller box for free.
-    row = SizedBox(height: Combobox.itemHeightOf(context), child: row);
+    row = SizedBox(height: Combobox.itemHeight, child: row);
 
     row = DefaultTextStyle.merge(
       style: TextStyle(color: ink),
       child: row,
     );
-    row = Semantics(
+    row = Opacity(
+      opacity: item.enabled ? 1 : SurfaceOpacity.disabled,
+      child: row,
+    );
+
+    return Semantics(
       button: true,
       selected: checked,
       enabled: item.enabled,
@@ -758,13 +750,6 @@ class _ComboboxRow<T> extends StatelessWidget {
           child: row,
         ),
       ),
-    );
-
-    return Disabled(
-      disabled: !item.enabled,
-      blockPointer: false,
-      reason: item.disabledReason,
-      child: row,
     );
   }
 }
@@ -787,7 +772,7 @@ class _ComboboxEmpty extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: space(2)),
       child: StyledText(
         label!,
-        TextStyles.small,
+        TextStyles.body,
         color: theme.mutedForeground,
         align: TextAlign.center,
       ),

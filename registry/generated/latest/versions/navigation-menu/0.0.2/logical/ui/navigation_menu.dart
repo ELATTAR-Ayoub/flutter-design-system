@@ -95,7 +95,6 @@ import './press.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './icon.dart';
 import './icon_paths.dart';
-import './input.dart';
 import './popover.dart';
 
 /// Radix's `delayDuration` — how long a pointer must rest on a trigger before
@@ -651,9 +650,7 @@ class _NavigationMenuTriggerState extends State<_NavigationMenuTrigger> {
                   children: <Widget>[
                     StyledText(
                       widget.label,
-                      // Reads as the row's own content, not as a nav word —
-                      // [Input.textSpecDefault], i.e. TextStyles.body.
-                      Input.textSpecDefault,
+                      TextStyles.nav,
                       color: lit ? theme.foreground : theme.mutedForeground,
                       softWrap: false,
                     ),
@@ -787,14 +784,11 @@ class _NavigationMenuLinkState extends State<NavigationMenuLink> {
                 vertical: NavigationMenuLink.paddingY,
               ),
               child: DefaultTextStyle(
-                // Ambient, so the row's own children (and any `tone: inherit`
-                // glyph in them) read it. This is the row's title — primary
-                // content, [Input.textSpecDefault] — and not a field's name;
-                // a caller adding a second, description line overrides it
-                // explicitly with [TextStyles.small].
+                // `text-sm text-muted-foreground` — ambient, so the row's own
+                // children (and any `tone: inherit` glyph in them) read it.
                 style: StyledText.styleOf(
                   context,
-                  Input.textSpecDefault,
+                  TextStyles.small,
                   color: lit ? theme.accentForeground : theme.mutedForeground,
                 ),
                 child: widget.child,

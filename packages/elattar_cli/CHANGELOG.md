@@ -5,6 +5,15 @@ changelog — components, tokens, effects, motion — lives at
 [`CHANGELOG.md`](https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/CHANGELOG.md)
 in the repository root.
 
+## 0.0.3
+
+Reads `/registry/0.0.3/` by default. The registry publishes the design
+system's shared disabled-state and form-recovery APIs, responsive typography,
+chart interaction work, and integrated agent/voice sources.
+
+The command surface is unchanged. Existing `elattar_cli 0.0.1` and `0.0.2`
+installations remain pinned to their matching immutable registry paths.
+
 ## 0.0.2
 
 Reads `/registry/0.0.2/` by default, because the design system published a new

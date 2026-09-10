@@ -1,0 +1,30 @@
+{
+  "name": "disabled",
+  "type": "component",
+  "version": "0.0.3",
+  "description": "The shared disabled-state wrapper: dims through the surface opacity token, blocks pointer input, swaps the cursor and shows a reason tooltip on hover or touch tap.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/disabled.dart",
+      "target": "@ui/disabled.dart",
+      "sha256": "cd9fc68c1bf00a2ac45dcd3544fa3f04e3e1f620165f11f3cf896a4603197f31"
+    }
+  ],
+  "registryDependencies": [
+    "tooltip",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "tooltip"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/disabled",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/disabled.dart",
+  "deprecated": false
+}

@@ -54,17 +54,16 @@ Future<void> _pump(
       controller: ThemeController(mode: ColorMode.light),
       child: WidgetsApp(
         color: const Color(0xFFFFFFFF),
-        pageRouteBuilder:
-            <T>(RouteSettings settings, WidgetBuilder builder) =>
-                PageRouteBuilder<T>(
-                  settings: settings,
-                  pageBuilder:
-                      (
-                        BuildContext context,
-                        Animation<double> animation,
-                        Animation<double> secondaryAnimation,
-                      ) => builder(context),
-                ),
+        pageRouteBuilder: <T>(RouteSettings settings, WidgetBuilder builder) =>
+            PageRouteBuilder<T>(
+              settings: settings,
+              pageBuilder:
+                  (
+                    BuildContext context,
+                    Animation<double> animation,
+                    Animation<double> secondaryAnimation,
+                  ) => builder(context),
+            ),
         home: ChartsGalleryPage(clipboardWriter: clipboardWriter),
       ),
     ),
@@ -92,10 +91,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await _pump(tester);
-    expect(
-      find.byType(ChartSpecimenCard),
-      findsNWidgets(areaSpecimens.length),
-    );
+    expect(find.byType(ChartSpecimenCard), findsNWidgets(areaSpecimens.length));
     expect(tester.takeException(), isNull);
   });
 
@@ -132,46 +128,45 @@ void main() {
     }
   });
 
-  testWidgets(
-    "the area family's first card copies its own generated source",
-    (WidgetTester tester) async {
-      final List<String> written = <String>[];
+  testWidgets("the area family's first card copies its own generated source", (
+    WidgetTester tester,
+  ) async {
+    final List<String> written = <String>[];
 
-      await _pump(
-        tester,
-        clipboardWriter: (String text) async {
-          written.add(text);
-        },
-      );
+    await _pump(
+      tester,
+      clipboardWriter: (String text) async {
+        written.add(text);
+      },
+    );
 
-      // Scoped to the ChartSpecimenCard for areaSpecimens.first specifically
-      // (see `_cardFor`), then to a DocsCopyButton *inside* it. No sheet is
-      // open anywhere in this test — `SheetOverlay`'s content is an
-      // `OverlayPortal` that only builds once its trigger opens it
-      // (`lib/src/components/ui/sheet.dart`) — so `DocsSnippet`'s own
-      // (unwritable, real-clipboard) DocsCopyButton never gets built, and
-      // this card's toolbar Copy button is the only DocsCopyButton in the
-      // tree under it. That makes the target unambiguous by construction,
-      // rather than by hoping a shared accessible name ('Copy code', which
-      // every card's toolbar button carries) or a shared visible label
-      // resolves to the right widget.
-      final Finder card = _cardFor(areaSpecimens.first.id);
-      expect(card, findsOneWidget);
-      final Finder toolbarCopyButton = find.descendant(
-        of: card,
-        matching: find.byType(DocsCopyButton),
-      );
-      expect(toolbarCopyButton, findsOneWidget);
+    // Scoped to the ChartSpecimenCard for areaSpecimens.first specifically
+    // (see `_cardFor`), then to a DocsCopyButton *inside* it. No sheet is
+    // open anywhere in this test — `SheetOverlay`'s content is an
+    // `OverlayPortal` that only builds once its trigger opens it
+    // (`lib/src/components/ui/sheet.dart`) — so `DocsSnippet`'s own
+    // (unwritable, real-clipboard) DocsCopyButton never gets built, and
+    // this card's toolbar Copy button is the only DocsCopyButton in the
+    // tree under it. That makes the target unambiguous by construction,
+    // rather than by hoping a shared accessible name ('Copy code', which
+    // every card's toolbar button carries) or a shared visible label
+    // resolves to the right widget.
+    final Finder card = _cardFor(areaSpecimens.first.id);
+    expect(card, findsOneWidget);
+    final Finder toolbarCopyButton = find.descendant(
+      of: card,
+      matching: find.byType(DocsCopyButton),
+    );
+    expect(toolbarCopyButton, findsOneWidget);
 
-      await tester.tap(toolbarCopyButton);
-      // Let the button's copy → confirm → revert cycle finish
-      // (`DocsCopyButton.confirmation`, 2s) instead of leaving its timer
-      // pending at the end of the test.
-      await tester.pumpAndSettle(DocsCopyButton.confirmation);
+    await tester.tap(toolbarCopyButton);
+    // Let the button's copy → confirm → revert cycle finish
+    // (`DocsCopyButton.confirmation`, 2s) instead of leaving its timer
+    // pending at the end of the test.
+    await tester.pumpAndSettle(DocsCopyButton.confirmation);
 
-      expect(written.single, chartSources[areaSpecimens.first.id]);
-    },
-  );
+    expect(written.single, chartSources[areaSpecimens.first.id]);
+  });
 
   testWidgets('View Code opens a right sheet holding that source', (
     WidgetTester tester,

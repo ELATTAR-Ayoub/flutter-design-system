@@ -9,21 +9,19 @@
     {
       "source": "lib/src/components/ui/dropdown_menu.dart",
       "target": "@ui/dropdown_menu.dart",
-      "sha256": "05a59f15aea4f7edeaec6afef25dbe98958f3aea96d5786b148510f343431185"
+      "sha256": "981c286ce69209c9770529a81c3787b7a9a02febf2de5861fbfb27bb5719dc51"
     }
   ],
   "registryDependencies": [
     "button",
     "menu",
     "popover",
-    "source-foundation",
-    "disabled"
+    "source-foundation"
   ],
   "semanticDependencies": [
     "button",
     "menu",
-    "popover",
-    "disabled"
+    "popover"
   ],
   "pubDependencies": {},
   "assets": [],

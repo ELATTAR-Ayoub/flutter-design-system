@@ -44,12 +44,12 @@
     {
       "source": "lib/src/design_system/foundation/theme.dart",
       "target": "@foundation/theme.dart",
-      "sha256": "bd700fe367ebe05e465529c1e8d09d6136f368c5ab65b408f8588c92ffce02f1"
+      "sha256": "4ab108f25ec64f98c468c60966f5f691a6debbb4697ac1dd1dff8df50bf39af1"
     },
     {
       "source": "lib/src/design_system/foundation/typography.dart",
       "target": "@foundation/typography.dart",
-      "sha256": "01989f1d06335089d0937a026bd7bc1cb954a0e4f85547317115b26c3ed4f845"
+      "sha256": "9f97890a10fdffa4ce0091bba3a0655aa8f56202a6767c3b3e2ae6f0595e9891"
     },
     {
       "source": "lib/src/design_system/foundation/text_layout.dart",

@@ -229,37 +229,34 @@ Widget pieStacked(ChartInk ink) => plot(
 );
 
 // specimen: chart-pie-interactive
-Widget pieInteractive(
-  BuildContext context,
-  ChartInk ink,
-  int activeIndex,
-) => plot(
-  ink.pieMonths,
-  PieChart(
-    pies: <PieSpec>[
-      PieSpec(
-        data: ink.rows(pieMonthsDesktop),
-        dataKey: 'desktop',
-        nameKey: 'month',
-        innerRadius: 60,
-        strokeWidth: 5,
-        activeIndex: activeIndex,
-        activeGrow: 10,
-        activeRing: true,
+Widget pieInteractive(BuildContext context, ChartInk ink, int activeIndex) =>
+    plot(
+      ink.pieMonths,
+      PieChart(
+        pies: <PieSpec>[
+          PieSpec(
+            data: ink.rows(pieMonthsDesktop),
+            dataKey: 'desktop',
+            nameKey: 'month',
+            innerRadius: 60,
+            strokeWidth: 5,
+            activeIndex: activeIndex,
+            activeGrow: 10,
+            activeRing: true,
+          ),
+        ],
+        centerLabel: (BuildContext context) => donutCentre(
+          context,
+          chartNumber(pieMonthsDesktop[activeIndex]['desktop']! as num),
+          'Visitors',
+        ),
+        tooltip: ChartTooltipSpec(
+          cursor: false,
+          defaultIndex: activeIndex,
+          hideLabel: true,
+        ),
       ),
-    ],
-    centerLabel: (BuildContext context) => donutCentre(
-      context,
-      chartNumber(pieMonthsDesktop[activeIndex]['desktop']! as num),
-      'Visitors',
-    ),
-    tooltip: ChartTooltipSpec(
-      cursor: false,
-      defaultIndex: activeIndex,
-      hideLabel: true,
-    ),
-  ),
-);
+    );
 
 /// The active slice, handed down through the keyed slot.
 class PieActiveScope extends InheritedWidget {
@@ -268,8 +265,7 @@ class PieActiveScope extends InheritedWidget {
   final int index;
 
   static int of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<PieActiveScope>()?.index ??
-      0;
+      context.dependOnInheritedWidgetOfExactType<PieActiveScope>()?.index ?? 0;
 
   @override
   bool updateShouldNotify(PieActiveScope old) => old.index != index;
@@ -361,7 +357,6 @@ Widget _pieDonutActiveBuild(BuildContext context, ChartInk ink) =>
     pieDonutActive(ink);
 Widget _pieDonutTextBuild(BuildContext context, ChartInk ink) =>
     pieDonutText(ink);
-Widget _pieStackedBuild(BuildContext context, ChartInk ink) =>
-    pieStacked(ink);
+Widget _pieStackedBuild(BuildContext context, ChartInk ink) => pieStacked(ink);
 Widget _pieInteractiveBuild(BuildContext context, ChartInk ink) =>
     pieInteractive(context, ink, PieActiveScope.of(context));
