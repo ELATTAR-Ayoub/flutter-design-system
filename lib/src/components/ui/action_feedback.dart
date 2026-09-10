@@ -105,9 +105,8 @@ import './surface.dart';
 // Angles, sizes and stop positions belonging to this one effect. No other
 // surface in the system refers to them, so they live with the effect that owns
 // them rather than in `foundation/` — the same call `background_effect.dart` makes for
-// the body glow.
-//
-// allow-hardcoded: action-feedback gradient geometry (globals.css L2093–2160)
+// the body glow. (Declared a token source in its own right in the guard's
+// `_exemptDirs` — see test/token_guard_test.dart.)
 
 /// `background-image: linear-gradient(176deg, …)` — the ramp (L2093–2100).
 const double _rampAngle = 176;
@@ -260,42 +259,28 @@ class ActionFeedback extends StatefulWidget {
   /// eases *between* keyframes, and applying it once across the run would smear
   /// the double thump into a wobble.
   @visibleForTesting
-  static final Animatable<double> beatScale = TweenSequence<double>(
-    <TweenSequenceItem<double>>[
-      // allow-hardcoded: action-beat keyframes (globals.css L2059–2088)
-      _beatStep(0.55, 1, 10),
-      // allow-hardcoded: action-beat keyframes
-      _beatStep(1, 1.32, 14),
-      // allow-hardcoded: action-beat keyframes
-      _beatStep(1.32, 0.7, 6),
-      // allow-hardcoded: action-beat keyframes
-      _beatStep(0.7, 1.06, 10),
-      // allow-hardcoded: action-beat keyframes
-      _beatStep(1.06, 1.38, 14),
-      // allow-hardcoded: action-beat keyframes
-      _beatStep(1.38, 1.38, 46),
-    ],
-  );
+  static final Animatable<double> beatScale =
+      TweenSequence<double>(<TweenSequenceItem<double>>[
+        _beatStep(0.55, 1, 10),
+        _beatStep(1, 1.32, 14),
+        _beatStep(1.32, 0.7, 6),
+        _beatStep(0.7, 1.06, 10),
+        _beatStep(1.06, 1.38, 14),
+        _beatStep(1.38, 1.38, 46),
+      ]);
 
   /// `@keyframes action-beat`'s `opacity` track — same keyframe percentages,
   /// therefore the same weights, as [beatScale].
   @visibleForTesting
-  static final Animatable<double> beatOpacity = TweenSequence<double>(
-    <TweenSequenceItem<double>>[
-      // allow-hardcoded: action-beat keyframes (globals.css L2059–2088)
-      _beatStep(0, 0.62, 10),
-      // allow-hardcoded: action-beat keyframes
-      _beatStep(0.62, 0, 14),
-      // allow-hardcoded: action-beat keyframes
-      _beatStep(0, 0, 6),
-      // allow-hardcoded: action-beat keyframes
-      _beatStep(0, 0.34, 10),
-      // allow-hardcoded: action-beat keyframes
-      _beatStep(0.34, 0, 14),
-      // allow-hardcoded: action-beat keyframes
-      _beatStep(0, 0, 46),
-    ],
-  );
+  static final Animatable<double> beatOpacity =
+      TweenSequence<double>(<TweenSequenceItem<double>>[
+        _beatStep(0, 0.62, 10),
+        _beatStep(0.62, 0, 14),
+        _beatStep(0, 0, 6),
+        _beatStep(0, 0.34, 10),
+        _beatStep(0.34, 0, 14),
+        _beatStep(0, 0, 46),
+      ]);
 
   /// Where an animation stands after [elapsed], given the duration it is
   /// *currently* declared at — the whole of the B7/B8 ruling, as arithmetic.

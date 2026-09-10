@@ -41,9 +41,10 @@
 ///    `react-syntax-highlighter` writes `vscDarkPlus` as *inline* styles, so
 ///    the vendored theme beats every class on the element. Measured live:
 ///    `#1e1e1e` ground, `#d4d4d4` ink, 13px padding, 6.5px vertical margin,
-///    19.5px per line. Those literals carry `allow-hardcoded:` with the reason
-///    that they are a third-party syntax theme rather than tokens of this
-///    system — the same footing the reference's own stand-in photograph gets.
+///    19.5px per line. Those literals live in [PrismPalette]
+///    (`agent_markdown_prism_theme.dart`), declared a token source in its own
+///    right — a third-party syntax theme rather than tokens of this system —
+///    the same footing the reference's own stand-in photograph gets.
 ///
 /// ## Recorded divergences
 ///
@@ -71,6 +72,7 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 import 'package:flutter/widgets.dart' as flutter show Table;
 
+import './agent_markdown_prism_theme.dart';
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
@@ -795,57 +797,6 @@ const Map<String, String> languageAliases = <String, String>{
   'tsx': 'tsx',
   'typescript': 'typescript',
 };
-
-/// The VS Code **Dark Plus** palette, as `react-syntax-highlighter` writes it.
-///
-/// allow-hardcoded: a third-party syntax theme, not tokens of this system.
-/// `vscDarkPlus` arrives as an inline style object, so it beats every class on
-/// the element — the `bg-muted` on the wrapper never reaches the `<pre>`, and
-/// `--foreground` never reaches its text. Deriving these from the theme would
-/// change what the reference renders, which is the one thing the port may not
-/// do. Every value below was read off the live page.
-class PrismPalette {
-  const PrismPalette._();
-
-  /// `pre[class*="language-"] { background: #1e1e1e }`.
-  static const Color ground = Color(
-    0xFF1E1E1E,
-  ); // allow-hardcoded: vscDarkPlus ground
-
-  /// The theme's plain-text colour.
-  static const Color plain = Color(
-    0xFFD4D4D4,
-  ); // allow-hardcoded: vscDarkPlus plain
-
-  static const Color keyword = Color(
-    0xFF569CD6,
-  ); // allow-hardcoded: vscDarkPlus keyword
-  static const Color string = Color(
-    0xFFCE9178,
-  ); // allow-hardcoded: vscDarkPlus string
-  static const Color number = Color(
-    0xFFB5CEA8,
-  ); // allow-hardcoded: vscDarkPlus number
-  static const Color function = Color(
-    0xFFDCDCAA,
-  ); // allow-hardcoded: vscDarkPlus function
-  static const Color comment = Color(
-    0xFF6A9955,
-  ); // allow-hardcoded: vscDarkPlus comment
-  static const Color type = Color(
-    0xFF4EC9B0,
-  ); // allow-hardcoded: vscDarkPlus class-name
-
-  /// `padding: 1em` at the theme's own 13px.
-  static const double padding = 13; // allow-hardcoded: vscDarkPlus 1em @ 13px
-
-  /// `margin: .5em 0` — real vertical space in the block, above and below.
-  static const double margin = 6.5; // allow-hardcoded: vscDarkPlus .5em
-
-  /// The theme's `font-size: 13px` over Preflight's 1.5 — 19.5px per line, and
-  /// what actually sets the height of the body.
-  static const double lineHeight = 19.5; // allow-hardcoded: vscDarkPlus strut
-}
 
 /// One coloured run inside a line of highlighted code.
 @immutable

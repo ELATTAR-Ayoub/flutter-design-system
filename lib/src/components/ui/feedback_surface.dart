@@ -590,8 +590,6 @@ class FeedbackSurface extends StatefulWidget {
   BloomInk inkFor(ThemeTokens theme) {
     Color relit(Color source) {
       final ({double l, double c, double h}) from = OklabColor.toOklch(source);
-      // allow-hardcoded: every argument is a semantic token; this constructor
-      // declares no colour of its own.
       return OklabColor.fromOklch(
         from.l * theme.bloomL,
         from.c * theme.bloomC,
@@ -606,8 +604,6 @@ class FeedbackSurface extends StatefulWidget {
       core: core,
       glow: relit(bloom1(theme)),
       // `calc(l + (1 - l) * var(--bloom-lift))` on the core's own lightness.
-      // allow-hardcoded: derives the effect-owned hot colour from semantic
-      // token inputs.
       hot: OklabColor.fromOklch(
         coreLch.l + (1 - coreLch.l) * theme.bloomLift,
         coreLch.c * theme.bloomHotC,

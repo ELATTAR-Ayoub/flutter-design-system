@@ -84,6 +84,7 @@ import 'package:flutter/widgets.dart'
 import '../kit.dart';
 import '../nav.dart';
 import '../shell.dart';
+import '../demo_latency.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
@@ -972,9 +973,7 @@ class _DangerZone extends StatefulWidget {
 
   /// `const DEFAULT_DELETE = () => new Promise((resolve) =>
   /// setTimeout(resolve, 1400))`: the demo's own latency.
-  static const Duration defaultLatency = Duration(
-    milliseconds: 1400,
-  ); // allow-hardcoded: the page's own demo latency, a call-site constant and not a --duration-* token
+  static const Duration defaultLatency = demoDialogLatency;
 
   @override
   State<_DangerZone> createState() => _DangerZoneState();
@@ -1636,11 +1635,11 @@ class _PopoverSectionState extends State<_PopoverSection> {
               variant: ButtonVariant.outline,
               size: ButtonSize.sm,
               onPressed: () => setState(() => _odds = !_odds),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Icon(IconGlyph.info, size: IconSize.sm),
-                  SizedBox(width: 6), // allow-hardcoded: `gap-1.5` on `sm`.
+                  const Icon(IconGlyph.info, size: IconSize.sm),
+                  SizedBox(width: space(1.5)),
                   // Flexible so a doubled text scale wraps the label
                   // instead of pushing the row past the button's
                   // constrained width.

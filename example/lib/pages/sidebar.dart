@@ -183,9 +183,8 @@ const double _stageFooter = 320;
 /// `h-96`: the shell frame. 384px.
 const double _shellHeight = 384;
 
-/// `lg:grid-cols-[20rem_1fr]`: the anatomy's fixed first column, 20rem.
-// allow-hardcoded: framework rem measure with no token to read it from.
-const double _railColumn = 320;
+/// `lg:grid-cols-[20rem_1fr]`: the anatomy's fixed first column, 20rem — the
+/// same 320px [Containers.xs] (`--container-xs`) already carries.
 
 /* ── Stages ──────────────────────────────────────────────────────────────── */
 
@@ -503,7 +502,7 @@ class _AnatomySection extends StatelessWidget {
         LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             final Widget rail = ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _railColumn),
+              constraints: const BoxConstraints(maxWidth: Containers.xs),
               child: const Panel(
                 label: 'The shared composition',
                 flush: true,

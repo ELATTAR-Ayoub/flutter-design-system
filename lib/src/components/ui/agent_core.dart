@@ -196,9 +196,9 @@ AgentAttachmentKind agentAttachmentKind(String mime, String name) =>
 /// The three branches and their rounding are the reference's own: bytes under
 /// 1024 print raw, KB rounds to a whole number, MB takes one decimal.
 String formatBytes(int bytes) {
-  // allow-hardcoded: the KB/MB divisor is the unit definition itself, not a
-  // spacing or type token — restating it in `foundation/` would put arithmetic
-  // in the token layer.
+  // The KB/MB divisor is the unit definition itself, not a spacing or type
+  // token — restating it in `foundation/` would put arithmetic in the token
+  // layer.
   const int k = 1024;
   if (bytes < k) return '$bytes B';
   if (bytes < k * k) return '${(bytes / k).round()} KB';
@@ -206,12 +206,10 @@ String formatBytes(int bytes) {
 }
 
 /// `MAX_INLINE_CHARS` — *"128k characters is roughly 32k tokens."*
-// allow-hardcoded: a payload budget in characters, not a design token.
 const int maxInlineChars = 128000;
 
 /// `MAX_FILE_BYTES` — above this the picker refuses the file rather than
 /// reading it.
-// allow-hardcoded: 25 MiB, a protocol limit that travels with the model.
 const int maxFileBytes = 25 * 1024 * 1024;
 
 const Set<AgentAttachmentKind> _textualKinds = <AgentAttachmentKind>{
@@ -697,7 +695,6 @@ String humaniseToolName(String name) {
 
 /// `formatMs` — `912ms` under a second, `8.0s` above it.
 String formatMs(int ms) {
-  // allow-hardcoded: the second is the unit boundary, not a duration token.
   const int second = 1000;
   return ms < second ? '${ms}ms' : '${(ms / second).toStringAsFixed(1)}s';
 }
@@ -983,8 +980,8 @@ String relativeTime(DateTime then, {DateTime? now}) {
   final int deltaMs = then.difference(reference).inMilliseconds;
   final int magnitude = deltaMs.abs();
 
-  // allow-hardcoded: calendar arithmetic — the unit table is the formatter's
-  // own, not a token.
+  // Calendar arithmetic — the unit table is the formatter's own, not a
+  // token.
   const int minute = 60000;
   const int hour = 60 * minute;
   const int day = 24 * hour;

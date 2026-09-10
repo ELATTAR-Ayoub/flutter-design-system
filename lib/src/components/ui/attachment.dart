@@ -86,6 +86,7 @@ import 'package:flutter/widgets.dart'
     as flutter
     show AspectRatio, ScrollPosition;
 
+import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
@@ -641,7 +642,9 @@ class AttachmentMedia extends StatelessWidget {
       // `overflow-hidden`.
       clipBehavior: Clip.antiAlias,
       child: DefaultTextStyle.merge(
-        style: TextStyle(
+        style: StyledText.styleOf(
+          context,
+          scope.size == AttachmentSize.md ? TextStyles.body : TextStyles.small,
           color: error ? theme.destructiveText : theme.foreground,
         ),
         child: content,
@@ -877,7 +880,7 @@ class AttachmentStatusText extends StatefulWidget {
   const AttachmentStatusText({super.key, required this.child});
 
   /// `--shimmer-duration: 2s`.
-  static const Duration period = Duration(seconds: 2);
+  static const Duration period = MotionDurations.attachmentStatusShimmer;
 
   /// `calc(3ch + 40px)` — the `ch` half is font-relative, so the widget
   /// measures it rather than pinning 63.2383.
@@ -943,9 +946,7 @@ class _ShimmerTextState extends State<AttachmentStatusText>
         // `oklch(from currentColor max(.8, calc(l + .4)) c h / calc(alpha +
         // .4))` over a `--foreground` that is already near-white, measured as
         // `oklch(1 0.0000489 23.7853)`: pure white at full alpha.
-        // allow-hardcoded: the measured resolution of a relative colour whose
-        // source is the ink this widget is already painting.
-        ? const Color(0xFFFFFFFF) // allow-hardcoded: measured relative colour
+        ? white
         : base.withValues(alpha: AttachmentStatusText.lightHighlightAlpha);
     final Color mid = Color.lerp(highlight, base, 0.5)!;
     final double fontSize =
@@ -1367,12 +1368,11 @@ class _ScrollFadeX extends StatelessWidget {
             // A mask stencil, not a colour: `mask-image` reads only the
             // alpha channel, and these are the gradient's own `#000` and
             // `transparent` stops.
-            // allow-hardcoded: mask alpha stencil, not a design colour.
             colors: const <Color>[
-              Color(0x00000000), // allow-hardcoded: mask alpha stencil
-              Color(0xFF000000), // allow-hardcoded: mask alpha stencil
-              Color(0xFF000000), // allow-hardcoded: mask alpha stencil
-              Color(0x00000000), // allow-hardcoded: mask alpha stencil
+              transparent,
+              opaqueBlack,
+              opaqueBlack,
+              transparent,
             ],
             stops: <double>[
               0,

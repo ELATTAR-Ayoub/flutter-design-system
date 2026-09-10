@@ -151,7 +151,6 @@ class _WebVoiceSource implements VoiceSource {
 
   /// ~60Hz. Not a design-system motion duration — a polling interval for a
   /// data source with no `Ticker` of its own to drive it.
-  // allow-hardcoded: audio frame-loop interval, not layout/motion.
   static const Duration _frameInterval = Duration(milliseconds: 16);
 
   @override

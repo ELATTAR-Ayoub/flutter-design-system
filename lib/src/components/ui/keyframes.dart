@@ -412,16 +412,16 @@ class EntranceMotion {
   static const KeyframeFill fill = KeyframeFill.both;
 
   static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0), // allow-hardcoded: yuki-pop-in geometry
-    KeyframeStop(55, 1), // allow-hardcoded: yuki-pop-in geometry
+    KeyframeStop(0, 0),
+    KeyframeStop(55, 1),
   ];
 
   static const List<KeyframeStop<Offset>> scaleStops = <KeyframeStop<Offset>>[
-    KeyframeStop(0, Offset(0.25, 0.25)), // allow-hardcoded: yuki-pop-in
-    KeyframeStop(55, Offset(0.92, 1.08)), // allow-hardcoded: yuki-pop-in
-    KeyframeStop(80, Offset(1.04, 0.97)), // allow-hardcoded: yuki-pop-in
-    KeyframeStop(92, Offset(0.99, 1.01)), // allow-hardcoded: yuki-pop-in
-    KeyframeStop(100, Offset(1, 1)), // allow-hardcoded: yuki-pop-in
+    KeyframeStop(0, Offset(0.25, 0.25)),
+    KeyframeStop(55, Offset(0.92, 1.08)),
+    KeyframeStop(80, Offset(1.04, 0.97)),
+    KeyframeStop(92, Offset(0.99, 1.01)),
+    KeyframeStop(100, Offset(1, 1)),
   ];
 
   static final Animatable<double> opacity = Keyframes.doubles(
@@ -463,12 +463,12 @@ class StateChangeMotion {
   static const KeyframeFill fill = KeyframeFill.both;
 
   static const List<KeyframeStop<Offset>> scaleStops = <KeyframeStop<Offset>>[
-    KeyframeStop(0, Offset(1, 1)), // allow-hardcoded: yuki-jelly geometry
-    KeyframeStop(30, Offset(1.18, 0.82)), // allow-hardcoded: yuki-jelly
-    KeyframeStop(45, Offset(0.88, 1.12)), // allow-hardcoded: yuki-jelly
-    KeyframeStop(60, Offset(1.06, 0.94)), // allow-hardcoded: yuki-jelly
-    KeyframeStop(78, Offset(0.98, 1.02)), // allow-hardcoded: yuki-jelly
-    KeyframeStop(100, Offset(1, 1)), // allow-hardcoded: yuki-jelly
+    KeyframeStop(0, Offset(1, 1)),
+    KeyframeStop(30, Offset(1.18, 0.82)),
+    KeyframeStop(45, Offset(0.88, 1.12)),
+    KeyframeStop(60, Offset(1.06, 0.94)),
+    KeyframeStop(78, Offset(0.98, 1.02)),
+    KeyframeStop(100, Offset(1, 1)),
   ];
 
   static final Animatable<Offset> scale = Keyframes.offsets(
@@ -500,17 +500,17 @@ class SpringEntranceMotion {
   static const KeyframeFill fill = KeyframeFill.both;
 
   static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0), // allow-hardcoded: yuki-spring-up geometry
-    KeyframeStop(55, 1), // allow-hardcoded: yuki-spring-up geometry
+    KeyframeStop(0, 0),
+    KeyframeStop(55, 1),
   ];
 
   static const List<KeyframeStop<double>> translateYStops =
       <KeyframeStop<double>>[
-        KeyframeStop(0, 32), // allow-hardcoded: yuki-spring-up geometry
-        KeyframeStop(55, -4), // allow-hardcoded: yuki-spring-up geometry
-        KeyframeStop(76, 1.5), // allow-hardcoded: yuki-spring-up geometry
-        KeyframeStop(90, -0.5), // allow-hardcoded: yuki-spring-up geometry
-        KeyframeStop(100, 0), // allow-hardcoded: yuki-spring-up geometry
+        KeyframeStop(0, 32),
+        KeyframeStop(55, -4),
+        KeyframeStop(76, 1.5),
+        KeyframeStop(90, -0.5),
+        KeyframeStop(100, 0),
       ];
 
   static final Animatable<double> opacity = Keyframes.doubles(
@@ -547,22 +547,22 @@ class OpenMotion {
   static const KeyframeFill fill = KeyframeFill.both;
 
   static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0), // allow-hardcoded: yuki-jelly-in geometry
-    KeyframeStop(60, 1), // allow-hardcoded: yuki-jelly-in geometry
-    KeyframeStop(100, 1), // allow-hardcoded: yuki-jelly-in geometry
+    KeyframeStop(0, 0),
+    KeyframeStop(60, 1),
+    KeyframeStop(100, 1),
   ];
 
   static const List<KeyframeStop<double>> scaleStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0.92), // allow-hardcoded: yuki-jelly-in geometry
-    KeyframeStop(60, 1.02), // allow-hardcoded: yuki-jelly-in geometry
-    KeyframeStop(100, 1), // allow-hardcoded: yuki-jelly-in geometry
+    KeyframeStop(0, 0.92),
+    KeyframeStop(60, 1.02),
+    KeyframeStop(100, 1),
   ];
 
   static const List<KeyframeStop<double>> translateYStops =
       <KeyframeStop<double>>[
-        KeyframeStop(0, 24), // allow-hardcoded: yuki-jelly-in geometry
-        KeyframeStop(60, -4), // allow-hardcoded: yuki-jelly-in geometry
-        KeyframeStop(100, 0), // allow-hardcoded: yuki-jelly-in geometry
+        KeyframeStop(0, 24),
+        KeyframeStop(60, -4),
+        KeyframeStop(100, 0),
       ];
 
   static final Animatable<double> opacity = Keyframes.doubles(
@@ -606,8 +606,7 @@ class DiscreteProgressMotion {
   static const bool loops = true;
 
   /// `steps(8)`, i.e. `steps(8, jump-end)`.
-  static const int positions =
-      8; // allow-hardcoded: steps(8) (globals.css L2417)
+  static const int positions = 8;
   static const Curve curve = StepCurve(positions);
 
   /// One held position — derived in the foundation layer from 1.4s ÷ 8.
@@ -713,42 +712,36 @@ class TextRevealMotion {
   /// The 100% stop repeats the 70% stop verbatim, so the table has six rows,
   /// not seven.
   static const List<TextRevealFrame> frames = <TextRevealFrame>[
-    // allow-hardcoded: yuki-sign-on geometry (globals.css L2474–2481)
     TextRevealFrame(
       percent: 0,
       opacity: 0.12,
       brightness: 0.5,
       glowBlurs: <double>[],
     ),
-    // allow-hardcoded: yuki-sign-on geometry (globals.css L2474–2481)
     TextRevealFrame(
       percent: 16,
       opacity: 1,
       brightness: 1.35,
       glowBlurs: <double>[8, 22],
     ),
-    // allow-hardcoded: yuki-sign-on geometry (globals.css L2474–2481)
     TextRevealFrame(
       percent: 28,
       opacity: 0.2,
       brightness: 0.6,
       glowBlurs: <double>[],
     ),
-    // allow-hardcoded: yuki-sign-on geometry (globals.css L2474–2481)
     TextRevealFrame(
       percent: 44,
       opacity: 1,
       brightness: 1.3,
       glowBlurs: <double>[8, 22],
     ),
-    // allow-hardcoded: yuki-sign-on geometry (globals.css L2474–2481)
     TextRevealFrame(
       percent: 56,
       opacity: 0.35,
       brightness: 0.75,
       glowBlurs: <double>[4],
     ),
-    // allow-hardcoded: yuki-sign-on geometry (globals.css L2474–2481)
     TextRevealFrame(
       percent: 70,
       opacity: 1,
@@ -815,15 +808,15 @@ class RevealMotion {
   static const KeyframeFill fill = KeyframeFill.both;
 
   /// The `from` stop's `rotateY`.
-  static const double fromDegrees = -38; // allow-hardcoded: pulls-reveal
+  static const double fromDegrees = -38;
   static const double fromRadians = fromDegrees * math.pi / 180;
 
   /// The `from` stop's uniform `scale`.
-  static const double fromScale = 0.9; // allow-hardcoded: pulls-reveal
+  static const double fromScale = 0.9;
 
   static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0), // allow-hardcoded: pulls-reveal geometry
-    KeyframeStop(100, 1), // allow-hardcoded: pulls-reveal geometry
+    KeyframeStop(0, 0),
+    KeyframeStop(100, 1),
   ];
 
   static const List<KeyframeStop<double>> rotationYStops =
@@ -834,7 +827,7 @@ class RevealMotion {
 
   static const List<KeyframeStop<double>> scaleStops = <KeyframeStop<double>>[
     KeyframeStop(0, fromScale),
-    KeyframeStop(100, 1), // allow-hardcoded: pulls-reveal geometry
+    KeyframeStop(100, 1),
   ];
 
   static final Animatable<double> opacity = Keyframes.doubles(
@@ -910,13 +903,13 @@ class LoadingShimmerMotion {
   static const bool loops = true;
 
   /// `background-size: 200% 100%` — the tile is twice the box wide.
-  static const double tileFactor = 2; // allow-hardcoded: background-size: 200%
+  static const double tileFactor = 2;
 
   /// `from { background-position: 200% 0 }`, as a fraction.
-  static const double fromPercent = 2; // allow-hardcoded: pulls-shimmer
+  static const double fromPercent = 2;
 
   /// `to { background-position: -200% 0 }`.
-  static const double toPercent = -2; // allow-hardcoded: pulls-shimmer
+  static const double toPercent = -2;
 
   /// `2W` on a box of [width].
   static double tileWidth(double width) => width * tileFactor;
@@ -987,30 +980,28 @@ class LivePulseMotion {
   static Color get dotColor => Palette.success;
 
   /// `rgba(61, 220, 151, …)` — drift D14, a palette orphan.
-  static final Color ringColor = const Color(
-    0xFF3DDC97,
-  ); // allow-hardcoded: rgba(61,220,151) ring (L2521)
+  static final Color ringColor = const Color(0xFF3DDC97);
 
   /// The 50% stop's `box-shadow` spread.
-  static const double ringSpread = 5; // allow-hardcoded: pulls-pulse-live
+  static const double ringSpread = 5;
 
   /// The 0%/100% stops' ring alpha.
-  static const double ringAlpha = 0.5; // allow-hardcoded: pulls-pulse-live
+  static const double ringAlpha = 0.5;
 
   /// 0 at the resting stops, 1 at the 50% stop: the ring's own progress, which
   /// drives both its radius and its fade.
   static const List<KeyframeStop<double>> ringPhaseStops =
       <KeyframeStop<double>>[
-        KeyframeStop(0, 0), // allow-hardcoded: pulls-pulse-live geometry
-        KeyframeStop(50, 1), // allow-hardcoded: pulls-pulse-live geometry
-        KeyframeStop(100, 0), // allow-hardcoded: pulls-pulse-live geometry
+        KeyframeStop(0, 0),
+        KeyframeStop(50, 1),
+        KeyframeStop(100, 0),
       ];
 
   static const List<KeyframeStop<double>> dotOpacityStops =
       <KeyframeStop<double>>[
-        KeyframeStop(0, 1), // allow-hardcoded: pulls-pulse-live geometry
-        KeyframeStop(50, 0.75), // allow-hardcoded: pulls-pulse-live geometry
-        KeyframeStop(100, 1), // allow-hardcoded: pulls-pulse-live geometry
+        KeyframeStop(0, 1),
+        KeyframeStop(50, 0.75),
+        KeyframeStop(100, 1),
       ];
 
   static final Animatable<double> ringPhase = Keyframes.doubles(
@@ -1066,10 +1057,7 @@ class SweepMotion {
   static const KeyframeFill fill = KeyframeFill.both;
 
   static const List<KeyframeStop<double>> widthFactorStops =
-      <KeyframeStop<double>>[
-        KeyframeStop(0, 0), // allow-hardcoded: sweep geometry
-        KeyframeStop(100, 1), // allow-hardcoded: sweep geometry
-      ];
+      <KeyframeStop<double>>[KeyframeStop(0, 0), KeyframeStop(100, 1)];
 
   /// `0 → 1`, for a `FractionallySizedBox.widthFactor` inside the clipped
   /// track.
@@ -1163,7 +1151,7 @@ class CheckmarkDrawMotion {
 
   /// `stroke-dasharray: 22` — the utility's own declaration, not a keyframe.
   /// Also the `from` offset, because one dash has to cover the whole path.
-  static const double dashArray = 22; // allow-hardcoded: check-draw geometry
+  static const double dashArray = 22;
 
   static const List<KeyframeStop<double>> dashOffsetStops =
       <KeyframeStop<double>>[KeyframeStop(0, dashArray), KeyframeStop(100, 0)];
@@ -1202,7 +1190,7 @@ class DashDrawMotion {
   static const KeyframeFill fill = KeyframeFill.both;
 
   /// `stroke-dasharray: 12`.
-  static const double dashArray = 12; // allow-hardcoded: dash-draw geometry
+  static const double dashArray = 12;
 
   static const List<KeyframeStop<double>> dashOffsetStops =
       <KeyframeStop<double>>[KeyframeStop(0, dashArray), KeyframeStop(100, 0)];
@@ -1241,15 +1229,15 @@ class DotSelectionMotion {
   static const KeyframeFill fill = KeyframeFill.both;
 
   static const List<KeyframeStop<double>> scaleStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0), // allow-hardcoded: dot-pop geometry
-    KeyframeStop(55, 1.35), // allow-hardcoded: dot-pop geometry
-    KeyframeStop(100, 1), // allow-hardcoded: dot-pop geometry
+    KeyframeStop(0, 0),
+    KeyframeStop(55, 1.35),
+    KeyframeStop(100, 1),
   ];
 
   static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0), // allow-hardcoded: dot-pop geometry
-    KeyframeStop(55, 1), // allow-hardcoded: dot-pop geometry
-    KeyframeStop(100, 1), // allow-hardcoded: dot-pop geometry
+    KeyframeStop(0, 0),
+    KeyframeStop(55, 1),
+    KeyframeStop(100, 1),
   ];
 
   static final Animatable<double> scale = Keyframes.doubles(

@@ -83,22 +83,20 @@ double get _markSize => space(3.5);
 
 /// `stroke-width="3.2"`, in the 24-unit grid the two paths are drawn on.
 ///
-/// allow-hardcoded: `checkbox.tsx` authors this stroke on its own `<svg>`; it
-/// is the mark's geometry, not a token, and it is stated nowhere else.
+/// `checkbox.tsx` authors this stroke on its own `<svg>`; it is the mark's
+/// geometry, not a token, and it is stated nowhere else.
 const double _markStroke = 3.2;
 
 /// `d="M5 12.5 10 17.5 19 7"` — the tick, hand-authored on lucide's grid
 /// because lucide's own `Check` cannot carry a dash the length of itself.
-///
-/// allow-hardcoded: transcribed path data (`checkbox.tsx` L17).
+/// Transcribed path data (`checkbox.tsx` L17).
 Path _tickPath() => Path()
   ..moveTo(5, 12.5)
   ..lineTo(10, 17.5)
   ..lineTo(19, 7);
 
-/// `d="M6 12h12"` — the indeterminate bar.
-///
-/// allow-hardcoded: transcribed path data (`checkbox.tsx` L17).
+/// `d="M6 12h12"` — the indeterminate bar. Transcribed path data
+/// (`checkbox.tsx` L17).
 Path _dashPath() => Path()
   ..moveTo(6, 12)
   ..lineTo(18, 12);

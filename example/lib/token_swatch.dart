@@ -62,41 +62,41 @@ import 'package:flutter/widgets.dart'
 
 /// WCAG 2.x relative luminance: the linearisation threshold on the `0..1`
 /// channel. The reference writes it in `token-swatch.tsx`'s `luminance()`.
-const double _linearThreshold = 0.03928; // allow-hardcoded: WCAG 2.x constant
+const double _linearThreshold = 0.03928;
 
 /// The low-end slope below [_linearThreshold].
-const double _linearSlope = 12.92; // allow-hardcoded: WCAG 2.x constant
+const double _linearSlope = 12.92;
 
 /// The gamma-expansion offset: `((s + 0.055) / 1.055) ^ 2.4`.
-const double _gammaOffset = 0.055; // allow-hardcoded: WCAG 2.x constant
+const double _gammaOffset = 0.055;
 
 /// The gamma-expansion divisor.
-const double _gammaScale = 1.055; // allow-hardcoded: WCAG 2.x constant
+const double _gammaScale = 1.055;
 
 /// The gamma-expansion exponent.
-const double _gammaExponent = 2.4; // allow-hardcoded: WCAG 2.x constant
+const double _gammaExponent = 2.4;
 
 /// Red's share of relative luminance.
-const double _luminanceRed = 0.2126; // allow-hardcoded: WCAG 2.x constant
+const double _luminanceRed = 0.2126;
 
 /// Green's share of relative luminance.
-const double _luminanceGreen = 0.7152; // allow-hardcoded: WCAG 2.x constant
+const double _luminanceGreen = 0.7152;
 
 /// Blue's share of relative luminance.
-const double _luminanceBlue = 0.0722; // allow-hardcoded: WCAG 2.x constant
+const double _luminanceBlue = 0.0722;
 
 /// The flare term in `(hi + 0.05) / (lo + 0.05)`: the ambient light the
 /// standard assumes falls on the screen, which is what keeps the ratio finite.
-const double _contrastFlare = 0.05; // allow-hardcoded: WCAG 2.x constant
+const double _contrastFlare = 0.05;
 
 /// SC 1.4.6 Contrast (Enhanced).
-const double _thresholdAaa = 7; // allow-hardcoded: WCAG 2.x success criterion
+const double _thresholdAaa = 7;
 
 /// SC 1.4.3 Contrast (Minimum), body text.
-const double _thresholdAa = 4.5; // allow-hardcoded: WCAG 2.x success criterion
+const double _thresholdAa = 4.5;
 
 /// SC 1.4.3 large text / SC 1.4.11 non-text contrast.
-const double _thresholdLarge = 3; // allow-hardcoded: WCAG 2.x success criterion
+const double _thresholdLarge = 3;
 
 /// One channel, sRGB → linear light.
 ///

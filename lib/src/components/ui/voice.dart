@@ -579,7 +579,9 @@ class _MicButtonState extends State<_MicButton>
     // colour arrives the same way it does in the browser: from the text style
     // the button's content sits in.
     final Widget live = DefaultTextStyle.merge(
-      style: TextStyle(color: theme.agentAccent),
+      style: DefaultTextStyle.of(
+        context,
+      ).style.copyWith(color: theme.agentAccent),
       child: button,
     );
 

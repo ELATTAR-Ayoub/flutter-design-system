@@ -93,7 +93,6 @@ import '../nav.dart';
 /// Tailwind's `leading-snug` ratio, which `.type-small`'s own 1.5 loses to on
 /// every `use` caption in `#tones` and `#set`. `globals.css` declares no
 /// `--leading-*` token for it, so it cannot come from the foundation layer.
-// allow-hardcoded: framework default with no token to read it from.
 const double _leadingSnug = 1.375;
 
 /// `size-9`: the plinth every 20px specimen glyph is mounted on.

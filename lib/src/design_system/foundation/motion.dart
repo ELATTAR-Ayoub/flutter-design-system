@@ -116,6 +116,92 @@ class MotionDurations {
   /// pointer leaving to `data-state="closed"`.
   static const Duration hoverCardHideDelay = Duration(milliseconds: 300);
 
+  /// Radix `MenuSubTrigger`'s own submenu-open timer —
+  /// `window.setTimeout(open, 100)` on `pointermove`, cleared on
+  /// `pointerleave`. A dependency's own timer, not a `--duration-*` token —
+  /// the same standing as [selectAutoScrollTick].
+  static const Duration menuSubOpenDelay = Duration(milliseconds: 100);
+
+  /// Radix `useTypeaheadSearch`'s idle-buffer reset — how long the menu's
+  /// typeahead search debounces before it forgets what was typed.
+  static const Duration menuTypeaheadReset = Duration(milliseconds: 1000);
+
+  /// Radix `NavigationMenu`'s `delayDuration` — the hover-open delay before a
+  /// panel opens. Measured on the live reference: a first hover opened the
+  /// panel 281ms after the pointer landed, against a ~230–280ms expectation
+  /// once measurement latency is allowed for.
+  static const Duration navigationMenuOpenDelay = Duration(milliseconds: 200);
+
+  /// Radix `NavigationMenu`'s own close timer — how long a panel stays open
+  /// after the pointer leaves. Measured at ~186ms from a real `pointerleave`,
+  /// which is this plus the sampler's slop.
+  static const Duration navigationMenuCloseDelay = Duration(
+    milliseconds: 150,
+  );
+
+  /// Radix `NavigationMenu`'s `skipDelayDuration` — the window after a panel
+  /// closes during which the **next** trigger opens with no delay at all.
+  static const Duration navigationMenuSkipDelay = Duration(milliseconds: 300);
+
+  /// Radix `ScrollArea`'s `scrollHideDelay` default. Measured between 542ms
+  /// and 650ms. Not on the `--duration-*` scale: `globals.css` never names
+  /// it, and nothing else in the system waits this long.
+  static const Duration scrollAreaHideDelay = Duration(milliseconds: 600);
+
+  /// Radix `Select`'s own auto-scroll interval —
+  /// `window.setInterval(onAutoScroll, 50)` while a scroll button is
+  /// hovered; each tick scrolls the viewport by one item's height.
+  static const Duration selectAutoScrollTick = Duration(milliseconds: 50);
+
+  /// sonner's `TOAST_LIFETIME` — how long a toast stays on screen before it
+  /// auto-dismisses.
+  static const Duration toastLifetime = Duration(seconds: 4);
+
+  /// sonner's `TIME_BEFORE_UNMOUNT` — how long a dismissed toast stays in the
+  /// tree after it has been told to go.
+  ///
+  /// It is numerically equal to [dashDraw] and unrelated to it; a retimed
+  /// checkbox must not retime the toast queue.
+  ///
+  /// Shorter than every exit transition it fires alongside, which is not a
+  /// mistake: sonner's own comment calls it *"Equal to exit animation
+  /// duration"* and it is equal to only one of the four. The visible
+  /// consequence is that every exit is cut off partway.
+  static const Duration toastUnmountDelay = Duration(milliseconds: 200);
+
+  /// `transition: transform 400ms, opacity 400ms, height 400ms` — the window
+  /// almost every leg of sonner's toast choreography runs in.
+  ///
+  /// Numerically equal to [slow] and deliberately not spelled as it: this is
+  /// a third-party stylesheet's own literal, and retiming the design
+  /// system's slow window must not retime a foreign component.
+  static const Duration toastTransition = Duration(milliseconds: 400);
+
+  /// sonner: `[data-removed][data-front=false][data-expanded=false] {
+  /// transition: transform 500ms, opacity 200ms }` — the transform half of
+  /// the one exit that does not use [toastTransition]. Its opacity half is
+  /// [toastUnmountDelay]'s number.
+  static const Duration toastCollapsedExitTransform = Duration(
+    milliseconds: 500,
+  );
+
+  /// sonner: `animation-duration: 200ms` on the four `swipe-out-*`
+  /// keyframes.
+  static const Duration toastSwipeOutDuration = Duration(milliseconds: 200);
+
+  /// sonner: `[data-promise=true] [data-icon] > svg { animation:
+  /// sonner-fade-in 300ms ease forwards }` — the settled glyph arriving over
+  /// the loader it replaces.
+  static const Duration toastPromiseSwapIn = Duration(milliseconds: 300);
+
+  /// `AttachmentStatusText`'s `--shimmer-duration: 2s` — the shimmer sweep
+  /// period on the attachment's status line.
+  ///
+  /// Numerically close to but distinct from [shimmer] (1400ms) and
+  /// [shimmerText] (2600ms): a third component's own measured period, not
+  /// either of those two.
+  static const Duration attachmentStatusShimmer = Duration(seconds: 2);
+
   /// `window.setTimeout(() => setSaving(false), 1600)` — how long
   /// `AttachmentAction`'s glyph stays on the check after a save is started
   /// (`attachment.tsx` L328).
@@ -308,6 +394,14 @@ class MotionDurations {
   /// infinite }` (globals.css L2354–2356) — *"the only animation allowed to
   /// run forever, and only on the live indicator"*.
   static const Duration pulseLive = Duration(seconds: 2);
+
+  /// How long a copy control holds its confirmed state before reverting.
+  ///
+  /// Not a transition: the swap into and out of the confirmed glyph runs on
+  /// [MotionDurations.fast]. This is the dwell between them — long enough for
+  /// a reader who looked away mid-click to still catch that the copy landed,
+  /// short enough that a second copy is never blocked by the first.
+  static const Duration copyConfirmation = Duration(seconds: 2);
 
   // ── The interaction utilities' own literals ────────────────────────────
 

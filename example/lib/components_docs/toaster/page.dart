@@ -659,7 +659,7 @@ class _ApiReferenceContent extends StatelessWidget {
             name: 'Toaster.unmountDelay (static)',
             type: 'Duration',
             description:
-                'Duration(milliseconds: 200) -- 200ms. How long a ' // allow-hardcoded: prose describing Toaster.unmountDelay, not a value used
+                'Duration(milliseconds: 200) -- 200ms. How long a '
                 'dismissed toast stays mounted after '
                 'ToastController.dismiss before it is actually '
                 'removed (sonner\'s TIME_BEFORE_UNMOUNT); every exit '
@@ -670,7 +670,7 @@ class _ApiReferenceContent extends StatelessWidget {
             name: 'Toaster.transition (static)',
             type: 'Duration',
             description:
-                'Duration(milliseconds: 400) -- 400ms. The window ' // allow-hardcoded: prose describing Toaster.transition, not a value used
+                'Duration(milliseconds: 400) -- 400ms. The window '
                 'the entrance, the collapse, the expand, and two of the '
                 'three exits all ride.',
           ),
@@ -678,7 +678,7 @@ class _ApiReferenceContent extends StatelessWidget {
             name: 'Toaster.collapsedExitTransform (static)',
             type: 'Duration',
             description:
-                'Duration(milliseconds: 500) -- 500ms. The transform ' // allow-hardcoded: prose describing Toaster.collapsedExitTransform, not a value used
+                'Duration(milliseconds: 500) -- 500ms. The transform '
                 'half of a back toast\'s collapsed exit; its opacity '
                 'half is unmountDelay\'s 200ms.',
           ),
@@ -686,7 +686,7 @@ class _ApiReferenceContent extends StatelessWidget {
             name: 'Toaster.swipeOutDuration (static)',
             type: 'Duration',
             description:
-                'Duration(milliseconds: 200) -- 200ms. The ' // allow-hardcoded: prose describing Toaster.swipeOutDuration, not a value used
+                'Duration(milliseconds: 200) -- 200ms. The '
                 'thrown-away animation once a swipe clears the '
                 'threshold.',
           ),

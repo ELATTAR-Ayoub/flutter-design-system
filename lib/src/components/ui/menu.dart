@@ -107,17 +107,13 @@ const double _destructiveFillAlphaDark = 0.20;
 /// `pointermove` and clears it on `pointerleave`. A dependency's own timer, not
 /// a `--duration-*` token — the same standing as `select.tsx`'s 50ms
 /// auto-scroll interval.
-const Duration _subOpenDelay = Duration(
-  milliseconds: 100,
-); // allow-hardcoded: Radix's own submenu timer
+const Duration _subOpenDelay = MotionDurations.menuSubOpenDelay;
 
 /// How long the typeahead buffer survives an idle keyboard.
 ///
 /// Radix's `useTypeaheadSearch` debounces its reset by 1000ms. Also a
 /// dependency's constant.
-const Duration _typeaheadReset = Duration(
-  milliseconds: 1000,
-); // allow-hardcoded: Radix's own typeahead reset
+const Duration _typeaheadReset = MotionDurations.menuTypeaheadReset;
 
 /* ── The row model ───────────────────────────────────────────────────────── */
 
@@ -1352,7 +1348,9 @@ class _MenuRow extends StatelessWidget {
                   // `text-*` utility on an SVG's parent means, and the only way
                   // a lucide glyph is ever coloured.
                   DefaultTextStyle.merge(
-                    style: TextStyle(color: glyph),
+                    style: DefaultTextStyle.of(
+                      context,
+                    ).style.copyWith(color: glyph),
                     child: leading != null
                         ? Icon(
                             leading!,
@@ -1497,7 +1495,7 @@ class _MenuRow extends StatelessWidget {
     );
     // The row's resolved `color`, which every `text-current` child reads.
     row = DefaultTextStyle.merge(
-      style: TextStyle(color: ink),
+      style: DefaultTextStyle.of(context).style.copyWith(color: ink),
       child: row,
     );
     row = Semantics(

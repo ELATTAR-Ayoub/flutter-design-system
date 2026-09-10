@@ -105,8 +105,7 @@ import '../nav.dart';
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
 /// `max-w-xs`, `--container-xs`, 20rem. The context-menu card.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureXs = 320;
+const double _measureXs = Containers.xs;
 
 /// `className="w-60"` on the account menu, 240.
 double get _accountMenuWidth => space(60);

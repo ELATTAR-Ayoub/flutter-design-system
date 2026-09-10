@@ -134,6 +134,11 @@
       "classification": "dependency"
     },
     {
+      "source": "lib/src/components/ui/agent_markdown_prism_theme.dart",
+      "owner": "agent-markdown",
+      "classification": "bundled"
+    },
+    {
       "source": "lib/src/components/ui/agent_slash_palette.dart",
       "owner": "agent-slash-palette",
       "classification": "dependency"

@@ -49,7 +49,7 @@
     {
       "source": "lib/src/design_system/foundation/typography.dart",
       "target": "@foundation/typography.dart",
-      "sha256": "9d51894c5af15827b6c822a689cb4007e88f099a5a689fcdf368787790276ad1"
+      "sha256": "01989f1d06335089d0937a026bd7bc1cb954a0e4f85547317115b26c3ed4f845"
     },
     {
       "source": "lib/src/design_system/foundation/text_layout.dart",

@@ -480,12 +480,7 @@ class ScrollFade extends StatelessWidget {
             // A mask stencil, not a colour: `mask-image` reads only the
             // alpha channel, and these are the gradient's own `#000` and
             // `transparent` stops.
-            // allow-hardcoded: mask alpha stencil, not a design colour.
-            colors: const <Color>[
-              Color(0xFF000000), // allow-hardcoded: mask alpha stencil
-              Color(0xFF000000), // allow-hardcoded: mask alpha stencil
-              Color(0x00000000), // allow-hardcoded: mask alpha stencil
-            ],
+            colors: const <Color>[opaqueBlack, opaqueBlack, transparent],
             stops: <double>[0, stop, 1],
           ).createShader(bounds),
           child: child,

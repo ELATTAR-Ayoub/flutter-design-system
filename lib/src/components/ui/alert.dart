@@ -192,7 +192,9 @@ class Alert extends StatelessWidget {
             // the first line of a 13px title.
             padding: EdgeInsets.only(top: space(0.5)),
             child: DefaultTextStyle.merge(
-              style: TextStyle(color: variant.inkOf(theme)),
+              style: DefaultTextStyle.of(
+                context,
+              ).style.copyWith(color: variant.inkOf(theme)),
               child: icon!,
             ),
           ),

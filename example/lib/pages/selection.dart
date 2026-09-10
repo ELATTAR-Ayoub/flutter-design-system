@@ -100,17 +100,17 @@ import '../nav.dart';
 /// `max-w-sm`, `--container-sm`, 24rem. Tailwind's **container** scale, which
 /// `globals.css` does not override, so it is not the spacing ladder even where
 /// the two coincide.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureSm = 384;
+const double _measureSm = Containers.sm;
 
 /// `max-w-md`, `--container-md`, 28rem. Both slider panels.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureMd = 448;
+const double _measureMd = Containers.md;
 
 /// `max-w-lg`, `--container-lg`, 32rem. The bulk header, the withdrawal cards
-/// and the preferences list.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureLg = 512;
+/// and the preferences list. Tailwind's container scale has no `lg` rung
+/// transcribed in [Containers] — only the rungs the port already reaches for
+/// are — so this file is the source of truth for 512 until another caller
+/// needs the same rung.
+const double _measureLg = Containers.lg;
 
 /// A block box wearing a `max-w-*`.
 ///
@@ -163,7 +163,6 @@ const double _actionRim = 0.50;
 /// `--strong`, as Preflight sets it: `b, strong { font-weight: bolder }`, which
 /// against the body's 400 resolves to 700. The opening Note's four control
 /// names step up to it.
-// allow-hardcoded: Preflight's own `bolder`, resolved; there is no `--` token for it.
 const double _bolder = 700;
 
 /// [base] at [_bolder], keeping every other variable axis.

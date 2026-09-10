@@ -214,7 +214,9 @@ class AgentMessage extends StatelessWidget {
       children: <Widget>[
         if (text.trim().isNotEmpty)
           DefaultTextStyle.merge(
-            style: TextStyle(color: theme.foreground),
+            style: DefaultTextStyle.of(
+              context,
+            ).style.copyWith(color: theme.foreground),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
@@ -424,7 +426,7 @@ class _StatusIcon extends StatelessWidget {
       final bool retry = attempt != null && attempt! > 1;
       return _Spin(
         child: DefaultTextStyle.merge(
-          style: TextStyle(
+          style: DefaultTextStyle.of(context).style.copyWith(
             color: retry ? theme.warningText : theme.agentAccent,
           ),
           child: Icon.lucide(
@@ -1384,7 +1386,9 @@ class _CapabilityGrid extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               DefaultTextStyle.merge(
-                style: TextStyle(color: theme.agentAccent),
+                style: DefaultTextStyle.of(
+                  context,
+                ).style.copyWith(color: theme.agentAccent),
                 child: Icon.lucide(
                   capability.glyph ?? Lucide.sparkles,
                   sizePx: WelcomeCard.capabilityGlyphPx,

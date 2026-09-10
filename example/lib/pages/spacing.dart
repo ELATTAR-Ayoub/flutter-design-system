@@ -43,8 +43,8 @@ const double _glowBorderAlpha = 0.40;
 
 /// Tailwind's `leading-snug` ratio, which the two specimen captions override
 /// `.type-small`'s own 1.5 with. `globals.css` declares no `--leading-*` token
-/// for it, so it cannot come from the foundation layer.
-// allow-hardcoded: framework default with no token to read it from.
+/// for it, so it cannot come from the foundation layer — a framework default
+/// with no token to read it from.
 const double _leadingSnug = 1.375;
 
 /// `w-36`: the column one radius specimen occupies.

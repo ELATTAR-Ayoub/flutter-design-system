@@ -121,7 +121,6 @@ const double _ringAlpha = 0.50;
 /// slider (`step={5}`) `PageUp` moves 15 → 65, and on the odds slider
 /// (`step={1}`) it moves 85 → 95.
 ///
-// allow-hardcoded: Radix's page-key multiplier, measured on the live reference; it is keyboard behaviour, not a design token.
 const int _pageStepMultiplier = 10;
 
 /// A ranged control: a sunken channel, a lit fill, and one raised knob per
@@ -542,7 +541,10 @@ class _SliderState extends State<Slider> {
     // JavaScript rather than through `pointer-events`, which is why the probe
     // reads `pointer-events: auto` on a disabled root and the value still does
     // not move.
-    slider = IgnorePointer(ignoring: widget.enabled && !_operable, child: slider);
+    slider = IgnorePointer(
+      ignoring: widget.enabled && !_operable,
+      child: slider,
+    );
     slider = Disabled(
       disabled: !widget.enabled,
       reason: widget.disabledReason,

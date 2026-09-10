@@ -467,8 +467,8 @@ class _DashedRing extends Decoration {
   final Color color;
 
   /// Tailwind's `border-dashed` is `border-style: dashed`, which Chrome draws
-  /// as a 3 : 3 dash at a 1px width.
-  // allow-hardcoded: the UA's dash geometry, not a spacing token.
+  /// as a 3 : 3 dash at a 1px width — the UA's own dash geometry, not a
+  /// spacing token.
   static const double dash = 3;
 
   @override

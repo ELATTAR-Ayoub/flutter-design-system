@@ -495,7 +495,7 @@ class PopoverSurface extends StatelessWidget {
       // open `Select` wore two yellow lines. Merging a colour alone left the
       // underline behind; a popup surface owns its whole text style.
       child: DefaultTextStyle.merge(
-        style: TextStyle(
+        style: DefaultTextStyle.of(context).style.copyWith(
           color: theme.popoverForeground,
           decoration: TextDecoration.none,
         ),

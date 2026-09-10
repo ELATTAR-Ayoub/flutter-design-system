@@ -573,9 +573,14 @@ void main() {
         );
         final Text tick = t.widget<Text>(find.text('Jan'));
         expect(tick.style!.fontSize, TextStyles.small.desktop.size);
+        // numberSm and small can share a size, so size alone does not separate
+        // them. The typeface does, and both sides read from the tokens: a
+        // category tick is prose (Fonts.sans), never the numeric role
+        // (Fonts.mono).
+        expect(tick.style!.fontFamily, contains(TextStyles.small.family));
         expect(
-          tick.style!.fontSize,
-          isNot(TextStyles.numberSm.desktop.size),
+          tick.style!.fontFamily,
+          isNot(contains(TextStyles.numberSm.family)),
         );
       },
     );
