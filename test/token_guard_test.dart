@@ -72,6 +72,12 @@ const List<String> _exemptDirs = <String>[
   // A ~60Hz audio-analyser polling interval — not a layout/motion duration,
   // and not stated in `globals.css`.
   'example/lib/voice_source_web.dart',
+  // The fake round trips the live specimens wait on — a React demo's own
+  // `setTimeout` values, transcribed whole and chosen by nothing here. Named
+  // once in this file precisely so they are not six private constants on six
+  // pages, each excusing itself; see its own header for why they are kept out
+  // of MotionDurations.
+  'example/lib/demo_latency.dart',
 ];
 
 /// Roots scanned, relative to the repo root.

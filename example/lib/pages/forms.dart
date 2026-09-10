@@ -13,7 +13,7 @@
 /// mounted once by the shell (ruling F8) exactly as `<Toaster/>` is mounted once
 /// by the root layout.
 ///
-/// **The measure is `max-w-md`, 448px** ([_measureMd]), on all four forms. The
+/// **The measure is `max-w-md`, 448px** ([Containers.md]), on all four forms. The
 /// inputs page's is `max-w-lg`; these are different rungs of Tailwind's
 /// container scale and neither is the spacing ladder.
 ///
@@ -149,14 +149,9 @@ import 'package:flutter/widgets.dart'
 import '../kit.dart';
 import '../nav.dart';
 import '../shell.dart';
+import '../demo_latency.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
-
-/// `max-w-md`, `--container-md`, 28rem. Tailwind's **container** scale, which
-/// `globals.css` does not override, so it is not the spacing ladder even where
-/// the two coincide. The measure all four `<form>`s are cut to.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureMd = 448;
 
 /// `await new Promise(r => setTimeout(r, 900))`: the account form's simulated
 /// round trip, and the window its spinner is visible in.
@@ -164,17 +159,11 @@ const double _measureMd = 448;
 /// A page constant, not a duration token: it is a fake network, and putting it
 /// on the `--duration-*` scale would let a retimed animation retime a fake
 /// network. Same reasoning `toaster.dart` gives for sonner's unmount window.
-///
-/// The guard scans per line, so the escape sits on the declaration itself.
-const Duration _accountLatency = Duration(
-  milliseconds: 900,
-); // allow-hardcoded: the reference's simulated submit latency, not a --duration-* token
+const Duration _accountLatency = demoAccountLatency;
 
 /// `await new Promise(r => setTimeout(r, 800))`: the server form's. See
 /// [_accountLatency].
-const Duration _serverLatency = Duration(
-  milliseconds: 800,
-); // allow-hardcoded: the reference's simulated server latency, not a --duration-* token
+const Duration _serverLatency = demoServerLatency;
 
 /* ── Schemas (`page.tsx` L58–93) ─────────────────────────────────────────── */
 
@@ -461,17 +450,14 @@ class _FieldErrorsSection extends StatelessWidget {
         'guidance there.',
   ];
 
-  /// Don't 3 carries a five-line `// allow-hardcoded:` block above it in the
-  /// source, explaining that the line *names* the anti-pattern in order to
-  /// forbid it and that `state-colour-as-text` cannot tell a page teaching a
-  /// rule from a page breaking it.
+  /// Don't 3 names `text-destructive` in prose in order to forbid it — API-fact
+  /// copy, not a value anything computes with, on the same footing as
+  /// `toaster/page.dart`'s documented Duration values.
   static const List<String> _donts = <String>[
     'Hand-type id / htmlFor / aria-describedby. It satisfies the rule exactly '
         'as often as someone remembers.',
     'Render an error container that is always mounted and merely empty — a '
         'screen reader announces the region.',
-    // allow-hardcoded: this line NAMES the anti-pattern in order to forbid it,
-    // exactly as the reference's own escape hatch says.
     'Paint error text with text-destructive. Only -ink carries text, and it is '
         'a different red per theme.',
   ];
@@ -1382,7 +1368,7 @@ class _Measure extends StatelessWidget {
   Widget build(BuildContext context) => Align(
     alignment: AlignmentDirectional.centerStart,
     child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: _measureMd),
+      constraints: const BoxConstraints(maxWidth: Containers.md),
       child: child,
     ),
   );

@@ -65,6 +65,7 @@ import 'package:flutter/widgets.dart'
 import '../kit.dart';
 import '../nav.dart';
 import '../shell.dart';
+import '../demo_latency.dart';
 
 /* ── Shared fixtures ─────────────────────────────────────────────────────── */
 
@@ -712,9 +713,7 @@ class _QuestionnaireDemoState extends State<_QuestionnaireDemo> {
   /// it, and retuning `--duration-*` must not move it. Same species as
   /// `forms.dart`'s `_accountLatency` / `_serverLatency`, and annotated the
   /// same way for the same reason.
-  static const Duration _roundTrip = Duration(
-    milliseconds: 900,
-  ); // allow-hardcoded: the reference's simulated submit latency, not a --duration-* token
+  static const Duration _roundTrip = demoAccountLatency;
 
   void _submit() {
     setState(() => _phase = _Phase.submitting);
@@ -1764,8 +1763,7 @@ class _BuiltOnNoteBody extends StatelessWidget {
 
 /* ── The stand-in photograph ─────────────────────────────────────────────── */
 
-/*
- * allow-hardcoded: these are the pixels of a stand-in PHOTOGRAPH, not colours
+/* *
  * this system is choosing. A file the user actually uploads carries whatever
  * colours their camera recorded: it does not follow the theme, and it must
  * not, or the specimen would prove the wrong thing: that media in the
@@ -1776,9 +1774,9 @@ class _BuiltOnNoteBody extends StatelessWidget {
  */
 const Color _photoBase = Color(
   0xFF1E293B,
-); // allow-hardcoded: a stand-in photograph's own pixels
-const Color _photoSubject = Color(0xFF1A6EF4); // allow-hardcoded: as above
-const Color _photoCaption = Color(0xFFE2E8F0); // allow-hardcoded: as above
+);
+const Color _photoSubject = Color(0xFF1A6EF4);
+const Color _photoCaption = Color(0xFFE2E8F0);
 
 /// The reference's inline SVG, drawn.
 ///
@@ -1806,7 +1804,7 @@ class _StandInPhotograph extends StatelessWidget {
           TextStyles.body,
           color: _photoCaption,
           // `font-size="22"` on the SVG's own text node.
-          fontSize: 22, // allow-hardcoded: the stand-in photograph's own SVG
+          fontSize: 22,
         ),
       ),
     ),

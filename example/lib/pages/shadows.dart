@@ -81,20 +81,17 @@ const double _glowBorderAlpha = 0.40;
 /// `#ambient` and `#machine` override `.type-small`'s own 1.5 with.
 /// `globals.css` declares no `--leading-*` token for it, so it cannot come from
 /// the foundation layer.
-// allow-hardcoded: framework default with no token to read it from.
 const double _leadingSnug = 1.375;
 
 /// Preflight's `b, strong { font-weight: bolder }`. Outside `.prose`,
 /// `globals.css` styles neither `<strong>` nor `<em>`, so the framework default
 /// applies and `bolder` against the inherited 400 computes to exactly this.
-// allow-hardcoded: framework default with no token to read it from.
 const double _bolder = 700;
 
 /// `max-w-sm`, 24rem. Tailwind's **container** scale, which `globals.css` does
 /// not override (shadows-map §0); it is not the spacing scale, so it is not
 /// `space(96)` even though the two coincide here.
-// allow-hardcoded: framework default with no token to read it from.
-const double _measureSm = 384;
+const double _measureSm = Containers.sm;
 
 /// `h-24`: the height every specimen box on this page shares.
 final double _specimenHeight = space(24);

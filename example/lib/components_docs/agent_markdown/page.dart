@@ -660,65 +660,65 @@ const List<DocsApiFact> _prismPaletteFacts = <DocsApiFact>[
     name: 'ground',
     type: 'Color',
     description:
-        'allow-hardcoded: #1e1e1e, vscDarkPlus\'s own background — never '
+        '#1e1e1e, vscDarkPlus\'s own background — never '
         'a theme token, on purpose. See Theming below.',
   ),
   DocsApiFact(
     name: 'plain',
     type: 'Color',
     description:
-        'allow-hardcoded: #d4d4d4, the theme\'s plain-text '
+        '#d4d4d4, the theme\'s plain-text '
         'colour.',
   ),
   DocsApiFact(
     name: 'keyword',
     type: 'Color',
-    description: 'allow-hardcoded: #569cd6.',
+    description: '#569cd6.',
   ),
   DocsApiFact(
     name: 'string',
     type: 'Color',
-    description: 'allow-hardcoded: #ce9178.',
+    description: '#ce9178.',
   ),
   DocsApiFact(
     name: 'number',
     type: 'Color',
-    description: 'allow-hardcoded: #b5cea8.',
+    description: '#b5cea8.',
   ),
   DocsApiFact(
     name: 'function',
     type: 'Color',
-    description: 'allow-hardcoded: #dcdcaa.',
+    description: '#dcdcaa.',
   ),
   DocsApiFact(
     name: 'comment',
     type: 'Color',
-    description: 'allow-hardcoded: #6a9955.',
+    description: '#6a9955.',
   ),
   DocsApiFact(
     name: 'type',
     type: 'Color',
     description:
-        'allow-hardcoded: #4ec9b0 (vscDarkPlus\'s class-name '
+        '#4ec9b0 (vscDarkPlus\'s class-name '
         'colour).',
   ),
   DocsApiFact(
     name: 'padding',
     type: 'double',
-    description: 'allow-hardcoded: 13 (1em at the theme\'s own 13px).',
+    description: '13 (1em at the theme\'s own 13px).',
   ),
   DocsApiFact(
     name: 'margin',
     type: 'double',
     description:
-        'allow-hardcoded: 6.5 (.5em) — real vertical space above '
+        '6.5 (.5em) — real vertical space above '
         'and below the highlighted body.',
   ),
   DocsApiFact(
     name: 'lineHeight',
     type: 'double',
     description:
-        'allow-hardcoded: 19.5 — 13px over Preflight\'s 1.5, and '
+        '19.5 — 13px over Preflight\'s 1.5, and '
         'what actually sets a highlighted line\'s own height.',
   ),
 ];

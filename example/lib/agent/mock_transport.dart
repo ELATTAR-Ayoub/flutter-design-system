@@ -220,9 +220,9 @@ List<_Beat> _scriptFor(String text) {
 
 /// *"Streaming is what makes an agent feel like it is thinking rather than
 /// returning."*
-// allow-hardcoded: `CHUNK`, `CHAR_MS` and `THINK_MS` are this mock's own
-// pacing, tuned by eye in `mock-transport.ts` and stated there. They are not
-// design tokens: nothing renders them and no other surface shares them.
+// `CHUNK`, `CHAR_MS` and `THINK_MS` are this mock's own pacing, tuned by eye
+// in `mock-transport.ts` and stated there. They are not design tokens:
+// nothing renders them and no other surface shares them.
 const int _chunk = 3;
 const int _charMs = 12;
 const int _thinkMs = 420;

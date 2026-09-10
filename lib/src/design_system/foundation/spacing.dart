@@ -205,6 +205,26 @@ class Containers {
   /// danger zone's description column is held to.
   static const double md = 448;
 
+  /// `--container-lg: 32rem` = **512px** — `max-w-lg`.
+  ///
+  /// The measure the inputs page holds a field column to, and the one the
+  /// selection page caps its longest control row at. Added when those two
+  /// reached for it: a rung earns its place here by having a consumer, which
+  /// is the same bar every other rung on this ladder met.
+  static const double lg = 512;
+
+  /// `--container-xl: 36rem` = **576px** — `max-w-xl`.
+  ///
+  /// The floor the charts page's unit-activity scroller holds itself to, so a
+  /// dense figure never compresses below the width its own labels need.
+  static const double xl = 576;
+
+  /// `--container-3xl: 48rem` = **768px** — `max-w-3xl`.
+  ///
+  /// The measure every prose block in the charts page's animation section is
+  /// held to: long-form explanation, capped where a line stops being readable.
+  static const double xl3 = 768;
+
   /// `--container-2xl: 42rem` = **672px** — `max-w-2xl`, the settings column
   /// the dialogs page centres its first danger zone in.
   static const double xl2 = 672;

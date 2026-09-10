@@ -132,9 +132,10 @@ import '../nav.dart';
 /// `max-w-lg`, `--container-lg`, 32rem. Tailwind's **container** scale, which
 /// `globals.css` does not override, so it is not the spacing ladder even where
 /// the two coincide. The measure every `FieldGroup` and the composed `<form>`
-/// are cut to.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureLg = 512;
+/// are cut to. `Containers` has no `lg` rung transcribed — only the rungs the
+/// port already reaches for are — so this file is the source of truth for 512
+/// until another caller needs the same rung.
+const double _measureLg = Containers.lg;
 
 /// `max-w-40`: the Quantity and Referral groups. This one *is* the spacing
 /// scale, so it reads off it.

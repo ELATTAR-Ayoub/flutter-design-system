@@ -147,8 +147,7 @@ class DataTableDemo extends StatefulWidget {
   static double get stackGap => space(4);
 
   /// `max-w-xs` on the filter.
-  // allow-hardcoded: framework container scale with no token to read it from.
-  static const double filterWidth = 320;
+  static const double filterWidth = Containers.xs;
 
   /// `pl-10`: the room the glyph needs.
   static double get filterInset => space(10);

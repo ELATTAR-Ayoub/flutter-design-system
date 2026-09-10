@@ -128,13 +128,14 @@ import '../nav.dart';
 import '../token_swatch.dart';
 
 /// `max-w-3xl`, `--container-3xl`, 48rem. Every prose block in the Animation
-/// section.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measure3xl = 768;
+/// section. Tailwind's container scale step between `Containers.xl2` (672)
+/// and the next one up — not one `Containers` currently declares.
+const double _measure3xl = Containers.xl3;
 
 /// `min-w-xl`, `--container-xl`, 36rem. The unit-activity scroller's floor.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureXl = 576;
+/// The container-scale step between `Containers.md` (448) and
+/// `Containers.xl2` (672) — likewise not one `Containers` currently declares.
+const double _measureXl = Containers.xl;
 
 /// `MetaItem` is a record typedef, so a plain string value has to be wrapped
 /// in the [InlineSpan] the row renders.
@@ -2259,11 +2260,11 @@ class _AaNote extends StatelessWidget {
 
   /// recharts' own inline default fills, quoted as the evidence for the two
   /// contrast failures they caused. Third-party literals this page is
-  /// documenting, not colours it is choosing.
-  // allow-hardcoded: recharts' own inline default tick fill, quoted as copy.
+  /// documenting, not colours it is choosing — the same historical defaults
+  /// `lib/src/components/ui/chart.dart`'s own header explains and does not
+  /// use.
   static const String rechartsTickFill = '#666';
 
-  // allow-hardcoded: the same exemption, for the polar tick's default fill.
   static const String rechartsPolarFill = '#808080';
 
   @override

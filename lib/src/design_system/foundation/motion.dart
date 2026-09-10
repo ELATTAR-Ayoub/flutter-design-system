@@ -395,6 +395,14 @@ class MotionDurations {
   /// run forever, and only on the live indicator"*.
   static const Duration pulseLive = Duration(seconds: 2);
 
+  /// How long a copy control holds its confirmed state before reverting.
+  ///
+  /// Not a transition: the swap into and out of the confirmed glyph runs on
+  /// [MotionDurations.fast]. This is the dwell between them — long enough for
+  /// a reader who looked away mid-click to still catch that the copy landed,
+  /// short enough that a second copy is never blocked by the first.
+  static const Duration copyConfirmation = Duration(seconds: 2);
+
   // ── The interaction utilities' own literals ────────────────────────────
 
   /// `press-spring { transition: transform 0.22s var(--ease-spring) }`

@@ -68,21 +68,18 @@ import 'package:flutter/widgets.dart'
 import '../data_table_demo.dart';
 import '../kit.dart';
 import '../nav.dart';
+import '../demo_latency.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
 /// `max-w-md`, `--container-md`, 28rem.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureMd = 448;
+const double _measureMd = Containers.md;
 
 /// *"A fake network wait, not a motion value. The motion scale describes how
 /// long a thing takes to move; this is how long a server takes to answer, and
 /// the two are unrelated, `--duration-slow` is 400ms and no API is that
 /// polite."*
-const Duration _reloadWait = Duration(
-  milliseconds: 1100,
-); // allow-hardcoded: RELOAD_MS: a network
-// wait, not a motion value; the source says so beside it.
+const Duration _reloadWait = demoReloadWait;
 
 /// `mt-5`: the caption under a specimen.
 double get _captionGap => space(5);
@@ -100,7 +97,6 @@ double get _markerGap => space(6);
 ///
 /// The Filter Effects luminance coefficients: the same numbers the browser
 /// uses for `grayscale(1)`, which is a saturate matrix at amount 0.
-// allow-hardcoded: the CSS Filter Effects grayscale matrix, quoted.
 const ColorFilter _grayscale = ColorFilter.matrix(<double>[
   0.2126, 0.7152, 0.0722, 0, 0, //
   0.2126, 0.7152, 0.0722, 0, 0, //

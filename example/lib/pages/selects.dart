@@ -185,13 +185,11 @@ import '../nav.dart';
 /// `max-w-sm`, `--container-sm`, 24rem. §1's and §2's `FieldGroup`, and §3's
 /// bare `div`. Tailwind's **container** scale, which `globals.css` does not
 /// override, so it is not the spacing ladder even where the two coincide.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureSm = 384;
+const double _measureSm = Containers.sm;
 
 /// `max-w-xs`, `--container-xs`, 20rem. §7's `FieldGroup`, and the only place
 /// on the page that steps down from `sm`.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureXs = 320;
+const double _measureXs = Containers.xs;
 
 /// `w-40` on the three state-cell triggers: the third width case, and the one
 /// [Select.expand] could not spell.

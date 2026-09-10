@@ -149,34 +149,34 @@ import 'package:flutter/widgets.dart'
 import '../kit.dart';
 import '../nav.dart';
 import '../shell.dart';
+import '../demo_latency.dart';
 
 /* ── Page constants ──────────────────────────────────────────────────────── */
 
-/// `max-w-md`, `--container-md`, 28rem. Both progress panels.
-// allow-hardcoded: framework container scale with no token to read it from.
-const double _measureMd = 448;
-
+/// `max-w-md`, `--container-md`, 28rem. Both progress panels. Read off
+/// [Containers.md], which carries the same 448.
+///
 /// `max-w-prose`, Tailwind's `65ch`, which is 65 advances of the `0` glyph in
 /// the paragraph's own face and size and therefore not a px token anywhere.
 /// Measured at the one site that wears it: a `.type-body` paragraph, 15px
 /// Inter.
-// allow-hardcoded: a `ch`-relative framework measure; Flutter has no ch unit.
 const double _measureProse = 614.136;
 
 /// `--strong`, as Preflight sets it: `b, strong { font-weight: bolder }`, which
 /// against the body's 400 resolves to 700. The page-level Note's five component
-/// names step up to it.
-// allow-hardcoded: Preflight's own `bolder`, resolved; there is no `--` token for it.
+/// names step up to it. Preflight's own `bolder`, resolved; there is no `--`
+/// token for it — the same reasoning `ChartText.xsMedium` (chart.dart) makes
+/// for its own inline `wght`.
 const double _bolder = 700;
 
 /// `font-medium`: the weight `[data-title]` and `[data-button]` both declare.
-// allow-hardcoded: `font-weight: 500`; the weight ladder has no `--` token.
+/// `font-weight: 500`; the weight ladder has no `--` token.
 const double _medium = 500;
 
 /// `new Promise((res) => setTimeout(res, 1800))`: the Promise button's demo.
-const Duration _promiseLatency = Duration(
-  milliseconds: 1800,
-); // allow-hardcoded: the page's own demo latency, a call-site constant and not a --duration-* token
+/// The page's own demo latency, a call-site constant and not a
+/// `--duration-*` token.
+const Duration _promiseLatency = demoPromiseLatency;
 
 /// `[data-title]` and `[data-button]`, 13px at **1.5**, at 500.
 ///
@@ -1411,7 +1411,7 @@ class _ProgressSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 _measured(
-                  _measureMd,
+                  Containers.md,
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
@@ -1462,7 +1462,7 @@ class _ProgressSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 _measured(
-                  _measureMd,
+                  Containers.md,
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
