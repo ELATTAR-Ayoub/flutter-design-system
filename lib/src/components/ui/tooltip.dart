@@ -293,7 +293,17 @@ class _TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
     _open = false;
     _byTouch = false;
     if (!_portal.isShowing) return;
-    _animation.duration = effectiveMotionDuration(context, CloseMotion.duration);
+    // `AnimationController.reverse()` prefers `reverseDuration` over
+    // `duration` whenever the former is non-null — and the constructor sets
+    // one (`CloseMotion.duration`, a fixed value) so a caller reading
+    // `_animation.duration` mid-close still sees the right number. Both have
+    // to be reassigned here, or a reduced-motion close ignores this
+    // computed duration and always reverses over the constructor's own
+    // fixed value.
+    final Duration closeDuration = effectiveMotionDuration(context, CloseMotion.duration);
+    _animation
+      ..duration = closeDuration
+      ..reverseDuration = closeDuration;
     _animation.reverse().whenComplete(() {
       if (_animation.value != 0 || !mounted) return;
       _portal.hide();

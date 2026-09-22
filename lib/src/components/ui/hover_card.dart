@@ -142,7 +142,16 @@ class _HoverCardState extends State<HoverCard>
       if (!mounted || _pending != token || _insideCard) return;
       _pending = null;
       if (!_portal.isShowing) return;
-      _animation.duration = effectiveMotionDuration(context, CloseMotion.duration);
+      // `AnimationController.reverse()` prefers `reverseDuration` over
+      // `duration` whenever the former is non-null — and the constructor
+      // sets one (`CloseMotion.duration`, a fixed value). Both have to be
+      // reassigned here, or a reduced-motion close ignores this computed
+      // duration and always reverses over the constructor's own fixed
+      // value.
+      final Duration closeDuration = effectiveMotionDuration(context, CloseMotion.duration);
+      _animation
+        ..duration = closeDuration
+        ..reverseDuration = closeDuration;
       _animation.reverse().whenComplete(() {
         if (_animation.value != 0 || !mounted) return;
         _portal.hide();

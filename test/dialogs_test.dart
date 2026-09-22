@@ -892,6 +892,41 @@ void main() {
       expect(content.left, closeTo(trigger.right, 0.5));
       expect(content.center.dy, closeTo(trigger.center.dy, 0.5));
     });
+
+    testWidgets(
+      'reduced motion collapses the close, same as the open — regression '
+      'for the `reverseDuration` priority over the reassigned `duration`',
+      (WidgetTester t) async {
+        _useFrame(t);
+        await t.pumpWidget(
+          _host(
+            Builder(
+              builder: (BuildContext context) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(disableAnimations: true),
+                child: tip(),
+              ),
+            ),
+          ),
+        );
+        final TestGesture pointer = await t.createGesture(
+          kind: PointerDeviceKind.mouse,
+        );
+        addTearDown(pointer.removePointer);
+        await pointer.addPointer(location: Offset.zero);
+
+        await pointer.moveTo(t.getCenter(find.text('trigger')));
+        await t.pump(MotionDurations.tooltipShowDelay);
+        await t.pump();
+        expect(find.byType(TooltipContent), findsOneWidget);
+
+        await pointer.moveTo(const Offset(2, 2));
+        await t.pump();
+        // No further `overlayEnter`-sized pumps: under `disableAnimations`
+        // the close must collapse to zero and finish in this one frame, the
+        // way the open already does above.
+        expect(find.byType(TooltipContent), findsNothing);
+      },
+    );
   });
 
   // ── the tap path — user-ordered, touch ────────────────────────────────────
@@ -1087,6 +1122,45 @@ void main() {
       await t.pump();
       expect(find.byType(HoverCardContent), findsNothing);
     });
+
+    testWidgets(
+      'reduced motion collapses the close, same as the open — regression '
+      'for the `reverseDuration` priority over the reassigned `duration`',
+      (WidgetTester t) async {
+        _useFrame(t);
+        await t.pumpWidget(
+          _host(
+            Builder(
+              builder: (BuildContext context) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(disableAnimations: true),
+                child: HoverCard(
+                  trigger: Button(onPressed: () {}, child: const Text('trigger')),
+                  content: const SizedBox(height: 120),
+                ),
+              ),
+            ),
+          ),
+        );
+        final TestGesture pointer = await t.createGesture(
+          kind: PointerDeviceKind.mouse,
+        );
+        addTearDown(pointer.removePointer);
+        await pointer.addPointer(location: Offset.zero);
+
+        await pointer.moveTo(t.getCenter(find.text('trigger')));
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 800));
+        expect(find.byType(HoverCardContent), findsOneWidget);
+
+        await pointer.moveTo(const Offset(2, 2));
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 400));
+        // No further `overlayEnter`-sized pumps: under `disableAnimations`
+        // the close must collapse to zero and finish within the closeDelay
+        // window, the way the open already does above.
+        expect(find.byType(HoverCardContent), findsNothing);
+      },
+    );
   });
 
   group('both themes', () {
