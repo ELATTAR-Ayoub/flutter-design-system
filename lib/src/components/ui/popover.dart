@@ -775,7 +775,16 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
       _portal.hide();
       return;
     }
-    _animation.duration = _closeDuration;
+    // `AnimationController.reverse()` prefers `reverseDuration` over
+    // `duration` whenever the former is non-null — and the constructor
+    // below sets one (`CloseMotion.duration`, a fixed 250ms) so that a
+    // caller reading `_animation.duration` mid-close still sees the right
+    // number. Both have to be reassigned here, or a reduced-motion (or
+    // `animate: false`) close ignores `_closeDuration` and always reverses
+    // over the constructor's own fixed value.
+    _animation
+      ..duration = _closeDuration
+      ..reverseDuration = _closeDuration;
     _animation.reverse().whenComplete(() {
       // A reopen mid-exit takes the controller forward again; only the run that
       // actually reached zero may pull the popup.

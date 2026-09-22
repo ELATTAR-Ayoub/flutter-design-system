@@ -10,6 +10,11 @@
       "source": "lib/src/components/ui/keyframes.dart",
       "target": "@ui/keyframes.dart",
       "sha256": "959708e2685fc8ad6ab621339b51026f61c829c8908c11914b9ad3f0c76e219b"
+    },
+    {
+      "source": "lib/src/components/ui/open_transition.dart",
+      "target": "@ui/open_transition.dart",
+      "sha256": "2b309e80e48ddc0b5bb789a14236e0f7953e0a03e55861e14741511dda5d948b"
     }
   ],
   "registryDependencies": [
