@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart'
@@ -14,6 +16,30 @@ import 'package:flutter/widgets.dart'
         Table,
         TableColumnWidth;
 import 'package:flutter_test/flutter_test.dart';
+
+/// Retired 2026-09-22 with the fourteen. A symbol here may appear only in
+/// CHANGELOG.md and docs/references/motion-rename.md.
+const List<String> kRetiredMotionSymbols = <String>[
+  'EntranceMotion', 'SpringEntranceMotion', 'StateChangeMotion',
+  'DiscreteProgressMotion', 'TextRevealMotion', 'TextRevealFrame',
+  'RevealMotion', 'LoadingShimmerMotion', 'LivePulseMotion', 'SweepMotion',
+  'TravelMotion', 'CheckmarkDrawMotion', 'DashDrawMotion', 'DotSelectionMotion',
+  'ContentSwapMotion', 'FadeUp', 'RowMotion', 'MenuMotion', 'InteractiveCard',
+  '_PanelIn', '_FadeIn', '_ConfirmSlide', 'BlurSwitchController',
+  'MotionDurations.reward', 'MotionDurations.popIn', 'MotionDurations.springUp',
+  'MotionDurations.signOn', 'MotionDurations.ratchet', 'MotionDurations.checkDraw',
+  'MotionDurations.dashDraw', 'MotionDurations.dotPop', 'MotionDurations.pressSpringUp',
+  'MotionDurations.copyConfirmation', 'MotionDurations.liftY', 'MotionDurations.keyDownY',
+  'MotionDurations.frame', 'MotionDurations.overlayExit', 'MotionDurations.close',
+  'MotionDurations.collapse',
+  'MotionTransforms.clickSpringScale', 'MotionTransforms.pressSpringScale',
+  'MotionTransforms.buttonPress', 'MotionTransforms.sliderThumbHoverScale',
+  'MotionTransforms.sliderThumbActiveScale', 'MotionTransforms.liftY',
+  'MotionTransforms.keyDownY',
+  'MotionCurves.balanced', 'MotionCurves.decelerate', 'MotionCurves.symmetric',
+  'MotionCurves.linear', 'MotionCurves.vaul',
+  'yuki-', 'pulls-', 'globals.css L',
+];
 
 /// The motion layer: the three interaction utilities the shell and the docs
 /// pages are built out of — `press`, `lift`, and the travelling `slide-pill`
@@ -1198,6 +1224,46 @@ void main() {
       );
       expect(scale.x, 1.0);
       expect(scale.y, 1.0);
+    });
+  });
+
+  group('the fourteen', () {
+    final List<File> sources = <Directory>[
+      Directory('lib'),
+      Directory('example/lib'),
+      Directory('test'),
+    ]
+        .expand((Directory d) => d.listSync(recursive: true))
+        .whereType<File>()
+        .where((File f) => f.path.endsWith('.dart'))
+        .where((File f) => !f.path.endsWith('motion_test.dart'))
+        .toList();
+
+    test('no source names a retired motion symbol', () {
+      final List<String> hits = <String>[];
+      for (final File f in sources) {
+        final String text = f.readAsStringSync();
+        for (final String s in kRetiredMotionSymbols) {
+          if (text.contains(s)) hits.add('${f.path}: $s');
+        }
+      }
+      expect(hits, isEmpty, reason: hits.join('\n'));
+    });
+
+    test('keyframes.dart declares exactly the twelve recipes', () {
+      final String text = File('lib/src/components/ui/keyframes.dart').readAsStringSync();
+      final Iterable<String> declared = RegExp(r'^class (\w+Motion) ', multiLine: true)
+          .allMatches(text)
+          .map((RegExpMatch m) => m.group(1)!);
+      expect(declared.toSet(), <String>{
+        'EnterMotion', 'ExitMotion', 'OpenMotion', 'CloseMotion', 'ExpandMotion',
+        'ChangeMotion', 'SpinMotion', 'ShimmerMotion', 'ProgressMotion',
+        'PulseMotion', 'CaretMotion', 'SwapRollMotion',
+      });
+    });
+
+    test('the press scale is 0.9 and there is only one', () {
+      expect(MotionTransforms.press, 0.9);
     });
   });
 }

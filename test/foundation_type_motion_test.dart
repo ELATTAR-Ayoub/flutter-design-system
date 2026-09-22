@@ -606,8 +606,9 @@ void main() {
       expect(MotionDurations.slow, const Duration(milliseconds: 400));
       expect(MotionDurations.overlayEnter, const Duration(milliseconds: 320));
       expect(MotionDurations.open, const Duration(milliseconds: 420));
-      expect(MotionDurations.reward, const Duration(milliseconds: 550));
       expect(MotionDurations.bloom, const Duration(milliseconds: 1000));
+      // The scale is seven steps. `close`, `collapse`, `overlayExit` were
+      // aliases of `normal` / `overlayEnter` and are read as those now.
       expect(MotionDurations.sway, const Duration(seconds: 44));
       expect(MotionDurations.swayAlt, const Duration(seconds: 33));
     });
