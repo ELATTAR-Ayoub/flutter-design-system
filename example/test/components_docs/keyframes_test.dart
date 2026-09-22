@@ -63,8 +63,9 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// The twelve keyframe tables `lib/src/components/ui/keyframes.dart` exports,
-/// by the class name the API Reference documents them under.
+/// The fourteen names the API Reference and the fourteen cards both show —
+/// the twelve keyframe tables `lib/src/components/ui/keyframes.dart` exports,
+/// plus `Press` and `ActiveIndicator`.
 const List<String> _keyframeNames = <String>[
   'EnterMotion',
   'ExitMotion',
@@ -80,20 +81,23 @@ const List<String> _keyframeNames = <String>[
   'SwapRollMotion',
 ];
 
-const List<String> _exampleKeys = <String>[
-  'keyframes-example:static',
-  'keyframes-example:pop-in',
-  'keyframes-example:jelly',
-  'keyframes-example:spring-up',
-  'keyframes-example:jelly-in',
-  'keyframes-example:change',
-  'keyframes-example:ratchet',
-  'keyframes-example:shimmer',
-  'keyframes-example:pulse-live',
-  'keyframes-example:progress',
-  'keyframes-example:check-draw',
-  'keyframes-example:dash-draw',
-  'keyframes-example:swap-roll',
+/// One card container per motion, keyed `keyframes-example:<id>`, in the
+/// order the page declares them.
+const List<String> _cardIds = <String>[
+  'enter',
+  'exit',
+  'open',
+  'close',
+  'expand',
+  'change',
+  'spin',
+  'shimmer',
+  'progress',
+  'pulse',
+  'caret',
+  'press',
+  'toggle-slide',
+  'swap-roll',
 ];
 
 void main() {
@@ -136,13 +140,17 @@ void main() {
       // keyframe.
       expect(find.textContaining('SwapRollMotion'), findsWidgets);
 
-      for (final String key in _exampleKeys) {
+      for (final String id in _cardIds) {
         expect(
-          find.byKey(ValueKey<String>(key)),
+          find.byKey(ValueKey<String>('keyframes-example:$id')),
           findsOneWidget,
-          reason: 'missing example specimen $key',
+          reason: 'missing card $id',
         );
       }
+      expect(
+        find.byKey(const ValueKey<String>('keyframes-example:replay-all')),
+        findsOneWidget,
+      );
 
       expect(keyframesDoc.name, 'keyframes');
       expect(keyframesDoc.exports, containsAll(_keyframeNames));
@@ -151,7 +159,7 @@ void main() {
     });
 
     testWidgets(
-      'the Preview replay button re-mounts the EnterMotion specimen',
+      "the enter card's Replay button re-mounts its stage without throwing",
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -166,13 +174,13 @@ void main() {
         await tester.pump();
 
         final Finder replay = find.byKey(
-          const ValueKey<String>('keyframes-example:preview-replay'),
+          const ValueKey<String>('keyframes-example:enter-replay'),
         );
         await tester.ensureVisible(replay);
         await tester.pump();
 
-        // Never pumpAndSettle: a bounded pump advances the one-shot player
-        // partway, then the replay tap remounts it under a fresh key.
+        // Never pumpAndSettle: a bounded pump advances the stagger partway,
+        // then the replay tap remounts it under a fresh key.
         await tester.pump();
         await tester.pump(EnterMotion.duration);
         await tester.tap(replay);
@@ -180,16 +188,94 @@ void main() {
         expect(tester.takeException(), isNull);
 
         expect(
-          find.byKey(const ValueKey<String>('keyframes-example:pop-in')),
+          find.byKey(const ValueKey<String>('keyframes-example:enter')),
           findsOneWidget,
         );
       },
     );
 
-    testWidgets('the three loopers advance a bounded frame without throwing', (
+    testWidgets(
+      'the loopers (spin, shimmer, progress, pulse, caret) advance a '
+      'bounded frame without throwing',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ThemeController(mode: ColorMode.dark),
+            child: const KeyframesDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        final Finder spin = find.byKey(
+          const ValueKey<String>('keyframes-example:spin'),
+        );
+        await tester.ensureVisible(spin);
+        await tester.pump();
+
+        // Every looper repeat()s forever: two bounded pumps, never
+        // pumpAndSettle.
+        await tester.pump(const Duration(milliseconds: 500));
+        await tester.pump(const Duration(seconds: 2));
+
+        expect(tester.takeException(), isNull);
+        for (final String id in <String>[
+          'spin',
+          'shimmer',
+          'progress',
+          'pulse',
+          'caret',
+        ]) {
+          expect(
+            find.byKey(ValueKey<String>('keyframes-example:$id')),
+            findsOneWidget,
+          );
+        }
+      },
+    );
+
+    testWidgets(
+      "the swap-roll card's Replay flips its transition without throwing",
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          _harness(
+            controller: ThemeController(mode: ColorMode.dark),
+            child: const KeyframesDocPage(),
+          ),
+        );
+        await tester.pump();
+
+        final Finder swapRoll = find.byKey(
+          const ValueKey<String>('keyframes-example:swap-roll-replay'),
+        );
+        await tester.ensureVisible(swapRoll);
+        await tester.pump();
+
+        await tester.tap(swapRoll);
+        await tester.pump();
+        await tester.pump(MotionDurations.slow);
+        // The beat reverts on its own after MotionDurations.hoverCardShowDelay.
+        await tester.pump(MotionDurations.hoverCardShowDelay);
+
+        expect(tester.takeException(), isNull);
+        expect(
+          find.byKey(const ValueKey<String>('keyframes-example:swap-roll')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets('Replay all bumps every card without throwing', (
       WidgetTester tester,
     ) async {
-      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.physicalSize = const Size(1440, 6000);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
 
@@ -201,54 +287,18 @@ void main() {
       );
       await tester.pump();
 
-      final Finder looping = find.byKey(
-        const ValueKey<String>('keyframes-example:ratchet'),
+      final Finder replayAll = find.byKey(
+        const ValueKey<String>('keyframes-example:replay-all'),
       );
-      await tester.ensureVisible(looping);
+      await tester.ensureVisible(replayAll);
       await tester.pump();
 
-      // The StepCurve ratchet, ShimmerMotion and PulseMotion all repeat() forever: two
-      // bounded pumps, never pumpAndSettle.
+      await tester.tap(replayAll);
+      await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
-      await tester.pump(const Duration(seconds: 2));
+      await tester.pump(MotionDurations.hoverCardShowDelay);
 
       expect(tester.takeException(), isNull);
-      for (final String key in <String>[
-        'keyframes-example:ratchet',
-        'keyframes-example:shimmer',
-        'keyframes-example:pulse-live',
-      ]) {
-        expect(find.byKey(ValueKey<String>(key)), findsOneWidget);
-      }
-    });
-
-    testWidgets('the Transition specimen rolls on tap', (
-      WidgetTester tester,
-    ) async {
-      tester.view.physicalSize = const Size(1440, 900);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-
-      await tester.pumpWidget(
-        _harness(
-          controller: ThemeController(mode: ColorMode.dark),
-          child: const KeyframesDocPage(),
-        ),
-      );
-      await tester.pump();
-
-      final Finder swapRoll = find.byKey(
-        const ValueKey<String>('keyframes-example:swap-roll'),
-      );
-      await tester.ensureVisible(swapRoll);
-      await tester.pump();
-
-      await tester.tap(swapRoll);
-      await tester.pump();
-      await tester.pump(MotionDurations.slow);
-
-      expect(tester.takeException(), isNull);
-      expect(swapRoll, findsOneWidget);
     });
 
     testWidgets('the page is declared, and every section is a kit component', (
@@ -266,9 +316,8 @@ void main() {
       );
       await tester.pump();
 
-      // Six EffectSection stages: Preview, Entrance & Exit, Looping,
-      // Progress, Selection Draw, Transition.
-      expect(find.byType(DocsShowcase), findsNWidgets(6));
+      // One EffectSection stage: The fourteen.
+      expect(find.byType(DocsShowcase), findsNWidgets(1));
       expect(find.byType(DocsInstall), findsOneWidget);
       expect(find.byType(DocsDisclosure), findsNWidgets(8));
     });
@@ -277,14 +326,9 @@ void main() {
       expect(
         keyframesDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
         <String>[
-          'Preview',
+          'The fourteen',
           'Installation',
           'Usage',
-          'Entrance & Exit',
-          'Looping',
-          'Progress',
-          'Selection Draw',
-          'Transition',
           'API Reference',
           'States',
           'Accessibility',
@@ -318,14 +362,9 @@ void main() {
           .toList();
 
       expect(titles, <String>[
-        'Preview',
+        'The fourteen',
         'Installation',
         'Usage',
-        'Entrance & Exit',
-        'Looping',
-        'Progress',
-        'Selection Draw',
-        'Transition',
         'API Reference',
         'States',
         'Accessibility',

@@ -4,9 +4,10 @@
 /// (`lib/src/components/ui/press.dart`) carries no variant enum and paints nothing
 /// of its own: it reads a `child` and wraps it in a `Listener` plus a
 /// `Transform.scale`, so the thing worth looking at is what it does to a
-/// host, not a specimen of the widget in isolation. Every non-Preview
-/// section here stages a host with and without the wrapper, exactly as the
-/// brief for this page asks.
+/// host, not a specimen of the widget in isolation. The Preview stages four
+/// real hosts — a `Button`, a `Badge`, a row and a `Card` — each wrapped in
+/// `Press`, because "anything clickable" is the claim and a single chip
+/// under-proves it.
 ///
 /// **House shape, motion edition.** Preview, Installation, Usage, then the
 /// one `EffectSection` `Press` actually has — the default squish, which is
@@ -53,13 +54,13 @@ final ComponentDocSpec pressMotionDocSpec = ComponentDocSpec(
       id: 'preview',
       title: 'Preview',
       description:
-          'Press either chip. The left one is wrapped in Press: the '
-          'instant a pointer goes down it squishes to MotionTransforms.'
-          'press (0.9) over MotionDurations.pressIn (40ms), then '
-          'springs back over MotionDurations.normal (250ms) on release — the '
-          'asymmetry the source calls "the whole feel." The right one is '
-          'the same chip, unwrapped, for comparison against no press '
-          'feedback at all.',
+          'One class, Press. Anything clickable shrinks to 90% the '
+          'instant you press it and springs back when you let go — here, '
+          'a Button, a Badge, a row and a Card, each wrapped in Press. '
+          'The instant a pointer goes down each squishes to '
+          'MotionTransforms.press (0.9) over MotionDurations.pressIn '
+          '(40ms), then springs back over MotionDurations.normal (250ms) '
+          'on release — the asymmetry the source calls "the whole feel."',
       host: const _PreviewHost(),
       code: _previewCode,
       label: 'Preview specimen view',
@@ -209,39 +210,6 @@ class PressDocPage extends StatelessWidget {
 
 /* ── Shared specimen shape ──────────────────────────────────────────────── */
 
-double get _chipHeight => space(10);
-
-class _CaptionedPair extends StatelessWidget {
-  const _CaptionedPair({
-    required this.leftCaption,
-    required this.left,
-    required this.rightCaption,
-    required this.right,
-  });
-
-  final String leftCaption;
-  final Widget left;
-  final String rightCaption;
-  final Widget right;
-
-  @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: space(2)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _Captioned(caption: leftCaption, child: left),
-          SizedBox(width: space(8)),
-          _Captioned(caption: rightCaption, child: right),
-        ],
-      ),
-    ),
-  );
-}
-
 class _Captioned extends StatelessWidget {
   const _Captioned({required this.caption, required this.child});
 
@@ -264,24 +232,35 @@ class _Captioned extends StatelessWidget {
   );
 }
 
-class _Chip extends StatelessWidget {
-  const _Chip({required this.label});
-
-  final String label;
+/// The row host — a nav-row shape, the fourth clickable surface Press
+/// wraps in the Preview: a `Button`, a `Badge`, this row, and a `Card`.
+class _Row extends StatelessWidget {
+  const _Row();
 
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
     return Container(
-      height: _chipHeight,
-      padding: EdgeInsets.symmetric(horizontal: space(5)),
-      alignment: Alignment.center,
+      width: space(48),
+      padding: EdgeInsets.symmetric(horizontal: space(4), vertical: space(3)),
       decoration: BoxDecoration(
         color: theme.card,
-        borderRadius: BorderRadius.circular(Radii.full),
+        borderRadius: BorderRadius.circular(Radii.md),
         border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
-      child: StyledText(label, TextStyles.small, color: theme.foreground),
+      child: Row(
+        children: <Widget>[
+          const Icon(IconGlyph.bell, size: IconSize.sm, tone: IconTone.action),
+          SizedBox(width: space(3)),
+          Expanded(
+            child: StyledText(
+              'Inbox',
+              TextStyles.small,
+              color: theme.foreground,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -292,29 +271,80 @@ class _PreviewHost extends StatelessWidget {
   const _PreviewHost();
 
   @override
-  Widget build(BuildContext context) => _CaptionedPair(
-    leftCaption: 'Press(child: chip)',
-    left: SizedBox(
-      key: const ValueKey<String>('press-example:wrapped'),
-      child: Press(child: const _Chip(label: 'Press me')),
-    ),
-    rightCaption: 'chip, unwrapped',
-    right: const SizedBox(
-      key: ValueKey<String>('press-example:bare'),
-      child: _Chip(label: 'Nothing happens'),
+  Widget build(BuildContext context) => SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Padding(
+      padding: EdgeInsets.symmetric(horizontal: space(2)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          _Captioned(
+            caption: 'Press(child: Button(…))',
+            child: SizedBox(
+              key: const ValueKey<String>('press-example:button'),
+              child: Press(
+                child: Button(
+                  variant: ButtonVariant.outline,
+                  suppressPressScale: true,
+                  onPressed: () {},
+                  child: const Text('Continue'),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: space(8)),
+          _Captioned(
+            caption: 'Press(child: Badge(…))',
+            child: SizedBox(
+              key: const ValueKey<String>('press-example:badge'),
+              child: Press(
+                child: const Badge(label: 'New', variant: BadgeVariant.primary),
+              ),
+            ),
+          ),
+          SizedBox(width: space(8)),
+          _Captioned(
+            caption: 'Press(child: row)',
+            child: SizedBox(
+              key: const ValueKey<String>('press-example:row'),
+              child: Press(child: const _Row()),
+            ),
+          ),
+          SizedBox(width: space(8)),
+          _Captioned(
+            caption: 'Press(child: Card(…))',
+            child: SizedBox(
+              key: const ValueKey<String>('press-example:card'),
+              width: space(48),
+              child: Press(
+                child: Card(
+                  children: <Widget>[
+                    CardContent(
+                      child: StyledText(
+                        'Tap the card',
+                        TextStyles.small,
+                        color: ThemeScope.of(context).foreground,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }
 
 const String _previewCode =
     "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-    '// Without: no feedback at all on pointer-down.\n'
-    "Text('Nothing happens')\n\n"
-    '// With: Press squishes the child on pointer-down and springs it\n'
-    '// back on release.\n'
-    'Press(\n'
-    "  child: const Text('Press me'),\n"
-    ')';
+    '// Anything clickable, wrapped once:\n'
+    'Press(child: Button(onPressed: () {}, child: const Text(\'Continue\')))\n'
+    "Press(child: const Badge(label: 'New'))\n"
+    'Press(child: navRow)\n'
+    'Press(child: Card(children: [CardContent(child: …)]))';
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
 
@@ -600,8 +630,8 @@ class _ThemingContent extends StatelessWidget {
         'Press reads no Color at all: it never calls ThemeScope.of(context) '
             'and paints nothing beyond a Transform.scale around child. '
             'Every colour a reader sees on this page\'s specimens comes '
-            'from the chip host this page builds around it, not from '
-            'Press itself.',
+            'from the Button, Badge, row and Card hosts this page builds '
+            'around it, not from Press itself.',
         'The two durations it does read — downDuration and upDuration — '
             'are resolved through effectiveMotionDuration on every build, so '
             'MediaQuery.disableAnimations collapses both to zero: a '

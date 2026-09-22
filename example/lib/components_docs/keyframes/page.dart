@@ -5,15 +5,12 @@
 /// twelve data tables (`EnterMotion`, `ExitMotion`, … `SwapRollMotion`) plus
 /// one player, `KeyframePlayer`. `SwapRollMotion` is the twelfth and the odd
 /// one out — a transition table, explicitly documented as not a keyframe at
-/// all. Every section below stages one or several of the twelve running on
-/// a representative host, grouped the way the source file itself groups
-/// them (§D the twelve recipes, §the selection-control pair, one transition
-/// at the end).
-///
-/// **Twelve, not fourteen.** The API Reference table below has exactly
-/// twelve rows — the recipes this file declares. `Press` and
-/// `ActiveIndicator` are the other two names in the fourteen-name
-/// vocabulary, each documented on its own page.
+/// all. `Press` and `ActiveIndicator` round the vocabulary out to fourteen,
+/// each with its own page, but every one of the fourteen is worth seeing on
+/// the piece of UI it actually animates rather than as a bare animated box —
+/// so this page's one specimen section is fourteen cards, one per motion,
+/// each staged on a representative host with its own Replay, plus one
+/// Replay all.
 ///
 /// **`pumpAndSettle` never appears in this page's own test.** `SpinMotion`,
 /// `ShimmerMotion`, `ProgressMotion` and `PulseMotion` all run on a
@@ -24,9 +21,10 @@
 /// for the same tables.
 library;
 
-import 'dart:math' as math;
+import 'dart:async';
 
 import 'package:elattar_design_system/elattar_design_system.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
@@ -52,18 +50,21 @@ final ComponentDocSpec keyframesDocSpec = ComponentDocSpec(
   description: keyframesDoc.description,
   sections: <DocsPageSection>[
     EffectSection(
-      id: 'preview',
-      title: 'Preview',
+      id: 'the-fourteen',
+      title: 'The fourteen',
       description:
-          'The same notification chip, twice. The left one is static: no '
-          'KeyframePlayer wraps it. The right one is driven by EnterMotion — '
-          'opacity 0 → 1, a 12px rise to 0 and a 0.97 → 1 scale, together, '
-          'over EnterMotion.duration (slow, 400ms) on MotionCurves.enter, '
-          'fill: both. Replay remounts it, matching how the reference itself '
-          'replays: a fresh key, not a restarted controller.',
-      host: const _PreviewHost(),
-      code: _previewCode,
-      label: 'Preview specimen view',
+          "Use one of these; don't write a new keyframe. They all live in "
+          'lib/src/components/ui/keyframes.dart — change that file and '
+          'every component follows. Each card plays on the piece of UI it '
+          'actually animates: a dialog on its scrim, a list of rows, a '
+          'skeleton, the OTP caret, a button being pressed. Replay remounts '
+          'a card under a fresh key, or — for the three that answer a '
+          'state change rather than a mount (exit, close, press, '
+          'toggle-slide, swap-roll are transitions) — flips the same state '
+          'the real component flips, for a beat and back.',
+      host: const _FourteenGrid(),
+      code: _fourteenCode,
+      label: 'The fourteen specimen view',
     ),
     InstallSection(
       id: 'install',
@@ -105,84 +106,6 @@ final ComponentDocSpec keyframesDocSpec = ComponentDocSpec(
           'progress to builder; the easing lives in the table\'s own '
           'Animatable, never in the player.',
       code: _usageCode,
-    ),
-    EffectSection(
-      id: 'entrance',
-      title: 'Entrance & Exit',
-      description:
-          'Six of the nine anim-* tables the motion page demonstrates: '
-          'each runs once and holds its final stop (fill: both). Replay '
-          'remounts all six under a fresh key, the way the reference '
-          'itself replays — a freshly keyed element restarting its CSS '
-          'animation from t=0, never a rewound controller.',
-      host: const _EntranceHost(),
-      code: _entranceCode,
-      label: 'Entrance and exit specimen view',
-    ),
-    EffectSection(
-      id: 'looping',
-      title: 'Looping',
-      description:
-          'ShimmerMotion (a sweeping gradient band) and PulseMotion (an '
-          'expanding, fading ring around a live dot) both declare no fill '
-          'mode at all. A bare StepCurve(8) sits beside them — never shows '
-          '360°, and has no recipe of its own. All three repeat forever, '
-          'and all three revert to their resting style — stop 0 — the '
-          'instant reduced motion stills them, rather than holding a '
-          'frozen frame the way the six above do.',
-      host: const _LoopingHost(),
-      code: _loopingCode,
-      label: 'Looping specimen view',
-      minHeight: space(56),
-    ),
-    EffectSection(
-      id: 'progress',
-      title: 'Progress',
-      description:
-          'The motion page\'s own two tables, declared for its duration '
-          'and easing panels rather than for a named anim-* utility. The '
-          'sweep bar genuinely fills, 0 → 1, over whichever MotionDurations '
-          'rung its own row demonstrates. The travel chip is a verified '
-          'no-op at its one real call site: a CSS percentage inside '
-          'translateX resolves against the translated element\'s OWN '
-          'border box, and that element is the 24px chip itself, so '
-          '`calc(100% - 1.5rem)` evaluates to 0px and the chip never '
-          'moves — only the easing panel around it communicates the '
-          'curve.',
-      host: const _ProgressHost(),
-      code: _progressCode,
-      label: 'Progress specimen view',
-    ),
-    EffectSection(
-      id: 'selection-draw',
-      title: 'Selection Draw',
-      description:
-          'Three tables that belong to the checkbox and the radio, and '
-          'appear on no motion page at all: ChangeMotion and ChangeMotion '
-          'both animate a CSS stroke-dashoffset, transcribed as a '
-          '"drawn fraction" a caller reveals a path through; ChangeMotion is '
-          'the radio dot arriving, the one table in the file that runs on '
-          'MotionCurves.emphasized rather than MotionCurves.enter and overshoots twice '
-          'over — once in the keyframe\'s own 1.35 stop, once again from '
-          'the spring curve between stops.',
-      host: const _SelectionDrawHost(),
-      code: _selectionDrawCode,
-      label: 'Selection draw specimen view',
-    ),
-    EffectSection(
-      id: 'transition',
-      title: 'Transition',
-      description:
-          'SwapRollMotion is the one entry in this file that is not a '
-          'keyframe: a transition, with no stops, only a from-state and a '
-          'to-state. Tap to flip it. Both transform and opacity ride '
-          'MotionCurves.emphasized over MotionDurations.slow (400ms), and because the '
-          'curve exceeds 1 partway through, opacity clamps early — full '
-          'opacity lands at roughly 147ms of the 400ms roll, a real '
-          'crossfade the panel\'s own copy says does not happen.',
-      host: const _TransitionHost(),
-      code: _transitionCode,
-      label: 'Transition specimen view',
     ),
     DisclosureSection(
       id: 'api',
@@ -291,493 +214,1084 @@ class KeyframesDocPage extends StatelessWidget {
   );
 }
 
-/* ── Shared specimen shape ──────────────────────────────────────────────── */
+/* ── The fourteen ────────────────────────────────────────────────────────── */
 
-class _Captioned extends StatelessWidget {
-  const _Captioned({required this.caption, required this.child});
+/// One card's spec: its name (as code), its one-line "what it is for", and
+/// the stage it plays on.
+class _CardSpec {
+  const _CardSpec({
+    required this.id,
+    required this.name,
+    required this.what,
+    required this.builder,
+    this.transition = false,
+  });
 
-  final String caption;
-  final Widget child;
+  /// A short, key-safe id — `keyframes-example:<id>`.
+  final String id;
+
+  /// The class name, shown as code in the card header.
+  final String name;
+
+  /// The one-line caption, adapted from the web reference verbatim where the
+  /// web names a CSS custom property or utility this Dart API replaces.
+  final String what;
+
+  /// True for the five cards that answer a state change rather than a
+  /// mount: Replay flips a flag for a beat (`MotionDurations.hoverCardShowDelay`,
+  /// 700ms — an existing token, reused rather than a new literal) and back,
+  /// exactly as `on` did on the reference page. Every other card remounts
+  /// under a fresh key.
+  final bool transition;
+
+  /// Builds the stage. [run] is the remount counter (bumped by this card's
+  /// own Replay and by Replay all); [on] is true for the beat after a
+  /// transition Replay.
+  final Widget Function(BuildContext context, int run, bool on) builder;
+}
+
+/// The four rows [_enterStage] and [_exitStage] both stage.
+class _StageRow extends StatelessWidget {
+  const _StageRow({this.opacity = 1, this.translateY = 0, this.scale = 1});
+
+  final double opacity;
+  final double translateY;
+  final double scale;
+
+  static double get width => space(40);
+  static double get height => space(6);
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Opacity(
+      opacity: opacity.clamp(0.0, 1.0),
+      child: Transform.translate(
+        offset: Offset(0, translateY),
+        child: Transform.scale(
+          scale: scale,
+          child: Container(
+            width: width,
+            height: height,
+            padding: EdgeInsets.symmetric(horizontal: space(2)),
+            alignment: Alignment.centerLeft,
+            decoration: BoxDecoration(
+              color: theme.card,
+              border: Border.all(
+                color: theme.border,
+                width: BorderWidths.hairline,
+              ),
+              borderRadius: BorderRadius.circular(Radii.md),
+            ),
+            child: Container(
+              height: space(1.5),
+              width: space(20),
+              decoration: BoxDecoration(
+                color: theme.muted,
+                borderRadius: BorderRadius.circular(Radii.full),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// enter — four rows, staggered with [EnterMotion.delayFor].
+///
+/// One controller runs the whole stagger; each row reads its own local
+/// progress off it rather than owning a player of its own, which is what
+/// lets `EnterMotion.delayFor(index)` — the stagger step the reference
+/// spells `--enter-stage` — read the same way a caller reads it.
+class _EnterRows extends StatefulWidget {
+  const _EnterRows();
+
+  @override
+  State<_EnterRows> createState() => _EnterRowsState();
+}
+
+class _EnterRowsState extends State<_EnterRows>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  static Duration get _total => EnterMotion.duration + EnterMotion.delayFor(3);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: _total)
+      ..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _controller,
+    builder: (BuildContext context, Widget? child) => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        for (int i = 0; i < 4; i++) ...<Widget>[
+          if (i > 0) SizedBox(height: space(1.5)),
+          _rowAt(i),
+        ],
+      ],
+    ),
+  );
+
+  Widget _rowAt(int i) {
+    final double elapsedMs =
+        _controller.value * _total.inMilliseconds.toDouble();
+    final double delayMs = EnterMotion.delayFor(i).inMilliseconds.toDouble();
+    final double durationMs = EnterMotion.duration.inMilliseconds.toDouble();
+    final double local = durationMs == 0
+        ? 1
+        : ((elapsedMs - delayMs) / durationMs).clamp(0.0, 1.0);
+    return _StageRow(
+      opacity: EnterMotion.opacity.transform(local),
+      translateY: EnterMotion.translateY.transform(local),
+      scale: EnterMotion.scale.transform(local),
+    );
+  }
+}
+
+Widget _enterStage(BuildContext context, int run, bool on) =>
+    KeyedSubtree(key: ValueKey<String>('enter-$run'), child: const _EnterRows());
+
+/// exit — the same four rows, statically at rest; the second one leaves on
+/// Replay (playing [ExitMotion] once) and comes back — no animation class at
+/// all once the beat ends, exactly as the reference's `still` rows carry
+/// none.
+class _ExitRows extends StatelessWidget {
+  const _ExitRows({required this.run, required this.on});
+
+  final int run;
+  final bool on;
 
   @override
   Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      child,
-      SizedBox(height: space(2)),
-      StyledText(
-        caption,
-        TextStyles.small,
-        color: ThemeScope.of(context).mutedForeground,
-      ),
+      for (int i = 0; i < 4; i++) ...<Widget>[
+        if (i > 0) SizedBox(height: space(1.5)),
+        if (i == 1 && on)
+          KeyedSubtree(
+            key: ValueKey<String>('exit-$run'),
+            child: KeyframePlayer(
+              duration: ExitMotion.duration,
+              fill: ExitMotion.fill,
+              builder: (BuildContext context, double t, Widget? child) =>
+                  _StageRow(
+                    opacity: ExitMotion.opacity.transform(t),
+                    translateY: ExitMotion.translateY.transform(t),
+                    scale: ExitMotion.scale.transform(t),
+                  ),
+            ),
+          )
+        else
+          const _StageRow(),
+      ],
     ],
   );
 }
 
-class _Row extends StatelessWidget {
-  const _Row({required this.children});
+Widget _exitStage(BuildContext context, int run, bool on) =>
+    _ExitRows(run: run, on: on);
 
-  final List<Widget> children;
+/// The scrim alpha the reference's `bg-background/60` names, shared by the
+/// open and close stages.
+const double _scrimAlpha = 0.6;
+
+// Title only, no description: the card's stage area is a fixed
+// space(36) high, and a two-line CardHeader does not fit it once the
+// scrim and the stage's own padding are accounted for.
+Widget _overlayDialog(BuildContext context) => SizedBox(
+  width: space(44),
+  child: const Card(children: <Widget>[CardHeader(title: CardTitle('Delete pack?'))]),
+);
+
+/// open — a dialog on its scrim, driven forward once per remount by
+/// [OpenTransition].
+class _OpenStage extends StatefulWidget {
+  const _OpenStage();
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: space(2)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          for (int i = 0; i < children.length; i++) ...<Widget>[
-            if (i > 0) SizedBox(width: space(6)),
-            children[i],
-          ],
-        ],
+  State<_OpenStage> createState() => _OpenStageState();
+}
+
+class _OpenStageState extends State<_OpenStage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: OpenMotion.duration)
+      ..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
+    // No fixed size: the Stack takes the dialog's own natural size (the one
+    // non-positioned child), so text scaled to 200% grows the card instead
+    // of overflowing a pixel box.
+    return Stack(
+      alignment: Alignment.center,
+      children: <Widget>[
+        Positioned.fill(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (BuildContext context, Widget? child) => Opacity(
+              opacity:
+                  EnterMotion.opacity.transform(_controller.value).clamp(
+                        0.0,
+                        1.0,
+                      ) *
+                  _scrimAlpha,
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: theme.background),
+              ),
+            ),
+          ),
+        ),
+        OpenTransition(animation: _controller, child: _overlayDialog(context)),
+      ],
+    );
+  }
+}
+
+Widget _openStage(BuildContext context, int run, bool on) =>
+    KeyedSubtree(key: ValueKey<String>('open-$run'), child: const _OpenStage());
+
+/// close — the same overlay leaving. Replay reverses the controller
+/// (playing [CloseMotion]); when the beat ends the dialog pops back, no
+/// animation at all, matching the reference's own edge.
+class _CloseStage extends StatefulWidget {
+  const _CloseStage({required this.on});
+
+  final bool on;
+
+  @override
+  State<_CloseStage> createState() => _CloseStageState();
+}
+
+class _CloseStageState extends State<_CloseStage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      value: 1,
+      duration: OpenMotion.duration,
+      reverseDuration: CloseMotion.duration,
+    );
+  }
+
+  @override
+  void didUpdateWidget(_CloseStage old) {
+    super.didUpdateWidget(old);
+    if (widget.on && !old.on) {
+      _controller.reverse(from: 1);
+    } else if (!widget.on && old.on) {
+      _controller.value = 1;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Stack(
+      alignment: Alignment.center,
+      children: <Widget>[
+        Positioned.fill(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (BuildContext context, Widget? child) => Opacity(
+              opacity: _controller.value.clamp(0.0, 1.0) * _scrimAlpha,
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: theme.background),
+              ),
+            ),
+          ),
+        ),
+        OpenTransition(animation: _controller, child: _overlayDialog(context)),
+      ],
+    );
+  }
+}
+
+Widget _closeStage(BuildContext context, int run, bool on) =>
+    _CloseStage(on: on);
+
+/// expand — a real [Accordion] panel, auto-opened one frame after each
+/// remount, the way the reference's own key-remounted div plays its unfold
+/// on mount rather than waiting for a tap.
+class _ExpandStage extends StatefulWidget {
+  const _ExpandStage();
+
+  @override
+  State<_ExpandStage> createState() => _ExpandStageState();
+}
+
+class _ExpandStageState extends State<_ExpandStage> {
+  bool _open = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _open = true);
+    });
+  }
+
+  @override
+  // Unconstrained width — a narrower box risks the trigger label and
+  // content wrapping to a second line, which, combined with
+  // MotionCurves.emphasized's own overshoot on the way open, is what
+  // pushed the panel a fraction of a pixel past this card's fixed
+  // space(36) stage.
+  Widget build(BuildContext context) => Accordion(
+    items: <AccordionItem>[
+      AccordionItem(
+        title: 'Shipping',
+        content: StyledText(
+          'Ships free.',
+          TextStyles.small,
+          color: ThemeScope.of(context).mutedForeground,
+        ),
+      ),
+    ],
+    openIndex: _open ? 0 : null,
+    // Decorative: this card auto-plays the unfold rather than waiting on
+    // a tap, matching the reference's own key-remounted specimen.
+    onChanged: (int? _) {},
+  );
+}
+
+Widget _expandStage(BuildContext context, int run, bool on) => KeyedSubtree(
+  key: ValueKey<String>('expand-$run'),
+  child: const _ExpandStage(),
+);
+
+/// change — a value tile that flips between two figures, squashing in with
+/// [ChangeMotion] on every remount.
+Widget _changeStage(BuildContext context, int run, bool on) {
+  final ThemeTokens theme = ThemeScope.of(context);
+  return KeyedSubtree(
+    key: ValueKey<String>('change-$run'),
+    child: KeyframePlayer(
+      duration: ChangeMotion.duration,
+      fill: ChangeMotion.fill,
+      builder: (BuildContext context, double t, Widget? child) {
+        final Offset scale = ChangeMotion.scale.transform(t);
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.diagonal3Values(scale.dx, scale.dy, 1),
+          child: child,
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: space(6), vertical: space(3)),
+        decoration: BoxDecoration(
+          color: theme.card,
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
+          borderRadius: BorderRadius.circular(Radii.lg),
+        ),
+        child: StyledText(
+          run.isEven ? r'$1,240' : r'$2,480',
+          TextStyles.numberMd,
+          color: theme.premiumText,
+        ),
       ),
     ),
   );
 }
 
-class _Chip extends StatelessWidget {
-  const _Chip({required this.child, this.keyValue});
+/// spin — the real [Spinner].
+Widget _spinStage(BuildContext context, int run, bool on) => KeyedSubtree(
+  key: ValueKey<String>('spin-$run'),
+  child: Spinner(size: space(8)),
+);
 
-  final Widget child;
+/// shimmer — three real [Skeleton]s.
+Widget _shimmerStage(BuildContext context, int run, bool on) => KeyedSubtree(
+  key: ValueKey<String>('shimmer-$run'),
+  child: SizedBox(
+    width: space(40),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Skeleton(height: space(3)),
+        SizedBox(height: space(2)),
+        Skeleton(height: space(3), width: space(30)),
+        SizedBox(height: space(2)),
+        Skeleton(height: space(3), width: space(20)),
+      ],
+    ),
+  ),
+);
+
+/// progress — an indeterminate sweep built from [ProgressMotion] directly.
+///
+/// DEVIATION FROM BRIEF: the brief asks for "the real `Progress()` with no
+/// value", but `lib/src/components/ui/progress.dart`'s [Progress] declares
+/// `value` as a required, non-nullable `double` — the port never grew an
+/// indeterminate mode, so there is no such call to make. This reproduces the
+/// same sweep the pre-existing Progress section on this page already built
+/// from [ProgressMotion] and a themed channel, rather than inventing a fake
+/// widget or silently skipping the card.
+Widget _progressStage(BuildContext context, int run, bool on) {
+  final ThemeTokens theme = ThemeScope.of(context);
+  return KeyedSubtree(
+    key: ValueKey<String>('progress-$run'),
+    child: SizedBox(
+      width: space(40),
+      height: space(3),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(Radii.sm),
+        child: DecoratedBox(
+          decoration: BoxDecoration(color: theme.muted),
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) =>
+                KeyframePlayer(
+                  duration: ProgressMotion.duration,
+                  fill: KeyframeFill.none,
+                  repeat: true,
+                  builder: (BuildContext context, double t, Widget? child) {
+                    final double width = constraints.maxWidth;
+                    final double fraction =
+                        ProgressMotion.fromFraction +
+                        (ProgressMotion.toFraction -
+                                ProgressMotion.fromFraction) *
+                            t;
+                    return Transform.translate(
+                      offset: Offset(fraction * width, 0),
+                      child: SizedBox(
+                        width: width * ProgressMotion.sliverFraction,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(color: theme.primary),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/// pulse — the live dot, [PulseMotion]'s ring painted around it.
+Widget _pulseStage(BuildContext context, int run, bool on) => KeyedSubtree(
+  key: ValueKey<String>('pulse-$run'),
+  child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      SizedBox(
+        width: space(6),
+        height: space(6),
+        child: KeyframePlayer(
+          duration: PulseMotion.duration,
+          fill: PulseMotion.fill,
+          repeat: PulseMotion.loops,
+          builder: (BuildContext context, double t, Widget? child) =>
+              CustomPaint(painter: _PulseLivePainter(t: t)),
+        ),
+      ),
+      SizedBox(width: space(2)),
+      StyledText(
+        'Live',
+        TextStyles.small,
+        color: ThemeScope.of(context).successText,
+      ),
+    ],
+  ),
+);
+
+/// caret — four OTP boxes, the third carrying [CaretMotion]'s hard-cut
+/// blink.
+Widget _caretStage(BuildContext context, int run, bool on) {
+  final ThemeTokens theme = ThemeScope.of(context);
+  const List<String> digits = <String>['4', '8', '', ''];
+  return KeyedSubtree(
+    key: ValueKey<String>('caret-$run'),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (int i = 0; i < 4; i++) ...<Widget>[
+          if (i > 0) SizedBox(width: space(1.5)),
+          Container(
+            width: space(7),
+            height: space(9),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: theme.card,
+              border: Border.all(
+                color: theme.border,
+                width: BorderWidths.hairline,
+              ),
+              borderRadius: BorderRadius.circular(Radii.md),
+            ),
+            child: i == 2
+                ? KeyframePlayer(
+                    duration: CaretMotion.duration,
+                    fill: KeyframeFill.none,
+                    repeat: CaretMotion.loops,
+                    builder: (BuildContext context, double t, Widget? child) =>
+                        Opacity(
+                          opacity: CaretMotion.visibleAt(t) ? 1 : 0,
+                          child: child,
+                        ),
+                    child: Container(
+                      width: BorderWidths.hairline,
+                      height: space(4),
+                      color: theme.foreground,
+                    ),
+                  )
+                : StyledText(
+                    digits[i],
+                    TextStyles.numberSm,
+                    color: theme.foreground,
+                  ),
+          ),
+        ],
+      ],
+    ),
+  );
+}
+
+/// press — a real [Button], driven into its own pressed state by a
+/// synthetic pointer down and, [MotionDurations.hoverCardShowDelay] (700ms
+/// — an existing token, not a new literal) later, a synthetic pointer up.
+/// [Button.suppressPressScale] is not set: the squish shown is the button's
+/// own, exactly as a real press produces it — this card is not a `Press`
+/// demo, `Press` already has its own page.
+class _PressStage extends StatefulWidget {
+  const _PressStage({required this.on});
+
+  final bool on;
+
+  @override
+  State<_PressStage> createState() => _PressStageState();
+}
+
+class _PressStageState extends State<_PressStage> {
+  final GlobalKey _buttonKey = GlobalKey();
+  int _pointer = 0;
+
+  @override
+  void didUpdateWidget(_PressStage old) {
+    super.didUpdateWidget(old);
+    if (widget.on && !old.on) _sendDown();
+    if (!widget.on && old.on) _sendUp();
+  }
+
+  Offset? _center() {
+    final RenderObject? object = _buttonKey.currentContext
+        ?.findRenderObject();
+    if (object is! RenderBox || !object.hasSize) return null;
+    return object.localToGlobal(object.size.center(Offset.zero));
+  }
+
+  void _sendDown() {
+    final Offset? center = _center();
+    if (center == null) return;
+    _pointer += 1;
+    GestureBinding.instance.handlePointerEvent(
+      PointerDownEvent(pointer: _pointer, position: center),
+    );
+  }
+
+  void _sendUp() {
+    final Offset? center = _center();
+    if (center == null) return;
+    GestureBinding.instance.handlePointerEvent(
+      PointerUpEvent(pointer: _pointer, position: center),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => Button(
+    key: _buttonKey,
+    onPressed: () {},
+    child: const Text('Continue'),
+  );
+}
+
+Widget _pressStage(BuildContext context, int run, bool on) =>
+    _PressStage(on: on);
+
+/// toggle-slide — a real [ActiveIndicator], its pill travelling between
+/// "Inbox" and "Sent".
+Widget _toggleLabel(BuildContext context, String label) => Padding(
+  padding: EdgeInsets.symmetric(horizontal: space(4), vertical: space(1.5)),
+  child: StyledText(
+    label,
+    TextStyles.small,
+    color: ThemeScope.of(context).foreground,
+  ),
+);
+
+Widget _toggleSlideStage(BuildContext context, int run, bool on) {
+  final ThemeTokens theme = ThemeScope.of(context);
+  return ActiveIndicator(
+    activeIndex: on ? 1 : 0,
+    padding: EdgeInsets.all(space(1)),
+    indicator: DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.accent,
+        borderRadius: BorderRadius.circular(Radii.full),
+      ),
+    ),
+    children: <Widget>[
+      _toggleLabel(context, 'Inbox'),
+      _toggleLabel(context, 'Sent'),
+    ],
+  );
+}
+
+/// swap-roll — a real [IconSwap], heart rolling into star.
+Widget _swapRollStage(BuildContext context, int run, bool on) {
+  final ThemeTokens theme = ThemeScope.of(context);
+  return Container(
+    width: space(10),
+    height: space(10),
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: theme.card,
+      border: Border.all(color: theme.border, width: BorderWidths.hairline),
+      borderRadius: BorderRadius.circular(Radii.lg),
+    ),
+    child: IconSwap(
+      activeIndex: on ? 1 : 0,
+      window: space(5),
+      cell: space(4),
+      icons: const <Widget>[
+        Icon(IconGlyph.heart, tone: IconTone.action),
+        Icon(IconGlyph.star, tone: IconTone.value),
+      ],
+    ),
+  );
+}
+
+final List<_CardSpec> _cardSpecs = <_CardSpec>[
+  _CardSpec(
+    id: 'enter',
+    name: 'EnterMotion',
+    what: 'Anything appearing. Rows stagger with EnterMotion.delayFor.',
+    builder: _enterStage,
+  ),
+  _CardSpec(
+    id: 'exit',
+    name: 'ExitMotion',
+    what: 'Anything leaving. Quicker than arriving.',
+    transition: true,
+    builder: _exitStage,
+  ),
+  _CardSpec(
+    id: 'open',
+    name: 'OpenMotion',
+    what: 'Dialogs, popovers, menus, tooltips opening.',
+    builder: _openStage,
+  ),
+  _CardSpec(
+    id: 'close',
+    name: 'CloseMotion',
+    what: 'The same overlay leaving.',
+    transition: true,
+    builder: _closeStage,
+  ),
+  _CardSpec(
+    id: 'expand',
+    name: 'ExpandMotion',
+    what:
+        'Accordions and collapsibles. The reverse leg '
+        '(ExpandMotion.collapseDuration) closes them.',
+    builder: _expandStage,
+  ),
+  _CardSpec(
+    id: 'change',
+    name: 'ChangeMotion',
+    what: 'A value that just changed. Also the checkbox tick and radio dot.',
+    builder: _changeStage,
+  ),
+  _CardSpec(id: 'spin', name: 'SpinMotion', what: 'The spinner.', builder: _spinStage),
+  _CardSpec(
+    id: 'shimmer',
+    name: 'ShimmerMotion',
+    what:
+        'Skeleton loading. ShimmerMotion.textDuration is the same sweep '
+        'through text.',
+    builder: _shimmerStage,
+  ),
+  _CardSpec(
+    id: 'progress',
+    name: 'ProgressMotion',
+    what: "A progress bar that doesn't know how long.",
+    builder: _progressStage,
+  ),
+  _CardSpec(
+    id: 'pulse',
+    name: 'PulseMotion',
+    what: 'The live dot.',
+    builder: _pulseStage,
+  ),
+  _CardSpec(
+    id: 'caret',
+    name: 'CaretMotion',
+    what: 'The cursor in a one-time-code input.',
+    builder: _caretStage,
+  ),
+  _CardSpec(
+    id: 'press',
+    name: 'Press',
+    what: 'Anything clickable: shrinks to 90% while held, springs back.',
+    transition: true,
+    builder: _pressStage,
+  ),
+  _CardSpec(
+    id: 'toggle-slide',
+    name: 'ActiveIndicator',
+    what: 'The selected-item pill moving to the new item.',
+    transition: true,
+    builder: _toggleSlideStage,
+  ),
+  _CardSpec(
+    id: 'swap-roll',
+    name: 'SwapRollMotion',
+    what: 'One icon rolling into another, like a wheel.',
+    transition: true,
+    builder: _swapRollStage,
+  ),
+];
+
+class _ReplayIconButton extends StatelessWidget {
+  const _ReplayIconButton({
+    required this.onTap,
+    required this.semanticLabel,
+    this.keyValue,
+  });
+
+  final VoidCallback onTap;
+  final String semanticLabel;
   final String? keyValue;
 
   @override
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
-    return Container(
+    return SizedBox(
       key: keyValue == null ? null : ValueKey<String>(keyValue!),
-      width: space(28),
-      height: space(28),
-      alignment: Alignment.center,
+      child: Press(
+        onTap: onTap,
+        semanticLabel: semanticLabel,
+        focusRadius: Radii.full,
+        child: Container(
+          width: space(8),
+          height: space(8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: theme.secondary,
+            shape: BoxShape.circle,
+          ),
+          child: DefaultTextStyle(
+            style: DefaultTextStyle.of(
+              context,
+            ).style.copyWith(color: theme.secondaryForeground),
+            child: const Icon(
+              IconGlyph.refreshCw,
+              size: IconSize.sm,
+              tone: IconTone.inherit,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// One card: the name as code, a Replay button, the stage, and the caption.
+class _MotionCard extends StatefulWidget {
+  const _MotionCard({required this.spec, required this.replayAll});
+
+  final _CardSpec spec;
+  final Listenable replayAll;
+
+  @override
+  State<_MotionCard> createState() => _MotionCardState();
+}
+
+class _MotionCardState extends State<_MotionCard> {
+  int _run = 0;
+  bool _on = false;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.replayAll.addListener(_replay);
+  }
+
+  @override
+  void dispose() {
+    widget.replayAll.removeListener(_replay);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _replay() {
+    _timer?.cancel();
+    setState(() {
+      _run++;
+      if (widget.spec.transition) _on = true;
+    });
+    if (widget.spec.transition) {
+      _timer = Timer(MotionDurations.hoverCardShowDelay, () {
+        if (mounted) setState(() => _on = false);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Container(
+      key: ValueKey<String>('keyframes-example:${widget.spec.id}'),
       decoration: BoxDecoration(
         color: theme.card,
         borderRadius: BorderRadius.circular(Radii.lg),
         border: Border.all(color: theme.border, width: BorderWidths.hairline),
       ),
-      child: child,
-    );
-  }
-}
-
-class _ReplayButton extends StatelessWidget {
-  const _ReplayButton({required this.onTap, required this.keyValue});
-
-  final VoidCallback onTap;
-  final String keyValue;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    return SizedBox(
-      key: ValueKey<String>(keyValue),
-      child: Press(
-        onTap: onTap,
-        child: Container(
-          height: space(9),
-          padding: EdgeInsets.symmetric(horizontal: space(4)),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: theme.secondary,
-            borderRadius: BorderRadius.circular(Radii.full),
-          ),
-          child: StyledText(
-            'Replay',
-            TextStyles.small,
-            color: theme.secondaryForeground,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/* ── Preview ─────────────────────────────────────────────────────────────── */
-
-class _NotificationCard extends StatelessWidget {
-  const _NotificationCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    return Container(
-      width: space(48),
-      padding: EdgeInsets.all(space(4)),
-      decoration: BoxDecoration(
-        color: theme.card,
-        borderRadius: BorderRadius.circular(Radii.xl),
-        border: Border.all(color: theme.border, width: BorderWidths.hairline),
-      ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const Icon(IconGlyph.bell, size: IconSize.md, tone: IconTone.action),
-          SizedBox(width: space(3)),
-          Expanded(
-            child: StyledText(
-              'New message',
-              TextStyles.small,
-              color: theme.foreground,
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: space(3),
+              vertical: space(2),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PreviewHost extends StatefulWidget {
-  const _PreviewHost();
-
-  @override
-  State<_PreviewHost> createState() => _PreviewHostState();
-}
-
-class _PreviewHostState extends State<_PreviewHost> {
-  int _run = 0;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisSize: MainAxisSize.min,
-    children: <Widget>[
-      _Row(
-        children: <Widget>[
-          const _Captioned(
-            caption: 'static (no player)',
-            child: SizedBox(
-              key: ValueKey<String>('keyframes-example:static'),
-              child: _NotificationCard(),
-            ),
-          ),
-          _Captioned(
-            caption: 'KeyframePlayer(duration: EnterMotion.duration, …)',
-            child: SizedBox(
-              key: const ValueKey<String>('keyframes-example:pop-in'),
-              child: KeyedSubtree(
-                key: ValueKey<String>('pop-in-$_run'),
-                child: KeyframePlayer(
-                  duration: EnterMotion.duration,
-                  fill: EnterMotion.fill,
-                  builder: (BuildContext context, double t, Widget? child) {
-                    final double scale = EnterMotion.scale.transform(t);
-                    return Opacity(
-                      opacity: EnterMotion.opacity
-                          .transform(t)
-                          .clamp(0.0, 1.0),
-                      child: Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.diagonal3Values(scale, scale, 1),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: const _NotificationCard(),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.border,
+                  width: BorderWidths.hairline,
                 ),
               ),
             ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Flexible(
+                  child: StyledText(
+                    '.${widget.spec.name}',
+                    TextStyles.code,
+                    color: theme.actionText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: space(2)),
+                _ReplayIconButton(
+                  onTap: _replay,
+                  semanticLabel: 'Replay ${widget.spec.name}',
+                  keyValue: 'keyframes-example:${widget.spec.id}-replay',
+                ),
+              ],
+            ),
+          ),
+          // A minimum, not a fixed height: at rest every card reads as the
+          // same size, but a stage whose content needs more room — text
+          // scaled to 200%, an accordion's own MotionCurves.emphasized
+          // overshoot — is allowed to take it rather than overflow.
+          ConstrainedBox(
+            constraints: BoxConstraints(minHeight: space(36)),
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(space(3)),
+              // A bare horizontal SingleChildScrollView hands its child an
+              // *infinite* width, which crashes anything that fills it —
+              // the accordion and ActiveIndicator both stretch. LayoutBuilder
+              // reads the real, finite width first, so the scroll view's
+              // child gets a generous but bounded box: wide enough for
+              // scaled text to still fit without a hard overflow, never
+              // infinite.
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints outer) {
+                  final double safeWidth = outer.maxWidth.isFinite
+                      ? outer.maxWidth
+                      : space(84);
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: safeWidth,
+                        maxWidth: safeWidth * 3,
+                      ),
+                      child: widget.spec.builder(context, _run, _on),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: space(3),
+              vertical: space(2),
+            ),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: theme.border,
+                  width: BorderWidths.hairline,
+                ),
+              ),
+            ),
+            child: StyledText(
+              widget.spec.what,
+              TextStyles.small,
+              color: theme.mutedForeground,
+            ),
           ),
         ],
       ),
-      SizedBox(height: space(4)),
-      _ReplayButton(
-        keyValue: 'keyframes-example:preview-replay',
-        onTap: () => setState(() => _run++),
-      ),
-    ],
-  );
+    );
+  }
 }
 
-const String _previewCode =
-    "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
-    '// Re-key to replay, the way the reference itself replays.\n'
-    "KeyedSubtree(\n"
-    "  key: ValueKey('pop-in-\$run'),\n"
-    '  child: KeyframePlayer(\n'
-    '    duration: EnterMotion.duration,\n'
-    '    fill: EnterMotion.fill,\n'
-    '    builder: (context, t, child) {\n'
-    '      final scale = EnterMotion.scale.transform(t);\n'
-    '      return Opacity(\n'
-    '        opacity: EnterMotion.opacity.transform(t),\n'
-    '        child: Transform(\n'
-    '          alignment: Alignment.center,\n'
-    '          transform: Matrix4.diagonal3Values(scale.dx, scale.dy, 1),\n'
-    '          child: child,\n'
-    '        ),\n'
-    '      );\n'
-    '    },\n'
-    "    child: const NotificationCard(),\n"
-    '  ),\n'
-    ')';
-
-/* ── Entrance & Exit ─────────────────────────────────────────────────────── */
-
-class _EntranceHost extends StatefulWidget {
-  const _EntranceHost();
+class _FourteenGrid extends StatefulWidget {
+  const _FourteenGrid();
 
   @override
-  State<_EntranceHost> createState() => _EntranceHostState();
+  State<_FourteenGrid> createState() => _FourteenGridState();
 }
 
-class _EntranceHostState extends State<_EntranceHost> {
-  int _run = 0;
+class _FourteenGridState extends State<_FourteenGrid> {
+  final ValueNotifier<int> _replayAll = ValueNotifier<int>(0);
+
+  @override
+  void dispose() {
+    _replayAll.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        KeyedSubtree(
-          key: ValueKey<String>('entrance-$_run'),
-          child: _Row(
-            children: <Widget>[
-              _Captioned(
-                caption: 'ChangeMotion',
-                child: _Chip(
-                  keyValue: 'keyframes-example:jelly',
-                  child: KeyframePlayer(
-                    duration: ChangeMotion.duration,
-                    fill: ChangeMotion.fill,
-                    builder: (BuildContext context, double t, Widget? child) {
-                      final Offset scale = ChangeMotion.scale.transform(t);
-                      return Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.diagonal3Values(
-                          scale.dx,
-                          scale.dy,
-                          1,
-                        ),
-                        child: child,
-                      );
-                    },
-                    child: const Icon(IconGlyph.check, tone: IconTone.success),
-                  ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: SizedBox(
+            key: const ValueKey<String>('keyframes-example:replay-all'),
+            child: Press(
+              onTap: () => _replayAll.value++,
+              child: Container(
+                height: space(9),
+                padding: EdgeInsets.symmetric(horizontal: space(4)),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: theme.secondary,
+                  borderRadius: BorderRadius.circular(Radii.full),
                 ),
-              ),
-              _Captioned(
-                caption: 'EnterMotion',
-                child: _Chip(
-                  keyValue: 'keyframes-example:spring-up',
-                  child: KeyframePlayer(
-                    duration: EnterMotion.duration,
-                    fill: EnterMotion.fill,
-                    builder: (BuildContext context, double t, Widget? child) =>
-                        Opacity(
-                          opacity: EnterMotion.opacity
-                              .transform(t)
-                              .clamp(0.0, 1.0),
-                          child: Transform.translate(
-                            offset: Offset(
-                              0,
-                              EnterMotion.translateY.transform(t),
-                            ),
-                            child: child,
-                          ),
-                        ),
-                    child: const Icon(
-                      IconGlyph.arrowRight,
-                      tone: IconTone.action,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    DefaultTextStyle(
+                      style: DefaultTextStyle.of(
+                        context,
+                      ).style.copyWith(color: theme.secondaryForeground),
+                      child: const Icon(
+                        IconGlyph.refreshCw,
+                        size: IconSize.sm,
+                        tone: IconTone.inherit,
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              _Captioned(
-                caption: 'OpenMotion',
-                child: _Chip(
-                  keyValue: 'keyframes-example:jelly-in',
-                  child: KeyframePlayer(
-                    duration: OpenMotion.duration,
-                    fill: OpenMotion.fill,
-                    builder: (BuildContext context, double t, Widget? child) =>
-                        Opacity(
-                          opacity: OpenMotion.opacity
-                              .transform(t)
-                              .clamp(0.0, 1.0),
-                          child: Transform.translate(
-                            offset: Offset(
-                              0,
-                              OpenMotion.translateY.transform(t),
-                            ),
-                            child: Transform.scale(
-                              scale: OpenMotion.scale.transform(t),
-                              child: child,
-                            ),
-                          ),
-                        ),
-                    child: const Icon(IconGlyph.sparkles, tone: IconTone.value),
-                  ),
-                ),
-              ),
-              _Captioned(
-                caption: 'ChangeMotion',
-                child: _Chip(
-                  keyValue: 'keyframes-example:change',
-                  child: KeyframePlayer(
-                    duration: ChangeMotion.duration,
-                    fill: ChangeMotion.fill,
-                    builder: (BuildContext context, double t, Widget? child) {
-                      final Offset scale = ChangeMotion.scale.transform(t);
-                      return Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.diagonal3Values(
-                          scale.dx,
-                          scale.dy,
-                          1,
-                        ),
-                        child: child,
-                      );
-                    },
-                    child: const Icon(
-                      IconGlyph.sparkles,
-                      tone: IconTone.action,
+                    SizedBox(width: space(2)),
+                    Flexible(
+                      child: StyledText(
+                        'Replay all',
+                        TextStyles.small,
+                        color: theme.secondaryForeground,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
         SizedBox(height: space(4)),
-        _ReplayButton(
-          keyValue: 'keyframes-example:entrance-replay',
-          onTap: () => setState(() => _run++),
+        Wrap(
+          spacing: space(4),
+          runSpacing: space(4),
+          children: <Widget>[
+            for (final _CardSpec spec in _cardSpecs)
+              SizedBox(
+                width: space(84),
+                child: _MotionCard(spec: spec, replayAll: _replayAll),
+              ),
+          ],
         ),
       ],
     );
   }
 }
 
-const String _entranceCode =
-    '// One table, three shapes: opacity alone (EnterMotion), scale alone\n'
-    '// (ChangeMotion), or opacity + scale + translateY together (OpenMotion).\n'
-    'KeyframePlayer(\n'
-    '  duration: OpenMotion.duration,\n'
-    '  fill: OpenMotion.fill,\n'
-    '  builder: (context, t, child) => Opacity(\n'
-    '    opacity: OpenMotion.opacity.transform(t),\n'
-    '    child: Transform.translate(\n'
-    '      offset: Offset(0, OpenMotion.translateY.transform(t)),\n'
-    '      child: Transform.scale(\n'
-    '        scale: OpenMotion.scale.transform(t),\n'
+const String _fourteenCode =
+    "import 'package:elattar_design_system/elattar_design_system.dart';\n\n"
+    '// A one-shot recipe: remount under a fresh key to replay.\n'
+    "KeyedSubtree(\n"
+    "  key: ValueKey('enter-\$run'),\n"
+    '  child: KeyframePlayer(\n'
+    '    duration: EnterMotion.duration,\n'
+    '    fill: EnterMotion.fill,\n'
+    '    builder: (context, t, child) => Opacity(\n'
+    '      opacity: EnterMotion.opacity.transform(t),\n'
+    '      child: Transform.translate(\n'
+    '        offset: Offset(0, EnterMotion.translateY.transform(t)),\n'
     '        child: child,\n'
     '      ),\n'
     '    ),\n'
+    "    child: const Row(...),\n"
     '  ),\n'
-    "  child: const Icon(...),\n"
-    ')';
+    ')\n\n'
+    '// A transition: flip the same state the real component flips.\n'
+    'OpenTransition(animation: controller, child: dialog)\n'
+    'ActiveIndicator(activeIndex: selected, indicator: pill, children: options)\n'
+    "IconSwap(activeIndex: selected, icons: {...}, window: 20, cell: 16)";
 
-/* ── Looping ─────────────────────────────────────────────────────────────── */
-
-class _LoopingHost extends StatelessWidget {
-  const _LoopingHost();
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    return _Row(
-      children: <Widget>[
-        _Captioned(
-          caption: 'StepCurve(8) — never shows 360°, no recipe of its own',
-          child: _Chip(
-            keyValue: 'keyframes-example:ratchet',
-            child: KeyframePlayer(
-              duration: MotionDurations.shimmer,
-              fill: KeyframeFill.none,
-              repeat: true,
-              builder: (BuildContext context, double t, Widget? child) =>
-                  Transform.rotate(
-                    angle: const StepCurve(8).transform(t) * 2 * math.pi,
-                    child: child,
-                  ),
-              child: const Icon(IconGlyph.refreshCw, tone: IconTone.action),
-            ),
-          ),
-        ),
-        _Captioned(
-          caption: 'ShimmerMotion — a sweeping gradient band',
-          child: SizedBox(
-            key: const ValueKey<String>('keyframes-example:shimmer'),
-            width: space(28),
-            height: space(28),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(Radii.lg),
-              child: KeyframePlayer(
-                duration: ShimmerMotion.duration,
-                fill: ShimmerMotion.fill,
-                repeat: ShimmerMotion.loops,
-                builder: (BuildContext context, double t, Widget? child) =>
-                    CustomPaint(
-                      painter: _ShimmerPainter(
-                        t: t,
-                        gradient: ShimmerMotion.gradient(theme),
-                      ),
-                      size: Size(space(28), space(28)),
-                    ),
-              ),
-            ),
-          ),
-        ),
-        _Captioned(
-          caption: 'PulseMotion — an expanding, fading ring',
-          child: SizedBox(
-            key: const ValueKey<String>('keyframes-example:pulse-live'),
-            width: space(28),
-            height: space(28),
-            child: Center(
-              child: KeyframePlayer(
-                duration: PulseMotion.duration,
-                fill: PulseMotion.fill,
-                repeat: PulseMotion.loops,
-                builder: (BuildContext context, double t, Widget? child) =>
-                    CustomPaint(painter: _PulseLivePainter(t: t)),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-const String _loopingCode =
-    'KeyframePlayer(\n'
-    '  duration: MotionDurations.shimmer,\n'
-    '  fill: KeyframeFill.none,\n'
-    '  repeat: true,\n'
-    '  builder: (context, t, child) =>\n'
-    '      Transform.rotate(angle: const StepCurve(8).transform(t) * 2 * pi, child: child),\n'
-    "  child: const Icon(...),\n"
-    ')';
-
-class _ShimmerPainter extends CustomPainter {
-  const _ShimmerPainter({required this.t, required this.gradient});
-
-  final double t;
-  final LinearGradient gradient;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Rect tile = Rect.fromLTWH(
-      ShimmerMotion.offsetAt(t, size.width),
-      0,
-      ShimmerMotion.tileWidth(size.width),
-      size.height,
-    );
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()..shader = gradient.createShader(tile),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _ShimmerPainter oldDelegate) =>
-      oldDelegate.t != t;
-}
-
+/// The [PulseMotion] ring, painted around a live dot. Shared with the
+/// pulse card.
 class _PulseLivePainter extends CustomPainter {
   const _PulseLivePainter({required this.t});
 
@@ -805,241 +1319,6 @@ class _PulseLivePainter extends CustomPainter {
   bool shouldRepaint(covariant _PulseLivePainter oldDelegate) =>
       oldDelegate.t != t;
 }
-
-/* ── Progress ────────────────────────────────────────────────────────────── */
-
-class _ProgressHost extends StatelessWidget {
-  const _ProgressHost();
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        _Captioned(
-          caption: 'ProgressMotion — a third-width sliver, −100% → 300%',
-          child: SizedBox(
-            key: const ValueKey<String>('keyframes-example:progress'),
-            width: space(56),
-            height: space(3),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(Radii.sm),
-              child: DecoratedBox(
-                decoration: BoxDecoration(color: theme.muted),
-                child: LayoutBuilder(
-                  builder:
-                      (BuildContext context, BoxConstraints constraints) =>
-                          KeyframePlayer(
-                            duration: ProgressMotion.duration,
-                            fill: KeyframeFill.none,
-                            repeat: true,
-                            builder:
-                                (
-                                  BuildContext context,
-                                  double t,
-                                  Widget? child,
-                                ) {
-                                  final double width = constraints.maxWidth;
-                                  final double fraction =
-                                      ProgressMotion.fromFraction +
-                                      (ProgressMotion.toFraction -
-                                              ProgressMotion.fromFraction) *
-                                          t;
-                                  return Transform.translate(
-                                    offset: Offset(fraction * width, 0),
-                                    child: SizedBox(
-                                      width:
-                                          width * ProgressMotion.sliverFraction,
-                                      child: DecoratedBox(
-                                        decoration: BoxDecoration(
-                                          color: theme.primary,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                          ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-const String _progressCode =
-    'KeyframePlayer(\n'
-    '  duration: ProgressMotion.duration,\n'
-    '  fill: KeyframeFill.none,\n'
-    '  repeat: true,\n'
-    '  builder: (context, t, child) {\n'
-    '    final fraction = ProgressMotion.fromFraction +\n'
-    '        (ProgressMotion.toFraction - ProgressMotion.fromFraction) * t;\n'
-    '    return Transform.translate(\n'
-    '      offset: Offset(fraction * width, 0),\n'
-    '      child: SizedBox(width: width * ProgressMotion.sliverFraction, child: child),\n'
-    '    );\n'
-    '  },\n'
-    ')';
-
-/* ── Selection Draw ──────────────────────────────────────────────────────── */
-
-class _SelectionDrawHost extends StatelessWidget {
-  const _SelectionDrawHost();
-
-  Widget _squash(Widget icon) => KeyframePlayer(
-    duration: ChangeMotion.duration,
-    fill: ChangeMotion.fill,
-    builder: (BuildContext context, double t, Widget? child) {
-      final Offset scale = ChangeMotion.scale.transform(t);
-      return Transform(
-        alignment: Alignment.center,
-        transform: Matrix4.diagonal3Values(scale.dx, scale.dy, 1),
-        child: child,
-      );
-    },
-    child: icon,
-  );
-
-  @override
-  Widget build(BuildContext context) => _Row(
-    children: <Widget>[
-      _Captioned(
-        caption:
-            'ChangeMotion — the checkbox tick, painted whole and squashed in',
-        child: _Chip(
-          keyValue: 'keyframes-example:check-draw',
-          child: _squash(
-            const Icon(IconGlyph.check, tone: IconTone.success),
-          ),
-        ),
-      ),
-      _Captioned(
-        caption: 'ChangeMotion — the radio dot, the same squash-and-stretch',
-        child: _Chip(
-          keyValue: 'keyframes-example:dash-draw',
-          child: _squash(
-            const Icon(IconGlyph.radio, tone: IconTone.action),
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-const String _selectionDrawCode =
-    'KeyframePlayer(\n'
-    '  duration: ChangeMotion.duration,\n'
-    '  fill: ChangeMotion.fill,\n'
-    '  builder: (context, t, child) {\n'
-    '    final scale = ChangeMotion.scale.transform(t);\n'
-    '    return Transform(\n'
-    '      alignment: Alignment.center,\n'
-    '      transform: Matrix4.diagonal3Values(scale.dx, scale.dy, 1),\n'
-    '      child: child,\n'
-    '    );\n'
-    '  },\n'
-    "  child: const Icon(...), // painted whole — no stroke to reveal\n"
-    ')';
-
-/* ── Transition ──────────────────────────────────────────────────────────── */
-
-class _TransitionHost extends StatefulWidget {
-  const _TransitionHost();
-
-  @override
-  State<_TransitionHost> createState() => _TransitionHostState();
-}
-
-class _TransitionHostState extends State<_TransitionHost> {
-  bool _flipped = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    final Duration duration = effectiveMotionDuration(
-      context,
-      SwapRollMotion.duration,
-    );
-    final double cellHeight = space(10);
-    final double travel = SwapRollMotion.travelFor(cellHeight);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Press(
-          onTap: () => setState(() => _flipped = !_flipped),
-          child: SizedBox(
-            key: const ValueKey<String>('keyframes-example:swap-roll'),
-            width: cellHeight,
-            height: cellHeight,
-            child: ClipRect(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: theme.card,
-                  borderRadius: BorderRadius.circular(Radii.lg),
-                  border: Border.all(
-                    color: theme.border,
-                    width: BorderWidths.hairline,
-                  ),
-                ),
-                child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(end: _flipped ? 1 : 0),
-                  duration: duration,
-                  curve: SwapRollMotion.curve,
-                  builder: (BuildContext context, double v, Widget? _) => Stack(
-                    alignment: Alignment.center,
-                    children: <Widget>[
-                      Transform.translate(
-                        offset: Offset(0, -travel * v),
-                        child: Opacity(
-                          opacity: (1 - v).clamp(0.0, 1.0),
-                          child: const Icon(
-                            IconGlyph.check,
-                            tone: IconTone.success,
-                          ),
-                        ),
-                      ),
-                      Transform.translate(
-                        offset: Offset(0, travel * (1 - v)),
-                        child: Opacity(
-                          opacity: v.clamp(0.0, 1.0),
-                          child: const Icon(IconGlyph.x, tone: IconTone.error),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: space(2)),
-        StyledText(
-          'Tap to roll',
-          TextStyles.small,
-          color: theme.mutedForeground,
-        ),
-      ],
-    );
-  }
-}
-
-const String _transitionCode =
-    'TweenAnimationBuilder<double>(\n'
-    '  tween: Tween(end: flipped ? 1 : 0),\n'
-    '  duration: SwapRollMotion.duration,\n'
-    '  curve: SwapRollMotion.curve,\n'
-    '  builder: (context, v, _) => Transform.translate(\n'
-    '    offset: Offset(0, SwapRollMotion.travelFor(cellHeight) * v),\n'
-    "    child: const Icon(...),\n"
-    '  ),\n'
-    ')';
 
 /* ── Disclosure content ─────────────────────────────────────────────────── */
 
@@ -1078,7 +1357,7 @@ class _ApiReferenceContent extends StatelessWidget {
           'SwapRollMotion is the twelfth entry and the odd one out: it is a '
           'transition (a from-state and a to-state, no stops), running '
           'MotionDurations.slow (400ms) on MotionCurves.emphasized — see '
-          'the Transition section above. Press and ActiveIndicator round '
+          'its swap-roll card above. Press and ActiveIndicator round '
           'the vocabulary out to fourteen; each is documented on its own '
           'page.',
           TextStyles.small,
@@ -1202,8 +1481,8 @@ class _StatesContent extends StatelessWidget {
         'stop) or to lowerBound for a none-fill looper (reverting to '
         'the element\'s own resting style, stop 0).',
     'A both-fill table never restarts on its own: replay is remount, '
-        'a fresh KeyedSubtree — see the Preview and Entrance & Exit '
-        'sections above.',
+        'a fresh KeyedSubtree — see the fourteen cards above, each with '
+        'its own Replay.',
   ]);
 }
 
@@ -1238,10 +1517,11 @@ class _KeyboardContent extends StatelessWidget {
         'Takes no focus and handles no key: none of the twelve tables '
             'or KeyframePlayer itself declare a Focus, a FocusNode or '
             'an onKeyEvent. Every specimen on this page that responds to '
-            'a tap (the Preview and Entrance & Exit replay buttons, the '
-            'Transition toggle) does so through the Press this page '
-            'composes around it, not through anything keyframes.dart '
-            'exposes.',
+            'a tap — each card\'s own Replay button, the Replay all '
+            'button, the open/close and press/toggle-slide/swap-roll '
+            'cards\' interactive hosts — does so through the Press or '
+            'the real component this page composes around it, not '
+            'through anything keyframes.dart exposes.',
       ]);
 }
 
@@ -1284,16 +1564,19 @@ class _DependenciesContent extends StatelessWidget {
             '_jellyScale is the pattern Keyframes.track generalises; '
             'icon_swap.dart composes ChangeMotion with SwapRollMotion for its own '
             'arrival squash; the checkbox and the radio both consume '
-            'ChangeMotion directly, on mount, painted whole.',
+            'ChangeMotion directly, on mount, painted whole; open_transition.dart '
+            'composes OpenMotion and CloseMotion into the one overlay '
+            'transition every dialog, popover, menu and tooltip shares.',
       ]),
       SizedBox(height: space(2)),
       DocsLinkRow(
         links: <DocsLink>[
-          DocsLink(label: 'Icon Swap', route: '/components/icon_swap'),
+          DocsLink(label: 'Press', route: '/components/press'),
           DocsLink(
             label: 'Active Indicator',
             route: '/components/active_indicator',
           ),
+          DocsLink(label: 'Icon Swap', route: '/components/icon_swap'),
           DocsLink(
             label: 'Source Foundation',
             route: '/components/source_foundation',
@@ -1317,7 +1600,7 @@ class _ThemingContent extends StatelessWidget {
         'it: PulseMotion.ringColorAt mixes a fixed ink against '
         'OklabColor.mix, read fresh on every frame rather than cached.',
     'What actually flips with the theme on this page is the host '
-        'around each table: the chip fill (theme.card), its border '
+        'around each table: the card fill (theme.card), its border '
         '(theme.border) and the icon tones passed to Icon — the '
         'same as any other specimen on the kit.',
   ]);

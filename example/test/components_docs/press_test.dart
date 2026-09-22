@@ -83,8 +83,10 @@ const List<String> _pressConstructorParams = <String>[
 ];
 
 const List<String> _exampleKeys = <String>[
-  'press-example:wrapped',
-  'press-example:bare',
+  'press-example:button',
+  'press-example:badge',
+  'press-example:row',
+  'press-example:card',
 ];
 
 void main() {
@@ -131,11 +133,11 @@ void main() {
         );
       }
 
-      // One live Press on Preview's wrapped chip, and one on the page's own
-      // breadcrumb link — `Breadcrumb` goes through `Press` now, which is
-      // how its links became keyboard-operable. Two in total. The
-      // right-hand Preview chip mounts none.
-      expect(find.byType(Press), findsNWidgets(2));
+      // One live Press wrapping each of the Preview's four hosts (Button,
+      // Badge, row, Card), and one on the page's own breadcrumb link —
+      // `Breadcrumb` goes through `Press` now, which is how its links
+      // became keyboard-operable. Five in total.
+      expect(find.byType(Press), findsNWidgets(5));
 
       expect(pressDoc.name, 'press');
       expect(pressDoc.exports, containsAll(<String>['Press']));
@@ -160,7 +162,7 @@ void main() {
         await tester.pump();
 
         final Finder wrapped = find.byKey(
-          const ValueKey<String>('press-example:wrapped'),
+          const ValueKey<String>('press-example:button'),
         );
         await tester.ensureVisible(wrapped);
         await tester.pump();
