@@ -1,6 +1,6 @@
 /// The travelling selection pill — `components/ui/sliding-indicator.tsx` plus
-/// the `slide-pill` utility (`app/globals.css` L2256) and the `yuki-jelly`
-/// keyframes (L2431–2438).
+/// the `slide-pill` utility and the arrival-squash keyframes [ChangeMotion]
+/// transcribes.
 ///
 /// RULES §4: *selection travels, never blinks.* Instead of every option owning
 /// a background and one blinking on while another blinks off, the group owns a
@@ -14,10 +14,10 @@
 ///   does not animate — flying in from the left edge on mount looks like a
 ///   glitch, so the web sets `transition: none` for one frame.
 ///
-/// The arrival squash itself is [StateChangeMotion] — `keyframes.dart` holds the one
-/// transcription of `yuki-jelly`, which is also what `.anim-jelly` plays on
-/// the motion page. This file used to carry a private second copy of the same
-/// six stops; the reference declares them once, and so does the port.
+/// The arrival squash itself is [ChangeMotion] — `keyframes.dart` holds the
+/// one transcription of it, which is also what the motion page's own demo
+/// plays. This file used to carry a private second copy of the same six
+/// stops; now there is exactly one.
 ///
 /// **The two edges, measured** (behaviour-audit §1.5–1.6, T6–T8b). Both were
 /// recorded from before hydration with a `MutationObserver` on the pill's
@@ -310,7 +310,7 @@ class _ActiveIndicatorState extends State<ActiveIndicator>
               child: AnimatedBuilder(
                 animation: _jelly,
                 builder: (BuildContext context, Widget? child) {
-                  final Offset scale = StateChangeMotion.scale.evaluate(_jelly);
+                  final Offset scale = ChangeMotion.scale.evaluate(_jelly);
                   return Transform.scale(
                     scaleX: scale.dx,
                     scaleY: scale.dy,

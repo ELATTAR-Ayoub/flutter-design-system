@@ -124,14 +124,33 @@ void main() {
       expect(borderOf(socketOf(t, Checkbox)), theme.primary);
     });
 
-    /// The mark's own player, told apart from [StateChangeFeedback]'s by its
-    /// duration: a draw runs 280ms or 200ms, the squash 600.
-    Finder markPlayer() => find.byWidgetPredicate(
+    /// The mark's own [CustomPaint] specifically — `_MarkPainter`, not any
+    /// of the other `CustomPaint`s a themed `Surface` paints its shadows
+    /// with — found by its painter's own (private) type name.
+    Finder markPaint() => find.byWidgetPredicate(
       (Widget w) =>
-          w is KeyframePlayer &&
-          (w.duration == CheckmarkDrawMotion.duration ||
-              w.duration == DashDrawMotion.duration),
+          w is CustomPaint &&
+          w.painter != null &&
+          w.painter.runtimeType.toString() == '_MarkPainter',
     );
+
+    /// The mark's own player, told apart from [StateChangeFeedback]'s —
+    /// both now play [ChangeMotion] at the same duration, and both are
+    /// technically ancestors of the mark's [CustomPaint] once nested — by
+    /// picking the DEEPEST (nearest) [KeyframePlayer] ancestor of it,
+    /// rather than every one `find.ancestor` returns.
+    Finder markPlayer() {
+      final List<Element> matches = find
+          .ancestor(of: markPaint(), matching: find.byType(KeyframePlayer))
+          .evaluate()
+          .toList();
+      if (matches.isEmpty) {
+        return find.byWidgetPredicate((Widget w) => false);
+      }
+      matches.sort((Element a, Element b) => b.depth.compareTo(a.depth));
+      final Element nearest = matches.first;
+      return find.byElementPredicate((Element e) => e == nearest);
+    }
 
     testWidgets('mounts no indicator while unchecked, and one when lit', (
       WidgetTester t,
@@ -143,13 +162,13 @@ void main() {
       // hid one, which is what made a swap reveal a finished stroke.
       await t.pumpWidget(host(const Checkbox(state: CheckboxState.checked)));
       expect(markPlayer(), findsOneWidget);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
 
       await t.pumpWidget(
         host(const Checkbox(state: CheckboxState.indeterminate)),
       );
       expect(markPlayer(), findsOneWidget);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
 
       // Going out is an unmount, not a reverse draw and not a fade.
       await t.pumpWidget(host(const Checkbox()));
@@ -171,12 +190,12 @@ void main() {
       // Element is exactly what a fresh CSS animation is here — the player is
       // re-keyed, so it cannot resume.
       await t.pumpWidget(host(const Checkbox(state: CheckboxState.checked)));
-      await t.pump(CheckmarkDrawMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
       final Element tick = t.element(markPlayer());
       expect(
         t.widget<KeyframePlayer>(markPlayer()).duration,
-        CheckmarkDrawMotion.duration,
+        ChangeMotion.duration,
       );
 
       // checked -> indeterminate re-runs `dash-draw`, all 200ms of it.
@@ -191,10 +210,10 @@ void main() {
       );
       expect(
         t.widget<KeyframePlayer>(markPlayer()).duration,
-        DashDrawMotion.duration,
+        ChangeMotion.duration,
       );
-      await t.pump(DashDrawMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
 
       // …and indeterminate -> checked re-runs `check-draw`.
       final Element bar = t.element(markPlayer());
@@ -207,26 +226,44 @@ void main() {
       );
       expect(
         t.widget<KeyframePlayer>(markPlayer()).duration,
-        CheckmarkDrawMotion.duration,
+        ChangeMotion.duration,
       );
-      await t.pump(CheckmarkDrawMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
     });
 
-    testWidgets('the tick draws itself on over 280ms', (WidgetTester t) async {
-      expect(CheckmarkDrawMotion.duration, MotionDurations.checkDraw);
-      expect(CheckmarkDrawMotion.drawnFractionAt(0), 0);
-      expect(CheckmarkDrawMotion.drawnFractionAt(1), 1);
-      expect(DashDrawMotion.duration, MotionDurations.dashDraw);
+    testWidgets(
+      'the tick is painted whole and plays in on ChangeMotion, not a stroke '
+      'reveal',
+      (WidgetTester t) async {
+        await t.pumpWidget(host(const Checkbox(state: CheckboxState.checked)));
 
-      await t.pumpWidget(host(const Checkbox(state: CheckboxState.checked)));
-      await t.pump(const Duration(milliseconds: 140));
-      // Mid-flight: part of the stroke, not all of it.
-      final double half = CheckmarkDrawMotion.drawnFractionAt(0.5);
-      expect(half, greaterThan(0));
-      expect(half, lessThan(1));
-      await t.pump(CheckmarkDrawMotion.duration);
-    });
+        // The whole path is what CustomPaint holds from the very first
+        // frame — there is no drawn-fraction painter left to sample.
+        final CustomPaint paint = t.widget<CustomPaint>(
+          find.descendant(
+            of: markPlayer(),
+            matching: find.byType(CustomPaint),
+          ),
+        );
+        expect(paint.painter, isNotNull);
+
+        Transform transformOf() => t.widget<Transform>(
+          find.descendant(of: markPlayer(), matching: find.byType(Transform)),
+        );
+
+        // Mid-flight the mark is squashing in on ChangeMotion.scale, not
+        // sitting at rest.
+        await t.pump(const Duration(milliseconds: 140));
+        expect(transformOf().transform.getMaxScaleOnAxis(), isNot(1.0));
+
+        await t.pump(ChangeMotion.duration);
+        expect(
+          transformOf().transform.getMaxScaleOnAxis(),
+          closeTo(1.0, 1e-6),
+        );
+      },
+    );
 
     testWidgets('a click toggles the way Radix does', (WidgetTester t) async {
       expect(
@@ -306,7 +343,7 @@ void main() {
       await t.pumpWidget(host(const Switch(value: false)));
       expect(find.byType(KeyframePlayer), findsOneWidget);
       await t.pumpAndSettle();
-      expect(StateChangeMotion.duration, MotionDurations.stateChange);
+      expect(ChangeMotion.duration, MotionDurations.stateChange);
     });
 
     testWidgets('aria-invalid beats focus-visible — F5, drift 6', (
@@ -460,13 +497,21 @@ void main() {
       expect(t.getSize(surfaces.last), const Size(8, 8));
     });
 
-    testWidgets('dot-pop overshoots to 1.35 at 55%', (WidgetTester t) async {
-      expect(DotSelectionMotion.duration, MotionDurations.dotPop);
-      expect(DotSelectionMotion.curve, MotionCurves.emphasized);
-      expect(DotSelectionMotion.scale.transform(0), 0);
-      expect(DotSelectionMotion.scale.transform(0.55), closeTo(1.35, 0.001));
-      expect(DotSelectionMotion.scale.transform(1), 1);
-    });
+    testWidgets(
+      'the dot plays the same ChangeMotion squash-and-stretch every '
+      'indicator shares',
+      (WidgetTester t) async {
+        expect(ChangeMotion.duration, MotionDurations.stateChange);
+        expect(ChangeMotion.curve, MotionCurves.enter);
+        expect(ChangeMotion.scale.transform(0), const Offset(1, 1));
+        expect(ChangeMotion.scale.transform(1), const Offset(1, 1));
+        // 30% is the table's own first overshoot stop — wider on x, thinner
+        // on y, not a uniform pop.
+        final Offset atThirty = ChangeMotion.scale.transform(0.3);
+        expect(atThirty.dx, greaterThan(1));
+        expect(atThirty.dy, lessThan(1));
+      },
+    );
 
     testWidgets('the socket lights on selection', (WidgetTester t) async {
       await t.pumpWidget(group('daily', (String _) {}));

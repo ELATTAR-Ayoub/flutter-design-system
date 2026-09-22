@@ -48,7 +48,7 @@ const ComponentDocEntry agentCoreDoc = ComponentDocEntry(
     'ConversationSummary',
     'ConversationStore',
     'SwitchPhase',
-    'BlurSwitchController',
+    'TranscriptSwitchController',
   ],
   sourcePath: 'lib/src/components/ui/agent_core.dart',
 );

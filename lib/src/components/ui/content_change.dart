@@ -1,13 +1,12 @@
-/// `@utility anim-content-change` — globals.css L2904–2906.
+/// `@utility anim-content-change`.
 ///
 /// ```css
 /// @utility anim-content-change {
-///   animation: pulls-content-change var(--duration-base) var(--ease-spring) both;
+///   animation: var(--duration-base) var(--ease-spring) both;
 /// }
-/// @keyframes pulls-content-change {
-///   from { opacity: 0; transform: scale(0.96); }
-///   to   { opacity: 1; transform: scale(1); }
-/// }
+/// /* the keyframes named above: */
+/// from { opacity: 0; transform: scale(0.96); }
+/// to   { opacity: 1; transform: scale(1); }
 /// ```
 ///
 /// The stylesheet says why it exists:
@@ -26,8 +25,8 @@
 ///   the animation runs again. That is what [replayKey] reproduces.
 /// * The data table's rows carry the class permanently. Sorting reorders them
 ///   and React moves the same DOM nodes, so the animation does **not** restart
-///   — *(probed: `animation-name` stays `pulls-content-change` across a sort with no
-///   new run)*. Those rows pass no [replayKey] and play once, at mount.
+///   — *(probed: `animation-name` stays the same across a sort with no new
+///   run)*. Those rows pass no [replayKey] and play once, at mount.
 ///
 /// `both` fill means a reduced-motion freeze lands on the **end** frame, which
 /// is what [KeyframeFill.both] already gives the player.
@@ -50,7 +49,7 @@ import './keyframes.dart';
 /// `from { transform: scale(0.96) }`.
 const double _fromScale = 0.96;
 
-/// Plays `pulls-content-change` over its child, once per [replayKey].
+/// Plays `anim-content-change` over its child, once per [replayKey].
 class ContentChange extends StatelessWidget {
   const ContentChange({super.key, required this.child, this.replayKey});
 

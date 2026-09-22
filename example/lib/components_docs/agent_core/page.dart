@@ -785,7 +785,7 @@ const List<DocsTocEntry> _apiChildren = <DocsTocEntry>[
   DocsTocEntry(title: 'ConversationStore', anchor: 'api-elconversationstore'),
   DocsTocEntry(title: 'SwitchPhase', anchor: 'api-elswitchphase'),
   DocsTocEntry(
-    title: 'BlurSwitchController',
+    title: 'TranscriptSwitchController',
     anchor: 'api-elblurswitchcontroller',
   ),
   DocsTocEntry(title: 'Top-level functions', anchor: 'api-functions'),
@@ -951,7 +951,7 @@ class _ApiReferenceContent extends StatelessWidget {
       const DocsAnchor(
         id: 'api-elblurswitchcontroller',
         child: DocsApiTable(
-          title: 'BlurSwitchController',
+          title: 'TranscriptSwitchController',
           facts: _blurSwitchFacts,
         ),
       ),
@@ -1682,19 +1682,19 @@ const List<DocsApiFact> _switchPhaseFacts = <DocsApiFact>[
 
 const List<DocsApiFact> _blurSwitchFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'BlurSwitchController({required open})',
+    name: 'TranscriptSwitchController({required open})',
     type: 'constructor',
     description:
         'open: void Function(String id) — the store call, made at the '
         'darkest point of the transition.',
   ),
   DocsApiFact(
-    name: 'BlurSwitchController.outDuration',
+    name: 'TranscriptSwitchController.outDuration',
     type: 'static Duration (get)',
     description: 'MotionDurations.fast — anim-blur-out.',
   ),
   DocsApiFact(
-    name: 'BlurSwitchController.inDuration',
+    name: 'TranscriptSwitchController.inDuration',
     type: 'static Duration (get)',
     description: 'MotionDurations.normal — anim-blur-in.',
   ),
@@ -1794,7 +1794,7 @@ class _StatesContent extends StatelessWidget {
             'label, and glyph, and Resolve agent state above for the real '
             'resolveAgentState precedence ladder that picks one.',
         'SwitchPhase is a second, much smaller state: idle / out / '
-            'blurIn, the three frames BlurSwitchController drives a '
+            'blurIn, the three frames TranscriptSwitchController drives a '
             'conversation switch through. Also documented in API '
             'Reference, not demonstrated live here: it needs an animated '
             'consumer (agent-history\'s own transcript) to be shown '
@@ -1889,7 +1889,7 @@ class _DependenciesContent extends StatelessWidget {
             description:
                 'date_format.dart supplies Clock (the ?clock= seam '
                 'relativeTimeOf reads); motion.dart supplies '
-                'MotionDurations.fast/base for BlurSwitchController; '
+                'MotionDurations.fast/base for TranscriptSwitchController; '
                 'icon_paths.g.dart supplies LucideGlyph, the type '
                 'AgentState.glyph returns.',
           ),

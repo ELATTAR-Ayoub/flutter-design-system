@@ -820,9 +820,10 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   DocsStateFact(
     state: 'Fade closing',
     treatment:
-        'Shrinks to zero over the last 96px of scroll travel, on '
-        'MotionCurves.symmetric — the measured compatibility curve, not this '
-        "system's own --ease-in-out.",
+        'Shrinks to zero over the last 96px of scroll travel, on the CSS '
+        'ease-in-out keyword — message_scroller.dart\'s own private '
+        'curve, kept local because MotionCurves.move would materially '
+        'change the reveal.',
     userSignal: 'The mask visibly thins as the reader nears the bottom.',
   ),
   DocsStateFact(

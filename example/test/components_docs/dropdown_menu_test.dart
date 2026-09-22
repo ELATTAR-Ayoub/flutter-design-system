@@ -163,7 +163,6 @@ void main() {
           'MenuSurface',
           'MenuContent',
           'MenuPointerDown',
-          'MenuMotion',
         ]),
       );
       expect(dropdownMenuDoc.dependencies, <String>[

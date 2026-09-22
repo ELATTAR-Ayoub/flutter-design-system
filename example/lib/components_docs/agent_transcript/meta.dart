@@ -10,8 +10,9 @@
 /// shape `field` documents: every kind of row a transcript can draw
 /// (`UserMessage`, `AgentMessage`, `ToolChip`, `ActionChip`,
 /// `ApprovalCard`, `WelcomeCard`) plus the small entrance utilities
-/// (`TypingCursor`, `FadeUp`, `RowIn`) and the plain data class
-/// (`AgentCapability`) they all share.
+/// (`TypingCursor`, `RowIn`) and the plain data class
+/// (`AgentCapability`) they all share. A card's own fade-and-rise
+/// entrance is private now, played through KeyframePlayer directly.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
@@ -42,7 +43,6 @@ const ComponentDocEntry agentTranscriptDoc = ComponentDocEntry(
     'ToolChip',
     'ActionChip',
     'ApprovalCard',
-    'FadeUp',
     'RowIn',
     'AgentCapability',
     'WelcomeCard',

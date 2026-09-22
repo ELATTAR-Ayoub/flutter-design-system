@@ -384,8 +384,8 @@ class _VoiceIndicatorState extends State<VoiceIndicator>
       // The fade-in is an entrance, and the blanket reduced-motion rule the
       // reference states for the avatar applies in spirit here: a frozen
       // entrance freezes at its END, not at its start. Leaving `uOpacity` at 0
-      // would make "reduced motion" mean "no orb", which is the trap
-      // `globals.css` L3186 calls out by name.
+      // would make "reduced motion" mean "no orb", which is the trap the
+      // stylesheet's own comment calls out by name.
       _uOpacity = 1;
       _frame.value++;
       return;
@@ -457,8 +457,7 @@ class _VoiceIndicatorState extends State<VoiceIndicator>
     );
   }
 
-  /// `--orb-from` / `--orb-to`, globals.css L733–734 (light) and L940–941
-  /// (dark).
+  /// `--orb-from` / `--orb-to`, declared per theme.
   ///
   /// *"Declared as their own tokens rather than read off `--agent` directly,
   /// because a shader cannot resolve a CSS variable … Keeping them separate

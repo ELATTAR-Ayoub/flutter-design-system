@@ -746,7 +746,7 @@ class _ThemingContent extends StatelessWidget {
         'the mask only matters when it is still."',
     'AgentStatusText\'s gradient is base (theme.mutedForeground) → '
         'band (theme.agentAccent) → base, a different three-stop shape from '
-        'both LoadingShimmerMotion and AttachmentStatusText: spelled out in this file '
+        'both ShimmerMotion and AttachmentStatusText: spelled out in this file '
         'rather than reused, because the source utility it ports, '
         'anim-shimmer-text, is a different animation from both.',
   ]);

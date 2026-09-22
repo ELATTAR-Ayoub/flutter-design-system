@@ -33,20 +33,19 @@ const List<String> _exemptDirs = <String>[
   // whole — motion *data*, in exactly the sense `TypeStep(14, 20)` is type
   // data in foundation/. See the file's own header.
   'lib/src/components/ui/keyframes.dart',
-  // The default Button surface's own gradient ramp/texture geometry
-  // (globals.css L2093–2160) and its `@keyframes action-beat` (L2059–2088) —
-  // one effect's own numbers, transcribed from one named stylesheet rule and
-  // read by no other file. See the file's "The utility's own geometry"
-  // section.
+  // The default Button surface's own gradient ramp/texture geometry and its
+  // `@keyframes action-beat` — one effect's own numbers, transcribed from
+  // one named stylesheet rule and read by no other file. See the file's
+  // "The utility's own geometry" section.
   'lib/src/components/ui/action_feedback.dart',
-  // The body background-effect's own `radial-gradient()` geometry
-  // (globals.css L985–989) — same reasoning as action_feedback.dart, for the
-  // one gradient this file paints.
+  // The body background-effect's own `radial-gradient()` geometry — same
+  // reasoning as action_feedback.dart, for the one gradient this file
+  // paints.
   'lib/src/components/ui/background_effect.dart',
-  // The value foil's own metal-ramp gradient geometry (globals.css
-  // L1964–2030) and its `@keyframes value-foil-drift` / `value-glint`
-  // (L1915–1946) — same reasoning as action_feedback.dart, transcribed for
-  // this one premium surface and read by nothing else.
+  // The value foil's own metal-ramp gradient geometry and its `@keyframes
+  // value-foil-drift` / `value-glint` — same reasoning as
+  // action_feedback.dart, transcribed for this one premium surface and read
+  // by nothing else.
   'lib/src/components/ui/premium_surface.dart',
   // The VS Code "Dark Plus" theme `react-syntax-highlighter` writes as
   // *inline* styles — a third-party theme's own palette and metrics, not
@@ -57,6 +56,30 @@ const List<String> _exemptDirs = <String>[
   // argument as the other entries above. See the file's own comment on
   // `_vaulCurve`.
   'lib/src/components/ui/drawer.dart',
+  // The collapse's width/gap/slide legs and the group label's fade are
+  // measured genuinely linear — no front-loading, no overshoot — and none
+  // of the seven MotionCurves eases or springs at 0, so none is honest here.
+  // Same "third-party feel, not vocabulary" argument as `_vaulCurve` above.
+  // See the file's own comment on `_sidebarLinear`.
+  'lib/src/components/ui/sidebar.dart',
+  // recharts can only receive the CSS keyword `ease-out`
+  // (`cubic-bezier(0, 0, 0.58, 1)`), a visibly different curve from this
+  // system's own MotionCurves.enter — reproducing the reference means
+  // reproducing that exact curve, not the nearest token. See the file's own
+  // comment on `_chartEaseOut`.
+  'lib/src/components/ui/chart.dart',
+  // The scroll fade names the CSS `ease-in-out` keyword
+  // (`cubic-bezier(0.42, 0, 0.58, 1)`), materially different from this
+  // system's own MotionCurves.move at the measured sample point — same
+  // "third-party feel, not vocabulary" argument as the entries above. See
+  // the file's own comment on `_scrollFadeCurve`.
+  'lib/src/components/ui/message_scroller.dart',
+  // sonner's own two easings — neither is one of the seven MotionCurves,
+  // and both are measured off the live toast rather than declared by this
+  // system. Same "third-party feel, not vocabulary" argument as the
+  // entries above. See the file's own comment on `_toastEntrance` and
+  // `_toastSwipeOut`.
+  'lib/src/components/ui/toaster.dart',
   // Holds the open/close stop tables for the disclosure transition — motion
   // *data*, in the same sense keyframes.dart's `@keyframes` transcription is,
   // not a component restating a token.

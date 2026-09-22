@@ -63,10 +63,9 @@ const ComponentDocEntry dropdownMenuDoc = ComponentDocEntry(
     'Menu',
     'MenuSurfaceVariant',
     'MenuSurface',
-    // menu.dart's open content and shared motion/gesture primitives.
+    // menu.dart's open content and shared pointer primitive.
     'MenuContent',
     'MenuPointerDown',
-    'MenuMotion',
   ],
   sourcePath: 'lib/src/components/ui/dropdown_menu.dart',
 );

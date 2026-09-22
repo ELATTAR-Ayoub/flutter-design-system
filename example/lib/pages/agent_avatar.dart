@@ -14,8 +14,8 @@
 /// [_StatusLine] ports `parts/agent-face.tsx`'s `StatusLine`, which belongs to
 /// the console family. It has exactly one consumer here, so it stays on this
 /// page on the B10 precedent: promotion to the package needs a second one.
-/// Its shimmer is `@utility anim-shimmer-text`, which is `pulls-shimmer` (the
-/// keyframes `Skeleton` already runs) at [MotionDurations.shimmerText] over a
+/// Its shimmer is `@utility anim-shimmer-text` (the same keyframes
+/// `Skeleton` already runs) at [MotionDurations.shimmerText] over a
 /// **three-stop, 100deg, 220%-wide** gradient clipped to the glyphs: a
 /// different utility from both `anim-shimmer` and the `shimmer` one
 /// `AttachmentStatusText` carries, and the reason it is spelled out rather than
@@ -358,7 +358,7 @@ class _PlaygroundState extends State<_Playground> {
 /// *"Shimmers while the agent is working and sits still when it is not, so the
 /// status can be read at a glance without parsing the word."*
 ///
-/// `@utility anim-shimmer-text` (globals.css L3051–3070):
+/// `@utility anim-shimmer-text`:
 ///
 /// ```css
 /// background-image: linear-gradient(100deg,
@@ -366,7 +366,7 @@ class _PlaygroundState extends State<_Playground> {
 /// background-size: 220% 100%;
 /// background-clip: text;
 /// color: transparent;
-/// animation: pulls-shimmer 2.6s var(--ease-in-out) infinite;
+/// animation: 2.6s var(--ease-in-out) infinite;
 /// ```
 ///
 /// Three mechanics, all of them measured on the live line:
@@ -374,10 +374,10 @@ class _PlaygroundState extends State<_Playground> {
 /// * `background-clip: text` with `color: transparent` is a [ShaderMask] in
 ///   [BlendMode.srcIn] over the painted glyphs: the gradient shows *through*
 ///   the letters and nowhere else.
-/// * `pulls-shimmer` is [LoadingShimmerMotion]'s own table, `200% 0 → −200% 0`, and a
+/// * The shimmer is [ShimmerMotion]'s own table, `200% 0 → −200% 0`, and a
 ///   `background-position` percentage resolves against `container − image`. At
 ///   **220%** that is `−1.2W` per unit rather than `−W`, so the band travels
-///   `±2.4W` and not `±2W`; [LoadingShimmerMotion.offsetAt] assumes the 200% tile, so the
+///   `±2.4W` and not `±2W`; [ShimmerMotion.offsetAt] assumes the 200% tile, so the
 ///   offset is computed here from the same two stops.
 /// * `background-repeat` defaults to `repeat`, so the box is never empty at the
 ///   extremes: the same fact [Skeleton]'s own note records.
@@ -455,13 +455,13 @@ class _StatusLineState extends State<_StatusLine>
         shaderCallback: (Rect bounds) {
           final double tile = bounds.width * _StatusLine.tileFactor;
           // `background-position: X%` puts the image's X% point on the box's
-          // X% point: `offset = (W − tileW) · X`. LoadingShimmerMotion states the two
+          // X% point: `offset = (W − tileW) · X`. ShimmerMotion states the two
           // ends; only the tile factor differs.
-          final double eased = LoadingShimmerMotion.curve.transform(_c.value);
+          final double eased = ShimmerMotion.curve.transform(_c.value);
           final double percent =
-              LoadingShimmerMotion.fromPercent +
-              (LoadingShimmerMotion.toPercent -
-                      LoadingShimmerMotion.fromPercent) *
+              ShimmerMotion.fromPercent +
+              (ShimmerMotion.toPercent -
+                      ShimmerMotion.fromPercent) *
                   eased;
           final double offset = (bounds.width - tile) * percent;
           final double radians = _StatusLine.angleDegrees * math.pi / 180;

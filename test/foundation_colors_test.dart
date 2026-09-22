@@ -14,7 +14,7 @@ import 'package:elattar_design_system/elattar_design_system.dart';
 void main() {
   // ── hslColor — CSS hsl() rasterisation ────────────────────────────────────────
   group('hslColor', () {
-    // globals.css L99–105: the ramp was annotated #93C5FD / #2563EB / #1D4ED8
+    // The ramp was annotated #93C5FD / #2563EB / #1D4ED8
     // for three brands and never rasterised to those. The hsl() values are
     // authoritative; these three hexes are what they actually paint.
     test('--color-action-bright: hsl(213 94% 78%) rasterises #92C2FC', () {
@@ -37,7 +37,7 @@ void main() {
     });
 
     test('alpha is straight, never pre-composited', () {
-      // --ink-2: hsl(240 20% 20% / 0.07) — globals.css L611.
+      // --ink-2: hsl(240 20% 20% / 0.07).
       final Color ink2 = hslColor(240, 20, 20, 0.07);
       expect(ink2.a, 0.07);
       expect(ink2.r, hslColor(240, 20, 20).r);
@@ -51,7 +51,7 @@ void main() {
     });
   });
 
-  // ── Palette — @theme static ramps + state (globals.css L71–433) ──────────
+  // ── Palette — @theme static ramps + state ──────────────────────────────
   group('Palette', () {
     test('brand ramps (L103–109)', () {
       expect(Palette.actionBright, hslColor(213, 94, 78));
@@ -81,7 +81,7 @@ void main() {
     });
   });
 
-  // ── ThemeTokens.dark — `.dark` block, globals.css L741–942 ────────────────
+  // ── ThemeTokens.dark — `.dark` block ─────────────────────────────────────
   group('ThemeTokens.dark', () {
     final ThemeTokens t = ThemeTokens.dark;
 
@@ -171,7 +171,7 @@ void main() {
     test('--radius (L814)', () => expect(t.radius, Radii.md));
   });
 
-  // ── ThemeTokens.light — `:root, .light` block, globals.css L546–735 ────────
+  // ── ThemeTokens.light — `:root, .light` block ───────────────────────────
   group('ThemeTokens.light', () {
     final ThemeTokens t = ThemeTokens.light;
 
@@ -429,7 +429,7 @@ void main() {
       expect(space(20), 80);
     });
 
-    test('widths (globals.css L228–322)', () {
+    test('widths', () {
       expect(LayoutWidths.shell, 1680);
       expect(LayoutWidths.content, 1080);
       expect(LayoutWidths.page, 1200);
@@ -447,7 +447,7 @@ void main() {
       expect(ScrollOffsets.anchoredHeading, 96);
     });
 
-    test('radii (globals.css L324–339)', () {
+    test('radii', () {
       expect(Radii.xs, 2);
       expect(Radii.sm, 6);
       expect(Radii.md, 10);

@@ -888,13 +888,13 @@ class _Dot extends StatefulWidget {
 class _DotState extends State<_Dot> with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: DotSelectionMotion.duration,
+    duration: ChangeMotion.duration,
   );
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (effectiveMotionDuration(context, DotSelectionMotion.duration) ==
+    if (effectiveMotionDuration(context, ChangeMotion.duration) ==
         Duration.zero) {
       _c.value = 1;
     } else if (!_c.isAnimating && _c.value == 0) {
@@ -914,13 +914,14 @@ class _DotState extends State<_Dot> with SingleTickerProviderStateMixin {
     return Center(
       child: AnimatedBuilder(
         animation: _c,
-        builder: (BuildContext context, Widget? child) => Opacity(
-          opacity: DotSelectionMotion.opacity.transform(_c.value),
-          child: Transform.scale(
-            scale: DotSelectionMotion.scale.transform(_c.value),
+        builder: (BuildContext context, Widget? child) {
+          final Offset scale = ChangeMotion.scale.transform(_c.value);
+          return Transform.scale(
+            scaleX: scale.dx,
+            scaleY: scale.dy,
             child: child,
-          ),
-        ),
+          );
+        },
         child: Container(
           width: QuestionnaireChoice.dot,
           height: QuestionnaireChoice.dot,

@@ -1378,78 +1378,97 @@ class IndexCard extends StatelessWidget {
     final double pad = _group ? space(7) : space(5);
     final double chipGap = _group ? space(5) : space(4);
 
-    return InteractiveCard(
-      radius: BorderRadius.circular(Radii.xl),
-      fill: theme.card,
-      borderColor: theme.border,
-      hoverBorderColor: Palette.action.withValues(alpha: _cardHoverBorderAlpha),
-      padding: EdgeInsets.all(pad),
-      onTap: () => AppRouter.of(context).navigate(href),
-      builder: (BuildContext context, bool hovered) =>
-          SelectionContainer.disabled(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Expanded(
-                      child: _group
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                CapsLabel(label!, color: theme.actionText),
-                                SizedBox(height: space(3)),
-                                StyledText(
-                                  title,
-                                  TextStyles.h3,
-                                  color: theme.foreground,
-                                ),
-                              ],
-                            )
-                          : StyledText(
-                              title,
-                              TextStyles.h4,
-                              color: theme.foreground,
-                            ),
-                    ),
-                    SizedBox(width: _group ? space(4) : space(3)),
-                    Padding(
-                      // `mt-1` on the group card, `mt-0.5` on the index card.
-                      padding: EdgeInsets.only(
-                        top: _group ? space(1) : space(0.5),
-                      ),
-                      child: _CardArrow(hovered: hovered, large: _group),
-                    ),
-                  ],
-                ),
-                SizedBox(height: _group ? space(3) : space(2)),
-                // `grow`: the blurb takes the slack so the chips sit on the
-                // bottom edge however tall the row's tallest card is.
-                Expanded(child: StyledText(blurb, TextStyles.small)),
-                SizedBox(height: chipGap),
-                Container(
-                  padding: EdgeInsets.only(top: chipGap),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: theme.border,
-                        width: BorderWidths.hairline,
-                      ),
-                    ),
-                  ),
-                  child: Wrap(
-                    spacing: space(1.5),
-                    runSpacing: space(1.5),
+    final BorderRadius radius = BorderRadius.circular(Radii.xl);
+    final Color hoverBorderColor = Palette.action.withValues(
+      alpha: _cardHoverBorderAlpha,
+    );
+
+    return HoverBuilder(
+      cursor: SystemMouseCursors.click,
+      builder: (BuildContext context, bool hovered) => Press(
+        onTap: () => AppRouter.of(context).navigate(href),
+        focusRadius: Radii.xl,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: theme.card,
+            borderRadius: radius,
+            border: Border.all(
+              color: hovered ? hoverBorderColor : theme.border,
+              width: BorderWidths.hairline,
+            ),
+            boxShadow: hovered
+                ? Shadows.lg.outerShadows(theme)
+                : const <BoxShadow>[],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(pad),
+            child: SelectionContainer.disabled(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      for (final String chip in contents)
-                        _CardChip(label: chip),
+                      Expanded(
+                        child: _group
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  CapsLabel(label!, color: theme.actionText),
+                                  SizedBox(height: space(3)),
+                                  StyledText(
+                                    title,
+                                    TextStyles.h3,
+                                    color: theme.foreground,
+                                  ),
+                                ],
+                              )
+                            : StyledText(
+                                title,
+                                TextStyles.h4,
+                                color: theme.foreground,
+                              ),
+                      ),
+                      SizedBox(width: _group ? space(4) : space(3)),
+                      Padding(
+                        // `mt-1` on the group card, `mt-0.5` on the index card.
+                        padding: EdgeInsets.only(
+                          top: _group ? space(1) : space(0.5),
+                        ),
+                        child: _CardArrow(hovered: hovered, large: _group),
+                      ),
                     ],
                   ),
-                ),
-              ],
+                  SizedBox(height: _group ? space(3) : space(2)),
+                  // `grow`: the blurb takes the slack so the chips sit on the
+                  // bottom edge however tall the row's tallest card is.
+                  Expanded(child: StyledText(blurb, TextStyles.small)),
+                  SizedBox(height: chipGap),
+                  Container(
+                    padding: EdgeInsets.only(top: chipGap),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: theme.border,
+                          width: BorderWidths.hairline,
+                        ),
+                      ),
+                    ),
+                    child: Wrap(
+                      spacing: space(1.5),
+                      runSpacing: space(1.5),
+                      children: <Widget>[
+                        for (final String chip in contents)
+                          _CardChip(label: chip),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
+        ),
+      ),
     );
   }
 }

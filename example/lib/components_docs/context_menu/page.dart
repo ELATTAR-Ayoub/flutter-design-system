@@ -907,9 +907,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'A right-click (or a trackpad two-finger click) opens the menu at '
         'the pointer\'s client coordinates, 2px to the right and slightly '
-        'up (side: right, align: start). The content animates in with '
-        'MenuMotion\'s slide-plus-zoom-plus-fade, over '
-        'MotionDurations.overlayEnter.',
+        'up (side: right, align: start). The content animates in through '
+        'OpenTransition\'s slide-plus-zoom-plus-fade, over '
+        'OpenMotion.duration.',
     userSignal: 'The menu appears at the cursor, not at a fixed anchor.',
   ),
   DocsStateFact(

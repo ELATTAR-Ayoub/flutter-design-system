@@ -90,7 +90,7 @@ Future<void> settleOverlay(WidgetTester tester) async {
 /// 2.5% of its height further down. Every geometry assertion below waits.
 Future<void> settleEntrance(WidgetTester tester) async {
   await settleOverlay(tester);
-  await tester.pump(MotionDurations.overlayEnter);
+  await tester.pump(OpenMotion.duration);
   await tester.pump();
 }
 
@@ -1094,12 +1094,13 @@ void main() {
 
         set(() => open = false);
         await tester.pump();
-        // The fold starts at `yuki-fold`'s own 0% — full height — rather than
-        // reversing from wherever an interrupted unfold had reached, so the
-        // first frame of a close is always the settled box.
+        // The fold starts at ExpandMotion's own 0% — full height — rather
+        // than reversing from wherever an interrupted unfold had reached, so
+        // the first frame of a close is always the settled box.
         await tester.pump(const Duration(milliseconds: 1));
         expect(tester.getSize(find.byType(Unfold)).height, closeTo(100, 1));
-        // `yuki-fold` runs `--duration-base`, not `--duration-jelly`.
+        // ExpandMotion.collapseDuration runs `--duration-base`, not the
+        // spring window.
         await tester.pump(MotionDurations.normal);
         await tester.pump();
         await tester.pump();

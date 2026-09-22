@@ -118,15 +118,15 @@ void main() {
 
       await tester.tap(sidebarToggle);
       await tester.pump();
-      // `ChatHistory`'s drawer slides in behind `_PanelIn`
-      // (`translateX(-100%) → none` over `ChatHistory.panelIn`, 320ms) — one
-      // bare `pump()` catches it mid-slide, off to the left of its resting
-      // rect, which is a transient animation frame rather than a defect in
-      // where the drawer is laid out (`_surfaceRect` itself resolves to the
-      // console's own rect correctly throughout, confirmed by probing it
-      // directly). Waiting out the same duration a real pointer would (a
-      // person cannot click a row before it has visually arrived either)
-      // settles the transform before the tap below.
+      // `ChatHistory`'s drawer fades and scales in through EnterMotion, `rise:
+      // 0` (`ChatHistory.panelIn`, 400ms) — one bare `pump()` catches it
+      // mid-animation, below full opacity, which is a transient animation
+      // frame rather than a defect in where the drawer is laid out
+      // (`_surfaceRect` itself resolves to the console's own rect correctly
+      // throughout, confirmed by probing it directly). Waiting out the same
+      // duration a real pointer would (a person cannot click a row before it
+      // has visually arrived either) settles the transform before the tap
+      // below.
       await tester.pump(ChatHistory.panelIn);
 
       // "Sealed inventory check" is the seeded store's active conversation;
@@ -146,7 +146,7 @@ void main() {
       // no longer in the tree.
       expect(find.text('Sealed inventory check'), findsNothing);
 
-      // Selecting also drives `BlurSwitchController.switchTo`, which the
+      // Selecting also drives `TranscriptSwitchController.switchTo`, which the
       // console wears on its transcript as `switchPhase`: the transcript's
       // `BlurSwitch` leaves `SwitchPhase.idle` for the transition, which is
       // the visible, on-console change a selection makes.

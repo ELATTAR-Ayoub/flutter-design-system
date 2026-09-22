@@ -64,21 +64,10 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// Every named constructor parameter each exported class declares
+/// Every named constructor parameter HoverBuilder declares
 /// (`lib/src/components/ui/hover_builder.dart`), excluding `key`.
 const List<String> _hoverBuilderConstructorParams = <String>[
   'builder',
-  'cursor',
-];
-const List<String> _interactiveCardConstructorParams = <String>[
-  'builder',
-  'radius',
-  'fill',
-  'borderColor',
-  'hoverBorderColor',
-  'shadow',
-  'padding',
-  'onTap',
   'cursor',
 ];
 
@@ -118,14 +107,9 @@ void main() {
         for (final String param in _hoverBuilderConstructorParams) {
           expect(find.text(param), findsWidgets, reason: 'missing $param');
         }
-        for (final String param in _interactiveCardConstructorParams) {
-          expect(find.text(param), findsWidgets, reason: 'missing $param');
-        }
 
-        // A live InteractiveCard mounts on Preview's "Lifts on hover" column and
-        // on Index Card: two. A live bare HoverBuilder mounts on Bare Lift, and
-        // InteractiveCard itself is built on HoverBuilder, so HoverBuilder totals three.
-        expect(find.byType(InteractiveCard), findsNWidgets(2));
+        // A live HoverBuilder mounts on Preview's "Lifts on hover" column,
+        // on Index Card, and on Bare HoverBuilder: three.
         expect(find.byType(HoverBuilder), findsNWidgets(3));
 
         for (final String key in <String>[
@@ -142,10 +126,7 @@ void main() {
         }
 
         expect(hoverBuilderDoc.name, 'hover_builder');
-        expect(
-          hoverBuilderDoc.exports,
-          containsAll(<String>['HoverBuilder', 'InteractiveCard']),
-        );
+        expect(hoverBuilderDoc.exports, <String>['HoverBuilder']);
         expect(hoverBuilderDoc.command, 'elattar add hover-builder');
         expect(destination, isNull);
       },
@@ -173,6 +154,12 @@ void main() {
         await tester.ensureVisible(card);
         await tester.pump();
 
+        AnimatedContainer container() => tester.widget<AnimatedContainer>(
+          find.descendant(of: card, matching: find.byType(AnimatedContainer)),
+        );
+
+        expect((container().decoration! as BoxDecoration).boxShadow, isNull);
+
         final TestGesture gesture = await tester.createGesture(
           kind: PointerDeviceKind.mouse,
         );
@@ -182,18 +169,15 @@ void main() {
 
         await gesture.moveTo(tester.getCenter(card));
         // One zero-duration pump lets MouseRegion.onEnter's setState land
-        // and call AnimationController.forward() before the clock moves; a
-        // fraction of the rise's own 250ms (MotionDurations.normal) then proves
-        // the controller actually ticked — never `pumpAndSettle` (which
-        // would hang on nothing here, but the house rule is never to reach
-        // for it on a docs page regardless).
+        // before the clock moves; a fraction of the rise's own 250ms
+        // (MotionDurations.normal) then proves the AnimatedContainer
+        // actually started tweening toward the hover decoration — never
+        // `pumpAndSettle` (which would hang on nothing here, but the house
+        // rule is never to reach for it on a docs page regardless).
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 100));
 
-        final Transform transform = tester.widget<Transform>(
-          find.descendant(of: card, matching: find.byType(Transform)).first,
-        );
-        expect(transform.transform.getTranslation().y, lessThan(-0.01));
+        expect((container().decoration! as BoxDecoration).boxShadow, isNotNull);
       },
     );
 

@@ -1366,8 +1366,6 @@ class _NavigatingStatState extends State<_NavigatingStat> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: Press(
-        scale: MotionTransforms.pressSpringScale,
-        upDuration: MotionDurations.pressSpringUp,
         onTap: () {},
         child: TweenAnimationBuilder<Color?>(
           // `transition-colors duration-fast`, DRIFT 3.

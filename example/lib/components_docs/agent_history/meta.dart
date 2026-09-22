@@ -8,13 +8,13 @@
 /// `source-foundation`, `spinner`.
 ///
 /// `lib/src/components/ui/agent_history.dart` ports three reference files —
-/// `history-card.tsx`, `chat-history.tsx`, `history-search.tsx` — plus one
-/// motion helper the three of them share. [exports] lists every public
+/// `history-card.tsx`, `chat-history.tsx`, `history-search.tsx` — plus the
+/// motion helpers they share (the row entrance/exit is private; a row plays
+/// [EnterMotion] and [ExitMotion] directly). [exports] lists every public
 /// name the file declares; the page documents [HistoryCard],
 /// [HistorySearch], and [ChatHistory] (the three real widgets), the
 /// two enums that shape a card's destructive and rename affordances, and
-/// [RowMotion], [BlurSwitch], and [FlipController] (the shared
-/// motion machinery) in full.
+/// [BlurSwitch] and [FlipController] (the shared motion machinery) in full.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
@@ -51,7 +51,6 @@ const ComponentDocEntry agentHistoryDoc = ComponentDocEntry(
     'ChatHistory',
     'HistoryConfirm',
     'HistoryRename',
-    'RowMotion',
     'BlurSwitch',
     'FlipController',
   ],

@@ -367,7 +367,7 @@ void main() {
       flip.reconcile(<String>['A', 'B', 'D', 'C']);
       // `lastPlacedIndex`: A(0) B(1) D(3) then C(old 2 < 3) → C is the child
       // given a Placement, and C is the row measured replaying
-      // `pulls-row-in`'s translateX(-10px). D — the row that actually moved —
+      // `anim-row-in`'s translateX(-10px). D — the row that actually moved —
       // teleports.
       expect(flip.generationOf('C'), 1);
       expect(flip.generationOf('D'), 0);
@@ -481,70 +481,68 @@ void main() {
 
   /* ── Row motion ────────────────────────────────────────────────────────── */
 
-  group('anim-row-in / anim-row-out', () {
-    test('the delay is a flat --duration-tick, because nothing staggers', () {
-      // `calc(--duration-tick + var(--row-index, 0) * --duration-tick / 2)`
-      // with no `--row-index` set anywhere on the page.
+  group('the row entrance/exit — EnterMotion staggered, ExitMotion on leave', () {
+    test('the first row\'s delay reproduces the old flat --duration-tick', () {
+      // The web original staggered by `--row-index`, an inline custom
+      // property nothing on the page ever set, so every row measured the
+      // same flat 80ms delay. `EnterMotion.delayFor(0 + 2)` reproduces that
+      // exact number for the first row.
+      expect(EnterMotion.delayFor(0 + 2), MotionDurations.tick);
+    });
+
+    test('a later row genuinely staggers, unlike the web original', () {
       expect(
-        RowMotion.enterSpan,
-        MotionDurations.tick + MotionDurations.normal,
+        EnterMotion.delayFor(1 + 2),
+        greaterThan(EnterMotion.delayFor(0 + 2)),
       );
-      expect(RowMotion.enterDelayFraction, closeTo(80 / 330, 0.001));
-      // The hold: nothing has moved while the delay runs.
-      expect(RowMotion.enterCurve.transform(0), 0);
-      expect(RowMotion.enterCurve.transform(RowMotion.enterDelayFraction), 0);
-      expect(RowMotion.enterCurve.transform(1), 1);
     });
 
-    test('the travels are the keyframes own', () {
-      expect(RowMotion.enterShift, -10);
-      expect(RowMotion.exitShift, -24);
-      expect(RowMotion.exitBreak, 0.45);
-    });
+    testWidgets(
+      'a leaving row keeps its own box — no height collapse, unlike the web '
+      'original',
+      (WidgetTester t) async {
+        Widget card({required bool leaving}) => HistoryCard(
+          conversation: _seed.first,
+          leaving: leaving,
+          onOpen: (_) {},
+          onRename: (_, _) {},
+          onRemove: (_) {},
+        );
 
-    testWidgets('a leaving row collapses its own height', (
-      WidgetTester t,
-    ) async {
-      Widget card({required bool leaving}) => HistoryCard(
-        conversation: _seed.first,
-        leaving: leaving,
-        onOpen: (_) {},
-        onRename: (_, _) {},
-        onRemove: (_) {},
-      );
+        await _pump(t, card(leaving: false));
+        await t.pump();
+        final double tall = t.getSize(find.byType(HistoryCard)).height;
+        // 69.5 in the reference, half a pixel taller here. The half pixel is
+        // `Item`'s action slot, which now hugs its child through
+        // `Align(widthFactor: 1)` instead of claiming the row's whole
+        // remaining width. Nothing else moved: an earlier pass briefly made
+        // `ItemActions` a `Wrap` and read 90 for this card, which was the
+        // actions falling onto a second line, not a taller line box. That
+        // reading was wrong and the `Wrap` is gone.
+        //
+        // The row is `Item`'s padding plus its hairline border top and
+        // bottom, the title's fixed slot, the content gap, and one line of
+        // the preview at whatever step this width resolves to.
+        final TypeStep small = StyledText.stepOf(
+          t.element(find.byType(HistoryCard)),
+          TextStyles.small,
+        );
+        final double expectedTall =
+            Item.padding.vertical +
+            BorderWidths.hairline * 2 +
+            HistoryCard.titleHeight +
+            ItemContent.gap +
+            small.leading;
+        expect(tall, closeTo(expectedTall, 0.5));
 
-      await _pump(t, card(leaving: false));
-      await t.pump();
-      final double tall = t.getSize(find.byType(HistoryCard)).height;
-      // 69.5 in the reference, half a pixel taller here. The half pixel is
-      // `Item`'s action slot, which now hugs its child through
-      // `Align(widthFactor: 1)` instead of claiming the row's whole
-      // remaining width. Nothing else moved: an earlier pass briefly made
-      // `ItemActions` a `Wrap` and read 90 for this card, which was the
-      // actions falling onto a second line, not a taller line box. That
-      // reading was wrong and the `Wrap` is gone.
-      //
-      // The row is `Item`'s padding plus its hairline border top and bottom,
-      // the title's fixed slot, the content gap, and one line of the preview
-      // at whatever step this width resolves to.
-      final TypeStep small = StyledText.stepOf(
-        t.element(find.byType(HistoryCard)),
-        TextStyles.small,
-      );
-      final double expectedTall =
-          Item.padding.vertical +
-          BorderWidths.hairline * 2 +
-          HistoryCard.titleHeight +
-          ItemContent.gap +
-          small.leading;
-      expect(tall, closeTo(expectedTall, 0.5));
-
-      await _pump(t, card(leaving: true));
-      await t.pump();
-      // Under reduced motion the exit lands on its final frame, which is a
-      // zero-height box — the collapse the list rises into.
-      expect(t.getSize(find.byType(HistoryCard)).height, 0);
-    });
+        await _pump(t, card(leaving: true));
+        await t.pump();
+        // ExitMotion carries no height leg: the box stays exactly the size
+        // it was, and only its opacity/position/scale animate. The list
+        // above this widget is what reflows once the row actually unmounts.
+        expect(t.getSize(find.byType(HistoryCard)).height, closeTo(tall, 0.5));
+      },
+    );
   });
 
   /* ── The card ──────────────────────────────────────────────────────────── */
@@ -955,7 +953,7 @@ void main() {
       // The store call is deferred by `EXIT_MS` so the row can play
       // `anim-row-out` — without it the list snaps shut under the cursor.
       expect(ChatHistory.exit, MotionDurations.normal);
-      expect(ChatHistory.panelIn, MotionDurations.overlayEnter);
+      expect(ChatHistory.panelIn, EnterMotion.duration);
     });
 
     testWidgets('New chat creates and closes; the drawer closes on its own X', (

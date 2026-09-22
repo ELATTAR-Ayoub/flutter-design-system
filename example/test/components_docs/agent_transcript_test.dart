@@ -78,7 +78,6 @@ const List<String> _agentTranscriptApiFactNames = <String>[
   'ApprovalCard.pad / gap',
   'ApprovalCard.paramsMaxHeight / paramsPad',
   'ApprovalCard.rimAlpha / washAlpha',
-  'FadeUp.rise',
   'RowIn.delayFor(index)',
   'RowIn.slide',
   'ToolChip.chevronAlpha',

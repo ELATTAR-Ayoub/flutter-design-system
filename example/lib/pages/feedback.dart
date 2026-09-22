@@ -775,9 +775,9 @@ class _ToastPreview extends StatelessWidget {
               // `[data-icon] { margin-top: calc(--spacing * 0.5) }`.
               padding: EdgeInsets.only(top: space(0.5)),
               child: type == ToastType.loading
-                  // `className="size-4 anim-spin"`, `pulls-spin`, 900ms,
-                  // linear, forever. Reduced motion holds it at 0°, which is
-                  // where a fill-less animation reverts to.
+                  // `className="size-4 anim-spin"`, 900ms, linear, forever.
+                  // Reduced motion holds it at 0°, which is where a
+                  // fill-less animation reverts to.
                   ? KeyframePlayer(
                       duration: MotionDurations.spin,
                       fill: KeyframeFill.none,
@@ -902,7 +902,7 @@ class _ToastPreview extends StatelessWidget {
 /// var(--text-small); font-weight: 500; transition: background-color
 /// var(--duration-base) var(--ease-out)`.
 ///
-/// **Secondary, not outline** (`globals.css` L2790–2795): a bordered
+/// **Secondary, not outline**: a bordered
 /// transparent control over moving light reads as a hole. The hover goes to
 /// `--accent`, and `--duration-base` is read from the variable directly here
 /// rather than through a `duration-<word>` utility, so it is genuinely

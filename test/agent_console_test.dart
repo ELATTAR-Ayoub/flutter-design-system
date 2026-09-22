@@ -227,7 +227,7 @@ void main() {
       () {
         // PROBE CORRECTION. `AttachmentStatusText` (attachment.dart) is shadcn's
         // `shimmer`: 2s linear, a `3ch + 40px` band. The status line wears
-        // `anim-shimmer-text`, measured live mid-turn as `pulls-shimmer 2.6s
+        // `anim-shimmer-text`, measured live mid-turn as `2.6s
         // cubic-bezier(0.65,0,0.35,1) infinite` over `background-size: 220%`.
         expect(AgentStatusText.period, MotionDurations.shimmerText);
         expect(AgentStatusText.period, const Duration(milliseconds: 2600));
@@ -1338,7 +1338,7 @@ void main() {
             .first,
       );
       expect(filtered.imageFilter, isNotNull);
-      // `pulls-blur-out` ends on blur(6px); the port halves it to a Gaussian σ.
+      // `anim-blur-out` ends on blur(6px); the port halves it to a Gaussian σ.
       expect(BlurSwitch.outRadius, 6);
       final Opacity opacity = tester.widget<Opacity>(
         find
@@ -1355,7 +1355,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await pumpAt(tester, SwitchPhase.blurIn);
-      // `pulls-blur-in` runs blur(8px) → 0, so its resting stop filters nothing.
+      // `anim-blur-in` runs blur(8px) → 0, so its resting stop filters nothing.
       expect(BlurSwitch.inRadius, 8);
       expect(
         find.ancestor(
@@ -1375,9 +1375,9 @@ void main() {
       expect(opacity.opacity, 1);
     });
 
-    test('the two legs are the measured durations', () {
-      expect(BlurSwitchController.outDuration, MotionDurations.fast); // 150ms
-      expect(BlurSwitchController.inDuration, MotionDurations.normal); // 250ms
+    test('the two legs are ExitMotion out, EnterMotion in', () {
+      expect(TranscriptSwitchController.outDuration, ExitMotion.duration); // 150ms
+      expect(TranscriptSwitchController.inDuration, EnterMotion.duration); // 400ms
     });
 
     test('the default is idle — a console with no history behind it', () {

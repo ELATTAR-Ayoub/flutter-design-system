@@ -195,7 +195,6 @@ final ComponentDocSpec menuDocSpec = ComponentDocSpec(
         DocsTocEntry(title: 'MenuSurface', anchor: 'api-elmenusurface'),
         DocsTocEntry(title: 'MenuContent', anchor: 'api-elmenucontent'),
         DocsTocEntry(title: 'MenuPointerDown', anchor: 'api-elmenupointerdown'),
-        DocsTocEntry(title: 'MenuMotion', anchor: 'api-elmenumotion'),
       ],
       child: _ApiReferenceContent(),
     ),
@@ -817,11 +816,6 @@ class _ApiReferenceContent extends StatelessWidget {
           facts: _menuPointerDownFacts,
         ),
       ),
-      SizedBox(height: space(5)),
-      const DocsAnchor(
-        id: 'api-elmenumotion',
-        child: DocsApiTable(title: 'MenuMotion', facts: _menuMotionFacts),
-      ),
     ],
   );
 }
@@ -1234,20 +1228,6 @@ const List<DocsApiFact> _menuPointerDownFacts = <DocsApiFact>[
     name: 'enabled',
     type: 'bool',
     description: 'Optional. Defaults to true. false renders child untouched.',
-  ),
-];
-
-const List<DocsApiFact> _menuMotionFacts = <DocsApiFact>[
-  DocsApiFact(
-    name: 'duration',
-    type: 'static Duration (get)',
-    description: 'MotionDurations.overlayEnter, 320ms.',
-  ),
-  DocsApiFact(
-    name: 'slideSides',
-    type: 'static Set<PopoverSide> (get)',
-    description:
-        'All four PopoverSide values: the overlay slides in from whichever side it actually lands on, on every one of the family.',
   ),
 ];
 

@@ -1415,7 +1415,7 @@ const List<DocsInstallFact> _themingFacts = <DocsInstallFact>[
   ),
   DocsInstallFact(
     label: 'Motion',
-    value: 'MotionDurations.normal, DotSelectionMotion, StateChangeFeedback',
+    value: 'MotionDurations.normal, ChangeMotion, StateChangeFeedback',
     description:
         'Socket colour/border/ring tween duration, the dot\'s own '
         'pop-in keyframe (scale and opacity, on the spring curve), and '

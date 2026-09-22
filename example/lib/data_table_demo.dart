@@ -524,7 +524,6 @@ class _SortHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Press(
-    scale: MotionTransforms.clickSpringScale,
     onTap: onPressed,
     behavior: HitTestBehavior.opaque,
     child: Row(

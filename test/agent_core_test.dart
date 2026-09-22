@@ -681,19 +681,19 @@ void main() {
     });
   });
 
-  group('BlurSwitchController', () {
+  group('TranscriptSwitchController', () {
     test('the two measured legs, and the store call in the middle', () {
-      expect(BlurSwitchController.outDuration, MotionDurations.fast);
-      expect(BlurSwitchController.inDuration, MotionDurations.normal);
-      expect(BlurSwitchController.outDuration.inMilliseconds, 150);
-      expect(BlurSwitchController.inDuration.inMilliseconds, 250);
+      expect(TranscriptSwitchController.outDuration, ExitMotion.duration);
+      expect(TranscriptSwitchController.inDuration, EnterMotion.duration);
+      expect(TranscriptSwitchController.outDuration.inMilliseconds, 150);
+      expect(TranscriptSwitchController.inDuration.inMilliseconds, 400);
     });
 
     testWidgets('blurs out, swaps at the darkest point, blurs in', (
       WidgetTester tester,
     ) async {
       final List<String> opened = <String>[];
-      final BlurSwitchController controller = BlurSwitchController(
+      final TranscriptSwitchController controller = TranscriptSwitchController(
         open: opened.add,
       );
       addTearDown(controller.dispose);
@@ -706,11 +706,11 @@ void main() {
       // now would blur the *new* conversation out and then back in.
       expect(opened, isEmpty);
 
-      await tester.pump(BlurSwitchController.outDuration);
+      await tester.pump(TranscriptSwitchController.outDuration);
       expect(opened, <String>['c-export']);
       expect(controller.phase, SwitchPhase.blurIn);
 
-      await tester.pump(BlurSwitchController.inDuration);
+      await tester.pump(TranscriptSwitchController.inDuration);
       expect(controller.phase, SwitchPhase.idle);
     });
 
@@ -718,7 +718,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final List<String> opened = <String>[];
-      final BlurSwitchController controller = BlurSwitchController(
+      final TranscriptSwitchController controller = TranscriptSwitchController(
         open: opened.add,
       );
       addTearDown(controller.dispose);
@@ -726,10 +726,10 @@ void main() {
       controller.switchTo('a');
       await tester.pump(const Duration(milliseconds: 100));
       controller.switchTo('b');
-      await tester.pump(BlurSwitchController.outDuration);
+      await tester.pump(TranscriptSwitchController.outDuration);
       // The first sequence's deferred `open` is dropped, not replayed.
       expect(opened, <String>['b']);
-      await tester.pump(BlurSwitchController.inDuration);
+      await tester.pump(TranscriptSwitchController.inDuration);
       expect(controller.phase, SwitchPhase.idle);
       expect(opened, <String>['b']);
     });

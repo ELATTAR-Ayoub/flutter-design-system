@@ -69,7 +69,7 @@ class DocsCopyButton extends StatefulWidget {
   final String copyToastLabel;
 
   /// How long the confirmation holds before reverting.
-  static const Duration confirmation = MotionDurations.copyConfirmation;
+  static const Duration confirmation = MotionDurations.confirmationHold;
 
   /// The wheel's three cells, in wheel order.
   static const int idleIndex = 0;

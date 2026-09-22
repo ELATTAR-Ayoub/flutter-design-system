@@ -252,7 +252,7 @@ class TokenRegistry {
   const TokenRegistry._();
 
   static final Map<String, _DsToken> _tokens = <String, _DsToken>{
-    // ── Monochrome: zinc (globals.css L549–574 light / L746–762 dark) ───────
+    // ── Monochrome: zinc (light / dark theme blocks) ────────────────────────
     '--background': (ThemeTokens t) => t.background,
     '--foreground': (ThemeTokens t) => t.foreground,
     '--card': (ThemeTokens t) => t.card,

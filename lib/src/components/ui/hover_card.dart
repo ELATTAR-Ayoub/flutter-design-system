@@ -43,10 +43,9 @@ import 'package:flutter/widgets.dart' as flutter show OverlayPortal;
 import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme_scope.dart';
+import './keyframes.dart';
+import './open_transition.dart';
 import './popover.dart';
-
-/// `zoom-in-95` / `zoom-out-95`.
-const double _zoom = 0.95;
 
 /// `HoverCard` — trigger, portal, content.
 class HoverCard extends StatefulWidget {
@@ -83,9 +82,6 @@ class HoverCard extends StatefulWidget {
   /// `sideOffset={4}`.
   static double get sideOffset => space(1);
 
-  /// `slide-in-from-top-2`.
-  static double get slide => space(2);
-
   @override
   State<HoverCard> createState() => _HoverCardState();
 }
@@ -112,7 +108,8 @@ class _HoverCardState extends State<HoverCard>
     super.initState();
     _animation = AnimationController(
       vsync: this,
-      duration: MotionDurations.overlayEnter,
+      duration: OpenMotion.duration,
+      reverseDuration: CloseMotion.duration,
     );
   }
 
@@ -133,10 +130,7 @@ class _HoverCardState extends State<HoverCard>
       _placement = null;
       _portal.show();
       _animation
-        ..duration = effectiveMotionDuration(
-          context,
-          MotionDurations.overlayEnter,
-        )
+        ..duration = effectiveMotionDuration(context, OpenMotion.duration)
         ..forward(from: 0);
     });
   }
@@ -148,10 +142,7 @@ class _HoverCardState extends State<HoverCard>
       if (!mounted || _pending != token || _insideCard) return;
       _pending = null;
       if (!_portal.isShowing) return;
-      _animation.duration = effectiveMotionDuration(
-        context,
-        MotionDurations.overlayEnter,
-      );
+      _animation.duration = effectiveMotionDuration(context, CloseMotion.duration);
       _animation.reverse().whenComplete(() {
         if (_animation.value != 0 || !mounted) return;
         _portal.hide();
@@ -193,9 +184,8 @@ class _HoverCardState extends State<HoverCard>
             _insideCard = false;
             _scheduleClose();
           },
-          child: _HoverCardTransition(
+          child: OpenTransition(
             animation: _animation,
-            origin: _placement?.origin ?? Alignment.topCenter,
             child: SizedBox(
               width: widget.width ?? HoverCard.defaultWidth,
               child: HoverCardContent(child: widget.content),
@@ -261,42 +251,3 @@ class HoverCardContent extends StatelessWidget {
   );
 }
 
-/// `animate-in fade-in-0 zoom-in-95 slide-in-from-top-2`, and its twin without
-/// the slide.
-class _HoverCardTransition extends StatelessWidget {
-  const _HoverCardTransition({
-    required this.animation,
-    required this.origin,
-    required this.child,
-  });
-
-  final Animation<double> animation;
-
-  /// `--radix-hover-card-content-transform-origin`, measured `50% 0px`.
-  final Alignment origin;
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: animation,
-    child: child,
-    builder: (BuildContext context, Widget? child) {
-      final double t = MotionCurves.enter.transform(
-        animation.value.clamp(0, 1),
-      );
-      final bool entering = animation.status != AnimationStatus.reverse;
-      return Opacity(
-        opacity: t,
-        child: Transform.translate(
-          offset: Offset(0, entering ? -HoverCard.slide * (1 - t) : 0),
-          child: Transform.scale(
-            scale: _zoom + (1 - _zoom) * t,
-            alignment: origin,
-            child: child,
-          ),
-        ),
-      );
-    },
-  );
-}

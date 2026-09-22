@@ -20,25 +20,60 @@ import 'package:flutter_test/flutter_test.dart';
 /// Retired 2026-09-22 with the fourteen. A symbol here may appear only in
 /// CHANGELOG.md and docs/references/motion-rename.md.
 const List<String> kRetiredMotionSymbols = <String>[
-  'EntranceMotion', 'SpringEntranceMotion', 'StateChangeMotion',
-  'DiscreteProgressMotion', 'TextRevealMotion', 'TextRevealFrame',
-  'RevealMotion', 'LoadingShimmerMotion', 'LivePulseMotion', 'SweepMotion',
-  'TravelMotion', 'CheckmarkDrawMotion', 'DashDrawMotion', 'DotSelectionMotion',
-  'ContentSwapMotion', 'FadeUp', 'RowMotion', 'MenuMotion', 'InteractiveCard',
-  '_PanelIn', '_FadeIn', '_ConfirmSlide', 'BlurSwitchController',
-  'MotionDurations.reward', 'MotionDurations.popIn', 'MotionDurations.springUp',
-  'MotionDurations.signOn', 'MotionDurations.ratchet', 'MotionDurations.checkDraw',
-  'MotionDurations.dashDraw', 'MotionDurations.dotPop', 'MotionDurations.pressSpringUp',
-  'MotionDurations.copyConfirmation', 'MotionDurations.liftY', 'MotionDurations.keyDownY',
-  'MotionDurations.frame', 'MotionDurations.overlayExit', 'MotionDurations.close',
+  'EntranceMotion',
+  'SpringEntranceMotion',
+  'StateChangeMotion',
+  'DiscreteProgressMotion',
+  'TextRevealMotion',
+  'TextRevealFrame',
+  'RevealMotion',
+  'LoadingShimmerMotion',
+  'LivePulseMotion',
+  'SweepMotion',
+  'TravelMotion',
+  'CheckmarkDrawMotion',
+  'DashDrawMotion',
+  'DotSelectionMotion',
+  'ContentSwapMotion',
+  'FadeUp',
+  'RowMotion',
+  'MenuMotion',
+  'InteractiveCard',
+  '_PanelIn',
+  '_FadeIn',
+  '_ConfirmSlide',
+  'BlurSwitchController',
+  'MotionDurations.reward',
+  'MotionDurations.popIn',
+  'MotionDurations.springUp',
+  'MotionDurations.signOn',
+  'MotionDurations.ratchet',
+  'MotionDurations.checkDraw',
+  'MotionDurations.dashDraw',
+  'MotionDurations.dotPop',
+  'MotionDurations.pressSpringUp',
+  'MotionDurations.copyConfirmation',
+  'MotionDurations.liftY',
+  'MotionDurations.keyDownY',
+  'MotionDurations.frame',
+  'MotionDurations.overlayExit',
+  'MotionDurations.close',
   'MotionDurations.collapse',
-  'MotionTransforms.clickSpringScale', 'MotionTransforms.pressSpringScale',
-  'MotionTransforms.buttonPress', 'MotionTransforms.sliderThumbHoverScale',
-  'MotionTransforms.sliderThumbActiveScale', 'MotionTransforms.liftY',
+  'MotionTransforms.clickSpringScale',
+  'MotionTransforms.pressSpringScale',
+  'MotionTransforms.buttonPress',
+  'MotionTransforms.sliderThumbHoverScale',
+  'MotionTransforms.sliderThumbActiveScale',
+  'MotionTransforms.liftY',
   'MotionTransforms.keyDownY',
-  'MotionCurves.balanced', 'MotionCurves.decelerate', 'MotionCurves.symmetric',
-  'MotionCurves.linear', 'MotionCurves.vaul',
-  'yuki-', 'pulls-', 'globals.css L',
+  'MotionCurves.balanced',
+  'MotionCurves.decelerate',
+  'MotionCurves.symmetric',
+  'MotionCurves.linear',
+  'MotionCurves.vaul',
+  'yuki-',
+  'pulls-',
+  'globals.css L',
 ];
 
 /// The motion layer: the three interaction utilities the shell and the docs
@@ -187,21 +222,18 @@ void main() {
       expect(taps, 1);
     });
 
-    testWidgets('honours a custom scale', (WidgetTester t) async {
+    testWidgets('presses to MotionTransforms.press, the one click feel', (
+      WidgetTester t,
+    ) async {
       await t.pumpWidget(
-        host(
-          Press(
-            scale: MotionTransforms.buttonPress,
-            child: const SizedBox(width: 80, height: 32),
-          ),
-        ),
+        host(Press(child: const SizedBox(width: 80, height: 32))),
       );
       final Finder press = find.byType(Press);
 
       await t.startGesture(t.getCenter(press));
       await t.pump();
       await t.pump(MotionDurations.pressIn);
-      expect(scaleOf(t, press).x, closeTo(MotionTransforms.buttonPress, 1e-6));
+      expect(scaleOf(t, press).x, closeTo(MotionTransforms.press, 1e-6));
     });
   });
 
@@ -234,162 +266,6 @@ void main() {
       await mouse.moveTo(Offset.zero);
       await t.pump();
       expect(states.last, isFalse);
-    });
-  });
-
-  group('InteractiveCard', () {
-    Future<TestGesture> hoverOver(WidgetTester t, Finder target) async {
-      final TestGesture mouse = await t.createGesture(
-        kind: PointerDeviceKind.mouse,
-      );
-      await mouse.addPointer(location: Offset.zero);
-      addTearDown(mouse.removePointer);
-      await t.pump();
-      await mouse.moveTo(t.getCenter(target));
-      return mouse;
-    }
-
-    BoxDecoration decorationOf(WidgetTester t) =>
-        t
-                .widget<DecoratedBox>(
-                  find
-                      .descendant(
-                        of: find.byType(InteractiveCard),
-                        matching: find.byType(DecoratedBox),
-                      )
-                      .first,
-                )
-                .decoration
-            as BoxDecoration;
-
-    testWidgets('rises 3px onto an e3 shadow and swaps its border', (
-      WidgetTester t,
-    ) async {
-      final Color hoverBorder = Palette.action.withValues(alpha: 0.45);
-      await t.pumpWidget(
-        host(
-          SizedBox(
-            width: 240,
-            height: 140,
-            child: InteractiveCard(
-              hoverBorderColor: hoverBorder,
-              builder: (BuildContext c, bool hovered) =>
-                  const SizedBox.expand(),
-            ),
-          ),
-        ),
-      );
-
-      final Finder card = find.byType(InteractiveCard);
-      expect(translationYOf(t, card), 0);
-      expect(decorationOf(t).boxShadow, isEmpty);
-      expect(
-        (decorationOf(t).border! as Border).top.color,
-        ThemeTokens.dark.border,
-      );
-
-      await hoverOver(t, card);
-      await t.pump();
-      await t.pump(MotionDurations.normal);
-
-      expect(translationYOf(t, card), closeTo(MotionTransforms.liftY, 1e-6));
-      final List<BoxShadow> lifted = Shadows.lg.outerShadows(ThemeTokens.dark);
-      expect(decorationOf(t).boxShadow, hasLength(lifted.length));
-      expect(decorationOf(t).boxShadow!.last.color, lifted.last.color);
-      expect((decorationOf(t).border! as Border).top.color, hoverBorder);
-    });
-
-    testWidgets('settles back when the pointer leaves', (WidgetTester t) async {
-      await t.pumpWidget(
-        host(
-          SizedBox(
-            width: 240,
-            height: 140,
-            child: InteractiveCard(
-              builder: (BuildContext c, bool hovered) =>
-                  const SizedBox.expand(),
-            ),
-          ),
-        ),
-      );
-      final Finder card = find.byType(InteractiveCard);
-
-      final TestGesture mouse = await hoverOver(t, card);
-      await t.pump();
-      await t.pump(MotionDurations.normal);
-      expect(translationYOf(t, card), closeTo(MotionTransforms.liftY, 1e-6));
-
-      await mouse.moveTo(Offset.zero);
-      await t.pump();
-      await t.pump(MotionDurations.normal);
-      expect(translationYOf(t, card), closeTo(0, 1e-6));
-    });
-
-    testWidgets('hands hover to its builder for the arrow quirk', (
-      WidgetTester t,
-    ) async {
-      bool seen = false;
-      await t.pumpWidget(
-        host(
-          SizedBox(
-            width: 240,
-            height: 140,
-            child: InteractiveCard(
-              builder: (BuildContext c, bool hovered) {
-                seen = hovered;
-                return const SizedBox.expand();
-              },
-            ),
-          ),
-        ),
-      );
-
-      await hoverOver(t, find.byType(InteractiveCard));
-      await t.pump();
-      expect(seen, isTrue);
-    });
-
-    // `box-sizing: border-box`, the rule the whole system is laid out under:
-    // a bordered, padded box gives its content `width − 2·padding − 2·border`.
-    // Two pixels is not cosmetic — the overview's index-card blurbs measured
-    // 309.33px here against 307.33px in Chrome, and that is the difference
-    // between "every contrast ratio" wrapping after `contrast` and after
-    // `ratio`.
-    testWidgets('the border is paid for out of the content box', (
-      WidgetTester t,
-    ) async {
-      const Key content = Key('content');
-      const double outer = 240;
-      final double pad = space(5); // `p-5`, the index card
-
-      await t.pumpWidget(
-        host(
-          SizedBox(
-            width: outer,
-            height: 140,
-            child: InteractiveCard(
-              padding: EdgeInsets.all(pad),
-              builder: (BuildContext c, bool hovered) =>
-                  const SizedBox.expand(key: content),
-            ),
-          ),
-        ),
-      );
-
-      expect(
-        t.getSize(find.byKey(content)).width,
-        outer - 2 * pad - 2 * BorderWidths.hairline,
-      );
-      expect(
-        t.getSize(find.byKey(content)).height,
-        140 - 2 * pad - 2 * BorderWidths.hairline,
-      );
-      // And the border it is paying for is the token, not `Border.all`'s
-      // coincidentally-identical default.
-      expect(
-        (decorationOf(t).border! as Border).top.width,
-        BorderWidths.hairline,
-      );
     });
   });
 
@@ -855,16 +731,17 @@ void main() {
   });
 
   group('the fourteen', () {
-    final List<File> sources = <Directory>[
-      Directory('lib'),
-      Directory('example/lib'),
-      Directory('test'),
-    ]
-        .expand((Directory d) => d.listSync(recursive: true))
-        .whereType<File>()
-        .where((File f) => f.path.endsWith('.dart'))
-        .where((File f) => !f.path.endsWith('motion_test.dart'))
-        .toList();
+    final List<File> sources =
+        <Directory>[
+              Directory('lib'),
+              Directory('example/lib'),
+              Directory('test'),
+            ]
+            .expand((Directory d) => d.listSync(recursive: true))
+            .whereType<File>()
+            .where((File f) => f.path.endsWith('.dart'))
+            .where((File f) => !f.path.endsWith('motion_test.dart'))
+            .toList();
 
     test('no source names a retired motion symbol', () {
       final List<String> hits = <String>[];
@@ -878,14 +755,26 @@ void main() {
     });
 
     test('keyframes.dart declares exactly the twelve recipes', () {
-      final String text = File('lib/src/components/ui/keyframes.dart').readAsStringSync();
-      final Iterable<String> declared = RegExp(r'^class (\w+Motion) ', multiLine: true)
-          .allMatches(text)
-          .map((RegExpMatch m) => m.group(1)!);
+      final String text = File(
+        'lib/src/components/ui/keyframes.dart',
+      ).readAsStringSync();
+      final Iterable<String> declared = RegExp(
+        r'^class (\w+Motion) ',
+        multiLine: true,
+      ).allMatches(text).map((RegExpMatch m) => m.group(1)!);
       expect(declared.toSet(), <String>{
-        'EnterMotion', 'ExitMotion', 'OpenMotion', 'CloseMotion', 'ExpandMotion',
-        'ChangeMotion', 'SpinMotion', 'ShimmerMotion', 'ProgressMotion',
-        'PulseMotion', 'CaretMotion', 'SwapRollMotion',
+        'EnterMotion',
+        'ExitMotion',
+        'OpenMotion',
+        'CloseMotion',
+        'ExpandMotion',
+        'ChangeMotion',
+        'SpinMotion',
+        'ShimmerMotion',
+        'ProgressMotion',
+        'PulseMotion',
+        'CaretMotion',
+        'SwapRollMotion',
       });
     });
 

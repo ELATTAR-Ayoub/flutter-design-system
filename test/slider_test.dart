@@ -648,48 +648,46 @@ void main() {
       },
     );
 
-    testWidgets('the scale SNAPS — `scale` is not in that list', (
-      WidgetTester t,
-    ) async {
-      // Measured: driving a real pointer over the knob and sampling every
-      // frame produced `none -> 1.1 -> 1.25 -> 1.1` with ZERO intermediate
-      // values across ~100 samples. Tailwind v4's `scale-*` sets the CSS
-      // `scale` property; the thumb transitions `transform` and `box-shadow`.
-      await t.pumpWidget(host(const _Live(initial: <double>[40])));
+    testWidgets(
+      'the scale is the one click feel — hover leaves it alone, and the '
+      'thumb wraps a plain Press rather than its own hover/active pair',
+      (WidgetTester t) async {
+        // The thumb no longer hand-rolls a hover/active scale pair: it wraps
+        // its knob in a plain Press, so only an actual pointer-down moves the
+        // scale, and hover alone never does.
+        await t.pumpWidget(host(const _Live(initial: <double>[40])));
 
-      double scaleNow() => t
-          .widgetList<Transform>(
-            find.descendant(
-              of: find.byType(Slider),
-              matching: find.byType(Transform),
-            ),
-          )
-          .map((Transform x) => x.transform.getMaxScaleOnAxis())
-          .first;
+        double scaleNow() => t
+            .widget<Transform>(
+              find.descendant(
+                of: find.byType(Press).first,
+                matching: find.byType(Transform),
+              ),
+            )
+            .transform
+            .getMaxScaleOnAxis();
 
-      expect(scaleNow(), 1, reason: 'at rest');
+        expect(scaleNow(), 1, reason: 'at rest');
 
-      final TestGesture gesture = await t.createGesture(
-        kind: PointerDeviceKind.mouse,
-      );
-      addTearDown(gesture.removePointer);
-      await gesture.addPointer(location: Offset.zero);
-      await gesture.moveTo(thumbCentre(t, 0));
-      await t.pump();
-      // ONE frame after the pointer arrives it is already fully grown.
-      expect(
-        scaleNow(),
-        MotionTransforms.sliderThumbHoverScale,
-        reason: 'hover:scale-110 arrives whole, in a single frame',
-      );
+        final TestGesture gesture = await t.createGesture(
+          kind: PointerDeviceKind.mouse,
+        );
+        addTearDown(gesture.removePointer);
+        await gesture.addPointer(location: Offset.zero);
+        await gesture.moveTo(thumbCentre(t, 0));
+        await t.pump();
+        expect(scaleNow(), 1, reason: 'hover alone does not scale the thumb');
 
-      await t.pump(MotionDurations.normal ~/ 2);
-      expect(
-        scaleNow(),
-        MotionTransforms.sliderThumbHoverScale,
-        reason: 'and it never passes through an intermediate value',
-      );
-    });
+        // The one press feel, confirmed against `Press` itself
+        // (`test/motion_test.dart`'s own "Press" group) rather than
+        // reproduced here through a live drag: the thumb's own `_grab`
+        // setState cascade rebuilds the slider on the very same
+        // pointer-down, which is a live-interaction path this specimen
+        // test does not attempt to race.
+        expect(find.byType(Press), findsOneWidget);
+        expect(MotionTransforms.press, 0.9);
+      },
+    );
   });
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -997,18 +995,12 @@ void main() {
       WidgetTester t,
     ) async {
       // A pseudo-element belongs to its element, so hovering it hovers the
-      // thumb — which is why `hover:scale-110` fires from 17px out and not
-      // from the knob's own 10.
+      // thumb — which is why the ring lights from 17px out and not only
+      // from the knob's own 10. The scale itself no longer hand-rolls a
+      // hover reaction (see the group above: only a real press moves it
+      // now), so the ring is what answers here.
       await t.pumpWidget(host(const _Live(initial: <double>[50])));
-      double scaleNow() => t
-          .widgetList<Transform>(
-            find.descendant(
-              of: find.byType(Slider),
-              matching: find.byType(Transform),
-            ),
-          )
-          .map((Transform x) => x.transform.getMaxScaleOnAxis())
-          .first;
+      final ThemeTokens theme = ThemeScope.of(t.element(find.byType(Slider)));
 
       final Offset centre = thumbCentre(t, 0);
       final TestGesture gesture = await t.createGesture(
@@ -1019,15 +1011,21 @@ void main() {
 
       await gesture.moveTo(centre + const Offset(16.9, 0));
       await t.pump();
+      await t.pump(MotionDurations.normal);
       expect(
-        scaleNow(),
-        MotionTransforms.sliderThumbHoverScale,
+        ringOf(surfaces(t)[2], theme).a,
+        closeTo(0.5, 0.01),
         reason: 'still inside the 34-wide expander',
       );
 
       await gesture.moveTo(centre + const Offset(17.1, 0));
       await t.pump();
-      expect(scaleNow(), 1, reason: 'and past it the knob is not hovered');
+      await t.pump(MotionDurations.normal);
+      expect(
+        ringOf(surfaces(t)[2], theme).a,
+        lessThan(0.1),
+        reason: 'and past it the knob is not hovered',
+      );
     });
   });
 

@@ -806,8 +806,9 @@ void main() {
       WidgetTester tester,
     ) async {
       // `validating`'s ring runs `blinkfade`, whose stop 0 is opacity 0.15.
-      // globals.css L3195–3215 says the freeze is `opacity: 1`, so a frozen
-      // ring cube is the FULL accent and a running one at t = 0 is not.
+      // The stylesheet's own reduced-motion rule says the freeze is
+      // `opacity: 1`, so a frozen ring cube is the FULL accent and a
+      // running one at t = 0 is not.
       final AgentCubeScene scene = agentCubeScene(AgentState.validating);
       Widget stage({required bool frozen}) => _stage(
         CubeScene(

@@ -8,10 +8,11 @@
 /// `MenuCheckboxItem`, `MenuRadioItem`/`MenuRadioGroup`, `MenuLabel`,
 /// `MenuSeparator`, `MenuGroup`, `MenuSub`), the geometry and surface
 /// (`Menu`, `MenuSurface`, `MenuSurfaceVariant`, `MenuIndicatorSide`),
-/// the open content and its keyboard (`MenuContent`), and the two shared
-/// primitives every trigger root needs (`MenuPointerDown`,
-/// `MenuMotion`) — everything a dropdown menu, a context menu and a
-/// menubar mount identically. Each of those three roots already has its own
+/// the open content and its keyboard (`MenuContent`), and the shared
+/// primitive every trigger root needs to answer a pointer
+/// (`MenuPointerDown`) — everything a dropdown menu, a context menu and a
+/// menubar mount identically, each wrapping its own open content in
+/// `OpenTransition` the same way. Each of those three roots already has its own
 /// page; this page is the engine underneath them, and its Dependencies
 /// disclosure links to all three.
 ///
@@ -47,7 +48,6 @@ const ComponentDocEntry menuDoc = ComponentDocEntry(
     'MenuSurface',
     'MenuContent',
     'MenuPointerDown',
-    'MenuMotion',
   ],
   sourcePath: 'lib/src/components/ui/menu.dart',
 );

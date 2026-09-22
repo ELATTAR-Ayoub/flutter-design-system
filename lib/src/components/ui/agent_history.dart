@@ -21,7 +21,7 @@
 /// |---|---|
 /// | card | 1030 × **69.5** at full width, 482 × **89** in a half-width panel (the preview wraps), radius 12, 1px `--border`, `gap-2.5 px-3 py-2.5` |
 /// | its `transition-colors duration-fast` | **0.25s / cubic-bezier(0.22, 1, 0.36, 1)** — `duration-fast` is a no-op, corpus-wide |
-/// | `anim-row-in` | `pulls-row-in 0.25s --ease-out both`, delay **0.08s flat** — no `--row-index` is set in these demos, so nothing staggers |
+/// | `anim-row-in` | `0.25s --ease-out both`, delay **0.08s flat** — no `--row-index` is set in these demos, so nothing staggers |
 /// | list | ONE flat `ItemGroup gap-1` → a **73.5px** pitch; no "Pinned"/"Recents" headings (those are the drawer's) |
 /// | pin button | `ghost` `icon-sm`, 32 × 32, `opacity: 0` at rest on an unpinned row and 1 on card hover; a pinned row holds it lit |
 /// | menu trigger | 32 × 32, `opacity: 0` at rest on **every** row |
@@ -42,21 +42,21 @@
 /// y=463.25, and across the whole 900ms window the moved row reports:
 ///
 /// ```text
-/// t=  13.4  y=536.75  tr=matrix(1,0,0,1,0,0)  an=pulls-row-in  inline=""
-/// t= 310.7  y=463.25  tr=matrix(1,0,0,1,0,0)  an=pulls-row-in  inline="translate(0px, 73.5px)"
-/// t= 332.4  y=463.25  tr=matrix(1,0,0,1,0,0)  an=pulls-row-in  inline=""  inlineTrans="transform 250ms var(--ease-settle)"
+/// t=  13.4  y=536.75  tr=matrix(1,0,0,1,0,0)  an=anim-row-in  inline=""
+/// t= 310.7  y=463.25  tr=matrix(1,0,0,1,0,0)  an=anim-row-in  inline="translate(0px, 73.5px)"
+/// t= 332.4  y=463.25  tr=matrix(1,0,0,1,0,0)  an=anim-row-in  inline=""  inlineTrans="transform 250ms var(--ease-settle)"
 /// ```
 ///
 /// The inline transform is written, and the **computed** transform never leaves
 /// the identity matrix. The cause is the cascade: every card carries
-/// `anim-row-in`, whose `animation-fill-mode: both` keeps `pulls-row-in`'s
+/// `anim-row-in`, whose `animation-fill-mode: both` keeps its own
 /// `to { transform: none }` in effect for ever, and **CSS animations outrank
 /// normal author declarations, inline styles included**. So the pinned row
 /// teleports one row up in a single frame.
 ///
 /// What *does* move is the row it overtook. In the same trace "Pricing service
 /// outage" runs `matrix(1,0,0,1,-10,0)` → 0 over 250ms — which is
-/// `pulls-row-in`'s own `translateX(-10px)`, horizontally, replaying after the
+/// `anim-row-in`'s own `translateX(-10px)`, horizontally, replaying after the
 /// 80ms delay. Exactly one row replays, and it is the one React's
 /// `lastPlacedIndex` walk moves in the DOM: the child whose old index is below
 /// the running maximum of the old indices already placed. [FlipController]
@@ -102,98 +102,81 @@ import './icon.dart';
 import './icon_paths.g.dart';
 import './input.dart';
 import './item.dart';
+import './keyframes.dart';
 import './menu.dart';
 import './open_transition.dart';
 import './popover.dart';
 import './spinner.dart';
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Row motion — `anim-row-in`, `anim-row-out`, `anim-blur-*`
+   Row motion — the fourteen's EnterMotion / ExitMotion, staggered per row
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/// `anim-row-in` / `anim-row-out`, the two utilities every editable list in the
-/// system shares.
+/// A row's own entrance and exit: [EnterMotion], staggered by [index] through
+/// [EnterMotion.delayFor], and [ExitMotion] on the way out.
 ///
-/// * in — `pulls-row-in`: `opacity 0 → 1`, `translateX(-10px) → none`, over
-///   [MotionDurations.normal] on [MotionCurves.enter], after an
-///   `animation-delay: calc(--duration-tick + var(--row-index, 0) *
-///   --duration-tick / 2)`. **Nothing on this page sets `--row-index`**, so the
-///   delay is a flat 80ms on every row *(measured: `animationDelay: 0.08s` on
-///   all seven)* and the list does not stagger.
-/// * out — `pulls-row-out`: opacity and a −24px slide over the first 45%, then
-///   the box collapses its own height to zero over the rest, all on
-///   [MotionCurves.move]. One movement, so the rows below rise into the gap
-///   instead of snapping shut after it.
+/// The web original staggered by `--row-index`, an inline CSS custom
+/// property nothing on this page ever set — every row measured the same flat
+/// delay. This port makes the stagger real: [index] is the row's own
+/// position, so a freshly mounted list actually cascades.
 ///
-/// [generation] replays the entrance when it changes — see the library note on
-/// which row that is and why.
-class RowMotion extends StatefulWidget {
-  const RowMotion({
-    super.key,
+/// One consequence accepted rather than ported: the web exit also collapsed
+/// the row's own height as it left, so the rows below rose into the closing
+/// gap. [ExitMotion] carries no height leg — a removed row now fades and
+/// drops in place, and the list reflows in the frame after it unmounts
+/// instead of through the animation.
+///
+/// [generation] replays the entrance when it changes — see the library note
+/// on which row that is and why.
+class _RowReveal extends StatefulWidget {
+  const _RowReveal({
     required this.child,
+    this.index = 0,
     this.generation = 0,
     this.leaving = false,
   });
 
   final Widget child;
 
-  /// Bumped to replay `anim-row-in`.
+  /// The row's position in the list — what [EnterMotion.delayFor] staggers
+  /// on.
+  final int index;
+
+  /// Bumped to replay the entrance.
   final int generation;
 
-  /// `data-leaving` — the list owns the timing, and the row stays mounted for
-  /// the whole of it.
+  /// The list owns the timing, and the row stays mounted for the whole of
+  /// it.
   final bool leaving;
 
-  /// `translateX(-10px)` — `pulls-row-in`'s only travel.
-  //
-  // A keyframe offset from globals.css L3079, not a spacing token —
-  // `--spacing * 2.5` would be a coincidence, not a derivation.
-  static const double enterShift = -10;
-
-  /// `translateX(-24px)` at the 45% stop of `pulls-row-out`.
-  static const double exitShift = -24;
-
-  /// The keyframe stop where `pulls-row-out` hands over from the slide to the
-  /// collapse.
-  static const double exitBreak = 0.45;
-
-  /// `animation-delay` + `animation-duration`, as one controller.
-  ///
-  /// The delay is `calc(--duration-tick + var(--row-index, 0) *
-  /// --duration-tick / 2)` and **no specimen on this page sets `--row-index`**
-  /// *(measured: `animationDelay: 0.08s` on all seven rows)*, so it is a flat
-  /// [MotionDurations.tick]. It rides the curve rather than a timer because
-  /// `animation-fill-mode: both` means the delay is *part of the animation* —
-  /// the backwards fill holds the `from` keyframe through it — and because a
-  /// pending [Timer] outlives a widget test that never advances the clock.
-  static Duration get enterSpan =>
-      MotionDurations.tick + MotionDurations.normal;
-
-  /// Where the delay ends inside [enterSpan].
-  static double get enterDelayFraction =>
-      MotionDurations.tick.inMicroseconds / enterSpan.inMicroseconds;
-
-  /// The whole of `anim-row-in`: hold, then `pulls-row-in` on `--ease-out`.
-  static Curve get enterCurve =>
-      Interval(enterDelayFraction, 1, curve: MotionCurves.enter);
-
   @override
-  State<RowMotion> createState() => _RowMotionState();
+  State<_RowReveal> createState() => _RowRevealState();
 }
 
-class _RowMotionState extends State<RowMotion> with TickerProviderStateMixin {
+class _RowRevealState extends State<_RowReveal> with TickerProviderStateMixin {
+  /// [EnterMotion.delayFor] plus the recipe's own run, as one controller —
+  /// the same reason `icon_swap.dart`'s squash runs its delay and its
+  /// animation on one clock: no [Timer] to cancel on dispose or under
+  /// reduced motion, and exactly one ticker a widget test can pump.
+  Duration get _enterSpan =>
+      EnterMotion.delayFor(widget.index + 2) + EnterMotion.duration;
+
+  double get _enterDelayFraction =>
+      EnterMotion.delayFor(widget.index + 2).inMicroseconds /
+      _enterSpan.inMicroseconds;
+
   late final AnimationController _enter = AnimationController(
     vsync: this,
-    duration: RowMotion.enterSpan,
+    duration: _enterSpan,
   );
   late final AnimationController _exit = AnimationController(
     vsync: this,
-    duration: MotionDurations.normal,
+    duration: ExitMotion.duration,
   );
 
-  /// `effectiveMotionDuration` reads the ambient `disableAnimations`, which is an
-  /// inherited lookup — so the first play waits for [didChangeDependencies]
-  /// rather than running in [initState].
+  /// `effectiveMotionDuration` reads the ambient `disableAnimations`, which is
+  /// an inherited lookup — so the first play waits for
+  /// [didChangeDependencies] rather than running in [initState].
   bool _started = false;
 
   @override
@@ -206,7 +189,7 @@ class _RowMotionState extends State<RowMotion> with TickerProviderStateMixin {
   }
 
   void _play() {
-    final Duration span = effectiveMotionDuration(context, RowMotion.enterSpan);
+    final Duration span = effectiveMotionDuration(context, _enterSpan);
     _enter.duration = span;
     if (span == Duration.zero) {
       _enter.value = 1;
@@ -216,21 +199,17 @@ class _RowMotionState extends State<RowMotion> with TickerProviderStateMixin {
   }
 
   @override
-  void didUpdateWidget(RowMotion old) {
+  void didUpdateWidget(_RowReveal old) {
     super.didUpdateWidget(old);
     if (old.generation != widget.generation) _play();
     if (old.leaving != widget.leaving) {
-      _exit
-        ..duration = effectiveMotionDuration(context, MotionDurations.normal)
-        ..value = widget.leaving ? 0 : 1;
+      _exit.duration = effectiveMotionDuration(context, ExitMotion.duration);
       if (!widget.leaving) {
         _exit.value = 0;
       } else if (_exit.duration == Duration.zero) {
-        // Reduced motion collapses the animation to its final frame, which for
-        // `pulls-row-out` is a zero-height box — the gap the list rises into.
         _exit.value = 1;
       } else {
-        _exit.forward();
+        _exit.forward(from: 0);
       }
     }
   }
@@ -248,38 +227,31 @@ class _RowMotionState extends State<RowMotion> with TickerProviderStateMixin {
       animation: Listenable.merge(<Listenable>[_enter, _exit]),
       builder: (BuildContext context, Widget? child) {
         if (_exit.value > 0 || widget.leaving) {
-          final double t = _exit.value;
-          // `0% → 45%` carries opacity and the slide; `45% → 100%` carries the
-          // collapse, and the transform holds at −24px through it.
-          final double slide =
-              MotionCurves.move.transform(t.clamp(0, 1)) / RowMotion.exitBreak;
-          final double a = slide.clamp(0, 1);
-          final double collapse = t <= RowMotion.exitBreak
-              ? 1
-              : 1 -
-                    ((MotionCurves.move.transform(t) - RowMotion.exitBreak) /
-                            (1 - RowMotion.exitBreak))
-                        .clamp(0, 1);
-          return Align(
-            alignment: Alignment.topCenter,
-            heightFactor: collapse,
-            child: Opacity(
-              opacity: 1 - a,
-              child: Transform.translate(
-                offset: Offset(RowMotion.exitShift * a, 0),
+          final double t = _exit.value.clamp(0.0, 1.0);
+          return Opacity(
+            opacity: ExitMotion.opacity.transform(t).clamp(0.0, 1.0),
+            child: Transform.translate(
+              offset: Offset(0, ExitMotion.translateY.transform(t)),
+              child: Transform.scale(
+                scale: ExitMotion.scale.transform(t),
                 child: child,
               ),
             ),
           );
         }
         // `animation-fill-mode: both` — the backwards fill is why the row is
-        // not painted at full opacity for the 80ms before its delay ends.
-        final double t = RowMotion.enterCurve.transform(_enter.value);
+        // not painted at full opacity for the delay before it starts.
+        final double raw = _enterDelayFraction >= 1
+            ? 0
+            : Interval(_enterDelayFraction, 1).transform(_enter.value);
         return Opacity(
-          opacity: t,
+          opacity: EnterMotion.opacity.transform(raw).clamp(0.0, 1.0),
           child: Transform.translate(
-            offset: Offset(RowMotion.enterShift * (1 - t), 0),
-            child: child,
+            offset: Offset(0, EnterMotion.translateY.transform(raw)),
+            child: Transform.scale(
+              scale: EnterMotion.scale.transform(raw),
+              child: child,
+            ),
           ),
         );
       },
@@ -295,7 +267,7 @@ class _RowMotionState extends State<RowMotion> with TickerProviderStateMixin {
 /// * `anim-blur-in` — `opacity 0 → 1`, `blur(8px) → blur(0)`, over
 ///   [MotionDurations.normal] on [MotionCurves.settle].
 ///
-/// *(Measured end to end: `pulls-blur-out` from t≈112 to 374, `pulls-blur-in`
+/// *(Measured end to end: `anim-blur-out` from t≈112 to 374, `anim-blur-in`
 /// from 374 to ≈586 — 150 out, 250 in, ≈475ms of wall clock including the
 /// click-to-first-frame latency.)*
 ///
@@ -307,13 +279,12 @@ class BlurSwitch extends StatefulWidget {
   final SwitchPhase phase;
   final Widget child;
 
-  /// `blur(6px)` — where `pulls-blur-out` ends.
+  /// `blur(6px)` — where `anim-blur-out` ends.
   //
-  // A keyframe filter radius from globals.css L3357; the `--blur-*` scale
-  // does not carry it.
+  // A keyframe filter radius the `--blur-*` scale does not carry.
   static const double outRadius = 6;
 
-  /// `blur(8px)` — where `pulls-blur-in` starts.
+  /// `blur(8px)` — where `anim-blur-in` starts.
   static const double inRadius = 8;
 
   @override
@@ -496,7 +467,7 @@ class FlipController extends ChangeNotifier {
     for (final String id in after) {
       final int? old = was[id];
       // A row with no previous index is new: it mounts, which plays the
-      // entrance once through [RowMotion.initState] rather than through a
+      // entrance once through [_RowReveal.createState] rather than through a
       // generation bump.
       if (old == null) continue;
       if (old < lastPlaced) {
@@ -547,6 +518,7 @@ class HistoryCard extends StatefulWidget {
     this.onShare,
     this.leaving = false,
     this.entranceGeneration = 0,
+    this.index = 0,
   });
 
   final ConversationSummary conversation;
@@ -573,8 +545,11 @@ class HistoryCard extends StatefulWidget {
   /// Set while this row plays its exit. The list owns the timing.
   final bool leaving;
 
-  /// [FlipController.generationOf] for this row — replays `anim-row-in`.
+  /// [FlipController.generationOf] for this row — replays the entrance.
   final int entranceGeneration;
+
+  /// The row's position in the list — staggers [EnterMotion.delayFor].
+  final int index;
 
   /// `CONFIRM_EXIT_MS` — matches `anim-confirm-out`, `--duration-tick`.
   static Duration get confirmExit => MotionDurations.tick;
@@ -586,8 +561,8 @@ class HistoryCard extends StatefulWidget {
   /// timestamp beneath it by a single pixel.
   static double get titleHeight => space(6);
 
-  /// `translateX(12%)` — `pulls-confirm-in`'s only travel, as a fraction of the
-  /// confirm's own width. *(Measured: 57.6px on the 480px box.)*
+  /// `translateX(12%)` — `anim-confirm-in`'s only travel, as a fraction of
+  /// the confirm's own width. *(Measured: 57.6px on the 480px box.)*
   static const double confirmShift = 0.12;
 
   /// `border-destructive/50` on the inline confirm.
@@ -822,9 +797,10 @@ class _HistoryCardState extends State<HistoryCard> {
       child: card,
     );
 
-    card = RowMotion(
+    card = _RowReveal(
       generation: widget.entranceGeneration,
       leaving: widget.leaving,
+      index: widget.index,
       child: card,
     );
 
@@ -901,7 +877,7 @@ class _HistoryCardState extends State<HistoryCard> {
   /// underneath showed straight through it and the two sets of words sat on top
   /// of each other. `bg-card` covers, and the destructive signal is carried by
   /// the border and the button, which is where it belongs.
-  Widget _inlineConfirm(ThemeTokens theme) => _ConfirmSlide(
+  Widget _inlineConfirm(ThemeTokens theme) => _ConfirmFade(
     closing: _closingConfirm,
     child: Semantics(
       container: true,
@@ -1057,17 +1033,17 @@ class _HistoryCardState extends State<HistoryCard> {
 /// [MotionCurves.exit] — **no retrace of the slide**, because the row underneath
 /// is what the eye should return to and sliding back out drags attention with
 /// it.
-class _ConfirmSlide extends StatefulWidget {
-  const _ConfirmSlide({required this.closing, required this.child});
+class _ConfirmFade extends StatefulWidget {
+  const _ConfirmFade({required this.closing, required this.child});
 
   final bool closing;
   final Widget child;
 
   @override
-  State<_ConfirmSlide> createState() => _ConfirmSlideState();
+  State<_ConfirmFade> createState() => _ConfirmFadeState();
 }
 
-class _ConfirmSlideState extends State<_ConfirmSlide>
+class _ConfirmFadeState extends State<_ConfirmFade>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(vsync: this);
 
@@ -1087,7 +1063,7 @@ class _ConfirmSlideState extends State<_ConfirmSlide>
   }
 
   @override
-  void didUpdateWidget(_ConfirmSlide old) {
+  void didUpdateWidget(_ConfirmFade old) {
     super.didUpdateWidget(old);
     if (old.closing == widget.closing) return;
     _c.duration = effectiveMotionDuration(context, MotionDurations.tick);
@@ -1422,11 +1398,12 @@ class ChatHistory extends StatefulWidget {
   /// `max-w-sm` — 384 *(measured)*.
   static double get width => Containers.sm;
 
-  /// `EXIT_MS` — *"must match `--duration-base` in globals.css"*.
+  /// `EXIT_MS` — *"must match `--duration-base` in the stylesheet"*.
   static Duration get exit => MotionDurations.normal;
 
-  /// `anim-panel-in` — `translateX(-100%) → none` over `--duration-overlay`.
-  static Duration get panelIn => MotionDurations.overlayEnter;
+  /// The panel and its scrim's own entrance — [EnterMotion.duration],
+  /// played through [_playEnter] with `rise: 0`.
+  static Duration get panelIn => EnterMotion.duration;
 
   @override
   State<ChatHistory> createState() => _ChatHistoryState();
@@ -1542,11 +1519,13 @@ class _ChatHistoryState extends State<ChatHistory> {
             children: <Widget>[
               // The dim covers the console and stops at its edges.
               Positioned.fill(
-                child: _FadeIn(
-                  child: _TapRegion(
+                child: _playEnter(
+                  context,
+                  _TapRegion(
                     onTap: () => _setOpen(false),
                     child: ColoredBox(color: ThemeScope.of(context).scrim),
                   ),
+                  rise: 0,
                 ),
               ),
               Positioned(
@@ -1556,7 +1535,7 @@ class _ChatHistoryState extends State<ChatHistory> {
                 width: rect.width < ChatHistory.width
                     ? rect.width
                     : ChatHistory.width,
-                child: _PanelIn(child: _drawerBody(context)),
+                child: _playEnter(context, _drawerBody(context), rise: 0),
               ),
             ],
           ),
@@ -1786,10 +1765,11 @@ class _ChatHistoryState extends State<ChatHistory> {
       ItemGroup(
         gapOverride: space(1),
         children: <Widget>[
-          for (final ConversationSummary c in rows)
+          for (final (int i, ConversationSummary c) in rows.indexed)
             HistoryCard(
               key: _flip.keyFor(c.id),
               conversation: c,
+              index: i,
               active: c.id == store.activeId,
               leaving: c.id == _leaving,
               entranceGeneration: _flip.generationOf(c.id),
@@ -1805,95 +1785,34 @@ class _ChatHistoryState extends State<ChatHistory> {
   );
 }
 
-/// `anim-fade-in` — `--duration-overlay` on `--ease-out`.
-class _FadeIn extends StatefulWidget {
-  const _FadeIn({required this.child});
-
-  final Widget child;
-
-  @override
-  State<_FadeIn> createState() => _FadeInState();
-}
-
-class _FadeInState extends State<_FadeIn> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this);
-
-  bool _started = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_started) return;
-    _started = true;
-    _c.duration = effectiveMotionDuration(
-      context,
-      MotionDurations.overlayEnter,
+/// Plays [EnterMotion] over [child], with an optional [rise] override.
+///
+/// The player's own parameter, not the recipe's — [EnterMotion]'s twelve
+/// tables stay exactly what `keyframes.dart` declares; a flat-arriving
+/// overlay like the drawer panel or its scrim (`rise: 0`) is a call-site
+/// choice, the same way a caller already chooses [EnterMotion.duration] and
+/// [EnterMotion.curve] by playing them through [KeyframePlayer] at all.
+/// Both the drawer's panel and its scrim now arrive this way — a fade and a
+/// scale, no slide.
+Widget _playEnter(
+  BuildContext context,
+  Widget child, {
+  double rise = EnterMotion.rise,
+}) => KeyframePlayer(
+  duration: EnterMotion.duration,
+  fill: EnterMotion.fill,
+  builder: (BuildContext context, double t, Widget? c) {
+    final double eased = EnterMotion.curve.transform(t);
+    return Opacity(
+      opacity: EnterMotion.opacity.transform(t).clamp(0.0, 1.0),
+      child: Transform.translate(
+        offset: Offset(0, rise * (1 - eased)),
+        child: Transform.scale(scale: EnterMotion.scale.transform(t), child: c),
+      ),
     );
-    if (_c.duration == Duration.zero) {
-      _c.value = 1;
-    } else {
-      _c.forward(from: 0);
-    }
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => FadeTransition(
-    opacity: CurvedAnimation(parent: _c, curve: MotionCurves.enter),
-    child: widget.child,
-  );
-}
-
-/// `anim-panel-in` — `translateX(-100%) → none` over `--duration-overlay` on
-/// `--ease-out`.
-class _PanelIn extends StatefulWidget {
-  const _PanelIn({required this.child});
-
-  final Widget child;
-
-  @override
-  State<_PanelIn> createState() => _PanelInState();
-}
-
-class _PanelInState extends State<_PanelIn>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this);
-
-  bool _started = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_started) return;
-    _started = true;
-    _c.duration = effectiveMotionDuration(context, ChatHistory.panelIn);
-    if (_c.duration == Duration.zero) {
-      _c.value = 1;
-    } else {
-      _c.forward(from: 0);
-    }
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => SlideTransition(
-    position: Tween<Offset>(
-      begin: const Offset(-1, 0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _c, curve: MotionCurves.enter)),
-    child: widget.child,
-  );
-}
+  },
+  child: child,
+);
 
 /// `EmptyMedia variant="icon"` with an arbitrary child.
 ///

@@ -2066,12 +2066,14 @@ const List<DocsApiFact> _providerFacts = <DocsApiFact>[
     name: 'duration and curve',
     type: '250ms, linear',
     description:
-        'MotionDurations.normal on MotionCurves.linear for all '
-        'three legs: gap width, panel width, and the offcanvas slide. '
-        'Measured as genuinely linear on the reference: even steps, no '
-        'front-loading, no overshoot. Everything routes through '
-        'effectiveMotionDuration, so reduced motion makes the whole '
-        'collapse instant.',
+        'MotionDurations.normal on sidebar.dart\'s own private linear '
+        'curve for all three legs: gap width, panel width, and the '
+        'offcanvas slide — none of the seven MotionCurves is genuinely '
+        'linear, so this one stays local, the same standing as '
+        'drawer.dart\'s vaul curve. Measured as genuinely linear on the '
+        'reference: even steps, no front-loading, no overshoot. '
+        'Everything routes through effectiveMotionDuration, so reduced '
+        'motion makes the whole collapse instant.',
   ),
   DocsApiFact(
     name: 'the row, mid-collapse',

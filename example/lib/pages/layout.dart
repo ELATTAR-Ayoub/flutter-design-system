@@ -722,53 +722,69 @@ class _PackCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
 
-    return InteractiveCard(
-      radius: BorderRadius.circular(Radii.lg),
-      padding: EdgeInsets.all(space(4)),
+    final BorderRadius radius = BorderRadius.circular(Radii.lg);
+
+    return HoverBuilder(
       cursor: MouseCursor.defer,
-      builder: (BuildContext context, bool hovered) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          AspectRatio(
-            ratio: 3 / 4,
-            // `mb-4`: drift 7: it shortens the box, it does not space it.
-            margin: EdgeInsets.only(bottom: space(4)),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Palette.action.withValues(alpha: _actionTint),
-                borderRadius: BorderRadius.circular(Radii.md),
-                border: Border.all(
-                  color: theme.border,
-                  width: BorderWidths.hairline,
+      builder: (BuildContext context, bool hovered) => DecoratedBox(
+        decoration: BoxDecoration(
+          color: theme.card,
+          borderRadius: radius,
+          border: Border.all(color: theme.border, width: BorderWidths.hairline),
+          boxShadow: hovered
+              ? Shadows.lg.outerShadows(theme)
+              : const <BoxShadow>[],
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(space(4)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              AspectRatio(
+                ratio: 3 / 4,
+                // `mb-4`: drift 7: it shortens the box, it does not space it.
+                margin: EdgeInsets.only(bottom: space(4)),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Palette.action.withValues(alpha: _actionTint),
+                    borderRadius: BorderRadius.circular(Radii.md),
+                    border: Border.all(
+                      color: theme.border,
+                      width: BorderWidths.hairline,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          StyledText('Eclipse series', TextStyles.small),
-          // `mt-1.5`.
-          SizedBox(height: space(1.5)),
-          StyledText(pack.$1, TextStyles.h4, color: theme.foreground),
-          // `mt-3`.
-          SizedBox(height: space(3)),
-          // `Wrap`, not a fixed `Row`: a carousel card is already this
-          // narrow by design (`basis-1/2` on a phone), and the badge does
-          // not shrink, so the price drops to its own line above it rather
-          // than the row overflowing the card.
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: space(2),
-            runSpacing: space(1),
-            children: <Widget>[
-              StyledText(
-                pack.$2,
-                TextStyles.numberMd,
-                color: theme.premiumText,
+              StyledText('Eclipse series', TextStyles.small),
+              // `mt-1.5`.
+              SizedBox(height: space(1.5)),
+              StyledText(pack.$1, TextStyles.h4, color: theme.foreground),
+              // `mt-3`.
+              SizedBox(height: space(3)),
+              // `Wrap`, not a fixed `Row`: a carousel card is already this
+              // narrow by design (`basis-1/2` on a phone), and the badge does
+              // not shrink, so the price drops to its own line above it rather
+              // than the row overflowing the card.
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: space(2),
+                runSpacing: space(1),
+                children: <Widget>[
+                  StyledText(
+                    pack.$2,
+                    TextStyles.numberMd,
+                    color: theme.premiumText,
+                  ),
+                  const Badge(
+                    label: '6 Cards',
+                    variant: BadgeVariant.secondary,
+                  ),
+                ],
               ),
-              const Badge(label: '6 Cards', variant: BadgeVariant.secondary),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

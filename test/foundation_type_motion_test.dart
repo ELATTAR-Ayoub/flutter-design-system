@@ -598,7 +598,7 @@ void main() {
 
   // ─── motion ──────────────────────────────────────────────────────────────
 
-  group('MotionDurations (globals.css L395–418)', () {
+  group('MotionDurations', () {
     test('every duration token', () {
       expect(MotionDurations.tick, const Duration(milliseconds: 80));
       expect(MotionDurations.fast, const Duration(milliseconds: 150));
@@ -641,7 +641,7 @@ void main() {
     });
   });
 
-  group('MotionCurves (globals.css L420–432)', () {
+  group('MotionCurves', () {
     test('--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1)', () {
       expect(MotionCurves.emphasized, const Cubic(0.34, 1.56, 0.64, 1));
       expect(
@@ -747,7 +747,7 @@ void main() {
   // --- shadows (appended by lead) ---
 
   group(
-    'Shadows — geometry is fixed, ink is themed (globals.css L354–387)',
+    'Shadows — geometry is fixed, ink is themed',
     () {
       void expectLayer(
         ShadowLayer layer,

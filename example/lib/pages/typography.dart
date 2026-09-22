@@ -865,8 +865,8 @@ typedef _ProseBlock = ({double top, double bottom, Widget child});
 
 /// `<div class="prose">`: unclassed markup, styled by element.
 ///
-/// Every value below is globals.css L1322–1507 (globals-map §6). Two CSS
-/// behaviours have to be performed rather than declared:
+/// Every value below is the stylesheet's own `.prose` rule (globals-map §6).
+/// Two CSS behaviours have to be performed rather than declared:
 ///
 /// * **Margin collapsing.** Adjacent block margins collapse to the larger of
 ///   the two, so a `p` (16px bottom) before an `h3` (32px top) is separated by

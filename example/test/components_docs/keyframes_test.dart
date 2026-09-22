@@ -63,23 +63,21 @@ Finder _disclosureTrigger(String title) => find.descendant(
   matching: find.byKey(DocsDisclosure.triggerKey),
 );
 
-/// The fourteen keyframe tables `lib/src/components/ui/keyframes.dart` exports,
+/// The twelve keyframe tables `lib/src/components/ui/keyframes.dart` exports,
 /// by the class name the API Reference documents them under.
 const List<String> _keyframeNames = <String>[
-  'EntranceMotion',
-  'StateChangeMotion',
-  'SpringEntranceMotion',
+  'EnterMotion',
+  'ExitMotion',
   'OpenMotion',
-  'DiscreteProgressMotion',
-  'TextRevealMotion',
-  'RevealMotion',
-  'LoadingShimmerMotion',
-  'LivePulseMotion',
-  'SweepMotion',
-  'TravelMotion',
-  'CheckmarkDrawMotion',
-  'DashDrawMotion',
-  'DotSelectionMotion',
+  'CloseMotion',
+  'ExpandMotion',
+  'ChangeMotion',
+  'SpinMotion',
+  'ShimmerMotion',
+  'ProgressMotion',
+  'PulseMotion',
+  'CaretMotion',
+  'SwapRollMotion',
 ];
 
 const List<String> _exampleKeys = <String>[
@@ -88,22 +86,19 @@ const List<String> _exampleKeys = <String>[
   'keyframes-example:jelly',
   'keyframes-example:spring-up',
   'keyframes-example:jelly-in',
-  'keyframes-example:sign-on',
-  'keyframes-example:reveal',
+  'keyframes-example:change',
   'keyframes-example:ratchet',
   'keyframes-example:shimmer',
   'keyframes-example:pulse-live',
-  'keyframes-example:sweep',
-  'keyframes-example:travel',
+  'keyframes-example:progress',
   'keyframes-example:check-draw',
   'keyframes-example:dash-draw',
-  'keyframes-example:dot-pop',
   'keyframes-example:swap-roll',
 ];
 
 void main() {
   group('keyframes docs page', () {
-    testWidgets('renders the article and the full fourteen-row API table', (
+    testWidgets('renders the article and the full twelve-row API table', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(1440, 900);
@@ -136,10 +131,10 @@ void main() {
       for (final String name in _keyframeNames) {
         expect(find.text(name), findsWidgets, reason: 'missing $name');
       }
-      // ContentSwapMotion is named in the API Reference's own paragraph, not as
-      // a table row: it is the fifteenth entry, and explicitly not one
-      // of the fourteen.
-      expect(find.textContaining('ContentSwapMotion'), findsWidgets);
+      // SwapRollMotion is the twelfth table row AND gets its own paragraph
+      // underneath, flagging it as the odd one out — a transition, not a
+      // keyframe.
+      expect(find.textContaining('SwapRollMotion'), findsWidgets);
 
       for (final String key in _exampleKeys) {
         expect(
@@ -156,7 +151,7 @@ void main() {
     });
 
     testWidgets(
-      'the Preview replay button re-mounts the EntranceMotion specimen',
+      'the Preview replay button re-mounts the EnterMotion specimen',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1;
@@ -179,7 +174,7 @@ void main() {
         // Never pumpAndSettle: a bounded pump advances the one-shot player
         // partway, then the replay tap remounts it under a fresh key.
         await tester.pump();
-        await tester.pump(MotionDurations.popIn);
+        await tester.pump(EnterMotion.duration);
         await tester.tap(replay);
         await tester.pump();
         expect(tester.takeException(), isNull);
@@ -212,7 +207,7 @@ void main() {
       await tester.ensureVisible(looping);
       await tester.pump();
 
-      // DiscreteProgressMotion, LoadingShimmerMotion and LivePulseMotion all repeat() forever: two
+      // The StepCurve ratchet, ShimmerMotion and PulseMotion all repeat() forever: two
       // bounded pumps, never pumpAndSettle.
       await tester.pump(const Duration(milliseconds: 500));
       await tester.pump(const Duration(seconds: 2));

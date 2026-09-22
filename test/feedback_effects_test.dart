@@ -181,6 +181,12 @@ Widget bloomBox(Size size, {bool starfield = true}) => SizedBox(
   ),
 );
 
+/// `toaster.dart`'s own private `_toastEntrance` — sonner's measured
+/// entrance/exit curve, not one of the seven MotionCurves. Declared here
+/// (not imported — it is private to the component file) so these
+/// tautological predictions use the curve the widget actually plays.
+const Cubic _toastEntrance = Cubic(0.25, 0.1, 0.25, 1);
+
 void main() {
   // ───────────────────────────────────────────────────────────────────────────
   // feedback-surface — the two drifts, the swell, and the caps that make both work
@@ -288,7 +294,7 @@ void main() {
   });
 
   group('the two min() caps', () {
-    // globals.css L1724–1729: `min(95%, 26rem)` / `min(86%, 21rem)` exist so
+    // `min(95%, 26rem)` / `min(86%, 21rem)` exist so
     // the corner light is roughly the same physical size on a 356px toast and a
     // 1030px Alert.
     test('both caps bite on the feedback page\'s Alert', () {
@@ -1047,9 +1053,9 @@ void main() {
   group('Skeleton', () {
     test('it states no motion of its own', () {
       expect(Skeleton.defaultRadius, Radii.md);
-      expect(LoadingShimmerMotion.duration, MotionDurations.shimmer);
-      expect(LoadingShimmerMotion.fill, KeyframeFill.none);
-      expect(LoadingShimmerMotion.loops, isTrue);
+      expect(ShimmerMotion.duration, MotionDurations.shimmer);
+      expect(ShimmerMotion.fill, KeyframeFill.none);
+      expect(ShimmerMotion.loops, isTrue);
     });
 
     testWidgets('the box is the caller\'s and the corner is rounded-md', (
@@ -1384,13 +1390,13 @@ void main() {
         // `data-mounted="true"` — one frame later, and it travels.
         await t.pump();
         await t.pump(Toaster.transition ~/ 2);
-        final double half = MotionCurves.balanced.transform(0.5);
+        final double half = _toastEntrance.transform(0.5);
         expect(
           raise(t, 'Sold 3 cards for \$2,481.00'),
           closeTo(-height * (1 - half), 0.6),
           reason:
-              'measured 0.645 of the travel at 38.3% of the window — this '
-              'curve, and not MotionCurves.standard or MotionCurves.enter',
+              'the toast entrance rides its own private _toastEntrance '
+              'curve — toaster.dart\'s own "Enter" note',
         );
         expect(
           opacityOf(t, 'Sold 3 cards for \$2,481.00'),
@@ -1580,7 +1586,7 @@ void main() {
         // Mid-fade: content, scale and offset all part-way, on the one 400ms
         // window they share.
         await t.pump(Toaster.transition ~/ 2);
-        final double half = MotionCurves.balanced.transform(0.5);
+        final double half = _toastEntrance.transform(0.5);
         expect(contentOpacityOf(t, back1), closeTo(half, 0.02));
         expect(opacityOf(t, back1), 1);
         expect(
@@ -1736,7 +1742,7 @@ void main() {
         );
 
         await t.pump(Toaster.transition ~/ 2);
-        final double half = MotionCurves.balanced.transform(0.5);
+        final double half = _toastEntrance.transform(0.5);
         expect(contentOpacityOf(t, first), closeTo(1 - half, 0.06));
         expect(
           contentOpacityOf(t, first),
@@ -1960,7 +1966,7 @@ void main() {
       await t.pump();
       await t.pump(Toaster.unmountDelay ~/ 2);
       // `--y: translateY(--lift * -100%)` — the entrance, run backwards.
-      final double t100 = MotionCurves.balanced.transform(
+      final double t100 = _toastEntrance.transform(
         Toaster.unmountDelay.inMicroseconds /
             2 /
             Toaster.transition.inMicroseconds,
@@ -2003,7 +2009,7 @@ void main() {
       // `--y: translateY(40%)` with NO `scale()` in it — so the scale is
       // released back to 1 on the way out. Measured: 0.9 → 0.9019 → 0.9152 →
       // 0.9295 over the frames before the unmount.
-      final double moved = MotionCurves.balanced.transform(
+      final double moved = _toastEntrance.transform(
         Toaster.unmountDelay.inMicroseconds /
             2 /
             Toaster.collapsedExitTransform.inMicroseconds,
@@ -2020,7 +2026,7 @@ void main() {
 
       // `transition: transform 500ms, opacity 200ms` — the fade is more than
       // twice as far along as the fall.
-      final double faded = MotionCurves.balanced.transform(0.5);
+      final double faded = _toastEntrance.transform(0.5);
       expect(opacityOf(t, back), closeTo(1 - faded, 0.06));
       expect(
         1 - opacityOf(t, back),
@@ -2069,7 +2075,7 @@ void main() {
 
         // `--y: translateY(--lift * --offset + --lift * -100%)` — it keeps the
         // slot the expansion gave it and travels a whole box further down it.
-        final double moved = MotionCurves.balanced.transform(
+        final double moved = _toastEntrance.transform(
           Toaster.unmountDelay.inMicroseconds /
               2 /
               Toaster.transition.inMicroseconds,
@@ -2601,34 +2607,24 @@ void main() {
       expect(t.widget<Icon>(find.byType(Icon)).strokeOverride, 2);
     });
 
-    testWidgets('sonner\'s two easings are CSS\'s, not the system\'s — F5', (
-      WidgetTester t,
-    ) async {
-      // Both are foreign defaults, and both are visibly not the tokens whose
-      // names they share. Measured against the live traces.
-      expect(MotionCurves.balanced, const Cubic(0.25, 0.1, 0.25, 1));
-      expect(MotionCurves.decelerate, const Cubic(0, 0, 0.58, 1));
-      expect(
-        MotionCurves.all,
-        isNot(contains(MotionCurves.balanced)),
-        reason:
-            'the transcript of --ease-* has seven entries and neither of '
-            'these is one of them',
-      );
-      expect(MotionCurves.all, isNot(contains(MotionCurves.decelerate)));
-      // The retiming that snapping either to a system token would have caused.
-      expect(
-        MotionCurves.balanced.transform(0.2),
-        isNot(closeTo(MotionCurves.standard.transform(0.2), 0.05)),
-      );
-      expect(
-        MotionCurves.decelerate.transform(0.775),
-        isNot(closeTo(MotionCurves.enter.transform(0.775), 0.02)),
-      );
-      // The two numbers the live traces actually produced.
-      expect(MotionCurves.balanced.transform(0.383), closeTo(0.645, 0.02));
-      expect(MotionCurves.decelerate.transform(0.775), closeTo(0.923, 0.02));
-    });
+    test(
+      'sonner\'s two easings are still foreign defaults, not folded into '
+      'the seven — F5 under the fourteen',
+      () {
+        // The fourteen retimed the *names* around sonner's choreography but
+        // did not fold its two untokenized cubic-beziers into the
+        // seven-curve scale: every transform/opacity leg above rides
+        // toaster.dart's own private `_toastEntrance`
+        // (`Cubic(0.25, 0.1, 0.25, 1)`, still visibly not [standard],
+        // [enter] or [move] at the measured sample points — see
+        // toaster.dart's own "Enter" note), and the one leg that names its
+        // own easing — swipe-release — rides `_toastSwipeOut`
+        // (`Cubic(0, 0, 0.58, 1)`, CSS's own `ease-out`).
+        const Cubic toastSwipeOut = Cubic(0, 0, 0.58, 1);
+        expect(MotionCurves.all.contains(_toastEntrance), isFalse);
+        expect(MotionCurves.all.contains(toastSwipeOut), isFalse);
+      },
+    );
   });
 
   // ────────────────────────────────────────────────────────────────────────
@@ -3016,7 +3012,7 @@ void main() {
       // same slow window and the same CSS ease as the wide contract.
       await t.pump();
       await t.pump(Toaster.transition ~/ 2);
-      final double half = MotionCurves.balanced.transform(0.5);
+      final double half = _toastEntrance.transform(0.5);
       expect(drop(t, title), closeTo(-height * (1 - half), 0.6));
       expect(
         drop(t, title),

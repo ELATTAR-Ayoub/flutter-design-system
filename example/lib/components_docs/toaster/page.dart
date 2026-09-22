@@ -354,7 +354,7 @@ class _PreviewSpecimenState extends State<_PreviewSpecimen> {
             variant: ButtonVariant.secondary,
             size: ButtonSize.sm,
             onPressed: () => _controller.promise<void>(
-              Future<void>.delayed(MotionDurations.reward),
+              Future<void>.delayed(MotionDurations.attachmentSaving),
               loading: 'Saving…',
               success: 'Saved',
               error: 'Could not save',

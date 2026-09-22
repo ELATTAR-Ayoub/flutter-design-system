@@ -36,15 +36,14 @@
 ///    is `size-6` = 24px, so `100%` is 24px and the `calc` is 0px. Verified
 ///    live by the supervisor (ruling M1): all four chips hold
 ///    `matrix(1,0,0,1,0,0)` across the run on a 482px track. [_TravelChip]
-///    ships the no-op by passing the *chip's* width to
-///    [TravelMotion.translationAt]; if upstream ever fixes it, the intended
-///    reading: travel the track, less the chip's own width: is that one
-///    argument changed to the track's width.
-/// 2. **D2, "40ms down, 250ms spring back" is true of two of six.** The
-///    `#interaction` description promises it for the family; `press-spring`
-///    releases in 220ms ([MotionDurations.pressSpringUp], a raw `0.22s` off the
-///    scale entirely) and `press-key` is 80ms linear both ways. The
-///    description ships verbatim, the panel notes print the real numbers, and
+///    ships the no-op by translating a zero offset; the intended reading —
+///    travel the track, less the chip's own width — is one argument away if
+///    upstream ever fixes it.
+/// 2. **D2, "40ms down, 250ms spring back" is now true of the one press feel
+///    there is.** The fourteen-name vocabulary collapsed `click-spring`,
+///    `press-spring` and `press-key` into the single [Press] recipe this page
+///    now demonstrates once, rather than as three variants with three
+///    different releases.
 ///    the demos run at their real numbers.
 /// 3. **D3, "overlays get up to 350ms"** in the `#durations` description,
 ///    while `--duration-overlay` is **320ms** and no 350ms token exists.
@@ -81,28 +80,23 @@
 ///    feel"*, "Reveal choreography" is `#choreography` *"Pack-opening
 ///    choreography"*, and `#rules` has no chip at all. Six chips, seven
 ///    sections; the nav registry's six `contents` strings render unchanged.
-/// 14. **D14: the live dot and its ring are different greens.**
-///    `pulls-pulse-live` rings in `rgba(61, 220, 151, …)` #3DDC97, a palette
-///    orphan; the dot is `bg-success` #10b981. Both themes, one 8px indicator.
+/// 14. **D14: the live dot and its ring are different greens.** [PulseMotion]
+///    rings in `rgba(61, 220, 151, …)` #3DDC97, a palette orphan; the dot is
+///    `bg-success` #10b981. Both themes, one 8px indicator.
 /// 15. **D15: the CurveGraph's dashed line is never visible.** The `<line>`
 ///    at y=0 lies exactly on the `<rect>`'s own top edge, same colour, same
 ///    width, and the rect's solid stroke paints over it. [_CurveGraphPainter]
 ///    draws both in source order: dead ink, not a missing feature.
-/// 16. **D16: six of the nine named animations set raw time literals**, not
-///    tokens; only `anim-jelly-in` and `anim-reveal` read one. The port keeps
-///    the literals in the foundation layer ([MotionDurations.popIn], `.springUp`,
-///    `.signOn`, `.ratchet`, `.shimmer`, `.pulseLive`) rather than inlining
-///    them here, which is the guard's rule, not a correction of the drift.
+/// 16. **D16: retired with the fourteen.** The raw-time-literal named demos
+///    this item once described (`anim-sign-on`'s text glow, `anim-reveal`'s
+///    card flip) went with them; nothing on this page reads an un-tokened
+///    duration any more.
 /// 17. **D17: the prose says Space Grotesk; `--font-sans` is Inter.** Tokens
-///    win (recorded port decision). Applies to "LEGENDARY", "Press and hold"
-///    and "Hover me".
+///    win (recorded port decision). Applies to "Press and hold" and "Hover
+///    me".
 ///
-/// ## Two supervisor rulings the code carries rather than the copy
+/// ## One supervisor ruling the code still carries
 ///
-/// * **M4, `pulls-reveal` is orthographic.** The element carries no
-///   `perspective` and neither does any ancestor, so the Y rotation is a flat
-///   horizontal squash with no foreshortening. [RevealMotion.transformAt] never
-///   sets the perspective entry; adding it would look better and be wrong.
 /// * **M5: the press buttons inherit 16px.** They carry no `.type-*` class,
 ///   so their label is the browser default at `font-semibold`.
 ///   [_inheritedFontSize] holds the `integration-verify` marker the supervisor
@@ -150,6 +144,9 @@ final double _msColumn = space(16);
 
 /// `max-w-sm`: the `.lift` card's cap.
 final double _liftMaxWidth = space(96);
+
+/// `steps(8)` — eight held positions per turn.
+const int _ratchetSteps = 8;
 
 /// `size-10` and its `h-4 w-0.5` needle: the ratchet.
 final double _ratchetSquare = space(10);
@@ -227,11 +224,6 @@ final List<_Duration> _durations = <_Duration>[
     token: '--duration-overlay',
     duration: MotionDurations.overlayEnter,
     use: 'Dialogs, drawers, sheets, popovers opening and closing.',
-  ),
-  (
-    token: '--duration-reward',
-    duration: MotionDurations.reward,
-    use: 'Card reveal, rare pull, XP fill, reward unlock. The only long one.',
   ),
 ];
 
@@ -571,11 +563,11 @@ class _SweepBar extends StatelessWidget {
           color: theme.muted,
           child: KeyframePlayer(
             duration: duration,
-            fill: SweepMotion.fill,
+            fill: KeyframeFill.both,
             builder: (BuildContext context, double t, Widget? child) =>
                 FractionallySizedBox(
                   alignment: Alignment.centerLeft,
-                  widthFactor: SweepMotion.widthFactor.transform(t),
+                  widthFactor: t.clamp(0.0, 1.0),
                   heightFactor: 1,
                   child: child,
                 ),
@@ -893,14 +885,14 @@ class _TravelChip extends StatelessWidget {
         child: Align(
           alignment: Alignment.centerLeft,
           child: KeyframePlayer(
-            duration: TravelMotion.duration,
-            fill: TravelMotion.fill,
+            duration: MotionDurations.bloom,
+            fill: KeyframeFill.both,
             builder: (BuildContext context, double t, Widget? child) =>
                 Transform.translate(
-                  offset: Offset(
-                    TravelMotion.translationAt(t, _chipSize, curve: curve),
-                    0,
-                  ),
+                  // `calc(100% − 1.5rem)` on an element exactly [_chipSize]
+                  // wide is 0px — the drift the class doc records, reproduced
+                  // rather than silently fixed.
+                  offset: Offset(curve.transform(t) * 0, 0),
                   child: child,
                 ),
             child: SizedBox(
@@ -934,21 +926,14 @@ class _InteractionSection extends StatelessWidget {
       // in 220ms and `press-key` is 80ms linear both ways: which the panel
       // notes below state correctly, on this same page.
       description:
-          'Ported from Yukirhythm, and the single most important '
-          'thing in the motion system. Instant squish in, springy return out — '
-          '40ms down, 250ms spring back. That asymmetry is what makes the '
-          'interface feel alive rather than animated.',
+          'The single most important thing in the motion system. Instant '
+          'squish in, springy return out — 40ms down, 250ms spring back. That '
+          'asymmetry is what makes the interface feel alive rather than '
+          'animated.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Grid(
-            sm: 3,
-            children: const <Widget>[
-              _ClickSpringPanel(),
-              _PressSpringPanel(),
-              _PressKeyPanel(),
-            ],
-          ),
+          const _ClickSpringPanel(),
           SizedBox(height: space(4)),
           const _LiftPanel(),
           SizedBox(height: space(4)),
@@ -1001,7 +986,8 @@ class _PressPanel extends StatelessWidget {
   }
 }
 
-/// `.click-spring`, 40ms down to scale 0.9, 250ms spring back.
+/// The one click feel: [MotionTransforms.press] (0.9), 40ms down, a 250ms
+/// spring back on [MotionCurves.emphasized].
 class _ClickSpringPanel extends StatelessWidget {
   const _ClickSpringPanel();
 
@@ -1010,14 +996,13 @@ class _ClickSpringPanel extends StatelessWidget {
     final ThemeTokens theme = ThemeScope.of(context);
 
     return _PressPanel(
-      label: '.click-spring',
+      label: 'Press',
       note: '40ms down · scale 0.9',
       copy:
-          'The global click feel. Goes on anything clickable that is not a '
-          'Button — avatars, chips, badges, rows, nav items.',
+          'The one click feel. Goes on anything clickable — avatars, chips, '
+          'badges, rows, nav items, and every Button underneath its own '
+          'surface.',
       button: Press(
-        scale: MotionTransforms.clickSpringScale,
-        upDuration: MotionDurations.normal,
         child: _PressSurface(
           // `shadow-btn-primary` carries two inset layers.
           spec: Shadows.controlPrimary,
@@ -1029,53 +1014,6 @@ class _ClickSpringPanel extends StatelessWidget {
   }
 }
 
-/// `.press-spring`: same 40ms down, scale 0.92, and a **220ms** release: a
-/// raw `0.22s` that is not on the duration scale at all (drift D2).
-class _PressSpringPanel extends StatelessWidget {
-  const _PressSpringPanel();
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-
-    return _PressPanel(
-      label: '.press-spring',
-      note: '40ms down · scale 0.92',
-      copy:
-          'Same feel, less travel. For larger surfaces where 0.9 would look '
-          'comical.',
-      button: Press(
-        scale: MotionTransforms.pressSpringScale,
-        upDuration: MotionDurations.pressSpringUp,
-        child: _PressSurface(
-          spec: Shadows.control,
-          fill: theme.card,
-          ink: theme.foreground,
-          border: Border.all(color: theme.border, width: BorderWidths.hairline),
-        ),
-      ),
-    );
-  }
-}
-
-/// `.press-key`: machine motion: 80ms linear both ways, 3px of travel, and a
-/// `--shadow-key` → `--shadow-key-down` swap. No spring, it just lands.
-class _PressKeyPanel extends StatelessWidget {
-  const _PressKeyPanel();
-
-  @override
-  Widget build(BuildContext context) {
-    return const _PressPanel(
-      label: '.press-key',
-      note: '80ms linear · 3px travel',
-      copy:
-          'A physical key travelling into its socket. Machine motion — '
-          'linear, no spring, it just lands.',
-      button: _PressKeyButton(),
-    );
-  }
-}
-
 /// The shared surface: `grid h-24 w-full place-items-center rounded-lg
 /// font-semibold`, over a shadow token that has inset layers.
 class _PressSurface extends StatelessWidget {
@@ -1083,13 +1021,11 @@ class _PressSurface extends StatelessWidget {
     required this.spec,
     required this.fill,
     required this.ink,
-    this.border,
   });
 
   final ShadowStyle spec;
   final Color fill;
   final Color ink;
-  final BoxBorder? border;
 
   @override
   Widget build(BuildContext context) {
@@ -1099,97 +1035,8 @@ class _PressSurface extends StatelessWidget {
         spec: spec,
         radius: BorderRadius.circular(Radii.lg),
         fill: fill,
-        border: border,
         child: Center(
           child: StyledText('Press and hold', _inheritedSemibold, color: ink),
-        ),
-      ),
-    );
-  }
-}
-
-/// `press-key`'s own clock.
-///
-/// Not [Press]: this utility springs nothing. `transition: transform
-/// var(--duration-tick) linear, box-shadow var(--duration-tick) linear`: so
-/// the controller's raw value **is** the progress, with no curve applied in
-/// either direction, and the same 80ms governs press and release.
-///
-/// The shadow swap is discrete on purpose. `--shadow-key`'s second layer is an
-/// outer shadow and `--shadow-key-down`'s is `inset`, and CSS cannot
-/// interpolate a shadow list whose insetness differs: the property falls back
-/// to discrete interpolation, which flips at 50% of the transition. So the key
-/// travels smoothly and its shadow cuts over at 40ms.
-class _PressKeyButton extends StatefulWidget {
-  const _PressKeyButton();
-
-  @override
-  State<_PressKeyButton> createState() => _PressKeyButtonState();
-}
-
-class _PressKeyButtonState extends State<_PressKeyButton>
-    with SingleTickerProviderStateMixin {
-  /// Where a non-interpolable property changes value: CSS discrete
-  /// interpolation flips from the start value to the end value at half the
-  /// transition, and holds each side.
-  static const double _discreteFlip = 0.5;
-
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: MotionDurations.tick,
-    reverseDuration: MotionDurations.tick,
-  );
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-    final Duration tick = effectiveMotionDuration(
-      context,
-      MotionDurations.tick,
-    );
-    _controller
-      ..duration = tick
-      ..reverseDuration = tick;
-
-    return Listener(
-      behavior: HitTestBehavior.opaque,
-      onPointerDown: (PointerDownEvent _) => _controller.forward(),
-      onPointerUp: (PointerUpEvent _) => _controller.reverse(),
-      onPointerCancel: (PointerCancelEvent _) => _controller.reverse(),
-      child: SizedBox(
-        height: _demoHeight,
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (BuildContext context, Widget? child) {
-            // Linear: the controller's own value, uncurved.
-            final double t = _controller.value;
-            return Transform.translate(
-              offset: Offset(0, MotionTransforms.keyDownY * t),
-              child: Surface(
-                spec: t < _discreteFlip
-                    ? Shadows.keyRaised
-                    : Shadows.keyPressed,
-                radius: BorderRadius.circular(Radii.lg),
-                // `bg-card` and no border class: the raised-key look is
-                // entirely the shadow's.
-                fill: theme.card,
-                child: child!,
-              ),
-            );
-          },
-          child: Center(
-            child: StyledText(
-              'Press and hold',
-              _inheritedSemibold,
-              color: theme.foreground,
-            ),
-          ),
         ),
       ),
     );
@@ -1219,23 +1066,37 @@ class _LiftPanel extends StatelessWidget {
                     // cap.
                     width: math.min(constraints.maxWidth, _liftMaxWidth),
                     height: _demoHeight,
-                    child: InteractiveCard(
-                      radius: BorderRadius.circular(Radii.lg),
-                      builder: (BuildContext context, bool hovered) => Center(
-                        child: StyledText(
-                          'Hover me',
-                          _inheritedSemibold,
-                          color: theme.foreground,
-                        ),
-                      ),
+                    child: HoverBuilder(
+                      cursor: MouseCursor.defer,
+                      builder: (BuildContext context, bool hovered) =>
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: theme.card,
+                              borderRadius: BorderRadius.circular(Radii.lg),
+                              border: Border.all(
+                                color: theme.border,
+                                width: BorderWidths.hairline,
+                              ),
+                              boxShadow: hovered
+                                  ? Shadows.lg.outerShadows(theme)
+                                  : const <BoxShadow>[],
+                            ),
+                            child: Center(
+                              child: StyledText(
+                                'Hover me',
+                                _inheritedSemibold,
+                                color: theme.foreground,
+                              ),
+                            ),
+                          ),
                     ),
                   ),
             ),
           ),
           SizedBox(height: space(5)),
           StyledText(
-            'Rises three pixels and gains a shadow — enough to read as '
-            'interactive without the grid feeling unstable.',
+            'Gains a shadow on hover — enough to read as interactive without '
+            'the grid feeling unstable.',
             TextStyles.small,
           ),
         ],
@@ -1322,28 +1183,6 @@ class _NamedSection extends StatelessWidget {
                     'Stepped mechanical spin. Eight discrete positions, not '
                     'a smooth rotation — it reads as a mechanism.',
                 demo: _RatchetDemo(),
-              ),
-              _NamedPanel(
-                label: '.anim-sign-on',
-                note: '900ms · TEXT only',
-                copy:
-                    'Neon power-up: flickers on, drops out, catches. Drives '
-                    'text-shadow, so it only works on text.',
-                demo: KeyedSubtree(
-                  key: ValueKey<String>('sign-$run'),
-                  child: const _SignOnDemo(),
-                ),
-              ),
-              _NamedPanel(
-                label: '.anim-reveal',
-                note: '550ms · our own',
-                copy:
-                    'The card turning face-up. Rotates on the Y axis. Ours, '
-                    'not Yuki’s.',
-                demo: KeyedSubtree(
-                  key: ValueKey<String>('reveal-$run'),
-                  child: const _RevealDemo(),
-                ),
               ),
               const _NamedPanel(
                 label: '.anim-shimmer',
@@ -1449,17 +1288,13 @@ class _PopInDemo extends StatelessWidget {
     final ThemeTokens theme = ThemeScope.of(context);
 
     return KeyframePlayer(
-      duration: EntranceMotion.duration,
-      fill: EntranceMotion.fill,
+      duration: EnterMotion.duration,
+      fill: EnterMotion.fill,
       builder: (BuildContext context, double t, Widget? child) {
-        final Offset scale = EntranceMotion.scale.transform(t);
+        final double scale = EnterMotion.scale.transform(t);
         return Opacity(
-          opacity: _opacity(EntranceMotion.opacity.transform(t)),
-          child: Transform.scale(
-            scaleX: scale.dx,
-            scaleY: scale.dy,
-            child: child,
-          ),
+          opacity: _opacity(EnterMotion.opacity.transform(t)),
+          child: Transform.scale(scale: scale, child: child),
         );
       },
       child: _DemoStage(
@@ -1482,10 +1317,10 @@ class _JellyDemo extends StatelessWidget {
     final ThemeTokens theme = ThemeScope.of(context);
 
     return KeyframePlayer(
-      duration: StateChangeMotion.duration,
-      fill: StateChangeMotion.fill,
+      duration: ChangeMotion.duration,
+      fill: ChangeMotion.fill,
       builder: (BuildContext context, double t, Widget? child) {
-        final Offset scale = StateChangeMotion.scale.transform(t);
+        final Offset scale = ChangeMotion.scale.transform(t);
         return Transform.scale(
           scaleX: scale.dx,
           scaleY: scale.dy,
@@ -1515,12 +1350,12 @@ class _SpringUpDemo extends StatelessWidget {
     final ThemeTokens theme = ThemeScope.of(context);
 
     return KeyframePlayer(
-      duration: SpringEntranceMotion.duration,
-      fill: SpringEntranceMotion.fill,
+      duration: EnterMotion.duration,
+      fill: EnterMotion.fill,
       builder: (BuildContext context, double t, Widget? child) => Opacity(
-        opacity: _opacity(SpringEntranceMotion.opacity.transform(t)),
+        opacity: _opacity(EnterMotion.opacity.transform(t)),
         child: Transform.translate(
-          offset: Offset(0, SpringEntranceMotion.translateY.transform(t)),
+          offset: Offset(0, EnterMotion.translateY.transform(t)),
           child: child,
         ),
       ),
@@ -1575,9 +1410,9 @@ class _JellyInDemo extends StatelessWidget {
 /// `.anim-ratchet`: eight held 45° positions of 175ms each. 360° is never
 /// displayed; the cycle wraps to 0°.
 ///
-/// Driven through [DiscreteProgressMotion.radiansAt] rather than a `CurvedAnimation`,
-/// deliberately: `CurvedAnimation` short-circuits `t == 1.0` to itself, which
-/// would paint the one frame `steps(8, jump-end)` exists to skip.
+/// Driven through [StepCurve] rather than a `CurvedAnimation`, deliberately:
+/// `CurvedAnimation` short-circuits `t == 1.0` to itself, which would paint
+/// the one frame `steps(8, jump-end)` exists to skip.
 ///
 /// Unkeyed and infinite. Under reduced motion it runs one collapsed iteration
 /// and, having no fill mode, reverts to the element's own transform, 0°
@@ -1593,12 +1428,14 @@ class _RatchetDemo extends StatelessWidget {
       height: _demoHeight,
       child: Center(
         child: KeyframePlayer(
-          duration: DiscreteProgressMotion.duration,
-          fill: DiscreteProgressMotion.fill,
-          repeat: DiscreteProgressMotion.loops,
+          duration: MotionDurations.shimmer,
+          fill: KeyframeFill.none,
+          repeat: true,
           builder: (BuildContext context, double t, Widget? child) =>
               Transform.rotate(
-                angle: DiscreteProgressMotion.radiansAt(t),
+                // `steps(8)`: eight held 45° positions, never a smooth spin.
+                angle:
+                    const StepCurve(_ratchetSteps).transform(t) * 2 * math.pi,
                 child: child,
               ),
           // The **square** rotates, needle included.
@@ -1626,88 +1463,6 @@ class _RatchetDemo extends StatelessWidget {
   }
 }
 
-/// `.anim-sign-on`: six hard cuts, no tweening.
-///
-/// `steps(1, end)` applied between every pair of stops means no interpolation
-/// at all, so this reads [TextRevealMotion.frameAt] rather than a tween. Render order
-/// is the filter spec's: draw the text **and its shadows**, apply
-/// `brightness()`, then apply `opacity`.
-///
-/// The resting state is not neutral. `both` holds the 70% frame, so after
-/// 900ms the word keeps a `0 0 6px` + `0 0 18px` glow at brightness 1.15
-/// forever: and that is also the frame reduced motion freezes it on.
-class _SignOnDemo extends StatelessWidget {
-  const _SignOnDemo();
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-
-    return SizedBox(
-      height: _demoHeight,
-      child: Center(
-        child: KeyframePlayer(
-          duration: TextRevealMotion.duration,
-          fill: TextRevealMotion.fill,
-          builder: (BuildContext context, double t, Widget? child) {
-            final TextRevealFrame frame = TextRevealMotion.frameAt(t);
-            // `currentColor` is `text-value-ink`.
-            final TextStyle style = StyledText.styleOf(
-              context,
-              TextStyles.h3,
-              color: theme.premiumText,
-            ).copyWith(shadows: frame.shadows(theme.premiumText));
-
-            return Opacity(
-              opacity: frame.opacity,
-              child: ColorFiltered(
-                colorFilter: frame.brightnessFilter,
-                child: LineBox(
-                  style: style,
-                  // Literal uppercase in the source; no `text-transform`.
-                  child: Text('LEGENDARY', style: style),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-/// `.anim-reveal`: the card turning face-up, **orthographically** (ruling M4).
-class _RevealDemo extends StatelessWidget {
-  const _RevealDemo();
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
-
-    return KeyframePlayer(
-      duration: RevealMotion.duration,
-      fill: RevealMotion.fill,
-      builder: (BuildContext context, double t, Widget? child) => Opacity(
-        opacity: _opacity(RevealMotion.opacity.transform(t)),
-        child: Transform(
-          transform: RevealMotion.transformAt(t),
-          // `transform-origin: 50% 50%`, the CSS default.
-          alignment: Alignment.center,
-          child: child,
-        ),
-      ),
-      child: _DemoStage(
-        border: theme.primary.withValues(alpha: _primaryBorderAlpha),
-        child: const Icon(
-          IconGlyph.sparkles,
-          size: IconSize.xl,
-          tone: IconTone.action,
-        ),
-      ),
-    );
-  }
-}
-
 /// `.anim-shimmer`: an empty box; all the paint comes from the utility.
 ///
 /// The tile is `2W` wide and its bright `--accent` midpoint crosses from `−W`
@@ -1726,9 +1481,9 @@ class _ShimmerDemo extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(Radii.lg),
         child: KeyframePlayer(
-          duration: LoadingShimmerMotion.duration,
-          fill: LoadingShimmerMotion.fill,
-          repeat: LoadingShimmerMotion.loops,
+          duration: ShimmerMotion.duration,
+          fill: ShimmerMotion.fill,
+          repeat: ShimmerMotion.loops,
           // No child: a childless [CustomPaint] takes `constraints.smallest`,
           // and the constraints here are tight on both axes: the stretched
           // panel column for width, the `h-24` above for height.
@@ -1736,7 +1491,7 @@ class _ShimmerDemo extends StatelessWidget {
               CustomPaint(
                 painter: _ShimmerPainter(
                   t: t,
-                  gradient: LoadingShimmerMotion.gradient(theme),
+                  gradient: ShimmerMotion.gradient(theme),
                 ),
               ),
         ),
@@ -1754,9 +1509,9 @@ class _ShimmerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Rect tile = Rect.fromLTWH(
-      LoadingShimmerMotion.offsetAt(t, size.width),
+      ShimmerMotion.offsetAt(t, size.width),
       0,
-      LoadingShimmerMotion.tileWidth(size.width),
+      ShimmerMotion.tileWidth(size.width),
       size.height,
     );
     canvas.drawRect(
@@ -1803,17 +1558,17 @@ class _PulseLiveDemo extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               KeyframePlayer(
-                duration: LivePulseMotion.duration,
-                fill: LivePulseMotion.fill,
-                repeat: LivePulseMotion.loops,
+                duration: PulseMotion.duration,
+                fill: PulseMotion.fill,
+                repeat: PulseMotion.loops,
                 builder: (BuildContext context, double t, Widget? child) =>
                     CustomPaint(
                       painter: _PulseRingPainter(t: t),
                       child: child,
                     ),
                 child: SizedBox(
-                  width: LivePulseMotion.dotDiameter,
-                  height: LivePulseMotion.dotDiameter,
+                  width: PulseMotion.dotDiameter,
+                  height: PulseMotion.dotDiameter,
                 ),
               ),
               SizedBox(width: space(2.5)),
@@ -1839,15 +1594,15 @@ class _PulseRingPainter extends CustomPainter {
     // The ring first: a `box-shadow` paints behind its element.
     canvas.drawCircle(
       centre,
-      LivePulseMotion.ringRadiusAt(t),
-      Paint()..color = LivePulseMotion.ringColorAt(t),
+      PulseMotion.ringRadiusAt(t),
+      Paint()..color = PulseMotion.ringColorAt(t),
     );
     canvas.drawCircle(
       centre,
-      LivePulseMotion.dotRadius,
+      PulseMotion.dotRadius,
       Paint()
-        ..color = LivePulseMotion.dotColor.withValues(
-          alpha: LivePulseMotion.dotOpacityAt(t),
+        ..color = PulseMotion.dotColor.withValues(
+          alpha: PulseMotion.dotOpacityAt(t),
         ),
     );
   }

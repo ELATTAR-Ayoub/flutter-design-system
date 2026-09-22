@@ -618,7 +618,7 @@ class _DependenciesContent extends StatelessWidget {
             'the registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/foundation.dart (clampDouble), '
             'package:flutter/widgets.dart.',
-        'Foundation imports: motion/keyframes.dart (StateChangeMotion, the arrival '
+        'Foundation imports: motion/keyframes.dart (ChangeMotion, the arrival '
             'squash table), theme_scope.dart (effectiveMotionDuration).',
         'registryDependencies, resolved automatically by `elattar add '
             'icon-swap`: keyframes, source-foundation — copied verbatim '
@@ -710,7 +710,7 @@ const List<DocsApiFact> _iconSwapApiFacts = <DocsApiFact>[
     description:
         "Required. The strip cell's own height — the glyph's height, not "
         'window. One roll step is 160% of this value '
-        '(ContentSwapMotion.travelFor). Passing a cell that disagrees with the '
+        '(SwapRollMotion.travelFor). Passing a cell that disagrees with the '
         "glyph's real box changes the travel exactly as a differently-"
         'sized glyph would, uncorrected: there is nothing to correct it '
         'against.',
@@ -744,9 +744,9 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     state: 'activeIndex changes (advance or reverse)',
     treatment:
         '_from and _fromOpacity capture the current frame before '
-        're-aiming, then _roll.forward(from: 0) over ContentSwapMotion.duration '
+        're-aiming, then _roll.forward(from: 0) over SwapRollMotion.duration '
         '(400ms, MotionCurves.emphasized) and _squash.forward(from: 0) over the '
-        'delayed 750ms clock (150ms delay + StateChangeMotion.duration 600ms).',
+        'delayed 750ms clock (150ms delay + ChangeMotion.duration 600ms).',
     userSignal:
         'The old glyph exits the direction the offset arithmetic implies '
         'and overshoots ≈9.8% of one step before settling; the arriving '

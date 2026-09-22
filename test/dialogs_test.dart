@@ -299,7 +299,7 @@ void main() {
   group('OpenTransition', () {
     // The keyframes, sampled where CSS declares them. Every number here is the
     // one globals.css writes; the trace confirmed all three stops.
-    test('yuki-jelly-in stops at 0 / 60 / 100%', () {
+    test('OpenMotion arrival stops at 0 / 60 / 100%', () {
       final ({double scale, double shift, double opacity}) start =
           OpenTransition.sample(0, entering: true);
       expect(start.scale, closeTo(0.92, 0.001));
@@ -319,7 +319,7 @@ void main() {
       expect(end.opacity, closeTo(1, 0.001));
     });
 
-    test('yuki-jelly-out stops at 0 / 30 / 100%', () {
+    test('CloseMotion exit stops at 0 / 30 / 100%', () {
       expect(
         OpenTransition.sample(0, entering: false).scale,
         closeTo(1, 0.001),
@@ -849,7 +849,7 @@ void main() {
       await pointer.addPointer(location: Offset.zero);
       await pointer.moveTo(t.getCenter(find.text('trigger')));
       await t.pump(MotionDurations.tooltipShowDelay);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       final Rect content = t.getRect(find.byType(TooltipContent));
       expect(content.width, Containers.xs);

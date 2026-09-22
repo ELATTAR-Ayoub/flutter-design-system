@@ -19,11 +19,7 @@ void main() {
 
     const List<String> tokens = <String>[
       'overlayEnter',
-      'overlayExit',
       'open',
-      'close',
-      'expand',
-      'collapse',
       'drawerOpen',
       'drawerClose',
       'pressIn',

@@ -1189,7 +1189,7 @@ class _PressableCell extends StatelessWidget {
         // `active:not-aria-[haspopup]:scale-95`, and it does **not** animate —
         // the flag is the frame, exactly as `Button` records under B1.
         child: Transform.scale(
-          scale: pressed ? MotionTransforms.buttonPress : 1,
+          scale: pressed ? MotionTransforms.press : 1,
           child: child,
         ),
       ),

@@ -61,7 +61,7 @@
 /// because this panel is neither of that component's two variants. Measured
 /// open at 1440×900: **768 × 630** (`max-w-3xl`), fixed and centred, `p-0`,
 /// 16px radius on `--card` under a single 1px `foreground/10` ring with no
-/// elevation, entering on `yuki-jelly-in` at 420ms; the image is `w-full
+/// elevation, entering on [OpenTransition] at 420ms; the image is `w-full
 /// object-contain` capped at `70vh` over a `--muted` letterbox; the close
 /// control is a **`secondary`** 40px icon button at `top-3 right-3`; the header
 /// is `sr-only`.
@@ -717,8 +717,8 @@ class AttachmentMedia extends StatelessWidget {
 /// (`max-w-3xl` against the dialog family's 384/448), it shows no stock close
 /// button, and its whole body is one bled image. Measured open at 1440×900:
 /// 768 × 630, fixed and centred, `p-0`, 16px radius on `--card`, a single 1px
-/// `foreground/10` ring and no elevation under it, entering on `yuki-jelly-in`
-/// at 420ms.
+/// `foreground/10` ring and no elevation under it, entering on
+/// [OpenTransition] at 420ms.
 class _AttachmentPreview extends StatelessWidget {
   const _AttachmentPreview({
     required this.name,
@@ -1236,7 +1236,7 @@ class _AttachmentGroupState extends State<AttachmentGroup> {
     _c.animateTo(
       best,
       duration: effectiveMotionDuration(context, MotionDurations.normal),
-      curve: MotionCurves.balanced,
+      curve: MotionCurves.enter,
     );
   }
 
@@ -1324,7 +1324,7 @@ class _ScrollFadeX extends StatelessWidget {
 
   /// The leading fade grows as the box scrolls away from the start; the
   /// trailing one shrinks as it reaches the end. Both run on
-  /// [MotionCurves.symmetric] over [reveal] px.
+  /// [MotionCurves.move] over [reveal] px.
   static (double start, double end) fadesFor({
     required double width,
     required double offset,
@@ -1335,8 +1335,8 @@ class _ScrollFadeX extends StatelessWidget {
     final double sT = (offset / reveal).clamp(0.0, 1.0);
     final double eT = ((offset - (max - reveal)) / reveal).clamp(0.0, 1.0);
     return (
-      full * MotionCurves.symmetric.transform(sT),
-      full * (1 - MotionCurves.symmetric.transform(eT)),
+      full * MotionCurves.move.transform(sT),
+      full * (1 - MotionCurves.move.transform(eT)),
     );
   }
 

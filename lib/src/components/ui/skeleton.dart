@@ -4,15 +4,15 @@
 /// <Comp data-slot="skeleton" className={cn("anim-shimmer rounded-md", className)} />
 /// ```
 ///
-/// Everything visible is `@utility anim-shimmer` (globals.css L2344–2353):
+/// Everything visible is `@utility anim-shimmer`:
 ///
 /// ```css
 /// background: linear-gradient(90deg, var(--popover) 0%, var(--accent) 50%, var(--popover) 100%);
 /// background-size: 200% 100%;
-/// animation: pulls-shimmer 1.4s var(--ease-in-out) infinite;
+/// animation: 1.4s var(--ease-in-out) infinite;
 /// ```
 ///
-/// So this file states no motion of its own: [LoadingShimmerMotion] already carries the
+/// So this file states no motion of its own: [ShimmerMotion] already carries the
 /// table, the tile factor, the two end positions and the theme-resolved
 /// gradient, and the motion page already renders it. What is new here is a
 /// **widget** — a box of a given size, with the sweep inside it.
@@ -26,7 +26,7 @@
 ///
 /// **The shimmer is a repeating tile, not a single band.** `background-repeat`
 /// defaults to `repeat`, which is why the box is never empty at the extremes —
-/// see [LoadingShimmerMotion]'s own note, which also explains why the reduced-motion
+/// see [ShimmerMotion]'s own note, which also explains why the reduced-motion
 /// freeze agrees with motion-map §8.2 even though the two name different
 /// numbers.
 ///
@@ -99,17 +99,17 @@ class Skeleton extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(radius ?? defaultRadius),
         child: KeyframePlayer(
-          duration: LoadingShimmerMotion.duration,
+          duration: ShimmerMotion.duration,
           // No `animation-fill-mode`, so a stilled shimmer reverts to stop 0.
-          fill: LoadingShimmerMotion.fill,
-          repeat: LoadingShimmerMotion.loops,
+          fill: ShimmerMotion.fill,
+          repeat: ShimmerMotion.loops,
           // A childless [CustomPaint] takes `constraints.smallest`, and the
           // constraints here are whatever the [SizedBox] resolved.
           builder: (BuildContext context, double t, Widget? child) =>
               CustomPaint(
                 painter: _ShimmerPainter(
                   t: t,
-                  gradient: LoadingShimmerMotion.gradient(theme),
+                  gradient: ShimmerMotion.gradient(theme),
                 ),
               ),
         ),
@@ -130,9 +130,9 @@ class _ShimmerPainter extends CustomPainter {
     // `background-size: 200% 100%` at the position the table says, drawn as a
     // repeating tile because `background-repeat` defaults to `repeat`.
     final Rect tile = Rect.fromLTWH(
-      LoadingShimmerMotion.offsetAt(t, size.width),
+      ShimmerMotion.offsetAt(t, size.width),
       0,
-      LoadingShimmerMotion.tileWidth(size.width),
+      ShimmerMotion.tileWidth(size.width),
       size.height,
     );
     canvas.drawRect(

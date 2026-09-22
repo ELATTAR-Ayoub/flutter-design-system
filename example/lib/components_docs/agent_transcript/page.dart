@@ -10,7 +10,7 @@
 /// a tool call and a plain one for a browser action (`ToolChip`,
 /// `ActionChip`), the approval gate (`ApprovalCard`), the
 /// empty-conversation card (`WelcomeCard`), three small entrance
-/// utilities (`TypingCursor`, `FadeUp`, `RowIn`), and the plain data
+/// utilities (`TypingCursor`, `RowIn`), and the plain data
 /// class the welcome card's grid renders (`AgentCapability`). API
 /// Reference gives each of the ten its own `DocsApiTable`, with a rail
 /// sub-anchor per table.
@@ -192,7 +192,6 @@ final ComponentDocSpec agentTranscriptDocSpec = ComponentDocSpec(
         DocsTocEntry(title: 'ToolChip', anchor: 'api-eltool-chip'),
         DocsTocEntry(title: 'ActionChip', anchor: 'api-elaction-chip'),
         DocsTocEntry(title: 'ApprovalCard', anchor: 'api-elapproval-card'),
-        DocsTocEntry(title: 'FadeUp', anchor: 'api-elfade-up'),
         DocsTocEntry(title: 'RowIn', anchor: 'api-elrow-in'),
         DocsTocEntry(
           title: 'AgentCapability',
@@ -674,11 +673,6 @@ class _ApiReferenceContent extends StatelessWidget {
       ),
       SizedBox(height: space(5)),
       const DocsAnchor(
-        id: 'api-elfade-up',
-        child: DocsApiTable(title: 'FadeUp', facts: _fadeUpFacts),
-      ),
-      SizedBox(height: space(5)),
-      const DocsAnchor(
         id: 'api-elrow-in',
         child: DocsApiTable(title: 'RowIn', facts: _rowInFacts),
       ),
@@ -930,17 +924,6 @@ const List<DocsApiFact> _approvalCardFacts = <DocsApiFact>[
     description:
         '"The assistant wants to run \\"{action}\\"{ on target}." when no '
         'describe is supplied.',
-  ),
-];
-
-const List<DocsApiFact> _fadeUpFacts = <DocsApiFact>[
-  DocsApiFact(name: 'child', type: 'Widget', description: 'Required.'),
-  DocsApiFact(
-    name: 'FadeUp.rise',
-    type: 'static double (get)',
-    description:
-        '10px — the translateY the child rises from as it fades in, over '
-        'MotionDurations.slow on MotionCurves.enter.',
   ),
 ];
 
@@ -1241,8 +1224,8 @@ class _DependenciesContent extends StatelessWidget {
                 'foundation/typography.dart, motion/keyframes.dart, '
                 'text_layout.dart, theme_scope.dart',
             description:
-                'motion/keyframes.dart supplies LivePulseMotion (the typing '
-                'cursor\'s pulse) and SpringEntranceMotion/EntranceMotion (the welcome '
+                'motion/keyframes.dart supplies PulseMotion (the typing '
+                'cursor\'s pulse) and EnterMotion/EnterMotion (the welcome '
                 'card\'s entrance) — the registry\'s own keyframes '
                 'dependency.',
           ),

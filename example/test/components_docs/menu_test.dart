@@ -157,7 +157,6 @@ const List<String> _menuApiTables = <String>[
   'MenuSurface',
   'MenuContent',
   'MenuPointerDown',
-  'MenuMotion',
 ];
 
 void main() {
@@ -193,7 +192,6 @@ void main() {
           'MenuSurface',
           'MenuContent',
           'MenuPointerDown',
-          'MenuMotion',
         ]),
       );
       expect(menuDoc.description, isNot(contains('..')));

@@ -210,7 +210,7 @@ void main() {
     });
 
     test('the beat blend mode is the one thing that flips with the theme', () {
-      // globals.css L3289–3295 — the sheen's ::before needs multiply on a
+      // The sheen's ::before needs multiply on a
       // light surface and screen on a dark one.
       expect(
         ActionFeedback.beatBlendFor(ResolvedColorMode.light),
@@ -223,7 +223,7 @@ void main() {
     });
 
     test('action-beat samples at every keyframe stop', () {
-      // globals.css L2059–2088: a double thump, then 46% of the cycle at rest.
+      // A double thump, then 46% of the cycle at rest.
       // Tolerance is 1e-3, not 1e-6: `TweenSequence` accumulates its segment
       // boundaries in floating point (0.3 + 0.15 == 0.44999999999999996) and
       // Flutter's `Cubic` solves its x-parameter by binary search to a
@@ -455,7 +455,7 @@ void main() {
     });
 
     test('the foil is soft-light and the glint is screen in BOTH themes', () {
-      // globals.css L3297–3300 says so explicitly: the foil is its own opaque
+      // The stylesheet says so explicitly: the foil is its own opaque
       // base, so it never needs the multiply/screen split the sheen needs.
       expect(PremiumSurface.foilBlend, BlendMode.softLight);
       expect(PremiumSurface.glintBlend, BlendMode.screen);
@@ -464,7 +464,7 @@ void main() {
     });
 
     test('value-foil-drift travels two layers and parks the third', () {
-      // globals.css L1915–1928. Layers 1 and 2 travel 140% and 220% of their
+      // Layers 1 and 2 travel 140% and 220% of their
       // own sizing box; layer 3 (the radial corner light) is stationary.
       expect(PremiumSurface.driftPosition(0, 0), closeTo(0, 1e-9));
       expect(PremiumSurface.driftPosition(0, 1), closeTo(1.40, 1e-9));
@@ -478,7 +478,7 @@ void main() {
     });
 
     test('value-glint idles for 54% of the cycle, then crosses once', () {
-      // globals.css L1930–1946. Position is declared only at 0/54/100, so it
+      // Position is declared only at 0/54/100, so it
       // HOLDS at 135% through the idle and then sweeps to −55%.
       const double tol = 1e-3;
       for (final double t in <double>[0, 0.2, 0.4, 0.54]) {

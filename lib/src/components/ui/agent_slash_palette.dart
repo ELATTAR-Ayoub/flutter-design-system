@@ -26,7 +26,7 @@
 /// | | value |
 /// |---|---|
 /// | box | `w-full` of the composer, `max-h-64` **256**, `rounded-lg` 12, 1px `--border`, `--popover`, `shadow-e3` |
-/// | entrance | `anim-fade-up` → **`pulls-fade-up` 400ms `cubic-bezier(.22,1,.36,1)` both**, `translateY(10px)` → none, opacity 0 → 1 |
+/// | entrance | `anim-fade-up` → **400ms `cubic-bezier(.22,1,.36,1)` both**, `translateY(10px)` → none, opacity 0 → 1 |
 /// | group heading | `px-3 pt-3 pb-1` `.type-caption` — 10.5/14.175/500, **30.175** tall |
 /// | row | `items-start gap-3 px-3 py-2`, **53.675** tall, `--accent` when active |
 /// | row glyph | 16px at `mt-1`, `--agent`, stroke **2** (lucide's own, not the `Icon` wrapper's 2.4) |
@@ -34,8 +34,8 @@
 ///
 /// The entrance was the probe's first correction: `anim-fade-up` names no
 /// duration or easing at its call site, and the utility resolves to a **400ms**
-/// `--ease-out` run of a keyframe called `pulls-fade-up` — not the 250ms
-/// class-list default the duration-word sweep leaves everywhere else.
+/// `--ease-out` run — not the 250ms class-list default the duration-word
+/// sweep leaves everywhere else.
 library;
 
 import 'package:flutter/gestures.dart';
@@ -184,8 +184,8 @@ class AgentSlashPalette extends StatelessWidget {
   /// `mb-2` — the gap between the palette's bottom edge and the composer's top.
   static double get bottomGap => space(2);
 
-  /// `anim-fade-up` — *(measured)* `pulls-fade-up 0.4s cubic-bezier(0.22, 1,
-  /// 0.36, 1) both`. The class names neither number; the utility carries both.
+  /// `anim-fade-up` — *(measured)* `0.4s cubic-bezier(0.22, 1, 0.36, 1)
+  /// both`. The class names neither number; the utility carries both.
   static Duration get entrance => MotionDurations.slow;
 
   /// The keyframe's own `translateY(10px)` at 0%.

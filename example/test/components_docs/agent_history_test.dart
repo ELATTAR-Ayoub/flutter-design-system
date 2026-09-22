@@ -8,7 +8,7 @@
 /// tables, matching `field_test.dart`'s own precedent of checking several
 /// tables individually rather than one flat merged set.
 ///
-/// **No `pumpAndSettle` anywhere in this file.** `RowMotion`'s own
+/// **No `pumpAndSettle` anywhere in this file.** The row's own
 /// entrance/exit and `BlurSwitch` run `AnimationController`s that this
 /// page's live specimens can trigger (pin, delete, rename); every test
 /// below uses `tester.pump()`.

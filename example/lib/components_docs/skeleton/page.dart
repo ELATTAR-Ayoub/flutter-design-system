@@ -495,12 +495,12 @@ class _DependenciesContent extends StatelessWidget {
             value:
                 'foundation/spacing.dart (space(), Radii), '
                 'foundation/theme.dart (ThemeTokens), '
-                'motion/keyframes.dart (KeyframePlayer, LoadingShimmerMotion), '
+                'motion/keyframes.dart (KeyframePlayer, ShimmerMotion), '
                 'theme_scope.dart (ThemeScope)',
             description:
-                'KeyframePlayer and LoadingShimmerMotion are the same '
-                'looping-animation engine every "pulls-*" motion in this '
-                'system reuses. No other component dependency.',
+                'KeyframePlayer and ShimmerMotion are the same '
+                'looping-animation engine every one of the twelve keyframe '
+                'recipes reuses. No other component dependency.',
           ),
           const DocsInstallFact(
             label: 'registryDependencies',
@@ -556,7 +556,7 @@ class _ThemingContent extends StatelessWidget {
     BuildContext context,
   ) => _bullets(ThemeScope.of(context), <String>[
     'The shimmer gradient is theme.popover → theme.accent → '
-        'theme.popover (LoadingShimmerMotion.gradient(theme)): both stops resolve '
+        'theme.popover (ShimmerMotion.gradient(theme)): both stops resolve '
         'from the live theme, so light and dark each get their own '
         'correctly contrasted sweep with no override needed.',
     'Skeleton declares no colour parameter of its own: the gradient '

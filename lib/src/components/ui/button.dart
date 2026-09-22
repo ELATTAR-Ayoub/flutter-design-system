@@ -8,7 +8,7 @@
 /// rather than merely dimming it), and the **pill shape** (controls are fully
 /// rounded; only containers use the radius ladder).
 ///
-/// The feel is `btn-spring` (globals.css L1886–1898): transform, background,
+/// The feel is `btn-spring`: transform, background,
 /// border, colour, box-shadow and opacity all transition at `--duration-base`
 /// on `--ease-spring`, and `:active` shortens that to `--duration-tick`.
 ///
@@ -220,7 +220,7 @@ const double _destructiveHoverFillAlpha = 0.20;
 const double _destructiveFocusBorderAlpha = 0.50;
 const double _destructiveFocusRingAlpha = 0.25;
 
-/// `--font-weight-semibold: 600` (globals.css L179), which `font-semibold` on
+/// `--font-weight-semibold: 600`, which `font-semibold` on
 /// the premium variant sets over the base list's `font-medium`.
 const double _semiboldWght = 600;
 
@@ -739,7 +739,7 @@ class _ButtonState extends State<Button> {
           fill: Palette.value,
           border: transparent,
           // `--color-value-foreground`: the one foreground in the system that
-          // deliberately does NOT flip with the theme (globals.css L111–127) —
+          // deliberately does NOT flip with the theme —
           // the foil is an opaque metal ramp, the same lime on a white page as
           // on a black one, so its label has to be dark in both.
           content: Palette.valueForeground,
@@ -1088,7 +1088,7 @@ class _ButtonState extends State<Button> {
     // does.
     button = Transform.scale(
       scale: _pressed && !widget.suppressPressScale
-          ? MotionTransforms.buttonPress
+          ? MotionTransforms.press
           : 1,
       child: Listener(
         // The one thing `Press` was contributing besides the animation: a hit

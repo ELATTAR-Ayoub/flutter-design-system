@@ -98,6 +98,13 @@ class MotionDurations {
   /// this long.
   static const Duration scrollAreaHideDelay = Duration(milliseconds: 600);
 
+  /// The browser's own `scrollTo({behavior: "smooth"})` animator, not the
+  /// stylesheet's: measured (`ba2-chat-inter.js`) at 100px settling in
+  /// ~168ms and 398px in ~335ms — `√distance` to within a frame, so the
+  /// per-pixel unit is this times `√distance`. [MessageScrollerViewport] is
+  /// its one consumer.
+  static const Duration smoothScrollFrame = Duration(microseconds: 16800);
+
   /// Radix `Select`'s own auto-scroll interval —
   /// `window.setInterval(onAutoScroll, 50)` while a scroll button is
   /// hovered; each tick scrolls the viewport by one item's height.
@@ -158,6 +165,14 @@ class MotionDurations {
   /// same reason — a duration in a component file is a literal the guard
   /// scans, and one nobody can point at a source for is a guess.
   static const Duration attachmentSaving = Duration(milliseconds: 1600);
+
+  /// How long a docs "Copy" button holds its confirmed state — the copied
+  /// glyph and label — before reverting to idle.
+  ///
+  /// A behaviour timer, not a motion: nothing here eases or keyframes, it is
+  /// only how long a state persists once reached, the same standing as
+  /// [attachmentSaving].
+  static const Duration confirmationHold = Duration(seconds: 2);
 
   /// Ambient, not interactive — a slow bloom on something that is not being
   /// acted on.

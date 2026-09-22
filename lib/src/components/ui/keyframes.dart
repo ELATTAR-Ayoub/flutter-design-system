@@ -501,8 +501,7 @@ class ExpandMotion {
   static const Curve collapseCurve = MotionCurves.move;
 }
 
-/// anim-change — squash-and-stretch in place. The same stop table the
-/// retired `StateChangeMotion` used to carry.
+/// anim-change — squash-and-stretch in place, mirroring web's `anim-change`.
 ///
 /// ```css
 /// 0%   { transform: scale3d(1,    1,    1); }
@@ -542,9 +541,8 @@ class SpinMotion {
   static const bool loops = true;
 }
 
-/// anim-shimmer / anim-shimmer-text — the skeleton sweep, the same body
-/// `LoadingShimmerMotion` used to carry; `textDuration` is the text variant's
-/// slower period.
+/// anim-shimmer / anim-shimmer-text — the skeleton sweep; `textDuration` is
+/// the text variant's slower period.
 ///
 /// ```css
 /// background: linear-gradient(90deg, var(--popover) 0%, var(--accent) 50%,
@@ -614,8 +612,7 @@ class ProgressMotion {
   static const double toFraction = 3;
 }
 
-/// anim-pulse — the live indicator's ring, the same body `LivePulseMotion`
-/// used to carry.
+/// anim-pulse — the live indicator's ring.
 ///
 /// ```css
 /// 0%, 100% { opacity: 1;    box-shadow: 0 0 0 0   rgba(61, 220, 151, 0.5); }
@@ -692,8 +689,7 @@ class CaretMotion {
   static bool visibleAt(double t) => t < 0.5;
 }
 
-/// swap-roll — the IconSwap wheel, the same body `ContentSwapMotion` used to
-/// carry.
+/// swap-roll — the IconSwap wheel.
 ///
 /// ```css
 /// --swap-offset: 0;

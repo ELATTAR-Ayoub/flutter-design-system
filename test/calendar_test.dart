@@ -1398,7 +1398,7 @@ void main() {
 
       await t.tap(find.byType(Button));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       final Rect trigger = t.getRect(find.byType(Button));
       final Rect popup = t.getRect(find.byType(PopoverSurface));
       expect(popup.top - trigger.bottom, moreOrLessEquals(4, epsilon: 0.01));
@@ -1483,7 +1483,7 @@ void main() {
       expect(changed, isTrue);
       expect(seen, DateTime(2026, 8, 20));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       await t.pump(MotionDurations.tick);
       await t.pump();
       expect(find.byType(PopoverSurface), findsNothing);

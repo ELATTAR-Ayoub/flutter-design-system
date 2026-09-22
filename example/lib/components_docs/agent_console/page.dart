@@ -640,7 +640,7 @@ const List<DocsApiFact> _consoleFacts = <DocsApiFact>[
     description:
         'Defaults to SwitchPhase.idle. The transcript\'s cross-fade '
         'phase while switching conversations — supplied by '
-        'BlurSwitchController (agent-core), never derived here.',
+        'TranscriptSwitchController (agent-core), never derived here.',
   ),
   DocsApiFact(
     name: 'height',

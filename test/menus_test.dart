@@ -368,7 +368,7 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       final Rect trigger = t.getRect(find.byType(_Trigger));
       final Rect content = t.getRect(find.byType(MenuContent));
@@ -395,7 +395,7 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       final Rect label = t.getRect(find.text('Fast'));
       final Rect hint = t.getRect(find.text('Answers in a second'));
@@ -444,7 +444,7 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       final ThemeTokens theme = ThemeScope.of(
         t.element(find.byType(MenuContent)),
@@ -485,7 +485,7 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       final ThemeTokens theme = ThemeScope.of(
         t.element(find.byType(MenuContent)),
@@ -541,7 +541,7 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       await t.tap(find.text('Sign out'));
       await runOverlay(t);
@@ -563,7 +563,7 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       final ThemeTokens theme = ThemeScope.of(
         t.element(find.byType(MenuContent)),
       );
@@ -603,7 +603,7 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       await t.sendKeyEvent(LogicalKeyboardKey.keyP);
       await t.pump();
@@ -625,7 +625,7 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       await t.sendKeyEvent(LogicalKeyboardKey.escape);
       await runOverlay(t);
       expect(find.text('Wallet'), findsNothing);
@@ -653,7 +653,7 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       Finder tickIn(String label) => find.descendant(
         of: find
@@ -686,14 +686,14 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       await t.tap(find.text('Condition'));
       await runOverlay(t);
       expect(find.text('Condition'), findsNothing);
 
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       expect(
         find.descendant(
           of: find.byType(MenuContent),
@@ -728,7 +728,7 @@ void main() {
       );
       await t.tap(find.byType(DropdownMenu));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       expect(
         find.descendant(
           of: find.byType(MenuContent),
@@ -837,7 +837,7 @@ void main() {
       final Offset at = t.getCenter(find.byType(ContextMenu));
       await t.tapAt(at, buttons: kSecondaryButton);
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       return at;
     }
 
@@ -909,7 +909,7 @@ void main() {
       );
       await t.pump(const Duration(milliseconds: 20));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       expect(find.text('Add to shipment'), findsOneWidget);
 
       final Rect trigger = t.getRect(
@@ -956,7 +956,7 @@ void main() {
       final TestGesture gesture = await hover(t, find.text('Shipping'));
       await t.pump(const Duration(milliseconds: 120));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       expect(find.text('Add to shipment'), findsOneWidget);
 
       await gesture.moveTo(t.getCenter(find.text('Favourite')));
@@ -994,7 +994,7 @@ void main() {
 
       await t.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       expect(find.text('Add to shipment'), findsOneWidget);
       expect(fillOf(t, 'Add to shipment'), theme.accent);
 
@@ -1090,7 +1090,7 @@ void main() {
       );
       await t.tap(find.text('Packs'));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       final Rect trigger = t.getRect(
         find
@@ -1125,7 +1125,7 @@ void main() {
       await t.pumpWidget(overlayHost(const Menubar(menus: admin)));
       await t.tap(find.text('Packs'));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       expect(find.text('New pack'), findsOneWidget);
 
       await hover(t, find.text('Users'));
@@ -1144,7 +1144,7 @@ void main() {
       await t.pumpWidget(overlayHost(const Menubar(menus: admin)));
       await t.tap(find.text('Packs'));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       await t.sendKeyEvent(LogicalKeyboardKey.escape);
       await t.pump();
@@ -1162,16 +1162,16 @@ void main() {
       await t.pumpWidget(overlayHost(const Menubar(menus: admin)));
       await t.tap(find.text('Packs'));
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       await t.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       expect(find.text('Search users'), findsOneWidget);
 
       await t.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
       expect(find.text('New pack'), findsOneWidget);
     });
 
@@ -1277,7 +1277,7 @@ void main() {
       );
       await gesture.up();
       await settleOverlay(t);
-      await t.pump(MotionDurations.overlayEnter);
+      await t.pump(OpenMotion.duration);
 
       final int barriersBefore = t
           .widgetList<Popover>(find.byType(Popover))
@@ -1306,8 +1306,11 @@ void main() {
       expect(popover.origin, PopoverAnchorMode.anchor);
       expect(popover.animateOut, isTrue);
       expect(popover.barrier, PopoverBarrier.modal);
-      expect(MenuMotion.slideSides.length, 4);
-      expect(MenuMotion.duration, MotionDurations.overlayEnter);
+      // The old menu-only motion class is gone — every menu now plays
+      // OpenTransition through Popover, passing all four PopoverSide values
+      // so a submenu still slides from whichever side it opens on.
+      expect(PopoverSide.values.toSet().length, 4);
+      expect(OpenMotion.duration, MotionDurations.open);
     });
   });
 }

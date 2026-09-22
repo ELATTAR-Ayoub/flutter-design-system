@@ -4,8 +4,8 @@
 /// `registry/components/hover-builder.json` — and [dependencies] is that
 /// manifest's own
 /// `registryDependencies` list, copied verbatim: `source-foundation`. The
-/// file exports two classes, both documented here: [HoverBuilder], the bare hover
-/// reporter, and [InteractiveCard], the standard card appearance built on it.
+/// file exports one class, [HoverBuilder], the bare hover reporter a caller
+/// composes with Press and its own AnimatedContainer for a card appearance.
 library;
 
 import '../catalog.dart' show ComponentDocEntry;
@@ -19,6 +19,6 @@ const ComponentDocEntry hoverBuilderDoc = ComponentDocEntry(
       'pointer the way the whole docs site\'s own cards do.',
   // registry/components/hover-builder.json's own registryDependencies, verbatim.
   dependencies: <String>['source-foundation'],
-  exports: <String>['HoverBuilder', 'InteractiveCard'],
+  exports: <String>['HoverBuilder'],
   sourcePath: 'lib/src/components/ui/hover_builder.dart',
 );

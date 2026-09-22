@@ -86,7 +86,7 @@ void main() {
       expect(MediaQuery.maybeDisableAnimationsOf(page), isTrue);
       // The gate every duration in the package is routed through.
       expect(
-        effectiveMotionDuration(page, MotionDurations.ratchet),
+        effectiveMotionDuration(page, MotionDurations.spin),
         Duration.zero,
       );
       expect(
@@ -103,8 +103,8 @@ void main() {
       final BuildContext page = tester.element(find.byType(ButtonDocPage));
       expect(MediaQuery.maybeDisableAnimationsOf(page), isFalse);
       expect(
-        effectiveMotionDuration(page, MotionDurations.ratchet),
-        MotionDurations.ratchet,
+        effectiveMotionDuration(page, MotionDurations.spin),
+        MotionDurations.spin,
       );
     });
   });

@@ -268,7 +268,9 @@ void main() {
 
       await tester.tap(find.byType(SidebarTrigger));
       await tester.pump();
-      await tester.pump(MotionDurations.frame);
+      // One 60Hz frame — a polling interval for the assertion below, not a
+      // motion the design system paces anything by.
+      await tester.pump(const Duration(milliseconds: 16));
 
       final Size row = tester
           .renderObject<RenderBox>(find.byType(SidebarMenuButton).first)

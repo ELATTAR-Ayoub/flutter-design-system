@@ -75,7 +75,6 @@ double _scaleOf(WidgetTester tester, Finder of) {
 /// Every named constructor parameter `Press`'s own class declares
 /// (`lib/src/components/ui/press.dart`), excluding `key`.
 const List<String> _pressConstructorParams = <String>[
-  'scale',
   'child',
   'onTap',
   'behavior',
@@ -86,9 +85,6 @@ const List<String> _pressConstructorParams = <String>[
 const List<String> _exampleKeys = <String>[
   'press-example:wrapped',
   'press-example:bare',
-  'press-example:press-scale',
-  'press-example:button-scale',
-  'press-example:click-spring-scale',
 ];
 
 void main() {
@@ -135,12 +131,11 @@ void main() {
         );
       }
 
-      // One live Press on Preview's wrapped chip, three more on the
-      // Custom Scale specimens, and one on the page's own breadcrumb link —
-      // `Breadcrumb` goes through `Press` now, which is how its links became
-      // keyboard-operable. Five in total. The right-hand Preview chip and
-      // none of the Custom Scale captions mount one.
-      expect(find.byType(Press), findsNWidgets(5));
+      // One live Press on Preview's wrapped chip, and one on the page's own
+      // breadcrumb link — `Breadcrumb` goes through `Press` now, which is
+      // how its links became keyboard-operable. Two in total. The
+      // right-hand Preview chip mounts none.
+      expect(find.byType(Press), findsNWidgets(2));
 
       expect(pressDoc.name, 'press');
       expect(pressDoc.exports, containsAll(<String>['Press']));
@@ -206,8 +201,8 @@ void main() {
       );
       await tester.pump();
 
-      // Two EffectSection stages: Preview, Custom Scale.
-      expect(find.byType(DocsShowcase), findsNWidgets(2));
+      // One EffectSection stage: Preview.
+      expect(find.byType(DocsShowcase), findsNWidgets(1));
       expect(find.byType(DocsInstall), findsOneWidget);
       expect(find.byType(DocsDisclosure), findsNWidgets(8));
     });
@@ -221,7 +216,6 @@ void main() {
           'Preview',
           'Installation',
           'Usage',
-          'Custom Scale',
           'API Reference',
           'States',
           'Accessibility',
@@ -258,7 +252,6 @@ void main() {
         'Preview',
         'Installation',
         'Usage',
-        'Custom Scale',
         'API Reference',
         'States',
         'Accessibility',

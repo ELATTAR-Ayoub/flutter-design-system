@@ -51,7 +51,6 @@ import '../../design_system/foundation/theme_scope.dart';
 class Press extends StatefulWidget {
   const Press({
     super.key,
-    this.scale = MotionTransforms.press,
     required this.child,
     this.onTap,
     this.behavior = HitTestBehavior.opaque,
@@ -69,10 +68,6 @@ class Press extends StatefulWidget {
     this.link = false,
     this.expanded,
   });
-
-  /// The `:active` scale. Defaults to the `press` utility's 0.94; `Button`
-  /// passes [MotionTransforms.buttonPress], `click-spring` surfaces 0.9.
-  final double scale;
 
   /// How long the squish takes. `press` and its two siblings all use 40ms;
   /// `btn-spring` — what a `Button` wears — uses `--duration-tick`, 80ms.
@@ -238,7 +233,7 @@ class _PressState extends State<Press> with SingleTickerProviderStateMixin {
         builder: (BuildContext context, Widget? child) => Transform.scale(
           // The spring overshoots past 1, which is what carries the scale a
           // hair beyond its target and back — do not clamp it.
-          scale: 1 + (widget.scale - 1) * _progress.value,
+          scale: 1 + (MotionTransforms.press - 1) * _progress.value,
           child: child,
         ),
         child: widget.child,

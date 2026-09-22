@@ -30,8 +30,8 @@
 ///     `DialogContent` centres itself with `-translate-x-1/2 -translate-y-1/2`,
 ///     which Tailwind v4 emits as the **standalone `translate` property** —
 ///     measured `translate: -50% -50%` with `transform: matrix(1,0,0,1,0,0)`.
-///     `anim-jelly-in`'s keyframes drive `transform` only, exactly as
-///     globals.css L2372–2374 warns they must. In Flutter the centring is
+///     `anim-jelly-in`'s keyframes drive `transform` only, exactly as the
+///     stylesheet's own comment warns they must. In Flutter the centring is
 ///     layout rather than paint, so the transform is the whole of the
 ///     animation — but the warning is why the keyframes are read as `transform`
 ///     and not as a translate that would have to be added to the centring.
@@ -122,6 +122,7 @@ import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
 import './icon.dart';
 import './icon_paths.dart';
+import './keyframes.dart';
 import './open_transition.dart';
 
 /// `bg-background/15` — every overlay in the family, Radix and vaul alike.
@@ -249,7 +250,7 @@ class OverlayPortal extends StatefulWidget {
     required this.transition,
     this.alignment = Alignment.center,
     this.enterDuration = MotionDurations.open,
-    this.exitDuration = MotionDurations.close,
+    this.exitDuration = CloseMotion.duration,
     this.overlayDuration = MotionDurations.overlayEnter,
     this.overlayCurve = MotionCurves.enter,
     this.dismissOnOverlayTap = true,
@@ -266,7 +267,7 @@ class OverlayPortal extends StatefulWidget {
   final Alignment alignment;
 
   /// `anim-jelly-in` is 420ms and `anim-jelly-out` 250 — *"leaving should never
-  /// take as long as arriving"* (globals.css L2379–2381). The two are separate
+  /// take as long as arriving"*. The two are separate
   /// because a CSS exit animation is a different animation, not the entrance
   /// played backwards.
   final Duration enterDuration;

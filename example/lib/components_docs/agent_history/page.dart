@@ -9,7 +9,7 @@
 /// library note, quoted rather than paraphrased: `FlipController` ports
 /// `use-flip.ts` correctly — it measures before a reorder, inverts with a
 /// transform, and releases on a curve — and none of it reaches the screen,
-/// because every card also carries `RowMotion`'s own entrance animation,
+/// because every card also carries its own entrance animation,
 /// whose `animation-fill-mode: both` outranks the inversion. Pinning a row
 /// teleports it and replays the entrance on the one neighbour the
 /// reconciliation displaces. The live specimen in Preview reproduces this
@@ -177,7 +177,8 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
       title: 'Chat History Drawer',
       description:
           'ChatHistory arranges the whole list behind a trigger: a '
-          '384px drawer (max-w-sm) sliding in over a scrim, laid out '
+          '384px drawer (max-w-sm) fading and scaling in over a scrim, '
+          'laid out '
           'through an OverlayPortal against surfaceKey — the console\'s '
           'own root — rather than the page\'s Overlay, so a caller with '
           'no console still gets an honest fallback: the whole Overlay.',
@@ -198,7 +199,6 @@ final ComponentDocSpec agentHistoryDocSpec = ComponentDocSpec(
         DocsTocEntry(title: 'HistorySearch', anchor: 'api-elhistorysearch'),
         DocsTocEntry(title: 'ChatHistory', anchor: 'api-elchathistory'),
         DocsTocEntry(title: 'Enums', anchor: 'api-enums'),
-        DocsTocEntry(title: 'RowMotion', anchor: 'api-elrowmotion'),
         DocsTocEntry(title: 'BlurSwitch', anchor: 'api-elblurswitch'),
         DocsTocEntry(title: 'FlipController', anchor: 'api-elflipcontroller'),
       ],
@@ -922,11 +922,6 @@ class _ApiReferenceContent extends StatelessWidget {
       ),
       SizedBox(height: space(5)),
       const DocsAnchor(
-        id: 'api-elrowmotion',
-        child: DocsApiTable(title: 'RowMotion', facts: _rowMotionFacts),
-      ),
-      SizedBox(height: space(5)),
-      const DocsAnchor(
         id: 'api-elblurswitch',
         child: DocsApiTable(title: 'BlurSwitch', facts: _blurSwitchFacts),
       ),
@@ -1081,9 +1076,9 @@ class _ThemingContent extends StatelessWidget {
             'an opaque theme.card fill — a tint rather than a solid, the '
             'same reasoning Button\'s own destructive variant states on '
             "its own page.",
-        'RowMotion and BlurSwitch paint no colour at all: both are '
-            'pure geometry and opacity transforms over whatever child '
-            'they wrap.',
+        "The row's own entrance/exit and BlurSwitch paint no colour at "
+            'all: both are pure geometry and opacity transforms over '
+            'whatever child they wrap.',
       ]);
 }
 
@@ -1313,48 +1308,6 @@ const List<DocsApiFact> _enumFacts = <DocsApiFact>[
   ),
 ];
 
-const List<DocsApiFact> _rowMotionFacts = <DocsApiFact>[
-  DocsApiFact(name: 'child', type: 'Widget', description: 'Required.'),
-  DocsApiFact(
-    name: 'generation',
-    type: 'int',
-    description: 'Defaults to 0. Bumped to replay the entrance.',
-  ),
-  DocsApiFact(name: 'leaving', type: 'bool', description: 'Defaults to false.'),
-  DocsApiFact(
-    name: 'enterShift',
-    type: 'static const double',
-    description: '-10 — the entrance\'s own translateX.',
-  ),
-  DocsApiFact(
-    name: 'exitShift',
-    type: 'static const double',
-    description: '-24 — the exit\'s slide, at its 45% stop.',
-  ),
-  DocsApiFact(
-    name: 'exitBreak',
-    type: 'static const double',
-    description:
-        '0.45 — where the exit hands over from the slide to the height '
-        'collapse.',
-  ),
-  DocsApiFact(
-    name: 'enterSpan',
-    type: 'static Duration get',
-    description: 'MotionDurations.tick + MotionDurations.normal.',
-  ),
-  DocsApiFact(
-    name: 'enterDelayFraction',
-    type: 'static double get',
-    description: 'Where the delay ends inside enterSpan.',
-  ),
-  DocsApiFact(
-    name: 'enterCurve',
-    type: 'static Curve get',
-    description: 'A hold, then MotionCurves.enter.',
-  ),
-];
-
 const List<DocsApiFact> _blurSwitchFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'phase',
@@ -1367,12 +1320,12 @@ const List<DocsApiFact> _blurSwitchFacts = <DocsApiFact>[
   DocsApiFact(
     name: 'outRadius',
     type: 'static const double',
-    description: '6 — the blur radius pulls-blur-out ends at (CSS px).',
+    description: '6 — the blur radius anim-blur-out ends at (CSS px).',
   ),
   DocsApiFact(
     name: 'inRadius',
     type: 'static const double',
-    description: '8 — the blur radius pulls-blur-in starts at (CSS px).',
+    description: '8 — the blur radius anim-blur-in starts at (CSS px).',
   ),
 ];
 
@@ -1440,19 +1393,21 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
   ),
   DocsStateFact(
     state: 'confirming delete (inline)',
-    treatment: 'the confirm slides in over the row on RowMotion\'s own clock',
+    treatment: 'the confirm fades in on its own MotionDurations.fast clock',
     userSignal: 'The delete control is physically covered, not just disabled.',
   ),
   DocsStateFact(
     state: 'entering the list (new / replayed)',
-    treatment: 'RowMotion\'s entrance: opacity + translateX(-10px) in',
+    treatment: 'EnterMotion, staggered by EnterMotion.delayFor(index + 2)',
     userSignal:
         'A pinned row TELEPORTS (the FLIP inversion is computed and '
         'discarded); the one row it displaces replays this entrance.',
   ),
   DocsStateFact(
     state: 'leaving the list (removed)',
-    treatment: 'RowMotion\'s exit: slide, then height collapse',
-    userSignal: 'The rows below rise into the gap in one movement.',
+    treatment: 'ExitMotion — a fade, drop and scale, no height leg',
+    userSignal:
+        'The row itself keeps its box; the list above it reflows once the '
+        'row actually unmounts.',
   ),
 ];

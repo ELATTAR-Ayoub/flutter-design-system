@@ -269,7 +269,6 @@ final ComponentDocSpec dropdownMenuDocSpec = ComponentDocSpec(
         DocsTocEntry(title: 'MenuContent', anchor: 'api-menucontent'),
         DocsTocEntry(title: 'MenuSurface', anchor: 'api-menusurface'),
         DocsTocEntry(title: 'MenuPointerDown', anchor: 'api-menupointerdown'),
-        DocsTocEntry(title: 'MenuMotion', anchor: 'api-menumotion'),
         DocsTocEntry(title: 'Menu: static geometry', anchor: 'api-menu'),
         DocsTocEntry(title: 'MenuItemVariant', anchor: 'api-menuitemvariant'),
         DocsTocEntry(
@@ -1549,27 +1548,6 @@ class _ApiReferenceContent extends StatelessWidget {
               name: 'enabled',
               type: 'bool',
               description: 'Default true. False renders child untouched.',
-            ),
-          ],
-        ),
-      ),
-      SizedBox(height: space(5)),
-      const DocsAnchor(
-        id: 'api-menumotion',
-        child: DocsApiTable(
-          title: 'MenuMotion',
-          facts: <DocsApiFact>[
-            DocsApiFact(
-              name: 'duration',
-              type: 'static Duration (get)',
-              description: 'MotionDurations.overlayEnter, 320ms.',
-            ),
-            DocsApiFact(
-              name: 'slideSides',
-              type: 'static Set<PopoverSide> (get)',
-              description:
-                  'All four PopoverSide values: the overlay slides in '
-                  'from whichever side it actually lands on.',
             ),
           ],
         ),

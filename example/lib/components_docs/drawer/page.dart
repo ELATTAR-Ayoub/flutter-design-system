@@ -563,8 +563,8 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'Scrim and panel both animate over 500ms on vaul\'s own '
         'cubic-bezier(0.32, 0.72, 0, 1) (MotionDurations.drawerOpen / '
-        'MotionCurves.vaul): a different clock and curve from every other '
-        'overlay in the system.',
+        'drawer.dart\'s own private vaul curve): a different clock and '
+        'curve from every other overlay in the system.',
     userSignal:
         'The grip handle signals the drawer is draggable before the '
         'user touches it.',
@@ -749,10 +749,10 @@ class _DependenciesContent extends StatelessWidget {
         'registryDependencies, read directly from the shipped '
             'manifest: ${drawerDoc.dependencies.join(', ')}.',
         'Assets, fonts, shaders: none, though its motion is worth '
-            'flagging even without an asset: driven by MotionCurves.vaul '
-            'and MotionDurations.drawerOpen rather than the shared '
-            'MotionDurations.overlayEnter / MotionCurves.enter tokens every other '
-            'OverlayPortal consumer uses.',
+            'flagging even without an asset: driven by its own private '
+            'vaul curve and MotionDurations.drawerOpen rather than the '
+            'shared MotionDurations.overlayEnter / MotionCurves.enter '
+            'tokens every other OverlayPortal consumer uses.',
       ]),
       SizedBox(height: space(2)),
       const DocsLinkRow(

@@ -281,8 +281,8 @@ class Shadows {
     ShadowLayer(0, 10, 34, -8, (_) => _valueAt(0.42)),
   ]);
 
-  /// `@keyframes pulls-pulse-live` (globals.css L2521–2530) — the expanding
-  /// ring under a live control, sampled at [t] through one half of its cycle.
+  /// The live-pulse keyframes' own ring — the expanding ring under a live
+  /// control, sampled at [t] through one half of its cycle.
   ///
   /// ```css
   /// 0%, 100% { box-shadow: 0 0 0 0   rgba(61, 220, 151, 0.5); }

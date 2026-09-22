@@ -944,7 +944,7 @@ class _ThemingContent extends StatelessWidget {
             'radial family\'s arc label chip — the same pairing every Card '
             'already uses, measured 16.97:1 dark and 19.90:1 light).',
         'Motion: ChartMotion.duration is MotionDurations.slow; '
-            'ChartMotion.curve is MotionCurves.decelerate rather than '
+            'ChartMotion.curve is a private CSS ease-out curve rather than '
             'MotionCurves.enter — a documented drift, not an oversight. '
             'recharts can only receive the CSS keyword ease-out '
             '(cubic-bezier(0,0,0.58,1)), a visibly different curve from '

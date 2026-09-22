@@ -198,7 +198,7 @@ class HistoryListDemo extends StatefulWidget {
 
 class _HistoryListDemoState extends State<HistoryListDemo> {
   MockConversationStore? _store;
-  late final BlurSwitchController _switch = BlurSwitchController(
+  late final TranscriptSwitchController _switch = TranscriptSwitchController(
     open: (String id) => _store!.open(id),
   );
   final FlipController _flip = FlipController();
@@ -917,7 +917,7 @@ class _SwitchSection extends StatelessWidget {
 /// KNOWN GAP, `switchPhase`. The reference passes `switchPhase={phase}` and
 /// the console wears `blurClass(switchPhase)` on its transcript;
 /// [AgentConsole] does not take one yet. The controller is built and driven
-/// here, and the drawer already calls [BlurSwitchController.switchTo], so the
+/// here, and the drawer already calls [TranscriptSwitchController.switchTo], so the
 /// only missing wire is the prop. Until it lands the transcript swaps without
 /// blurring: named as a residual rather than faked by blurring the whole
 /// console, which would take the header and the composer with it.
@@ -939,7 +939,7 @@ class _ConsoleWithHistoryState extends State<ConsoleWithHistory> {
   final MockTransport _transport = MockTransport();
 
   MockConversationStore? _store;
-  late final BlurSwitchController _switch = BlurSwitchController(
+  late final TranscriptSwitchController _switch = TranscriptSwitchController(
     open: (String id) => _store!.open(id),
   );
 

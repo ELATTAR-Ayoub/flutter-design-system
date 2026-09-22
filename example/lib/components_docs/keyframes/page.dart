@@ -2,25 +2,29 @@
 ///
 /// **Why `EffectSection`, not `ShowcaseSection`, and why there is no single
 /// widget.** `lib/src/components/ui/keyframes.dart` exports no component: it is
-/// fourteen data tables (`EntranceMotion`, `StateChangeMotion`, … `DotSelectionMotion`) plus one player,
-/// `KeyframePlayer`, and one transition table, `ContentSwapMotion`, that is
-/// explicitly documented as not a keyframe at all. Every section below
-/// stages one or several of the fourteen running on a representative host,
-/// grouped the way the source file itself groups them (§D "the eleven",
-/// §E the selection-control trio, §F the one transition).
+/// twelve data tables (`EnterMotion`, `ExitMotion`, … `SwapRollMotion`) plus
+/// one player, `KeyframePlayer`. `SwapRollMotion` is the twelfth and the odd
+/// one out — a transition table, explicitly documented as not a keyframe at
+/// all. Every section below stages one or several of the twelve running on
+/// a representative host, grouped the way the source file itself groups
+/// them (§D the twelve recipes, §the selection-control pair, one transition
+/// at the end).
 ///
-/// **Fourteen, not fifteen.** The API Reference table below has exactly
-/// fourteen rows. `ContentSwapMotion` gets its own short paragraph in the same
-/// disclosure, named as what the source calls it: a transition, not a
-/// keyframe.
+/// **Twelve, not fourteen.** The API Reference table below has exactly
+/// twelve rows — the recipes this file declares. `Press` and
+/// `ActiveIndicator` are the other two names in the fourteen-name
+/// vocabulary, each documented on its own page.
 ///
-/// **`pumpAndSettle` never appears in this page's own test.** `DiscreteProgressMotion`,
-/// `LoadingShimmerMotion` and `LivePulseMotion` all run on a `repeat()`ing
-/// `AnimationController` inside `KeyframePlayer` and never idle, so this
-/// page's test uses `tester.pump()` and bounded `tester.pump(duration)`
-/// calls throughout, exactly as `example/lib/pages/motion.dart` and
-/// `test/motion_test.dart` already do for the same tables.
+/// **`pumpAndSettle` never appears in this page's own test.** `SpinMotion`,
+/// `ShimmerMotion`, `ProgressMotion` and `PulseMotion` all run on a
+/// `repeat()`ing `AnimationController` inside `KeyframePlayer` and never
+/// idle, so this page's test uses `tester.pump()` and bounded
+/// `tester.pump(duration)` calls throughout, exactly as
+/// `example/lib/pages/motion.dart` and `test/motion_test.dart` already do
+/// for the same tables.
 library;
+
+import 'dart:math' as math;
 
 import 'package:elattar_design_system/elattar_design_system.dart';
 import 'package:flutter/widgets.dart'
@@ -52,12 +56,11 @@ final ComponentDocSpec keyframesDocSpec = ComponentDocSpec(
       title: 'Preview',
       description:
           'The same notification chip, twice. The left one is static: no '
-          'KeyframePlayer wraps it. The right one is driven by EntranceMotion — '
-          'opacity 0 → 1 by 55%, a scale table that overshoots twice '
-          '(0.92×1.08 at 55%, 1.04×0.97 at 80%) before settling — over '
-          'MotionDurations.popIn (550ms), MotionCurves.enter, fill: both. Replay '
-          'remounts it, matching how the reference itself replays: a fresh '
-          'key, not a restarted controller.',
+          'KeyframePlayer wraps it. The right one is driven by EnterMotion — '
+          'opacity 0 → 1, a 12px rise to 0 and a 0.97 → 1 scale, together, '
+          'over EnterMotion.duration (slow, 400ms) on MotionCurves.enter, '
+          'fill: both. Replay remounts it, matching how the reference itself '
+          'replays: a fresh key, not a restarted controller.',
       host: const _PreviewHost(),
       code: _previewCode,
       label: 'Preview specimen view',
@@ -120,13 +123,13 @@ final ComponentDocSpec keyframesDocSpec = ComponentDocSpec(
       id: 'looping',
       title: 'Looping',
       description:
-          'The three tables that declare no fill mode at all: DiscreteProgressMotion '
-          '(steps(8), never displays 360°), LoadingShimmerMotion (a sweeping gradient '
-          'band) and LivePulseMotion (an expanding, fading ring around a live '
-          'dot). All three repeat forever, and all three revert to their '
-          'resting style — stop 0 — the instant reduced motion stills '
-          'them, rather than holding a frozen frame the way the six above '
-          'do.',
+          'ShimmerMotion (a sweeping gradient band) and PulseMotion (an '
+          'expanding, fading ring around a live dot) both declare no fill '
+          'mode at all. A bare StepCurve(8) sits beside them — never shows '
+          '360°, and has no recipe of its own. All three repeat forever, '
+          'and all three revert to their resting style — stop 0 — the '
+          'instant reduced motion stills them, rather than holding a '
+          'frozen frame the way the six above do.',
       host: const _LoopingHost(),
       code: _loopingCode,
       label: 'Looping specimen view',
@@ -155,9 +158,9 @@ final ComponentDocSpec keyframesDocSpec = ComponentDocSpec(
       title: 'Selection Draw',
       description:
           'Three tables that belong to the checkbox and the radio, and '
-          'appear on no motion page at all: CheckmarkDrawMotion and DashDrawMotion '
+          'appear on no motion page at all: ChangeMotion and ChangeMotion '
           'both animate a CSS stroke-dashoffset, transcribed as a '
-          '"drawn fraction" a caller reveals a path through; DotSelectionMotion is '
+          '"drawn fraction" a caller reveals a path through; ChangeMotion is '
           'the radio dot arriving, the one table in the file that runs on '
           'MotionCurves.emphasized rather than MotionCurves.enter and overshoots twice '
           'over — once in the keyframe\'s own 1.35 stop, once again from '
@@ -170,7 +173,7 @@ final ComponentDocSpec keyframesDocSpec = ComponentDocSpec(
       id: 'transition',
       title: 'Transition',
       description:
-          'ContentSwapMotion is the one entry in this file that is not a '
+          'SwapRollMotion is the one entry in this file that is not a '
           'keyframe: a transition, with no stops, only a from-state and a '
           'to-state. Tap to flip it. Both transform and opacity ride '
           'MotionCurves.emphasized over MotionDurations.slow (400ms), and because the '
@@ -187,7 +190,7 @@ final ComponentDocSpec keyframesDocSpec = ComponentDocSpec(
       description:
           'The fourteen keyframe tables this file exports, by name, read '
           'off lib/src/components/ui/keyframes.dart: what each animates, and the '
-          'duration, curve and fill mode it runs under. ContentSwapMotion — a '
+          'duration, curve and fill mode it runs under. SwapRollMotion — a '
           'transition, not a keyframe — follows in its own paragraph.',
       child: const _ApiReferenceContent(),
     ),
@@ -450,27 +453,23 @@ class _PreviewHostState extends State<_PreviewHost> {
             ),
           ),
           _Captioned(
-            caption: 'KeyframePlayer(duration: EntranceMotion.duration, …)',
+            caption: 'KeyframePlayer(duration: EnterMotion.duration, …)',
             child: SizedBox(
               key: const ValueKey<String>('keyframes-example:pop-in'),
               child: KeyedSubtree(
                 key: ValueKey<String>('pop-in-$_run'),
                 child: KeyframePlayer(
-                  duration: EntranceMotion.duration,
-                  fill: EntranceMotion.fill,
+                  duration: EnterMotion.duration,
+                  fill: EnterMotion.fill,
                   builder: (BuildContext context, double t, Widget? child) {
-                    final Offset scale = EntranceMotion.scale.transform(t);
+                    final double scale = EnterMotion.scale.transform(t);
                     return Opacity(
-                      opacity: EntranceMotion.opacity
+                      opacity: EnterMotion.opacity
                           .transform(t)
                           .clamp(0.0, 1.0),
                       child: Transform(
                         alignment: Alignment.center,
-                        transform: Matrix4.diagonal3Values(
-                          scale.dx,
-                          scale.dy,
-                          1,
-                        ),
+                        transform: Matrix4.diagonal3Values(scale, scale, 1),
                         child: child,
                       ),
                     );
@@ -497,12 +496,12 @@ const String _previewCode =
     "KeyedSubtree(\n"
     "  key: ValueKey('pop-in-\$run'),\n"
     '  child: KeyframePlayer(\n'
-    '    duration: EntranceMotion.duration,\n'
-    '    fill: EntranceMotion.fill,\n'
+    '    duration: EnterMotion.duration,\n'
+    '    fill: EnterMotion.fill,\n'
     '    builder: (context, t, child) {\n'
-    '      final scale = EntranceMotion.scale.transform(t);\n'
+    '      final scale = EnterMotion.scale.transform(t);\n'
     '      return Opacity(\n'
-    '        opacity: EntranceMotion.opacity.transform(t),\n'
+    '        opacity: EnterMotion.opacity.transform(t),\n'
     '        child: Transform(\n'
     '          alignment: Alignment.center,\n'
     '          transform: Matrix4.diagonal3Values(scale.dx, scale.dy, 1),\n'
@@ -528,7 +527,6 @@ class _EntranceHostState extends State<_EntranceHost> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeTokens theme = ThemeScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -538,14 +536,14 @@ class _EntranceHostState extends State<_EntranceHost> {
           child: _Row(
             children: <Widget>[
               _Captioned(
-                caption: 'StateChangeMotion',
+                caption: 'ChangeMotion',
                 child: _Chip(
                   keyValue: 'keyframes-example:jelly',
                   child: KeyframePlayer(
-                    duration: StateChangeMotion.duration,
-                    fill: StateChangeMotion.fill,
+                    duration: ChangeMotion.duration,
+                    fill: ChangeMotion.fill,
                     builder: (BuildContext context, double t, Widget? child) {
-                      final Offset scale = StateChangeMotion.scale.transform(t);
+                      final Offset scale = ChangeMotion.scale.transform(t);
                       return Transform(
                         alignment: Alignment.center,
                         transform: Matrix4.diagonal3Values(
@@ -561,21 +559,21 @@ class _EntranceHostState extends State<_EntranceHost> {
                 ),
               ),
               _Captioned(
-                caption: 'SpringEntranceMotion',
+                caption: 'EnterMotion',
                 child: _Chip(
                   keyValue: 'keyframes-example:spring-up',
                   child: KeyframePlayer(
-                    duration: SpringEntranceMotion.duration,
-                    fill: SpringEntranceMotion.fill,
+                    duration: EnterMotion.duration,
+                    fill: EnterMotion.fill,
                     builder: (BuildContext context, double t, Widget? child) =>
                         Opacity(
-                          opacity: SpringEntranceMotion.opacity
+                          opacity: EnterMotion.opacity
                               .transform(t)
                               .clamp(0.0, 1.0),
                           child: Transform.translate(
                             offset: Offset(
                               0,
-                              SpringEntranceMotion.translateY.transform(t),
+                              EnterMotion.translateY.transform(t),
                             ),
                             child: child,
                           ),
@@ -615,48 +613,24 @@ class _EntranceHostState extends State<_EntranceHost> {
                 ),
               ),
               _Captioned(
-                caption: 'TextRevealMotion',
+                caption: 'ChangeMotion',
                 child: _Chip(
-                  keyValue: 'keyframes-example:sign-on',
+                  keyValue: 'keyframes-example:change',
                   child: KeyframePlayer(
-                    duration: TextRevealMotion.duration,
-                    fill: TextRevealMotion.fill,
+                    duration: ChangeMotion.duration,
+                    fill: ChangeMotion.fill,
                     builder: (BuildContext context, double t, Widget? child) {
-                      final TextRevealFrame frame = TextRevealMotion.frameAt(t);
-                      final TextStyle style = StyledText.styleOf(
-                        context,
-                        TextStyles.small,
-                        color: theme.premiumText,
-                      ).copyWith(shadows: frame.shadows(theme.premiumText));
-                      return Opacity(
-                        opacity: frame.opacity,
-                        child: ColorFiltered(
-                          colorFilter: frame.brightnessFilter,
-                          child: Text('ON', style: style),
+                      final Offset scale = ChangeMotion.scale.transform(t);
+                      return Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.diagonal3Values(
+                          scale.dx,
+                          scale.dy,
+                          1,
                         ),
+                        child: child,
                       );
                     },
-                  ),
-                ),
-              ),
-              _Captioned(
-                caption: 'RevealMotion',
-                child: _Chip(
-                  keyValue: 'keyframes-example:reveal',
-                  child: KeyframePlayer(
-                    duration: RevealMotion.duration,
-                    fill: RevealMotion.fill,
-                    builder: (BuildContext context, double t, Widget? child) =>
-                        Opacity(
-                          opacity: RevealMotion.opacity
-                              .transform(t)
-                              .clamp(0.0, 1.0),
-                          child: Transform(
-                            transform: RevealMotion.transformAt(t),
-                            alignment: Alignment.center,
-                            child: child,
-                          ),
-                        ),
                     child: const Icon(
                       IconGlyph.sparkles,
                       tone: IconTone.action,
@@ -678,8 +652,8 @@ class _EntranceHostState extends State<_EntranceHost> {
 }
 
 const String _entranceCode =
-    '// One table, three shapes: opacity alone (SpringEntranceMotion), scale alone\n'
-    '// (StateChangeMotion), or opacity + scale + translateY together (OpenMotion).\n'
+    '// One table, three shapes: opacity alone (EnterMotion), scale alone\n'
+    '// (ChangeMotion), or opacity + scale + translateY together (OpenMotion).\n'
     'KeyframePlayer(\n'
     '  duration: OpenMotion.duration,\n'
     '  fill: OpenMotion.fill,\n'
@@ -707,16 +681,16 @@ class _LoopingHost extends StatelessWidget {
     return _Row(
       children: <Widget>[
         _Captioned(
-          caption: 'DiscreteProgressMotion — steps(8), never shows 360°',
+          caption: 'StepCurve(8) — never shows 360°, no recipe of its own',
           child: _Chip(
             keyValue: 'keyframes-example:ratchet',
             child: KeyframePlayer(
-              duration: DiscreteProgressMotion.duration,
-              fill: DiscreteProgressMotion.fill,
-              repeat: DiscreteProgressMotion.loops,
+              duration: MotionDurations.shimmer,
+              fill: KeyframeFill.none,
+              repeat: true,
               builder: (BuildContext context, double t, Widget? child) =>
                   Transform.rotate(
-                    angle: DiscreteProgressMotion.radiansAt(t),
+                    angle: const StepCurve(8).transform(t) * 2 * math.pi,
                     child: child,
                   ),
               child: const Icon(IconGlyph.refreshCw, tone: IconTone.action),
@@ -724,7 +698,7 @@ class _LoopingHost extends StatelessWidget {
           ),
         ),
         _Captioned(
-          caption: 'LoadingShimmerMotion — a sweeping gradient band',
+          caption: 'ShimmerMotion — a sweeping gradient band',
           child: SizedBox(
             key: const ValueKey<String>('keyframes-example:shimmer'),
             width: space(28),
@@ -732,14 +706,14 @@ class _LoopingHost extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(Radii.lg),
               child: KeyframePlayer(
-                duration: LoadingShimmerMotion.duration,
-                fill: LoadingShimmerMotion.fill,
-                repeat: LoadingShimmerMotion.loops,
+                duration: ShimmerMotion.duration,
+                fill: ShimmerMotion.fill,
+                repeat: ShimmerMotion.loops,
                 builder: (BuildContext context, double t, Widget? child) =>
                     CustomPaint(
                       painter: _ShimmerPainter(
                         t: t,
-                        gradient: LoadingShimmerMotion.gradient(theme),
+                        gradient: ShimmerMotion.gradient(theme),
                       ),
                       size: Size(space(28), space(28)),
                     ),
@@ -748,16 +722,16 @@ class _LoopingHost extends StatelessWidget {
           ),
         ),
         _Captioned(
-          caption: 'LivePulseMotion — an expanding, fading ring',
+          caption: 'PulseMotion — an expanding, fading ring',
           child: SizedBox(
             key: const ValueKey<String>('keyframes-example:pulse-live'),
             width: space(28),
             height: space(28),
             child: Center(
               child: KeyframePlayer(
-                duration: LivePulseMotion.duration,
-                fill: LivePulseMotion.fill,
-                repeat: LivePulseMotion.loops,
+                duration: PulseMotion.duration,
+                fill: PulseMotion.fill,
+                repeat: PulseMotion.loops,
                 builder: (BuildContext context, double t, Widget? child) =>
                     CustomPaint(painter: _PulseLivePainter(t: t)),
               ),
@@ -771,11 +745,11 @@ class _LoopingHost extends StatelessWidget {
 
 const String _loopingCode =
     'KeyframePlayer(\n'
-    '  duration: DiscreteProgressMotion.duration,\n'
-    '  fill: DiscreteProgressMotion.fill,\n'
-    '  repeat: DiscreteProgressMotion.loops,\n'
+    '  duration: MotionDurations.shimmer,\n'
+    '  fill: KeyframeFill.none,\n'
+    '  repeat: true,\n'
     '  builder: (context, t, child) =>\n'
-    '      Transform.rotate(angle: DiscreteProgressMotion.radiansAt(t), child: child),\n'
+    '      Transform.rotate(angle: const StepCurve(8).transform(t) * 2 * pi, child: child),\n'
     "  child: const Icon(...),\n"
     ')';
 
@@ -788,9 +762,9 @@ class _ShimmerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Rect tile = Rect.fromLTWH(
-      LoadingShimmerMotion.offsetAt(t, size.width),
+      ShimmerMotion.offsetAt(t, size.width),
       0,
-      LoadingShimmerMotion.tileWidth(size.width),
+      ShimmerMotion.tileWidth(size.width),
       size.height,
     );
     canvas.drawRect(
@@ -814,15 +788,15 @@ class _PulseLivePainter extends CustomPainter {
     final Offset center = size.center(Offset.zero);
     canvas.drawCircle(
       center,
-      LivePulseMotion.ringRadiusAt(t),
-      Paint()..color = LivePulseMotion.ringColorAt(t),
+      PulseMotion.ringRadiusAt(t),
+      Paint()..color = PulseMotion.ringColorAt(t),
     );
     canvas.drawCircle(
       center,
-      LivePulseMotion.dotRadius,
+      PulseMotion.dotRadius,
       Paint()
-        ..color = LivePulseMotion.dotColor.withValues(
-          alpha: LivePulseMotion.dotOpacityAt(t),
+        ..color = PulseMotion.dotColor.withValues(
+          alpha: PulseMotion.dotOpacityAt(t),
         ),
     );
   }
@@ -845,73 +819,50 @@ class _ProgressHost extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         _Captioned(
-          caption: 'SweepMotion — 0 → 1, over MotionDurations.slow here',
+          caption: 'ProgressMotion — a third-width sliver, −100% → 300%',
           child: SizedBox(
-            key: const ValueKey<String>('keyframes-example:sweep'),
+            key: const ValueKey<String>('keyframes-example:progress'),
             width: space(56),
             height: space(3),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(Radii.sm),
               child: DecoratedBox(
                 decoration: BoxDecoration(color: theme.muted),
-                child: KeyframePlayer(
-                  duration: MotionDurations.slow,
-                  fill: SweepMotion.fill,
-                  builder: (BuildContext context, double t, Widget? child) =>
-                      FractionallySizedBox(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: SweepMotion.widthFactor.transform(t),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(color: theme.primary),
-                        ),
-                      ),
+                child: LayoutBuilder(
+                  builder:
+                      (BuildContext context, BoxConstraints constraints) =>
+                          KeyframePlayer(
+                            duration: ProgressMotion.duration,
+                            fill: KeyframeFill.none,
+                            repeat: true,
+                            builder:
+                                (
+                                  BuildContext context,
+                                  double t,
+                                  Widget? child,
+                                ) {
+                                  final double width = constraints.maxWidth;
+                                  final double fraction =
+                                      ProgressMotion.fromFraction +
+                                      (ProgressMotion.toFraction -
+                                              ProgressMotion.fromFraction) *
+                                          t;
+                                  return Transform.translate(
+                                    offset: Offset(fraction * width, 0),
+                                    child: SizedBox(
+                                      width:
+                                          width * ProgressMotion.sliverFraction,
+                                      child: DecoratedBox(
+                                        decoration: BoxDecoration(
+                                          color: theme.primary,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                          ),
                 ),
               ),
-            ),
-          ),
-        ),
-        SizedBox(height: space(6)),
-        _Captioned(
-          caption: 'TravelMotion — a verified no-op at its real 24px call site',
-          child: SizedBox(
-            key: const ValueKey<String>('keyframes-example:travel'),
-            width: space(56),
-            height: space(6),
-            child: Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: theme.muted,
-                      borderRadius: BorderRadius.circular(Radii.sm),
-                    ),
-                  ),
-                ),
-                KeyframePlayer(
-                  duration: TravelMotion.duration,
-                  fill: TravelMotion.fill,
-                  builder: (BuildContext context, double t, Widget? child) =>
-                      Transform.translate(
-                        offset: Offset(
-                          TravelMotion.translationAt(
-                            t,
-                            TravelMotion.inset,
-                            curve: MotionCurves.enter,
-                          ),
-                          0,
-                        ),
-                        child: child,
-                      ),
-                  child: Container(
-                    width: TravelMotion.inset,
-                    height: TravelMotion.inset,
-                    decoration: BoxDecoration(
-                      color: theme.accent,
-                      borderRadius: BorderRadius.circular(Radii.sm),
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
         ),
@@ -922,13 +873,17 @@ class _ProgressHost extends StatelessWidget {
 
 const String _progressCode =
     'KeyframePlayer(\n'
-    '  duration: MotionDurations.slow, // whichever rung this row demonstrates\n'
-    '  fill: SweepMotion.fill,\n'
-    '  builder: (context, t, child) => FractionallySizedBox(\n'
-    '    alignment: Alignment.centerLeft,\n'
-    '    widthFactor: SweepMotion.widthFactor.transform(t),\n'
-    '    child: child,\n'
-    '  ),\n'
+    '  duration: ProgressMotion.duration,\n'
+    '  fill: KeyframeFill.none,\n'
+    '  repeat: true,\n'
+    '  builder: (context, t, child) {\n'
+    '    final fraction = ProgressMotion.fromFraction +\n'
+    '        (ProgressMotion.toFraction - ProgressMotion.fromFraction) * t;\n'
+    '    return Transform.translate(\n'
+    '      offset: Offset(fraction * width, 0),\n'
+    '      child: SizedBox(width: width * ProgressMotion.sliverFraction, child: child),\n'
+    '    );\n'
+    '  },\n'
     ')';
 
 /* ── Selection Draw ──────────────────────────────────────────────────────── */
@@ -936,59 +891,39 @@ const String _progressCode =
 class _SelectionDrawHost extends StatelessWidget {
   const _SelectionDrawHost();
 
+  Widget _squash(Widget icon) => KeyframePlayer(
+    duration: ChangeMotion.duration,
+    fill: ChangeMotion.fill,
+    builder: (BuildContext context, double t, Widget? child) {
+      final Offset scale = ChangeMotion.scale.transform(t);
+      return Transform(
+        alignment: Alignment.center,
+        transform: Matrix4.diagonal3Values(scale.dx, scale.dy, 1),
+        child: child,
+      );
+    },
+    child: icon,
+  );
+
   @override
   Widget build(BuildContext context) => _Row(
     children: <Widget>[
       _Captioned(
         caption:
-            'CheckmarkDrawMotion — drawnFractionAt, revealed left to right',
+            'ChangeMotion — the checkbox tick, painted whole and squashed in',
         child: _Chip(
           keyValue: 'keyframes-example:check-draw',
-          child: KeyframePlayer(
-            duration: CheckmarkDrawMotion.duration,
-            fill: CheckmarkDrawMotion.fill,
-            builder: (BuildContext context, double t, Widget? child) =>
-                ClipRect(
-                  clipper: _FractionClipper(
-                    CheckmarkDrawMotion.drawnFractionAt(t),
-                  ),
-                  child: child,
-                ),
-            child: const Icon(IconGlyph.check, tone: IconTone.success),
+          child: _squash(
+            const Icon(IconGlyph.check, tone: IconTone.success),
           ),
         ),
       ),
       _Captioned(
-        caption: 'DashDrawMotion — the radio ring\'s own dash draw',
+        caption: 'ChangeMotion — the radio dot, the same squash-and-stretch',
         child: _Chip(
           keyValue: 'keyframes-example:dash-draw',
-          child: KeyframePlayer(
-            duration: DashDrawMotion.duration,
-            fill: DashDrawMotion.fill,
-            builder: (BuildContext context, double t, Widget? child) =>
-                ClipRect(
-                  clipper: _FractionClipper(DashDrawMotion.drawnFractionAt(t)),
-                  child: child,
-                ),
-            child: const Icon(IconGlyph.radio, tone: IconTone.action),
-          ),
-        ),
-      ),
-      _Captioned(
-        caption: 'DotSelectionMotion — spring, overshoots twice',
-        child: _Chip(
-          keyValue: 'keyframes-example:dot-pop',
-          child: KeyframePlayer(
-            duration: DotSelectionMotion.duration,
-            fill: DotSelectionMotion.fill,
-            builder: (BuildContext context, double t, Widget? child) => Opacity(
-              opacity: DotSelectionMotion.opacity.transform(t).clamp(0.0, 1.0),
-              child: Transform.scale(
-                scale: DotSelectionMotion.scale.transform(t),
-                child: child,
-              ),
-            ),
-            child: const Icon(IconGlyph.radio, tone: IconTone.value),
+          child: _squash(
+            const Icon(IconGlyph.radio, tone: IconTone.action),
           ),
         ),
       ),
@@ -996,29 +931,19 @@ class _SelectionDrawHost extends StatelessWidget {
   );
 }
 
-class _FractionClipper extends CustomClipper<Rect> {
-  const _FractionClipper(this.fraction);
-
-  final double fraction;
-
-  @override
-  Rect getClip(Size size) =>
-      Rect.fromLTWH(0, 0, size.width * fraction.clamp(0.0, 1.0), size.height);
-
-  @override
-  bool shouldReclip(covariant _FractionClipper oldClipper) =>
-      oldClipper.fraction != fraction;
-}
-
 const String _selectionDrawCode =
     'KeyframePlayer(\n'
-    '  duration: CheckmarkDrawMotion.duration,\n'
-    '  fill: CheckmarkDrawMotion.fill,\n'
-    '  builder: (context, t, child) => ClipRect(\n'
-    '    clipper: FractionClipper(CheckmarkDrawMotion.drawnFractionAt(t)),\n'
-    '    child: child,\n'
-    '  ),\n'
-    "  child: const Icon(...),\n"
+    '  duration: ChangeMotion.duration,\n'
+    '  fill: ChangeMotion.fill,\n'
+    '  builder: (context, t, child) {\n'
+    '    final scale = ChangeMotion.scale.transform(t);\n'
+    '    return Transform(\n'
+    '      alignment: Alignment.center,\n'
+    '      transform: Matrix4.diagonal3Values(scale.dx, scale.dy, 1),\n'
+    '      child: child,\n'
+    '    );\n'
+    '  },\n'
+    "  child: const Icon(...), // painted whole — no stroke to reveal\n"
     ')';
 
 /* ── Transition ──────────────────────────────────────────────────────────── */
@@ -1038,10 +963,10 @@ class _TransitionHostState extends State<_TransitionHost> {
     final ThemeTokens theme = ThemeScope.of(context);
     final Duration duration = effectiveMotionDuration(
       context,
-      ContentSwapMotion.duration,
+      SwapRollMotion.duration,
     );
     final double cellHeight = space(10);
-    final double travel = ContentSwapMotion.travelFor(cellHeight);
+    final double travel = SwapRollMotion.travelFor(cellHeight);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1066,7 +991,7 @@ class _TransitionHostState extends State<_TransitionHost> {
                 child: TweenAnimationBuilder<double>(
                   tween: Tween<double>(end: _flipped ? 1 : 0),
                   duration: duration,
-                  curve: ContentSwapMotion.curve,
+                  curve: SwapRollMotion.curve,
                   builder: (BuildContext context, double v, Widget? _) => Stack(
                     alignment: Alignment.center,
                     children: <Widget>[
@@ -1108,10 +1033,10 @@ class _TransitionHostState extends State<_TransitionHost> {
 const String _transitionCode =
     'TweenAnimationBuilder<double>(\n'
     '  tween: Tween(end: flipped ? 1 : 0),\n'
-    '  duration: ContentSwapMotion.duration,\n'
-    '  curve: ContentSwapMotion.curve,\n'
+    '  duration: SwapRollMotion.duration,\n'
+    '  curve: SwapRollMotion.curve,\n'
     '  builder: (context, v, _) => Transform.translate(\n'
-    '    offset: Offset(0, ContentSwapMotion.travelFor(cellHeight) * v),\n'
+    '    offset: Offset(0, SwapRollMotion.travelFor(cellHeight) * v),\n'
     "    child: const Icon(...),\n"
     '  ),\n'
     ')';
@@ -1122,12 +1047,12 @@ const String _usageCode = '''
 import 'package:elattar_design_system/elattar_design_system.dart';
 
 KeyframePlayer(
-  duration: EntranceMotion.duration,
-  fill: EntranceMotion.fill,
+  duration: EnterMotion.duration,
+  fill: EnterMotion.fill,
   builder: (context, t, child) {
-    final scale = EntranceMotion.scale.transform(t);
+    final scale = EnterMotion.scale.transform(t);
     return Opacity(
-      opacity: EntranceMotion.opacity.transform(t),
+      opacity: EnterMotion.opacity.transform(t),
       child: Transform(
         alignment: Alignment.center,
         transform: Matrix4.diagonal3Values(scale.dx, scale.dy, 1),
@@ -1145,15 +1070,17 @@ class _ApiReferenceContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      const DocsApiTable(title: 'The fourteen keyframes', facts: _apiFacts),
+      const DocsApiTable(title: 'The twelve keyframes', facts: _apiFacts),
       SizedBox(height: space(4)),
       ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: LayoutWidths.prose),
         child: StyledText(
-          'A fifteenth entry, ContentSwapMotion, lives in the same file but is not '
-          'one of the fourteen: it is a transition (a from-state and a '
-          'to-state, no stops), running MotionDurations.slow (400ms) on '
-          'MotionCurves.emphasized — see the Transition section above.',
+          'SwapRollMotion is the twelfth entry and the odd one out: it is a '
+          'transition (a from-state and a to-state, no stops), running '
+          'MotionDurations.slow (400ms) on MotionCurves.emphasized — see '
+          'the Transition section above. Press and ActiveIndicator round '
+          'the vocabulary out to fourteen; each is documented on its own '
+          'page.',
           TextStyles.small,
           color: ThemeScope.of(context).mutedForeground,
         ),
@@ -1164,114 +1091,92 @@ class _ApiReferenceContent extends StatelessWidget {
 
 const List<DocsApiFact> _apiFacts = <DocsApiFact>[
   DocsApiFact(
-    name: 'EntranceMotion',
-    type: 'both · 550ms · ease-out',
+    name: 'EnterMotion',
+    type: 'both · slow (400ms) · ease-enter',
     description:
-        'Opacity 0 → 1 by 55%, and a scale table that overshoots twice '
-        '(0.92×1.08 at 55%, 1.04×0.97 at 80%) before settling at 100%. '
-        'A generic entrance pop.',
+        'Opacity 0 → 1, a 12px translateY rise to 0, and a 0.97 → 1 '
+        'scale, together: content arriving in place.',
   ),
   DocsApiFact(
-    name: 'StateChangeMotion',
-    type: 'both · 600ms · ease-out',
+    name: 'ExitMotion',
+    type: 'both · fast (150ms) · ease-exit',
     description:
-        'Scale only, oscillating wide-then-tall then back (1.18×0.82 at '
-        '30%, 0.88×1.12 at 45%, …): a squash-and-stretch wobble with no '
-        'opacity change, used for an arriving glyph.',
-  ),
-  DocsApiFact(
-    name: 'SpringEntranceMotion',
-    type: 'both · 800ms · ease-settle',
-    description:
-        'Opacity 0 → 1 by 55%, translateY 32px → -4px → 1.5px → -0.5px → '
-        '0: rises past its resting position twice before settling.',
+        'Opacity 1 → 0, a 6px translateY drop, and a 1 → 0.98 scale: '
+        'content leaving in place, the mirror of EnterMotion.',
   ),
   DocsApiFact(
     name: 'OpenMotion',
-    type: 'both · 420ms · ease-spring',
+    type: 'both · open (420ms) · ease-spring',
     description:
-        'Opacity, scale and translateY together: the active indicator\'s own '
-        'arrival — opacity 0 → 1 by 60%, scale 0.92 → 1.02 → 1, translateY '
-        '24px → -4px → 0.',
+        'Opacity, scale and translateY together: an overlay\'s own '
+        'arrival — opacity 0 → 1 by 60%, scale 0.92 → 1.02 → 1, '
+        'translateY 24px → -4px → 0.',
   ),
   DocsApiFact(
-    name: 'DiscreteProgressMotion',
-    type: 'none · 1400ms · steps(8), loops',
+    name: 'CloseMotion',
+    type: 'both · normal (250ms) · ease-move',
     description:
-        'Eight held 45° positions of 175ms each. 360° is never displayed: '
-        'the wrap frame holds the last position and jumps straight to 0° '
-        'on the next cycle.',
+        'An overlay\'s exit: opacity held at 1 through 30% then to 0, '
+        'scale 1 → 1.01 → 0.94, translateY 0 → -4px → 16px — an '
+        'anticipation tick before it drops away.',
   ),
   DocsApiFact(
-    name: 'TextRevealMotion',
-    type: 'both · 900ms · steps(1, end)',
+    name: 'ExpandMotion',
+    type: 'n/a · open forward / normal reverse · ease-spring / ease-move',
     description:
-        'Opacity, a brightness filter and a text-shadow glow across six '
-        'hard cuts (no interpolation between stops): a neon '
-        'power-up-flicker-catch, holding its 70% frame forever once done.',
+        'Disclosure on height. No Animatable of its own — a collapsible '
+        'or accordion drives a SizeTransition directly off this '
+        'duration/curve pair, forward to open and reverse to collapse.',
   ),
   DocsApiFact(
-    name: 'RevealMotion',
-    type: 'both · 550ms · ease-out',
+    name: 'ChangeMotion',
+    type: 'both · stateChange (600ms) · ease-enter',
     description:
-        'Opacity 0 → 1 and an orthographic rotationY from -38° to 0° with '
-        'a scale ease to 1: a card turning face-up.',
+        'Scale only, squash-and-stretch: 1 → 1.18×0.82 (30%) → '
+        '0.88×1.12 (45%) → 1.06×0.94 (60%) → 0.98×1.02 (78%) → 1. "This '
+        'value just changed" — every selection indicator plays it whole, '
+        'painted at rest, on mount.',
   ),
   DocsApiFact(
-    name: 'LoadingShimmerMotion',
-    type: 'none · 1400ms · ease-in-out, loops',
-    description:
-        'A 2×-wide gradient band sweeping left to right across a '
-        'skeleton, repeating, tiled so the box is never empty at the '
-        'extremes.',
+    name: 'SpinMotion',
+    type: 'none · spin (900ms) · linear, loops',
+    description: 'One full turn, uneased: the loading spinner\'s rotation.',
   ),
   DocsApiFact(
-    name: 'LivePulseMotion',
-    type: 'none · 2000ms · ease-in-out, loops',
+    name: 'ShimmerMotion',
+    type: 'none · shimmer (1400ms) / shimmerText (2600ms) · ease-move, loops',
+    description:
+        'A 2×-wide gradient band sweeping across a skeleton or a status '
+        'line, tiled so the box is never empty at the extremes.',
+  ),
+  DocsApiFact(
+    name: 'ProgressMotion',
+    type: 'none · shimmer (1400ms) · linear, loops',
+    description:
+        'A third-width sliver sweeping −100% → 300%: the indeterminate '
+        'progress bar.',
+  ),
+  DocsApiFact(
+    name: 'PulseMotion',
+    type: 'none · pulseLive (2000ms) · ease-move, loops',
     description:
         'A ring expanding outward while it fades, around a dot whose own '
         'opacity breathes: the live-status indicator.',
   ),
   DocsApiFact(
-    name: 'SweepMotion',
-    type: 'both · caller-supplied · ease-out',
+    name: 'CaretMotion',
+    type: 'n/a · caret (1000ms) · steps(1, end), loops',
     description:
-        'widthFactor 0 → 1: a progress bar filling. No duration constant '
-        'of its own — the motion page\'s durations panel supplies one of '
-        'the six MotionDurations rungs per row, because the panel IS the '
-        'duration scale.',
+        'On for half the period, off for half — a hard cut, no '
+        'interpolation: the OTP field\'s fake caret.',
   ),
   DocsApiFact(
-    name: 'TravelMotion',
-    type: 'both · 1000ms (MotionDurations.bloom) · caller-supplied curve',
+    name: 'SwapRollMotion',
+    type: 'transition · slow (400ms) · ease-spring',
     description:
-        'translateX 0 → calc(100% - 1.5rem), where 100% resolves against '
-        'the translated element\'s OWN width. At its one real call site '
-        '(a 24px chip) that evaluates to 0px: a verified no-op.',
-  ),
-  DocsApiFact(
-    name: 'CheckmarkDrawMotion',
-    type: 'both · 280ms · ease-out',
-    description:
-        'stroke-dashoffset 22 → 0: the checkbox tick drawing itself on, '
-        'transcribed as drawnFractionAt for a caller with no SVG '
-        'stroke-dasharray to lean on.',
-  ),
-  DocsApiFact(
-    name: 'DashDrawMotion',
-    type: 'both · 200ms · ease-out',
-    description:
-        'stroke-dashoffset 12 → 0: the radio ring\'s own shorter dash '
-        'draw, same shape as CheckmarkDrawMotion over a smaller dash array.',
-  ),
-  DocsApiFact(
-    name: 'DotSelectionMotion',
-    type: 'both · 320ms · ease-spring',
-    description:
-        'Scale 0 → 1.35 → 1 with opacity reaching 1 at the same 55% stop '
-        'as the scale peak: the radio dot arriving, overshooting the '
-        'keyframe\'s own 1.35 stop and then the spring curve\'s own '
-        'overshoot on top of it.',
+        'Not an animation but a transition: translateY by 160% of the '
+        'cell\'s own height per step, and opacity, whenever the wheel\'s '
+        'offset changes — the IconSwap roll.',
   ),
 ];
 
@@ -1283,10 +1188,12 @@ class _StatesContent extends StatelessWidget {
     BuildContext context,
   ) => _bullets(ThemeScope.of(context), <String>[
     'This file has no "component state" of its own — each table is '
-        'data, and KeyframePlayer is the one place a run state '
-        'lives: forward-once (the eleven single-run tables, all fill: '
-        'both) or repeat() forever (DiscreteProgressMotion, LoadingShimmerMotion, '
-        'LivePulseMotion, all fill: none).',
+        'data, and KeyframePlayer is the one place a run state lives: '
+        'forward-once (EnterMotion, ExitMotion, OpenMotion, CloseMotion, '
+        'ChangeMotion, all fill: both) or repeat() forever (SpinMotion, '
+        'ShimmerMotion, ProgressMotion, PulseMotion, all fill: none). '
+        'ExpandMotion, CaretMotion and SwapRollMotion declare no fill at '
+        'all — none of the three is driven by KeyframePlayer.',
     'Reduced motion is the one real state every table answers to. '
         'KeyframePlayer reads effectiveMotionDuration on every build: '
         'under MediaQuery.disableAnimations the controller stops and '
@@ -1310,13 +1217,11 @@ class _AccessibilityContent extends StatelessWidget {
             'AnimatedBuilder, wrapped in a RepaintBoundary only when '
             'repeat is true. Whatever semantics the builder\'s own output '
             'carries pass through untouched.',
-        'TextRevealMotion is the one table this file\'s own doc flags as a '
-            'hazard: opacity and brightness alternate roughly 3.3 times '
-            'per second across its six cuts, under the WCAG 3Hz flash '
-            'threshold but the exact behaviour the reference\'s own '
-            '"don\'t flash or strobe" rule warns against. Both ship, '
-            'because the copy and the mechanism come from the same '
-            'source and neither overrides the other.',
+        'CaretMotion is the one table with a hard cut rather than an '
+            'interpolation: on for half its 1000ms period, off for the '
+            'other half, a square wave rather than a fade — well under '
+            'the WCAG 3Hz flash threshold, but worth naming because '
+            'nothing else on this page cuts rather than eases.',
         'Nothing here announces that a surface is animating: reduced '
             'motion is the only accessibility lever this file exposes, '
             'and it is read automatically from the platform, never from '
@@ -1330,7 +1235,7 @@ class _KeyboardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       _bullets(ThemeScope.of(context), <String>[
-        'Takes no focus and handles no key: none of the fourteen tables '
+        'Takes no focus and handles no key: none of the twelve tables '
             'or KeyframePlayer itself declare a Focus, a FocusNode or '
             'an onKeyEvent. Every specimen on this page that responds to '
             'a tap (the Preview and Entrance & Exit replay buttons, the '
@@ -1349,11 +1254,11 @@ class _ResponsiveContent extends StatelessWidget {
   ) => _bullets(ThemeScope.of(context), <String>[
     'No breakpoint branching anywhere in keyframes.dart: '
         'BuildContext width is never read for a layout decision.',
-    'Every geometric table (LoadingShimmerMotion\'s tile, TravelMotion\'s distance) '
-        'is expressed as a function of the host\'s own size — '
-        'tileWidth(width), distanceFor(elementWidth) — so the motion '
-        'scales with whatever box a caller gives it, exactly like a '
-        'CSS background-size or a percentage transform would.',
+    'Every geometric table (ShimmerMotion\'s tile, SwapRollMotion\'s '
+        'travel) is expressed as a function of the host\'s own size — '
+        'tileWidth(width), travelFor(cellHeight) — so the motion scales '
+        'with whatever box a caller gives it, exactly like a CSS '
+        'background-size or a percentage transform would.',
   ]);
 }
 
@@ -1368,19 +1273,18 @@ class _DependenciesContent extends StatelessWidget {
         'File: lib/src/components/ui/keyframes.dart: one file, no companions.',
         'Flutter imports: dart:math, package:flutter/widgets.dart.',
         'Foundation imports: foundation/colors.dart (OklabColor, Palette, '
-            'for LivePulseMotion\'s ring), foundation/motion.dart '
+            'for PulseMotion\'s ring), foundation/motion.dart '
             '(MotionDurations, MotionCurves, effectiveMotionDuration), '
-            'foundation/shadows.dart (ShadowLayer, for TextRevealMotion\'s blur '
-            'conversion), foundation/spacing.dart (space), '
-            'foundation/theme.dart, theme_scope.dart.',
+            'foundation/spacing.dart (space), foundation/theme.dart, '
+            'theme_scope.dart.',
         'registryDependencies, resolved automatically by `elattar add '
             'keyframes`: source-foundation — copied verbatim from '
             'registry/components/keyframes.json.',
         'Real use in this corpus: active_indicator.dart\'s own private '
             '_jellyScale is the pattern Keyframes.track generalises; '
-            'icon_swap.dart composes StateChangeMotion with ContentSwapMotion for its own '
-            'arrival squash; the checkbox and the radio consume '
-            'CheckmarkDrawMotion, DashDrawMotion and DotSelectionMotion directly.',
+            'icon_swap.dart composes ChangeMotion with SwapRollMotion for its own '
+            'arrival squash; the checkbox and the radio both consume '
+            'ChangeMotion directly, on mount, painted whole.',
       ]),
       SizedBox(height: space(2)),
       DocsLinkRow(
@@ -1408,13 +1312,10 @@ class _ThemingContent extends StatelessWidget {
     BuildContext context,
   ) => _bullets(ThemeScope.of(context), <String>[
     'Every table in this file is theme-blind: the geometry, the '
-        'durations and the curves are all constants. The two that '
-        'touch colour at all resolve it live rather than storing it: '
-        'LivePulseMotion.ringColorAt mixes a fixed ink against '
-        'OklabColor.mix, and TextRevealMotion\'s currentColor is whatever the '
-        'caller\'s own TextStyle carries in — this page passes '
-        'theme.premiumText, matching the reference\'s own '
-        'text-value-ink.',
+        'durations and the curves are all constants. The one that '
+        'touches colour at all resolves it live rather than storing '
+        'it: PulseMotion.ringColorAt mixes a fixed ink against '
+        'OklabColor.mix, read fresh on every frame rather than cached.',
     'What actually flips with the theme on this page is the host '
         'around each table: the chip fill (theme.card), its border '
         '(theme.border) and the icon tones passed to Icon — the '

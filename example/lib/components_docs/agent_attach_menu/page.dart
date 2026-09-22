@@ -566,7 +566,7 @@ class _DependenciesContent extends StatelessWidget {
             'declares), button.dart (Button), dropdown_menu.dart '
             '(DropdownMenu.sideOffset only — not the widget itself), '
             'icon.dart, icon_paths.g.dart, menu.dart (MenuSurface, '
-            'MenuPointerDown, MenuTriggerScope, MenuMotion, '
+            'MenuPointerDown, MenuTriggerScope, '
             'Menu.contentPadding — never MenuContent), popover.dart '
             '(Popover and friends).',
         'registryDependencies, resolved automatically by `elattar add '

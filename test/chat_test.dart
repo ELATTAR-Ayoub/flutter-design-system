@@ -605,8 +605,9 @@ void main() {
         ),
       );
       final Press press = t.widgetList<Press>(find.byType(Press)).first;
-      // Measured: 0.9374 min at ~39ms, spring back peaking at 1.0058.
-      expect(press.scale, MotionTransforms.press);
+      // Measured: 0.9374 min at ~39ms, spring back peaking at 1.0058. Press
+      // has no scale override any more — MotionTransforms.press is the only
+      // scale it ever squishes to.
       expect(press.downDuration, MotionDurations.pressIn);
       expect(press.upDuration, MotionDurations.normal);
     });
@@ -1034,11 +1035,23 @@ void main() {
       expect(ScrollFade.fadeFor(height: 320, offset: 398, max: 398), 0);
     });
 
-    test('the curve is CSS ease-in-out, not --ease-in-out', () {
-      // The measurement that separates them: 0.6412 against 0.716.
-      expect(MotionCurves.symmetric.transform(0.5833), closeTo(0.6437, 0.005));
-      expect(MotionCurves.move.transform(0.5833), isNot(closeTo(0.6437, 0.02)));
-    });
+    test(
+      'the curve is the CSS ease-in-out keyword, not MotionCurves.move',
+      () {
+        // The measurement that separates them: 0.6412 (CSS's own
+        // `ease-in-out`, cubic-bezier(0.42, 0, 0.58, 1) — message_scroller.dart's
+        // own private `_scrollFadeCurve`) against 0.716 (MotionCurves.move).
+        // ScrollFade.fadeFor's own test above pins the measured 0.3588
+        // (== 1 - 0.6412) directly; this test only rules out the system's
+        // own move curve as a stand-in, since it would give a visibly
+        // different 0.284.
+        expect(MotionCurves.move.transform(0.5833), closeTo(0.716, 0.005));
+        expect(
+          MotionCurves.move.transform(0.5833),
+          isNot(closeTo(0.6412, 0.01)),
+        );
+      },
+    );
 
     testWidgets('rendered: the bottom row is transparent and the top is opaque', (
       WidgetTester t,
@@ -1512,18 +1525,23 @@ void main() {
   /* ── The shared foundation extensions ─────────────────────────────────── */
 
   group('foundation', () {
-    test('MotionCurves.symmetric preserves measured scroll geometry', () {
-      expect(MotionCurves.symmetric, const Cubic(0.42, 0, 0.58, 1));
-      expect(MotionCurves.symmetric, isNot(MotionCurves.move));
-      // Not on `all`: it is a stock keyword the system did not choose.
-      expect(MotionCurves.all.contains(MotionCurves.symmetric), isFalse);
+    test('MotionCurves.move drives the scroll fade, on the seven-curve scale', () {
+      expect(MotionCurves.move, const Cubic(0.65, 0, 0.35, 1));
+      // On `all`, unlike the stock CSS ease-in-out the fourteen retired.
+      expect(MotionCurves.all.contains(MotionCurves.move), isTrue);
     });
 
-    test('MotionDurations.frame is one 60 Hz frame', () {
-      expect(MotionDurations.frame.inMicroseconds, 16667);
+    test('MotionDurations.smoothScrollFrame is the per-pixel scroll unit', () {
+      expect(MotionDurations.smoothScrollFrame.inMicroseconds, 16800);
       // The measured law: 100px in ~168ms, 398px in ~335ms.
-      expect((MotionDurations.frame * 10).inMilliseconds, closeTo(167, 2));
-      expect((MotionDurations.frame * 19.95).inMilliseconds, closeTo(332, 4));
+      expect(
+        (MotionDurations.smoothScrollFrame * 10).inMilliseconds,
+        closeTo(167, 2),
+      );
+      expect(
+        (MotionDurations.smoothScrollFrame * 19.95).inMilliseconds,
+        closeTo(332, 4),
+      );
     });
 
     test('chat anatomy reads at the two public copy roles', () {

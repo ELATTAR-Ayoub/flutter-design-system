@@ -193,7 +193,7 @@ void main() {
     await finger.up();
     await t.pump(MotionDurations.overlayEnter);
     expect(find.text('Finish the form first'), findsOneWidget);
-    await t.pump(Tooltip.touchDwell + MotionDurations.overlayExit);
+    await t.pump(Tooltip.touchDwell + CloseMotion.duration);
     await t.pumpAndSettle();
   });
 

@@ -1033,7 +1033,7 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
     treatment:
         'controller.valueOf(name) == choice.value. theme.muted fill, '
         'theme.primary 40%-alpha rim, a primary-filled dot that pops in '
-        'over DotSelectionMotion\'s own curve.',
+        'over ChangeMotion\'s own curve.',
     userSignal: 'A filled indicator with a springing dot inside it.',
   ),
   DocsStateFact(
@@ -1165,7 +1165,7 @@ class _DependenciesContent extends StatelessWidget {
             '(effectiveMotionDuration), foundation/shadows.dart, '
             'foundation/spacing.dart (space()), foundation/theme.dart, '
             'foundation/typography.dart, motion/keyframes.dart '
-            '(DotSelectionMotion), theme_scope.dart.',
+            '(ChangeMotion), theme_scope.dart.',
         'Component imports: button.dart (Button, the four action '
             'controls), input.dart (Input, what QuestionnaireInput '
             'wraps), kbd.dart (Kbd, the shortcut badge).',
@@ -1206,7 +1206,7 @@ class _ThemingContent extends StatelessWidget {
         'colour through the same tokens Field uses elsewhere: '
         'theme.input for the pill border, theme.destructiveText for '
         'the error text.',
-    'The answered dot\'s pop-in (DotSelectionMotion) and the row\'s own hover/'
+    'The answered dot\'s pop-in (ChangeMotion) and the row\'s own hover/'
         'checked transitions both run on MotionCurves and '
         'effectiveMotionDuration, the same clock every other control in '
         'this system shares — nothing here is a bespoke duration.',

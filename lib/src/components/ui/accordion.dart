@@ -208,9 +208,8 @@ class _AccordionTriggerState extends State<_AccordionTrigger> {
     final ThemeTokens theme = ThemeScope.of(context);
 
     // `transition-all` with no duration utility beside it: the framework
-    // default on the framework default easing, which globals.css L395–396
-    // points at `--duration-base` and `--ease-out`. Probed: `all | 0.25s |
-    // cubic-bezier(0.22, 1, 0.36, 1)`.
+    // default on the framework default easing — `--duration-base` and
+    // `--ease-out`. Probed: `all | 0.25s | cubic-bezier(0.22, 1, 0.36, 1)`.
     final Duration transition = effectiveMotionDuration(
       context,
       MotionDurations.normal,

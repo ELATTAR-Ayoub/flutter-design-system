@@ -361,7 +361,7 @@ void main() {
         .transform
         .storage[0];
 
-    testWidgets('squishes to 0.95 — the button scale, not press\'s 0.94', (
+    testWidgets('squishes to MotionTransforms.press — the one click feel', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(
@@ -377,14 +377,11 @@ void main() {
       expect(scaleOf(t), 1.0);
 
       await t.startGesture(t.getCenter(find.byType(Button)));
-      // RETUNED (behaviour-audit B1). This used to pump `--duration-tick`
-      // before asserting, on the theory that `btn-spring`'s `:active`
-      // duration eased the squish over 80ms. It does not: Tailwind v4 compiles
-      // `scale-95` to the standalone `scale` property, which is **not** in
-      // `btn-spring`'s transition-property list. One frame is all it takes on
-      // the reference, so one frame is all this pumps — stricter, and true.
+      // Measured on the live reference: the squish is already fully at its
+      // target scale one frame after pointerdown, with no intermediate
+      // value sampled — one pump is enough to prove it.
       await t.pump();
-      expect(scaleOf(t), MotionTransforms.buttonPress);
+      expect(scaleOf(t), MotionTransforms.press);
     });
 
     // ── Measured behaviour — behaviour-audit §3 ────────────────────────────
@@ -412,9 +409,10 @@ void main() {
       );
 
       // Measured: 9.5ms after `pointerdown` — the very next frame — the button
-      // is already fully at 0.95, with no intermediate value sampled.
+      // is already fully at MotionTransforms.press, with no intermediate
+      // value sampled.
       await t.pump();
-      expect(scaleOf(t), MotionTransforms.buttonPress);
+      expect(scaleOf(t), MotionTransforms.press);
       for (int i = 0; i < 24; i++) {
         await t.pump(const Duration(milliseconds: 16));
         frames.add(scaleOf(t));
@@ -432,47 +430,41 @@ void main() {
       // The whole press, sampled: two values and nothing else. No 80ms
       // down-stroke, no 250ms spring back, and none of the ≈1.005 release
       // overshoot the port used to carry through `Press`.
-      expect(frames.toSet(), <double>{MotionTransforms.buttonPress, 1.0});
+      expect(frames.toSet(), <double>{MotionTransforms.press, 1.0});
     });
 
-    testWidgets('B6 — a 10, 20 or 30ms tap still shows the full 0.95', (
-      WidgetTester t,
-    ) async {
-      await t.pumpWidget(
-        host(
-          Button(
-            variant: ButtonVariant.outline,
-            onPressed: () {},
-            child: const Icon(IconGlyph.menu),
+    testWidgets(
+      'B6 — a 10, 20 or 30ms tap still shows the full MotionTransforms.press',
+      (WidgetTester t) async {
+        await t.pumpWidget(
+          host(
+            Button(
+              variant: ButtonVariant.outline,
+              onPressed: () {},
+              child: const Icon(IconGlyph.menu),
+            ),
           ),
-        ),
-      );
-
-      // The port used to reach 0.9756 / 0.9592 / 0.9497 for these three holds,
-      // then play a shortened spring backwards. Instant means depth cannot
-      // depend on hold length.
-      for (final int ms in <int>[10, 20, 30]) {
-        final TestGesture tap = await t.startGesture(
-          t.getCenter(find.byType(Button)),
-        );
-        await t.pump();
-        expect(
-          scaleOf(t),
-          MotionTransforms.buttonPress,
-          reason: '${ms}ms hold',
-        );
-        await t.pump(Duration(milliseconds: ms));
-        expect(
-          scaleOf(t),
-          MotionTransforms.buttonPress,
-          reason: '${ms}ms hold',
         );
 
-        await tap.up();
-        await t.pump();
-        expect(scaleOf(t), 1.0, reason: 'one frame after a ${ms}ms hold');
-      }
-    });
+        // The flag is the frame (B1): every hold length lands on the same
+        // MotionTransforms.press, with no partial value in between and no
+        // spring to play backwards. Instant means depth cannot depend on hold
+        // length.
+        for (final int ms in <int>[10, 20, 30]) {
+          final TestGesture tap = await t.startGesture(
+            t.getCenter(find.byType(Button)),
+          );
+          await t.pump();
+          expect(scaleOf(t), MotionTransforms.press, reason: '${ms}ms hold');
+          await t.pump(Duration(milliseconds: ms));
+          expect(scaleOf(t), MotionTransforms.press, reason: '${ms}ms hold');
+
+          await tap.up();
+          await t.pump();
+          expect(scaleOf(t), 1.0, reason: 'one frame after a ${ms}ms hold');
+        }
+      },
+    );
 
     // ── The two attributes `asChild` merges into a trigger ─────────────────
 
@@ -1230,7 +1222,7 @@ void main() {
           .value;
 
       expect(turnsNow(), 0);
-      // Quarter of `pulls-spin`'s 0.9s. `linear` on purpose — a quarter of the
+      // Quarter of SpinMotion's 0.9s. `linear` on purpose — a quarter of the
       // clock has to be a quarter of the turn, or the spinner is easing.
       await t.pump(const Duration(milliseconds: 225));
       expect(turnsNow(), closeTo(0.25, 1e-6));
@@ -1281,7 +1273,7 @@ void main() {
           .turns
           .value;
 
-      // `pulls-spin` declares no fill mode, so the blanket reduced-motion rule
+      // SpinMotion declares no fill mode, so the blanket reduced-motion rule
       // leaves it at the element's resting style rather than its final stop.
       expect(turnsNow(), 0);
       await t.pump(MotionDurations.spin);
@@ -2023,26 +2015,26 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(swap(0));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(ContentSwapMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(SwapRollMotion.duration);
 
       double yOf(int i) => t.getRect(find.byType(Icon).at(i)).center.dy;
       final double windowCentre = t.getRect(find.byType(IconSwap)).center.dy;
 
       // At rest: glyph 0 centred, glyph 1 parked one full step BELOW.
       expect(yOf(0), closeTo(windowCentre, 0.51));
-      expect(yOf(1) - yOf(0), closeTo(ContentSwapMotion.travelFor(16), 0.51));
+      expect(yOf(1) - yOf(0), closeTo(SwapRollMotion.travelFor(16), 0.51));
 
       await t.pumpWidget(swap(1));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
 
       // After the roll the strip has moved up by exactly one step: glyph 1 is
       // centred and glyph 0 has left through the top.
       expect(yOf(1), closeTo(windowCentre, 0.51));
       expect(yOf(0), lessThan(windowCentre));
-      expect(yOf(1) - yOf(0), closeTo(ContentSwapMotion.travelFor(16), 0.51));
+      expect(yOf(1) - yOf(0), closeTo(SwapRollMotion.travelFor(16), 0.51));
     });
 
     testWidgets('the arriving glyph squashes on FIRST MOUNT too', (
@@ -2065,7 +2057,7 @@ void main() {
       await t.pump();
 
       // `animation-delay: var(--duration-fast)` — still identity at 150ms…
-      await t.pump(ContentSwapMotion.squashDelay);
+      await t.pump(SwapRollMotion.squashDelay);
       expect(
         scalesUnderSwap().every((double s) => (s - 1).abs() < 1e-6),
         isTrue,
@@ -2077,7 +2069,7 @@ void main() {
       expect(scalesUnderSwap().any((double s) => s > 1.1), isTrue);
 
       // It settles back to identity by the end of the run.
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
       expect(
         scalesUnderSwap().every((double s) => (s - 1).abs() < 1e-6),
         isTrue,
@@ -2154,13 +2146,13 @@ void main() {
       // Measured 25.6px against a 16px glyph. A CSS percentage translate
       // resolves against the element's own border box, so the multiplier hangs
       // off the cell and never off the 20/24px clip window.
-      expect(ContentSwapMotion.travelFor(16), closeTo(25.6, 1e-9));
-      expect(ContentSwapMotion.travelFor(20), closeTo(32, 1e-9));
+      expect(SwapRollMotion.travelFor(16), closeTo(25.6, 1e-9));
+      expect(SwapRollMotion.travelFor(20), closeTo(32, 1e-9));
       expect(MotionTransforms.swapRollTravel, 1.6);
 
       await t.pumpWidget(swap(0));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
       expect(
         yOf(t, 1) - yOf(t, 0),
         closeTo(25.6, 0.51),
@@ -2173,12 +2165,12 @@ void main() {
     ) async {
       // 400ms `--ease-spring`, peaking 9.77% past centre. The transform is left
       // unclamped on purpose — clamping it is the "fix" this guards against.
-      expect(ContentSwapMotion.duration, const Duration(milliseconds: 400));
-      expect(ContentSwapMotion.curve, MotionCurves.emphasized);
+      expect(SwapRollMotion.duration, const Duration(milliseconds: 400));
+      expect(SwapRollMotion.curve, MotionCurves.emphasized);
 
       await t.pumpWidget(swap(0));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
       final double home = centre(t);
 
       await t.pumpWidget(swap(1));
@@ -2190,13 +2182,13 @@ void main() {
         if (past > furthest) furthest = past;
       }
       expect(
-        furthest / ContentSwapMotion.travelFor(16),
+        furthest / SwapRollMotion.travelFor(16),
         closeTo(0.0977, 0.015),
         reason: 'measured +9.77% of travel past centre, mid-flight',
       );
 
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
       expect(
         yOf(t, 1),
         closeTo(home, 0.51),
@@ -2211,8 +2203,8 @@ void main() {
       // 400ms and the browser clamps the overshoot, so the crossfade is
       // visually finished at 163ms while the strip is still travelling.
       await t.pumpWidget(swap(0));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
 
       await t.pumpWidget(swap(1));
       for (int ms = 0; ms < 400; ms += 10) {
@@ -2225,7 +2217,7 @@ void main() {
           );
         }
       }
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
       expect(opacities(t), <double>[0, 1]);
     });
 
@@ -2233,8 +2225,8 @@ void main() {
       WidgetTester t,
     ) async {
       await t.pumpWidget(swap(0));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
       final double home = centre(t);
 
       await t.pumpWidget(swap(1));
@@ -2256,13 +2248,13 @@ void main() {
       // Advance sends the leaver up and out the top; reversing mirrors it with
       // no special-casing anywhere — `offset = i - strip(t)` does both.
       await t.pumpWidget(swap(0));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
       final double home = centre(t);
 
       await t.pumpWidget(swap(1));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
       expect(
         yOf(t, 0),
         lessThan(home),
@@ -2271,8 +2263,8 @@ void main() {
       final double advanced = home - yOf(t, 0);
 
       await t.pumpWidget(swap(0));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
       expect(
         yOf(t, 1),
         greaterThan(home),
@@ -2284,10 +2276,10 @@ void main() {
     testWidgets('S5: the squash waits 150ms, then runs 600 — one 750ms clock', (
       WidgetTester t,
     ) async {
-      expect(ContentSwapMotion.squashDelay, const Duration(milliseconds: 150));
-      expect(StateChangeMotion.duration, const Duration(milliseconds: 600));
+      expect(SwapRollMotion.squashDelay, const Duration(milliseconds: 150));
+      expect(ChangeMotion.duration, const Duration(milliseconds: 600));
       expect(
-        ContentSwapMotion.squashDelay + StateChangeMotion.duration,
+        SwapRollMotion.squashDelay + ChangeMotion.duration,
         const Duration(milliseconds: 750),
         reason: 'total visible motion, roll included, is 750ms',
       );
@@ -2299,8 +2291,8 @@ void main() {
       // Not an AnimatedSwitcher: the strip is one Stack holding all of them,
       // which is why the leaver can be seen travelling out.
       await t.pumpWidget(swap(0));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
 
       expect(
         find.descendant(of: find.byType(IconSwap), matching: find.byType(Icon)),
@@ -2329,8 +2321,8 @@ void main() {
       );
       expect(opacities(t), <double>[0, 1], reason: 'and no crossfade either');
 
-      // …while `yuki-jelly` (delay 0.15s, `both`) does run its full 600ms once.
-      await t.pump(ContentSwapMotion.squashDelay);
+      // …while ChangeMotion (delay 0.15s, `both`) does run its full 600ms once.
+      await t.pump(SwapRollMotion.squashDelay);
       await t.pump(const Duration(milliseconds: 180));
       final List<double> scales = t
           .widgetList<Transform>(
@@ -2346,7 +2338,7 @@ void main() {
         isTrue,
         reason: 'stop 2 of the jelly, 1.18',
       );
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(ChangeMotion.duration);
     });
 
     testWidgets('S8: an interruption re-targets from the CURRENT transform and '
@@ -2356,8 +2348,8 @@ void main() {
       // where the box actually is and restarts the whole duration; snapping to
       // the target first, or finishing early, are both the regression.
       await t.pumpWidget(swap(0));
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
       final double home = centre(t);
 
       await t.pumpWidget(swap(1));
@@ -2365,7 +2357,7 @@ void main() {
       final double interrupted = yOf(t, 0);
       expect(
         home - interrupted,
-        greaterThan(ContentSwapMotion.travelFor(16)),
+        greaterThan(SwapRollMotion.travelFor(16)),
         reason: 'at 264ms the leaver is PAST its target, mid-overshoot',
       );
 
@@ -2387,8 +2379,8 @@ void main() {
         reason: 'a shortened or scaled-down return is the regression',
       );
 
-      await t.pump(ContentSwapMotion.duration);
-      await t.pump(StateChangeMotion.duration);
+      await t.pump(SwapRollMotion.duration);
+      await t.pump(ChangeMotion.duration);
       expect(yOf(t, 0), closeTo(home, 0.51));
     });
   });

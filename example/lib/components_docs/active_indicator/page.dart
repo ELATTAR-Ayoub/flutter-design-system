@@ -754,7 +754,7 @@ class _DependenciesContent extends StatelessWidget {
             'the registry manifest lists exactly one entry under "files".',
         'Flutter imports: package:flutter/widgets.dart only.',
         'Foundation imports: foundation/motion.dart (effectiveMotionDuration, '
-            'MotionCurves, MotionDurations), motion/keyframes.dart (StateChangeMotion, the '
+            'MotionCurves, MotionDurations), motion/keyframes.dart (ChangeMotion, the '
             'arrival squash table this file used to carry a private copy '
             'of).',
         'registryDependencies, resolved automatically by `elattar add '

@@ -131,15 +131,15 @@ Future<void> settleOverlay(WidgetTester t) async {
   await t.pump();
 }
 
-/// Runs a `--duration-overlay` transition out and lets the portal mount or
-/// unmount behind it.
+/// Runs the OpenTransition out and lets the portal mount or unmount behind
+/// it.
 ///
 /// The extra beat is not padding: Flutter's interpolation simulation reports
-/// itself done only *past* its duration, so a pump of exactly 320ms lands on
-/// the final value without ever stopping the ticker — and the popup's exit
-/// waits on that ticker.
+/// itself done only *past* its duration, so a pump of exactly [OpenMotion.duration]
+/// lands on the final value without ever stopping the ticker — and the
+/// popup's exit waits on that ticker.
 Future<void> runOverlay(WidgetTester t) async {
-  await t.pump(MotionDurations.overlayEnter);
+  await t.pump(OpenMotion.duration);
   await t.pump(MotionDurations.tick);
   await t.pump();
 }
@@ -788,17 +788,23 @@ void main() {
       expect(find.text('popped'), findsNothing);
     });
 
-    testWidgets('the entrance is `--duration-overlay` on `--ease-out`', (
+    testWidgets('the entrance is OpenMotion.duration on OpenMotion.curve', (
       WidgetTester t,
     ) async {
       await t.pumpWidget(popoverHost(open: false));
       await t.tap(find.text('anchor'));
       await settleOverlay(t);
 
-      // `zoom-in-95` — the first frame is at 95%.
-      // `entry(0, 0)` is the x scale. Not `getMaxScaleOnAxis()`, which maxes
-      // over the z column as well — and z is 1 in a 2D zoom, so it reports 1
-      // for every scale under it.
+      // OpenMotion's own scale table — 0.92 → 1.02 → 1 — replaced the
+      // per-component `zoom-in-95`. `entry(0, 0)` is the x scale. Not
+      // `getMaxScaleOnAxis()`, which maxes over the z column as well — and z
+      // is 1 in a 2D zoom, so it reports 1 for every scale under it.
+      //
+      // OpenTransition nests `Transform.scale` OUTSIDE `Transform.translate`
+      // (`scale() translateY()` scales the translate too), so the nearest
+      // ancestor Transform to the text is the translate one — a pure
+      // translation always reads 1.0 at entry(0, 0). The scale transform is
+      // the second ancestor out.
       double scaleOf() => t
           .widget<Transform>(
             find
@@ -806,11 +812,11 @@ void main() {
                   of: find.text('popped'),
                   matching: find.byType(Transform),
                 )
-                .first,
+                .at(1),
           )
           .transform
           .entry(0, 0);
-      expect(scaleOf(), closeTo(0.95, 0.001));
+      expect(scaleOf(), closeTo(OpenMotion.scaleStops.first.value, 0.001));
 
       await runOverlay(t);
       expect(scaleOf(), closeTo(1, 0.001));
@@ -1264,6 +1270,9 @@ void main() {
       await t.pumpWidget(combobox());
       await t.tap(find.byType(InputGroupInput));
       await settleOverlay(t);
+      // OpenTransition nests Transform.scale OUTSIDE Transform.translate, so
+      // the nearest ancestor Transform is the translate one — `.at(1)` is
+      // the scale transform. See the Popover entrance test's own note.
       double scale() => t
           .widget<Transform>(
             find
@@ -1271,11 +1280,11 @@ void main() {
                   of: find.byType(PopoverSurface),
                   matching: find.byType(Transform),
                 )
-                .first,
+                .at(1),
           )
           .transform
           .entry(0, 0);
-      expect(scale(), closeTo(0.95, 0.001));
+      expect(scale(), closeTo(OpenMotion.scaleStops.first.value, 0.001));
       await runOverlay(t);
       expect(scale(), closeTo(1, 0.001));
     });

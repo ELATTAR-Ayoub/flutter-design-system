@@ -181,7 +181,7 @@ class _LiveSection extends StatelessWidget {
 /// One [AgentConsole], [AgentFeatures.all] switched on, with history folded
 /// into its `headerSlot` rather than shown beside it as a separate demo.
 /// Opening the sidebar (the panel-left icon in the console's header)
-/// and choosing a conversation calls [BlurSwitchController.switchTo]: the
+/// and choosing a conversation calls [TranscriptSwitchController.switchTo]: the
 /// transcript blurs out, `store.open` runs mid-blur, the console's own
 /// `switchPhase` blurs it back in, and the sidebar's own title row swaps to
 /// the chosen conversation — the same visible switch `ConsoleWithHistory`
@@ -213,7 +213,7 @@ class _IntegratedAgentSurfaceState extends State<_IntegratedAgentSurface> {
   final VoiceSource _voiceSource = createExampleVoiceSource();
 
   MockConversationStore? _store;
-  late final BlurSwitchController _switch = BlurSwitchController(
+  late final TranscriptSwitchController _switch = TranscriptSwitchController(
     open: (String id) => _store!.open(id),
   );
 

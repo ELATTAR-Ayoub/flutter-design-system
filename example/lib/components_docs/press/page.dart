@@ -8,10 +8,10 @@
 /// section here stages a host with and without the wrapper, exactly as the
 /// brief for this page asks.
 ///
-/// **House shape, motion edition.** Preview, Installation, Usage, then one
-/// `EffectSection` per facet `Press` actually has — the default squish and
-/// the three token scales a caller can substitute for it — then the same
-/// eight disclosures every page carries. The States disclosure is the one
+/// **House shape, motion edition.** Preview, Installation, Usage, then the
+/// one `EffectSection` `Press` actually has — the default squish, which is
+/// now the only scale it ever plays — then the same eight disclosures every
+/// page carries. The States disclosure is the one
 /// that carries real content: read straight off `_PressState.build` and
 /// the two `Duration` fields the constructor exposes, not inferred.
 ///
@@ -55,7 +55,7 @@ final ComponentDocSpec pressMotionDocSpec = ComponentDocSpec(
       description:
           'Press either chip. The left one is wrapped in Press: the '
           'instant a pointer goes down it squishes to MotionTransforms.'
-          'pressScale (0.94) over MotionDurations.pressIn (40ms), then '
+          'press (0.9) over MotionDurations.pressIn (40ms), then '
           'springs back over MotionDurations.normal (250ms) on release — the '
           'asymmetry the source calls "the whole feel." The right one is '
           'the same chip, unwrapped, for comparison against no press '
@@ -102,21 +102,6 @@ final ComponentDocSpec pressMotionDocSpec = ComponentDocSpec(
           'Put Press on anything clickable that is not already a '
           'Button — the logo, a chip, a nav row, a theme-toggle option.',
       code: _usageCode,
-    ),
-    EffectSection(
-      id: 'custom-scale',
-      title: 'Custom Scale',
-      description:
-          'scale defaults to MotionTransforms.press (0.94), the bare '
-          '`press` utility\'s own squish. A caller substitutes a sibling '
-          'token for a different feel: Button itself passes '
-          'MotionTransforms.buttonPress (0.95, less travel — it already moves '
-          'via its own shadow swap), and `click-spring` surfaces reach for '
-          'MotionTransforms.clickSpringScale (0.9, more travel, for a small '
-          'target that wants an emphatic click).',
-      host: const _CustomScaleHost(),
-      code: _customScaleCode,
-      label: 'Custom scale specimen view',
     ),
     DisclosureSection(
       id: 'api',
@@ -174,7 +159,7 @@ final ComponentDocSpec pressMotionDocSpec = ComponentDocSpec(
             value: 'test/motion_test.dart',
             description:
                 'The "Press" group covers the squish, the asymmetric '
-                'durations, a cancelled press, onTap, and a custom scale.',
+                'durations, a cancelled press, and onTap.',
           ),
           const DocsInstallFact(
             label: 'Docs test',
@@ -331,64 +316,6 @@ const String _previewCode =
     "  child: const Text('Press me'),\n"
     ')';
 
-class _CustomScaleHost extends StatelessWidget {
-  const _CustomScaleHost();
-
-  @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: space(2)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _Captioned(
-            caption: 'pressScale (0.94, default)',
-            child: SizedBox(
-              key: const ValueKey<String>('press-example:press-scale'),
-              child: Press(child: const _Chip(label: 'press')),
-            ),
-          ),
-          SizedBox(width: space(8)),
-          _Captioned(
-            caption: 'buttonScale (0.95)',
-            child: SizedBox(
-              key: const ValueKey<String>('press-example:button-scale'),
-              child: Press(
-                scale: MotionTransforms.buttonPress,
-                child: const _Chip(label: 'button'),
-              ),
-            ),
-          ),
-          SizedBox(width: space(8)),
-          _Captioned(
-            caption: 'clickSpringScale (0.9)',
-            child: SizedBox(
-              key: const ValueKey<String>('press-example:click-spring-scale'),
-              child: Press(
-                scale: MotionTransforms.clickSpringScale,
-                child: const _Chip(label: 'click-spring'),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-const String _customScaleCode =
-    '// The bare press utility.\n'
-    'Press(child: const Text(\'press\'))\n\n'
-    '// What Button itself passes.\n'
-    'Press(scale: MotionTransforms.buttonPress, child: const Text(\'button\'))\n\n'
-    '// click-spring: a smaller target, more travel.\n'
-    'Press(\n'
-    '  scale: MotionTransforms.clickSpringScale,\n'
-    "  child: const Text('click-spring'),\n"
-    ')';
-
 /* ── Disclosure content ─────────────────────────────────────────────────── */
 
 const String _usageCode = '''
@@ -408,15 +335,6 @@ class _ApiReferenceContent extends StatelessWidget {
 }
 
 const List<DocsApiFact> _apiFacts = <DocsApiFact>[
-  DocsApiFact(
-    name: 'scale',
-    type: 'double',
-    description:
-        'Optional. Defaults to MotionTransforms.press (0.94), the `:active`'
-        ' scale a bare `press` utility carries. Button passes '
-        'MotionTransforms.buttonPress; `click-spring` surfaces pass '
-        'MotionTransforms.clickSpringScale.',
-  ),
   DocsApiFact(
     name: 'child',
     type: 'Widget',
@@ -551,12 +469,14 @@ const List<DocsStateFact> _stateFacts = <DocsStateFact>[
         'controller runs 0 → 1 over downDuration (effectiveMotionDuration-'
         'resolved, so it collapses to zero under reduced motion), eased '
         'by MotionCurves.emphasized. Transform.scale reads '
-        '1 + (scale - 1) * progress, so a spring overshoot past 1.0 '
-        'carries the visible scale a hair beyond target and back — the '
-        'build() comment says explicitly not to clamp it.',
+        '1 + (MotionTransforms.press - 1) * progress, so a spring '
+        'overshoot past 1.0 carries the visible scale a hair beyond '
+        'target and back — the build() comment says explicitly not to '
+        'clamp it.',
     userSignal:
-        'The child squishes toward `scale`, springing slightly '
-        'past it before settling, the instant a pointer touches it.',
+        'The child squishes toward MotionTransforms.press, springing '
+        'slightly past it before settling, the instant a pointer touches '
+        'it.',
   ),
   DocsStateFact(
     state: 'Pointer up',
@@ -653,9 +573,9 @@ class _DependenciesContent extends StatelessWidget {
             'registry/components/press.json.',
         'Real use in this corpus: the source\'s own doc names the logo, '
             'a chip, a nav row and a theme-toggle option — anything '
-            'clickable that is not already a Button, which reaches for '
-            'MotionTransforms.buttonPress on its own surface instead of '
-            'wrapping itself in a second Press.',
+            'clickable that is not already a Button, which reads '
+            'MotionTransforms.press directly off its own flag-based scale '
+            'instead of wrapping itself in a second Press.',
       ]),
       SizedBox(height: space(2)),
       DocsLinkRow(
