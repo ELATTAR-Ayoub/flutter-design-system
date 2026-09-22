@@ -1,42 +1,26 @@
-/// `@keyframes` — the reference's fourteen, transcribed whole.
+/// The twelve motion recipes — the design system's whole animation
+/// vocabulary on Flutter, mirroring `styles/motion.css` on the web:
 ///
-/// Nine are the `anim-*` utilities the motion page demonstrates
-/// (`app/globals.css` L2424–2531); two more — the sweep bar keyframe
-/// (L2195–2202) and the travel chip keyframe (L2203–2210) — are declared for
-/// that page's own duration bars
-/// and easing chips. Three belong to the form controls and appear on no
-/// foundations page at all: `check-draw`, `dash-draw` and `dot-pop`
-/// (L2212–2242), added in §E when the checkbox and the radio arrived.
+///   EnterMotion · ExitMotion        content arriving / leaving in place
+///   OpenMotion · CloseMotion        an overlay arriving / leaving
+///   ExpandMotion                    disclosure on height (reverse = collapse)
+///   ChangeMotion                    "this value just changed"
+///   SpinMotion · ShimmerMotion · ProgressMotion · PulseMotion · CaretMotion
+///                                   the loops: the signal nothing has stalled
+///   SwapRollMotion                  the IconSwap wheel
 ///
-/// §F holds one entry that is **not** a keyframe — `swap-roll`, a transition
-/// utility (L2265–2271) — because the IconSwap wheel it drives needs exactly
-/// one motion table and this is the file that holds motion tables. Its own doc
-/// says so; nothing else in here is a transition.
+/// Plus `Press` (press.dart) and `ActiveIndicator` (active_indicator.dart) —
+/// the two transitions — which makes fourteen. A recipe is data: duration,
+/// curve, fill and stop tables. A component plays it through [KeyframePlayer]
+/// or its own controller. Adding a thirteenth recipe is a design decision,
+/// not a convenience.
 ///
-/// Three mechanics decide everything in this file:
-///
-/// * **A CSS `animation-timing-function` eases between adjacent keyframes, not
-///   across the run.** So a keyframe table is a [TweenSequence] with one item
-///   per gap, each wrapped in its own [CurveTween], weights = the percentage
-///   gaps — the pattern `active_indicator.dart` already uses for `yuki-jelly`, and
-///   which [Keyframes.track] generalises.
-/// * **A property declared at some stops and not others HOLDS.** `yuki-pop-in`
-///   writes `opacity` at 0% and 55% only, and it stays 1 from 55% to the end.
-///   That is a modelled tail ([ConstantTween]), not an accident of the last two
-///   values happening to be equal.
-/// * **`animation-fill-mode` decides what reduced motion freezes to.** The
-///   blanket `prefers-reduced-motion` rule (L2534–2565) collapses every
-///   duration to 0.01ms and every loop to one iteration, but it touches neither
-///   fill mode nor delay: a `both` animation holds its final stop, while the
-///   three loopers here declare no fill at all and revert to the element's
-///   resting style — stop 0. [KeyframeFill] is that distinction, and
-///   [KeyframePlayer] is where it is enforced.
-///
-/// DRIFT (motion-map D10). The page's own reduced-motion copy reads *"Looping
-/// animations run exactly once, then hold"*. The first half is the blanket
-/// rule; the second half is true only of `forwards`/`both`, and the three
-/// loopers on that very page declare no fill mode, so they **revert**. Copy
-/// ships verbatim; the mechanism is per-demo, and the mechanism is here.
+/// Three mechanics decide everything here: a timing function eases between
+/// adjacent stops, not across the run ([Keyframes.track] is a
+/// [TweenSequence] with one curved item per gap); a property declared at some
+/// stops and not others holds ([ConstantTween] tails); and [KeyframeFill]
+/// decides what reduced motion freezes to — `both` holds the last stop, a
+/// loop with no fill reverts to rest.
 library;
 
 import 'dart:math' as math;
@@ -54,7 +38,6 @@ import 'package:flutter/widgets.dart'
 
 import '../../design_system/foundation/colors.dart';
 import '../../design_system/foundation/motion.dart';
-import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/theme_scope.dart';
@@ -65,25 +48,21 @@ import '../../design_system/foundation/theme_scope.dart';
 
 /// CSS `steps(n)` — the timing function with no interpolation in it.
 ///
-/// Two animations need it and Flutter ships nothing equivalent:
-/// `yuki-ratchet` `steps(8)` (globals.css L2416–2418) and `yuki-sign-on`
-/// `steps(1, end)` (L2420–2422).
+/// Two of the web system's animations need it and Flutter ships nothing
+/// equivalent: a stepped ratchet spin, `steps(8)`, and a hard-cut text
+/// reveal, `steps(1, end)`.
 ///
 /// CSS `steps(n)` means `steps(n, jump-end)`: **`n` held positions**, the first
 /// at 0 and the last at `(n−1)/n`. The output `1` belongs to the instant the
 /// animation ends, which for an infinite loop is the same instant as the next
-/// cycle's 0 — so `yuki-ratchet` never displays 360°, it wraps to 0°.
+/// cycle's 0 — so a stepped ratchet never displays 360°, it wraps to 0°.
 ///
 /// [transform] is overridden rather than `transformInternal` on purpose. The
 /// base [Curve] short-circuits `t == 0.0` and `t == 1.0` to themselves, and
 /// `t == 1.0` is exactly the frame this curve must not answer `n/n = 1` for.
 /// Consequence worth knowing at the call site: `CurvedAnimation` performs the
 /// same short-circuit itself, so a ratchet driven through one would still show
-/// 360° on the wrap frame. Drive it through [DiscreteProgressMotion.turnsAt] instead.
-///
-/// Supervisor ruling M7 follows from the same guard: under reduced motion the
-/// ratchet runs one collapsed iteration and, having no fill mode, reverts to
-/// the element's own transform — **0°**, not 315° and not 360°.
+/// 360° on the wrap frame.
 @immutable
 class StepCurve extends Curve {
   const StepCurve(this.count, {this.jumpEnd = true}) : assert(count > 0);
@@ -131,23 +110,19 @@ class StepCurve extends Curve {
 // B · fill mode
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// CSS `animation-fill-mode`, as far as the reference uses it.
+/// CSS `animation-fill-mode`, as far as this system's motion vocabulary
+/// uses it.
 ///
 /// The hinge of the reduced-motion table (motion-map §8.2). The blanket rule
 /// collapses durations and iteration counts; it never touches fill mode, so
-/// fill mode alone decides the frozen frame:
-///
-/// | animation | fill | frozen at |
-/// |---|---|---|
-/// | `anim-pop-in`, `anim-jelly`, `anim-spring-up`, `anim-jelly-in`, `anim-sign-on`, `anim-reveal`, the sweep bar, the travel chip | `both` | the final stop |
-/// | `anim-ratchet`, `anim-shimmer`, `anim-pulse-live` | *(none declared)* | stop 0 |
+/// fill mode alone decides the frozen frame.
 enum KeyframeFill {
   /// `both` — the first stop applies before the run and the last one is held
   /// after it. Every finite animation on the page declares it.
   both,
 
   /// No fill mode declared: outside its run the element wears its own resting
-  /// style, which is what a keyframe table calls stop 0. All three loopers.
+  /// style, which is what a keyframe table calls stop 0. Every looper.
   none,
 }
 
@@ -189,7 +164,7 @@ class Keyframes {
   /// rather than left to emerge from two equal values.
   ///
   /// [lerp] keeps this generic over the value type; [doubles] and [offsets]
-  /// are the two shapes the reference actually needs.
+  /// are the two shapes the twelve recipes actually need.
   static Animatable<T> track<T>(
     List<KeyframeStop<T>> stops, {
     required Curve curve,
@@ -270,13 +245,14 @@ class _LerpTween<T> extends Tween<T> {
 /// resolved by stopping the controller and setting its value outright, not by
 /// running a zero-length animation — a zero-period `repeat()` has no meaning.
 ///
-/// **There is deliberately no `replay()`.** The reference replays by re-keying
-/// (motion-map §11): React remounts the element, and a freshly mounted element
+/// **There is deliberately no `replay()`.** The web system replays by
+/// re-keying (motion-map §11): React remounts the element, and a freshly
+/// mounted element
 /// starts its CSS animation at t=0, mid-flight restarts included. Wrapping this
 /// widget in `KeyedSubtree(key: ValueKey('$name-$run'))` reproduces that
 /// exactly, because the controller is created in `initState` and started on the
 /// first `didChangeDependencies`. A broadcast `forward(from: 0)` would not: it
-/// cannot express the sweep bar's `both` fill on a demo that has not been built
+/// cannot express a `both`-fill animation on a demo that has not been built
 /// yet.
 class KeyframePlayer extends StatefulWidget {
   const KeyframePlayer({
@@ -288,15 +264,14 @@ class KeyframePlayer extends StatefulWidget {
     this.child,
   });
 
-  /// The animation's own length. The sweep bar takes a different one per row —
-  /// the durations panel *is* the duration scale — so this is a parameter
-  /// rather than a table constant.
+  /// The animation's own length. Some callers take a different one per demo,
+  /// so this is a parameter rather than a table constant.
   final Duration duration;
 
   /// Decides the reduced-motion freeze frame, and nothing else.
   final KeyframeFill fill;
 
-  /// The three loopers. Also what puts a [RepaintBoundary] around [builder]'s
+  /// The loopers. Also what puts a [RepaintBoundary] around [builder]'s
   /// output: something that animates forever must not repaint its neighbours.
   final bool repeat;
 
@@ -383,61 +358,151 @@ class _KeyframePlayerState extends State<KeyframePlayer>
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// D · the eleven tables
+// D · the twelve recipes
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// `@keyframes yuki-pop-in` — globals.css L2424–2430, worn by `.anim-pop-in`
-/// (`animation: yuki-pop-in 0.55s var(--ease-out) both`, L2361–2363).
-///
-/// ```css
-/// 0%   { opacity: 0; transform: scale3d(0.25, 0.25, 1); }
-/// 55%  { opacity: 1; transform: scale3d(0.92, 1.08, 1); }
-/// 80%  {             transform: scale3d(1.04, 0.97, 1); }
-/// 92%  {             transform: scale3d(0.99, 1.01, 1); }
-/// 100% {             transform: scale3d(1,    1,    1); }
-/// ```
-///
-/// *"Pops from 25%, never from 0, so it always reads as arriving rather than
-/// materialising."* [opacity] is declared at two stops only and holds 1 from
-/// 55% on.
-///
-/// Its reduced-motion row carries a belt-and-braces special case
-/// (`opacity: 1; transform: none !important`, L2503–2506) that the `both` fill
-/// already delivers: the final stop *is* opacity 1 and identity.
-class EntranceMotion {
-  const EntranceMotion._();
-
-  static const Duration duration = MotionDurations.popIn;
+/// anim-enter — 12px rise + fade + 0.97 scale, `slow` on `enter`.
+class EnterMotion {
+  const EnterMotion._();
+  static const Duration duration = MotionDurations.slow;
   static const Curve curve = MotionCurves.enter;
   static const KeyframeFill fill = KeyframeFill.both;
+  static const double rise = 12;
+  static const double fromScale = 0.97;
+
+  /// Stagger step for lists: half a tick per row (web `--enter-stage`).
+  static Duration delayFor(int stage) => MotionDurations.tick * stage ~/ 2;
+  static final Animatable<double> opacity = Tween<double>(
+    begin: 0,
+    end: 1,
+  ).chain(CurveTween(curve: curve));
+  static final Animatable<double> translateY = Tween<double>(
+    begin: rise,
+    end: 0,
+  ).chain(CurveTween(curve: curve));
+  static final Animatable<double> scale = Tween<double>(
+    begin: fromScale,
+    end: 1,
+  ).chain(CurveTween(curve: curve));
+}
+
+/// anim-exit — 6px drop + fade + 0.98, `fast` on `exit`.
+class ExitMotion {
+  const ExitMotion._();
+  static const Duration duration = MotionDurations.fast;
+  static const Curve curve = MotionCurves.exit;
+  static const KeyframeFill fill = KeyframeFill.both;
+  static const double drop = 6;
+  static const double toScale = 0.98;
+  static final Animatable<double> opacity = Tween<double>(
+    begin: 1,
+    end: 0,
+  ).chain(CurveTween(curve: curve));
+  static final Animatable<double> translateY = Tween<double>(
+    begin: 0,
+    end: drop,
+  ).chain(CurveTween(curve: curve));
+  static final Animatable<double> scale = Tween<double>(
+    begin: 1,
+    end: toScale,
+  ).chain(CurveTween(curve: curve));
+}
+
+/// anim-open — the overlay entrance. Stop tables [OpenTransition] reads
+/// directly, rather than keeping a private copy of its own.
+class OpenMotion {
+  const OpenMotion._();
+  static const Duration duration = MotionDurations.open;
+  static const Curve curve = MotionCurves.emphasized;
+  static const KeyframeFill fill = KeyframeFill.both;
+
+  /// The one keyframe stop the web entrance declares between its ends.
+  static const double break_ = 0.60;
 
   static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
     KeyframeStop(0, 0),
-    KeyframeStop(55, 1),
+    KeyframeStop(60, 1),
   ];
-
-  static const List<KeyframeStop<Offset>> scaleStops = <KeyframeStop<Offset>>[
-    KeyframeStop(0, Offset(0.25, 0.25)),
-    KeyframeStop(55, Offset(0.92, 1.08)),
-    KeyframeStop(80, Offset(1.04, 0.97)),
-    KeyframeStop(92, Offset(0.99, 1.01)),
-    KeyframeStop(100, Offset(1, 1)),
+  static const List<KeyframeStop<double>> scaleStops = <KeyframeStop<double>>[
+    KeyframeStop(0, 0.92),
+    KeyframeStop(60, 1.02),
+    KeyframeStop(100, 1),
   ];
-
+  static const List<KeyframeStop<double>> translateYStops =
+      <KeyframeStop<double>>[
+        KeyframeStop(0, 24),
+        KeyframeStop(60, -4),
+        KeyframeStop(100, 0),
+      ];
   static final Animatable<double> opacity = Keyframes.doubles(
     opacityStops,
     curve: curve,
   );
-
-  /// `dx` = `scaleX`, `dy` = `scaleY`.
-  static final Animatable<Offset> scale = Keyframes.offsets(
+  static final Animatable<double> scale = Keyframes.doubles(
     scaleStops,
+    curve: curve,
+  );
+  static final Animatable<double> translateY = Keyframes.doubles(
+    translateYStops,
     curve: curve,
   );
 }
 
-/// `@keyframes yuki-jelly` — globals.css L2431–2438, worn by `.anim-jelly`
-/// (`animation: yuki-jelly 0.6s var(--ease-out) both`, L2365–2367).
+/// anim-close — the overlay exit. Anticipates up 4, drops 16, fades. Stop
+/// tables [OpenTransition] reads directly.
+class CloseMotion {
+  const CloseMotion._();
+  static const Duration duration = MotionDurations.normal;
+  static const Curve curve = MotionCurves.move;
+  static const KeyframeFill fill = KeyframeFill.both;
+
+  /// The web exit's one keyframe stop.
+  static const double break_ = 0.30;
+
+  static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
+    KeyframeStop(0, 1),
+    KeyframeStop(30, 1),
+    KeyframeStop(100, 0),
+  ];
+  static const List<KeyframeStop<double>> scaleStops = <KeyframeStop<double>>[
+    KeyframeStop(0, 1),
+    KeyframeStop(30, 1.01),
+    KeyframeStop(100, 0.94),
+  ];
+  static const List<KeyframeStop<double>> translateYStops =
+      <KeyframeStop<double>>[
+        KeyframeStop(0, 0),
+        KeyframeStop(30, -4),
+        KeyframeStop(100, 16),
+      ];
+  static final Animatable<double> opacity = Keyframes.doubles(
+    opacityStops,
+    curve: curve,
+  );
+  static final Animatable<double> scale = Keyframes.doubles(
+    scaleStops,
+    curve: curve,
+  );
+  static final Animatable<double> translateY = Keyframes.doubles(
+    translateYStops,
+    curve: curve,
+  );
+}
+
+/// anim-expand / anim-collapse — disclosure on height. One controller: forward
+/// on `open` / `emphasized`, reverse on `normal` / `move`. No `Animatable`
+/// here on purpose — a collapsible/accordion drives a [SizeTransition] off
+/// these durations and curves directly.
+class ExpandMotion {
+  const ExpandMotion._();
+  static const Duration duration = MotionDurations.open;
+  static const Curve curve = MotionCurves.emphasized;
+  static const Duration collapseDuration = MotionDurations.normal;
+  static const Curve collapseCurve = MotionCurves.move;
+}
+
+/// anim-change — squash-and-stretch in place. The same stop table the
+/// retired `StateChangeMotion` used to carry.
 ///
 /// ```css
 /// 0%   { transform: scale3d(1,    1,    1); }
@@ -447,17 +512,8 @@ class EntranceMotion {
 /// 78%  { transform: scale3d(0.98, 1.02, 1); }
 /// 100% { transform: scale3d(1,    1,    1); }
 /// ```
-///
-/// *"The reward. Squashes to 1.18×0.82 and wobbles back. Reserve it for wins."*
-///
-/// FOLLOW-UP. A private twin of this table survives as `_jellyScale` in
-/// `lib/src/components/ui/active_indicator.dart` (L242–262), which predates this file and
-/// is the pattern it generalises. Collapsing the two — pointing
-/// `ActiveIndicator` at [scale] and deleting `_jellyScale` — is a separate
-/// change to a file this one does not own, and is deliberately not made here.
-class StateChangeMotion {
-  const StateChangeMotion._();
-
+class ChangeMotion {
+  const ChangeMotion._();
   static const Duration duration = MotionDurations.stateChange;
   static const Curve curve = MotionCurves.enter;
   static const KeyframeFill fill = KeyframeFill.both;
@@ -477,427 +533,35 @@ class StateChangeMotion {
   );
 }
 
-/// `@keyframes yuki-spring-up` — globals.css L2439–2445, worn by
-/// `.anim-spring-up` (`animation: yuki-spring-up 0.8s var(--ease-settle) both`,
-/// L2369–2371).
-///
-/// ```css
-/// 0%   { opacity: 0; transform: translateY(32px); }
-/// 55%  { opacity: 1; transform: translateY(-4px); }
-/// 76%  {             transform: translateY(1.5px); }
-/// 90%  {             transform: translateY(-0.5px); }
-/// 100% {             transform: translateY(0); }
-/// ```
-///
-/// The one table that uses `--ease-settle` rather than `--ease-out`, and the
-/// one whose copy is arithmetically exact: *"Rises 32px, overshoots by 4, then
-/// settles in three decreasing bounces"* — −4, +1.5, −0.5.
-class SpringEntranceMotion {
-  const SpringEntranceMotion._();
-
-  static const Duration duration = MotionDurations.springUp;
-  static const Curve curve = MotionCurves.settle;
-  static const KeyframeFill fill = KeyframeFill.both;
-
-  static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0),
-    KeyframeStop(55, 1),
-  ];
-
-  static const List<KeyframeStop<double>> translateYStops =
-      <KeyframeStop<double>>[
-        KeyframeStop(0, 32),
-        KeyframeStop(55, -4),
-        KeyframeStop(76, 1.5),
-        KeyframeStop(90, -0.5),
-        KeyframeStop(100, 0),
-      ];
-
-  static final Animatable<double> opacity = Keyframes.doubles(
-    opacityStops,
-    curve: curve,
-  );
-
-  static final Animatable<double> translateY = Keyframes.doubles(
-    translateYStops,
-    curve: curve,
-  );
-}
-
-/// `@keyframes yuki-jelly-in` — globals.css L2446–2450, worn by
-/// `.anim-jelly-in` (`animation: yuki-jelly-in var(--duration-jelly)
-/// var(--ease-spring) both`, L2376–2378).
-///
-/// ```css
-/// 0%   { opacity: 0; transform: scale(0.92) translateY(24px); }
-/// 60%  { opacity: 1; transform: scale(1.02) translateY(-4px); }
-/// 100% { opacity: 1; transform: scale(1)    translateY(0); }
-/// ```
-///
-/// The utility's own comment (L2372–2375) is worth carrying: the keyframes
-/// drive **`transform`, never `translate`**, so the animation composes with a
-/// dialog's centring translate instead of fighting it. In Flutter terms the
-/// same discipline is a [Transform] *inside* whatever positions the element,
-/// never a change to its position.
-class OpenMotion {
-  const OpenMotion._();
-
-  static const Duration duration = MotionDurations.open;
-  static const Curve curve = MotionCurves.emphasized;
-  static const KeyframeFill fill = KeyframeFill.both;
-
-  static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0),
-    KeyframeStop(60, 1),
-    KeyframeStop(100, 1),
-  ];
-
-  static const List<KeyframeStop<double>> scaleStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0.92),
-    KeyframeStop(60, 1.02),
-    KeyframeStop(100, 1),
-  ];
-
-  static const List<KeyframeStop<double>> translateYStops =
-      <KeyframeStop<double>>[
-        KeyframeStop(0, 24),
-        KeyframeStop(60, -4),
-        KeyframeStop(100, 0),
-      ];
-
-  static final Animatable<double> opacity = Keyframes.doubles(
-    opacityStops,
-    curve: curve,
-  );
-
-  /// Uniform: CSS `scale(s)` is `scaleX == scaleY`, unlike the `scale3d`
-  /// tables above.
-  static final Animatable<double> scale = Keyframes.doubles(
-    scaleStops,
-    curve: curve,
-  );
-
-  static final Animatable<double> translateY = Keyframes.doubles(
-    translateYStops,
-    curve: curve,
-  );
-}
-
-/// `@keyframes yuki-ratchet` — globals.css L2471–2473, worn by `.anim-ratchet`
-/// (`animation: yuki-ratchet 1.4s steps(8) infinite`, L2416–2418).
-///
-/// ```css
-/// to { transform: rotate(360deg); }
-/// ```
-///
-/// There is no `0%` stop: the implicit one is the element's own transform,
-/// which is none. *"Stepped mechanical spin. Eight discrete positions, not a
-/// smooth rotation — it reads as a mechanism."*
-///
-/// Eight held 45° positions of [MotionDurations.ratchetStep] (175ms) each: 0°, 45°,
-/// 90°, 135°, 180°, 225°, 270°, 315°. **360° is never displayed** — see
-/// [StepCurve]. Infinite and unfilled, so it is one of the three demos the page
-/// deliberately leaves unkeyed: a loop has nothing to replay.
-class DiscreteProgressMotion {
-  const DiscreteProgressMotion._();
-
-  static const Duration duration = MotionDurations.ratchet;
+/// anim-spin — one full turn, linear, forever.
+class SpinMotion {
+  const SpinMotion._();
+  static const Duration duration = MotionDurations.spin;
+  static const Curve curve = Curves.linear;
   static const KeyframeFill fill = KeyframeFill.none;
   static const bool loops = true;
-
-  /// `steps(8)`, i.e. `steps(8, jump-end)`.
-  static const int positions = 8;
-  static const Curve curve = StepCurve(positions);
-
-  /// One held position — derived in the foundation layer from 1.4s ÷ 8.
-  static Duration get step => MotionDurations.ratchetStep;
-
-  /// The full turn the `to` stop names, as a fraction: 0 … 7/8.
-  static double turnsAt(double t) => curve.transform(t.clamp(0.0, 1.0));
-
-  /// [turnsAt] in radians, ready for `Transform.rotate`.
-  static double radiansAt(double t) => turnsAt(t) * 2 * math.pi;
-
-  /// [turnsAt] in degrees — 0, 45, 90 … 315.
-  static double degreesAt(double t) => turnsAt(t) * 360;
 }
 
-/// One hard cut of `yuki-sign-on`: everything that changes at a stop, held
-/// until the next one.
-@immutable
-class TextRevealFrame {
-  const TextRevealFrame({
-    required this.percent,
-    required this.opacity,
-    required this.brightness,
-    required this.glowBlurs,
-  });
-
-  /// The stop this frame belongs to. It holds until the next stop's time.
-  final double percent;
-
-  /// CSS `opacity`, applied **after** [brightnessFilter] — see [TextRevealMotion].
-  final double opacity;
-
-  /// The multiplier inside `filter: brightness(x)`.
-  final double brightness;
-
-  /// The `text-shadow` blur radii **in CSS px**, innermost first. Empty is
-  /// `text-shadow: none`.
-  final List<double> glowBlurs;
-
-  /// `filter: brightness(x)` — a per-channel sRGB multiply, clamped, which is
-  /// exactly what a colour matrix with `x` down its diagonal does (ruling M3:
-  /// ship the live filter; the map's precomputed colour table is a probe
-  /// oracle, not the source).
-  ColorFilter get brightnessFilter => ColorFilter.matrix(<double>[
-    brightness, 0, 0, 0, 0, //
-    0, brightness, 0, 0, 0, //
-    0, 0, brightness, 0, 0, //
-    0, 0, 0, 1, 0, //
-  ]);
-
-  /// [glowBlurs] as painter shadows in [color] — `currentColor`, which on this
-  /// demo is `text-value-ink`.
-  List<Shadow> shadows(Color color) => <Shadow>[
-    for (final double blur in glowBlurs)
-      Shadow(color: color, blurRadius: TextRevealMotion.blurRadiusFor(blur)),
-  ];
-}
-
-/// `@keyframes yuki-sign-on` — globals.css L2474–2481, worn by `.anim-sign-on`
-/// (`animation: yuki-sign-on 0.9s steps(1, end) both`, L2420–2422).
-///
-/// *"Neon power-up: flickers on, drops out, catches. Drives text-shadow, so it
-/// only works on text."*
-///
-/// `steps(1, jump-end)` applied *between every pair of stops* means *no
-/// interpolation at all*: each stop's value is held until the next stop's time,
-/// then snaps. Six hard cuts, so this is modelled as a discrete timeline
-/// ([frameAt]) rather than as a tween.
-///
-/// | stop | window | opacity | text-shadow | brightness |
-/// |---|---|---|---|---|
-/// | 0% | 0–144ms | 0.12 | none | 0.5 |
-/// | 16% | 144–252ms | 1 | `0 0 8px`, `0 0 22px` | 1.35 |
-/// | 28% | 252–396ms | 0.2 | none | 0.6 |
-/// | 44% | 396–504ms | 1 | `0 0 8px`, `0 0 22px` | 1.3 |
-/// | 56% | 504–630ms | 0.35 | `0 0 4px` | 0.75 |
-/// | 70%, 100% | 630–900ms, then held | 1 | `0 0 6px`, `0 0 18px` | 1.15 |
-///
-/// **The resting state is not neutral.** `both` holds the 70% frame forever, so
-/// the word keeps its glow at brightness 1.15 after the animation ends. Do not
-/// fade it out.
-///
-/// Render order is the filter spec's: draw the text **and its shadows**, apply
-/// [TextRevealFrame.brightnessFilter], then apply [TextRevealFrame.opacity].
-///
-/// DRIFT D9. The page's own Don't #3 reads *"Don't flash, strobe or rapidly
-/// alternate brightness; it is an accessibility hazard"*, and this animation
-/// alternates opacity 0.12 → 1 → 0.2 → 1 → 0.35 → 1 with brightness 0.5 → 1.35
-/// → 0.6 → 1.3 → 0.75 → 1.15 across six cuts in 900ms — about 3.3 alternations
-/// per second. Under the 3Hz hazard threshold, but it is the exact behaviour
-/// the rule names. Both ship.
-class TextRevealMotion {
-  const TextRevealMotion._();
-
-  static const Duration duration = MotionDurations.signOn;
-  static const KeyframeFill fill = KeyframeFill.both;
-
-  /// `steps(1, end)`. Recorded for the transcript; [frameAt] is what evaluates
-  /// the timeline, because a one-step curve between every pair of stops is a
-  /// lookup, not an interpolation.
-  static const Curve curve = StepCurve(1);
-
-  /// The 100% stop repeats the 70% stop verbatim, so the table has six rows,
-  /// not seven.
-  static const List<TextRevealFrame> frames = <TextRevealFrame>[
-    TextRevealFrame(
-      percent: 0,
-      opacity: 0.12,
-      brightness: 0.5,
-      glowBlurs: <double>[],
-    ),
-    TextRevealFrame(
-      percent: 16,
-      opacity: 1,
-      brightness: 1.35,
-      glowBlurs: <double>[8, 22],
-    ),
-    TextRevealFrame(
-      percent: 28,
-      opacity: 0.2,
-      brightness: 0.6,
-      glowBlurs: <double>[],
-    ),
-    TextRevealFrame(
-      percent: 44,
-      opacity: 1,
-      brightness: 1.3,
-      glowBlurs: <double>[8, 22],
-    ),
-    TextRevealFrame(
-      percent: 56,
-      opacity: 0.35,
-      brightness: 0.75,
-      glowBlurs: <double>[4],
-    ),
-    TextRevealFrame(
-      percent: 70,
-      opacity: 1,
-      brightness: 1.15,
-      glowBlurs: <double>[6, 18],
-    ),
-  ];
-
-  /// The frame in force at linear progress [t] — the last stop whose percentage
-  /// has been reached. At `t == 1` that is the 70% frame, which `both` then
-  /// holds for good.
-  static TextRevealFrame frameAt(double t) {
-    final double percent = t.clamp(0.0, 1.0) * 100;
-    TextRevealFrame held = frames.first;
-    for (final TextRevealFrame frame in frames) {
-      if (frame.percent > percent) break;
-      held = frame;
-    }
-    return held;
-  }
-
-  /// The [Shadow.blurRadius] that reproduces a CSS `text-shadow` blur.
-  ///
-  /// `text-shadow: 0 0 Npx c` is offset 0 and **blur N** — the same quantity
-  /// `box-shadow` spells third, and therefore the same conversion. Borrowed
-  /// from [ShadowLayer.blurRadius] rather than re-derived, so a correction
-  /// there carries here: CSS defines its blur as sigma = blur ÷ 2 while Flutter
-  /// derives sigma from a radius, and the port inverts Flutter's formula instead
-  /// of inflating every halo.
-  static double blurRadiusFor(double cssBlur) =>
-      ShadowLayer(0, 0, cssBlur, 0, _unusedColor).blurRadius;
-
-  /// [ShadowLayer] resolves its colour against the theme; this one is only
-  /// ever asked for its blur.
-  static Color _unusedColor(ThemeTokens theme) => transparent;
-}
-
-/// `@keyframes pulls-reveal` — globals.css L2503–2512, worn by `.anim-reveal`
-/// (`animation: pulls-reveal var(--duration-reward) var(--ease-out) both`,
-/// L2341–2343).
-///
-/// ```css
-/// from { opacity: 0; transform: rotateY(-38deg) scale(0.9); }
-/// to   { opacity: 1; transform: none; }
-/// ```
-///
-/// *"The card turning face-up. Rotates on the Y axis. Ours, not Yuki's."*
-///
-/// **Orthographic** (ruling M4). The element carries no `perspective`, and
-/// neither does any ancestor, so the rotation has no foreshortening: it is a
-/// flat horizontal squash. [transformAt] therefore never sets the perspective
-/// entry of the matrix. Adding it would look better and would be wrong.
-/// cos(38°) = 0.78801, so at t=0 the box is 78.8% of its width — and 0.9 of
-/// that again from the uniform scale.
-///
-/// Like `.anim-pop-in` this one also gets the blanket rule's redundant special
-/// case (`opacity: 1; transform: none !important`); the `both` fill already
-/// holds exactly that.
-class RevealMotion {
-  const RevealMotion._();
-
-  static const Duration duration = MotionDurations.reward;
-  static const Curve curve = MotionCurves.enter;
-  static const KeyframeFill fill = KeyframeFill.both;
-
-  /// The `from` stop's `rotateY`.
-  static const double fromDegrees = -38;
-  static const double fromRadians = fromDegrees * math.pi / 180;
-
-  /// The `from` stop's uniform `scale`.
-  static const double fromScale = 0.9;
-
-  static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0),
-    KeyframeStop(100, 1),
-  ];
-
-  static const List<KeyframeStop<double>> rotationYStops =
-      <KeyframeStop<double>>[
-        KeyframeStop(0, fromRadians),
-        KeyframeStop(100, 0),
-      ];
-
-  static const List<KeyframeStop<double>> scaleStops = <KeyframeStop<double>>[
-    KeyframeStop(0, fromScale),
-    KeyframeStop(100, 1),
-  ];
-
-  static final Animatable<double> opacity = Keyframes.doubles(
-    opacityStops,
-    curve: curve,
-  );
-
-  /// Radians, for `Transform` — CSS states it in degrees.
-  static final Animatable<double> rotationY = Keyframes.doubles(
-    rotationYStops,
-    curve: curve,
-  );
-
-  static final Animatable<double> scale = Keyframes.doubles(
-    scaleStops,
-    curve: curve,
-  );
-
-  /// `rotateY(θ) scale(s)`, in that order: CSS applies a transform list left to
-  /// right, so the scale happens in the rotated frame.
-  ///
-  /// Note what is *not* here: no `setEntry(3, 2, …)`. That entry is the
-  /// perspective divisor, and the reference has no perspective to divide by.
-  static Matrix4 transformAt(double t) {
-    final double s = scale.transform(t.clamp(0.0, 1.0));
-    return Matrix4.identity()
-      ..rotateY(rotationY.transform(t.clamp(0.0, 1.0)))
-      // CSS `scale(s)` is the 2-D one: z is left alone.
-      ..scaleByDouble(s, s, 1.0, 1.0);
-  }
-}
-
-/// `@keyframes pulls-shimmer` — globals.css L2513–2520, worn by `.anim-shimmer`
-/// (L2344–2353), which also supplies the paint the keyframes slide:
+/// anim-shimmer / anim-shimmer-text — the skeleton sweep, the same body
+/// `LoadingShimmerMotion` used to carry; `textDuration` is the text variant's
+/// slower period.
 ///
 /// ```css
 /// background: linear-gradient(90deg, var(--popover) 0%, var(--accent) 50%,
 ///                             var(--popover) 100%);
 /// background-size: 200% 100%;
-/// animation: pulls-shimmer 1.4s var(--ease-in-out) infinite;
 /// ```
 /// ```css
 /// from { background-position:  200% 0; }
 /// to   { background-position: -200% 0; }
 /// ```
-///
-/// *"Skeleton loading. Must match the footprint of the content it replaces."*
-///
-/// The arithmetic that makes this readable: a CSS percentage
-/// `background-position` is `(containerW − imageW) · pct`, and the tile is
-/// `2W` wide, so the offset is `−W · pct`. `200%` puts the tile's left edge at
-/// **−2W** and `−200%` at **+2W**; the bright `--accent` band sits at the
-/// tile's midpoint and therefore crosses from **−W to +3W, left to right**, once
-/// per cycle.
-///
-/// `background-repeat` defaults to `repeat`, which is not decoration — it is
-/// why the box is never empty at the extremes, and why this port's
-/// reduced-motion freeze agrees with motion-map §8.2 even though the two name
-/// different numbers. §8.2 says a no-fill looper reverts to the element's own
-/// `background-position: 0% 0` (offset 0); a stop-0 freeze puts it at −2W. Those
-/// differ by exactly one tile period, so they paint the same pixels: dark at the
-/// left edge, the `--accent` band at the box's right edge. Paint it with a
-/// repeating tile, not a single band.
-///
-/// Colours resolve from the live theme on every build. Freezing them would
-/// break the light theme, where both stops are near-white.
-class LoadingShimmerMotion {
-  const LoadingShimmerMotion._();
-
+class ShimmerMotion {
+  const ShimmerMotion._();
   static const Duration duration = MotionDurations.shimmer;
+
+  /// The agent's status line variant — the same sweep, at nearly twice the
+  /// period.
+  static const Duration textDuration = MotionDurations.shimmerText;
   static const Curve curve = MotionCurves.move;
   static const KeyframeFill fill = KeyframeFill.none;
   static const bool loops = true;
@@ -939,36 +603,26 @@ class LoadingShimmerMotion {
   );
 }
 
-/// `@keyframes pulls-pulse-live` — globals.css L2521–2531, worn by
-/// `.anim-pulse-live` (`animation: pulls-pulse-live 2s var(--ease-in-out)
-/// infinite`, L2354–2356).
+/// anim-progress-indeterminate — a third-width sliver, −100% → 300%, linear.
+class ProgressMotion {
+  const ProgressMotion._();
+  static const Duration duration = MotionDurations.shimmer; // web literal 1.4s == shimmer
+  static const Curve curve = Curves.linear;
+  static const bool loops = true;
+  static const double sliverFraction = 1 / 3;
+  static const double fromFraction = -1;
+  static const double toFraction = 3;
+}
+
+/// anim-pulse — the live indicator's ring, the same body `LivePulseMotion`
+/// used to carry.
 ///
 /// ```css
 /// 0%, 100% { opacity: 1;    box-shadow: 0 0 0 0   rgba(61, 220, 151, 0.5); }
 /// 50%      { opacity: 0.75; box-shadow: 0 0 0 5px rgba(61, 220, 151, 0); }
 /// ```
-///
-/// *"The only animation allowed to run forever, and only on the live
-/// indicator."*
-///
-/// Offset 0, blur 0, **spread** 0 → 5px, alpha 0.5 → 0: a hard-edged ring
-/// growing out of the 8px dot as it fades. Flutter has no hard CSS spread, so
-/// the ring is a filled circle of [ringRadiusAt] behind the dot, at
-/// [ringAlphaAt]; both halves of the cycle interpolate on `--ease-in-out`,
-/// which is what makes the return leg a contraction rather than a cut.
-///
-/// Under reduced motion this reverts to stop 0 — ring phase 0, i.e. a circle of
-/// exactly the dot's own radius, hidden behind it. Which is motion-map §8.2's
-/// *"plain 8px `--color-success` dot, no ring, opacity 1"* arrived at from the
-/// other direction.
-///
-/// DRIFT D14. `rgba(61, 220, 151, α)` is **#3DDC97**, a hard-coded green left
-/// over from an earlier palette, while the dot it rings is `bg-success`
-/// **#10b981**. Two different greens, in both themes, on one 8px indicator.
-/// Ported as written — there is nothing for the ring colour to derive from.
-class LivePulseMotion {
-  const LivePulseMotion._();
-
+class PulseMotion {
+  const PulseMotion._();
   static const Duration duration = MotionDurations.pulseLive;
   static const Curve curve = MotionCurves.move;
   static const KeyframeFill fill = KeyframeFill.none;
@@ -979,7 +633,8 @@ class LivePulseMotion {
   static double get dotRadius => space(2) / 2;
   static Color get dotColor => Palette.success;
 
-  /// `rgba(61, 220, 151, …)` — drift D14, a palette orphan.
+  /// `rgba(61, 220, 151, …)` — a hard-coded green left over from an earlier
+  /// palette, distinct from `bg-success`. Ported as written.
   static final Color ringColor = const Color(0xFF3DDC97);
 
   /// The 50% stop's `box-shadow` spread.
@@ -1029,233 +684,16 @@ class LivePulseMotion {
       dotOpacity.transform(t.clamp(0.0, 1.0));
 }
 
-/// The sweep bar keyframe — globals.css L2195–2202, the motion page's own.
-///
-/// ```css
-/// from { width: 0; }
-/// to   { width: 100%; }
-/// ```
-///
-/// Applied inline per duration row with its own duration and `both` fill.
-/// **There is no duration constant here on purpose**: the durations panel *is*
-/// the duration scale, so the caller supplies one of the six from
-/// [MotionDurations] per row, and the page's source carries an
-/// `allow-dynamic-motion:` note saying so.
-///
-/// Two paint details travel with the table. The track is `overflow-hidden`, so
-/// a clip is enough — no `Positioned` arithmetic. And the bar itself carries
-/// `rounded-sm`, so at small widths it renders as a 6px-radius pill rather than
-/// a square sliver.
-///
-/// Its reduced-motion row is the page's own joke on itself: `both` holds `to`,
-/// so all six bars freeze full-width and identical, and the section's entire
-/// point is destroyed by design.
-class SweepMotion {
-  const SweepMotion._();
-
-  static const Curve curve = MotionCurves.enter;
-  static const KeyframeFill fill = KeyframeFill.both;
-
-  static const List<KeyframeStop<double>> widthFactorStops =
-      <KeyframeStop<double>>[KeyframeStop(0, 0), KeyframeStop(100, 1)];
-
-  /// `0 → 1`, for a `FractionallySizedBox.widthFactor` inside the clipped
-  /// track.
-  static final Animatable<double> widthFactor = Keyframes.doubles(
-    widthFactorStops,
-    curve: curve,
-  );
+/// anim-caret — on for half the period, off for half. steps(1, end).
+class CaretMotion {
+  const CaretMotion._();
+  static const Duration duration = MotionDurations.caret;
+  static const bool loops = true;
+  static bool visibleAt(double t) => t < 0.5;
 }
 
-/// The travel chip keyframe — globals.css L2203–2210, the motion page's other
-/// own, and **a verified no-op**.
-///
-/// ```css
-/// from { transform: translateX(0); }
-/// to   { transform: translateX(calc(100% - 1.5rem)); }
-/// ```
-///
-/// Ruling M1: the supervisor confirmed live that all four easing chips hold
-/// `matrix(1,0,0,1,0,0)` across the run on a 482px track. The mechanism is the
-/// CSS transform spec — a percentage inside `translateX` resolves against **the
-/// transformed element's own border box**, never its parent's. The chip is
-/// `size-6`, 24px, so `100%` is 24px and `calc(100% − 1.5rem)` is **0px**. The
-/// animation runs its full [MotionDurations.bloom] and translates by nothing; the
-/// four panels communicate their curve through the graph alone, and the lime
-/// square is static.
-///
-/// So this ships as `translateX(elementWidth − 24px)`: it evaluates to 0 at the
-/// one call site, and stays faithful if the utility is ever reused on a wider
-/// element. **If upstream ever fixes it**, the intended reading is "travel the
-/// track, minus the chip's own width" — one line here: pass the *track's* width
-/// to [distanceFor] instead of the chip's.
-///
-/// Curve is the caller's: each easing panel runs the chip under its own curve,
-/// over a deliberately identical time, so the four can be judged against each
-/// other.
-class TravelMotion {
-  const TravelMotion._();
-
-  static const Duration duration = MotionDurations.bloom;
-  static const KeyframeFill fill = KeyframeFill.both;
-
-  /// `1.5rem`, the `size-6` chip's own width, subtracted by the `calc`.
-  static double get inset => space(6);
-
-  /// `calc(100% - 1.5rem)` where `100%` is [elementWidth]. Zero on the 24px
-  /// chip; 458 on the 482px track it looks like it should be crossing.
-  static double distanceFor(double elementWidth) => elementWidth - inset;
-
-  /// The `translateX` in force at linear progress [t].
-  static double translationAt(
-    double t,
-    double elementWidth, {
-    required Curve curve,
-  }) => distanceFor(elementWidth) * curve.transform(t.clamp(0.0, 1.0));
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// E · the selection-control tables
-// ─────────────────────────────────────────────────────────────────────────────
-// Three more `@keyframes` (globals.css L2212–2242) and their three `anim-*`
-// utilities (L2243–2253). They belong to the form controls rather than to the
-// motion page, which is why they are not among the eleven above and why the
-// motion page never demonstrates them.
-//
-// Two of the three animate `stroke-dashoffset`, a property Flutter has no
-// direct spelling for. The transcription keeps the CSS number and leaves the
-// drawing to the consumer: a checkbox paints its tick with a
-// `PathMetric.extractPath` window, and `dashoffset → 0` is that window opening
-// from nothing to the whole stroke. Recording the offset rather than a
-// "fraction drawn" keeps the table diffable against the stylesheet.
-
-/// `@keyframes check-draw` — globals.css L2212–2219, worn by
-/// `.anim-check-draw` (`stroke-dasharray: 22; animation: check-draw 280ms
-/// var(--ease-out) both`, L2243–2246).
-///
-/// ```css
-/// from { stroke-dashoffset: 22; }
-/// to   { stroke-dashoffset: 0; }
-/// ```
-///
-/// The checkbox tick draws itself on. `stroke-dasharray: 22` makes the dash as
-/// long as the path (the hand-authored `M5 12.5 10 17.5 19 7` measures just
-/// under 22 units), so one dash covers the whole stroke and the offset slides
-/// it into view from the start point.
-class CheckmarkDrawMotion {
-  const CheckmarkDrawMotion._();
-
-  static const Duration duration = MotionDurations.checkDraw;
-  static const Curve curve = MotionCurves.enter;
-  static const KeyframeFill fill = KeyframeFill.both;
-
-  /// `stroke-dasharray: 22` — the utility's own declaration, not a keyframe.
-  /// Also the `from` offset, because one dash has to cover the whole path.
-  static const double dashArray = 22;
-
-  static const List<KeyframeStop<double>> dashOffsetStops =
-      <KeyframeStop<double>>[KeyframeStop(0, dashArray), KeyframeStop(100, 0)];
-
-  static final Animatable<double> dashOffset = Keyframes.doubles(
-    dashOffsetStops,
-    curve: curve,
-  );
-
-  /// The same table read as "how much of the stroke is painted", `0..1` — the
-  /// form a [Path] consumer wants.
-  ///
-  /// Derived from [dashOffset] rather than tabulated beside it: two tables
-  /// stating the same animation is how they drift.
-  static double drawnFractionAt(double t) =>
-      1 - dashOffset.transform(t.clamp(0.0, 1.0)) / dashArray;
-}
-
-/// `@keyframes dash-draw` — globals.css L2220–2227, worn by `.anim-dash-draw`
-/// (`stroke-dasharray: 12; animation: dash-draw 200ms var(--ease-out) both`,
-/// L2247–2250).
-///
-/// ```css
-/// from { stroke-dashoffset: 12; }
-/// to   { stroke-dashoffset: 0; }
-/// ```
-///
-/// The checkbox's indeterminate bar, `M6 12h12` — 12 units long, drawn over
-/// 200ms rather than the tick's 280 because there is less of it to draw. Same
-/// mechanism, different length; the pair is why both numbers are stated.
-class DashDrawMotion {
-  const DashDrawMotion._();
-
-  static const Duration duration = MotionDurations.dashDraw;
-  static const Curve curve = MotionCurves.enter;
-  static const KeyframeFill fill = KeyframeFill.both;
-
-  /// `stroke-dasharray: 12`.
-  static const double dashArray = 12;
-
-  static const List<KeyframeStop<double>> dashOffsetStops =
-      <KeyframeStop<double>>[KeyframeStop(0, dashArray), KeyframeStop(100, 0)];
-
-  static final Animatable<double> dashOffset = Keyframes.doubles(
-    dashOffsetStops,
-    curve: curve,
-  );
-
-  /// See [CheckmarkDrawMotion.drawnFractionAt].
-  static double drawnFractionAt(double t) =>
-      1 - dashOffset.transform(t.clamp(0.0, 1.0)) / dashArray;
-}
-
-/// `@keyframes dot-pop` — globals.css L2228–2242, worn by `.anim-dot-pop`
-/// (`animation: dot-pop 320ms var(--ease-spring) both`, L2251–2253).
-///
-/// ```css
-/// 0%   { transform: scale(0);    opacity: 0; }
-/// 55%  { transform: scale(1.35); opacity: 1; }
-/// 100% { transform: scale(1);    opacity: 1; }
-/// ```
-///
-/// The radio dot arriving. The one table here that runs on `--ease-spring`
-/// rather than `--ease-out`, and it overshoots twice over: the 1.35 stop is the
-/// keyframe's own overshoot, and the spring curve overshoots *between* stops on
-/// top of it.
-///
-/// [opacity] is declared at all three stops and reaches 1 at 55%, the same
-/// instant the dot is at its widest — so the flash and the peak land together.
-class DotSelectionMotion {
-  const DotSelectionMotion._();
-
-  static const Duration duration = MotionDurations.dotPop;
-  static const Curve curve = MotionCurves.emphasized;
-  static const KeyframeFill fill = KeyframeFill.both;
-
-  static const List<KeyframeStop<double>> scaleStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0),
-    KeyframeStop(55, 1.35),
-    KeyframeStop(100, 1),
-  ];
-
-  static const List<KeyframeStop<double>> opacityStops = <KeyframeStop<double>>[
-    KeyframeStop(0, 0),
-    KeyframeStop(55, 1),
-    KeyframeStop(100, 1),
-  ];
-
-  static final Animatable<double> scale = Keyframes.doubles(
-    scaleStops,
-    curve: curve,
-  );
-
-  static final Animatable<double> opacity = Keyframes.doubles(
-    opacityStops,
-    curve: curve,
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// F · a transition, not a keyframe
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// `@utility swap-roll` — globals.css L2265–2271, the IconSwap wheel.
+/// swap-roll — the IconSwap wheel, the same body `ContentSwapMotion` used to
+/// carry.
 ///
 /// ```css
 /// --swap-offset: 0;
@@ -1267,26 +705,9 @@ class DotSelectionMotion {
 ///
 /// A **transition**, not an animation: there are no stops, only a from-state
 /// and a to-state, and the browser interpolates whenever `--swap-offset`
-/// changes. It is recorded in this file rather than inline in `icon_swap.dart`
-/// because it is the one motion table that file needs and because its three
-/// facts — 400ms, `--ease-spring`, 160% per step — are stated once here and
-/// nowhere else.
-///
-/// Two consequences of the curve, both visible and both deliberate:
-///
-/// * **The arriver sails past centre.** `--ease-spring` peaks at ≈1.098 around
-///   57% of the run, so a glyph rolling in overshoots its resting position by
-///   ≈9.8% of one step — ~2.5px at 16px, ~3.1px at 20px — before settling.
-/// * **There is a crossfade inside the roll.** `opacity` rides the same spring,
-///   and because the curve exceeds 1 the value clamps: full opacity is reached
-///   at ≈147ms of the 400ms roll. The panel's own copy says *"No crossfades"*
-///   (buttons-map drift 20); the stylesheet says otherwise, and this is the
-///   stylesheet.
-///
-/// The squash that lands on the arriving glyph is [StateChangeMotion], delayed by
-/// `--duration-fast` — see `icon_swap.dart`, which owns that composition.
-class ContentSwapMotion {
-  const ContentSwapMotion._();
+/// changes.
+class SwapRollMotion {
+  const SwapRollMotion._();
 
   /// `--duration-slow`, on both properties.
   static const Duration duration = MotionDurations.slow;

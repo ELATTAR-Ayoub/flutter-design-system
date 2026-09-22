@@ -672,9 +672,6 @@ void main() {
       // The frame `Curve.transform` is contractually asked for, and the one
       // CSS never paints: it holds the last position instead of reaching 1.
       expect(steps.transform(1), closeTo(7 / 8, 1e-12));
-      expect(DiscreteProgressMotion.degreesAt(1), closeTo(315, 1e-9));
-      expect(DiscreteProgressMotion.radiansAt(0), 0);
-      expect(DiscreteProgressMotion.step, MotionDurations.ratchetStep);
     });
 
     test('jump-start is the other CSS variant', () {
@@ -686,357 +683,6 @@ void main() {
       );
       expect(steps.transform(0.75), 1);
       expect(steps.transform(1), 1);
-    });
-  });
-
-  group('the finite keyframe tables', () {
-    test('yuki-pop-in matches globals.css at every stop', () {
-      expect(
-        EntranceMotion.scale.transform(0),
-        offsetMoreOrLessEquals(const Offset(0.25, 0.25), epsilon: 1e-9),
-      );
-      expect(
-        EntranceMotion.scale.transform(0.55),
-        offsetMoreOrLessEquals(
-          const Offset(0.92, 1.08),
-          epsilon: stopTolerance,
-        ),
-      );
-      expect(
-        EntranceMotion.scale.transform(0.80),
-        offsetMoreOrLessEquals(
-          const Offset(1.04, 0.97),
-          epsilon: stopTolerance,
-        ),
-      );
-      expect(
-        EntranceMotion.scale.transform(0.92),
-        offsetMoreOrLessEquals(
-          const Offset(0.99, 1.01),
-          epsilon: stopTolerance,
-        ),
-      );
-      expect(
-        EntranceMotion.scale.transform(1),
-        offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9),
-      );
-
-      // Declared at 0% and 55% only — and then it HOLDS, exactly, because the
-      // tail is modelled rather than left to emerge.
-      expect(EntranceMotion.opacity.transform(0), 0);
-      expect(EntranceMotion.opacity.transform(0.55), closeTo(1, stopTolerance));
-      expect(EntranceMotion.opacity.transform(0.8), 1);
-      expect(EntranceMotion.opacity.transform(1), 1);
-    });
-
-    test('yuki-jelly matches globals.css at every stop', () {
-      expect(
-        StateChangeMotion.scale.transform(0),
-        offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9),
-      );
-      expect(
-        StateChangeMotion.scale.transform(0.30),
-        offsetMoreOrLessEquals(
-          const Offset(1.18, 0.82),
-          epsilon: stopTolerance,
-        ),
-      );
-      expect(
-        StateChangeMotion.scale.transform(0.45),
-        offsetMoreOrLessEquals(
-          const Offset(0.88, 1.12),
-          epsilon: stopTolerance,
-        ),
-      );
-      expect(
-        StateChangeMotion.scale.transform(0.60),
-        offsetMoreOrLessEquals(
-          const Offset(1.06, 0.94),
-          epsilon: stopTolerance,
-        ),
-      );
-      expect(
-        StateChangeMotion.scale.transform(0.78),
-        offsetMoreOrLessEquals(
-          const Offset(0.98, 1.02),
-          epsilon: stopTolerance,
-        ),
-      );
-      expect(
-        StateChangeMotion.scale.transform(1),
-        offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9),
-      );
-    });
-
-    test('check-draw slides a 22-unit dash into view over 280ms', () {
-      // `from { stroke-dashoffset: 22 } to { stroke-dashoffset: 0 }`, and the
-      // utility's own `stroke-dasharray: 22` is what makes one dash cover the
-      // whole path.
-      expect(CheckmarkDrawMotion.dashArray, 22);
-      expect(CheckmarkDrawMotion.dashOffset.transform(0), 22);
-      expect(CheckmarkDrawMotion.dashOffset.transform(1), closeTo(0, 1e-9));
-      expect(CheckmarkDrawMotion.duration, MotionDurations.checkDraw);
-      expect(CheckmarkDrawMotion.duration.inMilliseconds, 280);
-      expect(CheckmarkDrawMotion.curve, MotionCurves.enter);
-
-      // Read the other way round: nothing painted at 0, all of it at 1.
-      expect(CheckmarkDrawMotion.drawnFractionAt(0), closeTo(0, 1e-9));
-      expect(CheckmarkDrawMotion.drawnFractionAt(1), closeTo(1, 1e-9));
-      // And the two readings are one table, not two — the fraction is the
-      // offset, inverted, at every point in between.
-      expect(
-        CheckmarkDrawMotion.drawnFractionAt(0.4),
-        closeTo(1 - CheckmarkDrawMotion.dashOffset.transform(0.4) / 22, 1e-12),
-      );
-    });
-
-    test('dash-draw is the same mechanism over a 12-unit stroke, in 200ms', () {
-      expect(DashDrawMotion.dashArray, 12);
-      expect(DashDrawMotion.dashOffset.transform(0), 12);
-      expect(DashDrawMotion.dashOffset.transform(1), closeTo(0, 1e-9));
-      expect(DashDrawMotion.duration.inMilliseconds, 200);
-      expect(DashDrawMotion.curve, MotionCurves.enter);
-      // Shorter stroke, shorter run — the pair is why both numbers exist.
-      expect(DashDrawMotion.duration, lessThan(CheckmarkDrawMotion.duration));
-      expect(DashDrawMotion.dashArray, lessThan(CheckmarkDrawMotion.dashArray));
-    });
-
-    test('dot-pop overshoots to 1.35 at 55%, on the spring', () {
-      expect(DotSelectionMotion.scale.transform(0), 0);
-      expect(
-        DotSelectionMotion.scale.transform(0.55),
-        closeTo(1.35, stopTolerance),
-      );
-      expect(DotSelectionMotion.scale.transform(1), closeTo(1, 1e-9));
-
-      // Opacity reaches 1 at the same stop the dot is widest, so the flash and
-      // the peak land together.
-      expect(DotSelectionMotion.opacity.transform(0), 0);
-      expect(
-        DotSelectionMotion.opacity.transform(0.55),
-        closeTo(1, stopTolerance),
-      );
-      expect(DotSelectionMotion.opacity.transform(1), 1);
-
-      expect(DotSelectionMotion.duration.inMilliseconds, 320);
-      expect(
-        DotSelectionMotion.curve,
-        MotionCurves.emphasized,
-        reason: 'the one selection-control table that is not --ease-out',
-      );
-    });
-
-    test('swap-roll is a transition: 400ms spring, 160% a step', () {
-      expect(ContentSwapMotion.duration, MotionDurations.slow);
-      expect(ContentSwapMotion.duration.inMilliseconds, 400);
-      expect(ContentSwapMotion.curve, MotionCurves.emphasized);
-      expect(ContentSwapMotion.squashDelay, MotionDurations.fast);
-      expect(ContentSwapMotion.squashDelay.inMilliseconds, 150);
-
-      // A CSS percentage translate resolves against the element's OWN box, and
-      // every strip cell is centred on one glyph — so a step is 1.6 × the
-      // glyph, never 1.6 × the clip window.
-      expect(ContentSwapMotion.travelFor(16), closeTo(25.6, 1e-9));
-      expect(ContentSwapMotion.travelFor(20), closeTo(32, 1e-9));
-      expect(MotionTransforms.swapRollTravel, 1.6);
-
-      // The spring exceeds 1 mid-flight, which is what sails the arriving
-      // glyph past centre before it settles.
-      final double peak = <double>[
-        for (int i = 0; i <= 100; i++)
-          ContentSwapMotion.curve.transform(i / 100),
-      ].reduce((double a, double b) => a > b ? a : b);
-      expect(peak, greaterThan(1));
-      expect(peak, closeTo(1.098, 1e-2));
-    });
-
-    test('yuki-spring-up rises 32, overshoots 4, settles in three bounces', () {
-      expect(SpringEntranceMotion.translateY.transform(0), 32);
-      expect(
-        SpringEntranceMotion.translateY.transform(0.55),
-        closeTo(-4, stopTolerance),
-      );
-      expect(
-        SpringEntranceMotion.translateY.transform(0.76),
-        closeTo(1.5, stopTolerance),
-      );
-      expect(
-        SpringEntranceMotion.translateY.transform(0.90),
-        closeTo(-0.5, stopTolerance),
-      );
-      expect(SpringEntranceMotion.translateY.transform(1), closeTo(0, 1e-9));
-
-      expect(SpringEntranceMotion.opacity.transform(0), 0);
-      expect(
-        SpringEntranceMotion.opacity.transform(0.55),
-        closeTo(1, stopTolerance),
-      );
-      expect(SpringEntranceMotion.opacity.transform(1), 1);
-      expect(
-        SpringEntranceMotion.curve,
-        MotionCurves.settle,
-        reason: 'the one table that is not --ease-out',
-      );
-    });
-
-    test('yuki-jelly-in matches globals.css at every stop', () {
-      expect(OpenMotion.scale.transform(0), 0.92);
-      expect(OpenMotion.scale.transform(0.60), closeTo(1.02, stopTolerance));
-      expect(OpenMotion.scale.transform(1), closeTo(1, 1e-9));
-
-      expect(OpenMotion.translateY.transform(0), 24);
-      expect(OpenMotion.translateY.transform(0.60), closeTo(-4, stopTolerance));
-      expect(OpenMotion.translateY.transform(1), closeTo(0, 1e-9));
-
-      expect(OpenMotion.opacity.transform(0), 0);
-      expect(OpenMotion.opacity.transform(0.60), closeTo(1, stopTolerance));
-      expect(OpenMotion.opacity.transform(1), 1);
-    });
-
-    test('pulls-reveal turns the card face-up flat, not in perspective', () {
-      expect(RevealMotion.opacity.transform(0), 0);
-      expect(RevealMotion.opacity.transform(1), 1);
-      expect(
-        RevealMotion.rotationY.transform(0),
-        closeTo(RevealMotion.fromRadians, 1e-12),
-      );
-      expect(RevealMotion.rotationY.transform(1), closeTo(0, 1e-9));
-      expect(RevealMotion.scale.transform(0), RevealMotion.fromScale);
-      expect(RevealMotion.scale.transform(1), closeTo(1, 1e-9));
-
-      // cos(38°) = 0.78801, and the 0.9 uniform scale on top of it.
-      final Matrix4 start = RevealMotion.transformAt(0);
-      expect(start.storage[0], closeTo(0.9 * 0.78801, 1e-4));
-      // Ruling M4: no perspective on the element or any ancestor, so the
-      // matrix's perspective entry stays untouched.
-      expect(start.storage[11], 0);
-      expect(RevealMotion.transformAt(1).storage[0], closeTo(1, stopTolerance));
-    });
-
-    test('the sweep bar grows 0 → 1 on --ease-out', () {
-      expect(SweepMotion.widthFactor.transform(0), 0);
-      expect(SweepMotion.widthFactor.transform(1), 1);
-      expect(
-        SweepMotion.widthFactor.transform(0.5),
-        greaterThan(0.5),
-        reason: '--ease-out is front-loaded',
-      );
-    });
-  });
-
-  group('yuki-sign-on', () {
-    test('cuts rather than interpolates', () {
-      for (final TextRevealFrame frame in TextRevealMotion.frames.skip(1)) {
-        final double t = frame.percent / 100;
-        expect(TextRevealMotion.frameAt(t), same(frame));
-
-        final TextRevealFrame before = TextRevealMotion.frameAt(t - 1e-9);
-        expect(before.percent, lessThan(frame.percent));
-        expect(before.opacity, isNot(frame.opacity));
-
-        // Just before the cut is still wholly the old frame, just after is
-        // wholly the new one. Nothing in between is ever produced.
-        expect(TextRevealMotion.frameAt(t - 1e-6).opacity, before.opacity);
-        expect(TextRevealMotion.frameAt(t + 1e-6).opacity, frame.opacity);
-      }
-    });
-
-    test('opens dark at 0.12 and brightness 0.5, unlit', () {
-      final TextRevealFrame first = TextRevealMotion.frameAt(0);
-      expect(first.percent, 0);
-      expect(first.opacity, 0.12);
-      expect(first.brightness, 0.5);
-      expect(first.glowBlurs, isEmpty, reason: 'text-shadow: none');
-    });
-
-    test('rests lit, not neutral — `both` holds the 70% frame', () {
-      final TextRevealFrame resting = TextRevealMotion.frameAt(1);
-      expect(resting.percent, 70);
-      expect(resting.opacity, 1);
-      expect(resting.brightness, 1.15);
-      expect(resting.glowBlurs, <double>[6, 18]);
-
-      // Ruling M3: the live filter ships, the map's colour table is the oracle.
-      expect(
-        resting.brightnessFilter,
-        const ColorFilter.matrix(<double>[
-          1.15, 0, 0, 0, 0, //
-          0, 1.15, 0, 0, 0, //
-          0, 0, 1.15, 0, 0, //
-          0, 0, 0, 1, 0, //
-        ]),
-      );
-
-      // `text-shadow: 0 0 Npx` → offset 0, blur N, σ = N/2 — inverted through
-      // the same arithmetic ShadowLayer.blurRadius uses for box-shadow.
-      final List<Shadow> glow = resting.shadows(ThemeTokens.dark.premiumText);
-      expect(glow, hasLength(2));
-      expect(glow.first.offset, Offset.zero);
-      expect(glow.first.color, ThemeTokens.dark.premiumText);
-      expect(glow.first.blurRadius, closeTo((6 / 2 - 0.5) / 0.57735, 1e-9));
-      expect(glow.last.blurRadius, closeTo((18 / 2 - 0.5) / 0.57735, 1e-9));
-    });
-  });
-
-  group('pulls-shimmer', () {
-    // The named-animation panel body at the 1440 frame.
-    const double w = 299.333;
-
-    test('slides one 2W tile from -2W to +2W, band -W to +3W', () {
-      expect(LoadingShimmerMotion.tileWidth(w), closeTo(2 * w, 1e-9));
-      expect(LoadingShimmerMotion.offsetAt(0, w), closeTo(-2 * w, 1e-9));
-      expect(LoadingShimmerMotion.offsetAt(1, w), closeTo(2 * w, 1e-9));
-      expect(LoadingShimmerMotion.bandCenterAt(0, w), closeTo(-w, 1e-9));
-      expect(LoadingShimmerMotion.bandCenterAt(1, w), closeTo(3 * w, 1e-9));
-
-      // One crossing per cycle, left to right, never back.
-      double previous = LoadingShimmerMotion.bandCenterAt(0, w);
-      for (int i = 1; i <= 20; i++) {
-        final double next = LoadingShimmerMotion.bandCenterAt(i / 20, w);
-        expect(next, greaterThan(previous));
-        previous = next;
-      }
-    });
-
-    test('takes its colours from the live theme, never frozen', () {
-      expect(LoadingShimmerMotion.gradient(ThemeTokens.dark).colors, <Color>[
-        ThemeTokens.dark.popover,
-        ThemeTokens.dark.accent,
-        ThemeTokens.dark.popover,
-      ]);
-      expect(
-        LoadingShimmerMotion.gradient(ThemeTokens.light).colors.first,
-        ThemeTokens.light.popover,
-      );
-      expect(LoadingShimmerMotion.gradient(ThemeTokens.dark).stops, <double>[
-        0,
-        0.5,
-        1,
-      ]);
-    });
-  });
-
-  group('travel chip', () {
-    test('is the verified no-op on a 24px chip (ruling M1)', () {
-      expect(TravelMotion.inset, space(6));
-      expect(TravelMotion.inset, 24);
-
-      // `calc(100% - 1.5rem)` where `100%` is the chip's own 24px border box.
-      expect(TravelMotion.distanceFor(24), 0);
-      expect(TravelMotion.translationAt(0, 24, curve: MotionCurves.enter), 0);
-      expect(
-        TravelMotion.translationAt(0.5, 24, curve: MotionCurves.emphasized),
-        0,
-      );
-      expect(TravelMotion.translationAt(1, 24, curve: MotionCurves.enter), 0);
-
-      // …and stays honest if the utility is ever put on a wider element.
-      expect(TravelMotion.distanceFor(482), 458);
-      expect(TravelMotion.translationAt(0, 482, curve: MotionCurves.enter), 0);
-      expect(
-        TravelMotion.translationAt(1, 482, curve: MotionCurves.enter),
-        closeTo(458, 1e-9),
-      );
     });
   });
 
@@ -1071,41 +717,25 @@ void main() {
         expect(
           await freezeFrame(
             t,
-            duration: EntranceMotion.duration,
-            fill: EntranceMotion.fill,
+            duration: EnterMotion.duration,
+            fill: EnterMotion.fill,
             repeat: false,
           ),
           1.0,
         );
-        expect(EntranceMotion.opacity.transform(1), 1);
-        expect(
-          EntranceMotion.scale.transform(1),
-          offsetMoreOrLessEquals(const Offset(1, 1), epsilon: 1e-9),
-        );
+        expect(EnterMotion.opacity.transform(1), 1);
+        expect(EnterMotion.translateY.transform(1), 0);
       },
     );
 
     testWidgets('reduced motion reverts each no-fill looper to stop 0', (
       WidgetTester t,
     ) async {
-      // Ruling M7: one collapsed iteration and no fill mode means the element's
-      // own transform — the ratchet lands on 0°, not 315° and not 360°.
       expect(
         await freezeFrame(
           t,
-          duration: DiscreteProgressMotion.duration,
-          fill: DiscreteProgressMotion.fill,
-          repeat: true,
-        ),
-        0.0,
-      );
-      expect(DiscreteProgressMotion.degreesAt(0), 0);
-
-      expect(
-        await freezeFrame(
-          t,
-          duration: LoadingShimmerMotion.duration,
-          fill: LoadingShimmerMotion.fill,
+          duration: ShimmerMotion.duration,
+          fill: ShimmerMotion.fill,
           repeat: true,
         ),
         0.0,
@@ -1114,17 +744,17 @@ void main() {
       expect(
         await freezeFrame(
           t,
-          duration: LivePulseMotion.duration,
-          fill: LivePulseMotion.fill,
+          duration: PulseMotion.duration,
+          fill: PulseMotion.fill,
           repeat: true,
         ),
         0.0,
       );
       // Stop 0 is a ring of exactly the dot's radius, i.e. hidden behind it —
       // motion-map §8.2's "plain 8px dot, no ring, opacity 1".
-      expect(LivePulseMotion.ringRadiusAt(0), LivePulseMotion.dotRadius);
-      expect(LivePulseMotion.ringAlphaAt(0), LivePulseMotion.ringAlpha);
-      expect(LivePulseMotion.dotOpacityAt(0), 1);
+      expect(PulseMotion.ringRadiusAt(0), PulseMotion.dotRadius);
+      expect(PulseMotion.ringAlphaAt(0), PulseMotion.ringAlpha);
+      expect(PulseMotion.dotOpacityAt(0), 1);
     });
 
     testWidgets('a looper runs, fenced off behind a RepaintBoundary', (
@@ -1134,8 +764,8 @@ void main() {
       await t.pumpWidget(
         host(
           KeyframePlayer(
-            duration: DiscreteProgressMotion.duration,
-            fill: DiscreteProgressMotion.fill,
+            duration: SpinMotion.duration,
+            fill: SpinMotion.fill,
             repeat: true,
             builder: (BuildContext c, double progress, Widget? child) {
               seen = progress;
@@ -1155,11 +785,8 @@ void main() {
 
       // No pumpAndSettle: this one never settles.
       await t.pump();
-      for (int i = 0; i < 4; i++) {
-        await t.pump(MotionDurations.ratchetStep);
-      }
+      await t.pump(const Duration(milliseconds: 300));
       expect(seen, greaterThan(0));
-      expect(DiscreteProgressMotion.degreesAt(seen) % 45, closeTo(0, 1e-9));
 
       // Unmount so the infinite ticker is disposed with the test.
       await t.pumpWidget(const SizedBox());
@@ -1172,8 +799,8 @@ void main() {
       await t.pumpWidget(
         host(
           KeyframePlayer(
-            duration: EntranceMotion.duration,
-            fill: EntranceMotion.fill,
+            duration: EnterMotion.duration,
+            fill: EnterMotion.fill,
             builder: (BuildContext c, double progress, Widget? child) {
               seen = progress;
               return const SizedBox(width: 40, height: 40);
@@ -1184,7 +811,7 @@ void main() {
 
       await t.pump();
       expect(seen, 0, reason: 'a freshly mounted demo starts at t=0');
-      await t.pump(MotionDurations.popIn);
+      await t.pump(EnterMotion.duration);
       expect(seen, 1.0);
     });
   });
@@ -1264,6 +891,34 @@ void main() {
 
     test('the press scale is 0.9 and there is only one', () {
       expect(MotionTransforms.press, 0.9);
+    });
+
+    test('EnterMotion rises 12 and fades in over slow on enter', () {
+      expect(EnterMotion.duration, MotionDurations.slow);
+      expect(EnterMotion.translateY.transform(0), 12);
+      expect(EnterMotion.translateY.transform(1), 0);
+      expect(EnterMotion.opacity.transform(1), 1);
+      expect(EnterMotion.delayFor(2), MotionDurations.tick);
+    });
+    test('ExitMotion is faster than EnterMotion', () {
+      expect(ExitMotion.duration < EnterMotion.duration, isTrue);
+      expect(ExitMotion.opacity.transform(1), 0);
+    });
+    test('OpenMotion overshoots to 1.02 at 60% and CloseMotion drops 16', () {
+      expect(OpenMotion.scale.transform(0.6), closeTo(1.02, 1e-9));
+      expect(CloseMotion.translateY.transform(1), 16);
+      expect(CloseMotion.duration < OpenMotion.duration, isTrue);
+    });
+    test('ChangeMotion squashes to 1.18×0.82 at 30%', () {
+      expect(ChangeMotion.scale.transform(0.3), const Offset(1.18, 0.82));
+    });
+    test('CaretMotion is a hard blink', () {
+      expect(CaretMotion.visibleAt(0.49), isTrue);
+      expect(CaretMotion.visibleAt(0.5), isFalse);
+    });
+    test('ProgressMotion sweeps a third-width sliver off both edges', () {
+      expect(ProgressMotion.fromFraction, -1);
+      expect(ProgressMotion.toFraction, 3);
     });
   });
 }
