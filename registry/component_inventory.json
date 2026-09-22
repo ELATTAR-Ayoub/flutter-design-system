@@ -379,6 +379,11 @@
       "classification": "installable"
     },
     {
+      "source": "lib/src/components/ui/open_transition.dart",
+      "owner": "keyframes",
+      "classification": "installable"
+    },
+    {
       "source": "lib/src/components/ui/marker.dart",
       "owner": "marker",
       "classification": "installable"

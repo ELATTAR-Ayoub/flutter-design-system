@@ -103,6 +103,7 @@ import './icon_paths.g.dart';
 import './input.dart';
 import './item.dart';
 import './menu.dart';
+import './open_transition.dart';
 import './popover.dart';
 import './spinner.dart';
 

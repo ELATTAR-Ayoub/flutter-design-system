@@ -98,6 +98,7 @@ import './dialog.dart';
 import './icon.dart';
 import './icon_paths.g.dart';
 import './icon_swap.dart';
+import './open_transition.dart';
 
 /// `state` — five, and each one says something the others do not.
 enum AttachmentState {

@@ -125,6 +125,7 @@ export './src/components/ui/voice_indicator.dart';
 
 // ── motion ──────────────────────────────────────────────────────────────────
 export './src/components/ui/keyframes.dart';
+export './src/components/ui/open_transition.dart';
 export './src/components/ui/hover_builder.dart';
 export './src/components/ui/press.dart';
 export './src/components/ui/active_indicator.dart';

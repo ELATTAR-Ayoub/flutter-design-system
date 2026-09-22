@@ -93,6 +93,7 @@ import './agent_core.dart';
 import './agent_face.dart';
 import './button.dart';
 import './dialog.dart';
+import './open_transition.dart';
 
 /// `AgentLauncher`.
 class AgentLauncher extends StatefulWidget {
