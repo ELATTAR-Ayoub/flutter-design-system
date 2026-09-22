@@ -52,6 +52,15 @@ const List<String> _exemptDirs = <String>[
   // *inline* styles — a third-party theme's own palette and metrics, not
   // this system's tokens, and read by nothing outside this file.
   'lib/src/components/ui/agent_markdown_prism_theme.dart',
+  // vaul's own easing curve, measured off the live drawer rather than
+  // declared by this system — the same "third-party feel, not vocabulary"
+  // argument as the other entries above. See the file's own comment on
+  // `_vaulCurve`.
+  'lib/src/components/ui/drawer.dart',
+  // Holds the open/close stop tables for the disclosure transition — motion
+  // *data*, in the same sense keyframes.dart's `@keyframes` transcription is,
+  // not a component restating a token.
+  'lib/src/components/ui/open_transition.dart',
 
   // ── example/ ─────────────────────────────────────────────────────────────
   // The example app demonstrates the token system; it is not itself scoped
