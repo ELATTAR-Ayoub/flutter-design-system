@@ -492,17 +492,18 @@ class _Dot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return KeyframePlayer(
-      duration: DotSelectionMotion.duration,
+      duration: ChangeMotion.duration,
       // `both`, so a reduced-motion browser lands on the settled dot rather
       // than on `scale(0)`.
-      fill: DotSelectionMotion.fill,
-      builder: (BuildContext context, double t, Widget? child) => Opacity(
-        opacity: DotSelectionMotion.opacity.transform(t).clamp(0.0, 1.0),
-        child: Transform.scale(
-          scale: DotSelectionMotion.scale.transform(t),
+      fill: ChangeMotion.fill,
+      builder: (BuildContext context, double t, Widget? child) {
+        final Offset scale = ChangeMotion.scale.transform(t);
+        return Transform.scale(
+          scaleX: scale.dx,
+          scaleY: scale.dy,
           child: child,
-        ),
-      ),
+        );
+      },
       child: SizedBox(
         width: _dotSize,
         height: _dotSize,

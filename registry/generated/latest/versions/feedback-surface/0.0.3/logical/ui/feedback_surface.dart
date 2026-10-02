@@ -52,7 +52,7 @@
 /// &:hover::before { scale: 2.2 }  &:hover::after { scale: 2.5 }
 /// ```
 ///
-/// The periods are coprime-ish on purpose (globals.css L1859–1860): the pair
+/// The periods are coprime-ish on purpose: the pair
 /// takes minutes to return to the same arrangement, which is what stops a
 /// corner light from reading as a loop.
 ///
@@ -106,9 +106,9 @@ import './ambient_pattern.dart';
 // ── CLOSED: the per-theme bloom variables ───────────────────────────────────
 // `--bloom-void` / `--bloom-l` / `--bloom-c` / `--bloom-lift` / `--bloom-hot-c`
 // used to live here as eight file-local constants under a standing FOLLOW-UP —
-// they are declared in the two theme blocks (globals.css L699–715 light,
-// L885–898 dark) beside every other token, and `foundation/theme.dart` was not
-// that task's file. Supervisor ruling F9 opened it: they are now
+// they are declared in the two theme blocks beside every other token, and
+// `foundation/theme.dart` was not that task's file. Supervisor ruling F9
+// opened it: they are now
 // `ThemeTokens.bloomVoid` / `.bloomL` / `.bloomC` / `.bloomLift` / `.bloomHotC`
 // and this file reads them like any other token. The FOLLOW-UP also asked for
 // `BloomInk.of` to be deleted; there is no such member and has not been since
@@ -531,10 +531,10 @@ class FeedbackSurface extends StatefulWidget {
   /// *in* to sparkles, and that should be a decision someone writes down.
   final bool starfield;
 
-  /// `mix-blend-mode` — `screen` on `.dark`, `multiply` on `:root`/`.light`
-  /// (globals.css L3235–3245). The same split `action-feedback` carries, and the
-  /// reason the ramps end on `--bloom-void`: white and black are the two
-  /// blends' identity operands.
+  /// `mix-blend-mode` — `screen` on `.dark`, `multiply` on `:root`/`.light`.
+  /// The same split `action-feedback` carries, and the reason the ramps end
+  /// on `--bloom-void`: white and black are the two blends' identity
+  /// operands.
   static BlendMode blendFor(ResolvedColorMode kind) => switch (kind) {
     // Light no longer multiplies: a multiplied ramp over white reads as a
     // grey-brown wash. It paints the ramp straight, masked to the corner.

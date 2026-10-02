@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/voice.dart",
       "target": "@ui/voice.dart",
-      "sha256": "3d0f5b2afb8cc72d3c78ccb727b7086dcd6927f26aebda5bfe4b9ec341c814d9"
+      "sha256": "2953f3b49a64a4d81e7c06850b05726a3cb0607f83621398255d9da944edf623"
     }
   ],
   "registryDependencies": [

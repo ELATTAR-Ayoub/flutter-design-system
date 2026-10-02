@@ -12,11 +12,11 @@
 ///   it. The distinction has no effect on this page — both roads lead to 16px —
 ///   but it means the spinner is 16px inside an `xl` button too, where the
 ///   override would have made it 20.
-/// * **`linear` on purpose.** `anim-spin` is `pulls-spin 0.9s linear infinite`
-///   (globals.css L2407–2409), and the utility's own comment says why
-///   (L2403–2406): *"a spinner that eases is a spinner that looks like it is
-///   struggling."* It is the only animation in the system that does not take a
-///   `--ease-*` curve.
+/// * **`linear` on purpose.** [SpinMotion] runs on the stock linear curve,
+///   never an eased one, and the
+///   utility's own comment says why: *"a spinner that eases is a spinner that
+///   looks like it is struggling."* It is the only animation in the system
+///   that does not take a `--ease-*` curve.
 /// * **It is silent.** See [Spinner] itself — that one is a drift, not a
 ///   decision, and the port reproduces it under supervisor ruling B9.
 library;
@@ -119,7 +119,7 @@ class _SpinnerState extends State<Spinner> with SingleTickerProviderStateMixin {
   /// Reduced motion (supervisor ruling B13): the blanket CSS rule collapses
   /// `animation-duration` to 0.01ms **and `animation-iteration-count` to 1**,
   /// so the spinner does not stop existing — it completes one 0.01ms turn and
-  /// holds. `pulls-spin` declares no fill mode, so what it holds is the
+  /// holds. [SpinMotion] declares no fill mode, so what it holds is the
   /// element's resting style: **0°, upright, still**. Stopping the controller
   /// at its lower bound is that frame.
   void _play() {
@@ -138,10 +138,9 @@ class _SpinnerState extends State<Spinner> with SingleTickerProviderStateMixin {
       MotionDurations.spin,
     );
 
-    // `@keyframes pulls-spin { to { transform: rotate(360deg) } }`
-    // (globals.css L2451–2453) — one property, one stop, and an implicit `from`
-    // of the element's current 0°. A whole turn per cycle, so progress in 0..1
-    // maps straight onto turns and there is no keyframe table to transcribe.
+    // One property, one stop, and an implicit `from` of the element's
+    // current 0°. A whole turn per cycle, so progress in 0..1 maps straight
+    // onto turns and there is no keyframe table to transcribe.
     return RepaintBoundary(
       child: ExcludeSemantics(
         child: RotationTransition(

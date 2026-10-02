@@ -19,10 +19,10 @@ import './colors.dart';
 
 /// Which theme block a [ThemeTokens] transcribes.
 enum ResolvedColorMode {
-  /// `:root, .light` — globals.css L546.
+  /// `:root, .light`.
   light,
 
-  /// `.dark` — globals.css L741.
+  /// `.dark`.
   dark,
 }
 
@@ -420,7 +420,7 @@ class ThemeTokens {
 
   // ───────────────────────────────────────────────────────────────────────────
 
-  /// `:root, .light` — globals.css L546–735.
+  /// `:root, .light`.
   static final ThemeTokens light = _build(
     kind: ResolvedColorMode.light,
     background: hslColor(0, 0, 100),
@@ -486,7 +486,7 @@ class ThemeTokens {
     starGlowMix: 0.85,
   );
 
-  /// `.dark` — globals.css L741–942.
+  /// `.dark`.
   static final ThemeTokens dark = _build(
     kind: ResolvedColorMode.dark,
     background: hslColor(240, 10, 3.9),
@@ -692,7 +692,7 @@ class ThemeTokens {
   }
 }
 
-/// `--agent-cube-*` — globals.css L720–731 (light) and L914–932 (dark).
+/// `--agent-cube-*` (light) and L914–932 (dark).
 ///
 /// The one block in the system that is not re-derivable from the semantic
 /// tokens, and globals.css says why: *"the handoff draws these cubes for paper,
@@ -775,7 +775,7 @@ class AgentCubeTokens {
   /// it has to: a blue failure looks like a blue success."*
   final Color errorStroke;
 
-  /// globals.css L720–731.
+  /// The light theme block's own `--agent-cube-*` values.
   static final AgentCubeTokens light = AgentCubeTokens(
     top: hslColor(240, 20, 99),
     left: hslColor(240, 15, 94),
@@ -791,7 +791,7 @@ class AgentCubeTokens {
     errorStroke: hslColor(0, 55, 69),
   );
 
-  /// globals.css L914–932.
+  /// The dark theme block's own `--agent-cube-*` values.
   static final AgentCubeTokens dark = AgentCubeTokens(
     top: hslColor(240, 5, 21),
     left: hslColor(240, 5, 17),

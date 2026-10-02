@@ -1,4 +1,4 @@
-/// Glass — `app/globals.css` L1560–1617.
+/// Glass.
 ///
 /// A surface *in front of* the page rather than cut out of it. Three utilities,
 /// one material, split by scale:
@@ -39,7 +39,7 @@
 /// ratio of object to shadow: the ambient depth that floats a 400px dialog
 /// leaves a 1440px panel looking welded down.
 ///
-/// **`overflow: hidden` is deliberately not set** (globals.css L1560–1562), so
+/// **`overflow: hidden` is deliberately not set**, so
 /// nothing here clips [GlassPanel.child]. The two clips in this file are
 /// structural, not stylistic: one bounds the backdrop filter to the shape,
 /// which is the minimum that filter needs to exist at all, and the other keeps
@@ -66,7 +66,7 @@
 ///
 /// ## Drifts (recorded, not fixed)
 ///
-/// * **Drift 3** — the section copy and the CSS comment (globals.css L1544)
+/// * **Drift 3** — the section copy and the CSS comment
 ///   both say "a 44px disc"; the specimen renders `h-12`, which is **48px**.
 ///   Three places, one number, and the render is 48. Supervisor ruling S8:
 ///   render 48, print 44. Sizing the specimen is the page's job, but this file
@@ -111,7 +111,7 @@ import './surface.dart';
 // theme instead of freezing two hexes per token.
 
 /// `background-color: color-mix(in oklab, var(--card) 74%, transparent)` —
-/// `glass-panel`, globals.css L1563–1584.
+/// `glass-panel`.
 const double _panelFillAlpha = SurfaceOpacity.glassPanel;
 
 /// `inset 0 0 0 1px color-mix(in oklab, var(--foreground) 12%, transparent)` —
@@ -119,7 +119,7 @@ const double _panelFillAlpha = SurfaceOpacity.glassPanel;
 const double _panelRimAlpha = 0.12;
 
 /// `background-color: color-mix(in oklab, var(--foreground) 7%, transparent)` —
-/// `glass-control`, globals.css L1612–1617.
+/// `glass-control`.
 const double _controlFillAlpha = 0.07;
 
 /// `inset 0 0 0 1px color-mix(in oklab, var(--foreground) 16%, transparent)` —
@@ -477,7 +477,7 @@ class _ElGlassSurface extends StatelessWidget {
   }
 }
 
-/// `@utility glass-panel` — globals.css L1563–1584.
+/// `@utility glass-panel`.
 ///
 /// ```css
 /// @apply backdrop-blur-xl backdrop-saturate-150;
@@ -648,7 +648,7 @@ class _GlassPanelClear extends StatelessWidget {
   );
 }
 
-/// `@utility glass-panel-deep` — globals.css L1586–1609.
+/// `@utility glass-panel-deep`.
 ///
 /// Byte-identical to [GlassPanel] except the ambient layer is
 /// `var(--shadow-e4)` instead of `var(--shadow-e2)`. Same fill, same rim, same
@@ -702,7 +702,7 @@ class _GlassPanelDeep extends StatelessWidget {
   );
 }
 
-/// `@utility glass-control` — globals.css L1612–1617.
+/// `@utility glass-control`.
 ///
 /// ```css
 /// background-color: color-mix(in oklab, var(--foreground) 7%, transparent);

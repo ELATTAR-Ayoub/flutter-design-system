@@ -30,8 +30,6 @@
 /// lucide glyph, because at 14px a 2.4 stroke reads as a scratch.
 library;
 
-import 'dart:ui' as ui;
-
 import 'package:flutter/widgets.dart'
     hide
         AspectRatio,
@@ -261,15 +259,6 @@ class _CheckboxState extends State<Checkbox> {
               height: _markSize,
               child: _Mark(
                 path: bar ? _dashPath() : _tickPath(),
-                dashArray: bar
-                    ? DashDrawMotion.dashArray
-                    : CheckmarkDrawMotion.dashArray,
-                duration: bar
-                    ? DashDrawMotion.duration
-                    : CheckmarkDrawMotion.duration,
-                drawnAt: bar
-                    ? DashDrawMotion.drawnFractionAt
-                    : CheckmarkDrawMotion.drawnFractionAt,
                 color: theme.primaryForeground,
               ),
             ),
@@ -316,78 +305,49 @@ class _CheckboxState extends State<Checkbox> {
   }
 }
 
-/// One drawn mark: a path on the 24-unit grid, revealed from its start.
-///
-/// `stroke-dashoffset` has no Flutter spelling, so the dash is a
-/// [PathMetric.extractPath] window instead — the consumer half of the note in
-/// `keyframes.dart`. The window is measured in the CSS's own dash units so the
-/// two agree exactly: a path shorter than its `stroke-dasharray` (the tick
-/// measures about 20.9 against a 22-unit dash) finishes early and holds, which
-/// is what the browser draws too.
+/// One mark: a path on the 24-unit grid, painted whole and played in with
+/// [ChangeMotion] — the squash-and-stretch every indicator on mount shares,
+/// rather than a stroke revealed from its start.
 class _Mark extends StatelessWidget {
-  const _Mark({
-    required this.path,
-    required this.dashArray,
-    required this.duration,
-    required this.drawnAt,
-    required this.color,
-  });
+  const _Mark({required this.path, required this.color});
 
   final Path path;
-  final double dashArray;
-  final Duration duration;
-  final double Function(double) drawnAt;
   final Color color;
 
   @override
   Widget build(BuildContext context) {
     return KeyframePlayer(
-      duration: duration,
-      // `both`, so a reduced-motion browser lands on the finished stroke.
-      fill: KeyframeFill.both,
-      builder: (BuildContext context, double t, Widget? child) => CustomPaint(
-        painter: _MarkPainter(
-          path: path,
-          drawn: dashArray * drawnAt(t),
-          color: color,
-        ),
-      ),
+      duration: ChangeMotion.duration,
+      fill: ChangeMotion.fill,
+      builder: (BuildContext context, double t, Widget? child) {
+        final Offset scale = ChangeMotion.scale.transform(t);
+        return Transform.scale(
+          scaleX: scale.dx,
+          scaleY: scale.dy,
+          child: child,
+        );
+      },
+      child: CustomPaint(painter: _MarkPainter(path: path, color: color)),
     );
   }
 }
 
 class _MarkPainter extends CustomPainter {
-  const _MarkPainter({
-    required this.path,
-    required this.drawn,
-    required this.color,
-  });
+  const _MarkPainter({required this.path, required this.color});
 
   final Path path;
-
-  /// How much of the stroke is painted, in the 24-unit grid's own units.
-  final double drawn;
-
   final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (size.isEmpty || drawn <= 0) return;
+    if (size.isEmpty) return;
     canvas.save();
     // The same `viewBox` fit `Icon` performs: 24 units into the rendered box,
     // with the stroke width scaled by the canvas rather than by hand.
     canvas.scale(size.width / _viewBox, size.height / _viewBox);
 
-    final Path stroke = Path();
-    for (final ui.PathMetric metric in path.computeMetrics()) {
-      stroke.addPath(
-        metric.extractPath(0, drawn.clamp(0, metric.length)),
-        Offset.zero,
-      );
-    }
-
     canvas.drawPath(
-      stroke,
+      path,
       Paint()
         ..color = color
         ..style = PaintingStyle.stroke
@@ -404,5 +364,5 @@ class _MarkPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_MarkPainter old) =>
-      old.drawn != drawn || old.color != color || old.path != path;
+      old.color != color || old.path != path;
 }

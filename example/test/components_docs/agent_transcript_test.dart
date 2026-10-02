@@ -353,7 +353,10 @@ void main() {
         agentTranscriptDocSpec.toc
             .singleWhere((DocsTocEntry e) => e.anchor == 'api')
             .children,
-        hasLength(10),
+        // Nine since 2026-09-22: the transcript's own `FadeUp` table went
+        // with the class, which folded into `EnterMotion` in the keyframes
+        // vocabulary and is documented there.
+        hasLength(9),
       );
     });
 

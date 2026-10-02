@@ -15,7 +15,7 @@
 /// | track `overflow-hidden` | which is what gives the range its corners |
 /// | range `absolute bg-action-ink shadow-btn-primary data-horizontal:h-full` | 8px — the track's content box — and lit |
 /// | thumb `size-5 rounded-full border border-input bg-foreground shadow-btn` | 20px, raised |
-/// | thumb `transition-[transform,box-shadow] duration-fast ease-spring` | the ring springs; see [MotionTransforms.sliderThumbHoverScale] for what does not |
+/// | thumb `transition-[transform,box-shadow] duration-fast ease-spring` | the ring springs; the scale does not — see [MotionTransforms.press] |
 /// | thumb `after:absolute after:-inset-2` | the hit expander |
 /// | thumb `hover:scale-110 hover:ring-3` · `focus-visible:ring-3` · `active:scale-125 active:ring-3` | — |
 ///
@@ -86,6 +86,7 @@ import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
 import './disabled.dart';
+import './press.dart';
 import './selection_control.dart';
 
 /// `data-horizontal:h-2.5` — the track, and therefore the root.
@@ -474,11 +475,6 @@ class _SliderState extends State<Slider> {
                     node: _nodes[i],
                     canFocus: _operable,
                     lit: _hovered == i || _active == i || _focused == i,
-                    scale: _active == i
-                        ? MotionTransforms.sliderThumbActiveScale
-                        : _hovered == i
-                        ? MotionTransforms.sliderThumbHoverScale
-                        : 1,
                     onFocusChange: (bool has) => _setFocused(i, has),
                     onKey: (KeyEvent event) => _onKey(i, event),
                     semantics: (Widget child) => Semantics(
@@ -642,13 +638,12 @@ class _Track extends StatelessWidget {
 ///    box-shadow]`, and it tweens on [MotionCurves.emphasized] over
 ///    [MotionDurations.normal];
 ///  * the **scale** is Tailwind v4's `scale` property, which that list does not
-///    name, so it snaps. See [MotionTransforms.sliderThumbHoverScale].
+///    name, so it snaps. See [MotionTransforms.press].
 class _Thumb extends StatelessWidget {
   const _Thumb({
     required this.node,
     required this.canFocus,
     required this.lit,
-    required this.scale,
     required this.onFocusChange,
     required this.onKey,
     required this.semantics,
@@ -661,7 +656,6 @@ class _Thumb extends StatelessWidget {
   /// `ring-3` — all three declare the identical ring.
   final bool lit;
 
-  final double scale;
   final ValueChanged<bool> onFocusChange;
   final KeyEventResult Function(KeyEvent) onKey;
   final Widget Function(Widget) semantics;
@@ -694,14 +688,10 @@ class _Thumb extends StatelessWidget {
       child: const SizedBox.expand(),
     );
 
-    // No tween: measured to arrive in one frame. `alignment: center` because
-    // the active scale shifts the knob's left edge by 2.5px on a 20px box,
-    // which is exactly half of the 5px it grows.
-    knob = Transform.scale(
-      alignment: Alignment.center,
-      scale: scale,
-      child: knob,
-    );
+    // The one click feel, rather than a hand-rolled hover/active scale pair:
+    // [Press] squishes on a real pointer-down and springs back on release, so
+    // the thumb's own drag gesture drives it for free.
+    knob = Press(child: knob);
 
     return semantics(
       Focus(

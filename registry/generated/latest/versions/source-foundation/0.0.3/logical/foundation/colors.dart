@@ -24,7 +24,7 @@ import 'dart:ui' show Color;
 /// straight alpha `0..1`. Channels are rounded the way CSS serialises them —
 /// `round(x * 255)` on the `0..1` float — which is why `hsl(213 94% 78%)` lands
 /// on `#92C2FC` and not on the `#93C5FD` the stylesheet's comment claimed for
-/// three brands (globals.css L99–105; the hsl values are authoritative).
+/// three brands (the hsl values are authoritative).
 ///
 /// Alpha is kept as a straight (non-premultiplied) double and is NOT quantised:
 /// `hsl(240 20% 20% / 0.04)` stays 0.04, never a pre-composited opaque colour.
@@ -127,7 +127,7 @@ class OklabColor {
   /// * an endpoint (`tA` at 0 or 1) returns that operand untouched;
   /// * mixing toward a fully transparent colour — the `color-mix(in oklab, X
   ///   45%, transparent)` form used by `--shadow-glow-action` and friends
-  ///   (globals.css L382–387) — returns X at `45%` of its own alpha, which is
+  /// — returns X at `45%` of its own alpha, which is
   ///   what premultiplied mixing works out to when the other side contributes
   ///   nothing.
   static Color mix(Color a, Color b, double tA) {
@@ -200,10 +200,9 @@ class OklabColor {
   /// is the `K` in `calc(c * K)`, and the hue is carried over unless [hue]
   /// overrides it. The result is gamut-mapped by [fromOklch].
   ///
-  /// This is how `--bubble-tinted` / `--bubble-tinted-hover` are defined in both
-  /// theme blocks (globals.css L602–603 light, L811–812 dark) — derived from
-  /// `--primary` so they follow a rebrand, which is why they are computed here
-  /// instead of frozen into two hexes.
+  /// This is how `--bubble-tinted` / `--bubble-tinted-hover` are defined in
+  /// both theme blocks — derived from `--primary` so they follow a rebrand,
+  /// which is why they are computed here instead of frozen into two hexes.
   static Color fromOklchRelative(
     Color source, {
     required double lightness,
@@ -306,70 +305,70 @@ class _Oklab {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// The ramps — `@theme static`, globals.css L71–433
+// The ramps — `@theme static`
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// The raw palette: two brand ramps and the state hues.
 ///
 /// Theme-independent by definition — these are the colours themselves, and
 /// nothing here flips between light and dark. Which END of a ramp carries a
-/// glyph is a per-theme answer and lives on `ThemeTokens.actionText` / `premiumText`
-/// (globals.css L586–594 / L782–802).
+/// glyph is a per-theme answer and lives on `ThemeTokens.actionText` /
+/// `premiumText`.
 ///
 /// "Three blues, three limes. Nothing else. Monochrome comes from zinc via the
-/// shadcn semantic tokens" (L81–83).
+/// shadcn semantic tokens."
 class Palette {
-  /// `--color-action-bright: hsl(213 94% 78%)` — globals.css L103. Ink on dark.
+  /// `--color-action-bright: hsl(213 94% 78%)`. Ink on dark.
   /// Rasterises `#92C2FC`.
   static final Color actionBright = hslColor(213, 94, 78);
 
-  /// `--color-action: hsl(217 91% 53%)` — globals.css L104. The fill.
+  /// `--color-action: hsl(217 91% 53%)`. The fill.
   /// Rasterises `#1A6EF4`.
   static final Color action = hslColor(217, 91, 53);
 
-  /// `--color-action-dark: hsl(224 76% 33%)` — globals.css L105. Ink on light.
+  /// `--color-action-dark: hsl(224 76% 33%)`. Ink on light.
   /// Rasterises `#143694`.
   static final Color actionDark = hslColor(224, 76, 33);
 
-  /// `--color-value-bright: #d9f99d` — globals.css L107. Lime, lifted.
+  /// `--color-value-bright: #d9f99d`. Lime, lifted.
   static final Color valueBright = _hex(0xFFD9F99D);
 
-  /// `--color-value: #a3e635` — globals.css L108. Lime, the fill.
+  /// `--color-value: #a3e635`. Lime, the fill.
   static final Color value = _hex(0xFFA3E635);
 
-  /// `--color-value-dark: #4d7c0f` — globals.css L109. Lime, ink on light.
+  /// `--color-value-dark: #4d7c0f`. Lime, ink on light.
   static final Color valueDark = _hex(0xFF4D7C0F);
 
-  /// `--color-value-foreground: hsl(240 10% 8%)` — globals.css L127.
+  /// `--color-value-foreground: hsl(240 10% 8%)`.
   ///
   /// The one foreground in this system that deliberately does NOT flip with the
   /// theme: the value foil is an opaque metal ramp, the same lime on a white
   /// page as on a black one, so its label has to be dark in both (L111–126).
   static final Color valueForeground = hslColor(240, 10, 8);
 
-  /// `--color-success: #10b981` — globals.css L148. Emerald 500.
+  /// `--color-success: #10b981`. Emerald 500.
   static final Color success = _hex(0xFF10B981);
 
-  /// `--color-warning: #fbbf24` — globals.css L149. Amber 400.
+  /// `--color-warning: #fbbf24`. Amber 400.
   static final Color warning = _hex(0xFFFBBF24);
 
-  /// `--color-info: #22d3ee` — globals.css L150. Cyan 400.
+  /// `--color-info: #22d3ee`. Cyan 400.
   static final Color info = _hex(0xFF22D3EE);
 
-  /// `--color-success-deep: #047857` — globals.css L158. Emerald 700.
+  /// `--color-success-deep: #047857`. Emerald 700.
   static final Color successDeep = _hex(0xFF047857);
 
-  /// `--color-warning-deep: #b45309` — globals.css L159. Amber 700.
+  /// `--color-warning-deep: #b45309`. Amber 700.
   static final Color warningDeep = _hex(0xFFB45309);
 
-  /// `--color-info-deep: #0e7490` — globals.css L160. Cyan 700.
+  /// `--color-info-deep: #0e7490`. Cyan 700.
   static final Color infoDeep = _hex(0xFF0E7490);
 
-  /// `--color-destructive-lifted: #f87171` — globals.css L164. Red 400, used
+  /// `--color-destructive-lifted: #f87171`. Red 400, used
   /// only where destructive has to carry text.
   static final Color destructiveLifted = _hex(0xFFF87171);
 
-  /// `--color-destructive-deep: hsl(0 72.2% 46%)` — globals.css L165.
+  /// `--color-destructive-deep: hsl(0 72.2% 46%)`.
   /// Light-theme ink on red washes.
   static final Color destructiveDeep = hslColor(0, 72.2, 46);
 }

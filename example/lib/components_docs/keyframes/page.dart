@@ -51,8 +51,9 @@ final ComponentDocSpec keyframesDocSpec = ComponentDocSpec(
   sections: <DocsPageSection>[
     EffectSection(
       id: 'the-fourteen',
-      title: 'The fourteen',
+      title: 'Preview',
       description:
+          'The fourteen. '
           "Use one of these; don't write a new keyframe. They all live in "
           'lib/src/components/ui/keyframes.dart — change that file and '
           'every component follows. Each card plays on the piece of UI it '

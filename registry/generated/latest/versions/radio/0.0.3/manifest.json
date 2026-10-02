@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/radio.dart",
       "target": "@ui/radio.dart",
-      "sha256": "e83967bb8cf0fde8dc30b96570f232bcabc409e55c8708c9406b3fd84e169455"
+      "sha256": "2e6e627801439158881b2bf01d13dcbafa6f92b0f0b2699a12b2aa0ab536089d"
     }
   ],
   "registryDependencies": [

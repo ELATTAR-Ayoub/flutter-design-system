@@ -46,7 +46,7 @@
 ///    `translateY(100%)` (of its own box) and `opacity: 0`, and one frame later
 ///    `data-mounted="true"` flips it to `translateY(0)` / `opacity: 1`. The
 ///    transition it rides is `transform, opacity, height` over the slow window
-///    on [MotionCurves.balanced]. Sonner's own comment: *"Trigger enter animation
+///    on [_toastEntrance]. Sonner's own comment: *"Trigger enter animation
 ///    without using CSS animation."*
 ///  * **The collapsed stack.** Only the front toast is legible. Every toast
 ///    behind it is translated by the gap times its index, scaled `1 − 0.05n`,
@@ -79,7 +79,7 @@
 ///    corner's own two directions is 1:1; against them it is dampened by
 ///    `1 / (1.5 + |delta| / 20)`. Released past the threshold the toast
 ///    animates out by a further 100% on the swiped axis over the short window
-///    on [MotionCurves.decelerate] — the one leg that names its easing. Released
+///    on [_toastSwipeOut] — the one leg that names its easing. Released
 ///    short, it **snaps** back: `transition: none` is still in force.
 ///  * **Hover-pause is resume-from-remainder, not restart.** `pauseTimer`
 ///    subtracts the elapsed time and stores what is left. Measured: a toast
@@ -678,6 +678,32 @@ enum ToastPosition {
 /// bottom-anchored one `padding.bottom + 24` up, and on any surface that
 /// reports no bars at all — every desktop, every browser, every test that does
 /// not set `view.padding` — the arithmetic is sonner's own number unchanged.
+///
+/// Sonner's own two easings, neither one of the seven [MotionCurves] and
+/// each kept local for the reason `drawer.dart`'s `_vaulCurve` and
+/// `chart.dart`'s `_chartEaseOut` are: a foreign default, adopted rather
+/// than invented, transcribed from one measurement and read by nothing
+/// else.
+///
+/// [_toastEntrance] carries every transform/opacity/height/scale leg above
+/// except the swipe release. Measured through a real toast entrance
+/// (1440 × 900, dark, 2026-08-16): opacity read 0.314 at 20.3% of the
+/// 400ms window, 0.645 at 38.3% and 0.9445 at 69.6% — which is this curve
+/// to within the sampler's own frame slop, and is not [MotionCurves.standard],
+/// [MotionCurves.enter] or [MotionCurves.move] at any of the three.
+const Cubic _toastEntrance = Cubic(0.25, 0.1, 0.25, 1);
+
+/// Sonner's swipe-out is the one leg that names an easing, and it names
+/// `ease-out` — CSS's `cubic-bezier(0, 0, 0.58, 1)`, the same stock curve
+/// `chart.dart`'s `_chartEaseOut` transcribes for a different reason.
+/// `swipe-out-*` keyframes run `200ms ease-out forwards`, and that
+/// `ease-out` is the CSS keyword, not `--ease-out`. Measured on a live
+/// downward swipe: transform and opacity both read 95.5% of their travel
+/// at 77.5% of the 200ms window, which is this curve and is visibly not
+/// [MotionCurves.enter] `(0.22, 1, 0.36, 1)` — that one is 99.7% done by
+/// the same instant.
+const Cubic _toastSwipeOut = Cubic(0, 0, 0.58, 1);
+
 class Toaster extends StatefulWidget {
   const Toaster({
     super.key,
@@ -1124,9 +1150,9 @@ class _ToasterState extends State<Toaster>
       double scale;
       double opacity = 1;
       Duration transformDuration = _transition;
-      Curve transformCurve = MotionCurves.balanced;
+      Curve transformCurve = _toastEntrance;
       Duration opacityDuration = _transition;
-      Curve opacityCurve = MotionCurves.balanced;
+      Curve opacityCurve = _toastEntrance;
 
       if (blanked) {
         // `--y: translateY(--lift-amount * --toasts-before) scale(1 - 0.05n)`.
@@ -1148,9 +1174,9 @@ class _ToasterState extends State<Toaster>
           // of them carries `[data-swipe-out=false]`. `--y` reverts to the
           // resting value and the keyframes ride on top of it.
           transformDuration = _swipeOutDuration;
-          transformCurve = MotionCurves.decelerate;
+          transformCurve = _toastSwipeOut;
           opacityDuration = _swipeOutDuration;
-          opacityCurve = MotionCurves.decelerate;
+          opacityCurve = _toastSwipeOut;
         } else if (isFront) {
           // `--y: translateY(--lift * -100%)` — out the way it came.
           fraction = -lift;
@@ -1229,7 +1255,7 @@ class _ToasterState extends State<Toaster>
     _extent.retarget(
       <double>[math.max(extent, 0)],
       effectiveMotionDuration(context, _transition),
-      MotionCurves.balanced,
+      _toastEntrance,
     );
 
     // Give this widget a full-size slot — `Positioned.fill` inside the shell's
@@ -1322,7 +1348,7 @@ class _Track {
   final AnimationController c;
   final List<double> _from;
   final List<double> _to;
-  Curve _curve = MotionCurves.balanced;
+  Curve _curve = _toastEntrance;
   bool _seeded = false;
 
   double at(int i) {
@@ -1535,13 +1561,13 @@ class _ToastSlotState extends State<_ToastSlot> with TickerProviderStateMixin {
       _height.retarget(
         <double>[c.height],
         effectiveMotionDuration(context, _transition),
-        MotionCurves.balanced,
+        _toastEntrance,
       );
     }
     _contentOpacity.retarget(
       <double>[c.contentOpacity],
       effectiveMotionDuration(context, _transition),
-      MotionCurves.balanced,
+      _toastEntrance,
     );
     _opacity.retarget(<double>[c.opacity], c.opacityDuration, c.opacityCurve);
   }
@@ -1621,11 +1647,11 @@ class _ToastSlotState extends State<_ToastSlot> with TickerProviderStateMixin {
         // clocks rebuild, and a value captured in the enclosing `build` would
         // only ever be as fresh as the last time the whole host rebuilt — which
         // is when a toast is queued, not once a frame.
-        final double swapIn = MotionCurves.balanced.transform(
+        final double swapIn = _toastEntrance.transform(
           _swap.value.clamp(0.0, 1.0),
         );
         // The loader's shorter window, read off the same elapsed time.
-        final double swapOut = MotionCurves.balanced.transform(
+        final double swapOut = _toastEntrance.transform(
           (_swap.value *
                   _promiseSwapIn.inMicroseconds /
                   _promiseSwapOut.inMicroseconds)

@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_transcript.dart",
       "target": "@ui/agent_transcript.dart",
-      "sha256": "7c08c8ac943441e1740c18fb2eb1b9f976123f251101bab3dea920411fa034ba"
+      "sha256": "06a824b5ccf311af4fac114d5e6ed885519e9b3d24d400f965e49f92ae26a52f"
     }
   ],
   "registryDependencies": [
@@ -40,7 +40,6 @@
     "AgentCapability",
     "AgentMessage",
     "ApprovalCard",
-    "FadeUp",
     "PopInEntrance",
     "RowIn",
     "SpringUpEntrance",

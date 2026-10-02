@@ -187,9 +187,11 @@ class ChartScope extends InheritedWidget {
 /// assigned; what is passed is the keyword `ease-out`, which is CSS's
 /// `cubic-bezier(0, 0, 0.58, 1)` and a visibly different curve. Reproducing the
 /// port on [MotionCurves.enter] would make the Flutter charts *better* than the
-/// reference and therefore wrong, so [curve] is [MotionCurves.decelerate] and the
-/// page documents the difference exactly as the reference's Animation section
-/// does.
+/// reference and therefore wrong, so [curve] is CSS's own `ease-out` — kept
+/// local for the same reason `drawer.dart`'s `_vaulCurve` and
+/// `sidebar.dart`'s `_sidebarLinear` are: a measured, third-party-shaped
+/// curve, not one of the seven [MotionCurves] — and the page documents the
+/// difference exactly as the reference's Animation section does.
 ///
 /// Reduced motion is resolved by the caller through `effectiveMotionDuration`
 /// (`foundation/motion.dart`), which is the port's equivalent of the hook's
@@ -203,9 +205,14 @@ class ChartMotion {
   /// `--duration-slow`, as `useChartMotion` reads it.
   static Duration get duration => MotionDurations.slow;
 
-  /// The CSS keyword `ease-out`, which is what recharts received.
-  static Curve get curve => MotionCurves.decelerate;
+  /// CSS's own `ease-out` — `cubic-bezier(0, 0, 0.58, 1)`, which is what
+  /// recharts received. A visibly different curve from this system's own
+  /// [MotionCurves.enter]; reproducing the reference means reproducing this
+  /// curve, not "fixing" it.
+  static Curve get curve => _chartEaseOut;
 }
+
+const Cubic _chartEaseOut = Cubic(0, 0, 0.58, 1);
 
 /* ── Container ───────────────────────────────────────────────────────────── */
 

@@ -92,6 +92,8 @@ rg -n "<ComponentName>" example/lib test
 | Tokens | `lib/src/design_system/foundation/` | `space`, measures, breakpoints, radii, type, themes, shadows, colors, motion. |
 | Context | `lib/src/design_system/foundation/theme_scope.dart` | `ThemeScope`, `StyledText`, typography resolution. |
 | Components | `lib/src/components/ui/` | Controls, navigation, feedback, data display, overlays, effects, and motion widgets. |
+| Motion vocabulary | `lib/src/components/ui/keyframes.dart` | The twelve recipes: `EnterMotion`, `ExitMotion`, `OpenMotion`, `CloseMotion`, `ExpandMotion`, `ChangeMotion`, `SpinMotion`, `ShimmerMotion`, `ProgressMotion`, `PulseMotion`, `CaretMotion`, `SwapRollMotion`. With `Press` and `ActiveIndicator` that is the whole vocabulary: fourteen. Reach for one before writing a keyframe. |
+| Overlay motion | `lib/src/components/ui/open_transition.dart` | `OpenTransition` plays `OpenMotion` / `CloseMotion` for every overlay. The sheet and drawer keep their own edge slides. |
 | Blocks | `lib/src/blocks/` | Complete opt-in application compositions. |
 | Specimens | `example/lib/` | Composition, routing, responsive conventions. |
 | Contracts | `test/`, `example/test/`, `test/token_guard_test.dart` | API behavior and no-literal guard. |

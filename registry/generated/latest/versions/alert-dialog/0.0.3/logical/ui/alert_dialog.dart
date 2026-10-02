@@ -66,6 +66,7 @@ import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
 import './button.dart';
 import './dialog.dart';
+import './open_transition.dart';
 import './tooltip.dart';
 
 /// `bg-muted/50` — the footer band.

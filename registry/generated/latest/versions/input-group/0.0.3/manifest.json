@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/input_group.dart",
       "target": "@ui/input_group.dart",
-      "sha256": "4ef4f7cd1f8f6de3eb93ac5260a56a3daeb07358175afa5c2210be97aefb6c38"
+      "sha256": "ad0b0d99aae9c31d9561158ac4efee2398f38b237c0f394ef4927a44f7b98f57"
     }
   ],
   "registryDependencies": [

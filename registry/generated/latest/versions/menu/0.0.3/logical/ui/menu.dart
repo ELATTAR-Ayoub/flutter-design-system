@@ -1558,16 +1558,3 @@ class MenuPointerDown extends StatelessWidget {
   }
 }
 
-/// The enter/exit set every menu overlay in the family runs, as one record so
-/// the three roots cannot drift apart.
-///
-/// `--duration-overlay` (320ms) on `--ease-out`, entering from `opacity 0`,
-/// `scale .95` and an 8px slide **towards the trigger on all four sides**, and
-/// leaving on opacity and scale alone.
-abstract final class MenuMotion {
-  /// `data-open:animate-in` and friends.
-  static Duration get duration => MotionDurations.overlayEnter;
-
-  /// All four `data-[side=*]:slide-in-from-*` utilities.
-  static Set<PopoverSide> get slideSides => PopoverSide.values.toSet();
-}

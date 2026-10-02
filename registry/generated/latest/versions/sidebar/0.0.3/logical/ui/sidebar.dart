@@ -29,9 +29,9 @@
 /// `sidebar.tsx` carries five `duration-base` classes — on the gap, the
 /// container, the rail, the group label and the disclosure line. The sweep's
 /// standing finding is that a `duration-<word>` utility emits nothing; what
-/// makes all five run at 250ms anyway is `--default-transition-duration: 250ms`
-/// (globals.css L395), which is `--duration-base` pointed at the framework's
-/// own default. Measured, all five are 250ms. The **easings** are real
+/// makes all five run at 250ms anyway is `--default-transition-duration: 250ms`,
+/// which is `--duration-base` pointed at the framework's own default.
+/// Measured, all five are 250ms. The **easings** are real
 /// utilities and do apply: `linear` on the gap and the container, `ease-out-flex`
 /// on the rail, `linear` on the group label, `--ease-out` on the line.
 ///
@@ -77,7 +77,7 @@
 ///     custom `Flex` that reorders hit tests or a layout change, and the
 ///     control has a keyboard-reachable twin ([SidebarTrigger]) doing the
 ///     same job.
-/// 10. **`.sidebar-pill` has no pseudo-elements.** globals.css L2704–2716
+/// 10. **`.sidebar-pill` has no pseudo-elements.** A stylesheet rule
 ///     pauses `::before`/`::after` animations on it and wakes them on hover of
 ///     the active row — but nothing gives the pill a `feedback-surface` or a
 ///     `starfield`, so `content` computes to `none` and the whole block is
@@ -123,6 +123,16 @@ import './input.dart';
 import './sheet.dart';
 import './skeleton.dart';
 import './tooltip.dart';
+
+/// `duration-base ease-linear` — measured genuinely linear (256 → 48 in even
+/// ~13.85px steps per frame, no front-loading, no overshoot), on the width,
+/// gap and slide legs of the collapse and on the group label's fade.
+///
+/// Not one of the seven [MotionCurves]: every named curve on the scale
+/// either eases or springs, and this leg is measured flat. Kept local for
+/// the same reason `drawer.dart`'s `_vaulCurve` is — a third-party-shaped
+/// feel, transcribed from one measurement and read by nothing else.
+const Curve _sidebarLinear = Curves.linear;
 
 /* ── Enums ───────────────────────────────────────────────────────────────── */
 
@@ -591,17 +601,17 @@ class Sidebar extends StatelessWidget {
         TweenAnimationBuilder<double>(
           tween: Tween<double>(end: gapWidth),
           duration: duration,
-          curve: MotionCurves.linear,
+          curve: _sidebarLinear,
           builder: (BuildContext context, double gap, Widget? _) =>
               TweenAnimationBuilder<double>(
                 tween: Tween<double>(end: containerWidth),
                 duration: duration,
-                curve: MotionCurves.linear,
+                curve: _sidebarLinear,
                 builder: (BuildContext context, double width, Widget? _) =>
                     TweenAnimationBuilder<double>(
                       tween: Tween<double>(end: slide),
                       duration: duration,
-                      curve: MotionCurves.linear,
+                      curve: _sidebarLinear,
                       builder: (BuildContext context, double dx, Widget? _) {
                         // In the gap's own coordinates.
                         final double left = side.isLeft ? dx : gap - width - dx;
@@ -1097,7 +1107,7 @@ class SidebarGroupLabel extends StatelessWidget {
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(end: icon ? 0 : 1),
       duration: effectiveMotionDuration(context, MotionDurations.normal),
-      curve: MotionCurves.linear,
+      curve: _sidebarLinear,
       builder: (BuildContext context, double t, Widget? child) => ClipRect(
         child: Align(
           alignment: Alignment.bottomLeft,
@@ -1331,7 +1341,7 @@ class _SidebarMenuScope extends InheritedWidget {
 /// its 37.5px button (measured). So the target is registered from below rather
 /// than indexed from above. Every number and curve is the same token —
 /// `slide-pill`'s 250ms `--ease-spring` travel, its 150ms `--ease-out` fade,
-/// and [StateChangeMotion] for the 600ms squash — so there is still one transcription of
+/// and [ChangeMotion] for the 600ms squash — so there is still one transcription of
 /// each.
 class SidebarMenu extends StatefulWidget {
   const SidebarMenu({super.key, required this.children});
@@ -1449,7 +1459,7 @@ class _SidebarMenuState extends State<SidebarMenu>
                   child: AnimatedBuilder(
                     animation: _jelly,
                     builder: (BuildContext context, Widget? child) {
-                      final Offset scale = StateChangeMotion.scale.evaluate(
+                      final Offset scale = ChangeMotion.scale.evaluate(
                         _jelly,
                       );
                       return Transform.scale(

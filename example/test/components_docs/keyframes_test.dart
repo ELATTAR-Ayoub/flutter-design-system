@@ -326,7 +326,7 @@ void main() {
       expect(
         keyframesDocSpec.toc.map((DocsTocEntry entry) => entry.title).toList(),
         <String>[
-          'The fourteen',
+          'Preview',
           'Installation',
           'Usage',
           'API Reference',
@@ -362,7 +362,7 @@ void main() {
           .toList();
 
       expect(titles, <String>[
-        'The fourteen',
+        'Preview',
         'Installation',
         'Usage',
         'API Reference',

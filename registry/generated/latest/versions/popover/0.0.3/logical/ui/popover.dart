@@ -90,8 +90,9 @@ import 'package:flutter/widgets.dart'
     as flutter
     show OverlayPortal, ScrollPosition;
 
+import './keyframes.dart';
+import './open_transition.dart';
 import './surface.dart';
-import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/shadows.dart';
 import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
@@ -99,11 +100,6 @@ import '../../design_system/foundation/theme_scope.dart';
 
 /// `ring-1 ring-foreground/10` — every overlay in the family wears it.
 const double _ringAlpha = 0.10;
-
-/// `zoom-in-95` / `zoom-out-95` — tw-animate-css's own scale, the same 95% the
-/// stock `scale-95` utility means. Not [MotionTransforms.buttonPress]: that records
-/// a *press*, and an overlay that borrowed it would follow a retuned button.
-const double _zoom = 0.95;
 
 /// Which edge of the trigger the popup is placed against — Radix's `side`.
 enum PopoverSide {
@@ -641,7 +637,8 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
     super.initState();
     _animation = AnimationController(
       vsync: this,
-      duration: MotionDurations.overlayEnter,
+      duration: OpenMotion.duration,
+      reverseDuration: CloseMotion.duration,
     );
     if (widget.open) _sync();
   }
@@ -735,14 +732,20 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
     _placement = null;
     _portal.show();
     _animation
-      ..duration = _duration
+      ..duration = _openDuration
       ..forward(from: 0);
   }
 
-  /// `--duration-overlay`, unless the class list cancels the animation or the
-  /// platform asks for reduced motion — both of which mean "no time at all".
-  Duration get _duration => widget.animate
-      ? effectiveMotionDuration(context, MotionDurations.overlayEnter)
+  /// [OpenMotion]'s duration, unless the class list cancels the animation or
+  /// the platform asks for reduced motion — both of which mean "no time at
+  /// all".
+  Duration get _openDuration => widget.animate
+      ? effectiveMotionDuration(context, OpenMotion.duration)
+      : Duration.zero;
+
+  /// [CloseMotion]'s duration, under the same reduced-motion rule.
+  Duration get _closeDuration => widget.animate
+      ? effectiveMotionDuration(context, CloseMotion.duration)
       : Duration.zero;
 
   /// Hands the focus back to whatever held it before the popup opened.
@@ -772,7 +775,16 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
       _portal.hide();
       return;
     }
-    _animation.duration = _duration;
+    // `AnimationController.reverse()` prefers `reverseDuration` over
+    // `duration` whenever the former is non-null — and the constructor
+    // below sets one (`CloseMotion.duration`, a fixed 250ms) so that a
+    // caller reading `_animation.duration` mid-close still sees the right
+    // number. Both have to be reassigned here, or a reduced-motion (or
+    // `animate: false`) close ignores `_closeDuration` and always reverses
+    // over the constructor's own fixed value.
+    _animation
+      ..duration = _closeDuration
+      ..reverseDuration = _closeDuration;
     _animation.reverse().whenComplete(() {
       // A reopen mid-exit takes the controller forward again; only the run that
       // actually reached zero may pull the popup.
@@ -840,23 +852,6 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
       },
     );
 
-    // The transform origin is the previous layout's answer; the first frame
-    // uses the requested side, which is also the resolved one whenever nothing
-    // collides.
-    final Alignment origin =
-        _placement?.origin ??
-        // [PopoverAnchorMode.selfCenter] does not depend on the placement at
-        // all, so it is right from the first frame rather than from the second.
-        (widget.origin == PopoverAnchorMode.selfCenter
-            ? Alignment.center
-            : switch (widget.side) {
-                PopoverSide.bottom => Alignment(_alignAxis, -1),
-                PopoverSide.top => Alignment(_alignAxis, 1),
-                PopoverSide.right => Alignment(-1, _alignAxis),
-                PopoverSide.left => Alignment(1, _alignAxis),
-              });
-    final PopoverSide side = _placement?.side ?? widget.side;
-
     return Stack(
       // The theatre hands an overlay child loose constraints; without this the
       // stack would collapse around children that are all positioned.
@@ -887,11 +882,6 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
               onPlaced: _report,
             ),
             child: _animate(
-              origin: origin,
-              // `data-[side=bottom]:slide-in-from-top-2`, and its three
-              // siblings on a menu. The travel is towards the trigger, so the
-              // resolved side names the axis and the sign.
-              slide: widget.slideSides.contains(side) ? side : null,
               child: Focus(
                 focusNode: _popupRoot,
                 onKeyEvent: _onKey,
@@ -911,25 +901,10 @@ class _PopoverState extends State<Popover> with SingleTickerProviderStateMixin {
   /// animation at zero" — it means the popup was never wrapped in one, which is
   /// the difference between a first frame at `scale(.95)` and a first frame
   /// that is simply the menu.
-  Widget _animate({
-    required Alignment origin,
-    required PopoverSide? slide,
-    required Widget child,
-  }) {
+  Widget _animate({required Widget child}) {
     if (!widget.animate) return child;
-    return _PopoverTransition(
-      animation: _animation,
-      origin: origin,
-      slide: slide,
-      child: child,
-    );
+    return OpenTransition(animation: _animation, child: child);
   }
-
-  double get _alignAxis => switch (widget.align) {
-    PopoverAlign.start => -1,
-    PopoverAlign.center => 0,
-    PopoverAlign.end => 1,
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -1012,60 +987,3 @@ class _PopoverLayout extends SingleChildLayoutDelegate {
       old.origin != origin;
 }
 
-/// `animate-in fade-in-0 zoom-in-95 slide-in-from-top-2` and its `animate-out`
-/// twin, on one controller.
-class _PopoverTransition extends StatelessWidget {
-  const _PopoverTransition({
-    required this.animation,
-    required this.origin,
-    required this.slide,
-    required this.child,
-  });
-
-  final Animation<double> animation;
-  final Alignment origin;
-
-  /// The resolved side, when its entrance carries a `slide-in-from-*`; null
-  /// when the class list writes none for that side.
-  final PopoverSide? slide;
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    // `slide-in-from-*-2` — 2 spacing units of travel, and the exit has no
-    // twin, so the offset is pinned to the forward run.
-    final double travel = space(2);
-    // The popup starts displaced **away** from the trigger's side and closes
-    // the gap: `side=bottom` writes `slide-in-from-top`, `side=right` writes
-    // `slide-in-from-left`.
-    final Offset unit = switch (slide) {
-      null => Offset.zero,
-      PopoverSide.bottom => const Offset(0, -1),
-      PopoverSide.top => const Offset(0, 1),
-      PopoverSide.right => const Offset(-1, 0),
-      PopoverSide.left => const Offset(1, 0),
-    };
-    return AnimatedBuilder(
-      animation: animation,
-      child: child,
-      builder: (BuildContext context, Widget? child) {
-        final double t = MotionCurves.enter.transform(
-          animation.value.clamp(0, 1),
-        );
-        final bool entering = animation.status != AnimationStatus.reverse;
-        return Opacity(
-          opacity: t,
-          child: Transform.translate(
-            offset: entering ? unit * (travel * (1 - t)) : Offset.zero,
-            child: Transform.scale(
-              scale: _zoom + (1 - _zoom) * t,
-              alignment: origin,
-              child: child,
-            ),
-          ),
-        );
-      },
-    );
-  }
-}

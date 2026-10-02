@@ -2,14 +2,14 @@
   "name": "keyframes",
   "type": "component",
   "version": "0.0.3",
-  "description": "`@keyframes` — the reference's fourteen, transcribed whole.",
+  "description": "The twelve motion recipes plus OpenTransition: the design system's whole animation vocabulary.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
   "files": [
     {
       "source": "lib/src/components/ui/keyframes.dart",
       "target": "@ui/keyframes.dart",
-      "sha256": "959708e2685fc8ad6ab621339b51026f61c829c8908c11914b9ad3f0c76e219b"
+      "sha256": "c7f8e0f6551f9c1cd57637dc18ffddc8977f6eebbc41630984884d9a234da890"
     },
     {
       "source": "lib/src/components/ui/open_transition.dart",
@@ -28,26 +28,23 @@
   "documentationRoute": "/components/keyframes",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/keyframes.dart",
   "exports": [
-    "CheckmarkDrawMotion",
-    "ContentSwapMotion",
-    "DashDrawMotion",
-    "DiscreteProgressMotion",
-    "DotSelectionMotion",
-    "EntranceMotion",
+    "CaretMotion",
+    "ChangeMotion",
+    "CloseMotion",
+    "EnterMotion",
+    "ExitMotion",
+    "ExpandMotion",
     "KeyframeFill",
     "KeyframePlayer",
     "KeyframeStop",
     "Keyframes",
-    "LivePulseMotion",
-    "LoadingShimmerMotion",
     "OpenMotion",
-    "RevealMotion",
-    "SpringEntranceMotion",
-    "StateChangeMotion",
+    "OpenTransition",
+    "ProgressMotion",
+    "PulseMotion",
+    "ShimmerMotion",
+    "SpinMotion",
     "StepCurve",
-    "SweepMotion",
-    "TextRevealFrame",
-    "TextRevealMotion",
-    "TravelMotion"
+    "SwapRollMotion"
   ]
 }

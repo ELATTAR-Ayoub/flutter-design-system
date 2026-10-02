@@ -735,7 +735,6 @@ class _InputGroupButtonState extends State<InputGroupButton> {
         : SizedBox(height: InputGroupButton.height, child: button);
 
     button = Press(
-      scale: MotionTransforms.buttonPress,
       downDuration: MotionDurations.tick,
       upDuration: MotionDurations.normal,
       onTap: widget.onPressed,

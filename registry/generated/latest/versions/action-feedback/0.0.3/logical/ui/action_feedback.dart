@@ -71,7 +71,7 @@
 /// on each build, so under `MediaQuery.disableAnimations` the beat's period is
 /// [Duration.zero], the clock stops and it freezes at frame 0 — `opacity: 0;
 /// scale(0.55)`, which is invisible. That is the port of the reference's
-/// blanket `prefers-reduced-motion` rule (globals.css L2533–2541), not a
+/// blanket `prefers-reduced-motion` rule, not a
 /// divergence from it: that rule collapses every animation to 0.01ms at
 /// `animation-iteration-count: 1`, and with no `animation-fill-mode` the
 /// element falls back to its base style — which for `::before` is exactly
@@ -148,7 +148,7 @@ const double _beatFade = 0.72;
 // `--color-action-bright` rather than the `rgba(146,194,252,…)` a devtools
 // readout would show.
 
-/// The striations' ink — `--color-action-bright` 34% (globals.css L2138).
+/// The striations' ink — `--color-action-bright` 34%.
 const double _striationAlpha = 0.34;
 
 /// The diagonal sheen's peak — `--color-action-bright` 52% (L2144).
@@ -210,7 +210,7 @@ class ActionFeedback extends StatefulWidget {
   final Widget child;
 
   /// The ramp's five stops, oklab-mixed from [Palette] exactly as
-  /// `linear-gradient(176deg, …)` does (globals.css L2093–2100).
+  /// `linear-gradient(176deg, …)` does.
   ///
   /// `176deg` is 4° off straight down — CSS measures gradient angles clockwise
   /// from "to top", so 180° is top-to-bottom and 176° tilts that 4°
@@ -230,7 +230,7 @@ class ActionFeedback extends StatefulWidget {
   static const List<double> rampStops = <double>[0, 0.44, 0.53, 0.76, 1];
 
   /// `mix-blend-mode` for `::before` — the one blend in the system that depends
-  /// on the theme (globals.css L3289–3295).
+  /// on the theme.
   ///
   /// The utility declares `screen`; `:root` and `.light` then override it to
   /// `multiply`, and `.dark` restates `screen`. The stylesheet gives no reason
@@ -240,7 +240,7 @@ class ActionFeedback extends StatefulWidget {
     ResolvedColorMode.dark => BlendMode.screen,
   };
 
-  /// `@keyframes action-beat`'s `transform` track (globals.css L2059–2088).
+  /// `@keyframes action-beat`'s `transform` track.
   ///
   /// ```css
   /// 0%   { transform: scale(0.55); opacity: 0;    }
@@ -322,8 +322,8 @@ class ActionFeedback extends StatefulWidget {
 }
 
 /// One keyframe gap: from one declared value to the next, over its share of the
-/// cycle, on `--ease-out`. The shape `active_indicator.dart` uses for `yuki-jelly`
-/// (L257–262).
+/// cycle, on `--ease-out`. The same shape `active_indicator.dart` uses for its
+/// own arrival squash.
 TweenSequenceItem<double> _beatStep(double from, double to, double weight) =>
     TweenSequenceItem<double>(
       tween: Tween<double>(

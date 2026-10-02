@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/spinner.dart",
       "target": "@ui/spinner.dart",
-      "sha256": "c11723383cce2140a6ba6e38134dfbb34e6ff08bfe97bfb738df168e41e902f5"
+      "sha256": "4eb4e67bcd8363295c9b776352bee5d3ec59b5bd507d369815eb5a5873b08cb8"
     }
   ],
   "registryDependencies": [

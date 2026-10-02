@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased
+
+### Changed: the motion vocabulary is fourteen names
+
+* **Fifteen motion recipes became twelve**, in `lib/src/components/ui/keyframes.dart`:
+  `EnterMotion`, `ExitMotion`, `OpenMotion`, `CloseMotion`, `ExpandMotion`,
+  `ChangeMotion`, `SpinMotion`, `ShimmerMotion`, `ProgressMotion`,
+  `PulseMotion`, `CaretMotion`, `SwapRollMotion`. With `Press` and
+  `ActiveIndicator` that is the whole vocabulary: fourteen.
+* **Every overlay opens on one motion.** `OpenTransition` moved into its own
+  file and now plays dialog, alert dialog, popover, tooltip, hover card, menu,
+  context menu, dropdown menu, menubar, combobox and select. Their private
+  transitions and `MenuMotion` are gone. The sheet and the drawer keep their
+  own edge slides, which were never vocabulary.
+* **One click feel.** `Press` shrinks to 0.9 and its `scale` parameter is
+  removed; `InteractiveCard`, the slider's thumb scales and the button's own
+  scale all fold into it.
+* **The scale is seven steps** plus one constant per looping animation or
+  surface. Retired: `reward`, `popIn`, `springUp`, `signOn`, `ratchet`,
+  `checkDraw`, `dashDraw`, `dotPop`, `pressSpringUp`, `copyConfirmation`,
+  `frame`, `overlayExit`, `close`, `collapse`, `expand`. `MotionCurves` keeps
+  seven; `balanced`, `decelerate`, `symmetric`, `linear` and `vaul` are gone.
+
+**Breaking.** The retired classes, `Press.scale`, and the retired
+`MotionDurations` / `MotionTransforms` / `MotionCurves` members are removed
+from the public API. See [`docs/references/motion-rename.md`](docs/references/motion-rename.md)
+for the full before and after, and for the four behaviour changes this carries.
+
 ## 0.0.3
 
 This release turns the new disabled-state contract, responsive type scale,

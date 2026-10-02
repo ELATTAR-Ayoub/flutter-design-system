@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_slash_palette.dart",
       "target": "@ui/agent_slash_palette.dart",
-      "sha256": "941363e2ad3970b9ce8c1f99c4332a027b3ca6625999c01c46e7153fbc0775d3"
+      "sha256": "881a63f670f76d69792ebaca342ed652a8316e84e3daba778f1047f2b59ed475"
     }
   ],
   "registryDependencies": [

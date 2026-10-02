@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_core.dart",
       "target": "@ui/agent_core.dart",
-      "sha256": "6d50c3a9b40ffab7945288e2ef4457d86b8447913bc9183c0132bdcbd2db33fa"
+      "sha256": "3371f3d5a1136a0adeeb36735397fb8faa593a229f2187b8406239fc9b096976"
     }
   ],
   "registryDependencies": [
@@ -49,7 +49,6 @@
     "AgentTurnStatus",
     "AgentUserTurn",
     "ApprovalOutcome",
-    "BlurSwitchController",
     "ConversationStore",
     "ConversationSummary",
     "ErrorTurn",

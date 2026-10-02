@@ -1,5 +1,4 @@
-/// `.starfield` — thirteen hand-placed sparkles and two slow sways
-/// (`app/globals.css` L3364–3488).
+/// `.starfield` — thirteen hand-placed sparkles and two slow sways.
 ///
 /// The companion to `feedback-surface`: the bloom is the corner light, this is the
 /// dust in it. Two clusters hang off the same corner of the same padding box —
@@ -88,7 +87,7 @@ import '../../design_system/foundation/theme_scope.dart';
 // that draws them, on `feedback_surface.dart`'s precedent for `_deepWidthCap`.
 
 /// The second `drop-shadow`'s radius is `calc(var(--star-glow-size) * 3)`
-/// (globals.css L3422) — the utility's own multiplier, not a theme token.
+/// — the utility's own multiplier, not a theme token.
 const double _wideGlowFactor = 3;
 
 /// CSS `drop-shadow()`'s third length is a **blur radius**, read the way
@@ -262,7 +261,7 @@ class StarfieldCluster {
   /// own resting style, plus whatever the hover transition has reached.
   ///
   /// `star-sway` declares no `animation-fill-mode`, and the blanket rule
-  /// (globals.css L2534–2542) collapses its duration to 0.01ms and its
+  /// collapses its duration to 0.01ms and its
   /// iteration count to 1 — so it *finishes* rather than freezing, and reverts
   /// to the element's own `rotate`, which is **0°, not the keyframe's −6°**.
   /// The transitions are collapsed rather than removed, so a hovered cluster
@@ -280,7 +279,7 @@ class StarfieldCluster {
 }
 
 /// `::before` — the dense bottom-right cluster, `viewBox="0 0 260 96"`,
-/// eight sparkles (globals.css L3474).
+/// eight sparkles.
 const StarfieldCluster starfieldDense = StarfieldCluster(
   tile: Size(260, 96),
   corner: Alignment.bottomRight,
@@ -302,7 +301,7 @@ const StarfieldCluster starfieldDense = StarfieldCluster(
 );
 
 /// `::after` — the thin top-right cluster, `viewBox="0 0 200 64"`, five
-/// sparkles (globals.css L3478).
+/// sparkles.
 const StarfieldCluster starfieldThin = StarfieldCluster(
   tile: Size(200, 64),
   corner: Alignment.topRight,
@@ -347,7 +346,7 @@ class AmbientPattern extends StatefulWidget {
   ];
 
   /// The `#ffffff` the SVG fills every instance with — the same in **both**
-  /// theme blocks (globals.css L3466–3471), which is why it is not a theme
+  /// theme blocks, which is why it is not a theme
   /// field.
   ///
   /// It is the background image's own content, like the `d` string beside it,

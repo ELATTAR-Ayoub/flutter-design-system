@@ -65,6 +65,9 @@ import './dialog.dart';
 /// vaul's `closeThreshold` default — a quarter of the drawer's own height.
 const double _closeThreshold = 0.25;
 
+/// vaul's own curve; the drawer is a third-party feel, not vocabulary.
+const Cubic _vaulCurve = Cubic(0.32, 0.72, 0, 1);
+
 /// `Drawer` — trigger, portal, overlay, panel, and the drag.
 class Drawer extends StatefulWidget {
   const Drawer({super.key, required this.trigger, required this.content});
@@ -123,7 +126,7 @@ class _DrawerState extends State<Drawer> {
     enterDuration: MotionDurations.drawerOpen,
     exitDuration: MotionDurations.drawerClose,
     overlayDuration: MotionDurations.overlayEnter,
-    overlayCurve: MotionCurves.vaul,
+    overlayCurve: _vaulCurve,
     transition:
         (BuildContext context, Animation<double> animation, Widget child) =>
             _DrawerTransition(animation: animation, drag: _drag, child: child),
@@ -196,7 +199,7 @@ class _DrawerTransition extends StatelessWidget {
     animation: animation,
     child: child,
     builder: (BuildContext context, Widget? child) {
-      final double t = MotionCurves.vaul.transform(animation.value.clamp(0, 1));
+      final double t = _vaulCurve.transform(animation.value.clamp(0, 1));
       return FractionalTranslation(
         translation: Offset(0, 1 - t),
         child: Transform.translate(offset: Offset(0, drag), child: child),

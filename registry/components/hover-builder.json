@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/hover_builder.dart",
       "target": "@ui/hover_builder.dart",
-      "sha256": "f5ca0d2344ea84ef339e770db912bbacd985e6fbfbd6b4d0536f5a06905545d6"
+      "sha256": "770308dc821ff360aa5aad55863136c65d22b10a1cc1aeffb117b4be4aabc461"
     }
   ],
   "registryDependencies": [
@@ -23,7 +23,6 @@
   "documentationRoute": "/components/hover_builder",
   "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/hover_builder.dart",
   "exports": [
-    "HoverBuilder",
-    "InteractiveCard"
+    "HoverBuilder"
   ]
 }

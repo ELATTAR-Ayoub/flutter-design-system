@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_attachments.dart",
       "target": "@ui/agent_attachments.dart",
-      "sha256": "ca5ca5413aa7aee3e2139366ce96d74468f199dc7ddbddb4c9e616a10c93e571"
+      "sha256": "628ee1ad0b3ead3aaa2a96392a8363fec7a304e681963b988a4080cfe02293ed"
     }
   ],
   "registryDependencies": [

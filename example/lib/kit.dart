@@ -1401,7 +1401,11 @@ class IndexCard extends StatelessWidget {
                 : const <BoxShadow>[],
           ),
           child: Padding(
-            padding: EdgeInsets.all(pad),
+            // The border insets its own content, the way `Container`'s
+            // decoration+padding pair does: `DecoratedBox` paints the hairline
+            // without reserving space for it, so the card's copy would sit a
+            // hairline wider than `p-5` on each side and wrap a word late.
+            padding: EdgeInsets.all(pad + BorderWidths.hairline),
             child: SelectionContainer.disabled(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

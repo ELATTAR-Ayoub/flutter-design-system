@@ -290,7 +290,10 @@ void main() {
           );
         }
         for (final String name in <String>[
-          'generation',
+          // `entranceGeneration` since 2026-09-22: `RowMotion` and its own
+          // `generation` prop folded into `EnterMotion`, and the list's
+          // public knob is the one the card actually takes.
+          'entranceGeneration',
           'measure',
           'reconcile',
         ]) {

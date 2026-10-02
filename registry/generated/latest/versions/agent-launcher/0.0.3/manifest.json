@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_launcher.dart",
       "target": "@ui/agent_launcher.dart",
-      "sha256": "5ffca8029b022f38b9e788e78c57a366e808bef99fbcc2d7ca1a32a9136a5294"
+      "sha256": "a7052a9521e46e1a8dd87dd7de5852acf5fd566c963f4815b6a00ad959837aca"
     }
   ],
   "registryDependencies": [
