@@ -35,7 +35,7 @@ elattar add button
 ```
 
 <p align="center">
-  <img src="docs/assets/launch/elattar-quickstart.webp" alt="Elattar installs its foundation and button source, then shows the resulting component gallery" width="720" />
+  <img src="docs/assets/launch/elattar-quickstart.webp" alt="Elattar adds a button from the terminal, its components come alive in dark and light themes, then the Elattar wordmark" width="100%" />
 </p>
 
 That is the whole quickstart. `elattar add button` copies the component and its
@@ -46,7 +46,7 @@ the implementation.
 The current registry contains 100 integrity-checked items, including accessible
 controls, navigation, data display, charts, agent UI, effects, motion, and one
 complete application block. Browse the [live component
-gallery](https://flutter.elattar.dev/components) or watch the [45-second
+gallery](https://flutter.elattar.dev/components) or watch the [15-second
 quickstart](docs/assets/launch/elattar-quickstart.mp4) before installing
 anything.
 

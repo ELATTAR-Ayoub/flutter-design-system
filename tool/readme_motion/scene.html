@@ -1,0 +1,470 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Elattar README motion</title>
+<style>
+@font-face { font-family: Inter; src: url('../../assets/fonts/InterVariable.ttf'); font-weight: 100 900; }
+@font-face { font-family: Geist Mono; src: url('../../assets/fonts/GeistMono-Variable.ttf'); font-weight: 100 900; }
+
+:root {
+  --action: hsl(217 91% 53%);
+  --action-bright: hsl(213 94% 78%);
+  --success: #10b981;
+  --lime: #a3e635;
+  --cyan: #22d3ee;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1600px; height: 800px; overflow: hidden; background: #09090b; }
+body { font-family: Inter, sans-serif; -webkit-font-smoothing: antialiased; }
+.mono { font-family: 'Geist Mono', monospace; }
+
+#stage { position: relative; width: 1600px; height: 800px; overflow: hidden; }
+
+.world { position: absolute; inset: 0; background: var(--bg); color: var(--fg); }
+.world.dark {
+  --bg: hsl(240 10% 3.9%); --card: hsl(240 5.9% 10%); --fg: hsl(0 0% 98%);
+  --muted: hsl(240 5% 64.9%); --secondary: hsl(240 3.7% 15.9%); --border: hsl(240 3.7% 15.9%);
+  --input: hsl(240 5.3% 26.1%); --ring: var(--action-bright); --grid: rgba(255,255,255,.045);
+  --bubble: oklch(from hsl(217 91% 53%) 0.3 calc(c * 0.4) h); --chart1: var(--action-bright);
+  --card-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 20px 50px rgba(0,0,0,.45);
+  --glow: hsla(217, 91%, 53%, .22);
+}
+.world.light {
+  --bg: hsl(0 0% 100%); --card: hsl(0 0% 100%); --fg: hsl(240 10% 3.9%);
+  --muted: hsl(240 3.8% 46.1%); --secondary: hsl(240 4.8% 95.9%); --border: hsl(240 5.9% 90%);
+  --input: hsl(240 5.9% 90%); --ring: var(--action); --grid: rgba(0,0,0,.05);
+  --bubble: oklch(from hsl(217 91% 53%) 0.93 calc(c * 0.4) h); --chart1: var(--action);
+  --card-shadow: 0 1px 2px rgba(0,0,0,.04), 0 16px 40px rgba(15,23,42,.08);
+  --glow: hsla(217, 91%, 53%, .10);
+}
+.grid {
+  position: absolute; inset: -40px;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 75% at 50% 50%, #000 30%, transparent 100%);
+}
+.glow { position: absolute; width: 900px; height: 900px; border-radius: 50%;
+  background: radial-gradient(circle, var(--glow), transparent 65%); }
+
+/* ---------- bento ---------- */
+.bento { position: absolute; left: 116px; top: 88px; width: 1368px; height: 624px;
+  display: grid; grid-template-columns: repeat(3, 440px); grid-template-rows: repeat(2, 300px); gap: 24px; }
+.card { position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+  box-shadow: var(--card-shadow); padding: 22px 24px; overflow: hidden; }
+.card-head { display: flex; align-items: center; justify-content: space-between; }
+.file { font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.file i { width: 7px; height: 7px; border-radius: 50%; background: var(--action); display: inline-block; }
+.card-title { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin-top: 6px; }
+.tag { font-size: 12px; font-weight: 500; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; }
+
+.btn { height: 46px; padding: 0 22px; border-radius: 999px; font-size: 15px; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
+.btn.primary { background: var(--action); color: #fff; box-shadow: 0 6px 20px hsla(217,91%,53%,.35), inset 0 1px 0 rgba(255,255,255,.18); }
+.btn.outline { border: 1px solid var(--input); color: var(--fg); background: transparent; }
+
+/* button card */
+.c-btn .row { position: absolute; left: 24px; right: 24px; top: 108px; display: flex; gap: 12px; justify-content: center; }
+.c-btn .deploy { position: relative; width: 168px; }
+.c-btn .deploy > span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.spinner { width: 18px; height: 18px; }
+.toast { position: absolute; left: 24px; right: 24px; bottom: 20px; height: 58px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  display: flex; align-items: center; gap: 12px; padding: 0 16px; font-size: 14px; }
+.toast b { font-weight: 600; }
+.toast .ok { width: 22px; height: 22px; border-radius: 50%; background: var(--success); display: grid; place-items: center; flex: none; }
+.toast .undo { margin-left: auto; font-weight: 600; color: var(--fg); border: 1px solid var(--input); border-radius: 999px; padding: 4px 12px; font-size: 13px; }
+.pointer { position: absolute; width: 22px; height: 22px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.4)); }
+
+/* controls card */
+.c-ctl .rows { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; }
+.ctl-row { display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 14px;
+  border-radius: 12px; background: var(--secondary); }
+.ctl-row .lbl { font-size: 14px; font-weight: 500; }
+.ctl-row .sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.switch { width: 44px; height: 24px; border-radius: 999px; background: var(--input); position: relative; }
+.switch .knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.check { width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid var(--input); display: grid; place-items: center; }
+
+/* chart card */
+.c-chart .kpi { display: flex; align-items: baseline; gap: 10px; margin-top: 10px; }
+.c-chart .num { font-size: 34px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.delta { font-size: 12px; font-weight: 600; color: var(--success); background: rgba(16,185,129,.12); border-radius: 999px; padding: 3px 8px; }
+.c-chart svg.plot { position: absolute; left: 24px; bottom: 22px; }
+
+/* input card */
+.field-lbl { font-size: 13px; font-weight: 500; margin-top: 18px; }
+.field { margin-top: 8px; height: 46px; border-radius: 12px; border: 1px solid var(--input); background: transparent;
+  display: flex; align-items: center; padding: 0 14px; font-size: 15px; position: relative; }
+.field .ph { color: var(--muted); position: absolute; left: 14px; }
+.caret { display: inline-block; width: 2px; height: 20px; background: var(--fg); margin-left: 1px; }
+.helper { margin-top: 10px; font-size: 13px; display: flex; align-items: center; gap: 6px; height: 18px; }
+.c-in .btn { position: absolute; left: 24px; right: 24px; bottom: 22px; height: 44px; }
+
+/* slider card */
+.slider { position: relative; height: 22px; margin-top: 26px; }
+.slider .track { position: absolute; left: 0; right: 0; top: 9px; height: 4px; border-radius: 4px; background: var(--secondary); }
+.slider .fill { position: absolute; left: 0; top: 9px; height: 4px; border-radius: 4px; background: var(--action); }
+.slider .thumb { position: absolute; top: 1px; width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  border: 2px solid var(--action); box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+.sl-head { display: flex; justify-content: space-between; margin-top: 16px; font-size: 13px; font-weight: 500; }
+.sl-head .v { font-variant-numeric: tabular-nums; color: var(--muted); }
+.seg { position: relative; margin-top: 26px; height: 40px; border-radius: 999px; background: var(--secondary); display: grid; grid-template-columns: repeat(3, 1fr); padding: 4px; }
+.seg .ind { position: absolute; top: 4px; bottom: 4px; left: 4px; border-radius: 999px; background: var(--card); box-shadow: 0 1px 4px rgba(0,0,0,.18); }
+.seg span { position: relative; display: grid; place-items: center; font-size: 13px; font-weight: 600; }
+.prog { margin-top: 18px; height: 8px; border-radius: 8px; background: var(--secondary); overflow: hidden; }
+.prog > div { height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--action), var(--cyan)); }
+
+/* chat card */
+.chat { position: absolute; left: 24px; right: 24px; top: 70px; bottom: 20px; }
+.bub { position: absolute; max-width: 300px; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.4; }
+.bub.me { right: 0; top: 4px; background: var(--action); color: #fff; border-bottom-right-radius: 6px; }
+.bub.ai { left: 0; top: 100px; background: var(--bubble); color: var(--fg); border-bottom-left-radius: 6px; }
+.tool { position: absolute; left: 0; top: 58px; font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--muted);
+  border: 1px dashed var(--input); border-radius: 8px; padding: 5px 9px; display: flex; gap: 6px; align-items: center; }
+.dots { position: absolute; left: 0; top: 100px; display: flex; gap: 5px; padding: 14px 16px; border-radius: 16px; background: var(--bubble); }
+.dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); display: block; }
+
+/* ---------- terminal ---------- */
+#terminal { position: absolute; left: 390px; top: 240px; width: 820px; height: 320px; border-radius: 16px;
+  background: hsl(240 6% 7%); border: 1px solid rgba(255,255,255,.09);
+  box-shadow: 0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.05); overflow: hidden; }
+#terminal .bar { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 18px; border-bottom: 1px solid rgba(255,255,255,.06); }
+#terminal .bar i { width: 12px; height: 12px; border-radius: 50%; background: hsl(240 4% 22%); display: block; }
+#terminal .bar span { margin-left: auto; margin-right: auto; transform: translateX(-26px); font-size: 13px; color: hsl(240 5% 55%); }
+#terminal .body { padding: 24px 28px; font-size: 18px; line-height: 34px; color: hsl(0 0% 92%); white-space: pre; }
+#terminal .l { opacity: 0; }
+.t-prompt { color: var(--action-bright); }
+.t-ok { color: var(--success); }
+.t-add { color: var(--action-bright); }
+.t-dim { color: hsl(240 5% 50%); }
+
+/* ---------- outro ---------- */
+#outro { position: absolute; inset: 0; }
+.tiles { position: absolute; left: 0; right: 0; top: 150px; display: flex; justify-content: center; gap: 40px; }
+.tile { width: 156px; height: 156px; border-radius: 40px; position: relative; overflow: hidden;
+  box-shadow: 0 30px 80px var(--tile-glow), inset 0 1px 0 rgba(255,255,255,.35); }
+.tile::before { content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.10) 1px, transparent 1px);
+  background-size: 26px 26px; background-position: 13px 13px; }
+.tile::after { content: ''; position: absolute; inset: 14px; border: 1.5px solid rgba(255,255,255,.55); border-radius: 30px; }
+.tile svg { position: absolute; inset: 0; margin: auto; }
+.tile.a { background: linear-gradient(160deg, #5ab8ff, #2563eb); --tile-glow: rgba(37,99,235,.45); }
+.tile.b { background: linear-gradient(160deg, #c08bff, #8b3dff); --tile-glow: rgba(139,61,255,.45); }
+.tile.c { background: linear-gradient(160deg, #ff3dc8, #ff3d6e 55%, #ff7a1a); --tile-glow: rgba(255,61,140,.42); }
+.word { position: absolute; left: 0; right: 0; top: 360px; text-align: center; font-size: 140px; font-weight: 700;
+  letter-spacing: -0.045em; color: #fff; line-height: 1; }
+.word span { display: inline-block; }
+.tagline { position: absolute; left: 0; right: 0; top: 530px; text-align: center; font-size: 24px; color: hsl(240 5% 70%); letter-spacing: -0.01em; }
+.pill { position: absolute; left: 50%; top: 590px; transform: translateX(-50%); font-size: 18px; color: hsl(0 0% 94%);
+  border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); border-radius: 999px; padding: 12px 22px;
+  display: flex; gap: 12px; align-items: center; white-space: nowrap; }
+
+#seamA, #seamB { position: absolute; top: -100px; width: 2px; height: 1000px; transform: rotate(14deg); transform-origin: 50% 50%;
+  background: linear-gradient(transparent, var(--action-bright) 20%, #fff 50%, var(--action-bright) 80%, transparent);
+  box-shadow: 0 0 24px 6px hsla(213,94%,78%,.55); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="world dark" id="wDark"></div>
+  <div class="world light" id="wLight"></div>
+  <div id="seamA"></div><div id="seamB"></div>
+
+  <div id="terminal">
+    <div class="bar"><i></i><i></i><i></i><span class="mono">~/my_flutter_app</span></div>
+    <div class="body mono"><div class="l" id="l0"><span class="t-prompt">❯ </span><span id="cmd"></span><span class="caret" id="tcaret" style="height:20px;vertical-align:-3px;background:hsl(0 0% 92%)"></span></div><div class="l" id="l1"><span class="t-ok">✓</span> registry 0.0.4 <span class="t-dim">· sha-256 verified</span></div><div class="l" id="l2"><span class="t-add">+</span> lib/components/ui/button.dart</div><div class="l" id="l3"><span class="t-add">+</span> lib/components/ui/spinner.dart</div><div class="l" id="l4"><span class="t-add">+</span> lib/components/ui/action_feedback.dart</div><div class="l" id="l5"><span class="t-ok">✓ Done.</span> <span class="t-dim">The source is yours.</span></div></div>
+  </div>
+
+  <div id="outro">
+    <div class="tiles">
+      <div class="tile a"><svg width="70" height="84" viewBox="0 0 70 84" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M6 4h40l18 18v58H6z" fill="rgba(255,255,255,.16)"/><path d="M46 4v18h18"/><path d="M27 44l-9 9 9 9M43 44l9 9-9 9M38 41l-6 24"/></svg></div>
+      <div class="tile b"><svg width="86" height="86" viewBox="0 0 86 86" fill="rgba(255,255,255,.16)" stroke="#fff" stroke-width="2.4"><circle cx="22" cy="22" r="19"/><circle cx="64" cy="22" r="19"/><circle cx="22" cy="64" r="19"/><circle cx="64" cy="64" r="19"/></svg></div>
+      <div class="tile c"><svg width="84" height="90" viewBox="0 0 84 90" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"><path d="M42 4l38 21v40L42 86 4 65V25z" fill="rgba(255,255,255,.16)"/><path d="M4 25l38 21 38-21M42 46v40"/></svg></div>
+    </div>
+    <div class="word" id="word"></div>
+    <div class="tagline" id="tagline">Flutter components, delivered as source you own.</div>
+    <div class="pill mono" id="pill"><span class="t-prompt">❯</span> dart install elattar_cli</div>
+  </div>
+</div>
+
+<script>
+const T = 15;
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.55, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const lerp = (a, b, x) => a + (b - a) * x;
+const $$ = (sel, fn) => document.querySelectorAll(sel).forEach(fn);
+const $ = id => document.getElementById(id);
+
+const CHECK = (c = '#fff', s = 14) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+const BARS = [0.42, 0.58, 0.5, 0.74, 0.63, 0.86, 0.95];
+
+function bento() {
+  const bars = BARS.map((_, i) => `<rect class="bar" data-i="${i}" x="${i * 56}" width="34" rx="8" fill="var(--chart1)"/>`).join('');
+  return `
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <div class="bento">
+    <div class="card c-btn"><div class="card-head"><div class="file"><i></i>button.dart</div><div class="tag">7 variants</div></div>
+      <div class="card-title">Button</div>
+      <div class="row"><div class="btn outline">Preview</div><div class="btn primary deploy">
+        <span class="s0">Deploy</span>
+        <span class="s1"><svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 3a9 9 0 1 1-9 9" /></svg>Deploying</span>
+        <span class="s2">${CHECK('#fff', 16)}Deployed</span></div></div>
+      <div class="toast"><div class="ok">${CHECK('#fff', 12)}</div><div><b>Deployed to production</b></div><div class="undo">Undo</div></div>
+      <svg class="pointer" viewBox="0 0 24 24"><path d="M4 2l16 10-7 1.6L9.5 21z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </div>
+
+    <div class="card c-ctl"><div class="card-head"><div class="file"><i></i>switch.dart</div><div class="tag">a11y</div></div>
+      <div class="card-title">Controls</div>
+      <div class="rows">
+        <div class="ctl-row"><div><div class="lbl">Push notifications</div></div><div class="switch sw0"><div class="knob"></div></div></div>
+        <div class="ctl-row"><div><div class="lbl">Reduce motion</div></div><div class="switch sw1"><div class="knob"></div></div></div>
+        <div class="ctl-row"><div><div class="lbl">Weekly digest</div></div><div class="check ck0">${CHECK('#fff', 13)}</div></div>
+      </div>
+    </div>
+
+    <div class="card c-chart"><div class="card-head"><div class="file"><i></i>chart.dart</div><div class="tag">Last 7 days</div></div>
+      <div class="kpi"><div class="num">0</div><div class="delta">+18.4%</div></div>
+      <svg class="plot" width="392" height="140" viewBox="0 0 392 140">
+        <g transform="translate(18,0)">${bars}</g>
+        <path class="line" fill="none" stroke="var(--lime)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle class="dot" r="5" fill="var(--lime)" stroke="var(--card)" stroke-width="3"/>
+      </svg>
+    </div>
+
+    <div class="card c-in"><div class="card-head"><div class="file"><i></i>input.dart</div><div class="tag">validated</div></div>
+      <div class="card-title">Join the beta</div>
+      <div class="field-lbl">Email</div>
+      <div class="field"><span class="ph">you@company.com</span><span class="typed"></span><span class="caret"></span></div>
+      <div class="helper"><span class="hicon"></span><span class="htext"></span></div>
+      <div class="btn primary">Request access</div>
+    </div>
+
+    <div class="card c-sl"><div class="card-head"><div class="file"><i></i>slider.dart</div><div class="tag">motion tokens</div></div>
+      <div class="sl-head"><span>Volume</span><span class="v">0%</span></div>
+      <div class="slider"><div class="track"></div><div class="fill"></div><div class="thumb"></div></div>
+      <div class="seg"><div class="ind"></div><span>Day</span><span>Week</span><span>Month</span></div>
+      <div class="prog"><div></div></div>
+    </div>
+
+    <div class="card c-chat"><div class="card-head"><div class="file"><i></i>chat.dart</div><div class="tag">Agent UI</div></div>
+      <div class="chat">
+        <div class="bub me">Build me a settings screen</div>
+        <div class="tool"><span style="color:var(--success)">●</span>elattar add switch slider</div>
+        <div class="dots"><i></i><i></i><i></i></div>
+        <div class="bub ai">Done: six components, both themes, keyboard ready.</div>
+      </div>
+    </div>
+  </div>`;
+}
+$('wDark').innerHTML = bento();
+$('wLight').innerHTML = bento();
+$('word').innerHTML = 'Elattar'.split('').map(c => `<span>${c}</span>`).join('');
+
+const CMD = 'elattar add button';
+const EMAIL = 'ayoub@elattar.dev';
+
+// Card-local loop clock: each demo runs on its own period once the card is in.
+const loc = (t, start, period) => t < start ? 0 : (t - start) % period;
+
+function seek(t) {
+  t = ((t % T) + T) % T;
+
+  // ambient glow drifts on a closed path so the loop is seamless
+  const ph = t / T * Math.PI * 2;
+  $$('.glow', g => { g.style.left = (350 + Math.cos(ph) * 220) + 'px'; g.style.top = (-200 + Math.sin(ph) * 120) + 'px'; });
+
+  /* ---------- terminal (0 → 3.6) ---------- */
+  const tin = eo(prog(t, 0.05, 0.6));
+  const tout = eio(prog(t, 3.05, 3.65));
+  const term = $('terminal');
+  term.style.opacity = tin * (1 - tout);
+  term.style.transform = `translateY(${(1 - tin) * 24 - tout * 60}px) scale(${lerp(0.96, 1, tin) * lerp(1, 0.9, tout)})`;
+  term.style.filter = `blur(${tout * 8}px)`;
+  const typed = Math.floor(clamp((t - 0.6) / 0.055, 0, CMD.length));
+  $('cmd').textContent = CMD.slice(0, typed);
+  $('l0').style.opacity = tin;
+  const typing = t > 0.6 && typed < CMD.length;
+  $('tcaret').style.opacity = t > 1.75 ? 0 : (typing || Math.floor(t * 2.6) % 2 === 0) ? 1 : 0;
+  [1.85, 2.05, 2.2, 2.35, 2.65].forEach((s, i) => {
+    const p = eo(prog(t, s, s + 0.22));
+    const el = $('l' + (i + 1));
+    el.style.opacity = p; el.style.transform = `translateX(${(1 - p) * -10}px)`;
+  });
+
+  /* ---------- bento (3.35 → 10.7) ---------- */
+  const order = [0, 1, 2, 3, 4, 5];
+  document.querySelectorAll('.world').forEach(w => {
+    w.querySelectorAll('.card').forEach((c, i) => {
+      const s = 3.35 + order[i] * 0.08;
+      const pin = prog(t, s, s + 0.7);
+      const e = 10.0 + (5 - i) * 0.06;
+      const pout = eio(prog(t, e, e + 0.5));
+      const k = back(pin);
+      c.style.opacity = clamp(pin * 3) * (1 - pout);
+      c.style.transform = `translateY(${(1 - k) * 40 + pout * -30}px) scale(${lerp(0.94, 1, k) * lerp(1, 0.92, pout)})`;
+      c.style.filter = pout > 0 ? `blur(${pout * 10}px)` : 'none';
+    });
+    const gridA = clamp(prog(t, 0, 0.6)) * (1 - prog(t, 14.4, 15));
+    w.querySelector('.grid').style.opacity = 0.35 + 0.65 * Math.max(gridA, t > 0.6 && t < 14.4 ? 1 : 0);
+  });
+
+  // 1. button: press → spinner → deployed → toast
+  {
+    const u = loc(t, 3.9, 4.6);
+    const press = prog(u, 0.9, 1.0) * (1 - prog(u, 1.0, 1.15));
+    const loading = u > 1.05 && u < 2.3;
+    const done = u >= 2.3 && u < 4.2;
+    const fade = (a, b) => clamp(prog(u, a, a + 0.15)) * (1 - clamp(prog(u, b, b + 0.15)));
+    const s0 = u < 1.05 ? 1 : prog(u, 4.2, 4.4);
+    $$('.c-btn .deploy', d => d.style.transform = `scale(${1 - press * 0.05})`);
+    $$('.c-btn .s0', d => d.style.opacity = s0);
+    $$('.c-btn .s1', d => d.style.opacity = loading ? fade(1.05, 2.2) : 0);
+    $$('.c-btn .s2', d => d.style.opacity = done ? fade(2.3, 4.05) : 0);
+    $$('.c-btn .deploy', d => d.style.background = done ? 'var(--success)' : 'var(--action)');
+    $$('.c-btn .spinner', d => d.style.transform = `rotate(${t * 520}deg)`);
+    const ti = eo(prog(u, 2.4, 2.85)), to = eio(prog(u, 3.9, 4.3));
+    $$('.c-btn .toast', d => { d.style.transform = `translateY(${(1 - ti) * 90 + to * 90}px)`; d.style.opacity = ti * (1 - to); });
+    // pointer glides in to the button, clicks, glides out
+    const pi = eio(prog(u, 0.2, 0.85)), po = eio(prog(u, 1.4, 2.0));
+    const px = lerp(400, 300, pi) + po * 120, py = lerp(240, 132, pi) + po * 60;
+    $$('.c-btn .pointer', d => { d.style.left = px + 'px'; d.style.top = py + 'px'; d.style.transform = `scale(${1 - press * 0.2})`; d.style.opacity = clamp(pi * 2) * (1 - po); });
+  }
+
+  // 2. controls: staggered toggles
+  {
+    const u = loc(t, 3.9, 4.8);
+    const on = (a, b) => eio(prog(u, a, a + 0.28)) * (1 - eio(prog(u, b, b + 0.28)));
+    const sw = [on(0.5, 3.6), on(1.1, 4.0)];
+    sw.forEach((v, i) => $$('.c-ctl .sw' + i, s => {
+      s.style.background = `color-mix(in oklab, var(--action) ${v * 100}%, var(--input))`;
+      s.querySelector('.knob').style.transform = `translateX(${v * 20}px) scaleX(${1 + Math.sin(v * Math.PI) * 0.25})`;
+    }));
+    const ck = on(1.7, 4.2);
+    $$('.c-ctl .ck0', c => {
+      c.style.background = `color-mix(in oklab, var(--action) ${ck * 100}%, transparent)`;
+      c.style.borderColor = ck > .5 ? 'var(--action)' : 'var(--input)';
+      const svg = c.querySelector('svg'); svg.style.opacity = ck; svg.style.transform = `scale(${0.5 + ck * 0.5})`;
+    });
+  }
+
+  // 3. chart: bars grow, line draws, number counts
+  {
+    const g = prog(t, 3.6, 4.9);
+    const wob = s => Math.sin(ph * 2 + s) * 0.05;
+    $$('.c-chart .bar', b => {
+      const i = +b.dataset.i;
+      const p = back(prog(t, 3.6 + i * 0.07, 4.3 + i * 0.07));
+      const h = 120 * (BARS[i] + wob(i)) * p;
+      b.setAttribute('y', 132 - Math.max(h, 0)); b.setAttribute('height', Math.max(h, 0));
+      b.setAttribute('opacity', 0.35 + (i === 6 ? 0.65 : 0.25));
+    });
+    const pts = BARS.map((v, i) => [18 + i * 56 + 17, 132 - 120 * (v * 0.82 + 0.1 + wob(i + 1) * 0.6)]);
+    const d = 'M' + pts.map(p => p.map(n => n.toFixed(1)).join(',')).join(' L');
+    $$('.c-chart .line', l => { l.setAttribute('d', d); l.style.strokeDasharray = 1000; l.style.strokeDashoffset = 1000 * (1 - eio(prog(t, 4.1, 5.2))); });
+    const dp = eio(prog(t, 4.1, 5.2)), last = pts[Math.min(6, Math.floor(dp * 6.999))];
+    $$('.c-chart .dot', c => { c.setAttribute('cx', last[0]); c.setAttribute('cy', last[1]); c.style.opacity = dp > 0.98 ? 1 : 0; });
+    $$('.c-chart .num', n => n.textContent = (12.4 * eo(g)).toFixed(1) + 'k');
+  }
+
+  // 4. input: focus, type, validate
+  {
+    const u = loc(t, 4.0, 5.6);
+    const focus = eio(prog(u, 0.2, 0.45)) * (1 - eio(prog(u, 5.0, 5.4)));
+    const n = Math.floor(clamp((u - 0.5) / 0.07, 0, EMAIL.length)) * (u < 5.0 ? 1 : 0);
+    const valid = u > 0.5 + EMAIL.length * 0.07 + 0.25 && u < 5.0;
+    const vp = eo(prog(u, 0.5 + EMAIL.length * 0.07 + 0.25, 0.5 + EMAIL.length * 0.07 + 0.55)) * (1 - prog(u, 4.9, 5.1));
+    $$('.c-in .field', f => {
+      f.style.borderColor = focus > .5 ? 'var(--ring)' : 'var(--input)';
+      f.style.boxShadow = `0 0 0 ${focus * 4}px color-mix(in oklab, var(--ring) 28%, transparent)`;
+      f.querySelector('.typed').textContent = EMAIL.slice(0, n);
+      f.querySelector('.ph').style.opacity = n ? 0 : 1;
+      f.querySelector('.caret').style.opacity = focus > .5 && (u < 0.5 + EMAIL.length * 0.07 || Math.floor(t * 2.6) % 2 === 0) ? 1 : 0;
+      f.querySelector('.ph').style.left = '18px';
+    });
+    $$('.c-in .helper', h => {
+      h.style.opacity = vp; h.style.transform = `translateY(${(1 - vp) * -6}px)`;
+      h.querySelector('.hicon').innerHTML = CHECK('var(--success)', 15);
+      h.querySelector('.htext').innerHTML = '<span style="color:var(--success);font-weight:600">Looks good.</span> <span style="color:var(--muted)">We will send one email.</span>';
+    });
+    $$('.c-in .btn', b => b.style.opacity = valid ? 1 : 0.55);
+  }
+
+  // 5. slider, segmented control, progress
+  {
+    const v = 0.5 + 0.38 * Math.sin(ph * 2 - 1.2);
+    const show = eo(prog(t, 3.9, 4.6));
+    const val = lerp(0, v, show);
+    $$('.c-sl .fill', f => f.style.width = (val * 392) + 'px');
+    $$('.c-sl .thumb', f => f.style.left = (val * 392 - 10) + 'px');
+    $$('.c-sl .v', f => f.textContent = Math.round(val * 100) + '%');
+    const seg = Math.floor(loc(t, 4.2, 1.6 * 3) / 1.6);
+    const segp = eio(prog(loc(t, 4.2, 1.6), 0, 0.42));
+    const segPos = (seg + segp - 1 + 3) % 3, from = (seg + 2) % 3;
+    const pos = t < 4.2 ? 0 : (from === 2 && seg === 0) ? lerp(2, 0, segp) : lerp(from, seg, segp);
+    const segW = (392 - 8) / 3;
+    $$('.c-sl .ind', i => { i.style.width = segW + 'px'; i.style.transform = `translateX(${pos * segW}px)`; });
+    const pr = eio(prog(loc(t, 4.0, 3.5), 0, 2.6));
+    $$('.c-sl .prog > div', d => d.style.width = (pr * 100) + '%');
+  }
+
+  // 6. chat
+  {
+    const u = loc(t, 4.1, 5.8);
+    const a = (s, e) => eo(prog(u, s, s + 0.35)) * (1 - prog(u, e, e + 0.3));
+    const me = a(0.2, 5.2), tool = a(1.0, 5.2), dots = a(1.5, 2.6), ai = a(2.7, 5.2);
+    $$('.c-chat .me', b => { b.style.opacity = me; b.style.transform = `translateY(${(1 - me) * 14}px) scale(${lerp(.9, 1, me)})`; b.style.transformOrigin = 'right bottom'; });
+    $$('.c-chat .tool', b => { b.style.opacity = tool; b.style.transform = `translateX(${(1 - tool) * -12}px)`; });
+    $$('.c-chat .dots', b => { b.style.opacity = dots; b.querySelectorAll('i').forEach((d, i) => d.style.transform = `translateY(${Math.sin(t * 9 - i * 0.9) * -3}px)`); });
+    $$('.c-chat .ai', b => { b.style.opacity = ai; b.style.transform = `translateY(${(1 - ai) * 14}px) scale(${lerp(.9, 1, ai)})`; b.style.transformOrigin = 'left bottom'; });
+  }
+
+  /* ---------- theme wipe (7.0 → 9.7) ---------- */
+  const SK = 200; // skew, px across the frame height
+  const b = lerp(-SK - 40, 1600 + 40, eio(prog(t, 6.9, 7.9)));
+  const a = lerp(-SK - 40, 1600 + 40, eio(prog(t, 8.8, 9.8)));
+  $('wLight').style.clipPath = `polygon(${a + SK}px 0, ${b + SK}px 0, ${b}px 800px, ${a}px 800px)`;
+  const seam = (el, x, on) => { el.style.left = (x + SK / 2) + 'px'; el.style.opacity = on; };
+  seam($('seamA'), b, t > 6.9 && t < 7.95 ? 1 : 0);
+  seam($('seamB'), a, t > 8.8 && t < 9.85 ? 1 : 0);
+
+  /* ---------- outro (10.3 → 15) ---------- */
+  const fin = 1 - eio(prog(t, 14.2, 14.9));
+  document.querySelectorAll('.tile').forEach((el, i) => {
+    const p = prog(t, 10.35 + i * 0.12, 11.15 + i * 0.12);
+    const k = back(p);
+    const float = Math.sin(t * 1.6 + i * 1.1) * 4 * prog(t, 11.2, 11.8);
+    el.style.opacity = clamp(p * 3) * fin;
+    el.style.transform = `translateY(${(1 - k) * 70 + float}px) scale(${lerp(0.6, 1, k)}) rotate(${(1 - k) * (i - 1) * 12}deg)`;
+  });
+  document.querySelectorAll('#word span').forEach((el, i) => {
+    const p = eo(prog(t, 10.9 + i * 0.045, 11.5 + i * 0.045));
+    el.style.opacity = p * fin; el.style.transform = `translateY(${(1 - p) * 50}px)`;
+    el.style.filter = `blur(${(1 - p) * 8}px)`;
+  });
+  const glowP = eo(prog(t, 11.3, 12.2));
+  $('word').style.textShadow = `0 0 ${40 * glowP}px rgba(120,140,255,${0.55 * glowP}), 0 0 ${90 * glowP}px rgba(170,80,255,${0.35 * glowP})`;
+  const tg = eo(prog(t, 11.7, 12.3)), pl = back(prog(t, 12.0, 12.6));
+  $('tagline').style.opacity = tg * fin; $('tagline').style.transform = `translateY(${(1 - tg) * 14}px)`;
+  $('pill').style.opacity = clamp(pl * 2) * fin; $('pill').style.transform = `translateX(-50%) translateY(${(1 - pl) * 18}px) scale(${lerp(.92, 1, pl)})`;
+}
+window.seek = seek;
+window.T = T;
+window.ready = document.fonts.ready.then(() => true);
+
+// live preview when opened directly in a browser
+if (!navigator.webdriver) {
+  const t0 = performance.now();
+  const loop = () => { seek((performance.now() - t0) / 1000); requestAnimationFrame(loop); };
+  loop();
+} else seek(0);
+</script>
+</body>
+</html>

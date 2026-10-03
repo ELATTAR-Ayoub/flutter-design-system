@@ -22,13 +22,13 @@ elattar add button
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ELATTAR-Ayoub/flutter-design-system/main/docs/assets/launch/elattar-quickstart.webp" alt="Elattar installs its foundation and button source, then shows the resulting component gallery" width="720" />
+  <img src="https://raw.githubusercontent.com/ELATTAR-Ayoub/flutter-design-system/main/docs/assets/launch/elattar-quickstart.webp" alt="Elattar adds a button from the terminal, its components come alive in dark and light themes, then the Elattar wordmark" width="100%" />
 </p>
 
 That produces local component and foundation barrels under `lib/`; it does not
 add an `elattar_design_system` runtime dependency. Explore the [live component
 gallery](https://flutter.elattar.dev/components), follow the [installation
-guide](https://flutter.elattar.dev/docs/installation), watch the [45-second
+guide](https://flutter.elattar.dev/docs/installation), watch the [15-second
 quickstart](https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/docs/assets/launch/elattar-quickstart.mp4),
 or read the [source-owned model](https://flutter.elattar.dev/docs/introduction).
 

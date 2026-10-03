@@ -1,9 +1,9 @@
 # 45-second Elattar demo
 
-The generated silent, captioned assets live at
-`docs/assets/launch/elattar-quickstart.mp4` and
-`docs/assets/launch/elattar-quickstart.webp`. Use this shot list when replacing
-them with a live cursor-and-terminal recording for the homepage, pub.dev,
+The README motion piece at `docs/assets/launch/elattar-quickstart.mp4` and
+`docs/assets/launch/elattar-quickstart.webp` is a 15-second loop rendered from
+`tool/readme_motion/scene.html` by `node tool/readme_motion/render.mjs`. Use
+this shot list for a separate live cursor-and-terminal recording for the homepage, pub.dev,
 GitHub release, and launch posts. Record at 1440×900 with a clean Flutter
 starter project and a readable terminal; export one MP4 and one compressed
 animated WebP.
