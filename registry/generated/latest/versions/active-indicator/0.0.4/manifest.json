@@ -1,0 +1,30 @@
+{
+  "name": "active-indicator",
+  "type": "component",
+  "version": "0.0.4",
+  "description": "The travelling selection pill — `components/ui/sliding-indicator.tsx` plus",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/active_indicator.dart",
+      "target": "@ui/active_indicator.dart",
+      "sha256": "dc698fbae87613a24107fe9a1ec79359f3ebeece1f60bfd3e48ec0f44ada1c2f"
+    }
+  ],
+  "registryDependencies": [
+    "keyframes",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "keyframes"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/active_indicator",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/src/components/ui/active_indicator.dart",
+  "deprecated": false
+}

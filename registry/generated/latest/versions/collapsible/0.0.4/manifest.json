@@ -1,0 +1,27 @@
+{
+  "name": "collapsible",
+  "type": "component",
+  "version": "0.0.4",
+  "description": "`components/ui/collapsible.tsx` — one independent disclosure, and the",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/collapsible.dart",
+      "target": "@ui/collapsible.dart",
+      "sha256": "b97fd39102e41d22e67f6919abb4ed6407b4ccfa33e4370047fc600fd3c173f1"
+    }
+  ],
+  "registryDependencies": [
+    "source-foundation"
+  ],
+  "semanticDependencies": [],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/collapsible",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/src/components/ui/collapsible.dart",
+  "deprecated": false
+}

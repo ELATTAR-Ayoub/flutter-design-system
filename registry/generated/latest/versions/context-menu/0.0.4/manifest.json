@@ -1,0 +1,32 @@
+{
+  "name": "context-menu",
+  "type": "component",
+  "version": "0.0.4",
+  "description": "`components/ui/context-menu.tsx` — the same menu, opened by a right-click,",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/context_menu.dart",
+      "target": "@ui/context_menu.dart",
+      "sha256": "52e487d9f8b0ed3827f8541f791230a9c774fd3bee0775596ffd4b9b46a5f1f9"
+    }
+  ],
+  "registryDependencies": [
+    "menu",
+    "popover",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "menu",
+    "popover"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/context-menu",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/src/components/ui/context_menu.dart",
+  "deprecated": false
+}

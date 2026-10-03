@@ -5,6 +5,21 @@ changelog — components, tokens, effects, motion — lives at
 [`CHANGELOG.md`](https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/CHANGELOG.md)
 in the repository root.
 
+## 0.0.4
+
+Reads `/registry/0.0.4/` by default. That registry publishes the motion
+vocabulary cut to fourteen names: twelve recipes in `keyframes.dart` plus
+`Press` and `ActiveIndicator`, one `OpenTransition` for every overlay, and a
+seven-step duration scale.
+
+Installing `0.0.4` sources over customized files is a breaking change for
+anyone who named a retired motion class or passed `Press(scale:)`. Run
+`elattar add --all --dry-run` first; the rename table is in the design
+system's [0.0.4 release notes](https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/main/docs/releases/0.0.4.md).
+
+The command surface is unchanged. Existing `elattar_cli 0.0.1` through `0.0.3`
+installations remain pinned to their matching immutable registry paths.
+
 ## 0.0.3
 
 Reads `/registry/0.0.3/` by default. The registry publishes the design

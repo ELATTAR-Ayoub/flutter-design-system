@@ -1,0 +1,300 @@
+/// `components/ui/empty.tsx` — six parts, and two of them are drifts.
+///
+/// *"An empty state must explain why it is empty and give one clear way out. A
+/// blank panel with 'No results' is an unfinished screen."*
+///
+/// | part | class list | rendered *(measured)* |
+/// |---|---|---|
+/// | [Empty] | `flex w-full min-w-0 flex-1 flex-col items-center justify-center gap-4 rounded-xl border-dashed p-6 text-center text-balance` | 24px padding, 16px gap, r**16**, centred |
+/// | [EmptyHeader] | `flex max-w-sm flex-col items-center gap-2` | **384px**, 8px gap |
+/// | [EmptyMedia] | `mb-2 flex shrink-0 items-center justify-center` + `size-8 rounded-lg bg-muted text-foreground` | **32 × 32**, r12, `--muted`, 8px below |
+/// | [EmptyTitle] | `font-heading text-sm font-medium tracking-tight` | 13 / 500 / 18.5714 / −0.26px |
+/// | [EmptyDescription] | `text-sm/relaxed text-muted-foreground` | 13 / 21.125 / `--muted-foreground` |
+/// | [EmptyContent] | `flex w-full max-w-sm min-w-0 flex-col items-center gap-2.5 text-sm text-balance` | **384px**, 10px gap |
+///
+/// ## DRIFT 8 — the dashed border never paints
+///
+/// *(measured: `border-style: dashed`, `border-width: **0px**`.)* `empty.tsx`
+/// L10 writes `rounded-xl border-dashed` and **no width class at all**.
+/// Tailwind's `border-dashed` sets only `border-style`, and Preflight resets
+/// every border to `0`, so the style has nothing to apply to. Both empty states
+/// on the page render as borderless centred blocks.
+///
+/// [Empty] therefore paints **no border**, which is not an omission: a port
+/// that read the class list instead of the render would draw a dashed rectangle
+/// that is nowhere on the reference. The corner radius is still real — it
+/// clips nothing today and would shape the border the moment someone adds a
+/// width — so it is kept.
+///
+/// ## DRIFT 9 — `EmptyMedia` defeats `Icon size="xl"`
+///
+/// *(measured: `width`/`height` attributes 24, computed box **16 × 16**,
+/// `stroke-width` **2**.)* `emptyMediaVariants.icon` carries
+/// `[&_svg:not([class*='size-'])]:size-4`, and `Icon` sets its size as
+/// **presentation attributes** plus a class list containing no `size-` token —
+/// so the CSS wins the box and the attributes lose. The glyph is drawn at 16px
+/// with the stroke computed for 24 (`icon.tsx` L82: `48/24 = 2`, not the 2.4 a
+/// 16px glyph normally gets), i.e. **visibly thinner than every other 16px
+/// glyph on the page**.
+///
+/// Both halves are reproduced by [EmptyMedia.glyphSize] and
+/// [EmptyMedia.glyphStroke], each derived from the rung it comes from rather
+/// than typed — so the quirk survives a change to the ladder instead of
+/// silently becoming a different quirk.
+///
+/// ## `text-balance`, recorded
+///
+/// [Empty] and [EmptyContent] both carry it. Flutter's line breaker has no
+/// balanced mode, so both wrap greedily — supervisor ruling F3: unreachable,
+/// not skipped, and the parity probe measures against a greedy reference.
+library;
+
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Icon,
+        OverlayPortal,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
+
+import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/theme.dart';
+import '../../design_system/foundation/typography.dart';
+import '../../design_system/foundation/text_layout.dart';
+import '../../design_system/foundation/theme_scope.dart';
+import './icon.dart';
+import './icon_paths.dart';
+
+/// The root — a centred column with nothing around it.
+class Empty extends StatelessWidget {
+  const Empty({super.key, required this.children});
+
+  /// `p-6`.
+  static double get padding => space(6);
+
+  /// `gap-4`.
+  static double get gap => space(4);
+
+  /// `rounded-xl` — 16px, and the only `rounded-xl` on the feedback page.
+  ///
+  /// It shapes nothing at present (drift 8: there is no border to shape and no
+  /// background to clip); it is transcribed because the class is written and
+  /// because it is what a future `border` width would follow.
+  static double get radius => Radii.xl;
+
+  /// `EmptyHeader` and `EmptyContent`, in order.
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(padding),
+      child: Column(
+        // `flex-col items-center justify-center`.
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          for (int i = 0; i < children.length; i++) ...<Widget>[
+            if (i > 0) SizedBox(height: gap),
+            children[i],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// `EmptyHeader` — the media, the title and the description, on a short
+/// measure.
+class EmptyHeader extends StatelessWidget {
+  const EmptyHeader({super.key, required this.children});
+
+  /// `gap-2`.
+  static double get gap => space(2);
+
+  /// `max-w-sm` — 384px.
+  static double get maxWidth => Containers.sm;
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          for (int i = 0; i < children.length; i++) ...<Widget>[
+            if (i > 0) SizedBox(height: gap),
+            children[i],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// `EmptyMedia variant="icon"` — a 32px muted tile with a glyph in it.
+class EmptyMedia extends StatelessWidget {
+  const EmptyMedia({
+    super.key,
+    required this.glyph,
+    this.tone = IconTone.normal,
+  });
+
+  /// `size-8` — the tile.
+  static double get box => space(8);
+
+  /// `rounded-lg` — 12px.
+  static double get radius => Radii.lg;
+
+  /// `mb-2` — the gap to the title, on top of `EmptyHeader`'s own `gap-2`.
+  static double get marginBottom => space(2);
+
+  /// The box the glyph is **actually** drawn in: `size-4`, forced by
+  /// `[&_svg:not([class*='size-'])]:size-4` over the `size="xl"` attribute.
+  static double get glyphSize => Icon.pxFor(IconSize.md);
+
+  /// …and the stroke it is drawn with, which the class list does **not**
+  /// override: `icon.tsx` computes `strokeWidth` from the size **prop**, so it
+  /// is still the 24px rung's **2**, not the 2.4 a 16px glyph gets.
+  ///
+  /// Derived from the rung the prop names, so the drift tracks the ladder.
+  static double get glyphStroke => Icon.strokeFor(Icon.pxFor(IconSize.xl));
+
+  final IconGlyph glyph;
+
+  /// `tone="action"` on the first specimen, `tone="subtle"` on the second.
+  final IconTone tone;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
+    return Padding(
+      padding: EdgeInsets.only(bottom: marginBottom),
+      child: Container(
+        width: box,
+        height: box,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: theme.muted,
+          borderRadius: BorderRadius.circular(radius),
+        ),
+        child: Icon(
+          glyph,
+          sizePx: glyphSize,
+          strokeOverride: glyphStroke,
+          tone: tone,
+        ),
+      ),
+    );
+  }
+}
+
+/// `EmptyTitle` — `font-heading text-sm font-medium tracking-tight`.
+///
+/// The title is the larger, heavier of the two lines — [EmptyDescription]
+/// sits under it at [TextStyles.small]. Sized off [TextStyles.body] rather
+/// than [TextStyles.nav] so the hierarchy actually reads title over
+/// description at every breakpoint; [TextStyles.nav]'s weight is kept, since
+/// this is still an interface word rather than reading prose.
+class EmptyTitle extends StatelessWidget {
+  const EmptyTitle(this.text, {super.key});
+
+  final String text;
+
+  /// The title's anatomy: the body step at the nav role's weight, tracked
+  /// slightly tighter so a short centred line does not read as loose beside
+  /// the description under it.
+  ///
+  /// Derived rather than published — an empty state's title is anatomy, not a
+  /// type role — and exposed so a caller composing its own empty state can
+  /// match it exactly.
+  static final TextStyleToken spec = TextStyles.body.derive(
+    name: 'empty-title',
+    wght: TextStyles.nav.wght,
+    tracking: _tracking,
+  );
+
+  static const double _tracking = -0.02;
+
+  /// [spec] resolved for [context], in [color] or the inherited ink.
+  static TextStyle styleOf(BuildContext context, {Color? color}) =>
+      StyledText.styleOf(context, spec, color: color);
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
+    final TextStyle style = styleOf(context, color: theme.foreground);
+    return LineBox(
+      style: style,
+      child: Text(text, style: style, textAlign: TextAlign.center),
+    );
+  }
+}
+
+/// `EmptyDescription` — `text-sm/relaxed text-muted-foreground`.
+class EmptyDescription extends StatelessWidget {
+  const EmptyDescription(this.text, {super.key});
+
+  /// The supporting-copy role — one step under [EmptyTitle]'s [TextStyles.body]
+  /// step, so the title reads larger than the description under it.
+  static TextStyleToken get spec => TextStyles.small;
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
+    return StyledText(
+      text,
+      spec,
+      color: theme.mutedForeground,
+      align: TextAlign.center,
+    );
+  }
+}
+
+/// `EmptyContent` — the way out, on the same short measure as the header.
+class EmptyContent extends StatelessWidget {
+  const EmptyContent({super.key, required this.children});
+
+  /// `gap-2.5` — 10px, one step wider than the header's.
+  static double get gap => space(2.5);
+
+  /// `max-w-sm`.
+  static double get maxWidth => Containers.sm;
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      // `text-sm` — the ambient style the actions inside inherit.
+      child: DefaultTextStyle.merge(
+        style: StyledText.styleOf(
+          context,
+          TextStyles.small,
+          color: theme.foreground,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            for (int i = 0; i < children.length; i++) ...<Widget>[
+              if (i > 0) SizedBox(height: gap),
+              children[i],
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

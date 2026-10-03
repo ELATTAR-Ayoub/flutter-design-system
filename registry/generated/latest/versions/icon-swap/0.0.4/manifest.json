@@ -1,0 +1,30 @@
+{
+  "name": "icon-swap",
+  "type": "component",
+  "version": "0.0.4",
+  "description": "`components/ui/icon-swap.tsx` — the two-state control's vertical wheel.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/icon_swap.dart",
+      "target": "@ui/icon_swap.dart",
+      "sha256": "e4bc263dc528bf9a7595f8691848d92d81d018da00ba6a4c3df5aa0b2f9f619d"
+    }
+  ],
+  "registryDependencies": [
+    "keyframes",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "keyframes"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/icon_swap",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/src/components/ui/icon_swap.dart",
+  "deprecated": false
+}

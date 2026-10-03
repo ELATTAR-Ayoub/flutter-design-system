@@ -1,7 +1,7 @@
 {
   "name": "source-foundation",
   "type": "foundation",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "The copy-first Flutter foundation: semantic colors, themes, typography, spacing, motion, shadows, surfaces, dates, and text layout.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -94,7 +94,7 @@
     }
   ],
   "documentationRoute": "/components/source_foundation",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/elattar_design_system.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/elattar_design_system.dart",
   "deprecated": false,
   "exports": [
     "AgentCubeTokens",

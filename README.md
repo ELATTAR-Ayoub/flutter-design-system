@@ -12,14 +12,14 @@ decision visible in your codebase.
 [![pub package](https://img.shields.io/pub/v/elattar_cli.svg)](https://pub.dev/packages/elattar_cli)
 [![license: MIT](https://img.shields.io/badge/license-MIT-2563eb.svg)](LICENSE)
 
-`0.0.3`, the current public release.
+`0.0.4`, the current public release.
 
 [Documentation](https://flutter.elattar.dev) ·
 [Components](https://flutter.elattar.dev/components) ·
 [Installation](https://flutter.elattar.dev/docs/installation) ·
 [Skills](https://flutter.elattar.dev/skills) ·
 [Changelog](CHANGELOG.md) ·
-[0.0.3 release notes](docs/releases/0.0.3.md) ·
+[0.0.4 release notes](docs/releases/0.0.4.md) ·
 [0.1.0 milestone](docs/launch/0.1.0-release-contract.md) ·
 [Adoption](docs/ADOPTION.md)
 
@@ -79,7 +79,7 @@ distribution route is `elattar_cli` and the source registry.
   <img src="docs/assets/readme/foundation.png" alt="A luminous violet blueprint tile for foundation tokens" width="100%" />
 </p>
 
-The `0.0.3` registry contains 100 items: 98 components, one application block,
+The `0.0.4` registry contains 100 items: 98 components, one application block,
 and one foundation bundle.
 
 - **Foundation:** semantic color, responsive typography, spacing, radii,
@@ -87,8 +87,9 @@ and one foundation bundle.
   icons.
 - **Components:** forms, selection, menus, navigation, dialogs, overlays,
   feedback, data display, charts, chat, layout, sidebar, and agent UI.
-- **Effects and motion:** press and hover feedback, active indicators,
-  keyframes, glass, premium surfaces, ambient patterns, and the voice orb.
+- **Effects and motion:** one press feel, active indicators, the fourteen
+  motion recipes, glass, premium surfaces, ambient patterns, and the voice
+  orb.
 - **Fonts:** Inter for words and Geist Mono for code, identifiers, and numbers.
 
 The public API uses ordinary Flutter names with no prefix: `Button`, `Card`,
@@ -124,8 +125,8 @@ system.
 | `elattar info <name>` | Inspect one item |
 | `elattar doctor` | Check the project, manifest, dependencies, and registry |
 
-The published CLI is `elattar_cli 0.0.3`. It reads the immutable
-[`0.0.3` registry](https://flutter.elattar.dev/registry/0.0.3/) by default.
+The published CLI is `elattar_cli 0.0.4`. It reads the immutable
+[`0.0.4` registry](https://flutter.elattar.dev/registry/0.0.4/) by default.
 
 ## Agent skill
 
@@ -150,7 +151,23 @@ example prompts, updates, and removal.
 
 ## Releases
 
-### 0.0.3 — current
+### 0.0.4 — current
+
+- Cut the motion vocabulary to fourteen names: twelve recipes in
+  `keyframes.dart` plus `Press` and `ActiveIndicator`.
+- Gave every overlay one entrance and one exit through `OpenTransition`,
+  replacing eleven private transitions.
+- Made `Press` the single click feel at `0.9` and removed its `scale`
+  argument, `InteractiveCard`, and the per-component scales.
+- Pruned `MotionDurations` to a seven-step scale plus one constant per loop or
+  surface, and `MotionCurves` to seven.
+- Fixed reduced motion on overlay close: six controllers now reassign
+  `reverseDuration` alongside `duration`.
+
+Read the focused [0.0.4 release notes](docs/releases/0.0.4.md) for the
+complete rename table and migration guidance.
+
+### 0.0.3
 
 - Added one disabled-state contract across controls, including reason
   tooltips, disabled-tap recovery, `FormScope`, and first-error reveal/focus.

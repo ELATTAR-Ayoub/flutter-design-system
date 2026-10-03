@@ -1,0 +1,40 @@
+{
+  "name": "button",
+  "type": "component",
+  "version": "0.0.4",
+  "description": "Semantic pill button with primary, premium, secondary, outline, ghost, destructive, and link variants plus sizes, loading, focus, and disabled states.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/button.dart",
+      "target": "@ui/button.dart",
+      "sha256": "db2abfb61f1ceedad96fab2f80c7c49e88dcd4acff142f07d3fe91ec1fa88da3"
+    }
+  ],
+  "registryDependencies": [
+    "premium-surface",
+    "surface",
+    "action-feedback",
+    "source-foundation",
+    "spinner",
+    "disabled",
+    "form"
+  ],
+  "semanticDependencies": [
+    "premium-surface",
+    "surface",
+    "action-feedback",
+    "spinner",
+    "disabled",
+    "form"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/button",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/src/components/ui/button.dart",
+  "deprecated": false
+}

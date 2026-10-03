@@ -10,7 +10,7 @@ import '../packages/elattar_cli/lib/src/project.dart';
 void main() {
   test('identity is centralised, and the registry URL derives from it', () {
     expect(cliName, 'elattar');
-    expect(cliVersion, '0.0.3');
+    expect(cliVersion, '0.0.4');
     expect(CliIdentity.name, cliName);
     expect(CliIdentity.version, cliVersion);
     // The version is stated once and the endpoint is built from it, so a CLI

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.0.4
 
 ### Changed: the motion vocabulary is fourteen names
 

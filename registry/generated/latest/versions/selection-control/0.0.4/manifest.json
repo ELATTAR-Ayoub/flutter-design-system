@@ -1,0 +1,36 @@
+{
+  "name": "selection-control",
+  "type": "component",
+  "version": "0.0.4",
+  "description": "What `Checkbox`, `RadioGroupItem` and `Switch` share.",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/selection_control.dart",
+      "target": "@ui/selection_control.dart",
+      "sha256": "b118d23b6c8513b519113d26b5041a672a06134d6cee4c3aae7faea2f314e702"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "keyframes",
+    "surface",
+    "source-foundation",
+    "disabled"
+  ],
+  "semanticDependencies": [
+    "button",
+    "keyframes",
+    "surface",
+    "disabled"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/selection_control",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/src/components/ui/selection_control.dart",
+  "deprecated": false
+}

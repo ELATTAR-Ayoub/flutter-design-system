@@ -1,0 +1,36 @@
+{
+  "name": "toggle",
+  "type": "component",
+  "version": "0.0.4",
+  "description": "`components/ui/toggle.tsx` — the whole `cva`, including the three",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/toggle.dart",
+      "target": "@ui/toggle.dart",
+      "sha256": "4dbcd0c0b155134fbd525760661882815c07bbe7c2377947127dea5246ff00e8"
+    }
+  ],
+  "registryDependencies": [
+    "button",
+    "icon",
+    "surface",
+    "source-foundation",
+    "disabled"
+  ],
+  "semanticDependencies": [
+    "button",
+    "icon",
+    "surface",
+    "disabled"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/toggle",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/src/components/ui/toggle.dart",
+  "deprecated": false
+}

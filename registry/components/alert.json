@@ -1,7 +1,7 @@
 {
   "name": "alert",
   "type": "component",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "`components/ui/alert.tsx` — one surface, five meanings.",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -24,7 +24,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/alert",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/alert.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/src/components/ui/alert.dart",
   "exports": [
     "Alert",
     "AlertVariant"

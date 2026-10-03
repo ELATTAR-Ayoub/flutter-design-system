@@ -1,7 +1,7 @@
 {
   "name": "feedback-surface",
   "type": "component",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "`feedback-surface` — the iridescence behind an Alert and a toast",
   "minDart": ">=3.12.2 <4.0.0",
   "minFlutter": ">=3.44.8",
@@ -26,7 +26,7 @@
   "fonts": [],
   "shaders": [],
   "documentationRoute": "/components/feedback_surface",
-  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.3/lib/src/components/ui/feedback_surface.dart",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/src/components/ui/feedback_surface.dart",
   "exports": [
     "BloomDrift",
     "BloomDriftStop",

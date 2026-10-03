@@ -1,7 +1,7 @@
 library;
 
 const String cliName = 'elattar';
-const String cliVersion = '0.0.3';
+const String cliVersion = '0.0.4';
 const int supportedConfigSchemaVersion = 1;
 const int supportedRegistrySchemaVersion = 1;
 const String configSchemaUri = 'https://elattar.dev/schema/config.json';

@@ -1,0 +1,30 @@
+{
+  "name": "hover-card",
+  "type": "component",
+  "version": "0.0.4",
+  "description": "`components/ui/hover-card.tsx` — *\\\"a richer preview on hover, for pointer",
+  "minDart": ">=3.12.2 <4.0.0",
+  "minFlutter": ">=3.44.8",
+  "files": [
+    {
+      "source": "lib/src/components/ui/hover_card.dart",
+      "target": "@ui/hover_card.dart",
+      "sha256": "8b266903fa3deeaf6904431021576957b109312f52e0d282806cdbebf5213187"
+    }
+  ],
+  "registryDependencies": [
+    "popover",
+    "source-foundation"
+  ],
+  "semanticDependencies": [
+    "popover"
+  ],
+  "pubDependencies": {},
+  "assets": [],
+  "fonts": [],
+  "shaders": [],
+  "licenses": [],
+  "documentationRoute": "/components/hover-card",
+  "sourceLink": "https://github.com/ELATTAR-Ayoub/flutter-design-system/blob/v0.0.4/lib/src/components/ui/hover_card.dart",
+  "deprecated": false
+}

@@ -1,0 +1,360 @@
+/// `components/ui/item.tsx` — a structured list row: media, content, actions.
+///
+/// ## The gap the group does not mean
+///
+/// `ItemGroup` is `flex w-full flex-col gap-4 has-data-[size=sm]:gap-2.5
+/// has-data-[size=xs]:gap-2`. The two `has-*` rules are meant to read "when the
+/// *items* in me are small, tighten"; what they compile to is
+/// `&:has(*[data-size="sm"])`, which matches **any descendant** carrying that
+/// attribute. `Button` writes `data-size={size}`, and the data page's payment
+/// rows each end in a `<Button variant="ghost" size="sm">Manage</Button>` — so
+/// the group's gap is **10px, not 16**. *(Measured: `gap: 10px` on the
+/// `[data-slot=item-group]`, with every `[data-slot=item]` reporting
+/// `data-size="default"`.)* Reproduced as measured; see [ItemGroup.gap].
+///
+/// ## The rest, measured
+///
+/// * `Item` at `size="default"` is `gap-2.5 px-3 py-2.5` inside a 1px
+///   transparent border, `rounded-lg` (12px), `items-center`, `flex-wrap`.
+/// * `transition-colors duration-fast` — **`duration-fast` is a no-op.**
+///   `item.tsx:45` is the known site: the computed style is
+///   `transition-duration: 0.25s`, the stylesheet default, because
+///   `duration-<word>` is not a Tailwind utility and nothing emits it. Probed
+///   on this page along with the rest.
+/// * `ItemMedia` at `variant="icon"` forces its glyph to `size-4` (16px) and,
+///   whenever the row has a description, takes `self-start` plus
+///   `translate-y-0.5` — a nudge that lines the glyph up with the title's
+///   cap height rather than with the row's centre. Ported as that intent,
+///   [ItemMedia.nudgeFor], rather than the flat 2px `translate-y-0.5`
+///   computes to on the one specimen it was measured against: the offset is
+///   half the gap between [ItemTitle]'s own rendered line box and the 16px
+///   glyph, so it tracks the title's role at every width instead of only the
+///   one that was measured.
+/// * `ItemContent` is `flex-1 flex-col gap-1`.
+///
+/// **Not ported:** `asChild` and with it the whole `[a]:hover:bg-muted` /
+/// `[button]:hover:bg-muted` pair — the hover surface is keyed to the element
+/// the row *is*, and the rows in the base corpus are plain `<div>`s, so none of
+/// it ever matches. `ItemSeparator`, `ItemHeader` and `ItemFooter` (no call
+/// site), `variant="muted"` (no call site), `size` `sm`/`xs` (their rungs are
+/// byte-identical to `default` for `sm`, and their only *visible* effect is on
+/// the group's gap, which is what the drift above reproduces anyway), and
+/// `focus-visible:` — a `<div>` takes no focus.
+///
+/// **Reopened by the agent family (2026-08-16).** `variant="outline"` and
+/// `items-start` both have a call site now — `agent/parts/history-card.tsx`
+/// renders `<Item variant="outline" className="… items-start …">` — so
+/// [ItemVariant] and [Item.alignStart] are built rather than recorded.
+library;
+
+import 'package:flutter/widgets.dart'
+    hide
+        AspectRatio,
+        Icon,
+        OverlayPortal,
+        RichText,
+        SafeArea,
+        ScrollPosition,
+        Table,
+        TableColumnWidth;
+
+import '../../design_system/foundation/colors.dart';
+import '../../design_system/foundation/spacing.dart';
+import '../../design_system/foundation/theme.dart';
+import '../../design_system/foundation/typography.dart';
+import '../../design_system/foundation/theme_scope.dart';
+
+/// `<ItemGroup>` — `role="list"`, `flex w-full flex-col`.
+class ItemGroup extends StatelessWidget {
+  const ItemGroup({super.key, required this.children, this.gapOverride});
+
+  final List<Widget> children;
+
+  /// A `gap-*` written at the call site, which beats the base list through
+  /// tailwind-merge.
+  ///
+  /// The agent's history list passes `gap-1` (**4px** *measured*) and the
+  /// drawer's navigation group `gap-0.5` (2px); the data page passes none and
+  /// keeps [gap]. Null is that base case, drift included.
+  final double? gapOverride;
+
+  /// `has-data-[size=sm]:gap-2.5` — 10px, matched by the `size="sm"` buttons
+  /// inside the rows rather than by the rows themselves. See the library doc.
+  static double get gap => space(2.5);
+
+  @override
+  Widget build(BuildContext context) {
+    final double pitch = gapOverride ?? gap;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (int i = 0; i < children.length; i++) ...<Widget>[
+          if (i > 0) SizedBox(height: pitch),
+          children[i],
+        ],
+      ],
+    );
+  }
+}
+
+/// `itemVariants`' first axis.
+enum ItemVariant {
+  /// `border-transparent`. Named [normal] because `default` is a Dart keyword.
+  normal,
+
+  /// `border-border` — what the agent's history card passes.
+  outline,
+
+  /// `border-transparent bg-muted/50`. RECORDED, NOT BUILT: no call site.
+  muted,
+}
+
+/// One row.
+class Item extends StatelessWidget {
+  const Item({
+    super.key,
+    this.media,
+    required this.content,
+    this.actions,
+    this.variant = ItemVariant.normal,
+    this.alignStart = false,
+  });
+
+  /// `<ItemMedia>`.
+  final Widget? media;
+
+  /// `<ItemContent>`.
+  final Widget content;
+
+  /// `<ItemActions>`.
+  final Widget? actions;
+
+  /// `data-variant` — which border the row wears.
+  final ItemVariant variant;
+
+  /// `items-start`, written at the call site over the base list's
+  /// `items-center`.
+  ///
+  /// It moves the **actions** and nothing else: [ItemMedia] is already
+  /// `self-start` whenever the row has a description, and [ItemContent] fills
+  /// the row either way. *(Measured on the history card: `item-actions` and
+  /// `item-content` share a top edge at y=801.25.)*
+  final bool alignStart;
+
+  /// `gap-2.5` — 10px, between media, content and actions.
+  static double get gap => space(2.5);
+
+  /// `px-3 py-2.5`.
+  static EdgeInsets get padding =>
+      EdgeInsets.symmetric(horizontal: space(3), vertical: space(2.5));
+
+  /// `rounded-lg`.
+  static double get radius => Radii.lg;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeTokens theme = ThemeScope.of(context);
+    // `border-transparent` on `default` — real, and paid for out of the row's
+    // width, which is why every variant keeps the same 1px.
+    final Color stroke = switch (variant) {
+      ItemVariant.normal || ItemVariant.muted => transparent,
+      ItemVariant.outline => theme.border,
+    };
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(radius),
+        color: variant == ItemVariant.muted
+            ? theme.muted.withValues(alpha: mutedFillAlpha)
+            : null,
+        border: Border.all(color: stroke, width: BorderWidths.hairline),
+      ),
+      // `items-center` with one child overriding it to `self-start` is a
+      // per-child cross alignment, which a [Row] has no property for. Giving
+      // every child the row's height and letting each align inside its own
+      // slot is the same layout, and the only one Flutter spells.
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            if (media != null) ...<Widget>[media!, SizedBox(width: gap)],
+            Expanded(child: content),
+            if (actions != null) ...<Widget>[
+              SizedBox(width: gap),
+              Align(
+                alignment: alignStart ? Alignment.topCenter : Alignment.center,
+                // A bare `Align` claims the row's whole remaining width
+                // instead of shrink-wrapping `actions!`, and the CSS this
+                // ports never asks for that: `items-center` and `self-start`
+                // move the slot, they do not size it. `widthFactor: 1` makes
+                // the box hug its child, so whatever the caller passed into
+                // [actions] governs the row's real width.
+                //
+                // Deliberately NOT `Flexible` as well. A [Row] offers a
+                // non-flexible child an unbounded main axis, so a `Wrap`
+                // inside [actions] never sees a width to wrap against, and
+                // adding the bound here would look like the fix. It is not:
+                // it moves this row's measured geometry, and `HistoryCard`
+                // reads 90 instead of its recorded 70 the moment it lands.
+                // The measurements are the authoritative ones. A surface whose
+                // actions genuinely cannot fit at a given width constrains
+                // them where it knows that width, which is the page, not here.
+                widthFactor: 1,
+                child: actions!,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// `bg-muted/50` on [ItemVariant.muted]. RECORDED, NOT BUILT beyond this
+  /// constant — no call site paints it.
+  static const double mutedFillAlpha = 0.50;
+}
+
+/// `<ItemMedia variant="icon">` — `flex shrink-0 items-center justify-center`
+/// with `[&_svg:not([class*='size-'])]:size-4`.
+///
+/// [nudged] is `group-has-data-[slot=item-description]/item:self-start` plus
+/// `:translate-y-0.5`, ported as a measured intent rather than the literal
+/// 2px the class computes to on one specimen: when the row carries a
+/// description, the glyph leaves the row's centre line and pins to the top of
+/// the content column, offset so its own centre lands on the centre of
+/// [ItemTitle]'s line box — the CSS rule's purpose ("lines up with the
+/// title's cap height", per the library doc) rather than its one measured
+/// number, which only happened to fit [TextStyles.body] at the width it was
+/// read at. [nudgeFor] reads that line box's height off
+/// [StyledText.stepOf], the same source [ItemTitle] itself renders from, so
+/// the two can never drift apart at a width the flat constant did not cover.
+class ItemMedia extends StatelessWidget {
+  const ItemMedia({super.key, required this.child, this.nudged = true});
+
+  final Widget child;
+
+  /// True (default): pin to the top of the content column and centre on the
+  /// title's own first line box — see [nudgeFor]. False: centre on the whole
+  /// (stretched) slot, which is what a title with no description wants, since
+  /// there the content column's height already equals the title's line box.
+  final bool nudged;
+
+  /// `size-4` — the glyph box the variant forces.
+  static double get size => space(4);
+
+  /// The top-of-content offset [nudged] applies in [context]: half the gap
+  /// between [ItemTitle]'s rendered line box ([TextStyles.body], the role
+  /// [ItemTitle] itself renders) and the forced 16px glyph square, so the
+  /// glyph's centre lands on the title's centre rather than on the row's.
+  /// Zero, never negative, on a width where the glyph is taller than the
+  /// line box it is centring on.
+  static double nudgeFor(BuildContext context) {
+    final double leading = StyledText.stepOf(context, TextStyles.body).leading;
+    final double gap = leading - size;
+    return gap > 0 ? gap / 2 : 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget box = SizedBox.square(dimension: size, child: child);
+    // Inside [Item] this sits in a stretched slot, so the alignment has a
+    // row height to work against; standing alone it fills whatever it is
+    // given, which is what `self-start` on a flex item does too.
+    if (!nudged) {
+      return Align(alignment: Alignment.center, child: box);
+    }
+    final double offset = nudgeFor(context);
+    return Align(
+      alignment: Alignment.topCenter,
+      child: offset > 0
+          ? Padding(
+              padding: EdgeInsets.only(top: offset),
+              child: box,
+            )
+          : box,
+    );
+  }
+}
+
+/// `<ItemContent>` — `flex flex-1 flex-col gap-1`.
+class ItemContent extends StatelessWidget {
+  const ItemContent({super.key, required this.children});
+
+  final List<Widget> children;
+
+  /// `gap-1`.
+  static double get gap => space(1);
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      for (int i = 0; i < children.length; i++) ...<Widget>[
+        if (i > 0) SizedBox(height: gap),
+        children[i],
+      ],
+    ],
+  );
+}
+
+/// `<ItemTitle>` — `line-clamp-1 flex w-fit items-center gap-2 text-sm
+/// leading-snug font-medium`.
+class ItemTitle extends StatelessWidget {
+  const ItemTitle(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Align(
+    // `w-fit` — the title is as wide as its string, not as wide as the row.
+    alignment: AlignmentDirectional.centerStart,
+    child: StyledText(
+      text,
+      TextStyles.body,
+      // `line-clamp-1`.
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    ),
+  );
+}
+
+/// `<ItemDescription>` — `line-clamp-2 text-left text-sm leading-normal
+/// font-normal text-muted-foreground`.
+class ItemDescription extends StatelessWidget {
+  const ItemDescription(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => StyledText(
+    text,
+    TextStyles.small,
+    color: ThemeScope.of(context).mutedForeground,
+    maxLines: 2,
+    overflow: TextOverflow.ellipsis,
+  );
+}
+
+/// `<ItemActions>` — `flex items-center gap-2`.
+class ItemActions extends StatelessWidget {
+  const ItemActions({super.key, required this.children});
+
+  final List<Widget> children;
+
+  /// `gap-2`.
+  static double get gap => space(2);
+
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: <Widget>[
+      for (int i = 0; i < children.length; i++) ...<Widget>[
+        if (i > 0) SizedBox(width: gap),
+        children[i],
+      ],
+    ],
+  );
+}
