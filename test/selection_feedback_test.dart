@@ -241,10 +241,7 @@ void main() {
         // The whole path is what CustomPaint holds from the very first
         // frame — there is no drawn-fraction painter left to sample.
         final CustomPaint paint = t.widget<CustomPaint>(
-          find.descendant(
-            of: markPlayer(),
-            matching: find.byType(CustomPaint),
-          ),
+          find.descendant(of: markPlayer(), matching: find.byType(CustomPaint)),
         );
         expect(paint.painter, isNotNull);
 
@@ -258,10 +255,7 @@ void main() {
         expect(transformOf().transform.getMaxScaleOnAxis(), isNot(1.0));
 
         await t.pump(ChangeMotion.duration);
-        expect(
-          transformOf().transform.getMaxScaleOnAxis(),
-          closeTo(1.0, 1e-6),
-        );
+        expect(transformOf().transform.getMaxScaleOnAxis(), closeTo(1.0, 1e-6));
       },
     );
 
@@ -497,21 +491,18 @@ void main() {
       expect(t.getSize(surfaces.last), const Size(8, 8));
     });
 
-    testWidgets(
-      'the dot plays the same ChangeMotion squash-and-stretch every '
-      'indicator shares',
-      (WidgetTester t) async {
-        expect(ChangeMotion.duration, MotionDurations.stateChange);
-        expect(ChangeMotion.curve, MotionCurves.enter);
-        expect(ChangeMotion.scale.transform(0), const Offset(1, 1));
-        expect(ChangeMotion.scale.transform(1), const Offset(1, 1));
-        // 30% is the table's own first overshoot stop — wider on x, thinner
-        // on y, not a uniform pop.
-        final Offset atThirty = ChangeMotion.scale.transform(0.3);
-        expect(atThirty.dx, greaterThan(1));
-        expect(atThirty.dy, lessThan(1));
-      },
-    );
+    testWidgets('the dot plays the same ChangeMotion squash-and-stretch every '
+        'indicator shares', (WidgetTester t) async {
+      expect(ChangeMotion.duration, MotionDurations.stateChange);
+      expect(ChangeMotion.curve, MotionCurves.enter);
+      expect(ChangeMotion.scale.transform(0), const Offset(1, 1));
+      expect(ChangeMotion.scale.transform(1), const Offset(1, 1));
+      // 30% is the table's own first overshoot stop — wider on x, thinner
+      // on y, not a uniform pop.
+      final Offset atThirty = ChangeMotion.scale.transform(0.3);
+      expect(atThirty.dx, greaterThan(1));
+      expect(atThirty.dy, lessThan(1));
+    });
 
     testWidgets('the socket lights on selection', (WidgetTester t) async {
       await t.pumpWidget(group('daily', (String _) {}));

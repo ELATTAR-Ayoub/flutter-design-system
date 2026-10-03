@@ -552,17 +552,16 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => _bullets(ThemeScope.of(context), <String>[
-    'The shimmer gradient is theme.popover → theme.accent → '
-        'theme.popover (ShimmerMotion.gradient(theme)): both stops resolve '
-        'from the live theme, so light and dark each get their own '
-        'correctly contrasted sweep with no override needed.',
-    'Skeleton declares no colour parameter of its own: the gradient '
-        'is entirely theme-derived, consistent with every other '
-        'primitive on this page.',
-  ]);
+  Widget build(BuildContext context) =>
+      _bullets(ThemeScope.of(context), <String>[
+        'The shimmer gradient is theme.popover → theme.accent → '
+            'theme.popover (ShimmerMotion.gradient(theme)): both stops resolve '
+            'from the live theme, so light and dark each get their own '
+            'correctly contrasted sweep with no override needed.',
+        'Skeleton declares no colour parameter of its own: the gradient '
+            'is entirely theme-derived, consistent with every other '
+            'primitive on this page.',
+      ]);
 }
 
 Widget _bullets(ThemeTokens theme, List<String> lines) => Column(

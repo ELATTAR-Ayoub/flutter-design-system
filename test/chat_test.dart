@@ -1035,23 +1035,17 @@ void main() {
       expect(ScrollFade.fadeFor(height: 320, offset: 398, max: 398), 0);
     });
 
-    test(
-      'the curve is the CSS ease-in-out keyword, not MotionCurves.move',
-      () {
-        // The measurement that separates them: 0.6412 (CSS's own
-        // `ease-in-out`, cubic-bezier(0.42, 0, 0.58, 1) — message_scroller.dart's
-        // own private `_scrollFadeCurve`) against 0.716 (MotionCurves.move).
-        // ScrollFade.fadeFor's own test above pins the measured 0.3588
-        // (== 1 - 0.6412) directly; this test only rules out the system's
-        // own move curve as a stand-in, since it would give a visibly
-        // different 0.284.
-        expect(MotionCurves.move.transform(0.5833), closeTo(0.716, 0.005));
-        expect(
-          MotionCurves.move.transform(0.5833),
-          isNot(closeTo(0.6412, 0.01)),
-        );
-      },
-    );
+    test('the curve is the CSS ease-in-out keyword, not MotionCurves.move', () {
+      // The measurement that separates them: 0.6412 (CSS's own
+      // `ease-in-out`, cubic-bezier(0.42, 0, 0.58, 1) — message_scroller.dart's
+      // own private `_scrollFadeCurve`) against 0.716 (MotionCurves.move).
+      // ScrollFade.fadeFor's own test above pins the measured 0.3588
+      // (== 1 - 0.6412) directly; this test only rules out the system's
+      // own move curve as a stand-in, since it would give a visibly
+      // different 0.284.
+      expect(MotionCurves.move.transform(0.5833), closeTo(0.716, 0.005));
+      expect(MotionCurves.move.transform(0.5833), isNot(closeTo(0.6412, 0.01)));
+    });
 
     testWidgets('rendered: the bottom row is transparent and the top is opaque', (
       WidgetTester t,
@@ -1525,11 +1519,14 @@ void main() {
   /* ── The shared foundation extensions ─────────────────────────────────── */
 
   group('foundation', () {
-    test('MotionCurves.move drives the scroll fade, on the seven-curve scale', () {
-      expect(MotionCurves.move, const Cubic(0.65, 0, 0.35, 1));
-      // On `all`, unlike the stock CSS ease-in-out the fourteen retired.
-      expect(MotionCurves.all.contains(MotionCurves.move), isTrue);
-    });
+    test(
+      'MotionCurves.move drives the scroll fade, on the seven-curve scale',
+      () {
+        expect(MotionCurves.move, const Cubic(0.65, 0, 0.35, 1));
+        // On `all`, unlike the stock CSS ease-in-out the fourteen retired.
+        expect(MotionCurves.all.contains(MotionCurves.move), isTrue);
+      },
+    );
 
     test('MotionDurations.smoothScrollFrame is the per-pixel scroll unit', () {
       expect(MotionDurations.smoothScrollFrame.inMicroseconds, 16800);

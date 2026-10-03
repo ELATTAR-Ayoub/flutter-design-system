@@ -2607,24 +2607,21 @@ void main() {
       expect(t.widget<Icon>(find.byType(Icon)).strokeOverride, 2);
     });
 
-    test(
-      'sonner\'s two easings are still foreign defaults, not folded into '
-      'the seven — F5 under the fourteen',
-      () {
-        // The fourteen retimed the *names* around sonner's choreography but
-        // did not fold its two untokenized cubic-beziers into the
-        // seven-curve scale: every transform/opacity leg above rides
-        // toaster.dart's own private `_toastEntrance`
-        // (`Cubic(0.25, 0.1, 0.25, 1)`, still visibly not [standard],
-        // [enter] or [move] at the measured sample points — see
-        // toaster.dart's own "Enter" note), and the one leg that names its
-        // own easing — swipe-release — rides `_toastSwipeOut`
-        // (`Cubic(0, 0, 0.58, 1)`, CSS's own `ease-out`).
-        const Cubic toastSwipeOut = Cubic(0, 0, 0.58, 1);
-        expect(MotionCurves.all.contains(_toastEntrance), isFalse);
-        expect(MotionCurves.all.contains(toastSwipeOut), isFalse);
-      },
-    );
+    test('sonner\'s two easings are still foreign defaults, not folded into '
+        'the seven — F5 under the fourteen', () {
+      // The fourteen retimed the *names* around sonner's choreography but
+      // did not fold its two untokenized cubic-beziers into the
+      // seven-curve scale: every transform/opacity leg above rides
+      // toaster.dart's own private `_toastEntrance`
+      // (`Cubic(0.25, 0.1, 0.25, 1)`, still visibly not [standard],
+      // [enter] or [move] at the measured sample points — see
+      // toaster.dart's own "Enter" note), and the one leg that names its
+      // own easing — swipe-release — rides `_toastSwipeOut`
+      // (`Cubic(0, 0, 0.58, 1)`, CSS's own `ease-out`).
+      const Cubic toastSwipeOut = Cubic(0, 0, 0.58, 1);
+      expect(MotionCurves.all.contains(_toastEntrance), isFalse);
+      expect(MotionCurves.all.contains(toastSwipeOut), isFalse);
+    });
   });
 
   // ────────────────────────────────────────────────────────────────────────

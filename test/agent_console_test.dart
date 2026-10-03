@@ -1376,8 +1376,14 @@ void main() {
     });
 
     test('the two legs are ExitMotion out, EnterMotion in', () {
-      expect(TranscriptSwitchController.outDuration, ExitMotion.duration); // 150ms
-      expect(TranscriptSwitchController.inDuration, EnterMotion.duration); // 400ms
+      expect(
+        TranscriptSwitchController.outDuration,
+        ExitMotion.duration,
+      ); // 150ms
+      expect(
+        TranscriptSwitchController.inDuration,
+        EnterMotion.duration,
+      ); // 400ms
     });
 
     test('the default is idle — a console with no history behind it', () {

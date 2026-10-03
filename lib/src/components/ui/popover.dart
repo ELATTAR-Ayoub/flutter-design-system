@@ -986,4 +986,3 @@ class _PopoverLayout extends SingleChildLayoutDelegate {
       old.collisionPadding != collisionPadding ||
       old.origin != origin;
 }
-

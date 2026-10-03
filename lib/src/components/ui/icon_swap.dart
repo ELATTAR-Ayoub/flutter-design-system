@@ -239,10 +239,7 @@ class _IconSwapState extends State<IconSwap> with TickerProviderStateMixin {
   /// Collapsing the delay along with the duration therefore renders identically
   /// to honouring it.
   void _readMotion() {
-    _roll.duration = effectiveMotionDuration(
-      context,
-      SwapRollMotion.duration,
-    );
+    _roll.duration = effectiveMotionDuration(context, SwapRollMotion.duration);
     _squash.duration = effectiveMotionDuration(context, _squashRun);
 
     final bool stilled = _roll.duration == Duration.zero;
@@ -297,10 +294,7 @@ class _IconSwapState extends State<IconSwap> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     // Re-read on every pass, the way `Press` and `ActiveIndicator` do:
     // the OS switch can flip between two frames of a running roll.
-    _roll.duration = effectiveMotionDuration(
-      context,
-      SwapRollMotion.duration,
-    );
+    _roll.duration = effectiveMotionDuration(context, SwapRollMotion.duration);
     _squash.duration = effectiveMotionDuration(context, _squashRun);
 
     final double step = SwapRollMotion.travelFor(widget.cell);

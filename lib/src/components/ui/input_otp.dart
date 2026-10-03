@@ -614,10 +614,8 @@ class _FakeCaret extends StatelessWidget {
       // visible** (inputs-map §6.3). `KeyframeFill.none` freezes the player at
       // stop 0, which is exactly that.
       fill: KeyframeFill.none,
-      builder: (BuildContext context, double t, Widget? child) => Opacity(
-        opacity: CaretMotion.visibleAt(t) ? 1 : 0,
-        child: child,
-      ),
+      builder: (BuildContext context, double t, Widget? child) =>
+          Opacity(opacity: CaretMotion.visibleAt(t) ? 1 : 0, child: child),
       child: SizedBox(
         // `w-px` — one logical pixel, not one hairline token: the caret is
         // a rule the stylesheet sizes in `px` directly.

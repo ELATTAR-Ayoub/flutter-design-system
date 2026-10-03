@@ -194,48 +194,45 @@ void main() {
       },
     );
 
-    testWidgets(
-      'the loopers (spin, shimmer, progress, pulse, caret) advance a '
-      'bounded frame without throwing',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1440, 900);
-        tester.view.devicePixelRatio = 1;
-        addTearDown(tester.view.reset);
+    testWidgets('the loopers (spin, shimmer, progress, pulse, caret) advance a '
+        'bounded frame without throwing', (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          _harness(
-            controller: ThemeController(mode: ColorMode.dark),
-            child: const KeyframesDocPage(),
-          ),
+      await tester.pumpWidget(
+        _harness(
+          controller: ThemeController(mode: ColorMode.dark),
+          child: const KeyframesDocPage(),
+        ),
+      );
+      await tester.pump();
+
+      final Finder spin = find.byKey(
+        const ValueKey<String>('keyframes-example:spin'),
+      );
+      await tester.ensureVisible(spin);
+      await tester.pump();
+
+      // Every looper repeat()s forever: two bounded pumps, never
+      // pumpAndSettle.
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(seconds: 2));
+
+      expect(tester.takeException(), isNull);
+      for (final String id in <String>[
+        'spin',
+        'shimmer',
+        'progress',
+        'pulse',
+        'caret',
+      ]) {
+        expect(
+          find.byKey(ValueKey<String>('keyframes-example:$id')),
+          findsOneWidget,
         );
-        await tester.pump();
-
-        final Finder spin = find.byKey(
-          const ValueKey<String>('keyframes-example:spin'),
-        );
-        await tester.ensureVisible(spin);
-        await tester.pump();
-
-        // Every looper repeat()s forever: two bounded pumps, never
-        // pumpAndSettle.
-        await tester.pump(const Duration(milliseconds: 500));
-        await tester.pump(const Duration(seconds: 2));
-
-        expect(tester.takeException(), isNull);
-        for (final String id in <String>[
-          'spin',
-          'shimmer',
-          'progress',
-          'pulse',
-          'caret',
-        ]) {
-          expect(
-            find.byKey(ValueKey<String>('keyframes-example:$id')),
-            findsOneWidget,
-          );
-        }
-      },
-    );
+      }
+    });
 
     testWidgets(
       "the swap-roll card's Replay flips its transition without throwing",

@@ -1459,9 +1459,7 @@ class _SidebarMenuState extends State<SidebarMenu>
                   child: AnimatedBuilder(
                     animation: _jelly,
                     builder: (BuildContext context, Widget? child) {
-                      final Offset scale = ChangeMotion.scale.evaluate(
-                        _jelly,
-                      );
+                      final Offset scale = ChangeMotion.scale.evaluate(_jelly);
                       return Transform.scale(
                         scaleX: scale.dx,
                         scaleY: scale.dy,

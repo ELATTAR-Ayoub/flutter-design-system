@@ -460,9 +460,7 @@ class _StatusLineState extends State<_StatusLine>
           final double eased = ShimmerMotion.curve.transform(_c.value);
           final double percent =
               ShimmerMotion.fromPercent +
-              (ShimmerMotion.toPercent -
-                      ShimmerMotion.fromPercent) *
-                  eased;
+              (ShimmerMotion.toPercent - ShimmerMotion.fromPercent) * eased;
           final double offset = (bounds.width - tile) * percent;
           final double radians = _StatusLine.angleDegrees * math.pi / 180;
           // CSS gradient angles run clockwise from "to top", so the axis is

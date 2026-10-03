@@ -370,8 +370,7 @@ class AgentStatusText extends StatelessWidget {
     final double eased = MotionCurves.move.transform(t.clamp(0.0, 1.0));
     final double percent =
         ShimmerMotion.fromPercent +
-        (ShimmerMotion.toPercent - ShimmerMotion.fromPercent) *
-            eased;
+        (ShimmerMotion.toPercent - ShimmerMotion.fromPercent) * eased;
     return width * (1 - tileFactor) * percent;
   }
 

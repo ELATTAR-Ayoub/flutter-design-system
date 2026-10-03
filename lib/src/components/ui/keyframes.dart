@@ -604,7 +604,8 @@ class ShimmerMotion {
 /// anim-progress-indeterminate — a third-width sliver, −100% → 300%, linear.
 class ProgressMotion {
   const ProgressMotion._();
-  static const Duration duration = MotionDurations.shimmer; // web literal 1.4s == shimmer
+  static const Duration duration =
+      MotionDurations.shimmer; // web literal 1.4s == shimmer
   static const Curve curve = Curves.linear;
   static const bool loops = true;
   static const double sliverFraction = 1 / 3;

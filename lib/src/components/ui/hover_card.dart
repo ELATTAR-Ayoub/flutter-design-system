@@ -148,7 +148,10 @@ class _HoverCardState extends State<HoverCard>
       // reassigned here, or a reduced-motion close ignores this computed
       // duration and always reverses over the constructor's own fixed
       // value.
-      final Duration closeDuration = effectiveMotionDuration(context, CloseMotion.duration);
+      final Duration closeDuration = effectiveMotionDuration(
+        context,
+        CloseMotion.duration,
+      );
       _animation
         ..duration = closeDuration
         ..reverseDuration = closeDuration;
@@ -259,4 +262,3 @@ class HoverCardContent extends StatelessWidget {
     child: Padding(padding: EdgeInsets.all(padding), child: child),
   );
 }
-

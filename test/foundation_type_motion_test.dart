@@ -746,219 +746,214 @@ void main() {
 
   // --- shadows (appended by lead) ---
 
-  group(
-    'Shadows — geometry is fixed, ink is themed',
-    () {
-      void expectLayer(
-        ShadowLayer layer,
-        double dx,
-        double dy,
-        double blur,
-        double spread, {
-        bool inset = false,
-      }) {
-        expect(layer.dx, dx);
-        expect(layer.dy, dy);
-        expect(layer.blur, blur);
-        expect(layer.spread, spread);
-        expect(layer.inset, inset);
-      }
+  group('Shadows — geometry is fixed, ink is themed', () {
+    void expectLayer(
+      ShadowLayer layer,
+      double dx,
+      double dy,
+      double blur,
+      double spread, {
+      bool inset = false,
+    }) {
+      expect(layer.dx, dx);
+      expect(layer.dy, dy);
+      expect(layer.blur, blur);
+      expect(layer.spread, spread);
+      expect(layer.inset, inset);
+    }
 
-      test('e1: 0 1px 1px ink-2, 0 1px 3px ink-1', () {
-        expect(Shadows.sm.layers, hasLength(2));
-        expectLayer(Shadows.sm.layers[0], 0, 1, 1, 0);
-        expectLayer(Shadows.sm.layers[1], 0, 1, 3, 0);
-        expect(
-          Shadows.sm.layers[0].color(ThemeTokens.dark),
-          ThemeTokens.dark.ink2,
-        );
-        expect(
-          Shadows.sm.layers[1].color(ThemeTokens.dark),
-          ThemeTokens.dark.ink1,
-        );
-        expect(Shadows.sm.hasInset, isFalse);
-      });
-
-      test('e2: 0 1px 2px ink-2, 0 4px 10px -2px ink-2', () {
-        expectLayer(Shadows.md.layers[0], 0, 1, 2, 0);
-        expectLayer(Shadows.md.layers[1], 0, 4, 10, -2);
-        expect(
-          Shadows.md.layers.every(
-            (l) => l.color(ThemeTokens.light) == ThemeTokens.light.ink2,
-          ),
-          isTrue,
-        );
-      });
-
-      test('e3: 0 2px 4px ink-2, 0 14px 28px -8px ink-3', () {
-        expectLayer(Shadows.lg.layers[0], 0, 2, 4, 0);
-        expectLayer(Shadows.lg.layers[1], 0, 14, 28, -8);
-        expect(
-          Shadows.lg.layers[0].color(ThemeTokens.dark),
-          ThemeTokens.dark.ink2,
-        );
-        expect(
-          Shadows.lg.layers[1].color(ThemeTokens.dark),
-          ThemeTokens.dark.ink3,
-        );
-        expect(Shadows.lg.hasInset, isFalse);
-      });
-
-      test('e4: 0 4px 8px ink-3, 0 28px 56px -14px ink-4', () {
-        expectLayer(Shadows.xl.layers[0], 0, 4, 8, 0);
-        expectLayer(Shadows.xl.layers[1], 0, 28, 56, -14);
-        expect(
-          Shadows.xl.layers[0].color(ThemeTokens.light),
-          ThemeTokens.light.ink3,
-        );
-        expect(
-          Shadows.xl.layers[1].color(ThemeTokens.light),
-          ThemeTokens.light.ink4,
-        );
-      });
-
-      test('key / key-down: the wall layer and its socket', () {
-        expectLayer(Shadows.keyRaised.layers[0], 0, 4, 0, 0);
-        expect(
-          Shadows.keyRaised.layers[0].color(ThemeTokens.dark),
-          ThemeTokens.dark.wall,
-        );
-        expectLayer(Shadows.keyRaised.layers[1], 0, 7, 12, 0);
-        expect(Shadows.keyRaised.hasInset, isFalse);
-
-        expectLayer(Shadows.keyPressed.layers[0], 0, 1, 0, 0);
-        expectLayer(Shadows.keyPressed.layers[1], 0, 2, 5, 0, inset: true);
-        expect(Shadows.keyPressed.hasInset, isTrue);
-      });
-
-      test('pressed: both layers inset', () {
-        expectLayer(Shadows.inset.layers[0], 0, 2, 5, 0, inset: true);
-        expectLayer(Shadows.inset.layers[1], 0, 1, 2, 0, inset: true);
-        expect(Shadows.inset.hasInset, isTrue);
-        expect(Shadows.inset.outerShadows(ThemeTokens.dark), isEmpty);
-      });
-
-      test('btn: rim highlight + inner bottom shade + two outer layers', () {
-        expect(Shadows.control.layers, hasLength(4));
-        expectLayer(Shadows.control.layers[0], 0, 1, 0, 0, inset: true);
-        expect(
-          Shadows.control.layers[0].color(ThemeTokens.dark),
-          ThemeTokens.dark.rim,
-        );
-        expectLayer(Shadows.control.layers[1], 0, -2, 4, 0, inset: true);
-        expectLayer(Shadows.control.layers[2], 0, 1, 2, 0);
-        expectLayer(Shadows.control.layers[3], 0, 3, 8, -2);
-        expect(Shadows.control.hasInset, isTrue);
-        expect(Shadows.control.insetLayers, hasLength(2));
-        expect(Shadows.control.outerShadows(ThemeTokens.dark), hasLength(2));
-      });
-
-      test('btn-primary: rim-strong + action cast at 55%', () {
-        expectLayer(Shadows.controlPrimary.layers[0], 0, 1, 0, 0, inset: true);
-        expect(
-          Shadows.controlPrimary.layers[0].color(ThemeTokens.light),
-          ThemeTokens.light.rimStrong,
-        );
-        expectLayer(Shadows.controlPrimary.layers[1], 0, -2, 5, 0, inset: true);
-        expectLayer(Shadows.controlPrimary.layers[2], 0, 1, 2, 0);
-        expectLayer(Shadows.controlPrimary.layers[3], 0, 4, 10, -2);
-        expect(
-          Shadows.controlPrimary.layers[3].color(ThemeTokens.dark),
-          Palette.action.withValues(alpha: 0.55),
-        );
-      });
-
-      test('btn-value: ink-1 inner shade + value cast at 45%', () {
-        expectLayer(Shadows.controlPremium.layers[1], 0, -2, 5, 0, inset: true);
-        expect(
-          Shadows.controlPremium.layers[1].color(ThemeTokens.dark),
-          ThemeTokens.dark.ink1,
-        );
-        expect(
-          Shadows.controlPremium.layers[3].color(ThemeTokens.dark),
-          Palette.value.withValues(alpha: 0.45),
-        );
-      });
-
-      test('btn-down / chip', () {
-        expectLayer(Shadows.controlPressed.layers[0], 0, 2, 4, 0, inset: true);
-        expectLayer(Shadows.controlPressed.layers[1], 0, 1, 1, 0);
-        expectLayer(Shadows.compactControl.layers[0], 0, 1, 0, 0, inset: true);
-        expectLayer(Shadows.compactControl.layers[1], 0, -1, 2, 0, inset: true);
-        expectLayer(Shadows.compactControl.layers[2], 0, 1, 2, 0);
-      });
-
-      test(
-        'glow-action: 0 0 0 1px action-bright@45% + 0 10 34 -8 action@60%',
-        () {
-          expectLayer(Shadows.glowAction.layers[0], 0, 0, 0, 1);
-          expect(
-            Shadows.glowAction.layers[0].color(ThemeTokens.dark),
-            Palette.actionBright.withValues(alpha: 0.45),
-          );
-          expectLayer(Shadows.glowAction.layers[1], 0, 10, 34, -8);
-          expect(
-            Shadows.glowAction.layers[1].color(ThemeTokens.dark),
-            Palette.action.withValues(alpha: 0.60),
-          );
-          expect(Shadows.glowAction.hasInset, isFalse);
-        },
+    test('e1: 0 1px 1px ink-2, 0 1px 3px ink-1', () {
+      expect(Shadows.sm.layers, hasLength(2));
+      expectLayer(Shadows.sm.layers[0], 0, 1, 1, 0);
+      expectLayer(Shadows.sm.layers[1], 0, 1, 3, 0);
+      expect(
+        Shadows.sm.layers[0].color(ThemeTokens.dark),
+        ThemeTokens.dark.ink2,
       );
-
-      test('glow-value: 0 0 0 1px value@45% + 0 10 34 -8 value@42%', () {
-        expectLayer(Shadows.glowValue.layers[0], 0, 0, 0, 1);
-        expect(
-          Shadows.glowValue.layers[0].color(ThemeTokens.light),
-          Palette.value.withValues(alpha: 0.45),
-        );
-        expectLayer(Shadows.glowValue.layers[1], 0, 10, 34, -8);
-        expect(
-          Shadows.glowValue.layers[1].color(ThemeTokens.light),
-          Palette.value.withValues(alpha: 0.42),
-        );
-      });
-
-      test('ink flips with the theme — same geometry, different colour', () {
-        final BoxShadow darkTop = Shadows.lg
-            .outerShadows(ThemeTokens.dark)
-            .last;
-        final BoxShadow lightTop = Shadows.lg
-            .outerShadows(ThemeTokens.light)
-            .last;
-        expect(darkTop.offset, lightTop.offset);
-        expect(darkTop.blurRadius, lightTop.blurRadius);
-        expect(darkTop.color, isNot(lightTop.color));
-        expect(darkTop.color, ThemeTokens.dark.ink2);
-        expect(lightTop.color, ThemeTokens.light.ink2);
-      });
-
-      test('CSS blur maps to the CSS Gaussian sigma, not Flutter default', () {
-        // CSS: sigma = blur / 2. Flutter: sigma = radius * 0.57735 + 0.5.
-        const ShadowLayer layer = ShadowLayer(0, 28, 56, -14, _dummyInk);
-        expect(layer.blurRadius * 0.57735 + 0.5, closeTo(28.0, 0.001));
-        // Known limit: sigmas below 0.5 are unreachable, so a 1px CSS blur
-        // collapses to a hard edge.
-        const ShadowLayer hairline = ShadowLayer(0, 1, 1, 0, _dummyInk);
-        expect(hairline.blurRadius, 0);
-        const ShadowLayer none = ShadowLayer(0, 0, 0, 1, _dummyInk);
-        expect(none.blurRadius, 0);
-      });
-
-      test(
-        'outerShadows reverses CSS order so the first layer paints on top',
-        () {
-          final List<BoxShadow> shadows = Shadows.xl.outerShadows(
-            ThemeTokens.dark,
-          );
-          expect(
-            shadows.first.offset.dy,
-            28,
-          ); // CSS-last painted first (bottom-most)
-          expect(shadows.last.offset.dy, 4); // CSS-first painted last (on top)
-        },
+      expect(
+        Shadows.sm.layers[1].color(ThemeTokens.dark),
+        ThemeTokens.dark.ink1,
       );
-    },
-  );
+      expect(Shadows.sm.hasInset, isFalse);
+    });
+
+    test('e2: 0 1px 2px ink-2, 0 4px 10px -2px ink-2', () {
+      expectLayer(Shadows.md.layers[0], 0, 1, 2, 0);
+      expectLayer(Shadows.md.layers[1], 0, 4, 10, -2);
+      expect(
+        Shadows.md.layers.every(
+          (l) => l.color(ThemeTokens.light) == ThemeTokens.light.ink2,
+        ),
+        isTrue,
+      );
+    });
+
+    test('e3: 0 2px 4px ink-2, 0 14px 28px -8px ink-3', () {
+      expectLayer(Shadows.lg.layers[0], 0, 2, 4, 0);
+      expectLayer(Shadows.lg.layers[1], 0, 14, 28, -8);
+      expect(
+        Shadows.lg.layers[0].color(ThemeTokens.dark),
+        ThemeTokens.dark.ink2,
+      );
+      expect(
+        Shadows.lg.layers[1].color(ThemeTokens.dark),
+        ThemeTokens.dark.ink3,
+      );
+      expect(Shadows.lg.hasInset, isFalse);
+    });
+
+    test('e4: 0 4px 8px ink-3, 0 28px 56px -14px ink-4', () {
+      expectLayer(Shadows.xl.layers[0], 0, 4, 8, 0);
+      expectLayer(Shadows.xl.layers[1], 0, 28, 56, -14);
+      expect(
+        Shadows.xl.layers[0].color(ThemeTokens.light),
+        ThemeTokens.light.ink3,
+      );
+      expect(
+        Shadows.xl.layers[1].color(ThemeTokens.light),
+        ThemeTokens.light.ink4,
+      );
+    });
+
+    test('key / key-down: the wall layer and its socket', () {
+      expectLayer(Shadows.keyRaised.layers[0], 0, 4, 0, 0);
+      expect(
+        Shadows.keyRaised.layers[0].color(ThemeTokens.dark),
+        ThemeTokens.dark.wall,
+      );
+      expectLayer(Shadows.keyRaised.layers[1], 0, 7, 12, 0);
+      expect(Shadows.keyRaised.hasInset, isFalse);
+
+      expectLayer(Shadows.keyPressed.layers[0], 0, 1, 0, 0);
+      expectLayer(Shadows.keyPressed.layers[1], 0, 2, 5, 0, inset: true);
+      expect(Shadows.keyPressed.hasInset, isTrue);
+    });
+
+    test('pressed: both layers inset', () {
+      expectLayer(Shadows.inset.layers[0], 0, 2, 5, 0, inset: true);
+      expectLayer(Shadows.inset.layers[1], 0, 1, 2, 0, inset: true);
+      expect(Shadows.inset.hasInset, isTrue);
+      expect(Shadows.inset.outerShadows(ThemeTokens.dark), isEmpty);
+    });
+
+    test('btn: rim highlight + inner bottom shade + two outer layers', () {
+      expect(Shadows.control.layers, hasLength(4));
+      expectLayer(Shadows.control.layers[0], 0, 1, 0, 0, inset: true);
+      expect(
+        Shadows.control.layers[0].color(ThemeTokens.dark),
+        ThemeTokens.dark.rim,
+      );
+      expectLayer(Shadows.control.layers[1], 0, -2, 4, 0, inset: true);
+      expectLayer(Shadows.control.layers[2], 0, 1, 2, 0);
+      expectLayer(Shadows.control.layers[3], 0, 3, 8, -2);
+      expect(Shadows.control.hasInset, isTrue);
+      expect(Shadows.control.insetLayers, hasLength(2));
+      expect(Shadows.control.outerShadows(ThemeTokens.dark), hasLength(2));
+    });
+
+    test('btn-primary: rim-strong + action cast at 55%', () {
+      expectLayer(Shadows.controlPrimary.layers[0], 0, 1, 0, 0, inset: true);
+      expect(
+        Shadows.controlPrimary.layers[0].color(ThemeTokens.light),
+        ThemeTokens.light.rimStrong,
+      );
+      expectLayer(Shadows.controlPrimary.layers[1], 0, -2, 5, 0, inset: true);
+      expectLayer(Shadows.controlPrimary.layers[2], 0, 1, 2, 0);
+      expectLayer(Shadows.controlPrimary.layers[3], 0, 4, 10, -2);
+      expect(
+        Shadows.controlPrimary.layers[3].color(ThemeTokens.dark),
+        Palette.action.withValues(alpha: 0.55),
+      );
+    });
+
+    test('btn-value: ink-1 inner shade + value cast at 45%', () {
+      expectLayer(Shadows.controlPremium.layers[1], 0, -2, 5, 0, inset: true);
+      expect(
+        Shadows.controlPremium.layers[1].color(ThemeTokens.dark),
+        ThemeTokens.dark.ink1,
+      );
+      expect(
+        Shadows.controlPremium.layers[3].color(ThemeTokens.dark),
+        Palette.value.withValues(alpha: 0.45),
+      );
+    });
+
+    test('btn-down / chip', () {
+      expectLayer(Shadows.controlPressed.layers[0], 0, 2, 4, 0, inset: true);
+      expectLayer(Shadows.controlPressed.layers[1], 0, 1, 1, 0);
+      expectLayer(Shadows.compactControl.layers[0], 0, 1, 0, 0, inset: true);
+      expectLayer(Shadows.compactControl.layers[1], 0, -1, 2, 0, inset: true);
+      expectLayer(Shadows.compactControl.layers[2], 0, 1, 2, 0);
+    });
+
+    test(
+      'glow-action: 0 0 0 1px action-bright@45% + 0 10 34 -8 action@60%',
+      () {
+        expectLayer(Shadows.glowAction.layers[0], 0, 0, 0, 1);
+        expect(
+          Shadows.glowAction.layers[0].color(ThemeTokens.dark),
+          Palette.actionBright.withValues(alpha: 0.45),
+        );
+        expectLayer(Shadows.glowAction.layers[1], 0, 10, 34, -8);
+        expect(
+          Shadows.glowAction.layers[1].color(ThemeTokens.dark),
+          Palette.action.withValues(alpha: 0.60),
+        );
+        expect(Shadows.glowAction.hasInset, isFalse);
+      },
+    );
+
+    test('glow-value: 0 0 0 1px value@45% + 0 10 34 -8 value@42%', () {
+      expectLayer(Shadows.glowValue.layers[0], 0, 0, 0, 1);
+      expect(
+        Shadows.glowValue.layers[0].color(ThemeTokens.light),
+        Palette.value.withValues(alpha: 0.45),
+      );
+      expectLayer(Shadows.glowValue.layers[1], 0, 10, 34, -8);
+      expect(
+        Shadows.glowValue.layers[1].color(ThemeTokens.light),
+        Palette.value.withValues(alpha: 0.42),
+      );
+    });
+
+    test('ink flips with the theme — same geometry, different colour', () {
+      final BoxShadow darkTop = Shadows.lg.outerShadows(ThemeTokens.dark).last;
+      final BoxShadow lightTop = Shadows.lg
+          .outerShadows(ThemeTokens.light)
+          .last;
+      expect(darkTop.offset, lightTop.offset);
+      expect(darkTop.blurRadius, lightTop.blurRadius);
+      expect(darkTop.color, isNot(lightTop.color));
+      expect(darkTop.color, ThemeTokens.dark.ink2);
+      expect(lightTop.color, ThemeTokens.light.ink2);
+    });
+
+    test('CSS blur maps to the CSS Gaussian sigma, not Flutter default', () {
+      // CSS: sigma = blur / 2. Flutter: sigma = radius * 0.57735 + 0.5.
+      const ShadowLayer layer = ShadowLayer(0, 28, 56, -14, _dummyInk);
+      expect(layer.blurRadius * 0.57735 + 0.5, closeTo(28.0, 0.001));
+      // Known limit: sigmas below 0.5 are unreachable, so a 1px CSS blur
+      // collapses to a hard edge.
+      const ShadowLayer hairline = ShadowLayer(0, 1, 1, 0, _dummyInk);
+      expect(hairline.blurRadius, 0);
+      const ShadowLayer none = ShadowLayer(0, 0, 0, 1, _dummyInk);
+      expect(none.blurRadius, 0);
+    });
+
+    test(
+      'outerShadows reverses CSS order so the first layer paints on top',
+      () {
+        final List<BoxShadow> shadows = Shadows.xl.outerShadows(
+          ThemeTokens.dark,
+        );
+        expect(
+          shadows.first.offset.dy,
+          28,
+        ); // CSS-last painted first (bottom-most)
+        expect(shadows.last.offset.dy, 4); // CSS-first painted last (on top)
+      },
+    );
+  });
 }
 
 Color _dummyInk(ThemeTokens t) => t.ink2;

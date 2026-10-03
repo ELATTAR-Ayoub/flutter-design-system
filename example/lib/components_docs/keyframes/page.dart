@@ -321,8 +321,7 @@ class _EnterRowsState extends State<_EnterRows>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: _total)
-      ..forward();
+    _controller = AnimationController(vsync: this, duration: _total)..forward();
   }
 
   @override
@@ -362,8 +361,10 @@ class _EnterRowsState extends State<_EnterRows>
   }
 }
 
-Widget _enterStage(BuildContext context, int run, bool on) =>
-    KeyedSubtree(key: ValueKey<String>('enter-$run'), child: const _EnterRows());
+Widget _enterStage(BuildContext context, int run, bool on) => KeyedSubtree(
+  key: ValueKey<String>('enter-$run'),
+  child: const _EnterRows(),
+);
 
 /// exit — the same four rows, statically at rest; the second one leaves on
 /// Replay (playing [ExitMotion] once) and comes back — no animation class at
@@ -415,7 +416,9 @@ const double _scrimAlpha = 0.6;
 // scrim and the stage's own padding are accounted for.
 Widget _overlayDialog(BuildContext context) => SizedBox(
   width: space(44),
-  child: const Card(children: <Widget>[CardHeader(title: CardTitle('Delete pack?'))]),
+  child: const Card(
+    children: <Widget>[CardHeader(title: CardTitle('Delete pack?'))],
+  ),
 );
 
 /// open — a dialog on its scrim, driven forward once per remount by
@@ -434,8 +437,10 @@ class _OpenStageState extends State<_OpenStage>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: OpenMotion.duration)
-      ..forward();
+    _controller = AnimationController(
+      vsync: this,
+      duration: OpenMotion.duration,
+    )..forward();
   }
 
   @override
@@ -458,10 +463,9 @@ class _OpenStageState extends State<_OpenStage>
             animation: _controller,
             builder: (BuildContext context, Widget? child) => Opacity(
               opacity:
-                  EnterMotion.opacity.transform(_controller.value).clamp(
-                        0.0,
-                        1.0,
-                      ) *
+                  EnterMotion.opacity
+                      .transform(_controller.value)
+                      .clamp(0.0, 1.0) *
                   _scrimAlpha,
               child: DecoratedBox(
                 decoration: BoxDecoration(color: theme.background),
@@ -813,8 +817,7 @@ class _PressStageState extends State<_PressStage> {
   }
 
   Offset? _center() {
-    final RenderObject? object = _buttonKey.currentContext
-        ?.findRenderObject();
+    final RenderObject? object = _buttonKey.currentContext?.findRenderObject();
     if (object is! RenderBox || !object.hasSize) return null;
     return object.localToGlobal(object.size.center(Offset.zero));
   }
@@ -837,11 +840,8 @@ class _PressStageState extends State<_PressStage> {
   }
 
   @override
-  Widget build(BuildContext context) => Button(
-    key: _buttonKey,
-    onPressed: () {},
-    child: const Text('Continue'),
-  );
+  Widget build(BuildContext context) =>
+      Button(key: _buttonKey, onPressed: () {}, child: const Text('Continue'));
 }
 
 Widget _pressStage(BuildContext context, int run, bool on) =>
@@ -941,7 +941,12 @@ final List<_CardSpec> _cardSpecs = <_CardSpec>[
     what: 'A value that just changed. Also the checkbox tick and radio dot.',
     builder: _changeStage,
   ),
-  _CardSpec(id: 'spin', name: 'SpinMotion', what: 'The spinner.', builder: _spinStage),
+  _CardSpec(
+    id: 'spin',
+    name: 'SpinMotion',
+    what: 'The spinner.',
+    builder: _spinStage,
+  ),
   _CardSpec(
     id: 'shimmer',
     name: 'ShimmerMotion',
@@ -1464,27 +1469,26 @@ class _StatesContent extends StatelessWidget {
   const _StatesContent();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => _bullets(ThemeScope.of(context), <String>[
-    'This file has no "component state" of its own — each table is '
-        'data, and KeyframePlayer is the one place a run state lives: '
-        'forward-once (EnterMotion, ExitMotion, OpenMotion, CloseMotion, '
-        'ChangeMotion, all fill: both) or repeat() forever (SpinMotion, '
-        'ShimmerMotion, ProgressMotion, PulseMotion, all fill: none). '
-        'ExpandMotion, CaretMotion and SwapRollMotion declare no fill at '
-        'all — none of the three is driven by KeyframePlayer.',
-    'Reduced motion is the one real state every table answers to. '
-        'KeyframePlayer reads effectiveMotionDuration on every build: '
-        'under MediaQuery.disableAnimations the controller stops and '
-        'its value snaps outright — never a zero-length animation — '
-        'to upperBound for a both-fill table (holding its final '
-        'stop) or to lowerBound for a none-fill looper (reverting to '
-        'the element\'s own resting style, stop 0).',
-    'A both-fill table never restarts on its own: replay is remount, '
-        'a fresh KeyedSubtree — see the fourteen cards above, each with '
-        'its own Replay.',
-  ]);
+  Widget build(BuildContext context) =>
+      _bullets(ThemeScope.of(context), <String>[
+        'This file has no "component state" of its own — each table is '
+            'data, and KeyframePlayer is the one place a run state lives: '
+            'forward-once (EnterMotion, ExitMotion, OpenMotion, CloseMotion, '
+            'ChangeMotion, all fill: both) or repeat() forever (SpinMotion, '
+            'ShimmerMotion, ProgressMotion, PulseMotion, all fill: none). '
+            'ExpandMotion, CaretMotion and SwapRollMotion declare no fill at '
+            'all — none of the three is driven by KeyframePlayer.',
+        'Reduced motion is the one real state every table answers to. '
+            'KeyframePlayer reads effectiveMotionDuration on every build: '
+            'under MediaQuery.disableAnimations the controller stops and '
+            'its value snaps outright — never a zero-length animation — '
+            'to upperBound for a both-fill table (holding its final '
+            'stop) or to lowerBound for a none-fill looper (reverting to '
+            'the element\'s own resting style, stop 0).',
+        'A both-fill table never restarts on its own: replay is remount, '
+            'a fresh KeyedSubtree — see the fourteen cards above, each with '
+            'its own Replay.',
+      ]);
 }
 
 class _AccessibilityContent extends StatelessWidget {
@@ -1530,17 +1534,16 @@ class _ResponsiveContent extends StatelessWidget {
   const _ResponsiveContent();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => _bullets(ThemeScope.of(context), <String>[
-    'No breakpoint branching anywhere in keyframes.dart: '
-        'BuildContext width is never read for a layout decision.',
-    'Every geometric table (ShimmerMotion\'s tile, SwapRollMotion\'s '
-        'travel) is expressed as a function of the host\'s own size — '
-        'tileWidth(width), travelFor(cellHeight) — so the motion scales '
-        'with whatever box a caller gives it, exactly like a CSS '
-        'background-size or a percentage transform would.',
-  ]);
+  Widget build(BuildContext context) =>
+      _bullets(ThemeScope.of(context), <String>[
+        'No breakpoint branching anywhere in keyframes.dart: '
+            'BuildContext width is never read for a layout decision.',
+        'Every geometric table (ShimmerMotion\'s tile, SwapRollMotion\'s '
+            'travel) is expressed as a function of the host\'s own size — '
+            'tileWidth(width), travelFor(cellHeight) — so the motion scales '
+            'with whatever box a caller gives it, exactly like a CSS '
+            'background-size or a percentage transform would.',
+      ]);
 }
 
 class _DependenciesContent extends StatelessWidget {
@@ -1592,19 +1595,18 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => _bullets(ThemeScope.of(context), <String>[
-    'Every table in this file is theme-blind: the geometry, the '
-        'durations and the curves are all constants. The one that '
-        'touches colour at all resolves it live rather than storing '
-        'it: PulseMotion.ringColorAt mixes a fixed ink against '
-        'OklabColor.mix, read fresh on every frame rather than cached.',
-    'What actually flips with the theme on this page is the host '
-        'around each table: the card fill (theme.card), its border '
-        '(theme.border) and the icon tones passed to Icon — the '
-        'same as any other specimen on the kit.',
-  ]);
+  Widget build(BuildContext context) =>
+      _bullets(ThemeScope.of(context), <String>[
+        'Every table in this file is theme-blind: the geometry, the '
+            'durations and the curves are all constants. The one that '
+            'touches colour at all resolves it live rather than storing '
+            'it: PulseMotion.ringColorAt mixes a fixed ink against '
+            'OklabColor.mix, read fresh on every frame rather than cached.',
+        'What actually flips with the theme on this page is the host '
+            'around each table: the card fill (theme.card), its border '
+            '(theme.border) and the icon tones passed to Icon — the '
+            'same as any other specimen on the kit.',
+      ]);
 }
 
 Widget _bullets(ThemeTokens theme, List<String> lines) => Column(

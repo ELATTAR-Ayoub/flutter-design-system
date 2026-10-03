@@ -1557,4 +1557,3 @@ class MenuPointerDown extends StatelessWidget {
     return Listener(onPointerDown: (_) => onPointerDown(), child: child);
   }
 }
-

@@ -1195,24 +1195,23 @@ class _ThemingContent extends StatelessWidget {
   const _ThemingContent();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => _bullets(ThemeScope.of(context), <String>[
-    'A choice reads theme.muted, theme.input, theme.primary and '
-        'theme.destructive live off ThemeScope.of(context) at every '
-        'build: unanswered, answered, hovered and invalid each pick '
-        'a different combination of the same four tokens.',
-    'QuestionnaireInput and QuestionnaireError both route their '
-        'colour through the same tokens Field uses elsewhere: '
-        'theme.input for the pill border, theme.destructiveText for '
-        'the error text.',
-    'The answered dot\'s pop-in (ChangeMotion) and the row\'s own hover/'
-        'checked transitions both run on MotionCurves and '
-        'effectiveMotionDuration, the same clock every other control in '
-        'this system shares — nothing here is a bespoke duration.',
-    'Flipping ThemeController re-resolves every one of these on '
-        'the next frame: nothing is cached.',
-  ]);
+  Widget build(BuildContext context) =>
+      _bullets(ThemeScope.of(context), <String>[
+        'A choice reads theme.muted, theme.input, theme.primary and '
+            'theme.destructive live off ThemeScope.of(context) at every '
+            'build: unanswered, answered, hovered and invalid each pick '
+            'a different combination of the same four tokens.',
+        'QuestionnaireInput and QuestionnaireError both route their '
+            'colour through the same tokens Field uses elsewhere: '
+            'theme.input for the pill border, theme.destructiveText for '
+            'the error text.',
+        'The answered dot\'s pop-in (ChangeMotion) and the row\'s own hover/'
+            'checked transitions both run on MotionCurves and '
+            'effectiveMotionDuration, the same clock every other control in '
+            'this system shares — nothing here is a bespoke duration.',
+        'Flipping ThemeController re-resolves every one of these on '
+            'the next frame: nothing is cached.',
+      ]);
 }
 
 Widget _bullets(ThemeTokens theme, List<String> lines) => Column(

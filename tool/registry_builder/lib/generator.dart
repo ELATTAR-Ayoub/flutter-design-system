@@ -58,7 +58,7 @@ class RegistryGenerator {
   /// moves with the release rather than on its own. Items keep their own
   /// versions: an item that did not change stays where it was released, which
   /// is what makes the released payloads reproducible byte for byte.
-  static const String defaultRegistryVersion = '0.0.3';
+  static const String defaultRegistryVersion = '0.0.4';
 
   final Directory repositoryRoot;
   final Directory? registryRoot;

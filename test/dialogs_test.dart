@@ -1134,7 +1134,10 @@ void main() {
               builder: (BuildContext context) => MediaQuery(
                 data: MediaQuery.of(context).copyWith(disableAnimations: true),
                 child: HoverCard(
-                  trigger: Button(onPressed: () {}, child: const Text('trigger')),
+                  trigger: Button(
+                    onPressed: () {},
+                    child: const Text('trigger'),
+                  ),
                   content: const SizedBox(height: 120),
                 ),
               ),
