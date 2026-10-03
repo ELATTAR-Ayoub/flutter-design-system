@@ -327,7 +327,9 @@ class _Mark extends StatelessWidget {
           child: child,
         );
       },
-      child: CustomPaint(painter: _MarkPainter(path: path, color: color)),
+      child: CustomPaint(
+        painter: _MarkPainter(path: path, color: color),
+      ),
     );
   }
 }

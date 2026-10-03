@@ -361,7 +361,7 @@
         {
           "source": "lib/src/components/ui/agent_face.dart",
           "target": "@ui/agent_face.dart",
-          "sha256": "9c3589732062dd9a4ee189d7837139390eb1244af5710e7f863553a92560f096"
+          "sha256": "b1652b158c6f8f2e9a5baffe81afc1ed60edd5a767098321ec7d4a98f09d0c80"
         }
       ],
       "registryDependencies": [
@@ -1179,7 +1179,7 @@
         {
           "source": "lib/src/components/ui/checkbox.dart",
           "target": "@ui/checkbox.dart",
-          "sha256": "02a1909139d367d87ed7dff9ba42ea1c3f346684031c182d3ad7947321a9ed4a"
+          "sha256": "58c708e0ce33f11713a2703ba1be698404fdd2e34ec04b42054f6007f0eef55d"
         }
       ],
       "registryDependencies": [
@@ -1690,7 +1690,7 @@
         {
           "source": "lib/src/components/ui/hover_card.dart",
           "target": "@ui/hover_card.dart",
-          "sha256": "8b266903fa3deeaf6904431021576957b109312f52e0d282806cdbebf5213187"
+          "sha256": "8e91e3799e458ae3c333129feb7c6327ac66fe990602a1431f8a3d06645704e8"
         }
       ],
       "registryDependencies": [
@@ -1768,7 +1768,7 @@
         {
           "source": "lib/src/components/ui/icon_swap.dart",
           "target": "@ui/icon_swap.dart",
-          "sha256": "e4bc263dc528bf9a7595f8691848d92d81d018da00ba6a4c3df5aa0b2f9f619d"
+          "sha256": "a14bdc2760610734a94f255d45d89d82fe3b11d9409043afecb256628c9bd9a2"
         }
       ],
       "registryDependencies": [
@@ -1874,7 +1874,7 @@
         {
           "source": "lib/src/components/ui/input_otp.dart",
           "target": "@ui/input_otp.dart",
-          "sha256": "8c81da8dc692b9f7841472e006d5511ec703a8faeeb34b5a7d43dce12bc5ddfd"
+          "sha256": "64d58131cc6a3562599a6dab55df5d013722ba63cfd0698d6d1d7e79e10fd703"
         }
       ],
       "registryDependencies": [
@@ -1973,7 +1973,7 @@
         {
           "source": "lib/src/components/ui/keyframes.dart",
           "target": "@ui/keyframes.dart",
-          "sha256": "c7f8e0f6551f9c1cd57637dc18ffddc8977f6eebbc41630984884d9a234da890"
+          "sha256": "e8eb2865311dda45c79e3f663d5dc2719580d69176a8e4889167d154afa269b7"
         },
         {
           "source": "lib/src/components/ui/open_transition.dart",
@@ -2059,7 +2059,7 @@
         {
           "source": "lib/src/components/ui/menu.dart",
           "target": "@ui/menu.dart",
-          "sha256": "db61a1c1b16d6873dbfaf75faea5e203e31bd9a0bd5c17cb4eeeeb4b7293e520"
+          "sha256": "be1fdf8ea3ec2b87150eab3a0c9d24fab7ae7f54d80e6036559822b39bff8b17"
         }
       ],
       "registryDependencies": [
@@ -2295,7 +2295,7 @@
         {
           "source": "lib/src/components/ui/popover.dart",
           "target": "@ui/popover.dart",
-          "sha256": "be9d644a326b7ea71f1cc7e965909a9fc3b1a587645b93ba7cb78556de8138bc"
+          "sha256": "2586330f75361f9a12234d70a85d0ccce6d992dfc685e2c1493325d256226e63"
         }
       ],
       "registryDependencies": [
@@ -2704,7 +2704,7 @@
         {
           "source": "lib/src/components/ui/sidebar.dart",
           "target": "@ui/sidebar.dart",
-          "sha256": "40772c8a2b2cc4fa6803efbed6bcc2da5144847461be880b597566bf7f583a4a"
+          "sha256": "be38a12cffe324e5aa285b57f49d33c7181bcd77272fece7db12c45aa11d1548"
         }
       ],
       "registryDependencies": [
@@ -3247,7 +3247,7 @@
         {
           "source": "lib/src/components/ui/tooltip.dart",
           "target": "@ui/tooltip.dart",
-          "sha256": "d26f1fc12a1d59f0231dec74083e318924c1525dc04843f1148fe0a0fc0196dd"
+          "sha256": "3bd29e2c8a9e8c6d954166ad8010ca08bb55f171768ccf15cc04bf1cc598f370"
         }
       ],
       "registryDependencies": [

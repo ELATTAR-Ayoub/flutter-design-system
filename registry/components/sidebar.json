@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/sidebar.dart",
       "target": "@ui/sidebar.dart",
-      "sha256": "40772c8a2b2cc4fa6803efbed6bcc2da5144847461be880b597566bf7f583a4a"
+      "sha256": "be38a12cffe324e5aa285b57f49d33c7181bcd77272fece7db12c45aa11d1548"
     }
   ],
   "registryDependencies": [

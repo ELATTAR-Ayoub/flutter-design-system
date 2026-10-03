@@ -300,7 +300,10 @@ class _TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
     // to be reassigned here, or a reduced-motion close ignores this
     // computed duration and always reverses over the constructor's own
     // fixed value.
-    final Duration closeDuration = effectiveMotionDuration(context, CloseMotion.duration);
+    final Duration closeDuration = effectiveMotionDuration(
+      context,
+      CloseMotion.duration,
+    );
     _animation
       ..duration = closeDuration
       ..reverseDuration = closeDuration;
@@ -553,4 +556,3 @@ class _ArrowPainter extends CustomPainter {
   bool shouldRepaint(_ArrowPainter old) =>
       old.color != color || old.side != side;
 }
-

@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_face.dart",
       "target": "@ui/agent_face.dart",
-      "sha256": "9c3589732062dd9a4ee189d7837139390eb1244af5710e7f863553a92560f096"
+      "sha256": "b1652b158c6f8f2e9a5baffe81afc1ed60edd5a767098321ec7d4a98f09d0c80"
     }
   ],
   "registryDependencies": [
