@@ -273,13 +273,13 @@ class _TypingCursorState extends State<TypingCursor>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: PulseMotion.duration,
+    duration: LivePulseMotion.duration,
   );
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (effectiveMotionDuration(context, PulseMotion.duration) ==
+    if (effectiveMotionDuration(context, LivePulseMotion.duration) ==
         Duration.zero) {
       _c.stop();
       _c.value = 0;
@@ -327,11 +327,11 @@ class _TypingCursorState extends State<TypingCursor>
   }
 }
 
-/// [PulseMotion] on a 1×16 box.
+/// `pulls-pulse-live` on a 1×16 box.
 ///
 /// CSS spread grows the *border box* on all four sides, and the caret's box has
 /// square corners, so the ring is a rectangle rather than the circle
-/// [PulseMotion] draws for the live dot. Both halves read off the same
+/// [LivePulseMotion] draws for the live dot. Both halves read off the same
 /// keyframe table, so retiming one retimes the other.
 class _CaretPainter extends CustomPainter {
   const _CaretPainter({required this.phase, required this.mark});
@@ -342,18 +342,18 @@ class _CaretPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final double spread =
-        PulseMotion.ringSpread * PulseMotion.ringPhase.transform(phase);
+        LivePulseMotion.ringSpread * LivePulseMotion.ringPhase.transform(phase);
     if (spread > 0) {
       canvas.drawRect(
         Rect.fromLTWH(0, 0, size.width, size.height).inflate(spread),
-        Paint()..color = PulseMotion.ringColorAt(phase),
+        Paint()..color = LivePulseMotion.ringColorAt(phase),
       );
     }
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
       Paint()
         ..color = mark.withValues(
-          alpha: mark.a * PulseMotion.dotOpacityAt(phase),
+          alpha: mark.a * LivePulseMotion.dotOpacityAt(phase),
         ),
     );
   }
@@ -365,7 +365,7 @@ class _CaretPainter extends CustomPainter {
 
 /* ── Tool chip ───────────────────────────────────────────────────────────── */
 
-/// `anim-spin` — [SpinMotion], 0.9s linear infinite.
+/// `anim-spin` — `pulls-spin 0.9s linear infinite`.
 ///
 /// *"`linear` on purpose: a spinner that eases is a spinner that looks broken."*
 class _Spin extends StatefulWidget {
@@ -855,16 +855,7 @@ class ApprovalCard extends StatelessWidget {
         describe?.call(approval.action, approval.params) ??
         defaultSentence(approval);
 
-    return KeyframePlayer(
-      duration: EnterMotion.duration,
-      fill: EnterMotion.fill,
-      builder: (BuildContext context, double t, Widget? child) => Opacity(
-        opacity: EnterMotion.opacity.transform(t),
-        child: Transform.translate(
-          offset: Offset(0, EnterMotion.translateY.transform(t)),
-          child: child,
-        ),
-      ),
+    return FadeUp(
       child: Semantics(
         container: true,
         label: 'The assistant is asking permission',
@@ -978,8 +969,62 @@ class ApprovalCard extends StatelessWidget {
 
 /* ── Entrance utilities ──────────────────────────────────────────────────── */
 
-/// `anim-row-in` — [EnterMotion] on `--duration-base`/`--ease-out`, with
-/// `animation-delay: calc(tick + index * tick / 2)`.
+/// `anim-fade-up` — `pulls-fade-up var(--duration-slow) var(--ease-out) both`:
+/// opacity 0→1 over a 10px rise.
+class FadeUp extends StatefulWidget {
+  const FadeUp({super.key, required this.child});
+
+  /// `translateY(10px)` at the `from` stop.
+  static double get rise => space(2.5);
+
+  final Widget child;
+
+  @override
+  State<FadeUp> createState() => _FadeUpState();
+}
+
+class _FadeUpState extends State<FadeUp> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: MotionDurations.slow,
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (effectiveMotionDuration(context, MotionDurations.slow) ==
+        Duration.zero) {
+      _c.value = 1;
+    } else if (!_c.isAnimating && _c.value == 0) {
+      _c.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _c,
+    builder: (BuildContext context, Widget? child) {
+      final double t = MotionCurves.enter.transform(_c.value);
+      return Opacity(
+        opacity: t,
+        child: Transform.translate(
+          offset: Offset(0, FadeUp.rise * (1 - t)),
+          child: child,
+        ),
+      );
+    },
+    child: widget.child,
+  );
+}
+
+/// `anim-row-in` — `pulls-row-in var(--duration-base) var(--ease-out) both`
+/// with `animation-delay: calc(tick + index * tick / 2)`.
 ///
 /// The same stagger the history list uses, so the two editable grids in this
 /// product arrive the same way.
@@ -1405,13 +1450,13 @@ class _SpringUpEntranceState extends State<SpringUpEntrance>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: EnterMotion.duration,
+    duration: SpringEntranceMotion.duration,
   );
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (effectiveMotionDuration(context, EnterMotion.duration) ==
+    if (effectiveMotionDuration(context, SpringEntranceMotion.duration) ==
         Duration.zero) {
       _c.value = 1;
     } else if (!_c.isAnimating && _c.value == 0) {
@@ -1429,9 +1474,9 @@ class _SpringUpEntranceState extends State<SpringUpEntrance>
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _c,
     builder: (BuildContext context, Widget? child) => Opacity(
-      opacity: EnterMotion.opacity.transform(_c.value),
+      opacity: SpringEntranceMotion.opacity.transform(_c.value),
       child: Transform.translate(
-        offset: Offset(0, EnterMotion.translateY.transform(_c.value)),
+        offset: Offset(0, SpringEntranceMotion.translateY.transform(_c.value)),
         child: child,
       ),
     ),
@@ -1453,13 +1498,13 @@ class _PopInEntranceState extends State<PopInEntrance>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: EnterMotion.duration,
+    duration: EntranceMotion.duration,
   );
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (effectiveMotionDuration(context, EnterMotion.duration) ==
+    if (effectiveMotionDuration(context, EntranceMotion.duration) ==
         Duration.zero) {
       _c.value = 1;
     } else if (!_c.isAnimating && _c.value == 0) {
@@ -1477,10 +1522,16 @@ class _PopInEntranceState extends State<PopInEntrance>
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _c,
     builder: (BuildContext context, Widget? child) {
-      final double scale = EnterMotion.scale.transform(_c.value);
+      // `dx` is `scaleX`, `dy` is `scaleY` — the pop squashes on the way
+      // through, so the two axes are never equal mid-flight.
+      final Offset scale = EntranceMotion.scale.transform(_c.value);
       return Opacity(
-        opacity: EnterMotion.opacity.transform(_c.value),
-        child: Transform.scale(scale: scale, child: child),
+        opacity: EntranceMotion.opacity.transform(_c.value),
+        child: Transform.scale(
+          scaleX: scale.dx,
+          scaleY: scale.dy,
+          child: child,
+        ),
       );
     },
     child: widget.child,

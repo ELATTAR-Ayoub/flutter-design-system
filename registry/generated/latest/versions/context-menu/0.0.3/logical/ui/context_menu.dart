@@ -97,7 +97,7 @@ class _ContextMenuState extends State<ContextMenu> {
       align: PopoverAlign.start,
       sideOffset: ContextMenu.sideOffset,
       origin: PopoverAnchorMode.corner,
-      slideSides: PopoverSide.values.toSet(),
+      slideSides: MenuMotion.slideSides,
       onDismiss: _close,
       anchor: Listener(
         // A secondary-button press. `onSecondaryTapDown` would work for a

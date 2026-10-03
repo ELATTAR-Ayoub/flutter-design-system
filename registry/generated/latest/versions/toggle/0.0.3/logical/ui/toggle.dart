@@ -8,7 +8,7 @@
 /// * **No press feedback at all.** The class list carries no `:active` rule and
 ///   no `btn-spring`. What it carries is a bare `transition-all`, which the
 ///   framework times at `--default-transition-duration` on
-///   `--default-transition-timing-function` — and the stylesheet points
+///   `--default-transition-timing-function` — and globals.css L395–396 points
 ///   those two at `--duration-base` and `--ease-out`. A Button squishes 5% and
 ///   registers in 80ms; a Toggle does nothing at all until the state actually
 ///   changes, then eases every changed property over 250ms (buttons-map
@@ -28,7 +28,7 @@
 /// | `rounded-lg` | 12px — **not** a pill. Only the group's travelling pill is a stadium |
 /// | `text-sm font-medium whitespace-nowrap` | 13px / 500, no wrapping |
 /// | `transition-all` | every property, at the framework defaults above |
-/// | `outline-none` | kills the global `:focus-visible` outline |
+/// | `outline-none` | kills the global `:focus-visible` outline (globals.css L997–1000) |
 /// | `hover:bg-muted hover:text-foreground` | fill `--muted`; **the ink half is inert** — see below |
 /// | `focus-visible:border-ring` | **inert on `variant="default"`** — see below |
 /// | `focus-visible:ring-3 focus-visible:ring-ring/50` | a `0 0 0 3px` ring at `--ring` @50%: the only focus affordance |

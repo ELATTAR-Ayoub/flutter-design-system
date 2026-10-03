@@ -32,9 +32,9 @@
 /// ## `anim-shimmer-text` is not the `shimmer` utility
 ///
 /// [AttachmentStatusText] (`attachment.dart`) is shadcn's `shimmer`: 2s linear, a
-/// `3ch + 40px` band, base ink → white. The status line wears `anim-shimmer-text`,
-/// which is a **different** animation and was measured as such on the live
-/// console:
+/// `3ch + 40px` band, base ink → white. The status line wears `anim-shimmer-text`
+/// (globals.css L3056–3068), which is a **different** animation and was measured
+/// as such on the live console:
 ///
 /// ```
 /// background-image: linear-gradient(100deg, --muted-foreground 30%,
@@ -43,11 +43,11 @@
 /// background-size: 220% 100%
 /// background-clip: text
 /// color: transparent
-/// animation: 2.6s var(--ease-in-out) infinite
+/// animation: pulls-shimmer 2.6s var(--ease-in-out) infinite
 /// ```
 ///
-/// So this file paints its own, sharing the same travel constants with
-/// [ShimmerMotion] rather than restating them. The `100deg` tilt is dropped: on the
+/// So this file paints its own, sharing `pulls-shimmer`'s travel constants with
+/// [LoadingShimmerMotion] rather than restating them. The `100deg` tilt is dropped: on the
 /// 13.8px line box a `.type-chip` renders, ten degrees of lean is 2.4px of
 /// vertical run against ~48px of horizontal, and [AttachmentStatusText] already sets
 /// the precedent of treating a small angle as horizontal.
@@ -328,7 +328,7 @@ class AgentStatusLine extends StatelessWidget {
   }
 }
 
-/// `@utility anim-shimmer-text`.
+/// `@utility anim-shimmer-text` — globals.css L3056–3068.
 ///
 /// *"A highlight travelling through live text — the agent's status line while it
 /// works. Clipped to the glyphs rather than painted behind them, so it reads as
@@ -336,19 +336,19 @@ class AgentStatusLine extends StatelessWidget {
 /// things that animate forever, and it earns it the same way `anim-pulse-live`
 /// does: it is the signal that the agent has not stalled."*
 ///
-/// Measured on the live console mid-turn: **2.6s**,
+/// Measured on the live console mid-turn: `pulls-shimmer`, **2.6s**,
 /// `cubic-bezier(0.65, 0, 0.35, 1)` (`--ease-in-out`), `infinite`, no fill —
 /// so reduced motion reverts to stop 0, the tile parked at `200%`.
 ///
 /// `background-size: 220% 100%` and `background-position: X%` put the tile's
 /// left edge at `(W − S)·X/100 = −1.2·W·X/100`. At the `200%` stop that is
-/// `−2.4W`; at `−200%`, `+2.4W`. [ShimmerMotion.fromPercent] / [ShimmerMotion.toPercent]
+/// `−2.4W`; at `−200%`, `+2.4W`. [LoadingShimmerMotion.fromPercent] / [LoadingShimmerMotion.toPercent]
 /// carry the two stops; only the tile factor differs from the utility they
 /// belong to.
 class AgentStatusText extends StatelessWidget {
   const AgentStatusText({super.key, required this.child});
 
-  /// `animation: 2.6s …` — [MotionDurations.shimmerText], which the
+  /// `animation: pulls-shimmer 2.6s …` — [MotionDurations.shimmerText], which the
   /// foundation already carries under exactly this name.
   static const Duration period = MotionDurations.shimmerText;
 
@@ -363,14 +363,14 @@ class AgentStatusText extends StatelessWidget {
 
   /// The tile's left edge, in the box's own coordinates, at linear progress [t].
   ///
-  /// `--ease-in-out` is applied here, exactly as [ShimmerMotion.offsetAt] applies
+  /// `--ease-in-out` is applied here, exactly as [LoadingShimmerMotion.offsetAt] applies
   /// its own curve, so a probe and the paint cannot disagree about where the
   /// band is.
   static double offsetAt(double t, double width) {
     final double eased = MotionCurves.move.transform(t.clamp(0.0, 1.0));
     final double percent =
-        ShimmerMotion.fromPercent +
-        (ShimmerMotion.toPercent - ShimmerMotion.fromPercent) *
+        LoadingShimmerMotion.fromPercent +
+        (LoadingShimmerMotion.toPercent - LoadingShimmerMotion.fromPercent) *
             eased;
     return width * (1 - tileFactor) * percent;
   }

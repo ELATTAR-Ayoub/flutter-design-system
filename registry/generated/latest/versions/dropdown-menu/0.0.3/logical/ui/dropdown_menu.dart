@@ -208,7 +208,7 @@ class _DropdownMenuState extends State<DropdownMenu> {
       align: widget.align,
       sideOffset: DropdownMenu.sideOffset,
       origin: PopoverAnchorMode.corner,
-      slideSides: PopoverSide.values.toSet(),
+      slideSides: MenuMotion.slideSides,
       onDismiss: _close,
       anchor: MenuPointerDown(
         enabled: widget.enabled,

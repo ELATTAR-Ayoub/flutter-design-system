@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/voice_indicator.dart",
       "target": "@ui/voice_indicator.dart",
-      "sha256": "2f3c3b4344be47cf2bbac99ab13ea75423cc95bce8ffcf20bf3b4eb4b96f5fa8"
+      "sha256": "1f71111fef602636df6e631a8d9fdce076902ac627e59a898a072547bb8a61be"
     }
   ],
   "registryDependencies": [

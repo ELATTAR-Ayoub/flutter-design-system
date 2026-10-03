@@ -66,7 +66,6 @@ import './button.dart';
 import './dialog.dart';
 import './icon.dart';
 import './icon_paths.g.dart';
-import './open_transition.dart';
 import './tooltip.dart';
 
 /// `ICON` — one glyph per `AttachmentKind`.

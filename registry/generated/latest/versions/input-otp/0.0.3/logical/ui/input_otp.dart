@@ -85,7 +85,8 @@ const double _invalidRingAlphaDark = 0.40;
 /// transparent there and read only by their hairlines.
 const double _slotFillAlphaDark = 0.30;
 
-/// The caret's own keyframes, as a fraction of the cycle:
+/// `@keyframes pulls-caret` (globals.css L2454–2457), as a fraction of the
+/// cycle:
 ///
 /// | % | opacity |
 /// |---|---|
@@ -94,8 +95,10 @@ const double _slotFillAlphaDark = 0.30;
 ///
 /// A **1000ms square wave — 500ms on, 500ms off, hard cut, no fade.**
 /// `steps(1, end)` makes every gap a hold and the 50 / 50.01 pair makes the cut
-/// unambiguous even without it, so [CaretMotion.visibleAt] models it as a
-/// discrete lookup rather than as a tween through a step curve.
+/// unambiguous even without it, so this is modelled as a discrete lookup rather
+/// than as a tween through a step curve — the shape `TextRevealMotion.frameAt` already
+/// established for a table that never interpolates.
+const double _caretLitFraction = 0.5;
 
 /// A six-digit verification field: painted boxes over one hidden input.
 class InputOtp extends StatefulWidget {
@@ -607,17 +610,15 @@ class _FakeCaret extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeTokens theme = ThemeScope.of(context);
     return KeyframePlayer(
-      duration: CaretMotion.duration,
-      repeat: CaretMotion.loops,
+      duration: MotionDurations.caret,
+      repeat: true,
       // No fill mode is declared on `anim-caret`, so under reduced motion the
       // caret reverts to the element's own resting style — **opacity 1, steady,
       // visible** (inputs-map §6.3). `KeyframeFill.none` freezes the player at
       // stop 0, which is exactly that.
       fill: KeyframeFill.none,
-      builder: (BuildContext context, double t, Widget? child) => Opacity(
-        opacity: CaretMotion.visibleAt(t) ? 1 : 0,
-        child: child,
-      ),
+      builder: (BuildContext context, double t, Widget? child) =>
+          Opacity(opacity: t < _caretLitFraction ? 1 : 0, child: child),
       child: SizedBox(
         // `w-px` — one logical pixel, not one hairline token: the caret is
         // a rule the stylesheet sizes in `px` directly.

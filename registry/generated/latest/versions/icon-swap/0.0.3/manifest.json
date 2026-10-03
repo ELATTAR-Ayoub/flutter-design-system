@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/icon_swap.dart",
       "target": "@ui/icon_swap.dart",
-      "sha256": "e4bc263dc528bf9a7595f8691848d92d81d018da00ba6a4c3df5aa0b2f9f619d"
+      "sha256": "facbb2f83a03363f866cd05aa0590350ffa50c0325b59fb6ba1bfc5e5eb735a3"
     }
   ],
   "registryDependencies": [

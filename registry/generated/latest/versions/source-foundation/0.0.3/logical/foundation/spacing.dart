@@ -15,20 +15,20 @@ import 'dart:ui' show Size;
 /// is 24px.
 double space(num n) => n.toDouble() * 4.0;
 
-/// The measures the shell and its pages are built on.
+/// The measures the shell and its pages are built on — globals.css L228–322.
 ///
 /// These are the widths that are neither a component's own size nor a fraction
 /// of the viewport; each is a `--width-*` / `--height-*` token in the reference.
 class LayoutWidths {
-  /// `--width-shell: 1680px`. The outer frame the sidebar
+  /// `--width-shell: 1680px` — globals.css L228. The outer frame the sidebar
   /// and the main column share.
   static const double shell = 1680;
 
-  /// `--width-content: 1080px`. The documentation reading
+  /// `--width-content: 1080px` — globals.css L229. The documentation reading
   /// column inside the shell, held to roughly 90 characters at body size.
   static const double content = 1080;
 
-  /// `--width-page: 1200px`. The cap for customer-facing
+  /// `--width-page: 1200px` — globals.css L244. The cap for customer-facing
   /// pages.
   ///
   /// DOCUMENTED DRIFT: `/design-system/spacing` has described this measure in
@@ -36,11 +36,11 @@ class LayoutWidths {
   /// ships as written and the token renders 1200; both sides are kept.
   static const double page = 1200;
 
-  /// `--width-prose: 720px`. A column carrying nothing but
+  /// `--width-prose: 720px` — globals.css L245. A column carrying nothing but
   /// sentences. Deliberately not interchangeable with [content].
   static const double prose = 720;
 
-  /// `--width-rail: 15rem` = 240px. The reading rail: a
+  /// `--width-rail: 15rem` = 240px — globals.css L251. The reading rail: a
   /// table of contents, an anchor list, an article's metadata column.
   static const double rail = 240;
 
@@ -55,15 +55,15 @@ class LayoutWidths {
   /// this width, not [content], to match that reference.
   static const double article = 640;
 
-  /// `--width-sidebar: 16rem` = 256px. The app shell's
+  /// `--width-sidebar: 16rem` = 256px — globals.css L320. The app shell's
   /// navigation panel.
   static const double sidebar = 256;
 
-  /// `--width-sidebar-icon: 3rem` = 48px. The collapsed
+  /// `--width-sidebar-icon: 3rem` = 48px — globals.css L322. The collapsed
   /// rail; also the hit-target floor.
   static const double sidebarCollapsed = 48;
 
-  /// `--width-sidebar-mobile: 18rem` = 288px. Wider than
+  /// `--width-sidebar-mobile: 18rem` = 288px — globals.css L321. Wider than
   /// [sidebar] on purpose: a sheet has no rail beside it competing for the eye.
   static const double sidebarMobile = 288;
 }
@@ -71,7 +71,7 @@ class LayoutWidths {
 class LayoutHeights {
   const LayoutHeights._();
 
-  /// `--height-site-header: 4rem` = 64px.
+  /// `--height-site-header: 4rem` = 64px — globals.css L290.
   static const double siteHeader = 64;
 }
 
@@ -103,7 +103,7 @@ class ScrollOffsets {
   static const double anchoredHeading = LayoutHeights.siteHeader + 32;
 }
 
-/// The corner ladder.
+/// The corner ladder — globals.css L324–339.
 ///
 /// Both theme blocks also set `--radius: 10px` (L605 / L814), which is
 /// numerically [md]; it is exposed per theme as `ThemeTokens.radius`.
@@ -150,7 +150,7 @@ class Radii {
   /// what `calc()` says. A frozen literal would silently stop tracking.
   ///
   /// The base is [md] because `--radius` resolves to 10px in *both* theme
-  /// blocks — numerically the same 10 the
+  /// blocks (globals.css L605 / L814) — numerically the same 10 the
   /// `--radius-md` rung carries. [ThemeTokens.radius] is the per-theme reading
   /// of `--radius`; if the two themes ever disagree, that is what this should
   /// be derived from instead, and this getter is the one place to change.

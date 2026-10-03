@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/message_scroller.dart",
       "target": "@ui/message_scroller.dart",
-      "sha256": "1b2c0e073ead946ad31c4eddff6c34b6bf91a50b24bf8ffee3e63c56a169978f"
+      "sha256": "b2cb5b7439edd75e593aaa89b29fb76dc4f207300d996b524031167e23b7ca6e"
     }
   ],
   "registryDependencies": [

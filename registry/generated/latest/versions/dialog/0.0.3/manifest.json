@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/dialog.dart",
       "target": "@ui/dialog.dart",
-      "sha256": "1d3a374f2c855f1fbbc57d7b8cb60e3f7cdb6a02b708f3036482f264dc823658"
+      "sha256": "875fd16fd8edaef8fbe053846d40f71994c9686af22748d1925c887cb09e6589"
     }
   ],
   "registryDependencies": [

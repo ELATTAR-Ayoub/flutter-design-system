@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/dropdown_menu.dart",
       "target": "@ui/dropdown_menu.dart",
-      "sha256": "e3c00482f73d08ac43f7e75e1c21f6fc03d3aaa744251c882a980e070e350963"
+      "sha256": "05a59f15aea4f7edeaec6afef25dbe98958f3aea96d5786b148510f343431185"
     }
   ],
   "registryDependencies": [

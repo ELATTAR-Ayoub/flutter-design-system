@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/agent_avatar.dart",
       "target": "@ui/agent_avatar.dart",
-      "sha256": "af9f31aebdc02fa0b99157cfc9838f2f51171b694cebc2cd8ff52db7d278c789"
+      "sha256": "94e13258a17542457b86203aa2e9a9d9b5e1430a1a2b37a8451e02ad29c2f802"
     }
   ],
   "registryDependencies": [

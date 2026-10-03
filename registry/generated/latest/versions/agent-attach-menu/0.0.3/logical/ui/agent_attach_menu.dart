@@ -189,7 +189,7 @@ class _AttachMenuState extends State<_AttachMenu> {
       align: PopoverAlign.start,
       sideOffset: DropdownMenu.sideOffset,
       origin: PopoverAnchorMode.corner,
-      slideSides: PopoverSide.values.toSet(),
+      slideSides: MenuMotion.slideSides,
       onDismiss: _close,
       anchor: MenuPointerDown(
         enabled: !widget.disabled,

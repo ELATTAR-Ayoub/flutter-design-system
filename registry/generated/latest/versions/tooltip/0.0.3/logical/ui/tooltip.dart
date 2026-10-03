@@ -87,8 +87,9 @@ import '../../design_system/foundation/spacing.dart';
 import '../../design_system/foundation/theme.dart';
 import '../../design_system/foundation/typography.dart';
 import '../../design_system/foundation/theme_scope.dart';
-import './keyframes.dart';
-import './open_transition.dart';
+
+/// `zoom-in-95` / `zoom-out-95`.
+const double _zoom = 0.95;
 
 /// `TooltipContent side` — the two the corpus asks for.
 ///
@@ -151,6 +152,9 @@ class Tooltip extends StatefulWidget {
   /// `py-1.5`.
   static double get verticalPadding => space(1.5);
 
+  /// `slide-in-from-bottom-2` — two spacing units of travel.
+  static double get slide => space(2);
+
   /// How long a **tap**-opened label stays up on its own — 1.5s.
   ///
   /// The reference cannot supply this number: it has no touch path, so there is
@@ -158,8 +162,8 @@ class Tooltip extends StatefulWidget {
   /// `Tooltip._defaultShowDuration` is `1500ms` and is passed as `touchDelay`,
   /// which is exactly this quantity: how long a label lingers after a touch
   /// opened it. Taking the host platform's answer for a question the reference
-  /// never asked is `drawer.dart`'s own vaul curve argument one layer up — a
-  /// foreign default, adopted rather than invented.
+  /// never asked is [MotionCurves.balanced]'s argument one layer up — a foreign
+  /// default, adopted rather than invented.
   ///
   /// Spelled as ten beats of [MotionDurations.fast] rather than typed, because the
   /// literal belongs in `foundation/` and this file is not it. The two agree to
@@ -215,8 +219,7 @@ class _TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
     super.initState();
     _animation = AnimationController(
       vsync: this,
-      duration: OpenMotion.duration,
-      reverseDuration: CloseMotion.duration,
+      duration: MotionDurations.overlayEnter,
     );
   }
 
@@ -282,7 +285,10 @@ class _TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
     _open = true;
     _portal.show();
     _animation
-      ..duration = effectiveMotionDuration(context, OpenMotion.duration)
+      ..duration = effectiveMotionDuration(
+        context,
+        MotionDurations.overlayEnter,
+      )
       ..forward(from: 0);
   }
 
@@ -293,17 +299,10 @@ class _TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
     _open = false;
     _byTouch = false;
     if (!_portal.isShowing) return;
-    // `AnimationController.reverse()` prefers `reverseDuration` over
-    // `duration` whenever the former is non-null — and the constructor sets
-    // one (`CloseMotion.duration`, a fixed value) so a caller reading
-    // `_animation.duration` mid-close still sees the right number. Both have
-    // to be reassigned here, or a reduced-motion close ignores this
-    // computed duration and always reverses over the constructor's own
-    // fixed value.
-    final Duration closeDuration = effectiveMotionDuration(context, CloseMotion.duration);
-    _animation
-      ..duration = closeDuration
-      ..reverseDuration = closeDuration;
+    _animation.duration = effectiveMotionDuration(
+      context,
+      MotionDurations.overlayEnter,
+    );
     _animation.reverse().whenComplete(() {
       if (_animation.value != 0 || !mounted) return;
       _portal.hide();
@@ -347,8 +346,9 @@ class _TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
         child: IgnorePointer(
           child: CustomSingleChildLayout(
             delegate: _TooltipLayout(anchor: anchor, side: widget.side),
-            child: OpenTransition(
+            child: _TooltipTransition(
               animation: _animation,
+              side: widget.side,
               child: TooltipContent(label: widget.label, side: widget.side),
             ),
           ),
@@ -554,3 +554,52 @@ class _ArrowPainter extends CustomPainter {
       old.color != color || old.side != side;
 }
 
+/// `animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2` and its
+/// `animate-out` twin, minus the slide the twin does not have.
+class _TooltipTransition extends StatelessWidget {
+  const _TooltipTransition({
+    required this.animation,
+    required this.child,
+    this.side = TooltipSide.top,
+  });
+
+  final Animation<double> animation;
+
+  /// `data-[side=top]:slide-in-from-bottom-2` against
+  /// `data-[side=right]:slide-in-from-left-2` — the travel is always **toward**
+  /// the trigger, so the axis follows the side.
+  final TooltipSide side;
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: animation,
+    child: child,
+    builder: (BuildContext context, Widget? child) {
+      final double t = MotionCurves.enter.transform(
+        animation.value.clamp(0, 1),
+      );
+      final bool entering = animation.status != AnimationStatus.reverse;
+      final double travel = entering ? Tooltip.slide * (1 - t) : 0;
+      return Opacity(
+        opacity: t,
+        child: Transform.translate(
+          offset: switch (side) {
+            TooltipSide.top => Offset(0, travel),
+            TooltipSide.right => Offset(-travel, 0),
+          },
+          child: Transform.scale(
+            scale: _zoom + (1 - _zoom) * t,
+            // The edge of the box the trigger is on.
+            alignment: switch (side) {
+              TooltipSide.top => Alignment.bottomCenter,
+              TooltipSide.right => Alignment.centerLeft,
+            },
+            child: child,
+          ),
+        ),
+      );
+    },
+  );
+}

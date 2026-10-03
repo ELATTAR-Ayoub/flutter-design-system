@@ -16,11 +16,12 @@
 /// The motion is two tables and one composition, and this file owns only the
 /// composition:
 ///
-/// * the roll is [SwapRollMotion] — `@utility swap-roll`,
+/// * the roll is [ContentSwapMotion] — `@utility swap-roll` (globals.css L2265–2271),
 ///   `--duration-slow` on `--ease-spring`, applied to **transform and opacity
 ///   together**, 160% of the strip cell per step;
-/// * the squash is [ChangeMotion], worn by the **inner** span of the active
-///   cell only and delayed by [SwapRollMotion.squashDelay];
+/// * the squash is [StateChangeMotion] — `.anim-jelly`, `yuki-jelly 0.6s var(--ease-out)
+///   both` (L2365–2367), worn by the **inner** span of the active cell only and
+///   delayed by [ContentSwapMotion.squashDelay];
 /// * the composition is the timeline: `t=0` roll starts → `t=150` squash starts
 ///   → `t=400` roll settles → `t=750` squash ends.
 ///
@@ -108,7 +109,7 @@ class IconSwap extends StatefulWidget {
   /// A CSS percentage translate resolves against the translated element's own
   /// border box, and each cell is `inline-flex items-center justify-center`
   /// around a single icon, so the cell is glyph-sized and one step is
-  /// [SwapRollMotion.travelFor] of *that* — 25.6px at 16, 32px at 20.
+  /// [ContentSwapMotion.travelFor] of *that* — 25.6px at 16, 32px at 20.
   ///
   /// DIVERGENCE. The browser measures this; here it is declared. Passing a
   /// [cell] that disagrees with the glyph's real box changes the travel exactly
@@ -133,17 +134,17 @@ class _IconSwapState extends State<IconSwap> with TickerProviderStateMixin {
   /// 750ms and mapping the tail costs one division and leaves the widget with
   /// exactly two tickers, both of which a widget test can pump.
   static final Duration _squashRun =
-      SwapRollMotion.squashDelay + ChangeMotion.duration;
+      ContentSwapMotion.squashDelay + StateChangeMotion.duration;
 
-  /// Where ChangeMotion's own 0% sits on that clock — 150/750 = 0.2.
+  /// Where `yuki-jelly`'s own 0% sits on that clock — 150/750 = 0.2.
   static final double _squashStart =
-      SwapRollMotion.squashDelay.inMicroseconds / _squashRun.inMicroseconds;
+      ContentSwapMotion.squashDelay.inMicroseconds / _squashRun.inMicroseconds;
 
   /// The transform+opacity transition. Both properties, one clock, because the
   /// stylesheet declares them in one `transition`.
   late final AnimationController _roll = AnimationController(
     vsync: this,
-    duration: SwapRollMotion.duration,
+    duration: ContentSwapMotion.duration,
   );
 
   /// The delayed squash on the arriving glyph.
@@ -229,7 +230,7 @@ class _IconSwapState extends State<IconSwap> with TickerProviderStateMixin {
   /// Applies `prefers-reduced-motion` to both clocks.
   ///
   /// Supervisor ruling B13: reduced motion is *instant*, never *disabled*. The
-  /// blanket rule collapses `transition-duration` and
+  /// blanket rule (globals.css L2534–2544) collapses `transition-duration` and
   /// `animation-duration` to 0.01ms, so the swap still happens and still lands
   /// — on its final frame, on the frame it was asked for.
   ///
@@ -241,7 +242,7 @@ class _IconSwapState extends State<IconSwap> with TickerProviderStateMixin {
   void _readMotion() {
     _roll.duration = effectiveMotionDuration(
       context,
-      SwapRollMotion.duration,
+      ContentSwapMotion.duration,
     );
     _squash.duration = effectiveMotionDuration(context, _squashRun);
 
@@ -257,7 +258,7 @@ class _IconSwapState extends State<IconSwap> with TickerProviderStateMixin {
 
   /// `--ease-spring` applied to the roll's linear progress. Deliberately not
   /// clamped: values above 1 are the overshoot.
-  double get _rollT => SwapRollMotion.curve.transform(_roll.value);
+  double get _rollT => ContentSwapMotion.curve.transform(_roll.value);
 
   /// The strip's centre, in steps, at eased progress [t].
   double _strip(double t) => _from + (_to - _from) * t;
@@ -288,7 +289,7 @@ class _IconSwapState extends State<IconSwap> with TickerProviderStateMixin {
     for (int i = 0; i < widget.icons.length; i++) i == active ? 1 : 0,
   ];
 
-  /// ChangeMotion's own 0..1, read off the shared clock. Everything before
+  /// `yuki-jelly`'s own 0..1, read off the shared clock. Everything before
   /// [_squashStart] is the delay, which the `both` fill holds at stop 0.
   double get _jellyT =>
       clampDouble((_squash.value - _squashStart) / (1 - _squashStart), 0, 1);
@@ -299,11 +300,11 @@ class _IconSwapState extends State<IconSwap> with TickerProviderStateMixin {
     // the OS switch can flip between two frames of a running roll.
     _roll.duration = effectiveMotionDuration(
       context,
-      SwapRollMotion.duration,
+      ContentSwapMotion.duration,
     );
     _squash.duration = effectiveMotionDuration(context, _squashRun);
 
-    final double step = SwapRollMotion.travelFor(widget.cell);
+    final double step = ContentSwapMotion.travelFor(widget.cell);
 
     return SizedBox(
       // `relative inline-grid place-items-center overflow-hidden size-N` — the
@@ -353,7 +354,7 @@ class _IconSwapState extends State<IconSwap> with TickerProviderStateMixin {
   Widget _squashed(Widget icon) => AnimatedBuilder(
     animation: _squash,
     builder: (BuildContext context, Widget? child) {
-      final Offset scale = ChangeMotion.scale.transform(_jellyT);
+      final Offset scale = StateChangeMotion.scale.transform(_jellyT);
       return Transform.scale(scaleX: scale.dx, scaleY: scale.dy, child: child);
     },
     child: icon,

@@ -15,10 +15,14 @@
 /// load-bearing: without it the overshoot reads as content spilling out of the
 /// panel rather than the panel breathing."*
 ///
-/// The pair is ported onto [ExpandMotion]: [ExpandMotion.duration] and
-/// [ExpandMotion.curve] opening, [ExpandMotion.collapseDuration] and
-/// [ExpandMotion.collapseCurve] closing — height animates from 0 to the
-/// measured `--unfold-h`, opacity 0 to 1 alongside it.
+/// The keyframes themselves (`app/globals.css` L2396–2400, L2458–2465):
+///
+/// ```css
+/// @utility anim-unfold { animation: yuki-unfold var(--duration-jelly) var(--ease-spring) both; }
+/// @utility anim-fold   { animation: yuki-fold   var(--duration-base)  var(--ease-in-out) both; }
+/// @keyframes yuki-unfold { 0% { height: 0; opacity: 0 } 100% { height: var(--unfold-h); opacity: 1 } }
+/// @keyframes yuki-fold   { 0% { height: var(--unfold-h); opacity: 1 } 100% { height: 0; opacity: 0 } }
+/// ```
 ///
 /// Both were driven and sampled on the live reference (1440 × 900,
 /// 2026-08-16). Fifty milliseconds after a click the opening panel read
@@ -40,8 +44,8 @@ import 'package:flutter/widgets.dart'
         Table,
         TableColumnWidth;
 
+import '../../design_system/foundation/motion.dart';
 import '../../design_system/foundation/theme_scope.dart';
-import './keyframes.dart';
 
 /// The shared disclosure animation: `anim-unfold` opening, `anim-fold` closing.
 ///
@@ -72,21 +76,21 @@ class Unfold extends StatefulWidget {
 class _UnfoldState extends State<Unfold> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: ExpandMotion.duration,
-    reverseDuration: ExpandMotion.collapseDuration,
+    duration: MotionDurations.expand,
+    reverseDuration: MotionDurations.collapse,
     value: widget.open ? 1 : 0,
   );
 
   /// `--ease-spring` opening, `--ease-in-out` closing.
   ///
   /// [FlippedCurve] is what turns a forward easing into the same easing read
-  /// along a reversing controller: `1 − f(1 − t)`, which is the shape the
-  /// closing keyframe traces as it walks its own 0% → 100% while the
-  /// controller walks 1 → 0.
+  /// along a reversing controller: `1 − f(1 − t)`, which is the shape
+  /// `yuki-fold` traces as it walks its own 0% → 100% while the controller
+  /// walks 1 → 0.
   late final Animation<double> _curve = CurvedAnimation(
     parent: _controller,
-    curve: ExpandMotion.curve,
-    reverseCurve: FlippedCurve(ExpandMotion.collapseCurve),
+    curve: MotionCurves.emphasized,
+    reverseCurve: FlippedCurve(MotionCurves.move),
   );
 
   @override
@@ -95,11 +99,11 @@ class _UnfoldState extends State<Unfold> with SingleTickerProviderStateMixin {
     if (widget.open == old.open) return;
     _controller.duration = effectiveMotionDuration(
       context,
-      ExpandMotion.duration,
+      MotionDurations.expand,
     );
     _controller.reverseDuration = effectiveMotionDuration(
       context,
-      ExpandMotion.collapseDuration,
+      MotionDurations.collapse,
     );
     if (widget.open) {
       _controller.forward(from: 0);

@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/menubar.dart",
       "target": "@ui/menubar.dart",
-      "sha256": "c19c06e8815b380c3d221a8f094b397adb71adf54f910fdd0a52b335ef697328"
+      "sha256": "44bd8e8c64aa59cbc20b87389d1e313e0bca3559d49079aedfdcf63169e4c47c"
     }
   ],
   "registryDependencies": [

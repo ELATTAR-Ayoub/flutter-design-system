@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/active_indicator.dart",
       "target": "@ui/active_indicator.dart",
-      "sha256": "dc698fbae87613a24107fe9a1ec79359f3ebeece1f60bfd3e48ec0f44ada1c2f"
+      "sha256": "c1f0056625ccf475e415541d32aa7bd0c6b6fd9339a16dae16ef4340747a7ada"
     }
   ],
   "registryDependencies": [

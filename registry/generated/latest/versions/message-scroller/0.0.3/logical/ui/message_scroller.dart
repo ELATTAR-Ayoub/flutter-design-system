@@ -30,11 +30,8 @@
 ///   **38.4px** at this specimen's 320;
 /// * `animation-range: calc(100% - 96px) 100%` on `scroll(self y)` with
 ///   `animation-fill-mode: both` shrinks `F` from full to zero across the last
-///   **96px** of travel, on the CSS `ease-in-out` keyword — this file's own
-///   private curve, not [MotionCurves.move]: at 58.33% through the range the
-///   measured fade is 0.3588 of full, and `move` would give 0.284 at the same
-///   point — materially different, so the CSS keyword's own curve is kept
-///   local rather than snapped to the nearest token. See `_scrollFadeCurve`.
+///   **96px** of travel, on the CSS `ease-in-out` keyword
+///   ([MotionCurves.symmetric], distinct from the system movement curve).
 ///
 /// So the fade is at full height for the first 302 of this specimen's 398px of
 /// travel and closes over the last 96. [ScrollFade] reproduces exactly that,
@@ -220,8 +217,8 @@ class MessageScrollerController extends ChangeNotifier {
   ///
   /// Chrome, not the stylesheet, owns this timing. Measured
   /// (`ba2-chat-inter.js`): 100px settles in ~168ms, 398px in ~335ms — `√d` to
-  /// within a frame, so the duration is [MotionDurations.smoothScrollFrame] × `√distance` and
-  /// the shape is [MotionCurves.move].
+  /// within a frame, so the duration is [MotionDurations.frame] × `√distance` and
+  /// the shape is [MotionCurves.balanced].
   ///
   /// **Residual, recorded:** the fitted curve tracks the samples at the two
   /// ends and runs up to ~9% of the travel *behind* Chrome through the middle
@@ -236,8 +233,8 @@ class MessageScrollerController extends ChangeNotifier {
     notifyListeners();
     await scroll.position.animateTo(
       target,
-      duration: MotionDurations.smoothScrollFrame * math.sqrt(distance),
-      curve: MotionCurves.move,
+      duration: MotionDurations.frame * math.sqrt(distance),
+      curve: MotionCurves.balanced,
     );
     _autoscrolling = false;
     notifyListeners();
@@ -313,7 +310,7 @@ class MessageScrollerViewport extends StatefulWidget {
   static const double gutter = 10;
 
   /// What `scrollbar-width: thin` actually paints: an 8px track with a pill
-  /// thumb in `--border`.
+  /// thumb in `--border` (globals.css L2831–2851).
   static double get thumbThickness => space(2);
 
   /// `role="region" aria-label="Messages"` on the live element.
@@ -422,21 +419,6 @@ class _ViewportScrollBehavior extends ScrollBehavior {
   };
 }
 
-/// CSS's own `ease-in-out` — `cubic-bezier(0.42, 0, 0.58, 1)`.
-///
-/// A symmetric measured curve, kept local for the scroll-fade geometry where
-/// the system's primary [MotionCurves.move] would materially change the
-/// reveal: `animation: 1ms ease-in-out scroll-fade-reveal-b` names the CSS
-/// keyword, not `--ease-in-out`. The two are far apart — this one is much
-/// lazier in the middle — and the mask geometry is where it shows. Measured
-/// on the chat page's message scroller: with the reveal 58.33% through its
-/// 96px range the mask's remaining fade read **0.3588** of full, and
-/// `1 - Y(0.5833)` on this curve is 0.3563; [MotionCurves.move] would give
-/// 0.284 at the same point. Two more samples (75% → 0.1292, 87.5% → 0.0561)
-/// agree to within the sampler's slop. Same standing as `drawer.dart`'s
-/// `_vaulCurve` and `chart.dart`'s `_chartEaseOut`.
-const Cubic _scrollFadeCurve = Cubic(0.42, 0, 0.58, 1);
-
 /// `scroll-fade-b` — the bottom mask, driven by the scroll offset.
 ///
 /// See the library note for the derivation. The mask is a straight vertical
@@ -469,7 +451,7 @@ class ScrollFade extends StatelessWidget {
     if (max <= 0) return full;
     final double start = max - reveal;
     final double t = ((offset - start) / reveal).clamp(0.0, 1.0);
-    return full * (1 - _scrollFadeCurve.transform(t));
+    return full * (1 - MotionCurves.symmetric.transform(t));
   }
 
   @override

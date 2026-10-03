@@ -1,4 +1,4 @@
-/// `premium-surface` — the premium Button's surface,
+/// `premium-surface` — the premium Button's surface (`app/globals.css` L1948–2040),
 /// with `@keyframes value-foil-drift` (L1915–1928) and `@keyframes value-glint`
 /// (L1930–1946).
 ///
@@ -403,8 +403,8 @@ class PremiumSurface extends StatefulWidget {
   State<PremiumSurface> createState() => _FoilValueState();
 }
 
-/// One `value-glint` keyframe gap, on `--ease-in-out`. The same shape
-/// `active_indicator.dart` uses for its own arrival squash.
+/// One `value-glint` keyframe gap, on `--ease-in-out`. The shape
+/// `active_indicator.dart` uses for `yuki-jelly` (L257–262).
 TweenSequenceItem<double> _glintStep(double from, double to, double weight) =>
     TweenSequenceItem<double>(
       tween: Tween<double>(

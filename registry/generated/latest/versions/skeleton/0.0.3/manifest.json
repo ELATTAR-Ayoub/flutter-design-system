@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/skeleton.dart",
       "target": "@ui/skeleton.dart",
-      "sha256": "61f92c5f7221f7bfaac0e5652cf9b50e1eafc91190cb5c36482e19be44201bdb"
+      "sha256": "838d461d68bebf989f5097ae1c7d484fe1cef75a3083972e68c4fcfeef2e1605"
     }
   ],
   "registryDependencies": [

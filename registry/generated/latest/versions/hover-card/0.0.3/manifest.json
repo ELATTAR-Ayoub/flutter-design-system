@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/hover_card.dart",
       "target": "@ui/hover_card.dart",
-      "sha256": "8b266903fa3deeaf6904431021576957b109312f52e0d282806cdbebf5213187"
+      "sha256": "3a39e9a14dd0dfa0e32a5a5e401c9d85b624249d309b6863498168b862b6cfb7"
     }
   ],
   "registryDependencies": [

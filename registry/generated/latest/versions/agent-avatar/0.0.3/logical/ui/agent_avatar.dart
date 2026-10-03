@@ -47,9 +47,8 @@
 ///
 /// ## Reduced motion is stated, not inherited
 ///
-/// The stylesheet writes the reduced-motion rule out by hand rather than
-/// letting the blanket `prefers-reduced-motion` collapse apply, because
-/// `appear` and `drop`
+/// globals.css L3195–3215 writes the rule out by hand rather than letting the
+/// blanket `prefers-reduced-motion` collapse apply, because `appear` and `drop`
 /// **end at opacity 0** and the blanket rule would freeze half these scenes to
 /// nothing at all. The explicit rule is `animation: none; opacity: 1;
 /// transform: none`, and [CubeScene.frozen] is exactly that: every cube fully
@@ -216,9 +215,9 @@ class AgentCube {
 
 // ── CLOSED: the twelve `--agent-cube-*` tokens ──────────────────────────────
 // `AgentCubeTokens` used to be declared here, under a standing FOLLOW-UP that
-// said exactly why it should not be: the twelve customs are declared in the
-// theme blocks beside every other token, and `foundation/theme.dart` was
-// not the avatar lane's file to open.
+// said exactly why it should not be: the twelve customs are declared in the two
+// theme blocks (globals.css L720–731 light, L914–932 dark) beside every other
+// token, and `foundation/theme.dart` was not the avatar lane's file to open.
 // This pass is the opening. The class is `ThemeTokens`'s neighbour now and the
 // tokens ride [ThemeTokens.cube]; `AgentCubeTokens.light` / `.dark` are
 // unchanged, so nothing that spends them had to move with them.
@@ -325,7 +324,7 @@ class AgentCubeFaces {
 
 /* ── C · the fourteen keyframes ──────────────────────────────────────────── */
 
-/// `@keyframes agent-cube-*`.
+/// `@keyframes agent-cube-*` — globals.css L3109–3177.
 ///
 /// *"Easing is always var(--ease-in-out) except spin3d, which is linear — a
 /// rotating cube that eases looks like it is struggling, same as a spinner."*
@@ -1158,8 +1157,8 @@ class CubeScene extends StatelessWidget {
   /// Seconds of wall clock since the scene mounted.
   final double elapsed;
 
-  /// The stylesheet's own reduced-motion rule — *"no animation, everything
-  /// visible, no transforms."*
+  /// globals.css L3195–3215 — *"no animation, everything visible, no
+  /// transforms."*
   final bool frozen;
 
   @override

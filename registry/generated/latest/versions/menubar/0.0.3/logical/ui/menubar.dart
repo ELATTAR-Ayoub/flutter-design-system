@@ -239,7 +239,7 @@ class _MenubarTriggerState extends State<_MenubarTrigger> {
       align: PopoverAlign.start,
       sideOffset: Menubar.sideOffset,
       origin: PopoverAnchorMode.corner,
-      slideSides: PopoverSide.values.toSet(),
+      slideSides: MenuMotion.slideSides,
       // Drift 2 — the one content in the family with no `animate-out`.
       animateOut: false,
       // `modal={false}` — Radix's menubar is non-modal, which is the whole

@@ -53,8 +53,8 @@ import 'package:flutter/widgets.dart'
         TableColumnWidth;
 
 import '../../design_system/foundation/date_format.dart';
+import '../../design_system/foundation/motion.dart';
 import './icon_paths.g.dart';
-import './keyframes.dart';
 
 /* ── Attachments ─────────────────────────────────────────────────────────────
  *
@@ -1065,22 +1065,20 @@ enum SwitchPhase {
 /// still on screen, swap at the point where nothing is legible anyway, then
 /// blur in over [inDuration].
 ///
-/// Measured on the live reference (`ag-h-inter.js` §6): the blur-out ran from
-/// t≈112ms after the click to t≈374, then blur-in from 374 to ≈586 — 150ms
-/// out, 250ms in. Ported onto the fourteen: [ExitMotion.duration] (150ms,
-/// unchanged) out, then [EnterMotion.duration] (400ms) in — the swap is now
-/// content leaving and content arriving, not a bespoke blur pair.
-class TranscriptSwitchController extends ChangeNotifier {
-  TranscriptSwitchController({required this.open});
+/// Measured on the reference (`ag-h-inter.js` §6): `pulls-blur-out` runs from
+/// t≈112ms after the click to t≈374, then `pulls-blur-in` from 374 to ≈586 —
+/// 150ms out, 250ms in, exactly the two duration tokens named below.
+class BlurSwitchController extends ChangeNotifier {
+  BlurSwitchController({required this.open});
 
   /// The store call. Made at the darkest point of the transition.
   final void Function(String id) open;
 
-  /// [ExitMotion.duration].
-  static Duration get outDuration => ExitMotion.duration;
+  /// `anim-blur-out` — `--duration-fast`.
+  static Duration get outDuration => MotionDurations.fast;
 
-  /// [EnterMotion.duration].
-  static Duration get inDuration => EnterMotion.duration;
+  /// `anim-blur-in` — `--duration-base`.
+  static Duration get inDuration => MotionDurations.normal;
 
   SwitchPhase _phase = SwitchPhase.idle;
   SwitchPhase get phase => _phase;

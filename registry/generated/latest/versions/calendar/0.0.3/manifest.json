@@ -9,7 +9,7 @@
     {
       "source": "lib/src/components/ui/calendar.dart",
       "target": "@ui/calendar.dart",
-      "sha256": "2a6593e5e04b2c1a8d178e45c6846e94c0172c5efafefbe360c388045536a3c1"
+      "sha256": "940ba433d9e0d65be13776188432cc2d828276ec78acba7b3eba5498c5833874"
     }
   ],
   "registryDependencies": [

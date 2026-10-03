@@ -517,8 +517,8 @@ class _MicButton extends StatefulWidget {
 
 class _MicButtonState extends State<_MicButton>
     with SingleTickerProviderStateMixin {
-  /// [PulseMotion] — the live-status ring, over `MotionDurations.pulseLive`
-  /// (2s) on `MotionCurves.move`, forever.
+  /// `anim-pulse-live { animation: pulls-pulse-live 2s var(--ease-in-out)
+  /// infinite }` — globals.css L2354.
   late final AnimationController _pulse = AnimationController(
     vsync: this,
     duration: MotionDurations.pulseLive,

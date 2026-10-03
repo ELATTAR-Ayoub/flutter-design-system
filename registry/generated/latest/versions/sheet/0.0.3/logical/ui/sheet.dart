@@ -6,12 +6,12 @@
 ///
 /// Motion comes from two places at once, and both are transcribed here:
 /// the `tw-animate-css` utilities on the element (`fade-in-0`,
-/// `slide-in-from-left-10`) supply the *shape* of the animation, and an
-/// unlayered bridge rule supplies its *timing* —
+/// `slide-in-from-left-10`) supply the *shape* of the animation, and the
+/// unlayered bridge at globals.css L2181–2185 supplies its *timing* —
 /// `[class*="animate-in"], [class*="animate-out"] { --tw-duration:
 /// var(--duration-overlay); --tw-ease: var(--ease-out) }`, which is what makes
-/// every overlay in the system run [MotionDurations.overlayEnter] (320ms) on
-/// `--ease-out` instead of the library's stock 150ms `ease`.
+/// every overlay in the system run 320ms on `--ease-out` instead of the
+/// library's stock 150ms `ease`.
 library;
 
 import 'dart:ui' as ui;
@@ -188,7 +188,7 @@ class _LeftSheetRoute extends PopupRoute<void> {
   /// reads `exit var(--tw-animation-duration, var(--tw-duration, .15s))
   /// var(--tw-ease, ease) …`.
   @override
-  Duration get reverseTransitionDuration => MotionDurations.overlayEnter;
+  Duration get reverseTransitionDuration => MotionDurations.overlayExit;
 
   @override
   bool get barrierDismissible => true;
@@ -357,7 +357,7 @@ class SheetOverlay extends StatelessWidget {
     clampToViewport: false,
     // The sheet's own clock, both ways: `--duration-overlay`.
     enterDuration: MotionDurations.overlayEnter,
-    exitDuration: MotionDurations.overlayEnter,
+    exitDuration: MotionDurations.overlayExit,
     transition:
         (BuildContext context, Animation<double> animation, Widget child) =>
             SheetTransition(animation: animation, side: side, child: child),

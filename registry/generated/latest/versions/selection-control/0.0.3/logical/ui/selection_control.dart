@@ -252,10 +252,10 @@ class _JellyReplayState extends State<StateChangeFeedback> {
     return KeyedSubtree(
       key: ValueKey<int>(_run),
       child: KeyframePlayer(
-        duration: ChangeMotion.duration,
-        fill: ChangeMotion.fill,
+        duration: StateChangeMotion.duration,
+        fill: StateChangeMotion.fill,
         builder: (BuildContext context, double t, Widget? child) {
-          final Offset scale = ChangeMotion.scale.transform(t);
+          final Offset scale = StateChangeMotion.scale.transform(t);
           return Transform(
             // `transform-origin` is untouched, so the squash pivots on the
             // control's own centre.
