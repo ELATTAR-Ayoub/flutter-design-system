@@ -25,11 +25,12 @@
     "icon",
     "input",
     "item",
-    "surface",
+    "keyframes",
     "menu",
     "popover",
     "source-foundation",
-    "spinner"
+    "spinner",
+    "surface"
   ],
   "semanticDependencies": [
     "agent-core",

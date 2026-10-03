@@ -17,6 +17,7 @@
     "dialog",
     "icon",
     "icon-swap",
+    "keyframes",
     "source-foundation"
   ],
   "semanticDependencies": [

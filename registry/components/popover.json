@@ -13,8 +13,9 @@
     }
   ],
   "registryDependencies": [
-    "surface",
-    "source-foundation"
+    "keyframes",
+    "source-foundation",
+    "surface"
   ],
   "semanticDependencies": [
     "surface"

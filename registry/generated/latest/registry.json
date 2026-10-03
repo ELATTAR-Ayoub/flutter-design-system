@@ -158,6 +158,7 @@
         "button",
         "dialog",
         "icon",
+        "keyframes",
         "source-foundation",
         "tooltip"
       ],
@@ -336,6 +337,7 @@
       ],
       "registryDependencies": [
         "icon",
+        "keyframes",
         "source-foundation"
       ],
       "semanticDependencies": [
@@ -415,11 +417,12 @@
         "icon",
         "input",
         "item",
-        "surface",
+        "keyframes",
         "menu",
         "popover",
         "source-foundation",
-        "spinner"
+        "spinner",
+        "surface"
       ],
       "semanticDependencies": [
         "agent-core",
@@ -467,6 +470,7 @@
         "agent-face",
         "button",
         "dialog",
+        "keyframes",
         "source-foundation"
       ],
       "semanticDependencies": [
@@ -633,8 +637,9 @@
       "registryDependencies": [
         "button",
         "dialog",
-        "surface",
+        "keyframes",
         "source-foundation",
+        "surface",
         "tooltip"
       ],
       "semanticDependencies": [
@@ -726,6 +731,7 @@
         "dialog",
         "icon",
         "icon-swap",
+        "keyframes",
         "source-foundation"
       ],
       "semanticDependencies": [
@@ -1219,6 +1225,7 @@
         }
       ],
       "registryDependencies": [
+        "keyframes",
         "source-foundation"
       ],
       "semanticDependencies": [],
@@ -1386,8 +1393,9 @@
       "registryDependencies": [
         "button",
         "icon",
-        "surface",
-        "source-foundation"
+        "keyframes",
+        "source-foundation",
+        "surface"
       ],
       "semanticDependencies": [
         "button",
@@ -1694,6 +1702,7 @@
         }
       ],
       "registryDependencies": [
+        "keyframes",
         "popover",
         "source-foundation"
       ],
@@ -2299,8 +2308,9 @@
         }
       ],
       "registryDependencies": [
-        "surface",
-        "source-foundation"
+        "keyframes",
+        "source-foundation",
+        "surface"
       ],
       "semanticDependencies": [
         "surface"
@@ -3251,6 +3261,7 @@
         }
       ],
       "registryDependencies": [
+        "keyframes",
         "source-foundation"
       ],
       "semanticDependencies": [],

@@ -15,8 +15,9 @@
   "registryDependencies": [
     "button",
     "icon",
-    "surface",
-    "source-foundation"
+    "keyframes",
+    "source-foundation",
+    "surface"
   ],
   "semanticDependencies": [
     "button",

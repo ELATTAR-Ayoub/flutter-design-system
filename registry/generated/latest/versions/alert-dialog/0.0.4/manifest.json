@@ -15,8 +15,9 @@
   "registryDependencies": [
     "button",
     "dialog",
-    "surface",
+    "keyframes",
     "source-foundation",
+    "surface",
     "tooltip"
   ],
   "semanticDependencies": [
